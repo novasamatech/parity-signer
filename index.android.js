@@ -4,7 +4,7 @@
  * @flow
  */
 
-import { AppRegistry } from 'react-native';
-import App from './app.js';
+import { AppRegistry } from 'react-native'
+import App from './src/components/App'
 
-AppRegistry.registerComponent('NativeSigner', () => App);
+AppRegistry.registerComponent('NativeSigner', () => App)

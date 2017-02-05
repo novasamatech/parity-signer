@@ -5,6 +5,6 @@
  */
 
 import { AppRegistry } from 'react-native'
-import App from './app'
+import App from './src/components/App'
 
 AppRegistry.registerComponent('NativeSigner', () => App)
