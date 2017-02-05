@@ -8,9 +8,13 @@ import {
 import Camera from 'react-native-camera';
 
 export default class Scanner extends Component {
+  static propTypes = {
+    onBarCodeRead: PropTypes.func.isRequired,
+  }
+
   render() {
     return (
-      <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.camera}>
+      <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
         <View style={styles.rectangleContainer}>
           <View style={styles.rectangle}/>
         </View>
@@ -19,13 +23,10 @@ export default class Scanner extends Component {
   }
 }
 
-Scanner.propTypes = {
-  onBarCodeRead: PropTypes.func.isRequired,
-}
-
 const styles = StyleSheet.create({
-  camera: {
+  view: {
     flex: 1,
+    marginTop: 60,
     marginBottom: 50,
   },
 
