@@ -7,6 +7,7 @@ import reducers from '../reducers'
 import TabIcon from './TabIcon'
 import QrScanner from '../containers/QrScanner'
 import Accounts from '../containers/Accounts'
+import NewAccount from '../containers/NewAccount'
 
 const ConnectedRouter = connect()(Router)
 const store = createStore(reducers)
@@ -30,7 +31,7 @@ const scenes = Actions.create(
         />
         <Scene
           key='add'
-          component={View}
+          component={NewAccount}
           title='Add Account'
         />
       </Scene>

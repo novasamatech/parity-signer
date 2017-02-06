@@ -13,8 +13,7 @@
     "react-native-router-flux": "^3.37.0",
     "react-native-tabs": "^1.0.9",
     "react-redux": "^5.0.2",
-    "redux": "^3.6.0",
-    "sjcl": "^1.0.6"
+    "redux": "^3.6.0"
   },
   "devDependencies": {
     "babel-jest": "18.0.0",
