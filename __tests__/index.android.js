@@ -1,12 +1,12 @@
 import React from 'react';
-import { View } from 'react-native'
-import Index from '../index.android.js';
+import 'react-native'
+import App from '../src/components/App'
 
 // Note: test renderer must be required after react-native.
 import renderer from 'react-test-renderer';
 
 it('renders correctly', () => {
   const tree = renderer.create(
-    <View/>
+    <App/>
   )
 });
