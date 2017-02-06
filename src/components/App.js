@@ -15,8 +15,25 @@ const scenes = Actions.create(
   <Scene key='root'>
     <Scene key='tabs' tabs>
       <Scene key='send' component={View} title='Send TX' icon={TabIcon}/>
-      <Scene key='scan' component={QrScanner} title='Scan QR' icon={TabIcon} initial={true}/>
-      <Scene key='accounts' component={Accounts} title='Accounts' icon={TabIcon}/>
+      <Scene key='scan' component={QrScanner} title='Scan QR' icon={TabIcon} initial/>
+      <Scene
+        key='accounts'
+        title='Accounts'
+        icon={TabIcon}
+      >
+        <Scene
+          key='accountsList'
+          title='Accounts'
+          component={Accounts}
+          rightTitle="Add"
+          onRight={() => Actions.add()}
+        />
+        <Scene
+          key='add'
+          component={View}
+          title='Add Account'
+        />
+      </Scene>
     </Scene>
   </Scene>
 )
