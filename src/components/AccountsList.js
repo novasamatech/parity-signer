@@ -15,6 +15,12 @@ export default class AccountsList extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows(nextProps.accounts)
+    })
+  }
+
   render() {
     return (
       <ListView

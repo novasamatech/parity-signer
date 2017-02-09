@@ -1,19 +1,26 @@
 import React, { Component } from 'react'
 import { View, Text, Button, StyleSheet } from 'react-native'
+import { connect } from 'react-redux'
+import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
 import NewAccountInput from '../components/NewAccountInput'
 import { words } from '../actions/random'
 import { keypairFromPhrase, toAddress } from '../actions/crypto'
+import { addAccount } from '../actions/accounts'
 
-//const addAccount = (dispatch) => {
-  //return {
-    //onAddAccount: (keypair) => {
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addAccount: (keypair) => {
+      const address = toAddress(keypair)
+      dispatch(addAccount({
+        address: address
+      }))
+      Actions.pop()
+    }
+  }
+}
 
-    //}
-  //}
-//}
-
-export default class NewAccount extends Component {
+export class NewAccount extends Component {
   constructor(props) {
     super(props)
 
@@ -34,7 +41,7 @@ export default class NewAccount extends Component {
         }/>
         <Text>0x{toAddress(this.state.keypair)}</Text>
         <Button
-          onPress={() => {}}
+          onPress={() => this.props.addAccount(this.state.keypair)}
           title="Add Account"
           color="#841584"
           accessibilityLabel="Press to add new account"
@@ -52,3 +59,9 @@ const styles = StyleSheet.create({
     padding: 10
   },
 })
+
+export default connect(
+  undefined,
+  mapDispatchToProps
+)(NewAccount)
+
