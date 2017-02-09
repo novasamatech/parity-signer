@@ -31,7 +31,7 @@ export default class NewAccountInput extends Component {
           this.props.onChangeText(text)
         }}
         value={this.state.text}
-        maxLength={100}
+        maxLength={240}
       />
     )
   }
