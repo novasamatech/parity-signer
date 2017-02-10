@@ -1,10 +1,7 @@
 'use strict';
 
 import React, { Component, PropTypes } from 'react'
-import {
-  StyleSheet,
-  View
-} from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Camera from 'react-native-camera';
 
 export default class Scanner extends Component {

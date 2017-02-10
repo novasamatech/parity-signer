@@ -6,6 +6,7 @@ import { Actions, ActionConst, Router, Scene } from 'react-native-router-flux'
 import reducers from '../reducers'
 import TabIcon from './TabIcon'
 import QrScanner from '../containers/QrScanner'
+import Signer from '../containers/Signer'
 import Accounts from '../containers/Accounts'
 import NewAccount from '../containers/NewAccount'
 
@@ -16,24 +17,13 @@ const scenes = Actions.create(
   <Scene key='root'>
     <Scene key='tabs' tabs>
       <Scene key='send' component={View} title='Send TX' icon={TabIcon}/>
-      <Scene key='scan' component={QrScanner} title='Scan QR' icon={TabIcon} initial/>
-      <Scene
-        key='accounts'
-        title='Accounts'
-        icon={TabIcon}
-      >
-        <Scene
-          key='accountsList'
-          title='Accounts'
-          component={Accounts}
-          rightTitle="Add"
-          onRight={() => Actions.add()}
-        />
-        <Scene
-          key='add'
-          component={NewAccount}
-          title='Add Account'
-        />
+      <Scene key='mid' title='Scan QR' initial icon={TabIcon}>
+        <Scene key='scan' component={QrScanner} title='Scan QR'/>
+        <Scene key='signer' component={Signer} title='Sign Tx'/>
+      </Scene>
+      <Scene key='accounts' title='Accounts' icon={TabIcon}>
+        <Scene key='accountsList' title='Accounts' component={Accounts} rightTitle="Add" onRight={() => Actions.add()}/>
+        <Scene key='add' component={NewAccount} title='Add Account'/>
       </Scene>
     </Scene>
   </Scene>

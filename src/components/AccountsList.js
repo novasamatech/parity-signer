@@ -27,6 +27,7 @@ export default class AccountsList extends Component {
         style={styles.view}
         dataSource={this.state.dataSource}
         renderRow={(rowData) => <AccountsListRow text={rowData}/>}
+        enableEmptySections={true}
       />
     )
   }
