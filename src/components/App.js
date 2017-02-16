@@ -9,20 +9,34 @@ import QrScanner from '../containers/QrScanner'
 import Signer from '../containers/Signer'
 import Accounts from '../containers/Accounts'
 import NewAccount from '../containers/NewAccount'
+import Send from '../components/Send'
 
 const ConnectedRouter = connect()(Router)
 const store = createStore(reducers)
 
+const styles = StyleSheet.create({
+  tabbar: {
+    backgroundColor: '#343E48',
+  },
+  navibar: {
+    backgroundColor: '#343E48',
+  },
+  navibarTitle: {
+    color: 'white'
+  }
+})
+
 const scenes = Actions.create(
   <Scene key='root'>
-    <Scene key='tabs' tabs>
-      <Scene key='send' component={View} title='Send TX' icon={TabIcon}/>
-      <Scene key='mid' title='Scan QR' initial icon={TabIcon}>
+    <Scene key='tabs' tabs style={styles.tabbar}>
+      <Scene key='send' component={Send} title='Send TX' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}/>
+      <Scene key='mid' title='Scan QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         <Scene key='scan' component={QrScanner} title='Scan QR'/>
         <Scene key='signer' component={Signer} title='Sign Tx'/>
       </Scene>
-      <Scene key='accounts' title='Accounts' icon={TabIcon}>
-        <Scene key='accountsList' title='Accounts' component={Accounts} rightTitle="Add" onRight={() => Actions.add()}/>
+      <Scene key='accounts' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
+        <Scene key='accountsList' title='Accounts' component={Accounts} rightTitle="Add" onRight={() => Actions.add()}
+          rightButtonTextStyle={styles.navibarTitle}/>
         <Scene key='add' component={NewAccount} title='Add Account'/>
       </Scene>
     </Scene>
@@ -42,3 +56,4 @@ export default class App extends Component {
     )
   }
 }
+

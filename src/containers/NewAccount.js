@@ -36,14 +36,15 @@ export class NewAccount extends Component {
     var self = this;
     return (
       <View style={styles.view}>
+        <Text style={styles.hint}>brain wallet seed</Text>
         <NewAccountInput seed={this.state.seed} onChangeText={
           debounce((text) => self.setState({keypair: keypairFromPhrase(text)}), 100)
         }/>
-        <Text>0x{toAddress(this.state.keypair)}</Text>
+        <Text style={styles.hint} adjustsFontSizeToFit={true}>0x{toAddress(this.state.keypair)}</Text>
         <Button
           onPress={() => this.props.addAccount(this.state.keypair)}
           title="Add Account"
-          color="#841584"
+          color="green"
           accessibilityLabel="Press to add new account"
         />
       </View>
@@ -56,8 +57,11 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 60,
     marginBottom: 50,
-    padding: 10
+    padding: 20
   },
+  hint: {
+    marginBottom: 20,
+  }
 })
 
 export default connect(

@@ -8,11 +8,10 @@ export default class AccountsListRow extends Component {
 
   render() {
     return (
-      <TouchableHighlight>
-        <View>
-          <View style={styles.row}>
-            <Text style={styles.text}>{this.props.text}</Text>
-          </View>
+      <TouchableHighlight style={styles.row}>
+        <View style={{flexDirection: 'row'}}>
+          <View style={styles.square}/>
+          <Text style={styles.text} fontSize={16} ellipsizeMode="middle" numberOfLines={1}>0x{this.props.text}</Text>
         </View>
       </TouchableHighlight>
     )
@@ -22,11 +21,19 @@ export default class AccountsListRow extends Component {
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 10,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#F8F8F8',
+    borderBottomWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  square: {
+    height: 60,
+    width: 60,
+    backgroundColor: '#D8D8D8',
+    marginRight: 10,
   },
   text: {
-    flex: 1,
+    marginTop: 20,
+    width: 200,
+    //flex: 1,
   }
 })

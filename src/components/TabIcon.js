@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { Text } from 'react-native'
+import { Text, StyleSheet } from 'react-native'
 
 export default class TabIcon extends Component {
   static propTypes = {
@@ -8,7 +8,18 @@ export default class TabIcon extends Component {
 
   render() {
     return (
-      <Text style={{color: this.props.selected ? 'red' :'black'}}>{this.props.title}</Text>
+      <Text style={this.props.selected ? styles.selected: styles.normal}>{this.props.title}</Text>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  normal: {
+    color: 'white',
+  },
+  selected: {
+    fontWeight: 'bold',
+    color: 'green',
+  }
+})
+

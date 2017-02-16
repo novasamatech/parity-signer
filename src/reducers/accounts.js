@@ -1,6 +1,6 @@
 import { ADD_ACCOUNT } from '../constants/AccountActions'
 
-const initialAccounts = []
+const initialAccounts = [{address: 'dupa'}, {address: 'dupa2'}]
 
 export default function accounts(state = initialAccounts, action) {
   switch (action.type) {

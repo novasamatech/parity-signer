@@ -18,10 +18,11 @@ export default class NewAccountInput extends Component {
     return (
       <TextInput
         style={styles.input}
+        placeholder='the brain wallet seed'
         editable={true}
         multiline={true}
         autoFocus={true}
-        returnKeyType="default"
+        returnKeyType='default'
         numberOfLines={6}
         fontSize={16}
         onChangeText={(text) => {
@@ -39,8 +40,6 @@ export default class NewAccountInput extends Component {
 
 const styles = StyleSheet.create({
   input: {
-    borderColor: 'gray',
-    borderWidth: 1,
     height: 200,
     fontWeight: 'bold'
   },
