@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, Button, StyleSheet } from 'react-native'
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
@@ -10,10 +10,11 @@ import { addAccount } from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addAccount: (keypair) => {
-      const address = toAddress(keypair)
+    addAccount: (account) => {
+      const address = toAddress(account.keypair)
       dispatch(addAccount({
-        address: address
+        address: address,
+        name: account.name,
       }))
       Actions.pop()
     }
@@ -29,6 +30,7 @@ export class NewAccount extends Component {
     this.state = {
       seed: seed,
       keypair: keypairFromPhrase(seed),
+      name: '',
     }
   }
 
@@ -36,13 +38,29 @@ export class NewAccount extends Component {
     var self = this;
     return (
       <View style={styles.view}>
+        <Text style={styles.hint}>name</Text>
+        <TextInput
+          placeholder='My Account'
+          value={this.state.name}
+          style={styles.input}
+          editable={true}
+          multiline={false}
+          returnKeyType='next'
+          numberOfLines={1}
+          fontSize={16}
+          autoFocus={true}
+          onChangeText={(text) => {this.setState({name: text})}}
+        />
         <Text style={styles.hint}>brain wallet seed</Text>
         <NewAccountInput seed={this.state.seed} onChangeText={
           debounce((text) => self.setState({keypair: keypairFromPhrase(text)}), 100)
         }/>
         <Text style={styles.hint} adjustsFontSizeToFit={true}>0x{toAddress(this.state.keypair)}</Text>
         <Button
-          onPress={() => this.props.addAccount(this.state.keypair)}
+          onPress={() => this.props.addAccount({
+            keypair: this.state.keypair,
+            name: this.state.name
+          })}
           title="Add Account"
           color="green"
           accessibilityLabel="Press to add new account"
@@ -60,6 +78,10 @@ const styles = StyleSheet.create({
     padding: 20
   },
   hint: {
+    marginBottom: 20,
+  },
+  input: {
+    height: 20,
     marginBottom: 20,
   }
 })

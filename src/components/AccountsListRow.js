@@ -3,15 +3,16 @@ import { TouchableHighlight, StyleSheet, View, Text } from 'react-native'
 
 export default class AccountsListRow extends Component {
   static propTypes = {
-    text: PropTypes.string.isRequired
+    text: PropTypes.string.isRequired,
+    onPress: PropTypes.func.isRequired,
   }
 
   render() {
     return (
-      <TouchableHighlight style={styles.row}>
+      <TouchableHighlight style={styles.row} onPress={this.props.onPress} underlayColor='#0004'>
         <View style={{flexDirection: 'row'}}>
           <View style={styles.square}/>
-          <Text style={styles.text} fontSize={16} ellipsizeMode="middle" numberOfLines={1}>0x{this.props.text}</Text>
+          <Text style={styles.text} fontSize={16} ellipsizeMode="middle" numberOfLines={1}>{this.props.text}</Text>
         </View>
       </TouchableHighlight>
     )

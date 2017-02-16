@@ -1,10 +1,13 @@
 import React, { Component, PropTypes } from 'react'
-import { Text, StyleSheet, ListView } from 'react-native'
+import { Text, StyleSheet, ListView, RecyclerViewBackedScrollView } from 'react-native'
 import AccountsListRow from './AccountsListRow'
 
 export default class AccountsList extends Component {
   static propTypes = {
-    accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
+    accounts: PropTypes.arrayOf(PropTypes.shape({
+      address: PropTypes.string.isRequired,
+    })).isRequired,
+    onAccountSelected: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -26,8 +29,16 @@ export default class AccountsList extends Component {
       <ListView
         style={styles.view}
         dataSource={this.state.dataSource}
-        renderRow={(rowData) => <AccountsListRow text={rowData}/>}
+        renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
+          return (
+            <AccountsListRow text={rowData.name ? rowData.name : '0x' + rowData.address} onPress={() => {
+              highlightRow(sectionID, rowID)
+              this.props.onAccountSelected(this.props.accounts[rowID])
+            }}/>
+          )
+        }}
         enableEmptySections={true}
+        renderScrollComponent={props => <RecyclerViewBackedScrollView {...props} />}
       />
     )
   }

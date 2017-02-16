@@ -10,6 +10,7 @@ import Signer from '../containers/Signer'
 import Accounts from '../containers/Accounts'
 import NewAccount from '../containers/NewAccount'
 import Send from '../components/Send'
+import Account from '../containers/Account'
 
 const ConnectedRouter = connect()(Router)
 const store = createStore(reducers)
@@ -38,6 +39,7 @@ const scenes = Actions.create(
         <Scene key='accountsList' title='Accounts' component={Accounts} rightTitle="Add" onRight={() => Actions.add()}
           rightButtonTextStyle={styles.navibarTitle}/>
         <Scene key='add' component={NewAccount} title='Add Account'/>
+        <Scene key='details' component={Account} title='Account Details'/>
       </Scene>
     </Scene>
   </Scene>

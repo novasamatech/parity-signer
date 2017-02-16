@@ -21,7 +21,6 @@ export default class NewAccountInput extends Component {
         placeholder='the brain wallet seed'
         editable={true}
         multiline={true}
-        autoFocus={true}
         returnKeyType='default'
         numberOfLines={6}
         fontSize={16}
