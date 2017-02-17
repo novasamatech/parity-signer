@@ -1,5 +1,7 @@
+'use strict'
+
 import React, { Component, PropTypes } from 'react'
-import { Text, StyleSheet, ListView, RecyclerViewBackedScrollView } from 'react-native'
+import { Text, StyleSheet, ListView, RecyclerViewBackedScrollView, StatusBar } from 'react-native'
 import AccountsListRow from './AccountsListRow'
 
 export default class AccountsList extends Component {
@@ -39,7 +41,9 @@ export default class AccountsList extends Component {
         }}
         enableEmptySections={true}
         renderScrollComponent={props => <RecyclerViewBackedScrollView {...props} />}
-      />
+      >
+        <StatusBar barStyle='light-content'/>
+      </ListView>
     )
   }
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component, PropTypes } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, StatusBar } from 'react-native'
 import Camera from 'react-native-camera';
 
 export default class Scanner extends Component {
@@ -12,6 +12,7 @@ export default class Scanner extends Component {
   render() {
     return (
       <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
+        <StatusBar barStyle='light-content'/>
         <View style={styles.rectangleContainer}>
           <View style={styles.rectangle}/>
         </View>

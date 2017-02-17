@@ -1,13 +1,12 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { StyleSheet, View, Text, TextInput, Button, StatusBar } from 'react-native'
+import { StyleSheet, View, Text, TextInput, Button } from 'react-native'
 
 export default class Send extends Component {
   render() {
     return (
       <View style={styles.view}>
-        <StatusBar barStyle='light-content'/>
         <Text style={styles.hint}>recipient address</Text>
         <TextInput
           placeholder='the recipient address'

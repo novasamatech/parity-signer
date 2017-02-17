@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
 const scenes = Actions.create(
   <Scene key='root'>
     <Scene key='tabs' tabs style={styles.tabbar}>
-      <Scene key='send' component={Send} title='Send TX' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}/>
       <Scene key='mid' title='Scan QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         <Scene key='scan' component={QrScanner} title='Scan QR'/>
         <Scene key='signer' component={Signer} title='Sign Tx'/>
@@ -40,6 +39,7 @@ const scenes = Actions.create(
           rightButtonTextStyle={styles.navibarTitle}/>
         <Scene key='add' component={NewAccount} title='Add Account'/>
         <Scene key='details' component={Account} title='Account Details'/>
+        <Scene key='send' component={Send} title='Send TX'/>
       </Scene>
     </Scene>
   </Scene>

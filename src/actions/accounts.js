@@ -1,4 +1,4 @@
-import { ADD_ACCOUNT, SELECT_ACCOUNT } from '../constants/AccountActions'
+import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT } from '../constants/AccountActions'
 
 export function addAccount(account) {
   return {
@@ -10,6 +10,13 @@ export function addAccount(account) {
 export function selectAccount(account) {
   return {
     type: SELECT_ACCOUNT,
+    account,
+  }
+}
+
+export function deleteAccount(account) {
+  return {
+    type: DELETE_ACCOUNT,
     account,
   }
 }

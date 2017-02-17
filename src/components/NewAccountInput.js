@@ -39,7 +39,7 @@ export default class NewAccountInput extends Component {
 
 const styles = StyleSheet.create({
   input: {
-    height: 200,
+    height: 120,
     fontWeight: 'bold'
   },
 })

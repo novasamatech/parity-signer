@@ -1,4 +1,4 @@
-import { ADD_ACCOUNT, SELECT_ACCOUNT } from '../constants/AccountActions'
+import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT } from '../constants/AccountActions'
 
 const initialAccounts = {
   all: [{
@@ -26,7 +26,12 @@ export default function accounts(state = initialAccounts, action) {
         selected: action.account,
       })
 
-      default:
-        return state
+    case DELETE_ACCOUNT:
+      return Object.assign({}, state, {
+        all: state.all.filter((account) => { return action.account != account })
+      })
+
+    default:
+      return state
   }
 }
