@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import Pin from '../components/Pin'
 import { addAccount, setPin } from '../actions/accounts'
+import { signedTx } from '../actions/transactions'
 
 const mapStateToPropsEnterPin = (state, ownProps) => ({
   account: state.accounts.selected,
@@ -12,6 +13,8 @@ const mapStateToPropsEnterPin = (state, ownProps) => ({
 const mapDispatchToPropsEnterPin = (dispatch, ownProps) => ({
   onNextPressed: (pin, account) => {
     if (pin === account.pin) {
+      dispatch(signedTx('my super awesome data'))
+      Actions.display()
     } else {
       Alert.alert('Invalid pin')
     }

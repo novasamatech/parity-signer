@@ -15,7 +15,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 })
 
 const Account = connect(state => ({
-  account: state.accounts.selected.address,
+  account: state.accounts.selected,
 }), mapDispatchToProps)(AccountDetails)
 
 export default Account
