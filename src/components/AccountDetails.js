@@ -20,13 +20,13 @@ export default class AccountDetails extends Component {
         <Text style={styles.text}>Address</Text>
         <Text style={styles.props}>{this.props.account.address}</Text>
         <View style={styles.buttonContainer}>
-          <Button
+          {/*<Button
             style={styles.button}
             onPress={this.props.onSendTransactionPressed}
             title='Send Transaction'
             color='green'
             accessibilityLabel='Press to send new transaction'
-          />
+          />*/}
           <Button
             style={styles.button}
             onPress={() => this.props.onDeleteAccountPressed(this.props.account)}

@@ -6,7 +6,3 @@ export function words() {
   return Array.from(buf).map(n => dictionary[n]).join(' ')
 }
 
-// this should be later replaced with random keypair
-export function address() {
-  return '0xb794f5ea0ba39494ce839613fffba74279579268'
-}

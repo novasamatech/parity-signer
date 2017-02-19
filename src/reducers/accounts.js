@@ -4,9 +4,11 @@ const initialAccounts = {
   all: [{
     address: 'mock',
     name: 'dupa',
+    pin: '',
   }, {
     address: 'mock',
     name: 'Katar',
+    pin: '',
   }],
   selected: {},
 }

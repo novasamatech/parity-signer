@@ -8,7 +8,7 @@
  */
 
 #import "AppDelegate.h"
-
+#import "NativeSigner-Swift.h"
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
@@ -16,6 +16,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+	EthkeyBridge* bridge;
+	[bridge brainWallet:@[] callback:^(NSArray *cb) {
+		
+	}];
   NSURL *jsCodeLocation;
 
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];

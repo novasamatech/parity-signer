@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
 import NewAccountInput from '../components/NewAccountInput'
-import { words } from '../actions/random'
-import { keypairFromPhrase, toAddress } from '../actions/crypto'
+import { words } from '../util/random'
+import { keypairFromPhrase, toAddress, toAddressAsync } from '../util/crypto'
 import { selectAccount }  from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch) => {
@@ -30,6 +30,7 @@ export class NewAccount extends Component {
     this.state = {
       seed: seed,
       keypair: keypairFromPhrase(seed),
+      address: '',
       name: '',
     }
   }
@@ -53,9 +54,17 @@ export class NewAccount extends Component {
         />
         <Text style={styles.hint}>brain wallet seed</Text>
         <NewAccountInput seed={this.state.seed} onChangeText={
-          debounce((text) => self.setState({keypair: keypairFromPhrase(text)}), 100)
-        }/>
-        <Text style={styles.hint} adjustsFontSizeToFit={true}>0x{toAddress(this.state.keypair)}</Text>
+          debounce((text) => {
+            var keypair = keypairFromPhrase(text)
+            toAddressAsync(keypair, (address) => {
+              self.setState({
+                keypair: keypairFromPhrase(text),
+                address: address,
+              })
+            })
+          }, 100)}
+        />
+        <Text style={styles.hint} adjustsFontSizeToFit={true}>0x{this.state.address}</Text>
         <Button
           onPress={() => this.props.addAccount({
             keypair: this.state.keypair,

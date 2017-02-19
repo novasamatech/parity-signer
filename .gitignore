@@ -1,3 +1,6 @@
+# rust output file
+*.a
+
 # OSX
 #
 .DS_Store

@@ -34,7 +34,7 @@ const scenes = Actions.create(
   <Scene key='root'>
     <Scene key='tabs' tabs style={styles.tabbar}>
       <Scene key='left' title='Scan QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        <Scene key='scan' component={QrScanner} title='Scan QR' rightTitle="confirmX"
+        <Scene key='scan' component={QrScanner} title='Scan QR' rightTitle="skip :)"
           onRight={() => Actions.confirm()} rightButtonTextStyle={styles.navibarTitle}/>
         <Scene key='confirm' component={ConfirmTransaction} title='Sign Tx'/>
         <Scene key='select' title='Select Account' component={SelectAccount}/>
