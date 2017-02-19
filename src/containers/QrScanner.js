@@ -9,7 +9,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   onBarCodeRead: (scanned) => {
     dispatch(newScannedTx(scanned.data))
     Vibration.vibrate()
-    Actions.signer()
+    Actions.confirm()
   }
 })
 

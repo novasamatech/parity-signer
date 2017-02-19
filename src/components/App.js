@@ -8,9 +8,12 @@ import TabIcon from './TabIcon'
 import QrScanner from '../containers/QrScanner'
 import Signer from '../containers/Signer'
 import Accounts from '../containers/Accounts'
+import SelectAccount from '../containers/SelectAccount'
 import NewAccount from '../containers/NewAccount'
 import Send from '../components/Send'
 import Account from '../containers/Account'
+import ConfirmTransaction from '../containers/ConfirmTransaction'
+import { EnterPin, SetPin, ConfirmPin } from '../containers/Pin'
 
 const ConnectedRouter = connect()(Router)
 const store = createStore(reducers)
@@ -30,14 +33,18 @@ const styles = StyleSheet.create({
 const scenes = Actions.create(
   <Scene key='root'>
     <Scene key='tabs' tabs style={styles.tabbar}>
-      <Scene key='mid' title='Scan QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        <Scene key='scan' component={QrScanner} title='Scan QR'/>
-        <Scene key='signer' component={Signer} title='Sign Tx'/>
+      <Scene key='left' title='Scan QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
+        <Scene key='scan' component={QrScanner} title='Scan QR' rightTitle="Scanned" onRight={() => Actions.confirm()} rightButtonTextStyle={styles.navibarTitle}/>
+        <Scene key='confirm' component={ConfirmTransaction} title='Sign Tx'/>
+        <Scene key='select' title='Select Account' component={SelectAccount}/>
+        <Scene key='enterPin' title='Enter Pin' component={EnterPin}/>
       </Scene>
-      <Scene key='accounts' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        <Scene key='accountsList' title='Accounts' component={Accounts} rightTitle="Add" onRight={() => Actions.add()}
+      <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
+        <Scene key='accounts' title='Accounts' component={Accounts} rightTitle="Add" onRight={() => Actions.add()}
           rightButtonTextStyle={styles.navibarTitle}/>
         <Scene key='add' component={NewAccount} title='Add Account'/>
+        <Scene key='setPin' title='Set Pin' component={SetPin}/>
+        <Scene key='confirmPin' title='Confirm Pin' component={ConfirmPin}/>
         <Scene key='details' component={Account} title='Account Details'/>
         <Scene key='send' component={Send} title='Send TX'/>
       </Scene>

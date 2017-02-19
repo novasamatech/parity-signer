@@ -4,6 +4,12 @@ import React, { Component, PropTypes } from 'react'
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native'
 
 export default class Send extends Component {
+  static propTypes = {
+    nextButtonTitle: PropTypes.string.isRequired,
+    nextButtonDescription: PropTypes.string.isRequired,
+    nextButtonAction: PropTypes.func.isRequired,
+  }
+
   render() {
     return (
       <View style={styles.view}>
@@ -41,10 +47,10 @@ export default class Send extends Component {
           fontSize={16}
         />
         <Button
-          onPress={() => {}}
-          title="Generate QR Code"
+          onPress={() => this.props.nextButtonAction()}
+          title={this.props.nextButtonTitle}
           color="green"
-          accessibilityLabel="Press to generate QR Code"
+          accessibilityLabel={this.props.nextButtonDescription}
         />
       </View>
     )

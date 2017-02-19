@@ -6,17 +6,17 @@ import debounce from 'debounce'
 import NewAccountInput from '../components/NewAccountInput'
 import { words } from '../actions/random'
 import { keypairFromPhrase, toAddress } from '../actions/crypto'
-import { addAccount } from '../actions/accounts'
+import { selectAccount }  from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch) => {
   return {
     addAccount: (account) => {
       const address = toAddress(account.keypair)
-      dispatch(addAccount({
+      dispatch(selectAccount({
         address: address,
         name: account.name,
       }))
-      Actions.pop()
+      Actions.setPin()
     }
   }
 }
