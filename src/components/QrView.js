@@ -3,6 +3,7 @@
 import React, { Component, PropTypes } from 'react'
 import { Text, View, StyleSheet } from 'react-native'
 import QRCode from 'react-native-qrcode'
+import AppStyles from '../styles'
 
 export default class QrView extends Component {
   static propTypes = {
@@ -11,7 +12,7 @@ export default class QrView extends Component {
 
   render() {
     return (
-      <View style={styles.view}>
+      <View style={AppStyles.view}>
         <View style={styles.rectangleContainer}>
           <QRCode
             value={this.props.text}
@@ -26,11 +27,6 @@ export default class QrView extends Component {
 }
 
 const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    marginTop: 60,
-    marginBottom: 50,
-  },
   rectangleContainer: {
     flex: 1,
     alignItems: 'center',

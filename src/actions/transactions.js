@@ -1,3 +1,5 @@
+'use strict'
+
 import { NEW_SCANNED_TX, SIGNED_TX } from '../constants/TransactionActions'
 
 export function newScannedTx(data) {

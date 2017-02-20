@@ -1,3 +1,5 @@
+'use strict'
+
 import { ActionConst } from 'react-native-router-flux'
 
 export default function reducer(state = {}, { type, scene }) {

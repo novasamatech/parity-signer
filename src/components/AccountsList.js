@@ -1,8 +1,9 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { Text, StyleSheet, ListView, RecyclerViewBackedScrollView, StatusBar } from 'react-native'
+import { Text, View, ListView, RecyclerViewBackedScrollView, StatusBar } from 'react-native'
 import AccountsListRow from './AccountsListRow'
+import AppStyles from '../styles'
 
 export default class AccountsList extends Component {
   static propTypes = {
@@ -29,7 +30,7 @@ export default class AccountsList extends Component {
   render() {
     return (
       <ListView
-        style={styles.view}
+        style={AppStyles.listView}
         dataSource={this.state.dataSource}
         renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
           return (
@@ -51,12 +52,3 @@ export default class AccountsList extends Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    marginTop: 60,
-    marginBottom: 50,
-  },
-})
-

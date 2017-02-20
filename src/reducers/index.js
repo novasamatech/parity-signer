@@ -1,3 +1,5 @@
+'use strict'
+
 import { combineReducers } from 'redux'
 import accounts from './accounts'
 import routes from './routes'

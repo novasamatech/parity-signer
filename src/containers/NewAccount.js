@@ -1,3 +1,5 @@
+'use strict'
+
 import React, { Component } from 'react'
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
@@ -7,6 +9,7 @@ import NewAccountInput from '../components/NewAccountInput'
 import { words } from '../util/random'
 import { brainWalletAddress } from '../util/crypto'
 import { selectAccount }  from '../actions/accounts'
+import AppStyles from '../styles'
 
 const mapDispatchToProps = (dispatch) => {
   return {
@@ -43,7 +46,7 @@ export class NewAccount extends Component {
   render() {
     var self = this;
     return (
-      <View style={styles.view}>
+      <View style={AppStyles.view}>
         <Text style={styles.hint}>name</Text>
         <TextInput
           placeholder='My Account'
@@ -85,12 +88,6 @@ export class NewAccount extends Component {
 }
 
 const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    marginTop: 60,
-    marginBottom: 50,
-    padding: 20
-  },
   hint: {
     marginBottom: 20,
   },

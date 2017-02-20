@@ -1,3 +1,5 @@
+'use strict'
+
 import React, { Component, PropTypes } from 'react'
 import { TextInput, StyleSheet } from 'react-native'
 

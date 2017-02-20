@@ -1,3 +1,5 @@
+'use strict'
+
 import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, SET_PIN } from '../constants/AccountActions'
 
 const initialAccounts = {

@@ -3,6 +3,7 @@
 import React, { Component, PropTypes } from 'react'
 import { StyleSheet, View, StatusBar } from 'react-native'
 import Camera from 'react-native-camera';
+import AppStyles from '../styles'
 
 export default class Scanner extends Component {
   static propTypes = {
@@ -11,10 +12,12 @@ export default class Scanner extends Component {
 
   render() {
     return (
-      <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
+      <Camera onBarCodeRead={this.props.onBarCodeRead} style={AppStyles.view}>
         <StatusBar barStyle='light-content'/>
         <View style={styles.rectangleContainer}>
-          <View style={styles.rectangle}/>
+          <View style={styles.rectangle}>
+            <View style={styles.innerRectangle}/>
+          </View>
         </View>
       </Camera>
     )
@@ -22,12 +25,6 @@ export default class Scanner extends Component {
 }
 
 const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    marginTop: 60,
-    marginBottom: 50,
-  },
-
   rectangleContainer: {
     flex: 1,
     alignItems: 'center',
@@ -36,10 +33,22 @@ const styles = StyleSheet.create({
   },
 
   rectangle: {
+    borderWidth: 2,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
     height: 250,
     width: 250,
+    borderColor: '#ccc',
+    backgroundColor: 'transparent',
+  },
+
+  innerRectangle: {
+    height: 248,
+    width: 248,
     borderWidth: 2,
-    borderColor: '#00FFFF',
+    borderRadius: 25,
+    borderColor: '#ddd',
     backgroundColor: 'transparent',
   },
 });

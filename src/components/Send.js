@@ -2,6 +2,7 @@
 
 import React, { Component, PropTypes } from 'react'
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native'
+import AppStyles from '../styles'
 
 export default class Send extends Component {
   static propTypes = {
@@ -12,7 +13,7 @@ export default class Send extends Component {
 
   render() {
     return (
-      <View style={styles.view}>
+      <View style={AppStyles.view}>
         <Text style={styles.hint}>recipient address</Text>
         <TextInput
           placeholder='the recipient address'
@@ -58,12 +59,6 @@ export default class Send extends Component {
 }
 
 const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    marginTop: 60,
-    marginBottom: 50,
-    padding: 20,
-  },
   hint: {
     marginBottom: 20,
   },
