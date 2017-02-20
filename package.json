@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "install": "cd rust/signer && ./setup.sh",
     "build-rust": "cd rust/signer && make",
     "start": "npm run build-rust && node node_modules/react-native/local-cli/cli.js run-ios",
     "test": "jest"
