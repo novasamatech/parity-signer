@@ -6,20 +6,24 @@ mod string;
 use ethkey::{KeyPair, Generator, Brain};
 use string::StringPtr;
 
+// string ffi
+
 #[no_mangle]
-pub unsafe extern fn ethkey_string_destroy(s: *mut StringPtr) {
+pub unsafe extern fn rust_string_ptr(s: *mut String) -> *mut StringPtr {
+  Box::into_raw(Box::new(StringPtr::from(&**s)))
+}
+
+#[no_mangle]
+pub unsafe extern fn rust_string_destroy(s: *mut String) {
   let _ = Box::from_raw(s);
 }
 
 #[no_mangle]
-pub extern fn ethkey_keypair_brainwallet(seed: *mut StringPtr) -> *mut KeyPair {
-  let seed = unsafe { Box::from_raw(seed) };
-  let generator = Brain::new(seed.as_str().to_owned());
-  let keypair = generator.generate().unwrap();
-  let boxed_keypair = Box::new(keypair);
-  let _ = Box::into_raw(seed);
-  Box::into_raw(boxed_keypair)
+pub unsafe extern fn rust_string_ptr_destroy(s: *mut StringPtr) {
+  let _ = Box::from_raw(s);
 }
+
+// ethkey ffi
 
 #[no_mangle]
 pub unsafe extern fn ethkey_keypair_destroy(keypair: *mut KeyPair) {
@@ -27,21 +31,20 @@ pub unsafe extern fn ethkey_keypair_destroy(keypair: *mut KeyPair) {
 }
 
 #[no_mangle]
-pub extern fn ethkey_keypair_secret(keypair: *mut KeyPair) -> *mut StringPtr {
-  let keypair = unsafe { Box::from_raw(keypair) };
-  let secret = keypair.secret().to_string();
-  let secret_ptr = StringPtr::from(&*secret);
-  let _ = Box::into_raw(keypair);
-  let _ = Box::into_raw(Box::new(secret));
-  Box::into_raw(Box::new(secret_ptr))
+pub unsafe extern fn ethkey_keypair_brainwallet(seed: *mut StringPtr) -> *mut KeyPair {
+  let generator = Brain::new((*seed).as_str().to_owned());
+  Box::into_raw(Box::new(generator.generate().unwrap()))
 }
 
 #[no_mangle]
-pub extern fn ethkey_keypair_address(keypair: *mut KeyPair) -> *mut StringPtr {
-  let keypair = unsafe { Box::from_raw(keypair) };
-  let address = keypair.address().to_string();
-  let address_ptr = StringPtr::from(&*address);
-  let _ = Box::into_raw(keypair);
-  let _ = Box::into_raw(Box::new(address));
-  Box::into_raw(Box::new(address_ptr))
+pub unsafe extern fn ethkey_keypair_secret(keypair: *mut KeyPair) -> *mut String {
+  let secret = (*keypair).secret().to_string();
+  Box::into_raw(Box::new(secret))
 }
+
+#[no_mangle]
+pub unsafe extern fn ethkey_keypair_address(keypair: *mut KeyPair) -> *mut String {
+  let address = (*keypair).address().to_string();
+  Box::into_raw(Box::new(address))
+}
+

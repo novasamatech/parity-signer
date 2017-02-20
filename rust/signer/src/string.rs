@@ -7,11 +7,9 @@ pub struct StringPtr {
     pub len: size_t,
 }
 
-  // TODO: fix ownership of string
-
 impl<'a> From<&'a str> for StringPtr {
     fn from(s: &'a str) -> Self {
-        StringPtr{
+        StringPtr {
             ptr: s.as_ptr(),
             len: s.len() as size_t,
         }
@@ -20,8 +18,7 @@ impl<'a> From<&'a str> for StringPtr {
 
 impl StringPtr {
 	pub fn as_str(&self) -> &str {
-		use std::slice;
-		use std::str;
+		use std::{slice, str};
 
 		unsafe {
 			let slice = slice::from_raw_parts(self.ptr, self.len);
