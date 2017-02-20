@@ -34,22 +34,64 @@ const scenes = Actions.create(
   <Scene key='root'>
     <Scene key='tabs' tabs style={styles.tabbar}>
       <Scene key='left' title='Scan QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        <Scene key='scan' component={QrScanner} title='Scan QR' rightTitle="skip :)"
-          onRight={() => Actions.confirm()} rightButtonTextStyle={styles.navibarTitle}/>
-        <Scene key='confirm' component={ConfirmTransaction} title='Sign Tx'/>
-        <Scene key='select' title='Select Account' component={SelectAccount}/>
-        <Scene key='enterPin' title='Enter Pin' component={EnterPin}/>
+        <Scene key='scan'
+          component={QrScanner}
+          title='Scan QR'
+          rightTitle="Skip*"
+          onRight={() => Actions.confirm()}
+          rightButtonTextStyle={styles.navibarTitle}
+        />
+        <Scene key='confirm' component={ConfirmTransaction} title='Sign Tx'
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
+        <Scene key='select' title='Select Account' component={SelectAccount}
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
+        <Scene key='enterPin' title='Enter Pin' component={EnterPin}
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
         <Scene key='display' title='QR Code' component={QrDisplay} rightTitle='Done'
-          onRight={() => Actions.popTo('left')} rightButtonTextStyle={styles.navibarTitle}/>
+          onRight={() => Actions.popTo('left')}
+          rightButtonTextStyle={styles.navibarTitle}
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
       </Scene>
       <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         <Scene key='accounts' title='Accounts' component={Accounts}
           rightTitle="Add" onRight={() => Actions.add()} rightButtonTextStyle={styles.navibarTitle}/>
-        <Scene key='add' component={NewAccount} title='Add Account'/>
-        <Scene key='setPin' title='Set Pin' component={SetPin}/>
-        <Scene key='confirmPin' title='Confirm Pin' component={ConfirmPin}/>
-        <Scene key='details' component={Account} title='Account Details'/>
-        <Scene key='send' component={Send} title='Send TX'/>
+        <Scene key='add' component={NewAccount} title='Add Account'
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
+        <Scene key='setPin' title='Set Pin' component={SetPin}
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
+        <Scene key='confirmPin' title='Confirm Pin' component={ConfirmPin}
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
+        <Scene key='details' component={Account} title='Account Details'
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
+        <Scene key='send' component={Send} title='Send TX'
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
       </Scene>
     </Scene>
   </Scene>

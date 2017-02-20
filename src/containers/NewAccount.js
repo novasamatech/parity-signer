@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
   },
   address: {
     marginBottom: 20,
+    fontSize: 12,
   },
   input: {
     height: 20,

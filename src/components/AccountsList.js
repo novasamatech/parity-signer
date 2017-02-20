@@ -33,10 +33,14 @@ export default class AccountsList extends Component {
         dataSource={this.state.dataSource}
         renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
           return (
-            <AccountsListRow text={rowData.name ? rowData.name : '0x' + rowData.address} onPress={() => {
-              highlightRow(sectionID, rowID)
-              this.props.onAccountSelected(this.props.accounts[rowID])
-            }}/>
+            <AccountsListRow
+              upperText={rowData.name ? rowData.name : 'no name'}
+              lowerText={'0x' + rowData.address}
+              onPress={() => {
+                highlightRow(sectionID, rowID)
+                this.props.onAccountSelected(this.props.accounts[rowID])
+              }}
+            />
           )
         }}
         enableEmptySections={true}

@@ -38,13 +38,13 @@ pub unsafe extern fn ethkey_keypair_brainwallet(seed: *mut StringPtr) -> *mut Ke
 
 #[no_mangle]
 pub unsafe extern fn ethkey_keypair_secret(keypair: *mut KeyPair) -> *mut String {
-  let secret = (*keypair).secret().to_string();
+  let secret = format!("{:?}", (*keypair).secret());
   Box::into_raw(Box::new(secret))
 }
 
 #[no_mangle]
 pub unsafe extern fn ethkey_keypair_address(keypair: *mut KeyPair) -> *mut String {
-  let address = (*keypair).address().to_string();
+  let address = format!("{:?}", (*keypair).address());
   Box::into_raw(Box::new(address))
 }
 

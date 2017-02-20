@@ -2,12 +2,12 @@ import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, SET_PIN } from '../constan
 
 const initialAccounts = {
   all: [{
-    address: 'mock',
-    name: 'dupa',
+    address: 'bF35fAA9C265bAf50C9CFF8c389C363B05753275',
+    name: 'Test: Wallet',
     pin: '',
   }, {
-    address: 'mock',
-    name: 'Katar',
+    address: '4EECf99D543B278106ac0c0e8ffe616F2137f10a',
+    name: 'Test: LockMyEther',
     pin: '',
   }],
   selected: {},

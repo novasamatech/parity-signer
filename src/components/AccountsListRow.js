@@ -3,7 +3,8 @@ import { TouchableHighlight, StyleSheet, View, Text } from 'react-native'
 
 export default class AccountsListRow extends Component {
   static propTypes = {
-    text: PropTypes.string.isRequired,
+    upperText: PropTypes.string.isRequired,
+    lowerText: PropTypes.string.isRequired,
     onPress: PropTypes.func.isRequired,
   }
 
@@ -12,7 +13,10 @@ export default class AccountsListRow extends Component {
       <TouchableHighlight style={styles.row} onPress={this.props.onPress} underlayColor='#0004'>
         <View style={{flexDirection: 'row'}}>
           <View style={styles.square}/>
-          <Text style={styles.text} fontSize={16} ellipsizeMode="middle" numberOfLines={1}>{this.props.text}</Text>
+          <View style={{flexDirection: 'column'}}>
+            <Text style={styles.upperText} ellipsizeMode="middle" numberOfLines={1}>{this.props.upperText}</Text>
+            <Text style={styles.lowerText} ellipsizeMode="middle" numberOfLines={1}>{this.props.lowerText}</Text>
+          </View>
         </View>
       </TouchableHighlight>
     )
@@ -32,9 +36,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#D8D8D8',
     marginRight: 10,
   },
-  text: {
+  upperText: {
     marginTop: 20,
     width: 200,
-    //flex: 1,
+    fontSize: 16,
+  },
+  lowerText: {
+    marginTop: 5,
+    color: '#ddd',
+    fontSize: 10,
   }
 })
