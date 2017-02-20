@@ -2,5 +2,5 @@
 
 ```
 npm i
-react-native run-ios
+npm start
 ```
