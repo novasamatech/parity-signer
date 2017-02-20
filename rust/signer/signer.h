@@ -20,7 +20,8 @@ struct keypair_ptr* ethkey_keypair_brainwallet(const struct string_ptr* seed);
 // removes keypair pointer
 void ethkey_keypair_destroy(struct keypair_ptr* keypair);
 
-struct string_ptr* ethkey_keypair_address(const struct keypair_ptr* keypair);
+// returns keypair secret
+struct string_ptr* ethkey_keypair_secret(const struct keypair_ptr* keypair);
 
-// test
-struct string_ptr* tmp_string();
+// return keypair address
+struct string_ptr* ethkey_keypair_address(const struct keypair_ptr* keypair);

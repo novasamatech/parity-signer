@@ -7,6 +7,8 @@ pub struct StringPtr {
     pub len: size_t,
 }
 
+  // TODO: fix ownership of string
+
 impl<'a> From<&'a str> for StringPtr {
     fn from(s: &'a str) -> Self {
         StringPtr{

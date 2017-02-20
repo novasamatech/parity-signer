@@ -55,10 +55,10 @@ export class NewAccount extends Component {
         <Text style={styles.hint}>brain wallet seed</Text>
         <NewAccountInput seed={this.state.seed} onChangeText={
           debounce((text) => {
-            var keypair = keypairFromPhrase(text)
-            toAddressAsync(keypair, (address) => {
+            //var keypair = keypairFromPhrase(text)
+            toAddressAsync(text, (address) => {
               self.setState({
-                keypair: keypairFromPhrase(text),
+                //keypair:
                 address: address,
               })
             })
