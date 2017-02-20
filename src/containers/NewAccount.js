@@ -5,15 +5,15 @@ import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
 import NewAccountInput from '../components/NewAccountInput'
 import { words } from '../util/random'
-import { keypairFromPhrase, toAddress, toAddressAsync } from '../util/crypto'
+import { brainWalletAddress } from '../util/crypto'
 import { selectAccount }  from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch) => {
   return {
     addAccount: (account) => {
-      const address = toAddress(account.keypair)
       dispatch(selectAccount({
-        address: address,
+        seed: account.seed,
+        address: account.address,
         name: account.name,
       }))
       Actions.setPin()
@@ -29,10 +29,15 @@ export class NewAccount extends Component {
 
     this.state = {
       seed: seed,
-      keypair: keypairFromPhrase(seed),
       address: '',
       name: '',
     }
+
+    brainWalletAddress(seed, (address) => {
+      this.setState({
+        address: address,
+      })
+    })
   }
 
   render() {
@@ -55,20 +60,20 @@ export class NewAccount extends Component {
         <Text style={styles.hint}>brain wallet seed</Text>
         <NewAccountInput seed={this.state.seed} onChangeText={
           debounce((text) => {
-            //var keypair = keypairFromPhrase(text)
-            toAddressAsync(text, (address) => {
+            brainWalletAddress(text, (address) => {
               self.setState({
-                //keypair:
+                seed: text,
                 address: address,
               })
             })
           }, 100)}
         />
-        <Text style={styles.hint} adjustsFontSizeToFit={true}>0x{this.state.address}</Text>
+        <Text style={styles.address}>0x{this.state.address}</Text>
         <Button
           onPress={() => this.props.addAccount({
-            keypair: this.state.keypair,
-            name: this.state.name
+            seed: this.state.seed,
+            address: this.state.address,
+            name: this.state.name,
           })}
           title="Add Account"
           color="green"
@@ -87,6 +92,9 @@ const styles = StyleSheet.create({
     padding: 20
   },
   hint: {
+    marginBottom: 20,
+  },
+  address: {
     marginBottom: 20,
   },
   input: {

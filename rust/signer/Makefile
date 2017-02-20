@@ -5,7 +5,7 @@ all: $(LIB)
 
 .PHONY: $(ARCHS)
 $(ARCHS): %:
-	cargo build --target $@
+	cargo build --target $@ --release
 
 $(LIB): $(ARCHS)
-	lipo -create -output $@ $(foreach arch,$(ARCHS),$(wildcard target/$(arch)/debug/$(LIB)))
+	lipo -create -output $@ $(foreach arch,$(ARCHS),$(wildcard target/$(arch)/release/$(LIB)))

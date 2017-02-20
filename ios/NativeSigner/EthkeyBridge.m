@@ -11,6 +11,6 @@
 @interface RCT_EXTERN_MODULE(EthkeyBridge, NSObject)
 
 RCT_EXTERN_METHOD(show:(NSString *)name)
-RCT_EXTERN_METHOD(brainWallet:(NSString*)seed callback:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(brainWalletAddress:(NSString*)seed callback:(RCTResponseSenderBlock)callback)
 
 @end

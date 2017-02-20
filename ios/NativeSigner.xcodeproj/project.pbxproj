@@ -965,6 +965,7 @@
 				DEAD_CODE_STRIPPING = NO;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = T4ZYEBHX9P;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = ../rust/signer;
@@ -989,6 +990,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = T4ZYEBHX9P;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = ../rust/signer;

@@ -14,11 +14,13 @@ class EthkeyBridge: NSObject {
 		NSLog("%@", name);
 	}
 	
-	@objc func brainWallet(_ seed: String, callback: RCTResponseSenderBlock) -> Void {
+	@objc func brainWalletAddress(_ seed: String, callback: RCTResponseSenderBlock) -> Void {
 		var seed_ptr = seed.asPtr()
-		let keypair = ethkey_keypair_brainwallet(&seed_ptr)
-		let address_ptr = ethkey_keypair_address(keypair)
+		let keypair_ptr = ethkey_keypair_brainwallet(&seed_ptr)
+		let address_ptr = ethkey_keypair_address(keypair_ptr)
 		let address = String.fromStringPtr(ptr: address_ptr!.pointee)
+		ethkey_keypair_destroy(keypair_ptr)
+		ethkey_string_destroy(address_ptr)
 		callback([address])
 	}
 }

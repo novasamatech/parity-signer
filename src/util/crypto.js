@@ -13,8 +13,6 @@ export function keypairFromPhrase(phrase) {
 
 export function toAddress(kp) { return keccak_256(kp.getPublic('buffer').slice(1)).substr(24); }
 
-export function toAddressAsync(kp, callback) {
-  //EthkeyBridge.show("hello")
-  EthkeyBridge.brainWallet("" + 1, callback)
-  //return
+export function brainWalletAddress(seed, callback) {
+  EthkeyBridge.brainWalletAddress(seed, callback)
 }
