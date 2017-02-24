@@ -25,7 +25,7 @@ export default class NewAccountInput extends Component {
         multiline={true}
         returnKeyType='default'
         numberOfLines={6}
-        fontSize={16}
+        fontSize={12}
         onChangeText={(text) => {
           this.setState({
             text: text

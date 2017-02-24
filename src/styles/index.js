@@ -14,5 +14,16 @@ export default StyleSheet.create({
     flex: 1,
     marginTop: 64,
     marginBottom: 50,
-  }
+  },
+  hintText: {
+    fontSize: 14,
+    color: '#ccc',
+    marginBottom: 20,
+  },
+  valueText: {
+    fontSize: 12,
+    color: 'black',
+    marginBottom: 20,
+    fontWeight: 'bold',
+  },
 })

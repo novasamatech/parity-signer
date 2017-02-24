@@ -33,4 +33,27 @@ class EthkeyBridge: NSObject {
 		ethkey_keypair_destroy(keypair_ptr)
 		callback([secret])
 	}
+	
+	@objc func brainWalletSign(_ seed: String, message: String, callback: RCTResponseSenderBlock) -> Void {
+		var seed_ptr = seed.asPtr()
+		var message_ptr = message.asPtr()
+		let keypair_ptr = ethkey_keypair_brainwallet(&seed_ptr)
+		let signature_rust_str = ethkey_keypair_sign(keypair_ptr, &message_ptr)
+		let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
+		let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(signature_rust_str_ptr)
+		rust_string_destroy(signature_rust_str)
+		ethkey_keypair_destroy(keypair_ptr)
+		callback([signature])
+	}
+	
+	@objc func rlpItem(_ rlp: String, position: UInt32, callback: RCTResponseSenderBlock) -> Void {
+		var rlp_ptr = rlp.asPtr()
+		let item_rust_str = rlp_item(&rlp_ptr, position)
+		let item_rust_str_ptr = rust_string_ptr(item_rust_str)
+		let item = String.fromStringPtr(ptr: item_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(item_rust_str_ptr)
+		rust_string_destroy(item_rust_str)
+		callback([item])
+	}
 }

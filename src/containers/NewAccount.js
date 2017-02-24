@@ -7,7 +7,7 @@ import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
 import NewAccountInput from '../components/NewAccountInput'
 import { words } from '../util/random'
-import { brainWalletAddress } from '../util/crypto'
+import { brainWalletAddress } from '../util/native'
 import { selectAccount }  from '../actions/accounts'
 import AppStyles from '../styles'
 
@@ -47,7 +47,7 @@ export class NewAccount extends Component {
     var self = this;
     return (
       <View style={AppStyles.view}>
-        <Text style={styles.hint}>name</Text>
+        <Text style={AppStyles.hintText}>name</Text>
         <TextInput
           placeholder='My Account'
           value={this.state.name}
@@ -56,11 +56,11 @@ export class NewAccount extends Component {
           multiline={false}
           returnKeyType='next'
           numberOfLines={1}
-          fontSize={16}
+          fontSize={12}
           autoFocus={true}
           onChangeText={(text) => {this.setState({name: text})}}
         />
-        <Text style={styles.hint}>brain wallet seed</Text>
+        <Text style={AppStyles.hintText}>brain wallet seed</Text>
         <NewAccountInput seed={this.state.seed} onChangeText={
           debounce((text) => {
             brainWalletAddress(text, (address) => {
@@ -71,7 +71,7 @@ export class NewAccount extends Component {
             })
           }, 100)}
         />
-        <Text style={styles.address}>0x{this.state.address}</Text>
+        <Text style={AppStyles.valueText}>0x{this.state.address}</Text>
         <Button
           onPress={() => this.props.addAccount({
             seed: this.state.seed,

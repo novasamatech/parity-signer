@@ -12,5 +12,7 @@
 
 RCT_EXTERN_METHOD(brainWalletAddress:(NSString*)seed callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(brainWalletSecret:(NSString*)seed callback:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(brainWalletSign:(NSString*)seed message:(NSString*)message callback:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(rlpItem:(NSString*)rlp position:(NSUInteger)position callback:(RCTResponseSenderBlock)callback)
 
 @end

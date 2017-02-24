@@ -25,6 +25,7 @@ export default class Pin extends Component {
           multiline={false}
           autoFocus={true}
           returnKeyType='next'
+          keyboardType='numeric'
           numberOfLines={1}
           fontSize={24}
           onChangeText={(text) => {this.setState({text: text})}}

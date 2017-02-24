@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { StyleSheet, View, Text, TextInput, Button } from 'react-native'
+import { StyleSheet, ScrollView, View, Text, TextInput, Button } from 'react-native'
 import AppStyles from '../styles'
 
 export default class Send extends Component {
@@ -9,62 +9,36 @@ export default class Send extends Component {
     nextButtonTitle: PropTypes.string.isRequired,
     nextButtonDescription: PropTypes.string.isRequired,
     nextButtonAction: PropTypes.func.isRequired,
+    txRecipientAddress: PropTypes.string.isRequired,
+    txValue: PropTypes.string.isRequired,
+    txNonce: PropTypes.string.isRequired,
+    txGas: PropTypes.string.isRequired,
+    txGasPrice: PropTypes.string.isRequired,
+    txData: PropTypes.string.isRequired,
   }
 
   render() {
     return (
-      <View style={AppStyles.view}>
-        <Text style={styles.hint}>recipient address</Text>
-        <TextInput
-          placeholder='the recipient address'
-          style={styles.input}
-          editable={true}
-          multiline={false}
-          autoFocus={true}
-          returnKeyType='next'
-          numberOfLines={1}
-          fontSize={16}
-        />
-        <Text style={styles.hint}>amount to transfer (in ETH)</Text>
-        <TextInput
-          placeholder=''
-          value='0.0'
-          style={styles.input}
-          editable={true}
-          multiline={false}
-          returnKeyType='next'
-          numberOfLines={1}
-          fontSize={16}
-        />
-        <Text style={styles.hint}>total transaction amount</Text>
-        <TextInput
-          placeholder=''
-          value='0.0'
-          style={styles.input}
-          editable={true}
-          multiline={false}
-          returnKeyType='next'
-          numberOfLines={1}
-          fontSize={16}
-        />
+      <ScrollView style={AppStyles.view}>
+        <Text style={AppStyles.hintText}>recipient address</Text>
+        <Text style={AppStyles.valueText}>{this.props.txRecipientAddress}</Text>
+        <Text style={AppStyles.hintText}>amount to transfer (in ETH)</Text>
+        <Text style={AppStyles.valueText}>{this.props.txValue}</Text>
+        <Text style={AppStyles.hintText}>nonce</Text>
+        <Text style={AppStyles.valueText}>{this.props.txNonce}</Text>
+        <Text style={AppStyles.hintText}>gas</Text>
+        <Text style={AppStyles.valueText}>{this.props.txGas}</Text>
+        <Text style={AppStyles.hintText}>gasPrice</Text>
+        <Text style={AppStyles.valueText}>{this.props.txGasPrice}</Text>
+        <Text style={AppStyles.hintText}>data</Text>
+        <Text style={AppStyles.valueText}>{this.props.txData}</Text>
         <Button
           onPress={() => this.props.nextButtonAction()}
           title={this.props.nextButtonTitle}
           color="green"
           accessibilityLabel={this.props.nextButtonDescription}
         />
-      </View>
+      </ScrollView>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  hint: {
-    marginBottom: 20,
-  },
-  input: {
-    height: 20,
-    marginBottom: 20,
-  }
-})
-

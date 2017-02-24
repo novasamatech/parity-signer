@@ -16,10 +16,10 @@ export default class AccountDetails extends Component {
   render() {
     return (
       <View style={AppStyles.view}>
-        <Text style={styles.text}>Name</Text>
-        <Text style={styles.props}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
-        <Text style={styles.text}>Address</Text>
-        <Text style={styles.props}>{this.props.account.address}</Text>
+        <Text style={AppStyles.hintText}>Name</Text>
+        <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
+        <Text style={AppStyles.hintText}>Address</Text>
+        <Text style={AppStyles.valueText}>{this.props.account.address}</Text>
         <View style={styles.buttonContainer}>
           {/*<Button
             style={styles.button}
@@ -42,16 +42,9 @@ export default class AccountDetails extends Component {
 }
 
 const styles = StyleSheet.create({
-  text: {
-    marginBottom: 20,
-  },
-  props: {
-    marginBottom: 20,
-    fontSize: 16,
-  },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+    //flexDirection: 'row',
+    //justifyContent: 'space-between'
   },
   button: {
     flex: 0.5,

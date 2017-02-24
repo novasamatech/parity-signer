@@ -39,3 +39,10 @@ struct rust_string* ethkey_keypair_secret(const struct keypair_ptr* keypair);
 // return keypair address
 struct rust_string* ethkey_keypair_address(const struct keypair_ptr* keypair);
 
+// returns message signed with keypair
+struct rust_string* ethkey_keypair_sign(const struct keypair_ptr* keypair, const struct rust_string_ptr* message);
+
+// rlp ffi
+
+// returns rlp item at given position
+struct rust_string* rlp_item(const struct rust_string_ptr* rlp, const unsigned position);

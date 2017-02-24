@@ -6,6 +6,7 @@ authors = ["debris <marek.kotewicz@gmail.com>"]
 [dependencies]
 libc = "0.2"
 ethkey = { git = "https://github.com/ethcore/parity" }
+rlp = { git = "https://github.com/ethcore/parity" }
 
 [lib]
 name = "signer"
