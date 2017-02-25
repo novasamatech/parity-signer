@@ -39,9 +39,6 @@ const scenes = Actions.create(
         <Scene key='scan'
           component={QrScanner}
           title='Scan QR'
-          rightTitle="Skip*"
-          onRight={() => Actions.confirm()}
-          rightButtonTextStyle={styles.navibarTitle}
         />
         <Scene key='confirm' component={ConfirmTransaction} title='Sign Tx'
           backTitle='Back'

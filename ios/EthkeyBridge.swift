@@ -35,6 +35,7 @@ class EthkeyBridge: NSObject {
 	}
 	
 	@objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+		print(seed, " + ", message)
 		var seed_ptr = seed.asPtr()
 		var message_ptr = message.asPtr()
 		let keypair_ptr = ethkey_keypair_brainwallet(&seed_ptr)
@@ -60,5 +61,15 @@ class EthkeyBridge: NSObject {
 		} else {
 			reject("invalid rlp", nil, nil)
 		}
+	}
+	
+	@objc func keccak(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+		var data_ptr = data.asPtr()
+		let hash_rust_str = keccak256(&data_ptr)
+		let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
+		let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(hash_rust_str_ptr)
+		rust_string_destroy(hash_rust_str)
+		resolve(hash)
 	}
 }

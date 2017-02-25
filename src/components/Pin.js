@@ -25,12 +25,11 @@ export default class Pin extends Component {
           multiline={false}
           autoFocus={true}
           returnKeyType='next'
-          keyboardType='numeric'
           numberOfLines={1}
           fontSize={24}
           onChangeText={(text) => {this.setState({text: text})}}
           value={this.state.text}
-          onEndEditing={() => { this.props.onNextPressed(this.state.text, this.props.account) }}
+          onEndEditing={() => { this.props.onNextPressed(this.state.text, this.props.account, this.props.extra) }}
         />
       </View>
     )

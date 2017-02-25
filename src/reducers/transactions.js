@@ -8,8 +8,7 @@ const initialState = {
     rlp: '',
   },
   signedTransaction: {
-    transaction: {},
-    rlp: '',
+    signature: '',
   },
 }
 
@@ -24,7 +23,7 @@ export default function transactions(state = initialState, action) {
         })
       case SIGNED_TX:
         return Object.assign({}, state, {
-          signedTransaction: action.data,
+          signedTransaction: action.signature,
         })
       default:
         return state

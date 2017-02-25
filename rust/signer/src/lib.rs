@@ -1,11 +1,13 @@
 extern crate libc;
 extern crate rustc_serialize;
+extern crate tiny_keccak;
 extern crate ethkey;
 extern crate rlp;
 
 mod string;
 
 use rustc_serialize::hex::{ToHex, FromHex};
+use tiny_keccak::Keccak;
 use ethkey::{KeyPair, Generator, Brain, Message, sign};
 use rlp::{UntrustedRlp, View};
 
@@ -79,6 +81,17 @@ pub unsafe extern fn rlp_item(rlp: *mut StringPtr, position: u32, error: *mut u3
       Box::into_raw(Box::new(s))
     }
   }
+}
+
+#[no_mangle]
+pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
+  let data = (*data).as_str();
+  let hex = data.from_hex().unwrap();
+  let mut res: [u8; 32] = [0; 32];
+  let mut keccak = Keccak::new_keccak256();
+  keccak.update(&hex);
+  keccak.finalize(&mut res);
+  Box::into_raw(Box::new(res.to_hex()))
 }
 
 #[cfg(test)]

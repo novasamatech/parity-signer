@@ -46,3 +46,7 @@ struct rust_string* ethkey_keypair_sign(const struct keypair_ptr* keypair, const
 
 // returns rlp item at given position
 struct rust_string* rlp_item(const struct rust_string_ptr* rlp, const unsigned position, unsigned* error);
+
+// sha3 ffi
+
+struct rust_string* keccak256(const struct rust_string_ptr* data);

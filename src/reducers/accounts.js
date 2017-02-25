@@ -6,10 +6,12 @@ const initialAccounts = {
   all: [{
     address: 'bF35fAA9C265bAf50C9CFF8c389C363B05753275',
     name: 'Test: Wallet',
+    seed: '123',
     pin: '',
   }, {
     address: '4EECf99D543B278106ac0c0e8ffe616F2137f10a',
     name: 'Test: LockMyEther',
+    seed: '123',
     pin: '',
   }],
   selected: {},

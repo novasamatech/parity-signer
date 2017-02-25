@@ -10,9 +10,9 @@ export function scannedTx(rlp, transaction) {
   }
 }
 
-export function signedTx(data) {
+export function signedTx(signature) {
   return {
     type: SIGNED_TX,
-    data: data,
+    signature: signature,
   }
 }

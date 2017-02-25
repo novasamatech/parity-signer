@@ -8,6 +8,7 @@ libc = "0.2"
 rustc-serialize = "0.3"
 ethkey = { git = "https://github.com/ethcore/parity" }
 rlp = { git = "https://github.com/ethcore/parity" }
+tiny-keccak = "1.1"
 
 [lib]
 name = "signer"
