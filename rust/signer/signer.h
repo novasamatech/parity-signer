@@ -45,4 +45,4 @@ struct rust_string* ethkey_keypair_sign(const struct keypair_ptr* keypair, const
 // rlp ffi
 
 // returns rlp item at given position
-struct rust_string* rlp_item(const struct rust_string_ptr* rlp, const unsigned position);
+struct rust_string* rlp_item(const struct rust_string_ptr* rlp, const unsigned position, unsigned* error);

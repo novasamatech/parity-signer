@@ -2,17 +2,29 @@
 
 import { NEW_SCANNED_TX, SIGNED_TX } from '../constants/TransactionActions'
 
-const initialState = {}
+const initialState = {
+  pendingTransaction: {
+    transaction: {},
+    rlp: '',
+  },
+  signedTransaction: {
+    transaction: {},
+    rlp: '',
+  },
+}
 
-export default function transactions(state = initialState, { type, data }) {
-  switch (type) {
+export default function transactions(state = initialState, action) {
+  switch (action.type) {
       case NEW_SCANNED_TX:
         return Object.assign({}, state, {
-          pendingTx: data,
+          pendingTransaction: {
+            rlp: action.rlp,
+            transaction: action.transaction,
+          }
         })
       case SIGNED_TX:
         return Object.assign({}, state, {
-          signedTx: data,
+          signedTransaction: action.data,
         })
       default:
         return state

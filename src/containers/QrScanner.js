@@ -1,17 +1,37 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { Vibration } from 'react-native'
+import { Vibration, Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import Scanner from '../components/Scanner'
-import { newScannedTx } from '../actions/transactions'
+import { scannedTx } from '../actions/transactions'
+import transaction from '../util/transaction'
+
+var scanning = false
+
+async function onScannedTransaction(data, dispatch) {
+  try {
+    if (scanning) {
+      return
+    }
+    scanning = true
+    let tx = await transaction(data);
+    dispatch(scannedTx(data, tx))
+    Vibration.vibrate()
+    Actions.confirm()
+    scanning = false
+  } catch (e) {
+    console.log(e)
+    Alert.alert('Invalid transaction', undefined, [
+      { text: 'OK', onPress: () => { scanning = false }}
+    ])
+  }
+}
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onBarCodeRead: (scanned) => {
-    dispatch(newScannedTx(scanned.data))
-    Vibration.vibrate()
-    Actions.confirm()
+    onScannedTransaction(scanned.data, dispatch)
   }
 })
 

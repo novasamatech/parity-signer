@@ -9,6 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "bignumber.js": "^4.0.0",
     "debounce": "^1.0.0",
     "react": "^15.4.2",
     "react-native": "0.40.0",

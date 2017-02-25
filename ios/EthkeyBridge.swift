@@ -10,7 +10,7 @@ import Foundation
 
 @objc(EthkeyBridge)
 class EthkeyBridge: NSObject {
-	@objc func brainWalletAddress(_ seed: String, callback: RCTResponseSenderBlock) -> Void {
+	@objc func brainWalletAddress(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var seed_ptr = seed.asPtr()
 		let keypair_ptr = ethkey_keypair_brainwallet(&seed_ptr)
 		let address_rust_str = ethkey_keypair_address(keypair_ptr)
@@ -19,10 +19,10 @@ class EthkeyBridge: NSObject {
 		rust_string_ptr_destroy(address_rust_str_ptr)
 		rust_string_destroy(address_rust_str)
 		ethkey_keypair_destroy(keypair_ptr)
-		callback([address])
+		resolve(address)
 	}
 	
-	@objc func brainWalletSecret(_ seed: String, callback: RCTResponseSenderBlock) -> Void {
+	@objc func brainWalletSecret(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var seed_ptr = seed.asPtr()
 		let keypair_ptr = ethkey_keypair_brainwallet(&seed_ptr)
 		let secret_rust_str = ethkey_keypair_secret(keypair_ptr)
@@ -31,10 +31,10 @@ class EthkeyBridge: NSObject {
 		rust_string_ptr_destroy(secret_rust_str_ptr)
 		rust_string_destroy(secret_rust_str)
 		ethkey_keypair_destroy(keypair_ptr)
-		callback([secret])
+		resolve(secret)
 	}
 	
-	@objc func brainWalletSign(_ seed: String, message: String, callback: RCTResponseSenderBlock) -> Void {
+	@objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var seed_ptr = seed.asPtr()
 		var message_ptr = message.asPtr()
 		let keypair_ptr = ethkey_keypair_brainwallet(&seed_ptr)
@@ -44,16 +44,21 @@ class EthkeyBridge: NSObject {
 		rust_string_ptr_destroy(signature_rust_str_ptr)
 		rust_string_destroy(signature_rust_str)
 		ethkey_keypair_destroy(keypair_ptr)
-		callback([signature])
+		resolve(signature)
 	}
 	
-	@objc func rlpItem(_ rlp: String, position: UInt32, callback: RCTResponseSenderBlock) -> Void {
+	@objc func rlpItem(_ rlp: String, position: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var rlp_ptr = rlp.asPtr()
-		let item_rust_str = rlp_item(&rlp_ptr, position)
+		var error: UInt32 = 0
+		let item_rust_str = rlp_item(&rlp_ptr, position, &error)
 		let item_rust_str_ptr = rust_string_ptr(item_rust_str)
 		let item = String.fromStringPtr(ptr: item_rust_str_ptr!.pointee)
 		rust_string_ptr_destroy(item_rust_str_ptr)
 		rust_string_destroy(item_rust_str)
-		callback([item])
+		if (error == 0) {
+			resolve(item)
+		} else {
+			reject("invalid rlp", nil, nil)
+		}
 	}
 }

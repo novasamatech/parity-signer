@@ -36,11 +36,18 @@ export class NewAccount extends Component {
       name: '',
     }
 
-    brainWalletAddress(seed, (address) => {
-      this.setState({
+    this.updateAddress(this, seed)
+  }
+
+  async updateAddress(self, seed) {
+    try {
+      let address = await brainWalletAddress(seed)
+      self.setState({
         address: address,
       })
-    })
+    } catch (e) {
+
+    }
   }
 
   render() {
@@ -62,15 +69,8 @@ export class NewAccount extends Component {
         />
         <Text style={AppStyles.hintText}>brain wallet seed</Text>
         <NewAccountInput seed={this.state.seed} onChangeText={
-          debounce((text) => {
-            brainWalletAddress(text, (address) => {
-              self.setState({
-                seed: text,
-                address: address,
-              })
-            })
-          }, 100)}
-        />
+          debounce((text) => { this.updateAddress(this, text) }, 100)
+        }/>
         <Text style={AppStyles.valueText}>0x{this.state.address}</Text>
         <Button
           onPress={() => this.props.addAccount({
