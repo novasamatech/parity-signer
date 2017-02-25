@@ -1,18 +1,24 @@
 'use strict'
 
 import React from 'react'
+import { Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import AccountDetails from '../components/AccountDetails'
 import { deleteAccount } from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onSendTransactionPressed: () => {
-    Actions.send()
+  onDisplayAddressPressed: () => {
+    Actions.displayAddress()
   },
   onDeleteAccountPressed: (account) => {
-    dispatch(deleteAccount(account))
-    Actions.pop()
+    Alert.alert('Do you want to delete the account?', undefined, [
+      { text: 'Yes', onPress: () => {
+        dispatch(deleteAccount(account))
+        Actions.pop()
+      }},
+      { text: 'No' }
+    ])
   },
 })
 

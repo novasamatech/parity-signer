@@ -19,7 +19,7 @@ async function signTransaction(dispatch, account, rlp) {
     let hash = await keccak(rlp)
     let signature = await brainWalletSign(account.seed, hash)
     dispatch(signedTx(signature))
-    Actions.display()
+    Actions.displayTransaction()
   } catch (e) {
     console.log(e)
   }

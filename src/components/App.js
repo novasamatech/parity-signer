@@ -15,7 +15,7 @@ import Send from '../components/Send'
 import Account from '../containers/Account'
 import ConfirmTransaction from '../containers/ConfirmTransaction'
 import { EnterPin, SetPin, ConfirmPin } from '../containers/Pin'
-import QrDisplay from '../containers/QrDisplay'
+import { QrViewTransaction, QrViewAddress }from '../containers/QrView'
 
 const ConnectedRouter = connect()(Router)
 const store = createStore(reducers)
@@ -40,7 +40,7 @@ const scenes = Actions.create(
           component={QrScanner}
           title='Scan QR'
         />
-        <Scene key='confirm' component={ConfirmTransaction} title='Sign Tx'
+        <Scene key='confirm' component={ConfirmTransaction} title='Transaction Details'
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage={true}
@@ -55,7 +55,7 @@ const scenes = Actions.create(
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage={true}
         />
-        <Scene key='display' title='QR Code' component={QrDisplay} rightTitle='Done'
+        <Scene key='displayTransaction' title='QR Code' component={QrViewTransaction} rightTitle='Done'
           onRight={() => Actions.popTo('left')}
           rightButtonTextStyle={styles.navibarTitle}
           backTitle='Back'
@@ -87,6 +87,13 @@ const scenes = Actions.create(
           hideBackImage={true}
         />
         <Scene key='send' component={Send} title='Send TX'
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage={true}
+        />
+        <Scene key='displayAddress' title='QR Code' component={QrViewAddress} rightTitle='Done'
+          onRight={() => Actions.popTo('right')}
+          rightButtonTextStyle={styles.navibarTitle}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage={true}

@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { StyleSheet, View, Text, Button } from 'react-native'
+import { StyleSheet, View, ScrollView, Text, Button } from 'react-native'
 import AppStyles from '../styles'
 
 export default class AccountDetails extends Component {
@@ -9,25 +9,25 @@ export default class AccountDetails extends Component {
     account: PropTypes.shape({
       address: PropTypes.string.isRequired,
     }).isRequired,
-    onSendTransactionPressed: PropTypes.func.isRequired,
+    onDisplayAddressPressed: PropTypes.func.isRequired,
     onDeleteAccountPressed: PropTypes.func.isRequired,
   }
 
   render() {
     return (
-      <View style={AppStyles.view}>
+      <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>Name</Text>
         <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
         <Text style={AppStyles.hintText}>Address</Text>
         <Text style={AppStyles.valueText}>{this.props.account.address}</Text>
         <View style={styles.buttonContainer}>
-          {/*<Button
+          <Button
             style={styles.button}
-            onPress={this.props.onSendTransactionPressed}
-            title='Send Transaction'
+            onPress={this.props.onDisplayAddressPressed}
+            title='Display Address QR Code'
             color='green'
-            accessibilityLabel='Press to send new transaction'
-          />*/}
+            accessibilityLabel='Press to address QR Code'
+          />
           <Button
             style={styles.button}
             onPress={() => this.props.onDeleteAccountPressed(this.props.account)}
@@ -36,7 +36,7 @@ export default class AccountDetails extends Component {
             accessibilityLabel='Press to delete account'
           />
         </View>
-      </View>
+      </ScrollView>
     )
   }
 }

@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native'
+import { View, ScrollView, Text, TextInput, Button, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
@@ -53,7 +53,7 @@ export class NewAccount extends Component {
   render() {
     var self = this;
     return (
-      <View style={AppStyles.view}>
+      <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>name</Text>
         <TextInput
           placeholder='My Account'
@@ -82,7 +82,7 @@ export class NewAccount extends Component {
           color="green"
           accessibilityLabel="Press to add new account"
         />
-      </View>
+      </ScrollView>
     )
   }
 }
