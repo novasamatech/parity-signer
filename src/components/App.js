@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, AppState } from 'react-native'
 import { Provider, connect } from 'react-redux'
 import { createStore } from 'redux'
 import { Actions, ActionConst, Router, Scene } from 'react-native-router-flux'
@@ -15,10 +15,16 @@ import Send from '../components/Send'
 import Account from '../containers/Account'
 import ConfirmTransaction from '../containers/ConfirmTransaction'
 import { EnterPin, SetPin, ConfirmPin } from '../containers/Pin'
-import { QrViewTransaction, QrViewAddress }from '../containers/QrView'
+import { QrViewTransaction, QrViewAddress } from '../containers/QrView'
+import { loadAccounts, saveAccounts } from '../util/db'
+import { setAccounts } from '../actions/accounts'
 
 const ConnectedRouter = connect()(Router)
 const store = createStore(reducers)
+
+loadAccounts().then(accounts => {
+  store.dispatch(setAccounts(accounts))
+})
 
 const styles = StyleSheet.create({
   tabbar: {
@@ -114,6 +120,26 @@ export default class App extends Component {
         <ConnectedRouter scenes={scenes}/>
       </Provider>
     )
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange);
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = (appState) => {
+    switch (appState) {
+      case 'inactive':
+        saveAccounts(store.getState().accounts.all)
+        break
+      case 'background':
+        break
+      case 'active':
+        break
+    }
   }
 }
 

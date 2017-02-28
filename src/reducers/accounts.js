@@ -1,19 +1,18 @@
 'use strict'
 
-import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, SET_PIN } from '../constants/AccountActions'
+import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, SET_PIN, SET_ACCOUNTS } from '../constants/AccountActions'
 
+// format of the account
+// {
+// address: 'bF35fAA9C265bAf50C9CFF8c389C363B05753275',
+// name: 'Test: Wallet',
+// seed: '123',
+// pin: ''
+// }
+
+// all accounts are loaded on init from db
 const initialAccounts = {
-  all: [{
-    address: 'bF35fAA9C265bAf50C9CFF8c389C363B05753275',
-    name: 'Test: Wallet',
-    seed: '123',
-    pin: '',
-  }, {
-    address: '4EECf99D543B278106ac0c0e8ffe616F2137f10a',
-    name: 'Test: LockMyEther',
-    seed: '123',
-    pin: '',
-  }],
+  all: [],
   selected: {},
 }
 
@@ -42,6 +41,11 @@ export default function accounts(state = initialAccounts, action) {
         selected: Object.assign({}, state.selected, {
           pin: action.pin
         })
+      })
+
+    case SET_ACCOUNTS:
+      return Object.assign({}, state, {
+        all: action.accounts,
       })
 
     default:

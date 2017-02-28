@@ -1,3 +1,5 @@
+'use strict'
+
 import { fromWei } from './units'
 
 describe('units', () => {

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "install": "cd rust/signer && ./setup.sh",
+    "installX": "cd rust/signer && ./setup.sh",
     "build-rust": "cd rust/signer && make",
     "start": "npm run build-rust && node node_modules/react-native/local-cli/cli.js run-ios",
     "test": "jest"
@@ -16,6 +16,7 @@
     "react-native-camera": "^0.5.1",
     "react-native-qrcode": "^0.2.3",
     "react-native-router-flux": "^3.37.0",
+    "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
     "react-native-tabs": "^1.0.9",
     "react-redux": "^5.0.2",
     "redux": "^3.6.0"
