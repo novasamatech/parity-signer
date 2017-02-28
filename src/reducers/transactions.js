@@ -23,7 +23,9 @@ export default function transactions(state = initialState, action) {
         })
       case SIGNED_TX:
         return Object.assign({}, state, {
-          signedTransaction: action.signature,
+          signedTransaction: {
+            signature: action.signature,
+          }
         })
       default:
         return state

@@ -59,7 +59,7 @@ pub unsafe extern fn ethkey_keypair_address(keypair: *mut KeyPair) -> *mut Strin
 pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut StringPtr) -> *mut String {
   let secret = (*keypair).secret();
   let message: Message = (*message).as_str().parse().unwrap();
-  let signature = format!("{:?}", sign(secret, &message).unwrap());
+  let signature = format!("{}", sign(secret, &message).unwrap());
   Box::into_raw(Box::new(signature))
 }
 

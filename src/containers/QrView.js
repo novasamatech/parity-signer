@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import QrView from '../components/QrView'
 
 const mapStateToPropsTransaction = (state, ownProps) => ({
-	text: state.transactions.signedTx,
+	text: state.transactions.signedTransaction.signature,
 })
 
 export const QrViewTransaction = connect(mapStateToPropsTransaction)(QrView)

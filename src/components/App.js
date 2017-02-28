@@ -5,7 +5,6 @@ import { View, Text, StyleSheet, AppState } from 'react-native'
 import { Provider, connect } from 'react-redux'
 import { createStore } from 'redux'
 import { Actions, ActionConst, Router, Scene } from 'react-native-router-flux'
-import reducers from '../reducers'
 import TabIcon from './TabIcon'
 import QrScanner from '../containers/QrScanner'
 import Accounts from '../containers/Accounts'
@@ -18,9 +17,9 @@ import { EnterPin, SetPin, ConfirmPin } from '../containers/Pin'
 import { QrViewTransaction, QrViewAddress } from '../containers/QrView'
 import { loadAccounts, saveAccounts } from '../util/db'
 import { setAccounts } from '../actions/accounts'
+import store from '../util/store'
 
 const ConnectedRouter = connect()(Router)
-const store = createStore(reducers)
 
 loadAccounts().then(accounts => {
   store.dispatch(setAccounts(accounts))

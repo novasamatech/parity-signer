@@ -8,6 +8,7 @@ import Pin from '../components/Pin'
 import { addAccount, setPin } from '../actions/accounts'
 import { signedTx } from '../actions/transactions'
 import { keccak, brainWalletSign } from '../util/native'
+import { saveAccount } from '../util/db'
 
 const mapStateToPropsEnterPin = (state, ownProps) => ({
   account: state.accounts.selected,
@@ -50,6 +51,7 @@ const mapDispatchToPropsConfirmPin = (dispatch, ownProps) => ({
   onNextPressed: (pin, account) => {
     if (pin === account.pin) {
       dispatch(addAccount(account))
+      saveAccount(account)
       Actions.popTo('accounts')
     } else {
       Alert.alert('Invalid pin')
