@@ -7,6 +7,7 @@ all: ios android
 ios: $(LIB)
 
 android: $(ARCHS_ANDROID)
+	sh copy_android.sh
 
 .PHONY: $(ARCHS_IOS)
 $(ARCHS_IOS): %:

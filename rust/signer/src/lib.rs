@@ -94,24 +94,65 @@ pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
   Box::into_raw(Box::new(res.to_hex()))
 }
 
-extern crate jni;
-use self::jni::sys::jint;
-
-#[no_mangle]
-#[allow(non_snake_case)]
-pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_hello() -> jint {
-  4
-}
-
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
   extern crate jni;
-  use self::jni::sys::jint;
+
+  use super::*;
+  use self::jni::JNIEnv;
+  use self::jni::objects::{JClass, JString};
+  use self::jni::sys::{jint, jstring};
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_helloFromRust() -> jint {
-    5
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBrainwalletAddress(env: JNIEnv, _: JClass, seed: JString) -> jstring {
+    let seed: String = env.get_string(seed).expect("Invalid seed").into();
+    let keypair = Brain::new(seed).generate().unwrap();
+    let java_address = env.new_string(format!("{:?}", keypair.address())).expect("Could not create java string");
+    java_address.into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBrainwalletSecret(env: JNIEnv, _: JClass, seed: JString) -> jstring {
+    let seed: String = env.get_string(seed).expect("Invalid seed").into();
+    let keypair = Brain::new(seed).generate().unwrap();
+    let java_secret = env.new_string(format!("{:?}", keypair.secret())).expect("Could not create java string");
+    java_secret.into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBrainwalletSign(env: JNIEnv, _: JClass, seed: JString, message: JString) -> jstring {
+    let seed: String = env.get_string(seed).expect("Invalid seed").into();
+    let message: String = env.get_string(message).expect("Invalid message").into();
+    let keypair = Brain::new(seed).generate().unwrap();
+    let message: Message = message.parse().unwrap();
+    let signature = sign(keypair.secret(), &message).unwrap();
+    let java_signature = env.new_string(format!("{}", signature)).expect("Could not create java string");
+    java_signature.into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyRlpItem(env: JNIEnv, _: JClass, data: JString, position: jint) -> jstring {
+    let data: String = env.get_string(data).expect("Invalid seed").into();
+    match safe_rlp_item(&data, position as u32) {
+      Ok(result) => env.new_string(result).expect("Could not create java string").into_inner(),
+      Err(_) => {
+        let res = env.new_string("").expect("").into_inner();
+        env.throw(res.into());
+        res
+      },
+    }
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyKeccak(env: JNIEnv, _: JClass, data: JString) -> jstring {
+    let data: String = env.get_string(data).expect("Invalid seed").into();
+    let hex = data.from_hex().unwrap();
+    let mut res: [u8; 32] = [0; 32];
+    let mut keccak = Keccak::new_keccak256();
+    keccak.update(&hex);
+    keccak.finalize(&mut res);
+    env.new_string(res.to_hex()).expect("Could not create java string").into_inner()
   }
 }
 

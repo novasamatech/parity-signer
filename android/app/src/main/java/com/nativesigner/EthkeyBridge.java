@@ -10,6 +10,10 @@ import com.facebook.react.bridge.Promise;
  */
 
 public class EthkeyBridge extends ReactContextBaseJavaModule {
+    static {
+        System.loadLibrary("signer");
+    }
+
     @Override
     public String getName() {
         return "EthkeyBridge";
@@ -21,14 +25,32 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void brainWalletAddress(String seed, Promise promise) {
-        int a = hello();
-        promise.resolve("hello from java " + a + " sa");
+        promise.resolve(ethkeyBrainwalletAddress(seed));
     }
 
     @ReactMethod
     public void brainWalletSecret(String seed, Promise promise) {
-        promise.resolve("hello from java");
+        promise.resolve(ethkeyBrainwalletSecret(seed));
     }
 
-    private static native int hello();
+    @ReactMethod
+    public void brainWalletSign(String seed, String message, Promise promise) {
+        promise.resolve(ethkeyBrainwalletSign(seed, message));
+    }
+
+    @ReactMethod
+    public void rlpItem(String rlp, int position, Promise promise) {
+        promise.resolve(ethkeyRlpItem(rlp, position));
+    }
+
+    @ReactMethod
+    public void keccak(String data, Promise promise) {
+        promise.resolve(ethkeyKeccak(data));
+    }
+
+    private static native String ethkeyBrainwalletAddress(String seed);
+    private static native String ethkeyBrainwalletSecret(String seed);
+    private static native String ethkeyBrainwalletSign(String seed, String message);
+    private static native String ethkeyRlpItem(String data, int position);
+    private static native String ethkeyKeccak(String data);
 }
