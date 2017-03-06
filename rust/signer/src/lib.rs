@@ -94,6 +94,27 @@ pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
   Box::into_raw(Box::new(res.to_hex()))
 }
 
+extern crate jni;
+use self::jni::sys::jint;
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_hello() -> jint {
+  4
+}
+
+#[cfg(target_os = "android")]
+#[allow(non_snake_case)]
+pub mod android {
+  extern crate jni;
+  use self::jni::sys::jint;
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_helloFromRust() -> jint {
+    5
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::safe_rlp_item;

@@ -1,5 +1,7 @@
 # rust output file
 *.a
+*.so
+.externalNativeBuild
 
 # OSX
 #

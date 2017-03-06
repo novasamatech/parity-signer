@@ -42,6 +42,7 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+    System.loadLibrary("signer");
     SoLoader.init(this, /* native exopackage */ false);
   }
 }

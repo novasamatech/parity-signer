@@ -10,9 +10,12 @@ ethkey = { git = "https://github.com/ethcore/parity" }
 rlp = { git = "https://github.com/ethcore/parity" }
 tiny-keccak = "1.1"
 
+#[target.'cfg(target_os="android")'.dependencies]
+jni = { git = "https://github.com/prevoty/jni-rs", default-features = false }
+
 [lib]
 name = "signer"
-crate-type = ["staticlib"]
+crate-type = ["staticlib", "cdylib"]
 
 # https://github.com/DaGenix/rust-crypto/issues/383
 [replace]
