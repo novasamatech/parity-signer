@@ -32,8 +32,8 @@ async function onScannedTransaction(data, dispatch) {
     let tx = await transaction(tx_request.rlp);
     dispatch(selectAccount(account))
     dispatch(scannedTx(data.rlp, tx))
-    Vibration.vibrate()
-    Actions.enterPin()
+    //Vibration.vibrate()
+    Actions.confirm()
     scanning = false
   } catch (e) {
     console.log(e)

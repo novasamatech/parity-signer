@@ -18,7 +18,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   nextButtonAction: () => {
-    Actions.select()
+    Actions.enterPin()
   }
 })
 
