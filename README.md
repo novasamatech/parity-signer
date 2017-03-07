@@ -40,6 +40,8 @@
     react-native run-android
     ```
 
+### Example
+
 #### Create new account
 
 seed: `this is sparta`
