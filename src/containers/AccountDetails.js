@@ -10,7 +10,7 @@ import { deleteAccount as dbDeleteAccount } from '../util/db'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onDisplayAddressPressed: () => {
-    Actions.displayAddress()
+    Actions.qrViewAddress()
   },
   onDeleteAccountPressed: (account) => {
     Alert.alert('Do you want to delete the account?', undefined, [
@@ -24,8 +24,8 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
 })
 
-const Account = connect(state => ({
+const AccountDetailsContainer = connect(state => ({
   account: state.accounts.selected,
 }), mapDispatchToProps)(AccountDetails)
 
-export default Account
+export default AccountDetailsContainer

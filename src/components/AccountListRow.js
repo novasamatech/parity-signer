@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react'
 import { TouchableHighlight, StyleSheet, View, Text } from 'react-native'
 
-export default class AccountsListRow extends Component {
+export default class AccountListRow extends Component {
   static propTypes = {
     upperText: PropTypes.string.isRequired,
     lowerText: PropTypes.string.isRequired,

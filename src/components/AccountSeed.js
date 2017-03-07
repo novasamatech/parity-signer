@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react'
 import { TextInput, StyleSheet } from 'react-native'
 
-export default class NewAccountInput extends Component {
+export default class AccountSeed extends Component {
   static propTypes = {
     seed: PropTypes.string.isRequired,
     onChangeText: PropTypes.func.isRequired,

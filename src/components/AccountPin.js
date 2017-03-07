@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react'
 import { Text, TextInput, View, StyleSheet } from 'react-native'
 
-export default class Pin extends Component {
+export default class AccountPin extends Component {
   static propTypes = {
     onNextPressed: PropTypes.func.isRequired,
   }

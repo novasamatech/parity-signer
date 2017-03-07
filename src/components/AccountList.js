@@ -2,10 +2,10 @@
 
 import React, { Component, PropTypes } from 'react'
 import { Text, View, ListView, RecyclerViewBackedScrollView, StatusBar } from 'react-native'
-import AccountsListRow from './AccountsListRow'
+import AccountListRow from './AccountListRow'
 import AppStyles from '../styles'
 
-export default class AccountsList extends Component {
+export default class AccountList extends Component {
   static propTypes = {
     accounts: PropTypes.arrayOf(PropTypes.shape({
       address: PropTypes.string.isRequired,
@@ -34,7 +34,7 @@ export default class AccountsList extends Component {
         dataSource={this.state.dataSource}
         renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
           return (
-            <AccountsListRow
+            <AccountListRow
               upperText={rowData.name ? rowData.name : 'no name'}
               lowerText={'0x' + rowData.address}
               onPress={() => {

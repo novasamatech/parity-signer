@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { Vibration, Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import Scanner from '../components/Scanner'
+import QrScanner from '../components/QrScanner'
 import { selectAccount } from '../actions/accounts'
 import { scannedTx } from '../actions/transactions'
 import transaction from '../util/transaction'
@@ -33,7 +33,7 @@ async function onScannedTransaction(data, dispatch) {
     dispatch(selectAccount(account))
     dispatch(scannedTx(data.rlp, tx))
     //Vibration.vibrate()
-    Actions.confirm()
+    Actions.txDetails()
     scanning = false
   } catch (e) {
     console.log(e)
@@ -49,9 +49,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   }
 })
 
-const QrScanner = connect(
+const QrScannerContainer = connect(
   undefined,
   mapDispatchToProps
-)(Scanner)
+)(QrScanner)
 
-export default QrScanner
+export default QrScannerContainer

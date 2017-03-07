@@ -3,18 +3,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import AccountsList from '../components/AccountsList'
+import AccountList from '../components/AccountList'
 import { selectAccount } from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onAccountSelected: (account) => {
     dispatch(selectAccount(account))
-    Actions.details()
+    Actions.accountDetails()
   }
 })
 
-const Accounts = connect(state => ({
+const AccountListContainer = connect(state => ({
   accounts: state.accounts.all
-}), mapDispatchToProps)(AccountsList)
+}), mapDispatchToProps)(AccountList)
 
-export default Accounts
+export default AccountListContainer

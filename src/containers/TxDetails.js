@@ -3,7 +3,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import Send from '../components/Send'
+import TxDetails from '../components/TxDetails'
 
 const mapStateToProps = (state, ownProps) => ({
   nextButtonTitle: 'Next',
@@ -18,10 +18,10 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   nextButtonAction: () => {
-    Actions.enterPin()
+    Actions.accountEnterPin()
   }
 })
 
-const ConfirmTransaction = connect(mapStateToProps, mapDispatchToProps)(Send)
+const TxDetailsContainer = connect(mapStateToProps, mapDispatchToProps)(TxDetails)
 
-export default ConfirmTransaction
+export default TxDetailsContainer

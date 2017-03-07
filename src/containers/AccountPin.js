@@ -4,7 +4,7 @@ import React from 'react'
 import { Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import Pin from '../components/Pin'
+import AccountPin from '../components/AccountPin'
 import { addAccount, setPin } from '../actions/accounts'
 import { signedTx } from '../actions/transactions'
 import { keccak, brainWalletSign } from '../util/native'
@@ -20,7 +20,7 @@ async function signTransaction(dispatch, account, rlp) {
     let hash = await keccak(rlp)
     let signature = await brainWalletSign(account.seed, hash)
     dispatch(signedTx(signature))
-    Actions.displayTransaction()
+    Actions.txViewTx()
   } catch (e) {
     console.log(e)
   }
@@ -39,7 +39,7 @@ const mapDispatchToPropsEnterPin = (dispatch, ownProps) => ({
 const mapDispatchToPropsSetPin = (dispatch, ownProps) => ({
   onNextPressed: (pin) => {
     dispatch(setPin(pin))
-    Actions.confirmPin()
+    Actions.accountConfirmPin()
   }
 })
 
@@ -52,18 +52,18 @@ const mapDispatchToPropsConfirmPin = (dispatch, ownProps) => ({
     if (pin === account.pin) {
       dispatch(addAccount(account))
       saveAccount(account)
-      Actions.popTo('accounts')
+      Actions.popTo('accountList')
     } else {
       Alert.alert('Invalid pin')
     }
   }
 })
 
-export const EnterPin = connect(mapStateToPropsEnterPin, mapDispatchToPropsEnterPin)(Pin)
+export const AccountEnterPin = connect(mapStateToPropsEnterPin, mapDispatchToPropsEnterPin)(AccountPin)
 
-export const SetPin = connect(undefined, mapDispatchToPropsSetPin)(Pin)
+export const AccountSetPin = connect(undefined, mapDispatchToPropsSetPin)(AccountPin)
 
-export const ConfirmPin = connect(mapStateToPropsConfirmPin, mapDispatchToPropsConfirmPin)(Pin)
+export const AccountConfirmPin = connect(mapStateToPropsConfirmPin, mapDispatchToPropsConfirmPin)(AccountPin)
 
 
 

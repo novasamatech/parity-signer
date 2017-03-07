@@ -5,7 +5,7 @@ import { View, ScrollView, Text, TextInput, Button, StyleSheet } from 'react-nat
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
-import NewAccountInput from '../components/NewAccountInput'
+import AccountSeed from '../components/AccountSeed'
 import { words } from '../util/random'
 import { brainWalletAddress } from '../util/native'
 import { selectAccount }  from '../actions/accounts'
@@ -19,12 +19,12 @@ const mapDispatchToProps = (dispatch) => {
         address: account.address,
         name: account.name,
       }))
-      Actions.setPin()
+      Actions.accountSetPin()
     }
   }
 }
 
-export class NewAccount extends Component {
+export class AccountNew extends Component {
   constructor(props) {
     super(props)
 
@@ -68,7 +68,7 @@ export class NewAccount extends Component {
           onChangeText={(text) => {this.setState({name: text})}}
         />
         <Text style={AppStyles.hintText}>brain wallet seed</Text>
-        <NewAccountInput seed={this.state.seed} onChangeText={
+        <AccountSeed seed={this.state.seed} onChangeText={
           debounce((text) => { this.updateAddress(this, text) }, 100)
         }/>
         <Text style={AppStyles.valueText}>0x{this.state.address}</Text>
@@ -104,5 +104,5 @@ const styles = StyleSheet.create({
 export default connect(
   undefined,
   mapDispatchToProps
-)(NewAccount)
+)(AccountNew)
 
