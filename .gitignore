@@ -1,3 +1,7 @@
+# NDK
+NDK/
+rust/.cargo
+
 # rust output file
 *.a
 *.so
