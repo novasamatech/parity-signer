@@ -31,7 +31,7 @@ async function onScannedTransaction(data, dispatch) {
     }
     let tx = await transaction(tx_request.rlp);
     dispatch(selectAccount(account))
-    dispatch(scannedTx(data.rlp, tx))
+    dispatch(scannedTx(tx_request.rlp, tx))
     //Vibration.vibrate()
     Actions.txDetails()
     scanning = false
