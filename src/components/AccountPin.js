@@ -1,7 +1,8 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { Text, TextInput, View, StyleSheet } from 'react-native'
+import { Text, TextInput, View } from 'react-native'
+import AppStyles from '../styles'
 
 export default class AccountPin extends Component {
   static propTypes = {
@@ -17,9 +18,10 @@ export default class AccountPin extends Component {
 
   render() {
     return (
-      <View style={styles.view}>
+      <View style={AppStyles.view}>
+        <View style={AppStyles.center}>
         <TextInput
-          style={styles.input}
+          style={AppStyles.pin}
           placeholder='enter pin here'
           editable={true}
           multiline={false}
@@ -32,20 +34,7 @@ export default class AccountPin extends Component {
           onEndEditing={() => { this.props.onNextPressed(this.state.text, this.props.account, this.props.extra) }}
         />
       </View>
+      </View>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    marginTop: 60,
-    marginBottom: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    height: 20,
-    textAlign: 'center'
-  }
-})

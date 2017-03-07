@@ -32,12 +32,14 @@ export default class Send extends Component {
         <Text style={AppStyles.valueText}>{this.props.txGasPrice}</Text>
         <Text style={AppStyles.hintText}>data</Text>
         <Text style={AppStyles.valueText}>{this.props.txData}</Text>
+        <View style={AppStyles.buttonContainer}>
         <Button
           onPress={() => this.props.nextButtonAction()}
           title={this.props.nextButtonTitle}
           color="green"
           accessibilityLabel={this.props.nextButtonDescription}
         />
+        </View>
       </ScrollView>
     )
   }

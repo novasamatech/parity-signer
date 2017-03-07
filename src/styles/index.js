@@ -1,18 +1,18 @@
-'use strict'
+//'use strict'
 
 import React from 'react'
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
 export default StyleSheet.create({
   view: {
     flex: 1,
-    marginTop: 64,
+    marginTop: (Platform.OS === 'ios') ? 64 : 54,
     marginBottom: 50,
-    padding: 20
+    padding: 20,
   },
   listView: {
     flex: 1,
-    marginTop: 64,
+    marginTop: (Platform.OS === 'ios') ? 64 : 54,
     marginBottom: 50,
   },
   hintText: {
@@ -25,5 +25,24 @@ export default StyleSheet.create({
     color: 'black',
     marginBottom: 20,
     fontWeight: 'bold',
+  },
+  inputValue: {
+    color: 'black',
+    marginBottom: 20,
+    height: 40,
+  },
+  pin: {
+    color: 'black',
+    height: 70,
+    width: 300,
+    textAlign: 'center',
+  },
+  center: {
+    flex: 1,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  buttonContainer: {
+    height: 65,
   },
 })

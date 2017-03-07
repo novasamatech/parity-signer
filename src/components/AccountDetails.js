@@ -20,7 +20,7 @@ export default class AccountDetails extends Component {
         <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
         <Text style={AppStyles.hintText}>Address</Text>
         <Text style={AppStyles.valueText}>{this.props.account.address}</Text>
-        <View style={styles.buttonContainer}>
+        <View style={AppStyles.buttonContainer}>
           <Button
             style={styles.button}
             onPress={this.props.onDisplayAddressPressed}
@@ -28,6 +28,8 @@ export default class AccountDetails extends Component {
             color='green'
             accessibilityLabel='Press to address QR Code'
           />
+        </View>
+        <View style={AppStyles.buttonContainer}>
           <Button
             style={styles.button}
             onPress={() => this.props.onDeleteAccountPressed(this.props.account)}
@@ -42,10 +44,6 @@ export default class AccountDetails extends Component {
 }
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    //flexDirection: 'row',
-    //justifyContent: 'space-between'
-  },
   button: {
     flex: 0.5,
   }

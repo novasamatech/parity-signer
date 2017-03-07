@@ -40,7 +40,12 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void rlpItem(String rlp, int position, Promise promise) {
-        promise.resolve(ethkeyRlpItem(rlp, position));
+        try {
+            promise.resolve(ethkeyRlpItem(rlp, position));
+        } catch (Exception e) {
+            promise.reject("invalid rlp", null, null);
+
+        }
     }
 
     @ReactMethod

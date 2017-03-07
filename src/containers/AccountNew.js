@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { View, ScrollView, Text, TextInput, Button, StyleSheet } from 'react-native'
+import { View, ScrollView, Text, TextInput, Button } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
@@ -46,19 +46,18 @@ export class AccountNew extends Component {
         address: address,
       })
     } catch (e) {
-
+      // this should never fail
     }
   }
 
   render() {
-    var self = this;
     return (
       <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>name</Text>
         <TextInput
           placeholder='My Account'
           value={this.state.name}
-          style={styles.input}
+          style={AppStyles.inputValue}
           editable={true}
           multiline={false}
           returnKeyType='next'
@@ -86,20 +85,6 @@ export class AccountNew extends Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-  hint: {
-    marginBottom: 20,
-  },
-  address: {
-    marginBottom: 20,
-    fontSize: 12,
-  },
-  input: {
-    height: 20,
-    marginBottom: 20,
-  }
-})
 
 export default connect(
   undefined,
