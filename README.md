@@ -27,6 +27,19 @@
 
 ### usage
 
+- iOS
+
+    ```
+    react-native run-ios
+    ```
+
+- Android
+
+    ```
+    make -C rust/signer android
+    react-native run-android
+    ```
+
 #### Create new account
 
 seed: `this is sparta`
