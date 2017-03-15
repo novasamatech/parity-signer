@@ -43,6 +43,7 @@ export class AccountNew extends Component {
     try {
       let address = await brainWalletAddress(seed)
       self.setState({
+        seed: seed,
         address: address,
       })
     } catch (e) {
