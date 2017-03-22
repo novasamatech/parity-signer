@@ -4,7 +4,7 @@
 <dict>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)org.reactjs.native.example.NativeSigner</string>
+		<string>$(AppIdentifierPrefix)io.parity.NativeSigner</string>
 	</array>
 </dict>
 </plist>
