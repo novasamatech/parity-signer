@@ -199,7 +199,7 @@ dependencies = [
 [[package]]
 name = "rust-crypto"
 version = "0.2.36"
-source = "git+https://github.com/debris/rust-crypto#e66897f8cef1085357a89c0f4ec087656dc03034"
+source = "git+https://github.com/debris/rust-crypto#3052010f653cd0b8d238410374cf2dc4609234f9"
 dependencies = [
  "gcc 0.3.43 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
