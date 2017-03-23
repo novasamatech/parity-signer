@@ -84,9 +84,7 @@ const scenes = Actions.create(
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage={true}
         />
-        <Scene key='qrViewAddress' title='QR Code' component={QrViewAddress} rightTitle='Done'
-          onRight={() => Actions.popTo('right')}
-          rightButtonTextStyle={styles.navibarTitle}
+        <Scene key='qrViewAddress' title='QR Code' component={QrViewAddress}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage={true}
