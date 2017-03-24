@@ -4,7 +4,7 @@ import SecureStorage from 'react-native-secure-storage'
 
 const accountsStore = {
   keychainService: 'accounts',
-  sharedPreferencesName: 'accounts',
+  sharedPreferencesName: 'accounts'
 }
 
 export const deleteAccount = (account) => SecureStorage.deleteItem(account.address, accountsStore)

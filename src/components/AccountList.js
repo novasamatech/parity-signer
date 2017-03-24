@@ -1,19 +1,19 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { Text, View, ListView, RecyclerViewBackedScrollView, StatusBar } from 'react-native'
+import { ListView, RecyclerViewBackedScrollView, StatusBar } from 'react-native'
 import AccountListRow from './AccountListRow'
 import AppStyles from '../styles'
 
 export default class AccountList extends Component {
   static propTypes = {
     accounts: PropTypes.arrayOf(PropTypes.shape({
-      address: PropTypes.string.isRequired,
+      address: PropTypes.string.isRequired
     })).isRequired,
-    onAccountSelected: PropTypes.func.isRequired,
+    onAccountSelected: PropTypes.func.isRequired
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
     this.state = {
@@ -21,13 +21,13 @@ export default class AccountList extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps (nextProps) {
     this.setState({
       dataSource: this.state.dataSource.cloneWithRows(nextProps.accounts)
     })
   }
 
-  render() {
+  render () {
     return (
       <ListView
         style={AppStyles.listView}
@@ -44,10 +44,10 @@ export default class AccountList extends Component {
             />
           )
         }}
-        enableEmptySections={true}
+        enableEmptySections
         renderScrollComponent={props => <RecyclerViewBackedScrollView {...props} />}
       >
-        <StatusBar barStyle='light-content'/>
+        <StatusBar barStyle='light-content' />
       </ListView>
     )
   }

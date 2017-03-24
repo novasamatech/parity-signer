@@ -4,13 +4,12 @@ import React, { Component, PropTypes } from 'react'
 import { TouchableHighlight, StyleSheet, View, Text, Image } from 'react-native'
 import { blockiesIcon } from '../util/native'
 
-async function displayIcon(self, seed) {
+async function displayIcon (self, seed) {
   try {
     let icon = await blockiesIcon(seed)
     self.setState({
-      icon: icon,
+      icon: icon
     })
-
   } catch (e) {
     console.log(e)
   }
@@ -20,15 +19,15 @@ export default class AccountListRow extends Component {
   static propTypes = {
     upperText: PropTypes.string.isRequired,
     lowerText: PropTypes.string.isRequired,
-    onPress: PropTypes.func.isRequired,
+    onPress: PropTypes.func.isRequired
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {}
   }
 
-  render() {
+  render () {
     displayIcon(this, this.props.lowerText)
 
     return (
@@ -40,12 +39,12 @@ export default class AccountListRow extends Component {
               source={{uri: this.state.icon}}
             />
             <View style={{flexDirection: 'column'}}>
-              <Text style={styles.upperText} ellipsizeMode="middle" numberOfLines={1}>{this.props.upperText}</Text>
-              <Text style={styles.lowerText} ellipsizeMode="middle" numberOfLines={1}>{this.props.lowerText}</Text>
+              <Text style={styles.upperText} ellipsizeMode='middle' numberOfLines={1}>{this.props.upperText}</Text>
+              <Text style={styles.lowerText} ellipsizeMode='middle' numberOfLines={1}>{this.props.lowerText}</Text>
             </View>
           </View>
-          <View style={{height: 1, backgroundColor: '#ccc'}}/>
-          <View style={{height: 1, backgroundColor: '#ddd'}}/>
+          <View style={{height: 1, backgroundColor: '#ccc'}} />
+          <View style={{height: 1, backgroundColor: '#ddd'}} />
         </View>
       </TouchableHighlight>
     )
@@ -54,23 +53,23 @@ export default class AccountListRow extends Component {
 
 const styles = StyleSheet.create({
   row: {
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#F8F8F8'
   },
   square: {
     height: 60,
     width: 60,
     marginRight: 10,
-    resizeMode: 'contain',
+    resizeMode: 'contain'
   },
   upperText: {
     marginTop: 20,
     width: 200,
     fontSize: 16,
-    color: '#888',
+    color: '#888'
   },
   lowerText: {
     marginTop: 5,
     color: '#aaa',
-    fontSize: 10,
-  },
+    fontSize: 10
+  }
 })

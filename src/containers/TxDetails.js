@@ -1,6 +1,5 @@
 'use strict'
 
-import React from 'react'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import TxDetails from '../components/TxDetails'
@@ -13,7 +12,7 @@ const mapStateToProps = (state, ownProps) => ({
   txNonce: state.transactions.pendingTransaction.transaction.nonce,
   txGas: state.transactions.pendingTransaction.transaction.gas,
   txGasPrice: state.transactions.pendingTransaction.transaction.gasPrice,
-  txData: state.transactions.pendingTransaction.transaction.data,
+  txData: state.transactions.pendingTransaction.transaction.data
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

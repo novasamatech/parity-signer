@@ -2,8 +2,8 @@ import { rlpItem } from './native'
 import { fromWei } from './units'
 
 class Transaction {
-  constructor(nonce, gasPrice, gas, action, value, data) {
-    this.nonce = nonce || "0"
+  constructor (nonce, gasPrice, gas, action, value, data) {
+    this.nonce = nonce || '0'
     this.gasPrice = parseInt(gasPrice, 16).toString()
     this.gas = parseInt(gas, 16).toString()
     this.action = action
@@ -12,7 +12,7 @@ class Transaction {
   }
 }
 
-async function asyncTransaction(rlp, resolve, reject) {
+async function asyncTransaction (rlp, resolve, reject) {
   try {
     let nonce = await rlpItem(rlp, 0)
     let gasPrice = await rlpItem(rlp, 1)
@@ -27,6 +27,6 @@ async function asyncTransaction(rlp, resolve, reject) {
   }
 }
 
-export default function transaction(rlp) {
+export default function transaction (rlp) {
   return new Promise((resolve, reject) => asyncTransaction(rlp, resolve, reject))
 }
