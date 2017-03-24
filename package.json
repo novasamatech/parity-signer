@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build-rust": "cd rust/signer && make ios",
-    "start": "npm run build-rust && node node_modules/react-native/local-cli/cli.js run-ios",
+    "build-rust-ios": "cd rust/signer && make ios",
+    "ios": "npm run build-rust-ios && npm run cli run-ios",
+    "build-rust-android": "cd rust/signer && make android",
+    "android": "npm run build-rust-android && npm run cli run-android",
+    "cli": "node node_modules/react-native/local-cli/cli.js",
+    "start": "npm run ios",
     "test": "jest",
     "lint": "standard",
     "commit": "commit-wizard"
