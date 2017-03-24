@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -e
+
 # ios
 multirust add-target stable i386-apple-ios
 multirust add-target stable x86_64-apple-ios

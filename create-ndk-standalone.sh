@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # based on https://github.com/kennytm/rust-ios-android
 
@@ -13,7 +13,7 @@ fi
 MAKER="$NDK_HOME/build/tools/make_standalone_toolchain.py"
 
 if [ -x "$MAKER" ]; then
-    MAKER="$(brew --prefix android-ndk)/build/tools/make_standalone_toolchain.py"
+    MAKER="$NDK_HOME/build/tools/make_standalone_toolchain.py"
 fi
 
 if [ -x "$MAKER" ]; then

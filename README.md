@@ -17,12 +17,18 @@
 
     ```
     ./setup_macos.sh
+
+    echo "ndk.dir=$NDK_HOME" > android/local.properties
+    echo "sdk.dir=$ANDROID_HOME" >> android/local.properties
     ```
 
 - linux
 
     ```
     ./setup_linux.sh
+
+    echo "ndk.dir=$NDK_HOME" > android/local.properties
+    echo "sdk.dir=$ANDROID_HOME" >> android/local.properties
     ```
 
 ### usage
@@ -30,14 +36,13 @@
 - iOS
 
     ```
-    react-native run-ios
+    npm run ios
     ```
 
 - Android
 
     ```
-    make -C rust/signer android
-    react-native run-android
+    npm run android
     ```
 
 ### Example
