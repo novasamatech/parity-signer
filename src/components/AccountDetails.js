@@ -7,13 +7,13 @@ import AppStyles from '../styles'
 export default class AccountDetails extends Component {
   static propTypes = {
     account: PropTypes.shape({
-      address: PropTypes.string.isRequired,
+      address: PropTypes.string.isRequired
     }).isRequired,
     onDisplayAddressPressed: PropTypes.func.isRequired,
-    onDeleteAccountPressed: PropTypes.func.isRequired,
+    onDeleteAccountPressed: PropTypes.func.isRequired
   }
 
-  render() {
+  render () {
     return (
       <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>Name</Text>
@@ -45,6 +45,6 @@ export default class AccountDetails extends Component {
 
 const styles = StyleSheet.create({
   button: {
-    flex: 0.5,
+    flex: 0.5
   }
 })

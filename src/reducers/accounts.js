@@ -13,27 +13,27 @@ import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, SET_PIN, SET_ACCOUNTS } fr
 // all accounts are loaded on init from db
 const initialAccounts = {
   all: [],
-  selected: {},
+  selected: {}
 }
 
-export default function accounts(state = initialAccounts, action) {
+export default function accounts (state = initialAccounts, action) {
   switch (action.type) {
-      case ADD_ACCOUNT:
-        return Object.assign({}, state, {
-          all: [
-            ...state.all,
-            action.account,
-          ]
-        })
+    case ADD_ACCOUNT:
+      return Object.assign({}, state, {
+        all: [
+          ...state.all,
+          action.account
+        ]
+      })
 
     case SELECT_ACCOUNT:
       return Object.assign({}, state, {
-        selected: action.account,
+        selected: action.account
       })
 
     case DELETE_ACCOUNT:
       return Object.assign({}, state, {
-        all: state.all.filter((account) => { return action.account != account })
+        all: state.all.filter((account) => { return action.account !== account })
       })
 
     case SET_PIN:
@@ -45,7 +45,7 @@ export default function accounts(state = initialAccounts, action) {
 
     case SET_ACCOUNTS:
       return Object.assign({}, state, {
-        all: action.accounts,
+        all: action.accounts
       })
 
     default:
