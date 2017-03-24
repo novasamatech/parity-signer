@@ -8,7 +8,7 @@ async function displayIcon(self, seed) {
   try {
     let icon = await blockiesIcon(seed)
     self.setState({
-      icon: 'data:image/png;base64,' + icon,
+      icon: icon,
     })
 
   } catch (e) {
