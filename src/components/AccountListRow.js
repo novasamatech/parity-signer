@@ -26,11 +26,10 @@ export default class AccountListRow extends Component {
   constructor(props) {
     super(props)
     this.state = {}
+    displayIcon(this, this.props.lowerText)
   }
 
   render() {
-    displayIcon(this, this.props.lowerText)
-
     return (
       <TouchableHighlight style={styles.row} onPress={this.props.onPress} underlayColor='#0004'>
         <View style={{flexDirection: 'column'}}>
