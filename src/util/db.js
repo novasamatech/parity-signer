@@ -14,6 +14,12 @@ export const saveAccount = (account) =>
 
 export const saveAccounts = (accounts) => accounts.forEach(saveAccount)
 
-export const loadAccounts = () => SecureStorage.getAllItems(accountsStore).then(
-  accounts => Object.values(accounts).map(account => JSON.parse(account))
-)
+export const loadAccounts = () => {
+  if (!SecureStorage) {
+    return Promise.resolve([])
+  }
+
+  SecureStorage.getAllItems(accountsStore).then(
+    accounts => Object.values(accounts).map(account => JSON.parse(account))
+  )
+}
