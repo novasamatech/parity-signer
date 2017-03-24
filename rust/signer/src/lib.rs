@@ -3,15 +3,38 @@ extern crate rustc_serialize;
 extern crate tiny_keccak;
 extern crate ethkey;
 extern crate rlp;
+extern crate blockies;
 
 mod string;
 
 use rustc_serialize::hex::{ToHex, FromHex};
+use rustc_serialize::base64::{self, ToBase64};
 use tiny_keccak::Keccak;
 use ethkey::{KeyPair, Generator, Brain, Message, sign};
-use rlp::{UntrustedRlp, View};
+use rlp::UntrustedRlp;
+use blockies::{Blockies, create_icon, ethereum};
 
 use string::StringPtr;
+
+fn blockies_icon_in_base64(seed: Vec<u8>) -> String {
+  let mut result = Vec::new();
+  let options = ethereum::Options {
+    size: 8,
+    scale: 16,
+    seed: seed,
+    color: None,
+    background_color: None,
+    spot_color: None,
+  };
+
+  create_icon(&mut result, Blockies::Ethereum(options)).unwrap();
+  result.to_base64(base64::Config {
+    char_set: base64::CharacterSet::Standard,
+    newline: base64::Newline::LF,
+    pad: true,
+    line_length: None,
+  })
+}
 
 // string ffi
 
@@ -94,6 +117,15 @@ pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
   Box::into_raw(Box::new(res.to_hex()))
 }
 
+// blockies ffi
+
+#[no_mangle]
+pub unsafe extern fn blockies_icon(blockies_seed: *mut StringPtr) -> *mut String {
+  let blockies_seed = (*blockies_seed).as_str();
+  let icon = blockies_icon_in_base64(blockies_seed.into());
+  Box::into_raw(Box::new(icon))
+}
+
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
@@ -153,6 +185,13 @@ pub mod android {
     keccak.update(&hex);
     keccak.finalize(&mut res);
     env.new_string(res.to_hex()).expect("Could not create java string").into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBlockiesIcon(env: JNIEnv, _: JClass, seed: JString) -> jstring {
+    let seed: String = env.get_string(seed).expect("Invalid seed").into();
+    let icon = blockies_icon_in_base64(seed.into());
+    env.new_string(icon).expect("Could not create java string").into_inner()
   }
 }
 

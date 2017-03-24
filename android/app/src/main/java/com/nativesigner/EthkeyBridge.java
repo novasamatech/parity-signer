@@ -53,9 +53,15 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         promise.resolve(ethkeyKeccak(data));
     }
 
+    @ReactMethod
+    public void blockiesIcon(String seed, Promise promise) {
+        promise.resolve(ethkeyBlockiesIcon(seed));
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletSecret(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
     private static native String ethkeyRlpItem(String data, int position);
     private static native String ethkeyKeccak(String data);
+    private static native String ethkeyBlockiesIcon(String seed);
 }

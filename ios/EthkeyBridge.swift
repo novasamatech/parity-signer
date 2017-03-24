@@ -72,4 +72,14 @@ class EthkeyBridge: NSObject {
 		rust_string_destroy(hash_rust_str)
 		resolve(hash)
 	}
+	
+	@objc func blockiesIcon(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+		var seed_ptr = seed.asPtr()
+		let icon_rust_str = blockies_icon(&seed_ptr)
+		let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
+		let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(icon_rust_str_ptr)
+		rust_string_destroy(icon_rust_str)
+		resolve(icon)
+	}
 }
