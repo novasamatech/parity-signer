@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
   square: {
     height: 60,
     width: 60,
-    //backgroundColor: '#D8D8D8',
     marginRight: 10,
     resizeMode: 'contain',
   },

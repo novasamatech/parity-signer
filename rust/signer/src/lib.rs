@@ -16,6 +16,26 @@ use blockies::{Blockies, create_icon, ethereum};
 
 use string::StringPtr;
 
+fn blockies_icon_in_base64(seed: Vec<u8>) -> String {
+  let mut result = Vec::new();
+  let options = ethereum::Options {
+    size: 8,
+    scale: 16,
+    seed: seed,
+    color: None,
+    background_color: None,
+    spot_color: None,
+  };
+
+  create_icon(&mut result, Blockies::Ethereum(options)).unwrap();
+  result.to_base64(base64::Config {
+    char_set: base64::CharacterSet::Standard,
+    newline: base64::Newline::LF,
+    pad: true,
+    line_length: None,
+  })
+}
+
 // string ffi
 
 #[no_mangle]
@@ -97,28 +117,13 @@ pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
   Box::into_raw(Box::new(res.to_hex()))
 }
 
+// blockies ffi
+
 #[no_mangle]
 pub unsafe extern fn blockies_icon(blockies_seed: *mut StringPtr) -> *mut String {
   let blockies_seed = (*blockies_seed).as_str();
-  let seed: Vec<u8> = blockies_seed.into();
-  let mut result = Vec::new();
-  let options = ethereum::Options {
-    size: 8,
-    scale: 16,
-    seed: seed,
-    color: None,
-    background_color: None,
-    spot_color: None,
-  };
-
-  create_icon(&mut result, Blockies::Ethereum(options)).unwrap();
-  let base64_icon = result.to_base64(base64::Config {
-    char_set: base64::CharacterSet::Standard,
-    newline: base64::Newline::LF,
-    pad: true,
-    line_length: None,
-  });
-  Box::into_raw(Box::new(base64_icon))
+  let icon = blockies_icon_in_base64(blockies_seed.into());
+  Box::into_raw(Box::new(icon))
 }
 
 #[cfg(target_os = "android")]
@@ -185,24 +190,8 @@ pub mod android {
   #[no_mangle]
   pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBlockiesIcon(env: JNIEnv, _: JClass, seed: JString) -> jstring {
     let seed: String = env.get_string(seed).expect("Invalid seed").into();
-    let seed: Vec<u8> = seed.into();
-    let mut result = Vec::new();
-    let options = ethereum::Options {
-      size: 8,
-      scale: 16,
-      seed: seed,
-      color: None,
-      background_color: None,
-      spot_color: None,
-    };
-    create_icon(&mut result, Blockies::Ethereum(options)).unwrap();
-    let base64_icon = result.to_base64(base64::Config {
-      char_set: base64::CharacterSet::Standard,
-      newline: base64::Newline::LF,
-      pad: true,
-      line_length: None,
-    });
-    env.new_string(base64_icon).expect("Could not create java string").into_inner()
+    let icon = blockies_icon_in_base64(seed.into());
+    env.new_string(icon).expect("Could not create java string").into_inner()
   }
 }
 
