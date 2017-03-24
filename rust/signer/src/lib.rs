@@ -3,13 +3,15 @@ extern crate rustc_serialize;
 extern crate tiny_keccak;
 extern crate ethkey;
 extern crate rlp;
+extern crate blockies;
 
 mod string;
 
 use rustc_serialize::hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
 use ethkey::{KeyPair, Generator, Brain, Message, sign};
-use rlp::{UntrustedRlp, View};
+use rlp::UntrustedRlp;
+use blockies::{Blockies, create_icon, ethereum};
 
 use string::StringPtr;
 
@@ -92,6 +94,24 @@ pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
   keccak.update(&hex);
   keccak.finalize(&mut res);
   Box::into_raw(Box::new(res.to_hex()))
+}
+
+#[no_mangle]
+pub unsafe extern fn blockies_icon(blockies_seed: *mut StringPtr) -> *mut String {
+  let blockies_seed = (*blockies_seed).as_str();
+  let seed: Vec<u8> = blockies_seed.into();
+  let mut result = Vec::new();
+  let options = ethereum::Options {
+    size: 8,
+    scale: 16,
+    seed: seed,
+    color: None,
+    background_color: None,
+    spot_color: None,
+  };
+
+  create_icon(&mut result, Blockies::Ethereum(options)).unwrap();
+  Box::into_raw(Box::new(String::from_utf8_unchecked(result)))
 }
 
 #[cfg(target_os = "android")]

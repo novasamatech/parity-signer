@@ -1,7 +1,20 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { TouchableHighlight, StyleSheet, View, Text } from 'react-native'
+import { TouchableHighlight, StyleSheet, View, Text, Image } from 'react-native'
+import { blockiesIcon } from '../util/native'
+
+async function displayIcon(self, seed) {
+  try {
+    let icon = await blockiesIcon(seed)
+    self.setState({
+      icon: 'data:image/png;base64,' + icon,
+    })
+
+  } catch (e) {
+    console.log(e)
+  }
+}
 
 export default class AccountListRow extends Component {
   static propTypes = {
@@ -10,12 +23,22 @@ export default class AccountListRow extends Component {
     onPress: PropTypes.func.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
+
   render() {
+    displayIcon(this, this.props.lowerText)
+
     return (
       <TouchableHighlight style={styles.row} onPress={this.props.onPress} underlayColor='#0004'>
         <View style={{flexDirection: 'column'}}>
           <View style={{flexDirection: 'row'}}>
-            <View style={styles.square}/>
+            <Image
+              style={styles.square}
+              source={{uri: this.state.icon}}
+            />
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.upperText} ellipsizeMode="middle" numberOfLines={1}>{this.props.upperText}</Text>
               <Text style={styles.lowerText} ellipsizeMode="middle" numberOfLines={1}>{this.props.lowerText}</Text>
@@ -36,8 +59,9 @@ const styles = StyleSheet.create({
   square: {
     height: 60,
     width: 60,
-    backgroundColor: '#D8D8D8',
+    //backgroundColor: '#D8D8D8',
     marginRight: 10,
+    resizeMode: 'contain',
   },
   upperText: {
     marginTop: 20,
@@ -49,5 +73,5 @@ const styles = StyleSheet.create({
     marginTop: 5,
     color: '#aaa',
     fontSize: 10,
-  }
+  },
 })
