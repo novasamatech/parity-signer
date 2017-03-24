@@ -30,13 +30,12 @@ export default class AccountDetails extends Component {
           />
         </View>
         <View style={AppStyles.buttonContainer}>
-          <Button
-            style={styles.button}
+          <Text
+            style={styles.buttonText}
             onPress={() => this.props.onDeleteAccountPressed(this.props.account)}
-            title='Delete'
-            color='red'
-            accessibilityLabel='Press to delete account'
-          />
+          >
+            Delete
+          </Text>
         </View>
       </ScrollView>
     )
@@ -46,5 +45,8 @@ export default class AccountDetails extends Component {
 const styles = StyleSheet.create({
   button: {
     flex: 0.5
+  },
+  buttonText: {
+    textAlign: 'right'
   }
 })

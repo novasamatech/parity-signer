@@ -19,7 +19,7 @@ export const loadAccounts = () => {
     return Promise.resolve([])
   }
 
-  SecureStorage.getAllItems(accountsStore).then(
+  return SecureStorage.getAllItems(accountsStore).then(
     accounts => Object.values(accounts).map(account => JSON.parse(account))
   )
 }
