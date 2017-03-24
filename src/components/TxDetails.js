@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { StyleSheet, ScrollView, View, Text, TextInput, Button } from 'react-native'
+import { ScrollView, View, Text, Button } from 'react-native'
 import AppStyles from '../styles'
 
 export default class Send extends Component {
@@ -14,10 +14,10 @@ export default class Send extends Component {
     txNonce: PropTypes.string.isRequired,
     txGas: PropTypes.string.isRequired,
     txGasPrice: PropTypes.string.isRequired,
-    txData: PropTypes.string.isRequired,
+    txData: PropTypes.string.isRequired
   }
 
-  render() {
+  render () {
     return (
       <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>recipient address</Text>
@@ -33,11 +33,11 @@ export default class Send extends Component {
         <Text style={AppStyles.hintText}>data</Text>
         <Text style={AppStyles.valueText}>{this.props.txData}</Text>
         <View style={AppStyles.buttonContainer}>
-        <Button
-          onPress={() => this.props.nextButtonAction()}
-          title={this.props.nextButtonTitle}
-          color="green"
-          accessibilityLabel={this.props.nextButtonDescription}
+          <Button
+            onPress={() => this.props.nextButtonAction()}
+            title={this.props.nextButtonTitle}
+            color='green'
+            accessibilityLabel={this.props.nextButtonDescription}
         />
         </View>
       </ScrollView>

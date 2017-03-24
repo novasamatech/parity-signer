@@ -1,14 +1,14 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { View, ScrollView, Text, TextInput, Button } from 'react-native'
+import { ScrollView, Text, TextInput, Button } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
 import AccountSeed from '../components/AccountSeed'
 import { words } from '../util/random'
 import { brainWalletAddress } from '../util/native'
-import { selectAccount }  from '../actions/accounts'
+import { selectAccount } from '../actions/accounts'
 import AppStyles from '../styles'
 
 const mapDispatchToProps = (dispatch) => {
@@ -17,7 +17,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(selectAccount({
         seed: account.seed,
         address: account.address,
-        name: account.name,
+        name: account.name
       }))
       Actions.accountSetPin()
     }
@@ -25,7 +25,7 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 export class AccountNew extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     const seed = words()
@@ -33,25 +33,25 @@ export class AccountNew extends Component {
     this.state = {
       seed: seed,
       address: '',
-      name: '',
+      name: ''
     }
 
     this.updateAddress(this, seed)
   }
 
-  async updateAddress(self, seed) {
+  async updateAddress (self, seed) {
     try {
       let address = await brainWalletAddress(seed)
       self.setState({
         seed: seed,
-        address: address,
+        address: address
       })
     } catch (e) {
       // this should never fail
     }
   }
 
-  render() {
+  render () {
     return (
       <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>name</Text>
@@ -59,28 +59,28 @@ export class AccountNew extends Component {
           placeholder='My Account'
           value={this.state.name}
           style={AppStyles.inputValue}
-          editable={true}
+          editable
           multiline={false}
           returnKeyType='next'
           numberOfLines={1}
           fontSize={12}
-          autoFocus={true}
-          onChangeText={(text) => {this.setState({name: text})}}
+          autoFocus
+          onChangeText={(text) => { this.setState({name: text}) }}
         />
         <Text style={AppStyles.hintText}>brain wallet seed</Text>
         <AccountSeed seed={this.state.seed} onChangeText={
           debounce((text) => { this.updateAddress(this, text) }, 100)
-        }/>
+        } />
         <Text style={AppStyles.valueText}>0x{this.state.address}</Text>
         <Button
           onPress={() => this.props.addAccount({
             seed: this.state.seed,
             address: this.state.address,
-            name: this.state.name,
+            name: this.state.name
           })}
-          title="Add Account"
-          color="green"
-          accessibilityLabel="Press to add new account"
+          title='Add Account'
+          color='green'
+          accessibilityLabel='Press to add new account'
         />
       </ScrollView>
     )
@@ -91,4 +91,3 @@ export default connect(
   undefined,
   mapDispatchToProps
 )(AccountNew)
-

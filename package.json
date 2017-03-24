@@ -9,7 +9,9 @@
     "android": "npm run build-rust-android && npm run cli run-android",
     "cli": "node node_modules/react-native/local-cli/cli.js",
     "start": "npm run ios",
-    "test": "jest"
+    "test": "jest",
+    "lint": "standard",
+    "commit": "commit-wizard"
   },
   "dependencies": {
     "bignumber.js": "^4.0.0",
@@ -25,16 +27,39 @@
     "redux": "^3.6.0"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.1",
     "babel-jest": "18.0.0",
     "babel-preset-react-native": "1.9.1",
     "jest": "18.1.0",
     "jest-react-native": "^18.0.0",
-    "react-test-renderer": "15.4.2"
+    "pre-git": "^3.14.0",
+    "react-test-renderer": "15.4.2",
+    "standard": "^9.0.2"
   },
   "jest": {
     "preset": "react-native",
     "setupFiles": [
       "<rootDir>/jest-setup.js"
     ]
+  },
+  "standard": {
+    "globals": [
+      "it",
+      "describe",
+      "expect"
+    ],
+    "parser": "babel-eslint"
+  },
+  "config": {
+    "pre-git": {
+      "pre-commit": [],
+      "pre-push": [
+        "npm run lint -- --fix",
+        "npm run test"
+      ],
+      "post-commit": [],
+      "post-checkout": [],
+      "post-merge": []
+    }
   }
 }

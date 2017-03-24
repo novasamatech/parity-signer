@@ -1,6 +1,5 @@
 'use strict'
 
-import React from 'react'
 import { Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
@@ -12,10 +11,10 @@ import { saveAccount } from '../util/db'
 
 const mapStateToPropsEnterPin = (state, ownProps) => ({
   account: state.accounts.selected,
-  extra: state.transactions.pendingTransaction.rlp,
+  extra: state.transactions.pendingTransaction.rlp
 })
 
-async function signTransaction(dispatch, account, rlp) {
+async function signTransaction (dispatch, account, rlp) {
   try {
     let hash = await keccak(rlp)
     let signature = await brainWalletSign(account.seed, hash)
@@ -33,7 +32,7 @@ const mapDispatchToPropsEnterPin = (dispatch, ownProps) => ({
     } else {
       Alert.alert('Invalid pin')
     }
-  },
+  }
 })
 
 const mapDispatchToPropsSetPin = (dispatch, ownProps) => ({
@@ -44,7 +43,7 @@ const mapDispatchToPropsSetPin = (dispatch, ownProps) => ({
 })
 
 const mapStateToPropsConfirmPin = (state, ownProps) => ({
-  account: state.accounts.selected,
+  account: state.accounts.selected
 })
 
 const mapDispatchToPropsConfirmPin = (dispatch, ownProps) => ({
@@ -64,6 +63,3 @@ export const AccountEnterPin = connect(mapStateToPropsEnterPin, mapDispatchToPro
 export const AccountSetPin = connect(undefined, mapDispatchToPropsSetPin)(AccountPin)
 
 export const AccountConfirmPin = connect(mapStateToPropsConfirmPin, mapDispatchToPropsConfirmPin)(AccountPin)
-
-
-

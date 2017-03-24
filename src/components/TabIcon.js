@@ -5,23 +5,22 @@ import { Text, StyleSheet } from 'react-native'
 
 export default class TabIcon extends Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
   }
 
-  render() {
+  render () {
     return (
-      <Text style={this.props.selected ? styles.selected: styles.normal}>{this.props.title}</Text>
+      <Text style={this.props.selected ? styles.selected : styles.normal}>{this.props.title}</Text>
     )
   }
 }
 
 const styles = StyleSheet.create({
   normal: {
-    color: 'white',
+    color: 'white'
   },
   selected: {
     fontWeight: 'bold',
-    color: '#ddd',
+    color: '#ddd'
   }
 })
-

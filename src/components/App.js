@@ -1,10 +1,9 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { View, Text, StyleSheet, AppState } from 'react-native'
+import { StyleSheet, AppState } from 'react-native'
 import { Provider, connect } from 'react-redux'
-import { createStore } from 'redux'
-import { Actions, ActionConst, Router, Scene } from 'react-native-router-flux'
+import { Actions, Router, Scene } from 'react-native-router-flux'
 import TabIcon from './TabIcon'
 import QrScanner from '../containers/QrScanner'
 import AccountList from '../containers/AccountList'
@@ -25,10 +24,10 @@ loadAccounts().then(accounts => {
 
 const styles = StyleSheet.create({
   tabbar: {
-    backgroundColor: '#343E48',
+    backgroundColor: '#343E48'
   },
   navibar: {
-    backgroundColor: '#343E48',
+    backgroundColor: '#343E48'
   },
   navibarTitle: {
     color: 'white'
@@ -46,48 +45,48 @@ const scenes = Actions.create(
         <Scene key='txDetails' component={TxDetails} title='Transaction Details'
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
         <Scene key='accountEnterPin' title='Enter Pin' component={AccountEnterPin}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
         <Scene key='qrViewTx' title='QR Code' component={QrViewTransaction} rightTitle='Done'
           onRight={() => Actions.popTo('left')}
           rightButtonTextStyle={styles.navibarTitle}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
       </Scene>
       <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         <Scene key='accountList' title='Accounts' component={AccountList}
-          rightTitle="Add" onRight={() => Actions.accountNew()} rightButtonTextStyle={styles.navibarTitle}/>
+          rightTitle='Add' onRight={() => Actions.accountNew()} rightButtonTextStyle={styles.navibarTitle} />
         <Scene key='accountNew' component={AccountNew} title='Add Account'
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
         <Scene key='accountSetPin' title='Set Pin' component={AccountSetPin}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
         <Scene key='accountConfirmPin' title='Confirm Pin' component={AccountConfirmPin}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
         <Scene key='accountDetails' component={AccountDetails} title='Account Details'
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
         <Scene key='qrViewAddress' title='QR Code' component={QrViewAddress}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
-          hideBackImage={true}
+          hideBackImage
         />
       </Scene>
     </Scene>
@@ -95,24 +94,20 @@ const scenes = Actions.create(
 )
 
 export default class App extends Component {
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
+  render () {
     return (
       <Provider store={store}>
-        <ConnectedRouter scenes={scenes}/>
+        <ConnectedRouter scenes={scenes} />
       </Provider>
     )
   }
 
-  componentDidMount() {
-    AppState.addEventListener('change', this._handleAppStateChange);
+  componentDidMount () {
+    AppState.addEventListener('change', this._handleAppStateChange)
   }
 
-  componentWillUnmount() {
-    AppState.removeEventListener('change', this._handleAppStateChange);
+  componentWillUnmount () {
+    AppState.removeEventListener('change', this._handleAppStateChange)
   }
 
   _handleAppStateChange = (appState) => {
@@ -127,4 +122,3 @@ export default class App extends Component {
     }
   }
 }
-
