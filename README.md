@@ -30,6 +30,7 @@
 - iOS
 
     ```
+    make -C rust/signer ios
     react-native run-ios
     ```
 
