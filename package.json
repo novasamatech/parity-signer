@@ -6,7 +6,8 @@
     "build-rust": "cd rust/signer && make ios",
     "start": "npm run build-rust && node node_modules/react-native/local-cli/cli.js run-ios",
     "test": "jest",
-    "lint": "standard"
+    "lint": "standard",
+    "commit": "commit-wizard"
   },
   "dependencies": {
     "bignumber.js": "^4.0.0",
@@ -27,6 +28,7 @@
     "babel-preset-react-native": "1.9.1",
     "jest": "18.1.0",
     "jest-react-native": "^18.0.0",
+    "pre-git": "^3.14.0",
     "react-test-renderer": "15.4.2",
     "standard": "^9.0.2"
   },
@@ -43,5 +45,17 @@
       "expect"
     ],
     "parser": "babel-eslint"
+  },
+  "config": {
+    "pre-git": {
+      "pre-commit": [],
+      "pre-push": [
+        "npm run lint -- --fix",
+        "npm run test"
+      ],
+      "post-commit": [],
+      "post-checkout": [],
+      "post-merge": []
+    }
   }
 }
