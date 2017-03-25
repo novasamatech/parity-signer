@@ -26,6 +26,10 @@ export default class AccountIcon extends Component {
     displayIcon(this, this.props.seed)
   }
 
+  componentWillReceiveProps (newProps) {
+    displayIcon(this, newProps.seed)
+  }
+
   render () {
     return (
       <Image

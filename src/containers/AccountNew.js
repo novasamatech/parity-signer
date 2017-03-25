@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { ScrollView, Text, TextInput, Button } from 'react-native'
+import { StyleSheet, ScrollView, Text, TextInput, Button } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
@@ -9,6 +9,7 @@ import AccountSeed from '../components/AccountSeed'
 import { words } from '../util/random'
 import { brainWalletAddress } from '../util/native'
 import { selectAccount } from '../actions/accounts'
+import AccountIcon from '../components/AccountIcon'
 import AppStyles from '../styles'
 
 const mapDispatchToProps = (dispatch) => {
@@ -54,6 +55,7 @@ export class AccountNew extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
+        <AccountIcon style={styles.icon} seed={'0x' + this.state.address}/>
         <Text style={AppStyles.hintText}>name</Text>
         <TextInput
           placeholder='My Account'
@@ -86,6 +88,14 @@ export class AccountNew extends Component {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  icon: {
+    height: 100,
+    width: 100,
+    marginBottom: 20
+  }
+})
 
 export default connect(
   undefined,
