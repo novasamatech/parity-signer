@@ -42,7 +42,6 @@ export default class AccountPin extends Component {
             multiline={false}
             numberOfLines={1}
             onChangeText={this.onChange}
-            onEndEditing={this.onNext}
             placeholder='enter pin here'
             returnKeyType='next'
             secureTextEntry
