@@ -17,9 +17,9 @@ export default class AccountDetails extends Component {
     return (
       <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>Name</Text>
-        <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
+        <Text selectable style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
         <Text style={AppStyles.hintText}>Address</Text>
-        <Text style={AppStyles.valueText}>0x{this.props.account.address}</Text>
+        <Text selectable style={AppStyles.valueText}>0x{this.props.account.address}</Text>
         <View style={AppStyles.buttonContainer}>
           <Button
             style={styles.button}

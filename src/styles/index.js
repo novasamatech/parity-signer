@@ -31,6 +31,9 @@ export default StyleSheet.create({
     marginBottom: 20,
     height: 40
   },
+  inputValueSmall: {
+    fontSize: 12
+  },
   pin: {
     color: 'black',
     height: 70,

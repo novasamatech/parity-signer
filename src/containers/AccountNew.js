@@ -56,7 +56,7 @@ export class AccountNew extends Component {
       <ScrollView style={AppStyles.view}>
         <Text style={AppStyles.hintText}>Account Name</Text>
         <TextInput
-          placeholder='Name of this account'
+          placeholder='Name for this account'
           value={this.state.name}
           style={AppStyles.inputValue}
           editable
@@ -72,7 +72,11 @@ export class AccountNew extends Component {
           debounce((text) => { this.updateAddress(this, text) }, 100)
         } />
         <Text style={AppStyles.hintText}>Address</Text>
-        <Text style={AppStyles.valueText}>0x{this.state.address}</Text>
+        <TextInput
+          editable={false}
+          style={[AppStyles.inputValue, AppStyles.inputValueSmall]}
+          value={`0x${this.state.address}`}
+          />
         <View style={AppStyles.buttonContainer}>
           <Button
             onPress={() => this.props.addAccount({
