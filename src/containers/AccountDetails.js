@@ -1,6 +1,5 @@
 'use strict'
 
-import React from 'react'
 import { Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
@@ -13,19 +12,28 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     Actions.qrViewAddress()
   },
   onDeleteAccountPressed: (account) => {
-    Alert.alert('Do you want to delete the account?', undefined, [
-      { text: 'Yes', onPress: () => {
-        dispatch(deleteAccount(account))
-        dbDeleteAccount(account)
-        Actions.pop()
-      }},
-      { text: 'No' }
-    ])
-  },
+    Alert.alert(
+      'Delete the account?',
+      `Account "${account.name}" will be unrecoverably wiped from your device.`,
+      [
+        {
+          text: 'Yes',
+          onPress: () => {
+            dispatch(deleteAccount(account))
+            dbDeleteAccount(account)
+            Actions.pop()
+          }
+        },
+        {
+          text: 'No'
+        }
+      ]
+    )
+  }
 })
 
 const AccountDetailsContainer = connect(state => ({
-  account: state.accounts.selected,
+  account: state.accounts.selected
 }), mapDispatchToProps)(AccountDetails)
 
 export default AccountDetailsContainer

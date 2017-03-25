@@ -8,5 +8,5 @@ import transactions from './transactions'
 export default combineReducers({
   accounts,
   routes,
-  transactions,
+  transactions
 })

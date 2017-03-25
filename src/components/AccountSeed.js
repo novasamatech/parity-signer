@@ -6,23 +6,23 @@ import { TextInput, StyleSheet } from 'react-native'
 export default class AccountSeed extends Component {
   static propTypes = {
     seed: PropTypes.string.isRequired,
-    onChangeText: PropTypes.func.isRequired,
+    onChangeText: PropTypes.func.isRequired
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       text: this.props.seed
     }
   }
 
-  render() {
+  render () {
     return (
       <TextInput
         style={styles.input}
         placeholder='the brain wallet seed'
-        editable={true}
-        multiline={true}
+        editable
+        multiline
         returnKeyType='default'
         numberOfLines={6}
         fontSize={12}
@@ -43,5 +43,5 @@ const styles = StyleSheet.create({
   input: {
     height: 120,
     fontWeight: 'bold'
-  },
+  }
 })

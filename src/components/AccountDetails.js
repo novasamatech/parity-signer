@@ -20,10 +20,10 @@ async function displayIcon(self, seed) {
 export default class AccountDetails extends Component {
   static propTypes = {
     account: PropTypes.shape({
-      address: PropTypes.string.isRequired,
+      address: PropTypes.string.isRequired
     }).isRequired,
     onDisplayAddressPressed: PropTypes.func.isRequired,
-    onDeleteAccountPressed: PropTypes.func.isRequired,
+    onDeleteAccountPressed: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -53,13 +53,12 @@ export default class AccountDetails extends Component {
           />
         </View>
         <View style={AppStyles.buttonContainer}>
-          <Button
-            style={styles.button}
+          <Text
+            style={styles.buttonText}
             onPress={() => this.props.onDeleteAccountPressed(this.props.account)}
-            title='Delete'
-            color='red'
-            accessibilityLabel='Press to delete account'
-          />
+          >
+            Delete
+          </Text>
         </View>
       </ScrollView>
     )
@@ -68,12 +67,15 @@ export default class AccountDetails extends Component {
 
 const styles = StyleSheet.create({
   button: {
-    flex: 0.5,
+    flex: 0.5
   },
   icon: {
     height: 100,
     width: 100,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginBottom: 20
+  },
+  buttonText: {
+    textAlign: 'right'
   }
 })

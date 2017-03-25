@@ -1,16 +1,16 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import QRCode from 'react-native-qrcode'
 import AppStyles from '../styles'
 
 export default class QrView extends Component {
   static propTypes = {
-    text: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired
   }
 
-  render() {
+  render () {
     return (
       <View style={AppStyles.view}>
         <View style={styles.rectangleContainer}>
@@ -31,6 +31,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
+    backgroundColor: 'transparent'
+  }
 })
