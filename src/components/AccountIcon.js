@@ -17,7 +17,7 @@ async function displayIcon (self, seed) {
 
 export default class AccountIcon extends Component {
   static propTypes = {
-    seed: PropTypes.string.isRequired,
+    seed: PropTypes.string.isRequired
   }
 
   state = {}
@@ -39,4 +39,3 @@ export default class AccountIcon extends Component {
     )
   }
 }
-

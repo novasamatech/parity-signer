@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { TouchableHighlight, StyleSheet, View, Text, Image } from 'react-native'
+import { TouchableHighlight, StyleSheet, View, Text } from 'react-native'
 import AccountIcon from './AccountIcon'
 
 export default class AccountListRow extends Component {
@@ -16,7 +16,7 @@ export default class AccountListRow extends Component {
       <TouchableHighlight style={styles.row} onPress={this.props.onPress} underlayColor='#0004'>
         <View style={{flexDirection: 'column'}}>
           <View style={{flexDirection: 'row'}}>
-            <AccountIcon style={styles.square} seed={this.props.lowerText}/>
+            <AccountIcon style={styles.square} seed={this.props.lowerText} />
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.upperText} ellipsizeMode='middle' numberOfLines={1}>{this.props.upperText}</Text>
               <Text style={styles.lowerText} ellipsizeMode='middle' numberOfLines={1}>{this.props.lowerText}</Text>
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   square: {
     height: 60,
     width: 60,
-    marginRight: 10,
+    marginRight: 10
   },
   upperText: {
     marginTop: 20,

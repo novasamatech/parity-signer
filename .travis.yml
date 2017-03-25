@@ -10,5 +10,6 @@ cache:
 install: true
 
 script:
+  - npm i
   - npm run lint
   - npm run test

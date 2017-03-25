@@ -55,7 +55,7 @@ export class AccountNew extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <AccountIcon style={styles.icon} seed={'0x' + this.state.address}/>
+        <AccountIcon style={styles.icon} seed={'0x' + this.state.address} />
         <Text style={AppStyles.hintText}>name</Text>
         <TextInput
           placeholder='My Account'

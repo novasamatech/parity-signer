@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { StyleSheet, View, ScrollView, Text, Button, Image } from 'react-native'
+import { StyleSheet, View, ScrollView, Text, Button } from 'react-native'
 import AppStyles from '../styles'
 import AccountIcon from './AccountIcon'
 
@@ -17,7 +17,7 @@ export default class AccountDetails extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <AccountIcon style={styles.icon} seed={'0x' + this.props.account.address}/>
+        <AccountIcon style={styles.icon} seed={'0x' + this.props.account.address} />
         <Text style={AppStyles.hintText}>Name</Text>
         <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
         <Text style={AppStyles.hintText}>Address</Text>
