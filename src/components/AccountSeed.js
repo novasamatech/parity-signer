@@ -9,31 +9,39 @@ export default class AccountSeed extends Component {
     onChangeText: PropTypes.func.isRequired
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      text: this.props.seed
-    }
+  state = {
+    text: this.props.seed,
+    height: 0
+  }
+
+  onChange = (text) => {
+    this.setState({
+      text: text
+    })
+    this.props.onChangeText(text)
+  }
+
+  onContentSizeChange = (event) => {
+    this.setState({
+      height: event.nativeEvent.contentSize.height
+    })
   }
 
   render () {
     return (
       <TextInput
-        style={styles.input}
-        placeholder='the brain wallet seed'
         editable
-        multiline
-        returnKeyType='default'
-        numberOfLines={6}
         fontSize={12}
-        onChangeText={(text) => {
-          this.setState({
-            text: text
-          })
-          this.props.onChangeText(text)
-        }}
-        value={this.state.text}
         maxLength={240}
+        multiline
+        onChangeText={this.onChange}
+        onContentSizeChange={this.onContentSizeChange}
+        placeholder='Parity account recovery phrase'
+        returnKeyType='default'
+        selectTextOnFocus
+        spellCheck={false}
+        style={[styles.input, {height: Math.max(35, this.state.height)}]}
+        value={this.state.text}
       />
     )
   }
@@ -42,6 +50,7 @@ export default class AccountSeed extends Component {
 const styles = StyleSheet.create({
   input: {
     height: 120,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    textAlignVertical: 'top'
   }
 })

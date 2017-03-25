@@ -17,7 +17,8 @@ export default StyleSheet.create({
   hintText: {
     fontSize: 14,
     color: '#ccc',
-    marginBottom: 20
+    marginBottom: 10,
+    marginTop: 10
   },
   valueText: {
     fontSize: 12,
@@ -29,6 +30,9 @@ export default StyleSheet.create({
     color: 'black',
     marginBottom: 20,
     height: 40
+  },
+  inputValueSmall: {
+    fontSize: 12
   },
   pin: {
     color: 'black',

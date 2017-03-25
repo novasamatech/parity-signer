@@ -30,7 +30,7 @@ const mapDispatchToPropsEnterPin = (dispatch, ownProps) => ({
     if (pin === account.pin) {
       signTransaction(dispatch, account, rlp)
     } else {
-      Alert.alert('Invalid pin')
+      Alert.alert('Invalid PIN')
     }
   }
 })
@@ -52,8 +52,9 @@ const mapDispatchToPropsConfirmPin = (dispatch, ownProps) => ({
       dispatch(addAccount(account))
       saveAccount(account)
       Actions.popTo('accountList')
+      Alert.alert('Account created')
     } else {
-      Alert.alert('Invalid pin')
+      Alert.alert('Invalid PIN')
     }
   }
 })

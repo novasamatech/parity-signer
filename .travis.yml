@@ -7,7 +7,8 @@ cache:
   directories:
   - node_modules
 
-install: true
+install:
+  - npm i
 
 script:
   - npm i
