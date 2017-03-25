@@ -27,7 +27,9 @@ export default class AccountIcon extends Component {
   }
 
   componentWillReceiveProps (newProps) {
-    displayIcon(this, newProps.seed)
+    if (newProps.seed !== this.props.seed) {
+      displayIcon(this, newProps.seed)
+    }
   }
 
   render () {

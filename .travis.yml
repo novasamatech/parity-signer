@@ -11,6 +11,5 @@ install:
   - npm i
 
 script:
-  - npm i
   - npm run lint
   - npm run test
