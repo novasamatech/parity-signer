@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { ScrollView, Text, TextInput, Button } from 'react-native'
+import { ScrollView, View, Text, TextInput, Button } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
@@ -54,9 +54,9 @@ export class AccountNew extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <Text style={AppStyles.hintText}>name</Text>
+        <Text style={AppStyles.hintText}>Account Name</Text>
         <TextInput
-          placeholder='My Account'
+          placeholder='Name of this account'
           value={this.state.name}
           style={AppStyles.inputValue}
           editable
@@ -67,21 +67,24 @@ export class AccountNew extends Component {
           autoFocus
           onChangeText={(text) => { this.setState({name: text}) }}
         />
-        <Text style={AppStyles.hintText}>brain wallet seed</Text>
+        <Text style={AppStyles.hintText}>Recovery Phrase (for backup)</Text>
         <AccountSeed seed={this.state.seed} onChangeText={
           debounce((text) => { this.updateAddress(this, text) }, 100)
         } />
+        <Text style={AppStyles.hintText}>Address</Text>
         <Text style={AppStyles.valueText}>0x{this.state.address}</Text>
-        <Button
-          onPress={() => this.props.addAccount({
-            seed: this.state.seed,
-            address: this.state.address,
-            name: this.state.name
-          })}
-          title='Add Account'
-          color='green'
-          accessibilityLabel='Press to add new account'
-        />
+        <View style={AppStyles.buttonContainer}>
+          <Button
+            onPress={() => this.props.addAccount({
+              seed: this.state.seed,
+              address: this.state.address,
+              name: this.state.name
+            })}
+            title='Set up PIN'
+            color='green'
+            accessibilityLabel='Press to set up the PIN for the account'
+          />
+        </View>
       </ScrollView>
     )
   }
