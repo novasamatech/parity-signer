@@ -3,19 +3,7 @@
 import React, { Component, PropTypes } from 'react'
 import { StyleSheet, View, ScrollView, Text, Button, Image } from 'react-native'
 import AppStyles from '../styles'
-import { blockiesIcon } from '../util/native'
-
-async function displayIcon(self, seed) {
-  try {
-    let icon = await blockiesIcon(seed)
-    self.setState({
-      icon: icon,
-    })
-  }
-  catch (e) {
-    console.log(e)
-  }
-}
+import AccountIcon from './AccountIcon'
 
 export default class AccountDetails extends Component {
   static propTypes = {
@@ -26,19 +14,10 @@ export default class AccountDetails extends Component {
     onDeleteAccountPressed: PropTypes.func.isRequired
   }
 
-  constructor(props) {
-    super(props)
-    this.state = {}
-    displayIcon(this, '0x' + this.props.account.address)
-  }
-
-  render() {
+  render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <Image
-          style={styles.icon}
-          source={{uri: this.state.icon}}
-        />
+        <AccountIcon style={styles.icon} seed={'0x' + this.props.account.address}/>
         <Text style={AppStyles.hintText}>Name</Text>
         <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
         <Text style={AppStyles.hintText}>Address</Text>
@@ -72,7 +51,6 @@ const styles = StyleSheet.create({
   icon: {
     height: 100,
     width: 100,
-    resizeMode: 'contain',
     marginBottom: 20
   },
   buttonText: {
