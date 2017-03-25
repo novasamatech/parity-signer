@@ -17,7 +17,7 @@ export default class AccountDetails extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <AccountIcon style={styles.icon} seed={'0x' + this.props.account.address} />
+        <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.account.address} />
         <Text style={AppStyles.hintText}>Name</Text>
         <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
         <Text style={AppStyles.hintText}>Address</Text>
@@ -47,11 +47,6 @@ export default class AccountDetails extends Component {
 const styles = StyleSheet.create({
   button: {
     flex: 0.5
-  },
-  icon: {
-    height: 100,
-    width: 100,
-    marginBottom: 20
   },
   buttonText: {
     textAlign: 'right'

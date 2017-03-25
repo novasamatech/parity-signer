@@ -3,12 +3,14 @@
 import React, { Component, PropTypes } from 'react'
 import { ScrollView, View, Text, Button } from 'react-native'
 import AppStyles from '../styles'
+import AccountIcon from './AccountIcon'
 
 export default class Send extends Component {
   static propTypes = {
     nextButtonTitle: PropTypes.string.isRequired,
     nextButtonDescription: PropTypes.string.isRequired,
     nextButtonAction: PropTypes.func.isRequired,
+    txSenderAddress: PropTypes.string.isRequired,
     txRecipientAddress: PropTypes.string.isRequired,
     txValue: PropTypes.string.isRequired,
     txNonce: PropTypes.string.isRequired,
@@ -20,6 +22,9 @@ export default class Send extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
+        <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.txSenderAddress} />
+        <Text style={AppStyles.hintText}>sender address</Text>
+        <Text style={AppStyles.valueText}>{this.props.txSenderAddress}</Text>
         <Text style={AppStyles.hintText}>recipient address</Text>
         <Text style={AppStyles.valueText}>{this.props.txRecipientAddress}</Text>
         <Text style={AppStyles.hintText}>amount to transfer (in ETH)</Text>

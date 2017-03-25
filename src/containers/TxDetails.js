@@ -6,7 +6,8 @@ import TxDetails from '../components/TxDetails'
 
 const mapStateToProps = (state, ownProps) => ({
   nextButtonTitle: 'Next',
-  nextButtonDescription: 'Choose account',
+  nextButtonDescription: 'Enter Pin',
+  txSenderAddress: state.accounts.selected.address,
   txRecipientAddress: state.transactions.pendingTransaction.transaction.action,
   txValue: state.transactions.pendingTransaction.transaction.value,
   txNonce: state.transactions.pendingTransaction.transaction.nonce,

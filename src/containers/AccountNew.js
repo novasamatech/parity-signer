@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, Text, TextInput, Button } from 'react-native'
+import { ScrollView, Text, TextInput, Button } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
@@ -55,7 +55,7 @@ export class AccountNew extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <AccountIcon style={styles.icon} seed={'0x' + this.state.address} />
+        <AccountIcon style={AppStyles.icon} seed={'0x' + this.state.address} />
         <Text style={AppStyles.hintText}>name</Text>
         <TextInput
           placeholder='My Account'
@@ -88,14 +88,6 @@ export class AccountNew extends Component {
     )
   }
 }
-
-const styles = StyleSheet.create({
-  icon: {
-    height: 100,
-    width: 100,
-    marginBottom: 20
-  }
-})
 
 export default connect(
   undefined,

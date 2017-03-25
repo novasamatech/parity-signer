@@ -43,5 +43,10 @@ export default StyleSheet.create({
   },
   buttonContainer: {
     height: 65
+  },
+  icon: {
+    height: 100,
+    width: 100,
+    marginBottom: 20
   }
 })
