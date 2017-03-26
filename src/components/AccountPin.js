@@ -9,18 +9,15 @@ export default class AccountPin extends Component {
     onNextPressed: PropTypes.func.isRequired
   }
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      text: ''
-    }
+  state = {
+    text: ''
   }
 
   onNext = () => {
     const {text} = this.state
-    const {account, extra} = this.props
+    const {account} = this.props
 
-    this.props.onNextPressed(text, account, extra)
+    this.props.onNextPressed(text, account)
   }
 
   onChange = (text) => {

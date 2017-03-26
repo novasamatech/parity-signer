@@ -5,7 +5,7 @@ import { NEW_SCANNED_TX, SIGNED_TX } from '../constants/TransactionActions'
 const initialState = {
   pendingTransaction: {
     transaction: {},
-    rlp: ''
+    rlpHash: ''
   },
   signedTransaction: {
     signature: ''
@@ -17,7 +17,7 @@ export default function transactions (state = initialState, action) {
     case NEW_SCANNED_TX:
       return Object.assign({}, state, {
         pendingTransaction: {
-          rlp: action.rlp,
+          rlpHash: action.rlpHash,
           transaction: action.transaction
         }
       })

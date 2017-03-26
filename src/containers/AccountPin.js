@@ -6,17 +6,17 @@ import { Actions } from 'react-native-router-flux'
 import AccountPin from '../components/AccountPin'
 import { addAccount, setPin } from '../actions/accounts'
 import { signedTx } from '../actions/transactions'
-import { keccak, brainWalletSign } from '../util/native'
+import { brainWalletSign } from '../util/native'
 import { saveAccount } from '../util/db'
+import store from '../util/store'
 
 const mapStateToPropsEnterPin = (state, ownProps) => ({
-  account: state.accounts.selected,
-  extra: state.transactions.pendingTransaction.rlp
+  account: state.accounts.selected
 })
 
-async function signTransaction (dispatch, account, rlp) {
+async function signTransaction (dispatch, account) {
   try {
-    let hash = await keccak(rlp)
+    let hash = store.getState().transactions.pendingTransaction.rlpHash
     let signature = await brainWalletSign(account.seed, hash)
     dispatch(signedTx(signature))
     Actions.qrViewTx()
@@ -26,9 +26,9 @@ async function signTransaction (dispatch, account, rlp) {
 }
 
 const mapDispatchToPropsEnterPin = (dispatch, ownProps) => ({
-  onNextPressed: (pin, account, rlp) => {
+  onNextPressed: (pin, account) => {
     if (pin === account.pin) {
-      signTransaction(dispatch, account, rlp)
+      signTransaction(dispatch, account)
     } else {
       Alert.alert('Invalid PIN')
     }

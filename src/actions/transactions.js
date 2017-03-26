@@ -2,10 +2,10 @@
 
 import { NEW_SCANNED_TX, SIGNED_TX } from '../constants/TransactionActions'
 
-export function scannedTx (rlp, transaction) {
+export function scannedTx (rlpHash, transaction) {
   return {
     type: NEW_SCANNED_TX,
-    rlp,
+    rlpHash,
     transaction
   }
 }

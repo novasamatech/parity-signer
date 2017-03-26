@@ -4,6 +4,7 @@ import React, { Component, PropTypes } from 'react'
 import { StyleSheet, View, ScrollView, Text, Button } from 'react-native'
 import AppStyles from '../styles'
 import AccountIcon from './AccountIcon'
+import AccountAddress from './AccountAddress'
 
 export default class AccountDetails extends Component {
   static propTypes = {
@@ -19,9 +20,9 @@ export default class AccountDetails extends Component {
       <ScrollView style={AppStyles.view}>
         <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.account.address} />
         <Text style={AppStyles.hintText}>Name</Text>
-        <Text selectable style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
+        <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
         <Text style={AppStyles.hintText}>Address</Text>
-        <Text selectable style={AppStyles.valueText}>0x{this.props.account.address}</Text>
+        <AccountAddress address={this.props.account.address} />
         <View style={AppStyles.buttonContainer}>
           <Button
             style={styles.button}

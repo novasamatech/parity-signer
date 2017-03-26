@@ -4,6 +4,7 @@ import React, { Component, PropTypes } from 'react'
 import { ScrollView, View, Text, Button } from 'react-native'
 import AppStyles from '../styles'
 import AccountIcon from './AccountIcon'
+import AccountAddress from './AccountAddress'
 
 export default class Send extends Component {
   static propTypes = {
@@ -24,9 +25,9 @@ export default class Send extends Component {
       <ScrollView style={AppStyles.view}>
         <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.txSenderAddress} />
         <Text style={AppStyles.hintText}>sender address</Text>
-        <Text style={AppStyles.valueText}>{this.props.txSenderAddress}</Text>
+        <AccountAddress address={this.props.txSenderAddress} />
         <Text style={AppStyles.hintText}>recipient address</Text>
-        <Text style={AppStyles.valueText}>{this.props.txRecipientAddress}</Text>
+        <AccountAddress address={this.props.txRecipientAddress} />
         <Text style={AppStyles.hintText}>amount to transfer (in ETH)</Text>
         <Text style={AppStyles.valueText}>{this.props.txValue}</Text>
         <Text style={AppStyles.hintText}>nonce</Text>
