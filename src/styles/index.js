@@ -51,6 +51,9 @@ export default StyleSheet.create({
   icon: {
     height: 100,
     width: 100,
-    marginBottom: 20
+    marginBottom: 10,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#eee'
   }
 })

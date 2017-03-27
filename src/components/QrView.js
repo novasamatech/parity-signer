@@ -7,20 +7,35 @@ import AppStyles from '../styles'
 
 export default class QrView extends Component {
   static propTypes = {
-    text: PropTypes.string.isRequired
+    text: PropTypes.string.isRequired,
+    screen: PropTypes.bool
+  }
+
+  static defaultProps = {
+    screen: false
   }
 
   render () {
-    return (
-      <View style={AppStyles.view}>
-        <View style={styles.rectangleContainer}>
-          <QRCode
-            value={this.props.text}
-            size={250}
-            bgColor='black'
-            fgColor='white'
-          />
+    if (this.props.screen) {
+      return (
+        <View style={AppStyles.view}>
+          {this.renderQr()}
         </View>
+      );
+    }
+
+    return this.renderQr()
+  }
+
+  renderQr () {
+    return (
+      <View style={styles.rectangleContainer}>
+        <QRCode
+          value={this.props.text}
+          size={250}
+          bgColor='black'
+          fgColor='white'
+        />
       </View>
     )
   }

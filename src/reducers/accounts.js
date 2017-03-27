@@ -1,6 +1,8 @@
 'use strict'
 
-import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, SET_PIN, SET_ACCOUNTS } from '../constants/AccountActions'
+import {
+  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_PIN, SET_ACCOUNTS
+} from '../constants/AccountActions'
 
 // format of the account
 // {
@@ -34,6 +36,17 @@ export default function accounts (state = initialAccounts, action) {
     case DELETE_ACCOUNT:
       return Object.assign({}, state, {
         all: state.all.filter((account) => { return action.account !== account })
+      })
+
+    case MODIFY_ACCOUNT:
+      return Object.assign({}, state, {
+        all: state.all.map(account => {
+          if (account === action.account) {
+            return Object.assign(account, action.modifications)
+          }
+
+          return account
+        })
       })
 
     case SET_PIN:
