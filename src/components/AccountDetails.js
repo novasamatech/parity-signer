@@ -1,11 +1,10 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { StyleSheet, View, ScrollView, Text, Button, TouchableOpacity } from 'react-native'
-import Prompt  from 'react-native-prompt'
+import { StyleSheet, View, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native'
 import AppStyles from '../styles'
 import AccountIcon from './AccountIcon'
-import QrView from './QrView';
+import QrView from './QrView'
 
 export default class AccountDetails extends Component {
   static propTypes = {
@@ -17,36 +16,32 @@ export default class AccountDetails extends Component {
   }
 
   state = {
-    isEditing: false
+    isEditing: false,
+    name: this.props.account.name
   }
 
   startEdit = () => {
     this.setEditing(true)
+    this.setState({
+      name: this.props.account.name
+    })
   }
 
   cancelEdit = () => {
     this.setEditing(false)
   }
 
-  finishEdit = (newName) => {
+  finishEdit = () => {
     this.setEditing(false)
-    this.props.onNameChange(this.props.account, newName)
+    this.props.onNameChange(this.props.account, this.state.name)
   }
 
-  setEditing(isEditing) {
+  updateName = (name) => {
+    this.setState({ name })
+  }
+
+  setEditing (isEditing) {
     this.setState({ isEditing })
-  }
-
-  renderPrompt () {
-    return (
-      <Prompt
-        title='Account Name'
-        defaultValue={this.props.account.name}
-        visible={this.state.isEditing}
-        onCancel={this.cancelEdit}
-        onSubmit={this.finishEdit}
-        />
-    );
   }
 
   render () {
@@ -57,12 +52,24 @@ export default class AccountDetails extends Component {
         </View>
 
         <TouchableOpacity style={styles.wrapper}
-          onPress={this.startEdit}
+          onLongPress={this.startEdit}
           >
           <View>
             <Text style={AppStyles.hintText}>Name</Text>
-            <Text selectable style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
-            { this.renderPrompt() }
+            { this.state.isEditing
+              ? (
+                <TextInput
+                  style={[AppStyles.valueText, AppStyles.valueTextInput]}
+                  value={this.state.name}
+                  autoFocus
+                  onChangeText={this.updateName}
+                  onEndEditing={this.cancelEdit}
+                  onSubmitEditing={this.finishEdit}
+                />
+              ) : (
+                <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
+              )
+            }
           </View>
         </TouchableOpacity>
 
@@ -105,7 +112,7 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   deleteText: {
-    textAlign: 'right',
+    textAlign: 'right'
   },
   changePinText: {
     textAlign: 'left',

@@ -26,6 +26,11 @@ export default StyleSheet.create({
     marginBottom: 20,
     fontWeight: 'bold'
   },
+  valueTextInput: {
+    height: 35,
+    padding: 5,
+    marginTop: -5
+  },
   inputValue: {
     color: 'black',
     marginBottom: 20,

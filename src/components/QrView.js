@@ -21,7 +21,7 @@ export default class QrView extends Component {
         <View style={AppStyles.view}>
           {this.renderQr()}
         </View>
-      );
+      )
     }
 
     return this.renderQr()

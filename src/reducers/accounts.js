@@ -39,10 +39,14 @@ export default function accounts (state = initialAccounts, action) {
       })
 
     case MODIFY_ACCOUNT:
+      if (state.selected === action.account) {
+        Object.assign(state.selected, action.modifications)
+      }
+
       return Object.assign({}, state, {
         all: state.all.map(account => {
           if (account === action.account) {
-            return Object.assign(account, action.modifications)
+            return Object.assign({}, account, action.modifications)
           }
 
           return account
