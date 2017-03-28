@@ -26,6 +26,11 @@ export default StyleSheet.create({
     marginBottom: 20,
     fontWeight: 'bold'
   },
+  valueTextInput: {
+    height: 35,
+    padding: 5,
+    marginTop: -5
+  },
   inputValue: {
     color: 'black',
     marginBottom: 20,
@@ -51,6 +56,9 @@ export default StyleSheet.create({
   icon: {
     height: 100,
     width: 100,
-    marginBottom: 20
+    marginBottom: 10,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#eee'
   }
 })

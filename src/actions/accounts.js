@@ -1,6 +1,8 @@
 'use strict'
 
-import { ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, SET_PIN, SET_ACCOUNTS } from '../constants/AccountActions'
+import {
+  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_NEW_PIN, SET_ACCOUNTS
+} from '../constants/AccountActions'
 
 export function addAccount (account) {
   return {
@@ -23,9 +25,17 @@ export function deleteAccount (account) {
   }
 }
 
-export function setPin (pin) {
+export function modifyAccount (account, modifications) {
   return {
-    type: SET_PIN,
+    type: MODIFY_ACCOUNT,
+    account,
+    modifications
+  }
+}
+
+export function setNewPin (pin) {
+  return {
+    type: SET_NEW_PIN,
     pin
   }
 }
