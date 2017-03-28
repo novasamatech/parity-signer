@@ -7,7 +7,7 @@ import QrScanner from '../components/QrScanner'
 import { selectAccount } from '../actions/accounts'
 import { scannedTx } from '../actions/transactions'
 import transaction from '../util/transaction'
-import keccak from '../util/native'
+import { keccak } from '../util/native'
 import store from '../util/store'
 
 var scanning = false
@@ -20,7 +20,7 @@ function displayAlert (text) {
 
 function findAccountWithAddress (address) {
   return store.getState().accounts.all.find(account => {
-    return account.address.toLowerCase() === address
+    return account.address.toLowerCase() === address.toLowerCase()
   })
 }
 
@@ -31,41 +31,35 @@ async function onScannedTransaction (data, dispatch) {
     }
     scanning = true
     let txRequest = JSON.parse(data)
-    switch (txRequest.action) {
-      case 'signTransaction': {
-        let account = findAccountWithAddress(txRequest.data.account)
-        if (!account) {
-          displayAlert('Invalid sender address ' + txRequest.data.account)
-          return
-        }
-        let tx = await transaction(txRequest.data.rlp)
-        let hash = await keccak(txRequest.data.rlp)
-        dispatch(selectAccount(account))
-        dispatch(scannedTx(hash, tx))
-        break
-      }
-      case 'signTransactionHash': {
-        let account = findAccountWithAddress(txRequest.data.account)
-        if (!account) {
-          displayAlert('Invalid sender address ' + txRequest.data.account)
-          return
-        }
-        let details = txRequest.data.details
-        let hash = txRequest.data.hash
-        dispatch(selectAccount(account))
-        dispatch(scannedTx(hash, details))
-        break
-      }
-      default: {
-        displayAlert('Invalid request')
+    if (txRequest.action === 'signTransaction') {
+      let account = findAccountWithAddress(txRequest.data.account)
+      if (!account) {
+        displayAlert('Invalid sender address ' + txRequest.data.account)
         return
       }
+      let tx = await transaction(txRequest.data.rlp)
+      let hash = await keccak(txRequest.data.rlp)
+      dispatch(selectAccount(account))
+      dispatch(scannedTx(hash, tx))
+    } else if (txRequest.action === 'signTransactionHash') {
+      let account = findAccountWithAddress(txRequest.data.account)
+      if (!account) {
+        displayAlert('Invalid sender address ' + txRequest.data.account)
+        return
+      }
+      let details = txRequest.data.details
+      let hash = txRequest.data.hash
+      dispatch(selectAccount(account))
+      dispatch(scannedTx(hash, details))
+    } else {
+      displayAlert('Invalid request')
+      return
     }
     Actions.txDetails()
     scanning = false
   } catch (e) {
     console.log(e)
-    displayAlert('Invalid transaction')
+    displayAlert('Invalid transaction ' + e)
   }
 }
 

@@ -24,7 +24,8 @@
     "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
     "react-native-tabs": "^1.0.9",
     "react-redux": "^5.0.2",
-    "redux": "^3.6.0"
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.1",

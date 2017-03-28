@@ -1,6 +1,6 @@
 'use strict'
 
-import { NEW_SCANNED_TX, SIGNED_TX } from '../constants/TransactionActions'
+import { NEW_SCANNED_TX, SIGN_TX } from '../constants/TransactionActions'
 
 const initialState = {
   pendingTransaction: {
@@ -21,7 +21,7 @@ export default function transactions (state = initialState, action) {
           transaction: action.transaction
         }
       })
-    case SIGNED_TX:
+    case SIGN_TX:
       return Object.assign({}, state, {
         signedTransaction: {
           signature: action.signature
