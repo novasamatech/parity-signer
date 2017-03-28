@@ -12,6 +12,7 @@ export default class AccountDetails extends Component {
       address: PropTypes.string.isRequired
     }).isRequired,
     onNameChange: PropTypes.func.isRequired,
+    onChangePin: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired
   }
 
@@ -47,10 +48,7 @@ export default class AccountDetails extends Component {
   render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <View style={styles.identicon}>
-          <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.account.address} />
-        </View>
-
+        <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.account.address} />
         <TouchableOpacity style={styles.wrapper}
           onLongPress={this.startEdit}
           >
@@ -84,7 +82,8 @@ export default class AccountDetails extends Component {
 
         <View style={[styles.actionsContainer, AppStyles.buttonContainer]}>
           <TouchableOpacity
-            style={[styles.actionButtonContainer, {opacity: 0.0}]}
+            style={styles.actionButtonContainer}
+            onPress={() => this.props.onChangePin(this.props.account)}
             >
             <Text style={styles.changePinText}>Change PIN</Text>
           </TouchableOpacity>
@@ -101,9 +100,6 @@ export default class AccountDetails extends Component {
 }
 
 const styles = StyleSheet.create({
-  identicon: {
-    alignItems: 'center'
-  },
   wrapper: {
     borderRadius: 5
   },

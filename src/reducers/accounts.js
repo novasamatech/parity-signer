@@ -1,8 +1,10 @@
 'use strict'
 
 import {
-  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_PIN, SET_ACCOUNTS
+  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_NEW_PIN, SET_ACCOUNTS
 } from '../constants/AccountActions'
+// TODO [ToDr] Move side-effects to middleware
+import { saveAccount, deleteAccount } from '../util/db'
 
 // format of the account
 // {
@@ -21,49 +23,63 @@ const initialAccounts = {
 export default function accounts (state = initialAccounts, action) {
   switch (action.type) {
     case ADD_ACCOUNT:
-      return Object.assign({}, state, {
+      saveAccount(action.account)
+
+      return {
+        ...state,
         all: [
           ...state.all,
           action.account
         ]
-      })
+      }
 
     case SELECT_ACCOUNT:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         selected: action.account
-      })
+      }
+
+    case SET_NEW_PIN:
+      return {
+        ...state,
+        selected: {
+          ...state.selected,
+          newPin: action.pin
+        }
+      }
 
     case DELETE_ACCOUNT:
-      return Object.assign({}, state, {
-        all: state.all.filter((account) => { return action.account !== account })
-      })
+      deleteAccount(action.account)
+
+      return {
+        ...state,
+        all: state.all.filter(account => action.account !== account)
+      }
 
     case MODIFY_ACCOUNT:
       if (state.selected === action.account) {
         Object.assign(state.selected, action.modifications)
+        delete state.selected.newPin
       }
 
-      return Object.assign({}, state, {
+      return {
+        ...state,
         all: state.all.map(account => {
-          if (account === action.account) {
-            return Object.assign({}, account, action.modifications)
+          if (account.address === action.account.address) {
+            account = Object.assign({}, account, action.modifications)
+            saveAccount(account)
+            return account
           }
 
           return account
         })
-      })
-
-    case SET_PIN:
-      return Object.assign({}, state, {
-        selected: Object.assign({}, state.selected, {
-          pin: action.pin
-        })
-      })
+      }
 
     case SET_ACCOUNTS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         all: action.accounts
-      })
+      }
 
     default:
       return state

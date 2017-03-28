@@ -5,13 +5,15 @@ import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import AccountDetails from '../components/AccountDetails'
 import { deleteAccount, modifyAccount } from '../actions/accounts'
-import { deleteAccount as dbDeleteAccount } from '../util/db'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onNameChange: (account, name) => {
     dispatch(modifyAccount(account, {
       name
     }))
+  },
+  onChangePin: (account) => {
+    Actions.accountChangePin()
   },
   onDelete: (account) => {
     Alert.alert(
@@ -22,7 +24,6 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
           text: 'Yes',
           onPress: () => {
             dispatch(deleteAccount(account))
-            dbDeleteAccount(account)
             Actions.pop()
           }
         },

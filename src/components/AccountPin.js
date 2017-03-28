@@ -6,26 +6,34 @@ import AppStyles from '../styles'
 
 export default class AccountPin extends Component {
   static propTypes = {
-    onNextPressed: PropTypes.func.isRequired
+    onNextPressed: PropTypes.func.isRequired,
+    account: PropTypes.object.isRequired,
+    placeholder: PropTypes.string,
+    extra: PropTypes.object
+  }
+
+  static defaultProps = {
+    extra: {},
+    placeholder: 'Enter PIN'
   }
 
   constructor (props) {
     super(props)
     this.state = {
-      text: ''
+      pin: ''
     }
   }
 
   onNext = () => {
-    const {text} = this.state
+    const {pin} = this.state
     const {account, extra} = this.props
 
-    this.props.onNextPressed(text, account, extra)
+    this.props.onNextPressed(pin, account, extra)
   }
 
-  onChange = (text) => {
+  onChange = (pin) => {
     this.setState({
-      text
+      pin
     })
   }
 
@@ -42,18 +50,18 @@ export default class AccountPin extends Component {
             multiline={false}
             numberOfLines={1}
             onChangeText={this.onChange}
-            placeholder='enter pin here'
+            placeholder={this.props.placeholder}
             returnKeyType='next'
             secureTextEntry
             style={AppStyles.pin}
-            value={this.state.text}
+            value={this.state.pin}
           />
           <View style={[AppStyles.buttonContainer, styles.button]}>
             <Button
               onPress={this.onNext}
               color='green'
               title='Next'
-              accessibilityLabel='Confrim PIN'
+              accessibilityLabel={this.props.placeholder}
             />
           </View>
         </View>

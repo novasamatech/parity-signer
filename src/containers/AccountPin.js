@@ -4,15 +4,9 @@ import { Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import AccountPin from '../components/AccountPin'
-import { addAccount, setPin } from '../actions/accounts'
+import { addAccount, modifyAccount, setNewPin } from '../actions/accounts'
 import { signedTx } from '../actions/transactions'
 import { keccak, brainWalletSign } from '../util/native'
-import { saveAccount } from '../util/db'
-
-const mapStateToPropsEnterPin = (state, ownProps) => ({
-  account: state.accounts.selected,
-  extra: state.transactions.pendingTransaction.rlp
-})
 
 async function signTransaction (dispatch, account, rlp) {
   try {
@@ -25,42 +19,88 @@ async function signTransaction (dispatch, account, rlp) {
   }
 }
 
-const mapDispatchToPropsEnterPin = (dispatch, ownProps) => ({
-  onNextPressed: (pin, account, rlp) => {
-    if (pin === account.pin) {
-      signTransaction(dispatch, account, rlp)
-    } else {
-      Alert.alert('Invalid PIN')
+export const AccountEnterPin = connect(
+  (state) => ({
+    account: state.accounts.selected,
+    extra: {
+      rlp: state.transactions.pendingTransaction.rlp
+    },
+    withConfirmation: false
+  }),
+  (dispatch) => ({
+    onNextPressed: (pin, account, {rlp}) => {
+      if (pin === account.pin) {
+        signTransaction(dispatch, account, rlp)
+      } else {
+        Alert.alert('Invalid PIN')
+      }
     }
-  }
-})
+  })
+)(AccountPin)
 
-const mapDispatchToPropsSetPin = (dispatch, ownProps) => ({
-  onNextPressed: (pin) => {
-    dispatch(setPin(pin))
-    Actions.accountConfirmPin()
-  }
-})
-
-const mapStateToPropsConfirmPin = (state, ownProps) => ({
-  account: state.accounts.selected
-})
-
-const mapDispatchToPropsConfirmPin = (dispatch, ownProps) => ({
-  onNextPressed: (pin, account) => {
-    if (pin === account.pin) {
-      dispatch(addAccount(account))
-      saveAccount(account)
-      Actions.popTo('accountList')
-      Alert.alert('Account created')
-    } else {
-      Alert.alert('Invalid PIN')
+export const AccountChangePin = connect(
+  (state) => ({
+    account: state.accounts.selected,
+    placeholder: 'Current PIN',
+    withConfirmation: false
+  }),
+  (dispatch) => ({
+    onNextPressed: (pin, account, rlp) => {
+      if (pin === account.pin) {
+        Actions.accountSetPin()
+      } else {
+        Alert.alert('Invalid PIN')
+      }
     }
-  }
-})
+  })
+)(AccountPin)
 
-export const AccountEnterPin = connect(mapStateToPropsEnterPin, mapDispatchToPropsEnterPin)(AccountPin)
+export const AccountSetPin = connect(
+  ({accounts}) => {
+    const isNew = !accounts.all.find(acc => acc.address === accounts.selected.address)
 
-export const AccountSetPin = connect(undefined, mapDispatchToPropsSetPin)(AccountPin)
+    return {
+      account: accounts.selected,
+      placeholder: isNew ? 'Enter PIN' : 'Enter new PIN'
+    }
+  },
+  (dispatch) => ({
+    onNextPressed: (pin, account) => {
+      dispatch(setNewPin(pin))
+      Actions.accountConfirmPin()
+    }
+  })
+)(AccountPin)
 
-export const AccountConfirmPin = connect(mapStateToPropsConfirmPin, mapDispatchToPropsConfirmPin)(AccountPin)
+export const AccountConfirmPin = connect(
+  ({accounts}) => {
+    const isNew = !accounts.all.find(acc => acc.address === accounts.selected.address)
+
+    return {
+      account: accounts.selected,
+      extra: { isNew },
+      placeholder: 'Confirm PIN'
+    }
+  },
+  (dispatch) => ({
+    onNextPressed: (pin, account, {isNew}) => {
+      if (pin !== account.newPin) {
+        Alert.alert('PIN doesn\'t match')
+        return
+      }
+
+      if (isNew) {
+        dispatch(addAccount(account))
+        Actions.popTo('accountList')
+        Alert.alert('Account Created')
+        return
+      }
+
+      dispatch(modifyAccount(account, {
+        pin
+      }))
+      Actions.popTo('accountDetails')
+      Alert.alert('PIN changed')
+    }
+  })
+)(AccountPin)
