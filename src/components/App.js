@@ -10,7 +10,7 @@ import AccountList from '../containers/AccountList'
 import AccountNew from '../containers/AccountNew'
 import AccountDetails from '../containers/AccountDetails'
 import TxDetails from '../containers/TxDetails'
-import { AccountEnterPin, AccountSetPin, AccountConfirmPin } from '../containers/AccountPin'
+import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from '../containers/AccountPin'
 import { QrViewTransaction, QrViewAddress } from '../containers/QrView'
 import { loadAccounts, saveAccounts } from '../util/db'
 import { setAccounts } from '../actions/accounts'
@@ -52,8 +52,9 @@ const scenes = Actions.create(
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage
         />
-        <Scene key='qrViewTx' title='Signature QR' component={QrViewTransaction} rightTitle='Done'
+        <Scene key='qrViewTx' title='Signature QR' component={QrViewTransaction}
           onRight={() => Actions.popTo('left')}
+          rightTitle='Done'
           rightButtonTextStyle={styles.navibarTitle}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
@@ -62,13 +63,21 @@ const scenes = Actions.create(
       </Scene>
       <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         <Scene key='accountList' title='Accounts' component={AccountList}
-          rightTitle='Add' onRight={() => Actions.accountNew()} rightButtonTextStyle={styles.navibarTitle} />
+          onRight={() => Actions.accountNew()}
+          rightTitle='Add'
+          rightButtonTextStyle={styles.navibarTitle}
+        />
         <Scene key='accountNew' component={AccountNew} title='New Account'
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage
         />
-        <Scene key='accountSetPin' title='Set PIN' component={AccountSetPin}
+        <Scene key='accountChangePin' title='Current PIN' component={AccountChangePin}
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage
+        />
+        <Scene key='accountSetPin' title='Set Account PIN' component={AccountSetPin}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage
@@ -78,7 +87,7 @@ const scenes = Actions.create(
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage
         />
-        <Scene key='accountDetails' component={AccountDetails} title='Account Details'
+        <Scene key='accountDetails' title='Account Details' component={AccountDetails}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage
