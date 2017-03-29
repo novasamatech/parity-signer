@@ -6,8 +6,8 @@ authors = ["debris <marek.kotewicz@gmail.com>"]
 [dependencies]
 libc = "0.2"
 rustc-serialize = "0.3"
-ethkey = { git = "https://github.com/ethcore/parity" }
-rlp = { git = "https://github.com/ethcore/parity" }
+ethkey = { git = "https://github.com/paritytech/parity" }
+rlp = { git = "https://github.com/paritytech/parity" }
 tiny-keccak = "1.1"
 blockies = "0.1"
 

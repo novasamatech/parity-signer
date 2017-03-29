@@ -3,9 +3,9 @@
 set -e
 
 # android
-multirust add-target stable aarch64-linux-android
-multirust add-target stable armv7-linux-androideabi
-multirust add-target stable i686-linux-android
+rustup target add aarch64-linux-android
+rustup target add armv7-linux-androideabi
+rustup target add i686-linux-android
 
 ./create-ndk-standalone.sh
 
