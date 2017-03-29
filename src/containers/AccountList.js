@@ -6,6 +6,9 @@ import AccountList from '../components/AccountList'
 import { selectAccount } from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
+  onNewAccount: () => {
+    Actions.accountNew()
+  },
   onAccountSelected: (account) => {
     dispatch(selectAccount(account))
     Actions.accountDetails()

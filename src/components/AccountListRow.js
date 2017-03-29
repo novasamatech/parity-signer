@@ -2,6 +2,7 @@
 
 import React, { Component, PropTypes } from 'react'
 import { TouchableHighlight, StyleSheet, View, Text } from 'react-native'
+import AppStyles from '../styles'
 import AccountIcon from './AccountIcon'
 
 export default class AccountListRow extends Component {
@@ -15,9 +16,9 @@ export default class AccountListRow extends Component {
     return (
       <TouchableHighlight style={styles.row} onPress={this.props.onPress} underlayColor='#0004'>
         <View style={{flexDirection: 'column'}}>
-          <View style={{flexDirection: 'row'}}>
-            <AccountIcon style={styles.square} seed={this.props.lowerText} />
-            <View style={{flexDirection: 'column'}}>
+          <View style={styles.innerRow}>
+            <AccountIcon style={[AppStyles.icon, styles.icon]} seed={this.props.lowerText} />
+            <View style={styles.accountDetails}>
               <Text style={styles.upperText} ellipsizeMode='middle' numberOfLines={1}>{this.props.upperText}</Text>
               <Text style={styles.lowerText} ellipsizeMode='middle' numberOfLines={1}>{this.props.lowerText}</Text>
             </View>
@@ -34,14 +35,21 @@ const styles = StyleSheet.create({
   row: {
     backgroundColor: '#F8F8F8'
   },
-  square: {
+  innerRow: {
+    padding: 5,
+    flexDirection: 'row'
+  },
+  accountDetails: {
+    flexDirection: 'column',
+    justifyContent: 'center'
+  },
+  icon: {
     height: 60,
     width: 60,
-    marginRight: 10
+    marginRight: 10,
+    marginBottom: 0
   },
   upperText: {
-    marginTop: 20,
-    width: 200,
     fontSize: 16,
     color: '#888'
   },
