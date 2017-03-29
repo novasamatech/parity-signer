@@ -1,7 +1,9 @@
 'use strict'
 
-import React, { Component } from 'react'
-import { ScrollView, View, Text, TextInput, Button } from 'react-native'
+import React, { Component, PropTypes } from 'react'
+import {
+  ScrollView, View, Text, TextInput, Button, TouchableOpacity, Share
+} from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
@@ -14,18 +16,29 @@ import AppStyles from '../styles'
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addAccount: (account) => {
+    onAddAccount: (account) => {
       dispatch(selectAccount({
         seed: account.seed,
         address: account.address,
         name: account.name
       }))
       Actions.accountSetPin()
+    },
+    onBackupPhrase: (seed, address) => {
+      Share.share({
+        message: `Recovery phrase for ${address}: ${seed}`,
+        ttile: `Recovery phrase for ${address}`
+      })
     }
   }
 }
 
 export class AccountNew extends Component {
+  static propTypes = {
+    onBackupPhrase: PropTypes.func.isRequired,
+    onAddAccount: PropTypes.func.isRequired
+  }
+
   constructor (props) {
     super(props)
 
@@ -49,7 +62,13 @@ export class AccountNew extends Component {
       })
     } catch (e) {
       // this should never fail
+      console.error(e)
     }
+  }
+
+  backupSeed = () => {
+    const { address, seed } = this.state
+    this.props.onBackupPhrase(seed, address)
   }
 
   render () {
@@ -69,10 +88,15 @@ export class AccountNew extends Component {
           autoFocus
           onChangeText={(text) => { this.setState({name: text}) }}
         />
-        <Text style={AppStyles.hintText}>Recovery Phrase (for backup)</Text>
+        <Text style={AppStyles.hintText}>Recovery Phrase</Text>
         <AccountSeed seed={this.state.seed} onChangeText={
           debounce((text) => { this.updateAddress(this, text) }, 100)
         } />
+        <TouchableOpacity
+          onPress={this.backupSeed}
+          >
+          <Text style={AppStyles.hintTextSmall}>Make sure to back up your recovery phrase! Click this text to share it.</Text>
+        </TouchableOpacity>
         <Text style={AppStyles.hintText}>Address</Text>
         <TextInput
           editable={false}
@@ -81,7 +105,7 @@ export class AccountNew extends Component {
           />
         <View style={AppStyles.buttonContainer}>
           <Button
-            onPress={() => this.props.addAccount({
+            onPress={() => this.props.onAddAccount({
               seed: this.state.seed,
               address: this.state.address,
               name: this.state.name
