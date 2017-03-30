@@ -7,7 +7,7 @@ import { selectAccount } from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   onNewAccount: () => {
-    Actions.accountNew()
+    Actions.iconChooser()
   },
   onAccountSelected: (account) => {
     dispatch(selectAccount(account))
