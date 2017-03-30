@@ -2,6 +2,7 @@
   "name": "NativeSigner",
   "version": "0.0.1",
   "private": true,
+  "license": "GPL-3.0",
   "scripts": {
     "build-rust-ios": "cd rust/signer && make ios",
     "ios": "npm run build-rust-ios && npm run cli run-ios",
