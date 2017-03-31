@@ -48,10 +48,10 @@ let unitMap = {
 
 function getValueOfUnit (unit) {
   unit = unit ? unit.toLowerCase() : 'ether'
-  var unitValue = unitMap[unit]
+  var unitValue = unitMap[unit] || 0
   return new BigNumber(unitValue, 10)
 }
 
 export function fromWei (number, unit) {
-  return new BigNumber(number, 16).dividedBy(getValueOfUnit(unit)).toString(10)
+  return new BigNumber(number || 0, 16).dividedBy(getValueOfUnit(unit)).toString(10)
 }
