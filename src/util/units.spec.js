@@ -24,4 +24,12 @@ describe('units', () => {
     let ether = fromWei(wei)
     expect(ether).toEqual('0.000000000000021')
   })
+
+  it('should return BigNumber for undefined values', () => {
+    expect(fromWei(null)).toEqual('0')
+    expect(fromWei(undefined)).toEqual('0')
+    expect(fromWei(0)).toEqual('0')
+    expect(fromWei('0')).toEqual('0')
+    expect(fromWei('')).toEqual('0')
+  })
 })
