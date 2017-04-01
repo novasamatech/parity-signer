@@ -58,7 +58,7 @@
     "pre-git": {
       "pre-commit": [],
       "pre-push": [
-        "npm run lint -- --fix",
+        "npm run lint",
         "npm run test"
       ],
       "post-commit": [],

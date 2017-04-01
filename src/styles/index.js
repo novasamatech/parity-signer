@@ -36,6 +36,11 @@ export default StyleSheet.create({
     marginBottom: 10,
     marginTop: 10
   },
+  hintTextSmall: {
+    fontSize: 12,
+    color: '#777',
+    marginBottom: 10
+  },
   valueText: {
     fontSize: 12,
     color: 'black',
