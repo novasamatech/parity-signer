@@ -22,7 +22,6 @@ import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
 import AccountSeed from '../components/AccountSeed'
-import { words } from '../util/random'
 import { brainWalletAddress } from '../util/native'
 import { selectAccount } from '../actions/accounts'
 import AccountIcon from '../components/AccountIcon'
@@ -45,14 +44,17 @@ export class AccountNew extends Component {
   constructor (props) {
     super(props)
 
-    const seed = words()
-
     this.state = {
-      seed: seed,
+      seed: this.props.seed,
       address: '',
       name: ''
     }
 
+    this.updateAddress(this, this.props.seed)
+  }
+
+  componentWillReceiveProps (newProps) {
+    const { seed } = newProps
     this.updateAddress(this, seed)
   }
 

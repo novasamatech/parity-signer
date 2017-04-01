@@ -21,6 +21,7 @@ import { StyleSheet, AppState } from 'react-native'
 import { Provider, connect } from 'react-redux'
 import { Actions, Router, Scene } from 'react-native-router-flux'
 import TabIcon from './TabIcon'
+import IconChooser from '../containers/IconChooser'
 import QrScanner from '../containers/QrScanner'
 import AccountList from '../containers/AccountList'
 import AccountNew from '../containers/AccountNew'
@@ -79,7 +80,7 @@ const scenes = Actions.create(
       </Scene>
       <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         <Scene key='accountList' title='Accounts' component={AccountList}
-          onRight={() => Actions.accountNew()}
+          onRight={() => Actions.iconChooser()}
           rightTitle='Add'
           rightButtonTextStyle={styles.navibarTitle}
         />
@@ -109,6 +110,11 @@ const scenes = Actions.create(
           hideBackImage
         />
         <Scene key='qrViewAddress' title='Address QR' component={QrViewAddress}
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage
+        />
+        <Scene key='iconChooser' title='Choose an Icon' component={IconChooser}
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage
