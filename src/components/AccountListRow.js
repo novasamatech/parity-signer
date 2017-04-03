@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
   icon: {
     height: 60,
     width: 60,
+    borderRadius: 30,
     marginRight: 10,
     marginBottom: 0
   },

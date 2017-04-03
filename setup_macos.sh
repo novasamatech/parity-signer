@@ -3,16 +3,16 @@
 set -e
 
 # ios
-multirust add-target stable i386-apple-ios
-multirust add-target stable x86_64-apple-ios
-multirust add-target stable armv7-apple-ios
-multirust add-target stable armv7s-apple-ios
-multirust add-target stable aarch64-apple-ios
+rustup target add i386-apple-ios
+rustup target add x86_64-apple-ios
+rustup target add armv7-apple-ios
+rustup target add armv7s-apple-ios
+rustup target add aarch64-apple-ios
 
 # android
-multirust add-target stable aarch64-linux-android
-multirust add-target stable armv7-linux-androideabi
-multirust add-target stable i686-linux-android
+rustup target add aarch64-linux-android
+rustup target add armv7-linux-androideabi
+rustup target add i686-linux-android
 
 ./create-ndk-standalone.sh
 
