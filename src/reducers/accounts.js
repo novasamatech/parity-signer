@@ -39,13 +39,17 @@ const initialAccounts = {
 export default function accounts (state = initialAccounts, action) {
   switch (action.type) {
     case ADD_ACCOUNT:
-      saveAccount(action.account)
+      const account = action.account
+      account.pin = account.newPin
+      delete account.newPin
+
+      saveAccount(account)
 
       return {
         ...state,
         all: [
           ...state.all,
-          action.account
+          account
         ]
       }
 
