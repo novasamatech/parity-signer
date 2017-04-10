@@ -16,8 +16,10 @@
 
 import { EthkeyBridge } from 'NativeModules'
 
+const asString = (x) => x.split('').map(x => x.charCodeAt(0).toString(16)).join('')
+
 export const brainWalletAddress = (seed) => EthkeyBridge.brainWalletAddress(seed)
-  .then(address => keccak(address).then(hash => ({address, hash: hash.slice(-40)})))
+  .then(address => keccak(asString(address)).then(hash => ({address, hash: hash})))
   .then(acc => {
     let result = ''
     for (let n = 0; n < 40; n++) {
