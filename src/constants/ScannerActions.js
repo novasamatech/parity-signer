@@ -16,30 +16,7 @@
 
 'use strict'
 
-import { Actions } from 'react-native-router-flux'
-import { NEW_SCANNED_TX, SIGN_TX } from '../constants/TransactionActions'
-import { brainWalletSign } from '../util/native'
-
-export function scannedTx (rlpHash, transaction) {
-  return {
-    type: NEW_SCANNED_TX,
-    rlpHash,
-    transaction
-  }
-}
-
-export function signTx (account) {
-  return function (dispatch, getState) {
-    let hash = getState().transactions.pendingTransaction.rlpHash
-    return brainWalletSign(account.seed, hash).then(
-      signature => {
-        dispatch({
-          type: SIGN_TX,
-          signature: signature
-        })
-        Actions.qrViewTx()
-      },
-      error => console.error(error)
-    )
-  }
-}
+export const ENABLE_SCANNER = 'SCANNER_ACTION_ENABLE_SCANNER'
+export const DISABLE_SCANNER = 'SCANNER_ACTION_DISABLE_SCANNER'
+export const DISABLE_SCANNER_WARNINGS = 'SCANNER_ACTION_DISABLE_SCANNER_WARNINGS'
+export const RESET_SCANNER = 'SCANNER_ACTION_RESET_SCANNER'

@@ -19,10 +19,12 @@
 import { combineReducers } from 'redux'
 import accounts from './accounts'
 import routes from './routes'
+import scanner from './scanner'
 import transactions from './transactions'
 
 export default combineReducers({
   accounts,
   routes,
+  scanner,
   transactions
 })
