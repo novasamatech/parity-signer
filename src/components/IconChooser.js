@@ -6,8 +6,12 @@ import AppStyles from '../styles'
 
 import AccountIcon from './AccountIcon'
 
-import { words } from '../util/random'
-import { brainWalletAddress } from '../util/native'
+import { brainWalletAddress, words } from '../util/native'
+
+async function refreshIcons (self) {
+  const icons = await Promise.all(Array(6).join(' ').split(' ').map(() => words()))
+  self.setState({ icons })
+}
 
 export default class IconChooser extends Component {
   static propTypes = {
@@ -19,12 +23,7 @@ export default class IconChooser extends Component {
   }
 
   componentDidMount () {
-    this.refreshIcons()
-  }
-
-  refreshIcons = () => {
-    const icons = Array(6).join(' ').split(' ').map(() => words())
-    this.setState({ icons })
+    refreshIcons(this)
   }
 
   render () {
@@ -42,7 +41,7 @@ export default class IconChooser extends Component {
           }
         </View>
         <Button
-          onPress={this.refreshIcons}
+          onPress={() => refreshIcons(this)}
           color='green'
           title='More'
         />

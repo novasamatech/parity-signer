@@ -10,6 +10,7 @@ ethkey = { git = "https://github.com/paritytech/parity" }
 rlp = { git = "https://github.com/paritytech/parity" }
 tiny-keccak = "1.1"
 blockies = "0.1"
+parity-wordlist = { git = "https://github.com/paritytech/wordlist" }
 
 [target.'cfg(target_os="android")'.dependencies]
 jni = { git = "https://github.com/prevoty/jni-rs", default-features = false }
