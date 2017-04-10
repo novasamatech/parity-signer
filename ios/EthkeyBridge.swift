@@ -82,4 +82,13 @@ class EthkeyBridge: NSObject {
 		rust_string_destroy(icon_rust_str)
 		resolve(icon)
 	}
+	
+	@objc func randomPhrase(_ words: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+		let words_rust_str = random_phrase(words)
+		let words_rust_str_ptr = rust_string_ptr(words_rust_str)
+		let words = String.fromStringPtr(ptr: words_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(words_rust_str_ptr)
+		rust_string_destroy(words_rust_str)
+		resolve(words)
+	}
 }
