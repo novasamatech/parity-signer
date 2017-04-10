@@ -25,6 +25,7 @@ class Transaction {
     this.action = action
     this.value = fromWei(value)
     this.data = data || '-'
+    this.isSafe = true
   }
 }
 

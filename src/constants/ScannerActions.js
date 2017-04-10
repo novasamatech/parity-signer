@@ -16,18 +16,7 @@
 
 'use strict'
 
-import React, { Component, PropTypes } from 'react'
-import { Text } from 'react-native'
-import AppStyles from '../styles'
-
-export default class AccountAddress extends Component {
-  static propTypes = {
-    address: PropTypes.string
-  }
-
-  render () {
-    return (
-      <Text selectable style={AppStyles.valueText}>{this.props.address ? '0x' + this.props.address : 'Unknown'}</Text>
-    )
-  }
-}
+export const ENABLE_SCANNER = 'SCANNER_ACTION_ENABLE_SCANNER'
+export const DISABLE_SCANNER = 'SCANNER_ACTION_DISABLE_SCANNER'
+export const DISABLE_SCANNER_WARNINGS = 'SCANNER_ACTION_DISABLE_SCANNER_WARNINGS'
+export const RESET_SCANNER = 'SCANNER_ACTION_RESET_SCANNER'

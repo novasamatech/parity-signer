@@ -16,18 +16,38 @@
 
 'use strict'
 
-import React, { Component, PropTypes } from 'react'
-import { Text } from 'react-native'
+import React, { Component, PropTypes} from 'react'
+import { Text, View, StyleSheet } from 'react-native'
 import AppStyles from '../styles'
+import AccountIcon from './AccountIcon'
+import AccountAddress from './AccountAddress'
 
-export default class AccountAddress extends Component {
+export default class AccountPrettyAddress extends Component {
   static propTypes = {
+    name: PropTypes.string.isRequired,
     address: PropTypes.string
   }
 
   render () {
     return (
-      <Text selectable style={AppStyles.valueText}>{this.props.address ? '0x' + this.props.address : 'Unknown'}</Text>
+      <View>
+        <View style={styles.row}>
+          <AccountIcon style={[AppStyles.icon, styles.icon]} seed={this.props.address || ''} />
+          <Text style={{marginTop: 5, marginLeft: 5}}>{this.props.name}</Text>
+        </View>
+        <AccountAddress address={this.props.address} />
+      </View>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row'
+  },
+  icon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15
+  }
+})

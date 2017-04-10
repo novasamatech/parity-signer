@@ -39,7 +39,7 @@ export function signTx (account) {
         })
         Actions.qrViewTx()
       },
-      error => console.log(error)
+      error => console.error(error)
     )
   }
 }

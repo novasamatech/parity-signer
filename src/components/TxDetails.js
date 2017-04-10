@@ -19,41 +19,60 @@
 import React, { Component, PropTypes } from 'react'
 import { ScrollView, View, Text, Button } from 'react-native'
 import AppStyles from '../styles'
-import AccountIcon from './AccountIcon'
-import AccountAddress from './AccountAddress'
+import AccountPrettyAddress from './AccountPrettyAddress'
+
+const orUnknown = (value = 'Unknown') => value
 
 export default class Send extends Component {
   static propTypes = {
     nextButtonTitle: PropTypes.string.isRequired,
     nextButtonDescription: PropTypes.string.isRequired,
     nextButtonAction: PropTypes.func.isRequired,
+    txRlpHash: PropTypes.string.isRequired,
     txSenderAddress: PropTypes.string.isRequired,
-    txRecipientAddress: PropTypes.string.isRequired,
-    txValue: PropTypes.string.isRequired,
-    txNonce: PropTypes.string.isRequired,
-    txGas: PropTypes.string.isRequired,
-    txGasPrice: PropTypes.string.isRequired,
-    txData: PropTypes.string.isRequired
+    txRecipientAddress: PropTypes.string,
+    txValue: PropTypes.string,
+    txNonce: PropTypes.string,
+    txGas: PropTypes.string,
+    txGasPrice: PropTypes.string,
+    txData: PropTypes.string,
+    isSafe: PropTypes.bool.isRequired,
+    txSenderName: PropTypes.string.isRequired,
+    txRecipientName: PropTypes.string
   }
 
   render () {
     return (
       <ScrollView style={AppStyles.view}>
-        <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.txSenderAddress} />
+        <Text style={AppStyles.hintText}>transaction hash</Text>
+        <Text style={AppStyles.valueText}>0x{this.props.txRlpHash}</Text>
         <Text style={AppStyles.hintText}>sender address</Text>
-        <AccountAddress address={this.props.txSenderAddress} />
+        <AccountPrettyAddress
+          address={this.props.txSenderAddress}
+          name={this.props.txSenderName}
+        />
         <Text style={AppStyles.hintText}>recipient address</Text>
-        <AccountAddress address={this.props.txRecipientAddress} />
+        <AccountPrettyAddress
+          address={this.props.txRecipientAddress}
+          name={orUnknown(this.props.txRecipientName)}
+        />
         <Text style={AppStyles.hintText}>amount to transfer (in ETH)</Text>
-        <Text style={AppStyles.valueText}>{this.props.txValue}</Text>
+        <Text style={AppStyles.valueText}>{orUnknown(this.props.txValue)}</Text>
         <Text style={AppStyles.hintText}>nonce</Text>
-        <Text style={AppStyles.valueText}>{this.props.txNonce}</Text>
+        <Text style={AppStyles.valueText}>{orUnknown(this.props.txNonce)}</Text>
         <Text style={AppStyles.hintText}>gas</Text>
-        <Text style={AppStyles.valueText}>{this.props.txGas}</Text>
+        <Text style={AppStyles.valueText}>{orUnknown(this.props.txGas)}</Text>
         <Text style={AppStyles.hintText}>gasPrice</Text>
-        <Text style={AppStyles.valueText}>{this.props.txGasPrice}</Text>
+        <Text style={AppStyles.valueText}>{orUnknown(this.props.txGasPrice)}</Text>
         <Text style={AppStyles.hintText}>data</Text>
-        <Text style={AppStyles.valueText}>{this.props.txData}</Text>
+        <Text style={AppStyles.valueText}>{orUnknown(this.props.txData)}</Text>
+        {
+          !this.props.isSafe
+            ? <Text style={AppStyles.hintText}>
+              Signing this transaction is unsafe. Proceed only if this transaction comes from trusted source.
+            </Text>
+            : null
+        }
         <View style={AppStyles.buttonContainer}>
           <Button
             onPress={() => this.props.nextButtonAction()}
