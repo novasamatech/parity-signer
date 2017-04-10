@@ -18,7 +18,7 @@
 
 import { Alert } from 'react-native'
 import { Actions } from 'react-native-router-flux'
-import { ENABLE_SCANNER, DISABLE_SCANNER, DISABLE_SCANNER_WARNINGS, RESET_SCANNER } from '../actions/ScannerActions'
+import { ENABLE_SCANNER, DISABLE_SCANNER, DISABLE_SCANNER_WARNINGS, RESET_SCANNER } from '../constants/ScannerActions'
 import { selectAccount } from './accounts'
 import { scannedTx } from './transactions'
 import transaction from '../util/transaction'
@@ -85,12 +85,12 @@ export function scannerDispatch (data) {
         return
       }
 
-      if (txRequest.action == 'signTransaction') {
+      if (txRequest.action === 'signTransaction') {
         let tx = await transaction(txRequest.data.rlp)
         let hash = await keccak(txRequest.data.rlp)
         dispatch(selectAccount(account))
         dispatch(scannedTx(hash, tx))
-      } else if (txRequest.action == 'signTransactionHash') {
+      } else if (txRequest.action === 'signTransactionHash') {
         let details = txRequest.data.details
         let hash = txRequest.data.hash
         dispatch(selectAccount(account))
@@ -100,10 +100,10 @@ export function scannerDispatch (data) {
         return
       }
       Actions.txDetails()
-      dispatch(enableScanner())
+      dispatch(resetScanner())
     } catch (e) {
       console.error(e)
-      dispatch(displayScannerWarning('Invalid transaction'))
+      dispatch(displayScannerWarning('Invalid transaction' + e))
     }
   }
 }

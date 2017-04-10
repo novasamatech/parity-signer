@@ -70,3 +70,7 @@ struct rust_string* keccak256(const struct rust_string_ptr* data);
 // blockies ffi
 
 struct rust_string* blockies_icon(const struct rust_string_ptr* blockies_seed);
+
+// random phrase ffi
+
+struct rust_string* random_phrase(const uint32_t words);

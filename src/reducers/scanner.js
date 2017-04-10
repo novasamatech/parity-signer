@@ -16,11 +16,11 @@
 
 'use strict'
 
-import { ENABLE_SCANNER, DISABLE_SCANNER, DISABLE_SCANNER_WARNINGS, RESET_SCANNER } from '../actions/ScannerActions'
+import { ENABLE_SCANNER, DISABLE_SCANNER, DISABLE_SCANNER_WARNINGS, RESET_SCANNER } from '../constants/ScannerActions'
 
 const initialState = {
   scannerEnabled: true,
-  shouldDisplayWarning: true,
+  shouldDisplayWarning: true
 }
 
 export default function scanner (state = initialState, action) {
@@ -46,9 +46,10 @@ export default function scanner (state = initialState, action) {
     case RESET_SCANNER:
       return {
         scannerEnabled: false,
-        shouldDisplayWarning: false,
+        shouldDisplayWarning: false
       }
 
     default:
       return state
+  }
 }
