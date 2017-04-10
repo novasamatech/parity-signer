@@ -28,6 +28,7 @@ export default class Send extends Component {
     nextButtonTitle: PropTypes.string.isRequired,
     nextButtonDescription: PropTypes.string.isRequired,
     nextButtonAction: PropTypes.func.isRequired,
+    txRlpHash: PropTypes.string.isRequired,
     txSenderAddress: PropTypes.string.isRequired,
     txRecipientAddress: PropTypes.string,
     txValue: PropTypes.string,
@@ -36,21 +37,24 @@ export default class Send extends Component {
     txGasPrice: PropTypes.string,
     txData: PropTypes.string,
     isSafe: PropTypes.bool.isRequired,
-    fetchAccountName: PropTypes.func.isRequired
+    txSenderName: PropTypes.string.isRequired,
+    txRecipientName: PropTypes.string
   }
 
   render () {
     return (
       <ScrollView style={AppStyles.view}>
+        <Text style={AppStyles.hintText}>transaction hash</Text>
+        <Text style={AppStyles.valueText}>0x{this.props.txRlpHash}</Text>
         <Text style={AppStyles.hintText}>sender address</Text>
         <AccountPrettyAddress
           address={this.props.txSenderAddress}
-          name={this.props.fetchAccountName(this.props.txSenderAddress)}
+          name={this.props.txSenderName}
         />
         <Text style={AppStyles.hintText}>recipient address</Text>
         <AccountPrettyAddress
           address={this.props.txRecipientAddress}
-          name={this.props.fetchAccountName(this.props.txRecipientAddress || '')}
+          name={orUnknown(this.props.txRecipientName)}
         />
         <Text style={AppStyles.hintText}>amount to transfer (in ETH)</Text>
         <Text style={AppStyles.valueText}>{orUnknown(this.props.txValue)}</Text>
@@ -67,7 +71,7 @@ export default class Send extends Component {
             ? <Text style={AppStyles.hintText}>
               Signing this transaction is unsafe. Proceed only if this transaction comes from trusted source.
             </Text>
-            : <View />
+            : null
         }
         <View style={AppStyles.buttonContainer}>
           <Button
