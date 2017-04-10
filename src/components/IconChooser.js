@@ -6,8 +6,7 @@ import AppStyles from '../styles'
 
 import AccountIcon from './AccountIcon'
 
-import { words } from '../util/random'
-import { brainWalletAddress } from '../util/native'
+import { brainWalletAddress, words } from '../util/native'
 
 export default class IconChooser extends Component {
   static propTypes = {
@@ -18,13 +17,17 @@ export default class IconChooser extends Component {
     icons: []
   }
 
-  componentDidMount () {
-    this.refreshIcons()
+  refreshIcons = async () => {
+    try {
+      const icons = await Promise.all(Array(6).join(' ').split(' ').map(() => words()))
+      this.setState({ icons })
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  refreshIcons = () => {
-    const icons = Array(6).join(' ').split(' ').map(() => words())
-    this.setState({ icons })
+  componentDidMount () {
+    this.refreshIcons()
   }
 
   render () {

@@ -17,6 +17,7 @@
 extern crate libc;
 extern crate rustc_serialize;
 extern crate tiny_keccak;
+extern crate parity_wordlist as wordlist;
 extern crate ethkey;
 extern crate rlp;
 extern crate blockies;
@@ -142,11 +143,19 @@ pub unsafe extern fn blockies_icon(blockies_seed: *mut StringPtr) -> *mut String
   Box::into_raw(Box::new(icon))
 }
 
+// random phrase ffi
+#[no_mangle]
+pub unsafe extern fn random_phrase(words: u32) -> *mut String {
+  let words = wordlist::random_phrase(words as usize);
+  Box::into_raw(Box::new(words))
+}
+
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
   extern crate jni;
 
+  use wordlist;
   use super::*;
   use self::jni::JNIEnv;
   use self::jni::objects::{JClass, JString};
@@ -208,6 +217,12 @@ pub mod android {
     let seed: String = env.get_string(seed).expect("Invalid seed").into();
     let icon = blockies_icon_in_base64(seed.into());
     env.new_string(icon).expect("Could not create java string").into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyRandomPhrase(env: JNIEnv, _: JClass, words: jint) -> jstring {
+    let words = wordlist::random_phrase(words as usize);
+    env.new_string(words).expect("Could not create java string").into_inner()
   }
 }
 

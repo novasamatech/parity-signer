@@ -28,3 +28,4 @@ export const brainWalletSign = (seed, message) => EthkeyBridge.brainWalletSign(s
 export const rlpItem = (rlp, position) => EthkeyBridge.rlpItem(rlp, position)
 export const keccak = (data) => EthkeyBridge.keccak(data)
 export const blockiesIcon = (seed) => EthkeyBridge.blockiesIcon(seed.toLowerCase()).then(icon => 'data:image/png;base64,' + icon)
+export const words = () => EthkeyBridge.randomPhrase(11)
