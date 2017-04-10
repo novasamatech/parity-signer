@@ -91,7 +91,8 @@ export function scannerDispatch (data) {
         dispatch(selectAccount(account))
         dispatch(scannedTx(hash, tx))
       } else if (txRequest.action === 'signTransactionHash') {
-        let details = txRequest.data.details
+        var details = txRequest.data.details
+        details.isSafe = false
         let hash = txRequest.data.hash
         dispatch(selectAccount(account))
         dispatch(scannedTx(hash, details))

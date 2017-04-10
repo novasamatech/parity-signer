@@ -29,7 +29,14 @@ const mapStateToProps = (state, ownProps) => ({
   txNonce: state.transactions.pendingTransaction.transaction.nonce,
   txGas: state.transactions.pendingTransaction.transaction.gas,
   txGasPrice: state.transactions.pendingTransaction.transaction.gasPrice,
-  txData: state.transactions.pendingTransaction.transaction.data
+  txData: state.transactions.pendingTransaction.transaction.data,
+  isSafe: state.transactions.pendingTransaction.transaction.isSafe,
+  fetchAccountName: (address) => {
+    let account = state.accounts.all.find(account => {
+      return account.address.toLowerCase() === address.toLowerCase()
+    })
+    return account ? account.name : 'Unknown'
+  }
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
