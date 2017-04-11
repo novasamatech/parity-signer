@@ -14,17 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+'use strict'
+
 import { EthkeyBridge } from 'NativeModules'
+import { checksummedAddress } from './checksum'
+
+const asString = (x) => x.split('').map(x => x.charCodeAt(0).toString(16)).join('')
 
 export const brainWalletAddress = (seed) => EthkeyBridge.brainWalletAddress(seed)
-  .then(address => keccak(address).then(hash => ({address, hash: hash.slice(-40)})))
-  .then(acc => {
-    let result = ''
-    for (let n = 0; n < 40; n++) {
-      result = `${result}${parseInt(acc.hash[n], 16) > 7 ? acc.address[n].toUpperCase() : acc.address[n]}`
-    }
-    return result
-  })
+  .then(address => keccak(asString(address)).then(hash => checksummedAddress(address, hash)))
 export const brainWalletSecret = (seed) => EthkeyBridge.brainWalletSecret(seed)
 export const brainWalletSign = (seed, message) => EthkeyBridge.brainWalletSign(seed, message)
 export const rlpItem = (rlp, position) => EthkeyBridge.rlpItem(rlp, position)
