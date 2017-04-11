@@ -46,8 +46,8 @@ export default function scanner (state = initialState, action) {
     case RESET_SCANNER:
       return {
         ...state,
-        scannerEnabled: false,
-        shouldDisplayWarning: false
+        scannerEnabled: true,
+        shouldDisplayWarning: true
       }
 
     default:
