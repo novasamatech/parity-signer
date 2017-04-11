@@ -23,24 +23,44 @@ import AppStyles from '../styles'
 
 export default class Scanner extends Component {
   static propTypes = {
-    onBarCodeRead: PropTypes.func.isRequired
+    onBarCodeRead: PropTypes.func.isRequired,
+    isActive: PropTypes.bool.isRequired
   }
 
   render () {
+    if (!this.props.isActive) {
+      return (
+        <View style={[AppStyles.view, styles.view]}>
+          <StatusBar barStyle='light-content' />
+          { this.renderRects() }
+        </View>
+      )
+    }
+
     return (
       <Camera onBarCodeRead={this.props.onBarCodeRead} style={AppStyles.view}>
         <StatusBar barStyle='light-content' />
-        <View style={styles.rectangleContainer}>
-          <View style={styles.rectangle}>
-            <View style={styles.innerRectangle} />
-          </View>
-        </View>
+        { this.renderRects() }
       </Camera>
+    )
+  }
+
+  renderRects () {
+    return (
+      <View style={styles.rectangleContainer}>
+        <View style={styles.rectangle}>
+          <View style={styles.innerRectangle} />
+        </View>
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  view: {
+    backgroundColor: 'black'
+  },
+
   rectangleContainer: {
     flex: 1,
     alignItems: 'center',
