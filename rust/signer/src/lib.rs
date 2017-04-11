@@ -19,6 +19,7 @@ extern crate rustc_serialize;
 extern crate tiny_keccak;
 extern crate parity_wordlist as wordlist;
 extern crate ethkey;
+extern crate ethstore;
 extern crate rlp;
 extern crate blockies;
 
@@ -28,6 +29,7 @@ use rustc_serialize::hex::{ToHex, FromHex};
 use rustc_serialize::base64::{self, ToBase64};
 use tiny_keccak::Keccak;
 use ethkey::{KeyPair, Generator, Brain, Message, sign};
+use ethstore::Crypto;
 use rlp::UntrustedRlp;
 use blockies::{Blockies, create_icon, ethereum};
 
@@ -148,6 +150,38 @@ pub unsafe extern fn blockies_icon(blockies_seed: *mut StringPtr) -> *mut String
 pub unsafe extern fn random_phrase(words: u32) -> *mut String {
   let words = wordlist::random_phrase(words as usize);
   Box::into_raw(Box::new(words))
+}
+
+// data encryption ffi
+
+#[no_mangle]
+pub unsafe extern fn encrypt_data(data: *mut StringPtr, password: *mut StringPtr) -> *mut String {
+  let data = (*data).as_str();
+  let password = (*password).as_str();
+  let crypto = Crypto::with_plain(data.as_bytes(), password, 10240);
+  Box::into_raw(Box::new(crypto.into()))
+}
+
+#[no_mangle]
+pub unsafe extern fn decrypt_data(encrypted_data: *mut StringPtr, password: *mut StringPtr, error: *mut u32) -> *mut String {
+  let data = (*encrypted_data).as_str();
+  let password = (*password).as_str();
+  let crypto: Crypto = match data.parse() {
+    Ok(crypto) => crypto,
+    Err(_) => {
+      *error = 1;
+      return Box::into_raw(Box::new(String::new()))
+    }
+  };
+  match crypto.decrypt(password) {
+    Ok(decrypted) => {
+      Box::into_raw(Box::new(String::from_utf8_unchecked(decrypted)))
+    },
+    Err(_) => {
+      *error = 2;
+      Box::into_raw(Box::new(String::new()))
+    },
+  }
 }
 
 #[cfg(target_os = "android")]

@@ -91,4 +91,33 @@ class EthkeyBridge: NSObject {
 		rust_string_destroy(words_rust_str)
 		resolve(words)
 	}
+	
+	@objc func encryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+		var data_ptr = data.asPtr()
+		var password_ptr = password.asPtr()
+		let encrypted_data_rust_str = encrypt_data(&data_ptr, &password_ptr)
+		let encrypted_data_rust_str_ptr = rust_string_ptr(encrypted_data_rust_str)
+		let encrypted_data = String.fromStringPtr(ptr: encrypted_data_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(encrypted_data_rust_str_ptr)
+		rust_string_destroy(encrypted_data_rust_str)
+		resolve(encrypted_data)
+	}
+	
+	@objc func decryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+		var data_ptr = data.asPtr()
+		var password_ptr = password.asPtr()
+		var error: UInt32 = 0
+		let decrypted_data_rust_str = decrypt_data(&data_ptr, &password_ptr, &error)
+		let decrypted_data_rust_str_ptr = rust_string_ptr(decrypted_data_rust_str)
+		let decrypted_data = String.fromStringPtr(ptr: decrypted_data_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(decrypted_data_rust_str_ptr)
+		rust_string_destroy(decrypted_data_rust_str)
+		if error == 0 {
+			resolve(decrypted_data)
+		} else if error == 1{
+			reject("invalid data", nil, nil)
+		} else {
+			reject("invalid password", nil, nil)
+		}
+	}
 }
