@@ -16,14 +16,35 @@
 
 'use strict'
 
+import { Alert } from 'react-native'
+import { Actions } from 'react-native-router-flux'
 import {
-  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_NEW_PIN, SET_ACCOUNTS
+  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_NEW_PIN, SET_OLD_PIN, SET_ACCOUNTS
 } from '../constants/AccountActions'
+import { encryptData, decryptData } from '../util/native'
 
-export function addAccount (account) {
-  return {
-    type: ADD_ACCOUNT,
-    account
+export function addAccount (pin) {
+  return async function (dispatch, getState) {
+    try {
+      let account = getState().accounts.selected
+      if (!account) {
+        return
+      }
+
+      let seed = await encryptData(account.seed, pin)
+      dispatch({
+        type: ADD_ACCOUNT,
+        account: {
+          encryptedSeed: seed,
+          address: account.address,
+          name: account.name
+        }
+      })
+      Actions.popTo('accountList')
+      Alert.alert('Account Created')
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -49,10 +70,33 @@ export function modifyAccount (account, modifications) {
   }
 }
 
+export function setOldPin (pin) {
+  return async function (dispatch, getState) {
+    let account = getState().accounts.selected
+    if (!account) {
+      return
+    }
+
+    try {
+      await decryptData(account.encryptedSeed, pin)
+      dispatch({
+        type: SET_OLD_PIN,
+        pin
+      })
+      Actions.accountSetPin()
+    } catch (e) {
+      Alert.alert('Invalid PIN')
+    }
+  }
+}
+
 export function setNewPin (pin) {
-  return {
-    type: SET_NEW_PIN,
-    pin
+  return function (dispatch) {
+    dispatch({
+      type: SET_NEW_PIN,
+      pin
+    })
+    Actions.accountConfirmPin()
   }
 }
 
@@ -60,5 +104,33 @@ export function setAccounts (accounts) {
   return {
     type: SET_ACCOUNTS,
     accounts
+  }
+}
+
+export function changePin (newPin) {
+  return async function (dispatch, getState) {
+    let account = getState().accounts.selected
+    if (!account) {
+      return
+    }
+
+    if (account.newPin !== newPin) {
+      Alert.alert('New PIN must be the same')
+    }
+
+    try {
+      let seed = await decryptData(account.encryptedSeed, account.oldPin)
+      let encryptedSeed = await encryptData(seed, newPin)
+
+      dispatch(modifyAccount(account, {
+        encryptedSeed: encryptedSeed
+      }))
+
+      Actions.popTo('accountDetails')
+      Alert.alert('PIN changed')
+    } catch (e) {
+      // this is unreachanle if setOldPin was called before
+      console.error(e)
+    }
   }
 }
