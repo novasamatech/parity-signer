@@ -16,7 +16,7 @@
 
 'use strict'
 
-import { Alert } from 'react-native'
+import { Alert, Keyboard } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import AccountPin from '../components/AccountPin'
@@ -31,6 +31,7 @@ export const AccountEnterPin = connect(
   (dispatch) => ({
     onNextPressed: (pin, account) => {
       if (pin === account.pin) {
+        Keyboard.dismiss()
         dispatch(signTx(account))
       } else {
         Alert.alert('Invalid PIN')
@@ -89,6 +90,8 @@ export const AccountConfirmPin = connect(
         Alert.alert('PIN doesn\'t match')
         return
       }
+
+      Keyboard.dismiss()
 
       if (isNew) {
         dispatch(addAccount(account))
