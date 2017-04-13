@@ -23,7 +23,6 @@ import AppStyles from '../styles'
 export default class AccountPin extends Component {
   static propTypes = {
     onNextPressed: PropTypes.func.isRequired,
-    account: PropTypes.object.isRequired,
     placeholder: PropTypes.string,
     extra: PropTypes.object
   }
@@ -38,9 +37,9 @@ export default class AccountPin extends Component {
 
   onNext = () => {
     const {pin} = this.state
-    const {account, extra} = this.props
+    const {extra} = this.props
 
-    this.props.onNextPressed(pin, account, extra)
+    this.props.onNextPressed(pin, extra)
   }
 
   onChange = (pin) => {

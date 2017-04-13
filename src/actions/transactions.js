@@ -16,9 +16,10 @@
 
 'use strict'
 
+import { Alert } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import { NEW_SCANNED_TX, SIGN_TX } from '../constants/TransactionActions'
-import { brainWalletSign } from '../util/native'
+import { brainWalletSign, decryptData } from '../util/native'
 
 export function scannedTx (rlpHash, transaction) {
   return {
@@ -28,18 +29,20 @@ export function scannedTx (rlpHash, transaction) {
   }
 }
 
-export function signTx (account) {
-  return function (dispatch, getState) {
-    let hash = getState().transactions.pendingTransaction.rlpHash
-    return brainWalletSign(account.seed, hash).then(
-      signature => {
-        dispatch({
-          type: SIGN_TX,
-          signature: signature
-        })
-        Actions.qrViewTx()
-      },
-      error => console.error(error)
-    )
+export function signTx (pin) {
+  return async function (dispatch, getState) {
+    try {
+      let account = getState().accounts.selected
+      let hash = getState().transactions.pendingTransaction.rlpHash
+      let seed = await decryptData(account.encryptedSeed, pin)
+      let signature = await brainWalletSign(seed, hash)
+      dispatch({
+        type: SIGN_TX,
+        signature: signature
+      })
+      Actions.qrViewTx()
+    } catch (e) {
+      Alert.alert('Invalid PIN')
+    }
   }
 }

@@ -74,3 +74,9 @@ struct rust_string* blockies_icon(const struct rust_string_ptr* blockies_seed);
 // random phrase ffi
 
 struct rust_string* random_phrase(const uint32_t words);
+
+// data encryption ffi
+
+struct rust_string* encrypt_data(const struct rust_string_ptr* data, const struct rust_string_ptr* password);
+
+struct rust_string* decrypt_data(const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password, unsigned* error);

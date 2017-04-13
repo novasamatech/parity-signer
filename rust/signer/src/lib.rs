@@ -19,6 +19,7 @@ extern crate rustc_serialize;
 extern crate tiny_keccak;
 extern crate parity_wordlist as wordlist;
 extern crate ethkey;
+extern crate ethstore;
 extern crate rlp;
 extern crate blockies;
 
@@ -28,6 +29,7 @@ use rustc_serialize::hex::{ToHex, FromHex};
 use rustc_serialize::base64::{self, ToBase64};
 use tiny_keccak::Keccak;
 use ethkey::{KeyPair, Generator, Brain, Message, sign};
+use ethstore::Crypto;
 use rlp::UntrustedRlp;
 use blockies::{Blockies, create_icon, ethereum};
 
@@ -150,6 +152,38 @@ pub unsafe extern fn random_phrase(words: u32) -> *mut String {
   Box::into_raw(Box::new(words))
 }
 
+// data encryption ffi
+
+#[no_mangle]
+pub unsafe extern fn encrypt_data(data: *mut StringPtr, password: *mut StringPtr) -> *mut String {
+  let data = (*data).as_str();
+  let password = (*password).as_str();
+  let crypto = Crypto::with_plain(data.as_bytes(), password, 10240);
+  Box::into_raw(Box::new(crypto.into()))
+}
+
+#[no_mangle]
+pub unsafe extern fn decrypt_data(encrypted_data: *mut StringPtr, password: *mut StringPtr, error: *mut u32) -> *mut String {
+  let data = (*encrypted_data).as_str();
+  let password = (*password).as_str();
+  let crypto: Crypto = match data.parse() {
+    Ok(crypto) => crypto,
+    Err(_) => {
+      *error = 1;
+      return Box::into_raw(Box::new(String::new()))
+    }
+  };
+  match crypto.decrypt(password) {
+    Ok(decrypted) => {
+      Box::into_raw(Box::new(String::from_utf8_unchecked(decrypted)))
+    },
+    Err(_) => {
+      *error = 2;
+      Box::into_raw(Box::new(String::new()))
+    },
+  }
+}
+
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
@@ -223,6 +257,39 @@ pub mod android {
   pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyRandomPhrase(env: JNIEnv, _: JClass, words: jint) -> jstring {
     let words = wordlist::random_phrase(words as usize);
     env.new_string(words).expect("Could not create java string").into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyEncryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
+    let data: String = env.get_string(data).expect("Invalid data").into();
+    let password: String = env.get_string(password).expect("Invalid password").into();
+    let crypto = Crypto::with_plain(data.as_bytes(), &password, 10240);
+    env.new_string(String::from(crypto)).expect("Could not create java string").into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
+    let data: String = env.get_string(data).expect("Invalid data").into();
+    let password: String = env.get_string(password).expect("Invalid password").into();
+    let crypto: Crypto = match data.parse() {
+      Ok(crypto) => crypto,
+      Err(_) => {
+        let res = env.new_string("").expect("").into_inner();
+        env.throw(res.into());
+        return res
+      },
+    };
+
+    match crypto.decrypt(&password) {
+      Ok(decrypted) => {
+        env.new_string(String::from_utf8_unchecked(decrypted)).expect("Could not create java string").into_inner()
+      },
+      Err(_) => {
+        let res = env.new_string("").expect("").into_inner();
+        env.throw(res.into());
+        res
+      },
+    }
   }
 }
 

@@ -79,6 +79,20 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         promise.resolve(ethkeyRandomPhrase(words));
     }
 
+    @ReactMethod
+    public void encryptData(String data, String password, Promise promise) {
+        promise.resolve(ethkeyEncryptData(data, password));
+    }
+
+    @ReactMethod
+    public void decryptData(String data, String password, Promise promise) {
+        try {
+            promise.resolve(ethkeyDecryptData(data, password));
+        } catch (Exception e) {
+            promise.reject("invalid password", null, null);
+        }
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletSecret(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
@@ -86,4 +100,6 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native String ethkeyKeccak(String data);
     private static native String ethkeyBlockiesIcon(String seed);
     private static native String ethkeyRandomPhrase(int words);
+    private static native String ethkeyEncryptData(String data, String password);
+    private static native String ethkeyDecryptData(String data, String password);
 }

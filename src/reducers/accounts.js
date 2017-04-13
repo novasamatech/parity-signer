@@ -17,7 +17,7 @@
 'use strict'
 
 import {
-  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_NEW_PIN, SET_ACCOUNTS
+  ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_NEW_PIN, SET_OLD_PIN, SET_ACCOUNTS
 } from '../constants/AccountActions'
 // TODO [ToDr] Move side-effects to middleware
 import { saveAccount, deleteAccount } from '../util/db'
@@ -39,8 +39,8 @@ const initialAccounts = {
 export default function accounts (state = initialAccounts, action) {
   switch (action.type) {
     case ADD_ACCOUNT:
-      const account = action.account
-      account.pin = account.newPin
+      let account = action.account
+      delete account.seed
       delete account.newPin
 
       saveAccount(account)
@@ -57,6 +57,15 @@ export default function accounts (state = initialAccounts, action) {
       return {
         ...state,
         selected: action.account
+      }
+
+    case SET_OLD_PIN:
+      return {
+        ...state,
+        selected: {
+          ...state.selected,
+          oldPin: action.pin
+        }
       }
 
     case SET_NEW_PIN:
