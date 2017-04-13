@@ -116,6 +116,7 @@ export function changePin (newPin) {
 
     if (account.newPin !== newPin) {
       Alert.alert('New PIN must be the same')
+      return
     }
 
     Keyboard.dismiss()

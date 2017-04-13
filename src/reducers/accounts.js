@@ -39,7 +39,7 @@ const initialAccounts = {
 export default function accounts (state = initialAccounts, action) {
   switch (action.type) {
     case ADD_ACCOUNT:
-      var account = action.account
+      let account = action.account
       delete account.seed
       delete account.newPin
 
