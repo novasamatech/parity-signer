@@ -16,7 +16,7 @@
 
 'use strict'
 
-import { Alert } from 'react-native'
+import { Alert, Keyboard } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import {
   ADD_ACCOUNT, SELECT_ACCOUNT, DELETE_ACCOUNT, MODIFY_ACCOUNT, SET_NEW_PIN, SET_OLD_PIN, SET_ACCOUNTS
@@ -117,6 +117,8 @@ export function changePin (newPin) {
     if (account.newPin !== newPin) {
       Alert.alert('New PIN must be the same')
     }
+
+    Keyboard.dismiss()
 
     try {
       let seed = await decryptData(account.encryptedSeed, account.oldPin)

@@ -20,15 +20,18 @@ import { connect } from 'react-redux'
 import QrScanner from '../components/QrScanner'
 import { scannerDispatch } from '../actions/scanner'
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  onBarCodeRead: (scanned) => {
-    dispatch(scannerDispatch(scanned.data))
-  }
-})
-
 const QrScannerContainer = connect(
-  undefined,
-  mapDispatchToProps
+  (state, ...args) => {
+    const { name } = state.routes.scene
+    return {
+      isActive: name === 'qrScan' || name === 'tabs'
+    }
+  },
+  (dispatch, ownProps) => ({
+    onBarCodeRead: (scanned) => {
+      dispatch(scannerDispatch(scanned.data))
+    }
+  })
 )(QrScanner)
 
 export default QrScannerContainer

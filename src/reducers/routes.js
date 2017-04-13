@@ -18,7 +18,13 @@
 
 import { ActionConst } from 'react-native-router-flux'
 
-export default function reducer (state = {}, { type, scene }) {
+const initialState = {
+  scene: {
+    name: 'qrScan'
+  }
+}
+
+export default function reducer (state = initialState, { type, scene }) {
   switch (type) {
     case ActionConst.FOCUS:
       return {

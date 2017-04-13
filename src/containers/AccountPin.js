@@ -16,6 +16,7 @@
 
 'use strict'
 
+import { Keyboard } from 'react-native'
 import { connect } from 'react-redux'
 import AccountPin from '../components/AccountPin'
 import { addAccount, setNewPin, setOldPin, changePin } from '../actions/accounts'
@@ -27,6 +28,7 @@ export const AccountEnterPin = connect(
   }),
   (dispatch) => ({
     onNextPressed: (pin) => {
+      Keyboard.dismiss()
       dispatch(signTx(pin))
     }
   })
