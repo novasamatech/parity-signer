@@ -561,7 +561,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = T4ZYEBHX9P;
+						DevelopmentTeam = P2PX3JU8FT;
 						LastSwiftMigration = 810;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -977,7 +977,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = T4ZYEBHX9P;
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -988,7 +988,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSignerw;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = NativeSigner;
 				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1007,7 +1007,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = T4ZYEBHX9P;
+				DEVELOPMENT_TEAM = P2PX3JU8FT;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -1018,7 +1018,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSignerw;
+				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
 				PRODUCT_NAME = NativeSigner;
 				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner-Bridging-Header.h";
 				SWIFT_VERSION = 3.0.1;
