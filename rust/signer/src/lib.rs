@@ -258,6 +258,39 @@ pub mod android {
     let words = wordlist::random_phrase(words as usize);
     env.new_string(words).expect("Could not create java string").into_inner()
   }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyEncryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
+    let data: String = env.get_string(data).expect("Invalid data").into();
+    let password: String = env.get_string(password).expect("Invalid password").into();
+    let crypto = Crypto::with_plain(data.as_bytes(), &password, 10240);
+    env.new_string(String::from(crypto)).expect("Could not create java string").into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
+    let data: String = env.get_string(data).expect("Invalid data").into();
+    let password: String = env.get_string(password).expect("Invalid password").into();
+    let crypto: Crypto = match data.parse() {
+      Ok(crypto) => crypto,
+      Err(_) => {
+        let res = env.new_string("").expect("").into_inner();
+        env.throw(res.into());
+        return res
+      },
+    };
+
+    match crypto.decrypt(&password) {
+      Ok(decrypted) => {
+        env.new_string(String::from_utf8_unchecked(decrypted)).expect("Could not create java string").into_inner()
+      },
+      Err(_) => {
+        let res = env.new_string("").expect("").into_inner();
+        env.throw(res.into());
+        res
+      },
+    }
+  }
 }
 
 #[cfg(test)]
