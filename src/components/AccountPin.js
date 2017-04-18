@@ -59,6 +59,7 @@ export default class AccountPin extends Component {
             fontSize={24}
             keyboardType='numeric'
             multiline={false}
+            autoCorrect={false}
             numberOfLines={1}
             onChangeText={this.onChange}
             placeholder={this.props.placeholder}
