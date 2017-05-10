@@ -31,6 +31,11 @@ export function addAccount (pin) {
         return
       }
 
+      if (account.newPin !== pin) {
+        Alert.alert('PIN must be the same')
+        return
+      }
+
       let seed = await encryptData(account.seed, pin)
       dispatch({
         type: ADD_ACCOUNT,
