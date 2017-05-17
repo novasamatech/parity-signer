@@ -20,7 +20,7 @@ import { Keyboard } from 'react-native'
 import { connect } from 'react-redux'
 import AccountPin from '../components/AccountPin'
 import { addAccount, setNewPin, setOldPin, changePin } from '../actions/accounts'
-import { signTx } from '../actions/transactions'
+import { signTx } from '../actions/signer'
 
 export const AccountEnterPin = connect(
   (state) => ({

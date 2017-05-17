@@ -20,11 +20,11 @@ import { combineReducers } from 'redux'
 import accounts from './accounts'
 import routes from './routes'
 import scanner from './scanner'
-import transactions from './transactions'
+import signer from './signer'
 
 export default combineReducers({
   accounts,
   routes,
   scanner,
-  transactions
+  signer
 })

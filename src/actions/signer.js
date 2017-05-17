@@ -18,26 +18,33 @@
 
 import { Alert } from 'react-native'
 import { Actions } from 'react-native-router-flux'
-import { NEW_SCANNED_TX, SIGN_TX } from '../constants/TransactionActions'
+import { NEW_SCANNED_TX, NEW_SCANNED_HASH, SIGN_HASH } from '../constants/SignerActions'
 import { brainWalletSign, decryptData } from '../util/native'
 
-export function scannedTx (rlpHash, transaction) {
+export function scannedTx (hash, transaction) {
   return {
     type: NEW_SCANNED_TX,
-    rlpHash,
+    hash,
     transaction
   }
 }
 
-export function signTx (pin) {
+export function scannedHash (hash) {
+  return {
+    type: NEW_SCANNED_HASH,
+    hash
+  }
+}
+
+export function signHash (pin) {
   return async function (dispatch, getState) {
     try {
       let account = getState().accounts.selected
-      let hash = getState().transactions.pendingTransaction.rlpHash
+      let hash = getState().signer.hashToSign
       let seed = await decryptData(account.encryptedSeed, pin)
       let signature = await brainWalletSign(seed, hash)
       dispatch({
-        type: SIGN_TX,
+        type: SIGN_HASH,
         signature: signature
       })
       Actions.qrViewTx()

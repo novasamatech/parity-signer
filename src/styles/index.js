@@ -79,7 +79,7 @@ export default StyleSheet.create({
     width: 100,
     marginBottom: 10,
     borderRadius: 50,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#eee'
   }
 })

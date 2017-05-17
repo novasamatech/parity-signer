@@ -16,32 +16,28 @@
 
 'use strict'
 
-import { NEW_SCANNED_TX, SIGN_TX } from '../constants/TransactionActions'
+import { NEW_SCANNED_TX, NEW_SCANNED_HASH, SIGN_HASH } from '../constants/SignerActions'
 
 const initialState = {
-  pendingTransaction: {
-    transaction: {},
-    rlpHash: ''
-  },
-  signedTransaction: {
-    signature: ''
-  }
+  transactionDetails: {},
+  hashToSign: '',
+  signedHash: ''
 }
 
-export default function transactions (state = initialState, action) {
+export default function signer (state = initialState, action) {
   switch (action.type) {
     case NEW_SCANNED_TX:
       return Object.assign({}, state, {
-        pendingTransaction: {
-          rlpHash: action.rlpHash,
-          transaction: action.transaction
-        }
+        transactionDetails: action.transaction,
+        hashToSign: action.hash
       })
-    case SIGN_TX:
+    case NEW_SCANNED_HASH:
       return Object.assign({}, state, {
-        signedTransaction: {
-          signature: action.signature
-        }
+        hashToSign: action.hash
+      })
+    case SIGN_HASH:
+      return Object.assign({}, state, {
+        signedHash: action.signature
       })
     default:
       return state
