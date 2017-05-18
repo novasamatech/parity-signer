@@ -16,6 +16,28 @@
 
 'use strict'
 
-export const NEW_SCANNED_TX = 'SIGNER_ACTION_NEW_SCANNED_TX'
-export const NEW_SCANNED_DATA = 'SIGNER_ACTION_NEW_SCANNED_DATA'
-export const SIGN_HASH = 'SIGNER_ACTION_SIGNED_HASH'
+import React, { Component, PropTypes } from 'react'
+import { View, Button, Text } from 'react-native'
+import AppStyles from '../styles'
+
+export default class DataDetails extends Component {
+  static propTypes = {
+    text: PropTypes.string.isRequired,
+    onNextButtonPressed: PropTypes.func.isRequired
+  }
+
+  render () {
+    return (
+      <View style={AppStyles.view}>
+        <Text style={AppStyles.hintText}>Data to sign</Text>
+        <Text style={AppStyles.valueText}>{this.props.text}</Text>
+        <Button
+          onPress={this.props.onNextButtonPressed}
+          title='Next'
+          color='gree'
+          accessibilityLabel='Enter Pin'
+        />
+      </View>
+    )
+  }
+}

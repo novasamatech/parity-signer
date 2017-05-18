@@ -16,6 +16,16 @@
 
 'use strict'
 
-export const NEW_SCANNED_TX = 'SIGNER_ACTION_NEW_SCANNED_TX'
-export const NEW_SCANNED_DATA = 'SIGNER_ACTION_NEW_SCANNED_DATA'
-export const SIGN_HASH = 'SIGNER_ACTION_SIGNED_HASH'
+import { connect } from 'react-redux'
+import { Actions } from 'react-native-router-flux'
+import DataDetails from '../components/DataDetails'
+
+const DataDetailsContainer = connect(state => ({
+  text: 'dupa'
+}), dispatch => ({
+  onNextButtonPressed: () => {
+    Actions.accountEnterPin()
+  }
+}))(DataDetails)
+
+export default DataDetailsContainer

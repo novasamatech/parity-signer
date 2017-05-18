@@ -16,10 +16,11 @@
 
 'use strict'
 
-import { NEW_SCANNED_TX, NEW_SCANNED_HASH, SIGN_HASH } from '../constants/SignerActions'
+import { NEW_SCANNED_TX, NEW_SCANNED_DATA, SIGN_HASH } from '../constants/SignerActions'
 
 const initialState = {
   transactionDetails: {},
+  data: '',
   hashToSign: '',
   signedHash: ''
 }
@@ -31,8 +32,9 @@ export default function signer (state = initialState, action) {
         transactionDetails: action.transaction,
         hashToSign: action.hash
       })
-    case NEW_SCANNED_HASH:
+    case NEW_SCANNED_DATA:
       return Object.assign({}, state, {
+        data: action.data,
         hashToSign: action.hash
       })
     case SIGN_HASH:

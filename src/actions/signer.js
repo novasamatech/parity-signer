@@ -18,7 +18,7 @@
 
 import { Alert } from 'react-native'
 import { Actions } from 'react-native-router-flux'
-import { NEW_SCANNED_TX, NEW_SCANNED_HASH, SIGN_HASH } from '../constants/SignerActions'
+import { NEW_SCANNED_TX, NEW_SCANNED_DATA, SIGN_HASH } from '../constants/SignerActions'
 import { brainWalletSign, decryptData } from '../util/native'
 
 export function scannedTx (hash, transaction) {
@@ -29,10 +29,11 @@ export function scannedTx (hash, transaction) {
   }
 }
 
-export function scannedHash (hash) {
+export function scannedData (hash, data) {
   return {
-    type: NEW_SCANNED_HASH,
-    hash
+    type: NEW_SCANNED_DATA,
+    hash,
+    data
   }
 }
 

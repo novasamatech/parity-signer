@@ -29,6 +29,7 @@ import AccountDetails from '../containers/AccountDetails'
 import TxDetails from '../containers/TxDetails'
 import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from '../containers/AccountPin'
 import { QrViewTransaction, QrViewAddress } from '../containers/QrView'
+import DataDetails from '../containers/DataDetails'
 import { loadAccounts, saveAccounts } from '../util/db'
 import { setAccounts } from '../actions/accounts'
 import store from '../util/store'
@@ -60,6 +61,11 @@ const scenes = Actions.create(
           title='Scan Transaction QR'
         />
         <Scene key='txDetails' component={TxDetails} title='Transaction Details'
+          backTitle='Back'
+          backButtonTextStyle={styles.navibarTitle}
+          hideBackImage
+        />
+        <Scene key='dataDetails' component={DataDetails} title='Sign Data'
           backTitle='Back'
           backButtonTextStyle={styles.navibarTitle}
           hideBackImage

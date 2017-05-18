@@ -20,7 +20,7 @@ import { Alert } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import { ENABLE_SCANNER, DISABLE_SCANNER, DISABLE_SCANNER_WARNINGS, RESET_SCANNER } from '../constants/ScannerActions'
 import { selectAccount } from './accounts'
-import { scannedTx, scannedHash } from './signer'
+import { scannedTx, scannedData } from './signer'
 import transaction from '../util/transaction'
 import { keccak } from '../util/native'
 
@@ -101,13 +101,15 @@ export function scannerDispatch (data) {
         Actions.txDetails()
         dispatch(resetScanner())
       } else if (txRequest.action === 'signData') {
-        let hash = txRequest.data.hash
+        let data = txRequest.data.data
+        let hash = await keccak(txRequest.data.data)
         dispatch(selectAccount(account))
-        dispatch(scannedHash(hash))
-        Actions.accountEnterPin()
+        dispatch(scannedData(hash, data))
+        Actions.dataDetails()
         dispatch(resetScanner())
       } else {
         dispatch(displayScannerWarning('Invalid request'))
+        dispatch(resetScanner())
         return
       }
     } catch (e) {
