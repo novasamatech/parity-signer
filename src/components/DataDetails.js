@@ -20,9 +20,29 @@ import React, { Component, PropTypes } from 'react'
 import { View, Button, Text } from 'react-native'
 import AppStyles from '../styles'
 
+function isAscii (data) {
+  for (var i = 2; i < data.length; i += 2) {
+    let n = parseInt(data.substr(i, 2), 16)
+
+    if (n < 32 || n >= 128) {
+      return false
+    }
+  }
+  return true
+}
+
+function hexToAscii (hexx) {
+  var hex = hexx.toString()
+  var str = ''
+  for (var i = 0; i < hex.length; i += 2) {
+    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16))
+  }
+  return str
+}
+
 export default class DataDetails extends Component {
   static propTypes = {
-    text: PropTypes.string.isRequired,
+    data: PropTypes.string.isRequired,
     onNextButtonPressed: PropTypes.func.isRequired
   }
 
@@ -30,7 +50,7 @@ export default class DataDetails extends Component {
     return (
       <View style={AppStyles.view}>
         <Text style={AppStyles.hintText}>Data to sign</Text>
-        <Text style={AppStyles.valueText}>{this.props.text}</Text>
+        <Text style={AppStyles.valueText}>{ isAscii(this.props.data) ? hexToAscii(this.props.data) : this.props.data }</Text>
         <Button
           onPress={this.props.onNextButtonPressed}
           title='Next'

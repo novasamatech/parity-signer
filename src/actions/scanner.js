@@ -22,7 +22,7 @@ import { ENABLE_SCANNER, DISABLE_SCANNER, DISABLE_SCANNER_WARNINGS, RESET_SCANNE
 import { selectAccount } from './accounts'
 import { scannedTx, scannedData } from './signer'
 import transaction from '../util/transaction'
-import { keccak } from '../util/native'
+import { keccak, ethSign } from '../util/native'
 
 export function enableScanner () {
   return {
@@ -102,7 +102,7 @@ export function scannerDispatch (data) {
         dispatch(resetScanner())
       } else if (txRequest.action === 'signData') {
         let data = txRequest.data.data
-        let hash = await keccak(txRequest.data.data)
+        let hash = await ethSign(txRequest.data.data)
         dispatch(selectAccount(account))
         dispatch(scannedData(hash, data))
         Actions.dataDetails()

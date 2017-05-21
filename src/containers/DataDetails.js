@@ -21,7 +21,7 @@ import { Actions } from 'react-native-router-flux'
 import DataDetails from '../components/DataDetails'
 
 const DataDetailsContainer = connect(state => ({
-  text: 'dupa'
+  data: state.signer.data
 }), dispatch => ({
   onNextButtonPressed: () => {
     Actions.accountEnterPin()
