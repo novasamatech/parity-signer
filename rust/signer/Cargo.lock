@@ -2,7 +2,7 @@
 name = "signer"
 version = "0.1.0"
 dependencies = [
- "blockies 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "blockies 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ethkey 0.2.0 (git+https://github.com/paritytech/parity)",
  "ethstore 0.1.0 (git+https://github.com/paritytech/parity)",
  "jni 0.3.1 (git+https://github.com/prevoty/jni-rs)",
@@ -51,7 +51,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "blockies"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "hsl 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -583,7 +583,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum ascii 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)" = "3ae7d751998c189c1d4468cf0a39bb2eae052a9c58d50ebb3b9591ee3813ad50"
 "checksum bigint 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "4865ae66523e00114a17935fc03865323c668381e9e37fa96c525a8bbcc4e04f"
 "checksum bitflags 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "aad18937a628ec6abcd26d1489012cc0e18c21798210f491af69ded9b881106d"
-"checksum blockies 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "88f848260161ae4410b5133744d5f47b7b126cf1bb4a08a552f2de328022f1d3"
+"checksum blockies 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "94c3d40dd56387cc8bb3e7486d476be73d0d8da16d224b3e5b07bf0c3e33de5a"
 "checksum byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c40977b0ee6b9885c9013cd41d9feffdd22deb3bb4dc3a71d901cc7a77de18c8"
 "checksum cesu8 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6d43a04d8753f35258c91f8ec639f792891f748a1edbd759cf1dcea3382ad83c"
 "checksum combine 2.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "89749770bffc77cb34db11b60d5d4b197388b46bc7774ac8acbde33c26ad6c08"
