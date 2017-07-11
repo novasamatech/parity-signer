@@ -37,12 +37,6 @@ export default class Scanner extends Component {
       )
     }
 
-    let data = {
-      data: '{"action":"signData","data":{"data":"12","account":"006E27B6A72E1f34C626762F3C4761547Aff1421"}}'
-    }
-
-    this.props.onBarCodeRead(data)
-
     return (
       <Camera onBarCodeRead={this.props.onBarCodeRead} style={AppStyles.view}>
         <StatusBar barStyle='light-content' />
