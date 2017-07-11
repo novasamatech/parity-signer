@@ -20,9 +20,9 @@ import { Alert } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import { ENABLE_SCANNER, DISABLE_SCANNER, DISABLE_SCANNER_WARNINGS, RESET_SCANNER } from '../constants/ScannerActions'
 import { selectAccount } from './accounts'
-import { scannedTx } from './transactions'
+import { scannedTx, scannedData } from './signer'
 import transaction from '../util/transaction'
-import { keccak } from '../util/native'
+import { keccak, ethSign } from '../util/native'
 
 export function enableScanner () {
   return {
@@ -90,18 +90,28 @@ export function scannerDispatch (data) {
         let hash = await keccak(txRequest.data.rlp)
         dispatch(selectAccount(account))
         dispatch(scannedTx(hash, tx))
+        Actions.txDetails()
+        dispatch(resetScanner())
       } else if (txRequest.action === 'signTransactionHash') {
         var details = txRequest.data.details
         details.isSafe = false
         let hash = txRequest.data.hash
         dispatch(selectAccount(account))
         dispatch(scannedTx(hash, details))
+        Actions.txDetails()
+        dispatch(resetScanner())
+      } else if (txRequest.action === 'signData') {
+        let data = txRequest.data.data
+        let hash = await ethSign(txRequest.data.data)
+        dispatch(selectAccount(account))
+        dispatch(scannedData(hash, data))
+        Actions.dataDetails()
+        dispatch(resetScanner())
       } else {
         dispatch(displayScannerWarning('Invalid request'))
+        dispatch(resetScanner())
         return
       }
-      Actions.txDetails()
-      dispatch(resetScanner())
     } catch (e) {
       console.error(e)
       dispatch(displayScannerWarning('Invalid transaction' + e))

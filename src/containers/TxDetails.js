@@ -30,17 +30,17 @@ const fetchAccountName = (state, address = '') => {
 const mapStateToProps = (state, ownProps) => ({
   nextButtonTitle: 'Next',
   nextButtonDescription: 'Enter Pin',
-  txRlpHash: state.transactions.pendingTransaction.rlpHash,
+  txRlpHash: state.signer.pendingTransaction.rlpHash,
   txSenderAddress: state.accounts.selected.address,
-  txRecipientAddress: state.transactions.pendingTransaction.transaction.action,
-  txValue: state.transactions.pendingTransaction.transaction.value,
-  txNonce: state.transactions.pendingTransaction.transaction.nonce,
-  txGas: state.transactions.pendingTransaction.transaction.gas,
-  txGasPrice: state.transactions.pendingTransaction.transaction.gasPrice,
-  txData: state.transactions.pendingTransaction.transaction.data,
-  isSafe: state.transactions.pendingTransaction.transaction.isSafe,
+  txRecipientAddress: state.signer.transactionDetails.action,
+  txValue: state.signer.transactionDetails.value,
+  txNonce: state.signer.transactionDetails.nonce,
+  txGas: state.signer.transactionDetails.gas,
+  txGasPrice: state.signer.transactionDetails.gasPrice,
+  txData: state.signer.transactionDetails.data,
+  isSafe: state.signer.transactionDetails.isSafe,
   txSenderName: fetchAccountName(state, state.accounts.selected.address),
-  txRecipientName: fetchAccountName(state, state.transactions.pendingTransaction.transaction.action)
+  txRecipientName: fetchAccountName(state, state.signer.transactionDetails.action)
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

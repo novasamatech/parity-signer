@@ -136,6 +136,19 @@ pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
   Box::into_raw(Box::new(res.to_hex()))
 }
 
+#[no_mangle]
+pub unsafe extern fn eth_sign(data: *mut StringPtr) -> *mut String {
+  let data = (*data).as_str();
+  let hex = data.from_hex().unwrap();
+  let message = format!("\x19Ethereum Signed Message:\n{}", hex.len()).into_bytes();
+  let mut res: [u8; 32] = [0; 32];
+  let mut keccak = Keccak::new_keccak256();
+  keccak.update(&message);
+  keccak.update(&hex);
+  keccak.finalize(&mut res);
+  Box::into_raw(Box::new(res.to_hex()))
+}
+
 // blockies ffi
 
 #[no_mangle]
@@ -239,6 +252,18 @@ pub mod android {
   pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyKeccak(env: JNIEnv, _: JClass, data: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid seed").into();
     let hex = data.from_hex().unwrap();
+    let mut res: [u8; 32] = [0; 32];
+    let mut keccak = Keccak::new_keccak256();
+    keccak.update(&hex);
+    keccak.finalize(&mut res);
+    env.new_string(res.to_hex()).expect("Could not create java string").into_inner()
+  }
+
+  #[no_mangle]
+  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyEthSign(env: JNIEnv, _: JClass, data: JString) -> jstring {
+    let data: String = env.get_string(data).expect("Invalid seed").into();
+    let hex = data.from_hex().unwrap();
+    let message = format!("\x19Ethereum Signed Message:\n{}", hex.len()).into_bytes();
     let mut res: [u8; 32] = [0; 32];
     let mut keccak = Keccak::new_keccak256();
     keccak.update(&hex);
