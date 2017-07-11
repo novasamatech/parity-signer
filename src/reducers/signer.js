@@ -16,5 +16,32 @@
 
 'use strict'
 
-export const NEW_SCANNED_TX = 'TRANSACTION_ACTION_NEW_SCANNED_TX'
-export const SIGN_TX = 'TRANSACTION_ACTION_SIGNED_TX'
+import { NEW_SCANNED_TX, NEW_SCANNED_DATA, SIGN_HASH } from '../constants/SignerActions'
+
+const initialState = {
+  transactionDetails: {},
+  data: '',
+  hashToSign: '',
+  signedHash: ''
+}
+
+export default function signer (state = initialState, action) {
+  switch (action.type) {
+    case NEW_SCANNED_TX:
+      return Object.assign({}, state, {
+        transactionDetails: action.transaction,
+        hashToSign: action.hash
+      })
+    case NEW_SCANNED_DATA:
+      return Object.assign({}, state, {
+        data: action.data,
+        hashToSign: action.hash
+      })
+    case SIGN_HASH:
+      return Object.assign({}, state, {
+        signedHash: action.signature
+      })
+    default:
+      return state
+  }
+}

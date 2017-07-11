@@ -73,6 +73,16 @@ class EthkeyBridge: NSObject {
 		resolve(hash)
 	}
 	
+	@objc func ethSign(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+		var data_ptr = data.asPtr()
+		let hash_rust_str = eth_sign(&data_ptr)
+		let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
+		let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
+		rust_string_ptr_destroy(hash_rust_str_ptr)
+		rust_string_destroy(hash_rust_str)
+		resolve(hash)
+	}
+	
 	@objc func blockiesIcon(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var seed_ptr = seed.asPtr()
 		let icon_rust_str = blockies_icon(&seed_ptr)

@@ -16,15 +16,16 @@
 
 'use strict'
 
-import { combineReducers } from 'redux'
-import accounts from './accounts'
-import routes from './routes'
-import scanner from './scanner'
-import signer from './signer'
+import { connect } from 'react-redux'
+import { Actions } from 'react-native-router-flux'
+import DataDetails from '../components/DataDetails'
 
-export default combineReducers({
-  accounts,
-  routes,
-  scanner,
-  signer
-})
+const DataDetailsContainer = connect(state => ({
+  data: state.signer.data
+}), dispatch => ({
+  onNextButtonPressed: () => {
+    Actions.accountEnterPin()
+  }
+}))(DataDetails)
+
+export default DataDetailsContainer

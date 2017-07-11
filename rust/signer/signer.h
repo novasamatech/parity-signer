@@ -67,6 +67,8 @@ struct rust_string* rlp_item(const struct rust_string_ptr* rlp, const unsigned p
 
 struct rust_string* keccak256(const struct rust_string_ptr* data);
 
+struct rust_string* eth_sign(const struct rust_string_ptr* data);
+
 // blockies ffi
 
 struct rust_string* blockies_icon(const struct rust_string_ptr* blockies_seed);
