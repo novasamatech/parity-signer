@@ -10,7 +10,7 @@ ethkey = { git = "https://github.com/paritytech/parity" }
 ethstore = { git = "https://github.com/paritytech/parity" }
 rlp = { git = "https://github.com/paritytech/parity" }
 tiny-keccak = "1.1"
-blockies = "0.1"
+blockies = "0.2"
 parity-wordlist = { git = "https://github.com/paritytech/wordlist" }
 
 [target.'cfg(target_os="android")'.dependencies]
