@@ -30,7 +30,7 @@ const fetchAccountName = (state, address = '') => {
 const mapStateToProps = (state, ownProps) => ({
   nextButtonTitle: 'Next',
   nextButtonDescription: 'Enter Pin',
-  txRlpHash: state.signer.pendingTransaction.rlpHash,
+  txRlpHash: state.signer.hashToSign,
   txSenderAddress: state.accounts.selected.address,
   txRecipientAddress: state.signer.transactionDetails.action,
   txValue: state.signer.transactionDetails.value,

@@ -114,7 +114,7 @@ export function scannerDispatch (data) {
       }
     } catch (e) {
       console.error(e)
-      dispatch(displayScannerWarning('Invalid transaction' + e))
+      dispatch(displayScannerWarning('Invalid transaction ' + e))
     }
   }
 }
