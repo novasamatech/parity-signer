@@ -3,49 +3,49 @@
     {
       "size" : "20x20",
       "idiom" : "iphone",
-      "filename" : "blockies-6.png",
+      "filename" : "icon_2.png",
       "scale" : "2x"
     },
     {
       "size" : "20x20",
       "idiom" : "iphone",
-      "filename" : "blockies-4.png",
+      "filename" : "icon_3.png",
       "scale" : "3x"
     },
     {
       "size" : "29x29",
       "idiom" : "iphone",
-      "filename" : "blockies-3.png",
+      "filename" : "icon_4.png",
       "scale" : "2x"
     },
     {
       "size" : "29x29",
       "idiom" : "iphone",
-      "filename" : "blockies-2.png",
+      "filename" : "icon_5.png",
       "scale" : "3x"
     },
     {
       "size" : "40x40",
       "idiom" : "iphone",
-      "filename" : "blockies.png",
+      "filename" : "icon_6.png",
       "scale" : "2x"
     },
     {
       "size" : "40x40",
       "idiom" : "iphone",
-      "filename" : "blockies-5.png",
+      "filename" : "icon_7-1.png",
       "scale" : "3x"
     },
     {
       "size" : "60x60",
       "idiom" : "iphone",
-      "filename" : "blockies-1.png",
+      "filename" : "icon_7.png",
       "scale" : "2x"
     },
     {
       "size" : "60x60",
       "idiom" : "iphone",
-      "filename" : "blockies-7.png",
+      "filename" : "icon_1.png",
       "scale" : "3x"
     }
   ],
