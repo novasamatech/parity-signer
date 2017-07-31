@@ -3,13 +3,14 @@
 ### Requirements
 
 - `node.js` (tested on `v7.4.0`)
-- `npm` (tested on `4.0.5`)
+- `npm` (tested on `5.2.0`)
 - `rustup` (tested on `rustup 1.0.0 (17b6d21 2016-12-15)`)
-- `rustc` (tested on `1.15.1 (021bd294c 2017-02-08)`)
-- `cargo` (tested on `0.16.0-nightly (6e0c18c 2017-01-27)`)
+- `rustc` (tested on `rustc 1.19.0 (0ade33941 2017-07-17)`)
+- `cargo` (tested on `cargo 0.20.0 (a60d185c8 2017-07-13)`)
 - `android_ndk` (tested on `r13b`)
 - `Xcode` (only, for iOS, tested on `Version 8.1 (8B62)`)
 - `$NDK_HOME` envarionment variable set to ndk home directory (eg. `/usr/local/opt/android-ndk`)
+- `$JAVA_HOME` envarionment variable set to java home directory (eg. `/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home`)
 
 ### setup
 
