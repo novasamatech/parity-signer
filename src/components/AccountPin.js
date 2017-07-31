@@ -17,7 +17,7 @@
 'use strict'
 
 import React, { Component, PropTypes } from 'react'
-import { TextInput, View, Button, StyleSheet } from 'react-native'
+import { TextInput, View, Button, StyleSheet, KeyboardAvoidingView } from 'react-native'
 import AppStyles from '../styles'
 
 export default class AccountPin extends Component {
@@ -51,7 +51,7 @@ export default class AccountPin extends Component {
   render () {
     return (
       <View style={AppStyles.view}>
-        <View style={AppStyles.center}>
+        <KeyboardAvoidingView style={AppStyles.center} behavior='padding'>
           <TextInput
             autoFocus
             clearTextOnFocus
@@ -76,7 +76,7 @@ export default class AccountPin extends Component {
               accessibilityLabel={this.props.placeholder}
             />
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
     )
   }

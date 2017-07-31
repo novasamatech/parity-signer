@@ -197,7 +197,7 @@ pub unsafe extern fn decrypt_data(encrypted_data: *mut StringPtr, password: *mut
   }
 }
 
-#[cfg(target_os = "android")]
+#[cfg(feature = "jni")]
 #[allow(non_snake_case)]
 pub mod android {
   extern crate jni;
@@ -205,8 +205,14 @@ pub mod android {
   use wordlist;
   use super::*;
   use self::jni::JNIEnv;
-  use self::jni::objects::{JClass, JString};
+  use self::jni::objects::{JClass, JString, JThrowable};
   use self::jni::sys::{jint, jstring};
+
+  fn new_exception<'a>(env: &'a JNIEnv<'a>) -> JThrowable<'a> {
+    let exception = env.find_class("java/lang/Exception").unwrap();
+    // javap -s java.lang.Exception
+    env.new_object(exception, "()V", &[]).unwrap().into()
+  }
 
   #[no_mangle]
   pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBrainwalletAddress(env: JNIEnv, _: JClass, seed: JString) -> jstring {
@@ -242,7 +248,7 @@ pub mod android {
       Ok(result) => env.new_string(result).expect("Could not create java string").into_inner(),
       Err(_) => {
         let res = env.new_string("").expect("").into_inner();
-        env.throw(res.into());
+        env.throw(new_exception(&env)).unwrap();
         res
       },
     }
@@ -266,6 +272,7 @@ pub mod android {
     let message = format!("\x19Ethereum Signed Message:\n{}", hex.len()).into_bytes();
     let mut res: [u8; 32] = [0; 32];
     let mut keccak = Keccak::new_keccak256();
+    keccak.update(&message);
     keccak.update(&hex);
     keccak.finalize(&mut res);
     env.new_string(res.to_hex()).expect("Could not create java string").into_inner()
@@ -299,9 +306,9 @@ pub mod android {
     let crypto: Crypto = match data.parse() {
       Ok(crypto) => crypto,
       Err(_) => {
-        let res = env.new_string("").expect("").into_inner();
-        env.throw(res.into());
-        return res
+        let result = env.new_string("").expect("first result to be created").into_inner();
+        env.throw(new_exception(&env)).expect("first throw failed");
+        return result
       },
     };
 
@@ -310,10 +317,114 @@ pub mod android {
         env.new_string(String::from_utf8_unchecked(decrypted)).expect("Could not create java string").into_inner()
       },
       Err(_) => {
-        let res = env.new_string("").expect("").into_inner();
-        env.throw(res.into());
-        res
+        let result = env.new_string("").expect("second result to be created").into_inner();
+        env.throw(new_exception(&env)).expect("second throw failed");
+        result
       },
+    }
+  }
+
+  #[cfg(test)]
+  mod tests {
+    extern crate jni;
+    use std::os::raw::c_void;
+    use std::ptr;
+    use self::jni::sys::{JavaVM, JavaVMInitArgs, JNI_CreateJavaVM, JNI_OK, JNI_EDETACHED, JNI_EEXIST, JNI_EINVAL,
+    JNI_ENOMEM, JNI_ERR, JNI_EVERSION, JNI_VERSION_1_8, JNI_FALSE, JavaVMOption};
+    use ethstore::Crypto;
+    use super::Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData;
+
+    #[link(name="jvm")]
+    extern {
+    }
+
+    struct TestVM {
+      _jvm: *mut JavaVM,
+      sys_env: *mut jni::sys::JNIEnv,
+    }
+
+    impl TestVM {
+      fn env<'a>(&'a self) -> jni::JNIEnv<'a> {
+        jni::JNIEnv::from(self.sys_env)
+      }
+    }
+
+    unsafe fn test_vm() -> TestVM {
+      let mut jvm_options = Vec::<JavaVMOption>::new();
+      // Create the JVM arguments.
+      let mut jvm_arguments = JavaVMInitArgs::default();
+      jvm_arguments.version = JNI_VERSION_1_8;
+      jvm_arguments.options = jvm_options.as_mut_ptr();
+      jvm_arguments.nOptions = jvm_options.len() as i32;
+      jvm_arguments.ignoreUnrecognized = JNI_FALSE;
+
+      // Initialize space for a pointer to the JNI environment.
+      let mut jvm: *mut JavaVM = ptr::null_mut();
+      let mut jni_environment : *mut jni::sys::JNIEnv = ptr::null_mut();
+
+      // Try to instantiate the JVM.
+      let result = JNI_CreateJavaVM(
+        &mut jvm,
+        (&mut jni_environment as *mut *mut jni::sys::JNIEnv) as *mut *mut c_void,
+        (&mut jvm_arguments as *mut JavaVMInitArgs) as *mut c_void
+      );
+
+      // There was an error while trying to instantiate the JVM.
+      if result != JNI_OK {
+
+        // Translate the error code to a message.
+        let error_message = match result {
+          JNI_EDETACHED => "thread detached from JVM",
+          JNI_EEXIST => "JVM exists already",
+          JNI_EINVAL => "invalid arguments",
+          JNI_ENOMEM => "not enough memory",
+          JNI_ERR => "unknown error",
+          JNI_EVERSION => "JNI version error",
+          _ => "unknown JNI error value",
+        };
+
+        panic!("`JNI_CreateJavaVM()` signaled an error: {}", error_message);
+      }
+
+      TestVM {
+        _jvm: jvm,
+        sys_env: jni_environment,
+      }
+    }
+
+    #[test]
+    fn test_decrypt() {
+      unsafe {
+        let jvm = test_vm();
+
+        let data = b"test_data";
+        let password = "password";
+        let crypto = Crypto::with_plain(data, password, 10240);
+        let crypto_string: String = crypto.into();
+        let env = jvm.env();
+        let jni_crypto_str = env.new_string(crypto_string).unwrap();
+        let jni_password_str = env.new_string(password).unwrap();
+        let any_class = env.find_class("java/lang/Object").unwrap();
+
+        let result = Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(
+          jvm.env(),
+          any_class,
+          jni_crypto_str,
+          jni_password_str
+        );
+
+        let result: String = env.get_string(result.into()).expect("invalid result").into();
+        assert_eq!(result, "test_data".to_owned());
+        assert_eq!(env.exception_check().unwrap(), false);
+
+        let _ = Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(
+          jvm.env(),
+          any_class,
+          jni_crypto_str,
+          env.new_string("wrong password").unwrap()
+        );
+        assert_eq!(env.exception_check().unwrap(), true);
+      }
     }
   }
 }

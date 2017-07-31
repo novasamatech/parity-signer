@@ -11,7 +11,7 @@ android: $(ARCHS_ANDROID)
 
 .PHONY: $(ARCHS_IOS)
 $(ARCHS_IOS): %:
-	cargo build --target $@ --release
+	cargo build --target $@ --release --no-default-features
 
 .PHONY: $(ARCHS_ANDROID)
 $(ARCHS_ANDROID): %:
