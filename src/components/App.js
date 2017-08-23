@@ -17,7 +17,7 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { StyleSheet, AppState } from 'react-native'
+import { StyleSheet, AppState, Alert } from 'react-native'
 import { Provider, connect } from 'react-redux'
 import { Actions, Router, Scene } from 'react-native-router-flux'
 import TabIcon from './TabIcon'
@@ -52,7 +52,60 @@ const styles = StyleSheet.create({
   }
 })
 
-const scenes = Actions.create(
+const accountScenes =
+  <Scene>
+    <Scene key='accountList' title='Accounts' component={AccountList}
+      onRight={() => Actions.iconChooser()}
+      rightTitle='Add'
+      rightButtonTextStyle={styles.navibarTitle}
+    />
+    <Scene key='accountNew' component={AccountNew} title='New Account' hideTabBar
+      onBack={() => Alert.alert('Do you want to cancel account creation?', undefined, [{
+        text: 'Yes',
+        onPress: () => {
+          Actions.popTo('right')
+        }
+      }, {
+        text: 'No',
+        onPress: () => {}
+      }])}
+      backTitle='Back'
+      backButtonTextStyle={styles.navibarTitle}
+      hideBackImage
+    />
+    <Scene key='accountChangePin' title='Current PIN' component={AccountChangePin}
+      backTitle='Back'
+      backButtonTextStyle={styles.navibarTitle}
+      hideBackImage
+    />
+    <Scene key='accountSetPin' title='Set Account PIN' component={AccountSetPin}
+      backTitle='Back'
+      backButtonTextStyle={styles.navibarTitle}
+      hideBackImage
+    />
+    <Scene key='accountConfirmPin' title='Confirm PIN' component={AccountConfirmPin}
+      backTitle='Back'
+      backButtonTextStyle={styles.navibarTitle}
+      hideBackImage
+    />
+    <Scene key='accountDetails' title='Account Details' component={AccountDetails}
+      backTitle='Back'
+      backButtonTextStyle={styles.navibarTitle}
+      hideBackImage
+    />
+    <Scene key='qrViewAddress' title='Address QR' component={QrViewAddress}
+      backTitle='Back'
+      backButtonTextStyle={styles.navibarTitle}
+      hideBackImage
+    />
+    <Scene key='iconChooser' title='Choose an Icon' component={IconChooser}
+      backTitle='Back'
+      backButtonTextStyle={styles.navibarTitle}
+      hideBackImage
+    />
+  </Scene>
+
+const scenes =
   <Scene key='root'>
     <Scene key='tabs' tabs style={styles.tabbar}>
       <Scene key='left' title='Scan Transaction QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
@@ -85,56 +138,17 @@ const scenes = Actions.create(
         />
       </Scene>
       <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        <Scene key='accountList' title='Accounts' component={AccountList}
-          onRight={() => Actions.iconChooser()}
-          rightTitle='Add'
-          rightButtonTextStyle={styles.navibarTitle}
-        />
-        <Scene key='accountNew' component={AccountNew} title='New Account'
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='accountChangePin' title='Current PIN' component={AccountChangePin}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='accountSetPin' title='Set Account PIN' component={AccountSetPin}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='accountConfirmPin' title='Confirm PIN' component={AccountConfirmPin}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='accountDetails' title='Account Details' component={AccountDetails}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='qrViewAddress' title='Address QR' component={QrViewAddress}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='iconChooser' title='Choose an Icon' component={IconChooser}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
+        {accountScenes.props.children}
       </Scene>
     </Scene>
   </Scene>
-)
 
 export default class App extends Component {
   render () {
+    let actions = Actions.create(scenes)
     return (
       <Provider store={store}>
-        <ConnectedRouter scenes={scenes} />
+        <ConnectedRouter scenes={actions} />
       </Provider>
     )
   }

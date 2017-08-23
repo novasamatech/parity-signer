@@ -70,6 +70,10 @@ function findAccountWithAddress (getState, address) {
   })
 }
 
+function hasAccounts (getState) {
+  return getState().accounts.all.length !== 0
+}
+
 export function scannerDispatch (data) {
   return async function (dispatch, getState) {
     if (!getState().scanner.scannerEnabled) {
@@ -78,10 +82,15 @@ export function scannerDispatch (data) {
 
     dispatch(disableScanner())
     try {
+      if (!hasAccounts(getState)) {
+        dispatch(displayScannerWarning('No accounts found'))
+        return
+      }
+
       let txRequest = JSON.parse(data)
       let account = findAccountWithAddress(getState, txRequest.data.account)
       if (!account) {
-        dispatch(displayScannerWarning('Invalid sender address ' + txRequest.data.account))
+        dispatch(displayScannerWarning('You are not able to sign transaction X from ' + txRequest.data.account))
         return
       }
 

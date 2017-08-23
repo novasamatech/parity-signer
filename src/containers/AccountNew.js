@@ -91,7 +91,7 @@ export class AccountNew extends Component {
 
   render () {
     return (
-      <ScrollView style={AppStyles.view}>
+      <ScrollView style={AppStyles.fullscreenView}>
         <AccountIcon style={AppStyles.icon} seed={'0x' + this.state.address} />
         <Text style={AppStyles.hintText}>Account Name</Text>
         <TextInput
