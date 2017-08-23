@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   }
 })
 
-const account_scenes =
+const accountScenes =
   <Scene>
     <Scene key='accountList' title='Accounts' component={AccountList}
       onRight={() => Actions.iconChooser()}
@@ -60,7 +60,7 @@ const account_scenes =
       rightButtonTextStyle={styles.navibarTitle}
     />
     <Scene key='accountNew' component={AccountNew} title='New Account' hideTabBar
-      onBack={() => Alert.alert("Do you want to cancel account creation?", undefined, [{
+      onBack={() => Alert.alert('Do you want to cancel account creation?', undefined, [{
         text: 'Yes',
         onPress: () => {
           Actions.popTo('right')
@@ -138,7 +138,7 @@ const scenes =
         />
       </Scene>
       <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        {account_scenes.props.children}
+        {accountScenes.props.children}
       </Scene>
     </Scene>
   </Scene>

@@ -71,7 +71,7 @@ function findAccountWithAddress (getState, address) {
 }
 
 function hasAccounts (getState) {
-  return getState().accounts.all.length != 0
+  return getState().accounts.all.length !== 0
 }
 
 export function scannerDispatch (data) {
