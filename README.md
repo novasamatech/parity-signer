@@ -3,7 +3,7 @@
 ### Requirements
 
 - `node.js` (tested on `v7.4.0`)
-- `npm` (tested on `5.2.0`)
+- `npm` (tested on `5.0.0`) **does not work with npm 5.1+, see [#75](https://github.com/paritytech/parity-signer/issues/75)**
 - `rustup` (tested on `rustup 1.0.0 (17b6d21 2016-12-15)`)
 - `rustc` (tested on `rustc 1.19.0 (0ade33941 2017-07-17)`)
 - `cargo` (tested on `cargo 0.20.0 (a60d185c8 2017-07-13)`)
