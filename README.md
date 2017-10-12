@@ -1,5 +1,13 @@
 # native-signer
 
+[![App Store][app-store-badge]][app-store-url]
+[![Google Play][google-play-badge]][google-play-url]
+
+[app-store-badge]: ./res/app-store-badge.png
+[app-store-url]: https://itunes.apple.com/us/app/parity-signer/id1218174838
+[google-play-badge]: ./res/google-play-badge.png
+[google-play-url]: https://play.google.com/store/apps/details?id=com.nativesigner
+
 ### Requirements
 
 - `node.js` (tested on `v7.4.0`)
