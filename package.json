@@ -5,11 +5,11 @@
   "license": "GPL-3.0",
   "scripts": {
     "build-rust-ios": "cd rust/signer && make ios",
-    "ios": "npm run build-rust-ios && npm run cli run-ios",
+    "ios": "yarn run build-rust-ios && yarn run cli run-ios",
     "build-rust-android": "cd rust/signer && make android",
-    "android": "npm run build-rust-android && npm run cli run-android",
+    "android": "yarn run build-rust-android && yarn run cli run-android",
     "cli": "node node_modules/react-native/local-cli/cli.js",
-    "start": "npm run ios",
+    "start": "yarn run ios",
     "test": "jest",
     "lint": "standard",
     "commit": "commit-wizard"
@@ -17,15 +17,18 @@
   "dependencies": {
     "bignumber.js": "^4.0.0",
     "debounce": "^1.0.0",
-    "react": "^15.4.2",
-    "react-native": "0.40.0",
-    "react-native-camera": "^0.5.1",
+    "prop-types": "^15.6.1",
+    "react": "16.3.1",
+    "react-addons-pure-render-mixin": "^15.5.0",
+    "react-native": "0.55.3",
+    "react-native-camera": "^1.1.1",
     "react-native-prompt": "^1.0.0",
-    "react-native-qrcode": "^0.2.3",
-    "react-native-router-flux": "=3.37.0",
+    "react-native-qrcode": "^0.2.6",
+    "react-native-router-flux": "^4.0.0-beta.26",
     "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
     "react-native-tabs": "^1.0.9",
-    "react-redux": "^5.0.2",
+    "react-redux": "^5.0.7",
+    "react-static-container": "^1.0.1",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0"
   },
@@ -64,5 +67,8 @@
       "post-checkout": [],
       "post-merge": []
     }
+  },
+  "release": {
+    "analyzeCommits": "simple-commit-message"
   }
 }

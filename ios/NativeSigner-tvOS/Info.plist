@@ -39,6 +39,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSAppTransportSecurity</key>
+	<!--See http://ste.vn/2015/06/10/configuring-app-transport-security-ios-9-osx-10-11/ -->
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
@@ -49,9 +50,5 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>Access to camera is required to scan qr code with transaction details</string>
-	<key>CFBundleDisplayName</key>
-	<string>Parity Signer</string>
 </dict>
 </plist>

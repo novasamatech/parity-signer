@@ -1,3 +1,5 @@
+yarn-error.log
+
 # NDK
 NDK/
 rust/.cargo
@@ -64,3 +66,4 @@ fastlane/screenshots
 
 # vim
 *.swp
+.vscode

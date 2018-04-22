@@ -16,7 +16,8 @@
 
 'use strict'
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { StyleSheet, View, StatusBar } from 'react-native'
 import Camera from 'react-native-camera'
 import AppStyles from '../styles'

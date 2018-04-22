@@ -16,4 +16,4 @@ rustup target add i686-linux-android
 
 ./create-ndk-standalone.sh
 
-npm i
+yarn
