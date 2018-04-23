@@ -10,6 +10,11 @@ import Foundation
 
 @objc(EthkeyBridge)
 class EthkeyBridge: NSObject {
+  
+  open static func requiresMainQueueSetup() -> Bool {
+    return true;
+  }
+  
   @objc func brainWalletAddress(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var seed_ptr = seed.asPtr()
     let keypair_ptr = ethkey_keypair_brainwallet(&seed_ptr)
