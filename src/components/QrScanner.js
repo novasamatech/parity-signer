@@ -23,6 +23,10 @@ import Camera from 'react-native-camera'
 import AppStyles from '../styles'
 
 export default class Scanner extends Component {
+  static navigationOptions = {
+    title: 'Scan Transaction'
+  }
+
   static propTypes = {
     onBarCodeRead: PropTypes.func.isRequired,
     isActive: PropTypes.bool.isRequired

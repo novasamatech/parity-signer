@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // Copyright 2015-2017 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
@@ -18,8 +20,9 @@
 
 import React, { Component } from 'react'
 import { StyleSheet, AppState, Alert } from 'react-native'
-import { Provider, connect } from 'react-redux'
-import { Actions, Router, Scene } from 'react-native-router-flux'
+import { Provider } from 'react-redux'
+import { StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation'
+import { Actions, Scene } from 'react-native-router-flux'
 import TabIcon from './TabIcon'
 import IconChooser from '../containers/IconChooser'
 import QrScanner from '../containers/QrScanner'
@@ -33,8 +36,6 @@ import DataDetails from '../containers/DataDetails'
 import { loadAccounts, saveAccounts } from '../util/db'
 import { setAccounts } from '../actions/accounts'
 import store from '../util/store'
-
-const ConnectedRouter = connect()(Router)
 
 loadAccounts().then(accounts => {
   store.dispatch(setAccounts(accounts))
@@ -145,10 +146,9 @@ const scenes =
 
 export default class App extends Component {
   render () {
-    let actions = Actions.create(scenes)
     return (
       <Provider store={store}>
-        <ConnectedRouter scenes={actions} />
+        <Screens />
       </Provider>
     )
   }
@@ -173,3 +173,31 @@ export default class App extends Component {
     }
   }
 }
+
+const Screens = StackNavigator ({
+  Tabs: {
+    screen: TabNavigator ({
+      Home: {
+        screen: QrScanner
+      },
+      Accounts: {
+        screen: StackNavigator ({
+          List: {
+            screen: AccountList
+          },
+          Details: {
+            screen: AccountDetails
+          }
+        },
+        {
+          headerMode: 'none'
+        }
+      )
+    }})
+  }
+},
+{
+    tabBarComponent: TabBarBottom,
+    tabBarPosition: 'bottom',
+  }
+)

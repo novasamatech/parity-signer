@@ -23,6 +23,10 @@ import AccountListRow from './AccountListRow'
 import AppStyles from '../styles'
 
 export default class AccountList extends Component {
+  static navigationOptions = {
+    title: 'Accounts'
+  }
+
   static propTypes = {
     accounts: PropTypes.arrayOf(PropTypes.shape({
       address: PropTypes.string.isRequired

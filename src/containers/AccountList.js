@@ -27,7 +27,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
   },
   onAccountSelected: (account) => {
     dispatch(selectAccount(account))
-    Actions.accountDetails()
+    ownProps.navigation.navigate('Details')
   }
 })
 

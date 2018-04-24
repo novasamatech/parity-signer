@@ -21,8 +21,6 @@ import { Platform, StyleSheet } from 'react-native'
 export default StyleSheet.create({
   view: {
     flex: 1,
-    marginTop: (Platform.OS === 'ios') ? 64 : 54,
-    marginBottom: 50,
     padding: 20
   },
   fullscreenView: {
@@ -32,7 +30,6 @@ export default StyleSheet.create({
   },
   listView: {
     flex: 1,
-    marginTop: (Platform.OS === 'ios') ? 64 : 54,
     marginBottom: 50
   },
   hintText: {

@@ -24,6 +24,10 @@ import AccountIcon from './AccountIcon'
 import QrView from './QrView'
 
 export default class AccountDetails extends Component {
+  static navigationOptions = {
+    title: 'Account Details'
+  }
+
   static propTypes = {
     account: PropTypes.shape({
       address: PropTypes.string.isRequired
@@ -64,7 +68,7 @@ export default class AccountDetails extends Component {
 
   render () {
     return (
-      <ScrollView style={AppStyles.view}>
+      <ScrollView contentContainerStyle={AppStyles.view}>
         <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.account.address} />
         <TouchableOpacity
           style={styles.wrapper}
@@ -89,7 +93,7 @@ export default class AccountDetails extends Component {
           </View>
         </TouchableOpacity>
 
-        <View>
+        <View style={styles.address}>
           <Text style={AppStyles.hintText}>Address</Text>
           <Text selectable style={AppStyles.valueText}>0x{this.props.account.address}</Text>
         </View>
@@ -121,9 +125,13 @@ const styles = StyleSheet.create({
   wrapper: {
     borderRadius: 5
   },
+  address: {
+    flex: 1
+  },
   qr: {
+    flex: 1,
     padding: 10,
-    marginTop: 20
+    marginTop: 50
   },
   deleteText: {
     textAlign: 'right'
@@ -133,7 +141,7 @@ const styles = StyleSheet.create({
     color: 'green'
   },
   actionsContainer: {
-    marginTop: 40,
+    flex: 1,
     flexDirection: 'row'
   },
   actionButtonContainer: {
