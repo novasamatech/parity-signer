@@ -21,9 +21,10 @@
 import React, { Component } from 'react'
 import { StyleSheet, AppState, Alert, SafeAreaView } from 'react-native'
 import { Provider } from 'react-redux'
-import { StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation'
+import { StackNavigator, TabNavigator } from 'react-navigation'
 import { Actions, Scene } from 'react-native-router-flux'
 import Header from './components/Header'
+import TabBarBottom from './components/TabBarBottom'
 import TabIcon from './components/TabIcon'
 import IconChooser from './containers/IconChooser'
 import QrScanner from './containers/QrScanner'
@@ -185,7 +186,7 @@ export default class App extends Component {
 const Screens = StackNavigator ({
   Tabs: {
     screen: TabNavigator ({
-      Home: {
+      Scanner: {
         screen: QrScanner
       },
       Accounts: {
@@ -201,12 +202,14 @@ const Screens = StackNavigator ({
           headerMode: 'none'
         }
       )
-    }})
+    }
+  }, {
+    tabBarComponent: TabBarBottom,
+    tabBarPosition: 'bottom',
+  })
   }
 },
 {
-    tabBarComponent: TabBarBottom,
-    tabBarPosition: 'bottom',
     navigationOptions: {
       header: Header
     }

@@ -17,6 +17,7 @@
   "dependencies": {
     "bignumber.js": "^4.0.0",
     "debounce": "^1.0.0",
+    "hoist-non-react-statics": "^2.5.0",
     "prop-types": "^15.6.1",
     "react": "16.3.1",
     "react-addons-pure-render-mixin": "^15.5.0",
@@ -28,7 +29,7 @@
     "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^4.6.0",
-    "react-navigation": "^1.5.11",
+    "react-navigation": "^2.0.0-rc.3",
     "react-redux": "^5.0.7",
     "react-static-container": "^1.0.1",
     "redux": "^3.6.0",
