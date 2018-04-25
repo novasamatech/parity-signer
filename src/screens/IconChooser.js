@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { Button, View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
 import AppStyles from '../styles'
 
-import AccountIcon from './AccountIcon'
+import AccountIcon from '../components/AccountIcon'
 
 import { brainWalletAddress, words } from '../util/native'
 

@@ -2,7 +2,7 @@
 
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import IconChooser from '../components/IconChooser'
+import IconChooser from '../screens/IconChooser'
 
 const IconChooserContainer = connect(
   undefined,

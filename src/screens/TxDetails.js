@@ -20,7 +20,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { ScrollView, View, Text, Button } from 'react-native'
 import AppStyles from '../styles'
-import AccountPrettyAddress from './AccountPrettyAddress'
+import AccountPrettyAddress from '../components/AccountPrettyAddress'
 
 const orUnknown = (value = 'Unknown') => value
 

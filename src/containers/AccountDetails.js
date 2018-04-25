@@ -19,7 +19,7 @@
 import { Alert } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import AccountDetails from '../components/AccountDetails'
+import AccountDetails from '../screens/AccountDetails'
 import { deleteAccount, modifyAccount } from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

@@ -20,8 +20,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, View, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native'
 import AppStyles from '../styles'
-import AccountIcon from './AccountIcon'
-import QrView from './QrView'
+import AccountIcon from '../components/AccountIcon'
+import QrView from '../components/QrView'
 
 export default class AccountDetails extends Component {
   static navigationOptions = {

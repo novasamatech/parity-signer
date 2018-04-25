@@ -19,7 +19,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Button, View, Text, ListView, StatusBar, StyleSheet } from 'react-native'
-import AccountListRow from './AccountListRow'
+import AccountListRow from '../components/AccountListRow'
 import AppStyles from '../styles'
 
 export default class AccountList extends Component {

@@ -18,7 +18,7 @@
 
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import AccountList from '../components/AccountList'
+import AccountList from '../screens/AccountList'
 import { selectAccount } from '../actions/accounts'
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

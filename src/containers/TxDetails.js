@@ -18,7 +18,7 @@
 
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
-import TxDetails from '../components/TxDetails'
+import TxDetails from '../screens/TxDetails'
 
 const fetchAccountName = (state, address = '') => {
   let account = state.accounts.all.find(account => {
