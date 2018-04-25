@@ -19,10 +19,11 @@
 'use strict'
 
 import React, { Component } from 'react'
-import { StyleSheet, AppState, Alert } from 'react-native'
+import { StyleSheet, AppState, Alert, SafeAreaView } from 'react-native'
 import { Provider } from 'react-redux'
 import { StackNavigator, TabNavigator, TabBarBottom } from 'react-navigation'
 import { Actions, Scene } from 'react-native-router-flux'
+import Header from './components/Header'
 import TabIcon from './components/TabIcon'
 import IconChooser from './containers/IconChooser'
 import QrScanner from './containers/QrScanner'
@@ -36,6 +37,7 @@ import DataDetails from './containers/DataDetails'
 import { loadAccounts, saveAccounts } from './util/db'
 import { setAccounts } from './actions/accounts'
 import store from './util/store'
+import colors from './colors'
 
 loadAccounts().then(accounts => {
   store.dispatch(setAccounts(accounts))
@@ -50,6 +52,10 @@ const styles = StyleSheet.create({
   },
   navibarTitle: {
     color: 'white'
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.bg
   }
 })
 
@@ -148,7 +154,9 @@ export default class App extends Component {
   render () {
     return (
       <Provider store={store}>
-        <Screens />
+        <SafeAreaView style={styles.safeArea}>
+          <Screens />
+        </SafeAreaView>
       </Provider>
     )
   }
@@ -199,5 +207,7 @@ const Screens = StackNavigator ({
 {
     tabBarComponent: TabBarBottom,
     tabBarPosition: 'bottom',
-  }
-)
+    navigationOptions: {
+      header: Header
+    }
+})
