@@ -17,7 +17,7 @@
 'use strict'
 
 import { connect } from 'react-redux'
-import QrScanner from '../components/QrScanner'
+import QrScanner from '../screens/QrScanner'
 import { scannerDispatch } from '../actions/scanner'
 
 const QrScannerContainer = connect(
