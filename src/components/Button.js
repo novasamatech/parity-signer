@@ -27,8 +27,6 @@ export default class Button extends React.Component<{
       onPress,
       title,
       disabled,
-    } = this.props;
-    let {
       textStyles,
       buttonStyles
     } = this.props;
@@ -60,7 +58,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
-    // Material design blue from https://material.google.com/style/color.html#color-color-palette
     backgroundColor: colors.bg_text_sec,
   },
   text: {
