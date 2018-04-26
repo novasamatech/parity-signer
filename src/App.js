@@ -194,6 +194,15 @@ const Screens = StackNavigator ({
           List: {
             screen: AccountList
           },
+          NewAccount: {
+            screen: AccountNew
+          },
+          AccountSetPin: {
+            screen: AccountSetPin
+          },
+          AccountConfirmPin: {
+            screen: AccountConfirmPin
+          },
           Details: {
             screen: AccountDetails
           }

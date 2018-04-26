@@ -101,7 +101,6 @@ export function setNewPin (pin) {
       type: SET_NEW_PIN,
       pin
     })
-    Actions.accountConfirmPin()
   }
 }
 
@@ -134,7 +133,6 @@ export function changePin (newPin) {
         encryptedSeed: encryptedSeed
       }))
 
-      Actions.popTo('accountDetails')
       Alert.alert('PIN changed')
     } catch (e) {
       // this is unreachanle if setOldPin was called before

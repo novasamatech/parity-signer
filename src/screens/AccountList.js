@@ -19,7 +19,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { View, Text, ListView, StatusBar, StyleSheet } from 'react-native'
-import AccountListRow from '../components/AccountListRow'
+import AccountCard from '../components/AccountCard'
 import Button from '../components/Button'
 import AppStyles from '../styles'
 import colors from '../colors';
@@ -56,7 +56,9 @@ export default class AccountList extends Component {
   renderBottom() {
     return (
       <View style={styles.bottom}>
-        <Button buttonStyles={ { height: 60 } } title="Add Account" onPress={ () => {} } />
+        <Button buttonStyles={ { height: 60 } } title="Add Account" onPress={ () => {
+          this.props.navigation.navigate('NewAccount')
+        } } />
       </View>)
   }
 
@@ -66,9 +68,9 @@ export default class AccountList extends Component {
       dataSource={this.state.dataSource}
       renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
         return (
-          <AccountListRow
-            upperText={rowData.name ? rowData.name : 'no name'}
-            lowerText={'0x' + rowData.address}
+          <AccountCard
+            title={rowData.name ? rowData.name : 'no name'}
+            address={'0x' + rowData.address}
             onPress={() => {
               highlightRow(sectionID, rowID)
               this.props.onAccountSelected(this.props.accounts[rowID])
@@ -96,7 +98,8 @@ const styles = StyleSheet.create({
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    paddingBottom: 20
   },
   body: {
     flex: 1,

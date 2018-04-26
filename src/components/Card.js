@@ -8,47 +8,55 @@ import colors from '../colors'
 
 export default class Card extends React.Component<{
   title: string,
-
+  secondaryText?: ?string,
+  labelText?: ?string,
+  footerStyle?: ?StyleSheet.Styles,
+  style: ?StyleSheet.Styles,
   onPress: () => any,
-  textStyles?: ?StyleSheet.Styles,
-  buttonStyles?: ?StyleSheet.Styles,
-  disabled?: ?boolean,
 }> {
   static propTypes = {
     title: PropTypes.string.isRequired,
     secondaryText: PropTypes.string,
     labelText: PropTypes.string,
-    labelBlockStyle: View.propTypes.style
+    style: View.propTypes.style,
+    footerStyle: View.propTypes.style,
+    onPress: PropTypes.func,
   };
 
   render() {
     const {
-      color,
-      onPress,
       title,
-      disabled,
-    } = this.props;
-    let {
-      textStyles,
-      buttonStyles
+      secondaryText,
+      labelText,
+      footerStyle,
+      style,
+      onPress,
     } = this.props;
 
-    finalTextStyles = [styles.text, textStyles];
-    finalButtonStyles = [styles.button, buttonStyles];
-
-    if (disabled) {
-      finalTextStyles.push(styles.textDisabled);
-      finalButtonStyles.push(styles.buttonDisabled);
-    }
+    const finalBodyStyle = [style.body, FooterStyle]
+    const finalContentStyle = [style.content];
+    const finalFooterStyle = [styles.footer, footerStyle];
+    const finalTitleTextStyle = [styles.titleText];
+    const finalSecondaryTextStyle = [styles.secondaryText];
+    const finalFooterTextStyle = [styles.footerText];
 
     const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     return (
       <Touchable
         accessibilityComponentType="button"
-        disabled={disabled}
+        disabled={false}
         onPress={onPress}>
-        <View style={finalButtonStyles}>
-          <Text style={finalTextStyles} disabled={disabled}>{title}</Text>
+        <View style={finalBodyStyle}>
+          <View style={finalContentStyle}>
+            <Image source={require('../../icon.png')} style={styles.image} />
+            <View>
+              <Text style={finalTitleTextStyle}>{title}</Text>
+              <Text style={finalSecondaryTextStyle}>{secondaryText}</Text>
+            </View>
+          </View>
+          <View style={finalFooterStyle}>
+            <Text style={finalFooterTextStyle}>{labelText}</Text>
+          </View>
         </View>
       </Touchable>
     );
@@ -56,24 +64,27 @@ export default class Card extends React.Component<{
 }
 
 const styles = StyleSheet.create({
-  button: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    // Material design blue from https://material.google.com/style/color.html#color-color-palette
-    backgroundColor: colors.bg_text_sec,
+  body: {
+
   },
-  text: {
-    color: 'white',
-    padding: 8,
-    fontWeight: 'bold',
-    fontSize: 20
+  content: {
+    backgroundColor: colors.card_bg,
+    padding: 10,
   },
-  buttonDisabled: {
-    elevation: 0,
-    backgroundColor: '#dfdfdf',
+  footer: {
+
   },
-  textDisabled: {
-    color: '#a1a1a1',
+  image: {
+    width: 80,
+    height: 80
   },
+  titleText: {
+
+  },
+  secondaryText: {
+
+  },
+  footerText: {
+
+  }
 });

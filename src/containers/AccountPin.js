@@ -18,7 +18,7 @@
 
 import { Keyboard } from 'react-native'
 import { connect } from 'react-redux'
-import AccountPin from '../components/AccountPin'
+import AccountPin from '../screens/AccountPin'
 import { addAccount, setNewPin, setOldPin, changePin } from '../actions/accounts'
 import { signHash } from '../actions/signer'
 
@@ -54,9 +54,10 @@ export const AccountSetPin = connect(
       placeholder: isNew ? 'Enter PIN' : 'Enter new PIN'
     }
   },
-  (dispatch) => ({
+  (dispatch, props) => ({
     onNextPressed: (pin) => {
       dispatch(setNewPin(pin))
+      props.navigation.navigate('AccountConfirmPin')
     }
   })
 )(AccountPin)
@@ -70,13 +71,14 @@ export const AccountConfirmPin = connect(
       placeholder: 'Confirm PIN'
     }
   },
-  (dispatch) => ({
+  (dispatch, props) => ({
     onNextPressed: async (pin, {isNew}) => {
       if (isNew) {
         dispatch(addAccount(pin))
         return
       }
       dispatch(changePin(pin))
+      props.navigation.navigate('Details')
     }
   })
 )(AccountPin)

@@ -1,0 +1,85 @@
+// @flow
+
+import React from 'react'
+import PropTypes from 'prop-types'
+import { View, Text, Platform, StyleSheet} from 'react-native'
+import colors from '../colors'
+import Card from './Card'
+import AccountIcon from './AccountIcon'
+
+export default class AccountCard extends React.Component<{
+  title: string,
+  address: string,
+  icon: string,
+  networkId: number
+}> {
+  static propTypes = {
+    title: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    icon: PropTypes.element.isRequired,
+    networkId: PropTypes.number,
+  };
+
+  render() {
+    const {
+      title,
+      address,
+      icon,
+      networkId
+    } = this.props;
+
+    return (
+      <View style={styles.body}>
+        <View style={styles.content}>
+          <AccountIcon style={[styles.icon]} seed={address} />
+          <View style={styles.desc}>
+            <Text style={styles.titleText}>{title}</Text>
+            <Text style={styles.secondaryText}>{address}</Text>
+          </View>
+        </View>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Ethereum</Text>
+        </View>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  body: {
+    paddingBottom: 20,
+  },
+  content: {
+    flexDirection: 'row',
+    backgroundColor: colors.card_bg,
+    padding: 10,
+  },
+  icon: {
+    width: 47,
+    height: 47
+  },
+  desc: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    paddingLeft: 10,
+    flex: 1
+  },
+  footer: {
+    backgroundColor: '#977CF6',
+    flexDirection: 'row-reverse',
+    padding: 5
+  },
+  titleText: {
+    fontSize: 20
+  },
+  secondaryText: {
+    color: colors.bg_text_sec,
+    fontWeight: '500',
+    fontSize: 10
+
+  },
+  footerText: {
+    color: colors.card_bg,
+    fontWeight: 'bold'
+  }
+});

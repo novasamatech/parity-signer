@@ -30,7 +30,7 @@ import { selectAccount } from '../actions/accounts'
 import AccountIcon from '../components/AccountIcon'
 import AppStyles from '../styles'
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch, props) => {
   return {
     onAddAccount: (account) => {
       dispatch(selectAccount({
@@ -38,7 +38,7 @@ const mapDispatchToProps = (dispatch) => {
         address: account.address,
         name: account.name
       }))
-      Actions.accountSetPin()
+      props.navigation.navigate('AccountSetPin')
     },
     onBackupPhrase: (seed, address) => {
       Share.share({
@@ -50,6 +50,9 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 export class AccountNew extends Component {
+  static navigationOptions = {
+    title: 'New Account'
+  }
   static propTypes = {
     onBackupPhrase: PropTypes.func.isRequired,
     onAddAccount: PropTypes.func.isRequired

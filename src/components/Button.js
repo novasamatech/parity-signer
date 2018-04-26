@@ -31,8 +31,8 @@ export default class Button extends React.Component<{
       buttonStyles
     } = this.props;
 
-    finalTextStyles = [styles.text, textStyles];
-    finalButtonStyles = [styles.button, buttonStyles];
+    const finalTextStyles = [styles.text, textStyles];
+    const finalButtonStyles = [styles.button, buttonStyles];
 
     if (disabled) {
       finalTextStyles.push(styles.textDisabled);
