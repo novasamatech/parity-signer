@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#FFFFFF",
+    borderBottomColor: colors.bg_text_sec,
 
   },
   logo: {

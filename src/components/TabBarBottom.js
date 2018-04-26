@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     height: DEFAULT_HEIGHT,
     backgroundColor: colors.bg,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.card_bg,
+    borderTopColor: colors.bg_text_sec,
     flexDirection: 'row',
   },
   tabBarRegular: {

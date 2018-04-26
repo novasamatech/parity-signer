@@ -18,9 +18,11 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Button, View, Text, ListView, StatusBar, StyleSheet } from 'react-native'
+import { View, Text, ListView, StatusBar, StyleSheet } from 'react-native'
 import AccountListRow from '../components/AccountListRow'
+import Button from '../components/Button'
 import AppStyles from '../styles'
+import colors from '../colors';
 
 export default class AccountList extends Component {
   static navigationOptions = {
@@ -38,6 +40,8 @@ export default class AccountList extends Component {
   constructor (props) {
     super(props)
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    this.renderBottom = this.renderBottom.bind(this);
+    this.renderList = this.renderContent.bind(this);
     this.state = {
       dataSource: ds.cloneWithRows(props.accounts)
     }
@@ -49,52 +53,64 @@ export default class AccountList extends Component {
     })
   }
 
-  render () {
-    if (!this.props.accounts.length) {
-      return (
-        <View style={AppStyles.view}>
-          <View style={styles.introContainer}>
-            <Text style={styles.introText}>
-              To sign transactions you need at least one account.
-            </Text>
-            <View style={AppStyles.buttonContainer}>
-              <Button
-                style={styles.introButton}
-                onPress={this.props.onNewAccount}
-                color='green'
-                title='Create Account'
-                accessibilityLabel='Create new account.'
-              />
-            </View>
-          </View>
-        </View>
-      )
-    }
+  renderBottom() {
     return (
-      <ListView
-        style={AppStyles.listView}
-        dataSource={this.state.dataSource}
-        renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
-          return (
-            <AccountListRow
-              upperText={rowData.name ? rowData.name : 'no name'}
-              lowerText={'0x' + rowData.address}
-              onPress={() => {
-                highlightRow(sectionID, rowID)
-                this.props.onAccountSelected(this.props.accounts[rowID])
-              }}
-            />
-          )
-        }}
-        enableEmptySections
-      >
-        <StatusBar barStyle='light-content' />
-      </ListView>
+      <View style={styles.bottom}>
+        <Button buttonStyles={ { height: 60 } } title="Add Account" onPress={ () => {} } />
+      </View>)
+  }
+
+  renderContent() {
+    return (<ListView
+      style={styles.content}
+      dataSource={this.state.dataSource}
+      renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
+        return (
+          <AccountListRow
+            upperText={rowData.name ? rowData.name : 'no name'}
+            lowerText={'0x' + rowData.address}
+            onPress={() => {
+              highlightRow(sectionID, rowID)
+              this.props.onAccountSelected(this.props.accounts[rowID])
+            }}
+          />
+        )
+      }}
+      enableEmptySections
+    ></ListView>)
+  }
+
+  render () {
+    return (
+      <View style={ styles.body }>
+        <Text style={ styles.title }>ACCOUNTS</Text>
+        { this.renderContent() }
+        { this.renderBottom() }
+      </View>
+
     )
   }
 }
 
 const styles = StyleSheet.create({
+  title: {
+    color: colors.bg_text_sec,
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  body: {
+    flex: 1,
+    flexDirection: 'column',
+    padding: 20,
+    backgroundColor: colors.bg
+  },
+  content: {
+    flex: 1,
+  },
+  bottom: {
+    marginTop: 20,
+    flexBasis: 60,
+  },
   introContainer: {
     padding: 30,
     flex: 1,
