@@ -19,7 +19,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {
-  ScrollView, View, Text, TextInput, Button, TouchableOpacity, Share
+  ScrollView, View, Text, TextInput, Button, TouchableOpacity, Share, StyleSheet
 } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
@@ -29,6 +29,8 @@ import { brainWalletAddress } from '../util/native'
 import { selectAccount } from '../actions/accounts'
 import AccountIcon from '../components/AccountIcon'
 import AppStyles from '../styles'
+
+import colors from '../colors'
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
@@ -95,54 +97,53 @@ export class AccountNew extends Component {
 
   render () {
     return (
-      <ScrollView style={AppStyles.fullscreenView}>
-        <AccountIcon style={AppStyles.icon} seed={'0x' + this.state.address} />
-        <Text style={AppStyles.hintText}>Account Name</Text>
-        <TextInput
-          placeholder='Name for this account'
-          value={this.state.name}
-          style={AppStyles.inputValue}
-          editable
-          multiline={false}
-          returnKeyType='next'
-          numberOfLines={1}
-          fontSize={12}
-          autoFocus
-          onChangeText={(text) => { this.setState({name: text}) }}
-        />
-        <Text style={AppStyles.hintText}>Recovery Phrase</Text>
-        <AccountSeed seed={this.state.seed} onChangeText={
-          debounce((text) => { this.updateAddress(this, text) }, 100)
-        } />
-        <TouchableOpacity
-          onPress={this.backupSeed}
-          >
-          <Text style={AppStyles.hintTextSmall}>Make sure to back up your recovery phrase! Click this text to share it.</Text>
-        </TouchableOpacity>
-        <Text style={AppStyles.hintText}>Address</Text>
-        <TextInput
-          editable={false}
-          style={[AppStyles.inputValue, AppStyles.inputValueSmall]}
-          value={`0x${this.state.address}`}
-          />
-        <View style={AppStyles.buttonContainer}>
-          <Button
-            onPress={() => this.props.onAddAccount({
-              seed: this.state.seed,
-              address: this.state.address,
-              name: this.state.name
-            })}
-            title='Set up PIN'
-            color='green'
-            accessibilityLabel='Press to set up the PIN for the account'
-          />
-        </View>
+      <ScrollView style={AppStyles.view}>
+        <Text style={ styles.title_top }>CREATE ACCOUNT</Text>
+        <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
       </ScrollView>
     )
   }
+}
+
+function IdenticonChooser() {
+  const style = StyleSheet.create({
+    body: {
+      backgroundColor: colors.card_bg
+    },
+    addressText: {
+
+    }
+  });
+  return (
+    <View>
+
+    </View>
+  )
 }
 
 export default connect(
   undefined,
   mapDispatchToProps
 )(AccountNew)
+
+const styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    flexDirection: 'column',
+    padding: 20,
+    backgroundColor: colors.bg
+  },
+  title: {
+    color: colors.bg_text_sec,
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingBottom: 20
+  },
+  title_top: {
+    color: colors.bg_text_sec,
+    fontSize: 24,
+    fontWeight: 'bold',
+    paddingBottom: 20,
+    textAlign: 'center'
+  },
+});

@@ -23,7 +23,6 @@ export default class Button extends React.Component<{
 
   render() {
     const {
-      color,
       onPress,
       title,
       disabled,

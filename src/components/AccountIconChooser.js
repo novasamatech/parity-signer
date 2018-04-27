@@ -8,17 +8,12 @@ import colors from '../colors'
 import Card from './Card'
 import AccountIcon from './AccountIcon'
 
-export default class AccountCard extends React.Component<{
-  title: string,
-  address: string,
-  networkId: number,
-  onPress: () => any,
+export default class AccountIconChooser extends React.Component<{
+  selectedAddress: string,
+  onChange: () => any,
 }> {
   static propTypes = {
-    title: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
-    networkId: PropTypes.number,
-    onPress: PropTypes.func,
+    selectedAddress : PropTypes.string.isRequired,
   };
 
   render() {
@@ -38,14 +33,14 @@ export default class AccountCard extends React.Component<{
         onPress={onPress}>
         <View style={styles.body}>
           <View style={styles.content}>
-            <AccountIcon style={styles.icon} seed={address} />
+            <AccountIcon style={[styles.icon]} seed={address} />
             <View style={styles.desc}>
               <Text style={styles.titleText}>{title}</Text>
-              <Text style={styles.secondaryText}>0x{address}</Text>
+              <Text style={styles.editText}>Tap to edit account</Text>
             </View>
           </View>
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Ethereum</Text>
+          <View>
+            <Text style={styles.addressText}>0x{address}</Text>
           </View>
         </View>
       </Touchable>
@@ -55,20 +50,21 @@ export default class AccountCard extends React.Component<{
 
 const styles = StyleSheet.create({
   body: {
-    paddingBottom: 20,
+    marginBottom: 20,
+    padding: 20,
+    backgroundColor: colors.card_bg,
   },
   content: {
     flexDirection: 'row',
     backgroundColor: colors.card_bg,
-    padding: 10,
+
   },
   icon: {
-    width: 47,
-    height: 47
+    width: 70,
+    height: 70
   },
   desc: {
     flexDirection: 'column',
-    justifyContent: 'space-between',
     paddingLeft: 10,
     flex: 1
   },
@@ -80,11 +76,17 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 20
   },
-  secondaryText: {
+  editText: {
+    paddingTop: 12,
     color: colors.bg_text_sec,
     fontWeight: '500',
-    fontSize: 10
-
+    fontSize: 15
+  },
+  addressText: {
+    paddingTop: 20,
+    color: colors.bg,
+    fontWeight: '700',
+    fontSize: 11
   },
   footerText: {
     color: colors.card_bg,

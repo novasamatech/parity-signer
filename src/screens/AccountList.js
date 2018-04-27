@@ -70,7 +70,7 @@ export default class AccountList extends Component {
         return (
           <AccountCard
             title={rowData.name ? rowData.name : 'no name'}
-            address={'0x' + rowData.address}
+            address={rowData.address}
             onPress={() => {
               highlightRow(sectionID, rowID)
               this.props.onAccountSelected(this.props.accounts[rowID])

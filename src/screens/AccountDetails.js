@@ -21,7 +21,10 @@ import PropTypes from 'prop-types'
 import { StyleSheet, View, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native'
 import AppStyles from '../styles'
 import AccountIcon from '../components/AccountIcon'
+import AccountDetailsCard from '../components/AccountDetailsCard'
 import QrView from '../components/QrView'
+import Button from '../components/Button'
+import colors from '../colors';
 
 export default class AccountDetails extends Component {
   static navigationOptions = {
@@ -67,61 +70,33 @@ export default class AccountDetails extends Component {
   }
 
   render () {
+    const { account: { address, name } } = this.props;
     return (
-      <ScrollView contentContainerStyle={AppStyles.view}>
-        <AccountIcon style={AppStyles.icon} seed={'0x' + this.props.account.address} />
-        <TouchableOpacity
-          style={styles.wrapper}
-          onLongPress={this.startEdit}
-          >
-          <View>
-            <Text style={AppStyles.hintText}>Name</Text>
-            { this.state.isEditing
-              ? (
-                <TextInput
-                  style={[AppStyles.valueText, AppStyles.valueTextInput]}
-                  value={this.state.name}
-                  autoFocus
-                  onChangeText={this.updateName}
-                  onEndEditing={this.cancelEdit}
-                  onSubmitEditing={this.finishEdit}
-                />
-              ) : (
-                <Text style={AppStyles.valueText}>{this.props.account.name ? this.props.account.name : 'no name'}</Text>
-              )
-            }
-          </View>
-        </TouchableOpacity>
-
-        <View style={styles.address}>
-          <Text style={AppStyles.hintText}>Address</Text>
-          <Text selectable style={AppStyles.valueText}>0x{this.props.account.address}</Text>
-        </View>
-
-        <View style={styles.qr}>
-          <QrView text={this.props.account.address} />
-        </View>
-
-        <View style={[styles.actionsContainer, AppStyles.buttonContainer]}>
-          <TouchableOpacity
-            style={styles.actionButtonContainer}
-            onPress={() => this.props.onChangePin(this.props.account)}
-            >
-            <Text style={styles.changePinText}>Change PIN</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionButtonContainer}
-            onPress={() => this.props.onDelete(this.props.account)}
-            >
-            <Text style={styles.deleteText}>Delete</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      <View style={ styles.body }>
+        <Text style={ styles.title }>ACCOUNT</Text>
+        <AccountDetailsCard address={ address } title={ name } />
+        <Button textStyles={{color: colors.card_bg_text}}
+                buttonStyles={{ backgroundColor: colors.card_bg }}
+                title="Show Account QR Code"
+                onPress={ () => {} }/>
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    flexDirection: 'column',
+    padding: 20,
+    backgroundColor: colors.bg
+  },
+  title: {
+    color: colors.bg_text_sec,
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingBottom: 20
+  },
   wrapper: {
     borderRadius: 5
   },

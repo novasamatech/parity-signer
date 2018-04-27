@@ -27,8 +27,9 @@ export default StyleSheet.create({
   },
   fullscreenView: {
     flex: 1,
-    marginTop: (Platform.OS === 'ios') ? 64 : 54,
-    padding: 20
+    flexDirection: 'column',
+    padding: 20,
+    backgroundColor: colors.bg
   },
   listView: {
     flex: 1,
