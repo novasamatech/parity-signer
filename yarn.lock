@@ -5107,7 +5107,7 @@ react-native-router-flux@^4.0.0-beta.26:
 
 "react-native-secure-storage@https://github.com/debris/react-native-secure-storage":
   version "1.0.0"
-  resolved "https://github.com/debris/react-native-secure-storage#8c695221f583363e8d84a76297f7cb8274c9a40e"
+  resolved "https://github.com/debris/react-native-secure-storage#7de7c6f0e57b0483982c7fd44a4b678a9822b623"
 
 react-native-tab-view@^0.0.70:
   version "0.0.70"
