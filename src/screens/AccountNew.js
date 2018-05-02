@@ -27,7 +27,7 @@ import debounce from 'debounce'
 import AccountSeed from '../components/AccountSeed'
 import { brainWalletAddress } from '../util/native'
 import { selectAccount } from '../actions/accounts'
-import AccountIcon from '../components/AccountIcon'
+import AccountIconChooser from '../components/AccountIconChooser'
 import AppStyles from '../styles'
 
 import colors from '../colors'
@@ -64,42 +64,25 @@ export class AccountNew extends Component {
     super(props)
 
     this.state = {
-      seed: this.props.seed,
+      seed: '',
       address: '',
       name: ''
     }
-
-    this.updateAddress(this, this.props.seed)
   }
 
-  componentWillReceiveProps (newProps) {
-    const { seed } = newProps
-    this.updateAddress(this, seed)
-  }
-
-  async updateAddress (self, seed) {
-    try {
-      let address = await brainWalletAddress(seed)
-      self.setState({
-        seed: seed,
-        address: address
-      })
-    } catch (e) {
-      // this should never fail
-      console.error(e)
-    }
-  }
-
-  backupSeed = () => {
-    const { address, seed } = this.state
-    this.props.onBackupPhrase(seed, address)
-  }
+  // backupSeed = () => {
+  //   const { address, seed } = this.state
+  //   this.props.onBackupPhrase(seed, address)
+  // }
 
   render () {
+    const { address } = this.state
     return (
       <ScrollView style={AppStyles.view}>
         <Text style={ styles.title_top }>CREATE ACCOUNT</Text>
         <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
+        <AccountIconChooser selectedAddress={ address } onSelect={
+          (address) => { this.setState({ address }) } } />
       </ScrollView>
     )
   }
