@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 4,
     backgroundColor: colors.bg_text_sec,
+    height: 60
   },
   text: {
     color: 'white',

@@ -19,7 +19,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {
-  ScrollView, View, Text, TextInput, Button, TouchableOpacity, Share, StyleSheet
+  ScrollView, View, Text, TouchableOpacity, Share, StyleSheet
 } from 'react-native'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
@@ -28,6 +28,8 @@ import AccountSeed from '../components/AccountSeed'
 import { brainWalletAddress } from '../util/native'
 import { selectAccount } from '../actions/accounts'
 import AccountIconChooser from '../components/AccountIconChooser'
+import TextInput from '../components/TextInput'
+import Button from '../components/Button'
 import AppStyles from '../styles'
 
 import colors from '../colors'
@@ -78,30 +80,24 @@ export class AccountNew extends Component {
   render () {
     const { address } = this.state
     return (
-      <ScrollView style={AppStyles.view}>
-        <Text style={ styles.title_top }>CREATE ACCOUNT</Text>
-        <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
-        <AccountIconChooser selectedAddress={ address } onSelect={
-          (address) => { this.setState({ address }) } } />
+      <View style={ styles.body } >
+      <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>
+        <View style={ styles.top }>
+          <Text style={ styles.titleTop }>CREATE ACCOUNT</Text>
+          <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
+          <AccountIconChooser selectedAddress={ address } onSelect={
+            (address) => { this.setState({ address }) } } />
+          <Text style={ styles.title }>ACCOUNT NAME</Text>
+          <TextInput value= />
+        </View>
+        <View style={ styles.bottom }>
+          <Text style={ styles.hintText }>On the next step you will be asked to backup your account, get pen and paper ready</Text>
+          <Button buttonStyles={ styles.nextStep } title="Next Step" onPress={ () => {} } />
+        </View>
       </ScrollView>
+      </View>
     )
   }
-}
-
-function IdenticonChooser() {
-  const style = StyleSheet.create({
-    body: {
-      backgroundColor: colors.card_bg
-    },
-    addressText: {
-
-    }
-  });
-  return (
-    <View>
-
-    </View>
-  )
 }
 
 export default connect(
@@ -111,10 +107,20 @@ export default connect(
 
 const styles = StyleSheet.create({
   body: {
+    backgroundColor: colors.bg,
+    paddingBottom: 20
+  },
+  bodyContainer: {
     flex: 1,
     flexDirection: 'column',
-    padding: 20,
-    backgroundColor: colors.bg
+    justifyContent: 'space-between',
+  },
+  top: {
+    flex: 1
+  },
+  bottom: {
+    flexBasis: 50,
+    paddingBottom: 15
   },
   title: {
     color: colors.bg_text_sec,
@@ -122,11 +128,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingBottom: 20
   },
-  title_top: {
+  titleTop: {
     color: colors.bg_text_sec,
     fontSize: 24,
     fontWeight: 'bold',
     paddingBottom: 20,
     textAlign: 'center'
   },
+  hintText: {
+    textAlign: 'center',
+    paddingTop: 20,
+    color: colors.bg_text_sec,
+    fontWeight: '500',
+    fontSize: 10
+  },
+  nextStep: {
+    marginTop: 15,
+  }
 });

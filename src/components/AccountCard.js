@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
     color: colors.bg_text_sec,
     fontWeight: '500',
     fontSize: 10
-
   },
   footerText: {
     color: colors.card_bg,

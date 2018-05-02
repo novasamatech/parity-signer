@@ -88,7 +88,7 @@ class TabBarBottom extends React.Component<Props> {
   }
 }
 
-const DEFAULT_HEIGHT = 90;
+const DEFAULT_HEIGHT = 70;
 
 const styles = StyleSheet.create({
   tabBar: {
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontSize: 22,
-    paddingTop: 33,
+    paddingTop: 24,
     textAlign: 'center',
     color: colors.card_bg,
     flex: 1,
