@@ -14,17 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
-import 'react-native'
-import App from '../src/components/App'
+use libc::size_t;
 
-// Note: test renderer must be required after react-native.
-import renderer from 'react-test-renderer'
+// Helper struct that we'll use to give strings to C.
+#[repr(C)]
+pub struct StringPtr {
+    pub ptr: *const u8,
+    pub len: size_t,
+}
 
-it('renders correctly', () => {
-  const tree = renderer.create(
-    <App />
-  )
+impl<'a> From<&'a str> for StringPtr {
+    fn from(s: &'a str) -> Self {
+        StringPtr {
+            ptr: s.as_ptr(),
+            len: s.len() as size_t,
+        }
+    }
+}
 
-  expect(tree).toBeTruthy()
-})
+impl StringPtr {
+	pub fn as_str(&self) -> &str {
+		use std::{slice, str};
+
+		unsafe {
+			let slice = slice::from_raw_parts(self.ptr, self.len);
+			str::from_utf8(slice).unwrap()
+		}
+	}
+}
+

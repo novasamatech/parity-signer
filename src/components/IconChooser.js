@@ -1,6 +1,7 @@
 'use strict'
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { Button, View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
 import AppStyles from '../styles'
 

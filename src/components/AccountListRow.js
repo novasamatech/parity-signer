@@ -16,7 +16,8 @@
 
 'use strict'
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { TouchableHighlight, StyleSheet, View, Text } from 'react-native'
 import AppStyles from '../styles'
 import AccountIcon from './AccountIcon'

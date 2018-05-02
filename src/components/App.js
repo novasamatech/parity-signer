@@ -28,7 +28,7 @@ import AccountNew from '../containers/AccountNew'
 import AccountDetails from '../containers/AccountDetails'
 import TxDetails from '../containers/TxDetails'
 import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from '../containers/AccountPin'
-import { QrViewTransaction, QrViewAddress } from '../containers/QrView'
+import { QrViewTransaction } from '../containers/QrView'
 import DataDetails from '../containers/DataDetails'
 import { loadAccounts, saveAccounts } from '../util/db'
 import { setAccounts } from '../actions/accounts'
@@ -63,7 +63,7 @@ const accountScenes =
       onBack={() => Alert.alert('Do you want to cancel account creation?', undefined, [{
         text: 'Yes',
         onPress: () => {
-          Actions.popTo('right')
+          Actions.popTo('_right')
         }
       }, {
         text: 'No',
@@ -93,11 +93,11 @@ const accountScenes =
       backButtonTextStyle={styles.navibarTitle}
       hideBackImage
     />
-    <Scene key='qrViewAddress' title='Address QR' component={QrViewAddress}
+    {/* <Scene key='qrViewAddress' title='Address QR' component={QrViewAddress}
       backTitle='Back'
       backButtonTextStyle={styles.navibarTitle}
       hideBackImage
-    />
+    /> */}
     <Scene key='iconChooser' title='Choose an Icon' component={IconChooser}
       backTitle='Back'
       backButtonTextStyle={styles.navibarTitle}
@@ -108,7 +108,7 @@ const accountScenes =
 const scenes =
   <Scene key='root'>
     <Scene key='tabs' tabs style={styles.tabbar}>
-      <Scene key='left' title='Scan Transaction QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
+      <Scene key='_left' title='Scan Transaction QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         <Scene key='qrScan'
           component={QrScanner}
           title='Scan Transaction QR'
@@ -129,7 +129,7 @@ const scenes =
           hideBackImage
         />
         <Scene key='qrViewTx' title='Signature QR' component={QrViewTransaction}
-          onRight={() => Actions.popTo('left')}
+          onRight={() => Actions.popTo('_left')}
           rightTitle='Done'
           rightButtonTextStyle={styles.navibarTitle}
           backTitle='Back'
@@ -137,7 +137,7 @@ const scenes =
           hideBackImage
         />
       </Scene>
-      <Scene key='right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
+      <Scene key='_right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
         {accountScenes.props.children}
       </Scene>
     </Scene>
