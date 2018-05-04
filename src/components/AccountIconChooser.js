@@ -10,12 +10,12 @@ import AccountIcon from './AccountIcon'
 import AppStyles from '../styles'
 
 export default class AccountIconChooser extends Component<{
-  selectedAddress: string,
-  onSelect: () => any,
+  value: string,
+  onChange: () => any,
   }> {
   static propTypes = {
-    selectedAddress : PropTypes.string.isRequired,
-    onSelect: PropTypes.func,
+    value : PropTypes.string.isRequired,
+    onChange: PropTypes.func,
   };
 
   constructor(props) {
@@ -49,8 +49,8 @@ export default class AccountIconChooser extends Component<{
 
   render() {
     const {
-      selectedAddress,
-      onSelect
+      value,
+      onChange
     } = this.props;
 
     return (
@@ -60,16 +60,16 @@ export default class AccountIconChooser extends Component<{
           dataSource={this.state.iconsDS}
           horizontal={true}
           renderRow={({ address, seed }, sectionID: number, rowID: number, highlightRow) => {
-            const selected = address === selectedAddress
+            const selected = address === value
             const style = [styles.icon]
             return (
-              <TouchableOpacity style={ [styles.iconBorder, address === selectedAddress ? styles.selected : {}] } onPress={ () => this.props.onSelect(address) }>
+              <TouchableOpacity style={ [styles.iconBorder, address === value ? styles.selected : {}] } onPress={ () => this.props.onChange({ address, seed }) }>
                   <AccountIcon style={style} seed={'0x' + address} />
               </TouchableOpacity>
             )
           }}>
         </ListView>
-        <Text style={styles.addressText}>{selectedAddress ? `0x${selectedAddress}` : `Select an identicon`}</Text>
+        <Text style={styles.addressText}>{value ? `0x${value}` : `Select an identicon`}</Text>
       </View>
     );
   }

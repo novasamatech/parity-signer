@@ -19,8 +19,9 @@
 'use strict'
 
 import React, { Component } from 'react'
+import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated'
 import { StyleSheet, AppState, Alert, SafeAreaView } from 'react-native'
-import { Provider } from 'react-redux'
+import { Provider as ReduxProvider } from 'react-redux'
 import { StackNavigator, TabNavigator } from 'react-navigation'
 import { Actions, Scene } from 'react-native-router-flux'
 import Header from './components/Header'
@@ -154,11 +155,13 @@ const scenes =
 export default class App extends Component {
   render () {
     return (
-      <Provider store={store}>
-        <SafeAreaView style={styles.safeArea}>
-          <Screens />
-        </SafeAreaView>
-      </Provider>
+      <UnstatedProvider>
+        <ReduxProvider store={store}>
+          <SafeAreaView style={styles.safeArea}>
+            <Screens />
+          </SafeAreaView>
+        </ReduxProvider>
+      </UnstatedProvider>
     )
   }
 

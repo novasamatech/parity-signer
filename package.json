@@ -33,7 +33,8 @@
     "react-redux": "^5.0.7",
     "react-static-container": "^1.0.1",
     "redux": "^3.6.0",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "unstated": "^2.0.3"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.1",

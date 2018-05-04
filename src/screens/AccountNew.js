@@ -21,9 +21,11 @@ import PropTypes from 'prop-types'
 import {
   ScrollView, View, Text, TouchableOpacity, Share, StyleSheet
 } from 'react-native'
+import { Subscribe } from 'unstated'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
 import debounce from 'debounce'
+import AccountsStore from '../stores/AccountsStore'
 import AccountSeed from '../components/AccountSeed'
 import { brainWalletAddress } from '../util/native'
 import { selectAccount } from '../actions/accounts'
@@ -78,24 +80,35 @@ export class AccountNew extends Component {
   // }
 
   render () {
-    const { address } = this.state
     return (
-      <View style={ styles.body } >
-      <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>
-        <View style={ styles.top }>
-          <Text style={ styles.titleTop }>CREATE ACCOUNT</Text>
-          <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
-          <AccountIconChooser selectedAddress={ address } onSelect={
-            (address) => { this.setState({ address }) } } />
-          <Text style={ styles.title }>ACCOUNT NAME</Text>
-          <TextInput value= />
+      <Subscribe to={[AccountsStore]}>{
+        accounts => {
+          const selected = accounts.getSelected()
+          return <View style={ styles.body } >
+            <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>
+              <View style={ styles.top }>
+                <Text style={ styles.titleTop }>CREATE ACCOUNT</Text>
+                <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
+                <AccountIconChooser
+                  value={ selected.address }
+                  onChange={async ({ address, seed }) => {
+                    accounts.update({ address, seed })
+                    accounts.select(address)
+                    } } />
+                <Text style={ styles.title }>ACCOUNT NAME</Text>
+                <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
+                  value={selected.name}
+                  placeholder="Enter a new account name"/>
+              </View>
+              <View style={ styles.bottom }>
+                <Text style={ styles.hintText }>On the next step you will be asked to backup your account, get pen and paper ready</Text>
+                <Button buttonStyles={ styles.nextStep } title="Next Step" onPress={ () => { this.props.navigation.navigate('AccountSetPin') } } />
+              </View>
+            </ScrollView>
         </View>
-        <View style={ styles.bottom }>
-          <Text style={ styles.hintText }>On the next step you will be asked to backup your account, get pen and paper ready</Text>
-          <Button buttonStyles={ styles.nextStep } title="Next Step" onPress={ () => {} } />
-        </View>
-      </ScrollView>
-      </View>
+        }
+      }
+      </Subscribe>
     )
   }
 }
@@ -108,7 +121,8 @@ export default connect(
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    paddingBottom: 20
+    paddingBottom: 20,
+     flex: 1,
   },
   bodyContainer: {
     flex: 1,
@@ -139,7 +153,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingTop: 20,
     color: colors.bg_text_sec,
-    fontWeight: '500',
+    fontWeight: '800',
     fontSize: 10
   },
   nextStep: {
