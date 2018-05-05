@@ -19,7 +19,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {
-  ScrollView, View, Text, TouchableOpacity, Share, StyleSheet
+  Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet
 } from 'react-native'
 import { Subscribe } from 'unstated'
 import { connect } from 'react-redux'
@@ -91,7 +91,7 @@ export class AccountNew extends Component {
                 <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
                 <AccountIconChooser
                   value={ selected.address }
-                  onChange={async ({ address, seed }) => {
+                  onChange={({ address, seed }) => {
                     accounts.update({ address, seed })
                     accounts.select(address)
                     } } />
@@ -101,8 +101,17 @@ export class AccountNew extends Component {
                   placeholder="Enter a new account name"/>
               </View>
               <View style={ styles.bottom }>
-                <Text style={ styles.hintText }>On the next step you will be asked to backup your account, get pen and paper ready</Text>
-                <Button buttonStyles={ styles.nextStep } title="Next Step" onPress={ () => { this.props.navigation.navigate('AccountSetPin') } } />
+                <Text style={ styles.hintText }>
+                  On the next step you will be asked to backup your account, get pen and paper ready
+                </Text>
+                <Button
+                  buttonStyles={ styles.nextStep }
+                  title="Next Step"
+                  onPress={ async () => {
+                    await accounts.saveSelected()
+                    Alert.alert('Account Created')
+                    this.props.navigation.navigate('AccountList')
+                    console.log('TEST') } } />
               </View>
             </ScrollView>
         </View>

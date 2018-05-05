@@ -189,15 +189,15 @@ export default class App extends Component {
 const Screens = StackNavigator ({
   Tabs: {
     screen: TabNavigator ({
-      Scanner: {
+      QrScanner: {
         screen: QrScanner
       },
       Accounts: {
         screen: StackNavigator ({
-          List: {
+          AccountList: {
             screen: AccountList
           },
-          NewAccount: {
+          AccountNew: {
             screen: AccountNew
           },
           AccountSetPin: {
@@ -206,7 +206,7 @@ const Screens = StackNavigator ({
           AccountConfirmPin: {
             screen: AccountConfirmPin
           },
-          Details: {
+          AccountDetails: {
             screen: AccountDetails
           }
         },

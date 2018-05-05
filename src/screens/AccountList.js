@@ -57,7 +57,7 @@ export default class AccountList extends Component {
     return (
       <View style={styles.bottom}>
         <Button buttonStyles={ { height: 60 } } title="Add Account" onPress={ () => {
-          this.props.navigation.navigate('NewAccount')
+          this.props.navigation.navigate('AccountNew')
         } } />
       </View>)
   }

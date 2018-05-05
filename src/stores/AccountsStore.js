@@ -1,5 +1,4 @@
 // @flow
-import { Alert } from 'react-native'
 import { Container } from 'unstated'
 import { saveAccount, deleteAccount } from '../util/db'
 import { encryptData, decryptData } from '../util/native'
@@ -63,8 +62,6 @@ export default class AccountsStore extends Container<AccountsState> {
         ...account,
         encryptedSeed
       })
-      this.props.navigation.navigate('AccountList')
-      Alert.alert('Account Created')
     } catch (e) {
       console.error(e)
     }
