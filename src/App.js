@@ -216,7 +216,7 @@ const Screens = StackNavigator ({
       )
     }
   }, {
-    tabBarComponent: TabBarBottom,
+    tabBarComponent: props => <TabBarBottom { ...props } />,
     tabBarPosition: 'bottom',
   })
   }

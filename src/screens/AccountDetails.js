@@ -19,6 +19,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, View, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native'
+import { Subscribe } from 'unstated'
+import AccountsStore from '../stores/AccountsStore'
 import AppStyles from '../styles'
 import AccountIcon from '../components/AccountIcon'
 import AccountDetailsCard from '../components/AccountDetailsCard'
@@ -31,55 +33,25 @@ export default class AccountDetails extends Component {
     title: 'Account Details'
   }
 
-  static propTypes = {
-    account: PropTypes.shape({
-      address: PropTypes.string.isRequired
-    }).isRequired,
-    onNameChange: PropTypes.func.isRequired,
-    onChangePin: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired
-  }
-
-  state = {
-    isEditing: false,
-    name: this.props.account.name
-  }
-
-  startEdit = () => {
-    this.setEditing(true)
-    this.setState({
-      name: this.props.account.name
-    })
-  }
-
-  cancelEdit = () => {
-    this.setEditing(false)
-  }
-
-  finishEdit = () => {
-    this.setEditing(false)
-    this.props.onNameChange(this.props.account, this.state.name)
-  }
-
-  updateName = (name) => {
-    this.setState({ name })
-  }
-
-  setEditing (isEditing) {
-    this.setState({ isEditing })
-  }
-
   render () {
     const { account: { address, name } } = this.props;
     return (
-      <View style={ styles.body }>
-        <Text style={ styles.title }>ACCOUNT</Text>
-        <AccountDetailsCard address={ address } title={ name } />
-        <Button textStyles={{color: colors.card_bg_text}}
-                buttonStyles={{ backgroundColor: colors.card_bg }}
-                title="Show Account QR Code"
-                onPress={ () => {} }/>
-      </View>
+      <Subscribe to={[AccountsStore]}>{
+        (accounts) => {
+          const account = accounts.getSelected()
+          return (
+            <View style={ styles.body }>
+              <Text style={ styles.title }>ACCOUNT</Text>
+              <AccountDetailsCard address={ account.address } title={ account.name } />
+              <Button textStyles={{color: colors.card_bg_text}}
+                      buttonStyles={{ backgroundColor: colors.card_bg }}
+                      title="Show Account QR Code"
+                      onPress={ () => {} }/>
+            </View>
+        )
+        }
+      }
+      </Subscribe>
     )
   }
 }

@@ -19,12 +19,28 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { View, Text, ListView, StatusBar, StyleSheet } from 'react-native'
+import { Subscribe } from 'unstated'
+import AccountsStore from '../stores/AccountsStore'
 import AccountCard from '../components/AccountCard'
 import Button from '../components/Button'
 import AppStyles from '../styles'
 import colors from '../colors';
 
 export default class AccountList extends Component {
+  render() {
+    return <Subscribe to={[AccountsStore]}>{
+      accounts => <_AccountList
+        { ...this.props }
+        accounts={ accounts.getAccounts() }
+        onAccountSelected={ address => {
+          accounts.select(address)
+          this.props.navigation.navigate('AccountDetails')
+        }}></_AccountList>
+    }</Subscribe>
+  }
+}
+
+class _AccountList extends Component {
   static navigationOptions = {
     title: 'Accounts'
   }
@@ -39,7 +55,7 @@ export default class AccountList extends Component {
 
   constructor (props) {
     super(props)
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => true})
     this.renderBottom = this.renderBottom.bind(this);
     this.renderList = this.renderContent.bind(this);
     this.state = {
@@ -47,10 +63,10 @@ export default class AccountList extends Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(nextProps.accounts)
-    })
+  static getDerivedStateFromProps (nextProps, prevState) {
+    return {
+      dataSource: prevState.dataSource.cloneWithRows(nextProps.accounts)
+    }
   }
 
   renderBottom() {
@@ -66,6 +82,7 @@ export default class AccountList extends Component {
     return (<ListView
       style={styles.content}
       dataSource={this.state.dataSource}
+      removeClippedSubviews={false}
       renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
         return (
           <AccountCard
@@ -73,7 +90,7 @@ export default class AccountList extends Component {
             address={rowData.address}
             onPress={() => {
               highlightRow(sectionID, rowID)
-              this.props.onAccountSelected(this.props.accounts[rowID])
+              this.props.onAccountSelected(this.props.accounts[rowID].address)
             }}
           />
         )

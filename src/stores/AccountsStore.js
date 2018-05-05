@@ -1,6 +1,6 @@
 // @flow
 import { Container } from 'unstated'
-import { saveAccount, deleteAccount } from '../util/db'
+import { loadAccounts, saveAccount, deleteAccount } from '../util/db'
 import { encryptData, decryptData } from '../util/native'
 
 type Account = {
@@ -30,6 +30,9 @@ export default class AccountsStore extends Container<AccountsState> {
 
   constructor(props) {
     super(props)
+    loadAccounts().then((accounts) => {
+      this.setState({accounts})
+    })
   }
 
   select(address) {
@@ -42,11 +45,12 @@ export default class AccountsStore extends Container<AccountsState> {
       account = this.state.newAccount
     }
     Object.assign(account, accountUpdate)
-    this.setState()
+    console.log(accountUpdate)
+    this.setState({})
   }
 
-  updateSelected() {
-    this.update(this.getSelected())
+  updateSelected(accountUpdate) {
+    this.update(Object.assign(this.getSelected(), accountUpdate))
   }
 
   // TODO: PIN
@@ -57,11 +61,14 @@ export default class AccountsStore extends Container<AccountsState> {
         return
       }
       let encryptedSeed = await encryptData(account.seed, '')
+      console.log(account)
       delete account.seed
       saveAccount({
         ...account,
         encryptedSeed
       })
+      this.setState({accounts: await loadAccounts()})
+
     } catch (e) {
       console.error(e)
     }
@@ -74,11 +81,10 @@ export default class AccountsStore extends Container<AccountsState> {
 
   getSelected(): Account {
     // console.log(this.state.selected, this.state.newAccount);
-    return this.getByAddress(this.state.selected) || {
-      name: '',
-      address: '',
-      seed: '',
-      encryptedSeed: ''
-    }
+    return this.getByAddress(this.state.selected)
+  }
+
+  getAccounts(): Array<Account> {
+    return this.state.accounts
   }
 }

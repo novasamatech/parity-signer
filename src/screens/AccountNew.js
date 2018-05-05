@@ -36,32 +36,9 @@ import AppStyles from '../styles'
 
 import colors from '../colors'
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {
-    onAddAccount: (account) => {
-      dispatch(selectAccount({
-        seed: account.seed,
-        address: account.address,
-        name: account.name
-      }))
-      props.navigation.navigate('AccountSetPin')
-    },
-    onBackupPhrase: (seed, address) => {
-      Share.share({
-        message: `Recovery phrase for ${address}: ${seed}`,
-        ttile: `Recovery phrase for ${address}`
-      })
-    }
-  }
-}
-
-export class AccountNew extends Component {
+export default class AccountNew extends Component {
   static navigationOptions = {
     title: 'New Account'
-  }
-  static propTypes = {
-    onBackupPhrase: PropTypes.func.isRequired,
-    onAddAccount: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -92,8 +69,8 @@ export class AccountNew extends Component {
                 <AccountIconChooser
                   value={ selected.address }
                   onChange={({ address, seed }) => {
-                    accounts.update({ address, seed })
                     accounts.select(address)
+                    accounts.update({ address, seed })
                     } } />
                 <Text style={ styles.title }>ACCOUNT NAME</Text>
                 <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
@@ -121,11 +98,6 @@ export class AccountNew extends Component {
     )
   }
 }
-
-export default connect(
-  undefined,
-  mapDispatchToProps
-)(AccountNew)
 
 const styles = StyleSheet.create({
   body: {
