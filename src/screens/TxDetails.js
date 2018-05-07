@@ -21,14 +21,36 @@ import PropTypes from 'prop-types'
 import { ScrollView, View, Text, Button } from 'react-native'
 import AppStyles from '../styles'
 import AccountPrettyAddress from '../components/AccountPrettyAddress'
+import transaction from '../util/transaction'
 
 const orUnknown = (value = 'Unknown') => value
 
-export default class Send extends Component {
+export default class TxDetails extends Component {
+  render() {
+    return <Subscribe to={[ScannerStore, AccountsStore]}>{
+      (scannerStore, accounts) => {
+        const txRequest = scannerStore.getTXRequest()
+        if (txRequest) {
+          const txDetails = transaction(txRequest.data.rlp)
+          return <TxDetailsView
+            { ...txDetails }
+            onNext={ () => {
+
+            }} />
+        } else {
+          return null
+        }
+      }
+    }
+    </Subscribe>
+  }
+}
+
+export class TxDetailsView extends Component {
   static propTypes = {
     nextButtonTitle: PropTypes.string.isRequired,
     nextButtonDescription: PropTypes.string.isRequired,
-    nextButtonAction: PropTypes.func.isRequired,
+    onNext: PropTypes.func.isRequired,
     txRlpHash: PropTypes.string.isRequired,
     txSenderAddress: PropTypes.string.isRequired,
     txRecipientAddress: PropTypes.string,
@@ -76,7 +98,7 @@ export default class Send extends Component {
         }
         <View style={AppStyles.buttonContainer}>
           <Button
-            onPress={() => this.props.nextButtonAction()}
+            onPress={() => this.props.onNext()}
             title={this.props.nextButtonTitle}
             color='green'
             accessibilityLabel={this.props.nextButtonDescription}

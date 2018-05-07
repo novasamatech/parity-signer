@@ -26,24 +26,14 @@ import { StackNavigator, TabNavigator } from 'react-navigation'
 import { Actions, Scene } from 'react-native-router-flux'
 import Header from './components/Header'
 import TabBarBottom from './components/TabBarBottom'
-import TabIcon from './components/TabIcon'
-import IconChooser from './containers/IconChooser'
-import QrScanner from './containers/QrScanner'
-import AccountList from './containers/AccountList'
+import QrScanner from './screens/QrScanner'
+import AccountList from './screens/AccountList'
 import AccountNew from './screens/AccountNew'
-import AccountDetails from './containers/AccountDetails'
-import TxDetails from './containers/TxDetails'
+import AccountDetails from './screens/AccountDetails'
+import TxDetails from './screens/TxDetails'
+import SignedTx from './screens/SignedTx'
 import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from './containers/AccountPin'
-import { QrViewTransaction } from './containers/QrView'
-import DataDetails from './containers/DataDetails'
-import { loadAccounts, saveAccounts } from './util/db'
-import { setAccounts } from './actions/accounts'
-import store from './util/store'
 import colors from './colors'
-
-loadAccounts().then(accounts => {
-  store.dispatch(setAccounts(accounts))
-})
 
 const styles = StyleSheet.create({
   tabbar: {
@@ -60,97 +50,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg
   }
 })
-
-const accountScenes =
-  <Scene>
-    <Scene key='accountList' title='Accounts' component={AccountList}
-      onRight={() => Actions.iconChooser()}
-      rightTitle='Add'
-      rightButtonTextStyle={styles.navibarTitle}
-    />
-    <Scene key='accountNew' component={AccountNew} title='New Account' hideTabBar
-      onBack={() => Alert.alert('Do you want to cancel account creation?', undefined, [{
-        text: 'Yes',
-        onPress: () => {
-          Actions.popTo('_right')
-        }
-      }, {
-        text: 'No',
-        onPress: () => {}
-      }])}
-      backTitle='Back'
-      backButtonTextStyle={styles.navibarTitle}
-      hideBackImage
-    />
-    <Scene key='accountChangePin' title='Current PIN' component={AccountChangePin}
-      backTitle='Back'
-      backButtonTextStyle={styles.navibarTitle}
-      hideBackImage
-    />
-    <Scene key='accountSetPin' title='Set Account PIN' component={AccountSetPin}
-      backTitle='Back'
-      backButtonTextStyle={styles.navibarTitle}
-      hideBackImage
-    />
-    <Scene key='accountConfirmPin' title='Confirm PIN' component={AccountConfirmPin}
-      backTitle='Back'
-      backButtonTextStyle={styles.navibarTitle}
-      hideBackImage
-    />
-    <Scene key='accountDetails' title='Account Details' component={AccountDetails}
-      backTitle='Back'
-      backButtonTextStyle={styles.navibarTitle}
-      hideBackImage
-    />
-    {/* <Scene key='qrViewAddress' title='Address QR' component={QrViewAddress}
-      backTitle='Back'
-      backButtonTextStyle={styles.navibarTitle}
-      hideBackImage
-    /> */}
-    <Scene key='iconChooser' title='Choose an Icon' component={IconChooser}
-      backTitle='Back'
-      backButtonTextStyle={styles.navibarTitle}
-      hideBackImage
-    />
-  </Scene>
-
-const scenes =
-  <Scene key='root'>
-    <Scene key='tabs' tabs style={styles.tabbar}>
-      <Scene key='_left' title='Scan Transaction QR' initial icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        <Scene key='qrScan'
-          component={QrScanner}
-          title='Scan Transaction QR'
-        />
-        <Scene key='txDetails' component={TxDetails} title='Transaction Details'
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='dataDetails' component={DataDetails} title='Sign Data'
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='accountEnterPin' title='Enter PIN' component={AccountEnterPin}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-        <Scene key='qrViewTx' title='Signature QR' component={QrViewTransaction}
-          onRight={() => Actions.popTo('_left')}
-          rightTitle='Done'
-          rightButtonTextStyle={styles.navibarTitle}
-          backTitle='Back'
-          backButtonTextStyle={styles.navibarTitle}
-          hideBackImage
-        />
-      </Scene>
-      <Scene key='_right' title='Accounts' icon={TabIcon} navigationBarStyle={styles.navibar} titleStyle={styles.navibarTitle}>
-        {accountScenes.props.children}
-      </Scene>
-    </Scene>
-  </Scene>
 
 export default class App extends Component {
   render () {
@@ -174,23 +73,25 @@ export default class App extends Component {
   }
 
   _handleAppStateChange = (appState) => {
-    switch (appState) {
-      case 'inactive':
-        saveAccounts(store.getState().accounts.all)
-        break
-      case 'background':
-        break
-      case 'active':
-        break
-    }
+    // TODO: handle
   }
 }
 
 const Screens = StackNavigator ({
   Tabs: {
     screen: TabNavigator ({
-      QrScanner: {
-        screen: QrScanner
+      Scanner: {
+        screen: StackNavigator ({
+          QrScanner: {
+            screen: QrScanner
+          },
+          TxDetails: {
+            screen: TxDetails
+          },
+          SignedTx: {
+            screen: SignedTx
+          }
+        })
       },
       Accounts: {
         screen: StackNavigator ({

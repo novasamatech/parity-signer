@@ -20,28 +20,45 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { StyleSheet, View, StatusBar } from 'react-native'
 import Camera from 'react-native-camera'
+import { Subscribe } from 'unstated'
+import AccountsStore from '../stores/AccountsStore'
+import ScannerStore from '../stores/ScannerStore'
 import AppStyles from '../styles'
 
 export default class Scanner extends Component {
+  render() {
+    return <Subscribe to={[ScannerStore, AccountsStore]}>{
+      (scannerStore, accounts) => {
+        if (!scannerStore.getTXRequest()) {
+          return <ScannerView
+            onBarCodeRead={ (txRequestData) => {
+              try {
+                const txRequest = JSON.parse(txRequestData)
+                scannerStore.setTXRequest(txRequest)
+                this.props.navigation.navigate('TxDetails')
+              } catch (e) {
+                scannerStore.setErrorMsg(e.message)
+              }
+            }} />
+        } else {
+          return null
+        }
+      }
+    }
+    </Subscribe>
+  }
+}
+
+export class ScannerView extends Component {
   static navigationOptions = {
     title: 'Scan Transaction'
   }
 
   static propTypes = {
     onBarCodeRead: PropTypes.func.isRequired,
-    isActive: PropTypes.bool.isRequired
   }
 
   render () {
-    if (!this.props.isActive) {
-      return (
-        <View style={[AppStyles.view, styles.view]}>
-          <StatusBar barStyle='light-content' />
-          { this.renderRects() }
-        </View>
-      )
-    }
-
     return (
       <Camera onBarCodeRead={this.props.onBarCodeRead} style={AppStyles.view}>
         <StatusBar barStyle='light-content' />

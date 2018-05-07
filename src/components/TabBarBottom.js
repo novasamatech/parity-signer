@@ -78,7 +78,7 @@ class TabBarBottom extends React.Component<Props> {
                   { backgroundColor }
                 ]}
               >
-                <Text style={[styles.labelText, { color }]}>{ route.key === 'QrScanner' ? 'Scanner' : 'Accounts' }</Text>
+                <Text style={[styles.labelText, { color }]}>{ route.key === 'Scanner' ? 'Scanner' : 'Accounts' }</Text>
               </View>
             </TouchableWithoutFeedback>
           );

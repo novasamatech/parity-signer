@@ -29,8 +29,20 @@ import Button from '../components/Button'
 import colors from '../colors';
 
 export default class AccountDetails extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      showQr: false
+    }
+  }
+
   static navigationOptions = {
     title: 'Account Details'
+  }
+
+  state: {
+    showQr: false
   }
 
   render () {
@@ -40,14 +52,19 @@ export default class AccountDetails extends Component {
         (accounts) => {
           const account = accounts.getSelected()
           return (
-            <View style={ styles.body }>
+            <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
               <Text style={ styles.title }>ACCOUNT</Text>
               <AccountDetailsCard address={ account.address } title={ account.name } />
-              <Button textStyles={{color: colors.card_bg_text}}
-                      buttonStyles={{ backgroundColor: colors.card_bg }}
-                      title="Show Account QR Code"
-                      onPress={ () => {} }/>
-            </View>
+              { this.state.showQr
+                ? <View style={styles.qr}>
+                    <QrView text={account.address} />
+                  </View>
+                : <Button textStyles={{color: colors.card_bg_text}}
+                    buttonStyles={{ backgroundColor: colors.card_bg }}
+                    title="Show Account QR Code"
+                    onPress={ () => { this.setState({showQr: true})} }/>
+              }
+            </ScrollView>
         )
         }
       }
@@ -63,6 +80,9 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: colors.bg
   },
+  bodyContent: {
+    paddingBottom: 40,
+  },
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
@@ -77,8 +97,7 @@ const styles = StyleSheet.create({
   },
   qr: {
     flex: 1,
-    padding: 10,
-    marginTop: 50
+    backgroundColor: colors.card_bg,
   },
   deleteText: {
     textAlign: 'right'

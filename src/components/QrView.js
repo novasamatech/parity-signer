@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import { View, StyleSheet } from 'react-native'
 import QRCode from 'react-native-qrcode'
 import AppStyles from '../styles'
+import colors from '../colors';
 
 export default class QrView extends Component {
   static propTypes = {
@@ -49,9 +50,9 @@ export default class QrView extends Component {
       <View style={styles.rectangleContainer}>
         <QRCode
           value={this.props.text}
-          size={250}
+          size={290}
           bgColor='black'
-          fgColor='white'
+          fgColor={ colors.card_bg }
         />
       </View>
     )
@@ -60,6 +61,7 @@ export default class QrView extends Component {
 
 const styles = StyleSheet.create({
   rectangleContainer: {
+    margin: 20,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
