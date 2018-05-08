@@ -37,18 +37,18 @@ export default StyleSheet.create({
   },
   hintText: {
     fontSize: 14,
-    color: '#ccc',
+    color: 'white',
     marginBottom: 10,
     marginTop: 10
   },
   hintTextSmall: {
     fontSize: 12,
-    color: '#777',
+    color: 'white',
     marginBottom: 10
   },
   valueText: {
     fontSize: 12,
-    color: 'black',
+    color: 'white',
     marginBottom: 20,
     fontWeight: 'bold'
   },

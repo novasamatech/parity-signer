@@ -21,20 +21,18 @@ import PropTypes from 'prop-types'
 import { StyleSheet, View, StatusBar } from 'react-native'
 import Camera from 'react-native-camera'
 import { Subscribe } from 'unstated'
-import AccountsStore from '../stores/AccountsStore'
 import ScannerStore from '../stores/ScannerStore'
 import AppStyles from '../styles'
 
 export default class Scanner extends Component {
   render() {
-    return <Subscribe to={[ScannerStore, AccountsStore]}>{
-      (scannerStore, accounts) => {
+    return <Subscribe to={[ScannerStore]}>{
+      (scannerStore) => {
         if (!scannerStore.getTXRequest()) {
           return <ScannerView
             onBarCodeRead={ (txRequestData) => {
               try {
-                const txRequest = JSON.parse(txRequestData)
-                scannerStore.setTXRequest(txRequest)
+                scannerStore.setTXRequest(txRequestData.data)
                 this.props.navigation.navigate('TxDetails')
               } catch (e) {
                 scannerStore.setErrorMsg(e.message)

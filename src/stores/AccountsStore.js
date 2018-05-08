@@ -3,7 +3,7 @@ import { Container } from 'unstated'
 import { loadAccounts, saveAccount, deleteAccount } from '../util/db'
 import { encryptData, decryptData } from '../util/native'
 
-type Account = {
+export type Account = {
   name: string,
   address: string,
   seed: string,
@@ -60,7 +60,7 @@ export default class AccountsStore extends Container<AccountsState> {
       if (!account) {
         return
       }
-      let encryptedSeed = await encryptData(account.seed, '')
+      let encryptedSeed = await encryptData(account.seed, '1')
       console.log(account)
       delete account.seed
       saveAccount({

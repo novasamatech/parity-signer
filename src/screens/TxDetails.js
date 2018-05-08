@@ -18,10 +18,16 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { ScrollView, View, Text, Button } from 'react-native'
+import { StyleSheet, ScrollView, View, Text } from 'react-native'
+import { Subscribe } from 'unstated'
+import ScannerStore from '../stores/ScannerStore'
+import AccountsStore from '../stores/AccountsStore'
+import Button from '../components/Button'
+import AccountCard from '../components/AccountCard'
+import TxDetailsCard from '../components/TxDetailsCard'
 import AppStyles from '../styles'
 import AccountPrettyAddress from '../components/AccountPrettyAddress'
-import transaction from '../util/transaction'
+import colors from '../colors';
 
 const orUnknown = (value = 'Unknown') => value
 
@@ -31,11 +37,24 @@ export default class TxDetails extends Component {
       (scannerStore, accounts) => {
         const txRequest = scannerStore.getTXRequest()
         if (txRequest) {
-          const txDetails = transaction(txRequest.data.rlp)
+          const sender = accounts.getByAddress(txRequest.data.account)
           return <TxDetailsView
-            { ...txDetails }
-            onNext={ () => {
-
+            { ...scannerStore.getTx() }
+            sender = { sender.address }
+            senderName = { sender.name }
+            dataToSign = { scannerStore.getDataToSign() }
+            onNext = { async () => {
+              if (!sender) {
+                scannerStore.setErrorMsg(`No account with address ${txRequest.data.account} found in your wallet`)
+                return
+              }
+              try {
+                await scannerStore.signData(sender)
+                this.props.navigation.navigate('SignedTx')
+              } catch (e) {
+                console.log(e)
+                scannerStore.setErrorMsg(e.message)
+              }
             }} />
         } else {
           return null
@@ -48,63 +67,86 @@ export default class TxDetails extends Component {
 
 export class TxDetailsView extends Component {
   static propTypes = {
-    nextButtonTitle: PropTypes.string.isRequired,
-    nextButtonDescription: PropTypes.string.isRequired,
     onNext: PropTypes.func.isRequired,
-    txRlpHash: PropTypes.string.isRequired,
-    txSenderAddress: PropTypes.string.isRequired,
-    txRecipientAddress: PropTypes.string,
-    txValue: PropTypes.string,
-    txNonce: PropTypes.string,
-    txGas: PropTypes.string,
-    txGasPrice: PropTypes.string,
-    txData: PropTypes.string,
+    dataToSign: PropTypes.string.isRequired,
+    sender: PropTypes.string.isRequired,
+    action: PropTypes.string,
+    value: PropTypes.string,
+    nonce: PropTypes.string,
+    gas: PropTypes.string,
+    gasPrice: PropTypes.string,
+    data: PropTypes.string,
     isSafe: PropTypes.bool.isRequired,
-    txSenderName: PropTypes.string.isRequired,
-    txRecipientName: PropTypes.string
+    senderName: PropTypes.string.isRequired,
+    recipientName: PropTypes.string
   }
 
   render () {
     return (
-      <ScrollView style={AppStyles.view}>
-        <Text style={AppStyles.hintText}>transaction hash</Text>
-        <Text style={AppStyles.valueText}>0x{this.props.txRlpHash}</Text>
-        <Text style={AppStyles.hintText}>sender address</Text>
-        <AccountPrettyAddress
-          address={this.props.txSenderAddress}
-          name={this.props.txSenderName}
-        />
-        <Text style={AppStyles.hintText}>recipient address</Text>
-        <AccountPrettyAddress
-          address={this.props.txRecipientAddress}
-          name={orUnknown(this.props.txRecipientName)}
-        />
-        <Text style={AppStyles.hintText}>amount to transfer (in ETH)</Text>
-        <Text style={AppStyles.valueText}>{orUnknown(this.props.txValue)}</Text>
-        <Text style={AppStyles.hintText}>nonce</Text>
-        <Text style={AppStyles.valueText}>{orUnknown(this.props.txNonce)}</Text>
-        <Text style={AppStyles.hintText}>gas</Text>
-        <Text style={AppStyles.valueText}>{orUnknown(this.props.txGas)}</Text>
-        <Text style={AppStyles.hintText}>gasPrice</Text>
-        <Text style={AppStyles.valueText}>{orUnknown(this.props.txGasPrice)}</Text>
-        <Text style={AppStyles.hintText}>data</Text>
-        <Text style={AppStyles.valueText}>{orUnknown(this.props.txData)}</Text>
-        {
-          !this.props.isSafe
-            ? <Text style={AppStyles.hintText}>
-              Signing this transaction is unsafe. Proceed only if this transaction comes from trusted source.
-            </Text>
-            : null
-        }
-        <View style={AppStyles.buttonContainer}>
-          <Button
-            onPress={() => this.props.onNext()}
-            title={this.props.nextButtonTitle}
-            color='green'
-            accessibilityLabel={this.props.nextButtonDescription}
-        />
-        </View>
+      <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
+        <Text style={ styles.topTitle }>SIGN TRANSACTION</Text>
+        <Text style={ styles.title }>FROM ACCOUNT</Text>
+        <AccountCard
+            title={this.props.senderName || 'no name'}
+            address={this.props.sender}
+            onPress={() => {}}
+          />
+        <Text style={ styles.title }>TRANSACTION DETAILS</Text>
+        <TxDetailsCard value={ this.props.value } recipient={ this.props.action } />
+        <Button
+          buttonStyles={ { backgroundColor: colors.bg_positive, marginTop: 20, height: 60 } } title="Sign Transaction"
+          onPress={ () => this.props.onNext() } />
       </ScrollView>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    flexDirection: 'column',
+    padding: 20,
+    backgroundColor: colors.bg
+  },
+  bodyContent: {
+    paddingBottom: 40,
+  },
+  transactionDetails: {
+    flex: 1,
+    backgroundColor: colors.card_bg,
+  },
+  topTitle: {
+    textAlign: 'center',
+    color: colors.bg_text_sec,
+    fontSize: 24,
+    fontWeight: 'bold',
+    paddingBottom: 20
+  },
+  title: {
+    textAlign: 'center',
+    color: colors.bg_text_sec,
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingBottom: 20
+  },
+  wrapper: {
+    borderRadius: 5
+  },
+  address: {
+    flex: 1
+  },
+  deleteText: {
+    textAlign: 'right'
+  },
+  changePinText: {
+    textAlign: 'left',
+    color: 'green'
+  },
+  actionsContainer: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  actionButtonContainer: {
+    flex: 1
+  }
+})

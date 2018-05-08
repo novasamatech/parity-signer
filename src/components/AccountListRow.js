@@ -24,8 +24,8 @@ import AccountIcon from './AccountIcon'
 
 export default class AccountListRow extends Component {
   static propTypes = {
-    upperText: PropTypes.string.isRequired,
-    lowerText: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
     onPress: PropTypes.func.isRequired
   }
 
@@ -34,10 +34,10 @@ export default class AccountListRow extends Component {
       <TouchableHighlight style={styles.row} onPress={this.props.onPress} underlayColor='#0004'>
         <View style={{flexDirection: 'column'}}>
           <View style={styles.innerRow}>
-            <AccountIcon style={[AppStyles.icon, styles.icon]} seed={this.props.lowerText} />
+            <AccountIcon style={[AppStyles.icon, styles.icon]} seed={this.props.address} />
             <View style={styles.accountDetails}>
-              <Text style={styles.upperText} ellipsizeMode='middle' numberOfLines={1}>{this.props.upperText}</Text>
-              <Text style={styles.lowerText} ellipsizeMode='middle' numberOfLines={1}>{this.props.lowerText}</Text>
+              <Text style={styles.upperText} ellipsizeMode='middle' numberOfLines={1}>{this.props.name}</Text>
+              <Text style={styles.lowerText} ellipsizeMode='middle' numberOfLines={1}>{this.props.address}</Text>
             </View>
           </View>
           <View style={{height: 1, backgroundColor: '#ccc'}} />

@@ -34,7 +34,7 @@ export default class AccountPrettyAddress extends Component {
       <View>
         <View style={styles.row}>
           <AccountIcon style={[AppStyles.icon, styles.icon]} seed={this.props.address ? '0x' + this.props.address : ''} />
-          <Text style={{marginTop: 5, marginLeft: 5}}>{this.props.name}</Text>
+          <Text style={{color: 'white',marginTop: 5, marginLeft: 5}}>{this.props.name}</Text>
         </View>
         <AccountAddress address={this.props.address} />
       </View>
