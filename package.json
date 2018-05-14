@@ -29,7 +29,7 @@
     "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^4.6.0",
-    "react-navigation": "^2.0.0-rc.3",
+    "react-navigation": "^2.0.1",
     "react-redux": "^5.0.7",
     "react-static-container": "^1.0.1",
     "redux": "^3.6.0",

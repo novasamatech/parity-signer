@@ -46,7 +46,6 @@ export default class AccountDetails extends Component {
   }
 
   render () {
-    const { account: { address, name } } = this.props;
     return (
       <Subscribe to={[AccountsStore]}>{
         (accounts) => {

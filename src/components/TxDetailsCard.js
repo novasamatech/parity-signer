@@ -15,7 +15,7 @@ export default class TxDetailsCard extends React.Component<{
 }> {
   static propTypes = {
     value: PropTypes.string.isRequired,
-    recipient: PropTypes.func,
+    recipient: PropTypes.string.isRequired,
     networkId: PropTypes.number
   };
 
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
 
   },
   icon: {
-    textAlign: 'center',
     width: 47,
     height: 47
   },

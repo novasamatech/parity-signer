@@ -1,14 +1,16 @@
 import React from 'react'
-import { Text, View, StyleSheet, Image } from 'react-native'
+import { Text, View, StyleSheet, Image, SafeAreaView } from 'react-native'
 import colors from '../colors'
 
 export default function () {
   return (
+    <SafeAreaView style={ { backgroundColor: colors.bg } }>
     <View style={styles.row}>
       <Image source={require('../../icon.png')} style={styles.logo} />
       <Text style={styles.headerTextLeft}>parity</Text>
       <Text style={styles.headerTextRight}>Secured</Text>
-    </View>)
+    </View>
+    </SafeAreaView>)
 }
 
 

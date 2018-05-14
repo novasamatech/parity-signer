@@ -27,6 +27,9 @@ import AppStyles from '../styles'
 import colors from '../colors';
 
 export default class AccountList extends Component {
+  static navigationOptions = {
+    title: 'Back to List',
+  }
   render() {
     return <Subscribe to={[AccountsStore]}>{
       accounts => <_AccountList
@@ -41,15 +44,11 @@ export default class AccountList extends Component {
 }
 
 class _AccountList extends Component {
-  static navigationOptions = {
-    title: 'Accounts'
-  }
 
   static propTypes = {
     accounts: PropTypes.arrayOf(PropTypes.shape({
       address: PropTypes.string.isRequired
     })).isRequired,
-    onNewAccount: PropTypes.func.isRequired,
     onAccountSelected: PropTypes.func.isRequired
   }
 

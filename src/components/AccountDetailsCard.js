@@ -38,7 +38,7 @@ export default class AccountDetailsCard extends React.Component<{
         onPress={onPress}>
         <View style={styles.body}>
           <View style={styles.content}>
-            <AccountIcon style={styles.icon} seed={address} />
+            <AccountIcon style={styles.icon} seed={'0x' + address} />
             <View style={styles.desc}>
               <Text style={styles.titleText}>{title}</Text>
               <Text style={styles.editText}>Tap to edit account</Text>

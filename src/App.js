@@ -20,11 +20,13 @@
 
 import React, { Component } from 'react'
 import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated'
-import { StyleSheet, AppState, Alert, SafeAreaView } from 'react-native'
-import { StackNavigator, TabNavigator } from 'react-navigation'
+import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native'
+import { createStackNavigator, createTabNavigator, HeaderTitle, Header } from 'react-navigation'
 import { Actions, Scene } from 'react-native-router-flux'
-import Header from './components/Header'
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+import { default as HomeHeader } from './components/Header'
 import TabBarBottom from './components/TabBarBottom'
+import TouchableItem from './components/TouchableItem'
 import QrScanner from './screens/QrScanner'
 import AccountList from './screens/AccountList'
 import AccountNew from './screens/AccountNew'
@@ -34,29 +36,11 @@ import SignedTx from './screens/SignedTx'
 import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from './containers/AccountPin'
 import colors from './colors'
 
-const styles = StyleSheet.create({
-  tabbar: {
-    backgroundColor: '#343E48'
-  },
-  navibar: {
-    backgroundColor: '#343E48'
-  },
-  navibarTitle: {
-    color: 'white'
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.bg
-  }
-})
-
 export default class App extends Component {
   render () {
     return (
       <UnstatedProvider>
-        <SafeAreaView style={styles.safeArea}>
           <Screens />
-        </SafeAreaView>
       </UnstatedProvider>
     )
   }
@@ -74,13 +58,87 @@ export default class App extends Component {
   }
 }
 
-const Screens = StackNavigator ({
+const headerStyles = StyleSheet.create({
+  headerStyle: {
+    backgroundColor: colors.bg,
+    height: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderBottomWidth: 0.5,
+    borderBottomColor: colors.bg_text_sec,
+
+  },
+  logo: {
+    width: 42,
+    height: 42
+  },
+  headerTextLeft: {
+    flex: 1,
+    paddingLeft: 10,
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: colors.bg_text
+  },
+  headerTextRight: {
+    marginLeft: 0,
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: colors.bg_text_positive
+  },
+});
+
+class HeaderLeftHome extends Component {
+  render() {
+
+    return <View
+      style={{ flexDirection: 'row', alignItems: 'center' }}
+      accessibilityComponentType="button"
+      accessibilityTraits="button"
+      testID="header-back"
+      delayPressIn={0}
+      onPress={ () => this.props.onPress && this.props.onPress() } >
+      <Image source={require('../icon.png')} style={headerStyles.logo} />
+      <Text style={headerStyles.headerTextLeft}>parity</Text>
+    </View>
+  }
+}
+
+const globalStackNavigationOptions = {
+  headerTintColor: colors.card_bg,
+  headerRight: (
+    <View>
+      <Text style={headerStyles.headerTextRight}>Secured</Text>
+      {/* <Icon.security /> */}
+    </View>),
+  headerStyle: {
+    backgroundColor: colors.bg,
+    height: 60,
+    paddingTop: 0,
+    paddingBottom: 0,
+    padding: 14,
+    borderBottomWidth: 0.5,
+    borderBottomColor: colors.bg_text_sec,
+  },
+  headerTitleStyle: {
+    display: 'none'
+  },
+  headerBackTitleStyle: {
+    paddingLeft: 5,
+    fontSize: 18
+ }
+}
+
+const Screens = createStackNavigator ({
   Tabs: {
-    screen: TabNavigator ({
+    screen: createTabNavigator ({
       Scanner: {
-        screen: StackNavigator ({
+        screen: createStackNavigator ({
           QrScanner: {
-            screen: QrScanner
+            screen: QrScanner,
+            navigationOptions: {
+              headerLeft: <HeaderLeftHome />
+            }
           },
           TxDetails: {
             screen: TxDetails
@@ -90,13 +148,16 @@ const Screens = StackNavigator ({
           }
         },
         {
-          headerMode: 'none'
+          navigationOptions: globalStackNavigationOptions
         })
       },
       Accounts: {
-        screen: StackNavigator ({
+        screen: createStackNavigator ({
           AccountList: {
-            screen: AccountList
+            screen: AccountList,
+            navigationOptions: {
+              headerLeft: <HeaderLeftHome />
+            }
           },
           AccountNew: {
             screen: AccountNew
@@ -108,11 +169,11 @@ const Screens = StackNavigator ({
             screen: AccountConfirmPin
           },
           AccountDetails: {
-            screen: AccountDetails
+            screen: AccountDetails,
           }
         },
         {
-          headerMode: 'none'
+          navigationOptions: globalStackNavigationOptions
         }
       )
     }
@@ -123,7 +184,5 @@ const Screens = StackNavigator ({
   }
 },
 {
-    navigationOptions: {
-      header: Header
-    }
+    headerMode: 'none',
 })

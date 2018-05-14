@@ -25,22 +25,24 @@ import ScannerStore from '../stores/ScannerStore'
 import AppStyles from '../styles'
 
 export default class Scanner extends Component {
+
+  static navigationOptions = {
+    title: 'Scan Transaction',
+
+  }
+
   render() {
     return <Subscribe to={[ScannerStore]}>{
       (scannerStore) => {
-        if (!scannerStore.getTXRequest()) {
-          return <ScannerView
-            onBarCodeRead={ (txRequestData) => {
-              try {
-                scannerStore.setTXRequest(txRequestData.data)
-                this.props.navigation.navigate('TxDetails')
-              } catch (e) {
-                scannerStore.setErrorMsg(e.message)
-              }
-            }} />
-        } else {
-          return null
-        }
+        return <ScannerView
+          onBarCodeRead={ (txRequestData) => {
+            try {
+              scannerStore.setTXRequest(txRequestData.data)
+              this.props.navigation.navigate('TxDetails')
+            } catch (e) {
+              scannerStore.setErrorMsg(e.message)
+            }
+          }} />
       }
     }
     </Subscribe>
@@ -48,8 +50,9 @@ export default class Scanner extends Component {
 }
 
 export class ScannerView extends Component {
-  static navigationOptions = {
-    title: 'Scan Transaction'
+
+  constructor(props) {
+    super(props)
   }
 
   static propTypes = {
@@ -58,7 +61,7 @@ export class ScannerView extends Component {
 
   render () {
     return (
-      <Camera onBarCodeRead={this.props.onBarCodeRead} style={AppStyles.view}>
+       <Camera onBarCodeRead={this.props.onBarCodeRead} style={AppStyles.view}>
         <StatusBar barStyle='light-content' />
         { this.renderRects() }
       </Camera>
