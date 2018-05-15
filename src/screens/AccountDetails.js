@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
+    fontFamily: 'Roboto',
     fontWeight: 'bold',
     paddingBottom: 20
   },
@@ -99,6 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card_bg,
   },
   deleteText: {
+    fontFamily: 'Roboto',
     textAlign: 'right'
   },
   changePinText: {

@@ -100,9 +100,10 @@ const styles = StyleSheet.create({
     borderColor: colors.bg,
   },
   addressText: {
+    fontFamily: 'Roboto',
     paddingTop: 20,
     color: colors.bg,
     fontWeight: '700',
-    fontSize: 11
+    fontSize: 12
   },
 });

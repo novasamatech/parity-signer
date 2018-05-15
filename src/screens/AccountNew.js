@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15
   },
   title: {
+    fontFamily: 'Roboto',
     color: colors.bg_text_sec,
     fontSize: 18,
     fontWeight: 'bold',
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   hintText: {
+    fontFamily: 'Roboto',
     textAlign: 'center',
     paddingTop: 20,
     color: colors.bg_text_sec,

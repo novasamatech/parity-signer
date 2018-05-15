@@ -78,14 +78,17 @@ const styles = StyleSheet.create({
     padding: 5
   },
   titleText: {
+    fontFamily: 'Roboto',
     fontSize: 20
   },
   secondaryText: {
+    fontFamily: 'Roboto',
     color: colors.bg_text_sec,
     fontWeight: '500',
     fontSize: 10
   },
   footerText: {
+    fontFamily: 'Roboto',
     color: colors.card_bg,
     fontWeight: 'bold'
   }

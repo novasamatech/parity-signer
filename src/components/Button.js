@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     height: 60
   },
   text: {
+    fontFamily: 'Roboto',
     color: 'white',
     padding: 8,
     fontWeight: 'bold',
