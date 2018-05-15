@@ -23,7 +23,7 @@ import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated'
 import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native'
 import { createStackNavigator, createTabNavigator, HeaderTitle, Header } from 'react-navigation'
 import { Actions, Scene } from 'react-native-router-flux'
-// import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header'
 import TabBarBottom from './components/TabBarBottom'
 import TouchableItem from './components/TouchableItem'
@@ -35,6 +35,8 @@ import TxDetails from './screens/TxDetails'
 import SignedTx from './screens/SignedTx'
 import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from './containers/AccountPin'
 import colors from './colors'
+
+console.log(Icon)
 
 export default class App extends Component {
   render () {
@@ -77,12 +79,20 @@ const headerStyles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     fontSize: 25,
-    fontWeight: 'bold',
+    fontFamily: 'Roboto',
     color: colors.bg_text
+  },
+  headerSecureIcon: {
+    marginLeft: 0,
+    fontSize: 20,
+    fontWeight: 'bold',
+    paddingRight: 5,
+    color: colors.bg_text_positive
   },
   headerTextRight: {
     marginLeft: 0,
     fontSize: 17,
+    fontFamily: 'Roboto',
     fontWeight: 'bold',
     color: colors.bg_text_positive
   },
@@ -107,9 +117,9 @@ class HeaderLeftHome extends Component {
 const globalStackNavigationOptions = {
   headerTintColor: colors.card_bg,
   headerRight: (
-    <View>
+    <View style={ { flexDirection: 'row' } }>
+      <Icon style={headerStyles.headerSecureIcon} name='security' />
       <Text style={headerStyles.headerTextRight}>Secured</Text>
-      {/* <Icon.security /> */}
     </View>),
   headerStyle: {
     backgroundColor: colors.bg,

@@ -10,6 +10,7 @@ import {
   Platform,
   SafeAreaView
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import colors from '../colors'
 import withDimensions from './utils/withDimensions';
 
@@ -78,6 +79,7 @@ class TabBarBottom extends React.Component<Props> {
                   { backgroundColor }
                 ]}
               >
+                <Icon style={[ styles.labelIcon, { color }]} name={ route.key === 'Scanner' ? 'qrcode' : 'briefcase' } />
                 <Text style={[styles.labelText, { color }]}>{ route.key === 'Scanner' ? 'Scanner' : 'Accounts' }</Text>
               </View>
             </TouchableWithoutFeedback>
@@ -88,7 +90,7 @@ class TabBarBottom extends React.Component<Props> {
   }
 }
 
-const DEFAULT_HEIGHT = 70;
+const DEFAULT_HEIGHT = 65;
 
 const styles = StyleSheet.create({
   tabBar: {
@@ -103,45 +105,21 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   labelText: {
     fontSize: 22,
-    paddingTop: 24,
-    textAlign: 'center',
+    fontFamily: 'Roboto',
+    fontWeight: '400',
     color: colors.card_bg,
-    flex: 1,
     color:'white',
   },
-  tabPortrait: {
-    justifyContent: 'flex-end',
-    flexDirection: 'column',
-  },
-  tabLandscape: {
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  iconWithoutLabel: {
-    flex: 1,
-  },
-  iconWithLabel: {
-    flex: 1,
-  },
-  iconWithExplicitHeight: {
-    height: DEFAULT_HEIGHT,
-  },
-  label: {
-    textAlign: 'center',
-    backgroundColor: 'transparent',
-  },
-  labelBeneath: {
-    fontSize: 10,
-    marginBottom: 1.5,
-  },
-  labelBeside: {
-    fontSize: 13,
-    marginLeft: 20,
-  },
+  labelIcon: {
+    fontSize: 30,
+    paddingRight: 10
+  }
 });
 
 export default withDimensions(TabBarBottom);

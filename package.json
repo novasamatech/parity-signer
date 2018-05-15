@@ -22,6 +22,7 @@
     "react": "16.3.1",
     "react-addons-pure-render-mixin": "^15.5.0",
     "react-native": "0.55.3",
+    "react-native-bgimage": "^1.4.0",
     "react-native-camera": "^1.1.1",
     "react-native-prompt": "^1.0.0",
     "react-native-qrcode": "^0.2.6",
@@ -45,6 +46,11 @@
     "pre-git": "^3.14.0",
     "react-test-renderer": "15.4.2",
     "standard": "^9.0.2"
+  },
+  "rnpm": {
+    "assets": [
+      "./res/fonts"
+    ]
   },
   "jest": {
     "preset": "react-native",

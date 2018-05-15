@@ -3,6 +3,7 @@ package com.nativesigner;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.bgimage.BgImagePackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactlibrary.RNSecureStoragePackage;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
@@ -26,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new BgImagePackage(),
             new VectorIconsPackage(),
             new RNSecureStoragePackage(),
             new RCTCameraPackage()
