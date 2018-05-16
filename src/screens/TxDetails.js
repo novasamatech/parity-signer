@@ -52,7 +52,6 @@ export default class TxDetails extends Component {
                 await scannerStore.signData(sender)
                 this.props.navigation.navigate('SignedTx')
               } catch (e) {
-                console.log(e)
                 scannerStore.setErrorMsg(e.message)
               }
             }} />
