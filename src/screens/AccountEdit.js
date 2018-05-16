@@ -51,21 +51,24 @@ export default class AccountNew extends Component {
           const selected = accounts.getSelected()
           return <View style={ styles.body } >
             <View style={ styles.bodyContainer }>
-            <View>
-              <Text style={ styles.titleTop }>EDIT ACCOUNT</Text>
-              <AccountCard
-                title={selected.name ? selected.name : 'no name'}
-                address={selected.address}
-                onPress={() => {}}
-              />
-              <Text style={ styles.title }>ACCOUNT NAME</Text>
-              <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
-                  value={selected.name}
-                  placeholder="Enter a new account name"/>
-            </View>
-            <View>
-              <Button buttonStyles={ styles.deleteButton } title="Delete / Backup Account" />
-            </View>
+              <View>
+                <Text style={ styles.titleTop }>EDIT ACCOUNT</Text>
+                <AccountCard
+                  title={selected.name ? selected.name : 'no name'}
+                  address={selected.address}
+                  onPress={() => {}}
+                />
+                <Text style={ styles.title }>ACCOUNT NAME</Text>
+                <TextInput
+                    onChangeText={(name) => accounts.updateSelected({ name })}
+                    onEndEditing={(text) => accounts.saveSelected()}
+                    value={selected.name}
+                    autoFocus
+                    placeholder="Enter a new account name"/>
+              </View>
+              <View>
+                <Button buttonStyles={ styles.deleteButton } title="Delete / Backup Account" />
+              </View>
             </View>
         </View>
         }
@@ -78,8 +81,7 @@ export default class AccountNew extends Component {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    paddingBottom: 20,
-     flex: 1,
+    flex: 1,
   },
   bodyContainer: {
     flex: 1,

@@ -45,7 +45,6 @@ export default class AccountsStore extends Container<AccountsState> {
       account = this.state.newAccount
     }
     Object.assign(account, accountUpdate)
-    console.log(accountUpdate)
     this.setState({})
   }
 
@@ -61,7 +60,6 @@ export default class AccountsStore extends Container<AccountsState> {
         return
       }
       let encryptedSeed = await encryptData(account.seed, '1')
-      console.log(account)
       delete account.seed
       saveAccount({
         ...account,
