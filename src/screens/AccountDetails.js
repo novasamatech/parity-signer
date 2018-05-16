@@ -53,7 +53,10 @@ export default class AccountDetails extends Component {
           return (
             <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
               <Text style={ styles.title }>ACCOUNT</Text>
-              <AccountDetailsCard address={ account.address } title={ account.name } />
+              <AccountDetailsCard
+                address={ account.address }
+                title={ account.name }
+                onPress={ () => this.props.navigation.navigate('AccountEdit') } />
               { this.state.showQr
                 ? <View style={styles.qr}>
                     <QrView text={account.address} />

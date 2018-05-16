@@ -31,6 +31,7 @@ import QrScanner from './screens/QrScanner'
 import AccountList from './screens/AccountList'
 import AccountNew from './screens/AccountNew'
 import AccountDetails from './screens/AccountDetails'
+import AccountEdit from './screens/AccountEdit'
 import TxDetails from './screens/TxDetails'
 import SignedTx from './screens/SignedTx'
 import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from './containers/AccountPin'
@@ -180,6 +181,9 @@ const Screens = createStackNavigator ({
           },
           AccountDetails: {
             screen: AccountDetails,
+          },
+          AccountEdit: {
+            screen: AccountEdit,
           }
         },
         {

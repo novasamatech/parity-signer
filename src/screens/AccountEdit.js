@@ -24,6 +24,7 @@ import {
 import { Subscribe } from 'unstated'
 import { connect } from 'react-redux'
 import { Actions } from 'react-native-router-flux'
+import AccountCard from '../components/AccountCard'
 import AccountsStore from '../stores/AccountsStore'
 import AccountSeed from '../components/AccountSeed'
 import { selectAccount } from '../actions/accounts'
@@ -36,7 +37,7 @@ import colors from '../colors'
 
 export default class AccountNew extends Component {
   static navigationOptions = {
-    title: 'New Account'
+    title: 'Edit Account'
   }
 
   constructor (props) {
@@ -49,35 +50,23 @@ export default class AccountNew extends Component {
         accounts => {
           const selected = accounts.getSelected()
           return <View style={ styles.body } >
-            <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>
-              <View style={ styles.top }>
-                <Text style={ styles.titleTop }>CREATE ACCOUNT</Text>
-                <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
-                <AccountIconChooser
-                  value={ selected.address }
-                  onChange={({ address, seed }) => {
-                    accounts.select(address)
-                    accounts.update({ address, seed })
-                    } } />
-                <Text style={ styles.title }>ACCOUNT NAME</Text>
-                <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
+            <View style={ styles.bodyContainer }>
+            <View>
+              <Text style={ styles.titleTop }>EDIT ACCOUNT</Text>
+              <AccountCard
+                title={selected.name ? selected.name : 'no name'}
+                address={selected.address}
+                onPress={() => {}}
+              />
+              <Text style={ styles.title }>ACCOUNT NAME</Text>
+              <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
                   value={selected.name}
                   placeholder="Enter a new account name"/>
-              </View>
-              <View style={ styles.bottom }>
-                <Text style={ styles.hintText }>
-                  On the next step you will be asked to backup your account, get pen and paper ready
-                </Text>
-                <Button
-                  buttonStyles={ styles.nextStep }
-                  title="Next Step"
-                  onPress={ async () => {
-                    await accounts.saveSelected()
-                    Alert.alert('Account Created')
-                    this.props.navigation.navigate('AccountList')
-                    console.log('TEST') } } />
-              </View>
-            </ScrollView>
+            </View>
+            <View>
+              <Button buttonStyles={ styles.deleteButton } title="Delete / Backup Account" />
+            </View>
+            </View>
         </View>
         }
       }
@@ -96,6 +85,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
+    padding: 20,
   },
   top: {
     flex: 1
@@ -126,7 +116,8 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 10
   },
-  nextStep: {
+  deleteButton: {
     marginTop: 15,
+    backgroundColor: 'red'
   }
 });

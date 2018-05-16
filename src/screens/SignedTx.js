@@ -29,7 +29,7 @@ export default class SignedTx extends Component {
     return (
       <Subscribe to={[ScannerStore]}>{
         (scanner) => {
-          return <SignedTxView data={ scanner.getSignedTxData } />
+          return <SignedTxView data={ scanner.getSignedTxData() } />
         }
       }
       </Subscribe>

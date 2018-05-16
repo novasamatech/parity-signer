@@ -39,10 +39,14 @@ export default class TxDetails extends Component {
         if (txRequest) {
           const sender = accounts.getByAddress(txRequest.data.account)
           return <TxDetailsView
-            { ...scannerStore.getTx() }
+            { ...{ ...this.props, ...scannerStore.getTx()} }
             sender = { sender.address }
             senderName = { sender.name }
             dataToSign = { scannerStore.getDataToSign() }
+            onPressAccount = { (account) => {
+              accounts.select(account)
+              this.props.navigation.navigate('AccountDetails')
+            }}
             onNext = { async () => {
               if (!sender) {
                 scannerStore.setErrorMsg(`No account with address ${txRequest.data.account} found in your wallet`)
@@ -67,6 +71,7 @@ export default class TxDetails extends Component {
 export class TxDetailsView extends Component {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
+    onPressSender: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,
     sender: PropTypes.string.isRequired,
     action: PropTypes.string,
@@ -88,13 +93,13 @@ export class TxDetailsView extends Component {
         <AccountCard
             title={this.props.senderName || 'no name'}
             address={this.props.sender}
-            onPress={() => {}}
+            onPress={() => { this.props.onPressAccount(this.props.sender) }}
           />
         <Text style={ styles.title }>TRANSACTION DETAILS</Text>
         <TxDetailsCard value={ this.props.value } recipient={ this.props.action } />
         <Button
           buttonStyles={ { backgroundColor: colors.bg_positive, marginTop: 20, height: 60 } } title="Sign Transaction"
-          onPress={ () => this.props.onNext() } />
+          onPress={ () => this.props.onPressSender() } />
       </ScrollView>
     )
   }
