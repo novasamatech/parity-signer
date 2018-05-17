@@ -56,10 +56,10 @@ class AccountUnlockView extends Component {
             try {
               let res = await accounts.checkPinForSelected(this.state.pin)
               console.log(res)
-              Alert.alert('PIN OK')
+              Alert.alert('PIN is OK')
               this.props.navigation.goBack()
             } catch (e) {
-              Alert.alert('INCORRECT PIN')
+              Alert.alert('PIN is incorrect')
             }
           }}
           color='green'

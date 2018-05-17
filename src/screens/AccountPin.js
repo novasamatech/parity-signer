@@ -19,6 +19,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
+import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated'
 import AccountsStore from '../stores/AccountsStore'
 import TextInput from '../components/TextInput'
@@ -77,10 +78,21 @@ class AccountPinView extends Component {
         />
         <Button
           onPress={async () => {
-            this.state.pin.length > 0
-              && this.state.pin === this.state.confirmation
-              && await accounts.saveSelected(this.state.pin)
-            this.props.navigation.navigate('AccountDetails')
+            if (this.state.pin.length > 0
+                && this.state.pin === this.state.confirmation) {
+                  const account = accounts.getNew()
+                  await accounts.save(account, this.state.pin)
+                  accounts.submitNew()
+                  accounts.select(account.address)
+                  accounts.refreshList()
+                  const resetAction = StackActions.reset({
+                    index: 1,
+                    actions: [
+                      NavigationActions.navigate({ routeName: 'AccountList' }),
+                      NavigationActions.navigate({ routeName: 'AccountDetails' })],
+                  });
+                  this.props.navigation.dispatch(resetAction);
+              }
           }}
           color='green'
           title='Done'

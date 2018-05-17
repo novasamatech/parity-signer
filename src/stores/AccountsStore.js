@@ -11,14 +11,14 @@ export type Account = {
 }
 
 type AccountsState = {
-  accounts: [Account],
+  accounts: Map<string, Account>,
   newAccount: Account,
   selected: string,
 };
 
 export default class AccountsStore extends Container<AccountsState> {
   state = {
-    accounts: [],
+    accounts: new Map(),
     newAccount: {
       name: '',
       address: '',
@@ -30,19 +30,33 @@ export default class AccountsStore extends Container<AccountsState> {
 
   constructor(props) {
     super(props)
-    loadAccounts().then((accounts) => {
-      this.setState({accounts})
-    })
+    this.refreshList()
   }
 
   select(address) {
     this.setState({selected: address})
   }
 
+  updateNew(accountUpdate: Object) {
+    Object.assign(this.state.newAccount, accountUpdate)
+    this.setState({})
+  }
+
+  getNew(): Account {
+    return this.state.newAccount
+  }
+
+  submitNew() {
+    this.setState({
+      accounts:
+        this.state.accounts.set(this.state.newAccount.address, this.state.newAccount)})
+  }
+
   update(accountUpdate: {address: string}) {
-    let account = this.getByAddress(accountUpdate.address)
+    let account = this.state.accounts.get(accountUpdate.address)
     if (!account) {
-      account = this.state.newAccount
+      this.state.accounts.set(accountUpdate.address, accountUpdate)
+      account = this.state.accounts.get(accountUpdate.address)
     }
     Object.assign(account, accountUpdate)
     this.setState({})
@@ -52,24 +66,31 @@ export default class AccountsStore extends Container<AccountsState> {
     this.update(Object.assign(this.getSelected(), accountUpdate))
   }
 
-  // TODO: PIN
-  async saveSelected(pin) {
+  async refreshList() {
+    loadAccounts().then((res) => {
+      const accounts = new Map(res.map(a => [a.address, a]))
+      this.setState({accounts})
+    })
+  }
+
+  async save(account, pin = null) {
     try {
-      const account = this.getSelected()
-      if (!account) {
-        return
+      if (pin && account.seed) {
+        let encryptedSeed = await encryptData(account.seed, pin)
+        delete account.seed
+        account.encryptedSeed = encryptedSeed
+        saveAccount(account)
+      } else {
+        saveAccount(account)
       }
-      let encryptedSeed = await encryptData(account.seed, pin)
-      delete account.seed
-      saveAccount({
-        ...account,
-        encryptedSeed
-      })
-      this.setState({accounts: await loadAccounts()})
 
     } catch (e) {
       console.error(e)
     }
+  }
+
+  async saveSelected(pin) {
+    this.save(this.getSelected(), pin)
   }
 
   async checkPinForSelected(pin) {
@@ -84,16 +105,15 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   getByAddress(address: string): ?Account {
-    return this.state.newAccount.address === address && this.state.newAccount
-     || this.state.accounts.find(account => account.address === address)
+    return this.state.accounts.get(address)
   }
 
   getSelected(): Account {
     // console.log(this.state.selected, this.state.newAccount);
-    return this.getByAddress(this.state.selected)
+    return this.state.accounts.get(this.state.selected)
   }
 
   getAccounts(): Array<Account> {
-    return this.state.accounts
+    return Array.from(this.state.accounts.values())
   }
 }

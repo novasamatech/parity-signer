@@ -50,7 +50,7 @@ class AccountBackupView extends Component {
 
   render () {
     const { accounts } = this.props
-    const selected = accounts.getSelected()
+    const selected = accounts.getNew()
     return (
       <View style={ styles.body } >
         <Text style={ styles.titleTop }>BACKUP ACCOUNT</Text>

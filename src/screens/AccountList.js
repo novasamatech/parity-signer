@@ -32,18 +32,20 @@ export default class AccountList extends Component {
   }
   render() {
     return <Subscribe to={[AccountsStore]}>{
-      accounts => <_AccountList
+      accounts => {
+        console.log(accounts.getAccounts())
+        return <AccountListView
         { ...this.props }
         accounts={ accounts.getAccounts() }
         onAccountSelected={ address => {
           accounts.select(address)
           this.props.navigation.navigate('AccountDetails')
-        }}></_AccountList>
+        }}></AccountListView>}
     }</Subscribe>
   }
 }
 
-class _AccountList extends Component {
+class AccountListView extends Component {
 
   static propTypes = {
     accounts: PropTypes.arrayOf(PropTypes.shape({

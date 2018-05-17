@@ -51,19 +51,13 @@ export default class AccountNew extends Component {
 
 class AccountNewView extends Component {
 
-  componentWillUnmount() {
-    if (!this.state.select) {
-      this.props.accounts.select('')
-    }
-  }
-
-  state = {
-    select: false
+  componentWillMount() {
+    this.props.accounts.select('')
   }
 
   render () {
     const { accounts } = this.props
-    const selected = accounts.getSelected()
+    const selected = accounts.getNew()
     return (
       <View style={ styles.body } >
         <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>
@@ -73,11 +67,10 @@ class AccountNewView extends Component {
             <AccountIconChooser
               value={ selected && selected.address }
               onChange={({ address, seed }) => {
-                accounts.select(address)
-                accounts.update({ address, seed })
+                accounts.updateNew({ address, seed })
                 } } />
             <Text style={ styles.title }>ACCOUNT NAME</Text>
-            <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
+            <TextInput onChangeText={(name) => accounts.updateNew({ name })}
               value={ selected && selected.name}
               placeholder="Enter a new account name"/>
           </View>
@@ -89,7 +82,6 @@ class AccountNewView extends Component {
               buttonStyles={ styles.nextStep }
               title="Next Step"
               onPress={ () => {
-                this.setState({ select: true })
                 selected && this.props.navigation.navigate('AccountBackup') }} />
           </View>
         </ScrollView>
