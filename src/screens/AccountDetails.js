@@ -29,6 +29,17 @@ import Button from '../components/Button'
 import colors from '../colors';
 
 export default class AccountDetails extends Component {
+  render () {
+    return (
+      <Subscribe to={[AccountsStore]}>{
+        (accounts) => <AccountDetailsView { ...this.props } accounts={ accounts } />
+      }
+      </Subscribe>
+    )
+  }
+}
+
+class AccountDetailsView extends Component {
 
   constructor(props) {
     super(props)
@@ -45,33 +56,36 @@ export default class AccountDetails extends Component {
     showQr: false
   }
 
+  // componentWillUnmount() {
+  //   this.props.accounts.select('')
+  // }
+
   render () {
+    const account = this.props.accounts.getSelected()
     return (
-      <Subscribe to={[AccountsStore]}>{
-        (accounts) => {
-          const account = accounts.getSelected()
-          return (
-            <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
-              <Text style={ styles.title }>ACCOUNT</Text>
-              <AccountDetailsCard
-                address={ account.address }
-                title={ account.name }
-                onPress={ () => this.props.navigation.navigate('AccountEdit') } />
-              { this.state.showQr
-                ? <View style={styles.qr}>
-                    <QrView text={account.address} />
-                  </View>
-                : <Button textStyles={{color: colors.card_bg_text}}
-                    buttonStyles={{ backgroundColor: colors.card_bg }}
-                    title="Show Account QR Code"
-                    onPress={ () => { this.setState({showQr: true})} }/>
-              }
-            </ScrollView>
-        )
+      <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
+        <Text style={ styles.title }>ACCOUNT</Text>
+        <AccountDetailsCard
+          address={ account.address }
+          title={ account.name }
+          onPress={ () => this.props.navigation.navigate('AccountEdit') } />
+        { this.state.showQr
+          ? <View style={styles.qr}>
+              <QrView text={account.address} />
+            </View>
+          : <Button textStyles={{color: colors.card_bg_text}}
+              buttonStyles={{ backgroundColor: colors.card_bg }}
+              title="Show Account QR Code"
+              onPress={ () => { this.setState({showQr: true})} }/>
         }
-      }
-      </Subscribe>
-    )
+        <Button textStyles={{color: colors.card_bg_text}}
+              buttonStyles={{ backgroundColor: colors.card_bg }}
+              title="Check PIN"
+              onPress={ () => {
+                this.props.navigation.navigate('AccountUnlock')
+              }}/>
+      </ScrollView>
+  )
   }
 }
 

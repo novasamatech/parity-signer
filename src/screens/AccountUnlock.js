@@ -18,7 +18,7 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
+import { Alert, View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
 import { Subscribe } from 'unstated'
 import AccountsStore from '../stores/AccountsStore'
 import TextInput from '../components/TextInput'
@@ -26,65 +26,45 @@ import Button from '../components/Button'
 import AppStyles from '../styles'
 import colors from '../colors'
 
-export default class AccountPin extends Component {
+export default class AccountUnlock extends Component {
   render() {
     return (
       <Subscribe to={[AccountsStore]}>{
-        (accounts) => <AccountPinView { ...this.props } accounts={ accounts } />}
+        (accounts) => <AccountUnlockView { ...this.props } accounts={ accounts } />}
       </Subscribe>
     )
   }
 }
 
-class AccountPinView extends Component {
-
-  static propTypes = {
-    type: PropTypes.string.isRequired
-  };
-
-  static defaultProps = {
-    type: 'NEW'
-  }
-
-  static defa = {
-    type: PropTypes.string.isRequired
-  };
-
+class AccountUnlockView extends Component {
   state = {
     pin: '',
-    confirmation: ''
   }
 
   render () {
-    const { accounts, type } = this.props
-    const title = {
-      'NEW': 'ACCOUNT PIN',
-      'CHANGE': 'CHANGE PIN'
-    }[type]
+    const { accounts } = this.props
     return (
       <View style={styles.body}>
-        <Text style={ styles.titleTop }>{ title }</Text>
-        <Text style={ styles.hintText }>Please make your PIN 6 or more digits</Text>
+        <Text style={ styles.titleTop }>UNLOCK ACCOUNT</Text>
         <Text style={ styles.title }>PIN</Text>
         <PinInput
           onChangeText={(pin) => this.setState({pin})}
           value={this.state.pin}
         />
-        <Text style={ styles.title }>CONFIRM PIN</Text>
-        <PinInput
-          onChangeText={(confirmation) => this.setState({confirmation})}
-          value={this.state.confirmation}
-        />
         <Button
           onPress={async () => {
-            this.state.pin.length > 0
-              && this.state.pin === this.state.confirmation
-              && await accounts.saveSelected(this.state.pin)
-            this.props.navigation.navigate('AccountDetails')
+            try {
+              let res = await accounts.checkPinForSelected(this.state.pin)
+              console.log(res)
+              Alert.alert('PIN OK')
+              this.props.navigation.goBack()
+            } catch (e) {
+              Alert.alert('INCORRECT PIN')
+            }
           }}
           color='green'
-          title='Done'
-          accessibilityLabel={'Done'}
+          title='CHECK PIN'
+          accessibilityLabel={'CHECK PIN'}
         />
       </View>
     )

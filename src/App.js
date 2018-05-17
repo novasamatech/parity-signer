@@ -30,7 +30,10 @@ import TouchableItem from './components/TouchableItem'
 import QrScanner from './screens/QrScanner'
 import AccountList from './screens/AccountList'
 import AccountNew from './screens/AccountNew'
+import AccountBackup from './screens/AccountBackup'
+import AccountPin from './screens/AccountPin'
 import AccountDetails from './screens/AccountDetails'
+import AccountUnlock from './screens/AccountUnlock'
 import AccountEdit from './screens/AccountEdit'
 import TxDetails from './screens/TxDetails'
 import SignedTx from './screens/SignedTx'
@@ -173,14 +176,17 @@ const Screens = createStackNavigator ({
           AccountNew: {
             screen: AccountNew
           },
-          AccountSetPin: {
-            screen: AccountSetPin
+          AccountBackup: {
+            screen: AccountBackup
           },
-          AccountConfirmPin: {
-            screen: AccountConfirmPin
+          AccountPin: {
+            screen: AccountPin
           },
           AccountDetails: {
             screen: AccountDetails,
+          },
+          AccountUnlock: {
+            screen: AccountUnlock,
           },
           AccountEdit: {
             screen: AccountEdit,

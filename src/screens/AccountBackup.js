@@ -22,57 +22,49 @@ import {
   Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet
 } from 'react-native'
 import { Subscribe } from 'unstated'
-import { connect } from 'react-redux'
-import { Actions } from 'react-native-router-flux'
-import AccountCard from '../components/AccountCard'
 import AccountsStore from '../stores/AccountsStore'
 import AccountSeed from '../components/AccountSeed'
+import AccountCard from '../components/AccountCard'
 import { selectAccount } from '../actions/accounts'
 import AccountIconChooser from '../components/AccountIconChooser'
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import AppStyles from '../styles'
-
 import colors from '../colors'
 
-export default class AccountNew extends Component {
+export default class AccountBackup extends Component {
   static navigationOptions = {
-    title: 'Edit Account'
+    title: 'Account Backup'
   }
-
-  constructor (props) {
-    super(props)
-  }
-
   render () {
     return (
       <Subscribe to={[AccountsStore]}>{
-        accounts => {
-          const selected = accounts.getSelected()
-          return <View style={ styles.body } >
-            <View style={ styles.bodyContainer }>
-              <View>
-                <Text style={ styles.titleTop }>EDIT ACCOUNT</Text>
-                <AccountCard
-                  title={selected.name ? selected.name : 'no name'}
-                  address={selected.address}
-                  onPress={() => {}}
-                />
-                <Text style={ styles.title }>ACCOUNT NAME</Text>
-                <TextInput
-                    onChangeText={(name) => accounts.updateSelected({ name })}
-                    onEndEditing={(text) => accounts.saveSelected()}
-                    value={selected.name}
-                    placeholder="Enter a new account name"/>
-              </View>
-              <View>
-                <Button buttonStyles={ styles.deleteButton } title="Delete / Backup Account" />
-              </View>
-            </View>
-        </View>
-        }
+        accounts =>  <AccountBackupView { ...this.props } accounts={ accounts } />
       }
       </Subscribe>
+    )
+  }
+}
+
+class AccountBackupView extends Component {
+
+  render () {
+    const { accounts } = this.props
+    const selected = accounts.getSelected()
+    return (
+      <View style={ styles.body } >
+        <Text style={ styles.titleTop }>BACKUP ACCOUNT</Text>
+        <AccountCard address={ selected.address } title={ selected.name || 'no name' } />
+        <Text style={ styles.titleTop }>RECOVERY WORDS</Text>
+        <Text style={ styles.hintText }>
+              Write these words down on paper. Keep it safe. These words allow anyone to recover this account.
+        </Text>
+        <TextInput style={ { height: 140, lineHeight: 30 } } editable={ false } value={ selected.seed } multiline={ true }></TextInput>
+        <Button
+              buttonStyles={ styles.nextStep }
+              title="Done Backing Up"
+              onPress={ () => { this.props.navigation.navigate('AccountPin') }} />
+      </View>
     )
   }
 }
@@ -80,13 +72,13 @@ export default class AccountNew extends Component {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    flex: 1,
+    padding: 20,
+     flex: 1,
   },
   bodyContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    padding: 20,
   },
   top: {
     flex: 1
@@ -112,13 +104,12 @@ const styles = StyleSheet.create({
   hintText: {
     fontFamily: 'Roboto',
     textAlign: 'center',
-    paddingTop: 20,
     color: colors.bg_text_sec,
-    fontWeight: '800',
-    fontSize: 10
+    fontWeight: '700',
+    fontSize: 12,
+    paddingBottom: 20
   },
-  deleteButton: {
-    marginTop: 15,
-    backgroundColor: 'red'
+  nextStep: {
+    marginTop: 20,
   }
 });

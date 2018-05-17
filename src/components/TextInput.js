@@ -3,7 +3,8 @@ import { TextInput as TextInputOrigin, Platform, StyleSheet } from 'react-native
 import colors from '../colors'
 
 export default function TextInput (props) {
-  return <TextInputOrigin { ...props } style={ styles.input } />
+
+  return <TextInputOrigin { ...props } style={ [styles.input, props.style ] } />
 }
 
 const styles = StyleSheet.create({

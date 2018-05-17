@@ -36,52 +36,64 @@ import colors from '../colors'
 
 export default class AccountNew extends Component {
   static navigationOptions = {
-    title: 'New Account'
+    title: 'New Account',
+    headerBackTitle: 'Back'
   }
-
-  constructor (props) {
-    super(props)
-  }
-
   render () {
     return (
       <Subscribe to={[AccountsStore]}>{
-        accounts => {
-          const selected = accounts.getSelected()
-          return <View style={ styles.body } >
-            <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>
-              <View style={ styles.top }>
-                <Text style={ styles.titleTop }>CREATE ACCOUNT</Text>
-                <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
-                <AccountIconChooser
-                  value={ selected.address }
-                  onChange={({ address, seed }) => {
-                    accounts.select(address)
-                    accounts.update({ address, seed })
-                    } } />
-                <Text style={ styles.title }>ACCOUNT NAME</Text>
-                <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
-                  value={selected.name}
-                  placeholder="Enter a new account name"/>
-              </View>
-              <View style={ styles.bottom }>
-                <Text style={ styles.hintText }>
-                  On the next step you will be asked to backup your account, get pen and paper ready
-                </Text>
-                <Button
-                  buttonStyles={ styles.nextStep }
-                  title="Next Step"
-                  onPress={ async () => {
-                    await accounts.saveSelected()
-                    Alert.alert('Account Created')
-                    this.props.navigation.navigate('AccountList')
-                    console.log('TEST') } } />
-              </View>
-            </ScrollView>
-        </View>
-        }
+        accounts =>  <AccountNewView { ...this.props } accounts={ accounts } />
       }
       </Subscribe>
+    )
+  }
+}
+
+class AccountNewView extends Component {
+
+  componentWillUnmount() {
+    if (!this.state.select) {
+      this.props.accounts.select('')
+    }
+  }
+
+  state = {
+    select: false
+  }
+
+  render () {
+    const { accounts } = this.props
+    const selected = accounts.getSelected()
+    return (
+      <View style={ styles.body } >
+        <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>
+          <View style={ styles.top }>
+            <Text style={ styles.titleTop }>CREATE ACCOUNT</Text>
+            <Text style={ styles.title }>CHOOSE AN IDENTICON</Text>
+            <AccountIconChooser
+              value={ selected && selected.address }
+              onChange={({ address, seed }) => {
+                accounts.select(address)
+                accounts.update({ address, seed })
+                } } />
+            <Text style={ styles.title }>ACCOUNT NAME</Text>
+            <TextInput onChangeText={(name) => accounts.updateSelected({ name })}
+              value={ selected && selected.name}
+              placeholder="Enter a new account name"/>
+          </View>
+          <View style={ styles.bottom }>
+            <Text style={ styles.hintText }>
+              On the next step you will be asked to backup your account, get pen and paper ready
+            </Text>
+            <Button
+              buttonStyles={ styles.nextStep }
+              title="Next Step"
+              onPress={ () => {
+                this.setState({ select: true })
+                selected && this.props.navigation.navigate('AccountBackup') }} />
+          </View>
+        </ScrollView>
+      </View>
     )
   }
 }

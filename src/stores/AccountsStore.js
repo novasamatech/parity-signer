@@ -23,7 +23,7 @@ export default class AccountsStore extends Container<AccountsState> {
       name: '',
       address: '',
       seed: '',
-      encryptedSeed: ''
+      encryptedSeed: null
     },
     selected: ''
    };
@@ -53,13 +53,13 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   // TODO: PIN
-  async saveSelected() {
+  async saveSelected(pin) {
     try {
       const account = this.getSelected()
       if (!account) {
         return
       }
-      let encryptedSeed = await encryptData(account.seed, '1')
+      let encryptedSeed = await encryptData(account.seed, pin)
       delete account.seed
       saveAccount({
         ...account,
@@ -69,6 +69,17 @@ export default class AccountsStore extends Container<AccountsState> {
 
     } catch (e) {
       console.error(e)
+    }
+  }
+
+  async checkPinForSelected(pin) {
+    const account = this.getSelected()
+    console.log(account)
+    console.log(this.state)
+    if (account && account.encryptedSeed) {
+      return await decryptData(account.encryptedSeed, pin)
+    } else {
+      return false
     }
   }
 
