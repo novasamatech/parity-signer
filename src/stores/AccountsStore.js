@@ -8,6 +8,8 @@ export type Account = {
   address: string,
   seed: string,
   encryptedSeed: string,
+  createdAt: number,
+  updatedAt: number,
   archived: boolean
 }
 
@@ -24,6 +26,8 @@ export default class AccountsStore extends Container<AccountsState> {
       name: '',
       address: '',
       seed: '',
+      createdAt: (new Date).getTime(),
+      updatedAt: (new Date).getTime(),
       archived: false,
       encryptedSeed: null
     },
@@ -81,11 +85,9 @@ export default class AccountsStore extends Container<AccountsState> {
         let encryptedSeed = await encryptData(account.seed, pin)
         delete account.seed
         account.encryptedSeed = encryptedSeed
-        saveAccount(account)
-      } else {
-        saveAccount(account)
       }
-
+      account.updatedAt = (new Date).getTime()
+      saveAccount(account)
     } catch (e) {
       console.error(e)
     }
