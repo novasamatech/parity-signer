@@ -32,7 +32,7 @@ export default class TxDetailsCard extends React.Component<{
         <Text style={styles.secondaryText}>{value}</Text>
         <Text style={styles.titleText}>To the following address</Text>
         <Text style={styles.secondaryText}>0x{recipient}</Text>
-        <AccountIcon style={styles.icon} seed={recipient} />
+        <AccountIcon style={styles.icon} seed={'0x' + recipient} />
       </View>
     );
   }

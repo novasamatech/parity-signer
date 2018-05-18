@@ -19,7 +19,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet
+  Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet, Clipboard
 } from 'react-native'
 import { Subscribe } from 'unstated'
 import { connect } from 'react-redux'
@@ -59,7 +59,9 @@ export default class AccountEdit extends Component {
                 <AccountCard
                   title={selected.name ? selected.name : 'no name'}
                   address={selected.address}
-                  onPress={() => {}}
+                  onPress={async () => {
+                    await Clipboard.setString('0x' + selected.address);
+                  }}
                 />
                 <Text style={ styles.title }>ACCOUNT NAME</Text>
                 <TextInput

@@ -36,6 +36,7 @@ import AccountDetails from './screens/AccountDetails'
 import AccountUnlock from './screens/AccountUnlock'
 import AccountEdit from './screens/AccountEdit'
 import TxDetails from './screens/TxDetails'
+import { AccountUnlockAndSign } from './screens/AccountUnlock'
 import SignedTx from './screens/SignedTx'
 import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from './containers/AccountPin'
 import colors from './colors'
@@ -156,6 +157,9 @@ const Screens = createStackNavigator ({
           },
           TxDetails: {
             screen: TxDetails
+          },
+          AccountUnlockAndSign: {
+            screen: AccountUnlockAndSign
           },
           SignedTx: {
             screen: SignedTx

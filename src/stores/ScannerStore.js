@@ -32,9 +32,8 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async signData(account: Account, pin = '1') {
     let seed = await decryptData(account.encryptedSeed, pin)
-    let signature = await brainWalletSign(seed, this.state.dataToSign)
     this.setState({
-      signedData: await ethSign(this.state.dataToSign)
+      signedData: await brainWalletSign(seed, this.state.dataToSign)
     })
   }
 

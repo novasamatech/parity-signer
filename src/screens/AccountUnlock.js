@@ -21,16 +21,50 @@ import PropTypes from 'prop-types'
 import { Alert, View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
 import { Subscribe } from 'unstated'
 import AccountsStore from '../stores/AccountsStore'
+import ScannerStore from '../stores/ScannerStore'
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import AppStyles from '../styles'
 import colors from '../colors'
 
+export class AccountUnlockAndSign extends Component {
+  render() {
+    return (
+      <Subscribe to={[AccountsStore, ScannerStore]}>{
+        (accounts, scannerStore) => <AccountUnlockView { ...this.props }
+          accounts={ accounts }
+          nextButtonTitle="Sign"
+          onNext={async (pin) => {
+            try {
+              const txRequest = scannerStore.getTXRequest()
+              const sender = accounts.getByAddress(txRequest.data.account)
+              let res = await scannerStore.signData(sender, pin)
+              this.props.navigation.navigate('SignedTx')
+            } catch (e) {
+              console.log(e)
+              Alert.alert('PIN is incorrect')
+            }
+            }} />}
+      </Subscribe>
+    )
+  }
+}
+
 export default class AccountUnlock extends Component {
   render() {
     return (
       <Subscribe to={[AccountsStore]}>{
-        (accounts) => <AccountUnlockView { ...this.props } accounts={ accounts } />}
+        (accounts) => <AccountUnlockView { ...this.props }
+          onNext={async (pin) => {
+            try {
+              let res = await accounts.checkPinForSelected(pin)
+              Alert.alert('PIN is OK')
+              this.props.navigation.goBack()
+            } catch (e) {
+              Alert.alert('PIN is incorrect')
+            }
+            }}
+          accounts={ accounts } />}
       </Subscribe>
     )
   }
@@ -39,6 +73,11 @@ export default class AccountUnlock extends Component {
 class AccountUnlockView extends Component {
   state = {
     pin: '',
+  }
+
+  static propTypes = {
+    onNext: PropTypes.func.isRequired,
+    nextButtonTitle: PropTypes.string,
   }
 
   render () {
@@ -52,19 +91,10 @@ class AccountUnlockView extends Component {
           value={this.state.pin}
         />
         <Button
-          onPress={async () => {
-            try {
-              let res = await accounts.checkPinForSelected(this.state.pin)
-              console.log(res)
-              Alert.alert('PIN is OK')
-              this.props.navigation.goBack()
-            } catch (e) {
-              Alert.alert('PIN is incorrect')
-            }
-          }}
+          onPress={() => this.props.onNext(this.state.pin)}
           color='green'
-          title='CHECK PIN'
-          accessibilityLabel={'CHECK PIN'}
+          title={ this.props.nextButtonTitle || 'CHECK' }
+          accessibilityLabel={ this.props.nextButtonTitle || 'CHECK'}
         />
       </View>
     )

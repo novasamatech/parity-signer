@@ -53,8 +53,7 @@ export default class TxDetails extends Component {
                 return
               }
               try {
-                await scannerStore.signData(sender)
-                this.props.navigation.navigate('SignedTx')
+                this.props.navigation.navigate('AccountUnlockAndSign')
               } catch (e) {
                 scannerStore.setErrorMsg(e.message)
               }
@@ -99,7 +98,7 @@ export class TxDetailsView extends Component {
         <TxDetailsCard value={ this.props.value } recipient={ this.props.action } />
         <Button
           buttonStyles={ { backgroundColor: colors.bg_positive, marginTop: 20, height: 60 } } title="Sign Transaction"
-          onPress={ () => this.props.onPressSender() } />
+          onPress={ () => this.props.onNext() } />
       </ScrollView>
     )
   }
