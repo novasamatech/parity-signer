@@ -33,7 +33,6 @@ export default class AccountList extends Component {
   render() {
     return <Subscribe to={[AccountsStore]}>{
       accounts => {
-        console.log(accounts.getAccounts())
         return <AccountListView
         { ...this.props }
         accounts={ accounts.getAccounts() }

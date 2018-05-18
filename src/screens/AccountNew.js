@@ -51,13 +51,12 @@ export default class AccountNew extends Component {
 
 class AccountNewView extends Component {
 
-  componentWillMount() {
-    this.props.accounts.select('')
-  }
-
   render () {
     const { accounts } = this.props
     const selected = accounts.getNew()
+    if (!selected) {
+      return null
+    }
     return (
       <View style={ styles.body } >
         <ScrollView style={ { padding: 20 } } containerStyle={ styles.bodyContainer }>

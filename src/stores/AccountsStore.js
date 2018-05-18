@@ -8,6 +8,7 @@ export type Account = {
   address: string,
   seed: string,
   encryptedSeed: string,
+  archived: boolean
 }
 
 type AccountsState = {
@@ -23,6 +24,7 @@ export default class AccountsStore extends Container<AccountsState> {
       name: '',
       address: '',
       seed: '',
+      archived: false,
       encryptedSeed: null
     },
     selected: ''
@@ -89,8 +91,18 @@ export default class AccountsStore extends Container<AccountsState> {
     }
   }
 
+  async deleteAccount(account) {
+    // deleteAccount(account)
+    account.archived = true
+    this.state.accounts.set(account.address, account)
+    this.setState({
+      accounts:this.state.accounts
+    })
+    await this.save(account)
+  }
+
   async saveSelected(pin) {
-    this.save(this.getSelected(), pin)
+    await this.save(this.getSelected(), pin)
   }
 
   async checkPinForSelected(pin) {
@@ -108,12 +120,11 @@ export default class AccountsStore extends Container<AccountsState> {
     return this.state.accounts.get(address)
   }
 
-  getSelected(): Account {
-    // console.log(this.state.selected, this.state.newAccount);
+  getSelected(): ?Account {
     return this.state.accounts.get(this.state.selected)
   }
 
   getAccounts(): Array<Account> {
-    return Array.from(this.state.accounts.values())
+    return Array.from(this.state.accounts.values()).filter(a => !a.archived)
   }
 }

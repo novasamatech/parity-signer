@@ -35,7 +35,7 @@ import AppStyles from '../styles'
 
 import colors from '../colors'
 
-export default class AccountNew extends Component {
+export default class AccountEdit extends Component {
   static navigationOptions = {
     title: 'Edit Account'
   }
@@ -49,6 +49,9 @@ export default class AccountNew extends Component {
       <Subscribe to={[AccountsStore]}>{
         accounts => {
           const selected = accounts.getSelected()
+          if (!selected) {
+            return null
+          }
           return <View style={ styles.body } >
             <View style={ styles.bodyContainer }>
               <View>
@@ -66,7 +69,28 @@ export default class AccountNew extends Component {
                     placeholder="Enter a new account name"/>
               </View>
               <View>
-                <Button buttonStyles={ styles.deleteButton } title="Delete / Backup Account" />
+                <Button
+                  buttonStyles={ styles.deleteButton }
+                  title="Delete / Backup Account"
+                  onPress={() => {
+                    Alert.alert(
+                      'Delete Account',
+                      `Are you sure to delete ${selected.name || selected.address}`,
+                      [
+                        {
+                          text: 'Delete',
+                          style: 'destructive',
+                          onPress: () => {
+                            accounts.deleteAccount(selected)
+                            this.props.navigation.navigate('AccountList')
+                          }
+                        },
+                        {
+                          text: 'Cancel', style: 'cancel'
+                        },
+                      ],
+                    )
+                  }} />
               </View>
             </View>
         </View>

@@ -62,7 +62,9 @@ class AccountDetailsView extends Component {
 
   render () {
     const account = this.props.accounts.getSelected()
-    console.log(this.props.accounts)
+    if (!account) {
+      return null
+    }
     return (
       <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
         <Text style={ styles.title }>ACCOUNT</Text>
