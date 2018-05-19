@@ -38,10 +38,11 @@ export default class TxDetails extends Component {
         const txRequest = scannerStore.getTXRequest()
         if (txRequest) {
           const sender = accounts.getByAddress(txRequest.data.account)
+          const recipient = accounts.getByAddress(scannerStore.getTx().action.toLowerCase())
           return <TxDetailsView
             { ...{ ...this.props, ...scannerStore.getTx()} }
-            sender = { sender.address }
-            senderName = { sender.name }
+            sender = { sender }
+            recipient = { recipient }
             dataToSign = { scannerStore.getDataToSign() }
             onPressAccount = { (account) => {
               accounts.select(account)
@@ -72,32 +73,41 @@ export class TxDetailsView extends Component {
     onNext: PropTypes.func.isRequired,
     onPressSender: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,
-    sender: PropTypes.string.isRequired,
-    action: PropTypes.string,
+    sender: PropTypes.object.isRequired,
+    recipient: PropTypes.object.isRequired,
     value: PropTypes.string,
     nonce: PropTypes.string,
     gas: PropTypes.string,
     gasPrice: PropTypes.string,
     data: PropTypes.string,
     isSafe: PropTypes.bool.isRequired,
-    senderName: PropTypes.string.isRequired,
-    recipientName: PropTypes.string
   }
 
   render () {
     return (
       <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
         <Text style={ styles.topTitle }>SIGN TRANSACTION</Text>
-        <Text style={ styles.title }>FROM ACCOUNT</Text>
+        <Text style={ styles.title }>FROM</Text>
         <AccountCard
-            title={this.props.senderName || 'no name'}
-            address={this.props.sender}
-            onPress={() => { this.props.onPressAccount(this.props.sender) }}
+            title={this.props.sender.name || 'no name'}
+            address={this.props.sender.address}
+            onPress={() => { this.props.onPressAccount(this.props.sender.address) }}
           />
         <Text style={ styles.title }>TRANSACTION DETAILS</Text>
-        <TxDetailsCard value={ this.props.value } recipient={ this.props.action } />
+        <TxDetailsCard
+          style={{ marginBottom: 20 }}
+          value={ this.props.value }
+          gas={ this.props.gas }
+          gasPrice={ this.props.gasPrice } />
+        <Text style={ styles.title }>RECIPIENT</Text>
+        <AccountCard
+            title={this.props.recipient.name || 'no name'}
+            address={this.props.recipient.address}
+            onPress={() => { this.props.onPressAccount(this.props.recipient.address) }}
+          />
         <Button
           buttonStyles={ { backgroundColor: colors.bg_positive, marginTop: 20, height: 60 } } title="Sign Transaction"
+          textStyles={ { color: colors.card_text } }
           onPress={ () => this.props.onNext() } />
       </ScrollView>
     )
@@ -126,7 +136,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   title: {
-    textAlign: 'center',
     color: colors.bg_text_sec,
     fontSize: 18,
     fontWeight: 'bold',

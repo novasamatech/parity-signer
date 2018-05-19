@@ -18,6 +18,7 @@ export default class AccountCard extends React.Component<{
     title: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
     networkId: PropTypes.number,
+    style: View.propTypes.style,
     onPress: PropTypes.func,
   };
 
@@ -26,6 +27,7 @@ export default class AccountCard extends React.Component<{
       title,
       address,
       networkId,
+      style,
       onPress
     } = this.props;
 
@@ -36,7 +38,7 @@ export default class AccountCard extends React.Component<{
         accessibilityComponentType="button"
         disabled={false}
         onPress={onPress}>
-        <View style={styles.body}>
+        <View style={[styles.body, style]}>
           <View style={styles.content}>
             <AccountIcon style={styles.icon} seed={"0x" + address} />
             <View style={styles.desc}>

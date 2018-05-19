@@ -19,18 +19,22 @@ type AccountsState = {
   selected: string,
 };
 
+function empty(address = '') {
+  return {
+    name: '',
+    address,
+    seed: '',
+    createdAt: (new Date).getTime(),
+    updatedAt: (new Date).getTime(),
+    archived: false,
+    encryptedSeed: null
+  }
+}
+
 export default class AccountsStore extends Container<AccountsState> {
   state = {
     accounts: new Map(),
-    newAccount: {
-      name: '',
-      address: '',
-      seed: '',
-      createdAt: (new Date).getTime(),
-      updatedAt: (new Date).getTime(),
-      archived: false,
-      encryptedSeed: null
-    },
+    newAccount: empty(),
     selected: ''
    };
 
@@ -40,7 +44,7 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   select(address) {
-    this.setState({selected: address})
+    this.setState({selected: address.toLowerCase()})
   }
 
   updateNew(accountUpdate: Object) {
@@ -55,14 +59,14 @@ export default class AccountsStore extends Container<AccountsState> {
   submitNew() {
     this.setState({
       accounts:
-        this.state.accounts.set(this.state.newAccount.address, this.state.newAccount)})
+        this.state.accounts.set(this.state.newAccount.address.toLowerCase(), this.state.newAccount)})
   }
 
   update(accountUpdate: {address: string}) {
-    let account = this.state.accounts.get(accountUpdate.address)
+    let account = this.state.accounts.get(accountUpdate.address.toLowerCase())
     if (!account) {
-      this.state.accounts.set(accountUpdate.address, accountUpdate)
-      account = this.state.accounts.get(accountUpdate.address)
+      this.state.accounts.set(accountUpdate.address.toLowerCase(), accountUpdate)
+      account = this.state.accounts.get(accountUpdate.address.toLowerCase())
     }
     Object.assign(account, accountUpdate)
     this.setState({})
@@ -74,7 +78,7 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async refreshList() {
     loadAccounts().then((res) => {
-      const accounts = new Map(res.map(a => [a.address, a]))
+      const accounts = new Map(res.map(a => [a.address.toLowerCase(), a]))
       this.setState({accounts})
     })
   }
@@ -96,7 +100,7 @@ export default class AccountsStore extends Container<AccountsState> {
   async deleteAccount(account) {
     // deleteAccount(account)
     account.archived = true
-    this.state.accounts.set(account.address, account)
+    this.state.accounts.set(account.address.toLowerCase(), account)
     this.setState({
       accounts:this.state.accounts
     })
@@ -109,8 +113,6 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async checkPinForSelected(pin) {
     const account = this.getSelected()
-    console.log(account)
-    console.log(this.state)
     if (account && account.encryptedSeed) {
       return await decryptData(account.encryptedSeed, pin)
     } else {
@@ -119,7 +121,8 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   getByAddress(address: string): ?Account {
-    return this.state.accounts.get(address)
+    console.log(Array.from(this.state.accounts.keys()))
+    return this.state.accounts.get(address.toLowerCase()) || empty(address)
   }
 
   getSelected(): ?Account {
