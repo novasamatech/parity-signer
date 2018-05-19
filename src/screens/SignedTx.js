@@ -18,7 +18,7 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import QrView from '../components/QrView'
 import { Subscribe } from 'unstated'
 import ScannerStore from '../stores/ScannerStore'
@@ -45,8 +45,11 @@ export class SignedTxView extends Component {
 
   render () {
     return (
-      <View style={styles.rectangleContainer}>
-        <QrView text={this.props.data} />
+      <View style={styles.body}>
+        <Text style={ styles.topTitle }>SIGNED TRANSACTION</Text>
+        <View style={ styles.qr }>
+          <QrView text={this.props.data} />
+        </View>
       </View>
     )
   }
@@ -58,5 +61,16 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     padding: 20,
     backgroundColor: colors.bg
-  }
+  },
+  qr: {
+    flex: 1,
+    backgroundColor: colors.card_bg,
+  },
+  topTitle: {
+    textAlign: 'center',
+    color: colors.bg_text_sec,
+    fontSize: 24,
+    fontWeight: 'bold',
+    paddingBottom: 20
+  },
 })
