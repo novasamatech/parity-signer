@@ -62,8 +62,6 @@ class AccountListView extends Component {
   constructor(props) {
     super(props);
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => true });
-    this.renderBottom = this.renderBottom.bind(this);
-    this.renderList = this.renderContent.bind(this);
     this.state = {
       dataSource: ds.cloneWithRows(props.accounts)
     };
@@ -75,49 +73,37 @@ class AccountListView extends Component {
     };
   }
 
-  renderBottom() {
-    return (
-      <View style={styles.bottom}>
-        <Button
-          buttonStyles={{ height: 60 }}
-          title="Add Account"
-          onPress={() => {
-            this.props.navigation.navigate('AccountNew');
-          }}
-        />
-      </View>
-    );
-  }
-
-  renderContent() {
-    return (
-      <ListView
-        style={styles.content}
-        dataSource={this.state.dataSource}
-        removeClippedSubviews={false}
-        renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
-          return (
-            <AccountCard
-              title={rowData.name ? rowData.name : 'no name'}
-              address={rowData.address}
-              onPress={() => {
-                highlightRow(sectionID, rowID);
-                this.props.onAccountSelected(this.props.accounts[rowID].address);
-              }}
-            />
-          );
-        }}
-        enableEmptySections
-      />
-    );
-  }
-
   render() {
     return (
       <View style={styles.body}>
         <Text style={styles.title}>ACCOUNTS</Text>
-        {this.renderContent()}
-        {this.renderBottom()}
+        <ListView
+          style={styles.content}
+          dataSource={this.state.dataSource}
+          removeClippedSubviews={false}
+          renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
+            return (
+              <AccountCard
+                title={rowData.name ? rowData.name : 'no name'}
+                address={rowData.address}
+                onPress={() => {
+                  highlightRow(sectionID, rowID);
+                  this.props.onAccountSelected(this.props.accounts[rowID].address);
+                }}
+              />
+            );
+          }}
+          enableEmptySections
+        />
+        <View style={styles.bottom}>
+          <Button
+            buttonStyles={{ height: 60 }}
+            title="Add Account"
+            onPress={() => {
+              this.props.navigation.navigate('AccountNew');
+            }}
+          />
+        </View>
       </View>
     );
   }
