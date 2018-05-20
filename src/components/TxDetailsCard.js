@@ -1,14 +1,13 @@
 // @flow
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, Platform, StyleSheet,
-  TouchableNativeFeedback, TouchableOpacity} from 'react-native'
-import colors from '../colors'
-import Card from './Card'
-import AccountIcon from './AccountIcon'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { View, Text, Platform, StyleSheet, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import colors from '../colors';
+import Card from './Card';
+import AccountIcon from './AccountIcon';
 
-const WEI_IN_ETH = 1000000000000000000
+const WEI_IN_ETH = 1000000000000000000;
 
 export default class TxDetailsCard extends React.Component<{
   value: string,
@@ -19,18 +18,11 @@ export default class TxDetailsCard extends React.Component<{
     value: PropTypes.string.isRequired,
     gas: PropTypes.string.isRequired,
     gasPrice: PropTypes.string.isRequired,
-    style: View.propTypes.style,
+    style: View.propTypes.style
   };
 
   render() {
-    const {
-      value,
-      gas,
-      gasPrice,
-      recipient,
-      networkId,
-      style
-    } = this.props;
+    const { value, gas, gasPrice, recipient, networkId, style } = this.props;
 
     return (
       <View style={[styles.body, style]}>
@@ -41,23 +33,25 @@ export default class TxDetailsCard extends React.Component<{
   }
 }
 
-function Amount({style, value, gas, gasPrice }) {
-    const fee = parseInt(gas) * parseInt(gasPrice) / WEI_IN_ETH
-    return (
-      <View style={[{ justifyContent: 'center', alignItems: 'center' }, style]}>
-        <View>
-          <View style={{ padding: 5, paddingVertical: 2, backgroundColor: colors.bg }}>
-            <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: '800' }}>
-              <Text style={{ color: colors.card_bg }}>{value}</Text>
-              <Text style={{ color: colors.bg_text_sec }}> ETH</Text>
-            </Text>
-          </View>
-          <View style={{ padding: 5, backgroundColor: colors.bg_text_sec }}>
-            <Text style={{ textAlign: 'center', fontSize: 10, fontWeight: '800', color: colors.card_bg }}>fee: {fee} ETH</Text>
-          </View>
+function Amount({ style, value, gas, gasPrice }) {
+  const fee = parseInt(gas) * parseInt(gasPrice) / WEI_IN_ETH;
+  return (
+    <View style={[{ justifyContent: 'center', alignItems: 'center' }, style]}>
+      <View>
+        <View style={{ padding: 5, paddingVertical: 2, backgroundColor: colors.bg }}>
+          <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: '800' }}>
+            <Text style={{ color: colors.card_bg }}>{value}</Text>
+            <Text style={{ color: colors.bg_text_sec }}> ETH</Text>
+          </Text>
+        </View>
+        <View style={{ padding: 5, backgroundColor: colors.bg_text_sec }}>
+          <Text style={{ textAlign: 'center', fontSize: 10, fontWeight: '800', color: colors.card_bg }}>
+            fee: {fee} ETH
+          </Text>
         </View>
       </View>
-  )
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -65,11 +59,9 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 10,
     flexDirection: 'column',
-    backgroundColor: colors.card_bg,
+    backgroundColor: colors.card_bg
   },
-  content: {
-
-  },
+  content: {},
   icon: {
     width: 47,
     height: 47
@@ -83,7 +75,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     fontWeight: '700',
-    color: colors.card_bg_text,
+    color: colors.card_bg_text
   },
   secondaryText: {
     textAlign: 'center',

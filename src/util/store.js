@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import { createStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
-import reducers from '../reducers'
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import reducers from '../reducers';
 
-export default createStore(reducers, applyMiddleware(thunk))
+export default createStore(reducers, applyMiddleware(thunk));

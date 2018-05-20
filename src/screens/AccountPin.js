@@ -14,37 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
-import { Subscribe } from 'unstated'
-import AccountsStore from '../stores/AccountsStore'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import colors from '../colors'
+import { Subscribe } from 'unstated';
+import AccountsStore from '../stores/AccountsStore';
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
+import colors from '../colors';
 
 export default class AccountPin extends Component {
   render() {
     return (
-      <Subscribe to={[AccountsStore]}>{
-        (accounts) => <AccountPinView { ...this.props } accounts={ accounts } />}
-      </Subscribe>
-    )
+      <Subscribe to={[AccountsStore]}>{accounts => <AccountPinView {...this.props} accounts={accounts} />}</Subscribe>
+    );
   }
 }
 
 class AccountPinView extends Component {
-
   static propTypes = {
     type: PropTypes.string.isRequired
   };
 
   static defaultProps = {
     type: 'NEW'
-  }
+  };
 
   static defa = {
     type: PropTypes.string.isRequired
@@ -53,84 +50,78 @@ class AccountPinView extends Component {
   state = {
     pin: '',
     confirmation: ''
-  }
+  };
 
-  render () {
-    const { accounts, type } = this.props
+  render() {
+    const { accounts, type } = this.props;
     const title = {
-      'NEW': 'ACCOUNT PIN',
-      'CHANGE': 'CHANGE PIN'
-    }[type]
+      NEW: 'ACCOUNT PIN',
+      CHANGE: 'CHANGE PIN'
+    }[type];
     return (
       <View style={styles.body}>
-        <Text style={ styles.titleTop }>{ title }</Text>
-        <Text style={ styles.hintText }>Please make your PIN 6 or more digits</Text>
-        <Text style={ styles.title }>PIN</Text>
-        <PinInput
-          onChangeText={(pin) => this.setState({pin})}
-          value={this.state.pin}
-        />
-        <Text style={ styles.title }>CONFIRM PIN</Text>
-        <PinInput
-          onChangeText={(confirmation) => this.setState({confirmation})}
-          value={this.state.confirmation}
-        />
+        <Text style={styles.titleTop}>{title}</Text>
+        <Text style={styles.hintText}>Please make your PIN 6 or more digits</Text>
+        <Text style={styles.title}>PIN</Text>
+        <PinInput onChangeText={pin => this.setState({ pin })} value={this.state.pin} />
+        <Text style={styles.title}>CONFIRM PIN</Text>
+        <PinInput onChangeText={confirmation => this.setState({ confirmation })} value={this.state.confirmation} />
         <Button
           onPress={async () => {
-            if (this.state.pin.length > 0
-                && this.state.pin === this.state.confirmation) {
-                  const account = accounts.getNew()
-                  await accounts.save(account, this.state.pin)
-                  accounts.submitNew()
-                  accounts.select(account.address)
-                  accounts.refreshList()
-                  const resetAction = StackActions.reset({
-                    index: 1,
-                    actions: [
-                      NavigationActions.navigate({ routeName: 'AccountList' }),
-                      NavigationActions.navigate({ routeName: 'AccountDetails' })],
-                  });
-                  this.props.navigation.dispatch(resetAction);
-              }
+            if (this.state.pin.length > 0 && this.state.pin === this.state.confirmation) {
+              const account = accounts.getNew();
+              await accounts.save(account, this.state.pin);
+              accounts.submitNew();
+              accounts.select(account.address);
+              accounts.refreshList();
+              const resetAction = StackActions.reset({
+                index: 1,
+                actions: [
+                  NavigationActions.navigate({ routeName: 'AccountList' }),
+                  NavigationActions.navigate({ routeName: 'AccountDetails' })
+                ]
+              });
+              this.props.navigation.dispatch(resetAction);
+            }
           }}
-          color='green'
-          title='Done'
+          color="green"
+          title="Done"
           accessibilityLabel={'Done'}
         />
       </View>
-    )
+    );
   }
 }
 
-function PinInput (props) {
+function PinInput(props) {
   return (
     <TextInput
       autoFocus
       clearTextOnFocus
       editable
       fontSize={24}
-      keyboardType='numeric'
+      keyboardType="numeric"
       multiline={false}
       autoCorrect={false}
       numberOfLines={1}
-      returnKeyType='next'
+      returnKeyType="next"
       secureTextEntry
-      style={ styles.pinInput }
-      { ...props }
+      style={styles.pinInput}
+      {...props}
     />
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
     padding: 20,
-     flex: 1,
+    flex: 1
   },
   bodyContainer: {
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   top: {
     flex: 1
@@ -165,6 +156,6 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   nextStep: {
-    marginTop: 20,
+    marginTop: 20
   }
 });

@@ -14,47 +14,38 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { View, StyleSheet } from 'react-native'
-import QRCode from 'react-native-qrcode'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { View, StyleSheet } from 'react-native';
+import QRCode from 'react-native-qrcode';
 import colors from '../colors';
 
 export default class QrView extends Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
     screen: PropTypes.bool
-  }
+  };
 
   static defaultProps = {
     screen: false
-  }
+  };
 
-  render () {
+  render() {
     if (this.props.screen) {
-      return (
-        <View style={AppStyles.view}>
-          {this.renderQr()}
-        </View>
-      )
+      return <View style={AppStyles.view}>{this.renderQr()}</View>;
     }
 
-    return this.renderQr()
+    return this.renderQr();
   }
 
-  renderQr () {
+  renderQr() {
     return (
       <View style={styles.rectangleContainer}>
-        <QRCode
-          value={this.props.text}
-          size={290}
-          bgColor='black'
-          fgColor={ colors.card_bg }
-        />
+        <QRCode value={this.props.text} size={290} bgColor="black" fgColor={colors.card_bg} />
       </View>
-    )
+    );
   }
 }
 
@@ -66,4 +57,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'transparent'
   }
-})
+});

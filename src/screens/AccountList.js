@@ -14,99 +14,112 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, ListView, StatusBar, StyleSheet } from 'react-native'
-import { Subscribe } from 'unstated'
-import AccountsStore from '../stores/AccountsStore'
-import AccountCard from '../components/AccountCard'
-import Button from '../components/Button'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { View, Text, ListView, StatusBar, StyleSheet } from 'react-native';
+import { Subscribe } from 'unstated';
+import AccountsStore from '../stores/AccountsStore';
+import AccountCard from '../components/AccountCard';
+import Button from '../components/Button';
 import colors from '../colors';
 
 export default class AccountList extends Component {
   static navigationOptions = {
-    title: 'Back to List',
-  }
+    title: 'Back to List'
+  };
   render() {
-    return <Subscribe to={[AccountsStore]}>{
-      accounts => {
-        return <AccountListView
-        { ...this.props }
-        accounts={ accounts.getAccounts() }
-        onAccountSelected={ address => {
-          accounts.select(address)
-          this.props.navigation.navigate('AccountDetails')
-        }}></AccountListView>}
-    }</Subscribe>
+    return (
+      <Subscribe to={[AccountsStore]}>
+        {accounts => {
+          return (
+            <AccountListView
+              {...this.props}
+              accounts={accounts.getAccounts()}
+              onAccountSelected={address => {
+                accounts.select(address);
+                this.props.navigation.navigate('AccountDetails');
+              }}
+            />
+          );
+        }}
+      </Subscribe>
+    );
   }
 }
 
 class AccountListView extends Component {
-
   static propTypes = {
-    accounts: PropTypes.arrayOf(PropTypes.shape({
-      address: PropTypes.string.isRequired
-    })).isRequired,
+    accounts: PropTypes.arrayOf(
+      PropTypes.shape({
+        address: PropTypes.string.isRequired
+      })
+    ).isRequired,
     onAccountSelected: PropTypes.func.isRequired
-  }
+  };
 
-  constructor (props) {
-    super(props)
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => true})
+  constructor(props) {
+    super(props);
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => true });
     this.renderBottom = this.renderBottom.bind(this);
     this.renderList = this.renderContent.bind(this);
     this.state = {
       dataSource: ds.cloneWithRows(props.accounts)
-    }
+    };
   }
 
-  static getDerivedStateFromProps (nextProps, prevState) {
+  static getDerivedStateFromProps(nextProps, prevState) {
     return {
       dataSource: prevState.dataSource.cloneWithRows(nextProps.accounts)
-    }
+    };
   }
 
   renderBottom() {
     return (
       <View style={styles.bottom}>
-        <Button buttonStyles={ { height: 60 } } title="Add Account" onPress={ () => {
-          this.props.navigation.navigate('AccountNew')
-        } } />
-      </View>)
+        <Button
+          buttonStyles={{ height: 60 }}
+          title="Add Account"
+          onPress={() => {
+            this.props.navigation.navigate('AccountNew');
+          }}
+        />
+      </View>
+    );
   }
 
   renderContent() {
-    return (<ListView
-      style={styles.content}
-      dataSource={this.state.dataSource}
-      removeClippedSubviews={false}
-      renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
-        return (
-          <AccountCard
-            title={rowData.name ? rowData.name : 'no name'}
-            address={rowData.address}
-            onPress={() => {
-              highlightRow(sectionID, rowID)
-              this.props.onAccountSelected(this.props.accounts[rowID].address)
-            }}
-          />
-        )
-      }}
-      enableEmptySections
-    ></ListView>)
+    return (
+      <ListView
+        style={styles.content}
+        dataSource={this.state.dataSource}
+        removeClippedSubviews={false}
+        renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
+          return (
+            <AccountCard
+              title={rowData.name ? rowData.name : 'no name'}
+              address={rowData.address}
+              onPress={() => {
+                highlightRow(sectionID, rowID);
+                this.props.onAccountSelected(this.props.accounts[rowID].address);
+              }}
+            />
+          );
+        }}
+        enableEmptySections
+      />
+    );
   }
 
-  render () {
+  render() {
     return (
-      <View style={ styles.body }>
-        <Text style={ styles.title }>ACCOUNTS</Text>
-        { this.renderContent() }
-        { this.renderBottom() }
+      <View style={styles.body}>
+        <Text style={styles.title}>ACCOUNTS</Text>
+        {this.renderContent()}
+        {this.renderBottom()}
       </View>
-
-    )
+    );
   }
 }
 
@@ -125,11 +138,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg
   },
   content: {
-    flex: 1,
+    flex: 1
   },
   bottom: {
     marginTop: 20,
-    flexBasis: 60,
+    flexBasis: 60
   },
   introContainer: {
     padding: 30,
@@ -142,4 +155,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20
   }
-})
+});

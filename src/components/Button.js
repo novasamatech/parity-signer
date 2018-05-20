@@ -1,34 +1,27 @@
 // @flow
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, Platform, StyleSheet,
-         TouchableNativeFeedback, TouchableOpacity } from 'react-native'
-import colors from '../colors'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { View, Text, Platform, StyleSheet, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import colors from '../colors';
 
 export default class Button extends React.Component<{
   title: string,
   onPress: () => any,
   textStyles?: ?StyleSheet.Styles,
   buttonStyles?: ?StyleSheet.Styles,
-  disabled?: ?boolean,
+  disabled?: ?boolean
 }> {
   static propTypes = {
     title: PropTypes.string.isRequired,
     textStyles: Text.propTypes.style,
     buttonStyles: View.propTypes.style,
     disabled: PropTypes.bool,
-    onPress: PropTypes.func.isRequired,
+    onPress: PropTypes.func.isRequired
   };
 
   render() {
-    const {
-      onPress,
-      title,
-      disabled,
-      textStyles,
-      buttonStyles
-    } = this.props;
+    const { onPress, title, disabled, textStyles, buttonStyles } = this.props;
 
     const finalTextStyles = [styles.text, textStyles];
     const finalButtonStyles = [styles.button, buttonStyles];
@@ -40,12 +33,11 @@ export default class Button extends React.Component<{
 
     const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     return (
-      <Touchable
-        accessibilityComponentType="button"
-        disabled={disabled}
-        onPress={onPress}>
+      <Touchable accessibilityComponentType="button" disabled={disabled} onPress={onPress}>
         <View style={finalButtonStyles}>
-          <Text style={finalTextStyles} disabled={disabled}>{title}</Text>
+          <Text style={finalTextStyles} disabled={disabled}>
+            {title}
+          </Text>
         </View>
       </Touchable>
     );
@@ -69,9 +61,9 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     elevation: 0,
-    backgroundColor: '#dfdfdf',
+    backgroundColor: '#dfdfdf'
   },
   textDisabled: {
-    color: '#a1a1a1',
-  },
+    color: '#a1a1a1'
+  }
 });

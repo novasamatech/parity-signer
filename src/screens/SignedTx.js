@@ -14,44 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { StyleSheet, View, Text } from 'react-native'
-import QrView from '../components/QrView'
-import { Subscribe } from 'unstated'
-import ScannerStore from '../stores/ScannerStore'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { StyleSheet, View, Text } from 'react-native';
+import QrView from '../components/QrView';
+import { Subscribe } from 'unstated';
+import ScannerStore from '../stores/ScannerStore';
 import colors from '../colors';
 
 export default class SignedTx extends Component {
   render() {
     return (
-      <Subscribe to={[ScannerStore]}>{
-        (scanner) => {
-          return <SignedTxView data={ scanner.getSignedTxData() } />
-        }
-      }
+      <Subscribe to={[ScannerStore]}>
+        {scanner => {
+          return <SignedTxView data={scanner.getSignedTxData()} />;
+        }}
       </Subscribe>
-    )
+    );
   }
 }
 
 export class SignedTxView extends Component {
-
   static propTypes = {
-    data: PropTypes.string.isRequired,
-  }
+    data: PropTypes.string.isRequired
+  };
 
-  render () {
+  render() {
     return (
       <View style={styles.body}>
-        <Text style={ styles.topTitle }>SIGNED TRANSACTION</Text>
-        <View style={ styles.qr }>
+        <Text style={styles.topTitle}>SIGNED TRANSACTION</Text>
+        <View style={styles.qr}>
           <QrView text={this.props.data} />
         </View>
       </View>
-    )
+    );
   }
 }
 
@@ -64,7 +62,7 @@ const styles = StyleSheet.create({
   },
   qr: {
     flex: 1,
-    backgroundColor: colors.card_bg,
+    backgroundColor: colors.card_bg
   },
   topTitle: {
     textAlign: 'center',
@@ -72,5 +70,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     paddingBottom: 20
-  },
-})
+  }
+});

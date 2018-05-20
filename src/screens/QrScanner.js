@@ -14,67 +14,68 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { StyleSheet, View, StatusBar } from 'react-native'
-import Camera from 'react-native-camera'
-import { Subscribe } from 'unstated'
-import ScannerStore from '../stores/ScannerStore'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { StyleSheet, View, StatusBar } from 'react-native';
+import Camera from 'react-native-camera';
+import { Subscribe } from 'unstated';
+import ScannerStore from '../stores/ScannerStore';
 
 export default class Scanner extends Component {
-
   static navigationOptions = {
-    title: 'Scan Transaction',
-
-  }
+    title: 'Scan Transaction'
+  };
 
   render() {
-    return <Subscribe to={[ScannerStore]}>{
-      (scannerStore) => {
-        return <QrScannerView
-          onBarCodeRead={ (txRequestData) => {
-            try {
-              scannerStore.setTXRequest(txRequestData.data)
-              this.props.navigation.navigate('TxDetails')
-            } catch (e) {
-              scannerStore.setErrorMsg(e.message)
-            }
-          }} />
-      }
-    }
-    </Subscribe>
+    return (
+      <Subscribe to={[ScannerStore]}>
+        {scannerStore => {
+          return (
+            <QrScannerView
+              onBarCodeRead={txRequestData => {
+                try {
+                  scannerStore.setTXRequest(txRequestData.data);
+                  this.props.navigation.navigate('TxDetails');
+                } catch (e) {
+                  scannerStore.setErrorMsg(e.message);
+                }
+              }}
+            />
+          );
+        }}
+      </Subscribe>
+    );
   }
 }
 
 export class QrScannerView extends Component {
-
   constructor(props) {
-    super(props)
+    super(props);
   }
 
   static propTypes = {
-    onBarCodeRead: PropTypes.func.isRequired,
-  }
+    onBarCodeRead: PropTypes.func.isRequired
+  };
 
-  render () {
+  render() {
     return (
-       <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
-        <StatusBar barStyle='light-content' />
-        { this.renderRects() }
+      <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
+        <StatusBar barStyle="light-content" />
+        {this.renderRects()}
       </Camera>
-    )
+    );
   }
 
-  renderRects () {
+  renderRects() {
     return (
       <View style={styles.rectangleContainer}>
         <View style={styles.rectangle}>
           <View style={styles.innerRectangle} />
         </View>
       </View>
-    )
+    );
   }
 }
 
@@ -110,4 +111,4 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     backgroundColor: 'transparent'
   }
-})
+});

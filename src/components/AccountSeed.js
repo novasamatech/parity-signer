@@ -14,37 +14,37 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { TextInput, StyleSheet } from 'react-native'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { TextInput, StyleSheet } from 'react-native';
 
 export default class AccountSeed extends Component {
   static propTypes = {
     seed: PropTypes.string.isRequired,
     onChangeText: PropTypes.func.isRequired
-  }
+  };
 
   state = {
     text: this.props.seed,
     height: 0
-  }
+  };
 
-  onChange = (text) => {
+  onChange = text => {
     this.setState({
       text: text
-    })
-    this.props.onChangeText(text)
-  }
+    });
+    this.props.onChangeText(text);
+  };
 
-  onContentSizeChange = (event) => {
+  onContentSizeChange = event => {
     this.setState({
       height: event.nativeEvent.contentSize.height
-    })
-  }
+    });
+  };
 
-  render () {
+  render() {
     return (
       <TextInput
         editable
@@ -53,14 +53,14 @@ export default class AccountSeed extends Component {
         multiline
         onChangeText={this.onChange}
         onContentSizeChange={this.onContentSizeChange}
-        placeholder='Parity account recovery phrase'
-        returnKeyType='default'
+        placeholder="Parity account recovery phrase"
+        returnKeyType="default"
         selectTextOnFocus
         spellCheck={false}
-        style={[styles.input, {height: Math.max(35, this.state.height)}]}
+        style={[styles.input, { height: Math.max(35, this.state.height) }]}
         value={this.state.text}
       />
-    )
+    );
   }
 }
 
@@ -70,4 +70,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlignVertical: 'top'
   }
-})
+});

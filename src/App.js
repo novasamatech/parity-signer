@@ -16,50 +16,50 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated'
-import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native'
-import { createStackNavigator, createTabNavigator, HeaderTitle, Header } from 'react-navigation'
-import { Actions, Scene } from 'react-native-router-flux'
+import React, { Component } from 'react';
+import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated';
+import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native';
+import { createStackNavigator, createTabNavigator, HeaderTitle, Header } from 'react-navigation';
+import { Actions, Scene } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { default as HomeHeader } from './components/Header'
-import TabBarBottom from './components/TabBarBottom'
-import TouchableItem from './components/TouchableItem'
-import QrScanner from './screens/QrScanner'
-import AccountList from './screens/AccountList'
-import AccountNew from './screens/AccountNew'
-import AccountBackup from './screens/AccountBackup'
-import AccountPin from './screens/AccountPin'
-import AccountDetails from './screens/AccountDetails'
-import AccountUnlock from './screens/AccountUnlock'
-import AccountEdit from './screens/AccountEdit'
-import TxDetails from './screens/TxDetails'
-import { AccountUnlockAndSign } from './screens/AccountUnlock'
-import SignedTx from './screens/SignedTx'
-import colors from './colors'
+import { default as HomeHeader } from './components/Header';
+import TabBarBottom from './components/TabBarBottom';
+import TouchableItem from './components/TouchableItem';
+import QrScanner from './screens/QrScanner';
+import AccountList from './screens/AccountList';
+import AccountNew from './screens/AccountNew';
+import AccountBackup from './screens/AccountBackup';
+import AccountPin from './screens/AccountPin';
+import AccountDetails from './screens/AccountDetails';
+import AccountUnlock from './screens/AccountUnlock';
+import AccountEdit from './screens/AccountEdit';
+import TxDetails from './screens/TxDetails';
+import { AccountUnlockAndSign } from './screens/AccountUnlock';
+import SignedTx from './screens/SignedTx';
+import colors from './colors';
 
 export default class App extends Component {
-  render () {
+  render() {
     return (
       <UnstatedProvider>
-          <Screens />
+        <Screens />
       </UnstatedProvider>
-    )
+    );
   }
 
-  componentDidMount () {
-    AppState.addEventListener('change', this._handleAppStateChange)
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange);
   }
 
-  componentWillUnmount () {
-    AppState.removeEventListener('change', this._handleAppStateChange)
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
-  _handleAppStateChange = (appState) => {
+  _handleAppStateChange = appState => {
     // TODO: handle
-  }
+  };
 }
 
 const headerStyles = StyleSheet.create({
@@ -70,8 +70,7 @@ const headerStyles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: colors.bg_text_sec,
-
+    borderBottomColor: colors.bg_text_sec
   },
   logo: {
     width: 42,
@@ -97,32 +96,35 @@ const headerStyles = StyleSheet.create({
     fontFamily: 'Roboto',
     fontWeight: 'bold',
     color: colors.bg_text_positive
-  },
+  }
 });
 
 class HeaderLeftHome extends Component {
   render() {
-
-    return <View
-      style={{ flexDirection: 'row', alignItems: 'center' }}
-      accessibilityComponentType="button"
-      accessibilityTraits="button"
-      testID="header-back"
-      delayPressIn={0}
-      onPress={ () => this.props.onPress && this.props.onPress() } >
-      <Image source={require('../icon.png')} style={headerStyles.logo} />
-      <Text style={headerStyles.headerTextLeft}>parity</Text>
-    </View>
+    return (
+      <View
+        style={{ flexDirection: 'row', alignItems: 'center' }}
+        accessibilityComponentType="button"
+        accessibilityTraits="button"
+        testID="header-back"
+        delayPressIn={0}
+        onPress={() => this.props.onPress && this.props.onPress()}
+      >
+        <Image source={require('../icon.png')} style={headerStyles.logo} />
+        <Text style={headerStyles.headerTextLeft}>parity</Text>
+      </View>
+    );
   }
 }
 
 const globalStackNavigationOptions = {
   headerTintColor: colors.card_bg,
   headerRight: (
-    <View style={ { flexDirection: 'row' } }>
-      <Icon style={headerStyles.headerSecureIcon} name='security' />
+    <View style={{ flexDirection: 'row' }}>
+      <Icon style={headerStyles.headerSecureIcon} name="security" />
       <Text style={headerStyles.headerTextRight}>Secured</Text>
-    </View>),
+    </View>
+  ),
   headerStyle: {
     backgroundColor: colors.bg,
     height: 60,
@@ -130,7 +132,7 @@ const globalStackNavigationOptions = {
     paddingBottom: 0,
     padding: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: colors.bg_text_sec,
+    borderBottomColor: colors.bg_text_sec
   },
   headerTitleStyle: {
     display: 'none'
@@ -138,72 +140,80 @@ const globalStackNavigationOptions = {
   headerBackTitleStyle: {
     paddingLeft: 5,
     fontSize: 18
- }
-}
+  }
+};
 
-const Screens = createStackNavigator ({
-  Tabs: {
-    screen: createTabNavigator ({
-      Scanner: {
-        screen: createStackNavigator ({
-          QrScanner: {
-            screen: QrScanner,
-            navigationOptions: {
-              headerLeft: <HeaderLeftHome />
-            }
+const Screens = createStackNavigator(
+  {
+    Tabs: {
+      screen: createTabNavigator(
+        {
+          Scanner: {
+            screen: createStackNavigator(
+              {
+                QrScanner: {
+                  screen: QrScanner,
+                  navigationOptions: {
+                    headerLeft: <HeaderLeftHome />
+                  }
+                },
+                TxDetails: {
+                  screen: TxDetails
+                },
+                AccountUnlockAndSign: {
+                  screen: AccountUnlockAndSign
+                },
+                SignedTx: {
+                  screen: SignedTx
+                }
+              },
+              {
+                navigationOptions: globalStackNavigationOptions
+              }
+            )
           },
-          TxDetails: {
-            screen: TxDetails
-          },
-          AccountUnlockAndSign: {
-            screen: AccountUnlockAndSign
-          },
-          SignedTx: {
-            screen: SignedTx
+          Accounts: {
+            screen: createStackNavigator(
+              {
+                AccountList: {
+                  screen: AccountList,
+                  navigationOptions: {
+                    headerLeft: <HeaderLeftHome />
+                  }
+                },
+                AccountNew: {
+                  screen: AccountNew
+                },
+                AccountBackup: {
+                  screen: AccountBackup
+                },
+                AccountPin: {
+                  screen: AccountPin
+                },
+                AccountDetails: {
+                  screen: AccountDetails
+                },
+                AccountUnlock: {
+                  screen: AccountUnlock
+                },
+                AccountEdit: {
+                  screen: AccountEdit
+                }
+              },
+              {
+                navigationOptions: globalStackNavigationOptions
+              }
+            )
           }
         },
         {
-          navigationOptions: globalStackNavigationOptions
-        })
-      },
-      Accounts: {
-        screen: createStackNavigator ({
-          AccountList: {
-            screen: AccountList,
-            navigationOptions: {
-              headerLeft: <HeaderLeftHome />
-            }
-          },
-          AccountNew: {
-            screen: AccountNew
-          },
-          AccountBackup: {
-            screen: AccountBackup
-          },
-          AccountPin: {
-            screen: AccountPin
-          },
-          AccountDetails: {
-            screen: AccountDetails,
-          },
-          AccountUnlock: {
-            screen: AccountUnlock,
-          },
-          AccountEdit: {
-            screen: AccountEdit,
-          }
-        },
-        {
-          navigationOptions: globalStackNavigationOptions
+          tabBarComponent: props => <TabBarBottom {...props} />,
+          tabBarPosition: 'bottom'
         }
       )
     }
-  }, {
-    tabBarComponent: props => <TabBarBottom { ...props } />,
-    tabBarPosition: 'bottom',
-  })
+  },
+  {
+    headerMode: 'none'
   }
-},
-{
-    headerMode: 'none',
-})
+);

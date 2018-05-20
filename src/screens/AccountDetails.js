@@ -14,80 +14,86 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { StyleSheet, View, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native'
-import { Subscribe } from 'unstated'
-import AccountsStore from '../stores/AccountsStore'
-import AccountIcon from '../components/AccountIcon'
-import AccountDetailsCard from '../components/AccountDetailsCard'
-import QrView from '../components/QrView'
-import Button from '../components/Button'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { StyleSheet, View, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Subscribe } from 'unstated';
+import AccountsStore from '../stores/AccountsStore';
+import AccountIcon from '../components/AccountIcon';
+import AccountDetailsCard from '../components/AccountDetailsCard';
+import QrView from '../components/QrView';
+import Button from '../components/Button';
 import colors from '../colors';
 
 export default class AccountDetails extends Component {
-  render () {
+  render() {
     return (
-      <Subscribe to={[AccountsStore]}>{
-        (accounts) => <AccountDetailsView { ...this.props } accounts={ accounts } />
-      }
+      <Subscribe to={[AccountsStore]}>
+        {accounts => <AccountDetailsView {...this.props} accounts={accounts} />}
       </Subscribe>
-    )
+    );
   }
 }
 
 class AccountDetailsView extends Component {
-
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       showQr: false
-    }
+    };
   }
 
   static navigationOptions = {
     title: 'Account Details'
-  }
+  };
 
   state: {
     showQr: false
-  }
+  };
 
   // componentWillUnmount() {
   //   this.props.accounts.select('')
   // }
 
-  render () {
-    const account = this.props.accounts.getSelected()
+  render() {
+    const account = this.props.accounts.getSelected();
     if (!account) {
-      return null
+      return null;
     }
     return (
-      <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
-        <Text style={ styles.title }>ACCOUNT</Text>
+      <ScrollView contentContainerStyle={styles.bodyContent} style={styles.body}>
+        <Text style={styles.title}>ACCOUNT</Text>
         <AccountDetailsCard
-          address={ account.address }
-          title={ account.name }
-          onPress={ () => this.props.navigation.navigate('AccountEdit') } />
-        { this.state.showQr
-          ? <View style={styles.qr}>
-              <QrView text={account.address} />
-            </View>
-          : <Button textStyles={{color: colors.card_bg_text}}
-              buttonStyles={{ backgroundColor: colors.card_bg }}
-              title="Show Account QR Code"
-              onPress={ () => { this.setState({showQr: true})} }/>
-        }
-        <Button textStyles={{color: colors.card_bg_text}}
-              buttonStyles={{ backgroundColor: colors.card_bg }}
-              title="Check PIN"
-              onPress={ () => {
-                this.props.navigation.navigate('AccountUnlock')
-              }}/>
+          address={account.address}
+          title={account.name}
+          onPress={() => this.props.navigation.navigate('AccountEdit')}
+        />
+        {this.state.showQr ? (
+          <View style={styles.qr}>
+            <QrView text={account.address} />
+          </View>
+        ) : (
+          <Button
+            textStyles={{ color: colors.card_bg_text }}
+            buttonStyles={{ backgroundColor: colors.card_bg }}
+            title="Show Account QR Code"
+            onPress={() => {
+              this.setState({ showQr: true });
+            }}
+          />
+        )}
+        <Button
+          textStyles={{ color: colors.card_bg_text }}
+          buttonStyles={{ backgroundColor: colors.card_bg }}
+          title="Check PIN"
+          onPress={() => {
+            this.props.navigation.navigate('AccountUnlock');
+          }}
+        />
       </ScrollView>
-  )
+    );
   }
 }
 
@@ -99,7 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg
   },
   bodyContent: {
-    paddingBottom: 40,
+    paddingBottom: 40
   },
   title: {
     color: colors.bg_text_sec,
@@ -116,7 +122,7 @@ const styles = StyleSheet.create({
   },
   qr: {
     flex: 1,
-    backgroundColor: colors.card_bg,
+    backgroundColor: colors.card_bg
   },
   deleteText: {
     fontFamily: 'Roboto',
@@ -133,4 +139,4 @@ const styles = StyleSheet.create({
   actionButtonContainer: {
     flex: 1
   }
-})
+});

@@ -14,101 +14,99 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import {
-  Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet, Clipboard
-} from 'react-native'
-import { Subscribe } from 'unstated'
-import AccountCard from '../components/AccountCard'
-import AccountsStore from '../stores/AccountsStore'
-import AccountSeed from '../components/AccountSeed'
-import AccountIconChooser from '../components/AccountIconChooser'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet, Clipboard } from 'react-native';
+import { Subscribe } from 'unstated';
+import AccountCard from '../components/AccountCard';
+import AccountsStore from '../stores/AccountsStore';
+import AccountSeed from '../components/AccountSeed';
+import AccountIconChooser from '../components/AccountIconChooser';
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
 
-import colors from '../colors'
+import colors from '../colors';
 
 export default class AccountEdit extends Component {
   static navigationOptions = {
     title: 'Edit Account'
+  };
+
+  constructor(props) {
+    super(props);
   }
 
-  constructor (props) {
-    super(props)
-  }
-
-  render () {
+  render() {
     return (
-      <Subscribe to={[AccountsStore]}>{
-        accounts => {
-          const selected = accounts.getSelected()
+      <Subscribe to={[AccountsStore]}>
+        {accounts => {
+          const selected = accounts.getSelected();
           if (!selected) {
-            return null
+            return null;
           }
-          return <View style={ styles.body } >
-            <View style={ styles.bodyContainer }>
-              <View>
-                <Text style={ styles.titleTop }>EDIT ACCOUNT</Text>
-                <AccountCard
-                  title={selected.name ? selected.name : 'no name'}
-                  address={selected.address}
-                  onPress={async () => {
-                    await Clipboard.setString('0x' + selected.address);
-                  }}
-                />
-                <Text style={ styles.title }>ACCOUNT NAME</Text>
-                <TextInput
-                    onChangeText={(name) => accounts.updateSelected({ name })}
-                    onEndEditing={(text) => accounts.saveSelected()}
+          return (
+            <View style={styles.body}>
+              <View style={styles.bodyContainer}>
+                <View>
+                  <Text style={styles.titleTop}>EDIT ACCOUNT</Text>
+                  <AccountCard
+                    title={selected.name ? selected.name : 'no name'}
+                    address={selected.address}
+                    onPress={async () => {
+                      await Clipboard.setString('0x' + selected.address);
+                    }}
+                  />
+                  <Text style={styles.title}>ACCOUNT NAME</Text>
+                  <TextInput
+                    onChangeText={name => accounts.updateSelected({ name })}
+                    onEndEditing={text => accounts.saveSelected()}
                     value={selected.name}
-                    placeholder="Enter a new account name"/>
-              </View>
-              <View>
-                <Button
-                  buttonStyles={ styles.deleteButton }
-                  title="Delete / Backup Account"
-                  onPress={() => {
-                    Alert.alert(
-                      'Delete Account',
-                      `Are you sure to delete ${selected.name || selected.address}`,
-                      [
+                    placeholder="Enter a new account name"
+                  />
+                </View>
+                <View>
+                  <Button
+                    buttonStyles={styles.deleteButton}
+                    title="Delete / Backup Account"
+                    onPress={() => {
+                      Alert.alert('Delete Account', `Are you sure to delete ${selected.name || selected.address}`, [
                         {
                           text: 'Delete',
                           style: 'destructive',
                           onPress: () => {
-                            accounts.deleteAccount(selected)
-                            this.props.navigation.navigate('AccountList')
+                            accounts.deleteAccount(selected);
+                            this.props.navigation.navigate('AccountList');
                           }
                         },
                         {
-                          text: 'Cancel', style: 'cancel'
-                        },
-                      ],
-                    )
-                  }} />
+                          text: 'Cancel',
+                          style: 'cancel'
+                        }
+                      ]);
+                    }}
+                  />
+                </View>
               </View>
             </View>
-        </View>
-        }
-      }
+          );
+        }}
       </Subscribe>
-    )
+    );
   }
 }
 
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    flex: 1,
+    flex: 1
   },
   bodyContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    padding: 20,
+    padding: 20
   },
   top: {
     flex: 1

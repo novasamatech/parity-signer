@@ -1,41 +1,32 @@
 // @flow
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, Platform, StyleSheet,
-  TouchableNativeFeedback, TouchableOpacity} from 'react-native'
-import colors from '../colors'
-import Card from './Card'
-import AccountIcon from './AccountIcon'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { View, Text, Platform, StyleSheet, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import colors from '../colors';
+import Card from './Card';
+import AccountIcon from './AccountIcon';
 
 export default class AccountDetailsCard extends React.Component<{
   title: string,
   address: string,
   networkId: number,
-  onPress: () => any,
+  onPress: () => any
 }> {
   static propTypes = {
     title: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
     networkId: PropTypes.number,
-    onPress: PropTypes.func,
+    onPress: PropTypes.func
   };
 
   render() {
-    const {
-      title,
-      address,
-      networkId,
-      onPress
-    } = this.props;
+    const { title, address, networkId, onPress } = this.props;
 
     const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
     return (
-      <Touchable
-        accessibilityComponentType="button"
-        disabled={false}
-        onPress={onPress}>
+      <Touchable accessibilityComponentType="button" disabled={false} onPress={onPress}>
         <View style={styles.body}>
           <View style={styles.content}>
             <AccountIcon style={styles.icon} seed={'0x' + address} />
@@ -57,12 +48,11 @@ const styles = StyleSheet.create({
   body: {
     marginBottom: 20,
     padding: 20,
-    backgroundColor: colors.card_bg,
+    backgroundColor: colors.card_bg
   },
   content: {
     flexDirection: 'row',
-    backgroundColor: colors.card_bg,
-
+    backgroundColor: colors.card_bg
   },
   icon: {
     width: 70,

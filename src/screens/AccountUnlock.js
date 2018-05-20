@@ -14,120 +14,125 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { Alert, View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native'
-import { Subscribe } from 'unstated'
-import AccountsStore from '../stores/AccountsStore'
-import ScannerStore from '../stores/ScannerStore'
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import colors from '../colors'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Alert, View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { Subscribe } from 'unstated';
+import AccountsStore from '../stores/AccountsStore';
+import ScannerStore from '../stores/ScannerStore';
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
+import colors from '../colors';
 
 export class AccountUnlockAndSign extends Component {
   render() {
     return (
-      <Subscribe to={[AccountsStore, ScannerStore]}>{
-        (accounts, scannerStore) => <AccountUnlockView { ...this.props }
-          accounts={ accounts }
-          nextButtonTitle="Sign"
-          onNext={async (pin) => {
-            try {
-              const txRequest = scannerStore.getTXRequest()
-              const sender = accounts.getByAddress(txRequest.data.account)
-              let res = await scannerStore.signData(sender, pin)
-              this.props.navigation.navigate('SignedTx')
-            } catch (e) {
-              Alert.alert('PIN is incorrect')
-            }
-            }} />}
+      <Subscribe to={[AccountsStore, ScannerStore]}>
+        {(accounts, scannerStore) => (
+          <AccountUnlockView
+            {...this.props}
+            accounts={accounts}
+            nextButtonTitle="Sign"
+            onNext={async pin => {
+              try {
+                const txRequest = scannerStore.getTXRequest();
+                const sender = accounts.getByAddress(txRequest.data.account);
+                let res = await scannerStore.signData(sender, pin);
+                this.props.navigation.navigate('SignedTx');
+              } catch (e) {
+                Alert.alert('PIN is incorrect');
+              }
+            }}
+          />
+        )}
       </Subscribe>
-    )
+    );
   }
 }
 
 export default class AccountUnlock extends Component {
   render() {
     return (
-      <Subscribe to={[AccountsStore]}>{
-        (accounts) => <AccountUnlockView { ...this.props }
-          onNext={async (pin) => {
-            try {
-              let res = await accounts.checkPinForSelected(pin)
-              Alert.alert('PIN is OK')
-              this.props.navigation.goBack()
-            } catch (e) {
-              Alert.alert('PIN is incorrect')
-            }
+      <Subscribe to={[AccountsStore]}>
+        {accounts => (
+          <AccountUnlockView
+            {...this.props}
+            onNext={async pin => {
+              try {
+                let res = await accounts.checkPinForSelected(pin);
+                Alert.alert('PIN is OK');
+                this.props.navigation.goBack();
+              } catch (e) {
+                Alert.alert('PIN is incorrect');
+              }
             }}
-          accounts={ accounts } />}
+            accounts={accounts}
+          />
+        )}
       </Subscribe>
-    )
+    );
   }
 }
 
 class AccountUnlockView extends Component {
   state = {
-    pin: '',
-  }
+    pin: ''
+  };
 
   static propTypes = {
     onNext: PropTypes.func.isRequired,
-    nextButtonTitle: PropTypes.string,
-  }
+    nextButtonTitle: PropTypes.string
+  };
 
-  render () {
-    const { accounts } = this.props
+  render() {
+    const { accounts } = this.props;
     return (
       <View style={styles.body}>
-        <Text style={ styles.titleTop }>UNLOCK ACCOUNT</Text>
-        <Text style={ styles.title }>PIN</Text>
-        <PinInput
-          onChangeText={(pin) => this.setState({pin})}
-          value={this.state.pin}
-        />
+        <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
+        <Text style={styles.title}>PIN</Text>
+        <PinInput onChangeText={pin => this.setState({ pin })} value={this.state.pin} />
         <Button
           onPress={() => this.props.onNext(this.state.pin)}
-          color='green'
-          title={ this.props.nextButtonTitle || 'CHECK' }
-          accessibilityLabel={ this.props.nextButtonTitle || 'CHECK'}
+          color="green"
+          title={this.props.nextButtonTitle || 'CHECK'}
+          accessibilityLabel={this.props.nextButtonTitle || 'CHECK'}
         />
       </View>
-    )
+    );
   }
 }
 
-function PinInput (props) {
+function PinInput(props) {
   return (
     <TextInput
       autoFocus
       clearTextOnFocus
       editable
       fontSize={24}
-      keyboardType='numeric'
+      keyboardType="numeric"
       multiline={false}
       autoCorrect={false}
       numberOfLines={1}
-      returnKeyType='next'
+      returnKeyType="next"
       secureTextEntry
-      style={ styles.pinInput }
-      { ...props }
+      style={styles.pinInput}
+      {...props}
     />
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
     padding: 20,
-     flex: 1,
+    flex: 1
   },
   bodyContainer: {
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   top: {
     flex: 1
@@ -162,6 +167,6 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   nextStep: {
-    marginTop: 20,
+    marginTop: 20
   }
 });

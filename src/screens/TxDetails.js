@@ -14,55 +14,59 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { StyleSheet, ScrollView, View, Text } from 'react-native'
-import { Subscribe } from 'unstated'
-import ScannerStore from '../stores/ScannerStore'
-import AccountsStore from '../stores/AccountsStore'
-import Button from '../components/Button'
-import AccountCard from '../components/AccountCard'
-import TxDetailsCard from '../components/TxDetailsCard'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { StyleSheet, ScrollView, View, Text } from 'react-native';
+import { Subscribe } from 'unstated';
+import ScannerStore from '../stores/ScannerStore';
+import AccountsStore from '../stores/AccountsStore';
+import Button from '../components/Button';
+import AccountCard from '../components/AccountCard';
+import TxDetailsCard from '../components/TxDetailsCard';
 import colors from '../colors';
 
-const orUnknown = (value = 'Unknown') => value
+const orUnknown = (value = 'Unknown') => value;
 
 export default class TxDetails extends Component {
   render() {
-    return <Subscribe to={[ScannerStore, AccountsStore]}>{
-      (scannerStore, accounts) => {
-        const txRequest = scannerStore.getTXRequest()
-        if (txRequest) {
-          const sender = accounts.getByAddress(txRequest.data.account)
-          const recipient = accounts.getByAddress(scannerStore.getTx().action.toLowerCase())
-          return <TxDetailsView
-            { ...{ ...this.props, ...scannerStore.getTx()} }
-            sender = { sender }
-            recipient = { recipient }
-            dataToSign = { scannerStore.getDataToSign() }
-            onPressAccount = { (account) => {
-              accounts.select(account)
-              this.props.navigation.navigate('AccountDetails')
-            }}
-            onNext = { async () => {
-              if (!sender) {
-                scannerStore.setErrorMsg(`No account with address ${txRequest.data.account} found in your wallet`)
-                return
-              }
-              try {
-                this.props.navigation.navigate('AccountUnlockAndSign')
-              } catch (e) {
-                scannerStore.setErrorMsg(e.message)
-              }
-            }} />
-        } else {
-          return null
-        }
-      }
-    }
-    </Subscribe>
+    return (
+      <Subscribe to={[ScannerStore, AccountsStore]}>
+        {(scannerStore, accounts) => {
+          const txRequest = scannerStore.getTXRequest();
+          if (txRequest) {
+            const sender = accounts.getByAddress(txRequest.data.account);
+            const recipient = accounts.getByAddress(scannerStore.getTx().action.toLowerCase());
+            return (
+              <TxDetailsView
+                {...{ ...this.props, ...scannerStore.getTx() }}
+                sender={sender}
+                recipient={recipient}
+                dataToSign={scannerStore.getDataToSign()}
+                onPressAccount={account => {
+                  accounts.select(account);
+                  this.props.navigation.navigate('AccountDetails');
+                }}
+                onNext={async () => {
+                  if (!sender) {
+                    scannerStore.setErrorMsg(`No account with address ${txRequest.data.account} found in your wallet`);
+                    return;
+                  }
+                  try {
+                    this.props.navigation.navigate('AccountUnlockAndSign');
+                  } catch (e) {
+                    scannerStore.setErrorMsg(e.message);
+                  }
+                }}
+              />
+            );
+          } else {
+            return null;
+          }
+        }}
+      </Subscribe>
+    );
   }
 }
 
@@ -78,37 +82,44 @@ export class TxDetailsView extends Component {
     gas: PropTypes.string,
     gasPrice: PropTypes.string,
     data: PropTypes.string,
-    isSafe: PropTypes.bool.isRequired,
-  }
+    isSafe: PropTypes.bool.isRequired
+  };
 
-  render () {
+  render() {
     return (
-      <ScrollView contentContainerStyle={ styles.bodyContent } style={ styles.body }>
-        <Text style={ styles.topTitle }>SIGN TRANSACTION</Text>
-        <Text style={ styles.title }>FROM</Text>
+      <ScrollView contentContainerStyle={styles.bodyContent} style={styles.body}>
+        <Text style={styles.topTitle}>SIGN TRANSACTION</Text>
+        <Text style={styles.title}>FROM</Text>
         <AccountCard
-            title={this.props.sender.name || 'no name'}
-            address={this.props.sender.address}
-            onPress={() => { this.props.onPressAccount(this.props.sender.address) }}
-          />
-        <Text style={ styles.title }>TRANSACTION DETAILS</Text>
+          title={this.props.sender.name || 'no name'}
+          address={this.props.sender.address}
+          onPress={() => {
+            this.props.onPressAccount(this.props.sender.address);
+          }}
+        />
+        <Text style={styles.title}>TRANSACTION DETAILS</Text>
         <TxDetailsCard
           style={{ marginBottom: 20 }}
-          value={ this.props.value }
-          gas={ this.props.gas }
-          gasPrice={ this.props.gasPrice } />
-        <Text style={ styles.title }>RECIPIENT</Text>
+          value={this.props.value}
+          gas={this.props.gas}
+          gasPrice={this.props.gasPrice}
+        />
+        <Text style={styles.title}>RECIPIENT</Text>
         <AccountCard
-            title={this.props.recipient.name || 'no name'}
-            address={this.props.recipient.address}
-            onPress={() => { this.props.onPressAccount(this.props.recipient.address) }}
-          />
+          title={this.props.recipient.name || 'no name'}
+          address={this.props.recipient.address}
+          onPress={() => {
+            this.props.onPressAccount(this.props.recipient.address);
+          }}
+        />
         <Button
-          buttonStyles={ { backgroundColor: colors.bg_positive, marginTop: 20, height: 60 } } title="Sign Transaction"
-          textStyles={ { color: colors.card_text } }
-          onPress={ () => this.props.onNext() } />
+          buttonStyles={{ backgroundColor: colors.bg_positive, marginTop: 20, height: 60 }}
+          title="Sign Transaction"
+          textStyles={{ color: colors.card_text }}
+          onPress={() => this.props.onNext()}
+        />
       </ScrollView>
-    )
+    );
   }
 }
 
@@ -120,11 +131,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg
   },
   bodyContent: {
-    paddingBottom: 40,
+    paddingBottom: 40
   },
   transactionDetails: {
     flex: 1,
-    backgroundColor: colors.card_bg,
+    backgroundColor: colors.card_bg
   },
   topTitle: {
     textAlign: 'center',
@@ -159,4 +170,4 @@ const styles = StyleSheet.create({
   actionButtonContainer: {
     flex: 1
   }
-})
+});

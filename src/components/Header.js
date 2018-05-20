@@ -1,18 +1,18 @@
-import React from 'react'
-import { Text, View, StyleSheet, Image, SafeAreaView } from 'react-native'
-import colors from '../colors'
+import React from 'react';
+import { Text, View, StyleSheet, Image, SafeAreaView } from 'react-native';
+import colors from '../colors';
 
-export default function () {
+export default function() {
   return (
-    <SafeAreaView style={ { backgroundColor: colors.bg } }>
-    <View style={styles.row}>
-      <Image source={require('../../icon.png')} style={styles.logo} />
-      <Text style={styles.headerTextLeft}>parity</Text>
-      <Text style={styles.headerTextRight}>Secured</Text>
-    </View>
-    </SafeAreaView>)
+    <SafeAreaView style={{ backgroundColor: colors.bg }}>
+      <View style={styles.row}>
+        <Image source={require('../../icon.png')} style={styles.logo} />
+        <Text style={styles.headerTextLeft}>parity</Text>
+        <Text style={styles.headerTextRight}>Secured</Text>
+      </View>
+    </SafeAreaView>
+  );
 }
-
 
 const styles = StyleSheet.create({
   row: {
@@ -22,8 +22,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: colors.bg_text_sec,
-
+    borderBottomColor: colors.bg_text_sec
   },
   logo: {
     width: 50,
@@ -41,5 +40,5 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 'bold',
     color: colors.bg_text_positive
-  },
+  }
 });

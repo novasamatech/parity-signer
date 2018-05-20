@@ -1,46 +1,36 @@
 // @flow
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, Platform, StyleSheet,
-  TouchableNativeFeedback, TouchableOpacity} from 'react-native'
-import colors from '../colors'
-import Card from './Card'
-import AccountIcon from './AccountIcon'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { View, Text, Platform, StyleSheet, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import colors from '../colors';
+import Card from './Card';
+import AccountIcon from './AccountIcon';
 
 export default class AccountCard extends React.Component<{
   title: string,
   address: string,
   networkId: number,
-  onPress: () => any,
+  onPress: () => any
 }> {
   static propTypes = {
     title: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
     networkId: PropTypes.number,
     style: View.propTypes.style,
-    onPress: PropTypes.func,
+    onPress: PropTypes.func
   };
 
   render() {
-    const {
-      title,
-      address,
-      networkId,
-      style,
-      onPress
-    } = this.props;
+    const { title, address, networkId, style, onPress } = this.props;
 
     const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
     return (
-      <Touchable
-        accessibilityComponentType="button"
-        disabled={false}
-        onPress={onPress}>
+      <Touchable accessibilityComponentType="button" disabled={false} onPress={onPress}>
         <View style={[styles.body, style]}>
           <View style={styles.content}>
-            <AccountIcon style={styles.icon} seed={"0x" + address} />
+            <AccountIcon style={styles.icon} seed={'0x' + address} />
             <View style={styles.desc}>
               <Text style={styles.titleText}>{title}</Text>
               <Text style={styles.secondaryText}>0x{address}</Text>
@@ -57,12 +47,12 @@ export default class AccountCard extends React.Component<{
 
 const styles = StyleSheet.create({
   body: {
-    paddingBottom: 20,
+    paddingBottom: 20
   },
   content: {
     flexDirection: 'row',
     backgroundColor: colors.card_bg,
-    padding: 10,
+    padding: 10
   },
   icon: {
     width: 47,

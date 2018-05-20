@@ -11,7 +11,7 @@
     "cli": "node node_modules/react-native/local-cli/cli.js",
     "start": "yarn run ios",
     "test": "jest",
-    "lint": "standard",
+    "lint": "",
     "commit": "commit-wizard"
   },
   "dependencies": {
