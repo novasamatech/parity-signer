@@ -12,7 +12,7 @@
     "start": "yarn run ios",
     "test": "jest",
     "lint": "",
-    "commit": "commit-wizard"
+    "commit": ""
   },
   "dependencies": {
     "bignumber.js": "^4.0.0",
