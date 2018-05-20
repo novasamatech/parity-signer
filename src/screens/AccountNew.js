@@ -22,16 +22,11 @@ import {
   Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet
 } from 'react-native'
 import { Subscribe } from 'unstated'
-import { connect } from 'react-redux'
-import { Actions } from 'react-native-router-flux'
 import AccountsStore from '../stores/AccountsStore'
 import AccountSeed from '../components/AccountSeed'
-import { selectAccount } from '../actions/accounts'
 import AccountIconChooser from '../components/AccountIconChooser'
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
-import AppStyles from '../styles'
-
 import colors from '../colors'
 
 export default class AccountNew extends Component {

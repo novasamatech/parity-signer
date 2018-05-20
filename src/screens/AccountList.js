@@ -23,7 +23,6 @@ import { Subscribe } from 'unstated'
 import AccountsStore from '../stores/AccountsStore'
 import AccountCard from '../components/AccountCard'
 import Button from '../components/Button'
-import AppStyles from '../styles'
 import colors from '../colors';
 
 export default class AccountList extends Component {

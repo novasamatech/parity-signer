@@ -22,7 +22,6 @@ import { StyleSheet, View, StatusBar } from 'react-native'
 import Camera from 'react-native-camera'
 import { Subscribe } from 'unstated'
 import ScannerStore from '../stores/ScannerStore'
-import AppStyles from '../styles'
 
 export default class Scanner extends Component {
 
@@ -34,7 +33,7 @@ export default class Scanner extends Component {
   render() {
     return <Subscribe to={[ScannerStore]}>{
       (scannerStore) => {
-        return <ScannerView
+        return <QrScannerView
           onBarCodeRead={ (txRequestData) => {
             try {
               scannerStore.setTXRequest(txRequestData.data)
@@ -49,7 +48,7 @@ export default class Scanner extends Component {
   }
 }
 
-export class ScannerView extends Component {
+export class QrScannerView extends Component {
 
   constructor(props) {
     super(props)
@@ -61,7 +60,7 @@ export class ScannerView extends Component {
 
   render () {
     return (
-       <Camera onBarCodeRead={this.props.onBarCodeRead} style={AppStyles.view}>
+       <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
         <StatusBar barStyle='light-content' />
         { this.renderRects() }
       </Camera>
@@ -81,6 +80,7 @@ export class ScannerView extends Component {
 
 const styles = StyleSheet.create({
   view: {
+    flex: 1,
     backgroundColor: 'black'
   },
 

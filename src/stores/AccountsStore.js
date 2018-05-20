@@ -121,7 +121,6 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   getByAddress(address: string): ?Account {
-    console.log(Array.from(this.state.accounts.keys()))
     return this.state.accounts.get(address.toLowerCase()) || empty(address)
   }
 

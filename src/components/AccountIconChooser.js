@@ -7,7 +7,6 @@ import { brainWalletAddress, words } from '../util/native'
 import colors from '../colors'
 import Card from './Card'
 import AccountIcon from './AccountIcon'
-import AppStyles from '../styles'
 
 export default class AccountIconChooser extends Component<{
   value: string,

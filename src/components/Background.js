@@ -7,8 +7,6 @@ export default class Background extends Component {
     const lines = (new Array(100)).fill(0).map((_, i) => (
       <View key={i} style={ styles.line } />
     ))
-
-    console.log(lines)
     return (
       <View style={ styles.bg }>
         <View { ...this.props }>{ this.props.children }</View>

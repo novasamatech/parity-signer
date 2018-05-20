@@ -38,10 +38,7 @@ import AccountEdit from './screens/AccountEdit'
 import TxDetails from './screens/TxDetails'
 import { AccountUnlockAndSign } from './screens/AccountUnlock'
 import SignedTx from './screens/SignedTx'
-import { AccountEnterPin, AccountChangePin, AccountSetPin, AccountConfirmPin } from './containers/AccountPin'
 import colors from './colors'
-
-console.log(Icon)
 
 export default class App extends Component {
   render () {

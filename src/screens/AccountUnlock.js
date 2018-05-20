@@ -24,7 +24,6 @@ import AccountsStore from '../stores/AccountsStore'
 import ScannerStore from '../stores/ScannerStore'
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
-import AppStyles from '../styles'
 import colors from '../colors'
 
 export class AccountUnlockAndSign extends Component {
@@ -41,7 +40,6 @@ export class AccountUnlockAndSign extends Component {
               let res = await scannerStore.signData(sender, pin)
               this.props.navigation.navigate('SignedTx')
             } catch (e) {
-              console.log(e)
               Alert.alert('PIN is incorrect')
             }
             }} />}

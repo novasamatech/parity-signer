@@ -25,11 +25,9 @@ import { Subscribe } from 'unstated'
 import AccountsStore from '../stores/AccountsStore'
 import AccountSeed from '../components/AccountSeed'
 import AccountCard from '../components/AccountCard'
-import { selectAccount } from '../actions/accounts'
 import AccountIconChooser from '../components/AccountIconChooser'
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
-import AppStyles from '../styles'
 import colors from '../colors'
 
 export default class AccountBackup extends Component {

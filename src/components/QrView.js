@@ -20,7 +20,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { View, StyleSheet } from 'react-native'
 import QRCode from 'react-native-qrcode'
-import AppStyles from '../styles'
 import colors from '../colors';
 
 export default class QrView extends Component {

@@ -25,8 +25,6 @@ import AccountsStore from '../stores/AccountsStore'
 import Button from '../components/Button'
 import AccountCard from '../components/AccountCard'
 import TxDetailsCard from '../components/TxDetailsCard'
-import AppStyles from '../styles'
-import AccountPrettyAddress from '../components/AccountPrettyAddress'
 import colors from '../colors';
 
 const orUnknown = (value = 'Unknown') => value

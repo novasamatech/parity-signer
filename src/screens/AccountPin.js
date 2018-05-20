@@ -24,7 +24,6 @@ import { Subscribe } from 'unstated'
 import AccountsStore from '../stores/AccountsStore'
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
-import AppStyles from '../styles'
 import colors from '../colors'
 
 export default class AccountPin extends Component {
