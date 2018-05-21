@@ -35,14 +35,13 @@ export class AccountUnlockAndSign extends Component {
             {...this.props}
             accounts={accounts}
             nextButtonTitle="Sign"
-            onNext={async pin => {
+            onChange={async pin => {
               try {
                 const txRequest = scannerStore.getTXRequest();
                 const sender = accounts.getByAddress(txRequest.data.account);
                 let res = await scannerStore.signData(sender, pin);
                 this.props.navigation.navigate('SignedTx');
               } catch (e) {
-                Alert.alert('PIN is incorrect');
               }
             }}
           />
@@ -59,11 +58,10 @@ export class AccountUnlock extends Component {
         {accounts => (
           <AccountUnlockView
             {...this.props}
-            onNext={async pin => {
+            onChange={async pin => {
+              // TODO: lock account back after if result wasn't saved
               if (await accounts.unlockAccount(accounts.getSelected().address, pin)) {
                 this.props.navigation.navigate('AccountBackup');
-              } else {
-                Alert.alert('PIN is incorrect');
               }
             }}
             accounts={accounts}
@@ -81,13 +79,12 @@ export class AccountCheckPin extends Component {
         {accounts => (
           <AccountUnlockView
             {...this.props}
-            onNext={async pin => {
+            onChange={async pin => {
               try {
                 let res = await accounts.checkPinForSelected(pin);
                 Alert.alert('PIN is OK');
                 this.props.navigation.goBack();
               } catch (e) {
-                Alert.alert('PIN is incorrect');
               }
             }}
             accounts={accounts}
@@ -104,7 +101,7 @@ class AccountUnlockView extends Component {
   };
 
   static propTypes = {
-    onNext: PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
     nextButtonTitle: PropTypes.string
   };
 
@@ -114,12 +111,12 @@ class AccountUnlockView extends Component {
       <View style={styles.body}>
         <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
         <Text style={styles.title}>PIN</Text>
-        <PinInput onChangeText={pin => this.setState({ pin })} value={this.state.pin} />
-        <Button
-          onPress={() => this.props.onNext(this.state.pin)}
-          color="green"
-          title={this.props.nextButtonTitle || 'CHECK'}
-          accessibilityLabel={this.props.nextButtonTitle || 'CHECK'}
+        <PinInput
+          onChangeText={pin => {
+            this.setState({ pin });
+            this.props.onChange(pin)
+          }}
+          value={this.state.pin}
         />
       </View>
     );
