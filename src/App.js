@@ -29,6 +29,7 @@ import TabBarBottom from './components/TabBarBottom';
 import TouchableItem from './components/TouchableItem';
 import QrScanner from './screens/QrScanner';
 import AccountList from './screens/AccountList';
+import AccountAdd from './screens/AccountAdd';
 import AccountNew from './screens/AccountNew';
 import AccountBackup from './screens/AccountBackup';
 import AccountPin from './screens/AccountPin';
@@ -183,6 +184,9 @@ const Screens = createStackNavigator(
                 },
                 AccountNew: {
                   screen: AccountNew
+                },
+                AccountAdd: {
+                  screen: AccountAdd
                 },
                 AccountBackup: {
                   screen: AccountBackup

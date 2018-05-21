@@ -100,7 +100,7 @@ class AccountListView extends Component {
             buttonStyles={{ height: 60 }}
             title="Add Account"
             onPress={() => {
-              this.props.navigation.navigate('AccountNew');
+              this.props.navigation.navigate('AccountAdd');
             }}
           />
         </View>
