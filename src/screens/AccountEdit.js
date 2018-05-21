@@ -68,8 +68,15 @@ export default class AccountEdit extends Component {
                 </View>
                 <View>
                   <Button
+                    buttonStyles={styles.nextStep}
+                    title="Backup"
+                    onPress={() => {
+                      this.props.navigation.navigate('AccountUnlock');
+                    }}
+                  />
+                  <Button
                     buttonStyles={styles.deleteButton}
-                    title="Delete / Backup Account"
+                    title="Delete Account"
                     onPress={() => {
                       Alert.alert('Delete Account', `Are you sure to delete ${selected.name || selected.address}`, [
                         {
@@ -138,7 +145,7 @@ const styles = StyleSheet.create({
     fontSize: 10
   },
   deleteButton: {
-    marginTop: 15,
+    marginTop: 20,
     backgroundColor: 'red'
   }
 });

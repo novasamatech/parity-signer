@@ -58,15 +58,17 @@ export default class AccountsStore extends Container<AccountsState> {
 
   submitNew() {
     this.setState({
-      accounts: this.state.accounts.set(this.state.newAccount.address.toLowerCase(), this.state.newAccount)
+      accounts: this.state.accounts.set(this.state.newAccount.address.toLowerCase(), this.state.newAccount),
+      newAccount: empty()
     });
   }
 
   update(accountUpdate: { address: string }) {
-    let account = this.state.accounts.get(accountUpdate.address.toLowerCase());
+    accountUpdate.address = accountUpdate.address.toLowerCase();
+    let account = this.state.accounts.get(accountUpdate.address);
     if (!account) {
       this.state.accounts.set(accountUpdate.address.toLowerCase(), accountUpdate);
-      account = this.state.accounts.get(accountUpdate.address.toLowerCase());
+      account = this.state.accounts.get(accountUpdate.address);
     }
     Object.assign(account, accountUpdate);
     this.setState({});
@@ -109,6 +111,21 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async saveSelected(pin) {
     await this.save(this.getSelected(), pin);
+  }
+
+  async unlockAccount(address, pin) {
+    address = address.toLowerCase();
+    const account = this.getByAddress(address);
+    if (!account || !account.encryptedSeed) {
+      return false;
+    }
+    try {
+      account.seed = await decryptData(account.encryptedSeed, pin);
+      this.setState({ accounts: this.state.accounts.set(address, account) });
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
 
   async checkPinForSelected(pin) {

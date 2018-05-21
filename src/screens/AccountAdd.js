@@ -46,11 +46,14 @@ class AccountAddView extends Component {
       <View style={styles.body}>
         <TouchableItem style={styles.card} onPress={() => this.props.navigation.navigate('AccountNew')}>
           <Icon style={{ textAlign: 'center', color: colors.card_text, fontSize: 66 }} name="layers" />
-          <Text style={[styles.cardText, { paddingTop: 20 }]}>Create New Account</Text>
+          <Text style={[styles.cardText, { marginTop: 20 }]}>Create New Account</Text>
         </TouchableItem>
-        <TouchableItem style={[styles.card, { marginTop: 20 }]}>
+        <TouchableItem
+          style={[styles.card, { marginTop: 20 }]}
+          onPress={() => this.props.navigation.navigate('AccountRecover')}
+        >
           <Icon style={{ textAlign: 'center', color: colors.card_text, fontSize: 66 }} name="graphic-eq" />
-          <Text style={[styles.cardText, { paddingTop: 20 }]}>Recover Account</Text>
+          <Text style={[styles.cardText, { marginTop: 20 }]}>Recover Account</Text>
         </TouchableItem>
         <TouchableItem style={[styles.card, { marginTop: 20 }]}>
           <Text style={styles.cardText}>About Accounts</Text>

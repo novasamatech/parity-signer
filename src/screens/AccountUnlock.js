@@ -52,7 +52,29 @@ export class AccountUnlockAndSign extends Component {
   }
 }
 
-export default class AccountUnlock extends Component {
+export class AccountUnlock extends Component {
+  render() {
+    return (
+      <Subscribe to={[AccountsStore]}>
+        {accounts => (
+          <AccountUnlockView
+            {...this.props}
+            onNext={async pin => {
+              if (await accounts.unlockAccount(accounts.getSelected().address, pin)) {
+                this.props.navigation.navigate('AccountBackup');
+              } else {
+                Alert.alert('PIN is incorrect');
+              }
+            }}
+            accounts={accounts}
+          />
+        )}
+      </Subscribe>
+    );
+  }
+}
+
+export class AccountCheckPin extends Component {
   render() {
     return (
       <Subscribe to={[AccountsStore]}>

@@ -43,8 +43,10 @@ export default class AccountBackup extends Component {
 
 class AccountBackupView extends Component {
   render() {
-    const { accounts } = this.props;
-    const selected = accounts.getNew();
+    const { accounts, navigation } = this.props;
+    const isNew = navigation.getParam('isNew');
+    const selected = isNew ? accounts.getNew() : accounts.getSelected();
+    console.log(selected);
     return (
       <View style={styles.body}>
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
@@ -58,7 +60,11 @@ class AccountBackupView extends Component {
           buttonStyles={styles.nextStep}
           title="Done Backing Up"
           onPress={() => {
-            this.props.navigation.navigate('AccountPin');
+            if (navigation.getParam('isNew')) {
+              this.props.navigation.navigate('AccountPin');
+            } else {
+              this.props.navigation.navigate('AccountList');
+            }
           }}
         />
       </View>

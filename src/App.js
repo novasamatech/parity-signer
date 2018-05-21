@@ -31,13 +31,13 @@ import QrScanner from './screens/QrScanner';
 import AccountList from './screens/AccountList';
 import AccountAdd from './screens/AccountAdd';
 import AccountNew from './screens/AccountNew';
+import AccountRecover from './screens/AccountRecover';
 import AccountBackup from './screens/AccountBackup';
 import AccountPin from './screens/AccountPin';
 import AccountDetails from './screens/AccountDetails';
-import AccountUnlock from './screens/AccountUnlock';
 import AccountEdit from './screens/AccountEdit';
 import TxDetails from './screens/TxDetails';
-import { AccountUnlockAndSign } from './screens/AccountUnlock';
+import { AccountCheckPin, AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import SignedTx from './screens/SignedTx';
 import colors from './colors';
 
@@ -188,6 +188,9 @@ const Screens = createStackNavigator(
                 AccountAdd: {
                   screen: AccountAdd
                 },
+                AccountRecover: {
+                  screen: AccountRecover
+                },
                 AccountBackup: {
                   screen: AccountBackup
                 },
@@ -196,6 +199,9 @@ const Screens = createStackNavigator(
                 },
                 AccountDetails: {
                   screen: AccountDetails
+                },
+                AccountCheckPin: {
+                  screen: AccountCheckPin
                 },
                 AccountUnlock: {
                   screen: AccountUnlock

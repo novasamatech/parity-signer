@@ -20,63 +20,66 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet } from 'react-native';
 import { Subscribe } from 'unstated';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { brainWalletAddress } from '../util/native';
 import AccountsStore from '../stores/AccountsStore';
 import AccountSeed from '../components/AccountSeed';
+import AccountCard from '../components/AccountCard';
 import AccountIconChooser from '../components/AccountIconChooser';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import colors from '../colors';
 
-export default class AccountNew extends Component {
+export default class AccountRecover extends Component {
   static navigationOptions = {
-    title: 'New Account',
+    title: 'Recover Account',
     headerBackTitle: 'Back'
   };
   render() {
     return (
-      <Subscribe to={[AccountsStore]}>{accounts => <AccountNewView {...this.props} accounts={accounts} />}</Subscribe>
+      <Subscribe to={[AccountsStore]}>
+        {accounts => <AccountRecoverView {...this.props} accounts={accounts} />}
+      </Subscribe>
     );
   }
 }
 
-class AccountNewView extends Component {
+class AccountRecoverView extends Component {
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
-    if (!selected) {
-      return null;
-    }
     return (
       <View style={styles.body}>
         <ScrollView style={{ padding: 20 }} containerStyle={styles.bodyContainer}>
-          <View style={styles.top}>
-            <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-            <Text style={styles.title}>CHOOSE AN IDENTICON</Text>
-            <AccountIconChooser
-              value={selected && selected.address}
-              onChange={({ address, seed }) => {
-                accounts.updateNew({ address, seed });
-              }}
-            />
-            <Text style={styles.title}>ACCOUNT NAME</Text>
-            <TextInput
-              onChangeText={name => accounts.updateNew({ name })}
-              value={selected && selected.name}
-              placeholder="Enter a new account name"
-            />
-          </View>
-          <View style={styles.bottom}>
-            <Text style={styles.hintText}>
-              On the next step you will be asked to backup your account, get pen and paper ready
-            </Text>
-            <Button
-              buttonStyles={styles.nextStep}
-              title="Next Step"
-              onPress={() => {
-                selected && this.props.navigation.navigate('AccountBackup', { isNew: true });
-              }}
-            />
-          </View>
+          <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
+          <AccountCard address={selected.address || ''} title={selected.name || 'no name'} />
+          <Text style={styles.title}>ACCOUNT NAME</Text>
+          <TextInput
+            onChangeText={name => accounts.updateNew({ name })}
+            value={selected && selected.name}
+            placeholder="Enter an account name"
+          />
+
+          <Text style={[styles.title, { marginTop: 20 }]}>ENTER RECOVERY WORDS</Text>
+          <TextInput
+            onChangeText={async seed =>
+              accounts.updateNew({
+                seed,
+                address: await brainWalletAddress(seed)
+              })
+            }
+            style={{ height: 140, lineHeight: 30 }}
+            editable={true}
+            value={selected.seed}
+            multiline={true}
+          />
+          <Button
+            buttonStyles={{ marginTop: 20 }}
+            title="Next Step"
+            onPress={() => {
+              this.props.navigation.navigate('AccountPin');
+            }}
+          />
         </ScrollView>
       </View>
     );
@@ -101,6 +104,14 @@ const styles = StyleSheet.create({
     flexBasis: 50,
     paddingBottom: 15
   },
+  titleTop: {
+    fontFamily: 'Roboto',
+    color: colors.bg_text_sec,
+    fontSize: 24,
+    fontWeight: 'bold',
+    paddingBottom: 20,
+    textAlign: 'center'
+  },
   title: {
     fontFamily: 'Roboto',
     color: colors.bg_text_sec,
@@ -108,22 +119,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingBottom: 20
   },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingBottom: 20,
-    textAlign: 'center'
+  card: {
+    backgroundColor: colors.card_bg,
+    padding: 20
   },
-  hintText: {
-    fontFamily: 'Roboto',
+  cardText: {
     textAlign: 'center',
-    paddingTop: 20,
-    color: colors.bg_text_sec,
-    fontWeight: '800',
-    fontSize: 10
-  },
-  nextStep: {
-    marginTop: 15
+    color: colors.card_text,
+    fontFamily: 'Roboto',
+    fontSize: 20,
+    fontWeight: 'bold'
   }
 });
