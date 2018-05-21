@@ -25,7 +25,8 @@ import ScannerStore from '../stores/ScannerStore';
 
 export default class Scanner extends Component {
   static navigationOptions = {
-    title: 'Scan Transaction'
+    title: 'Transaction Details',
+    headerBackTitle: 'Scanner'
   };
 
   render() {

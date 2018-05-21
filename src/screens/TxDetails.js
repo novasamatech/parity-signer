@@ -30,6 +30,10 @@ import colors from '../colors';
 const orUnknown = (value = 'Unknown') => value;
 
 export default class TxDetails extends Component {
+  static navigationOptions = {
+    title: 'Transaction Details',
+    headerBackTitle: 'Transaction details'
+  };
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>

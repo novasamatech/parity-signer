@@ -58,7 +58,7 @@ class AccountBackupView extends Component {
         <TextInput style={{ height: 140, lineHeight: 30 }} editable={false} value={selected.seed} multiline={true} />
         <Button
           buttonStyles={styles.nextStep}
-          title="Done Backing Up"
+          title="Done"
           onPress={() => {
             if (navigation.getParam('isNew')) {
               this.props.navigation.navigate('AccountPin');

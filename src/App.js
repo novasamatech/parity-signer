@@ -139,7 +139,6 @@ const globalStackNavigationOptions = {
     display: 'none'
   },
   headerBackTitleStyle: {
-    paddingLeft: 5,
     fontSize: 18
   }
 };

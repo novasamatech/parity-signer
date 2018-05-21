@@ -28,6 +28,10 @@ import Button from '../components/Button';
 import colors from '../colors';
 
 export default class AccountDetails extends Component {
+  static navigationOptions = {
+    title: 'Account Details'
+  };
+
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -44,10 +48,6 @@ class AccountDetailsView extends Component {
       showQr: false
     };
   }
-
-  static navigationOptions = {
-    title: 'Account Details'
-  };
 
   state: {
     showQr: false

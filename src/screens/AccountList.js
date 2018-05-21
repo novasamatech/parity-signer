@@ -27,7 +27,7 @@ import colors from '../colors';
 
 export default class AccountList extends Component {
   static navigationOptions = {
-    title: 'Back to List'
+    title: 'Accounts'
   };
   render() {
     return (

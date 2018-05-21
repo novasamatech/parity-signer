@@ -19,6 +19,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
@@ -40,7 +41,15 @@ export class AccountUnlockAndSign extends Component {
                 const txRequest = scannerStore.getTXRequest();
                 const sender = accounts.getByAddress(txRequest.data.account);
                 let res = await scannerStore.signData(sender, pin);
-                this.props.navigation.navigate('SignedTx');
+                const resetAction = StackActions.reset({
+                  index: 2,
+                  actions: [
+                    NavigationActions.navigate({ routeName: 'QrScanner' }),
+                    NavigationActions.navigate({ routeName: 'TxDetails' }),
+                    NavigationActions.navigate({ routeName: 'SignedTx' })
+                  ]
+                });
+                this.props.navigation.dispatch(resetAction);
               } catch (e) {
               }
             }}
@@ -61,7 +70,15 @@ export class AccountUnlock extends Component {
             onChange={async pin => {
               // TODO: lock account back after if result wasn't saved
               if (await accounts.unlockAccount(accounts.getSelected().address, pin)) {
-                this.props.navigation.navigate('AccountBackup');
+                const resetAction = StackActions.reset({
+                  index: 2,
+                  actions: [
+                    NavigationActions.navigate({ routeName: 'AccountList' }),
+                    NavigationActions.navigate({ routeName: 'AccountDetails' }),
+                    NavigationActions.navigate({ routeName: 'AccountBackup' })
+                  ]
+                });
+                this.props.navigation.dispatch(resetAction);
               }
             }}
             accounts={accounts}
