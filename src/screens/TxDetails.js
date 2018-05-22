@@ -117,7 +117,7 @@ export class TxDetailsView extends Component {
           }}
         />
         <Button
-          buttonStyles={{ backgroundColor: colors.bg_positive, marginTop: 20, height: 60 }}
+          buttonStyles={{ backgroundColor: colors.bg_positive, height: 60 }}
           title="Sign Transaction"
           textStyles={{ color: colors.card_text }}
           onPress={() => this.props.onNext()}
