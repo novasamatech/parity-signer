@@ -1,4 +1,4 @@
-# native-signer
+# Parity Signer
 
 [![App Store][app-store-badge]][app-store-url]
 [![Google Play][google-play-badge]][google-play-url]
