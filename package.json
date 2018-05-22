@@ -36,7 +36,8 @@
     "babel-preset-react-native": "1.9.1",
     "jest": "18.1.0",
     "jest-react-native": "^18.0.0",
-    "pre-git": "^3.14.0"
+    "pre-git": "^3.14.0",
+    "prettier": "1.12.1"
   },
   "rnpm": {
     "assets": [

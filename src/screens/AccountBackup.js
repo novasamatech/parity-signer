@@ -44,8 +44,7 @@ export default class AccountBackup extends Component {
 class AccountBackupView extends Component {
   render() {
     const { accounts, navigation } = this.props;
-    const selected = navigation.getParam('isNew')
-      ? accounts.getNew() : accounts.getSelected();
+    const selected = navigation.getParam('isNew') ? accounts.getNew() : accounts.getSelected();
     return (
       <View style={styles.body}>
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
@@ -60,9 +59,11 @@ class AccountBackupView extends Component {
           title="Done"
           onPress={() => {
             if (navigation.getParam('isNew')) {
-              this.props.navigation.navigate('AccountPin');
+              this.props.navigation.navigate('AccountPin', {
+                isWelcome: navigation.getParam('isWelcome')
+              });
             } else {
-              this.props.navigation.navigate('AccountList');
+              navigation.navigate('AccountList');
             }
           }}
         />

@@ -21,11 +21,12 @@
 import React, { Component } from 'react';
 import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated';
 import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native';
-import { createStackNavigator, createTabNavigator, HeaderTitle, Header } from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator, HeaderTitle, Header } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header';
 import TabBarBottom from './components/TabBarBottom';
 import TouchableItem from './components/TouchableItem';
+import Loading from './screens/Loading';
 import QrScanner from './screens/QrScanner';
 import AccountList from './screens/AccountList';
 import AccountAdd from './screens/AccountAdd';
@@ -132,8 +133,41 @@ const globalStackNavigationOptions = {
 
 const Screens = createStackNavigator(
   {
+    Loading: {
+      screen: Loading
+    },
+    Welcome: {
+      screen: createStackNavigator(
+        {
+          AccountAdd: {
+            screen: AccountAdd,
+            navigationOptions: {
+              headerLeft: <HeaderLeftHome />
+            }
+          },
+          AccountNew: {
+            screen: AccountNew
+          },
+          AccountRecover: {
+            screen: AccountRecover
+          },
+          AccountBackup: {
+            screen: AccountBackup
+          },
+          AccountPin: {
+            screen: AccountPin
+          }
+        },
+        {
+          navigationOptions: globalStackNavigationOptions,
+          initialRouteParams: {
+            isWelcome: true
+          }
+        }
+      )
+    },
     Tabs: {
-      screen: createTabNavigator(
+      screen: createBottomTabNavigator(
         {
           Scanner: {
             screen: createStackNavigator(

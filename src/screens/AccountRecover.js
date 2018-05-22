@@ -77,7 +77,9 @@ class AccountRecoverView extends Component {
             buttonStyles={{ marginTop: 20 }}
             title="Next Step"
             onPress={() => {
-              this.props.navigation.navigate('AccountPin');
+              this.props.navigation.navigate('AccountPin', {
+                isWelcome: this.props.navigation.getParam('isWelcome')
+              });
             }}
           />
         </ScrollView>

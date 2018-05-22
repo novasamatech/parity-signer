@@ -33,6 +33,7 @@ export default class AccountAdd extends Component {
     title: 'Add Account',
     headerBackTitle: 'Back'
   };
+
   render() {
     return (
       <Subscribe to={[AccountsStore]}>{accounts => <AccountAddView {...this.props} accounts={accounts} />}</Subscribe>
@@ -42,15 +43,18 @@ export default class AccountAdd extends Component {
 
 class AccountAddView extends Component {
   render() {
+    const { navigation } = this.props;
+    const isWelcome = navigation.getParam('isWelcome');
     return (
       <View style={styles.body}>
-        <TouchableItem style={styles.card} onPress={() => this.props.navigation.navigate('AccountNew')}>
+        {isWelcome && <Text style={styles.titleTop}>GETTING STARTED</Text>}
+        <TouchableItem style={styles.card} onPress={() => navigation.navigate('AccountNew', { isWelcome })}>
           <Icon style={{ textAlign: 'center', color: colors.card_text, fontSize: 66 }} name="layers" />
           <Text style={[styles.cardText, { marginTop: 20 }]}>Create New Account</Text>
         </TouchableItem>
         <TouchableItem
           style={[styles.card, { marginTop: 20 }]}
-          onPress={() => this.props.navigation.navigate('AccountRecover')}
+          onPress={() => navigation.navigate('AccountRecover', { isWelcome })}
         >
           <Icon style={{ textAlign: 'center', color: colors.card_text, fontSize: 66 }} name="graphic-eq" />
           <Text style={[styles.cardText, { marginTop: 20 }]}>Recover Account</Text>

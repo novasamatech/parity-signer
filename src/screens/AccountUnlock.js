@@ -50,8 +50,7 @@ export class AccountUnlockAndSign extends Component {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) {
-              }
+              } catch (e) {}
             }}
           />
         )}
@@ -101,8 +100,7 @@ export class AccountCheckPin extends Component {
                 let res = await accounts.checkPinForSelected(pin);
                 Alert.alert('PIN is OK');
                 this.props.navigation.goBack();
-              } catch (e) {
-              }
+              } catch (e) {}
             }}
             accounts={accounts}
           />
@@ -131,7 +129,7 @@ class AccountUnlockView extends Component {
         <PinInput
           onChangeText={pin => {
             this.setState({ pin });
-            this.props.onChange(pin)
+            this.props.onChange(pin);
           }}
           value={this.state.pin}
         />
