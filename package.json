@@ -20,21 +20,14 @@
     "hoist-non-react-statics": "^2.5.0",
     "prop-types": "^15.6.1",
     "react": "16.3.1",
-    "react-addons-pure-render-mixin": "^15.5.0",
     "react-native": "0.55.3",
     "react-native-bgimage": "^1.4.0",
     "react-native-camera": "^1.1.1",
-    "react-native-prompt": "^1.0.0",
     "react-native-qrcode": "^0.2.6",
-    "react-native-router-flux": "^4.0.0-beta.26",
     "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^4.6.0",
     "react-navigation": "^2.0.1",
-    "react-redux": "^5.0.7",
-    "react-static-container": "^1.0.1",
-    "redux": "^3.6.0",
-    "redux-thunk": "^2.2.0",
     "unstated": "^2.0.3"
   },
   "devDependencies": {
@@ -43,9 +36,7 @@
     "babel-preset-react-native": "1.9.1",
     "jest": "18.1.0",
     "jest-react-native": "^18.0.0",
-    "pre-git": "^3.14.0",
-    "react-test-renderer": "15.4.2",
-    "standard": "^9.0.2"
+    "pre-git": "^3.14.0"
   },
   "rnpm": {
     "assets": [

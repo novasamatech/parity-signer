@@ -22,7 +22,6 @@ import React, { Component } from 'react';
 import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated';
 import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native';
 import { createStackNavigator, createTabNavigator, HeaderTitle, Header } from 'react-navigation';
-import { Actions, Scene } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header';
 import TabBarBottom from './components/TabBarBottom';
@@ -49,18 +48,6 @@ export default class App extends Component {
       </UnstatedProvider>
     );
   }
-
-  componentDidMount() {
-    AppState.addEventListener('change', this._handleAppStateChange);
-  }
-
-  componentWillUnmount() {
-    AppState.removeEventListener('change', this._handleAppStateChange);
-  }
-
-  _handleAppStateChange = appState => {
-    // TODO: handle
-  };
 }
 
 const headerStyles = StyleSheet.create({

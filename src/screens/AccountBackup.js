@@ -44,9 +44,8 @@ export default class AccountBackup extends Component {
 class AccountBackupView extends Component {
   render() {
     const { accounts, navigation } = this.props;
-    const isNew = navigation.getParam('isNew');
-    const selected = isNew ? accounts.getNew() : accounts.getSelected();
-    console.log(selected);
+    const selected = navigation.getParam('isNew')
+      ? accounts.getNew() : accounts.getSelected();
     return (
       <View style={styles.body}>
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
