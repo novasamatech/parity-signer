@@ -53,8 +53,7 @@ class AccountPinView extends Component {
   };
 
   render() {
-    const { accounts, type } = this.props;
-    console.log(this.props.navigation.state);
+    const { accounts, type, navigation } = this.props;
     const title = {
       NEW: 'ACCOUNT PIN',
       CHANGE: 'CHANGE PIN'
@@ -75,20 +74,16 @@ class AccountPinView extends Component {
               accounts.submitNew();
               accounts.select(account.address);
               accounts.refreshList();
-              if (this.props.navigation.getParam('isWelcome')) {
-                this.props.navigation.navigate('Tabs');
+              if (navigation.getParam('isWelcome')) {
+                navigation.navigate('Tabs');
                 const resetAction = StackActions.reset({
                   index: 0,
                   actions: [NavigationActions.navigate({ routeName: 'QrScanner' })]
                 });
-                this.props.navigation.dispatch(resetAction);
+                navigation.dispatch(resetAction);
               } else {
-                const resetAction = StackActions.reset({
-                  index: 0,
-                  actions: [NavigationActions.navigate({ routeName: 'AccountList' })]
-                });
-                this.props.navigation.dispatch(resetAction);
-                this.props.navigation.navigate('AccountDetails');
+                navigation.popToTop();
+                navigation.navigate('AccountDetails');
               }
             }
           }}
