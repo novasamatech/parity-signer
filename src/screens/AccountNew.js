@@ -73,7 +73,8 @@ class AccountNewView extends Component {
               buttonStyles={styles.nextStep}
               title="Next Step"
               onPress={() => {
-                selected &&
+                selected.address &&
+                  selected.address.length &&
                   this.props.navigation.navigate('AccountBackup', {
                     isNew: true,
                     isWelcome: this.props.navigation.getParam('isWelcome')

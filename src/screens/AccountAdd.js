@@ -42,6 +42,11 @@ export default class AccountAdd extends Component {
 }
 
 class AccountAddView extends Component {
+
+  componentWillMount() {
+    this.props.navigation.addListener('willFocus', () => { this.props.accounts.resetNew() });
+  }
+
   render() {
     const { navigation } = this.props;
     const isWelcome = navigation.getParam('isWelcome');

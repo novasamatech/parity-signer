@@ -69,6 +69,10 @@ export default class AccountsStore extends Container<AccountsState> {
     this.setState({});
   }
 
+  resetNew() {
+    this.setState({ newAccount: empty() });
+  }
+
   getNew(): Account {
     return this.state.newAccount;
   }
