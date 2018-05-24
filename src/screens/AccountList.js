@@ -18,7 +18,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, ListView, StatusBar, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StatusBar, StyleSheet } from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import AccountCard from '../components/AccountCard';
@@ -61,34 +61,25 @@ class AccountListView extends Component {
 
   constructor(props) {
     super(props);
-    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => true });
-    this.state = {
-      dataSource: ds.cloneWithRows(props.accounts)
-    };
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    return {
-      dataSource: prevState.dataSource.cloneWithRows(nextProps.accounts)
-    };
   }
 
   render() {
     return (
       <View style={styles.body}>
         <Text style={styles.title}>ACCOUNTS</Text>
-        <ListView
+        <FlatList
           style={styles.content}
-          dataSource={this.state.dataSource}
-          removeClippedSubviews={false}
-          renderRow={(rowData, sectionID: number, rowID: number, highlightRow) => {
+          data={this.props.accounts}
+          keyExtractor={item => item.address}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+          renderItem={({ item }) => {
             return (
               <AccountCard
-                title={rowData.name ? rowData.name : 'no name'}
-                address={rowData.address}
+                title={item.name ? item.name : 'no name'}
+                style={{ paddingBottom: null }}
+                address={item.address}
                 onPress={() => {
-                  highlightRow(sectionID, rowID);
-                  this.props.onAccountSelected(this.props.accounts[rowID].address);
+                  this.props.onAccountSelected(item.address);
                 }}
               />
             );
