@@ -52,7 +52,7 @@ export default class AccountIconChooser extends Component<{
               const seed = await words();
               return {
                 seed,
-                address: await brainWalletAddress(seed)
+                address: (await brainWalletAddress(seed)).toLowerCase()
               };
             })
         ))
