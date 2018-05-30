@@ -27,7 +27,7 @@ import {
   Share,
   StyleSheet
 } from 'react-native';
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import AccountSeed from '../components/AccountSeed';
