@@ -27,6 +27,7 @@ import {
   Share,
   StyleSheet
 } from 'react-native';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import AccountSeed from '../components/AccountSeed';
@@ -58,7 +59,7 @@ class AccountNewView extends Component {
     }
     return (
       <View style={styles.body}>
-        <ScrollView
+        <KeyboardAwareScrollView
           style={{ padding: 20 }}
           containerStyle={styles.bodyContainer}
         >
@@ -96,7 +97,7 @@ class AccountNewView extends Component {
               }}
             />
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     );
   }

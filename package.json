@@ -23,6 +23,7 @@
     "react-native": "0.55.3",
     "react-native-bgimage": "^1.4.0",
     "react-native-camera": "^1.1.1",
+    "react-native-keyboard-aware-scroll-view": "^0.5.0",
     "react-native-qrcode": "^0.2.6",
     "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
     "react-native-tabs": "^1.0.9",

@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
+"use strict";
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import {
   Alert,
   ScrollView,
@@ -26,23 +26,25 @@ import {
   TouchableOpacity,
   Share,
   StyleSheet,
-  KeyboardAvoidingView
-} from 'react-native';
-import { Subscribe } from 'unstated';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { brainWalletAddress } from '../util/native';
-import AccountsStore from '../stores/AccountsStore';
-import AccountSeed from '../components/AccountSeed';
-import AccountCard from '../components/AccountCard';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TextInput from '../components/TextInput';
-import Button from '../components/Button';
-import colors from '../colors';
+  KeyboardAvoidingView,
+  findNodeHandle
+} from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Subscribe } from "unstated";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { brainWalletAddress } from "../util/native";
+import AccountsStore from "../stores/AccountsStore";
+import AccountSeed from "../components/AccountSeed";
+import AccountCard from "../components/AccountCard";
+import AccountIconChooser from "../components/AccountIconChooser";
+import TextInput from "../components/TextInput";
+import Button from "../components/Button";
+import colors from "../colors";
 
 export default class AccountRecover extends Component {
   static navigationOptions = {
-    title: 'Recover Account',
-    headerBackTitle: 'Back'
+    title: "Recover Account",
+    headerBackTitle: "Back"
   };
   render() {
     return (
@@ -59,14 +61,20 @@ class AccountRecoverView extends Component {
     const selected = accounts.getNew();
     return (
       <View style={styles.body}>
-        <ScrollView
+        <KeyboardAwareScrollView
           style={{ padding: 20 }}
           containerStyle={styles.bodyContainer}
+          enableOnAndroid
+          scrollEnabled={true}
+          extraHeight={120}
+          innerRef={ref => {
+            this.scroll = ref;
+          }}
         >
           <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
           <AccountCard
-            address={selected.address || ''}
-            title={selected.name || 'no name'}
+            address={selected.address || ""}
+            title={selected.name || "no name"}
           />
           <Text style={styles.title}>ACCOUNT NAME</Text>
           <TextInput
@@ -79,6 +87,9 @@ class AccountRecoverView extends Component {
             ENTER RECOVERY WORDS
           </Text>
           <TextInput
+            onFocus={e => {
+              this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
+            }}
             onChangeText={async seed =>
               accounts.updateNew({
                 seed,
@@ -91,15 +102,15 @@ class AccountRecoverView extends Component {
             multiline={true}
           />
           <Button
-            buttonStyles={{ marginTop: 20 }}
+            buttonStyles={{ marginTop: 20, marginBottom: 40 }}
             title="Next Step"
             onPress={() => {
-              this.props.navigation.navigate('AccountPin', {
-                isWelcome: this.props.navigation.getParam('isWelcome')
+              this.props.navigation.navigate("AccountPin", {
+                isWelcome: this.props.navigation.getParam("isWelcome")
               });
             }}
           />
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     );
   }
@@ -108,45 +119,24 @@ class AccountRecoverView extends Component {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    paddingBottom: 20,
     flex: 1
   },
   bodyContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
+    paddingBottom: 20,
   },
   titleTop: {
-    fontFamily: 'Roboto',
+    fontFamily: "Roboto",
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     paddingBottom: 20,
-    textAlign: 'center'
+    textAlign: "center"
   },
   title: {
-    fontFamily: 'Roboto',
+    fontFamily: "Roboto",
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     paddingBottom: 20
-  },
-  card: {
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    textAlign: 'center',
-    color: colors.card_text,
-    fontFamily: 'Roboto',
-    fontSize: 20,
-    fontWeight: 'bold'
   }
 });
