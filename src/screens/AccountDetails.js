@@ -18,7 +18,14 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, ScrollView, Text, TextInput, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import AccountIcon from '../components/AccountIcon';
@@ -63,7 +70,10 @@ class AccountDetailsView extends Component {
       return null;
     }
     return (
-      <ScrollView contentContainerStyle={styles.bodyContent} style={styles.body}>
+      <ScrollView
+        contentContainerStyle={styles.bodyContent}
+        style={styles.body}
+      >
         <Text style={styles.title}>ACCOUNT</Text>
         <AccountDetailsCard
           address={account.address}

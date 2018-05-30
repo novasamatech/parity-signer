@@ -18,7 +18,16 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet, Clipboard } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Share,
+  StyleSheet,
+  Clipboard
+} from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountCard from '../components/AccountCard';
 import AccountsStore from '../stores/AccountsStore';
@@ -78,20 +87,25 @@ export default class AccountEdit extends Component {
                     buttonStyles={styles.deleteButton}
                     title="Delete Account"
                     onPress={() => {
-                      Alert.alert('Delete Account', `Are you sure to delete ${selected.name || selected.address}`, [
-                        {
-                          text: 'Delete',
-                          style: 'destructive',
-                          onPress: () => {
-                            accounts.deleteAccount(selected);
-                            this.props.navigation.navigate('AccountList');
+                      Alert.alert(
+                        'Delete Account',
+                        `Are you sure to delete ${selected.name ||
+                          selected.address}`,
+                        [
+                          {
+                            text: 'Delete',
+                            style: 'destructive',
+                            onPress: () => {
+                              accounts.deleteAccount(selected);
+                              this.props.navigation.navigate('AccountList');
+                            }
+                          },
+                          {
+                            text: 'Cancel',
+                            style: 'cancel'
                           }
-                        },
-                        {
-                          text: 'Cancel',
-                          style: 'cancel'
-                        }
-                      ]);
+                        ]
+                      );
                     }}
                   />
                 </View>

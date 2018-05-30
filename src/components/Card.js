@@ -18,7 +18,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, Platform, StyleSheet, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Platform,
+  StyleSheet,
+  TouchableNativeFeedback,
+  TouchableOpacity
+} from 'react-native';
 import colors from '../colors';
 
 export default class Card extends React.Component<{
@@ -39,7 +46,14 @@ export default class Card extends React.Component<{
   };
 
   render() {
-    const { title, secondaryText, labelText, footerStyle, style, onPress } = this.props;
+    const {
+      title,
+      secondaryText,
+      labelText,
+      footerStyle,
+      style,
+      onPress
+    } = this.props;
 
     const finalBodyStyle = [style.body, FooterStyle];
     const finalContentStyle = [style.content];
@@ -48,9 +62,14 @@ export default class Card extends React.Component<{
     const finalSecondaryTextStyle = [styles.secondaryText];
     const finalFooterTextStyle = [styles.footerText];
 
-    const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+    const Touchable =
+      Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     return (
-      <Touchable accessibilityComponentType="button" disabled={false} onPress={onPress}>
+      <Touchable
+        accessibilityComponentType="button"
+        disabled={false}
+        onPress={onPress}
+      >
         <View style={finalBodyStyle}>
           <View style={finalContentStyle}>
             <Image source={require('../../icon.png')} style={styles.image} />

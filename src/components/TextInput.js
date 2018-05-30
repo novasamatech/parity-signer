@@ -15,7 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { TextInput as TextInputOrigin, Platform, StyleSheet } from 'react-native';
+import {
+  TextInput as TextInputOrigin,
+  Platform,
+  StyleSheet
+} from 'react-native';
 import colors from '../colors';
 
 export default function TextInput(props) {

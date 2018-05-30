@@ -18,7 +18,15 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Share,
+  StyleSheet
+} from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import AccountSeed from '../components/AccountSeed';
@@ -34,7 +42,9 @@ export default class AccountNew extends Component {
   };
   render() {
     return (
-      <Subscribe to={[AccountsStore]}>{accounts => <AccountNewView {...this.props} accounts={accounts} />}</Subscribe>
+      <Subscribe to={[AccountsStore]}>
+        {accounts => <AccountNewView {...this.props} accounts={accounts} />}
+      </Subscribe>
     );
   }
 }
@@ -48,7 +58,10 @@ class AccountNewView extends Component {
     }
     return (
       <View style={styles.body}>
-        <ScrollView style={{ padding: 20 }} containerStyle={styles.bodyContainer}>
+        <ScrollView
+          style={{ padding: 20 }}
+          containerStyle={styles.bodyContainer}
+        >
           <View style={styles.top}>
             <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
             <Text style={styles.title}>CHOOSE AN IDENTICON</Text>
@@ -67,7 +80,8 @@ class AccountNewView extends Component {
           </View>
           <View style={styles.bottom}>
             <Text style={styles.hintText}>
-              On the next step you will be asked to backup your account, get pen and paper ready
+              On the next step you will be asked to backup your account, get pen
+              and paper ready
             </Text>
             <Button
               buttonStyles={styles.nextStep}

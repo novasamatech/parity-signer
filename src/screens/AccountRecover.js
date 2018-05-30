@@ -18,7 +18,16 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Share,
+  StyleSheet,
+  KeyboardAvoidingView
+} from 'react-native';
 import { Subscribe } from 'unstated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { brainWalletAddress } from '../util/native';
@@ -50,9 +59,15 @@ class AccountRecoverView extends Component {
     const selected = accounts.getNew();
     return (
       <View style={styles.body}>
-        <ScrollView style={{ padding: 20 }} containerStyle={styles.bodyContainer}>
+        <ScrollView
+          style={{ padding: 20 }}
+          containerStyle={styles.bodyContainer}
+        >
           <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
-          <AccountCard address={selected.address || ''} title={selected.name || 'no name'} />
+          <AccountCard
+            address={selected.address || ''}
+            title={selected.name || 'no name'}
+          />
           <Text style={styles.title}>ACCOUNT NAME</Text>
           <TextInput
             onChangeText={name => accounts.updateNew({ name })}
@@ -60,7 +75,9 @@ class AccountRecoverView extends Component {
             placeholder="Enter an account name"
           />
 
-          <Text style={[styles.title, { marginTop: 20 }]}>ENTER RECOVERY WORDS</Text>
+          <Text style={[styles.title, { marginTop: 20 }]}>
+            ENTER RECOVERY WORDS
+          </Text>
           <TextInput
             onChangeText={async seed =>
               accounts.updateNew({

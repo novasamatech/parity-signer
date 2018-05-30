@@ -18,7 +18,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, Platform, StyleSheet, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Platform,
+  StyleSheet,
+  TouchableNativeFeedback,
+  TouchableOpacity
+} from 'react-native';
 import colors from '../colors';
 import Card from './Card';
 import AccountIcon from './AccountIcon';
@@ -40,10 +47,15 @@ export default class AccountCard extends React.Component<{
   render() {
     const { title, address, networkId, style, onPress } = this.props;
 
-    const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+    const Touchable =
+      Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
     return (
-      <Touchable accessibilityComponentType="button" disabled={false} onPress={onPress}>
+      <Touchable
+        accessibilityComponentType="button"
+        disabled={false}
+        onPress={onPress}
+      >
         <View style={[styles.body, style]}>
           <View style={styles.content}>
             <AccountIcon style={styles.icon} seed={'0x' + address} />

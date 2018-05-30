@@ -21,7 +21,12 @@
 import React, { Component } from 'react';
 import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated';
 import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator, HeaderTitle, Header } from 'react-navigation';
+import {
+  createStackNavigator,
+  createBottomTabNavigator,
+  HeaderTitle,
+  Header
+} from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header';
 import TabBarBottom from './components/TabBarBottom';
@@ -37,7 +42,11 @@ import AccountPin from './screens/AccountPin';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
 import TxDetails from './screens/TxDetails';
-import { AccountCheckPin, AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
+import {
+  AccountCheckPin,
+  AccountUnlock,
+  AccountUnlockAndSign
+} from './screens/AccountUnlock';
 import SignedTx from './screens/SignedTx';
 import colors from './colors';
 

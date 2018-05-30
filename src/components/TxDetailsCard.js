@@ -18,7 +18,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, Platform, StyleSheet, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Platform,
+  StyleSheet,
+  TouchableNativeFeedback,
+  TouchableOpacity
+} from 'react-native';
 import colors from '../colors';
 import Card from './Card';
 import AccountIcon from './AccountIcon';
@@ -43,7 +50,12 @@ export default class TxDetailsCard extends React.Component<{
     return (
       <View style={[styles.body, style]}>
         <Text style={styles.titleText}>You are about to send</Text>
-        <Amount style={{ marginTop: 10 }} value={value} gas={gas} gasPrice={gasPrice} />
+        <Amount
+          style={{ marginTop: 10 }}
+          value={value}
+          gas={gas}
+          gasPrice={gasPrice}
+        />
       </View>
     );
   }
@@ -54,14 +66,25 @@ function Amount({ style, value, gas, gasPrice }) {
   return (
     <View style={[{ justifyContent: 'center', alignItems: 'center' }, style]}>
       <View>
-        <View style={{ padding: 5, paddingVertical: 2, backgroundColor: colors.bg }}>
-          <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: '800' }}>
+        <View
+          style={{ padding: 5, paddingVertical: 2, backgroundColor: colors.bg }}
+        >
+          <Text
+            style={{ textAlign: 'center', fontSize: 20, fontWeight: '800' }}
+          >
             <Text style={{ color: colors.card_bg }}>{value}</Text>
             <Text style={{ color: colors.bg_text_sec }}> ETH</Text>
           </Text>
         </View>
         <View style={{ padding: 5, backgroundColor: colors.bg_text_sec }}>
-          <Text style={{ textAlign: 'center', fontSize: 10, fontWeight: '800', color: colors.card_bg }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 10,
+              fontWeight: '800',
+              color: colors.card_bg
+            }}
+          >
             fee: {fee} ETH
           </Text>
         </View>

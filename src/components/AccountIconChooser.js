@@ -18,7 +18,13 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, StyleSheet, ListView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ListView,
+  TouchableOpacity
+} from 'react-native';
 import { brainWalletAddress, words } from '../util/native';
 import colors from '../colors';
 import Card from './Card';
@@ -36,7 +42,9 @@ export default class AccountIconChooser extends Component<{
   constructor(props) {
     super(props);
     this.icons = [];
-    const iconsDS = new ListView.DataSource({ rowHasChanged: (r1, r2) => true });
+    const iconsDS = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => true
+    });
     this.state = { iconsDS };
   }
 
@@ -76,12 +84,20 @@ export default class AccountIconChooser extends Component<{
           style={styles.icons}
           dataSource={this.state.iconsDS}
           horizontal={true}
-          renderRow={({ address, seed }, sectionID: number, rowID: number, highlightRow) => {
+          renderRow={(
+            { address, seed },
+            sectionID: number,
+            rowID: number,
+            highlightRow
+          ) => {
             const selected = address === value;
             const style = [styles.icon];
             return (
               <TouchableOpacity
-                style={[styles.iconBorder, address === value ? styles.selected : {}]}
+                style={[
+                  styles.iconBorder,
+                  address === value ? styles.selected : {}
+                ]}
                 onPress={() => this.props.onChange({ address, seed })}
               >
                 <AccountIcon style={style} seed={'0x' + address} />
@@ -89,7 +105,9 @@ export default class AccountIconChooser extends Component<{
             );
           }}
         />
-        <Text style={styles.addressText}>{value ? `0x${value}` : `Select an identicon`}</Text>
+        <Text style={styles.addressText}>
+          {value ? `0x${value}` : `Select an identicon`}
+        </Text>
       </View>
     );
   }

@@ -52,7 +52,10 @@ export default class AccountIcon extends Component {
   render() {
     return (
       <View style={styles.identicon}>
-        <Image style={this.props.style || {}} source={{ uri: this.state.icon }} />
+        <Image
+          style={this.props.style || {}}
+          source={{ uri: this.state.icon }}
+        />
       </View>
     );
   }

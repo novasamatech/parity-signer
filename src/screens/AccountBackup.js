@@ -18,7 +18,15 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Share,
+  StyleSheet
+} from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import AccountSeed from '../components/AccountSeed';
@@ -44,16 +52,27 @@ export default class AccountBackup extends Component {
 class AccountBackupView extends Component {
   render() {
     const { accounts, navigation } = this.props;
-    const selected = navigation.getParam('isNew') ? accounts.getNew() : accounts.getSelected();
+    const selected = navigation.getParam('isNew')
+      ? accounts.getNew()
+      : accounts.getSelected();
     return (
       <View style={styles.body}>
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
-        <AccountCard address={selected.address} title={selected.name || 'no name'} />
+        <AccountCard
+          address={selected.address}
+          title={selected.name || 'no name'}
+        />
         <Text style={styles.titleTop}>RECOVERY WORDS</Text>
         <Text style={styles.hintText}>
-          Write these words down on paper. Keep it safe. These words allow anyone to recover this account.
+          Write these words down on paper. Keep it safe. These words allow
+          anyone to recover this account.
         </Text>
-        <TextInput style={{ height: 140, lineHeight: 30 }} editable={false} value={selected.seed} multiline={true} />
+        <TextInput
+          style={{ height: 140, lineHeight: 30 }}
+          editable={false}
+          value={selected.seed}
+          multiline={true}
+        />
         <Button
           buttonStyles={styles.nextStep}
           title="Done"

@@ -18,7 +18,15 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, ScrollView, View, Text, TouchableOpacity, Share, StyleSheet } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Share,
+  StyleSheet
+} from 'react-native';
 import { Subscribe } from 'unstated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AccountsStore from '../stores/AccountsStore';
@@ -36,15 +44,18 @@ export default class AccountAdd extends Component {
 
   render() {
     return (
-      <Subscribe to={[AccountsStore]}>{accounts => <AccountAddView {...this.props} accounts={accounts} />}</Subscribe>
+      <Subscribe to={[AccountsStore]}>
+        {accounts => <AccountAddView {...this.props} accounts={accounts} />}
+      </Subscribe>
     );
   }
 }
 
 class AccountAddView extends Component {
-
   componentWillMount() {
-    this.props.navigation.addListener('willFocus', () => { this.props.accounts.resetNew() });
+    this.props.navigation.addListener('willFocus', () => {
+      this.props.accounts.resetNew();
+    });
   }
 
   render() {
@@ -53,16 +64,37 @@ class AccountAddView extends Component {
     return (
       <View style={styles.body}>
         {isWelcome && <Text style={styles.titleTop}>GETTING STARTED</Text>}
-        <TouchableItem style={styles.card} onPress={() => navigation.navigate('AccountNew', { isWelcome })}>
-          <Icon style={{ textAlign: 'center', color: colors.card_text, fontSize: 66 }} name="layers" />
-          <Text style={[styles.cardText, { marginTop: 20 }]}>Create New Account</Text>
+        <TouchableItem
+          style={styles.card}
+          onPress={() => navigation.navigate('AccountNew', { isWelcome })}
+        >
+          <Icon
+            style={{
+              textAlign: 'center',
+              color: colors.card_text,
+              fontSize: 66
+            }}
+            name="layers"
+          />
+          <Text style={[styles.cardText, { marginTop: 20 }]}>
+            Create New Account
+          </Text>
         </TouchableItem>
         <TouchableItem
           style={[styles.card, { marginTop: 20 }]}
           onPress={() => navigation.navigate('AccountRecover', { isWelcome })}
         >
-          <Icon style={{ textAlign: 'center', color: colors.card_text, fontSize: 66 }} name="graphic-eq" />
-          <Text style={[styles.cardText, { marginTop: 20 }]}>Recover Account</Text>
+          <Icon
+            style={{
+              textAlign: 'center',
+              color: colors.card_text,
+              fontSize: 66
+            }}
+            name="graphic-eq"
+          />
+          <Text style={[styles.cardText, { marginTop: 20 }]}>
+            Recover Account
+          </Text>
         </TouchableItem>
         <TouchableItem style={[styles.card, { marginTop: 20 }]}>
           <Text style={styles.cardText}>About Accounts</Text>

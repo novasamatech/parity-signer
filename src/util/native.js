@@ -30,12 +30,17 @@ export const brainWalletAddress = seed =>
     keccak(asString(address)).then(hash => checksummedAddress(address, hash))
   );
 export const brainWalletSecret = seed => EthkeyBridge.brainWalletSecret(seed);
-export const brainWalletSign = (seed, message) => EthkeyBridge.brainWalletSign(seed, message);
+export const brainWalletSign = (seed, message) =>
+  EthkeyBridge.brainWalletSign(seed, message);
 export const rlpItem = (rlp, position) => EthkeyBridge.rlpItem(rlp, position);
 export const keccak = data => EthkeyBridge.keccak(data);
 export const ethSign = data => EthkeyBridge.ethSign(data);
 export const blockiesIcon = seed =>
-  EthkeyBridge.blockiesIcon(seed.toLowerCase()).then(icon => 'data:image/png;base64,' + icon);
+  EthkeyBridge.blockiesIcon(seed.toLowerCase()).then(
+    icon => 'data:image/png;base64,' + icon
+  );
 export const words = () => EthkeyBridge.randomPhrase(11);
-export const encryptData = (data, password) => EthkeyBridge.encryptData(data, password);
-export const decryptData = (data, password) => EthkeyBridge.decryptData(data, password);
+export const encryptData = (data, password) =>
+  EthkeyBridge.encryptData(data, password);
+export const decryptData = (data, password) =>
+  EthkeyBridge.decryptData(data, password);

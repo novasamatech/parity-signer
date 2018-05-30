@@ -45,5 +45,7 @@ async function asyncTransaction(rlp, resolve, reject) {
 }
 
 export default function transaction(rlp) {
-  return new Promise((resolve, reject) => asyncTransaction(rlp, resolve, reject));
+  return new Promise((resolve, reject) =>
+    asyncTransaction(rlp, resolve, reject)
+  );
 }

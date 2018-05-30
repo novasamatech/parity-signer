@@ -41,7 +41,9 @@ export default class TxDetails extends Component {
           const txRequest = scannerStore.getTXRequest();
           if (txRequest) {
             const sender = accounts.getByAddress(txRequest.data.account);
-            const recipient = accounts.getByAddress(scannerStore.getTx().action.toLowerCase());
+            const recipient = accounts.getByAddress(
+              scannerStore.getTx().action.toLowerCase()
+            );
             return (
               <TxDetailsView
                 {...{ ...this.props, ...scannerStore.getTx() }}
@@ -54,7 +56,11 @@ export default class TxDetails extends Component {
                 }}
                 onNext={async () => {
                   if (!sender) {
-                    scannerStore.setErrorMsg(`No account with address ${txRequest.data.account} found in your wallet`);
+                    scannerStore.setErrorMsg(
+                      `No account with address ${
+                        txRequest.data.account
+                      } found in your wallet`
+                    );
                     return;
                   }
                   try {
@@ -91,7 +97,10 @@ export class TxDetailsView extends Component {
 
   render() {
     return (
-      <ScrollView contentContainerStyle={styles.bodyContent} style={styles.body}>
+      <ScrollView
+        contentContainerStyle={styles.bodyContent}
+        style={styles.body}
+      >
         <Text style={styles.topTitle}>SIGN TRANSACTION</Text>
         <Text style={styles.title}>FROM</Text>
         <AccountCard

@@ -43,7 +43,12 @@ export default class QrView extends Component {
   renderQr() {
     return (
       <View style={styles.rectangleContainer}>
-        <QRCode value={this.props.text} size={290} bgColor="black" fgColor={colors.card_bg} />
+        <QRCode
+          value={this.props.text}
+          size={290}
+          bgColor="black"
+          fgColor={colors.card_bg}
+        />
       </View>
     );
   }

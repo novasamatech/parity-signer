@@ -18,7 +18,13 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import {
+  Alert,
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView
+} from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
@@ -68,7 +74,12 @@ export class AccountUnlock extends Component {
             {...this.props}
             onChange={async pin => {
               // TODO: lock account back after if result wasn't saved
-              if (await accounts.unlockAccount(accounts.getSelected().address, pin)) {
+              if (
+                await accounts.unlockAccount(
+                  accounts.getSelected().address,
+                  pin
+                )
+              ) {
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [

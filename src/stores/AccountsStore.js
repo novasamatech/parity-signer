@@ -79,7 +79,10 @@ export default class AccountsStore extends Container<AccountsState> {
 
   submitNew() {
     this.setState({
-      accounts: this.state.accounts.set(this.state.newAccount.address.toLowerCase(), this.state.newAccount),
+      accounts: this.state.accounts.set(
+        this.state.newAccount.address.toLowerCase(),
+        this.state.newAccount
+      ),
       newAccount: empty()
     });
   }
@@ -88,7 +91,10 @@ export default class AccountsStore extends Container<AccountsState> {
     accountUpdate.address = accountUpdate.address.toLowerCase();
     let account = this.state.accounts.get(accountUpdate.address);
     if (!account) {
-      this.state.accounts.set(accountUpdate.address.toLowerCase(), accountUpdate);
+      this.state.accounts.set(
+        accountUpdate.address.toLowerCase(),
+        accountUpdate
+      );
       account = this.state.accounts.get(accountUpdate.address);
     }
     Object.assign(account, accountUpdate);

@@ -20,7 +20,9 @@ import colors from '../colors';
 
 export default class Background extends Component {
   render() {
-    const lines = new Array(100).fill(0).map((_, i) => <View key={i} style={styles.line} />);
+    const lines = new Array(100)
+      .fill(0)
+      .map((_, i) => <View key={i} style={styles.line} />);
     return (
       <View style={styles.bg}>
         <View {...this.props}>{this.props.children}</View>
@@ -39,7 +41,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     position: 'absolute',
     zIndex: -1000,
-    transform: [{ rotate: '-30deg' }, { translateX: -300 }, { translateY: -3000 }, { scale: 0.2 }]
+    transform: [
+      { rotate: '-30deg' },
+      { translateX: -300 },
+      { translateY: -3000 },
+      { scale: 0.2 }
+    ]
   },
   line: {
     zIndex: -1000,

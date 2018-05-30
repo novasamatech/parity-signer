@@ -19,7 +19,9 @@
 export const checksummedAddress = (address, hash) => {
   let result = '';
   for (let n = 0; n < 40; n++) {
-    result = `${result}${parseInt(hash[n], 16) > 7 ? address[n].toUpperCase() : address[n]}`;
+    result = `${result}${
+      parseInt(hash[n], 16) > 7 ? address[n].toUpperCase() : address[n]
+    }`;
   }
   return result;
 };

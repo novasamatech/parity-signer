@@ -29,7 +29,9 @@ import colors from '../colors';
 export default class AccountPin extends Component {
   render() {
     return (
-      <Subscribe to={[AccountsStore]}>{accounts => <AccountPinView {...this.props} accounts={accounts} />}</Subscribe>
+      <Subscribe to={[AccountsStore]}>
+        {accounts => <AccountPinView {...this.props} accounts={accounts} />}
+      </Subscribe>
     );
   }
 }
@@ -61,14 +63,25 @@ class AccountPinView extends Component {
     return (
       <View style={styles.body}>
         <Text style={styles.titleTop}>{title}</Text>
-        <Text style={styles.hintText}>Please make your PIN 6 or more digits</Text>
+        <Text style={styles.hintText}>
+          Please make your PIN 6 or more digits
+        </Text>
         <Text style={styles.title}>PIN</Text>
-        <PinInput onChangeText={pin => this.setState({ pin })} value={this.state.pin} />
+        <PinInput
+          onChangeText={pin => this.setState({ pin })}
+          value={this.state.pin}
+        />
         <Text style={styles.title}>CONFIRM PIN</Text>
-        <PinInput onChangeText={confirmation => this.setState({ confirmation })} value={this.state.confirmation} />
+        <PinInput
+          onChangeText={confirmation => this.setState({ confirmation })}
+          value={this.state.confirmation}
+        />
         <Button
           onPress={async () => {
-            if (this.state.pin.length > 0 && this.state.pin === this.state.confirmation) {
+            if (
+              this.state.pin.length > 0 &&
+              this.state.pin === this.state.confirmation
+            ) {
               const account = accounts.getNew();
               await accounts.save(account, this.state.pin);
               accounts.submitNew();
@@ -78,7 +91,9 @@ class AccountPinView extends Component {
                 navigation.navigate('Tabs');
                 const resetAction = StackActions.reset({
                   index: 0,
-                  actions: [NavigationActions.navigate({ routeName: 'QrScanner' })]
+                  actions: [
+                    NavigationActions.navigate({ routeName: 'QrScanner' })
+                  ]
                 });
                 navigation.dispatch(resetAction);
               } else {

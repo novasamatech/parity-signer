@@ -23,10 +23,15 @@ const accountsStore = {
   sharedPreferencesName: 'accounts'
 };
 
-export const deleteAccount = account => SecureStorage.deleteItem(account.address, accountsStore);
+export const deleteAccount = account =>
+  SecureStorage.deleteItem(account.address, accountsStore);
 
 export const saveAccount = account =>
-  SecureStorage.setItem(account.address.toLowerCase(), JSON.stringify(account, null, 0), accountsStore);
+  SecureStorage.setItem(
+    account.address.toLowerCase(),
+    JSON.stringify(account, null, 0),
+    accountsStore
+  );
 
 export const saveAccounts = accounts => accounts.forEach(saveAccount);
 

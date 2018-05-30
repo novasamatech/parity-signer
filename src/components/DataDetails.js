@@ -52,9 +52,16 @@ export default class DataDetails extends Component {
       <View style={AppStyles.view}>
         <Text style={AppStyles.hintText}>Data to sign</Text>
         <Text style={AppStyles.valueText}>
-          {isAscii(this.props.data) ? hexToAscii(this.props.data) : this.props.data}
+          {isAscii(this.props.data)
+            ? hexToAscii(this.props.data)
+            : this.props.data}
         </Text>
-        <Button onPress={this.props.onNextButtonPressed} title="Next" color="gree" accessibilityLabel="Enter Pin" />
+        <Button
+          onPress={this.props.onNextButtonPressed}
+          title="Next"
+          color="gree"
+          accessibilityLabel="Enter Pin"
+        />
       </View>
     );
   }
