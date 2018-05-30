@@ -79,7 +79,7 @@ class AccountPinView extends Component {
         <Button
           onPress={async () => {
             if (
-              this.state.pin.length > 0 &&
+              this.state.pin.length >= 6 &&
               this.state.pin === this.state.confirmation
             ) {
               const account = accounts.getNew();
