@@ -1299,13 +1299,12 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios",
 					"$(SRCROOT)/../node_modules/react-native-secure-storage/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../rust/signer",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-bgimage/ios/RNTBgImage",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../rust/signer";
 				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../rust/signer";
@@ -1340,7 +1339,7 @@
 					"$(SRCROOT)/../node_modules/react-native-bgimage/ios/RNTBgImage",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../rust/signer";
 				OTHER_LDFLAGS = (
