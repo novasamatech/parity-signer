@@ -20,7 +20,7 @@
 
 import React, { Component } from 'react';
 import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated';
-import { View, Text, Image, StyleSheet, AppState, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, AppState, Alert, StatusBar } from 'react-native';
 import {
   createStackNavigator,
   createBottomTabNavigator,
@@ -29,6 +29,7 @@ import {
 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header';
+import Background from './components/Background';
 import TabBarBottom from './components/TabBarBottom';
 import TouchableItem from './components/TouchableItem';
 import Loading from './screens/Loading';
@@ -54,6 +55,7 @@ export default class App extends Component {
   render() {
     return (
       <UnstatedProvider>
+        <Background />
         <Screens />
       </UnstatedProvider>
     );
@@ -240,6 +242,13 @@ const Screens = createStackNavigator(
                 }
               },
               {
+    mode: 'card',
+    cardStyle: { backgroundColor: 'transparent' },
+    transitionConfig: () => ({
+      containerStyle: {
+        backgroundColor: 'transparent',
+      },
+  }),
                 navigationOptions: globalStackNavigationOptions
               }
             )
@@ -253,6 +262,13 @@ const Screens = createStackNavigator(
     }
   },
   {
-    headerMode: 'none'
+    headerMode: 'none',
+    mode: 'card',
+    transitionConfig: (): Object => ({
+      containerStyle: {
+        backgroundColor: 'transparent',
+      },
+    }),
+    cardStyle: { backgroundColor: 'transparent' },
   }
 );

@@ -19,6 +19,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, Text } from 'react-native';
+import Background from '../components/Background';
 import QrView from '../components/QrView';
 import { Subscribe } from 'unstated';
 import ScannerStore from '../stores/ScannerStore';
@@ -44,6 +45,7 @@ export class SignedTxView extends Component {
   render() {
     return (
       <View style={styles.body}>
+        <Background />
         <Text style={styles.topTitle}>SIGNED TRANSACTION</Text>
         <View style={styles.qr}>
           <QrView text={this.props.data} />
@@ -55,10 +57,11 @@ export class SignedTxView extends Component {
 
 const styles = StyleSheet.create({
   body: {
+    backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
     padding: 20,
-    backgroundColor: colors.bg
+    overflow: 'hidden'
   },
   qr: {
     flex: 1,

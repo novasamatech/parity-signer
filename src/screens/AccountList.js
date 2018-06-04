@@ -23,6 +23,7 @@ import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import AccountCard from '../components/AccountCard';
 import Button from '../components/Button';
+import Background from '../components/Background';
 import colors from '../colors';
 
 export default class AccountList extends Component {
@@ -66,6 +67,7 @@ class AccountListView extends Component {
   render() {
     return (
       <View style={styles.body}>
+        <Background />
         <Text style={styles.title}>ACCOUNTS</Text>
         <FlatList
           style={styles.content}
@@ -109,10 +111,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   body: {
+    backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
-    padding: 20,
-    backgroundColor: colors.bg
+    padding: 20
   },
   content: {
     flex: 1

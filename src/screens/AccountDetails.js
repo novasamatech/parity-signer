@@ -32,6 +32,7 @@ import AccountIcon from '../components/AccountIcon';
 import AccountDetailsCard from '../components/AccountDetailsCard';
 import QrView from '../components/QrView';
 import Button from '../components/Button';
+import Background from '../components/Background';
 import colors from '../colors';
 
 export default class AccountDetails extends Component {
@@ -74,6 +75,7 @@ class AccountDetailsView extends Component {
         contentContainerStyle={styles.bodyContent}
         style={styles.body}
       >
+      <Background />
         <Text style={styles.title}>ACCOUNT</Text>
         <AccountDetailsCard
           address={account.address}
@@ -109,10 +111,10 @@ class AccountDetailsView extends Component {
 
 const styles = StyleSheet.create({
   body: {
+    backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
     padding: 20,
-    backgroundColor: colors.bg
   },
   bodyContent: {
     paddingBottom: 40

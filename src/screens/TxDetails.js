@@ -22,6 +22,7 @@ import { StyleSheet, ScrollView, View, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import ScannerStore from '../stores/ScannerStore';
 import AccountsStore from '../stores/AccountsStore';
+import Background from '../components/Background';
 import Button from '../components/Button';
 import AccountCard from '../components/AccountCard';
 import TxDetailsCard from '../components/TxDetailsCard';
@@ -101,6 +102,7 @@ export class TxDetailsView extends Component {
         contentContainerStyle={styles.bodyContent}
         style={styles.body}
       >
+        <Background />
         <Text style={styles.topTitle}>SIGN TRANSACTION</Text>
         <Text style={styles.title}>FROM</Text>
         <AccountCard
@@ -138,10 +140,11 @@ export class TxDetailsView extends Component {
 
 const styles = StyleSheet.create({
   body: {
+    backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
     padding: 20,
-    backgroundColor: colors.bg
+    overflow: 'hidden'
   },
   bodyContent: {
     paddingBottom: 40

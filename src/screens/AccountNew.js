@@ -30,6 +30,7 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
+import Background from '../components/Background';
 import AccountSeed from '../components/AccountSeed';
 import AccountIconChooser from '../components/AccountIconChooser';
 import TextInput from '../components/TextInput';
@@ -59,6 +60,7 @@ class AccountNewView extends Component {
     }
     return (
       <View style={styles.body}>
+        <Background />
         <KeyboardAwareScrollView
           style={{ padding: 20 }}
           containerStyle={styles.bodyContainer}
@@ -107,7 +109,8 @@ const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
     paddingBottom: 20,
-    flex: 1
+    flex: 1,
+    overflow: 'hidden'
   },
   bodyContainer: {
     flex: 1,

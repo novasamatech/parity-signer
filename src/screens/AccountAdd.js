@@ -30,6 +30,7 @@ import {
 import { Subscribe } from 'unstated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AccountsStore from '../stores/AccountsStore';
+import Background from '../components/Background';
 import AccountSeed from '../components/AccountSeed';
 import AccountIconChooser from '../components/AccountIconChooser';
 import TextInput from '../components/TextInput';
@@ -63,6 +64,7 @@ class AccountAddView extends Component {
     const isWelcome = navigation.getParam('isWelcome');
     return (
       <View style={styles.body}>
+        <Background />
         {isWelcome && <Text style={styles.titleTop}>GETTING STARTED</Text>}
         <TouchableItem
           style={styles.card}
@@ -106,10 +108,11 @@ class AccountAddView extends Component {
 
 const styles = StyleSheet.create({
   body: {
-    backgroundColor: colors.bg,
     padding: 20,
     flex: 1,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    overflow: 'hidden',
+    backgroundColor: colors.bg,
   },
   top: {
     flex: 1

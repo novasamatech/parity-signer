@@ -29,6 +29,7 @@ import {
   Clipboard
 } from 'react-native';
 import { Subscribe } from 'unstated';
+import Background from '../components/Background';
 import AccountCard from '../components/AccountCard';
 import AccountsStore from '../stores/AccountsStore';
 import AccountSeed from '../components/AccountSeed';
@@ -57,6 +58,7 @@ export default class AccountEdit extends Component {
           }
           return (
             <View style={styles.body}>
+              <Background />
               <View style={styles.bodyContainer}>
                 <View>
                   <Text style={styles.titleTop}>EDIT ACCOUNT</Text>
@@ -121,7 +123,8 @@ export default class AccountEdit extends Component {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    flex: 1
+    flex: 1,
+    overflow: 'hidden'
   },
   bodyContainer: {
     flex: 1,

@@ -29,6 +29,7 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import Background from '../components/Background';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import colors from '../colors';
@@ -135,6 +136,7 @@ class AccountUnlockView extends Component {
     const { accounts } = this.props;
     return (
       <View style={styles.body}>
+        <Background />
         <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
         <Text style={styles.title}>PIN</Text>
         <PinInput
@@ -172,7 +174,8 @@ const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
     padding: 20,
-    flex: 1
+    flex: 1,
+    overflow: 'hidden'
   },
   bodyContainer: {
     flex: 1,

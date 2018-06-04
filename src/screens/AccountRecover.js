@@ -35,6 +35,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import debounce from 'debounce';
 import { brainWalletAddress } from '../util/native';
 import AccountsStore from '../stores/AccountsStore';
+import Background from '../components/Background';
 import AccountSeed from '../components/AccountSeed';
 import AccountCard from '../components/AccountCard';
 import AccountIconChooser from '../components/AccountIconChooser';
@@ -73,6 +74,7 @@ class AccountRecoverView extends Component {
     const selected = accounts.getNew();
     return (
       <View style={styles.body}>
+        <Background />
         <KeyboardAwareScrollView
           style={{ padding: 20 }}
           containerStyle={styles.bodyContainer}
@@ -129,7 +131,8 @@ class AccountRecoverView extends Component {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    flex: 1
+    flex: 1,
+    overflow: 'hidden'
   },
   bodyContainer: {
     paddingBottom: 20

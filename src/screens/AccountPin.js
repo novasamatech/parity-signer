@@ -22,6 +22,7 @@ import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
+import Background from '../components/Background';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import colors from '../colors';
@@ -62,6 +63,7 @@ class AccountPinView extends Component {
     }[type];
     return (
       <View style={styles.body}>
+        <Background />
         <Text style={styles.titleTop}>{title}</Text>
         <Text style={styles.hintText}>
           Please make your PIN 6 or more digits
@@ -134,7 +136,8 @@ const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
     padding: 20,
-    flex: 1
+    flex: 1,
+    overflow: 'hidden'
   },
   bodyContainer: {
     flex: 1,

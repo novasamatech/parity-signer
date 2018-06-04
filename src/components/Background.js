@@ -25,7 +25,6 @@ export default class Background extends Component {
       .map((_, i) => <View key={i} style={styles.line} />);
     return (
       <View style={styles.bg}>
-        <View {...this.props}>{this.props.children}</View>
         <View style={styles.lines}>{lines}</View>
       </View>
     );
@@ -34,17 +33,16 @@ export default class Background extends Component {
 
 const styles = StyleSheet.create({
   bg: {
-    position: 'relative',
+    position: 'absolute',
     flex: 1
   },
   lines: {
-    backgroundColor: 'transparent',
     position: 'absolute',
     zIndex: -1000,
     transform: [
       { rotate: '-30deg' },
       { translateX: -300 },
-      { translateY: -3000 },
+      { translateY: -3100 },
       { scale: 0.2 }
     ]
   },
@@ -52,7 +50,7 @@ const styles = StyleSheet.create({
     zIndex: -1000,
     height: 60,
     width: 4000,
-    borderBottomWidth: 2,
+    borderBottomWidth: 3,
     borderBottomColor: colors.bg_text_sec_2,
     backgroundColor: colors.bg
   }
