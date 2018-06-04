@@ -16,7 +16,7 @@
 
 /* @flow */
 
-import React from 'react';
+import React from "react";
 import {
   Text,
   Animated,
@@ -25,24 +25,24 @@ import {
   View,
   Platform,
   SafeAreaView
-} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import colors from '../colors';
-import withDimensions from './utils/withDimensions';
+} from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import colors from "../colors";
+import withDimensions from "./utils/withDimensions";
 
 type Props = TabBarOptions & {
   navigation: any
 };
 
 const majorVersion = parseInt(Platform.Version, 10);
-const isIos = Platform.OS === 'ios';
+const isIos = Platform.OS === "ios";
 const isIOS11 = majorVersion >= 11 && isIos;
 
 class TabBarBottom extends React.Component<Props> {
   static defaultProps = {
-    activeTintColor: '#3478f6', // Default active tint color in iOS 10
+    activeTintColor: "#3478f6", // Default active tint color in iOS 10
     activeBackgroundColor: colors.bg,
-    inactiveTintColor: '#929292', // Default inactive tint color in iOS 10
+    inactiveTintColor: "#929292", // Default inactive tint color in iOS 10
     inactiveBackgroundColor: colors.bg,
     showLabel: true,
     showIcon: true,
@@ -68,7 +68,7 @@ class TabBarBottom extends React.Component<Props> {
     return (
       <SafeAreaView
         style={tabBarStyle}
-        forceInset={{ bottom: 'always', top: 'never' }}
+        forceInset={{ bottom: "always", top: "never" }}
       >
         {routes.map((route, index) => {
           const focused = index === navigation.state.index;
@@ -82,16 +82,20 @@ class TabBarBottom extends React.Component<Props> {
             <TouchableWithoutFeedback
               key={route.key}
               onPress={() => {
-                navigation.navigate(route.key);
+                if (focused) {
+                  navigation.popToTop();
+                } else {
+                  navigation.navigate(route.key);
+                }
               }}
             >
               <View style={[styles.tab, { backgroundColor }]}>
                 <Icon
                   style={[styles.labelIcon, { color }]}
-                  name={route.key === 'Scanner' ? 'qrcode' : 'briefcase'}
+                  name={route.key === "Scanner" ? "qrcode" : "briefcase"}
                 />
                 <Text style={[styles.labelText, { color }]}>
-                  {route.key === 'Scanner' ? 'Scanner' : 'Accounts'}
+                  {route.key === "Scanner" ? "Scanner" : "Accounts"}
                 </Text>
               </View>
             </TouchableWithoutFeedback>
@@ -110,23 +114,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.bg_text_sec,
-    flexDirection: 'row'
+    flexDirection: "row"
   },
   tabBarRegular: {
     height: DEFAULT_HEIGHT
   },
   tab: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center'
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   },
   labelText: {
     fontSize: 22,
-    fontFamily: 'Roboto',
-    fontWeight: '400',
+    fontFamily: "Roboto",
+    fontWeight: "400",
     color: colors.card_bg,
-    color: 'white'
+    color: "white"
   },
   labelIcon: {
     fontSize: 30,
