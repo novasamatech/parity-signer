@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-"use strict";
+'use strict';
 
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Alert,
   ScrollView,
@@ -28,24 +28,24 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   findNodeHandle
-} from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Subscribe } from "unstated";
-import Icon from "react-native-vector-icons/MaterialIcons";
-import debounce from "debounce";
-import { brainWalletAddress } from "../util/native";
-import AccountsStore from "../stores/AccountsStore";
-import AccountSeed from "../components/AccountSeed";
-import AccountCard from "../components/AccountCard";
-import AccountIconChooser from "../components/AccountIconChooser";
-import TextInput from "../components/TextInput";
-import Button from "../components/Button";
-import colors from "../colors";
+} from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Subscribe } from 'unstated';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import debounce from 'debounce';
+import { brainWalletAddress } from '../util/native';
+import AccountsStore from '../stores/AccountsStore';
+import AccountSeed from '../components/AccountSeed';
+import AccountCard from '../components/AccountCard';
+import AccountIconChooser from '../components/AccountIconChooser';
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
+import colors from '../colors';
 
 export default class AccountRecover extends Component {
   static navigationOptions = {
-    title: "Recover Account",
-    headerBackTitle: "Back"
+    title: 'Recover Account',
+    headerBackTitle: 'Back'
   };
   render() {
     return (
@@ -97,10 +97,10 @@ class AccountRecoverView extends Component {
             onFocus={e => {
               this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
             }}
-            onChangeText={(seed) => {
+            onChangeText={seed => {
               accounts.updateNew({ seed });
               debounce(this.updateAddressForSeed, 200)(seed);
-            } }
+            }}
             style={{ height: 140, lineHeight: 30 }}
             editable={true}
             value={selected.seed}
@@ -108,15 +108,15 @@ class AccountRecoverView extends Component {
           />
           <AccountCard
             style={{ marginTop: 20 }}
-            address={selected.address || ""}
-            title={selected.name || "no name"}
+            address={selected.address || ''}
+            title={selected.name || 'no name'}
           />
           <Button
             buttonStyles={{ marginBottom: 40 }}
             title="Next Step"
             onPress={() => {
-              this.props.navigation.navigate("AccountPin", {
-                isWelcome: this.props.navigation.getParam("isWelcome")
+              this.props.navigation.navigate('AccountPin', {
+                isWelcome: this.props.navigation.getParam('isWelcome')
               });
             }}
           />
@@ -135,18 +135,18 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   titleTop: {
-    fontFamily: "Roboto",
+    fontFamily: 'Roboto',
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     paddingBottom: 20,
-    textAlign: "center"
+    textAlign: 'center'
   },
   title: {
-    fontFamily: "Roboto",
+    fontFamily: 'Roboto',
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     paddingBottom: 20
   }
 });
