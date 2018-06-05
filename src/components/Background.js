@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     zIndex: -1000,
     height: 60,
     width: 4000,
-    borderBottomWidth: 3,
-    borderBottomColor: colors.bg_text_sec_2,
+    borderBottomWidth: 2,
+    borderBottomColor: '#3d3d3d',
     backgroundColor: colors.bg
   }
 });
