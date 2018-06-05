@@ -28,6 +28,7 @@ import {
 } from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
+import TxStore from '../stores/TxStore';
 import AccountIcon from '../components/AccountIcon';
 import AccountDetailsCard from '../components/AccountDetailsCard';
 import QrView from '../components/QrView';
@@ -42,8 +43,15 @@ export default class AccountDetails extends Component {
 
   render() {
     return (
-      <Subscribe to={[AccountsStore]}>
-        {accounts => <AccountDetailsView {...this.props} accounts={accounts} />}
+      <Subscribe to={[AccountsStore, TxStore]}>
+        {(accounts, txStore) => (
+          <AccountDetailsView
+            {...this.props}
+            txStore={txStore}
+            accounts={accounts}
+            selected={accounts.getSelected() && accounts.getSelected().address}
+          />
+        )}
       </Subscribe>
     );
   }
@@ -55,15 +63,22 @@ class AccountDetailsView extends Component {
     this.state = {
       showQr: false
     };
+
   }
 
   state: {
     showQr: false
   };
 
-  // componentWillUnmount() {
-  //   this.props.accounts.select('')
-  // }
+  componentDidMount() {
+    this.subscription = this.props.navigation.addListener('willFocus', (t) => {
+      this.props.txStore.loadTxsForAccount(this.props.selected);
+    })
+  }
+
+  componentWillUnmount() {
+    this.subscription.remove();
+  }
 
   render() {
     const account = this.props.accounts.getSelected();
@@ -75,7 +90,7 @@ class AccountDetailsView extends Component {
         contentContainerStyle={styles.bodyContent}
         style={styles.body}
       >
-      <Background />
+        <Background />
         <Text style={styles.title}>ACCOUNT</Text>
         <AccountDetailsCard
           address={account.address}
@@ -114,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
-    padding: 20,
+    padding: 20
   },
   bodyContent: {
     paddingBottom: 40

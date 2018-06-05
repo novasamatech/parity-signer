@@ -17,10 +17,19 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
+import '../ReactotronConfig';
 
 import React, { Component } from 'react';
 import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated';
-import { View, Text, Image, StyleSheet, AppState, Alert, StatusBar } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  AppState,
+  Alert,
+  StatusBar
+} from 'react-native';
 import {
   createStackNavigator,
   createBottomTabNavigator,
@@ -242,13 +251,13 @@ const Screens = createStackNavigator(
                 }
               },
               {
-    mode: 'card',
-    cardStyle: { backgroundColor: 'transparent' },
-    transitionConfig: () => ({
-      containerStyle: {
-        backgroundColor: 'transparent',
-      },
-  }),
+                mode: 'card',
+                cardStyle: { backgroundColor: 'transparent' },
+                transitionConfig: () => ({
+                  containerStyle: {
+                    backgroundColor: 'transparent'
+                  }
+                }),
                 navigationOptions: globalStackNavigationOptions
               }
             )
@@ -266,9 +275,9 @@ const Screens = createStackNavigator(
     mode: 'card',
     transitionConfig: (): Object => ({
       containerStyle: {
-        backgroundColor: 'transparent',
-      },
+        backgroundColor: 'transparent'
+      }
     }),
-    cardStyle: { backgroundColor: 'transparent' },
+    cardStyle: { backgroundColor: 'transparent' }
   }
 );

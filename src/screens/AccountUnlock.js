@@ -47,7 +47,10 @@ export class AccountUnlockAndSign extends Component {
               try {
                 const txRequest = scannerStore.getTXRequest();
                 const sender = accounts.getByAddress(txRequest.data.account);
-                let res = await scannerStore.signData(sender, pin);
+                let res = await scannerStore.signData(
+                  sender.encryptedSeed,
+                  pin
+                );
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [
@@ -57,7 +60,8 @@ export class AccountUnlockAndSign extends Component {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) {}
+              } catch (e) {
+              }
             }}
           />
         )}

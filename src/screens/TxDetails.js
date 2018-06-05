@@ -51,8 +51,8 @@ export default class TxDetails extends Component {
                 sender={sender}
                 recipient={recipient}
                 dataToSign={scannerStore.getDataToSign()}
-                onPressAccount={account => {
-                  accounts.select(account);
+                onPressAccount={async account => {
+                  await accounts.select(account);
                   this.props.navigation.navigate('AccountDetails');
                 }}
                 onNext={async () => {
@@ -84,7 +84,6 @@ export default class TxDetails extends Component {
 export class TxDetailsView extends Component {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
-    onPressSender: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,
     sender: PropTypes.object.isRequired,
     recipient: PropTypes.object.isRequired,

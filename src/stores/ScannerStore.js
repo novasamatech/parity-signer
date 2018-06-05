@@ -18,13 +18,24 @@
 import { Container } from 'unstated';
 import transaction from '../util/transaction';
 import { keccak, ethSign, brainWalletSign, decryptData } from '../util/native';
+import { saveTx, loadAccountTxs } from '../util/db';
 import { type Account } from './AccountsStore';
 
 type TXRequest = Object;
 
+type SignedTX = {
+  txRequest: TXRequest,
+  sender: string,
+  recipient: string
+};
+
 type ScannerState = {
   txRequest: TXRequest | null,
-  scanErrorMsg: string
+  tx: Object,
+  dataToSign: string,
+  signedData: string,
+  scanErrorMsg: string,
+  signedTxList: [SignedTX]
 };
 
 export default class ScannerStore extends Container<ScannerState> {
@@ -36,21 +47,31 @@ export default class ScannerStore extends Container<ScannerState> {
     scanErrorMsg: ''
   };
 
-  async setTXRequest(txRequestData) {
-    const txRequest = JSON.parse(txRequestData);
+  async setTXRequest(txRequest) {
+    const sender = txRequest.data.account.toLowerCase();
     const tx = await transaction(txRequest.data.rlp);
+    const recipient = tx.action.toLowerCase();
     const dataToSign = await keccak(txRequest.data.rlp);
     this.setState({
+      sender,
+      recipient,
       txRequest,
       tx,
       dataToSign
     });
   }
 
-  async signData(account: Account, pin = '1') {
-    let seed = await decryptData(account.encryptedSeed, pin);
-    this.setState({
-      signedData: await brainWalletSign(seed, this.state.dataToSign)
+  async signData(encryptedSeed, pin = '1') {
+    let seed = await decryptData(encryptedSeed, pin);
+    let signedData = await brainWalletSign(seed, this.state.dataToSign);
+    this.setState({ signedData });
+    await saveTx({
+      hash: this.state.dataToSign,
+      tx: this.state.tx,
+      sender: this.state.sender,
+      recipient: this.state.recipient,
+      signature: signedData,
+      createdAt: new Date().getTime()
     });
   }
 

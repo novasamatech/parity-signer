@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     overflow: 'hidden',
-    backgroundColor: colors.bg,
+    backgroundColor: colors.bg
   },
   top: {
     flex: 1

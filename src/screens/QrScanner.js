@@ -37,7 +37,7 @@ export default class Scanner extends Component {
             <QrScannerView
               onBarCodeRead={txRequestData => {
                 try {
-                  scannerStore.setTXRequest(txRequestData.data);
+                  scannerStore.setTXRequest(JSON.parse(txRequestData.data));
                   this.props.navigation.navigate('TxDetails');
                 } catch (e) {
                   scannerStore.setErrorMsg(e.message);

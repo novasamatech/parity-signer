@@ -16,9 +16,9 @@
 
 // @flow
 
-import { Container } from 'unstated';
-import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
-import { encryptData, decryptData } from '../util/native';
+import { Container } from "unstated";
+import { loadAccounts, saveAccount, deleteAccount } from "../util/db";
+import { encryptData, decryptData } from "../util/native";
 
 export type Account = {
   name: string,
@@ -33,14 +33,15 @@ export type Account = {
 type AccountsState = {
   accounts: Map<string, Account>,
   newAccount: Account,
-  selected: string
+  selected: string,
+  accountTxs: [Object]
 };
 
-function empty(address = '') {
+function empty(address = "") {
   return {
-    name: '',
+    name: "",
     address,
-    seed: '',
+    seed: "",
     createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),
     archived: false,
@@ -52,7 +53,7 @@ export default class AccountsStore extends Container<AccountsState> {
   state = {
     accounts: new Map(),
     newAccount: empty(),
-    selected: ''
+    selected: ""
   };
 
   constructor(props) {
@@ -60,8 +61,15 @@ export default class AccountsStore extends Container<AccountsState> {
     this.refreshList();
   }
 
-  select(address) {
-    this.setState({ selected: address.toLowerCase() });
+  async select(address) {
+    return new Promise((res, rej) => {
+      this.setState(
+        state => ({ selected: address.toLowerCase() }),
+        state => {
+          res(state);
+        }
+      );
+    });
   }
 
   updateNew(accountUpdate: Object) {
@@ -77,12 +85,11 @@ export default class AccountsStore extends Container<AccountsState> {
     return this.state.newAccount;
   }
 
-  submitNew() {
+  async submitNew(pin) {
+    const account = this.state.newAccount;
+    await this.save(account, pin);
     this.setState({
-      accounts: this.state.accounts.set(
-        this.state.newAccount.address.toLowerCase(),
-        this.state.newAccount
-      ),
+      accounts: this.state.accounts.set(account.address.toLowerCase(), account),
       newAccount: empty()
     });
   }
@@ -107,10 +114,17 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async refreshList() {
     loadAccounts().then(res => {
-      const accounts = new Map(res.map(a => [a.address.toLowerCase(), a]));
+      const accounts = new Map(
+        res.map(a => [
+          a.address.toLowerCase(),
+          { ...a, address: a.address.toLowerCase() }
+        ])
+      );
       this.setState({ accounts });
     });
   }
+
+  async loadAccountTxs() {}
 
   async save(account, pin = null) {
     try {
@@ -120,7 +134,7 @@ export default class AccountsStore extends Container<AccountsState> {
         account.encryptedSeed = encryptedSeed;
       }
       account.updatedAt = new Date().getTime();
-      saveAccount(account);
+      console.log(await saveAccount(account));
     } catch (e) {
       console.error(e);
     }

@@ -38,8 +38,8 @@ export default class AccountList extends Component {
             <AccountListView
               {...this.props}
               accounts={accounts.getAccounts()}
-              onAccountSelected={address => {
-                accounts.select(address);
+              onAccountSelected={async address => {
+                await accounts.select(address);
                 this.props.navigation.navigate('AccountDetails');
               }}
             />
