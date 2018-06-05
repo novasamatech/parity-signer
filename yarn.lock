@@ -4644,10 +4644,6 @@ react-lifecycles-compat@^3:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.2.tgz#7279047275bd727a912e25f734c0559527e84eff"
 
-react-native-bgimage@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/react-native-bgimage/-/react-native-bgimage-1.4.0.tgz#3ece076667f2723a6cab30d6d55bd1dec90ad558"
-
 react-native-camera@^1.1.1:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-1.1.2.tgz#a93c389c522c8909c564f04c4a86072909259d07"

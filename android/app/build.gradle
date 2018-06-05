@@ -136,7 +136,6 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-bgimage')
     compile project(':react-native-vector-icons')
     compile project(':react-native-secure-storage')
     compile project(':react-native-camera')

@@ -20,12 +20,12 @@ import colors from '../colors';
 
 export default class Background extends Component {
   render() {
-    const lines = new Array(100)
-      .fill(0)
-      .map((_, i) => <View key={i} style={styles.line} />);
+    // const lines = new Array(100)
+    //   .fill(0)
+    //   .map((_, i) => <View key={i} style={styles.line} />);
     return (
       <View style={styles.bg}>
-        <View style={styles.lines}>{lines}</View>
+        {/* <View style={styles.lines}>{lines}</View> */}
       </View>
     );
   }
@@ -34,6 +34,7 @@ export default class Background extends Component {
 const styles = StyleSheet.create({
   bg: {
     position: 'absolute',
+    backgroundColor: colors.bg,
     flex: 1
   },
   lines: {

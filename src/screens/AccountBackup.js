@@ -57,7 +57,9 @@ class AccountBackupView extends Component {
       ? accounts.getNew()
       : accounts.getSelected();
     return (
-      <View style={styles.body}>
+      <ScrollView
+        style={styles.body}
+        contentContainerStyle={styles.bodyContent}>
         <Background />
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
         <AccountCard
@@ -88,7 +90,7 @@ class AccountBackupView extends Component {
             }
           }}
         />
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -96,9 +98,12 @@ class AccountBackupView extends Component {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    padding: 20,
     flex: 1,
-    overflow: 'hidden'
+    flexDirection: 'column',
+    padding: 20
+  },
+  bodyContent: {
+    paddingBottom: 40
   },
   bodyContainer: {
     flex: 1,

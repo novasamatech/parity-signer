@@ -8,7 +8,6 @@
     "ios": "yarn run build-rust-ios && yarn run cli run-ios",
     "build-rust-android": "cd rust/signer && make android",
     "android": "yarn run build-rust-android && yarn run cli run-android",
-    "cli": "node node_modules/react-native/local-cli/cli.js",
     "start": "yarn run ios",
     "test": "jest",
     "lint": "",
@@ -21,7 +20,6 @@
     "prop-types": "^15.6.1",
     "react": "16.3.1",
     "react-native": "0.55.3",
-    "react-native-bgimage": "^1.4.0",
     "react-native-camera": "^1.1.1",
     "react-native-keyboard-aware-scroll-view": "^0.5.0",
     "react-native-qrcode": "^0.2.6",
@@ -51,28 +49,5 @@
     "setupFiles": [
       "<rootDir>/jest-setup.js"
     ]
-  },
-  "standard": {
-    "globals": [
-      "it",
-      "describe",
-      "expect"
-    ],
-    "parser": "babel-eslint"
-  },
-  "config": {
-    "pre-git": {
-      "pre-commit": [],
-      "pre-push": [
-        "npm run lint",
-        "npm run test"
-      ],
-      "post-commit": [],
-      "post-checkout": [],
-      "post-merge": []
-    }
-  },
-  "release": {
-    "analyzeCommits": "simple-commit-message"
   }
 }
