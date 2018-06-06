@@ -63,7 +63,7 @@ class AccountAddView extends Component {
     const { navigation } = this.props;
     const isWelcome = navigation.getParam('isWelcome');
     return (
-      <ScrollView style={styles.body} contentContainerStyle={ { padding: 20 } }>
+      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Background />
         {isWelcome && <Text style={styles.titleTop}>GETTING STARTED</Text>}
         <TouchableItem

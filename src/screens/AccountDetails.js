@@ -63,7 +63,6 @@ class AccountDetailsView extends Component {
     this.state = {
       showQr: false
     };
-
   }
 
   state: {
@@ -71,9 +70,9 @@ class AccountDetailsView extends Component {
   };
 
   componentDidMount() {
-    this.subscription = this.props.navigation.addListener('willFocus', (t) => {
+    this.subscription = this.props.navigation.addListener('willFocus', t => {
       this.props.txStore.loadTxsForAccount(this.props.selected);
-    })
+    });
   }
 
   componentWillUnmount() {

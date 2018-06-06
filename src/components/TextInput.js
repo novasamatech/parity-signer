@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   TextInput as TextInputOrigin,
   Platform,
@@ -22,8 +23,32 @@ import {
 } from 'react-native';
 import colors from '../colors';
 
-export default function TextInput(props) {
-  return <TextInputOrigin {...props} style={[styles.input, props.style]} />;
+export default class TextInput extends React.Component {
+  static defaultProps = {
+    focus: false
+  };
+
+  // Methods:
+  focus() {
+    this.input.focus();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { focus } = nextProps;
+
+    focus && this.focus();
+  }
+  render() {
+    return (
+      <TextInputOrigin
+        ref={input => {
+          this.input = input;
+        }}
+        {...this.props}
+        style={[styles.input, this.props.style]}
+      />
+    );
+  }
 }
 
 const styles = StyleSheet.create({

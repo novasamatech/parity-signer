@@ -38,29 +38,44 @@ export default class AccountPin extends Component {
 }
 
 class AccountPinView extends Component {
-  static propTypes = {
-    type: PropTypes.string.isRequired
-  };
-
-  static defaultProps = {
-    type: 'NEW'
-  };
-
-  static defa = {
-    type: PropTypes.string.isRequired
-  };
+  constructor(...args) {
+    super(...args);
+    this.submit = this.submit.bind(this);
+  }
 
   state = {
     pin: '',
-    confirmation: ''
+    confirmation: '',
+    focusConfirmation: false
   };
+
+  async submit() {
+    const { accounts, type, navigation } = this.props;
+    if (
+      this.state.pin.length >= 6 &&
+      this.state.pin === this.state.confirmation
+    ) {
+      const account = accounts.getNew();
+      await accounts.submitNew(this.state.pin);
+      await accounts.select(account.address);
+      accounts.refreshList();
+      if (navigation.getParam('isWelcome')) {
+        navigation.navigate('Tabs');
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({ routeName: 'QrScanner' })]
+        });
+        navigation.dispatch(resetAction);
+      } else {
+        navigation.popToTop();
+        navigation.navigate('AccountDetails');
+      }
+    }
+  }
 
   render() {
     const { accounts, type, navigation } = this.props;
-    const title = {
-      NEW: 'ACCOUNT PIN',
-      CHANGE: 'CHANGE PIN'
-    }[type];
+    const title = 'ACCOUNT PIN';
     return (
       <View style={styles.body}>
         <Background />
@@ -70,39 +85,24 @@ class AccountPinView extends Component {
         </Text>
         <Text style={styles.title}>PIN</Text>
         <PinInput
+          autoFocus
+          onFocus={() => this.setState({ focusConfirmation: false })}
+          onSubmitEditing={() => {
+            this.setState({ focusConfirmation: true });
+          }}
           onChangeText={pin => this.setState({ pin })}
           value={this.state.pin}
         />
         <Text style={styles.title}>CONFIRM PIN</Text>
         <PinInput
+          returnKeyType="Done"
+          focus={this.state.focusConfirmation}
           onChangeText={confirmation => this.setState({ confirmation })}
           value={this.state.confirmation}
+          onSubmitEditing={this.submit}
         />
         <Button
-          onPress={async () => {
-            if (
-              this.state.pin.length >= 6 &&
-              this.state.pin === this.state.confirmation
-            ) {
-              const account = accounts.getNew();
-              await accounts.submitNew(this.state.pin);
-              await accounts.select(account.address);
-              accounts.refreshList();
-              if (navigation.getParam('isWelcome')) {
-                navigation.navigate('Tabs');
-                const resetAction = StackActions.reset({
-                  index: 0,
-                  actions: [
-                    NavigationActions.navigate({ routeName: 'QrScanner' })
-                  ]
-                });
-                navigation.dispatch(resetAction);
-              } else {
-                navigation.popToTop();
-                navigation.navigate('AccountDetails');
-              }
-            }
-          }}
+          onPress={this.submit}
           color="green"
           title="Done"
           accessibilityLabel={'Done'}
@@ -112,23 +112,24 @@ class AccountPinView extends Component {
   }
 }
 
-function PinInput(props) {
-  return (
-    <TextInput
-      autoFocus
-      clearTextOnFocus
-      editable
-      fontSize={24}
-      keyboardType="numeric"
-      multiline={false}
-      autoCorrect={false}
-      numberOfLines={1}
-      returnKeyType="next"
-      secureTextEntry
-      style={styles.pinInput}
-      {...props}
-    />
-  );
+class PinInput extends Component {
+  render() {
+    return (
+      <TextInput
+        clearTextOnFocus
+        editable
+        fontSize={24}
+        keyboardType="numeric"
+        multiline={false}
+        autoCorrect={false}
+        numberOfLines={1}
+        returnKeyType="next"
+        secureTextEntry
+        style={styles.pinInput}
+        {...this.props}
+      />
+    );
+  }
 }
 
 const styles = StyleSheet.create({

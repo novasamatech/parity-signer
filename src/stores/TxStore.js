@@ -34,7 +34,7 @@ export default class TxStore extends Container<State> {
 
   async loadTxsForAccount(address) {
     const txs = await loadAccountTxs(address);
-    console.log("LOADED")
+    console.log('LOADED');
     this.setState({
       signedTxs: new Map([...this.state.signedTxs, ...txs])
     });

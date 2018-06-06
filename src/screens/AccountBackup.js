@@ -59,7 +59,8 @@ class AccountBackupView extends Component {
     return (
       <ScrollView
         style={styles.body}
-        contentContainerStyle={styles.bodyContent}>
+        contentContainerStyle={styles.bodyContent}
+      >
         <Background />
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
         <AccountCard

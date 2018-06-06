@@ -60,8 +60,7 @@ export class AccountUnlockAndSign extends Component {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) {
-              }
+              } catch (e) {}
             }}
           />
         )}

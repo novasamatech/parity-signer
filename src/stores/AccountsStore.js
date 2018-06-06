@@ -16,9 +16,9 @@
 
 // @flow
 
-import { Container } from "unstated";
-import { loadAccounts, saveAccount, deleteAccount } from "../util/db";
-import { encryptData, decryptData } from "../util/native";
+import { Container } from 'unstated';
+import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
+import { encryptData, decryptData } from '../util/native';
 
 export type Account = {
   name: string,
@@ -37,11 +37,11 @@ type AccountsState = {
   accountTxs: [Object]
 };
 
-function empty(address = "") {
+function empty(address = '') {
   return {
-    name: "",
+    name: '',
     address,
-    seed: "",
+    seed: '',
     createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),
     archived: false,
@@ -53,7 +53,7 @@ export default class AccountsStore extends Container<AccountsState> {
   state = {
     accounts: new Map(),
     newAccount: empty(),
-    selected: ""
+    selected: ''
   };
 
   constructor(props) {
