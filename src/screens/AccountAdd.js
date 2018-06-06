@@ -121,9 +121,9 @@ const styles = StyleSheet.create({
     paddingBottom: 15
   },
   titleTop: {
-    fontFamily: 'Roboto',
     color: colors.bg_text_sec,
     fontSize: 24,
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20,
     textAlign: 'center'
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   cardText: {
     textAlign: 'center',
     color: colors.card_text,
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     fontSize: 20,
     fontWeight: 'bold'
   }

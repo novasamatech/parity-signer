@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15
   },
   title: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
     fontSize: 18,
     fontWeight: 'bold',
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   hintText: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     textAlign: 'center',
     paddingTop: 20,
     color: colors.bg_text_sec,

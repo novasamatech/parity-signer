@@ -78,6 +78,11 @@
 		<string>Roboto-Regular.ttf</string>
 		<string>Roboto-Thin.ttf</string>
 		<string>Roboto-ThinItalic.ttf</string>
+		<string>Manifold-CF-Bold.otf</string>
+		<string>Manifold-CF-Demi-Bold.otf</string>
+		<string>Manifold-CF-Extra-Bold.otf</string>
+		<string>Manifold-CF-Light.otf</string>
+		<string>Manifold-CF.otf</string>
 	</array>
 </dict>
 </plist>

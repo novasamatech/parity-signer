@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   titleTop: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
     fontSize: 24,
     fontWeight: 'bold',

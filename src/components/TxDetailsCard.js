@@ -49,7 +49,7 @@ export default class TxDetailsCard extends React.Component<{
 
     return (
       <View style={[styles.body, style]}>
-        <Text style={styles.titleText}>You are about to send</Text>
+        <Text style={styles.titleText}>You are about to send the following amount</Text>
         <Amount
           style={{ marginTop: 10 }}
           value={value}
@@ -112,18 +112,21 @@ const styles = StyleSheet.create({
   },
   titleText: {
     textAlign: 'center',
-    fontSize: 20,
-    fontWeight: '700',
+    fontFamily: 'Manifold CF',
+    fontSize: 14,
+    fontWeight: '600',
     color: colors.card_bg_text
   },
   secondaryText: {
     textAlign: 'center',
     color: colors.card_bg_text,
+    fontFamily: 'Manifold CF',
     fontWeight: '500',
     fontSize: 10
   },
   footerText: {
     color: colors.card_bg,
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold'
   }
 });

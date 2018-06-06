@@ -48,11 +48,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     fontSize: 25,
-    fontWeight: 'bold',
+    fontFamily: 'Manifold CF',
+    fontWeight: '900',
     color: colors.bg_text
   },
   headerTextRight: {
     marginLeft: 0,
+    fontFamily: 'Roboto',
     fontSize: 17,
     fontWeight: 'bold',
     color: colors.bg_text_positive

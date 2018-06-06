@@ -85,14 +85,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black'
   },
-
   rectangleContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent'
   },
-
   rectangle: {
     borderWidth: 2,
     borderRadius: 25,
@@ -103,7 +101,6 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     backgroundColor: 'transparent'
   },
-
   innerRectangle: {
     height: 248,
     width: 248,

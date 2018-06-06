@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.bg_text_sec,
     fontSize: 24,
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20
   }

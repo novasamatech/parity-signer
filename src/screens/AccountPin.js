@@ -86,6 +86,7 @@ class AccountPinView extends Component {
         <Text style={styles.title}>PIN</Text>
         <PinInput
           autoFocus
+          returnKeyType="next"
           onFocus={() => this.setState({ focusConfirmation: false })}
           onSubmitEditing={() => {
             this.setState({ focusConfirmation: true });
@@ -95,7 +96,7 @@ class AccountPinView extends Component {
         />
         <Text style={styles.title}>CONFIRM PIN</Text>
         <PinInput
-          returnKeyType="Done"
+          returnKeyType="done"
           focus={this.state.focusConfirmation}
           onChangeText={confirmation => this.setState({ confirmation })}
           value={this.state.confirmation}
@@ -116,6 +117,7 @@ class PinInput extends Component {
   render() {
     return (
       <TextInput
+        keyboardAppearance="dark"
         clearTextOnFocus
         editable
         fontSize={24}
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15
   },
   title: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
     fontSize: 18,
     fontWeight: 'bold',
@@ -161,12 +163,13 @@ const styles = StyleSheet.create({
   titleTop: {
     color: colors.bg_text_sec,
     fontSize: 24,
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20,
     textAlign: 'center'
   },
   hintText: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     textAlign: 'center',
     color: colors.bg_text_sec,
     fontWeight: '700',

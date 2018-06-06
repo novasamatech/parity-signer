@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontSize: 22,
-    fontFamily: 'Roboto',
-    fontWeight: '400',
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
     color: colors.card_bg,
     color: 'white'
   },

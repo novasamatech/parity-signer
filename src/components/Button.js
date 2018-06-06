@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     height: 60
   },
   text: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     color: 'white',
     padding: 8,
     fontWeight: 'bold',

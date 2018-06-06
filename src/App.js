@@ -89,7 +89,8 @@ const headerStyles = StyleSheet.create({
     flex: 1,
     paddingLeft: 10,
     fontSize: 25,
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
     color: colors.bg_text
   },
   headerSecureIcon: {

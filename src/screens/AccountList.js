@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20
   },

@@ -103,7 +103,7 @@ export class TxDetailsView extends Component {
       >
         <Background />
         <Text style={styles.topTitle}>SIGN TRANSACTION</Text>
-        <Text style={styles.title}>FROM</Text>
+        <Text style={styles.title}>FROM ACCOUNT</Text>
         <AccountCard
           title={this.props.sender.name || 'no name'}
           address={this.props.sender.address}
@@ -156,12 +156,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.bg_text_sec,
     fontSize: 24,
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20
   },
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20
   },
