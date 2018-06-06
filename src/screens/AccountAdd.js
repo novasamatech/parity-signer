@@ -63,7 +63,7 @@ class AccountAddView extends Component {
     const { navigation } = this.props;
     const isWelcome = navigation.getParam('isWelcome');
     return (
-      <View style={styles.body}>
+      <ScrollView style={styles.body} contentContainerStyle={ { padding: 20 } }>
         <Background />
         {isWelcome && <Text style={styles.titleTop}>GETTING STARTED</Text>}
         <TouchableItem
@@ -101,14 +101,13 @@ class AccountAddView extends Component {
         <TouchableItem style={[styles.card, { marginTop: 20 }]}>
           <Text style={styles.cardText}>About Accounts</Text>
         </TouchableItem>
-      </View>
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   body: {
-    padding: 20,
     flex: 1,
     flexDirection: 'column',
     overflow: 'hidden',
