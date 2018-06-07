@@ -25,13 +25,15 @@ type TXRequest = Object;
 
 type SignedTX = {
   txRequest: TXRequest,
-  sender: string,
-  recipient: string
+  sender: Account,
+  recipient: Account
 };
 
 type ScannerState = {
   txRequest: TXRequest | null,
   tx: Object,
+  sender: Account,
+  recipient: Account,
   dataToSign: string,
   signedData: string,
   scanErrorMsg: string,
@@ -41,16 +43,19 @@ type ScannerState = {
 export default class ScannerStore extends Container<ScannerState> {
   state = {
     txRequest: null,
+    sender: null,
+    recipient: null,
     tx: '',
     dataToSign: '',
     signedData: '',
     scanErrorMsg: ''
   };
 
-  async setTXRequest(txRequest) {
-    const sender = txRequest.data.account.toLowerCase();
+  async setTXRequest(txRequest, accountsStore) {
+    const sender = accountsStore.getByAddress(txRequest.data.account);
     const tx = await transaction(txRequest.data.rlp);
-    const recipient = tx.action.toLowerCase();
+    const recipient = accountsStore.getByAddress(tx.action);
+
     const dataToSign = await keccak(txRequest.data.rlp);
     this.setState({
       sender,
@@ -61,9 +66,10 @@ export default class ScannerStore extends Container<ScannerState> {
     });
   }
 
-  async signData(encryptedSeed, pin = '1') {
-    let seed = await decryptData(encryptedSeed, pin);
-    let signedData = await brainWalletSign(seed, this.state.dataToSign);
+  async signData(pin = '1') {
+    const sender = this.state.sender;
+    const seed = await decryptData(sender.encryptedSeed, pin);
+    const signedData = await brainWalletSign(seed, this.state.dataToSign);
     this.setState({ signedData });
     await saveTx({
       hash: this.state.dataToSign,

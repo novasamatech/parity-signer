@@ -20,9 +20,29 @@ import { Container } from 'unstated';
 import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
 import { encryptData, decryptData } from '../util/native';
 
+const NETWORK_TYPE = {
+  ethereum: 'ethereum'
+}
+
+const NETWORK_ID = {
+  olympic: '0',
+  frontier: '1',
+  classic: '61',
+  expanse: '2',
+  ropsten: '3',
+  rinkeby: '4',
+  ubiq: '8',
+  kovan: '42',
+  sokol: '77',
+  core: '99',
+  musicoin: '7762959'
+}
+
 export type Account = {
   name: string,
   address: string,
+  networkType: string,
+  networkId: string,
   seed: string,
   encryptedSeed: string,
   createdAt: number,
@@ -41,6 +61,8 @@ function empty(address = '') {
   return {
     name: '',
     address,
+    networkType: NETWORK_TYPE.ethereum,
+    networkId: NETWORK_ID.frontier,
     seed: '',
     createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),

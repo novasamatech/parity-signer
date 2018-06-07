@@ -46,11 +46,7 @@ export class AccountUnlockAndSign extends Component {
             onChange={async pin => {
               try {
                 const txRequest = scannerStore.getTXRequest();
-                const sender = accounts.getByAddress(txRequest.data.account);
-                let res = await scannerStore.signData(
-                  sender.encryptedSeed,
-                  pin
-                );
+                let res = await scannerStore.signData(pin);
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [

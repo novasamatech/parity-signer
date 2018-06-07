@@ -17,6 +17,7 @@
 // @flow
 import { Container } from 'unstated';
 import { saveTx, loadAccountTxs } from '../util/db';
+import { accountId } from '../util/account'
 
 type State = {
   signedTxs: Map<string, Object>
@@ -32,9 +33,8 @@ export default class TxStore extends Container<State> {
     this.setState({ signedTxs: this.state.signedTxs.set(tx.hash, tx) });
   }
 
-  async loadTxsForAccount(address) {
-    const txs = await loadAccountTxs(address);
-    console.log('LOADED');
+  async loadTxsForAccount(account) {
+    const txs = await loadAccountTxs(account);
     this.setState({
       signedTxs: new Map([...this.state.signedTxs, ...txs])
     });

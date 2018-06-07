@@ -22,6 +22,7 @@ import { StyleSheet, View, StatusBar } from 'react-native';
 import Camera from 'react-native-camera';
 import { Subscribe } from 'unstated';
 import ScannerStore from '../stores/ScannerStore';
+import AccountsStore from '../stores/AccountsStore';
 
 export default class Scanner extends Component {
   static navigationOptions = {
@@ -31,13 +32,13 @@ export default class Scanner extends Component {
 
   render() {
     return (
-      <Subscribe to={[ScannerStore]}>
-        {scannerStore => {
+      <Subscribe to={[ScannerStore, AccountsStore]}>
+        {(scannerStore, accountsStore) => {
           return (
             <QrScannerView
               onBarCodeRead={txRequestData => {
                 try {
-                  scannerStore.setTXRequest(JSON.parse(txRequestData.data));
+                  scannerStore.setTXRequest(JSON.parse(txRequestData.data), accountsStore);
                   this.props.navigation.navigate('TxDetails');
                 } catch (e) {
                   scannerStore.setErrorMsg(e.message);

@@ -18,6 +18,7 @@
 
 import SecureStorage from 'react-native-secure-storage';
 import { AsyncStorage } from 'react-native';
+import { accountId } from './account';
 
 const accountsStore = {
   keychainService: 'accounts',
@@ -29,8 +30,8 @@ const txStore = {
   sharedPreferencesName: 'transactions'
 };
 
-function accountTxsKey(address) {
-  return 'account_txs_' + address;
+function accountTxsKey({ address, networkType, networkId }) {
+  return 'account_txs_' + accountId({ address, networkType, networkId });
 }
 
 function txKey(hash) {
@@ -42,14 +43,14 @@ export const deleteAccount = account =>
 
 export const saveAccount = account =>
   SecureStorage.setItem(
-    account.address.toLowerCase(),
+    accountId(account),
     JSON.stringify(account, null, 0),
     accountsStore
   );
 
 export const saveAccounts = accounts => accounts.forEach(saveAccount);
 
-export const loadAccounts = () => {
+export async function loadAccounts () {
   if (!SecureStorage) {
     return Promise.resolve([]);
   }
@@ -60,11 +61,11 @@ export const loadAccounts = () => {
 };
 
 export async function saveTx(tx) {
-  if (!tx.sender || tx.sender.length === 0) {
+  if (!tx.sender) {
     throw new Error('Tx should contain sender to save');
   }
-  if (!tx.recipient || tx.recipient.length === 0) {
-    throw new Error('Tx should contain receiver to save');
+  if (!tx.recipient) {
+    throw new Error('Tx should contain recipient to save');
   }
   await [
     storagePushValue(accountTxsKey(tx.sender), tx.hash),
@@ -73,13 +74,13 @@ export async function saveTx(tx) {
   ];
 }
 
-export async function loadAccountTxHashes(address) {
-  const result = await AsyncStorage.getItem(accountTxsKey(address));
+export async function loadAccountTxHashes(account) {
+  const result = await AsyncStorage.getItem(accountTxsKey(account));
   return result ? JSON.parse(result) : [];
 }
 
-export async function loadAccountTxs(address) {
-  const hashes = await loadAccountTxHashes(address);
+export async function loadAccountTxs(account) {
+  const hashes = await loadAccountTxHashes(account);
   return (await AsyncStorage.multiGet(hashes.map(txKey))).map(v => [
     v[0],
     JSON.parse(v[1])
