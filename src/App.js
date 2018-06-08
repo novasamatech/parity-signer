@@ -38,6 +38,7 @@ import {
 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header';
+import SecurityHeader from './components/SecurityHeader';
 import Background from './components/Background';
 import TabBarBottom from './components/TabBarBottom';
 import TouchableItem from './components/TouchableItem';
@@ -92,20 +93,6 @@ const headerStyles = StyleSheet.create({
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     color: colors.bg_text
-  },
-  headerSecureIcon: {
-    marginLeft: 0,
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingRight: 5,
-    color: colors.bg_text_positive
-  },
-  headerTextRight: {
-    marginLeft: 0,
-    fontSize: 17,
-    fontFamily: 'Roboto',
-    fontWeight: 'bold',
-    color: colors.bg_text_positive
   }
 });
 
@@ -129,12 +116,7 @@ class HeaderLeftHome extends Component {
 
 const globalStackNavigationOptions = {
   headerTintColor: colors.card_bg,
-  headerRight: (
-    <View style={{ flexDirection: 'row' }}>
-      <Icon style={headerStyles.headerSecureIcon} name="security" />
-      <Text style={headerStyles.headerTextRight}>Secured</Text>
-    </View>
-  ),
+  headerRight: <SecurityHeader />,
   headerStyle: {
     backgroundColor: colors.bg,
     height: 60,

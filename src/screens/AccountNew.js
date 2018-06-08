@@ -35,6 +35,7 @@ import AccountSeed from '../components/AccountSeed';
 import AccountIconChooser from '../components/AccountIconChooser';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
+import NetworkPicker from '../components/NetworkPicker';
 import colors from '../colors';
 
 export default class AccountNew extends Component {
@@ -67,6 +68,11 @@ class AccountNewView extends Component {
         >
           <View style={styles.top}>
             <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
+            <Text style={styles.title}>CHOOSE NETWORK</Text>
+            <NetworkPicker
+              selectedValue={selected.networkId}
+              onValueChange={value => accounts.updateNew({ networkId: value })}
+            />
             <Text style={styles.title}>CHOOSE AN IDENTICON</Text>
             <AccountIconChooser
               value={selected && selected.address}
