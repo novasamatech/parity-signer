@@ -38,6 +38,7 @@ import {
 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header';
+import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import Background from './components/Background';
 import TabBarBottom from './components/TabBarBottom';
@@ -68,48 +69,6 @@ export default class App extends Component {
         <Background />
         <Screens />
       </UnstatedProvider>
-    );
-  }
-}
-
-const headerStyles = StyleSheet.create({
-  headerStyle: {
-    backgroundColor: colors.bg,
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderBottomWidth: 0.5,
-    borderBottomColor: colors.bg_text_sec
-  },
-  logo: {
-    width: 42,
-    height: 42
-  },
-  headerTextLeft: {
-    flex: 1,
-    paddingLeft: 10,
-    fontSize: 25,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
-    color: colors.bg_text
-  }
-});
-
-class HeaderLeftHome extends Component {
-  render() {
-    return (
-      <View
-        style={{ flexDirection: 'row', alignItems: 'center' }}
-        accessibilityComponentType="button"
-        accessibilityTraits="button"
-        testID="header-back"
-        delayPressIn={0}
-        onPress={() => this.props.onPress && this.props.onPress()}
-      >
-        <Image source={require('../icon.png')} style={headerStyles.logo} />
-        <Text style={headerStyles.headerTextLeft}>parity</Text>
-      </View>
     );
   }
 }
