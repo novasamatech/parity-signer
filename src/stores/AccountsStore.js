@@ -19,13 +19,14 @@
 import { Container } from 'unstated';
 import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
 import { encryptData, decryptData } from '../util/native';
+import { accountId } from '../util/account'
 import { NETWORK_TYPE, NETWORK_ID } from '../constants';
 
 export type Account = {
   name: string,
   address: string,
   networkType: string,
-  networkId: string,
+  chainId: string,
   seed: string,
   encryptedSeed: string,
   createdAt: number,
@@ -45,7 +46,7 @@ function empty(address = '') {
     name: '',
     address,
     networkType: NETWORK_TYPE.ethereum,
-    networkId: NETWORK_ID.frontier,
+    chainId: NETWORK_ID.frontier,
     seed: '',
     createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),
@@ -66,10 +67,10 @@ export default class AccountsStore extends Container<AccountsState> {
     this.refreshList();
   }
 
-  async select(address) {
+  async select(account) {
     return new Promise((res, rej) => {
       this.setState(
-        state => ({ selected: address.toLowerCase() }),
+        state => ({ selected: accountId(account) }),
         state => {
           res(state);
         }
@@ -94,20 +95,19 @@ export default class AccountsStore extends Container<AccountsState> {
     const account = this.state.newAccount;
     await this.save(account, pin);
     this.setState({
-      accounts: this.state.accounts.set(account.address.toLowerCase(), account),
+      accounts: this.state.accounts.set(accountId(account), account),
       newAccount: empty()
     });
   }
 
-  update(accountUpdate: { address: string }) {
-    accountUpdate.address = accountUpdate.address.toLowerCase();
-    let account = this.state.accounts.get(accountUpdate.address);
+  update(accountUpdate) {
+    let account = this.state.accounts.get(accountId(accountUpdate));
     if (!account) {
       this.state.accounts.set(
-        accountUpdate.address.toLowerCase(),
+        accountId(accountUpdate),
         accountUpdate
       );
-      account = this.state.accounts.get(accountUpdate.address);
+      account = this.state.accounts.get(accountId(accountUpdate));
     }
     Object.assign(account, accountUpdate);
     this.setState({});
@@ -121,7 +121,7 @@ export default class AccountsStore extends Container<AccountsState> {
     loadAccounts().then(res => {
       const accounts = new Map(
         res.map(a => [
-          a.address.toLowerCase(),
+          accountId(a),
           { ...a, address: a.address.toLowerCase() }
         ])
       );
@@ -139,7 +139,7 @@ export default class AccountsStore extends Container<AccountsState> {
         account.encryptedSeed = encryptedSeed;
       }
       account.updatedAt = new Date().getTime();
-      console.log(await saveAccount(account));
+      await saveAccount(account);
     } catch (e) {
       console.error(e);
     }
@@ -148,7 +148,7 @@ export default class AccountsStore extends Container<AccountsState> {
   async deleteAccount(account) {
     // deleteAccount(account)
     account.archived = true;
-    this.state.accounts.set(account.address.toLowerCase(), account);
+    this.state.accounts.set(accountId(account), account);
     this.setState({
       accounts: this.state.accounts
     });
@@ -159,15 +159,13 @@ export default class AccountsStore extends Container<AccountsState> {
     await this.save(this.getSelected(), pin);
   }
 
-  async unlockAccount(address, pin) {
-    address = address.toLowerCase();
-    const account = this.getByAddress(address);
+  async unlockAccount(account, pin) {
     if (!account || !account.encryptedSeed) {
       return false;
     }
     try {
       account.seed = await decryptData(account.encryptedSeed, pin);
-      this.setState({ accounts: this.state.accounts.set(address, account) });
+      this.setState({ accounts: this.state.accounts.set(accountId(account), account) });
     } catch (e) {
       return false;
     }
@@ -183,8 +181,8 @@ export default class AccountsStore extends Container<AccountsState> {
     }
   }
 
-  getByAddress(address: string): ?Account {
-    return this.state.accounts.get(address.toLowerCase()) || empty(address);
+  getById(account): ?Account {
+    return this.state.accounts.get(accountId(account)) || empty(address);
   }
 
   getSelected(): ?Account {

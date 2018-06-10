@@ -35,7 +35,7 @@ const WEI_IN_ETH = 1000000000000000000;
 export default class TxDetailsCard extends React.Component<{
   value: string,
   recipient: string,
-  networkId: number
+  chainId: number
 }> {
   static propTypes = {
     value: PropTypes.string.isRequired,
@@ -45,7 +45,7 @@ export default class TxDetailsCard extends React.Component<{
   };
 
   render() {
-    const { value, gas, gasPrice, recipient, networkId, style } = this.props;
+    const { value, gas, gasPrice, recipient, chainId, style } = this.props;
 
     return (
       <View style={[styles.body, style]}>

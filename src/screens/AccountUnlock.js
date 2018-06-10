@@ -76,7 +76,7 @@ export class AccountUnlock extends Component {
               // TODO: lock account back after if result wasn't saved
               if (
                 await accounts.unlockAccount(
-                  accounts.getSelected().address,
+                  accounts.getSelected(),
                   pin
                 )
               ) {

@@ -41,29 +41,18 @@ export default class TxDetails extends Component {
         {(scannerStore, accounts) => {
           const txRequest = scannerStore.getTXRequest();
           if (txRequest) {
-            const sender = accounts.getByAddress(txRequest.data.account);
-            const recipient = accounts.getByAddress(
-              scannerStore.getTx().action.toLowerCase()
-            );
+            const tx = scannerStore.getTx();
             return (
               <TxDetailsView
-                {...{ ...this.props, ...scannerStore.getTx() }}
-                sender={sender}
-                recipient={recipient}
+                {...{ ...this.props, ...tx }}
+                sender={scannerStore.getSender()}
+                recipient={scannerStore.getRecipient()}
                 dataToSign={scannerStore.getDataToSign()}
                 onPressAccount={async account => {
                   await accounts.select(account);
                   this.props.navigation.navigate('AccountDetails');
                 }}
                 onNext={async () => {
-                  if (!sender) {
-                    scannerStore.setErrorMsg(
-                      `No account with address ${
-                        txRequest.data.account
-                      } found in your wallet`
-                    );
-                    return;
-                  }
                   try {
                     this.props.navigation.navigate('AccountUnlockAndSign');
                   } catch (e) {
@@ -107,8 +96,9 @@ export class TxDetailsView extends Component {
         <AccountCard
           title={this.props.sender.name || 'no name'}
           address={this.props.sender.address}
+          chainId={this.props.sender.chainId}
           onPress={() => {
-            this.props.onPressAccount(this.props.sender.address);
+            this.props.onPressAccount(this.props.sender);
           }}
         />
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
@@ -122,8 +112,9 @@ export class TxDetailsView extends Component {
         <AccountCard
           title={this.props.recipient.name || 'no name'}
           address={this.props.recipient.address}
+          chainId={this.props.recipient.chainId || ''}
           onPress={() => {
-            this.props.onPressAccount(this.props.recipient.address);
+            this.props.onPressAccount(this.props.recipient);
           }}
         />
         <Button

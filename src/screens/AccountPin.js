@@ -57,7 +57,7 @@ class AccountPinView extends Component {
     ) {
       const account = accounts.getNew();
       await accounts.submitNew(this.state.pin);
-      await accounts.select(account.address);
+      await accounts.select(account);
       accounts.refreshList();
       if (navigation.getParam('isWelcome')) {
         navigation.navigate('Tabs');

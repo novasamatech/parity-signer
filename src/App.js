@@ -48,6 +48,7 @@ import QrScanner from './screens/QrScanner';
 import AccountList from './screens/AccountList';
 import AccountAdd from './screens/AccountAdd';
 import AccountNew from './screens/AccountNew';
+import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountRecover from './screens/AccountRecover';
 import AccountBackup from './screens/AccountBackup';
 import AccountPin from './screens/AccountPin';
@@ -106,6 +107,9 @@ const Screens = createStackNavigator(
             navigationOptions: {
               headerLeft: <HeaderLeftHome />
             }
+          },
+          AccountNetworkChooser: {
+            screen: AccountNetworkChooser
           },
           AccountNew: {
             screen: AccountNew
@@ -169,6 +173,9 @@ const Screens = createStackNavigator(
                 },
                 AccountAdd: {
                   screen: AccountAdd
+                },
+                AccountNetworkChooser: {
+                  screen: AccountNetworkChooser
                 },
                 AccountRecover: {
                   screen: AccountRecover

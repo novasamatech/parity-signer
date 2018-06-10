@@ -18,13 +18,14 @@ import { rlpItem } from './native';
 import { fromWei } from './units';
 
 class Transaction {
-  constructor(nonce, gasPrice, gas, action, value, data) {
+  constructor(nonce, gasPrice, gas, action, value, data, chainId) {
     this.nonce = nonce || '0';
     this.gasPrice = parseInt(gasPrice, 16).toString();
     this.gas = parseInt(gas, 16).toString();
     this.action = action;
     this.value = fromWei(value);
     this.data = data || '-';
+    this.chainId = parseInt(chainId, 16).toString();
     this.isSafe = true;
   }
 }
@@ -37,7 +38,8 @@ async function asyncTransaction(rlp, resolve, reject) {
     let action = await rlpItem(rlp, 3);
     let value = await rlpItem(rlp, 4);
     let data = await rlpItem(rlp, 5);
-    let tx = new Transaction(nonce, gasPrice, gas, action, value, data);
+    let chainId = await rlpItem(rlp, 6);
+    let tx = new Transaction(nonce, gasPrice, gas, action, value, data, chainId);
     resolve(tx);
   } catch (e) {
     reject(e);

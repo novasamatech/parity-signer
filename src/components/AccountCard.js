@@ -26,26 +26,32 @@ import {
   TouchableNativeFeedback,
   TouchableOpacity
 } from 'react-native';
-import colors from '../colors';
-import Card from './Card';
 import AccountIcon from './AccountIcon';
+import Card from './Card';
+import {
+  NETWORK_LIST,
+  NETWORK_TITLES,
+  NETWORK_COLOR,
+  DEFAULT_NETWORK_COLOR
+} from '../constants';
+import colors from '../colors';
 
 export default class AccountCard extends React.Component<{
   title: string,
   address: string,
-  networkId: number,
+  chainId: string,
   onPress: () => any
 }> {
   static propTypes = {
     title: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
-    networkId: PropTypes.number,
+    chainId: PropTypes.string,
     style: View.propTypes.style,
     onPress: PropTypes.func
   };
 
   render() {
-    const { title, address, networkId, style, onPress } = this.props;
+    const { title, address, chainId, style, onPress } = this.props;
 
     const Touchable =
       Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
@@ -64,8 +70,27 @@ export default class AccountCard extends React.Component<{
               <Text style={styles.secondaryText}>0x{address}</Text>
             </View>
           </View>
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Ethereum</Text>
+          <View
+            style={[
+              styles.footer,
+              {
+                backgroundColor:
+                  NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+              }
+            ]}
+          >
+            <Text
+              style={[
+                styles.footerText,
+                {
+                  color: NETWORK_COLOR[chainId]
+                    ? colors.card_bg
+                    : colors.card_text
+                }
+              ]}
+            >
+              {NETWORK_TITLES[chainId]}
+            </Text>
           </View>
         </View>
       </Touchable>

@@ -25,6 +25,7 @@ import AccountCard from '../components/AccountCard';
 import Button from '../components/Button';
 import Background from '../components/Background';
 import colors from '../colors';
+import { accountId } from '../util/account'
 
 export default class AccountList extends Component {
   static navigationOptions = {
@@ -72,16 +73,17 @@ class AccountListView extends Component {
         <FlatList
           style={styles.content}
           data={this.props.accounts}
-          keyExtractor={item => item.address}
+          keyExtractor={account => accountId(account)}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item }) => {
+          renderItem={({ item: account }) => {
             return (
               <AccountCard
-                title={item.name ? item.name : 'no name'}
+                title={account.name ? account.name : 'no name'}
                 style={{ paddingBottom: null }}
-                address={item.address}
+                address={account.address}
+                chainId={account.chainId}
                 onPress={() => {
-                  this.props.onAccountSelected(item.address);
+                  this.props.onAccountSelected(account);
                 }}
               />
             );

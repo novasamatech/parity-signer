@@ -39,8 +39,15 @@ import Background from '../components/Background';
 import AccountSeed from '../components/AccountSeed';
 import AccountCard from '../components/AccountCard';
 import AccountIconChooser from '../components/AccountIconChooser';
+import TouchableItem from '../components/TouchableItem';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
+import {
+  NETWORK_LIST,
+  NETWORK_TITLES,
+  NETWORK_COLOR,
+  DEFAULT_NETWORK_COLOR
+} from '../constants';
 import colors from '../colors';
 
 export default class AccountRecover extends Component {
@@ -72,6 +79,7 @@ class AccountRecoverView extends Component {
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
+    const chainId = selected.chainId;
     return (
       <View style={styles.body}>
         <Background />
@@ -86,6 +94,33 @@ class AccountRecoverView extends Component {
           }}
         >
           <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
+          <Text style={styles.title}>CHOOSE NETWORK</Text>
+          <TouchableItem
+              style={[
+                styles.card,
+                {
+                  backgroundColor:
+                    NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR,
+                  marginBottom: 20
+                }
+              ]}
+              onPress={() =>
+                this.props.navigation.navigate('AccountNetworkChooser')
+              }
+            >
+              <Text
+                style={[
+                  styles.cardText,
+                  {
+                    color: NETWORK_COLOR[chainId]
+                      ? colors.card_bg
+                      : colors.card_text
+                  }
+                ]}
+              >
+                {NETWORK_TITLES[chainId]}
+              </Text>
+            </TouchableItem>
           <Text style={styles.title}>ACCOUNT NAME</Text>
           <TextInput
             onChangeText={name => accounts.updateNew({ name })}
@@ -111,6 +146,7 @@ class AccountRecoverView extends Component {
           <AccountCard
             style={{ marginTop: 20 }}
             address={selected.address || ''}
+            chainId={selected.chainId || ''}
             title={selected.name || 'no name'}
           />
           <Button
@@ -151,5 +187,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     paddingBottom: 20
+  },
+  card: {
+    backgroundColor: colors.card_bg,
+    padding: 20
+  },
+  cardText: {
+    color: colors.card_text,
+    fontFamily: 'Manifold CF',
+    fontSize: 20,
+    fontWeight: 'bold'
   }
 });

@@ -65,6 +65,7 @@ export default class AccountEdit extends Component {
                   <AccountCard
                     title={selected.name ? selected.name : 'no name'}
                     address={selected.address}
+                    chainId={selected.chainId}
                     onPress={async () => {
                       await Clipboard.setString('0x' + selected.address);
                     }}

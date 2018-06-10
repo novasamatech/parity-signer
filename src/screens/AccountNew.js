@@ -33,9 +33,15 @@ import AccountsStore from '../stores/AccountsStore';
 import Background from '../components/Background';
 import AccountSeed from '../components/AccountSeed';
 import AccountIconChooser from '../components/AccountIconChooser';
+import TouchableItem from '../components/TouchableItem';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
-import NetworkPicker from '../components/NetworkPicker';
+import {
+  NETWORK_LIST,
+  NETWORK_TITLES,
+  NETWORK_COLOR,
+  DEFAULT_NETWORK_COLOR
+} from '../constants';
 import colors from '../colors';
 
 export default class AccountNew extends Component {
@@ -56,6 +62,7 @@ class AccountNewView extends Component {
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
+    const chainId = selected.chainId;
     if (!selected) {
       return null;
     }
@@ -69,11 +76,34 @@ class AccountNewView extends Component {
           <View style={styles.top}>
             <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
             <Text style={styles.title}>CHOOSE NETWORK</Text>
-            <NetworkPicker
-              selectedValue={selected.networkId}
-              onValueChange={value => accounts.updateNew({ networkId: value })}
-            />
-            <Text style={styles.title}>CHOOSE AN IDENTICON</Text>
+            <TouchableItem
+              style={[
+                styles.card,
+                {
+                  backgroundColor:
+                    NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                }
+              ]}
+              onPress={() =>
+                this.props.navigation.navigate('AccountNetworkChooser')
+              }
+            >
+              <Text
+                style={[
+                  styles.cardText,
+                  {
+                    color: NETWORK_COLOR[chainId]
+                      ? colors.card_bg
+                      : colors.card_text
+                  }
+                ]}
+              >
+                {NETWORK_TITLES[chainId]}
+              </Text>
+            </TouchableItem>
+            <Text style={[styles.title, { marginTop: 20 }]}>
+              CHOOSE AN IDENTICON
+            </Text>
             <AccountIconChooser
               value={selected && selected.address}
               onChange={({ address, seed }) => {
@@ -154,5 +184,15 @@ const styles = StyleSheet.create({
   },
   nextStep: {
     marginTop: 15
+  },
+  card: {
+    backgroundColor: colors.card_bg,
+    padding: 20
+  },
+  cardText: {
+    color: colors.card_text,
+    fontFamily: 'Manifold CF',
+    fontSize: 20,
+    fontWeight: 'bold'
   }
 });

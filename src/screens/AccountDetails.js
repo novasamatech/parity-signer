@@ -93,6 +93,7 @@ class AccountDetailsView extends Component {
         <Text style={styles.title}>ACCOUNT</Text>
         <AccountDetailsCard
           address={account.address}
+          chainId={account.chainId}
           title={account.name}
           onPress={() => this.props.navigation.navigate('AccountEdit')}
         />
@@ -103,7 +104,7 @@ class AccountDetailsView extends Component {
         ) : (
           <Button
             textStyles={{ color: colors.card_bg_text }}
-            buttonStyles={{ backgroundColor: colors.card_bg }}
+            buttonStyles={styles.qr}
             title="Show Account QR Code"
             onPress={() => {
               this.setState({ showQr: true });
@@ -147,6 +148,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   qr: {
+    marginTop: 20,
     flex: 1,
     backgroundColor: colors.card_bg
   },

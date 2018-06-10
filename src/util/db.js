@@ -30,16 +30,16 @@ const txStore = {
   sharedPreferencesName: 'transactions'
 };
 
-function accountTxsKey({ address, networkType, networkId }) {
-  return 'account_txs_' + accountId({ address, networkType, networkId });
+function accountTxsKey({ address, networkType, chainId }) {
+  return 'account_txs_' + accountId({ address, networkType, chainId });
 }
 
 function txKey(hash) {
   return 'tx_' + hash;
 }
 
-export const deleteAccount = account =>
-  SecureStorage.deleteItem(account.address, accountsStore);
+export const deleteAccount = async account =>
+  SecureStorage.deleteItem(accountId(account), accountsStore);
 
 export const saveAccount = account =>
   SecureStorage.setItem(

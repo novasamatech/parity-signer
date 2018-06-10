@@ -52,10 +52,25 @@ export default class ScannerStore extends Container<ScannerState> {
   };
 
   async setTXRequest(txRequest, accountsStore) {
-    const sender = accountsStore.getByAddress(txRequest.data.account);
     const tx = await transaction(txRequest.data.rlp);
-    const recipient = accountsStore.getByAddress(tx.action);
+    const sender = accountsStore.getById({
+      networkType: 'ethereum',
+      chainId: tx.chainId,
+      address: txRequest.data.account
+    });
 
+    if (!sender.encryptedSeed) {
+      this.setErrorMsg(
+        `No account with address ${txRequest.data.account} found in your signer`
+      );
+      return false;
+    }
+
+    const recipient = accountsStore.getById({
+      networkType: 'ethereum',
+      chainId: tx.chainId,
+      address: tx.action
+    });
     const dataToSign = await keccak(txRequest.data.rlp);
     this.setState({
       sender,
@@ -64,6 +79,7 @@ export default class ScannerStore extends Container<ScannerState> {
       tx,
       dataToSign
     });
+    return true;
   }
 
   async signData(pin = '1') {
@@ -79,6 +95,14 @@ export default class ScannerStore extends Container<ScannerState> {
       signature: signedData,
       createdAt: new Date().getTime()
     });
+  }
+
+  getSender() {
+    return this.state.sender;
+  }
+
+  getRecipient() {
+    return this.state.recipient;
   }
 
   getTXRequest() {
