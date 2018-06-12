@@ -96,31 +96,31 @@ class AccountRecoverView extends Component {
           <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
           <Text style={styles.title}>CHOOSE NETWORK</Text>
           <TouchableItem
+            style={[
+              styles.card,
+              {
+                backgroundColor:
+                  NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR,
+                marginBottom: 20
+              }
+            ]}
+            onPress={() =>
+              this.props.navigation.navigate('AccountNetworkChooser')
+            }
+          >
+            <Text
               style={[
-                styles.card,
+                styles.cardText,
                 {
-                  backgroundColor:
-                    NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR,
-                  marginBottom: 20
+                  color: NETWORK_COLOR[chainId]
+                    ? colors.card_bg
+                    : colors.card_text
                 }
               ]}
-              onPress={() =>
-                this.props.navigation.navigate('AccountNetworkChooser')
-              }
             >
-              <Text
-                style={[
-                  styles.cardText,
-                  {
-                    color: NETWORK_COLOR[chainId]
-                      ? colors.card_bg
-                      : colors.card_text
-                  }
-                ]}
-              >
-                {NETWORK_TITLES[chainId]}
-              </Text>
-            </TouchableItem>
+              {NETWORK_TITLES[chainId]}
+            </Text>
+          </TouchableItem>
           <Text style={styles.title}>ACCOUNT NAME</Text>
           <TextInput
             onChangeText={name => accounts.updateNew({ name })}

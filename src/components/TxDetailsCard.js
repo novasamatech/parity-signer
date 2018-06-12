@@ -24,7 +24,8 @@ import {
   Platform,
   StyleSheet,
   TouchableNativeFeedback,
-  TouchableOpacity
+  TouchableOpacity,
+  ViewPropTypes
 } from 'react-native';
 import colors from '../colors';
 import Card from './Card';
@@ -41,7 +42,7 @@ export default class TxDetailsCard extends React.Component<{
     value: PropTypes.string.isRequired,
     gas: PropTypes.string.isRequired,
     gasPrice: PropTypes.string.isRequired,
-    style: View.propTypes.style
+    style: ViewPropTypes.style
   };
 
   render() {
@@ -49,7 +50,9 @@ export default class TxDetailsCard extends React.Component<{
 
     return (
       <View style={[styles.body, style]}>
-        <Text style={styles.titleText}>You are about to send the following amount</Text>
+        <Text style={styles.titleText}>
+          You are about to send the following amount
+        </Text>
         <Amount
           style={{ marginTop: 10 }}
           value={value}

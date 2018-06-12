@@ -17,7 +17,7 @@
 // @flow
 import { Container } from 'unstated';
 import { saveTx, loadAccountTxs } from '../util/db';
-import { accountId } from '../util/account'
+import { accountId } from '../util/account';
 
 type State = {
   signedTxs: Map<string, Object>

@@ -19,7 +19,7 @@
 import { Container } from 'unstated';
 import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
 import { encryptData, decryptData } from '../util/native';
-import { accountId } from '../util/account'
+import { accountId } from '../util/account';
 import { NETWORK_TYPE, NETWORK_ID } from '../constants';
 
 export type Account = {
@@ -103,10 +103,7 @@ export default class AccountsStore extends Container<AccountsState> {
   update(accountUpdate) {
     let account = this.state.accounts.get(accountId(accountUpdate));
     if (!account) {
-      this.state.accounts.set(
-        accountId(accountUpdate),
-        accountUpdate
-      );
+      this.state.accounts.set(accountId(accountUpdate), accountUpdate);
       account = this.state.accounts.get(accountId(accountUpdate));
     }
     Object.assign(account, accountUpdate);
@@ -120,10 +117,7 @@ export default class AccountsStore extends Container<AccountsState> {
   async refreshList() {
     loadAccounts().then(res => {
       const accounts = new Map(
-        res.map(a => [
-          accountId(a),
-          { ...a, address: a.address.toLowerCase() }
-        ])
+        res.map(a => [accountId(a), { ...a, address: a.address.toLowerCase() }])
       );
       this.setState({ accounts });
     });
@@ -165,7 +159,9 @@ export default class AccountsStore extends Container<AccountsState> {
     }
     try {
       account.seed = await decryptData(account.encryptedSeed, pin);
-      this.setState({ accounts: this.state.accounts.set(accountId(account), account) });
+      this.setState({
+        accounts: this.state.accounts.set(accountId(account), account)
+      });
     } catch (e) {
       return false;
     }

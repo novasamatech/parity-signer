@@ -24,7 +24,8 @@ import {
   Platform,
   StyleSheet,
   TouchableNativeFeedback,
-  TouchableOpacity
+  TouchableOpacity,
+  ViewPropTypes
 } from 'react-native';
 import AccountIcon from './AccountIcon';
 import Card from './Card';
@@ -45,8 +46,8 @@ export default class AccountCard extends React.Component<{
   static propTypes = {
     title: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
+    style: ViewPropTypes.style,
     chainId: PropTypes.string,
-    style: View.propTypes.style,
     onPress: PropTypes.func
   };
 
@@ -74,8 +75,7 @@ export default class AccountCard extends React.Component<{
             style={[
               styles.footer,
               {
-                backgroundColor:
-                  NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
               }
             ]}
           >

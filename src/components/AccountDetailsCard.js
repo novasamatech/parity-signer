@@ -74,27 +74,26 @@ export default class AccountDetailsCard extends React.Component<{
           </View>
         </View>
         <View
+          style={[
+            styles.footer,
+            {
+              backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+            }
+          ]}
+        >
+          <Text
             style={[
-              styles.footer,
+              styles.footerText,
               {
-                backgroundColor:
-                  NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                color: NETWORK_COLOR[chainId]
+                  ? colors.card_bg
+                  : colors.card_text
               }
             ]}
           >
-            <Text
-              style={[
-                styles.footerText,
-                {
-                  color: NETWORK_COLOR[chainId]
-                    ? colors.card_bg
-                    : colors.card_text
-                }
-              ]}
-            >
-              {NETWORK_TITLES[chainId]}
-            </Text>
-          </View>
+            {NETWORK_TITLES[chainId]}
+          </Text>
+        </View>
       </Touchable>
     );
   }

@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
@@ -31,16 +32,20 @@
 		1F426F9D208D358500CA43DB /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F9A208D358500CA43DB /* String.swift */; };
 		25585941EFBA436796B325D3 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 75EB071F2F264C599EB44A84 /* Feather.ttf */; };
 		2D0CDDA789254813913BC99F /* libRNSecureStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C53E8F3556242B0954F1A1B /* libRNSecureStorage.a */; };
+		3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */; };
 		3D7A98D07DE443E381067D3A /* Roboto-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */; };
 		423E02567C044AF6832B2388 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */; };
 		45F6516A44F949AB986ABB0F /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FF44AAEAAE3484A8B2D6DD9 /* libRNCamera.a */; };
+		5DC40D98E51D492C8FF692B5 /* Manifold-CF-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */; };
 		66E5EE9B2FAC4B64861A86BE /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DBF1BC87DE904C2C811D40C5 /* Entypo.ttf */; };
+		77AE2A2069B847F9B7EB4854 /* Manifold-CF.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */; };
 		7A7137D6EEDE40C184F30C15 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5CD421FF72D947B0AA9EBABB /* Roboto-Regular.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		863C4F61A39C4CB5BB9ED42B /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F6875F0B79AF4BB4B8B0B7A1 /* Zocial.ttf */; };
 		8E884A9F327F4D81BA88C775 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A50B8B6830BF499D9F66CF30 /* FontAwesome.ttf */; };
 		95279244A36A49849FCE2DAE /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D592A5F1000548E09C637958 /* Roboto-Bold.ttf */; };
 		A6DE194CA1E344F6B2BBDD09 /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F744F56289845F0A1085BBB /* Roboto-MediumItalic.ttf */; };
+		AD0B6F7EACB74BA7A42D2A2E /* Manifold-CF-Demi-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */; };
 		ADF793FFE1B140F68B67FCEE /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F740E38EB2B54179A78C97A7 /* Octicons.ttf */; };
 		B43B3542B9ED441AB8AFBA0B /* Roboto-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */; };
 		B64E632F8A9D4350B4762ADB /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 670C31C3459C46DDB927608B /* MaterialCommunityIcons.ttf */; };
@@ -52,11 +57,7 @@
 		ECA9271ADD0F4764B17DEBF0 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 659FAB33CEC8453DB21CAE19 /* libRNVectorIcons.a */; };
 		EDCE1EC0CA1249279F03F2E2 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */; };
 		EE896FB251B94030AC713B6F /* Roboto-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */; };
-		3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */; };
-		AD0B6F7EACB74BA7A42D2A2E /* Manifold-CF-Demi-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */; };
 		F1569210427145DEBBB5B898 /* Manifold-CF-Extra-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */; };
-		5DC40D98E51D492C8FF692B5 /* Manifold-CF-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */; };
-		77AE2A2069B847F9B7EB4854 /* Manifold-CF.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -366,13 +367,17 @@
 		1F426F9A208D358500CA43DB /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = String.swift; path = NativeSigner/String.swift; sourceTree = "<group>"; };
 		1F426F9B208D358500CA43DB /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NativeSigner-Bridging-Header.h"; path = "NativeSigner/NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
 		1F7FFA3B208B691700FF717A /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF.otf"; path = "../res/fonts/Manifold-CF.otf"; sourceTree = "<group>"; };
+		31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Light.otf"; path = "../res/fonts/Manifold-CF-Light.otf"; sourceTree = "<group>"; };
 		42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Italic.ttf"; path = "../res/fonts/Roboto-Italic.ttf"; sourceTree = "<group>"; };
 		53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Light.ttf"; path = "../res/fonts/Roboto-Light.ttf"; sourceTree = "<group>"; };
 		56DDC9AA691C4827B7946155 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		56ECFD4738844A7590D8F08A /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		5CD421FF72D947B0AA9EBABB /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../res/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
+		5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Demi-Bold.otf"; path = "../res/fonts/Manifold-CF-Demi-Bold.otf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		5F744F56289845F0A1085BBB /* Roboto-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-MediumItalic.ttf"; path = "../res/fonts/Roboto-MediumItalic.ttf"; sourceTree = "<group>"; };
+		624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Bold.otf"; path = "../res/fonts/Manifold-CF-Bold.otf"; sourceTree = "<group>"; };
 		659FAB33CEC8453DB21CAE19 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		670C31C3459C46DDB927608B /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		6C542BDCBB414412986234E5 /* RNSecureStorage.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSecureStorage.xcodeproj; path = "../node_modules/react-native-secure-storage/ios/RNSecureStorage.xcodeproj"; sourceTree = "<group>"; };
@@ -391,14 +396,10 @@
 		DDFA123E816A46BBB8DF60B6 /* libRCTCamera.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTCamera.a; sourceTree = "<group>"; };
 		E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Medium.ttf"; path = "../res/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; };
 		EA252ACE6F044BD88BDCD173 /* Roboto-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Black.ttf"; path = "../res/fonts/Roboto-Black.ttf"; sourceTree = "<group>"; };
+		F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Extra-Bold.otf"; path = "../res/fonts/Manifold-CF-Extra-Bold.otf"; sourceTree = "<group>"; };
 		F6875F0B79AF4BB4B8B0B7A1 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		F740E38EB2B54179A78C97A7 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ThinItalic.ttf"; path = "../res/fonts/Roboto-ThinItalic.ttf"; sourceTree = "<group>"; };
-		624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */ = {isa = PBXFileReference; name = "Manifold-CF-Bold.otf"; path = "../res/fonts/Manifold-CF-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */ = {isa = PBXFileReference; name = "Manifold-CF-Demi-Bold.otf"; path = "../res/fonts/Manifold-CF-Demi-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */ = {isa = PBXFileReference; name = "Manifold-CF-Extra-Bold.otf"; path = "../res/fonts/Manifold-CF-Extra-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */ = {isa = PBXFileReference; name = "Manifold-CF-Light.otf"; path = "../res/fonts/Manifold-CF-Light.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */ = {isa = PBXFileReference; name = "Manifold-CF.otf"; path = "../res/fonts/Manifold-CF.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -561,7 +562,6 @@
 				9C53E8F3556242B0954F1A1B /* libRNSecureStorage.a */,
 				8FF44AAEAAE3484A8B2D6DD9 /* libRNCamera.a */,
 				659FAB33CEC8453DB21CAE19 /* libRNVectorIcons.a */,
-				4002B0CB780444A6AF400786 /* libRNTBgImage.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -1234,9 +1234,7 @@
 				INFOPLIST_FILE = NativeSignerTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
@@ -1255,9 +1253,8 @@
 				INFOPLIST_FILE = NativeSignerTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				"OTHER_LDFLAGS[arch=*]" = " -lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";

@@ -74,12 +74,7 @@ export class AccountUnlock extends Component {
             {...this.props}
             onChange={async pin => {
               // TODO: lock account back after if result wasn't saved
-              if (
-                await accounts.unlockAccount(
-                  accounts.getSelected(),
-                  pin
-                )
-              ) {
+              if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [

@@ -39,7 +39,15 @@ async function asyncTransaction(rlp, resolve, reject) {
     let value = await rlpItem(rlp, 4);
     let data = await rlpItem(rlp, 5);
     let chainId = await rlpItem(rlp, 6);
-    let tx = new Transaction(nonce, gasPrice, gas, action, value, data, chainId);
+    let tx = new Transaction(
+      nonce,
+      gasPrice,
+      gas,
+      action,
+      value,
+      data,
+      chainId
+    );
     resolve(tx);
   } catch (e) {
     reject(e);

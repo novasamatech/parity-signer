@@ -24,7 +24,8 @@ import {
   Platform,
   StyleSheet,
   TouchableNativeFeedback,
-  TouchableOpacity
+  TouchableOpacity,
+  ViewPropTypes
 } from 'react-native';
 import colors from '../colors';
 
@@ -37,8 +38,8 @@ export default class Button extends React.Component<{
 }> {
   static propTypes = {
     title: PropTypes.string.isRequired,
+    style: ViewPropTypes.style,
     textStyles: Text.propTypes.style,
-    buttonStyles: View.propTypes.style,
     disabled: PropTypes.bool,
     onPress: PropTypes.func.isRequired
   };

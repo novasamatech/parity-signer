@@ -63,7 +63,7 @@ export default class SecurityHeader extends React.Component {
     return (
       <View style={{ flexDirection: 'row' }}>
         <Icon style={[styles.headerSecureIcon, { color }]} name="security" />
-        <Text style={[styles.headerTextRight, { color }]}>{ message }</Text>
+        <Text style={[styles.headerTextRight, { color }]}>{message}</Text>
       </View>
     );
   }

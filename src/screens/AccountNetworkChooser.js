@@ -71,8 +71,7 @@ class AccountNetworkChooserView extends Component {
               styles.card,
               {
                 marginTop: 20,
-                backgroundColor:
-                  NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
               }
             ]}
             onPress={() => {

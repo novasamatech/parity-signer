@@ -50,7 +50,7 @@ export const saveAccount = account =>
 
 export const saveAccounts = accounts => accounts.forEach(saveAccount);
 
-export async function loadAccounts () {
+export async function loadAccounts() {
   if (!SecureStorage) {
     return Promise.resolve([]);
   }
@@ -58,7 +58,7 @@ export async function loadAccounts () {
   return SecureStorage.getAllItems(accountsStore).then(accounts =>
     Object.values(accounts).map(account => JSON.parse(account))
   );
-};
+}
 
 export async function saveTx(tx) {
   if (!tx.sender) {

@@ -24,7 +24,8 @@ import {
   Platform,
   StyleSheet,
   TouchableNativeFeedback,
-  TouchableOpacity
+  TouchableOpacity,
+  ViewPropTypes
 } from 'react-native';
 import colors from '../colors';
 
@@ -40,8 +41,8 @@ export default class Card extends React.Component<{
     title: PropTypes.string.isRequired,
     secondaryText: PropTypes.string,
     labelText: PropTypes.string,
-    style: View.propTypes.style,
-    footerStyle: View.propTypes.style,
+    style: ViewPropTypes.style,
+    footerStyle: ViewPropTypes.style,
     onPress: PropTypes.func
   };
 

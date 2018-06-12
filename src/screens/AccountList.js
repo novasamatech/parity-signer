@@ -25,7 +25,7 @@ import AccountCard from '../components/AccountCard';
 import Button from '../components/Button';
 import Background from '../components/Background';
 import colors from '../colors';
-import { accountId } from '../util/account'
+import { accountId } from '../util/account';
 
 export default class AccountList extends Component {
   static navigationOptions = {
