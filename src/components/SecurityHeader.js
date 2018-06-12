@@ -16,49 +16,32 @@
 
 import React from 'react';
 import { Text, View, StyleSheet, NetInfo } from 'react-native';
+import { Subscribe } from 'unstated';
+import SecurityStore from '../stores/SecurityStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 
 export default class SecurityHeader extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.listener = null;
-    this.connectionChangeListener = this.connectionChangeListener.bind(this);
-    this.state = {
-      warning: 'red'
-    };
-  }
-
-  connectionChangeListener(connectionInfo) {
-    if (connectionInfo.type !== 'none') {
-      this.setState({ warning: 'red' });
-    } else {
-      this.setState({ warning: 'green' });
-    }
-  }
-
-  componentDidMount() {
-    NetInfo.addEventListener('connectionChange', this.connectionChangeListener);
-  }
-
-  componentWillUnmount() {
-    NetInfo.removeEventListener(
-      'connectionChange',
-      this.connectionChangeListener
-    );
-  }
-
   render() {
-    const { warning } = this.state;
+     return <Subscribe to={[SecurityStore]}>{
+      (securityStore) => <SecurityHeaderView level={ securityStore.getLevel() }/>
+    }</Subscribe>
+  }
+}
+
+class SecurityHeaderView extends React.Component {
+  render() {
+
+    const { level } = this.props;
     const color = {
       green: 'green',
       red: 'red'
-    }[warning];
+    }[level];
 
     const message = {
       green: 'Secured',
       red: 'Unsecured'
-    }[warning];
+    }[level];
 
     return (
       <View style={{ flexDirection: 'row' }}>
