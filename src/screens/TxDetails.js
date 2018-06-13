@@ -45,6 +45,7 @@ export default class TxDetails extends Component {
             return (
               <TxDetailsView
                 {...{ ...this.props, ...tx }}
+                scannerStore={scannerStore}
                 sender={scannerStore.getSender()}
                 recipient={scannerStore.getRecipient()}
                 dataToSign={scannerStore.getDataToSign()}

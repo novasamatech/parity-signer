@@ -40,18 +40,22 @@ type ScannerState = {
   signedTxList: [SignedTX]
 };
 
+const defaultState = {
+  busy: true,
+  txRequest: null,
+  sender: null,
+  recipient: null,
+  tx: '',
+  dataToSign: '',
+  signedData: '',
+  scanErrorMsg: ''
+};
+
 export default class ScannerStore extends Container<ScannerState> {
-  state = {
-    txRequest: null,
-    sender: null,
-    recipient: null,
-    tx: '',
-    dataToSign: '',
-    signedData: '',
-    scanErrorMsg: ''
-  };
+  state = defaultState;
 
   async setTXRequest(txRequest, accountsStore) {
+    this.setBusy();
     const tx = await transaction(txRequest.data.rlp);
     const sender = accountsStore.getById({
       networkType: 'ethereum',
@@ -95,6 +99,26 @@ export default class ScannerStore extends Container<ScannerState> {
       signature: signedData,
       createdAt: new Date().getTime()
     });
+  }
+
+  setBusy() {
+    this.setState({
+      busy: true
+    });
+  }
+
+  setReady() {
+    this.setState({
+      busy: false
+    });
+  }
+
+  isBusy() {
+    return this.state.busy;
+  }
+
+  cleanup() {
+    this.setState(defaultState);
   }
 
   getSender() {
