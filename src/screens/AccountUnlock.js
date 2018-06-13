@@ -25,6 +25,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView
 } from 'react-native';
+import debounce from 'debounce';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
@@ -136,7 +137,7 @@ class AccountUnlockView extends Component {
         <PinInput
           onChangeText={pin => {
             this.setState({ pin });
-            this.props.onChange(pin);
+            debounce(this.props.onChange, 200)(pin);
           }}
           value={this.state.pin}
         />
