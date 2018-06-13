@@ -34,7 +34,9 @@ import {
   createStackNavigator,
   createBottomTabNavigator,
   HeaderTitle,
-  Header
+  Header,
+  HeaderBackButton as HeaderBackButton,
+  withNavigation
 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { default as HomeHeader } from './components/Header';
@@ -44,6 +46,7 @@ import Background from './components/Background';
 import TabBarBottom from './components/TabBarBottom';
 import TouchableItem from './components/TouchableItem';
 import Loading from './screens/Loading';
+import Security from './screens/Security';
 import QrScanner from './screens/QrScanner';
 import AccountList from './screens/AccountList';
 import AccountAdd from './screens/AccountAdd';
@@ -94,10 +97,45 @@ const globalStackNavigationOptions = {
   }
 };
 
+// A workaround for https://github.com/react-navigation/react-navigation/issues/88
+const SecurityHeaderBackButton = withNavigation(
+  class _HeaderBackButton extends Component {
+    render() {
+      const { navigation } = this.props;
+      return (
+        <HeaderBackButton
+          {...this.props}
+          title="Back"
+          tintColor={colors.card_bg}
+          onPress={() => navigation.goBack(null)}
+        />
+      );
+    }
+  }
+);
+
 const Screens = createStackNavigator(
   {
     Loading: {
       screen: Loading
+    },
+    Security: {
+      screen: createStackNavigator(
+        {
+          Security: {
+            screen: Security,
+            navigationOptions: {
+              headerTintColor: colors.card_bg,
+              headerLeft: <SecurityHeaderBackButton />,
+              headerRight: null
+            }
+          }
+        },
+        {
+          headerMode: 'screen',
+          navigationOptions: globalStackNavigationOptions
+        }
+      )
     },
     Welcome: {
       screen: createStackNavigator(

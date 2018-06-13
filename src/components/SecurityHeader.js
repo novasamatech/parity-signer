@@ -15,39 +15,46 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Text, View, StyleSheet, NetInfo } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import SecurityStore from '../stores/SecurityStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import TouchableItem from './TouchableItem';
+import SecurityStore from '../stores/SecurityStore';
 import colors from '../colors';
 
 export default class SecurityHeader extends React.Component {
   render() {
-     return <Subscribe to={[SecurityStore]}>{
-      (securityStore) => <SecurityHeaderView level={ securityStore.getLevel() }/>
-    }</Subscribe>
+    return (
+      <Subscribe to={[SecurityStore]}>
+        {securityStore => (
+          <SecurityHeaderView level={securityStore.getLevel()} />
+        )}
+      </Subscribe>
+    );
   }
 }
 
-class SecurityHeaderView extends React.Component {
+class _SecurityHeaderView extends React.Component {
   render() {
-
     const { level } = this.props;
     const color = {
-      green: 'green',
-      red: 'red'
+      green: colors.bg_positive,
+      red: colors.bg_alert
     }[level];
 
     const message = {
       green: 'Secured',
-      red: 'Unsecured'
+      red: 'Insecure'
     }[level];
 
     return (
-      <View style={{ flexDirection: 'row' }}>
-        <Icon style={[styles.headerSecureIcon, { color }]} name="security" />
-        <Text style={[styles.headerTextRight, { color }]}>{message}</Text>
-      </View>
+      <TouchableItem onPress={() => this.props.navigation.navigate('Security')}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Icon style={[styles.headerSecureIcon, { color }]} name="security" />
+          <Text style={[styles.headerTextRight, { color }]}>{message}</Text>
+        </View>
+      </TouchableItem>
     );
   }
 }
@@ -68,3 +75,5 @@ const styles = StyleSheet.create({
     color: colors.bg_text_positive
   }
 });
+
+const SecurityHeaderView = withNavigation(_SecurityHeaderView);
