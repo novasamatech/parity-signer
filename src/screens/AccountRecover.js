@@ -147,7 +147,7 @@ class AccountRecoverView extends Component {
             style={{ marginTop: 20 }}
             address={selected.address || ''}
             chainId={selected.chainId || ''}
-            title={selected.name || 'no name'}
+            title={selected.name}
           />
           <Button
             buttonStyles={{ marginBottom: 40 }}

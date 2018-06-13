@@ -78,7 +78,7 @@ class AccountListView extends Component {
           renderItem={({ item: account }) => {
             return (
               <AccountCard
-                title={account.name ? account.name : 'no name'}
+                title={account.name}
                 style={{ paddingBottom: null }}
                 address={account.address}
                 chainId={account.chainId}

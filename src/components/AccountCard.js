@@ -56,7 +56,9 @@ export default class AccountCard extends React.Component<{
   }
 
   render() {
-    const { title, address, chainId, style, onPress } = this.props;
+    const { address, chainId, style, onPress } = this.props;
+    let { title } = this.props;
+    title = title.length ? title : AccountCard.defaultProps.title;
 
     const Touchable =
       Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;

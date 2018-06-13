@@ -63,7 +63,7 @@ export default class AccountEdit extends Component {
                 <View>
                   <Text style={styles.titleTop}>EDIT ACCOUNT</Text>
                   <AccountCard
-                    title={selected.name ? selected.name : 'no name'}
+                    title={selected.name}
                     address={selected.address}
                     chainId={selected.chainId}
                     onPress={async () => {

@@ -66,7 +66,7 @@ class AccountBackupView extends Component {
         <AccountCard
           address={selected.address}
           chainId={selected.chainId}
-          title={selected.name || 'no name'}
+          title={selected.name}
         />
         <Text style={styles.titleTop}>RECOVERY WORDS</Text>
         <Text style={styles.hintText}>

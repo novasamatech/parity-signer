@@ -92,7 +92,7 @@ export class TxDetailsView extends Component {
         <Text style={styles.topTitle}>SIGN TRANSACTION</Text>
         <Text style={styles.title}>FROM ACCOUNT</Text>
         <AccountCard
-          title={this.props.sender.name || 'no name'}
+          title={this.props.sender.name}
           address={this.props.sender.address}
           chainId={this.props.sender.chainId}
           onPress={() => {
@@ -109,7 +109,7 @@ export class TxDetailsView extends Component {
         />
         <Text style={styles.title}>RECIPIENT</Text>
         <AccountCard
-          title={this.props.recipient.name || 'no name'}
+          title={this.props.recipient.name}
           address={this.props.recipient.address}
           chainId={this.props.recipient.chainId || ''}
           onPress={() => {
