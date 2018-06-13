@@ -80,8 +80,6 @@ export class TxDetailsView extends Component {
     nonce: PropTypes.string,
     gas: PropTypes.string,
     gasPrice: PropTypes.string,
-    data: PropTypes.string,
-    isSafe: PropTypes.bool.isRequired
   };
 
   render() {
@@ -104,6 +102,7 @@ export class TxDetailsView extends Component {
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
         <TxDetailsCard
           style={{ marginBottom: 20 }}
+          description="You are about to send the following amount"
           value={this.props.value}
           gas={this.props.gas}
           gasPrice={this.props.gasPrice}

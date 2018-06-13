@@ -35,24 +35,25 @@ const WEI_IN_ETH = 1000000000000000000;
 
 export default class TxDetailsCard extends React.Component<{
   value: string,
-  recipient: string,
-  chainId: number
+  description: string,
+  gas: string,
+  gasPrice: string,
+  style: Object
 }> {
   static propTypes = {
     value: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
     gas: PropTypes.string.isRequired,
     gasPrice: PropTypes.string.isRequired,
     style: ViewPropTypes.style
   };
 
   render() {
-    const { value, gas, gasPrice, recipient, chainId, style } = this.props;
+    const { value, description, gas, gasPrice, style } = this.props;
 
     return (
       <View style={[styles.body, style]}>
-        <Text style={styles.titleText}>
-          You are about to send the following amount
-        </Text>
+        <Text style={styles.titleText}>{description}</Text>
         <Amount
           style={{ marginTop: 10 }}
           value={value}

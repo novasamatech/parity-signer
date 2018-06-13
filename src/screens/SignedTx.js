@@ -18,19 +18,32 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, ScrollView, Text } from 'react-native';
 import Background from '../components/Background';
 import QrView from '../components/QrView';
 import { Subscribe } from 'unstated';
 import ScannerStore from '../stores/ScannerStore';
+import AccountsStore from '../stores/AccountsStore';
+import TxDetailsCard from '../components/TxDetailsCard';
+import AccountCard from '../components/AccountCard';
 import colors from '../colors';
 
 export default class SignedTx extends Component {
   render() {
     return (
-      <Subscribe to={[ScannerStore]}>
-        {scanner => {
-          return <SignedTxView data={scanner.getSignedTxData()} />;
+      <Subscribe to={[ScannerStore, AccountsStore]}>
+        {(scanner, accounts) => {
+          return (
+            <SignedTxView
+              {...scanner.getTx()}
+              data={scanner.getSignedTxData()}
+              onPressAccount={async account => {
+                await accounts.select(account);
+                this.props.navigation.navigate('AccountDetails');
+              }}
+              recipient={scanner.getRecipient()}
+            />
+          );
         }}
       </Subscribe>
     );
@@ -39,18 +52,40 @@ export default class SignedTx extends Component {
 
 export class SignedTxView extends Component {
   static propTypes = {
-    data: PropTypes.string.isRequired
+    data: PropTypes.string.isRequired,
+    recipient: PropTypes.object.isRequired,
+    value: PropTypes.string,
+    nonce: PropTypes.string,
+    gas: PropTypes.string,
+    gasPrice: PropTypes.string,
   };
 
   render() {
     return (
-      <View style={styles.body}>
+      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Background />
-        <Text style={styles.topTitle}>SIGNED TRANSACTION</Text>
+        <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
         <View style={styles.qr}>
           <QrView text={this.props.data} />
         </View>
-      </View>
+        <Text style={styles.title}>TRANSACTION DETAILS</Text>
+        <TxDetailsCard
+          style={{ marginBottom: 20 }}
+          description="After scanning and publishing you will have sent"
+          value={this.props.value}
+          gas={this.props.gas}
+          gasPrice={this.props.gasPrice}
+        />
+        <Text style={styles.title}>RECIPIENT</Text>
+        <AccountCard
+          title={this.props.recipient.name}
+          address={this.props.recipient.address}
+          chainId={this.props.recipient.chainId || ''}
+          onPress={() => {
+            this.props.onPressAccount(this.props.recipient);
+          }}
+        />
+      </ScrollView>
     );
   }
 }
@@ -60,17 +95,24 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
-    padding: 20,
     overflow: 'hidden'
   },
   qr: {
     flex: 1,
+    marginBottom: 20,
     backgroundColor: colors.card_bg
   },
   topTitle: {
     textAlign: 'center',
     color: colors.bg_text_sec,
     fontSize: 24,
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
+    paddingBottom: 20
+  },
+  title: {
+    color: colors.bg_text_sec,
+    fontSize: 18,
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20

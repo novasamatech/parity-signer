@@ -38,18 +38,22 @@ import {
 import colors from '../colors';
 
 export default class AccountCard extends React.Component<{
-  title: string,
+  title: ?string,
   address: string,
   chainId: string,
   onPress: () => any
 }> {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     address: PropTypes.string.isRequired,
     style: ViewPropTypes.style,
     chainId: PropTypes.string,
     onPress: PropTypes.func
   };
+
+  static defaultProps = {
+    title: 'no name'
+  }
 
   render() {
     const { title, address, chainId, style, onPress } = this.props;
