@@ -57,10 +57,10 @@ export default class AccountEdit extends Component {
             return null;
           }
           return (
-            <View style={styles.body}>
+            <ScrollView style={styles.body}>
               <Background />
               <View style={styles.bodyContainer}>
-                <View>
+                <View style={{ marginBottom: 40 }}>
                   <Text style={styles.titleTop}>EDIT ACCOUNT</Text>
                   <AccountCard
                     title={selected.name}
@@ -80,40 +80,15 @@ export default class AccountEdit extends Component {
                 </View>
                 <View>
                   <Button
-                    buttonStyles={styles.nextStep}
-                    title="Backup"
+                    buttonStyles={{ marginBottom: 40 }}
+                    title="Backup/Delete Account"
                     onPress={() => {
                       this.props.navigation.navigate('AccountUnlock');
                     }}
                   />
-                  <Button
-                    buttonStyles={styles.deleteButton}
-                    title="Delete Account"
-                    onPress={() => {
-                      Alert.alert(
-                        'Delete Account',
-                        `Are you sure to delete ${selected.name ||
-                          selected.address}`,
-                        [
-                          {
-                            text: 'Delete',
-                            style: 'destructive',
-                            onPress: () => {
-                              accounts.deleteAccount(selected);
-                              this.props.navigation.navigate('AccountList');
-                            }
-                          },
-                          {
-                            text: 'Cancel',
-                            style: 'cancel'
-                          }
-                        ]
-                      );
-                    }}
-                  />
                 </View>
               </View>
-            </View>
+            </ScrollView>
           );
         }}
       </Subscribe>
@@ -164,7 +139,6 @@ const styles = StyleSheet.create({
     fontSize: 10
   },
   deleteButton: {
-    marginTop: 20,
     backgroundColor: 'red'
   }
 });

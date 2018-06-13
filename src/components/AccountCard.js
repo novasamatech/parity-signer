@@ -53,7 +53,7 @@ export default class AccountCard extends React.Component<{
 
   static defaultProps = {
     title: 'no name'
-  }
+  };
 
   render() {
     const { address, chainId, style, onPress } = this.props;

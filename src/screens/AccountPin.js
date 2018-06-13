@@ -51,13 +51,21 @@ class AccountPinView extends Component {
 
   async submit() {
     const { accounts, type, navigation } = this.props;
+    const isNew = navigation.getParam('isNew');
+    const { pin } = this.state;
     if (
       this.state.pin.length >= 6 &&
       this.state.pin === this.state.confirmation
     ) {
-      const account = accounts.getNew();
-      await accounts.submitNew(this.state.pin);
-      await accounts.select(account);
+      let account = null;
+      if (isNew) {
+        account = accounts.getNew();
+        await accounts.submitNew(pin);
+        await accounts.select(account);
+      } else {
+        account = accounts.getSelected();
+        await accounts.save(account, pin);
+      }
       accounts.refreshList();
       if (navigation.getParam('isWelcome')) {
         navigation.navigate('Tabs');

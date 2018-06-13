@@ -35,7 +35,7 @@ import {
   createBottomTabNavigator,
   HeaderTitle,
   Header,
-  HeaderBackButton as HeaderBackButton,
+  HeaderBackButton,
   withNavigation
 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -58,11 +58,7 @@ import AccountPin from './screens/AccountPin';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
 import TxDetails from './screens/TxDetails';
-import {
-  AccountCheckPin,
-  AccountUnlock,
-  AccountUnlockAndSign
-} from './screens/AccountUnlock';
+import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import SignedTx from './screens/SignedTx';
 import colors from './colors';
 
@@ -95,7 +91,7 @@ const globalStackNavigationOptions = {
   headerBackTitleStyle: {
     fontSize: 20,
     fontWeight: '500',
-    fontFamily: 'Manifold CF',
+    fontFamily: 'Manifold CF'
   }
 };
 
@@ -107,7 +103,7 @@ const SecurityHeaderBackButton = withNavigation(
       return (
         <HeaderBackButton
           {...this.props}
-          titleStyle={ globalStackNavigationOptions.headerBackTitleStyle }
+          titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
           title="Back"
           tintColor={colors.card_bg}
           onPress={() => navigation.goBack(null)}
@@ -229,9 +225,6 @@ const Screens = createStackNavigator(
                 },
                 AccountDetails: {
                   screen: AccountDetails
-                },
-                AccountCheckPin: {
-                  screen: AccountCheckPin
                 },
                 AccountUnlock: {
                   screen: AccountUnlock

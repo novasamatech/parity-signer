@@ -23,7 +23,6 @@ type SecurityState = {
 };
 
 export default class SecurityStore extends Container<SecurityState> {
-
   state = {
     level: 'green'
   };
@@ -42,7 +41,7 @@ export default class SecurityStore extends Container<SecurityState> {
     }
   }
 
-  getLevel () {
+  getLevel() {
     return this.state.level;
   }
 }

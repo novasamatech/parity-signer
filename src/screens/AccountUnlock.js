@@ -74,7 +74,6 @@ export class AccountUnlock extends Component {
           <AccountUnlockView
             {...this.props}
             onChange={async pin => {
-              // TODO: lock account back after if result wasn't saved
               if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
                 const resetAction = StackActions.reset({
                   index: 2,
@@ -95,7 +94,7 @@ export class AccountUnlock extends Component {
   }
 }
 
-export class AccountCheckPin extends Component {
+export class AccountUnlockAndChangePin extends Component {
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -104,9 +103,11 @@ export class AccountCheckPin extends Component {
             {...this.props}
             onChange={async pin => {
               try {
-                let res = await accounts.checkPinForSelected(pin);
-                Alert.alert('PIN is OK');
-                this.props.navigation.goBack();
+                if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
+                  this.props.navigation.navigate('AccountPin', {
+                    isChange: true
+                  });
+                }
               } catch (e) {}
             }}
             accounts={accounts}

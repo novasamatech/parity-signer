@@ -57,7 +57,7 @@ export class SignedTxView extends Component {
     value: PropTypes.string,
     nonce: PropTypes.string,
     gas: PropTypes.string,
-    gasPrice: PropTypes.string,
+    gasPrice: PropTypes.string
   };
 
   render() {

@@ -111,13 +111,6 @@ class AccountDetailsView extends Component {
             }}
           />
         )}
-        <Button
-          textStyles={{ color: colors.card_bg_text }}
-          buttonStyles={{ backgroundColor: colors.card_bg, marginTop: 20 }}
-          title="Check PIN"
-          onPress={() => {
-            this.props.navigation.navigate('AccountCheckPin');
-          }}
         />
       </ScrollView>
     );

@@ -168,6 +168,14 @@ export default class AccountsStore extends Container<AccountsState> {
     return true;
   }
 
+  lockAccount(account) {
+    const acc = this.state.accounts.get(accountId(account));
+    if (acc) {
+      delete acc.seed;
+    }
+    this.setState({});
+  }
+
   async checkPinForSelected(pin) {
     const account = this.getSelected();
     if (account && account.encryptedSeed) {

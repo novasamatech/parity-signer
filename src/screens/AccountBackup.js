@@ -51,11 +51,18 @@ export default class AccountBackup extends Component {
 }
 
 class AccountBackupView extends Component {
+  componentWillUnmount() {
+    const { accounts } = this.props;
+    const selected =
+      accounts.getNew().address && accounts.getNew().address.length
+        ? accounts.getNew()
+        : accounts.getSelected();
+    accounts.lockAccount(selected);
+  }
   render() {
     const { accounts, navigation } = this.props;
-    const selected = navigation.getParam('isNew')
-      ? accounts.getNew()
-      : accounts.getSelected();
+    const isNew = navigation.getParam('isNew');
+    const selected = isNew ? accounts.getNew() : accounts.getSelected();
     return (
       <ScrollView
         style={styles.body}
@@ -80,18 +87,72 @@ class AccountBackupView extends Component {
           multiline={true}
         />
         <Button
-          buttonStyles={styles.nextStep}
-          title="Done"
+          buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
+          title="Done Backup"
           onPress={() => {
-            if (navigation.getParam('isNew')) {
-              this.props.navigation.navigate('AccountPin', {
-                isWelcome: navigation.getParam('isWelcome')
-              });
+            if (isNew) {
+              Alert.alert(
+                'Important information',
+                `Make sure you've backed up recovery words for your account.
+              Recovery words are the only way to restore access to your account in case of device failure/lost.`,
+                [
+                  {
+                    text: 'Proceed',
+                    onPress: () => {
+                      this.props.navigation.navigate('AccountPin', {
+                        isWelcome: navigation.getParam('isWelcome'),
+                        isNew
+                      });
+                    }
+                  },
+                  {
+                    text: 'Cancel',
+                    style: 'cancel'
+                  }
+                ]
+              );
             } else {
               navigation.navigate('AccountList');
             }
           }}
         />
+
+        {!isNew && (
+          <Button
+            buttonStyles={{ marginBottom: 40 }}
+            title="Change PIN"
+            onPress={() => {
+              navigation.navigate('AccountPin', { isNew });
+            }}
+          />
+        )}
+
+        {!isNew && (
+          <Button
+            buttonStyles={styles.deleteButton}
+            title="Delete Account"
+            onPress={() => {
+              Alert.alert(
+                'Delete Account',
+                `Are you sure to delete ${selected.name || selected.address}`,
+                [
+                  {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: () => {
+                      accounts.deleteAccount(selected);
+                      this.props.navigation.navigate('AccountList');
+                    }
+                  },
+                  {
+                    text: 'Cancel',
+                    style: 'cancel'
+                  }
+                ]
+              );
+            }}
+          />
+        )}
       </ScrollView>
     );
   }
@@ -144,5 +205,8 @@ const styles = StyleSheet.create({
   },
   nextStep: {
     marginTop: 20
+  },
+  deleteButton: {
+    backgroundColor: colors.bg_alert
   }
 });
