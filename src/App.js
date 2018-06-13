@@ -93,7 +93,9 @@ const globalStackNavigationOptions = {
     display: 'none'
   },
   headerBackTitleStyle: {
-    fontSize: 18
+    fontSize: 20,
+    fontWeight: '500',
+    fontFamily: 'Manifold CF',
   }
 };
 
@@ -105,6 +107,7 @@ const SecurityHeaderBackButton = withNavigation(
       return (
         <HeaderBackButton
           {...this.props}
+          titleStyle={ globalStackNavigationOptions.headerBackTitleStyle }
           title="Back"
           tintColor={colors.card_bg}
           onPress={() => navigation.goBack(null)}
