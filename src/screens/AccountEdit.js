@@ -57,37 +57,33 @@ export default class AccountEdit extends Component {
             return null;
           }
           return (
-            <ScrollView style={styles.body}>
-              <Background />
-              <View style={styles.bodyContainer}>
-                <View style={{ marginBottom: 40 }}>
-                  <Text style={styles.titleTop}>EDIT ACCOUNT</Text>
-                  <AccountCard
-                    title={selected.name}
-                    address={selected.address}
-                    chainId={selected.chainId}
-                    onPress={async () => {
-                      await Clipboard.setString('0x' + selected.address);
-                    }}
-                  />
-                  <Text style={styles.title}>ACCOUNT NAME</Text>
-                  <TextInput
-                    onChangeText={name => accounts.updateSelected({ name })}
-                    onEndEditing={text => accounts.saveSelected()}
-                    value={selected.name}
-                    placeholder="Enter a new account name"
-                  />
-                </View>
-                <View>
-                  <Button
-                    buttonStyles={{ marginBottom: 40 }}
-                    title="Backup/Delete Account"
-                    onPress={() => {
-                      this.props.navigation.navigate('AccountUnlock');
-                    }}
-                  />
-                </View>
-              </View>
+            <ScrollView
+              style={styles.body}
+              contentContainerStyle={styles.bodyContainer}
+            >
+              <Text style={styles.titleTop}>EDIT ACCOUNT</Text>
+              <AccountCard
+                title={selected.name}
+                address={selected.address}
+                chainId={selected.chainId}
+                onPress={async () => {
+                  await Clipboard.setString('0x' + selected.address);
+                }}
+              />
+              <Text style={styles.title}>ACCOUNT NAME</Text>
+              <TextInput
+                style={{ marginBottom: 40 }}
+                onChangeText={name => accounts.updateSelected({ name })}
+                onEndEditing={text => accounts.saveSelected()}
+                value={selected.name}
+                placeholder="Enter a new account name"
+              />
+              <Button
+                title="Backup Account"
+                onPress={() => {
+                  this.props.navigation.navigate('AccountUnlock');
+                }}
+              />
             </ScrollView>
           );
         }}
@@ -100,12 +96,11 @@ const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
     flex: 1,
+    flexDirection: 'column',
     overflow: 'hidden'
   },
   bodyContainer: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
     padding: 20
   },
   top: {
