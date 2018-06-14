@@ -18,19 +18,11 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode';
 import colors from '../colors';
 
 export default class QrView extends Component {
-  static propTypes = {
-    text: PropTypes.string.isRequired,
-    screen: PropTypes.bool
-  };
-
-  static defaultProps = {
-    screen: false
-  };
 
   render() {
     if (this.props.screen) {
@@ -41,11 +33,14 @@ export default class QrView extends Component {
   }
 
   renderQr() {
+    const { width: deviceWidth } = Dimensions.get('window');
+    let size = this.props.size || deviceWidth - 80;
+    let flexBasis = this.props.height || deviceWidth - 40;
     return (
-      <View style={styles.rectangleContainer}>
+      <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>
         <QRCode
           value={this.props.text}
-          size={290}
+          size={size}
           bgColor="black"
           fgColor={colors.card_bg}
         />
@@ -56,7 +51,6 @@ export default class QrView extends Component {
 
 const styles = StyleSheet.create({
   rectangleContainer: {
-    margin: 20,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
