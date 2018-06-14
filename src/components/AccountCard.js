@@ -29,6 +29,7 @@ import {
 } from 'react-native';
 import AccountIcon from './AccountIcon';
 import Card from './Card';
+import TouchableItem from './TouchableItem';
 import {
   NETWORK_LIST,
   NETWORK_TITLES,
@@ -60,11 +61,8 @@ export default class AccountCard extends React.Component<{
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
 
-    const Touchable =
-      Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
-
     return (
-      <Touchable
+      <TouchableItem
         accessibilityComponentType="button"
         disabled={false}
         onPress={onPress}
@@ -99,7 +97,7 @@ export default class AccountCard extends React.Component<{
             </Text>
           </View>
         </View>
-      </Touchable>
+      </TouchableItem>
     );
   }
 }
