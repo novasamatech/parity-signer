@@ -63,7 +63,6 @@ export class SignedTxView extends Component {
   render() {
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Background />
         <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
         <View style={styles.qr}>
           <QrView text={this.props.data} />
@@ -98,7 +97,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
   qr: {
-    flex: 1,
     marginBottom: 20,
     backgroundColor: colors.card_bg
   },
