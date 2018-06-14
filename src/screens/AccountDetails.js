@@ -84,12 +84,25 @@ class AccountDetailsView extends Component {
     if (!account) {
       return null;
     }
+    const qr = this.state.showQr ? (
+      <View style={styles.qr}>
+        <QrView text={account.address} />
+      </View>
+    ) : (
+      <Button
+        textStyles={{ color: colors.card_bg_text }}
+        buttonStyles={styles.qrButton}
+        title="Show Account QR Code"
+        onPress={() => {
+          this.setState({ showQr: true });
+        }}
+      />
+    );
     return (
       <ScrollView
         contentContainerStyle={styles.bodyContent}
         style={styles.body}
       >
-        <Background />
         <Text style={styles.title}>ACCOUNT</Text>
         <AccountDetailsCard
           address={account.address}
@@ -97,21 +110,7 @@ class AccountDetailsView extends Component {
           title={account.name}
           onPress={() => this.props.navigation.navigate('AccountEdit')}
         />
-        {this.state.showQr ? (
-          <View style={styles.qr}>
-            <QrView text={account.address} />
-          </View>
-        ) : (
-          <Button
-            textStyles={{ color: colors.card_bg_text }}
-            buttonStyles={styles.qr}
-            title="Show Account QR Code"
-            onPress={() => {
-              this.setState({ showQr: true });
-            }}
-          />
-        )}
-        />
+        {qr}
       </ScrollView>
     );
   }
@@ -142,7 +141,10 @@ const styles = StyleSheet.create({
   },
   qr: {
     marginTop: 20,
-    flex: 1,
+    backgroundColor: colors.card_bg
+  },
+  qrButton: {
+    marginTop: 20,
     backgroundColor: colors.card_bg
   },
   deleteText: {
