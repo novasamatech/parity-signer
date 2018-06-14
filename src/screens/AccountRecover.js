@@ -154,7 +154,8 @@ class AccountRecoverView extends Component {
             title="Next Step"
             onPress={() => {
               this.props.navigation.navigate('AccountPin', {
-                isWelcome: this.props.navigation.getParam('isWelcome')
+                isWelcome: this.props.navigation.getParam('isWelcome'),
+                isNew: true
               });
             }}
           />
