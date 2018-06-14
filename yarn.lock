@@ -4694,7 +4694,7 @@ react-native-safe-area-view@^0.7.0:
 
 "react-native-secure-storage@https://github.com/debris/react-native-secure-storage":
   version "1.0.0"
-  resolved "https://github.com/debris/react-native-secure-storage#7de7c6f0e57b0483982c7fd44a4b678a9822b623"
+  resolved "https://github.com/debris/react-native-secure-storage#eacdd4445fa619edeafb277cb3024d42f394fb73"
 
 react-native-simple-picker@^2.1.0:
   version "2.1.0"
