@@ -138,6 +138,9 @@ class AccountUnlockView extends Component {
         <PinInput
           onChangeText={pin => {
             this.setState({ pin });
+            if (pin.length < 6) {
+              return;
+            }
             debounce(this.props.onChange, 200)(pin);
           }}
           value={this.state.pin}
