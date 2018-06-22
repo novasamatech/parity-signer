@@ -65,12 +65,23 @@ class AccountListView extends Component {
     super(props);
   }
 
+  componentDidMount() {
+    const { navigation } = this.props;
+    const index = navigation.getParam('index');
+    if (this.list && index) {
+      this.list.scrollToIndex(index);
+    }
+  }
+
   render() {
     return (
       <View style={styles.body}>
         <Background />
         <Text style={styles.title}>ACCOUNTS</Text>
         <FlatList
+          ref={list => {
+            this.list = list;
+          }}
           style={styles.content}
           data={this.props.accounts}
           keyExtractor={account => accountId(account)}

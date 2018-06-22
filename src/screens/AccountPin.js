@@ -25,6 +25,7 @@ import AccountsStore from '../stores/AccountsStore';
 import Background from '../components/Background';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
+import { accountId } from '../util/account';
 import colors from '../colors';
 
 export default class AccountPin extends Component {
@@ -76,7 +77,9 @@ class AccountPinView extends Component {
         navigation.dispatch(resetAction);
       } else {
         navigation.popToTop();
-        navigation.navigate('AccountDetails');
+        navigation.navigate('AccountList', {
+          index: accountId(account)
+        });
       }
     }
   }
