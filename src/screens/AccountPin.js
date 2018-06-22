@@ -78,7 +78,7 @@ class AccountPinView extends Component {
       } else {
         navigation.popToTop();
         navigation.navigate('AccountList', {
-          index: accountId(account)
+          accountId: accountId(account)
         });
       }
     }
