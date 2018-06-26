@@ -102,7 +102,7 @@ export class QrScannerView extends Component {
 
   render() {
     if (this.props.scannerStore.isBusy()) {
-      return <View style={ styles.body } />;
+      return <View style={styles.inactive} />;
     }
     return (
       <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
@@ -114,9 +114,16 @@ export class QrScannerView extends Component {
 
   renderRects() {
     return (
-      <View style={styles.rectangleContainer}>
-        <View style={styles.rectangle}>
-          <View style={styles.innerRectangle} />
+      <View style={styles.body}>
+        <View style={styles.top} />
+        <View style={styles.middle}>
+          <View style={styles.middleLeft} />
+          <View style={styles.middleCenter} />
+          <View style={styles.middleRight} />
+        </View>
+        <View style={styles.bottom}>
+          {/* <Text style={styles.descTitle}>Scan QR Code</Text>
+          <Text style={styles.descSecondary}>To Sign a New Transaction</Text> */}
         </View>
       </View>
     );
@@ -124,7 +131,7 @@ export class QrScannerView extends Component {
 }
 
 const styles = StyleSheet.create({
-  body: {
+  inactive: {
     backgroundColor: colors.bg,
     padding: 20,
     flex: 1,
@@ -134,28 +141,63 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black'
   },
-  rectangleContainer: {
+  body: {
     flex: 1,
+    flexDirection: 'column',
+    backgroundColor: 'transparent'
+  },
+  top: {
+    flexBasis: 90
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+  },
+  middle: {
+    flexBasis: 250,
+    flexDirection: 'row',
     backgroundColor: 'transparent'
   },
-  rectangle: {
-    borderWidth: 2,
-    borderRadius: 25,
+  middleLeft: {
+    flex: 1
+    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+  },
+  middleCenter: {
+    flexBasis: 250,
+    borderSize: 1,
+    backgroundColor: 'transparent'
+  },
+  middleRight: {
+    flex: 1
+    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+  },
+  bottom: {
+    flex: 1
     alignItems: 'center',
     justifyContent: 'center',
-    height: 250,
-    width: 250,
-    borderColor: '#ccc',
-    backgroundColor: 'transparent'
+    backgroundColor: 'rgba(0, 0, 0, 0.3)'
   },
-  innerRectangle: {
-    height: 248,
-    width: 248,
-    borderWidth: 2,
-    borderRadius: 25,
-    borderColor: '#ddd',
-    backgroundColor: 'transparent'
+  titleTop: {
+    color: colors.bg_text,
+    fontSize: 26,
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
+    paddingBottom: 20,
+    textAlign: 'center'
   },
+  descTitle: {
+    color: colors.bg_text,
+    fontSize: 18,
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
+    paddingBottom: 20,
+    textAlign: 'center'
+  },
+  descSecondary: {
+    color: colors.bg_text,
+    fontSize: 14,
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
+    paddingBottom: 20,
+    textAlign: 'center'
+  }
 });
