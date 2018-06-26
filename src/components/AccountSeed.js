@@ -18,56 +18,135 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TextInput, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  LayoutAnimation,
+  Keyboard,
+  Dimensions,
+  TouchableOpacity
+} from 'react-native';
+import { KeyboardTrackingView } from 'react-native-keyboard-tracking-view';
+import DoneButton from 'react-native-keyboard-done-button';
+import { AutoGrowingTextInput } from 'react-native-autogrow-textinput';
+import TextInput from './TextInput';
+import colors from '../colors';
+
+const WORD_LIST = require('../../res/wordlist.json');
 
 export default class AccountSeed extends Component {
-  static propTypes = {
-    seed: PropTypes.string.isRequired,
-    onChangeText: PropTypes.func.isRequired
-  };
+  constructor(...args) {
+    super(...args);
+    this.suggestions = this.suggestions.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.keyboardShow = this.keyboardShow.bind(this);
+    this.keyboardHide = this.keyboardHide.bind(this);
+    this.keyboardShowListener = null;
+    this.keyboardHideListener = null;
+  }
 
   state = {
-    text: this.props.seed,
-    height: 0
+    bottom: 0,
+    inputTop: 0
   };
 
-  onChange = text => {
-    this.setState({
-      text: text
-    });
-    this.props.onChangeText(text);
+  static propTypes = {
+    onChangeTags: PropTypes.func.isRequired,
+    onFocus: PropTypes.func.isRequired,
+    value: PropTypes.string.isRequired
   };
 
-  onContentSizeChange = event => {
+  componentDidMount() {
+    let keyboardShowEvent = 'keyboardWillShow';
+    let keyboardHideEvent = 'keyboardWillHide';
+
+    if (Platform.OS === 'android') {
+      keyboardShowEvent = 'keyboardDidShow';
+      keyboardHideEvent = 'keyboardDidHide';
+    }
+
+    this.keyboardShowListener = Keyboard.addListener(
+      keyboardShowEvent,
+      this.keyboardShow
+    );
+    this.keyboardHideListener = Keyboard.addListener(
+      keyboardHideEvent,
+      this.keyboardHide
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardShowListener.remove();
+    this.keyboardHideListener.remove();
+  }
+
+  keyboardShow(e) {
+    console.log(e.endCoordinates.height);
+    LayoutAnimation.easeInEaseOut();
     this.setState({
-      height: event.nativeEvent.contentSize.height
+      bottom: e.endCoordinates.height
     });
-  };
+  }
+
+  keyboardHide(e) {
+    LayoutAnimation.easeInEaseOut();
+    this.setState({
+      bottom: 0
+    });
+  }
+
+  suggestions() {
+    return WORD_LIST;
+  }
+
+  handleDelete() {}
 
   render() {
+    const { onChangeTags } = this.props;
+    const { height: screenHeight } = Dimensions.get('window');
     return (
-      <TextInput
-        editable
-        fontSize={12}
-        maxLength={240}
-        multiline
-        onChangeText={this.onChange}
-        onContentSizeChange={this.onContentSizeChange}
-        placeholder="Parity account recovery phrase"
-        returnKeyType="default"
-        selectTextOnFocus
-        spellCheck={false}
-        style={[styles.input, { height: Math.max(35, this.state.height) }]}
-        value={this.state.text}
-      />
+      <View
+        style={styles.body}
+        ref="Input"
+        onLayout={e => {
+          this.refs.Input.measure((_, y, _a, _b, _c, top) => {
+            console.log(screenHeight - top);
+            this.setState({ inputTop: screenHeight - top });
+          });
+        }}
+      >
+        <AutoGrowingTextInput
+          onChangeText={seed => {
+            onChangeTags(seed);
+          }}
+          autoCapitalize={'none'}
+          autoCorrect={false}
+          editable={true}
+          multiline={true}
+          {...this.props}
+          style={[styles.input, this.props.style]}
+        />
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   input: {
-    height: 120,
-    fontWeight: 'bold',
-    textAlignVertical: 'top'
-  }
+    fontSize: 20,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    padding: 10,
+    backgroundColor: colors.card_bg
+  },
+  body: {
+    backgroundColor: colors.card_bg
+  },
+  tags: {},
+  tag: {}
 });

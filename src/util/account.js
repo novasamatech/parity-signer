@@ -8,3 +8,11 @@ export function accountId({
   }
   return `${networkType}:0x${address.toLowerCase()}@${chainId}`;
 }
+
+export function phraseSplit(phrase) {
+  return Array.isArray(phrase) ? phrase : phrase.split(' ');
+}
+
+export function phraseJoin(phrase) {
+  return Array.isArray(phrase) ? phrase.join(' ') : phrase;
+}

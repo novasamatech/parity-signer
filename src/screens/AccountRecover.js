@@ -88,7 +88,7 @@ class AccountRecoverView extends Component {
           containerStyle={styles.bodyContainer}
           enableOnAndroid
           scrollEnabled={true}
-          extraHeight={230}
+          extraHeight={350}
           innerRef={ref => {
             this.scroll = ref;
           }}
@@ -130,15 +130,14 @@ class AccountRecoverView extends Component {
           <Text style={[styles.title, { marginTop: 20 }]}>
             ENTER RECOVERY WORDS
           </Text>
-          <TextInput
+          <AccountSeed
             onFocus={e => {
               this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
             }}
-            onChangeText={seed => {
+            onChangeTags={seed => {
               accounts.updateNew({ seed });
               debounce(this.updateAddressForSeed, 200)(seed);
             }}
-            style={{ height: 140, lineHeight: 30 }}
             editable={true}
             value={selected.seed}
             multiline={true}

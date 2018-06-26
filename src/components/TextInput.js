@@ -28,22 +28,17 @@ export default class TextInput extends React.Component {
     focus: false
   };
 
-  // Methods:
-  focus() {
-    this.input.focus();
-  }
-
   componentWillReceiveProps(nextProps) {
-    const { focus } = nextProps;
-
-    focus && this.focus();
+    nextProps.focus && this.input.focus();
   }
+
   render() {
     return (
       <TextInputOrigin
         ref={input => {
           this.input = input;
         }}
+        underlineColorAndroid={colors.card_bg}
         {...this.props}
         style={[styles.input, this.props.style]}
       />

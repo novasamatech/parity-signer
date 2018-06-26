@@ -36,6 +36,7 @@ import AccountIconChooser from '../components/AccountIconChooser';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import colors from '../colors';
+import { phraseSplit } from '../util/account';
 
 export default class AccountBackup extends Component {
   static navigationOptions = {
@@ -80,10 +81,11 @@ class AccountBackupView extends Component {
           Write these words down on paper. Keep it safe. These words allow
           anyone to recover this account.
         </Text>
-        <TextInput
+        <AccountSeed
           style={{ height: 140, lineHeight: 30 }}
           editable={false}
-          value={selected.seed}
+          selectTextOnFocus
+          words={phraseSplit(selected.seed)}
           multiline={true}
         />
         <Button
@@ -93,7 +95,7 @@ class AccountBackupView extends Component {
             if (isNew) {
               Alert.alert(
                 'Important information',
-                'Make sure you\'ve backed up recovery words for your account. Recovery words are the only way to restore access to your account in case of device failure/lost.',
+                "Make sure you've backed up recovery words for your account. Recovery words are the only way to restore access to your account in case of device failure/lost.",
                 [
                   {
                     text: 'Proceed',

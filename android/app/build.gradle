@@ -136,6 +136,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-autogrow-textinput')
     compile project(':react-native-vector-icons')
     compile project(':react-native-secure-storage')
     compile project(':react-native-camera')
