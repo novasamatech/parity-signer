@@ -81,7 +81,7 @@ class AccountBackupView extends Component {
           anyone to recover this account.
         </Text>
         <TextInput
-          style={{ height: 140, lineHeight: 30 }}
+          style={{ height: 120, lineHeight: 26, fontSize: 20 }}
           editable={false}
           value={selected.seed}
           multiline={true}

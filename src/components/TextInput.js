@@ -44,6 +44,7 @@ export default class TextInput extends React.Component {
         ref={input => {
           this.input = input;
         }}
+        underlineColorAndroid='transparent'
         {...this.props}
         style={[styles.input, this.props.style]}
       />
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
-    padding: 18,
+    paddingHorizontal: 18,
     backgroundColor: colors.card_bg
   }
 });

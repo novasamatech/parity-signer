@@ -138,7 +138,7 @@ class AccountRecoverView extends Component {
               accounts.updateNew({ seed });
               debounce(this.updateAddressForSeed, 200)(seed);
             }}
-            style={{ height: 140, lineHeight: 30 }}
+            style={{ height: 120, lineHeight: 26, fontSize: 20 }}
             editable={true}
             value={selected.seed}
             multiline={true}
