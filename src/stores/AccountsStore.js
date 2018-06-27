@@ -41,17 +41,17 @@ type AccountsState = {
   accountTxs: [Object]
 };
 
-function empty(address = '') {
+function empty(account = {}) {
   return {
     name: '',
-    address,
     networkType: NETWORK_TYPE.ethereum,
     chainId: NETWORK_ID.frontier,
     seed: '',
     createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),
     archived: false,
-    encryptedSeed: null
+    encryptedSeed: null,
+    ...account
   };
 }
 
@@ -186,7 +186,7 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   getById(account): ?Account {
-    return this.state.accounts.get(accountId(account)) || empty(address);
+    return this.state.accounts.get(accountId(account)) || empty(account);
   }
 
   getSelected(): ?Account {

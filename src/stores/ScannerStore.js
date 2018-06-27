@@ -19,6 +19,8 @@ import { Container } from 'unstated';
 import transaction from '../util/transaction';
 import { keccak, ethSign, brainWalletSign, decryptData } from '../util/native';
 import { saveTx, loadAccountTxs } from '../util/db';
+import { accountId } from '../util/account';
+import { NETWORK_TITLES, NETWORK_IDS } from '../constants';
 import { type Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -57,17 +59,21 @@ export default class ScannerStore extends Container<ScannerState> {
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
     const tx = await transaction(txRequest.data.rlp);
+    const { chainId = '1' } = tx;
+
     const sender = accountsStore.getById({
       networkType: 'ethereum',
-      chainId: tx.chainId,
+      chainId,
       address: txRequest.data.account
     });
+    const networkTitle = NETWORK_TITLES[chainId];
 
     if (!sender.encryptedSeed) {
-      this.setErrorMsg(
-        `No account with address ${txRequest.data.account} found in your signer`
+      throw new Error(
+        `No private key found for account ${
+          txRequest.data.account
+        } found in your signer key storage for the ${networkTitle} chain.`
       );
-      return false;
     }
 
     const recipient = accountsStore.getById({
