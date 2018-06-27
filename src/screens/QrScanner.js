@@ -18,7 +18,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, StatusBar, Alert } from 'react-native';
+import { StyleSheet, View, Text, StatusBar, Alert } from 'react-native';
 import Camera from 'react-native-camera';
 import { Subscribe } from 'unstated';
 import ScannerStore from '../stores/ScannerStore';
@@ -106,26 +106,21 @@ export class QrScannerView extends Component {
     }
     return (
       <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
-        <StatusBar barStyle="light-content" />
-        {this.renderRects()}
+        <View style={styles.body}>
+          <View style={styles.top}>
+            <Text style={styles.titleTop}>SCANNER</Text>
+          </View>
+          <View style={styles.middle}>
+            <View style={styles.middleLeft} />
+            <View style={styles.middleCenter} />
+            <View style={styles.middleRight} />
+          </View>
+          <View style={styles.bottom}>
+            <Text style={styles.descTitle}>Scan QR Code</Text>
+            <Text style={styles.descSecondary}>To Sign a New Transaction</Text>
+          </View>
+        </View>
       </Camera>
-    );
-  }
-
-  renderRects() {
-    return (
-      <View style={styles.body}>
-        <View style={styles.top} />
-        <View style={styles.middle}>
-          <View style={styles.middleLeft} />
-          <View style={styles.middleCenter} />
-          <View style={styles.middleRight} />
-        </View>
-        <View style={styles.bottom}>
-          {/* <Text style={styles.descTitle}>Scan QR Code</Text>
-          <Text style={styles.descSecondary}>To Sign a New Transaction</Text> */}
-        </View>
-      </View>
     );
   }
 }
@@ -147,41 +142,41 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent'
   },
   top: {
-    flexBasis: 90
+    flexBasis: 80,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   middle: {
-    flexBasis: 250,
+    flexBasis: 280,
     flexDirection: 'row',
     backgroundColor: 'transparent'
   },
   middleLeft: {
-    flex: 1
-    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   middleCenter: {
-    flexBasis: 250,
-    borderSize: 1,
+    flexBasis: 280,
+    borderWidth: 1,
     backgroundColor: 'transparent'
   },
   middleRight: {
-    flex: 1
-    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   bottom: {
-    flex: 1
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   titleTop: {
     color: colors.bg_text,
     fontSize: 26,
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
-    paddingBottom: 20,
     textAlign: 'center'
   },
   descTitle: {
@@ -189,7 +184,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
-    paddingBottom: 20,
+    paddingBottom: 10,
     textAlign: 'center'
   },
   descSecondary: {
@@ -198,6 +193,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20,
-    textAlign: 'center'
   }
 });
