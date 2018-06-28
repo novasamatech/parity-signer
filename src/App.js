@@ -66,6 +66,7 @@ export default class App extends Component {
   render() {
     return (
       <UnstatedProvider>
+        <StatusBar barStyle="light-content" />
         <Background />
         <Screens />
       </UnstatedProvider>
@@ -235,12 +236,12 @@ const Screens = createStackNavigator(
               },
               {
                 mode: 'card',
-                cardStyle: { backgroundColor: 'transparent' },
-                transitionConfig: () => ({
-                  containerStyle: {
-                    backgroundColor: 'transparent'
-                  }
-                }),
+                // cardStyle: { backgroundColor: 'transparent' },
+                // transitionConfig: () => ({
+                //   containerStyle: {
+                //     backgroundColor: 'transparent'
+                //   }
+                // }),
                 navigationOptions: globalStackNavigationOptions
               }
             )
@@ -256,11 +257,11 @@ const Screens = createStackNavigator(
   {
     headerMode: 'none',
     mode: 'card',
-    transitionConfig: (): Object => ({
-      containerStyle: {
-        backgroundColor: 'transparent'
-      }
-    }),
-    cardStyle: { backgroundColor: 'transparent' }
+    // transitionConfig: (): Object => ({
+    //   containerStyle: {
+    //     backgroundColor: 'transparent'
+    //   }
+    // }),
+    // cardStyle: { backgroundColor: 'transparent' }
   }
 );
