@@ -79,7 +79,7 @@ export default class AccountEdit extends React.PureComponent {
                 placeholder="Enter a new account name"
               />
               <Button
-                title="Backup Account"
+                title="Manage/Backup Account"
                 onPress={() => {
                   this.props.navigation.navigate('AccountUnlock');
                 }}
