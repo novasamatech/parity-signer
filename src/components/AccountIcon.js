@@ -21,31 +21,37 @@ import PropTypes from 'prop-types';
 import { Image, View, StyleSheet } from 'react-native';
 import { blockiesIcon } from '../util/native';
 
-async function displayIcon(self, seed) {
-  try {
-    let icon = await blockiesIcon(seed);
-    self.setState({
-      icon: icon
-    });
-  } catch (e) {
-    console.log(e);
-  }
-}
-
 export default class AccountIcon extends Component {
+
+  constructor(...args) {
+    super(...args);
+    this.displayIcon = this.displayIcon.bind(this);
+  }
+
   static propTypes = {
     seed: PropTypes.string.isRequired
   };
 
   state = {};
 
+  async displayIcon(seed) {
+    try {
+      let icon = await blockiesIcon(seed);
+      this.setState({
+        icon: icon
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   componentDidMount() {
-    displayIcon(this, this.props.seed);
+    this.displayIcon(this.props.seed);
   }
 
   componentWillReceiveProps(newProps) {
     if (newProps.seed !== this.props.seed) {
-      displayIcon(this, newProps.seed);
+      this.displayIcon(newProps.seed);
     }
   }
 
