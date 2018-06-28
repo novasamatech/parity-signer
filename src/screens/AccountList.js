@@ -27,7 +27,7 @@ import Background from '../components/Background';
 import colors from '../colors';
 import { accountId } from '../util/account';
 
-export default class AccountList extends Component {
+export default class AccountList extends React.PureComponent {
   static navigationOptions = {
     title: 'Accounts'
   };
@@ -51,7 +51,7 @@ export default class AccountList extends Component {
   }
 }
 
-class AccountListView extends Component {
+class AccountListView extends React.PureComponent {
   static propTypes = {
     accounts: PropTypes.arrayOf(
       PropTypes.shape({

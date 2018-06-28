@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Alert,
@@ -39,7 +39,7 @@ import {
 } from '../constants';
 import colors from '../colors';
 
-export default class AccountNetworkChooser extends Component {
+export default class AccountNetworkChooser extends React.PureComponent {
   static navigationOptions = {
     title: 'Choose a network',
     headerBackTitle: 'Back'
@@ -56,7 +56,7 @@ export default class AccountNetworkChooser extends Component {
   }
 }
 
-class AccountNetworkChooserView extends Component {
+class AccountNetworkChooserView extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { accounts } = this.props;

@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   StyleSheet,
@@ -36,7 +36,7 @@ import Button from '../components/Button';
 import Background from '../components/Background';
 import colors from '../colors';
 
-export default class AccountDetails extends Component {
+export default class AccountDetails extends React.PureComponent {
   static navigationOptions = {
     title: 'Account Details'
   };
@@ -57,7 +57,7 @@ export default class AccountDetails extends Component {
   }
 }
 
-class AccountDetailsView extends Component {
+class AccountDetailsView extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {

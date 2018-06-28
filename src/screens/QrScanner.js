@@ -25,7 +25,7 @@ import ScannerStore from '../stores/ScannerStore';
 import AccountsStore from '../stores/AccountsStore';
 import colors from '../colors';
 
-export default class Scanner extends Component {
+export default class Scanner extends React.PureComponent {
   static navigationOptions = {
     title: 'Transaction Details',
     headerBackTitle: 'Scanner'
@@ -69,7 +69,7 @@ export default class Scanner extends Component {
   }
 }
 
-export class QrScannerView extends Component {
+export class QrScannerView extends React.PureComponent {
   constructor(props) {
     super(props);
     this.setBusySubscription = null;

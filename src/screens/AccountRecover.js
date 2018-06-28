@@ -50,7 +50,7 @@ import {
 } from '../constants';
 import colors from '../colors';
 
-export default class AccountRecover extends Component {
+export default class AccountRecover extends React.Component {
   static navigationOptions = {
     title: 'Recover Account',
     headerBackTitle: 'Back'
@@ -64,7 +64,7 @@ export default class AccountRecover extends Component {
   }
 }
 
-class AccountRecoverView extends Component {
+class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
     this.updateAddressForSeed = this.updateAddressForSeed.bind(this);

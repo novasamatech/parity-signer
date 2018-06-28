@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Alert,
@@ -44,7 +44,7 @@ import {
 } from '../constants';
 import colors from '../colors';
 
-export default class AccountNew extends Component {
+export default class AccountNew extends React.Component {
   static navigationOptions = {
     title: 'New Account',
     headerBackTitle: 'Back'
@@ -58,7 +58,7 @@ export default class AccountNew extends Component {
   }
 }
 
-class AccountNewView extends Component {
+class AccountNewView extends React.Component {
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();

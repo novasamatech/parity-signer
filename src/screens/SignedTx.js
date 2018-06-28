@@ -28,7 +28,7 @@ import TxDetailsCard from '../components/TxDetailsCard';
 import AccountCard from '../components/AccountCard';
 import colors from '../colors';
 
-export default class SignedTx extends Component {
+export default class SignedTx extends React.PureComponent {
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
@@ -50,7 +50,7 @@ export default class SignedTx extends Component {
   }
 }
 
-export class SignedTxView extends Component {
+export class SignedTxView extends React.PureComponent {
   static propTypes = {
     data: PropTypes.string.isRequired,
     recipient: PropTypes.object.isRequired,

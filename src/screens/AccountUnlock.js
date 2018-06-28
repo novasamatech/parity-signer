@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Alert,
@@ -35,7 +35,7 @@ import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import colors from '../colors';
 
-export class AccountUnlockAndSign extends Component {
+export class AccountUnlockAndSign extends React.PureComponent {
   render() {
     return (
       <Subscribe to={[AccountsStore, ScannerStore]}>
@@ -66,7 +66,7 @@ export class AccountUnlockAndSign extends Component {
   }
 }
 
-export class AccountUnlock extends Component {
+export class AccountUnlock extends React.Component {
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -94,7 +94,7 @@ export class AccountUnlock extends Component {
   }
 }
 
-export class AccountUnlockAndChangePin extends Component {
+export class AccountUnlockAndChangePin extends React.PureComponent {
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -118,7 +118,7 @@ export class AccountUnlockAndChangePin extends Component {
   }
 }
 
-class AccountUnlockView extends Component {
+class AccountUnlockView extends React.PureComponent {
   state = {
     pin: ''
   };

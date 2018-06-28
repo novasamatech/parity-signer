@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Alert,
@@ -37,7 +37,7 @@ import TextInput from '../components/TextInput';
 import TouchableItem from '../components/TouchableItem';
 import colors from '../colors';
 
-export default class AccountAdd extends Component {
+export default class AccountAdd extends React.PureComponent {
   static navigationOptions = {
     title: 'Add Account',
     headerBackTitle: 'Back'
@@ -52,7 +52,7 @@ export default class AccountAdd extends Component {
   }
 }
 
-class AccountAddView extends Component {
+class AccountAddView extends React.PureComponent {
   componentWillMount() {
     this.props.navigation.addListener('willFocus', () => {
       this.props.accounts.resetNew();

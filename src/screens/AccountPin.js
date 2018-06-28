@@ -28,7 +28,7 @@ import Button from '../components/Button';
 import { accountId } from '../util/account';
 import colors from '../colors';
 
-export default class AccountPin extends Component {
+export default class AccountPin extends React.PureComponent {
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -38,7 +38,7 @@ export default class AccountPin extends Component {
   }
 }
 
-class AccountPinView extends Component {
+class AccountPinView extends React.PureComponent {
   constructor(...args) {
     super(...args);
     this.submit = this.submit.bind(this);

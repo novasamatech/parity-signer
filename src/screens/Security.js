@@ -21,7 +21,7 @@ import SecurityStore from '../stores/SecurityStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 
-export default class Security extends React.Component {
+export default class Security extends React.PureComponent {
   render() {
     return (
       <Subscribe to={[SecurityStore]}>
@@ -31,7 +31,7 @@ export default class Security extends React.Component {
   }
 }
 
-class SecurityView extends React.Component {
+class SecurityView extends React.PureComponent {
   render() {
     const { level } = this.props;
     const backgroundColor = {

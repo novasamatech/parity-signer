@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Alert,
@@ -37,7 +37,7 @@ import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import colors from '../colors';
 
-export default class AccountBackup extends Component {
+export default class AccountBackup extends React.PureComponent {
   static navigationOptions = {
     title: 'Account Backup'
   };
@@ -50,7 +50,7 @@ export default class AccountBackup extends Component {
   }
 }
 
-class AccountBackupView extends Component {
+class AccountBackupView extends React.PureComponent {
   componentWillUnmount() {
     const { accounts } = this.props;
     const selected =

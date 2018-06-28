@@ -30,7 +30,7 @@ import colors from '../colors';
 
 const orUnknown = (value = 'Unknown') => value;
 
-export default class TxDetails extends Component {
+export default class TxDetails extends React.PureComponent {
   static navigationOptions = {
     title: 'Transaction Details',
     headerBackTitle: 'Transaction details'
@@ -71,7 +71,7 @@ export default class TxDetails extends Component {
   }
 }
 
-export class TxDetailsView extends Component {
+export class TxDetailsView extends React.PureComponent {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,

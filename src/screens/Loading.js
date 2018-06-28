@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { View, Text, StyleSheet } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
@@ -24,7 +24,7 @@ import { Subscribe } from 'unstated';
 import { loadAccounts } from '../util/db';
 import colors from '../colors';
 
-export default class Loading extends Component {
+export default class Loading extends React.PureComponent {
   static navigationOptions = {
     title: 'Add Account',
     headerBackTitle: 'Back'

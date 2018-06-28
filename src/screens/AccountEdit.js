@@ -39,7 +39,7 @@ import Button from '../components/Button';
 
 import colors from '../colors';
 
-export default class AccountEdit extends Component {
+export default class AccountEdit extends React.PureComponent {
   static navigationOptions = {
     title: 'Edit Account'
   };
