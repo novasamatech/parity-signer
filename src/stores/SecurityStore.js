@@ -31,9 +31,7 @@ export default class SecurityStore extends Container<SecurityState> {
     super(...args);
     this.connectionChangeListener = this.connectionChangeListener.bind(this);
     NetInfo.addEventListener('connectionChange', this.connectionChangeListener);
-    NetInfo.getConnectionInfo().then(info =>
-      this.connectionChangeListener(info)
-    );
+    NetInfo.getConnectionInfo().then(this.connectionChangeListener);
   }
 
   connectionChangeListener(connectionInfo) {
