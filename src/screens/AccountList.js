@@ -69,9 +69,12 @@ class AccountListView extends Component {
   scrollToIndex() {
     const { accounts, navigation } = this.props;
     const id = navigation.getParam('accountId');
-    const index = accounts.findIndex(a => id === accountId(a));
+    const index = id
+      ? accounts.findIndex(a => id === accountId(a))
+      : navigation.getParam('index', -1);
     if (this.list && index > -1) {
-      this.list.scrollToIndex({index});
+      navigation.navigate('AccountList', { accountId: null, index: null });
+      this.list.scrollToIndex({ index });
     }
   }
 

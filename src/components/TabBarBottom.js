@@ -73,13 +73,19 @@ class TabBarBottom extends React.Component<Props> {
           const focused = index === navigation.state.index;
           const backgroundColor = focused ? colors.card_bg : colors.bg;
           const color = focused ? colors.bg : colors.card_bg;
-
           return (
             <TouchableWithoutFeedback
               key={route.key}
               onPress={() => {
                 if (focused) {
-                  navigation.popToTop();
+                  if (route.routes.length > 1) {
+                    // In case of we are not in the "home" route and route is "focused" we want to go home
+                    navigation.popToTop();
+                  } else {
+                    // In case we are on the "home" route we want to go to the first item in the list
+                    // TODO: make it work
+                    navigation.setParams({ index: 0 });
+                  }
                 } else {
                   navigation.navigate(route.key);
                 }
