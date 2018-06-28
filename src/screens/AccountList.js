@@ -72,8 +72,8 @@ class AccountListView extends Component {
     const index = id
       ? accounts.findIndex(a => id === accountId(a))
       : navigation.getParam('index', -1);
-    if (this.list && index > -1) {
-      navigation.navigate('AccountList', { accountId: null, index: null });
+    if (this.list && typeof index === 'number' && index !== -1) {
+      navigation.setParams({ accountId: undefined, index: undefined });
       this.list.scrollToIndex({ index });
     }
   }

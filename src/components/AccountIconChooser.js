@@ -35,7 +35,7 @@ export default class AccountIconChooser extends Component<{
   onChange: () => any
 }> {
   static propTypes = {
-    value: PropTypes.string.isRequired,
+    value: PropTypes.string,
     onChange: PropTypes.func
   };
 
