@@ -83,8 +83,7 @@ class TabBarBottom extends React.Component<Props> {
                     navigation.popToTop();
                   } else {
                     // In case we are on the "home" route we want to go to the first item in the list
-                    // TODO: make it work
-                    navigation.setParams({ index: 0 });
+                    navigation.navigate('AccountList', { index: 0 });
                   }
                 } else {
                   navigation.navigate(route.key);
