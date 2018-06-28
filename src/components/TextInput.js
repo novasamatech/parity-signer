@@ -44,6 +44,7 @@ export default class TextInput extends React.Component {
         ref={input => {
           this.input = input;
         }}
+        keyboardAppearance="dark"
         underlineColorAndroid='transparent'
         {...this.props}
         style={[styles.input, this.props.style]}
