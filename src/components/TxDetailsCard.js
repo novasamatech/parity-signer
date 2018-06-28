@@ -33,7 +33,7 @@ import AccountIcon from './AccountIcon';
 
 const WEI_IN_ETH = 1000000000000000000;
 
-export default class TxDetailsCard extends React.Component<{
+export default class TxDetailsCard extends React.PureComponent<{
   value: string,
   description: string,
   gas: string,

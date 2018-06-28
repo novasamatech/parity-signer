@@ -16,12 +16,12 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Image, View, StyleSheet } from 'react-native';
 import { blockiesIcon } from '../util/native';
 
-export default class AccountIcon extends Component {
+export default class AccountIcon extends React.PureComponent {
 
   constructor(...args) {
     super(...args);

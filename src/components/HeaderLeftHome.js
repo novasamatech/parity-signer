@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, StyleSheet, Image } from 'react-native';
 import colors from '../colors';
 
-export default class HeaderLeftHome extends React.Component {
+export default class HeaderLeftHome extends React.PureComponent {
   render() {
     return (
       <View

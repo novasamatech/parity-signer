@@ -35,7 +35,7 @@ export default class SecurityHeader extends React.Component {
   }
 }
 
-class _SecurityHeaderView extends React.Component {
+class _SecurityHeaderView extends React.PureComponent {
   render() {
     const { level } = this.props;
     const color = {

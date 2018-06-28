@@ -38,7 +38,7 @@ const majorVersion = parseInt(Platform.Version, 10);
 const isIos = Platform.OS === 'ios';
 const isIOS11 = majorVersion >= 11 && isIos;
 
-class TabBarBottom extends React.Component<Props> {
+class TabBarBottom extends React.PureComponent<Props> {
   static defaultProps = {
     activeTintColor: '#3478f6', // Default active tint color in iOS 10
     activeBackgroundColor: colors.bg,

@@ -29,7 +29,7 @@ import {
 } from 'react-native';
 import colors from '../colors';
 
-export default class Button extends React.Component<{
+export default class Button extends React.PureComponent<{
   title: string,
   onPress: () => any,
   textStyles?: ?StyleSheet.Styles,

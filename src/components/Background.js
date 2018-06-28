@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Component } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import colors from '../colors';
 
-export default class Background extends Component {
+export default class Background extends React.PureComponent {
   render() {
     // const lines = new Array(100)
     //   .fill(0)

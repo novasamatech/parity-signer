@@ -16,7 +16,7 @@
 
 // @flow
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   View,
@@ -30,7 +30,7 @@ import colors from '../colors';
 import Card from './Card';
 import AccountIcon from './AccountIcon';
 
-export default class AccountIconChooser extends Component<{
+export default class AccountIconChooser extends React.PureComponent<{
   value: string,
   onChange: () => any
 }> {

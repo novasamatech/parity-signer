@@ -37,7 +37,7 @@ import {
 } from '../constants';
 import colors from '../colors';
 
-export default class AccountDetailsCard extends React.Component<{
+export default class AccountDetailsCard extends React.PureComponent<{
   title: string,
   address: string,
   chainId: string,

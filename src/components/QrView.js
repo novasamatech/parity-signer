@@ -16,13 +16,13 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode';
 import colors from '../colors';
 
-export default class QrView extends Component {
+export default class QrView extends React.PureComponent {
 
   render() {
     if (this.props.screen) {

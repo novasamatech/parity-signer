@@ -29,7 +29,7 @@ import {
 } from 'react-native';
 import colors from '../colors';
 
-export default class Card extends React.Component<{
+export default class Card extends React.PureComponent<{
   title: string,
   secondaryText?: ?string,
   labelText?: ?string,

@@ -23,7 +23,7 @@ import {
 } from 'react-native';
 import colors from '../colors';
 
-export default class TextInput extends React.Component {
+export default class TextInput extends React.PureComponent {
   static defaultProps = {
     focus: false
   };
