@@ -24,7 +24,7 @@ export default function() {
       <View style={styles.row}>
         <Image source={require('../../icon.png')} style={styles.logo} />
         <Text style={styles.headerTextLeft}>parity</Text>
-        <Text style={styles.headerTextRight}>Secured</Text>
+        <Text style={styles.headerTextRight}>Secure</Text>
       </View>
     </SafeAreaView>
   );

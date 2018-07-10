@@ -40,7 +40,7 @@ class SecurityView extends React.PureComponent {
     }[level];
 
     const message = {
-      green: 'Secured',
+      green: 'Secure',
       red: 'Not Secure'
     }[level];
 
@@ -61,11 +61,11 @@ class SecurityView extends React.PureComponent {
             name="security"
           />
           <Text style={[styles.headerTextRight, { color: colors.bg_positive }]}>
-            Secured
+            Secure
           </Text>
         </View>
         <Text style={styles.text}>
-          Secured devices do no the sensors to connect to the Internet access.
+          Secure devices do no the sensors to connect to the Internet access.
         </Text>
         <View style={styles.headerContainer}>
           <Icon
