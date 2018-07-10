@@ -45,7 +45,7 @@ class _SecurityHeaderView extends React.PureComponent {
 
     const message = {
       green: 'Secured',
-      red: 'Insecure'
+      red: 'Not Secure'
     }[level];
 
     return (

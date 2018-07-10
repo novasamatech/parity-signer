@@ -41,7 +41,7 @@ class SecurityView extends React.PureComponent {
 
     const message = {
       green: 'Secured',
-      red: 'Insecure'
+      red: 'Not Secure'
     }[level];
 
     return (
@@ -65,8 +65,7 @@ class SecurityView extends React.PureComponent {
           </Text>
         </View>
         <Text style={styles.text}>
-          Secured devices do not have access to the internet nor the sensors to
-          connect to the internet access, nor any extraneous apps installed.
+          Secured devices do no the sensors to connect to the Internet access.
         </Text>
         <View style={styles.headerContainer}>
           <Icon
@@ -74,13 +73,13 @@ class SecurityView extends React.PureComponent {
             name="security"
           />
           <Text style={[styles.headerTextRight, { color: colors.bg_alert }]}>
-            Insecure
+            Not Secure
           </Text>
         </View>
         <Text style={styles.text}>
-          Insecure devices have access to the internet and thus at higher risk
-          than devices kept offline. We recommend not keeping high ETH balances
-          on insecure devices.
+          Not Secure devices have access to the Internet and are thus at higher risk
+          than devices kept offline. We recommend not keeping high balances
+          on these devices.
         </Text>
       </ScrollView>
     );
