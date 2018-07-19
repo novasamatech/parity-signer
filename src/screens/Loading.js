@@ -21,8 +21,10 @@ import PropTypes from 'prop-types';
 import { View, Text, StyleSheet } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import { loadAccounts } from '../util/db';
+import { loadAccounts, saveAccount, deleteAccountOld } from '../util/db';
+import AccountsStore from '../stores/AccountsStore'
 import colors from '../colors';
+import { empty } from '../util/account';
 
 export default class Loading extends React.PureComponent {
   static navigationOptions = {
@@ -32,7 +34,15 @@ export default class Loading extends React.PureComponent {
 
   async componentDidMount() {
     const accounts = await loadAccounts();
-    if (accounts.filter(a => !a.archived).length) {
+    let newAccounts = accounts;
+    // if we have an account with no associated chainId it means
+    // that we have to migrate accounts to the new format
+    if (accounts.length && accounts[0].chainId === undefined)  {
+      newAccounts = accounts.map(empty);
+      newAccounts.forEach(saveAccount);
+      accounts.forEach(deleteAccountOld);
+    }
+    if (newAccounts.filter(a => !a.archived).length) {
       const resetAction = StackActions.reset({
         index: 0,
         actions: [NavigationActions.navigate({ routeName: 'Tabs' })]

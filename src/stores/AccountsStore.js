@@ -19,7 +19,7 @@
 import { Container } from 'unstated';
 import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
 import { encryptData, decryptData } from '../util/native';
-import { accountId } from '../util/account';
+import { accountId, empty } from '../util/account';
 import { NETWORK_TYPE, NETWORK_ID } from '../constants';
 
 export type Account = {
@@ -40,20 +40,6 @@ type AccountsState = {
   selected: string,
   accountTxs: [Object]
 };
-
-function empty(account = {}) {
-  return {
-    name: '',
-    networkType: NETWORK_TYPE.ethereum,
-    chainId: NETWORK_ID.frontier,
-    seed: '',
-    createdAt: new Date().getTime(),
-    updatedAt: new Date().getTime(),
-    archived: false,
-    encryptedSeed: null,
-    ...account
-  };
-}
 
 export default class AccountsStore extends Container<AccountsState> {
   state = {

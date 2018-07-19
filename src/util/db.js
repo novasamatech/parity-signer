@@ -38,6 +38,9 @@ function txKey(hash) {
   return 'tx_' + hash;
 }
 
+export const deleteAccountOld = async account =>
+  SecureStorage.deleteItem(account.address, accountsStore);
+
 export const deleteAccount = async account =>
   SecureStorage.deleteItem(accountId(account), accountsStore);
 
