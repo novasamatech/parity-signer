@@ -22,7 +22,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import { loadAccounts, saveAccount, deleteAccountOld } from '../util/db';
-import AccountsStore from '../stores/AccountsStore'
+import AccountsStore from '../stores/AccountsStore';
 import colors from '../colors';
 import { empty } from '../util/account';
 
@@ -37,8 +37,8 @@ export default class Loading extends React.PureComponent {
     let newAccounts = accounts;
     // if we have an account with no associated chainId it means
     // that we have to migrate accounts to the new format
-    if (accounts.length && accounts[0].chainId === undefined)  {
-      newAccounts = accounts.map(empty);
+    if (accounts.length && accounts[0].chainId === undefined) {
+      newAccounts = accounts.map(empty).map(a => ({ ...a, v1recov: true }));
       newAccounts.forEach(saveAccount);
       accounts.forEach(deleteAccountOld);
     }
