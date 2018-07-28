@@ -45,12 +45,16 @@ export default class Scanner extends React.PureComponent {
                 }
                 try {
                   const data = JSON.parse(txRequestData.data);
+                  if (data.data.rlp === undefined) {
+                    return;
+                  }
                   if (!(await scannerStore.setTXRequest(data, accountsStore))) {
                     return;
                   } else {
                     this.props.navigation.navigate('TxDetails');
                   }
                 } catch (e) {
+                  scannerStore.setBusy();
                   Alert.alert('Unable to parse transaction', e.message, [
                     {
                       text: 'Try again',

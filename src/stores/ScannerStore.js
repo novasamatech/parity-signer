@@ -19,7 +19,7 @@ import { Container } from 'unstated';
 import transaction from '../util/transaction';
 import { keccak, ethSign, brainWalletSign, decryptData } from '../util/native';
 import { saveTx, loadAccountTxs } from '../util/db';
-import { accountId } from '../util/account';
+import { accountId } from '../util/account';``
 import { NETWORK_TITLES, NETWORK_IDS } from '../constants';
 import { type Account } from './AccountsStore';
 
@@ -43,7 +43,7 @@ type ScannerState = {
 };
 
 const defaultState = {
-  busy: true,
+  busy: false,
   txRequest: null,
   sender: null,
   recipient: null,
@@ -58,6 +58,11 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
+    if (!(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
+      throw new Error(
+        `Scanned QR contains no valid transaction`
+      );
+    }
     const tx = await transaction(txRequest.data.rlp);
     const { chainId = '1' } = tx;
 
