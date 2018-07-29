@@ -84,7 +84,7 @@ function Amount({ style, value, gas, gasPrice }) {
           <Text
             style={{
               textAlign: 'center',
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: '800',
               color: colors.card_bg
             }}
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     color: colors.card_bg_text,
     fontFamily: 'Manifold CF',
     fontWeight: '500',
-    fontSize: 10
+    fontSize: 12
   },
   footerText: {
     color: colors.card_bg,

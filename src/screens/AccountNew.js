@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     color: colors.bg_text_sec,
     fontWeight: '800',
-    fontSize: 10
+    fontSize: 12
   },
   nextStep: {
     marginTop: 15
