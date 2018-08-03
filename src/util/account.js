@@ -17,6 +17,8 @@ export function empty(account = {}) {
     networkType: NETWORK_TYPE.ethereum,
     chainId: NETWORK_ID.frontier,
     seed: '',
+    // address for an empty seed phrase
+    address: '00a329c0648769A73afAc7F9381E08FB43dBEA72',
     createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),
     archived: false,
