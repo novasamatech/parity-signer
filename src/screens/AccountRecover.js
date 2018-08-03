@@ -67,13 +67,6 @@ export default class AccountRecover extends React.Component {
 class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
-    this.updateAddressForSeed = this.updateAddressForSeed.bind(this);
-  }
-
-  async updateAddressForSeed(seed) {
-    this.props.accounts.updateNew({
-      address: await brainWalletAddress(seed)
-    });
   }
 
   render() {
@@ -136,7 +129,6 @@ class AccountRecoverView extends React.Component {
             }}
             onChangeText={seed => {
               accounts.updateNew({ seed });
-              debounce(this.updateAddressForSeed, 200)(seed);
             }}
             style={{ height: 120, lineHeight: 26, fontSize: 20 }}
             editable={true}

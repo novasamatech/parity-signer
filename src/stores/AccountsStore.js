@@ -17,8 +17,9 @@
 // @flow
 
 import { Container } from 'unstated';
+import debounce from 'debounce';
 import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
-import { encryptData, decryptData } from '../util/native';
+import { encryptData, decryptData, brainWalletAddress } from '../util/native';
 import { accountId, empty } from '../util/account';
 import { NETWORK_TYPE, NETWORK_ID } from '../constants';
 
@@ -66,6 +67,15 @@ export default class AccountsStore extends Container<AccountsState> {
 
   updateNew(accountUpdate: Object) {
     Object.assign(this.state.newAccount, accountUpdate);
+    const { seed } = this.state.newAccount;
+    if (typeof seed === 'string') {
+      debounce(async () => {
+        Object.assign(this.state.newAccount, {
+          address: await brainWalletAddress(seed)
+        });
+        this.setState({});
+      }, 200)();
+    }
     this.setState({});
   }
 
