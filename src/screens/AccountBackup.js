@@ -25,7 +25,8 @@ import {
   Text,
   TouchableOpacity,
   Share,
-  StyleSheet
+  StyleSheet,
+  Clipboard
 } from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
@@ -34,6 +35,7 @@ import AccountSeed from '../components/AccountSeed';
 import AccountCard from '../components/AccountCard';
 import AccountIconChooser from '../components/AccountIconChooser';
 import TextInput from '../components/TextInput';
+import TouchableItem from '../components/TouchableItem';
 import Button from '../components/Button';
 import colors from '../colors';
 
@@ -80,12 +82,40 @@ class AccountBackupView extends React.PureComponent {
           Write these words down on paper. Keep it safe. These words allow
           anyone to recover this account.
         </Text>
-        <TextInput
-          style={{ height: 120, lineHeight: 26, fontSize: 20 }}
-          editable={false}
-          value={selected.seed}
-          multiline={true}
-        />
+        <TouchableItem
+          onPress={() => {
+            Alert.alert(
+              'Use paper to store seed phrases',
+              `It's not recommended to transfer or store seed phrases digitally and unencrypted. Everyone who have the phrase is able to spend funds from this account.
+              `,
+              [
+                {
+                  text: 'Copy anyway',
+                  style: 'default',
+                  onPress: () => {
+                    Clipboard.setString(selected.seed);
+                  }
+                },
+                {
+                  text: 'Cancel',
+                  style: 'cancel'
+                }
+              ]
+            );
+          }}
+        >
+          <Text
+            style={{
+              padding: 10,
+              height: 120,
+              lineHeight: 26,
+              fontSize: 20,
+              backgroundColor: colors.card_bg
+            }}
+          >
+            {selected.seed}
+          </Text>
+        </TouchableItem>
         <Button
           buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
           title="Done Backup"
@@ -93,7 +123,7 @@ class AccountBackupView extends React.PureComponent {
             if (isNew) {
               Alert.alert(
                 'Important information',
-                'Make sure you\'ve backed up recovery words for your account. Recovery words are the only way to restore access to your account in case of device failure/lost.',
+                "Make sure you've backed up recovery words for your account. Recovery words are the only way to restore access to your account in case of device failure/lost.",
                 [
                   {
                     text: 'Proceed',
@@ -133,7 +163,7 @@ class AccountBackupView extends React.PureComponent {
             onPress={() => {
               Alert.alert(
                 'Delete Account',
-                `Are you sure to delete ${selected.name || selected.address}`,
+                `Are you sure to delete ${selected.name || selected.address} and its private key?`,
                 [
                   {
                     text: 'Delete',
