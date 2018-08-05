@@ -34,6 +34,7 @@ import AccountDetailsCard from '../components/AccountDetailsCard';
 import QrView from '../components/QrView';
 import Button from '../components/Button';
 import Background from '../components/Background';
+import { accountId } from '../util/account';
 import colors from '../colors';
 
 export default class AccountDetails extends React.Component {
@@ -86,7 +87,7 @@ class AccountDetailsView extends React.Component {
     }
     const qr = this.state.showQr ? (
       <View style={styles.qr}>
-        <QrView text={account.address} />
+        <QrView text={accountId(account)} />
       </View>
     ) : (
       <Button
