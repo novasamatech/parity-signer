@@ -33,6 +33,7 @@ export default class AccountSeed extends Component {
   state = {
     cursorPosition: 0,
     keyboard: false,
+    animation: false,
     suggestionsHeight: new Animated.Value(0) // Initial value for opacity: 0
   };
 
@@ -62,27 +63,28 @@ export default class AccountSeed extends Component {
   }
 
   keyboardDidShow() {
-    this.setState({ keyboard: true });
+    this.setState({ keyboard: true, animation: true });
     Animated.timing(
       // Animate over time
       this.state.suggestionsHeight, // The animated value to drive
       {
         toValue: 35, // Animate to opacity: 1 (opaque)
-        duration: 100 // Make it take a while
+        duration: 200 // Make it take a while
       }
-    ).start();
+    ).start(() => this.setState({ animation: false }));
   }
 
   keyboardDidHide() {
+    this.setState({ animation: true });
     Animated.timing(
       // Animate over time
       this.state.suggestionsHeight, // The animated value to drive
       {
         toValue: 0, // Animate to opacity: 1 (opaque)
-        duration: 100 // Make it take a while
+        duration: 200 // Make it take a while
       }
     ).start(() => {
-      this.setState({ keyboard: false });
+      this.setState({ keyboard: false, animation: false });
     });
   }
 
@@ -173,7 +175,7 @@ export default class AccountSeed extends Component {
         {/* <View style={styles.suggestion}>suggestion</View> */}
         {suggestions.map((suggestion, i) => {
           const sepStyle =
-            i !== suggestions.length - 1
+            !this.state.animation && i !== suggestions.length - 1
               ? { borderRightWidth: 1, borderColor: colors.card_bg }
               : {};
           return (
