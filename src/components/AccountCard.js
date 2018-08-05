@@ -71,8 +71,17 @@ export default class AccountCard extends React.PureComponent<{
           <View style={styles.content}>
             <AccountIcon style={styles.icon} seed={'0x' + address} />
             <View style={styles.desc}>
-              <Text style={styles.titleText}>{title}</Text>
-              <Text style={styles.secondaryText}>0x{address}</Text>
+              <Text numberOfLines={1} style={styles.titleText}>
+                {title}
+              </Text>
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.01}
+                style={styles.secondaryText}
+              >
+                0x{address}
+              </Text>
             </View>
           </View>
           <View
@@ -134,7 +143,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     color: colors.bg_text_sec,
     fontWeight: '500',
-    fontSize: 10
+    fontSize: 14
   },
   footerText: {
     fontFamily: 'Roboto',

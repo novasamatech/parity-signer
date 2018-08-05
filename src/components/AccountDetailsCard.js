@@ -63,12 +63,19 @@ export default class AccountDetailsCard extends React.PureComponent<{
           <View style={styles.content}>
             <AccountIcon style={styles.icon} seed={'0x' + address} />
             <View style={styles.desc}>
-              <Text style={styles.titleText}>{title}</Text>
+              <Text numberOfLines={1} style={styles.titleText}>{title}</Text>
               <Text style={styles.editText}>Tap to edit account</Text>
             </View>
           </View>
           <View>
-            <Text style={styles.addressText}>0x{address}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.01}
+              style={styles.addressText}
+            >
+              0x{address}
+            </Text>
           </View>
         </View>
         <View
@@ -133,7 +140,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     color: colors.bg,
     fontWeight: '700',
-    fontSize: 11
+    fontSize: 16
   },
   footerText: {
     color: colors.card_bg,

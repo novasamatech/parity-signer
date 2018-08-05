@@ -36,7 +36,7 @@ import Button from '../components/Button';
 import Background from '../components/Background';
 import colors from '../colors';
 
-export default class AccountDetails extends React.PureComponent {
+export default class AccountDetails extends React.Component {
   static navigationOptions = {
     title: 'Account Details'
   };
@@ -57,7 +57,7 @@ export default class AccountDetails extends React.PureComponent {
   }
 }
 
-class AccountDetailsView extends React.PureComponent {
+class AccountDetailsView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
