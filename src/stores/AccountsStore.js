@@ -71,7 +71,7 @@ export default class AccountsStore extends Container<AccountsState> {
     if (typeof seed === 'string') {
       debounce(async () => {
         Object.assign(this.state.newAccount, {
-          address: await brainWalletAddress(seed)
+          address: (await brainWalletAddress(seed)).toLowerCase()
         });
         this.setState({});
       }, 200)();

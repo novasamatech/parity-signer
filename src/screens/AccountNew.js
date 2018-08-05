@@ -106,7 +106,7 @@ class AccountNewView extends React.Component {
               CHOOSE AN IDENTICON
             </Text>
             <AccountIconChooser
-              value={selected && selected.address}
+              value={selected && selected.seed && selected.address}
               onChange={({ address, seed }) => {
                 accounts.updateNew({ address, seed });
               }}

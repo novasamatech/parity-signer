@@ -90,14 +90,11 @@ export default class AccountIconChooser extends React.PureComponent<{
             rowID: number,
             highlightRow
           ) => {
-            const selected = address === value;
+            const selected = address.toLowerCase() === value.toLowerCase();
             const style = [styles.icon];
             return (
               <TouchableOpacity
-                style={[
-                  styles.iconBorder,
-                  address === value ? styles.selected : {}
-                ]}
+                style={[styles.iconBorder, selected ? styles.selected : {}]}
                 onPress={() => this.props.onChange({ address, seed })}
               >
                 <AccountIcon style={style} seed={'0x' + address} />
@@ -147,6 +144,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     color: colors.bg,
     fontWeight: '700',
-    fontSize: 12
+    fontSize: 14
   }
 });
