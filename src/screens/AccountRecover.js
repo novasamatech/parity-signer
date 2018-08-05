@@ -80,7 +80,8 @@ class AccountRecoverView extends React.Component {
           style={{ padding: 20 }}
           containerStyle={styles.bodyContainer}
           enableOnAndroid
-          scrollEnabled={true}
+          scrollEnabled
+          keyboardShouldPersistTaps="handled"
           extraHeight={230}
           innerRef={ref => {
             this.scroll = ref;
@@ -123,17 +124,14 @@ class AccountRecoverView extends React.Component {
           <Text style={[styles.title, { marginTop: 20 }]}>
             ENTER RECOVERY WORDS
           </Text>
-          <TextInput
+          <AccountSeed
             onFocus={e => {
               this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
             }}
             onChangeText={seed => {
               accounts.updateNew({ seed });
             }}
-            style={{ height: 120, lineHeight: 26, fontSize: 20 }}
-            editable={true}
             value={selected.seed}
-            multiline={true}
           />
           <AccountCard
             style={{ marginTop: 20 }}
