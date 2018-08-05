@@ -190,6 +190,16 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   getAccounts(): Array<Account> {
-    return Array.from(this.state.accounts.values()).filter(a => !a.archived);
+    return Array.from(this.state.accounts.values())
+      .filter(a => !a.archived && a.chainId)
+      .sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      });
   }
 }

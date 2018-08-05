@@ -40,7 +40,7 @@ export default class Loading extends React.PureComponent {
     if (accounts.length && accounts[0].chainId === undefined) {
       newAccounts = accounts.map(empty).map(a => ({ ...a, v1recov: true }));
       newAccounts.forEach(saveAccount);
-      accounts.forEach(deleteAccountOld);
+      // accounts.forEach(deleteAccountOld);
     }
     if (newAccounts.filter(a => !a.archived).length) {
       const resetAction = StackActions.reset({
