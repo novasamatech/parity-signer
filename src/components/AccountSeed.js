@@ -18,7 +18,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Text, View, StyleSheet, Keyboard } from 'react-native';
+import { Animated, Text, View, StyleSheet } from 'react-native';
 import TouchableItem from './TouchableItem';
 import TextInput from './TextInput';
 import WORDS from '../../res/wordlist.json';
@@ -44,22 +44,6 @@ export default class AccountSeed extends Component {
     this.getWordPosition = this.getWordPosition.bind(this);
     this.keyboardDidShow = this.keyboardDidShow.bind(this);
     this.keyboardDidHide = this.keyboardDidHide.bind(this);
-  }
-
-  componentDidMount() {
-    this.keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      this.keyboardDidShow
-    );
-    this.keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      this.keyboardDidHide
-    );
-  }
-
-  componentWillUnmount() {
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
   }
 
   keyboardDidShow() {
@@ -201,10 +185,14 @@ export default class AccountSeed extends Component {
       <View>
         <TextInput
           style={styles.input}
-          editable={true}
-          multiline={true}
+          multiline
+          onBlur={this.keyboardDidHide}
           onSelectionChange={this.handleCursorPosition}
           {...this.props}
+          onFocus={(...args) => {
+            this.keyboardDidShow();
+            return this.props.onFocus(...args);
+          }}
         />
         {keyboard && this.renderSuggestions()}
       </View>
