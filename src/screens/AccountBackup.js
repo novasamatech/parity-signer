@@ -26,7 +26,8 @@ import {
   TouchableOpacity,
   Share,
   StyleSheet,
-  Clipboard
+  Clipboard,
+  AppState
 } from 'react-native';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
@@ -53,6 +54,21 @@ export default class AccountBackup extends React.PureComponent {
 }
 
 class AccountBackupView extends React.PureComponent {
+  constructor(...args) {
+    super(...args);
+    this.handleAppStateChange = this.handleAppStateChange.bind(this);
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this.handleAppStateChange);
+  }
+
+  handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'background') {
+      this.props.navigation.goBack();
+    }
+  }
+
   componentWillUnmount() {
     const { accounts } = this.props;
     const selected =
@@ -60,6 +76,7 @@ class AccountBackupView extends React.PureComponent {
         ? accounts.getNew()
         : accounts.getSelected();
     accounts.lockAccount(selected);
+    AppState.removeEventListener('change', this._handleAppStateChange);
   }
   render() {
     const { accounts, navigation } = this.props;

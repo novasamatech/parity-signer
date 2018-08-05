@@ -76,10 +76,11 @@ export class AccountUnlock extends React.Component {
             onChange={async pin => {
               if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
                 const resetAction = StackActions.reset({
-                  index: 2,
+                  index: 3,
                   actions: [
                     NavigationActions.navigate({ routeName: 'AccountList' }),
                     NavigationActions.navigate({ routeName: 'AccountDetails' }),
+                    NavigationActions.navigate({ routeName: 'AccountEdit' }),
                     NavigationActions.navigate({ routeName: 'AccountBackup' })
                   ]
                 });
