@@ -105,7 +105,12 @@ export default class AccountIconChooser extends React.PureComponent<{
             );
           }}
         />
-        <Text style={styles.addressText}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.01}
+          style={styles.addressText}
+        >
           {value ? `0x${value}` : `Select an identicon`}
         </Text>
       </View>

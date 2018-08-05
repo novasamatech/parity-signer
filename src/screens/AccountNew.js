@@ -71,6 +71,7 @@ class AccountNewView extends React.Component {
         <Background />
         <KeyboardAwareScrollView
           style={{ padding: 20 }}
+          keyboardShouldPersistTaps="handled"
           containerStyle={styles.bodyContainer}
         >
           <View style={styles.top}>
