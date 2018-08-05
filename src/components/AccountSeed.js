@@ -18,7 +18,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Text, View, StyleSheet, Keyboard } from 'react-native';
+import { Animated, Text, View, StyleSheet, Keyboard } from 'react-native';
 import TouchableItem from './TouchableItem';
 import TextInput from './TextInput';
 import WORDS from '../../res/wordlist.json';
@@ -32,7 +32,8 @@ const WORDS_INDEX = WORDS.reduce(
 export default class AccountSeed extends Component {
   state = {
     cursorPosition: 0,
-    keyboard: false
+    keyboard: false,
+    suggestionsHeight: new Animated.Value(0) // Initial value for opacity: 0
   };
 
   constructor(...args) {
@@ -62,10 +63,27 @@ export default class AccountSeed extends Component {
 
   keyboardDidShow() {
     this.setState({ keyboard: true });
+    Animated.timing(
+      // Animate over time
+      this.state.suggestionsHeight, // The animated value to drive
+      {
+        toValue: 35, // Animate to opacity: 1 (opaque)
+        duration: 100 // Make it take a while
+      }
+    ).start();
   }
 
   keyboardDidHide() {
-    this.setState({ keyboard: false });
+    Animated.timing(
+      // Animate over time
+      this.state.suggestionsHeight, // The animated value to drive
+      {
+        toValue: 0, // Animate to opacity: 1 (opaque)
+        duration: 100 // Make it take a while
+      }
+    ).start(() => {
+      this.setState({ keyboard: false });
+    });
   }
 
   handleCursorPosition({
@@ -149,7 +167,9 @@ export default class AccountSeed extends Component {
     }
     const suggestions = this.getSuggestions(searchInput, words);
     return (
-      <View style={styles.suggestions}>
+      <Animated.View
+        style={[styles.suggestions, { height: this.state.suggestionsHeight }]}
+      >
         {/* <View style={styles.suggestion}>suggestion</View> */}
         {suggestions.map((suggestion, i) => {
           const sepStyle =
@@ -169,7 +189,7 @@ export default class AccountSeed extends Component {
             </TouchableItem>
           );
         })}
-      </View>
+      </Animated.View>
     );
   }
 
