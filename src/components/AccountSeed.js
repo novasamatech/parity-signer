@@ -129,10 +129,10 @@ export default class AccountSeed extends Component {
     if (WORDS[fromIndex] === input) {
       fromIndex = 0;
     }
-    const SUGGETIONS_COUNT = 5;
+    const SUGGESTIONS_COUNT = 5;
     const result = [];
     let yielded = 0;
-    while (yielded < SUGGETIONS_COUNT && WORDS[fromIndex] !== undefined) {
+    while (yielded < SUGGESTIONS_COUNT && WORDS[fromIndex] !== undefined) {
       ++fromIndex;
       if (words.indexOf(WORDS[fromIndex]) !== -1) {
         continue;
