@@ -20,14 +20,27 @@ import SecureStorage from 'react-native-secure-storage';
 import { AsyncStorage } from 'react-native';
 import { accountId } from './account';
 
-const accountsStore = {
+const accountsStore_v1 = {
   keychainService: 'accounts',
   sharedPreferencesName: 'accounts'
 };
 
-const txStore = {
-  keychainService: 'transactions',
-  sharedPreferencesName: 'transactions'
+export const deleteAccount_v1 = async account =>
+  SecureStorage.deleteItem(account.address, accountsStore_v1);
+
+export async function loadAccounts_v1() {
+  if (!SecureStorage) {
+    return Promise.resolve([]);
+  }
+
+  return SecureStorage.getAllItems(accountsStore_v1).then(accounts =>
+    Object.values(accounts).map(account => JSON.parse(account))
+  );
+}
+
+const accountsStore = {
+  keychainService: 'accounts_v2',
+  sharedPreferencesName: 'accounts_v2'
 };
 
 function accountTxsKey({ address, networkType, chainId }) {
@@ -37,9 +50,6 @@ function accountTxsKey({ address, networkType, chainId }) {
 function txKey(hash) {
   return 'tx_' + hash;
 }
-
-export const deleteAccountOld = async account =>
-  SecureStorage.deleteItem(account.address, accountsStore);
 
 export const deleteAccount = async account =>
   SecureStorage.deleteItem(accountId(account), accountsStore);
