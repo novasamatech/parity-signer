@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
 export const checksummedAddress = (address, hash) => {
-  let result = ''
+  let result = '';
   for (let n = 0; n < 40; n++) {
-    result = `${result}${parseInt(hash[n], 16) > 7 ? address[n].toUpperCase() : address[n]}`
+    result = `${result}${
+      parseInt(hash[n], 16) > 7 ? address[n].toUpperCase() : address[n]
+    }`;
   }
-  return result
-}
+  return result;
+};

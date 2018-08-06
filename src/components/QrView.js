@@ -14,47 +14,38 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { View, StyleSheet } from 'react-native'
-import QRCode from 'react-native-qrcode'
-import AppStyles from '../styles'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import QRCode from 'react-native-qrcode';
+import colors from '../colors';
 
-export default class QrView extends Component {
-  static propTypes = {
-    text: PropTypes.string.isRequired,
-    screen: PropTypes.bool
-  }
+export default class QrView extends React.PureComponent {
 
-  static defaultProps = {
-    screen: false
-  }
-
-  render () {
+  render() {
     if (this.props.screen) {
-      return (
-        <View style={AppStyles.view}>
-          {this.renderQr()}
-        </View>
-      )
+      return <View style={AppStyles.view}>{this.renderQr()}</View>;
     }
 
-    return this.renderQr()
+    return this.renderQr();
   }
 
-  renderQr () {
+  renderQr() {
+    const { width: deviceWidth } = Dimensions.get('window');
+    let size = this.props.size || deviceWidth - 80;
+    let flexBasis = this.props.height || deviceWidth - 40;
     return (
-      <View style={styles.rectangleContainer}>
+      <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>
         <QRCode
           value={this.props.text}
-          size={250}
-          bgColor='black'
-          fgColor='white'
+          size={size}
+          bgColor="black"
+          fgColor={colors.card_bg}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -65,4 +56,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'transparent'
   }
-})
+});

@@ -14,51 +14,55 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { View, Button, Text } from 'react-native'
-import AppStyles from '../styles'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { View, Button, Text } from 'react-native';
+import AppStyles from '../styles';
 
-function isAscii (data) {
+function isAscii(data) {
   for (var i = 2; i < data.length; i += 2) {
-    let n = parseInt(data.substr(i, 2), 16)
+    let n = parseInt(data.substr(i, 2), 16);
 
     if (n < 32 || n >= 128) {
-      return false
+      return false;
     }
   }
-  return true
+  return true;
 }
 
-function hexToAscii (hexx) {
-  var hex = hexx.toString()
-  var str = ''
+function hexToAscii(hexx) {
+  var hex = hexx.toString();
+  var str = '';
   for (var i = 0; i < hex.length; i += 2) {
-    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16))
+    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
   }
-  return str
+  return str;
 }
 
 export default class DataDetails extends Component {
   static propTypes = {
     data: PropTypes.string.isRequired,
     onNextButtonPressed: PropTypes.func.isRequired
-  }
+  };
 
-  render () {
+  render() {
     return (
       <View style={AppStyles.view}>
         <Text style={AppStyles.hintText}>Data to sign</Text>
-        <Text style={AppStyles.valueText}>{ isAscii(this.props.data) ? hexToAscii(this.props.data) : this.props.data }</Text>
+        <Text style={AppStyles.valueText}>
+          {isAscii(this.props.data)
+            ? hexToAscii(this.props.data)
+            : this.props.data}
+        </Text>
         <Button
           onPress={this.props.onNextButtonPressed}
-          title='Next'
-          color='gree'
-          accessibilityLabel='Enter Pin'
+          title="Next"
+          color="gree"
+          accessibilityLabel="Enter Pin"
         />
       </View>
-    )
+    );
   }
 }

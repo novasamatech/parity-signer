@@ -30,7 +30,6 @@ import com.facebook.react.uimanager.ViewManager;
  */
 
 public class EthkeyBridgePackage implements ReactPackage {
-    @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

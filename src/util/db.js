@@ -14,28 +14,89 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict'
+'use strict';
 
-import SecureStorage from 'react-native-secure-storage'
+import SecureStorage from 'react-native-secure-storage';
+import { AsyncStorage } from 'react-native';
+import { accountId } from './account';
 
 const accountsStore = {
   keychainService: 'accounts',
   sharedPreferencesName: 'accounts'
+};
+
+const txStore = {
+  keychainService: 'transactions',
+  sharedPreferencesName: 'transactions'
+};
+
+function accountTxsKey({ address, networkType, chainId }) {
+  return 'account_txs_' + accountId({ address, networkType, chainId });
 }
 
-export const deleteAccount = (account) => SecureStorage.deleteItem(account.address, accountsStore)
+function txKey(hash) {
+  return 'tx_' + hash;
+}
 
-export const saveAccount = (account) =>
-  SecureStorage.setItem(account.address, JSON.stringify(account, null, 0), accountsStore)
+export const deleteAccountOld = async account =>
+  SecureStorage.deleteItem(account.address, accountsStore);
 
-export const saveAccounts = (accounts) => accounts.forEach(saveAccount)
+export const deleteAccount = async account =>
+  SecureStorage.deleteItem(accountId(account), accountsStore);
 
-export const loadAccounts = () => {
+export const saveAccount = account =>
+  SecureStorage.setItem(
+    accountId(account),
+    JSON.stringify(account, null, 0),
+    accountsStore
+  );
+
+export const saveAccounts = accounts => accounts.forEach(saveAccount);
+
+export async function loadAccounts() {
   if (!SecureStorage) {
-    return Promise.resolve([])
+    return Promise.resolve([]);
   }
 
-  return SecureStorage.getAllItems(accountsStore).then(
-    accounts => Object.values(accounts).map(account => JSON.parse(account))
-  )
+  return SecureStorage.getAllItems(accountsStore).then(accounts =>
+    Object.values(accounts).map(account => JSON.parse(account))
+  );
+}
+
+export async function saveTx(tx) {
+  if (!tx.sender) {
+    throw new Error('Tx should contain sender to save');
+  }
+  if (!tx.recipient) {
+    throw new Error('Tx should contain recipient to save');
+  }
+  await [
+    storagePushValue(accountTxsKey(tx.sender), tx.hash),
+    storagePushValue(accountTxsKey(tx.recipient), tx.hash),
+    AsyncStorage.setItem(txKey(tx.hash), JSON.stringify(tx))
+  ];
+}
+
+export async function loadAccountTxHashes(account) {
+  const result = await AsyncStorage.getItem(accountTxsKey(account));
+  return result ? JSON.parse(result) : [];
+}
+
+export async function loadAccountTxs(account) {
+  const hashes = await loadAccountTxHashes(account);
+  return (await AsyncStorage.multiGet(hashes.map(txKey))).map(v => [
+    v[0],
+    JSON.parse(v[1])
+  ]);
+}
+
+async function storagePushValue(key, value) {
+  let currentVal = await AsyncStorage.getItem(key);
+  if (currentVal === null) {
+    return AsyncStorage.setItem(key, JSON.stringify([value]));
+  } else {
+    currentVal = JSON.parse(currentVal);
+    const newVal = new Set([...currentVal, value]);
+    return AsyncStorage.setItem(key, JSON.stringify(Array.from(newVal)));
+  }
 }
