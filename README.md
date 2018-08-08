@@ -10,13 +10,13 @@
 
 ### Requirements
 
-- `node.js` (tested on `v7.4.0`)
+- `node.js` (tested on `v8.4.0`)
 - `yarn` (tested on `1.6.0`)
-- `rustup` (tested on `rustup 1.0.0 (17b6d21 2016-12-15)`)
-- `rustc` (tested on `rustc 1.19.0 (0ade33941 2017-07-17)`)
-- `cargo` (tested on `cargo 0.20.0 (a60d185c8 2017-07-13)`)
+- `rustup` (tested on `rustup 1.5.0 (92d0d1e9e 2017-06-24)`)
+- `rustc` (tested on `rustc 1.27.0 (3eda71b00 2018-06-19)`)
+- `cargo` (tested on `cargo 1.27.0 (1e95190e5 2018-05-27)`)
 - `android_ndk` (tested on `r13b`)
-- `Xcode` (only, for iOS, tested on `Version 9.2 (9C40b)`)
+- `Xcode` (only, for iOS, tested on `Version 9.4.1 (9F2000)`)
 - `$NDK_HOME` envarionment variable set to ndk home directory (eg. `/usr/local/opt/android-ndk`)
 - `$JAVA_HOME` envarionment variable set to java home directory (eg. `/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home`)
 
