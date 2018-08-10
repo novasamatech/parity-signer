@@ -1,0 +1,57 @@
+stages:
+  - test
+  - build
+variables:
+  GIT_DEPTH: "3"
+  SIMPLECOV: "true"
+  RUST_BACKTRACE: "1"
+  RUSTFLAGS: ""
+  CARGOFLAGS: ""
+cache:
+  untracked: true
+#android-test:
+#  stage: test
+#  image: parity/parity-android
+#  only:
+#    - beta
+#    - tags
+#    - stable
+#    - triggers
+#    - master
+#  script:
+#    - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+#    - apt-get install -y nodejs
+#    - npm install -g yarn
+#    - npm install
+#    - npm run test
+#  tags:
+#    - rust 
+android-build:
+  stage: build
+  image: parity/parity-android
+  only:
+    - beta
+    - tags
+    - stable
+    - triggers
+    - master
+  script:
+    - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    # To fix, put these in a docker image
+    - apt-get install -y nodejs openjdk-8-jdk
+    - mkdir -p /opt/android-sdk && cd /opt/android-sdk && wget -q https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip && unzip *tools*linux*.zip && rm *tools*linux*.zip && cd /builds/parity/parity-signer 
+
+    - echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+    - echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+    - apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+    - apt-get update
+    - echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
+    - apt-get install -y oracle-java8-installer
+    - yes | /opt/android-sdk/tools/bin/sdkmanager --licenses || true
+    - echo "ndk.dir=/usr/local/android-ndk-r16b" > android/local.properties
+    - echo "sdk.dir=/opt/android-sdk" >> android/local.properties
+    - npm install -g yarn
+    - bash ./setup_linux.sh
+    - npm run android
+  tags:
+    - rust 
