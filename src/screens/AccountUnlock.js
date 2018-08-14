@@ -139,7 +139,7 @@ class AccountUnlockView extends React.PureComponent {
         <PinInput
           onChangeText={pin => {
             this.setState({ pin });
-            if (pin.length < 6) {
+            if (pin.length < 1) {
               return;
             }
             debounce(this.props.onChange, 200)(pin);
