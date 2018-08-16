@@ -44,5 +44,11 @@ android-build:
     - bash ./setup_linux.sh
     - bash ./gen_key.sh
     - cd android && ./gradlew assembleRelease
+    - pwd
+    - ls
   tags:
     - rust 
+  artifacts:
+    paths:
+    - ./app/build/outputs/apk/release/app-release.apk 
+    
