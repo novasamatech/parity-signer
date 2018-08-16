@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -rf android/app/apk.keystore
+
 keytool -genkey -noprompt \
  -alias testing \
  -keysize 2048 \
