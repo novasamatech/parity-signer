@@ -42,6 +42,6 @@ android-build:
     - echo "sdk.dir=/opt/android-sdk" >> android/local.properties
     - npm install -g yarn
     - bash ./setup_linux.sh
-    - npm run android
+    - cd android && ./gradlew assembleRelease
   tags:
     - rust 
