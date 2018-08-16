@@ -29,6 +29,8 @@ cache:
 android-build:
   stage: build
   image: parity/parity-android
+  variables:
+    JAVA_HOME: "/usr/lib/jvm/java-8-oracle" 
   only:
     - beta
     - tags
