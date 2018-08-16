@@ -28,7 +28,7 @@ cache:
 #    - rust 
 android-build:
   stage: build
-  image: parity/parity-android
+  image: parity/parity-sdk
   only:
     - beta
     - tags
@@ -42,9 +42,6 @@ android-build:
     - echo "sdk.dir=/opt/android-sdk" >> android/local.properties
     - npm install -g yarn
     - bash ./setup_linux.sh
-    - ls -al /usr/lib/jvm/java-8-oracle
-    - export JAVA_HOME="/usr/lib/jvm/java-8-oracle"
-    - export PATH=$JAVA_HOME/bin:$PATH
     - cd android && ./gradlew assembleRelease
   tags:
     - rust 
