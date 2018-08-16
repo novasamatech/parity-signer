@@ -36,6 +36,8 @@ android-build:
     - triggers
     - master
   script:
+    - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    - apt-get install -y nodejs
     - echo "ndk.dir=/usr/local/android-ndk-r16b" > android/local.properties
     - echo "sdk.dir=/opt/android-sdk" >> android/local.properties
     - npm install -g yarn
