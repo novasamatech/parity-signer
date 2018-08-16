@@ -28,7 +28,7 @@ cache:
 #    - rust 
 android-build:
   stage: build
-  image: parity/parity-android
+  image: parity/android-sdk
   only:
     - beta
     - tags
