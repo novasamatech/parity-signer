@@ -50,5 +50,5 @@ android-build:
     - rust 
   artifacts:
     paths:
-    - ./app/build/outputs/apk/release/app-release.apk 
+    - ./android/app/build/outputs/apk/release/app-release.apk 
     
