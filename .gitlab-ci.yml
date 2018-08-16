@@ -28,7 +28,7 @@ cache:
 #    - rust 
 android-build:
   stage: build
-  image: parity/parity-sdk
+  image: parity/android-sdk
   only:
     - beta
     - tags
@@ -42,6 +42,6 @@ android-build:
     - echo "sdk.dir=/opt/android-sdk" >> android/local.properties
     - npm install -g yarn
     - bash ./setup_linux.sh
-    - cd android && ./gradlew assembleRelease
+    - npm run android
   tags:
     - rust 
