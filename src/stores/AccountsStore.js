@@ -71,7 +71,7 @@ export default class AccountsStore extends Container<AccountsState> {
     if (typeof seed === 'string') {
       debounce(async () => {
         Object.assign(this.state.newAccount, {
-          address: (await brainWalletAddress(seed)).toLowerCase()
+          address: await brainWalletAddress(seed)
         });
         this.setState({});
       }, 200)();
@@ -112,9 +112,7 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async refreshList() {
     loadAccounts().then(res => {
-      const accounts = new Map(
-        res.map(a => [accountId(a), { ...a, address: a.address.toLowerCase() }])
-      );
+      const accounts = new Map(res.map(a => [accountId(a), a]));
       this.setState({ accounts });
     });
   }

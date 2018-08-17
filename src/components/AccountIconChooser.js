@@ -60,7 +60,7 @@ export default class AccountIconChooser extends React.PureComponent<{
               const seed = await words();
               return {
                 seed,
-                address: (await brainWalletAddress(seed)).toLowerCase()
+                address: await brainWalletAddress(seed)
               };
             })
         ))
