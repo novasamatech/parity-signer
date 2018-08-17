@@ -48,6 +48,7 @@ import {
   NETWORK_COLOR,
   DEFAULT_NETWORK_COLOR
 } from '../constants';
+import { validateSeed } from '../util/account';
 import colors from '../colors';
 
 export default class AccountRecover extends React.Component {
@@ -128,6 +129,7 @@ class AccountRecoverView extends React.Component {
             onFocus={e => {
               this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
             }}
+            valid={validateSeed(selected.seed).valid}
             onChangeText={seed => {
               accounts.updateNew({ seed });
             }}
@@ -143,6 +145,32 @@ class AccountRecoverView extends React.Component {
             buttonStyles={{ marginBottom: 40 }}
             title="Next Step"
             onPress={() => {
+              const validation = validateSeed(selected.seed);
+              if (!validation.valid) {
+                Alert.alert(
+                  'Warning: seed phrase is not secure',
+                  `${validation.reason}`,
+                  [
+                    {
+                      text: 'I understand risks',
+                      style: 'default',
+                      onPress: () => {
+                        this.props.navigation.navigate('AccountPin', {
+                          isWelcome: this.props.navigation.getParam(
+                            'isWelcome'
+                          ),
+                          isNew: true
+                        });
+                      }
+                    },
+                    {
+                      text: 'Back',
+                      style: 'cancel'
+                    }
+                  ]
+                );
+                return;
+              }
               this.props.navigation.navigate('AccountPin', {
                 isWelcome: this.props.navigation.getParam('isWelcome'),
                 isNew: true

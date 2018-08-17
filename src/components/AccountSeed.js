@@ -21,13 +21,8 @@ import PropTypes from 'prop-types';
 import { Animated, Text, View, StyleSheet } from 'react-native';
 import TouchableItem from './TouchableItem';
 import TextInput from './TextInput';
-import WORDS from '../../res/wordlist.json';
+import { WORDS, WORDS_INDEX } from '../util/account';
 import colors from '../colors';
-
-const WORDS_INDEX = WORDS.reduce(
-  (res, w) => Object.assign(res, { [w]: 1 }),
-  {}
-);
 
 export default class AccountSeed extends Component {
   state = {
@@ -144,7 +139,9 @@ export default class AccountSeed extends Component {
   }
 
   renderSuggestions() {
-    const { value } = this.props;
+    const { value, valid } = this.props;
+
+    const invalidStyles = !valid ? styles.invalidInput : {};
     const words = value.length ? value.split(' ') : [];
     const wordPosition = this.getWordPosition();
     let searchInput = this.getSearchInput();
@@ -156,11 +153,10 @@ export default class AccountSeed extends Component {
       <Animated.View
         style={[styles.suggestions, { height: this.state.suggestionsHeight }]}
       >
-        {/* <View style={styles.suggestion}>suggestion</View> */}
         {suggestions.map((suggestion, i) => {
           const sepStyle =
             !this.state.animation && i !== suggestions.length - 1
-              ? { borderRightWidth: 1, borderColor: colors.card_bg }
+              ? { borderRightWidth: 0.3, borderColor: colors.card_bg_text_sec }
               : {};
           return (
             <TouchableItem
@@ -181,10 +177,12 @@ export default class AccountSeed extends Component {
 
   render() {
     const { keyboard } = this.state;
+    const { valid } = this.props;
+    const invalidStyles = !valid ? styles.invalidInput : {};
     return (
       <View>
         <TextInput
-          style={styles.input}
+          style={[styles.input, invalidStyles]}
           multiline
           onBlur={this.keyboardDidHide}
           onSelectionChange={this.handleCursorPosition}
@@ -207,10 +205,16 @@ const styles = StyleSheet.create({
   input: {
     height: 120,
     lineHeight: 26,
-    fontSize: 20
+    fontSize: 20,
+    backgroundColor: '#e4fee4'
+  },
+  invalidInput: {
+    backgroundColor: '#fee3e3'
   },
   suggestions: {
-    backgroundColor: '#E5E5E5',
+    backgroundColor: colors.card_bg,
+    borderTopWidth: 0.3,
+    borderColor: colors.card_bg_text_sec,
     paddingHorizontal: 5,
     height: 35,
     flexDirection: 'row',
