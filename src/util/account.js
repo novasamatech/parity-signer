@@ -48,7 +48,7 @@ export function validateSeed(seed) {
       if (set.has(word)) {
         return {
           valid: false,
-          reason: `Duplicated word "${word}" found. Words in seed phrase must be unique.`
+          reason: `A duplicated word "${word}" found. Words in seed phrase must be unique.`
         };
       }
       if (word === '') {
@@ -59,7 +59,7 @@ export function validateSeed(seed) {
       }
       return {
         valid: false,
-        reason: `Word ${word} is not from the word list`
+        reason: `The word "${word}" is not from the word list`
       }
     }
     set.add(word);
