@@ -65,7 +65,7 @@ class SecurityView extends React.PureComponent {
           </Text>
         </View>
         <Text style={styles.text}>
-          Secure devices do no the sensors to connect to the Internet access.
+          A device is considered secure if it does not have any internet access.
         </Text>
         <View style={styles.headerContainer}>
           <Icon
@@ -77,9 +77,8 @@ class SecurityView extends React.PureComponent {
           </Text>
         </View>
         <Text style={styles.text}>
-          Not Secure devices have access to the Internet and are thus at higher risk
-          than devices kept offline. We recommend not keeping high balances
-          on these devices.
+          A device is considered not secure if it has access to the internet. We recommend not keeping high balances
+          on this device.
         </Text>
       </ScrollView>
     );
