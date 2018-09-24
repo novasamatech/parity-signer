@@ -127,8 +127,12 @@ export default class AccountSeed extends Component {
     const SUGGESTIONS_COUNT = 5;
     const result = [];
     let yielded = 0;
+    result.push(WORDS[fromIndex]);
     while (yielded < SUGGESTIONS_COUNT && WORDS[fromIndex] !== undefined) {
       ++fromIndex;
+      if (!WORDS[fromIndex].startsWith(input)) {
+        return result;
+      }
       if (words.indexOf(WORDS[fromIndex]) !== -1) {
         continue;
       }
