@@ -56,6 +56,8 @@ import AccountRecover from './screens/AccountRecover';
 import AccountBackup from './screens/AccountBackup';
 import AccountPin from './screens/AccountPin';
 import About from './screens/About';
+import TermsAndConditions from './screens/TermsAndConditions';
+import PrivacyPolicy from './screens/PrivacyPolicy';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
 import TxDetails from './screens/TxDetails';
@@ -141,6 +143,15 @@ const Screens = createStackNavigator(
     Welcome: {
       screen: createStackNavigator(
         {
+          TermsAndConditions: {
+            screen: TermsAndConditions,
+            navigationOptions: {
+              headerLeft: <HeaderLeftHome />
+            }
+          },
+          PrivacyPolicy: {
+            screen: PrivacyPolicy,
+          },
           AccountAdd: {
             screen: AccountAdd,
             navigationOptions: {
