@@ -98,8 +98,11 @@ class AccountAddView extends React.PureComponent {
             Recover Account
           </Text>
         </TouchableItem>
-        <TouchableItem style={[styles.card, { marginTop: 20 }]}>
-          <Text style={styles.cardText}>About Accounts</Text>
+        <TouchableItem
+          style={[styles.card, { marginTop: 20 }]}
+          onPress={() => navigation.navigate('About')}
+        >
+          <Text style={styles.cardText}>About</Text>
         </TouchableItem>
       </ScrollView>
     );

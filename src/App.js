@@ -55,6 +55,7 @@ import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountRecover from './screens/AccountRecover';
 import AccountBackup from './screens/AccountBackup';
 import AccountPin from './screens/AccountPin';
+import About from './screens/About';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
 import TxDetails from './screens/TxDetails';
@@ -211,6 +212,9 @@ const Screens = createStackNavigator(
                 },
                 AccountAdd: {
                   screen: AccountAdd
+                },
+                About: {
+                  screen: About
                 },
                 AccountNetworkChooser: {
                   screen: AccountNetworkChooser
