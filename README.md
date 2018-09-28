@@ -1,5 +1,23 @@
-# Parity Signer
+![Parity Signer](https://wiki.parity.io/images/logo-parity-signer.jpg)
 
+# Parity Signer - a smartphone as coldstorage
+
+Parity Signer is a secure air-gapped wallet that allows users to use a smartphone as cold storage. It means that, once the App has been installed, users can create Ethereum accounts, sign transactions and [transfer funds](Parity-Signer-Mobile-App-Parity-Wallet-tutorial) from and to these accounts without any sort of connectivity enabled on the device. Wifi, Mobile Network, Bluetooth can be shut down and even removed physically to ensure that the mobile phone containing these accounts will not be exposed to any online threat.
+
+Any data transfer from or to the App will happen using QR code scanning. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer Mobile App can be used to store any Ethereum account, this includes ETH, ETC as well as Ether from various testnets (Kovan, Ropsten...).
+
+## How to get it and use it?
+
+### Device security
+Parity Signer Mobile App is built to be used offline. The mobile device used to run the App will hold important information that needs to be kept securely stored. It is therefore advised to:
+- Get a separate mobile device.
+- Make a factory reset.
+- Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).
+- Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.
+- Once the App has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.
+- Only charge the phone on a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.
+
+## Installation
 [![App Store][app-store-badge]][app-store-url]
 [![Google Play][google-play-badge]][google-play-url]
 
@@ -8,6 +26,11 @@
 [google-play-badge]: ./res/google-play-badge.png
 [google-play-url]: https://play.google.com/store/apps/details?id=com.nativesigner
 
+## Screenshots
+
+![Parity Signer Screenshots](https://i.imgur.com/HHnwyAp.jpg)
+
+## Build it
 ### Requirements
 
 - `node.js` (tested on `v8.4.0`)
@@ -20,7 +43,7 @@
 - `$NDK_HOME` envarionment variable set to ndk home directory (eg. `/usr/local/opt/android-ndk`)
 - `$JAVA_HOME` envarionment variable set to java home directory (eg. `/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home`)
 
-### setup
+### Setup
 
 - macOS
 
@@ -40,7 +63,7 @@
     echo "sdk.dir=$ANDROID_HOME" >> android/local.properties
     ```
 
-### usage
+### Usage
 
 - iOS
 
@@ -54,9 +77,8 @@
     npm run android
     ```
 
-### Example
 
-#### Create new account
+### Create new account
 
 seed: `this is sparta`
 
