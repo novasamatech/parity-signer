@@ -1,6 +1,6 @@
 ![Parity Signer](https://wiki.parity.io/images/logo-parity-signer.jpg)
 
-# Parity Signer - a smartphone as coldstorage
+# Parity Signer - a smartphone as cold storage
 
 Parity Signer is a secure air-gapped wallet that allows users to use a smartphone as cold storage. It means that, once the App has been installed, users can create Ethereum accounts, sign transactions and transfer funds from and to these accounts without any sort of connectivity enabled on the device. Wifi, Mobile Network, Bluetooth can be shut down and even removed physically to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Have a look at the tutorial on our wiki to learn how to [use MyCrypto together with Parity Signer](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial).
 
@@ -9,7 +9,7 @@ Any data transfer from or to the App will happen using QR code scanning. By doin
 ## How to get it and use it?
 
 ### Device security
-Parity Signer Mobile App is built to be used offline. The mobile device used to run the App will hold important information that needs to be kept securely stored. It is therefore advised to:
+Parity Signer Mobile App is built to be used offline. The mobile device used to run the App will hold valuable information that needs to be kept securely stored. It is therefore advised to:
 - Get a separate mobile device.
 - Make a factory reset.
 - Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).
@@ -78,10 +78,14 @@ Parity Signer Mobile App is built to be used offline. The mobile device used to 
     ```
 
 
-### Quickly test
+### Test Parity Signer
 
-- Recover a Kovan account
-- Use the seed: `this is sparta` you'll get the account address: `006E27B6A72E1f34C626762F3C4761547Aff1421`
+For a quick test and to avoid the hurdle of creating an account, sending funds to it and finally create a transaction as described in the [MyCrypto Tutorial](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial)), you can use a pre-funded account on Kovan Network. To get access to this account, you need to:
+
+- Recover an account
+- Select `Kovan` network and choose a name
+- Use the recovery phrase: `this is sparta` you'll get the account address: `006E27B6A72E1f34C626762F3C4761547Aff1421`
+- Validate and accept the warning message
 - Chose a pin code
 - Scan this QR code to sign a transaction sending some Kovan Eth to the same account.
 
