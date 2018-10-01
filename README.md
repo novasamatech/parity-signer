@@ -78,30 +78,23 @@ Parity Signer Mobile App is built to be used offline. The mobile device used to 
     ```
 
 
-### Create new account
+### Quickly test
 
-seed: `this is sparta`
+- Recover a Kovan account
+- Use the seed: `this is sparta` you'll get the account address: `006E27B6A72E1f34C626762F3C4761547Aff1421`
+- Chose a pin code
+- Scan this QR code to sign a transaction sending some Kovan Eth to the same account.
 
-address: `006E27B6A72E1f34C626762F3C4761547Aff1421`
+![qr code parity signer](docs/tx_qr.png)
 
-#### Scan qr code
-
-
-qr:
-
-[![qr][tx_qr]]
-
-data:
+Corresponding data:
 
 ```json
 {
-  "action":"signTransaction",
-  "data":
-  {
-    "rlp":"f85f800182520894095e7baea6a6c7c4c2dfeb977efac326af552d870a801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804",
-    "account":"006E27B6A72E1f34C626762F3C4761547Aff1421"
-  }
+    "action": "signTransaction",
+    "data": {
+        "account": "006e27b6a72e1f34c626762f3c4761547aff1421",
+        "rlp": "ea1584ee6b280082520894006e27b6a72e1f34c626762f3c4761547aff1421872386f26fc10000802a8080"
+    }
 }
 ```
-
-[tx_qr]: ./docs/tx_qr.png
