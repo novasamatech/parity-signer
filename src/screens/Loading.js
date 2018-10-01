@@ -40,6 +40,7 @@ export default class Loading extends React.PureComponent {
 
       accounts = oldAccounts.map(empty).map(a => ({ ...a, v1recov: true }));
       accounts.forEach(saveAccount);
+      accounts = await loadAccounts();
     }
 
     if (accounts.filter(a => !a.archived).length) {
