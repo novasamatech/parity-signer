@@ -11,7 +11,7 @@
     "start": "yarn run ios",
     "test": "jest",
     "lint": "",
-    "commit": ""
+    "commit": "commit-wizard"
   },
   "dependencies": {
     "bignumber.js": "^4.0.0",
@@ -22,8 +22,10 @@
     "react-native": "0.55.3",
     "react-native-camera": "^1.1.1",
     "react-native-keyboard-aware-scroll-view": "^0.5.0",
+    "react-native-markdown-renderer": "^3.2.8",
     "react-native-qrcode": "^0.2.6",
     "react-native-secure-storage": "https://github.com/debris/react-native-secure-storage",
+    "react-native-simple-markdown": "^1.1.0",
     "react-native-simple-picker": "^2.1.0",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^4.6.0",
@@ -50,5 +52,18 @@
     "setupFiles": [
       "<rootDir>/jest-setup.js"
     ]
+  },
+  "release": {
+    "analyzeCommits": "simple-commit-message"
+  },
+  "config": {
+    "pre-git": {
+      "commit-msg": "simple",
+      "pre-commit": [],
+      "pre-push": [],
+      "post-commit": [],
+      "post-checkout": [],
+      "post-merge": []
+    }
   }
 }
