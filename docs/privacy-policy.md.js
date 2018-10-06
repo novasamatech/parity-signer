@@ -10,11 +10,14 @@ This policy (together with our terms of use on our websites [https://parity.io](
 The Ethereum client written in the programming language Rust known as Parity does not collect information from you, however any information you publish onto a blockchain like Ethereum is public by design.
 
 If you go to our Sites or utilise other services, we may collect and process the following personal data about you:
-- **Information you give us**. This is information about you that you give us by filling in forms on our Sites or by corresponding with us by phone, e-mail or otherwise. It includes information you provide when you agree to our contributors license agreement (“CLA”), apply for a job on our Sites and when you report a problem with our Sites. The information you give us may include your name, address, e-mail address and phone number and job application information (e.g. your CV, education data, and picture).
+
+- **Information you give us**. This is information about you that you give us by filling in forms on our Sites, filling in forms on the sites of third party vendors providing us with a service, or by corresponding with us by phone, e-mail or otherwise. It includes information you provide when you agree to our contributors license agreement (“**CLA**”), apply to attend one of the events that we host, attend one of the events that we host, apply for a job on our Sites, ask to receive our newsletter and when you report a problem with our Sites. The information you give us may include your name, address, e-mail address and phone number and job application information (e.g. your CV, education data, and picture).
+
 - **Information we collect about you**. With regard to each of your visits to our Sites we may automatically collect the following information:
   - technical information, including the Internet protocol (IP) address used to connect your computer to the Internet, browser type and version, and versions, operating system and platform; and
   - information about your visit, including the full Uniform Resource Locators (URL), page response times and download errors.
-- **Information we receive from other sources**. This is information we receive about you if you use any of the other websites we operate or the other services we provide or, to the extent permitted by law, publicly accessible information about you on e.g. business social media. We are working closely with third parties (including, for example, recruitment services providers). We will notify you when we receive information about you from them and the purposes for which we intend to use that information.
+
+- **Information we receive from other sources**. This is information we receive about you if you use any of the other websites we operate or the other services we provide or, to the extent permitted by law, publicly accessible information about you on e.g. business social media. We are working closely with third parties (including, for example, recruitment services providers, and event organisation service providers and event partners). We will notify you when we receive information about you from them and the purposes for which we intend to use that information.
 
 ## Cookies
 
@@ -32,6 +35,8 @@ We may use information held about you in the following ways and relying on the f
   - to use information you provide to investigate any complaints received from you or from others, about our Sites or our products or services;
   - to assess your eligibility for the particular role you applied for;
   - to assess your eligibility for any role that we might have available;
+  - to schedule, arrange and administer events and meetups in which you have expressed an interest (including creating an attendance record for the event and sending anonymised data to the venue including attendees, dietary requirements and accessibility requirements);
+
   - to document the copyright and other rights granted with contributions made under our CLA;
   - to use data in connection with legal claims, compliance, regulatory and investigative purposes as necessary (including disclosure of such information in connection with legal process or litigation); and
   - Information we receive from other sources: We will combine this information with information you give to us and information we collect about you. We will use this information and the combined information for the purposes set out above (depending on the types of information we receive).
@@ -62,6 +67,7 @@ We will share your personal information with:
 - Selected third parties including but not limited to:
   - business partners and sub-contractors for the performance of any contract we enter into with them or you;
   - our newsletter service provider for the purposes of providing you with our newsletter;
+  - event organisation service providers for the purposes of scheduling and arranging events and meetups in which you have expressed an interest;
   - our applicant tracking system service provider for the purposes of assessing your application for a role at Parity; and
   - third party developers for and / or providers of website hosting and maintenance.
 
@@ -102,7 +108,8 @@ Where we process personal data with your consent, we process the data until you 
 
 For data about your visits to our Sites and where we process personal data for Sites security purposes, we will retain this data for 12 months following your last visit of our Sites.
 
-Data you provided to us in the course of your job application will be kept for 6 months, if your application was not successful. If you enter in an employment relationship with us, the relevant will be kept for the duration of the employment contract as part of your personnel file.
+Data you provided to us in the course of your job application will be kept for 6 months, if your application was not successful. If you enter in an employment relationship with us, the relevant information will be kept for the duration of the employment contract as part of your personnel file.
+
 
 Laws may require us to hold certain information for specific periods. In other cases, we may retain data for an appropriate period after any relationship with you ends to protect itself from legal claims, or to administer its business.
 
@@ -215,4 +222,5 @@ Statutory information
 - Registered in England and Wales
 - Registered Number: 09760015
 - Registered Office: Ignition Law, Moray House Floor 1, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
+
 `
