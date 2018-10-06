@@ -1,4 +1,4 @@
-
+export default `
 # TERMS & CONDITIONS - Parity Signer
 
 ## LEGAL WARNING SHORT VERSION
@@ -7,7 +7,7 @@
 - The user represents that the user has an adequate understanding of the risks, usage and intricacies of public and private key cryptography, cryptographic tokens, mobile wallet technology, blockchain-based open source software, the Ethereum platform and Ether (ETH).
 - The user acknowledges and agrees that, to the fullest extent permitted by any applicable law, the disclaimers of liability contained herein apply to any and all damages or injury whatsoever caused by or related to risks of, use of, or inability to use, the Parity Signer application under any cause or action whatsoever of any kind in any jurisdiction, including, without limitation, actions for breach of warranty, breach of contract or tort (including negligence) and that Parity Technologies Limited shall not be liable for any indirect, incidental, special, exemplary or consequential damages, including for loss of profits, goodwill or data.
 - Some jurisdictions do not allow the exclusion of certain warranties or the limitation or exclusion of liability for certain types of damages. Therefore, some of the above limitations in this section may not apply to a user. In particular, nothing in these terms shall affect the statutory rights of any user or limit or exclude liability for death or physical injury arising from the negligence or wilful misconduct of Parity Technologies Limited or for fraud or fraudulent misrepresentation.
-- All rights reserved by Parity Technologies Limited. Licensed to the public under the GNU General Public License Version 3: https://opensource.org/licenses/GPL-3.0 
+- All rights reserved by Parity Technologies Limited. Licensed to the public under the GNU General Public License Version 3: https://opensource.org/licenses/GPL-3.0
 
 ## LEGAL WARNING LONG VERSION
 The following Terms and Conditions ("Terms") govern the use of Parity Technologies Limited's open source software application Parity Signer and any published updates to that open source software application ("Parity Signer"). Prior to any use of Parity Signer or any of Parity Technologies Limited's products ("Parity Technologies' Products"), you ("User" or "you") confirm on your own behalf and on behalf of anyone who uses Parity Signer on your behalf that you (and they) understand, expressly agree to and will comply with all of the Terms. All capitalized words and expressions in these Terms will have the effect and meaning given to them in the Terms. The group of developers and other personnel that is now, or will be, employed by, or contracted with, or affiliated with, Parity Technologies Limited ("Parity Technologies" or "we") is termed the "Parity Technologies Team".
@@ -30,12 +30,12 @@ If Ethereum is rapidly adopted, the demand for transaction processing and distri
 
 ### Use of Parity Signer by you
 You agree to use Parity Signer only for purposes that are permitted by:
-1. these Terms (including the Software Licence Terms, as defined below);and
-1. any applicable law or regulation in the relevant jurisdictions (including any laws regarding the export of data or software to and from the United Kingdom or other relevant countries).
+1)  these Terms (including the Software Licence Terms, as defined below);and
+2)  any applicable law or regulation in the relevant jurisdictions (including any laws regarding the export of data or software to and from the United Kingdom or other relevant countries).
 
-You agree that you will not engage in any activity that: 
-1. interferes with or disrupts Parity Signer's or Parity Technologies' Products' functioning (or the networks for which Parity Signer creates accounts); or 
-1. is calculated or likely to do so.
+You agree that you will not engage in any activity that:
+1. interferes with or disrupts Parity Signer's or Parity Technologies' Products' functioning (or the networks for which Parity Signer creates accounts); or
+2. is calculated or likely to do so.
 
 Unless you have been specifically permitted to do so in a separate agreement with Parity Technologies, you agree that you will not reproduce, duplicate, copy, sell, trade or resell Parity Signer or Parity Technologies' Products for any purpose other than in accordance with the terms of the software licence terms available here: [https://opensource.org/licenses/GPL-3.0](https://opensource.org/licenses/GPL-3.0).
 
@@ -45,7 +45,7 @@ You agree that you are solely responsible for ensuring the security and integrit
 
 You agree that you are solely responsible for maintaining the confidentiality of your account names, password, recovery phrase and PIN code and ensuring the security of your personal and private access to your user accounts within Parity Signer and any wallet technology you use in conjunction with Parity Signer, as well as managing the restrictions on access to the devices on which you will use Parity Signer and any other equipment.
 
-When you use Parity Signer or Parity Technologies' Products, you may (as a result of, or in connection with your use of these products) use a service or download a piece of software, or smart contract, or purchase goods, which are provided by another person or company (“Third Party Services”), including but not limited to the use of cryptographic wallet technology such as software wallets. You agree and understand that Parity Technologies does not operate or control any such Third Party Services and that your use of them is at your sole risk and without warranties of any kind by Parity Technologies expressed, implied or otherwise. You further agree that under no circumstances is Parity Technologies liable for any damages arising from any transactions or interactions between you and the provider of any such Third Party Service or for any information that they provide you. 
+When you use Parity Signer or Parity Technologies' Products, you may (as a result of, or in connection with your use of these products) use a service or download a piece of software, or smart contract, or purchase goods, which are provided by another person or company (“Third Party Services”), including but not limited to the use of cryptographic wallet technology such as software wallets. You agree and understand that Parity Technologies does not operate or control any such Third Party Services and that your use of them is at your sole risk and without warranties of any kind by Parity Technologies expressed, implied or otherwise. You further agree that under no circumstances is Parity Technologies liable for any damages arising from any transactions or interactions between you and the provider of any such Third Party Service or for any information that they provide you.
 
 To the extent permitted by applicable law, you agree to be responsible for all activities that have been conducted from your user account or as a result of your use of Parity Signer with your password, PIN code or recovery phrase. You must take all necessary steps to ensure that your password, PIN code and recovery phrase remain confidential and secured.
 
@@ -85,7 +85,7 @@ You may not (and you may not permit anyone else to) copy, modify, create a deriv
 Unless Parity Technologies has given you specific written permission to do so, you may not assign (or grant a sub-licence of) your rights to use Parity Technologies' Products, grant a security interest in or over your rights to use Parity Technologies' Products, or otherwise transfer any part of your rights to use Parity Technologies' Products.
 
 ### Software updates
-Any software updates   to Parity Signer published by Parity Technologies are designed to improve, enhance and further develop Parity Signer and may take the form of bug fixes, enhanced functions, new software modules and completely new versions. As Parity Signer is designed to operate on a device which remains offline, you agree that it is your responsibility and choice to update Parity Signer and check and download updates of Parity Signer published by Parity Technologies. 
+Any software updates   to Parity Signer published by Parity Technologies are designed to improve, enhance and further develop Parity Signer and may take the form of bug fixes, enhanced functions, new software modules and completely new versions. As Parity Signer is designed to operate on a device which remains offline, you agree that it is your responsibility and choice to update Parity Signer and check and download updates of Parity Signer published by Parity Technologies.
 
 ### Ending your relationship with Parity Technologies
 The Terms will continue to apply until terminated by either you or Parity Technologies as set out below. You may at any time, terminate your legal agreement with Parity Technologies. Parity Technologies may at any time, terminate its legal agreement with you if:
@@ -129,13 +129,13 @@ Subject to any liability which may not be excluded, you expressly understand and
 1. any loss or damage which may be incurred by you, including but not limited to loss or damage as a result of:
 
     a. any changes which Parity Technologies may make to Parity Technologies' Products, or for any permanent or temporary cessation in the provision of Parity Technologies' Products (or any features within Parity Technologies' Products);
-    
+
     b. the deletion of, corruption of, or failure to store, any content and other communications data maintained or transmitted by or through your use of Parity Technologies' Products;
-    
+
     c. your failure to ensure the security or integrity of any device on which you install or use Parity Signer;
-    
+
     d. your failure to provide Parity Technologies with accurate account information (if this is required); and
-    
+
     e. your failure to keep your password or account details secure and confidential.
 
 The limitations on Parity Technologies' liability to you shall apply whether or not Parity Technologies has been advised of or should have been aware of the possibility of any such losses arising.
@@ -177,4 +177,4 @@ All disputes or claims arising out of, relating to, or in connection with the Te
 If you are a business entity, then the individual accepting on behalf of the entity (for the avoidance of doubt, for business entities, in these Terms, "you" means the entity) represents and warrants that he or she has the authority to act on your behalf, that you represent that you are duly authorized to do business in the country or countries where you operate, and that your employees, officers, representatives, and other agents accessing Parity Technologies' Products are duly authorized to access  Parity Signer and to legally bind you to these Terms.
 
 Subject to these Terms and subject to the Software Licence Terms, Parity Technologies grants you a non-exclusive, non-transferable licence to use  Parity Signer solely on machines intended for use by your employees, officers, representatives, and agents in connection with your business entity, and provided that their use of  Parity Signer will be subject to these Terms (including the Software Licence Terms).
-
+`

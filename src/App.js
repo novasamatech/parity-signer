@@ -56,6 +56,8 @@ import AccountRecover from './screens/AccountRecover';
 import AccountBackup from './screens/AccountBackup';
 import AccountPin from './screens/AccountPin';
 import About from './screens/About';
+import TermsAndConditions from './screens/TermsAndConditions';
+import PrivacyPolicy from './screens/PrivacyPolicy';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
 import TxDetails from './screens/TxDetails';
@@ -135,6 +137,27 @@ const Screens = createStackNavigator(
         {
           headerMode: 'screen',
           navigationOptions: globalStackNavigationOptions
+        }
+      )
+    },
+    TocAndPrivacyPolicy: {
+      screen: createStackNavigator(
+        {
+          TermsAndConditions: {
+            screen: TermsAndConditions,
+            navigationOptions: {
+              headerLeft: <HeaderLeftHome />
+            }
+          },
+          PrivacyPolicy: {
+            screen: PrivacyPolicy
+          }
+        },
+        {
+          navigationOptions: globalStackNavigationOptions,
+          initialRouteParams: {
+            isWelcome: true
+          }
         }
       )
     },
@@ -260,7 +283,7 @@ const Screens = createStackNavigator(
   },
   {
     headerMode: 'none',
-    mode: 'card',
+    mode: 'card'
     // transitionConfig: (): Object => ({
     //   containerStyle: {
     //     backgroundColor: 'transparent'

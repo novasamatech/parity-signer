@@ -1,4 +1,4 @@
-
+export default `
 # Privacy Policy
 
 Parity Technologies Limited (“**We**”; “**us**”; or “**our**”) are committed to protecting and respecting your privacy.
@@ -11,7 +11,7 @@ The Ethereum client written in the programming language Rust known as Parity doe
 
 If you go to our Sites or utilise other services, we may collect and process the following personal data about you:
 
-- **Information you give us**. This is information about you that you give us by filling in forms on our Sites, filling in forms on the sites of third party vendors providing us with a service, or by corresponding with us by phone, e-mail or otherwise. It includes information you provide when you agree to our contributors license agreement (“**CLA**”), apply to attend one of the events that we host, attend one of the events that we host, apply for a job on our Sites, ask to receive our newsletter and when you report a problem with our Sites. The information you give us may include your name, address, e-mail address and phone number and job application information (e.g. your CV, education data, and picture). 
+- **Information you give us**. This is information about you that you give us by filling in forms on our Sites, filling in forms on the sites of third party vendors providing us with a service, or by corresponding with us by phone, e-mail or otherwise. It includes information you provide when you agree to our contributors license agreement (“**CLA**”), apply to attend one of the events that we host, attend one of the events that we host, apply for a job on our Sites, ask to receive our newsletter and when you report a problem with our Sites. The information you give us may include your name, address, e-mail address and phone number and job application information (e.g. your CV, education data, and picture).
 
 - **Information we collect about you**. With regard to each of your visits to our Sites we may automatically collect the following information:
   - technical information, including the Internet protocol (IP) address used to connect your computer to the Internet, browser type and version, and versions, operating system and platform; and
@@ -223,3 +223,4 @@ Statutory information
 - Registered Number: 09760015
 - Registered Office: Ignition Law, Moray House Floor 1, 23-31 Great Titchfield Street, London, United Kingdom, WC1W 7PA.
 
+`

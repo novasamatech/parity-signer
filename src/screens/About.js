@@ -49,7 +49,7 @@ export default class About extends React.PureComponent {
     const isWelcome = navigation.getParam('isWelcome');
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.title}>ABOUT</Text>
+        <Text style={styles.title}>PARITY SIGNER (v2.0-beta)</Text>
         <View>
           <Text style={styles.text}>
             The Parity Signer mobile application is a secure air-gapped wallet
@@ -63,8 +63,10 @@ export default class About extends React.PureComponent {
             app can be used to store any Ethereum account. This includes ETH,
             ETC as well as Ether from various testnets (Kovan, Ropsten…).
           </Text>
-          This app does not send any data to Parity Technologies or any partner.
-          The app works entirely offline once installed.
+          <Text style={styles.text}>
+            This app does not send any data to Parity Technologies or any
+            partner. The app works entirely offline once installed.
+          </Text>
           <Text style={styles.text}>
             The code of this application is available on Github (<Text
               style={[styles.text, { textDecorationLine: 'underline' }]}
