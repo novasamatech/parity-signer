@@ -21,7 +21,12 @@ import PropTypes from 'prop-types';
 import { View, Text, StyleSheet } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import { loadAccounts, loadAccounts_v1, saveAccount } from '../util/db';
+import {
+  loadAccounts,
+  loadAccounts_v1,
+  saveAccount,
+  loadToCAndPPConfirmation
+} from '../util/db';
 import AccountsStore from '../stores/AccountsStore';
 import colors from '../colors';
 import { empty } from '../util/account';
@@ -33,7 +38,10 @@ export default class Loading extends React.PureComponent {
   };
 
   async componentDidMount() {
-    let accounts = await loadAccounts();
+    let [tocPP, accounts] = [
+      await loadToCAndPPConfirmation(),
+      await loadAccounts()
+    ];
     if (0 === accounts.length) {
       // Try to migrate v1 accounts
       const oldAccounts = await loadAccounts_v1();
@@ -43,19 +51,31 @@ export default class Loading extends React.PureComponent {
       accounts = await loadAccounts();
     }
 
-    if (accounts.filter(a => !a.archived).length) {
-      const resetAction = StackActions.reset({
+    const firstScreen = accounts.filter(a => !a.archived).length
+      ? 'Tabs'
+      : 'Welcome';
+    const firstScreenActions = StackActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: firstScreen })],
+      key: null
+    });
+
+    if (!tocPP) {
+      const tocAction = StackActions.reset({
         index: 0,
-        actions: [NavigationActions.navigate({ routeName: 'Tabs' })]
+        actions: [
+          NavigationActions.navigate({
+            routeName: 'TocAndPrivacyPolicy',
+            params: {
+              firstScreenActions
+            }
+          })
+        ]
       });
-      this.props.navigation.dispatch(resetAction);
-    } else {
-      const resetAction = StackActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({ routeName: 'Welcome' })]
-      });
-      this.props.navigation.dispatch(resetAction);
+      this.props.navigation.dispatch(tocAction);
+      return;
     }
+    this.props.navigation.dispatch(firstScreenActions);
   }
 
   render() {

@@ -110,3 +110,12 @@ async function storagePushValue(key, value) {
     return AsyncStorage.setItem(key, JSON.stringify(Array.from(newVal)));
   }
 }
+
+export async function loadToCAndPPConfirmation() {
+  const result = await AsyncStorage.getItem('ToCAndPPConfirmation');
+  return !!result;
+}
+
+export async function saveToCAndPPConfirmation() {
+  await AsyncStorage.setItem('ToCAndPPConfirmation', 'yes');
+}

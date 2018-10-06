@@ -29,6 +29,8 @@ import {
   Linking,
   Platform
 } from 'react-native';
+import { StackActions, NavigationActions } from 'react-navigation';
+import { saveToCAndPPConfirmation } from '../util/db';
 import Markdown from '../components/Markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '../components/Button';
@@ -94,7 +96,7 @@ export default class TermsAndConditions extends React.PureComponent {
             <Text
               style={{ textDecorationLine: 'underline' }}
               onPress={() => {
-                this.props.navigation.navigate('PrivacyPolicy');
+                navigation.navigate('PrivacyPolicy');
               }}
             >
               privacy policy
@@ -106,8 +108,12 @@ export default class TermsAndConditions extends React.PureComponent {
           buttonStyles={{ marginTop: 10, height: 60 }}
           title="Next"
           disabled={!ppAgreement || !tocAgreement}
-          onPress={() => {
-            this.props.navigation.navigate('AccountAdd');
+          onPress={async () => {
+            const firstScreenActions = navigation.getParam(
+              'firstScreenActions'
+            );
+            await saveToCAndPPConfirmation();
+            navigation.dispatch(firstScreenActions);
           }}
         />
       </View>

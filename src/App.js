@@ -140,7 +140,7 @@ const Screens = createStackNavigator(
         }
       )
     },
-    Welcome: {
+    TocAndPrivacyPolicy: {
       screen: createStackNavigator(
         {
           TermsAndConditions: {
@@ -150,8 +150,20 @@ const Screens = createStackNavigator(
             }
           },
           PrivacyPolicy: {
-            screen: PrivacyPolicy,
-          },
+            screen: PrivacyPolicy
+          }
+        },
+        {
+          navigationOptions: globalStackNavigationOptions,
+          initialRouteParams: {
+            isWelcome: true
+          }
+        }
+      )
+    },
+    Welcome: {
+      screen: createStackNavigator(
+        {
           AccountAdd: {
             screen: AccountAdd,
             navigationOptions: {
@@ -271,7 +283,7 @@ const Screens = createStackNavigator(
   },
   {
     headerMode: 'none',
-    mode: 'card',
+    mode: 'card'
     // transitionConfig: (): Object => ({
     //   containerStyle: {
     //     backgroundColor: 'transparent'
