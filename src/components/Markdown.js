@@ -35,19 +35,14 @@ export default class Markdown extends React.PureComponent {
           },
           listUnorderedItemIcon: {
             color: colors.card_bg,
-            ...Platform.select({
-              ['android']: {
-                marginTop: 20
-              }
-            })
+            fontWeight: "900",
+            marginRight: 3,
+            marginTop: 19
           },
           listOrderedItemIcon: {
             color: colors.card_bg,
-            ...Platform.select({
-              ['android']: {
-                marginTop: 20
-              }
-            })
+            marginTop: 19,
+            marginRight: 3
           }
         })}
         {...this.props}
