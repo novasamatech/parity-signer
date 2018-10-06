@@ -49,7 +49,7 @@ export default class About extends React.PureComponent {
     const isWelcome = navigation.getParam('isWelcome');
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.title}>ABOUT</Text>
+        <Text style={styles.title}>PARITY SIGNER (version 2.0-beta)</Text>
         <View>
           <Text style={styles.text}>
             The Parity Signer mobile application is a secure air-gapped wallet
