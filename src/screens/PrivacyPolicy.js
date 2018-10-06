@@ -30,13 +30,10 @@ import {
 } from 'react-native';
 import { Subscribe } from 'unstated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AccountsStore from '../stores/AccountsStore';
-import Background from '../components/Background';
-import AccountSeed from '../components/AccountSeed';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TextInput from '../components/TextInput';
+import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
 import colors from '../colors';
+import privacyPolicy from '../../docs/privacy-policy.md';
 
 export default class PrivacyPolicy extends React.PureComponent {
   static navigationOptions = {
@@ -48,13 +45,11 @@ export default class PrivacyPolicy extends React.PureComponent {
     const { navigation } = this.props;
     const isWelcome = navigation.getParam('isWelcome');
     return (
-      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.title}>Privacy policy</Text>
-        <View>
-
-        </View>
-        <View />
-      </ScrollView>
+      <View style={styles.body}>
+        <ScrollView contentContainerStyle={{}}>
+          <Markdown>{privacyPolicy}</Markdown>
+        </ScrollView>
+      </View>
     );
   }
 }
@@ -64,7 +59,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     overflow: 'hidden',
-    backgroundColor: colors.bg
+    backgroundColor: colors.bg,
+    padding: 20
   },
   top: {
     flex: 1
@@ -89,7 +85,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   text: {
-    marginBottom: 20,
+    marginTop: 10,
     fontFamily: 'Roboto',
     fontSize: 14,
     color: colors.card_bg

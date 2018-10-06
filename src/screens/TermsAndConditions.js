@@ -29,7 +29,7 @@ import {
   Linking,
   Platform
 } from 'react-native';
-import Markdown from 'react-native-markdown-renderer';
+import Markdown from '../components/Markdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '../components/Button';
 import TouchableItem from '../components/TouchableItem';
@@ -42,47 +42,19 @@ export default class TermsAndConditions extends React.PureComponent {
     headerBackTitle: 'Back'
   };
 
+  state = {
+    tocAgreement: false,
+    ppAgreement: false
+  };
+
   render() {
     const { navigation } = this.props;
+    const { tocAgreement, ppAgreement } = this.state;
     const isWelcome = navigation.getParam('isWelcome');
     return (
       <View style={styles.body}>
         <ScrollView contentContainerStyle={{}}>
-          <Markdown
-            style={StyleSheet.create({
-              text: {
-                marginTop: 10,
-                fontFamily: 'Roboto',
-                fontSize: 14,
-                color: colors.card_bg
-              },
-              listUnorderedItemIcon: {
-                color: colors.card_bg,
-                ...Platform.select({
-                  ['android']: {
-                    marginTop: 20
-                  }
-                }),
-              },
-              listOrderedItemIcon: {
-                color: colors.card_bg,
-                ...Platform.select({
-                  ['android']: {
-                    marginTop: 20
-                  }
-                }),
-              }
-            })}
-            rules={{
-              foo: (node, children, parent, styles) => (
-                <Text key={node.key} style={styles.foo}>
-                  {node.content}
-                </Text>
-              )
-            }}
-          >
-            {toc}
-          </Markdown>
+          <Markdown>{toc}</Markdown>
         </ScrollView>
 
         <TouchableItem
@@ -90,35 +62,50 @@ export default class TermsAndConditions extends React.PureComponent {
             flexDirection: 'row',
             alignItems: 'center'
           }}
-          onPress={() => {}}
+          onPress={() => {
+            this.setState({ tocAgreement: !tocAgreement });
+          }}
         >
           <Icon
-            name="checkbox-blank-outline"
+            name={tocAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
             style={[styles.text, { fontSize: 30 }]}
           />
+
           <Text style={[styles.text, { fontSize: 16 }]}>
             {'  I agree to the terms and conditions'}
           </Text>
         </TouchableItem>
-
         <TouchableItem
           style={{
             flexDirection: 'row',
             alignItems: 'center'
           }}
-          onPress={() => {}}
+          onPress={() => {
+            this.setState({ ppAgreement: !ppAgreement });
+          }}
         >
           <Icon
-            name="checkbox-blank-outline"
+            name={ppAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
             style={[styles.text, { fontSize: 30 }]}
           />
+
           <Text style={[styles.text, { fontSize: 16 }]}>
-            {'  I agree to the privacy policy'}
+            <Text>{'  I agree to the '}</Text>
+            <Text
+              style={{ textDecorationLine: 'underline' }}
+              onPress={() => {
+                this.props.navigation.navigate('PrivacyPolicy');
+              }}
+            >
+              privacy policy
+            </Text>
           </Text>
         </TouchableItem>
+
         <Button
           buttonStyles={{ marginTop: 10, height: 60 }}
           title="Next"
+          disabled={!ppAgreement || !tocAgreement}
           onPress={() => {
             this.props.navigation.navigate('AccountAdd');
           }}

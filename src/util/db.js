@@ -64,7 +64,6 @@ export const saveAccount = account =>
 export const saveAccounts = accounts => accounts.forEach(saveAccount);
 
 export async function loadAccounts() {
-  return [];
   if (!SecureStorage) {
     return Promise.resolve([]);
   }
