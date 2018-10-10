@@ -28,9 +28,9 @@ mod string;
 use rustc_serialize::hex::{ToHex, FromHex};
 use rustc_serialize::base64::{self, ToBase64};
 use tiny_keccak::Keccak;
-use ethkey::{KeyPair, Generator, Brain, Message, sign};
+use ethkey::{KeyPair, Generator, Brain, Message, Password, sign};
 use ethstore::Crypto;
-use rlp::UntrustedRlp;
+use rlp::decode_list;
 use blockies::{Blockies, create_icon, ethereum};
 
 use string::StringPtr;
@@ -81,7 +81,7 @@ pub unsafe extern fn ethkey_keypair_destroy(keypair: *mut KeyPair) {
 
 #[no_mangle]
 pub unsafe extern fn ethkey_keypair_brainwallet(seed: *mut StringPtr) -> *mut KeyPair {
-  let generator = Brain::new((*seed).as_str().to_owned());
+  let mut generator = Brain::new((*seed).as_str().to_owned());
   Box::into_raw(Box::new(generator.generate().unwrap()))
 }
 
@@ -107,9 +107,8 @@ pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut St
 
 fn safe_rlp_item(rlp: &str, position: u32) -> Result<String, String> {
   let hex = rlp.from_hex().map_err(| e | e.to_string())?;
-  let rlp = UntrustedRlp::new(&hex);
-  let item = rlp.at(position as usize).map_err(| e | e.to_string())?;
-  let data = item.data().map_err(| e | e.to_string())?;
+  let rlp = decode_list::<Vec<u8>>(&hex);
+  let data = rlp.get(position as usize).ok_or_else(|| "Invalid RLP position".to_string())?;
   Ok(data.to_hex())
 }
 
@@ -170,15 +169,15 @@ pub unsafe extern fn random_phrase(words: u32) -> *mut String {
 #[no_mangle]
 pub unsafe extern fn encrypt_data(data: *mut StringPtr, password: *mut StringPtr) -> *mut String {
   let data = (*data).as_str();
-  let password = (*password).as_str();
-  let crypto = Crypto::with_plain(data.as_bytes(), password, 10240);
+  let password = Password::from((*password).as_str());
+  let crypto = Crypto::with_plain(data.as_bytes(), &password, 10240).unwrap();
   Box::into_raw(Box::new(crypto.into()))
 }
 
 #[no_mangle]
 pub unsafe extern fn decrypt_data(encrypted_data: *mut StringPtr, password: *mut StringPtr, error: *mut u32) -> *mut String {
   let data = (*encrypted_data).as_str();
-  let password = (*password).as_str();
+  let password = Password::from((*password).as_str());
   let crypto: Crypto = match data.parse() {
     Ok(crypto) => crypto,
     Err(_) => {
@@ -186,7 +185,7 @@ pub unsafe extern fn decrypt_data(encrypted_data: *mut StringPtr, password: *mut
       return Box::into_raw(Box::new(String::new()))
     }
   };
-  match crypto.decrypt(password) {
+  match crypto.decrypt(&password) {
     Ok(decrypted) => {
       Box::into_raw(Box::new(String::from_utf8_unchecked(decrypted)))
     },
@@ -295,7 +294,8 @@ pub mod android {
   pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyEncryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid data").into();
     let password: String = env.get_string(password).expect("Invalid password").into();
-    let crypto = Crypto::with_plain(data.as_bytes(), &password, 10240);
+    let password = Password::from(password);
+    let crypto = Crypto::with_plain(data.as_bytes(), &password, 10240).unwrap();
     env.new_string(String::from(crypto)).expect("Could not create java string").into_inner()
   }
 
@@ -303,6 +303,7 @@ pub mod android {
   pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid data").into();
     let password: String = env.get_string(password).expect("Invalid password").into();
+    let password = Password::from(password);
     let crypto: Crypto = match data.parse() {
       Ok(crypto) => crypto,
       Err(_) => {
@@ -332,7 +333,7 @@ pub mod android {
     use self::jni::sys::{JavaVM, JavaVMInitArgs, JNI_CreateJavaVM, JNI_OK, JNI_EDETACHED, JNI_EEXIST, JNI_EINVAL,
     JNI_ENOMEM, JNI_ERR, JNI_EVERSION, JNI_VERSION_1_8, JNI_FALSE, JavaVMOption};
     use ethstore::Crypto;
-    use super::Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData;
+    use super::{Password, Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData};
 
     #[link(name="jvm")]
     extern {
@@ -398,8 +399,8 @@ pub mod android {
         let jvm = test_vm();
 
         let data = b"test_data";
-        let password = "password";
-        let crypto = Crypto::with_plain(data, password, 10240);
+        let password = Password::from("password");
+        let crypto = Crypto::with_plain(data, &password, 10240).unwrap();
         let crypto_string: String = crypto.into();
         let env = jvm.env();
         let jni_crypto_str = env.new_string(crypto_string).unwrap();
