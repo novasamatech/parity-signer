@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-package com.nativesigner;
+package io.parity.signer;
 
 import java.util.Collections;
 import java.util.List;

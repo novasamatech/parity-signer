@@ -97,7 +97,7 @@ android {
     compileSdkVersion 26
 
     defaultConfig {
-        applicationId "com.nativesigner"
+        applicationId "io.parity.signer"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
