@@ -1,4 +1,4 @@
-package com.nativesigner;
+package io.parity.signer;
 
 import android.app.Application;
 

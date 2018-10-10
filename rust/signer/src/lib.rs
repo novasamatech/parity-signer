@@ -214,7 +214,7 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBrainwalletAddress(env: JNIEnv, _: JClass, seed: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletAddress(env: JNIEnv, _: JClass, seed: JString) -> jstring {
     let seed: String = env.get_string(seed).expect("Invalid seed").into();
     let keypair = Brain::new(seed).generate().unwrap();
     let java_address = env.new_string(format!("{:?}", keypair.address())).expect("Could not create java string");
@@ -222,7 +222,7 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBrainwalletSecret(env: JNIEnv, _: JClass, seed: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletSecret(env: JNIEnv, _: JClass, seed: JString) -> jstring {
     let seed: String = env.get_string(seed).expect("Invalid seed").into();
     let keypair = Brain::new(seed).generate().unwrap();
     let java_secret = env.new_string(format!("{:?}", keypair.secret())).expect("Could not create java string");
@@ -230,7 +230,7 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBrainwalletSign(env: JNIEnv, _: JClass, seed: JString, message: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletSign(env: JNIEnv, _: JClass, seed: JString, message: JString) -> jstring {
     let seed: String = env.get_string(seed).expect("Invalid seed").into();
     let message: String = env.get_string(message).expect("Invalid message").into();
     let keypair = Brain::new(seed).generate().unwrap();
@@ -241,7 +241,7 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyRlpItem(env: JNIEnv, _: JClass, data: JString, position: jint) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyRlpItem(env: JNIEnv, _: JClass, data: JString, position: jint) -> jstring {
     let data: String = env.get_string(data).expect("Invalid seed").into();
     match safe_rlp_item(&data, position as u32) {
       Ok(result) => env.new_string(result).expect("Could not create java string").into_inner(),
@@ -254,7 +254,7 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyKeccak(env: JNIEnv, _: JClass, data: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyKeccak(env: JNIEnv, _: JClass, data: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid seed").into();
     let hex = data.from_hex().unwrap();
     let mut res: [u8; 32] = [0; 32];
@@ -265,7 +265,7 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyEthSign(env: JNIEnv, _: JClass, data: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyEthSign(env: JNIEnv, _: JClass, data: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid seed").into();
     let hex = data.from_hex().unwrap();
     let message = format!("\x19Ethereum Signed Message:\n{}", hex.len()).into_bytes();
@@ -278,20 +278,20 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyBlockiesIcon(env: JNIEnv, _: JClass, seed: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyBlockiesIcon(env: JNIEnv, _: JClass, seed: JString) -> jstring {
     let seed: String = env.get_string(seed).expect("Invalid seed").into();
     let icon = blockies_icon_in_base64(seed.into());
     env.new_string(icon).expect("Could not create java string").into_inner()
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyRandomPhrase(env: JNIEnv, _: JClass, words: jint) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyRandomPhrase(env: JNIEnv, _: JClass, words: jint) -> jstring {
     let words = wordlist::random_phrase(words as usize);
     env.new_string(words).expect("Could not create java string").into_inner()
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyEncryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyEncryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid data").into();
     let password: String = env.get_string(password).expect("Invalid password").into();
     let password = Password::from(password);
@@ -300,7 +300,7 @@ pub mod android {
   }
 
   #[no_mangle]
-  pub unsafe extern fn Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
+  pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData(env: JNIEnv, _: JClass, data: JString, password: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid data").into();
     let password: String = env.get_string(password).expect("Invalid password").into();
     let password = Password::from(password);
@@ -333,7 +333,8 @@ pub mod android {
     use self::jni::sys::{JavaVM, JavaVMInitArgs, JNI_CreateJavaVM, JNI_OK, JNI_EDETACHED, JNI_EEXIST, JNI_EINVAL,
     JNI_ENOMEM, JNI_ERR, JNI_EVERSION, JNI_VERSION_1_8, JNI_FALSE, JavaVMOption};
     use ethstore::Crypto;
-    use super::{Password, Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData};
+
+    use super::{Password, Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData};
 
     #[link(name="jvm")]
     extern {
@@ -407,7 +408,7 @@ pub mod android {
         let jni_password_str = env.new_string(password).unwrap();
         let any_class = env.find_class("java/lang/Object").unwrap();
 
-        let result = Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(
+        let result = Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData(
           jvm.env(),
           any_class,
           jni_crypto_str,
@@ -418,7 +419,7 @@ pub mod android {
         assert_eq!(result, "test_data".to_owned());
         assert_eq!(env.exception_check().unwrap(), false);
 
-        let _ = Java_com_nativesigner_EthkeyBridge_ethkeyDecryptData(
+        let _ = Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData(
           jvm.env(),
           any_class,
           jni_crypto_str,
