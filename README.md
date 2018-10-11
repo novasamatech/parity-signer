@@ -24,7 +24,7 @@ Parity Signer Mobile App is built to be used offline. The mobile device used to 
 [app-store-badge]: ./res/app-store-badge.png
 [app-store-url]: https://itunes.apple.com/us/app/parity-signer/id1218174838
 [google-play-badge]: ./res/google-play-badge.png
-[google-play-url]: https://play.google.com/store/apps/details?id=com.nativesigner
+[google-play-url]: https://play.google.com/store/apps/details?id=io.parity.signer
 
 ## Screenshots
 
