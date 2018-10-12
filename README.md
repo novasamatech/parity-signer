@@ -1,23 +1,6 @@
 ![Parity Signer](https://wiki.parity.io/images/logo-parity-signer.jpg)
 
-# Parity Signer - a smartphone as cold storage
 
-Parity Signer is a secure air-gapped wallet that allows users to use a smartphone as cold storage. It means that, once the App has been installed, users can create Ethereum accounts, sign transactions and transfer funds from and to these accounts without any sort of connectivity enabled on the device. Wifi, Mobile Network, Bluetooth can be shut down and even removed physically to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Have a look at the tutorial on our wiki to learn how to [use MyCrypto together with Parity Signer](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial).
-
-Any data transfer from or to the App will happen using QR code scanning. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer Mobile App can be used to store any Ethereum account, this includes ETH, ETC as well as Ether from various testnets (Kovan, Ropsten...).
-
-## How to get it and use it?
-
-### Device security
-Parity Signer Mobile App is built to be used offline. The mobile device used to run the App will hold valuable information that needs to be kept securely stored. It is therefore advised to:
-- Get a separate mobile device.
-- Make a factory reset.
-- Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).
-- Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.
-- Once the App has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.
-- Only charge the phone on a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.
-
-## Installation
 [![App Store][app-store-badge]][app-store-url]
 [![Google Play][google-play-badge]][google-play-url]
 
@@ -25,6 +8,22 @@ Parity Signer Mobile App is built to be used offline. The mobile device used to 
 [app-store-url]: https://itunes.apple.com/us/app/parity-signer/id1218174838
 [google-play-badge]: ./res/google-play-badge.png
 [google-play-url]: https://play.google.com/store/apps/details?id=io.parity.signer
+
+# Parity Signer - Turn your smartphone into a hardware wallet
+
+Parity Signer is a mobile application that turns a smartphone into a secure air-gapped wallet also called cold storage. It means that, once the app has been installed, users can create Ethereum accounts, sign transactions and transfer funds from and to these accounts without any sort of connectivity enabled on the device. Wifi, Mobile Network, Bluetooth can be shut down and even removed physically to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Have a look at the tutorial on our wiki to learn how to [use MyCrypto together with Parity Signer](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial).
+
+Any data transfer from or to the app will happen using QR code scanning. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Ethereum account, this includes ETH, ETC as well as Ether from various testnets (Kovan, Ropsten...).
+
+## Device security
+
+Parity Signer was built to be used offline. The mobile device used to run the app will hold valuable information that needs to be kept securely stored. It is therefore advised to:
+- Get a separate mobile device.
+- Make a factory reset.
+- Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).
+- Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.
+- Once the app has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.
+- Only charge the phone on a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.
 
 ## Screenshots
 
