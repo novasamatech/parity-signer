@@ -67,3 +67,8 @@ fastlane/screenshots
 # vim
 *.swp
 .vscode
+
+# Android
+android/.project
+android/app/.project
+android/app/bin
