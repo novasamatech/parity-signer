@@ -26,9 +26,12 @@ const asString = x =>
     .join('');
 
 export const brainWalletAddress = seed =>
-  EthkeyBridge.brainWalletAddress(seed).then(address =>
-    keccak(asString(address)).then(hash => checksummedAddress(address, hash))
-  );
+  EthkeyBridge.brainWalletAddress(seed).then(address0x => {
+    const address = address0x.substring(2);
+    return keccak(asString(address)).then(hash =>
+      checksummedAddress(address, hash)
+    );
+  });
 export const brainWalletSecret = seed => EthkeyBridge.brainWalletSecret(seed);
 export const brainWalletSign = (seed, message) =>
   EthkeyBridge.brainWalletSign(seed, message);
