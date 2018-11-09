@@ -22,8 +22,12 @@ extern crate ethkey;
 extern crate ethstore;
 extern crate rlp;
 extern crate blockies;
+extern crate bip39;
 
 mod string;
+mod bip39_mnemonic;
+
+pub use bip39_mnemonic::*;
 
 use rustc_serialize::hex::{ToHex, FromHex};
 use rustc_serialize::base64::{self, ToBase64};

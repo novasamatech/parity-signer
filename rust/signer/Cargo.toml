@@ -7,6 +7,8 @@ build = "build.rs"
 [dependencies]
 libc = "0.2"
 rustc-serialize = "0.3"
+bip39 = "0.5.1"
+substrate-primitives = { git = "https://github.com/paritytech/substrate" }
 ethkey = { git = "https://github.com/paritytech/parity-ethereum" }
 ethstore = { git = "https://github.com/paritytech/parity-ethereum" }
 rlp = { version = "0.3.0", features = ["ethereum"] }
