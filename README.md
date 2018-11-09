@@ -9,7 +9,7 @@
 [google-play-badge]: ./res/google-play-badge.png
 [google-play-url]: https://play.google.com/store/apps/details?id=io.parity.signer
 
-# Parity Signer - Turn your smartphone into a hardware wallet
+# Parity Signer - Turn your smartphone into a cold storage
 
 Parity Signer is a mobile application that turns a smartphone into a secure air-gapped wallet also called cold storage. It means that, once the app has been installed, users can create Ethereum accounts, sign transactions and transfer funds from and to these accounts without any sort of connectivity enabled on the device. Wifi, Mobile Network, Bluetooth can be shut down and even removed physically to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Have a look at the tutorial on our wiki to learn how to [use MyCrypto together with Parity Signer](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial).
 
