@@ -29,7 +29,7 @@
 		1F426F95208D334200CA43DB /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		1F426F9C208D358500CA43DB /* EthkeyBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F99208D358500CA43DB /* EthkeyBridge.swift */; };
 		1F426F9D208D358500CA43DB /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F9A208D358500CA43DB /* String.swift */; };
-		1F73EE2721777A1D00706E91 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F426F39208B7CC000CA43DB /* libsigner.a */; };
+		1F8BDAA8219CFFE50067BE1D /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F426F39208B7CC000CA43DB /* libsigner.a */; };
 		25585941EFBA436796B325D3 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 75EB071F2F264C599EB44A84 /* Feather.ttf */; };
 		2D0CDDA789254813913BC99F /* libRNSecureStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C53E8F3556242B0954F1A1B /* libRNSecureStorage.a */; };
 		3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */; };
@@ -415,7 +415,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F73EE2721777A1D00706E91 /* libsigner.a in Frameworks */,
+				1F8BDAA8219CFFE50067BE1D /* libsigner.a in Frameworks */,
 				1F426F95208D334200CA43DB /* libReact.a in Frameworks */,
 				1F426F94208D333700CA43DB /* libRCTActionSheet.a in Frameworks */,
 				1F426F93208D332A00CA43DB /* libRCTAnimation.a in Frameworks */,
