@@ -64,7 +64,7 @@ class AccountBackupView extends React.PureComponent {
   }
 
   handleAppStateChange = (nextAppState) => {
-    if (nextAppState === 'background') {
+    if (nextAppState === 'inactive') {
       this.props.navigation.goBack();
     }
   }
