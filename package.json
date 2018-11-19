@@ -11,7 +11,7 @@
     "start": "yarn run ios",
     "test": "jest",
     "lint": "",
-    "commit": ""
+    "commit": "commit-wizard"
   },
   "dependencies": {
     "bignumber.js": "^4.0.0",
@@ -51,5 +51,18 @@
     "setupFiles": [
       "<rootDir>/jest-setup.js"
     ]
+  },
+  "release": {
+    "analyzeCommits": "simple-commit-message"
+  },
+  "config": {
+    "pre-git": {
+      "commit-msg": "simple",
+      "pre-commit": [],
+      "pre-push": [],
+      "post-commit": [],
+      "post-checkout": [],
+      "post-merge": []
+    }
   }
 }
