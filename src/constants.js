@@ -13,6 +13,7 @@ export const NETWORK_IDS = {
   '61': 'classic',
   '77': 'sokol',
   '99': 'core',
+  '6284': 'görli',
   '7762959': 'musicoin'
 };
 
@@ -21,10 +22,11 @@ export const NETWORK_ID = Object.entries(NETWORK_IDS).reduce(
   {}
 );
 
-export const NETWORK_LIST = ['1', '61', '3', '42'];
+export const NETWORK_LIST = ['1', '6284', '61', '3', '42'];
 
 export const NETWORK_TITLES = {
   [NETWORK_ID.frontier]: 'Ethereum',
+  [NETWORK_ID.görli]: 'Görli Testnet',
   [NETWORK_ID.classic]: 'Ethereum Classic',
   [NETWORK_ID.ropsten]: 'Ropsten Testnet',
   [NETWORK_ID.kovan]: 'Kovan Testnet'
@@ -32,6 +34,7 @@ export const NETWORK_TITLES = {
 
 export const NETWORK_COLOR = {
   [NETWORK_ID.frontier]: '#977CF6',
+  [NETWORK_ID.görli]: '#ff1337',
   [NETWORK_ID.classic]: '#FC2166'
 };
 
