@@ -61,14 +61,7 @@ export default class AccountDetails extends React.Component {
 class AccountDetailsView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      showQr: false
-    };
   }
-
-  state: {
-    showQr: false
-  };
 
   componentDidMount() {
     this.subscription = this.props.navigation.addListener('willFocus', t => {
@@ -85,20 +78,7 @@ class AccountDetailsView extends React.Component {
     if (!account) {
       return null;
     }
-    const qr = this.state.showQr ? (
-      <View style={styles.qr}>
-        <QrView text={accountId(account)} />
-      </View>
-    ) : (
-      <Button
-        textStyles={{ color: colors.card_bg_text }}
-        buttonStyles={styles.qrButton}
-        title="Show Account QR Code"
-        onPress={() => {
-          this.setState({ showQr: true });
-        }}
-      />
-    );
+
     return (
       <ScrollView
         contentContainerStyle={styles.bodyContent}
@@ -111,7 +91,9 @@ class AccountDetailsView extends React.Component {
           title={account.name}
           onPress={() => this.props.navigation.navigate('AccountEdit')}
         />
-        {qr}
+        <View style={styles.qr}>
+          <QrView text={accountId(account)} />
+        </View>
       </ScrollView>
     );
   }
