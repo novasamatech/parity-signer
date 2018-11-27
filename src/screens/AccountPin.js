@@ -47,7 +47,9 @@ class AccountPinView extends React.PureComponent {
   state = {
     pin: '',
     confirmation: '',
-    focusConfirmation: false
+    focusConfirmation: false,
+    pinTooShort: false,
+    pinMismatch: true
   };
 
   async submit() {
@@ -81,7 +83,23 @@ class AccountPinView extends React.PureComponent {
           accountId: accountId(account)
         });
       }
+    } else {
+      if (this.state.pin.length < 6) {
+        this.setState({ pinTooShort: true });
+      } else if (this.state.pin !== this.state.confirmation)
+        this.setState({ pinMismatch: true });
     }
+  }
+
+  showErrorMessages = () => {
+    console.log('showErrorMessages - pinMismatch:' + this.state.pinMismatch + ' pinTooShort:' + this.state.pinTooShort)
+    const errorMessage = "";
+    if (this.state.pinMismatch) {
+      return <Text style={styles.hintText}>Hop gop missmatach</Text>
+    } else if (this.state.pinTooShort) {
+      return <Text style={styles.hintText}>too small</Text>
+    }
+    return null
   }
 
   render() {
@@ -92,8 +110,9 @@ class AccountPinView extends React.PureComponent {
         <Background />
         <Text style={styles.titleTop}>{title}</Text>
         <Text style={styles.hintText}>
-          Please make your PIN 6 or more digits
+          Choose a PIN code with 6 or more digits
         </Text>
+        {this.showErrorMessages()}
         <Text style={styles.title}>PIN</Text>
         <PinInput
           autoFocus
@@ -102,14 +121,14 @@ class AccountPinView extends React.PureComponent {
           onSubmitEditing={() => {
             this.setState({ focusConfirmation: true });
           }}
-          onChangeText={pin => this.setState({ pin })}
+          onChangeText={pin => this.setState({ pin: pin, pinMismatch: false, pinTooShort: false })}
           value={this.state.pin}
         />
         <Text style={styles.title}>CONFIRM PIN</Text>
         <PinInput
           returnKeyType="done"
           focus={this.state.focusConfirmation}
-          onChangeText={confirmation => this.setState({ confirmation })}
+          onChangeText={confirmation => this.setState({ confirmation: confirmation, pinMismatch: false, pinTooShort: false })}
           value={this.state.confirmation}
           onSubmitEditing={this.submit}
         />
