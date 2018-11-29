@@ -41,10 +41,10 @@ export class AccountUnlockAndSign extends React.PureComponent {
             {...this.props}
             accounts={accounts}
             nextButtonTitle="Sign"
-            onChange={async pin => {
+            onChange={async (o) => {
               try {
                 const txRequest = scannerStore.getTXRequest();
-                let res = await scannerStore.signData(pin);
+                let res = await scannerStore.signData(o.pin);
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [
@@ -67,7 +67,6 @@ export class AccountUnlock extends React.Component {
   state = {
     hasWrongPin: false
   };
-
 
   render() {
     console.log("AccountUnlock")
@@ -103,6 +102,8 @@ export class AccountUnlock extends React.Component {
   }
 }
 
+// This is not used anywhere
+/*
 export class AccountUnlockAndChangePin extends React.PureComponent {
   render() {
     return (
@@ -126,6 +127,7 @@ export class AccountUnlockAndChangePin extends React.PureComponent {
     );
   }
 }
+*/
 
 class AccountUnlockView extends React.PureComponent {
   state = {

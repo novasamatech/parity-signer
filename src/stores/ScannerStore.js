@@ -17,10 +17,9 @@
 // @flow
 import { Container } from 'unstated';
 import transaction from '../util/transaction';
-import { keccak, ethSign, brainWalletSign, decryptData } from '../util/native';
-import { saveTx, loadAccountTxs } from '../util/db';
-import { accountId } from '../util/account';``
-import { NETWORK_TITLES, NETWORK_IDS } from '../constants';
+import { keccak, brainWalletSign, decryptData } from '../util/native';
+import { saveTx } from '../util/db';
+import { NETWORK_TITLES } from '../constants';
 import { type Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -76,7 +75,7 @@ export default class ScannerStore extends Container<ScannerState> {
     if (!sender.encryptedSeed) {
       throw new Error(
         `No private key found for account ${
-          txRequest.data.account
+        txRequest.data.account
         } found in your signer key storage for the ${networkTitle} chain.`
       );
     }

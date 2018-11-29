@@ -18,7 +18,7 @@
 
 import { Container } from 'unstated';
 import debounce from 'debounce';
-import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
+import { loadAccounts, saveAccount } from '../util/db';
 import { encryptData, decryptData, brainWalletAddress } from '../util/native';
 import { accountId, empty } from '../util/account';
 
@@ -133,7 +133,6 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   async deleteAccount(account) {
-    // deleteAccount(account)
     account.archived = true;
     this.state.accounts.set(accountId(account), account);
     this.setState({
