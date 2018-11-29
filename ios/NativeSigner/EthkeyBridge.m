@@ -22,6 +22,7 @@
 //
 
 #import <React/RCTBridgeModule.h>
+#import "React/RCTConvert.h"
 
 @interface RCT_EXTERN_MODULE(EthkeyBridge, NSObject)
 
@@ -36,4 +37,5 @@ RCT_EXTERN_METHOD(randomPhrase:(NSUInteger)words resolve:(RCTPromiseResolveBlock
 RCT_EXTERN_METHOD(encryptData:(NSString*)data password:(NSString*)password resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(decryptData:(NSString*)data password:(NSString*)password resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(bip39MnemonicRandom:(NSUInteger)words resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 @end

@@ -135,4 +135,15 @@ class EthkeyBridge: NSObject {
       reject("invalid password", nil, nil)
     }
   }
+  
+  @objc func bip39MnemonicRandom(_ wordsCount: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    let mnemonic_ptr = bip39_mnemonic_random(wordsCount)
+    let mnemonic_rust_str = bip39_mnemonic_string(mnemonic_ptr);
+    let mnemonic_rust_str_ptr = rust_string_ptr(mnemonic_rust_str);
+    let words = String.fromStringPtr(ptr: mnemonic_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(mnemonic_rust_str_ptr)
+    rust_string_destroy(mnemonic_rust_str)
+    bip39_mnemonic_destroy(mnemonic_ptr)
+    resolve(words)
+  }
 }

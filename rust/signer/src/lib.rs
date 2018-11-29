@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-extern crate libc;
-extern crate rustc_serialize;
-extern crate tiny_keccak;
-extern crate parity_wordlist as wordlist;
+extern crate bip39;
+extern crate blockies;
 extern crate ethkey;
 extern crate ethstore;
+extern crate libc;
+extern crate parity_wordlist as wordlist;
 extern crate rlp;
-extern crate blockies;
-extern crate bip39;
+extern crate rustc_serialize;
+extern crate tiny_keccak;
 
 #[cfg(feature = "jni")]
 extern crate jni;
@@ -31,3 +31,24 @@ pub mod android;
 pub mod string;
 pub mod eth;
 pub mod bip39_mnemonic;
+
+use std::os::raw::c_void;
+extern "C" {
+	#[cfg_attr(any(target_os = "ios"), link_name = "malloc_size")]
+	fn malloc_usable_size(ptr: *const c_void) -> usize;
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn usable_size(ptr: *const c_void) -> usize {
+	if ptr.is_null() {
+		0
+	} else {
+		malloc_usable_size(ptr)
+	}
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn je_malloc_usable_size(_ptr: *const c_void) -> usize {
+	return malloc_usable_size(_ptr);
+}
+

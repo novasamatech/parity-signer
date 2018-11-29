@@ -82,3 +82,14 @@ struct rust_string* random_phrase(const uint32_t words);
 struct rust_string* encrypt_data(const struct rust_string_ptr* data, const struct rust_string_ptr* password);
 
 struct rust_string* decrypt_data(const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password, unsigned* error);
+
+struct bip_39_mnemonic;
+// creates new brainwallet keypair from seed
+struct bip_39_mnemonic* bip39_mnemonic_random(const uint32_t words_count);
+
+struct bip_39_mnemonic* bip39_mnemonic_from_string(const struct rust_string_ptr* str);
+
+struct rust_string* bip39_mnemonic_string(const struct bip_39_mnemonic*);
+
+void bip39_mnemonic_destroy(const struct bip_39_mnemonic*);
+
