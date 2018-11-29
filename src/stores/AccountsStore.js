@@ -21,7 +21,6 @@ import debounce from 'debounce';
 import { loadAccounts, saveAccount, deleteAccount } from '../util/db';
 import { encryptData, decryptData, brainWalletAddress } from '../util/native';
 import { accountId, empty } from '../util/account';
-import { NETWORK_TYPE, NETWORK_ID } from '../constants';
 
 export type Account = {
   name: string,
@@ -117,7 +116,7 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  async loadAccountTxs() {}
+  async loadAccountTxs() { }
 
   async save(account, pin = null) {
     try {

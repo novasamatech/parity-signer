@@ -19,11 +19,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert,
   View,
   Text,
   StyleSheet,
-  KeyboardAvoidingView
 } from 'react-native';
 import debounce from 'debounce';
 import { StackActions, NavigationActions } from 'react-navigation';
@@ -32,7 +30,6 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import Background from '../components/Background';
 import TextInput from '../components/TextInput';
-import Button from '../components/Button';
 import colors from '../colors';
 
 export class AccountUnlockAndSign extends React.PureComponent {
@@ -57,7 +54,7 @@ export class AccountUnlockAndSign extends React.PureComponent {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) {}
+              } catch (e) { }
             }}
           />
         )}
@@ -67,14 +64,20 @@ export class AccountUnlockAndSign extends React.PureComponent {
 }
 
 export class AccountUnlock extends React.Component {
+  state = {
+    hasWrongPin: false
+  };
+
+
   render() {
+    console.log("AccountUnlock")
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => (
           <AccountUnlockView
             {...this.props}
-            onChange={async pin => {
-              if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
+            onChange={async (o) => {
+              if (await accounts.unlockAccount(accounts.getSelected(), o.pin)) {
                 const resetAction = StackActions.reset({
                   index: 3,
                   actions: [
@@ -85,8 +88,13 @@ export class AccountUnlock extends React.Component {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
+                console.log('verifyPinAndNavigate 1')
+              } else if (o.submitted != undefined && o.submitted) {
+                this.setState({ hasWrongPin: true });
+                console.log('Submitted a wrong pin')
               }
             }}
+            hasWrongPin={this.state.hasWrongPin}
             accounts={accounts}
           />
         )}
@@ -109,7 +117,7 @@ export class AccountUnlockAndChangePin extends React.PureComponent {
                     isChange: true
                   });
                 }
-              } catch (e) {}
+              } catch (e) { }
             }}
             accounts={accounts}
           />
@@ -121,28 +129,45 @@ export class AccountUnlockAndChangePin extends React.PureComponent {
 
 class AccountUnlockView extends React.PureComponent {
   state = {
-    pin: ''
+    pin: '',
   };
 
   static propTypes = {
     onChange: PropTypes.func.isRequired,
-    nextButtonTitle: PropTypes.string
+    nextButtonTitle: PropTypes.string,
+    hasWrongPin: PropTypes.bool
   };
 
+  verifyAndSubmitPin = (submitted) => {
+    console.log('verifyAndSubmitPin, pin: ' + this.state.pin + ', submitted: ' + submitted)
+    debounce(this.props.onChange, 200)({
+      pin: this.state.pin,
+      submitted: submitted
+    });
+  }
+
   render() {
-    const { accounts } = this.props;
+    console.log("hasWrongPin: " + this.props.hasWrongPin)
     return (
       <View style={styles.body}>
         <Background />
         <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
+        <Text style={styles.errorText}>{this.props.hasWrongPin == undefined || !this.props.hasWrongPin ? null : 'Wrong pin, please try again'}</Text>
         <Text style={styles.title}>PIN</Text>
         <PinInput
-          onChangeText={pin => {
+          onChangeText={(pin) => {
+            const submitted = false
             this.setState({ pin });
+            console.log("TextChange: " + this.state.pin + " Submitted: " + submitted)
             if (pin.length < 1) {
               return;
             }
-            debounce(this.props.onChange, 200)(pin);
+            this.verifyAndSubmitPin(submitted);
+          }}
+          onSubmitEditing={() => {
+            const submitted = true
+            console.log("Text: " + this.state.pin + " submittedChanged : " + submitted)
+            this.verifyAndSubmitPin(submitted)
           }}
           value={this.state.pin}
         />
@@ -209,6 +234,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Manifold CF',
     textAlign: 'center',
     color: colors.bg_text_sec,
+    fontWeight: '700',
+    fontSize: 12,
+    paddingBottom: 20
+  },
+  errorText: {
+    fontFamily: 'Manifold CF',
+    textAlign: 'center',
+    color: colors.bg_alert,
     fontWeight: '700',
     fontSize: 12,
     paddingBottom: 20
