@@ -19,11 +19,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert,
   View,
   Text,
   StyleSheet,
-  KeyboardAvoidingView
 } from 'react-native';
 import debounce from 'debounce';
 import { StackActions, NavigationActions } from 'react-navigation';
@@ -32,7 +30,6 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import Background from '../components/Background';
 import TextInput from '../components/TextInput';
-import Button from '../components/Button';
 import colors from '../colors';
 
 export class AccountUnlockAndSign extends React.PureComponent {
@@ -57,7 +54,7 @@ export class AccountUnlockAndSign extends React.PureComponent {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) {}
+              } catch (e) { }
             }}
           />
         )}
@@ -95,30 +92,6 @@ export class AccountUnlock extends React.Component {
   }
 }
 
-export class AccountUnlockAndChangePin extends React.PureComponent {
-  render() {
-    return (
-      <Subscribe to={[AccountsStore]}>
-        {accounts => (
-          <AccountUnlockView
-            {...this.props}
-            onChange={async pin => {
-              try {
-                if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
-                  this.props.navigation.navigate('AccountPin', {
-                    isChange: true
-                  });
-                }
-              } catch (e) {}
-            }}
-            accounts={accounts}
-          />
-        )}
-      </Subscribe>
-    );
-  }
-}
-
 class AccountUnlockView extends React.PureComponent {
   state = {
     pin: ''
@@ -130,7 +103,6 @@ class AccountUnlockView extends React.PureComponent {
   };
 
   render() {
-    const { accounts } = this.props;
     return (
       <View style={styles.body}>
         <Background />
