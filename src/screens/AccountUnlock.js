@@ -102,33 +102,6 @@ export class AccountUnlock extends React.Component {
   }
 }
 
-// This is not used anywhere
-/*
-export class AccountUnlockAndChangePin extends React.PureComponent {
-  render() {
-    return (
-      <Subscribe to={[AccountsStore]}>
-        {accounts => (
-          <AccountUnlockView
-            {...this.props}
-            onChange={async pin => {
-              try {
-                if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
-                  this.props.navigation.navigate('AccountPin', {
-                    isChange: true
-                  });
-                }
-              } catch (e) { }
-            }}
-            accounts={accounts}
-          />
-        )}
-      </Subscribe>
-    );
-  }
-}
-*/
-
 class AccountUnlockView extends React.PureComponent {
   state = {
     pin: '',
@@ -149,7 +122,6 @@ class AccountUnlockView extends React.PureComponent {
   }
 
   render() {
-    console.log("hasWrongPin: " + this.props.hasWrongPin)
     return (
       <View style={styles.body}>
         <Background />

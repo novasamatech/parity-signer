@@ -17,8 +17,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
