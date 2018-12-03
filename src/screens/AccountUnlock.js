@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {
   View,
   Text,
-  StyleSheet,
+  StyleSheet
 } from 'react-native';
 import debounce from 'debounce';
 import { StackActions, NavigationActions } from 'react-navigation';
@@ -33,6 +33,10 @@ import TextInput from '../components/TextInput';
 import colors from '../colors';
 
 export class AccountUnlockAndSign extends React.PureComponent {
+  state = {
+    hasWrongPin: false,
+  };
+
   render() {
     return (
       <Subscribe to={[AccountsStore, ScannerStore]}>
@@ -40,7 +44,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
           <AccountUnlockView
             {...this.props}
             accounts={accounts}
-            nextButtonTitle="Sign"
             onChange={async (o) => {
               try {
                 const txRequest = scannerStore.getTXRequest();
@@ -54,8 +57,13 @@ export class AccountUnlockAndSign extends React.PureComponent {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) { }
+              } catch (e) {
+                if (o.submitted != undefined && o.submitted) {
+                  this.setState({ hasWrongPin: true })
+                }
+              }
             }}
+            hasWrongPin={this.state.hasWrongPin}
           />
         )}
       </Subscribe>
@@ -65,11 +73,11 @@ export class AccountUnlockAndSign extends React.PureComponent {
 
 export class AccountUnlock extends React.Component {
   state = {
-    hasWrongPin: false
+    hasWrongPin: false,
   };
 
   render() {
-    console.log("AccountUnlock")
+
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => (
@@ -87,10 +95,8 @@ export class AccountUnlock extends React.Component {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-                console.log('verifyPinAndNavigate 1')
               } else if (o.submitted != undefined && o.submitted) {
                 this.setState({ hasWrongPin: true });
-                console.log('Submitted a wrong pin')
               }
             }}
             hasWrongPin={this.state.hasWrongPin}
@@ -104,17 +110,15 @@ export class AccountUnlock extends React.Component {
 
 class AccountUnlockView extends React.PureComponent {
   state = {
-    pin: '',
+    pin: ''
   };
 
   static propTypes = {
     onChange: PropTypes.func.isRequired,
-    nextButtonTitle: PropTypes.string,
     hasWrongPin: PropTypes.bool
   };
 
   verifyAndSubmitPin = (submitted) => {
-    console.log('verifyAndSubmitPin, pin: ' + this.state.pin + ', submitted: ' + submitted)
     debounce(this.props.onChange, 200)({
       pin: this.state.pin,
       submitted: submitted
@@ -132,7 +136,6 @@ class AccountUnlockView extends React.PureComponent {
           onChangeText={(pin) => {
             const submitted = false
             this.setState({ pin });
-            console.log("TextChange: " + this.state.pin + " Submitted: " + submitted)
             if (pin.length < 1) {
               return;
             }
@@ -140,7 +143,6 @@ class AccountUnlockView extends React.PureComponent {
           }}
           onSubmitEditing={() => {
             const submitted = true
-            console.log("Text: " + this.state.pin + " submittedChanged : " + submitted)
             this.verifyAndSubmitPin(submitted)
           }}
           value={this.state.pin}
@@ -177,18 +179,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden'
   },
-  bodyContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
   title: {
     fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
@@ -204,14 +194,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     textAlign: 'center'
   },
-  hintText: {
-    fontFamily: 'Manifold CF',
-    textAlign: 'center',
-    color: colors.bg_text_sec,
-    fontWeight: '700',
-    fontSize: 12,
-    paddingBottom: 20
-  },
   errorText: {
     fontFamily: 'Manifold CF',
     textAlign: 'center',
@@ -222,8 +204,5 @@ const styles = StyleSheet.create({
   },
   pinInput: {
     marginBottom: 20
-  },
-  nextStep: {
-    marginTop: 20
   }
 });
