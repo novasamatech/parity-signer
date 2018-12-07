@@ -91,7 +91,6 @@ class AccountPinView extends React.PureComponent {
   }
 
   showHintOrError = () => {
-    console.log('showErrorMessages - pinMismatch:' + this.state.pinMismatch + ' pinTooShort:' + this.state.pinTooShort)
     if (this.state.pinTooShort) {
       return <Text style={styles.errorText}>Your pin must be at least 6 digits long!</Text>
     } else if (this.state.pinMismatch) {
@@ -101,7 +100,6 @@ class AccountPinView extends React.PureComponent {
   }
 
   render() {
-    const { accounts, type, navigation } = this.props;
     const title = 'ACCOUNT PIN';
     return (
       <View style={styles.body}>
@@ -166,18 +164,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden'
   },
-  bodyContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
   title: {
     fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
@@ -211,8 +197,5 @@ const styles = StyleSheet.create({
   },
   pinInput: {
     marginBottom: 20
-  },
-  nextStep: {
-    marginTop: 20
   }
 });

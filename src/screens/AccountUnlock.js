@@ -95,7 +95,7 @@ export class AccountUnlock extends React.Component {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } else if (o.submitted != undefined && o.submitted) {
+              } else if (o.canSendError != undefined && o.canSendError) {
                 this.setState({ hasWrongPin: true });
               }
             }}
@@ -110,7 +110,8 @@ export class AccountUnlock extends React.Component {
 
 class AccountUnlockView extends React.PureComponent {
   state = {
-    pin: ''
+    pin: '',
+    errorMessage: ''
   };
 
   static propTypes = {
@@ -118,10 +119,16 @@ class AccountUnlockView extends React.PureComponent {
     hasWrongPin: PropTypes.bool
   };
 
-  verifyAndSubmitPin = (submitted) => {
+  componentDidUpdate = () => {
+    if (this.props.hasWrongPin) {
+      this.setState({ errorMessage: 'Wrong pin, please try again' })
+    }
+  }
+
+  verifyAndSubmitPin = (canSendError) => {
     debounce(this.props.onChange, 200)({
       pin: this.state.pin,
-      submitted: submitted
+      canSendError: canSendError
     });
   }
 
@@ -130,20 +137,23 @@ class AccountUnlockView extends React.PureComponent {
       <View style={styles.body}>
         <Background />
         <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
-        <Text style={styles.errorText}>{this.props.hasWrongPin == undefined || !this.props.hasWrongPin ? null : 'Wrong pin, please try again'}</Text>
+        <Text style={styles.errorText}>{this.state.errorMessage}</Text>
         <Text style={styles.title}>PIN</Text>
         <PinInput
           onChangeText={(pin) => {
-            const submitted = false
+            let canSendError = false
             this.setState({ pin });
             if (pin.length < 1) {
               return;
             }
-            this.verifyAndSubmitPin(submitted);
+            if (pin.length > 5) {
+              canSendError = true
+            }
+            this.verifyAndSubmitPin(canSendError);
           }}
           onSubmitEditing={() => {
-            const submitted = true
-            this.verifyAndSubmitPin(submitted)
+            const canSendError = true
+            this.verifyAndSubmitPin(canSendError)
           }}
           value={this.state.pin}
         />
