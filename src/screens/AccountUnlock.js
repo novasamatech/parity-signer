@@ -46,8 +46,8 @@ export class AccountUnlockAndSign extends React.PureComponent {
             accounts={accounts}
             onChange={async (o) => {
               try {
-                const txRequest = scannerStore.getTXRequest();
-                let res = await scannerStore.signData(o.pin);
+                scannerStore.getTXRequest();
+                await scannerStore.signData(o.pin);
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [
@@ -58,7 +58,7 @@ export class AccountUnlockAndSign extends React.PureComponent {
                 });
                 this.props.navigation.dispatch(resetAction);
               } catch (e) {
-                if (o.submitted != undefined && o.submitted) {
+                if (o.canSendError != undefined && o.canSendError) {
                   this.setState({ hasWrongPin: true })
                 }
               }
