@@ -33,10 +33,6 @@ import TextInput from '../components/TextInput';
 import colors from '../colors';
 
 export class AccountUnlockAndSign extends React.PureComponent {
-  state = {
-    hasWrongPin: false,
-  };
-
   render() {
     return (
       <Subscribe to={[AccountsStore, ScannerStore]}>
@@ -44,10 +40,17 @@ export class AccountUnlockAndSign extends React.PureComponent {
           <AccountUnlockView
             {...this.props}
             accounts={accounts}
-            onChange={async (o) => {
+            checkPin={async (pin) => {
               try {
                 scannerStore.getTXRequest();
-                await scannerStore.signData(o.pin);
+                await scannerStore.signData(pin);
+                return true
+              } catch (e) {
+                return false
+              }
+            }}
+            navigate={
+              () => {
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [
@@ -57,13 +60,8 @@ export class AccountUnlockAndSign extends React.PureComponent {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) {
-                if (o.canSendError != undefined && o.canSendError) {
-                  this.setState({ hasWrongPin: true })
-                }
               }
-            }}
-            hasWrongPin={this.state.hasWrongPin}
+            }
           />
         )}
       </Subscribe>
@@ -72,35 +70,28 @@ export class AccountUnlockAndSign extends React.PureComponent {
 }
 
 export class AccountUnlock extends React.Component {
-  state = {
-    hasWrongPin: false,
-  };
-
   render() {
-
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => (
           <AccountUnlockView
             {...this.props}
-            onChange={async (o) => {
-              if (await accounts.unlockAccount(accounts.getSelected(), o.pin)) {
-                const resetAction = StackActions.reset({
-                  index: 3,
-                  actions: [
-                    NavigationActions.navigate({ routeName: 'AccountList' }),
-                    NavigationActions.navigate({ routeName: 'AccountDetails' }),
-                    NavigationActions.navigate({ routeName: 'AccountEdit' }),
-                    NavigationActions.navigate({ routeName: 'AccountBackup' })
-                  ]
-                });
-                this.props.navigation.dispatch(resetAction);
-              } else if (o.canSendError != undefined && o.canSendError) {
-                this.setState({ hasWrongPin: true });
-              }
+            checkPin={async (pin) => {
+              console.log('checkPin')
+              return await accounts.unlockAccount(accounts.getSelected(), pin)
             }}
-            hasWrongPin={this.state.hasWrongPin}
-            accounts={accounts}
+            navigate={() => {
+              const resetAction = StackActions.reset({
+                index: 3,
+                actions: [
+                  NavigationActions.navigate({ routeName: 'AccountList' }),
+                  NavigationActions.navigate({ routeName: 'AccountDetails' }),
+                  NavigationActions.navigate({ routeName: 'AccountEdit' }),
+                  NavigationActions.navigate({ routeName: 'AccountBackup' })
+                ]
+              });
+              this.props.navigation.dispatch(resetAction);
+            }}
           />
         )}
       </Subscribe>
@@ -109,27 +100,20 @@ export class AccountUnlock extends React.Component {
 }
 
 class AccountUnlockView extends React.PureComponent {
-  state = {
-    pin: '',
-    errorMessage: ''
-  };
 
   static propTypes = {
-    onChange: PropTypes.func.isRequired,
+    checkPin: PropTypes.func.isRequired,
     hasWrongPin: PropTypes.bool
   };
 
-  componentDidUpdate = () => {
-    if (this.props.hasWrongPin) {
-      this.setState({ errorMessage: 'Wrong pin, please try again' })
-    }
-  }
+  state = {
+    pin: '',
+    hasWrongPin: false
+  };
 
-  verifyAndSubmitPin = (canSendError) => {
-    debounce(this.props.onChange, 200)({
-      pin: this.state.pin,
-      canSendError: canSendError
-    });
+
+  showErrorMessage = () => {
+    return this.state.hasWrongPin ? 'Wrong pin, please try again' : '';
   }
 
   render() {
@@ -137,24 +121,21 @@ class AccountUnlockView extends React.PureComponent {
       <View style={styles.body}>
         <Background />
         <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
-        <Text style={styles.errorText}>{this.state.errorMessage}</Text>
+        <Text style={styles.errorText}>{this.showErrorMessage()}</Text>
         <Text style={styles.title}>PIN</Text>
         <PinInput
-          onChangeText={(pin) => {
-            let canSendError = false
-            this.setState({ pin });
-            if (pin.length < 1) {
+          onChangeText={async (pin) => {
+            this.setState({ pin: pin })
+            if (pin.length < 4) {
               return;
             }
-            if (pin.length > 5) {
-              canSendError = true
+            if (await this.props.checkPin(pin)) {
+              this.props.navigate()
+            } else if (pin.length > 5) {
+              this.setState({ hasWrongPin: true })
             }
-            this.verifyAndSubmitPin(canSendError);
           }}
-          onSubmitEditing={() => {
-            const canSendError = true
-            this.verifyAndSubmitPin(canSendError)
-          }}
+
           value={this.state.pin}
         />
       </View>
