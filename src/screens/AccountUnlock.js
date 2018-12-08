@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {
   View,
   Text,
-  StyleSheet,
+  StyleSheet
 } from 'react-native';
 import debounce from 'debounce';
 import { StackActions, NavigationActions } from 'react-navigation';
@@ -40,11 +40,17 @@ export class AccountUnlockAndSign extends React.PureComponent {
           <AccountUnlockView
             {...this.props}
             accounts={accounts}
-            nextButtonTitle="Sign"
-            onChange={async pin => {
+            checkPin={async (pin) => {
               try {
-                const txRequest = scannerStore.getTXRequest();
-                let res = await scannerStore.signData(pin);
+                scannerStore.getTXRequest();
+                await scannerStore.signData(pin);
+                return true
+              } catch (e) {
+                return false
+              }
+            }}
+            navigate={
+              () => {
                 const resetAction = StackActions.reset({
                   index: 2,
                   actions: [
@@ -54,8 +60,8 @@ export class AccountUnlockAndSign extends React.PureComponent {
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
-              } catch (e) { }
-            }}
+              }
+            }
           />
         )}
       </Subscribe>
@@ -70,21 +76,22 @@ export class AccountUnlock extends React.Component {
         {accounts => (
           <AccountUnlockView
             {...this.props}
-            onChange={async pin => {
-              if (await accounts.unlockAccount(accounts.getSelected(), pin)) {
-                const resetAction = StackActions.reset({
-                  index: 3,
-                  actions: [
-                    NavigationActions.navigate({ routeName: 'AccountList' }),
-                    NavigationActions.navigate({ routeName: 'AccountDetails' }),
-                    NavigationActions.navigate({ routeName: 'AccountEdit' }),
-                    NavigationActions.navigate({ routeName: 'AccountBackup' })
-                  ]
-                });
-                this.props.navigation.dispatch(resetAction);
-              }
+            checkPin={async (pin) => {
+              console.log('checkPin')
+              return await accounts.unlockAccount(accounts.getSelected(), pin)
             }}
-            accounts={accounts}
+            navigate={() => {
+              const resetAction = StackActions.reset({
+                index: 3,
+                actions: [
+                  NavigationActions.navigate({ routeName: 'AccountList' }),
+                  NavigationActions.navigate({ routeName: 'AccountDetails' }),
+                  NavigationActions.navigate({ routeName: 'AccountEdit' }),
+                  NavigationActions.navigate({ routeName: 'AccountBackup' })
+                ]
+              });
+              this.props.navigation.dispatch(resetAction);
+            }}
           />
         )}
       </Subscribe>
@@ -93,29 +100,42 @@ export class AccountUnlock extends React.Component {
 }
 
 class AccountUnlockView extends React.PureComponent {
-  state = {
-    pin: ''
-  };
 
   static propTypes = {
-    onChange: PropTypes.func.isRequired,
-    nextButtonTitle: PropTypes.string
+    checkPin: PropTypes.func.isRequired,
+    hasWrongPin: PropTypes.bool
   };
+
+  state = {
+    pin: '',
+    hasWrongPin: false
+  };
+
+
+  showErrorMessage = () => {
+    return this.state.hasWrongPin ? 'Wrong pin, please try again' : '';
+  }
 
   render() {
     return (
       <View style={styles.body}>
         <Background />
         <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
+        <Text style={styles.errorText}>{this.showErrorMessage()}</Text>
         <Text style={styles.title}>PIN</Text>
         <PinInput
-          onChangeText={pin => {
-            this.setState({ pin });
-            if (pin.length < 1) {
+          onChangeText={async (pin) => {
+            this.setState({ pin: pin })
+            if (pin.length < 4) {
               return;
             }
-            debounce(this.props.onChange, 200)(pin);
+            if (await this.props.checkPin(pin)) {
+              this.props.navigate()
+            } else if (pin.length > 5) {
+              this.setState({ hasWrongPin: true })
+            }
           }}
+
           value={this.state.pin}
         />
       </View>
@@ -150,18 +170,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden'
   },
-  bodyContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
   title: {
     fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
@@ -177,18 +185,15 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     textAlign: 'center'
   },
-  hintText: {
+  errorText: {
     fontFamily: 'Manifold CF',
     textAlign: 'center',
-    color: colors.bg_text_sec,
+    color: colors.bg_alert,
     fontWeight: '700',
     fontSize: 12,
     paddingBottom: 20
   },
   pinInput: {
     marginBottom: 20
-  },
-  nextStep: {
-    marginTop: 20
   }
 });

@@ -46,7 +46,9 @@ class AccountPinView extends React.PureComponent {
   state = {
     pin: '',
     confirmation: '',
-    focusConfirmation: false
+    focusConfirmation: false,
+    pinTooShort: false,
+    pinMismatch: false
   };
 
   async submit() {
@@ -80,19 +82,30 @@ class AccountPinView extends React.PureComponent {
           accountId: accountId(account)
         });
       }
+    } else {
+      if (this.state.pin.length < 6) {
+        this.setState({ pinTooShort: true });
+      } else if (this.state.pin !== this.state.confirmation)
+        this.setState({ pinMismatch: true });
     }
   }
 
+  showHintOrError = () => {
+    if (this.state.pinTooShort) {
+      return <Text style={styles.errorText}>Your pin must be at least 6 digits long!</Text>
+    } else if (this.state.pinMismatch) {
+      return <Text style={styles.errorText}>Pin codes don't match!</Text>
+    }
+    return (<Text style={styles.hintText}>Choose a PIN code with 6 or more digits</Text>)
+  }
+
   render() {
-    const { accounts, type, navigation } = this.props;
     const title = 'ACCOUNT PIN';
     return (
       <View style={styles.body}>
         <Background />
         <Text style={styles.titleTop}>{title}</Text>
-        <Text style={styles.hintText}>
-          Please make your PIN 6 or more digits
-        </Text>
+        {this.showHintOrError()}
         <Text style={styles.title}>PIN</Text>
         <PinInput
           autoFocus
@@ -101,14 +114,14 @@ class AccountPinView extends React.PureComponent {
           onSubmitEditing={() => {
             this.setState({ focusConfirmation: true });
           }}
-          onChangeText={pin => this.setState({ pin })}
+          onChangeText={pin => this.setState({ pin: pin, pinMismatch: false, pinTooShort: false })}
           value={this.state.pin}
         />
         <Text style={styles.title}>CONFIRM PIN</Text>
         <PinInput
           returnKeyType="done"
           focus={this.state.focusConfirmation}
-          onChangeText={confirmation => this.setState({ confirmation })}
+          onChangeText={confirmation => this.setState({ confirmation: confirmation, pinMismatch: false, pinTooShort: false })}
           value={this.state.confirmation}
           onSubmitEditing={this.submit}
         />
@@ -151,18 +164,6 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden'
   },
-  bodyContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
   title: {
     fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
@@ -186,10 +187,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     paddingBottom: 20
   },
+  errorText: {
+    fontFamily: 'Manifold CF',
+    textAlign: 'center',
+    color: colors.bg_alert,
+    fontWeight: '700',
+    fontSize: 12,
+    paddingBottom: 20
+  },
   pinInput: {
     marginBottom: 20
-  },
-  nextStep: {
-    marginTop: 20
   }
 });
