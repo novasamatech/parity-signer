@@ -4,8 +4,8 @@
   "private": true,
   "license": "GPL-3.0",
   "scripts": {
-    "build-rust-ios": "cd rust/signer && make ios",
-    "build-rust-android": "cd rust/signer && make android",
+    "ios": "npm run build-rust-ios && react-native run-ios",
+    "android": "npm run build-rust-android && react-native run-android",
     "start": "yarn run ios",
     "test": "jest",
     "lint": "",
