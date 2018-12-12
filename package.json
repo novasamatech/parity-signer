@@ -5,9 +5,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "build-rust-ios": "cd rust/signer && make ios",
-    "ios": "yarn run build-rust-ios",
     "build-rust-android": "cd rust/signer && make android",
-    "android": "yarn run build-rust-android",
     "start": "yarn run ios",
     "test": "jest",
     "lint": "",
