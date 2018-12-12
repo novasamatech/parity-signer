@@ -67,13 +67,13 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 - iOS
 
     ```
-    npm run ios
+    npm run build-rust-ios
     ```
 
 - Android
 
     ```
-    npm run android
+    npm run build-rust-android
     ```
 
 
