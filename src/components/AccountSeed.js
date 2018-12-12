@@ -17,7 +17,6 @@
 'use strict';
 
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { Animated, Text, View, StyleSheet } from 'react-native';
 import TouchableItem from './TouchableItem';
 import TextInput from './TextInput';
@@ -188,6 +187,7 @@ export default class AccountSeed extends Component {
         <TextInput
           style={[styles.input, invalidStyles]}
           multiline
+          autoCapitalize="none"
           onBlur={this.keyboardDidHide}
           onSelectionChange={this.handleCursorPosition}
           {...this.props}
