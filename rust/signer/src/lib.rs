@@ -31,6 +31,7 @@ pub mod android;
 pub mod string;
 pub mod eth;
 pub mod crypt;
+pub mod _rlp;
 pub mod bip39_mnemonic;
 
 use std::os::raw::c_void;
