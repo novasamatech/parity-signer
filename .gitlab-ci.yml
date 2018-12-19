@@ -1,14 +1,22 @@
 stages:
   - test
   - build
+  - release
+
 variables:
   GIT_DEPTH: "3"
   SIMPLECOV: "true"
   RUST_BACKTRACE: "1"
   RUSTFLAGS: ""
   CARGOFLAGS: ""
-cache:
-  untracked: true
+
+.releaseable_branches:             # list of git refs for building GitLab artifacts (think "pre-release binaries")
+  only:                            &releaseable_branches
+    - stable
+    - beta
+    - tags
+    - master
+
 #android-test:
 #  stage: test
 #  image: parity/parity-android
@@ -26,6 +34,7 @@ cache:
 #    - npm run test
 #  tags:
 #    - rust 
+
 android-build:
   stage: build
   image: parity/android-sdk
@@ -41,14 +50,27 @@ android-build:
     - echo "ndk.dir=/usr/local/android-ndk-r16b" > android/local.properties
     - echo "sdk.dir=/opt/android-sdk" >> android/local.properties
     - npm install -g yarn
+    - cat android/gradle.properties
     - bash ./setup_linux.sh
     - bash ./gen_key.sh
-    - cd android && ./gradlew assembleRelease
-    - pwd
-    - ls
+    - npm run android
+    - cd android && ./gradlew assemble && cd ..
+    - find . | grep apk
   tags:
-    - rust 
+    - rust
   artifacts:
     paths:
-    - ./android/app/build/outputs/apk/release/app-release.apk 
+    - ./android/app/build/outputs/apk/release/app-release-unsigned.apk
 
+android-release:
+  stage: release
+  image: parity/android-sdk
+  only: *releaseable_branches
+  script:
+    - bash ./postinstall.sh
+    - find . | grep apk
+  tags:
+    - rust
+  artifacts:
+    paths:
+    - ./release/signer-app-release.apk
