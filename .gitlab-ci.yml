@@ -55,7 +55,6 @@ android-build:
     - cat android/gradle.properties
     - bash ./setup_linux.sh
     - bash ./gen_key.sh
-    - npm run android
     - cd android && ./gradlew assemble && cd ..
     - find . | grep apk
   tags:
