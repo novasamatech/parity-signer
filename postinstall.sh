@@ -4,8 +4,8 @@ echo $APK_KEYSTORE | base64 -d >> android/app/parity.keystore
 
 curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install awscli
 
-ech "signing apk"
-jarsigner -verbose -storepass $(echo $KEYSTORE_PASSWORD | base64 -d) -sigalg SHA1withRSA -digestalg SHA1 -keystore parity.keystore ./android/app/build/outputs/apk/release/app-release-unsigned.apk  parity-signer-key
+echo "signing apk"
+jarsigner -verbose -storepass $(echo $KEYSTORE_PASSWORD | base64 -d) -sigalg SHA1withRSA -digestalg SHA1 -keystore android/app/parity.keystore ./android/app/build/outputs/apk/release/app-release-unsigned.apk  parity-signer-key
 mkdir release
 zipalign -p 4 ./android/app/build/outputs/apk/release/app-release-unsigned.apk release/signer-app-release.apk
 
