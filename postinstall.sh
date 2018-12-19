@@ -10,10 +10,6 @@ mkdir release
 zipalign -p 4 ./android/app/build/outputs/apk/release/app-release-unsigned.apk release/signer-app-release.apk
 
 echo "uploading build ${SCHEDULE_TAG:-${CI_COMMIT_REF_NAME}} s3"
-aws configure set aws_access_key_id $S3_KEY
-aws configure set aws_secret_access_key $S3_SECRET
-
-export AWS_ACCESS_KEY_ID="$S3_KEY"
 
 case "${SCHEDULE_TAG:-${CI_COMMIT_REF_NAME}}" in
   (beta|stable|nightly|master)
