@@ -16,6 +16,7 @@ variables:
     - beta
     - tags
     - master
+    - dd-sign-apk
 
 #android-test:
 #  stage: test
@@ -44,6 +45,7 @@ android-build:
     - stable
     - triggers
     - master
+    - dd-sign-apk
   script:
     - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
     - apt-get install -y nodejs
