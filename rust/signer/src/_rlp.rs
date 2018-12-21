@@ -4,7 +4,7 @@ use rlp::decode_list;
 
 // RLP
 
-fn safe_rlp_item(rlp: &str, position: u32) -> Result<String, String> {
+pub fn safe_rlp_item(rlp: &str, position: u32) -> Result<String, String> {
   let hex = rlp.from_hex().map_err(| e | e.to_string())?;
   let rlp = decode_list::<Vec<u8>>(&hex);
   let data = rlp.get(position as usize).ok_or_else(|| "Invalid RLP position".to_string())?;

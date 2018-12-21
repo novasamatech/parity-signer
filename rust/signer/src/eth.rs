@@ -63,7 +63,7 @@ pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut St
   Box::into_raw(Box::new(signature))
 }
 
-fn blockies_icon_in_base64(seed: Vec<u8>) -> String {
+pub fn blockies_icon_in_base64(seed: Vec<u8>) -> String {
   let mut result = Vec::new();
   let options = ethereum::Options {
     size: 8,

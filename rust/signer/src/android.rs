@@ -1,10 +1,16 @@
 #![allow(non_snake_case)]
 
 use wordlist;
-use super::*;
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JThrowable};
 use jni::sys::{jint, jstring};
+
+use rustc_serialize::hex::{ToHex, FromHex};
+use tiny_keccak::Keccak;
+use eth::blockies_icon_in_base64;
+use ethkey::{Password, Generator, Brain, Message, sign};
+use ethstore::Crypto;
+use _rlp::safe_rlp_item;
 
 fn new_exception<'a>(env: &'a JNIEnv<'a>) -> JThrowable<'a> {
   let exception = env.find_class("java/lang/Exception").unwrap();
