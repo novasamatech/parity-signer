@@ -43,6 +43,7 @@ import {
   DEFAULT_NETWORK_COLOR
 } from '../constants';
 import colors from '../colors';
+import { validateSeed } from '../util/account';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -126,9 +127,9 @@ class AccountNewView extends React.Component {
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
+              disabled={ !validateSeed(selected.seed).valid }
               onPress={() => {
-                selected.address &&
-                  selected.address.length &&
+                validateSeed(selected.seed).valid &&
                   this.props.navigation.navigate('AccountBackup', {
                     isNew: true,
                     isWelcome: this.props.navigation.getParam('isWelcome')
