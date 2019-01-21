@@ -1,5 +1,5 @@
-import { NETWORK_TYPE, NETWORK_ID } from '../constants';
 import WORDS from '../../res/wordlist.json';
+import { NETWORK_ID, NETWORK_TYPE } from '../constants';
 
 export { WORDS };
 export const WORDS_INDEX = WORDS.reduce(

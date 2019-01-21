@@ -17,15 +17,7 @@
 /* @flow */
 
 import React from 'react';
-import {
-  Text,
-  Animated,
-  TouchableWithoutFeedback,
-  StyleSheet,
-  View,
-  Platform,
-  SafeAreaView
-} from 'react-native';
+import { Platform, SafeAreaView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import colors from '../colors';
 import withDimensions from './utils/withDimensions';

@@ -17,25 +17,7 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet,
-  Linking
-} from 'react-native';
-import { Subscribe } from 'unstated';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import AccountsStore from '../stores/AccountsStore';
-import Background from '../components/Background';
-import AccountSeed from '../components/AccountSeed';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TextInput from '../components/TextInput';
-import TouchableItem from '../components/TouchableItem';
+import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 
 export default class About extends React.PureComponent {

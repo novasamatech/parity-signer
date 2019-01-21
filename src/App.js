@@ -17,53 +17,35 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
-import '../ReactotronConfig';
-
 import React, { Component } from 'react';
-import { Provider as UnstatedProvider, Subscribe, Container } from 'unstated';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  AppState,
-  Alert,
-  StatusBar
-} from 'react-native';
-import {
-  createStackNavigator,
-  createBottomTabNavigator,
-  HeaderTitle,
-  Header,
-  HeaderBackButton,
-  withNavigation
-} from 'react-navigation';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { default as HomeHeader } from './components/Header';
+import { StatusBar } from 'react-native';
+import { createBottomTabNavigator, createStackNavigator, HeaderBackButton, withNavigation } from 'react-navigation';
+import { Provider as UnstatedProvider } from 'unstated';
+import '../ReactotronConfig';
+import colors from './colors';
+import Background from './components/Background';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
-import Background from './components/Background';
 import TabBarBottom from './components/TabBarBottom';
-import TouchableItem from './components/TouchableItem';
-import Loading from './screens/Loading';
-import Security from './screens/Security';
-import QrScanner from './screens/QrScanner';
-import AccountList from './screens/AccountList';
-import AccountAdd from './screens/AccountAdd';
-import AccountNew from './screens/AccountNew';
-import AccountNetworkChooser from './screens/AccountNetworkChooser';
-import AccountRecover from './screens/AccountRecover';
-import AccountBackup from './screens/AccountBackup';
-import AccountPin from './screens/AccountPin';
 import About from './screens/About';
-import TermsAndConditions from './screens/TermsAndConditions';
-import PrivacyPolicy from './screens/PrivacyPolicy';
+import AccountAdd from './screens/AccountAdd';
+import AccountBackup from './screens/AccountBackup';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
-import TxDetails from './screens/TxDetails';
+import AccountList from './screens/AccountList';
+import AccountNetworkChooser from './screens/AccountNetworkChooser';
+import AccountNew from './screens/AccountNew';
+import AccountPin from './screens/AccountPin';
+import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
+import Loading from './screens/Loading';
+import PrivacyPolicy from './screens/PrivacyPolicy';
+import QrScanner from './screens/QrScanner';
+import Security from './screens/Security';
 import SignedTx from './screens/SignedTx';
-import colors from './colors';
+import TermsAndConditions from './screens/TermsAndConditions';
+import TxDetails from './screens/TxDetails';
+
 
 export default class App extends Component {
   render() {

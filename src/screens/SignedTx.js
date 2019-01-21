@@ -16,17 +16,16 @@
 
 'use strict';
 
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, ScrollView, Text } from 'react-native';
-import Background from '../components/Background';
-import QrView from '../components/QrView';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import ScannerStore from '../stores/ScannerStore';
-import AccountsStore from '../stores/AccountsStore';
-import TxDetailsCard from '../components/TxDetailsCard';
-import AccountCard from '../components/AccountCard';
 import colors from '../colors';
+import AccountCard from '../components/AccountCard';
+import QrView from '../components/QrView';
+import TxDetailsCard from '../components/TxDetailsCard';
+import AccountsStore from '../stores/AccountsStore';
+import ScannerStore from '../stores/ScannerStore';
 
 export default class SignedTx extends React.PureComponent {
   render() {

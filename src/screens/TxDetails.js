@@ -16,17 +16,17 @@
 
 'use strict';
 
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, ScrollView, View, Text } from 'react-native';
+import React from 'react';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
-import ScannerStore from '../stores/ScannerStore';
-import AccountsStore from '../stores/AccountsStore';
+import colors from '../colors';
+import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import AccountCard from '../components/AccountCard';
 import TxDetailsCard from '../components/TxDetailsCard';
-import colors from '../colors';
+import AccountsStore from '../stores/AccountsStore';
+import ScannerStore from '../stores/ScannerStore';
 
 const orUnknown = (value = 'Unknown') => value;
 

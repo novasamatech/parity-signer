@@ -16,14 +16,14 @@
 
 'use strict';
 
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, Text, StatusBar, Alert } from 'react-native';
+import React from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import Camera from 'react-native-camera';
 import { Subscribe } from 'unstated';
-import ScannerStore from '../stores/ScannerStore';
-import AccountsStore from '../stores/AccountsStore';
 import colors from '../colors';
+import AccountsStore from '../stores/AccountsStore';
+import ScannerStore from '../stores/ScannerStore';
 
 export default class Scanner extends React.PureComponent {
   static navigationOptions = {

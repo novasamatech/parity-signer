@@ -15,8 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
-import { Container } from 'unstated';
 import { NetInfo } from 'react-native';
+import { Container } from 'unstated';
 
 type SecurityState = {
   signedTxs: Map<string, Object>

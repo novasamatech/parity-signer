@@ -15,13 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { withNavigation } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import TouchableItem from './TouchableItem';
-import SecurityStore from '../stores/SecurityStore';
 import colors from '../colors';
+import SecurityStore from '../stores/SecurityStore';
+import TouchableItem from './TouchableItem';
 
 export default class SecurityHeader extends React.Component {
   render() {

@@ -17,26 +17,14 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet,
-  Linking,
-  Platform
-} from 'react-native';
-import { StackActions, NavigationActions } from 'react-navigation';
-import { saveToCAndPPConfirmation } from '../util/db';
-import Markdown from '../components/Markdown';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Button from '../components/Button';
-import TouchableItem from '../components/TouchableItem';
-import colors from '../colors';
 import toc from '../../docs/terms-and-conditions.md';
+import colors from '../colors';
+import Button from '../components/Button';
+import Markdown from '../components/Markdown';
+import TouchableItem from '../components/TouchableItem';
+import { saveToCAndPPConfirmation } from '../util/db';
 
 export default class TermsAndConditions extends React.PureComponent {
   static navigationOptions = {

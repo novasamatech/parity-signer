@@ -17,27 +17,12 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet
-} from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import AccountSeed from '../components/AccountSeed';
-import TouchableItem from '../components/TouchableItem';
-import {
-  NETWORK_LIST,
-  NETWORK_TITLES,
-  NETWORK_COLOR,
-  DEFAULT_NETWORK_COLOR
-} from '../constants';
 import colors from '../colors';
+import TouchableItem from '../components/TouchableItem';
+import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_LIST, NETWORK_TITLES } from '../constants';
+import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountNetworkChooser extends React.PureComponent {
   static navigationOptions = {

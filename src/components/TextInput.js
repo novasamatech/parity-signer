@@ -15,12 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  TextInput as TextInputOrigin,
-  Platform,
-  StyleSheet
-} from 'react-native';
+import { StyleSheet, TextInput as TextInputOrigin } from 'react-native';
 import colors from '../colors';
 
 export default class TextInput extends React.PureComponent {

@@ -16,15 +16,15 @@
 
 'use strict';
 
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, FlatList, StatusBar, StyleSheet } from 'react-native';
+import React from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import AccountCard from '../components/AccountCard';
-import Button from '../components/Button';
-import Background from '../components/Background';
 import colors from '../colors';
+import AccountCard from '../components/AccountCard';
+import Background from '../components/Background';
+import Button from '../components/Button';
+import AccountsStore from '../stores/AccountsStore';
 import { accountId } from '../util/account';
 
 export default class AccountList extends React.PureComponent {
