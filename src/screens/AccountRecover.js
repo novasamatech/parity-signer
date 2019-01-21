@@ -152,7 +152,7 @@ class AccountRecoverView extends React.Component {
                   `${validation.reason}`,
                   [
                     {
-                      text: 'I understand risks',
+                      text: 'I understand the risks',
                       style: 'default',
                       onPress: () => {
                         this.props.navigation.navigate('AccountPin', {
