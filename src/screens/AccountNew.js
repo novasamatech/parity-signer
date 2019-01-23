@@ -17,32 +17,17 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import Background from '../components/Background';
-import AccountSeed from '../components/AccountSeed';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TouchableItem from '../components/TouchableItem';
-import TextInput from '../components/TextInput';
-import Button from '../components/Button';
-import {
-  NETWORK_LIST,
-  NETWORK_TITLES,
-  NETWORK_COLOR,
-  DEFAULT_NETWORK_COLOR
-} from '../constants';
 import colors from '../colors';
+import AccountIconChooser from '../components/AccountIconChooser';
+import Background from '../components/Background';
+import Button from '../components/Button';
+import TextInput from '../components/TextInput';
+import TouchableItem from '../components/TouchableItem';
+import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
 
 export default class AccountNew extends React.Component {

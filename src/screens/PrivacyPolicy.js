@@ -17,23 +17,10 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet,
-  Linking
-} from 'react-native';
-import { Subscribe } from 'unstated';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import Markdown from '../components/Markdown';
-import TouchableItem from '../components/TouchableItem';
-import colors from '../colors';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import privacyPolicy from '../../docs/privacy-policy.md';
+import colors from '../colors';
+import Markdown from '../components/Markdown';
 
 export default class PrivacyPolicy extends React.PureComponent {
   static navigationOptions = {

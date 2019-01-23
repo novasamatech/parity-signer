@@ -16,9 +16,9 @@
 
 'use strict';
 
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Button, Text } from 'react-native';
+import React, { Component } from 'react';
+import { Button, Text, View } from 'react-native';
 import AppStyles from '../styles';
 
 function isAscii(data) {

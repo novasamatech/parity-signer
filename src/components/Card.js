@@ -16,17 +16,9 @@
 
 // @flow
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  Platform,
-  StyleSheet,
-  TouchableNativeFeedback,
-  TouchableOpacity,
-  ViewPropTypes
-} from 'react-native';
+import React from 'react';
+import { Platform, StyleSheet, Text, TouchableNativeFeedback, TouchableOpacity, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
 
 export default class Card extends React.PureComponent<{

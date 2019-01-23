@@ -16,18 +16,11 @@
 
 // @flow
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ListView,
-  TouchableOpacity
-} from 'react-native';
-import { brainWalletAddress, words } from '../util/native';
+import React from 'react';
+import { ListView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import colors from '../colors';
-import Card from './Card';
+import { brainWalletAddress, words } from '../util/native';
 import AccountIcon from './AccountIcon';
 
 export default class AccountIconChooser extends React.PureComponent<{

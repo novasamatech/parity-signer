@@ -17,11 +17,11 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { Animated, Text, View, StyleSheet } from 'react-native';
-import TouchableItem from './TouchableItem';
-import TextInput from './TextInput';
-import { WORDS, WORDS_INDEX } from '../util/account';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
+import { WORDS, WORDS_INDEX } from '../util/account';
+import TextInput from './TextInput';
+import TouchableItem from './TouchableItem';
 
 export default class AccountSeed extends Component {
   state = {

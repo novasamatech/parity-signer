@@ -17,25 +17,14 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import TxStore from '../stores/TxStore';
-import AccountIcon from '../components/AccountIcon';
+import colors from '../colors';
 import AccountDetailsCard from '../components/AccountDetailsCard';
 import QrView from '../components/QrView';
-import Button from '../components/Button';
-import Background from '../components/Background';
+import AccountsStore from '../stores/AccountsStore';
+import TxStore from '../stores/TxStore';
 import { accountId } from '../util/account';
-import colors from '../colors';
 
 export default class AccountDetails extends React.Component {
   static navigationOptions = {

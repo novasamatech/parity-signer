@@ -16,9 +16,9 @@
 
 'use strict';
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import { Image, View, StyleSheet } from 'react-native';
+import React from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import { blockiesIcon } from '../util/native';
 
 export default class AccountIcon extends React.PureComponent {

@@ -16,20 +16,10 @@
 
 // @flow
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  Platform,
-  StyleSheet,
-  TouchableNativeFeedback,
-  TouchableOpacity,
-  ViewPropTypes
-} from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
-import Card from './Card';
-import AccountIcon from './AccountIcon';
 
 const WEI_IN_ETH = 1000000000000000000;
 

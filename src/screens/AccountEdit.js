@@ -16,28 +16,15 @@
 
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet,
-  Clipboard
-} from 'react-native';
+import React from 'react';
+import { Clipboard, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
-import Background from '../components/Background';
-import AccountCard from '../components/AccountCard';
-import AccountsStore from '../stores/AccountsStore';
-import AccountSeed from '../components/AccountSeed';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TextInput from '../components/TextInput';
-import Button from '../components/Button';
-
 import colors from '../colors';
+import AccountCard from '../components/AccountCard';
+import Button from '../components/Button';
+import TextInput from '../components/TextInput';
+import AccountsStore from '../stores/AccountsStore';
+
 
 export default class AccountEdit extends React.PureComponent {
   static navigationOptions = {

@@ -16,11 +16,11 @@
 
 // @flow
 
-import { Container } from 'unstated';
 import debounce from 'debounce';
-import { loadAccounts, saveAccount } from '../util/db';
-import { encryptData, decryptData, brainWalletAddress } from '../util/native';
+import { Container } from 'unstated';
 import { accountId, empty } from '../util/account';
+import { loadAccounts, saveAccount } from '../util/db';
+import { brainWalletAddress, decryptData, encryptData } from '../util/native';
 
 export type Account = {
   name: string,

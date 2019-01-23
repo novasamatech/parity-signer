@@ -17,19 +17,11 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import { View, Text, StyleSheet } from 'react-native';
-import { StackActions, NavigationActions } from 'react-navigation';
-import { Subscribe } from 'unstated';
-import {
-  loadAccounts,
-  loadAccounts_v1,
-  saveAccount,
-  loadToCAndPPConfirmation
-} from '../util/db';
-import AccountsStore from '../stores/AccountsStore';
+import { StyleSheet, View } from 'react-native';
+import { NavigationActions, StackActions } from 'react-navigation';
 import colors from '../colors';
 import { empty } from '../util/account';
+import { loadAccounts, loadAccounts_v1, loadToCAndPPConfirmation, saveAccount } from '../util/db';
 
 export default class Loading extends React.PureComponent {
   static navigationOptions = {
