@@ -1,6 +1,8 @@
 package io.parity.signer;
 
 import com.facebook.react.ReactActivity;
+import android.os.Bundle;
+import android.view.WindowManager;
 
 public class MainActivity extends ReactActivity {
 
@@ -11,5 +13,12 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
         return "NativeSigner";
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
+                           WindowManager.LayoutParams.FLAG_SECURE);
     }
 }
