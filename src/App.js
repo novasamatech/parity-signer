@@ -19,7 +19,12 @@
 'use strict';
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
-import { createBottomTabNavigator, createStackNavigator, HeaderBackButton, withNavigation } from 'react-navigation';
+import {
+  createBottomTabNavigator,
+  createStackNavigator,
+  HeaderBackButton,
+  withNavigation
+} from 'react-navigation';
 import { Provider as UnstatedProvider } from 'unstated';
 import '../ReactotronConfig';
 import colors from './colors';
@@ -39,13 +44,14 @@ import AccountPin from './screens/AccountPin';
 import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import Loading from './screens/Loading';
+import MessageDetails from './screens/MessageDetails';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
+import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
-
 
 export default class App extends Component {
   render() {
@@ -196,6 +202,12 @@ const Screens = createStackNavigator(
                 },
                 SignedTx: {
                   screen: SignedTx
+                },
+                SignedMessage: {
+                  screen: SignedMessage
+                },
+                MessageDetails: {
+                  screen: MessageDetails
                 }
               },
               {

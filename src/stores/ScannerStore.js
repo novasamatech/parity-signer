@@ -18,7 +18,7 @@
 import { Container } from 'unstated';
 import { NETWORK_TITLES } from '../constants';
 import { saveTx } from '../util/db';
-import { brainWalletSign, decryptData, keccak } from '../util/native';
+import { brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
 import { Account } from './AccountsStore';
 
@@ -31,7 +31,9 @@ type SignedTX = {
 };
 
 type ScannerState = {
+  type: 'transaction' | 'message',
   txRequest: TXRequest | null,
+  message: string,
   tx: Object,
   sender: Account,
   recipient: Account,
@@ -42,8 +44,10 @@ type ScannerState = {
 };
 
 const defaultState = {
+  type: null,
   busy: false,
   txRequest: null,
+  message: null,
   sender: null,
   recipient: null,
   tx: '',
@@ -55,12 +59,44 @@ const defaultState = {
 export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
+  async setData(data, accountsStore) {
+    console.log(data);
+    switch (data.action) {
+      case 'signTransaction':
+        return await this.setTXRequest(data, accountsStore);
+      case 'signData':
+        return await this.setDataToSign(data, accountsStore);
+      default:
+        throw new Error(
+          `Scanned QR should contain either transaction or a message to sign`
+        );
+    }
+  }
+
+  async setDataToSign(signRequest, accountsStore) {
+    const message = signRequest.data.data;
+    const address = signRequest.data.account;
+    const dataToSign = await ethSign(message);
+    const sender = accountsStore.getByAddress(address);
+    if (!sender || !sender.encryptedSeed) {
+      throw new Error(
+        `No private key found for ${address} found in your signer key storage.`
+      );
+    }
+    this.setState({
+      type: 'message',
+      sender,
+      message,
+      dataToSign
+    });
+    return true;
+  }
+
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
+    console.log(txRequest);
     if (!(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
-      throw new Error(
-        `Scanned QR contains no valid transaction`
-      );
+      throw new Error(`Scanned QR contains no valid transaction`);
     }
     const tx = await transaction(txRequest.data.rlp);
     const { chainId = '1' } = tx;
@@ -72,10 +108,10 @@ export default class ScannerStore extends Container<ScannerState> {
     });
     const networkTitle = NETWORK_TITLES[chainId];
 
-    if (!sender.encryptedSeed) {
+    if (!sender || !sender.encryptedSeed) {
       throw new Error(
         `No private key found for account ${
-        txRequest.data.account
+          txRequest.data.account
         } found in your signer key storage for the ${networkTitle} chain.`
       );
     }
@@ -87,6 +123,7 @@ export default class ScannerStore extends Container<ScannerState> {
     });
     const dataToSign = await keccak(txRequest.data.rlp);
     this.setState({
+      type: 'transaction',
       sender,
       recipient,
       txRequest,
@@ -97,18 +134,24 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async signData(pin = '1') {
-    const sender = this.state.sender;
+    const { type, sender } = this.state;
     const seed = await decryptData(sender.encryptedSeed, pin);
     const signedData = await brainWalletSign(seed, this.state.dataToSign);
     this.setState({ signedData });
-    await saveTx({
-      hash: this.state.dataToSign,
-      tx: this.state.tx,
-      sender: this.state.sender,
-      recipient: this.state.recipient,
-      signature: signedData,
-      createdAt: new Date().getTime()
-    });
+    if (type == 'transaction') {
+      await saveTx({
+        hash: this.state.dataToSign,
+        tx: this.state.tx,
+        sender: this.state.sender,
+        recipient: this.state.recipient,
+        signature: signedData,
+        createdAt: new Date().getTime()
+      });
+    }
+  }
+
+  getType() {
+    return this.state.type;
   }
 
   setBusy() {
@@ -141,6 +184,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
   getTXRequest() {
     return this.state.txRequest;
+  }
+
+  getMessage() {
+    return this.state.message;
   }
 
   getTx() {

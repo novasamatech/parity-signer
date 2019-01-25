@@ -28,35 +28,36 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
 export class AccountUnlockAndSign extends React.PureComponent {
+
   render() {
+    const { navigation } = this.props;
+    const next = navigation.getParam('next', 'SignedTx');
     return (
       <Subscribe to={[AccountsStore, ScannerStore]}>
         {(accounts, scannerStore) => (
           <AccountUnlockView
             {...this.props}
             accounts={accounts}
-            checkPin={async (pin) => {
+            checkPin={async pin => {
               try {
                 scannerStore.getTXRequest();
                 await scannerStore.signData(pin);
-                return true
+                return true;
               } catch (e) {
-                return false
+                return false;
               }
             }}
-            navigate={
-              () => {
-                const resetAction = StackActions.reset({
-                  index: 2,
-                  actions: [
-                    NavigationActions.navigate({ routeName: 'QrScanner' }),
-                    NavigationActions.navigate({ routeName: 'TxDetails' }),
-                    NavigationActions.navigate({ routeName: 'SignedTx' })
-                  ]
-                });
-                this.props.navigation.dispatch(resetAction);
-              }
-            }
+            navigate={() => {
+              const resetAction = StackActions.reset({
+                index: 2,
+                actions: [
+                  NavigationActions.navigate({ routeName: 'QrScanner' }),
+                  NavigationActions.navigate({ routeName: 'TxDetails' }),
+                  NavigationActions.navigate({ routeName: next })
+                ]
+              });
+              navigation.dispatch(resetAction);
+            }}
           />
         )}
       </Subscribe>
@@ -71,9 +72,8 @@ export class AccountUnlock extends React.Component {
         {accounts => (
           <AccountUnlockView
             {...this.props}
-            checkPin={async (pin) => {
-              console.log('checkPin')
-              return await accounts.unlockAccount(accounts.getSelected(), pin)
+            checkPin={async pin => {
+              return await accounts.unlockAccount(accounts.getSelected(), pin);
             }}
             navigate={() => {
               const resetAction = StackActions.reset({
@@ -95,7 +95,6 @@ export class AccountUnlock extends React.Component {
 }
 
 class AccountUnlockView extends React.PureComponent {
-
   static propTypes = {
     checkPin: PropTypes.func.isRequired,
     hasWrongPin: PropTypes.bool
@@ -106,10 +105,9 @@ class AccountUnlockView extends React.PureComponent {
     hasWrongPin: false
   };
 
-
   showErrorMessage = () => {
     return this.state.hasWrongPin ? 'Wrong pin, please try again' : '';
-  }
+  };
 
   render() {
     return (
@@ -119,18 +117,17 @@ class AccountUnlockView extends React.PureComponent {
         <Text style={styles.errorText}>{this.showErrorMessage()}</Text>
         <Text style={styles.title}>PIN</Text>
         <PinInput
-          onChangeText={async (pin) => {
-            this.setState({ pin: pin })
+          onChangeText={async pin => {
+            this.setState({ pin: pin });
             if (pin.length < 4) {
               return;
             }
             if (await this.props.checkPin(pin)) {
-              this.props.navigate()
+              this.props.navigate();
             } else if (pin.length > 5) {
-              this.setState({ hasWrongPin: true })
+              this.setState({ hasWrongPin: true });
             }
           }}
-
           value={this.state.pin}
         />
       </View>

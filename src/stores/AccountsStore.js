@@ -116,7 +116,7 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  async loadAccountTxs() { }
+  async loadAccountTxs() {}
 
   async save(account, pin = null) {
     try {
@@ -179,6 +179,12 @@ export default class AccountsStore extends Container<AccountsState> {
 
   getById(account): ?Account {
     return this.state.accounts.get(accountId(account)) || empty(account);
+  }
+
+  getByAddress(address): ?Account {
+    return this.getAccounts().find(
+      a => a.address.toLowerCase() === address.toLowerCase()
+    );
   }
 
   getSelected(): ?Account {
