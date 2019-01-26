@@ -26,6 +26,7 @@ import QrView from '../components/QrView';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import { isAscii, hexToAscii } from '../util/message';
 
 export default class SignedMessage extends React.PureComponent {
   render() {
@@ -35,6 +36,7 @@ export default class SignedMessage extends React.PureComponent {
           return (
             <SignedMessageView
               data={scanner.getSignedTxData()}
+              message={scanner.getMessage()}
               onPressAccount={async account => {
                 await accounts.select(account);
                 this.props.navigation.navigate('AccountDetails');
@@ -49,7 +51,7 @@ export default class SignedMessage extends React.PureComponent {
 
 export class SignedMessageView extends React.PureComponent {
   static propTypes = {
-    data: PropTypes.string.isRequired,
+    data: PropTypes.string.isRequired
   };
 
   render() {
@@ -59,6 +61,12 @@ export class SignedMessageView extends React.PureComponent {
         <View style={styles.qr}>
           <QrView text={this.props.data} />
         </View>
+        <Text style={styles.title}>MESSAGE</Text>
+        <Text style={styles.message}>
+          {isAscii(this.props.message)
+            ? hexToAscii(this.props.message)
+            : this.props.data}
+        </Text>
       </ScrollView>
     );
   }
@@ -89,5 +97,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20
+  },
+  message: {
+    marginBottom: 20,
+    padding: 10,
+    height: 120,
+    lineHeight: 26,
+    fontSize: 20,
+    backgroundColor: colors.card_bg
   }
 });

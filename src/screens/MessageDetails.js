@@ -27,6 +27,7 @@ import Button from '../components/Button';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import { isAscii, hexToAscii } from '../util/message';
 
 const orUnknown = (value = 'Unknown') => value;
 
@@ -78,10 +79,7 @@ export class MessageDetailsView extends React.PureComponent {
     onNext: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,
     sender: PropTypes.object.isRequired,
-    value: PropTypes.string,
-    nonce: PropTypes.string,
-    gas: PropTypes.string,
-    gasPrice: PropTypes.string
+    message: PropTypes.string.isRequired
   };
 
   render() {
@@ -102,6 +100,11 @@ export class MessageDetailsView extends React.PureComponent {
           }}
         />
         <Text style={styles.title}>MESSAGE</Text>
+        <Text style={styles.message}>
+          {isAscii(this.props.message)
+            ? hexToAscii(this.props.message)
+            : this.props.data}
+        </Text>
         <Button
           buttonStyles={{ backgroundColor: colors.bg_positive, height: 60 }}
           title="Sign Message"
@@ -142,6 +145,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     paddingBottom: 20
+  },
+  message: {
+    marginBottom: 20,
+    padding: 10,
+    height: 120,
+    lineHeight: 26,
+    fontSize: 20,
+    backgroundColor: colors.card_bg
   },
   wrapper: {
     borderRadius: 5
