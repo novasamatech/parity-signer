@@ -21,12 +21,10 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
-import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { isAscii, hexToAscii } from '../util/message';
+import { hexToAscii, isAscii } from '../util/message';
 
 export default class SignedMessage extends React.PureComponent {
   render() {

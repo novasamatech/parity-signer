@@ -24,10 +24,9 @@ import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { isAscii, hexToAscii } from '../util/message';
+import { hexToAscii, isAscii } from '../util/message';
 
 const orUnknown = (value = 'Unknown') => value;
 
