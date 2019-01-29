@@ -17,8 +17,7 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode';
 import colors from '../colors';
 

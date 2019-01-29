@@ -17,15 +17,15 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { StackActions, NavigationActions } from 'react-navigation';
+import { StyleSheet, Text, View } from 'react-native';
+import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import Background from '../components/Background';
-import TextInput from '../components/TextInput';
-import Button from '../components/Button';
-import { accountId } from '../util/account';
 import colors from '../colors';
+import Background from '../components/Background';
+import Button from '../components/Button';
+import TextInput from '../components/TextInput';
+import AccountsStore from '../stores/AccountsStore';
+import { accountId } from '../util/account';
 
 export default class AccountPin extends React.PureComponent {
   render() {

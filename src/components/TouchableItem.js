@@ -8,12 +8,7 @@
  * of TouchableNativeFeedback.
  */
 import React from 'react';
-import {
-  Platform,
-  TouchableNativeFeedback,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Platform, TouchableNativeFeedback, TouchableOpacity, View } from 'react-native';
 
 const ANDROID_VERSION_LOLLIPOP = 21;
 

@@ -16,40 +16,20 @@
 
 'use strict';
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet,
-  KeyboardAvoidingView,
-  findNodeHandle
-} from 'react-native';
+import React from 'react';
+import { Alert, findNodeHandle, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Subscribe } from 'unstated';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import debounce from 'debounce';
-import { brainWalletAddress } from '../util/native';
-import AccountsStore from '../stores/AccountsStore';
-import Background from '../components/Background';
-import AccountSeed from '../components/AccountSeed';
-import AccountCard from '../components/AccountCard';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TouchableItem from '../components/TouchableItem';
-import TextInput from '../components/TextInput';
-import Button from '../components/Button';
-import {
-  NETWORK_LIST,
-  NETWORK_TITLES,
-  NETWORK_COLOR,
-  DEFAULT_NETWORK_COLOR
-} from '../constants';
-import { validateSeed } from '../util/account';
 import colors from '../colors';
+import AccountCard from '../components/AccountCard';
+import AccountSeed from '../components/AccountSeed';
+import Background from '../components/Background';
+import Button from '../components/Button';
+import TextInput from '../components/TextInput';
+import TouchableItem from '../components/TouchableItem';
+import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import AccountsStore from '../stores/AccountsStore';
+import { validateSeed } from '../util/account';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -152,7 +132,7 @@ class AccountRecoverView extends React.Component {
                   `${validation.reason}`,
                   [
                     {
-                      text: 'I understand risks',
+                      text: 'I understand the risks',
                       style: 'default',
                       onPress: () => {
                         this.props.navigation.navigate('AccountPin', {

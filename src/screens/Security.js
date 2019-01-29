@@ -15,11 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Text, View, StyleSheet, ScrollView } from 'react-native';
-import { Subscribe } from 'unstated';
-import SecurityStore from '../stores/SecurityStore';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Subscribe } from 'unstated';
 import colors from '../colors';
+import SecurityStore from '../stores/SecurityStore';
 
 export default class Security extends React.PureComponent {
   render() {

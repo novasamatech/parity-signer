@@ -17,25 +17,13 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet
-} from 'react-native';
-import { Subscribe } from 'unstated';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AccountsStore from '../stores/AccountsStore';
-import Background from '../components/Background';
-import AccountSeed from '../components/AccountSeed';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TextInput from '../components/TextInput';
-import TouchableItem from '../components/TouchableItem';
+import { Subscribe } from 'unstated';
 import colors from '../colors';
+import Background from '../components/Background';
+import TouchableItem from '../components/TouchableItem';
+import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountAdd extends React.PureComponent {
   static navigationOptions = {

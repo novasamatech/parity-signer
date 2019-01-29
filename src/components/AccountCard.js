@@ -16,27 +16,13 @@
 
 // @flow
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  Platform,
-  StyleSheet,
-  TouchableNativeFeedback,
-  TouchableOpacity,
-  ViewPropTypes
-} from 'react-native';
-import AccountIcon from './AccountIcon';
-import Card from './Card';
-import TouchableItem from './TouchableItem';
-import {
-  NETWORK_LIST,
-  NETWORK_TITLES,
-  NETWORK_COLOR,
-  DEFAULT_NETWORK_COLOR
-} from '../constants';
+import React from 'react';
+import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
+import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import AccountIcon from './AccountIcon';
+import TouchableItem from './TouchableItem';
 
 export default class AccountCard extends React.PureComponent<{
   title: ?string,

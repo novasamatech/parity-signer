@@ -17,28 +17,14 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Share,
-  StyleSheet,
-  Clipboard,
-  AppState
-} from 'react-native';
+import { Alert, AppState, Clipboard, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import Background from '../components/Background';
-import AccountSeed from '../components/AccountSeed';
-import AccountCard from '../components/AccountCard';
-import AccountIconChooser from '../components/AccountIconChooser';
-import TextInput from '../components/TextInput';
-import TouchableItem from '../components/TouchableItem';
-import Button from '../components/Button';
 import colors from '../colors';
+import AccountCard from '../components/AccountCard';
+import Background from '../components/Background';
+import Button from '../components/Button';
+import TouchableItem from '../components/TouchableItem';
+import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountBackup extends React.PureComponent {
   static navigationOptions = {
@@ -64,7 +50,7 @@ class AccountBackupView extends React.PureComponent {
   }
 
   handleAppStateChange = (nextAppState) => {
-    if (nextAppState === 'background') {
+    if (nextAppState === 'inactive') {
       this.props.navigation.goBack();
     }
   }

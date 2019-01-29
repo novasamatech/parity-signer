@@ -16,8 +16,8 @@
 
 'use strict';
 
-import SecureStorage from 'react-native-secure-storage';
 import { AsyncStorage } from 'react-native';
+import SecureStorage from 'react-native-secure-storage';
 import { accountId } from './account';
 
 const accountsStore_v1 = {

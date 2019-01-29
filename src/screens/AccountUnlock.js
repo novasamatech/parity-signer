@@ -16,21 +16,16 @@
 
 'use strict';
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  StyleSheet
-} from 'react-native';
-import debounce from 'debounce';
-import { StackActions, NavigationActions } from 'react-navigation';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import ScannerStore from '../stores/ScannerStore';
+import colors from '../colors';
 import Background from '../components/Background';
 import TextInput from '../components/TextInput';
-import colors from '../colors';
+import AccountsStore from '../stores/AccountsStore';
+import ScannerStore from '../stores/ScannerStore';
 
 export class AccountUnlockAndSign extends React.PureComponent {
   render() {

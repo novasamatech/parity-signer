@@ -16,11 +16,11 @@
 
 // @flow
 import { Container } from 'unstated';
-import transaction from '../util/transaction';
-import { keccak, brainWalletSign, decryptData } from '../util/native';
-import { saveTx } from '../util/db';
 import { NETWORK_TITLES } from '../constants';
-import { type Account } from './AccountsStore';
+import { saveTx } from '../util/db';
+import { brainWalletSign, decryptData, keccak } from '../util/native';
+import transaction from '../util/transaction';
+import { Account } from './AccountsStore';
 
 type TXRequest = Object;
 

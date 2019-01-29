@@ -17,8 +17,7 @@
 // @flow
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import { View, Text, Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { default as MarkdownRender } from 'react-native-markdown-renderer';
 import colors from '../colors';
 
