@@ -18,6 +18,7 @@
     "commit": ""
   },
   "dependencies": {
+    "@babel/runtime": "^7.3.1",
     "bignumber.js": "^4.0.0",
     "debounce": "^1.0.0",
     "hoist-non-react-statics": "^2.5.0",
@@ -39,6 +40,7 @@
     "@babel/cli": "^7.0.0-beta.56",
     "@babel/core": "^7.0.0-beta.56",
     "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.0.0-beta.56",
     "@babel/preset-react": "^7.0.0-beta.56",
     "babel-eslint": "^10.0.1",
