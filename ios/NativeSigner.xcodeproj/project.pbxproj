@@ -30,12 +30,12 @@
 		1F426F9C208D358500CA43DB /* EthkeyBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F99208D358500CA43DB /* EthkeyBridge.swift */; };
 		1F426F9D208D358500CA43DB /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F9A208D358500CA43DB /* String.swift */; };
 		1F73EE2721777A1D00706E91 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F426F39208B7CC000CA43DB /* libsigner.a */; };
+		1FB6D78122009A0700042A99 /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F4E397D208B620D00AA9D08 /* libRNCamera.a */; };
 		25585941EFBA436796B325D3 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 75EB071F2F264C599EB44A84 /* Feather.ttf */; };
 		2D0CDDA789254813913BC99F /* libRNSecureStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C53E8F3556242B0954F1A1B /* libRNSecureStorage.a */; };
 		3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */; };
 		3D7A98D07DE443E381067D3A /* Roboto-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */; };
 		423E02567C044AF6832B2388 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */; };
-		45F6516A44F949AB986ABB0F /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FF44AAEAAE3484A8B2D6DD9 /* libRNCamera.a */; };
 		5DC40D98E51D492C8FF692B5 /* Manifold-CF-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */; };
 		66E5EE9B2FAC4B64861A86BE /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DBF1BC87DE904C2C811D40C5 /* Entypo.ttf */; };
 		77AE2A2069B847F9B7EB4854 /* Manifold-CF.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */; };
@@ -426,8 +426,8 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
+				1FB6D78122009A0700042A99 /* libRNCamera.a in Frameworks */,
 				2D0CDDA789254813913BC99F /* libRNSecureStorage.a in Frameworks */,
-				45F6516A44F949AB986ABB0F /* libRNCamera.a in Frameworks */,
 				ECA9271ADD0F4764B17DEBF0 /* libRNVectorIcons.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
