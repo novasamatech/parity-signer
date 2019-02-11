@@ -45,13 +45,17 @@ export default class Scanner extends React.PureComponent {
                 }
                 try {
                   const data = JSON.parse(txRequestData.data);
-                  if (data.data.rlp === undefined) {
+                  if (data.action === undefined) {
                     return;
                   }
-                  if (!(await scannerStore.setTXRequest(data, accountsStore))) {
+                  if (!(await scannerStore.setData(data, accountsStore))) {
                     return;
                   } else {
-                    this.props.navigation.navigate('TxDetails');
+                    if ('transaction' === scannerStore.getType()) {
+                      this.props.navigation.navigate('TxDetails');
+                    } else { // message
+                      this.props.navigation.navigate('MessageDetails');
+                    }
                   }
                 } catch (e) {
                   scannerStore.setBusy();
