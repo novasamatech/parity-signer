@@ -13,7 +13,8 @@ rlp = { version = "0.3.0", features = ["ethereum"] }
 tiny-keccak = "1.4"
 blockies = "0.2"
 parity-wordlist = "1.2.1"
-jni = { git = "https://github.com/prevoty/jni-rs", default-features = false, optional = true }
+# jni = { git = "https://github.com/prevoty/jni-rs", default-features = false, optional = true }
+jni = { version = "0.10.2", default-features = false, optional = true }
 
 [lib]
 name = "signer"

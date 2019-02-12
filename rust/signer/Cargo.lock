@@ -369,7 +369,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "jni"
 version = "0.10.2"
-source = "git+https://github.com/prevoty/jni-rs#e261b981ef2344a8287cd0b3fe38223887c2a24a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cesu8 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "combine 3.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -856,7 +856,7 @@ dependencies = [
  "blockies 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ethkey 0.3.0 (git+https://github.com/paritytech/parity-ethereum)",
  "ethstore 0.2.0 (git+https://github.com/paritytech/parity-ethereum)",
- "jni 0.10.2 (git+https://github.com/prevoty/jni-rs)",
+ "jni 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.43 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-wordlist 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rlp 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1050,7 +1050,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum inflate 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "e7e0062d2dc2f17d2f13750d95316ae8a2ff909af0fda957084f5defd87c43bb"
 "checksum itertools 0.5.10 (registry+https://github.com/rust-lang/crates.io-index)" = "4833d6978da405305126af4ac88569b5d71ff758581ce5a987dbfa3755f694fc"
 "checksum itoa 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "1306f3464951f30e30d12373d31c79fbd52d236e5e896fd92f96ec7babbbe60b"
-"checksum jni 0.10.2 (git+https://github.com/prevoty/jni-rs)" = "<none>"
+"checksum jni 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1ecfa3b81afc64d9a6539c4eece96ac9a93c551c713a313800dade8e33d7b5c1"
 "checksum jni-sys 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 "checksum journaldb 0.2.0 (git+https://github.com/paritytech/parity-ethereum)" = "<none>"
 "checksum keccak-hasher 0.1.1 (git+https://github.com/paritytech/parity-ethereum)" = "<none>"
