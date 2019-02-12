@@ -15,6 +15,7 @@ blockies = "0.2"
 parity-wordlist = "1.2.1"
 jni = { version = "0.10.2", default-features = false, optional = true }
 bip39 = { git = "https://github.com/maciejhirsz/bip39-rs", default-features = false } # This will land in offical 0.6, sometime...
+schnorrkel = "0.0.0"
 
 [lib]
 name = "signer"
