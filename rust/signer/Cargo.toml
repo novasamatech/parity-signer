@@ -14,7 +14,7 @@ tiny-keccak = "1.4"
 blockies = "0.2"
 parity-wordlist = "1.2.1"
 jni = { version = "0.10.2", default-features = false, optional = true }
-bip39 = "0.5.1"
+# bip39 = "0.5.1"
 
 [lib]
 name = "signer"

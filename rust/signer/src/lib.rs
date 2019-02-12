@@ -35,6 +35,8 @@ use blockies::{Blockies, create_icon, ethereum};
 
 use string::StringPtr;
 
+const CRYPTO_ROUNDS: ::std::num::NonZeroU32 = unsafe { ::std::num::NonZeroU32::new_unchecked(10240) }; 
+
 fn blockies_icon_in_base64(seed: Vec<u8>) -> String {
   let mut result = Vec::new();
   let options = ethereum::Options {
@@ -170,7 +172,7 @@ pub unsafe extern fn random_phrase(words: u32) -> *mut String {
 pub unsafe extern fn encrypt_data(data: *mut StringPtr, password: *mut StringPtr) -> *mut String {
   let data = (*data).as_str();
   let password = Password::from((*password).as_str());
-  let crypto = Crypto::with_plain(data.as_bytes(), &password, 10240).unwrap();
+  let crypto = Crypto::with_plain(data.as_bytes(), &password, CRYPTO_ROUNDS).unwrap();
   Box::into_raw(Box::new(crypto.into()))
 }
 
@@ -295,7 +297,7 @@ pub mod android {
     let data: String = env.get_string(data).expect("Invalid data").into();
     let password: String = env.get_string(password).expect("Invalid password").into();
     let password = Password::from(password);
-    let crypto = Crypto::with_plain(data.as_bytes(), &password, 10240).unwrap();
+    let crypto = Crypto::with_plain(data.as_bytes(), &password, CRYPTO_ROUNDS).unwrap();
     env.new_string(String::from(crypto)).expect("Could not create java string").into_inner()
   }
 
@@ -401,7 +403,7 @@ pub mod android {
 
         let data = b"test_data";
         let password = Password::from("password");
-        let crypto = Crypto::with_plain(data, &password, 10240).unwrap();
+        let crypto = Crypto::with_plain(data, &password, CRYPTO_ROUNDS).unwrap();
         let crypto_string: String = crypto.into();
         let env = jvm.env();
         let jni_crypto_str = env.new_string(crypto_string).unwrap();
