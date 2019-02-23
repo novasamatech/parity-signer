@@ -31,7 +31,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
 
   render() {
     const { navigation } = this.props;
-    //const next = navigation.getParam('next', 'SignedTx');
     return (
       <Subscribe to={[AccountsStore, ScannerStore]}>
         {(accounts, scannerStore) => (
@@ -48,8 +47,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
               }
             }}
             navigate={() => {
-              //navigation.navigate('SignedTx')
-              //navigation.reset([NavigationActions.navigate({ routeName: 'SignedTx' })])
               const resetAction = StackActions.reset({
                 index: 1,
                 actions: [
