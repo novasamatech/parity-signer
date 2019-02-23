@@ -28,8 +28,6 @@ import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
-const orUnknown = (value = 'Unknown') => value;
-
 export default class TxDetails extends React.PureComponent {
   static navigationOptions = {
     title: 'Transaction Details',

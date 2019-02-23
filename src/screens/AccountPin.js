@@ -70,6 +70,7 @@ class AccountPinView extends React.PureComponent {
       }
       accounts.refreshList();
       if (navigation.getParam('isWelcome')) {
+        //take a look here
         navigation.navigate('Tabs');
         const resetAction = StackActions.reset({
           index: 0,
