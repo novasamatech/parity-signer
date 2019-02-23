@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
   },
   bottom: {
     marginTop: 20,
-    //flexBasis: 60
   },
   introContainer: {
     padding: 30,

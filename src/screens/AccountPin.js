@@ -73,7 +73,6 @@ class AccountPinView extends React.PureComponent {
       navigation.navigate('AccountList', {
         accountId: accountId(account)
       });
-
     } else {
       if (this.state.pin.length < 6) {
         this.setState({ pinTooShort: true });

@@ -56,7 +56,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
                 ]
               });
               navigation.dispatch(resetAction);
-
             }}
           />
         )}
