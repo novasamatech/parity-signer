@@ -118,9 +118,12 @@ class AccountListView extends React.PureComponent {
           <Button
             buttonStyles={{ height: 60 }}
             title="Add Account"
-            onPress={() => {
-              this.props.navigation.navigate('AccountAdd');
-            }}
+            onPress={() => this.props.navigation.navigate('AccountAdd')}
+          />
+          <Button
+            buttonStyles={{ height: 60, marginTop: 20 }}
+            title="Scan"
+            onPress={() => this.props.navigation.navigate('QrScanner')}
           />
         </View>
       </View>
@@ -147,7 +150,6 @@ const styles = StyleSheet.create({
   },
   bottom: {
     marginTop: 20,
-    flexBasis: 60
   },
   introContainer: {
     padding: 30,

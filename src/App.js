@@ -20,7 +20,6 @@
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import {
-  createBottomTabNavigator,
   createStackNavigator,
   HeaderBackButton,
   withNavigation
@@ -31,7 +30,6 @@ import colors from './colors';
 import Background from './components/Background';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
-import TabBarBottom from './components/TabBarBottom';
 import About from './screens/About';
 import AccountAdd from './screens/AccountAdd';
 import AccountBackup from './screens/AccountBackup';
@@ -152,6 +150,12 @@ const Screens = createStackNavigator(
     Welcome: {
       screen: createStackNavigator(
         {
+          AccountList: {
+            screen: AccountList,
+            navigationOptions: {
+              headerLeft: <HeaderLeftHome />
+            }
+          },
           AccountAdd: {
             screen: AccountAdd,
             navigationOptions: {
@@ -172,6 +176,36 @@ const Screens = createStackNavigator(
           },
           AccountPin: {
             screen: AccountPin
+          },
+          QrScanner: {
+            screen: QrScanner,
+          },
+          TxDetails: {
+            screen: TxDetails
+          },
+          AccountUnlockAndSign: {
+            screen: AccountUnlockAndSign
+          },
+          SignedTx: {
+            screen: SignedTx
+          },
+          SignedMessage: {
+            screen: SignedMessage
+          },
+          MessageDetails: {
+            screen: MessageDetails
+          },
+          About: {
+            screen: About
+          },
+          AccountDetails: {
+            screen: AccountDetails
+          },
+          AccountUnlock: {
+            screen: AccountUnlock
+          },
+          AccountEdit: {
+            screen: AccountEdit
           }
         },
         {
@@ -182,107 +216,9 @@ const Screens = createStackNavigator(
         }
       )
     },
-    Tabs: {
-      screen: createBottomTabNavigator(
-        {
-          Scanner: {
-            screen: createStackNavigator(
-              {
-                QrScanner: {
-                  screen: QrScanner,
-                  navigationOptions: {
-                    headerLeft: <HeaderLeftHome />
-                  }
-                },
-                TxDetails: {
-                  screen: TxDetails
-                },
-                AccountUnlockAndSign: {
-                  screen: AccountUnlockAndSign
-                },
-                SignedTx: {
-                  screen: SignedTx
-                },
-                SignedMessage: {
-                  screen: SignedMessage
-                },
-                MessageDetails: {
-                  screen: MessageDetails
-                }
-              },
-              {
-                navigationOptions: globalStackNavigationOptions
-              }
-            )
-          },
-          Accounts: {
-            screen: createStackNavigator(
-              {
-                AccountList: {
-                  screen: AccountList,
-                  navigationOptions: {
-                    headerLeft: <HeaderLeftHome />
-                  }
-                },
-                AccountNew: {
-                  screen: AccountNew
-                },
-                AccountAdd: {
-                  screen: AccountAdd
-                },
-                About: {
-                  screen: About
-                },
-                AccountNetworkChooser: {
-                  screen: AccountNetworkChooser
-                },
-                AccountRecover: {
-                  screen: AccountRecover
-                },
-                AccountBackup: {
-                  screen: AccountBackup
-                },
-                AccountPin: {
-                  screen: AccountPin
-                },
-                AccountDetails: {
-                  screen: AccountDetails
-                },
-                AccountUnlock: {
-                  screen: AccountUnlock
-                },
-                AccountEdit: {
-                  screen: AccountEdit
-                }
-              },
-              {
-                mode: 'card',
-                // cardStyle: { backgroundColor: 'transparent' },
-                // transitionConfig: () => ({
-                //   containerStyle: {
-                //     backgroundColor: 'transparent'
-                //   }
-                // }),
-                navigationOptions: globalStackNavigationOptions
-              }
-            )
-          }
-        },
-        {
-          tabBarComponent: props => <TabBarBottom {...props} />,
-          tabBarPosition: 'bottom'
-        }
-      )
-    }
   },
   {
     headerMode: 'none',
     mode: 'card'
-    // transitionConfig: (): Object => ({
-    //   containerStyle: {
-    //     backgroundColor: 'transparent'
-    //   }
-    // }),
-    // cardStyle: { backgroundColor: 'transparent' }
   }
 );

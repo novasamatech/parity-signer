@@ -28,8 +28,6 @@ import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
-const orUnknown = (value = 'Unknown') => value;
-
 export default class TxDetails extends React.PureComponent {
   static navigationOptions = {
     title: 'Transaction Details',
@@ -38,7 +36,7 @@ export default class TxDetails extends React.PureComponent {
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
-        {(scannerStore, accounts) => {
+        {(scannerStore) => {
           const txRequest = scannerStore.getTXRequest();
           if (txRequest) {
             const tx = scannerStore.getTx();
@@ -49,10 +47,6 @@ export default class TxDetails extends React.PureComponent {
                 sender={scannerStore.getSender()}
                 recipient={scannerStore.getRecipient()}
                 dataToSign={scannerStore.getDataToSign()}
-                onPressAccount={async account => {
-                  await accounts.select(account);
-                  this.props.navigation.navigate('AccountDetails');
-                }}
                 onNext={async () => {
                   try {
                     this.props.navigation.navigate('AccountUnlockAndSign');
@@ -96,9 +90,6 @@ export class TxDetailsView extends React.PureComponent {
           title={this.props.sender.name}
           address={this.props.sender.address}
           chainId={this.props.sender.chainId}
-          onPress={() => {
-            this.props.onPressAccount(this.props.sender);
-          }}
         />
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
         <TxDetailsCard
@@ -113,9 +104,6 @@ export class TxDetailsView extends React.PureComponent {
           title={this.props.recipient.name}
           address={this.props.recipient.address}
           chainId={this.props.recipient.chainId || ''}
-          onPress={() => {
-            this.props.onPressAccount(this.props.recipient);
-          }}
         />
         <Button
           buttonStyles={{ backgroundColor: colors.bg_positive, height: 60 }}

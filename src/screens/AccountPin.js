@@ -53,14 +53,14 @@ class AccountPinView extends React.PureComponent {
 
   async submit() {
     const { accounts, type, navigation } = this.props;
-    const isNew = navigation.getParam('isNew');
+    const accountCreation = navigation.getParam('isNew');
     const { pin } = this.state;
     if (
       this.state.pin.length >= 6 &&
       this.state.pin === this.state.confirmation
     ) {
       let account = null;
-      if (isNew) {
+      if (accountCreation) {
         account = accounts.getNew();
         await accounts.submitNew(pin);
         await accounts.select(account);
@@ -69,19 +69,10 @@ class AccountPinView extends React.PureComponent {
         await accounts.save(account, pin);
       }
       accounts.refreshList();
-      if (navigation.getParam('isWelcome')) {
-        navigation.navigate('Tabs');
-        const resetAction = StackActions.reset({
-          index: 0,
-          actions: [NavigationActions.navigate({ routeName: 'QrScanner' })]
-        });
-        navigation.dispatch(resetAction);
-      } else {
-        navigation.popToTop();
-        navigation.navigate('AccountList', {
-          accountId: accountId(account)
-        });
-      }
+      navigation.popToTop();
+      navigation.navigate('AccountList', {
+        accountId: accountId(account)
+      });
     } else {
       if (this.state.pin.length < 6) {
         this.setState({ pinTooShort: true });

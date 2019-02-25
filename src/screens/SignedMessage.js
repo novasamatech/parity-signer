@@ -35,10 +35,6 @@ export default class SignedMessage extends React.PureComponent {
             <SignedMessageView
               data={scanner.getSignedTxData()}
               message={scanner.getMessage()}
-              onPressAccount={async account => {
-                await accounts.select(account);
-                this.props.navigation.navigate('AccountDetails');
-              }}
             />
           );
         }}

@@ -49,10 +49,9 @@ export class AccountUnlockAndSign extends React.PureComponent {
             }}
             navigate={() => {
               const resetAction = StackActions.reset({
-                index: 2,
+                index: 1,
                 actions: [
-                  NavigationActions.navigate({ routeName: 'QrScanner' }),
-                  NavigationActions.navigate({ routeName: 'TxDetails' }),
+                  NavigationActions.navigate({ routeName: 'AccountList' }),
                   NavigationActions.navigate({ routeName: next })
                 ]
               });

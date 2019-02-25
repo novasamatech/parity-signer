@@ -36,10 +36,6 @@ export default class SignedTx extends React.PureComponent {
             <SignedTxView
               {...scanner.getTx()}
               data={scanner.getSignedTxData()}
-              onPressAccount={async account => {
-                await accounts.select(account);
-                this.props.navigation.navigate('AccountDetails');
-              }}
               recipient={scanner.getRecipient()}
             />
           );
@@ -79,9 +75,6 @@ export class SignedTxView extends React.PureComponent {
           title={this.props.recipient.name}
           address={this.props.recipient.address}
           chainId={this.props.recipient.chainId || ''}
-          onPress={() => {
-            this.props.onPressAccount(this.props.recipient);
-          }}
         />
       </ScrollView>
     );

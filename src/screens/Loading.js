@@ -43,9 +43,7 @@ export default class Loading extends React.PureComponent {
       accounts = await loadAccounts();
     }
 
-    const firstScreen = accounts.filter(a => !a.archived).length
-      ? 'Tabs'
-      : 'Welcome';
+    const firstScreen = 'Welcome';
     const firstScreenActions = StackActions.reset({
       index: 0,
       actions: [NavigationActions.navigate({ routeName: firstScreen })],
