@@ -33,7 +33,6 @@ import Background from './components/Background';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import About from './screens/About';
-import AccountAdd from './screens/AccountAdd';
 import AccountBackup from './screens/AccountBackup';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
@@ -156,12 +155,6 @@ const Screens = createStackNavigator(
         {
           AccountList: {
             screen: AccountList,
-            navigationOptions: {
-              headerLeft: <HeaderLeftHome />
-            }
-          },
-          AccountAdd: {
-            screen: AccountAdd,
             navigationOptions: {
               headerLeft: <HeaderLeftHome />
             }

@@ -63,13 +63,7 @@ export default class AccountEdit extends React.PureComponent {
                 onChangeText={name => accounts.updateSelected({ name })}
                 onEndEditing={text => accounts.saveSelected()}
                 value={selected.name}
-                placeholder="Enter a new account name"
-              />
-              <Button
-                title="Manage/Backup Account"
-                onPress={() => {
-                  this.props.navigation.navigate('AccountUnlock');
-                }}
+                placeholder="New name"
               />
             </ScrollView>
           );

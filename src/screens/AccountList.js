@@ -147,7 +147,7 @@ class AccountListView extends React.PureComponent {
         />
         <View style={styles.bottom}>
           <Button
-            buttonStyles={{ height: 60, marginTop: 20 }}
+            buttonStyles={{ height: 60 }}
             title="Scan"
             onPress={() => this.props.navigation.navigate('QrScanner')}
           />

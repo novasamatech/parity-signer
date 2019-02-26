@@ -19,8 +19,16 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import colors from '../colors';
-import AccountDetailsCard from '../components/AccountDetailsCard';
+import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import TxStore from '../stores/TxStore';
@@ -62,6 +70,37 @@ class AccountDetailsView extends React.Component {
     this.subscription.remove();
   }
 
+  onOptionSelect = (value) => {
+    const navigate = this.props.navigation.navigate
+
+    if (value !== 'AccountEdit') {
+      navigate('AccountUnlock', {
+        next: value
+      });
+    } else {
+      navigate(value);
+    }
+  }
+
+  showEditMenu = () => {
+    const editIcon = <Icon name="more-vert" size={35} color={colors.bg_text_sec} />
+
+    return (
+      <View style={styles.menuView}>
+        <Menu
+          onSelect={this.onOptionSelect}
+        >
+          <MenuTrigger children={editIcon} />
+          <MenuOptions customStyles={menuOptionsStyles}>
+            <MenuOption value={'AccountEdit'} text='Edit' />
+            <MenuOption value={'AccountPin'} text='Change Pin' />
+            <MenuOption value={'AccountBackup'} text='View Recovery Phrase' />
+          </MenuOptions>
+        </Menu>
+      </View>
+    )
+  };
+
   render() {
     const account = this.props.accounts.getSelected();
     if (!account) {
@@ -73,12 +112,14 @@ class AccountDetailsView extends React.Component {
         contentContainerStyle={styles.bodyContent}
         style={styles.body}
       >
-        <Text style={styles.title}>ACCOUNT</Text>
-        <AccountDetailsCard
+        <View style={styles.header}>
+          <Text style={styles.title}>ACCOUNT</Text>
+          {this.showEditMenu()}
+        </View>
+        <AccountCard
           address={account.address}
           chainId={account.chainId}
           title={account.name}
-          onPress={() => this.props.navigation.navigate('AccountEdit')}
         />
         <View style={styles.qr}>
           <QrView text={accountId(account)} />
@@ -97,13 +138,6 @@ const styles = StyleSheet.create({
   },
   bodyContent: {
     paddingBottom: 40
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
-    paddingBottom: 20
   },
   wrapper: {
     borderRadius: 5
@@ -133,5 +167,33 @@ const styles = StyleSheet.create({
   },
   actionButtonContainer: {
     flex: 1
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 20,
+    justifyContent: 'center',
+  },
+  menuView: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  title: {
+    color: colors.bg_text_sec,
+    fontSize: 18,
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
+    flexDirection: 'column',
+    justifyContent: 'center',
   }
 });
+
+const menuOptionsStyles = {
+  optionWrapper: {
+    padding: 15,
+  },
+  optionText: {
+    fontFamily: 'Roboto',
+    fontSize: 16
+  },
+};
