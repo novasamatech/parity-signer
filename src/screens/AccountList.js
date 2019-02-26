@@ -20,6 +20,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
@@ -31,6 +39,7 @@ export default class AccountList extends React.PureComponent {
   static navigationOptions = {
     title: 'Accounts'
   };
+
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -86,11 +95,33 @@ class AccountListView extends React.PureComponent {
     this.scrollToIndex();
   }
 
+  AccountMenu = () => {
+    const addIcon = <Icon name="add" size={35} color={colors.bg_text_sec} />
+
+    return (
+      <View style={styles.menuView}>
+        <Menu
+          onSelect={value => this.props.navigation.navigate(value)}
+        >
+          <MenuTrigger children={addIcon} />
+          <MenuOptions customStyles={menuOptionsStyles}>
+            <MenuOption value={'AccountNew'} text='New Account' />
+            <MenuOption value={'AccountRecover'} text='Recover Account' />
+            <MenuOption value={'About'} text='About' />
+          </MenuOptions>
+        </Menu>
+      </View>
+    )
+  };
+
   render() {
     return (
       <View style={styles.body}>
         <Background />
-        <Text style={styles.title}>ACCOUNTS</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>ACCOUNTS</Text>
+          {this.AccountMenu()}
+        </View>
         <FlatList
           ref={list => {
             this.list = list;
@@ -116,11 +147,6 @@ class AccountListView extends React.PureComponent {
         />
         <View style={styles.bottom}>
           <Button
-            buttonStyles={{ height: 60 }}
-            title="Add Account"
-            onPress={() => this.props.navigation.navigate('AccountAdd')}
-          />
-          <Button
             buttonStyles={{ height: 60, marginTop: 20 }}
             title="Scan"
             onPress={() => this.props.navigation.navigate('QrScanner')}
@@ -132,24 +158,27 @@ class AccountListView extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
-    paddingBottom: 20
-  },
   body: {
     backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
     padding: 20
   },
+  bottom: {
+    marginTop: 20,
+  },
   content: {
     flex: 1
   },
-  bottom: {
-    marginTop: 20,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 20,
+    justifyContent: 'center',
+  },
+  menuView: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   introContainer: {
     padding: 30,
@@ -161,5 +190,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     marginBottom: 20
+  },
+  title: {
+    color: colors.bg_text_sec,
+    fontSize: 18,
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
+    flexDirection: 'column',
+    justifyContent: 'center',
   }
 });
+
+const menuOptionsStyles = {
+  optionWrapper: {
+    padding: 15,
+  },
+  optionText: {
+    fontFamily: 'Roboto',
+    fontSize: 16
+  },
+};
+
+
+

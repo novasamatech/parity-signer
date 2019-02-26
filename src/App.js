@@ -25,6 +25,8 @@ import {
   withNavigation
 } from 'react-navigation';
 import { Provider as UnstatedProvider } from 'unstated';
+import { MenuProvider } from 'react-native-popup-menu';
+
 import '../ReactotronConfig';
 import colors from './colors';
 import Background from './components/Background';
@@ -55,9 +57,11 @@ export default class App extends Component {
   render() {
     return (
       <UnstatedProvider>
-        <StatusBar barStyle="light-content" />
-        <Background />
-        <Screens />
+        <MenuProvider backHandler={true}>
+          <StatusBar barStyle="light-content" />
+          <Background />
+          <Screens />
+        </MenuProvider>
       </UnstatedProvider>
     );
   }
