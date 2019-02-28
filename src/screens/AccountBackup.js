@@ -144,33 +144,6 @@ class AccountBackupView extends React.PureComponent {
             }}
           />
         }
-
-        {!isNew && (
-          <Button
-            buttonStyles={styles.deleteButton}
-            title="Delete Account"
-            onPress={() => {
-              Alert.alert(
-                'Delete Account',
-                `Are you sure to delete ${selected.name || selected.address} and its private key?`,
-                [
-                  {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: () => {
-                      accounts.deleteAccount(selected);
-                      this.props.navigation.navigate('AccountList');
-                    }
-                  },
-                  {
-                    text: 'Cancel',
-                    style: 'cancel'
-                  }
-                ]
-              );
-            }}
-          />
-        )}
       </ScrollView>
     );
   }

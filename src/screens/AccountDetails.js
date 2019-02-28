@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import {
   Menu,
@@ -66,6 +66,31 @@ class AccountDetailsView extends React.Component {
     });
   }
 
+  onDelete = () => {
+    const accounts = this.props.accounts
+    const selected = accounts.getSelected();
+
+    Alert.alert(
+      'Delete Account',
+      `Do you really want to delete ${selected.name || selected.address}?
+This account can only be recovered with its associated recovery phrase.`,
+      [
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            accounts.deleteAccount(selected);
+            this.props.navigation.navigate('AccountList');
+          }
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        }
+      ]
+    );
+  }
+
   componentWillUnmount() {
     this.subscription.remove();
   }
@@ -75,7 +100,8 @@ class AccountDetailsView extends React.Component {
 
     if (value !== 'AccountEdit') {
       navigate('AccountUnlock', {
-        next: value
+        next: value,
+        onDelete: this.onDelete
       });
     } else {
       navigate(value);
@@ -95,6 +121,7 @@ class AccountDetailsView extends React.Component {
             <MenuOption value={'AccountEdit'} text='Edit' />
             <MenuOption value={'AccountPin'} text='Change Pin' />
             <MenuOption value={'AccountBackup'} text='View Recovery Phrase' />
+            <MenuOption value={'AccountDelete'} ><Text style={styles.deleteText}>Delete</Text></MenuOption>
           </MenuOptions>
         </Menu>
       </View>
@@ -139,34 +166,12 @@ const styles = StyleSheet.create({
   bodyContent: {
     paddingBottom: 40
   },
-  wrapper: {
-    borderRadius: 5
-  },
-  address: {
-    flex: 1
-  },
   qr: {
     marginTop: 20,
     backgroundColor: colors.card_bg
   },
-  qrButton: {
-    marginTop: 20,
-    backgroundColor: colors.card_bg
-  },
   deleteText: {
-    fontFamily: 'Manifold CF',
-    textAlign: 'right'
-  },
-  changePinText: {
-    textAlign: 'left',
-    color: 'green'
-  },
-  actionsContainer: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  actionButtonContainer: {
-    flex: 1
+    color: 'red'
   },
   header: {
     flexDirection: 'row',
@@ -178,6 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
+
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
@@ -195,5 +201,5 @@ const menuOptionsStyles = {
   optionText: {
     fontFamily: 'Roboto',
     fontSize: 16
-  },
-};
+  }
+}
