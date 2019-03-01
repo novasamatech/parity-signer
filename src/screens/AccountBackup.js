@@ -89,7 +89,7 @@ class AccountBackupView extends React.PureComponent {
           onPress={() => {
             Alert.alert(
               'Write this recovery phrase on paper',
-              `It's not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
+              `It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
               `,
               [
                 {

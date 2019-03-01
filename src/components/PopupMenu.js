@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -32,9 +32,7 @@ export default class PopupMenu extends React.PureComponent {
         const { onSelect, menuTriggerIconName, menuItems } = this.props
         const menuTriggerIcon = <Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />
         return (
-            <Menu
-                onSelect={onSelect}
-            >
+            <Menu onSelect={onSelect}>
                 <MenuTrigger children={menuTriggerIcon} />
                 <MenuOptions customStyles={menuOptionsStyles}>
                     {

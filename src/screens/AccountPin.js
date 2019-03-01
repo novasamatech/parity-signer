@@ -64,7 +64,6 @@ class AccountPinView extends React.PureComponent {
         account = accounts.getNew();
         await accounts.submitNew(pin);
         await accounts.select(account);
-        accounts.refreshList();
         navigation.popToTop();
         navigation.navigate('AccountList', {
           accountId: accountId(account)
