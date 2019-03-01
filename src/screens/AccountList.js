@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import {
   Menu,
@@ -95,6 +95,17 @@ class AccountListView extends React.PureComponent {
     this.scrollToIndex();
   }
 
+  showOnboardingMessage = () => {
+    return (
+      <View style={styles.onboardingWrapper} >
+        <Text style={styles.onboardingText}>Nothing here yet.
+        Click on the + to add an account</Text>
+        <View style={styles.onboardingArrowWrapper}><Image style={styles.onboardingArrow} source={require('../assets/img/onboardingArrow.png')}
+        /></View>
+      </View>
+    )
+  }
+
   AccountMenu = () => {
     const addIcon = <Icon name="add" size={35} color={colors.bg_text_sec} />
 
@@ -122,6 +133,7 @@ class AccountListView extends React.PureComponent {
           <Text style={styles.title}>ACCOUNTS</Text>
           {this.AccountMenu()}
         </View>
+        {this.props.accounts.length < 1 && this.showOnboardingMessage()}
         <FlatList
           ref={list => {
             this.list = list;
@@ -180,17 +192,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
-  introContainer: {
-    padding: 30,
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center'
-  },
-  introText: {
-    textAlign: 'center',
-    fontSize: 16,
-    marginBottom: 20
-  },
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
@@ -198,6 +199,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     flexDirection: 'column',
     justifyContent: 'center',
+  },
+  onboardingWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end'
+  },
+  onboardingArrowWrapper:
+  {
+    flex: 1,
+    paddingBottom: 20,
+    paddingLeft: 5
+  },
+  onboardingArrow: {
+    resizeMode: 'contain'
+  },
+  onboardingText: {
+    flex: 5,
+    fontFamily: 'Roboto',
+    fontSize: 20,
+    color: colors.bg_text_sec,
   }
 });
 
