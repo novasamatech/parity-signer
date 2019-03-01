@@ -206,6 +206,3 @@ const styles = StyleSheet.create({
     color: colors.bg_text_sec,
   }
 });
-
-
-

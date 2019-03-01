@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-// @flow
+'use strict';
 
 import React from 'react';
 import { Text } from 'react-native';
@@ -28,8 +28,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 
 export default class PopupMenu extends React.PureComponent {
-
-
     render() {
         const { onSelect, menuTriggerIconName, menuItems } = this.props
         const menuTriggerIcon = <Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />
@@ -51,6 +49,7 @@ export default class PopupMenu extends React.PureComponent {
         );
     }
 }
+
 const menuOptionsStyles = {
     optionWrapper: {
         padding: 15,
