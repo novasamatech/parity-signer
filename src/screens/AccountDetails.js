@@ -19,13 +19,6 @@
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from 'react-native-popup-menu';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
@@ -33,6 +26,7 @@ import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import TxStore from '../stores/TxStore';
 import { accountId } from '../util/account';
+import PopupMenu from '../components/PopupMenu'
 
 export default class AccountDetails extends React.Component {
   static navigationOptions = {
@@ -108,26 +102,6 @@ This account can only be recovered with its associated recovery phrase.`,
     }
   }
 
-  showEditMenu = () => {
-    const editIcon = <Icon name="more-vert" size={35} color={colors.bg_text_sec} />
-
-    return (
-      <View style={styles.menuView}>
-        <Menu
-          onSelect={this.onOptionSelect}
-        >
-          <MenuTrigger children={editIcon} />
-          <MenuOptions customStyles={menuOptionsStyles}>
-            <MenuOption value={'AccountEdit'} text='Edit' />
-            <MenuOption value={'AccountPin'} text='Change Pin' />
-            <MenuOption value={'AccountBackup'} text='View Recovery Phrase' />
-            <MenuOption value={'AccountDelete'} ><Text style={styles.deleteText}>Delete</Text></MenuOption>
-          </MenuOptions>
-        </Menu>
-      </View>
-    )
-  };
-
   render() {
     const account = this.props.accounts.getSelected();
     if (!account) {
@@ -141,7 +115,17 @@ This account can only be recovered with its associated recovery phrase.`,
       >
         <View style={styles.header}>
           <Text style={styles.title}>ACCOUNT</Text>
-          {this.showEditMenu()}
+          <View style={styles.menuView}>
+            <PopupMenu
+              onSelect={this.onOptionSelect}
+              menuTriggerIconName={"more-vert"}
+              menuItems={[
+                { value: 'AccountEdit', text: 'Edit' },
+                { value: 'AccountPin', text: 'Change Pin' },
+                { value: 'AccountBackup', text: 'View Recovery Phrase' },
+                { value: 'AccountDelete', text: 'Delete', textStyle: styles.deleteText }]}
+            />
+          </View>
         </View>
         <AccountCard
           address={account.address}
@@ -193,13 +177,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   }
 });
-
-const menuOptionsStyles = {
-  optionWrapper: {
-    padding: 15,
-  },
-  optionText: {
-    fontFamily: 'Roboto',
-    fontSize: 16
-  }
-}

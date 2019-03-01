@@ -20,13 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from 'react-native-popup-menu';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
@@ -34,6 +28,7 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import AccountsStore from '../stores/AccountsStore';
 import { accountId } from '../util/account';
+import PopupMenu from '../components/PopupMenu';
 
 export default class AccountList extends React.PureComponent {
   static navigationOptions = {
@@ -106,32 +101,22 @@ class AccountListView extends React.PureComponent {
     )
   }
 
-  AccountMenu = () => {
-    const addIcon = <Icon name="add" size={35} color={colors.bg_text_sec} />
-
-    return (
-      <View style={styles.menuView}>
-        <Menu
-          onSelect={value => this.props.navigation.navigate(value)}
-        >
-          <MenuTrigger children={addIcon} />
-          <MenuOptions customStyles={menuOptionsStyles}>
-            <MenuOption value={'AccountNew'} text='New Account' />
-            <MenuOption value={'AccountRecover'} text='Recover Account' />
-            <MenuOption value={'About'} text='About' />
-          </MenuOptions>
-        </Menu>
-      </View>
-    )
-  };
-
   render() {
     return (
       <View style={styles.body}>
         <Background />
         <View style={styles.header}>
           <Text style={styles.title}>ACCOUNTS</Text>
-          {this.AccountMenu()}
+          <View style={styles.menuView}>
+            <PopupMenu
+              onSelect={value => this.props.navigation.navigate(value)}
+              menuTriggerIconName={"add"}
+              menuItems={[
+                { value: 'AccountNew', text: 'New Account' },
+                { value: 'AccountRecover', text: 'Recover Account' },
+                { value: 'About', text: 'About' }]}
+            />
+          </View>
         </View>
         {this.props.accounts.length < 1 && this.showOnboardingMessage()}
         <FlatList
@@ -221,16 +206,6 @@ const styles = StyleSheet.create({
     color: colors.bg_text_sec,
   }
 });
-
-const menuOptionsStyles = {
-  optionWrapper: {
-    padding: 15,
-  },
-  optionText: {
-    fontFamily: 'Roboto',
-    fontSize: 16
-  },
-};
 
 
 
