@@ -1,17 +1,20 @@
 ![Parity Signer](https://wiki.parity.io/images/logo-parity-signer.jpg)
 
-
-[![App Store][app-store-badge]][app-store-url]
-[![Google Play][google-play-badge]][google-play-url]
-
-[app-store-badge]: ./res/app-store-badge.png
-[app-store-url]: https://itunes.apple.com/us/app/parity-signer/id1218174838
-[google-play-badge]: ./res/google-play-badge.png
-[google-play-url]: https://play.google.com/store/apps/details?id=io.parity.signer
+[<img src="./res/github-badge.png" width="250"/>](https://github.com/paritytech/parity-signer/releases/)
+[<img src="./res/google-play-badge.png" width="250"/>](https://play.google.com/store/apps/details?id=io.parity.signer)
+[<img src="./res/app-store-badge.png" width="250"/>](https://itunes.apple.com/us/app/parity-signer/id1218174838)
 
 # Parity Signer - Turn your smartphone into a hardware wallet
 
-Parity Signer is a mobile application that turns a smartphone into a secure air-gapped wallet also called cold storage. It means that, once the app has been installed, users can create Ethereum accounts, sign transactions and transfer funds from and to these accounts without any sort of connectivity enabled on the device. Wifi, Mobile Network, Bluetooth can be shut down and even removed physically to ensure that the mobile phone containing these accounts will not be exposed to any online threat. Have a look at the tutorial on our wiki to learn how to [use MyCrypto together with Parity Signer](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial).
+Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
+
+Once the app has been installed, users can create Ethereum accounts, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
+
+Users can opt to shut off and even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat.
+
+**Disabling the mobile phone's networking abilities is a requirement for the app to be used as intended.**
+
+Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Fether](https://wiki.parity.io/Parity-Signer-Mobile-App-Fether-tutorial) or [MyCrypto app](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial).
 
 Any data transfer from or to the app will happen using QR code scanning. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Ethereum account, this includes ETH, ETC as well as Ether from various testnets (Kovan, Ropsten...).
 
@@ -83,7 +86,7 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 
 ### Test Parity Signer
 
-For a quick test and to avoid the hurdle of creating an account, sending funds to it and finally create a transaction as described in the [MyCrypto Tutorial](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial)), you can use a pre-funded account on Kovan Network. To get access to this account, you need to:
+For a quick test and to avoid the hurdle of creating an account, sending funds to it and finally create a transaction as described in the [Parity Fether Tutorial](https://wiki.parity.io/Parity-Signer-Mobile-App-Fether-tutorial), you can use a pre-funded account on Kovan Network. To get access to this account, you need to:
 
 - Recover an account
 - Select `Kovan` network and choose a name
