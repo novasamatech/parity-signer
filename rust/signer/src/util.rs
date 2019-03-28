@@ -14,22 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-use tiny_keccak::Keccak;
 use libc::size_t;
-
-pub trait Keccak256<T> {
-	fn keccak256(&self) -> T where T: Sized;
-}
-
-impl Keccak256<[u8; 32]> for [u8] {
-	fn keccak256(&self) -> [u8; 32] {
-		let mut keccak = Keccak::new_keccak256();
-		let mut result = [0u8; 32];
-		keccak.update(self);
-		keccak.finalize(&mut result);
-		result
-	}
-}
 
 // Helper struct that we'll use to give strings to C.
 #[repr(C)]

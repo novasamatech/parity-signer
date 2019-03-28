@@ -383,10 +383,10 @@ dependencies = [
 
 [[package]]
 name = "ethsign"
-version = "0.5.0"
-source = "git+https://github.com/tomusdrw/ethsign.git#339a9edf232c27c22d4216c4e1d9ecd7b72da4fc"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "ethsign-crypto 0.1.0 (git+https://github.com/tomusdrw/ethsign.git)",
+ "ethsign-crypto 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsecp256k1 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "memzero 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -397,7 +397,7 @@ dependencies = [
 [[package]]
 name = "ethsign-crypto"
 version = "0.1.0"
-source = "git+https://github.com/tomusdrw/ethsign.git#339a9edf232c27c22d4216c4e1d9ecd7b72da4fc"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "aes-ctr 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hmac 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1092,7 +1092,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "blockies 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "ethsign 0.5.0 (git+https://github.com/tomusdrw/ethsign.git)",
+ "ethsign 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "jni 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.48 (registry+https://github.com/rust-lang/crates.io-index)",
  "rlp 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1311,8 +1311,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum ethbloom 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1a93a43ce2e9f09071449da36bfa7a1b20b950ee344b6904ff23de493b03b386"
 "checksum ethereum-types 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "35b3c5a18bc5e73a32a110ac743ec04b02bbbcd3b71d3118d40a6113d509378a"
 "checksum ethereum-types-serialize 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4ac59a21a9ce98e188f3dace9eb67a6c4a3c67ec7fbc7218cb827852679dc002"
-"checksum ethsign 0.5.0 (git+https://github.com/tomusdrw/ethsign.git)" = "<none>"
-"checksum ethsign-crypto 0.1.0 (git+https://github.com/tomusdrw/ethsign.git)" = "<none>"
+"checksum ethsign 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "96d29647713ba24ade587139ab8ac200e390ecb49df1e1010f1b2e45e9a0e5e3"
+"checksum ethsign-crypto 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0239998cf14901be86d9b30391fe873da495a80ae848016da4b8ff7cacbbc717"
 "checksum failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "795bd83d3abeb9220f257e597aa0080a508b27533824adf336529648f6abf7e2"
 "checksum failure_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "ea1063915fd7ef4309e222a5a07cf9c319fb9c7836b1f89b85458672dbb127e1"
 "checksum fake-simd 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e88a8acf291dafb59c2d96e8f59828f3838bb1a70398823ade51a84de6a6deed"

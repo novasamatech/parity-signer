@@ -17,7 +17,7 @@
 mod eth;
 mod util;
 
-use util::{Keccak256, StringPtr};
+use util::StringPtr;
 use eth::KeyPair;
 
 use blockies::{Blockies, create_icon, ethereum};
@@ -25,6 +25,7 @@ use ethsign::{Protected, keyfile::Crypto};
 use rlp::decode_list;
 use rustc_hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
+use tiny_keccak::keccak256 as keccak;
 
 use std::num::NonZeroU32;
 
@@ -113,7 +114,7 @@ pub unsafe extern fn rlp_item(rlp: *mut StringPtr, position: u32, error: *mut u3
 #[no_mangle]
 pub unsafe extern fn keccak256(data: *mut StringPtr) -> *mut String {
   let data: Vec<u8> = (*data).as_str().from_hex().unwrap();
-  let res = data.keccak256();
+  let res = keccak(&data);
   Box::into_raw(Box::new(res.to_hex()))
 }
 
@@ -184,8 +185,6 @@ pub unsafe extern fn decrypt_data(encrypted_data: *mut StringPtr, password: *mut
 #[cfg(feature = "jni")]
 #[allow(non_snake_case)]
 pub mod android {
-  // extern crate jni;
-
   use super::*;
   use jni::JNIEnv;
   use jni::objects::{JClass, JString, JThrowable};
@@ -233,7 +232,7 @@ pub mod android {
   pub unsafe extern fn Java_io_parity_signer_EthkeyBridge_ethkeyKeccak(env: JNIEnv, _: JClass, data: JString) -> jstring {
     let data: String = env.get_string(data).expect("Invalid seed").into();
     let data: Vec<u8> = data.from_hex().unwrap();
-    let res = data.keccak256();
+    let res = keccak(&data);
     env.new_string(res.to_hex::<String>()).expect("Could not create java string").into_inner()
   }
 
@@ -294,116 +293,11 @@ pub mod android {
       },
       Err(_) => {
         let result = env.new_string("").expect("Could not create java string").into_inner();
-        env.throw(new_exception(&env)).expect("second trhow failed");
+        env.throw(new_exception(&env)).expect("second throw failed");
         result
       },
     }
   }
-
-  // #[cfg(test)]
-  // mod tests {
-  //   extern crate jni;
-  //   use std::os::raw::c_void;
-  //   use std::ptr;
-  //   use self::jni::sys::{JavaVM, JavaVMInitArgs, JNI_CreateJavaVM, JNI_OK, JNI_EDETACHED, JNI_EEXIST, JNI_EINVAL,
-  //   JNI_ENOMEM, JNI_ERR, JNI_EVERSION, JNI_VERSION_1_8, JNI_FALSE, JavaVMOption};
-  //   use ethstore::Crypto;
-
-  //   use super::{Password, Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData};
-
-  //   #[link(name="jvm")]
-  //   extern {
-  //   }
-
-  //   struct TestVM {
-  //     _jvm: *mut JavaVM,
-  //     sys_env: *mut jni::sys::JNIEnv,
-  //   }
-
-  //   impl TestVM {
-  //     fn env<'a>(&'a self) -> jni::JNIEnv<'a> {
-  //       jni::JNIEnv::from(self.sys_env)
-  //     }
-  //   }
-
-  //   unsafe fn test_vm() -> TestVM {
-  //     let mut jvm_options = Vec::<JavaVMOption>::new();
-  //     // Create the JVM arguments.
-  //     let mut jvm_arguments = JavaVMInitArgs::default();
-  //     jvm_arguments.version = JNI_VERSION_1_8;
-  //     jvm_arguments.options = jvm_options.as_mut_ptr();
-  //     jvm_arguments.nOptions = jvm_options.len() as i32;
-  //     jvm_arguments.ignoreUnrecognized = JNI_FALSE;
-
-  //     // Initialize space for a pointer to the JNI environment.
-  //     let mut jvm: *mut JavaVM = ptr::null_mut();
-  //     let mut jni_environment : *mut jni::sys::JNIEnv = ptr::null_mut();
-
-  //     // Try to instantiate the JVM.
-  //     let result = JNI_CreateJavaVM(
-  //       &mut jvm,
-  //       (&mut jni_environment as *mut *mut jni::sys::JNIEnv) as *mut *mut c_void,
-  //       (&mut jvm_arguments as *mut JavaVMInitArgs) as *mut c_void
-  //     );
-
-  //     // There was an error while trying to instantiate the JVM.
-  //     if result != JNI_OK {
-
-  //       // Translate the error code to a message.
-  //       let error_message = match result {
-  //         JNI_EDETACHED => "thread detached from JVM",
-  //         JNI_EEXIST => "JVM exists already",
-  //         JNI_EINVAL => "invalid arguments",
-  //         JNI_ENOMEM => "not enough memory",
-  //         JNI_ERR => "unknown error",
-  //         JNI_EVERSION => "JNI version error",
-  //         _ => "unknown JNI error value",
-  //       };
-
-  //       panic!("`JNI_CreateJavaVM()` signaled an error: {}", error_message);
-  //     }
-
-  //     TestVM {
-  //       _jvm: jvm,
-  //       sys_env: jni_environment,
-  //     }
-  //   }
-
-//     #[test]
-//     fn test_decrypt() {
-//       unsafe {
-//         let jvm = test_vm();
-
-//         let data = b"test_data";
-//         let password = Password::from("password");
-//         let crypto = Crypto::with_plain(data, &password, CRYPTO_ITERATIONS).unwrap();
-//         let crypto_string: String = crypto.into();
-//         let env = jvm.env();
-//         let jni_crypto_str = env.new_string(crypto_string).unwrap();
-//         let jni_password_str = env.new_string(password).unwrap();
-//         let any_class = env.find_class("java/lang/Object").unwrap();
-
-//         let result = Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData(
-//           jvm.env(),
-//           any_class,
-//           jni_crypto_str,
-//           jni_password_str
-//         );
-
-//         let result: String = env.get_string(result.into()).expect("invalid result").into();
-//         assert_eq!(result, "test_data".to_owned());
-//         assert_eq!(env.exception_check().unwrap(), false);
-
-//         let _ = Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData(
-//           jvm.env(),
-//           any_class,
-//           jni_crypto_str,
-//           env.new_string("wrong password").unwrap()
-//         );
-//         assert_eq!(env.exception_check().unwrap(), true);
-//       }
-//     }
-//   }
 }
 
 #[cfg(test)]

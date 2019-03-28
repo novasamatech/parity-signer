@@ -16,11 +16,10 @@
 
 //! Ethereum key utils
 
-use crate::util::Keccak256;
-
 use bip39::{Mnemonic, Seed, Language};
 use ethsign::{SecretKey, PublicKey, Error};
 use tiny_hderive::bip32::ExtendedPrivKey;
+use tiny_keccak::keccak256;
 
 pub struct KeyPair {
 	secret: SecretKey,
@@ -38,11 +37,11 @@ impl KeyPair {
 	}
 
 	pub fn from_parity_phrase(phrase: &str) -> KeyPair {
-		let mut secret = phrase.as_bytes().keccak256();
+		let mut secret = keccak256(phrase.as_bytes());
 		let mut i = 0;
 
 		loop {
-			secret = secret.keccak256();
+			secret = keccak256(&secret);
 
 			match i > 16384 {
 				false => i += 1,
