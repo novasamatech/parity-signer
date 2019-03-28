@@ -49,6 +49,16 @@ export function validateSeed(seed) {
       reason: `Add ${11 - words.length} more unique word(s) to compose a secure seed phrase`
     }
   }
+
+  for (let word of words) {
+    if (word === '') {
+      return {
+        valid: false,
+        reason: `Extra whitespace found`
+      };
+    }
+  }
+
   return {
     valid: true,
     reason: null
