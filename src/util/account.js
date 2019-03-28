@@ -42,32 +42,11 @@ export function validateSeed(seed) {
     };
   }
   const words = seed.split(' ');
-  const set = new Set();
-  for (let word of words) {
-    if (typeof WORDS_INDEX[word] === 'undefined') {
-      if (set.has(word)) {
-        return {
-          valid: false,
-          reason: `A duplicated word "${word}" found. Words in seed phrase must be unique.`
-        };
-      }
-      if (word === '') {
-        return {
-          valid: false,
-          reason: `Extra whitespace found`
-        };
-      }
-      return {
-        valid: false,
-        reason: `The word "${word}" is not from the word list`
-      }
-    }
-    set.add(word);
-  }
-  if (set.size < 11) {
+
+  if (words.length < 11) {
     return {
       valid: false,
-      reason: `Add ${11 - set.size} more unique word(s) to compose a secure seed phrase`
+      reason: `Add ${11 - words.length} more unique word(s) to compose a secure seed phrase`
     }
   }
   return {

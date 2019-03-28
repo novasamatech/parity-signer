@@ -26,13 +26,11 @@ const asString = x =>
     .join('');
 
 export const brainWalletAddress = seed =>
-  EthkeyBridge.brainWalletAddress(seed).then(address0x => {
-    const address = address0x.substring(2);
+  EthkeyBridge.brainWalletAddress(seed).then(address => {
     return keccak(asString(address)).then(hash =>
       checksummedAddress(address, hash)
     );
   });
-export const brainWalletSecret = seed => EthkeyBridge.brainWalletSecret(seed);
 export const brainWalletSign = (seed, message) =>
   EthkeyBridge.brainWalletSign(seed, message);
 export const rlpItem = (rlp, position) => EthkeyBridge.rlpItem(rlp, position);
@@ -42,7 +40,7 @@ export const blockiesIcon = seed =>
   EthkeyBridge.blockiesIcon(seed.toLowerCase()).then(
     icon => 'data:image/png;base64,' + icon
   );
-export const words = () => EthkeyBridge.randomPhrase(11);
+export const words = () => EthkeyBridge.randomPhrase();
 export const encryptData = (data, password) =>
   EthkeyBridge.encryptData(data, password);
 export const decryptData = (data, password) =>
