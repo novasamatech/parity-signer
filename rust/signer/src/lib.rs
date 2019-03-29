@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 mod eth;
+mod strate;
 mod util;
 
 use util::StringPtr;
