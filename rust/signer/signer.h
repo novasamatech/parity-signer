@@ -49,9 +49,6 @@ void ethkey_keypair_destroy(struct keypair_ptr* keypair);
 // creates new brainwallet keypair from seed
 struct keypair_ptr* ethkey_keypair_brainwallet(const struct rust_string_ptr* seed);
 
-// returns keypair secret
-struct rust_string* ethkey_keypair_secret(const struct keypair_ptr* keypair);
-
 // return keypair address
 struct rust_string* ethkey_keypair_address(const struct keypair_ptr* keypair);
 
@@ -75,7 +72,7 @@ struct rust_string* blockies_icon(const struct rust_string_ptr* blockies_seed);
 
 // random phrase ffi
 
-struct rust_string* random_phrase(const uint32_t words);
+struct rust_string* random_phrase();
 
 // data encryption ffi
 

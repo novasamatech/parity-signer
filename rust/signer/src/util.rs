@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -41,5 +41,13 @@ impl StringPtr {
 			str::from_utf8(slice).unwrap()
 		}
 	}
+}
+
+impl std::ops::Deref for StringPtr {
+    type Target = str;
+
+    fn deref(&self) -> &str {
+    	self.as_str()
+    }
 }
 

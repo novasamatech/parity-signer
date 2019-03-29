@@ -8,6 +8,7 @@ export const NETWORK_IDS = {
   '2': 'expanse',
   '3': 'ropsten',
   '4': 'rinkeby',
+  '5': 'goerli',
   '8': 'ubiq',
   '42': 'kovan',
   '61': 'classic',
@@ -21,13 +22,14 @@ export const NETWORK_ID = Object.entries(NETWORK_IDS).reduce(
   {}
 );
 
-export const NETWORK_LIST = ['1', '61', '3', '42'];
+export const NETWORK_LIST = ['1', '61', '3', '42', '5'];
 
 export const NETWORK_TITLES = {
   [NETWORK_ID.frontier]: 'Ethereum',
   [NETWORK_ID.classic]: 'Ethereum Classic',
   [NETWORK_ID.ropsten]: 'Ropsten Testnet',
-  [NETWORK_ID.kovan]: 'Kovan Testnet'
+  [NETWORK_ID.kovan]: 'Kovan Testnet',
+  [NETWORK_ID.goerli]: 'Görli Testnet'
 };
 
 export const NETWORK_COLOR = {

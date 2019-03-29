@@ -40,14 +40,14 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 - `rustup` (tested on `rustup 1.16.0`)
 - `rustc` (tested on `rustc 1.32.0 (9fda7c223 2019-01-16)`)
 - `cargo` (tested on `cargo 1.32.0 (8610973aa 2019-01-02)`)
-- `android_ndk` (tested on `r13b`)
+- `android_ndk` (tested on `r19`)
 - `Android Studio` (only for Android, tested on `Version 3.3`)
 - `Xcode` (only for iOS, tested on `Version 9.4.1 (9F2000)`)
 - `$NDK_HOME` envarionment variable set to ndk home directory (eg. `/usr/local/opt/android-ndk`)
 - `$JAVA_HOME` envarionment variable set to java home directory (eg. `/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home`)
 - `$ANDROID_HOME` environment variable set to Android SDK directory (eg. `/home/your_username/Android/Sdk`)*.
 
-\* It's recommended to install **Android Studio** and use that to install the necessary build tools and SDKs for the Android version you want to test on. It's also the best way to test in the emulator. **DO NOT INSTALL NDK VIA ANDROID STUDIO** as that will install the latest version instead of `r13b`.
+\* It's recommended to install **Android Studio** and use that to install the necessary build tools and SDKs for the Android version you want to test on. It's also the best way to test in the emulator. **DO NOT INSTALL NDK VIA ANDROID STUDIO** as that will install the latest version. Make sure to get `r19` instead.
 
 ### Setup
 
@@ -124,3 +124,11 @@ adb shell input keyevent 82
 (You can find `adb` binary in your local Android SDK folder under `platform-tools`, eg. `/home/your_username/Android/Sdk/platform-tools`)
 
 This should open a menu on the device. In that menu go to `Dev Settings` > `Debug server host & port for device`, and enter your local IP address with port 8081 (eg. `192.168.1.42:8081`). Restart the app, the error should disappear.
+
+#### Upgrading NDK from `r13b` to `r19`
+
+1. [Download NDK `r19`](https://developer.android.com/ndk/downloads/), unpack it in a convenient location.
+1. Update your `NDK_HOME` env variable to the absolute path of the NDK directory.
+1. Edit `./android/local.properties` so that `ndk.dir` points to the absolute path to the NDK directory.
+1. Remove old NDK build with `rm -rf ./NDK`.
+1. Build the new NDK with `./create-ndk-standalone.sh`.

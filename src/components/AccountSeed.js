@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   input: {
-    height: 120,
+    height: 160,
     lineHeight: 26,
     fontSize: 20,
     backgroundColor: '#e4fee4'
