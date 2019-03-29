@@ -66,6 +66,9 @@ export class AccountUnlockAndSign extends React.PureComponent {
 
 export class AccountUnlock extends React.Component {
   render() {
+    const { navigation } = this.props;
+    const next = navigation.getParam('next', 'AccountList');
+
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => (
@@ -75,16 +78,20 @@ export class AccountUnlock extends React.Component {
               return await accounts.unlockAccount(accounts.getSelected(), pin);
             }}
             navigate={() => {
-              const resetAction = StackActions.reset({
-                index: 3,
-                actions: [
-                  NavigationActions.navigate({ routeName: 'AccountList' }),
-                  NavigationActions.navigate({ routeName: 'AccountDetails' }),
-                  NavigationActions.navigate({ routeName: 'AccountEdit' }),
-                  NavigationActions.navigate({ routeName: 'AccountBackup' })
-                ]
-              });
-              this.props.navigation.dispatch(resetAction);
+              if (next === 'AccountDelete') {
+                navigation.goBack();
+                navigation.state.params.onDelete();
+              } else {
+                const resetAction = StackActions.reset({
+                  index: 2,
+                  actions: [
+                    NavigationActions.navigate({ routeName: 'AccountList' }),
+                    NavigationActions.navigate({ routeName: 'AccountDetails' }),
+                    NavigationActions.navigate({ routeName: next })
+                  ]
+                });
+                this.props.navigation.dispatch(resetAction);
+              }
             }}
           />
         )}

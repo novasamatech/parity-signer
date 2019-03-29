@@ -29,8 +29,6 @@ export default class PrivacyPolicy extends React.PureComponent {
   };
 
   render() {
-    const { navigation } = this.props;
-    const isWelcome = navigation.getParam('isWelcome');
     return (
       <View style={styles.body}>
         <ScrollView contentContainerStyle={{}}>

@@ -18,19 +18,23 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
+
+
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import AccountsStore from '../stores/AccountsStore';
 import { accountId } from '../util/account';
+import PopupMenu from '../components/PopupMenu';
 
 export default class AccountList extends React.PureComponent {
   static navigationOptions = {
     title: 'Accounts'
   };
+
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -86,11 +90,35 @@ class AccountListView extends React.PureComponent {
     this.scrollToIndex();
   }
 
+  showOnboardingMessage = () => {
+    return (
+      <View style={styles.onboardingWrapper} >
+        <Text style={styles.onboardingText}>Nothing here yet.
+        Click on the + to add an account</Text>
+        <View style={styles.onboardingArrowWrapper}><Image style={styles.onboardingArrow} source={require('../assets/img/onboardingArrow.png')}
+        /></View>
+      </View>
+    )
+  }
+
   render() {
     return (
       <View style={styles.body}>
         <Background />
-        <Text style={styles.title}>ACCOUNTS</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>ACCOUNTS</Text>
+          <View style={styles.menuView}>
+            <PopupMenu
+              onSelect={value => this.props.navigation.navigate(value)}
+              menuTriggerIconName={"add"}
+              menuItems={[
+                { value: 'AccountNew', text: 'New Account' },
+                { value: 'AccountRecover', text: 'Recover Account' },
+                { value: 'About', text: 'About' }]}
+            />
+          </View>
+        </View>
+        {this.props.accounts.length < 1 && this.showOnboardingMessage()}
         <FlatList
           ref={list => {
             this.list = list;
@@ -117,11 +145,6 @@ class AccountListView extends React.PureComponent {
         <View style={styles.bottom}>
           <Button
             buttonStyles={{ height: 60 }}
-            title="Add Account"
-            onPress={() => this.props.navigation.navigate('AccountAdd')}
-          />
-          <Button
-            buttonStyles={{ height: 60, marginTop: 20 }}
             title="Scan"
             onPress={() => this.props.navigation.navigate('QrScanner')}
           />
@@ -132,34 +155,54 @@ class AccountListView extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
-    paddingBottom: 20
-  },
   body: {
     backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
     padding: 20
   },
-  content: {
-    flex: 1
-  },
   bottom: {
     marginTop: 20,
   },
-  introContainer: {
-    padding: 30,
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center'
+  content: {
+    flex: 1
   },
-  introText: {
-    textAlign: 'center',
-    fontSize: 16,
-    marginBottom: 20
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 20,
+    justifyContent: 'center',
+  },
+  menuView: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  title: {
+    color: colors.bg_text_sec,
+    fontSize: 18,
+    fontFamily: 'Manifold CF',
+    fontWeight: 'bold',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  onboardingWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end'
+  },
+  onboardingArrowWrapper:
+  {
+    flex: 1,
+    paddingBottom: 20,
+    paddingLeft: 5
+  },
+  onboardingArrow: {
+    resizeMode: 'contain'
+  },
+  onboardingText: {
+    flex: 5,
+    fontFamily: 'Roboto',
+    fontSize: 20,
+    color: colors.bg_text_sec,
   }
 });

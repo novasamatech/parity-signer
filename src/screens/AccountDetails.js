@@ -17,14 +17,16 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
-import AccountDetailsCard from '../components/AccountDetailsCard';
+import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import TxStore from '../stores/TxStore';
 import { accountId } from '../util/account';
+import PopupMenu from '../components/PopupMenu'
 
 export default class AccountDetails extends React.Component {
   static navigationOptions = {
@@ -58,8 +60,46 @@ class AccountDetailsView extends React.Component {
     });
   }
 
+  onDelete = () => {
+    const accounts = this.props.accounts
+    const selected = accounts.getSelected();
+
+    Alert.alert(
+      'Delete Account',
+      `Do you really want to delete ${selected.name || selected.address}?
+This account can only be recovered with its associated recovery phrase.`,
+      [
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            accounts.deleteAccount(selected);
+            this.props.navigation.navigate('AccountList');
+          }
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        }
+      ]
+    );
+  }
+
   componentWillUnmount() {
     this.subscription.remove();
+  }
+
+  onOptionSelect = (value) => {
+    const navigate = this.props.navigation.navigate
+
+    if (value !== 'AccountEdit') {
+      navigate('AccountUnlock', {
+        next: value,
+        onDelete: this.onDelete
+      });
+    } else {
+      navigate(value);
+    }
   }
 
   render() {
@@ -73,12 +113,24 @@ class AccountDetailsView extends React.Component {
         contentContainerStyle={styles.bodyContent}
         style={styles.body}
       >
-        <Text style={styles.title}>ACCOUNT</Text>
-        <AccountDetailsCard
+        <View style={styles.header}>
+          <Text style={styles.title}>ACCOUNT</Text>
+          <View style={styles.menuView}>
+            <PopupMenu
+              onSelect={this.onOptionSelect}
+              menuTriggerIconName={"more-vert"}
+              menuItems={[
+                { value: 'AccountEdit', text: 'Edit' },
+                { value: 'AccountPin', text: 'Change Pin' },
+                { value: 'AccountBackup', text: 'View Recovery Phrase' },
+                { value: 'AccountDelete', text: 'Delete', textStyle: styles.deleteText }]}
+            />
+          </View>
+        </View>
+        <AccountCard
           address={account.address}
           chainId={account.chainId}
           title={account.name}
-          onPress={() => this.props.navigation.navigate('AccountEdit')}
         />
         <View style={styles.qr}>
           <QrView text={accountId(account)} />
@@ -98,40 +150,30 @@ const styles = StyleSheet.create({
   bodyContent: {
     paddingBottom: 40
   },
+  qr: {
+    marginTop: 20,
+    backgroundColor: colors.card_bg
+  },
+  deleteText: {
+    color: 'red'
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 20,
+    justifyContent: 'center',
+  },
+  menuView: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
-    paddingBottom: 20
-  },
-  wrapper: {
-    borderRadius: 5
-  },
-  address: {
-    flex: 1
-  },
-  qr: {
-    marginTop: 20,
-    backgroundColor: colors.card_bg
-  },
-  qrButton: {
-    marginTop: 20,
-    backgroundColor: colors.card_bg
-  },
-  deleteText: {
-    fontFamily: 'Manifold CF',
-    textAlign: 'right'
-  },
-  changePinText: {
-    textAlign: 'left',
-    color: 'green'
-  },
-  actionsContainer: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  actionButtonContainer: {
-    flex: 1
+    flexDirection: 'column',
+    justifyContent: 'center',
   }
 });

@@ -27,8 +27,6 @@ export default class About extends React.PureComponent {
   };
 
   render() {
-    const { navigation } = this.props;
-    const isWelcome = navigation.getParam('isWelcome');
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>PARITY SIGNER (v2.0-beta)</Text>

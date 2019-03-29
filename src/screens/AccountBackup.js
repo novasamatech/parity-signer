@@ -80,16 +80,16 @@ class AccountBackupView extends React.PureComponent {
           chainId={selected.chainId}
           title={selected.name}
         />
-        <Text style={styles.titleTop}>RECOVERY WORDS</Text>
+        <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
         <Text style={styles.hintText}>
           Write these words down on paper. Keep it safe. These words allow
-          anyone to recover this account.
+          anyone to recover and access the funds of this account.
         </Text>
         <TouchableItem
           onPress={() => {
             Alert.alert(
-              'Use paper to store seed phrases',
-              `It's not recommended to transfer or store seed phrases digitally and unencrypted. Everyone who have the phrase is able to spend funds from this account.
+              'Write this recovery phrase on paper',
+              `It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
               `,
               [
                 {
@@ -119,61 +119,20 @@ class AccountBackupView extends React.PureComponent {
             {selected.seed}
           </Text>
         </TouchableItem>
-        <Button
-          buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
-          title="Done Backup"
-          onPress={() => {
-            if (isNew) {
+        {(isNew) &&
+          <Button
+            buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
+            title="Backup Done"
+            onPress={() => {
+
               Alert.alert(
-                'Important information',
-                "Make sure you've backed up recovery words for your account. Recovery words are the only way to restore access to your account in case of device failure/lost.",
+                'Important',
+                "Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",
                 [
                   {
                     text: 'Proceed',
                     onPress: () => {
-                      this.props.navigation.navigate('AccountPin', {
-                        isWelcome: navigation.getParam('isWelcome'),
-                        isNew
-                      });
-                    }
-                  },
-                  {
-                    text: 'Cancel',
-                    style: 'cancel'
-                  }
-                ]
-              );
-            } else {
-              navigation.navigate('AccountList');
-            }
-          }}
-        />
-
-        {!isNew && (
-          <Button
-            buttonStyles={{ marginBottom: 40 }}
-            title="Change PIN"
-            onPress={() => {
-              navigation.navigate('AccountPin', { isNew });
-            }}
-          />
-        )}
-
-        {!isNew && (
-          <Button
-            buttonStyles={styles.deleteButton}
-            title="Delete Account"
-            onPress={() => {
-              Alert.alert(
-                'Delete Account',
-                `Are you sure to delete ${selected.name || selected.address} and its private key?`,
-                [
-                  {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: () => {
-                      accounts.deleteAccount(selected);
-                      this.props.navigation.navigate('AccountList');
+                      this.props.navigation.navigate('AccountPin', { isNew });
                     }
                   },
                   {
@@ -184,7 +143,7 @@ class AccountBackupView extends React.PureComponent {
               );
             }}
           />
-        )}
+        }
       </ScrollView>
     );
   }

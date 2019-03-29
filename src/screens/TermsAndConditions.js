@@ -40,7 +40,6 @@ export default class TermsAndConditions extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { tocAgreement, ppAgreement } = this.state;
-    const isWelcome = navigation.getParam('isWelcome');
     return (
       <View style={styles.body}>
         <ScrollView contentContainerStyle={{}}>

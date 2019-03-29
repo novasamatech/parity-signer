@@ -25,13 +25,14 @@ import {
   withNavigation
 } from 'react-navigation';
 import { Provider as UnstatedProvider } from 'unstated';
+import { MenuProvider } from 'react-native-popup-menu';
+
 import '../ReactotronConfig';
 import colors from './colors';
 import Background from './components/Background';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import About from './screens/About';
-import AccountAdd from './screens/AccountAdd';
 import AccountBackup from './screens/AccountBackup';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
@@ -55,9 +56,11 @@ export default class App extends Component {
   render() {
     return (
       <UnstatedProvider>
-        <StatusBar barStyle="light-content" />
-        <Background />
-        <Screens />
+        <MenuProvider backHandler={true}>
+          <StatusBar barStyle="light-content" />
+          <Background />
+          <Screens />
+        </MenuProvider>
       </UnstatedProvider>
     );
   }
@@ -152,12 +155,6 @@ const Screens = createStackNavigator(
         {
           AccountList: {
             screen: AccountList,
-            navigationOptions: {
-              headerLeft: <HeaderLeftHome />
-            }
-          },
-          AccountAdd: {
-            screen: AccountAdd,
             navigationOptions: {
               headerLeft: <HeaderLeftHome />
             }

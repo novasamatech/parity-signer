@@ -142,9 +142,7 @@ export default class AccountSeed extends Component {
   }
 
   renderSuggestions() {
-    const { value, valid } = this.props;
-
-    const invalidStyles = !valid ? styles.invalidInput : {};
+    const { value } = this.props;
     const words = value.length ? value.split(' ') : [];
     const wordPosition = this.getWordPosition();
     let searchInput = this.getSearchInput();
@@ -163,6 +161,7 @@ export default class AccountSeed extends Component {
               : {};
           return (
             <TouchableItem
+              key={i}
               onPress={e => {
                 words[wordPosition] = suggestion;
                 this.props.onChangeText(words.join(' '));
