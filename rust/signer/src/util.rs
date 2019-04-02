@@ -16,6 +16,11 @@
 
 use libc::size_t;
 
+#[cfg(feature = "jni")]
+use jni::{JNIEnv, objects::JString, sys::{jstring, jint}};
+#[cfg(not(feature = "jni"))]
+use std::cell::Cell;
+
 // Helper struct that we'll use to give strings to C.
 #[repr(C)]
 pub struct StringPtr {
@@ -38,7 +43,7 @@ impl StringPtr {
 
 		unsafe {
 			let slice = slice::from_raw_parts(self.ptr, self.len);
-			str::from_utf8(slice).unwrap()
+			str::from_utf8_unchecked(slice)
 		}
 	}
 }
@@ -51,3 +56,215 @@ impl std::ops::Deref for StringPtr {
     }
 }
 
+/// Trait for converting FFI arguments into Rust types
+pub trait Argument<'a> {
+    type Ext;
+    type Env;
+
+    fn convert(env: &Self::Env, val: Self::Ext) -> Self;
+}
+
+/// Trait for converting Rust types into FFI return values
+pub trait Return<'a> {
+    type Ext;
+    type Env;
+
+    fn convert(env: &Self::Env, val: Self) -> Self::Ext;
+}
+
+#[cfg(not(feature = "jni"))]
+impl Argument<'static> for u32 {
+    type Ext = u32;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        val
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl<'a> Argument<'static> for &'a str {
+    type Ext = *const StringPtr;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        unsafe { &*val }.as_str()
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl Argument<'static> for String {
+    type Ext = *const StringPtr;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        unsafe { &*val }.as_str().to_owned()
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl Return<'static> for String {
+    type Ext = StringPtr;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
+        let slice = val.into_boxed_str();
+
+        let ptr = slice.as_ptr();
+        let len = slice.len() as size_t;
+
+        // Forget
+        Box::into_raw(slice);
+
+        StringPtr {
+            ptr,
+            len,
+        }
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl<Inner: Return<'static, Env = u32> + Default> Return<'static> for Option<Inner> {
+    type Ext = Inner::Ext;
+    type Env = Inner::Env;
+
+    fn convert(env: &Self::Env, val: Self) -> Self::Ext {
+        let val = match val {
+            Some(inner) => inner,
+            None => {
+                env.set(1);
+
+                Inner::default()
+            }
+        };
+
+        Return::convert(env, val)
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Argument<'jni> for u32 {
+    type Ext = jint;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        val as u32
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'a, 'jni> Argument<'jni> for &'a str {
+    type Ext = JString<'jni>;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(env: &Self::Env, val: Self::Ext) -> Self {
+        use std::ffi::CStr;
+        use std::str;
+
+        unsafe {
+            let ptr = env.get_string_utf_chars(val).expect("Invalid java string");
+            let slice = CStr::from_ptr(ptr).to_bytes();
+
+            str::from_utf8_unchecked(slice)
+        }
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Argument<'jni> for String {
+    type Ext = JString<'jni>;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(env: &Self::Env, val: Self::Ext) -> Self {
+        env.get_string(val).expect("Invalid java string").into()
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Return<'jni> for String {
+    type Ext = jstring;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(env: &Self::Env, val: Self) -> Self::Ext {
+        env.new_string(val).expect("Could not create java string").into_inner()
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni> for Option<Inner> {
+    type Ext = Inner::Ext;
+    type Env = Inner::Env;
+
+    fn convert(env: &Self::Env, val: Self) -> Self::Ext {
+        use jni::objects::JThrowable;
+
+        match val {
+            Some(inner) => Return::convert(env, inner),
+            None => {
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // !!!!                                                              !!!!
+                // !!!! RETURN VALUE HAS TO BE CREATED BEFORE THROWING THE EXCEPTION !!!!
+                // !!!!                                                              !!!!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                let ret = Return::convert(env, Inner::default());
+
+                let class = env.find_class("java/lang/Exception").expect("Must have the Exception class; qed");
+                let exception: JThrowable<'jni> = env.new_object(class, "()V", &[]).expect("Must be able to instantiate the Exception; qed").into();
+
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // !!!!                                                        !!!!
+                // !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THIS POINT !!!!
+                // !!!!                                                        !!!!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                env.throw(exception).expect("Must be able to throw the Exception; qed");
+
+                ret
+            }
+        }
+    }
+}
+
+#[macro_export]
+macro_rules! export {
+    ($( @$jname:ident fn $name:ident($($par:ident : $t:ty),*) -> $ret:ty $code:block )*) => {
+        $(
+            pub fn $name($( $par: $t ),*) -> $ret $code
+        )*
+
+        #[cfg(feature = "jni")]
+        #[allow(non_snake_case)]
+        pub mod droid {
+            use crate::util::Argument;
+            use crate::util::Return;
+
+            use jni::JNIEnv;
+            use jni::objects::JClass;
+
+            $(
+                #[no_mangle]
+                pub extern fn $jname<'jni>(env: JNIEnv<'jni>, _: JClass, $( $par: <$t as Argument<'jni>>::Ext ),*) -> <$ret as Return<'jni>>::Ext {
+                    let ret = super::$name($(Argument::convert(&env, $par)),*);
+
+                    Return::convert(&env, ret)
+                }
+            )*
+        }
+
+        #[cfg(not(feature = "jni"))]
+        pub mod ios {
+            use crate::util::Argument;
+            use crate::util::Return;
+
+            $(
+                #[no_mangle]
+                pub extern fn $name($( $par: <$t as crate::util::Argument<'static>>::Ext ),*) -> <$ret as Return<'static>>::Ext {
+                    let mut error = Cell::new(0);
+
+                    let ret = super::$name($(Argument::convert(&error, $par)),*);
+
+                    Return::convert(&error, ret)
+                }
+            )*
+        }
+    }
+}
