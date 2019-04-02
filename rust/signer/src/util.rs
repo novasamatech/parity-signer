@@ -124,7 +124,7 @@ impl Return<'static> for String {
 }
 
 #[cfg(not(feature = "jni"))]
-impl<Inner: Return<'static, Env = u32> + Default> Return<'static> for Option<Inner> {
+impl<Inner: Return<'static, Env = Cell<u32>> + Default> Return<'static> for Option<Inner> {
     type Ext = Inner::Ext;
     type Env = Inner::Env;
 
@@ -255,11 +255,12 @@ macro_rules! export {
             use crate::util::Argument;
             use crate::util::Return;
 
+            use std::cell::Cell;
+
             $(
                 #[no_mangle]
                 pub extern fn $name($( $par: <$t as crate::util::Argument<'static>>::Ext ),*) -> <$ret as Return<'static>>::Ext {
-                    let mut error = Cell::new(0);
-
+                    let error = Cell::new(0);
                     let ret = super::$name($(Argument::convert(&error, $par)),*);
 
                     Return::convert(&error, ret)
