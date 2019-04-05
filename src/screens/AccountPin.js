@@ -28,7 +28,7 @@ import AccountsStore from '../stores/AccountsStore';
 import { accountId } from '../util/account';
 
 export default class AccountPin extends React.PureComponent {
-  render() {
+  render () {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountPinView {...this.props} accounts={accounts} />}
@@ -51,25 +51,27 @@ class AccountPinView extends React.PureComponent {
     pinMismatch: false
   };
 
-  async submit() {
+  async submit () {
     const { accounts, navigation } = this.props;
     const accountCreation = navigation.getParam('isNew');
     const { pin } = this.state;
+    const account = accountCreation ? accounts.getNew() : accounts.getSelected();
     if (
       this.state.pin.length >= 6 &&
       this.state.pin === this.state.confirmation
     ) {
-      let account = null;
       if (accountCreation) {
-        account = accounts.getNew();
+        console.log('AccountPin - submit new account');
         await accounts.submitNew(pin);
-        await accounts.select(account);
-        navigation.popToTop();
-        navigation.navigate('AccountList', {
-          accountId: accountId(account)
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [
+            NavigationActions.navigate({ routeName: 'AccountList' }),
+          ]
         });
+        this.props.navigation.dispatch(resetAction);
       } else {
-        account = accounts.getSelected();
+        console.log('AccountPin - submit update account');
         await accounts.save(account, pin);
         const resetAction = StackActions.reset({
           index: 1,
@@ -97,7 +99,8 @@ class AccountPinView extends React.PureComponent {
     return (<Text style={styles.hintText}>Choose a PIN code with 6 or more digits</Text>)
   }
 
-  render() {
+  render () {
+    console.log('AccountPin - render');
     const title = 'ACCOUNT PIN';
     return (
       <View style={styles.body}>
@@ -135,7 +138,7 @@ class AccountPinView extends React.PureComponent {
 }
 
 class PinInput extends Component {
-  render() {
+  render () {
     return (
       <TextInput
         keyboardAppearance="dark"

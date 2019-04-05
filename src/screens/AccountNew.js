@@ -35,7 +35,7 @@ export default class AccountNew extends React.Component {
     title: 'New Account',
     headerBackTitle: 'Back'
   };
-  render() {
+  render () {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountNewView {...this.props} accounts={accounts} />}
@@ -45,7 +45,8 @@ export default class AccountNew extends React.Component {
 }
 
 class AccountNewView extends React.Component {
-  render() {
+  render () {
+    console.log('AccountNew - render');
     const { accounts } = this.props;
     const selected = accounts.getNew();
     const chainId = selected.chainId;
@@ -112,7 +113,7 @@ class AccountNewView extends React.Component {
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
-              disabled={ !validateSeed(selected.seed).valid }
+              disabled={!validateSeed(selected.seed).valid}
               onPress={() => {
                 validateSeed(selected.seed).valid &&
                   this.props.navigation.navigate('AccountBackup', {

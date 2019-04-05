@@ -6760,6 +6760,11 @@ react-native-markdown-renderer@^3.2.8:
     prop-types "^15.5.10"
     react-native-fit-image "^1.5.2"
 
+react-native-popup-menu@^0.15.0:
+  version "0.15.5"
+  resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.15.5.tgz#3f5d7e58f4af8ef108481d5ec2df44e007f3698e"
+  integrity sha512-9Lgj3HQgemrEDddiDGS9x/5U9jLdo9hzYpGqohmIBe7n+z9VN1P/VxOr951WZAq6GPUHnNDXBBM/7Mun+1v5hw==
+
 react-native-qrcode@^0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/react-native-qrcode/-/react-native-qrcode-0.2.7.tgz#d103166fb1a5b53643e8bf7b88c0672e689ac4f8"
