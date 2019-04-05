@@ -39,10 +39,16 @@ export default class AccountBackup extends React.PureComponent {
   }
 }
 
-class AccountBackupView extends React.PureComponent {
+class AccountBackupView extends React.Component {
   constructor(...args) {
     super(...args);
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
+  }
+
+  shouldComponentUpdate (nextProps) {
+    const hasEmptySeed = nextProps.accounts.state.newAccount.seed === "";
+    console.log('AccountBackup - non empty seed?', !hasEmptySeed);
+    return !hasEmptySeed;
   }
 
   componentDidMount () {
