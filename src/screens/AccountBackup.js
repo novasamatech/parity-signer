@@ -47,7 +47,6 @@ class AccountBackupView extends React.Component {
 
   shouldComponentUpdate (nextProps) {
     const hasEmptySeed = nextProps.accounts.state.newAccount.seed === "";
-    console.log('AccountBackup - non empty seed?', !hasEmptySeed);
     return !hasEmptySeed;
   }
 
@@ -61,17 +60,18 @@ class AccountBackupView extends React.Component {
     }
   }
 
-  componentWillUnmount () {
+  async componentWillUnmount () {
     const { accounts } = this.props;
     const selected =
       accounts.getNew().address && accounts.getNew().address.length
         ? accounts.getNew()
         : accounts.getSelected();
-    accounts.lockAccount(selected);
+    await accounts.lockAccount(selected);
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
+
+
   render () {
-    console.log('AccountBackup - render');
     const { accounts, navigation } = this.props;
     const isNew = navigation.getParam('isNew');
     const selected = isNew ? accounts.getNew() : accounts.getSelected();

@@ -48,12 +48,10 @@ class AccountNewView extends React.Component {
 
   shouldComponentUpdate (nextProps) {
     const hasEmptySeed = nextProps.accounts.state.newAccount.seed === "";
-    console.log('Account new - non empty seed?', !hasEmptySeed);
     return !hasEmptySeed;
   }
 
   render () {
-    console.log('AccountNew - render');
     const { accounts } = this.props;
     const selected = accounts.getNew();
     const chainId = selected.chainId;

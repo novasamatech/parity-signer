@@ -53,7 +53,7 @@ export default class AccountsStore extends Container<AccountsState> {
     this.refreshList();
   }
 
-  async select(account) {
+  async select (account) {
     return new Promise((res, rej) => {
       this.setState(
         state => ({ selected: accountId(account) }),
@@ -64,7 +64,7 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  updateNew(accountUpdate: Object) {
+  updateNew (accountUpdate: Object) {
     Object.assign(this.state.newAccount, accountUpdate);
     const { seed } = this.state.newAccount;
     if (typeof seed === 'string') {
@@ -78,15 +78,15 @@ export default class AccountsStore extends Container<AccountsState> {
     this.setState({});
   }
 
-  resetNew() {
+  resetNew () {
     this.setState({ newAccount: empty() });
   }
 
-  getNew(): Account {
+  getNew (): Account {
     return this.state.newAccount;
   }
 
-  async submitNew(pin) {
+  async submitNew (pin) {
     const account = this.state.newAccount;
     await this.save(account, pin);
     this.setState({
@@ -95,7 +95,7 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  update(accountUpdate) {
+  update (accountUpdate) {
     let account = this.state.accounts.get(accountId(accountUpdate));
     if (!account) {
       this.state.accounts.set(accountId(accountUpdate), accountUpdate);
@@ -105,20 +105,20 @@ export default class AccountsStore extends Container<AccountsState> {
     this.setState({});
   }
 
-  updateSelected(accountUpdate) {
+  updateSelected (accountUpdate) {
     this.update(Object.assign(this.getSelected(), accountUpdate));
   }
 
-  async refreshList() {
+  async refreshList () {
     loadAccounts().then(res => {
       const accounts = new Map(res.map(a => [accountId(a), a]));
       this.setState({ accounts });
     });
   }
 
-  async loadAccountTxs() {}
+  async loadAccountTxs () { }
 
-  async save(account, pin = null) {
+  async save (account, pin = null) {
     try {
       if (pin && account.seed) {
         let encryptedSeed = await encryptData(account.seed, pin);
@@ -132,7 +132,7 @@ export default class AccountsStore extends Container<AccountsState> {
     }
   }
 
-  async deleteAccount(account) {
+  async deleteAccount (account) {
     account.archived = true;
     this.state.accounts.set(accountId(account), account);
     this.setState({
@@ -141,11 +141,11 @@ export default class AccountsStore extends Container<AccountsState> {
     await this.save(account);
   }
 
-  async saveSelected(pin) {
+  async saveSelected (pin) {
     await this.save(this.getSelected(), pin);
   }
 
-  async unlockAccount(account, pin) {
+  async unlockAccount (account, pin) {
     if (!account || !account.encryptedSeed) {
       return false;
     }
@@ -160,7 +160,7 @@ export default class AccountsStore extends Container<AccountsState> {
     return true;
   }
 
-  lockAccount(account) {
+  lockAccount (account) {
     const acc = this.state.accounts.get(accountId(account));
     if (acc) {
       delete acc.seed;
@@ -168,7 +168,7 @@ export default class AccountsStore extends Container<AccountsState> {
     this.setState({});
   }
 
-  async checkPinForSelected(pin) {
+  async checkPinForSelected (pin) {
     const account = this.getSelected();
     if (account && account.encryptedSeed) {
       return await decryptData(account.encryptedSeed, pin);
@@ -177,21 +177,21 @@ export default class AccountsStore extends Container<AccountsState> {
     }
   }
 
-  getById(account): ?Account {
+  getById (account): ?Account {
     return this.state.accounts.get(accountId(account)) || empty(account);
   }
 
-  getByAddress(address): ?Account {
+  getByAddress (address): ?Account {
     return this.getAccounts().find(
       a => a.address.toLowerCase() === address.toLowerCase()
     );
   }
 
-  getSelected(): ?Account {
+  getSelected (): ?Account {
     return this.state.accounts.get(this.state.selected);
   }
 
-  getAccounts(): Array<Account> {
+  getAccounts (): Array<Account> {
     return Array.from(this.state.accounts.values())
       .filter(a => !a.archived && a.chainId)
       .sort((a, b) => {
