@@ -111,7 +111,7 @@ Corresponding data:
 
 ### Troubleshooting
 
-#### `No dimension set for key window` on Andrid < 5.0
+#### `No dimension set for key window` on Android < 5.0
 
 This error should be accompanied with `error: closed` in terminal when deploying the debug version of the signer on a device that runs Android older than 5.0. It happens because the Android API does not support the reverse proxy that would allow the phone to communicate with the debug server on your computer.
 
