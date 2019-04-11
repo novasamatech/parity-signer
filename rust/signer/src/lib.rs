@@ -168,6 +168,34 @@ export! {
 
     String::from_utf8(decrypted).ok()
   }
+
+  @Java_io_parity_signer_EthkeyBridge_ethkeyQrCode
+  fn qrcode(data: &str) -> Option<String> {
+    use qrcodegen::{QrCode, QrCodeEcc};
+    use pixelate::{Image, WHITE, BLACK};
+
+    let qr = QrCode::encode_binary(data.as_bytes(), QrCodeEcc::Medium).ok()?;
+
+    let palette = &[WHITE, BLACK];
+    let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
+
+    for y in 0 .. qr.size() {
+      for x in 0 .. qr.size() {
+        pixels.push(qr.get_module(x, y) as u8);
+      }
+    }
+
+    let mut result = Vec::new();
+
+    Image {
+      palette,
+      pixels: &pixels,
+      width: qr.size() as usize,
+      scale: 8,
+    }.render(&mut result).ok();
+
+    Some(base64::encode(&result))
+  }
 }
 
 #[cfg(test)]

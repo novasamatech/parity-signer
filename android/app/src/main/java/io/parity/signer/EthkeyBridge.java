@@ -93,6 +93,15 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void qrCode(String data, Promise promise) {
+        try {
+            promise.resolve(ethkeyQrCode(data));
+        } catch (Exception e) {
+            promise.reject("failed to create QR code", null, null);
+        }
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
     private static native String ethkeyRlpItem(String data, int position);
@@ -102,4 +111,5 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native String ethkeyRandomPhrase();
     private static native String ethkeyEncryptData(String data, String password);
     private static native String ethkeyDecryptData(String data, String password);
+    private static native String ethkeyQrCode(String data);
 }

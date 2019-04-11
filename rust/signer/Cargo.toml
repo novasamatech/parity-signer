@@ -20,6 +20,8 @@ sha2 = "0.8"
 tiny-bip39 = { version = "0.6.1", default-features = false }
 tiny-hderive = "0.1"
 tiny-keccak = "1.4"
+pixelate = "0.1"
+qrcodegen = "1.4"
 
 [lib]
 name = "signer"

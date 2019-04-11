@@ -45,3 +45,7 @@ export const encryptData = (data, password) =>
   EthkeyBridge.encryptData(data, password);
 export const decryptData = (data, password) =>
   EthkeyBridge.decryptData(data, password);
+export const qrCode = (data) =>
+  EthkeyBridge.qrCode(data).then(
+    qr => 'data:image/png;base64,' + qr
+  );
