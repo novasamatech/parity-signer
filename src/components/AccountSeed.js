@@ -42,25 +42,13 @@ export default class AccountSeed extends Component {
     this.setState({ cursorPosition: start });
   }
 
-  // Return the characters from the word positioned
-  // right before the user's cursor
-  getSearchInput () {
-    const { value } = this.props;
-    const { cursorPosition } = this.state;
-    let startFrom = cursorPosition;
-    while (startFrom > 0 && [' '].indexOf(value.charAt(startFrom - 1)) === -1) {
-      --startFrom;
-    }
-    return value.substring(startFrom, cursorPosition);
-  }
-
   // Parse the imput field and return the position of the word
   // that is currently under the user's cursor
   getWordPosition = () => {
     const { value } = this.props;
     const { cursorPosition } = this.state;
     let wordPosition = 0;
-    let iterator = 0;
+    let i = 0;
     let char = '';
     let wasLetter = false;
     // if the input field is empty
@@ -68,11 +56,11 @@ export default class AccountSeed extends Component {
       return 0;
     }
     while (true) {
-      //if the iterator met the cursor or the iterator is at the end of the recovery phrase
-      if (cursorPosition === iterator || (char = value.charAt(iterator)) === '') {
+      // get out if the i met the cursor or the i is at the end of the recovery phrase
+      if (cursorPosition === i || (char = value.charAt(i)) === '') {
         break;
       }
-      // if the character rigth after the iterator isn't a white space or new line
+      // if the character rigth after the i isn't a white space or new line
       if ([' ', '\n', '\r'].indexOf(char) === -1) {
         wasLetter = true;
       } else {
@@ -82,12 +70,13 @@ export default class AccountSeed extends Component {
         }
         wasLetter = false;
       }
-      iterator++;
+      i++;
     }
     return wordPosition;
   }
 
-  getSuggestions = (input, words, word_list) => {
+  getSuggestions = (words, word_list) => {
+    const input = words[words.length - 1]
     // the word list is sorted, get the index we should start searching
     // for the word
     let fromIndex = word_list.findIndex(w => w.startsWith(input));
@@ -129,17 +118,13 @@ export default class AccountSeed extends Component {
   generateSuggestions = (words) => {
     const { useBIP39WordList, useParityWordList } = this.state;
 
-    // what word the user is currently typing
-    let searchInput = this.getSearchInput();
-
     // try to narrow down the word list using the last word typed, 
     // as soon as a second word is being typed
     words.length > 1 && useBIP39WordList && useParityWordList && this.narrowWordList(words);
 
     let suggestions = []
-
-    useParityWordList && suggestions.push(...this.getSuggestions(searchInput, words, PARITY_WORDS));
-    useBIP39WordList && suggestions.push(...this.getSuggestions(searchInput, words, BIP39_WORDS));
+    useParityWordList && suggestions.push(...this.getSuggestions(words, PARITY_WORDS));
+    useBIP39WordList && suggestions.push(...this.getSuggestions(words, BIP39_WORDS));
 
     //return a deduplicated sorted array if both word lists are still used
     return (useBIP39WordList && useParityWordList) ? [...new Set(suggestions.sort())] : suggestions;
@@ -150,7 +135,6 @@ export default class AccountSeed extends Component {
     // array of the words in the input field 
     const words = value.length ? value.toLowerCase().split(' ') : [];
     // at what word number the user's cursor is
-    console.log('words', words)
     const wordPosition = this.getWordPosition();
     const suggestions = this.generateSuggestions(words);
 
