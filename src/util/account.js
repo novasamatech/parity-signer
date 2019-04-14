@@ -1,13 +1,6 @@
-import WORDS from '../../res/wordlist.json';
 import { NETWORK_ID, NETWORK_TYPE } from '../constants';
 
-export { WORDS };
-export const WORDS_INDEX = WORDS.reduce(
-  (res, w) => Object.assign(res, { [w]: 1 }),
-  {}
-);
-
-export function accountId({
+export function accountId ({
   address,
   networkType = 'ethereum',
   chainId = '1'
@@ -18,7 +11,7 @@ export function accountId({
   return `${networkType}:0x${address.toLowerCase()}@${chainId}`;
 }
 
-export function empty(account = {}) {
+export function empty (account = {}) {
   return {
     name: '',
     networkType: NETWORK_TYPE.ethereum,
@@ -34,7 +27,7 @@ export function empty(account = {}) {
   };
 }
 
-export function validateSeed(seed) {
+export function validateSeed (seed) {
   if (seed.length === 0) {
     return {
       valid: false,

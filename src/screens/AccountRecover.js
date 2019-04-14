@@ -36,7 +36,7 @@ export default class AccountRecover extends React.Component {
     title: 'Recover Account',
     headerBackTitle: 'Back'
   };
-  render() {
+  render () {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountRecoverView {...this.props} accounts={accounts} />}
@@ -50,7 +50,7 @@ class AccountRecoverView extends React.Component {
     super(...args);
   }
 
-  render() {
+  render () {
     const { accounts } = this.props;
     const selected = accounts.getNew();
     const chainId = selected.chainId;

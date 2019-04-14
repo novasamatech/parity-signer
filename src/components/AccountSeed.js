@@ -17,146 +17,150 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
-import { WORDS, WORDS_INDEX } from '../util/account';
+import PARITY_WORDS from '../../res/parity_wordlist.json';
+import BIP39_WORDS from '../../res/bip39_wordlist.json';;
 import TextInput from './TextInput';
 import TouchableItem from './TouchableItem';
 
 export default class AccountSeed extends Component {
   state = {
     cursorPosition: 0,
-    keyboard: false,
-    animation: false,
-    suggestionsHeight: new Animated.Value(0) // Initial value for opacity: 0
+    useBIP39WordList: true,
+    useParityWordList: true,
   };
 
-  constructor(...args) {
-    super(...args);
-    this.getSuggestions = this.getSuggestions.bind(this);
-    this.handleCursorPosition = this.handleCursorPosition.bind(this);
-    this.getWordPosition = this.getWordPosition.bind(this);
-    this.keyboardDidShow = this.keyboardDidShow.bind(this);
-    this.keyboardDidHide = this.keyboardDidHide.bind(this);
-  }
-
-  keyboardDidShow() {
-    this.setState({ keyboard: true, animation: true });
-    Animated.timing(
-      // Animate over time
-      this.state.suggestionsHeight, // The animated value to drive
-      {
-        toValue: 35, // Animate to opacity: 1 (opaque)
-        duration: 200 // Make it take a while
-      }
-    ).start(() => this.setState({ animation: false }));
-  }
-
-  keyboardDidHide() {
-    this.setState({ animation: true });
-    Animated.timing(
-      // Animate over time
-      this.state.suggestionsHeight, // The animated value to drive
-      {
-        toValue: 0, // Animate to opacity: 1 (opaque)
-        duration: 200 // Make it take a while
-      }
-    ).start(() => {
-      this.setState({ keyboard: false, animation: false });
-    });
-  }
-
-  handleCursorPosition({
+  handleCursorPosition = ({
     nativeEvent: {
       selection: { start, end }
     }
-  }) {
+  }) => {
     if (start !== end) {
       return;
     }
     this.setState({ cursorPosition: start });
   }
 
-  getSearchInput() {
+  // Return the characters from the word positioned
+  // right before the user's cursor
+  getSearchInput () {
     const { value } = this.props;
     const { cursorPosition } = this.state;
     let startFrom = cursorPosition;
-    // find the first space or start of string
     while (startFrom > 0 && [' '].indexOf(value.charAt(startFrom - 1)) === -1) {
       --startFrom;
     }
     return value.substring(startFrom, cursorPosition);
   }
 
-  getWordPosition() {
+  // Parse the imput field and return the position of the word
+  // that is currently under the user's cursor
+  getWordPosition = () => {
     const { value } = this.props;
     const { cursorPosition } = this.state;
     let wordPosition = 0;
-    let cursor = 0;
+    let iterator = 0;
     let char = '';
     let wasLetter = false;
+    // if the input field is empty
     if (0 === value.length) {
       return 0;
     }
     while (true) {
-      if (cursorPosition === cursor || (char = value.charAt(cursor)) === '') {
+      //if the iterator met the cursor or the iterator is at the end of the recovery phrase
+      if (cursorPosition === iterator || (char = value.charAt(iterator)) === '') {
         break;
       }
+      // if the character rigth after the iterator isn't a white space or new line
       if ([' ', '\n', '\r'].indexOf(char) === -1) {
         wasLetter = true;
       } else {
+        // otherwise if we had a letter before, it means we reached the end of a word
         if (wasLetter) {
-          ++wordPosition;
+          wordPosition++;
         }
         wasLetter = false;
       }
-      ++cursor;
+      iterator++;
     }
     return wordPosition;
   }
 
-  getSuggestions(input, words) {
-    let fromIndex = WORDS.findIndex(w => w.startsWith(input));
+  getSuggestions = (input, words, word_list) => {
+    // the word list is sorted, get the index we should start searching
+    // for the word
+    let fromIndex = word_list.findIndex(w => w.startsWith(input));
     if (fromIndex === -1) {
       return [];
     }
-    if (WORDS[fromIndex] === input) {
-      fromIndex = 0;
+    // if the whole word has already been typed in
+    if (word_list[fromIndex] === input) {
+      return [];
     }
     const SUGGESTIONS_COUNT = 5;
     const result = [];
     let yielded = 0;
-    result.push(WORDS[fromIndex]);
-    while (yielded < SUGGESTIONS_COUNT && WORDS[fromIndex] !== undefined) {
-      ++fromIndex;
-      if (!WORDS[fromIndex].startsWith(input)) {
+    while (yielded < SUGGESTIONS_COUNT && fromIndex < word_list.length) {
+      if (!word_list[fromIndex].startsWith(input)) {
         return result;
       }
-      if (words.indexOf(WORDS[fromIndex]) !== -1) {
-        continue;
+
+      //do not suggest words that where already added
+      if (words.indexOf(word_list[fromIndex]) === -1) {
+        result.push(word_list[fromIndex]);
+        yielded++
       }
-      result.push(WORDS[fromIndex]);
-      ++yielded;
+      fromIndex++;
     }
     return result;
   }
 
-  renderSuggestions() {
-    const { value } = this.props;
-    const words = value.length ? value.split(' ') : [];
-    const wordPosition = this.getWordPosition();
-    let searchInput = this.getSearchInput();
-    if (WORDS_INDEX[searchInput]) {
-      searchInput = '';
+  narrowWordList = (words) => {
+    // if the last word is only present in BIP39 word list
+    if (BIP39_WORDS.indexOf(words[words.length - 2]) !== -1 && PARITY_WORDS.indexOf(words[words.length - 2]) === -1) {
+      this.setState({ useParityWordList: false })
+      // if the second last word is only present in Parity word list
+    } else if (BIP39_WORDS.indexOf(words[words.length - 2]) === -1 && PARITY_WORDS.indexOf(words[words.length - 2]) !== -1) {
+      this.setState({ useBIP39WordList: false })
     }
-    const suggestions = this.getSuggestions(searchInput, words);
+  }
+
+  generateSuggestions = (words) => {
+    const { useBIP39WordList, useParityWordList } = this.state;
+
+    // what word the user is currently typing
+    let searchInput = this.getSearchInput();
+
+    // try to narrow down the word list using the last word typed, 
+    // as soon as a second word is being typed
+    words.length > 1 && useBIP39WordList && useParityWordList && this.narrowWordList(words);
+
+    let suggestions = []
+
+    useParityWordList && suggestions.push(...this.getSuggestions(searchInput, words, PARITY_WORDS));
+    useBIP39WordList && suggestions.push(...this.getSuggestions(searchInput, words, BIP39_WORDS));
+
+    //return a deduplicated sorted array if both word lists are still used
+    return (useBIP39WordList && useParityWordList) ? [...new Set(suggestions.sort())] : suggestions;
+  }
+
+  renderSuggestions () {
+    const { value } = this.props;
+    // array of the words in the input field 
+    const words = value.length ? value.toLowerCase().split(' ') : [];
+    // at what word number the user's cursor is
+    console.log('words', words)
+    const wordPosition = this.getWordPosition();
+    const suggestions = this.generateSuggestions(words);
+
     return (
-      <Animated.View
+      <View
         style={[styles.suggestions, { height: this.state.suggestionsHeight }]}
       >
         {suggestions.map((suggestion, i) => {
           const sepStyle =
-            !this.state.animation && i !== suggestions.length - 1
+            i !== suggestions.length - 1
               ? { borderRightWidth: 0.3, borderColor: colors.card_bg_text_sec }
               : {};
           return (
@@ -173,12 +177,11 @@ export default class AccountSeed extends Component {
             </TouchableItem>
           );
         })}
-      </Animated.View>
+      </View>
     );
   }
 
-  render() {
-    const { keyboard } = this.state;
+  render () {
     const { valid } = this.props;
     const invalidStyles = !valid ? styles.invalidInput : {};
     return (
@@ -187,15 +190,10 @@ export default class AccountSeed extends Component {
           style={[styles.input, invalidStyles]}
           multiline
           autoCapitalize="none"
-          onBlur={this.keyboardDidHide}
           onSelectionChange={this.handleCursorPosition}
           {...this.props}
-          onFocus={(...args) => {
-            this.keyboardDidShow();
-            return this.props.onFocus(...args);
-          }}
         />
-        {keyboard && this.renderSuggestions()}
+        {this.renderSuggestions()}
       </View>
     );
   }
@@ -221,7 +219,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     height: 35,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+
   },
   suggestion: {
     paddingVertical: 9,
