@@ -26,21 +26,9 @@ import TouchableItem from './TouchableItem';
 
 export default class AccountSeed extends Component {
   state = {
-    cursorPosition: 0,
     useBIP39WordList: true,
     useParityWordList: true,
   };
-
-  handleCursorPosition = ({
-    nativeEvent: {
-      selection: { start, end }
-    }
-  }) => {
-    if (start !== end) {
-      return;
-    }
-    this.setState({ cursorPosition: start });
-  }
 
   getSuggestions = (inputWordArray, word_list) => {
     const input = inputWordArray[inputWordArray.length - 1]
@@ -137,7 +125,6 @@ export default class AccountSeed extends Component {
           style={[styles.input, invalidStyles]}
           multiline
           autoCapitalize="none"
-          onSelectionChange={this.handleCursorPosition}
           {...this.props}
         />
         {value.length > 0 && this.renderSuggestions()}
