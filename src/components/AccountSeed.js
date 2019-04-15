@@ -42,39 +42,6 @@ export default class AccountSeed extends Component {
     this.setState({ cursorPosition: start });
   }
 
-  // Parse the imput field and return the position of the word
-  // that is currently under the user's cursor
-  getWordPosition = () => {
-    const { value } = this.props;
-    const { cursorPosition } = this.state;
-    let wordPosition = 0;
-    let i = 0;
-    let char = '';
-    let wasLetter = false;
-    // if the input field is empty
-    if (0 === value.length) {
-      return 0;
-    }
-    while (true) {
-      // get out if the i met the cursor or the i is at the end of the recovery phrase
-      if (cursorPosition === i || (char = value.charAt(i)) === '') {
-        break;
-      }
-      // if the character rigth after the i isn't a white space or new line
-      if ([' ', '\n', '\r'].indexOf(char) === -1) {
-        wasLetter = true;
-      } else {
-        // otherwise if we had a letter before, it means we reached the end of a word
-        if (wasLetter) {
-          wordPosition++;
-        }
-        wasLetter = false;
-      }
-      i++;
-    }
-    return wordPosition;
-  }
-
   getSuggestions = (inputWordArray, word_list) => {
     const input = inputWordArray[inputWordArray.length - 1]
     // the word list is sorted, get the index we should start searching
@@ -93,7 +60,7 @@ export default class AccountSeed extends Component {
       }
 
       // do not suggest words that where already used (and part of `inputWordArray`)
-      // unless it's the latest word e.g the user just typed it
+      // unless it's the latest word e.g what the user is typing
       if (inputWordArray.indexOf(word_list[fromIndex]) === -1 || inputWordArray.indexOf(word_list[fromIndex]) === (inputWordArray.length - 1)) {
         result.push(word_list[fromIndex]);
         yielded++
@@ -132,8 +99,6 @@ export default class AccountSeed extends Component {
     const { value } = this.props;
     // array of the words in the input field 
     const inputWordArray = value.length ? value.split(' ') : [];
-    // at what word number the user's cursor is
-    const wordPosition = this.getWordPosition();
     const suggestions = this.generateSuggestions(inputWordArray);
 
     return (
@@ -149,7 +114,7 @@ export default class AccountSeed extends Component {
             <TouchableItem
               key={i}
               onPress={e => {
-                inputWordArray[wordPosition] = suggestion;
+                inputWordArray[inputWordArray.length-1] = suggestion;
                 this.props.onChangeText(inputWordArray.join(' '));
               }}
             >
