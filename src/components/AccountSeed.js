@@ -75,18 +75,15 @@ export default class AccountSeed extends Component {
     return wordPosition;
   }
 
-  getSuggestions = (words, word_list) => {
-    const input = words[words.length - 1]
+  getSuggestions = (inputWordArray, word_list) => {
+    const input = inputWordArray[inputWordArray.length - 1]
     // the word list is sorted, get the index we should start searching
     // for the word
     let fromIndex = word_list.findIndex(w => w.startsWith(input));
     if (fromIndex === -1) {
       return [];
     }
-    // if the whole word has already been typed in
-    if (word_list[fromIndex] === input) {
-      return [];
-    }
+
     const SUGGESTIONS_COUNT = 5;
     const result = [];
     let yielded = 0;
@@ -95,8 +92,9 @@ export default class AccountSeed extends Component {
         return result;
       }
 
-      //do not suggest words that where already added
-      if (words.indexOf(word_list[fromIndex]) === -1) {
+      // do not suggest words that where already used (and part of `inputWordArray`)
+      // unless it's the latest word e.g the user just typed it
+      if (inputWordArray.indexOf(word_list[fromIndex]) === -1 || inputWordArray.indexOf(word_list[fromIndex]) === (inputWordArray.length - 1)) {
         result.push(word_list[fromIndex]);
         yielded++
       }
@@ -105,26 +103,26 @@ export default class AccountSeed extends Component {
     return result;
   }
 
-  narrowWordList = (words) => {
+  narrowWordList = (inputWordArray) => {
     // if the last word is only present in BIP39 word list
-    if (BIP39_WORDS.indexOf(words[words.length - 2]) !== -1 && PARITY_WORDS.indexOf(words[words.length - 2]) === -1) {
+    if (BIP39_WORDS.indexOf(inputWordArray[inputWordArray.length - 2]) !== -1 && PARITY_WORDS.indexOf(inputWordArray[inputWordArray.length - 2]) === -1) {
       this.setState({ useParityWordList: false })
       // if the second last word is only present in Parity word list
-    } else if (BIP39_WORDS.indexOf(words[words.length - 2]) === -1 && PARITY_WORDS.indexOf(words[words.length - 2]) !== -1) {
+    } else if (BIP39_WORDS.indexOf(inputWordArray[inputWordArray.length - 2]) === -1 && PARITY_WORDS.indexOf(inputWordArray[inputWordArray.length - 2]) !== -1) {
       this.setState({ useBIP39WordList: false })
     }
   }
 
-  generateSuggestions = (words) => {
+  generateSuggestions = (inputWordArray) => {
     const { useBIP39WordList, useParityWordList } = this.state;
 
     // try to narrow down the word list using the last word typed, 
     // as soon as a second word is being typed
-    words.length > 1 && useBIP39WordList && useParityWordList && this.narrowWordList(words);
+    inputWordArray.length > 1 && useBIP39WordList && useParityWordList && this.narrowWordList(inputWordArray);
 
     let suggestions = []
-    useParityWordList && suggestions.push(...this.getSuggestions(words, PARITY_WORDS));
-    useBIP39WordList && suggestions.push(...this.getSuggestions(words, BIP39_WORDS));
+    useParityWordList && suggestions.push(...this.getSuggestions(inputWordArray, PARITY_WORDS));
+    useBIP39WordList && suggestions.push(...this.getSuggestions(inputWordArray, BIP39_WORDS));
 
     //return a deduplicated sorted array if both word lists are still used
     return (useBIP39WordList && useParityWordList) ? [...new Set(suggestions.sort())] : suggestions;
@@ -133,10 +131,10 @@ export default class AccountSeed extends Component {
   renderSuggestions () {
     const { value } = this.props;
     // array of the words in the input field 
-    const words = value.length ? value.toLowerCase().split(' ') : [];
+    const inputWordArray = value.length ? value.split(' ') : [];
     // at what word number the user's cursor is
     const wordPosition = this.getWordPosition();
-    const suggestions = this.generateSuggestions(words);
+    const suggestions = this.generateSuggestions(inputWordArray);
 
     return (
       <View
@@ -151,8 +149,8 @@ export default class AccountSeed extends Component {
             <TouchableItem
               key={i}
               onPress={e => {
-                words[wordPosition] = suggestion;
-                this.props.onChangeText(words.join(' '));
+                inputWordArray[wordPosition] = suggestion;
+                this.props.onChangeText(inputWordArray.join(' '));
               }}
             >
               <View key={suggestion} style={[styles.suggestion, sepStyle]}>
@@ -166,7 +164,7 @@ export default class AccountSeed extends Component {
   }
 
   render () {
-    const { valid } = this.props;
+    const { valid, value } = this.props;
     const invalidStyles = !valid ? styles.invalidInput : {};
     return (
       <View>
@@ -177,7 +175,7 @@ export default class AccountSeed extends Component {
           onSelectionChange={this.handleCursorPosition}
           {...this.props}
         />
-        {this.renderSuggestions()}
+        {value.length > 0 && this.renderSuggestions()}
       </View>
     );
   }
