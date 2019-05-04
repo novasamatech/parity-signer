@@ -27,7 +27,7 @@ import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountPin extends React.PureComponent {
-  render () {
+  render() {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountPinView {...this.props} accounts={accounts} />}
@@ -50,7 +50,7 @@ class AccountPinView extends React.PureComponent {
     pinMismatch: false
   };
 
-  async submit () {
+  async submit() {
     const { accounts, navigation } = this.props;
     const accountCreation = navigation.getParam('isNew');
     const { pin } = this.state;
@@ -96,7 +96,7 @@ class AccountPinView extends React.PureComponent {
     return (<Text style={styles.hintText}>Choose a PIN code with 6 or more digits</Text>)
   }
 
-  render () {
+  render() {
     const title = 'ACCOUNT PIN';
     return (
       <View style={styles.body}>
@@ -133,7 +133,7 @@ class AccountPinView extends React.PureComponent {
 }
 
 class PinInput extends Component {
-  render () {
+  render() {
     return (
       <TextInput
         keyboardAppearance="dark"

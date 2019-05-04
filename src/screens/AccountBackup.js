@@ -30,7 +30,7 @@ export default class AccountBackup extends React.PureComponent {
   static navigationOptions = {
     title: 'Account Backup'
   };
-  render () {
+  render() {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountBackupView {...this.props} accounts={accounts} />}
@@ -45,7 +45,7 @@ class AccountBackupView extends React.PureComponent {
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
   }
 
-  componentDidMount () {
+  componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
   }
 
@@ -55,7 +55,7 @@ class AccountBackupView extends React.PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { accounts } = this.props;
     const selected =
       accounts.getNew().address && accounts.getNew().address.length
@@ -65,8 +65,7 @@ class AccountBackupView extends React.PureComponent {
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
-
-  render () {
+  render() {
     const { accounts, navigation } = this.props;
     const isNew = navigation.getParam('isNew');
     const selected = isNew ? accounts.getNew() : accounts.getSelected();

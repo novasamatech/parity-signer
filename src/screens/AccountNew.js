@@ -35,7 +35,7 @@ export default class AccountNew extends React.Component {
     title: 'New Account',
     headerBackTitle: 'Back'
   };
-  render () {
+  render() {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountNewView {...this.props} accounts={accounts} />}
@@ -45,7 +45,7 @@ export default class AccountNew extends React.Component {
 }
 
 class AccountNewView extends React.Component {
-  render () {
+  render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
     const chainId = selected.chainId;
