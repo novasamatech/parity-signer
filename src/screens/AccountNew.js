@@ -45,12 +45,6 @@ export default class AccountNew extends React.Component {
 }
 
 class AccountNewView extends React.Component {
-
-  shouldComponentUpdate (nextProps) {
-    const hasEmptySeed = nextProps.accounts.state.newAccount.seed === "";
-    return !hasEmptySeed;
-  }
-
   render () {
     const { accounts } = this.props;
     const selected = accounts.getNew();

@@ -39,15 +39,10 @@ export default class AccountBackup extends React.PureComponent {
   }
 }
 
-class AccountBackupView extends React.Component {
+class AccountBackupView extends React.PureComponent {
   constructor(...args) {
     super(...args);
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
-  }
-
-  shouldComponentUpdate (nextProps) {
-    const hasEmptySeed = nextProps.accounts.state.newAccount.seed === "";
-    return !hasEmptySeed;
   }
 
   componentDidMount () {
@@ -60,13 +55,13 @@ class AccountBackupView extends React.Component {
     }
   }
 
-  async componentWillUnmount () {
+  componentWillUnmount () {
     const { accounts } = this.props;
     const selected =
       accounts.getNew().address && accounts.getNew().address.length
         ? accounts.getNew()
         : accounts.getSelected();
-    await accounts.lockAccount(selected);
+    accounts.lockAccount(selected);
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
