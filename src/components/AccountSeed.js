@@ -30,13 +30,28 @@ const ALL_WORDS = Array.from(new Set(PARITY_WORDS.concat(BIP39_WORDS))).sort();
 const SUGGESTIONS_COUNT = 5;
 
 export default class AccountSeed extends Component {
-  generateSuggestions (inputWordArray) {
-    if (inputWordArray.length < 1) {
-      return [];
-    }
+  state = {
+    cursorPosition: 0,
+  };
 
-    const input = inputWordArray[inputWordArray.length - 1]; // last word
-    const wordList = this.selectWordList(inputWordArray);
+  handleCursorPosition = (event) => {
+    const {start, end} = event.nativeEvent.selection;
+
+    if (start !== end) {
+      return;
+    }
+    this.setState({ cursorPosition: start });
+  }
+
+  /**
+   * Generate a list of suggestions for input
+   *
+   * @param {string}   input    to find suggestions for
+   * @param {string[]} wordList to find suggestions in
+   *
+   * @return {string[]} suggestions
+   */
+  generateSuggestions (input, wordList) {
     const fromIndex = binarySearch(wordList, input).index; // index to start search from
 
     let suggestions = wordList.slice(fromIndex, fromIndex + SUGGESTIONS_COUNT);
@@ -50,12 +65,8 @@ export default class AccountSeed extends Component {
     return suggestions;
   }
 
-  selectWordList (inputWordArray) {
-    const previousWords = inputWordArray.slice(0, -1); // input without last word
-
-    let words = [];
-
-    for (const word of previousWords) {
+  selectWordList (otherWords) {
+    for (const word of otherWords) {
       const isBIP39 = binarySearch(BIP39_WORDS, word).hit;
       const isParity = binarySearch(PARITY_WORDS, word).hit;
 
@@ -71,14 +82,23 @@ export default class AccountSeed extends Component {
 
   renderSuggestions () {
     const { value } = this.props;
-    // array of the words in the input field
-    const inputWordArray = value.length ? value.split(' ') : [];
-    const suggestions = this.generateSuggestions(inputWordArray);
+    const { cursorPosition } = this.state;
+
+    let left = value.substring(0, cursorPosition).split(' ');
+    let right = value.substring(cursorPosition).split(' ');
+
+    // combine last nibble before cursor and first nibble after cursor into a word
+    const input = left[left.length - 1] + right[0];
+
+    left = left.slice(0, -1);
+    right = right.slice(1);
+
+    // find a wordList using words around as discriminator
+    const wordList = this.selectWordList(left.concat(right));
+    const suggestions = this.generateSuggestions(input, wordList);
 
     return (
-      <View
-        style={[styles.suggestions]}
-      >
+      <View style={styles.suggestions}>
         {suggestions.map((suggestion, i) => {
           const sepStyle =
             i !== suggestions.length - 1
@@ -88,8 +108,9 @@ export default class AccountSeed extends Component {
             <TouchableItem
               key={i}
               onPress={e => {
-                inputWordArray[inputWordArray.length-1] = suggestion;
-                this.props.onChangeText(inputWordArray.join(' '));
+                const phrase = left.concat(suggestion, right).join(' ');
+
+                this.props.onChangeText(phrase);
               }}
             >
               <View key={suggestion} style={[styles.suggestion, sepStyle]}>
@@ -111,6 +132,7 @@ export default class AccountSeed extends Component {
           style={[styles.input, invalidStyles]}
           multiline
           autoCapitalize="none"
+          onSelectionChange={this.handleCursorPosition}
           {...this.props}
         />
         {value.length > 0 && this.renderSuggestions()}
@@ -140,7 +162,6 @@ const styles = StyleSheet.create({
     height: 35,
     flexDirection: 'row',
     alignItems: 'center',
-
   },
   suggestion: {
     paddingVertical: 9,
