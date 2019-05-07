@@ -95,7 +95,7 @@ export default class AccountSeed extends Component {
 
     // find a wordList using words around as discriminator
     const wordList = this.selectWordList(left.concat(right));
-    const suggestions = this.generateSuggestions(input, wordList);
+    const suggestions = this.generateSuggestions(input.toLowerCase(), wordList);
 
     return (
       <View style={styles.suggestions}>
