@@ -33,33 +33,19 @@ export function binarySearch(array, item, compare = defaultCompare) {
   let min = 0;
   let max = array.length - 1;
 
-  while (min !== max) {
-    let guess = (min + max) / 2 | 0;
-    const other = array[guess];
+  while (min <= max) {
+    let guess = (min + max) >> 1; // fast integer division by 2
 
-    if (item === other) {
-      return { hit: true, index: guess };
-    }
-
-    const result = compare(item, other);
+    const result = compare(item, array[guess]);
 
     if (result < 0) {
-      max = Math.max(min, guess - 1);
+      max = guess - 1;
     } else if (result > 0) {
-      min = Math.min(max, guess + 1);
+      min = guess + 1;
     } else {
-      // Equal sort value, but different reference, do value search from min
-      return { hit: true, index: array.indexOf(item, min) };
+      return { hit: true, index: guess };
     }
   }
 
-  const result = compare(item, array[min]);
-
-  if (result < 0) {
-    return { hit: false, index: min };
-  } else if (result > 0) {
-    return { hit: false, index: min + 1 };
-  }
-
-  return { hit: true, index: min };
+  return { hit: false, index: min };
 }
