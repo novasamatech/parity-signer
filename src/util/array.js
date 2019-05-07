@@ -27,7 +27,7 @@ function defaultCompare(a, b) {
  */
 export function binarySearch(array, item, compare = defaultCompare) {
   if (array.length === 0) {
-    return -1;
+    return { hit: false, index: 0 };
   }
 
   let min = 0;
