@@ -36,31 +36,23 @@ export default class AccountSeed extends Component {
     }
 
     const input = inputWordArray[inputWordArray.length - 1]; // last word
-    const previousWords = inputWordArray.slice(0, -1); // input without last word
-    const wordList = this.selectWordList(previousWords);
+    const wordList = this.selectWordList(inputWordArray);
     const fromIndex = binarySearch(wordList, input).index; // index to start search from
 
-    const result = [];
+    let suggestions = wordList.slice(fromIndex, fromIndex + SUGGESTIONS_COUNT);
 
-    for (const suggestion of wordList.slice(fromIndex)) {
-      if (!suggestion.startsWith(input)) {
-        break;
-      }
+    const lastValidIndex = suggestions.findIndex((word) => !word.startsWith(input));
 
-      // do not suggest words that where already used
-      if (previousWords.indexOf(suggestion) === -1) {
-        result.push(suggestion);
-
-        if (result.length >= SUGGESTIONS_COUNT) {
-          break;
-        }
-      }
+    if (lastValidIndex !== -1) {
+      suggestions = suggestions.slice(0, lastValidIndex);
     }
 
-    return result;
+    return suggestions;
   }
 
-  selectWordList (previousWords) {
+  selectWordList (inputWordArray) {
+    const previousWords = inputWordArray.slice(0, -1); // input without last word
+
     let words = [];
 
     for (const word of previousWords) {
