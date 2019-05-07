@@ -30,8 +30,6 @@ const ALL_WORDS = Array.from(new Set(PARITY_WORDS.concat(BIP39_WORDS))).sort();
 const SUGGESTIONS_COUNT = 5;
 
 export default class AccountSeed extends Component {
-  state = {};
-
   generateSuggestions (inputWordArray) {
     if (inputWordArray.length < 1) {
       return [];
@@ -87,7 +85,7 @@ export default class AccountSeed extends Component {
 
     return (
       <View
-        style={[styles.suggestions, { height: this.state.suggestionsHeight }]}
+        style={[styles.suggestions]}
       >
         {suggestions.map((suggestion, i) => {
           const sepStyle =
