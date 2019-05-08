@@ -12,106 +12,103 @@ import Foundation
 class EthkeyBridge: NSObject {
 	@objc func brainWalletAddress(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var seed_ptr = seed.asPtr()
-		let address_rust_str = ethkey_brainwallet_address(&seed_ptr)
-		let address_rust_str_ptr = rust_string_ptr(address_rust_str)
-		let address = String.fromStringPtr(ptr: address_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(address_rust_str_ptr)
-		rust_string_destroy(address_rust_str)
-		resolve(address)
+		var error: UInt32 = 0
+		let address = String.fromRust(ethkey_brainwallet_address(&error, &seed_ptr))
+		if error == 0 {
+			resolve(address)
+		} else {
+			reject("There was an error", nil, nil)
+		}
 	}
 
 	@objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		print(seed, " + ", message)
 		var seed_ptr = seed.asPtr()
 		var message_ptr = message.asPtr()
-		let signature_rust_str = ethkey_brainwallet_sign(&seed_ptr, &message_ptr)
-		let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
-		let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(signature_rust_str_ptr)
-		rust_string_destroy(signature_rust_str)
-		resolve(signature)
+		var error: UInt32 = 0
+		let signature = String.fromRust(ethkey_brainwallet_sign(&error, &seed_ptr, &message_ptr))
+		if error == 0 {
+			resolve(signature)
+		} else {
+			reject("There was an error", nil, nil)
+		}
 	}
 
 	@objc func rlpItem(_ rlp: String, position: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var rlp_ptr = rlp.asPtr()
 		var error: UInt32 = 0
-		let item_rust_str = rlp_item(&rlp_ptr, position, &error)
-		let item_rust_str_ptr = rust_string_ptr(item_rust_str)
-		let item = String.fromStringPtr(ptr: item_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(item_rust_str_ptr)
-		rust_string_destroy(item_rust_str)
-		if (error == 0) {
+		let item = String.fromRust(rlp_item(&error, &rlp_ptr, position))
+		if error == 0 {
 			resolve(item)
 		} else {
-			reject("invalid rlp", nil, nil)
+			reject("There was an error", nil, nil)
 		}
 	}
 
 	@objc func keccak(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var data_ptr = data.asPtr()
-		let hash_rust_str = keccak256(&data_ptr)
-		let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
-		let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(hash_rust_str_ptr)
-		rust_string_destroy(hash_rust_str)
-		resolve(hash)
+		var error: UInt32 = 0
+		let hash = String.fromRust(keccak256(&error, &data_ptr))
+		if error == 0 {
+			resolve(hash)
+		} else {
+			reject("There was an error", nil, nil)
+		}
 	}
 
 	@objc func ethSign(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var data_ptr = data.asPtr()
-		let hash_rust_str = eth_sign(&data_ptr)
-		let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
-		let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(hash_rust_str_ptr)
-		rust_string_destroy(hash_rust_str)
-		resolve(hash)
+		var error: UInt32 = 0
+		let hash = String.fromRust(eth_sign(&error, &data_ptr))
+		if error == 0 {
+			resolve(hash)
+		} else {
+			reject("There was an error", nil, nil)
+		}
 	}
 
 	@objc func blockiesIcon(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var seed_ptr = seed.asPtr()
-		let icon_rust_str = blockies_icon(&seed_ptr)
-		let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
-		let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(icon_rust_str_ptr)
-		rust_string_destroy(icon_rust_str)
-		resolve(icon)
+		var error: UInt32 = 0
+		let icon = String.fromRust(blockies_icon(&error, &seed_ptr))
+		if error == 0 {
+			resolve(icon)
+		} else {
+			reject("There was an error", nil, nil)
+		}
 	}
 
 	@objc func randomPhrase(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-		let words_rust_str = random_phrase()
-		let words_rust_str_ptr = rust_string_ptr(words_rust_str)
-		let words = String.fromStringPtr(ptr: words_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(words_rust_str_ptr)
-		rust_string_destroy(words_rust_str)
-		resolve(words)
+		var error: UInt32 = 0
+		let words = String.fromRust(random_phrase(&error))
+		if error == 0 {
+			resolve(words)
+		} else {
+			reject("There was an error", nil, nil)
+		}
 	}
 
 	@objc func encryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var data_ptr = data.asPtr()
 		var password_ptr = password.asPtr()
-		let encrypted_data_rust_str = encrypt_data(&data_ptr, &password_ptr)
-		let encrypted_data_rust_str_ptr = rust_string_ptr(encrypted_data_rust_str)
-		let encrypted_data = String.fromStringPtr(ptr: encrypted_data_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(encrypted_data_rust_str_ptr)
-		rust_string_destroy(encrypted_data_rust_str)
-		resolve(encrypted_data)
+		var error: UInt32 = 0
+		let encrypted_data = String.fromRust(encrypt_data(&error, &data_ptr, &password_ptr))
+		if error == 0 {
+			resolve(encrypted_data)
+		} else {
+			reject("There was an error", nil, nil)
+		}
 	}
 
 	@objc func decryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
 		var data_ptr = data.asPtr()
 		var password_ptr = password.asPtr()
 		var error: UInt32 = 0
-		let decrypted_data_rust_str = decrypt_data(&data_ptr, &password_ptr, &error)
-		let decrypted_data_rust_str_ptr = rust_string_ptr(decrypted_data_rust_str)
-		let decrypted_data = String.fromStringPtr(ptr: decrypted_data_rust_str_ptr!.pointee)
-		rust_string_ptr_destroy(decrypted_data_rust_str_ptr)
-		rust_string_destroy(decrypted_data_rust_str)
+		let decrypted_data = String.fromRust(decrypt_data(&error, &data_ptr, &password_ptr))
 		if error == 0 {
 			resolve(decrypted_data)
-		} else if error == 1{
-			reject("invalid data", nil, nil)
 		} else {
-			reject("invalid password", nil, nil)
+			reject("There was an error", nil, nil)
 		}
 	}
 }

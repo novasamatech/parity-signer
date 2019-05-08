@@ -259,9 +259,11 @@ macro_rules! export {
 
             $(
                 #[no_mangle]
-                pub extern fn $name($( $par: <$t as Argument<'static>>::Ext ),*) -> <$ret as Return<'static>>::Ext {
+                pub extern fn $name(err: *mut u32, $( $par: <$t as Argument<'static>>::Ext ),*) -> <$ret as Return<'static>>::Ext {
                     let error = Cell::new(0);
                     let ret = super::$name($(Argument::convert(&error, $par)),*);
+
+                    unsafe { *err |= error.get() };
 
                     Return::convert(&error, ret)
                 }
