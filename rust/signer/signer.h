@@ -40,20 +40,11 @@ void rust_string_ptr_destroy(struct rust_string_ptr* s);
 
 // ethkey ffi
 
-// keypair pointer
-struct keypair_ptr;
-
-// removes keypair pointer
-void ethkey_keypair_destroy(struct keypair_ptr* keypair);
-
-// creates new brainwallet keypair from seed
-struct keypair_ptr* ethkey_keypair_brainwallet(const struct rust_string_ptr* seed);
-
 // return keypair address
-struct rust_string* ethkey_keypair_address(const struct keypair_ptr* keypair);
+struct rust_string* ethkey_brainwallet_address(const struct rust_string_ptr* seed);
 
 // returns message signed with keypair
-struct rust_string* ethkey_keypair_sign(const struct keypair_ptr* keypair, const struct rust_string_ptr* message);
+struct rust_string* ethkey_brainwallet_sign(const struct rust_string_ptr* seed, const struct rust_string_ptr* message);
 
 // rlp ffi
 

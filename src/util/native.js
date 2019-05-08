@@ -19,33 +19,53 @@
 import { EthkeyBridge } from 'NativeModules';
 import { checksummedAddress } from './checksum';
 
-const asString = x =>
-  x
+function asString (x) {
+  return x
     .split('')
     .map(x => x.charCodeAt(0).toString(16))
+    .map(n => n.length < 2 ? `0${n}` : n)
     .join('');
+}
 
-export const brainWalletAddress = seed =>
-  EthkeyBridge.brainWalletAddress(seed).then(address => {
-    return keccak(asString(address)).then(hash =>
-      checksummedAddress(address, hash)
-    );
-  });
-export const brainWalletSign = (seed, message) =>
-  EthkeyBridge.brainWalletSign(seed, message);
-export const rlpItem = (rlp, position) => EthkeyBridge.rlpItem(rlp, position);
-export const keccak = data => EthkeyBridge.keccak(data);
-export const ethSign = data => EthkeyBridge.ethSign(data);
-export const blockiesIcon = seed =>
-  EthkeyBridge.blockiesIcon(seed.toLowerCase()).then(
-    icon => 'data:image/png;base64,' + icon
-  );
-export const words = () => EthkeyBridge.randomPhrase();
-export const encryptData = (data, password) =>
-  EthkeyBridge.encryptData(data, password);
-export const decryptData = (data, password) =>
-  EthkeyBridge.decryptData(data, password);
-export const qrCode = (data) =>
-  EthkeyBridge.qrCode(data).then(
-    qr => 'data:image/png;base64,' + qr
-  );
+export async function brainWalletAddress (seed) {
+  const address = await EthkeyBridge.brainWalletAddress(seed);
+  const hash = await keccak(asString(address));
+
+  return checksummedAddress(address, hash);
+}
+
+export function brainWalletSign (seed, message) {
+  return EthkeyBridge.brainWalletSign(seed, message);
+}
+
+export function rlpItem (rlp, position) {
+  return EthkeyBridge.rlpItem(rlp, position);
+}
+
+export function keccak (data) {
+  return EthkeyBridge.keccak(data);
+}
+
+export function ethSign (data) {
+  return EthkeyBridge.ethSign(data);
+}
+
+export function blockiesIcon (seed) {
+  return EthkeyBridge.blockiesIcon(seed.toLowerCase());
+}
+
+export function words () {
+  return EthkeyBridge.randomPhrase();
+}
+
+export function encryptData (data, password) {
+  return EthkeyBridge.encryptData(data, password);
+}
+
+export function decryptData (data, password) {
+  return EthkeyBridge.decryptData(data, password);
+}
+
+export function qrCode (data) {
+  return EthkeyBridge.qrCode(data)
+}

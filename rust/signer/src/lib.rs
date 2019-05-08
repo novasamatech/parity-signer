@@ -31,8 +31,19 @@ use std::num::NonZeroU32;
 // 10240 is always non-zero, ergo this is safe
 const CRYPTO_ITERATIONS: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(10240) };
 
-// string ffi
+fn base64png(png: &[u8]) -> String {
+  static HEADER: &str = "data:image/png;base64,";
 
+  let mut out = String::with_capacity(png.len() + png.len() / 2 + HEADER.len());
+
+  out.push_str(HEADER);
+
+  base64::encode_config_buf(png, base64::STANDARD, &mut out);
+
+  out
+}
+
+// string ffi
 #[no_mangle]
 pub unsafe extern fn rust_string_ptr(s: *mut String) -> *mut StringPtr {
   Box::into_raw(Box::new(StringPtr::from(&**s)))
@@ -46,26 +57,6 @@ pub unsafe extern fn rust_string_destroy(s: *mut String) {
 #[no_mangle]
 pub unsafe extern fn rust_string_ptr_destroy(s: *mut StringPtr) {
   let _ = Box::from_raw(s);
-}
-
-// ethkey ffi
-#[no_mangle]
-pub unsafe extern fn ethkey_keypair_destroy(keypair: *mut KeyPair) {
-  let _ = Box::from_raw(keypair);
-}
-
-// TODO: REMOVE
-#[no_mangle]
-pub unsafe extern fn ethkey_keypair_brainwallet(seed: *mut StringPtr) -> *mut KeyPair {
-  let keypair = KeyPair::from_auto_phrase(&**seed);
-  Box::into_raw(Box::new(keypair))
-}
-
-// TODO: REMOVE, use ethkey_brainwallet_address!
-#[no_mangle]
-pub unsafe extern fn ethkey_keypair_address(keypair: *mut KeyPair) -> *mut String {
-  let address: String = (*keypair).address().to_hex();
-  Box::into_raw(Box::new(address))
 }
 
 // TODO: REMOVE, use ethkey_brainwallet_sign!
@@ -126,7 +117,7 @@ export! {
 
     create_icon(&mut result, Blockies::Ethereum(options)).ok()?;
 
-    Some(base64::encode(&result))
+    Some(base64png(&result))
   }
 
   @Java_io_parity_signer_EthkeyBridge_ethkeyEthSign
@@ -172,15 +163,15 @@ export! {
   @Java_io_parity_signer_EthkeyBridge_ethkeyQrCode
   fn qrcode(data: &str) -> Option<String> {
     use qrcodegen::{QrCode, QrCodeEcc};
-    use pixelate::{Image, WHITE, BLACK};
+    use pixelate::{Image, Color, BLACK};
 
     let qr = QrCode::encode_binary(data.as_bytes(), QrCodeEcc::Medium).ok()?;
 
-    let palette = &[WHITE, BLACK];
+    let palette = &[Color::Rgba(255,255,255,0), BLACK];
     let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
 
-    for y in 0 .. qr.size() {
-      for x in 0 .. qr.size() {
+    for y in 0..qr.size() {
+      for x in 0..qr.size() {
         pixels.push(qr.get_module(x, y) as u8);
       }
     }
@@ -191,10 +182,10 @@ export! {
       palette,
       pixels: &pixels,
       width: qr.size() as usize,
-      scale: 8,
-    }.render(&mut result).ok();
+      scale: 16,
+    }.render(&mut result).ok()?;
 
-    Some(base64::encode(&result))
+    Some(base64png(&result))
   }
 }
 
