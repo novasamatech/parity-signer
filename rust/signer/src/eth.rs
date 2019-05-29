@@ -26,6 +26,11 @@ pub struct KeyPair {
 	public: PublicKey,
 }
 
+pub enum PhraseKind {
+	Bip39,
+	Legacy,
+}
+
 impl KeyPair {
 	pub fn from_secret(secret: SecretKey) -> KeyPair {
 		let public = secret.public();
@@ -64,9 +69,10 @@ impl KeyPair {
 		SecretKey::from_raw(&epriv.secret()).map(KeyPair::from_secret).ok()
 	}
 
-	pub fn from_auto_phrase(phrase: &str) -> KeyPair {
+	pub fn from_auto_phrase(phrase: &str) -> (PhraseKind, KeyPair) {
 		Self::from_bip39_phrase(phrase)
-			.unwrap_or_else(|| Self::from_parity_phrase(phrase))
+			.map(|keypair| (PhraseKind::Bip39, keypair))
+			.unwrap_or_else(|| (PhraseKind::Legacy, Self::from_parity_phrase(phrase)))
 	}
 
 	pub fn secret(&self) -> &SecretKey {

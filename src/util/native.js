@@ -19,6 +19,26 @@
 import { EthkeyBridge } from 'NativeModules';
 import { checksummedAddress } from './checksum';
 
+/**
+ * Turn an address string tagged with either 'legacy:' or 'bip39:' prefix
+ * to an object, marking if it was generated with BIP39.
+ */
+function untagAddress(address) {
+  let bip39 = false;
+
+  const colonIdx = address.indexOf(':');
+
+  if (colonIdx !== -1) {
+    bip39 = address.substring(0, colonIdx) === 'bip39';
+    address = address.substring(colonIdx + 1);
+  }
+
+  return {
+    bip39,
+    address,
+  };
+}
+
 function asString (x) {
   return x
     .split('')
@@ -28,10 +48,32 @@ function asString (x) {
 }
 
 export async function brainWalletAddress (seed) {
-  const address = await EthkeyBridge.brainWalletAddress(seed);
+  const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
+  const { bip39, address } = untagAddress(taggedAddress);
   const hash = await keccak(asString(address));
 
-  return checksummedAddress(address, hash);
+  return {
+    bip39,
+    address: checksummedAddress(address, hash),
+  };
+}
+
+export function brainWalletBIP39Address (seed) {
+  return EthkeyBridge
+    .brainWalletBIP(seed)
+    .then(async (taggedAddress) => {
+      const { bip39, address } = untagAddress(taggedAddress);
+
+      const hash = await keccak(asString(address));
+
+      return {
+        bip39,
+        address: checksummedAddress(address, hash),
+      };
+    })
+    .catch((_) => {
+      return null;
+    });
 }
 
 export function brainWalletSign (seed, message) {

@@ -40,33 +40,36 @@ void rust_string_ptr_destroy(struct rust_string_ptr* s);
 
 // ethkey ffi
 
-// return keypair address
-struct rust_string* ethkey_brainwallet_address(const struct rust_string_ptr* seed);
+// return keypair address, automatically picking BIP39 or parity phrases
+struct rust_string* ethkey_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed);
+
+// return keypair address from BIP39 phrase
+struct rust_string* ethkey_brainwallet_bip39_address(unsigned* error, const struct rust_string_ptr* seed);
 
 // returns message signed with keypair
-struct rust_string* ethkey_brainwallet_sign(const struct rust_string_ptr* seed, const struct rust_string_ptr* message);
+struct rust_string* ethkey_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* message);
 
 // rlp ffi
 
 // returns rlp item at given position
-struct rust_string* rlp_item(const struct rust_string_ptr* rlp, const unsigned position, unsigned* error);
+struct rust_string* rlp_item(unsigned* error, const struct rust_string_ptr* rlp, const unsigned position);
 
 // sha3 ffi
 
-struct rust_string* keccak256(const struct rust_string_ptr* data);
+struct rust_string* keccak256(unsigned* error, const struct rust_string_ptr* data);
 
-struct rust_string* eth_sign(const struct rust_string_ptr* data);
+struct rust_string* eth_sign(unsigned* error, const struct rust_string_ptr* data);
 
 // blockies ffi
 
-struct rust_string* blockies_icon(const struct rust_string_ptr* blockies_seed);
+struct rust_string* blockies_icon(unsigned* error, const struct rust_string_ptr* blockies_seed);
 
 // random phrase ffi
 
-struct rust_string* random_phrase();
+struct rust_string* random_phrase(unsigned* error);
 
 // data encryption ffi
 
-struct rust_string* encrypt_data(const struct rust_string_ptr* data, const struct rust_string_ptr* password);
+struct rust_string* encrypt_data(unsigned* error, const struct rust_string_ptr* data, const struct rust_string_ptr* password);
 
-struct rust_string* decrypt_data(const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password, unsigned* error);
+struct rust_string* decrypt_data(unsigned* error, const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password);
