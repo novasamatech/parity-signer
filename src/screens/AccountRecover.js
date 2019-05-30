@@ -130,7 +130,7 @@ class AccountRecoverView extends React.Component {
               const validation = validateSeed(selected.seed, selected.validBip39Seed);
               if (!validation.valid) {
                 Alert.alert(
-                  'Warning: seed phrase is not secure',
+                  'Warning:',
                   `${validation.reason}`,
                   [
                     {
