@@ -112,9 +112,9 @@ class AccountNewView extends React.Component {
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
-              disabled={ !validateSeed(selected.seed).valid }
+              disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
               onPress={() => {
-                validateSeed(selected.seed).valid &&
+                validateSeed(selected.seed, selected.validBip39Seed).valid &&
                   this.props.navigation.navigate('AccountBackup', {
                     isNew: true,
                     isWelcome: this.props.navigation.getParam('isWelcome')
