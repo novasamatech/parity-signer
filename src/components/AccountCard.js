@@ -28,7 +28,7 @@ export default class AccountCard extends React.PureComponent<{
   address: string,
   chainId: string,
   onPress: () => any,
-  title: ?string,
+  title?: string,
   seedType?: string,
 }> {
   static propTypes = {
@@ -50,7 +50,7 @@ export default class AccountCard extends React.PureComponent<{
     title = title.length ? title : AccountCard.defaultProps.title;
     let seedTypeDisplay = ''
 
-    if (seedType && seedType!== ''){
+    if (seedType && seedType !== ''){
       seedTypeDisplay = 'seed: '+ seedType;
     }
 
