@@ -48,11 +48,7 @@ export default class AccountCard extends React.PureComponent<{
     const { address, chainId, onPress, seedType, style } = this.props;
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
-    let seedTypeDisplay = ''
-
-    if (seedType && seedType !== ''){
-      seedTypeDisplay = 'seed: '+ seedType;
-    }
+    const seedTypeDisplay = seedType || '';
 
     return (
       <TouchableItem
