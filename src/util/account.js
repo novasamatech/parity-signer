@@ -49,7 +49,7 @@ export function validateSeed (seed, validBip39Seed) {
   if (!validBip39Seed) {
     return {
       valid: false,
-      reason: `This recovery phrase will be treated as a "legacy Parity brain wallet"`
+      reason: `This recovery phrase will be treated as a legacy Parity brain wallet`
     };
   }
 
