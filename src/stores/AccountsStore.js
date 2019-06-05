@@ -31,7 +31,8 @@ export type Account = {
   encryptedSeed: string,
   createdAt: number,
   updatedAt: number,
-  archived: boolean
+  archived: boolean,
+  validBip39Seed: boolean
 };
 
 type AccountsState = {
@@ -71,7 +72,7 @@ export default class AccountsStore extends Container<AccountsState> {
       debounce(async () => {
         const { bip39, address } = await brainWalletAddress(seed);
 
-        Object.assign(this.state.newAccount, { address });
+        Object.assign(this.state.newAccount, { address, validBip39Seed: bip39 });
         this.setState({});
       }, 200)();
     }
