@@ -78,10 +78,6 @@ export default class AccountsStore extends Container<AccountsState> {
     this.setState({});
   }
 
-  resetNew() {
-    this.setState({ newAccount: empty() });
-  }
-
   getNew(): Account {
     return this.state.newAccount;
   }
@@ -116,15 +112,21 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  async loadAccountTxs() {}
+  async loadAccountTxs() { }
 
   async save(account, pin = null) {
     try {
+      //only save an account if the seed isn't empty
+      if (account.seed === ''){
+        return;
+      }
+
       if (pin && account.seed) {
         let encryptedSeed = await encryptData(account.seed, pin);
         delete account.seed;
         account.encryptedSeed = encryptedSeed;
       }
+
       account.updatedAt = new Date().getTime();
       await saveAccount(account);
     } catch (e) {
