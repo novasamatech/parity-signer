@@ -46,6 +46,7 @@ android-build:
     - bash ./gen_key.sh
     - cd android && ./gradlew assembleRelease
     - pwd
+    - find . | grep apk
     - ls
   tags:
     - rust 
