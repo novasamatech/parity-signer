@@ -35,6 +35,7 @@ android-build:
     - stable
     - triggers
     - master
+    - dd-ci-patch
   script:
     - curl -sL https://deb.nodesource.com/setup_8.x | bash -
     - apt-get install -y nodejs
