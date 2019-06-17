@@ -64,6 +64,7 @@ class AccountBackupView extends React.PureComponent {
     accounts.lockAccount(selected);
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
+
   render() {
     const { accounts, navigation } = this.props;
     const isNew = navigation.getParam('isNew');
