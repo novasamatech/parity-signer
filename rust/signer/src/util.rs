@@ -256,14 +256,15 @@ macro_rules! export {
             use crate::util::Return;
 
             use std::cell::Cell;
+            use libc::c_uint;
 
             $(
                 #[no_mangle]
-                pub extern fn $name(err: *mut u32, $( $par: <$t as Argument<'static>>::Ext ),*) -> <$ret as Return<'static>>::Ext {
+                pub extern fn $name(err: *mut c_uint, $( $par: <$t as Argument<'static>>::Ext ),*) -> <$ret as Return<'static>>::Ext {
                     let error = Cell::new(0);
                     let ret = super::$name($(Argument::convert(&error, $par)),*);
 
-                    unsafe { *err |= error.get() };
+                    unsafe { *err |= error.get() as c_uint };
 
                     Return::convert(&error, ret)
                 }
