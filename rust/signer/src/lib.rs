@@ -116,22 +116,15 @@ export! {
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyBlockiesIcon
     fn blockies_icon(seed: String) -> Option<String> {
-        use blockies::{create_icon, Blockies, ethereum};
+        use blockies::Ethereum;
 
         let mut result = Vec::new();
+        let blockies = Ethereum::default();
 
-        let options = ethereum::Options {
-            size: 8,
-            scale: 16,
-            seed: seed.into(),
-            color: None,
-            background_color: None,
-            spot_color: None,
-        };
-
-        create_icon(&mut result, Blockies::Ethereum(options)).ok()?;
-
-        Some(base64png(&result))
+        match blockies.create_icon(&mut result, seed.as_bytes()) {
+            Ok(_) => Some(base64png(&result)),
+            Err(_) => None,
+        }
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyEthSign

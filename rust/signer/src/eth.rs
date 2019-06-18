@@ -141,7 +141,7 @@ mod tests {
         let phrase = "panda eyebrow bullet gorilla call smoke muffin taste mesh discover soft ostrich alcohol speed nation flash devote level hobby quick inner drive ghost inside";
         let expected_address = b"\x63\xF9\xA9\x2D\x8D\x61\xb4\x8a\x9f\xFF\x8d\x58\x08\x04\x25\xA3\x01\x2d\x05\xC8";
 
-        let keypair = KeyPair::from_auto_phrase(phrase);
+        let (_, keypair) = KeyPair::from_auto_phrase(phrase);
 
         assert_eq!(keypair.address(), expected_address);
 	}
@@ -151,7 +151,7 @@ mod tests {
 		let phrase = "this is sparta";
 		let expected_address = b"\x00\x6E\x27\xB6\xA7\x2E\x1f\x34\xC6\x26\x76\x2F\x3C\x47\x61\x54\x7A\xff\x14\x21";
 
-		let keypair = KeyPair::from_auto_phrase(phrase);
+		let (_, keypair) = KeyPair::from_auto_phrase(phrase);
 
 		assert_eq!(keypair.address(), expected_address);
 

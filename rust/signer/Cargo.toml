@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 base64 = "0.10.1"
-blockies = "0.2"
+blockies = "0.3"
 ethsign = { version = "0.6.1", default-features = false, features = ["pure-rust"] }
 jni = { version = "0.10.2", default-features = false, optional = true }
 libc = "0.2"
