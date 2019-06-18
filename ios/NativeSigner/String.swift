@@ -29,15 +29,6 @@ extension String {
     return String(data: data as Data, encoding: String.Encoding.utf8)!
   }
 
-  static func fromRust(_ rust_str: rust_string) -> String {
-    let rust_str_ptr = rust_string_ptr(rust_str)
-    let result = String.fromStringPtr(ptr: rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(rust_str_ptr)
-    rust_string_destroy(rust_str)
-
-    return result
-  }
-
   func asPtr() -> rust_string_ptr {
     let data = self.data(using: String.Encoding.utf8, allowLossyConversion: false)!
     return rust_string_ptr(ptr: (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count), len: data.count)
