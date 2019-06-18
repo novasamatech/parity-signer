@@ -84,7 +84,11 @@ class EthkeyBridge: NSObject {
     let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(icon_rust_str_ptr)
     rust_string_destroy(icon_rust_str)
-    resolve(icon)
+    if error == 0 {
+      resolve(icon)
+    } else {
+      reject("Failed to generate blockies", nil, nil)
+    }
   }
 
   @objc func randomPhrase(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
