@@ -104,22 +104,13 @@ impl Argument<'static> for String {
 
 #[cfg(not(feature = "jni"))]
 impl Return<'static> for String {
-    type Ext = StringPtr;
+    type Ext = *mut String;
     type Env = Cell<u32>;
 
     fn convert(_: &Self::Env, val: Self) -> Self::Ext {
-        let slice = val.into_boxed_str();
+        let string = val.to_owned();
 
-        let ptr = slice.as_ptr();
-        let len = slice.len() as size_t;
-
-        // Forget
-        Box::into_raw(slice);
-
-        StringPtr {
-            ptr,
-            len,
-        }
+        Box::into_raw(Box::new(string))
     }
 }
 
