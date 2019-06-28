@@ -73,3 +73,6 @@ struct rust_string* random_phrase(unsigned* error);
 struct rust_string* encrypt_data(unsigned* error, const struct rust_string_ptr* data, const struct rust_string_ptr* password);
 
 struct rust_string* decrypt_data(unsigned* error, const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password);
+
+// qr code generator
+struct rust_string* qrcode(unsigned* error, const struct rust_string_ptr* data);
