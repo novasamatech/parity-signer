@@ -254,10 +254,11 @@ macro_rules! export {
                 pub extern fn $name(err: *mut c_uint, $( $par: <$t as Argument<'static>>::Ext ),*) -> <$ret as Return<'static>>::Ext {
                     let error = Cell::new(0);
                     let ret = super::$name($(Argument::convert(&error, $par)),*);
+                    let ret = Return::convert(&error, ret);
 
                     unsafe { *err |= error.get() as c_uint };
 
-                    Return::convert(&error, ret)
+                    ret
                 }
             )*
         }
