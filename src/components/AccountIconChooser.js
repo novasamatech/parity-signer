@@ -51,9 +51,11 @@ export default class AccountIconChooser extends React.PureComponent<{
             .split(' ')
             .map(async () => {
               const seed = await words();
+              const { bip39, address } = await brainWalletAddress(seed);
+
               return {
                 seed,
-                address: await brainWalletAddress(seed)
+                address,
               };
             })
         ))

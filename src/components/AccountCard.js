@@ -25,17 +25,19 @@ import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
 
 export default class AccountCard extends React.PureComponent<{
-  title: ?string,
   address: string,
   chainId: string,
-  onPress: () => any
+  onPress: () => any,
+  title?: string,
+  seedType?: string,
 }> {
   static propTypes = {
-    title: PropTypes.string,
     address: PropTypes.string.isRequired,
-    style: ViewPropTypes.style,
     chainId: PropTypes.string,
-    onPress: PropTypes.func
+    onPress: PropTypes.func,
+    seedType: PropTypes.string,
+    style: ViewPropTypes.style,
+    title: PropTypes.string,
   };
 
   static defaultProps = {
@@ -43,9 +45,10 @@ export default class AccountCard extends React.PureComponent<{
   };
 
   render() {
-    const { address, chainId, style, onPress } = this.props;
+    const { address, chainId, onPress, seedType, style } = this.props;
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
+    const seedTypeDisplay = seedType || '';
 
     return (
       <TouchableItem
@@ -80,7 +83,19 @@ export default class AccountCard extends React.PureComponent<{
           >
             <Text
               style={[
-                styles.footerText,
+                styles.footerSeedType,
+                {
+                  color: NETWORK_COLOR[chainId]
+                    ? colors.card_bg
+                    : colors.card_text
+                }
+              ]}
+            >
+              {seedTypeDisplay}
+            </Text>
+            <Text
+              style={[
+                styles.footerNetwork,
                 {
                   color: NETWORK_COLOR[chainId]
                     ? colors.card_bg
@@ -118,7 +133,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: '#977CF6',
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     padding: 5
   },
   titleText: {
@@ -131,7 +147,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 14
   },
-  footerText: {
+  footerSeedType: {
+    fontFamily: 'Roboto',
+    color: colors.card_bg
+  },
+  footerNetwork: {
     fontFamily: 'Roboto',
     color: colors.card_bg,
     fontWeight: 'bold'

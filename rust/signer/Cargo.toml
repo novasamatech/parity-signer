@@ -2,24 +2,25 @@
 name = "signer"
 version = "0.1.0"
 authors = ["debris <marek.kotewicz@gmail.com>"]
-build = "build.rs"
 edition = "2018"
 
 [dependencies]
 base64 = "0.10.1"
-blockies = "0.2"
+blockies = "0.3"
 ethsign = { version = "0.6.1", default-features = false, features = ["pure-rust"] }
 jni = { version = "0.10.2", default-features = false, optional = true }
 libc = "0.2"
 rlp = { version = "0.3.0", features = ["ethereum"] }
 rustc-hex = "2.0.1"
-schnorrkel = "0.0.0"
+schnorrkel = "0.1.0"
 serde = "1.0"
 serde_json = "1.0"
 sha2 = "0.8"
 tiny-bip39 = { version = "0.6.1", default-features = false }
 tiny-hderive = "0.1"
 tiny-keccak = "1.4"
+pixelate = "0.1"
+qrcodegen = "1.4"
 
 [lib]
 name = "signer"
