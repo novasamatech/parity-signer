@@ -25,7 +25,6 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
-import { accountId } from '../util/account';
 
 export default class AccountPin extends React.PureComponent {
   render() {
@@ -55,21 +54,21 @@ class AccountPinView extends React.PureComponent {
     const { accounts, navigation } = this.props;
     const accountCreation = navigation.getParam('isNew');
     const { pin } = this.state;
+    const account = accountCreation ? accounts.getNew() : accounts.getSelected();
     if (
       this.state.pin.length >= 6 &&
       this.state.pin === this.state.confirmation
     ) {
-      let account = null;
       if (accountCreation) {
-        account = accounts.getNew();
         await accounts.submitNew(pin);
-        await accounts.select(account);
-        navigation.popToTop();
-        navigation.navigate('AccountList', {
-          accountId: accountId(account)
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [
+            NavigationActions.navigate({ routeName: 'AccountList' }),
+          ]
         });
+        this.props.navigation.dispatch(resetAction);
       } else {
-        account = accounts.getSelected();
         await accounts.save(account, pin);
         const resetAction = StackActions.reset({
           index: 1,
@@ -121,7 +120,6 @@ class AccountPinView extends React.PureComponent {
           focus={this.state.focusConfirmation}
           onChangeText={confirmation => this.setState({ confirmation: confirmation, pinMismatch: false, pinTooShort: false })}
           value={this.state.confirmation}
-          onSubmitEditing={this.submit}
         />
         <Button
           onPress={this.submit}

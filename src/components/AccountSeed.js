@@ -17,154 +17,100 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
-import { WORDS, WORDS_INDEX } from '../util/account';
+import PARITY_WORDS from '../../res/parity_wordlist.json';
+import BIP39_WORDS from '../../res/bip39_wordlist.json';;
 import TextInput from './TextInput';
 import TouchableItem from './TouchableItem';
+import { binarySearch } from '../util/array';
+
+// Combined, de-duplicated, sorted word list (could be a precompute from json as well)
+const ALL_WORDS = Array.from(new Set(PARITY_WORDS.concat(BIP39_WORDS))).sort();
+const SUGGESTIONS_COUNT = 5;
 
 export default class AccountSeed extends Component {
   state = {
     cursorPosition: 0,
-    keyboard: false,
-    animation: false,
-    suggestionsHeight: new Animated.Value(0) // Initial value for opacity: 0
   };
 
-  constructor(...args) {
-    super(...args);
-    this.getSuggestions = this.getSuggestions.bind(this);
-    this.handleCursorPosition = this.handleCursorPosition.bind(this);
-    this.getWordPosition = this.getWordPosition.bind(this);
-    this.keyboardDidShow = this.keyboardDidShow.bind(this);
-    this.keyboardDidHide = this.keyboardDidHide.bind(this);
-  }
+  handleCursorPosition = (event) => {
+    const {start, end} = event.nativeEvent.selection;
 
-  keyboardDidShow() {
-    this.setState({ keyboard: true, animation: true });
-    Animated.timing(
-      // Animate over time
-      this.state.suggestionsHeight, // The animated value to drive
-      {
-        toValue: 35, // Animate to opacity: 1 (opaque)
-        duration: 200 // Make it take a while
-      }
-    ).start(() => this.setState({ animation: false }));
-  }
-
-  keyboardDidHide() {
-    this.setState({ animation: true });
-    Animated.timing(
-      // Animate over time
-      this.state.suggestionsHeight, // The animated value to drive
-      {
-        toValue: 0, // Animate to opacity: 1 (opaque)
-        duration: 200 // Make it take a while
-      }
-    ).start(() => {
-      this.setState({ keyboard: false, animation: false });
-    });
-  }
-
-  handleCursorPosition({
-    nativeEvent: {
-      selection: { start, end }
-    }
-  }) {
     if (start !== end) {
       return;
     }
     this.setState({ cursorPosition: start });
   }
 
-  getSearchInput() {
+  /**
+   * Generate a list of suggestions for input
+   *
+   * @param {string}   input    to find suggestions for
+   * @param {string[]} wordList to find suggestions in
+   *
+   * @return {string[]} suggestions
+   */
+  generateSuggestions (input, wordList) {
+    const fromIndex = binarySearch(wordList, input).index; // index to start search from
+
+    let suggestions = wordList.slice(fromIndex, fromIndex + SUGGESTIONS_COUNT);
+
+    const lastValidIndex = suggestions.findIndex((word) => !word.startsWith(input));
+
+    if (lastValidIndex !== -1) {
+      suggestions = suggestions.slice(0, lastValidIndex);
+    }
+
+    return suggestions;
+  }
+
+  selectWordList (otherWords) {
+    for (const word of otherWords) {
+      const isBIP39 = binarySearch(BIP39_WORDS, word).hit;
+      const isParity = binarySearch(PARITY_WORDS, word).hit;
+
+      if (!isBIP39 && isParity) {
+        return PARITY_WORDS;
+      } else if (isBIP39 && !isParity) {
+        return BIP39_WORDS;
+      }
+    }
+
+    return ALL_WORDS;
+  }
+
+  renderSuggestions () {
     const { value } = this.props;
     const { cursorPosition } = this.state;
-    let startFrom = cursorPosition;
-    // find the first space or start of string
-    while (startFrom > 0 && [' '].indexOf(value.charAt(startFrom - 1)) === -1) {
-      --startFrom;
-    }
-    return value.substring(startFrom, cursorPosition);
-  }
 
-  getWordPosition() {
-    const { value } = this.props;
-    const { cursorPosition } = this.state;
-    let wordPosition = 0;
-    let cursor = 0;
-    let char = '';
-    let wasLetter = false;
-    if (0 === value.length) {
-      return 0;
-    }
-    while (true) {
-      if (cursorPosition === cursor || (char = value.charAt(cursor)) === '') {
-        break;
-      }
-      if ([' ', '\n', '\r'].indexOf(char) === -1) {
-        wasLetter = true;
-      } else {
-        if (wasLetter) {
-          ++wordPosition;
-        }
-        wasLetter = false;
-      }
-      ++cursor;
-    }
-    return wordPosition;
-  }
+    let left = value.substring(0, cursorPosition).split(' ');
+    let right = value.substring(cursorPosition).split(' ');
 
-  getSuggestions(input, words) {
-    let fromIndex = WORDS.findIndex(w => w.startsWith(input));
-    if (fromIndex === -1) {
-      return [];
-    }
-    if (WORDS[fromIndex] === input) {
-      fromIndex = 0;
-    }
-    const SUGGESTIONS_COUNT = 5;
-    const result = [];
-    let yielded = 0;
-    result.push(WORDS[fromIndex]);
-    while (yielded < SUGGESTIONS_COUNT && WORDS[fromIndex] !== undefined) {
-      ++fromIndex;
-      if (!WORDS[fromIndex].startsWith(input)) {
-        return result;
-      }
-      if (words.indexOf(WORDS[fromIndex]) !== -1) {
-        continue;
-      }
-      result.push(WORDS[fromIndex]);
-      ++yielded;
-    }
-    return result;
-  }
+    // combine last nibble before cursor and first nibble after cursor into a word
+    const input = left[left.length - 1] + right[0];
 
-  renderSuggestions() {
-    const { value } = this.props;
-    const words = value.length ? value.split(' ') : [];
-    const wordPosition = this.getWordPosition();
-    let searchInput = this.getSearchInput();
-    if (WORDS_INDEX[searchInput]) {
-      searchInput = '';
-    }
-    const suggestions = this.getSuggestions(searchInput, words);
+    left = left.slice(0, -1);
+    right = right.slice(1);
+
+    // find a wordList using words around as discriminator
+    const wordList = this.selectWordList(left.concat(right));
+    const suggestions = this.generateSuggestions(input.toLowerCase(), wordList);
+
     return (
-      <Animated.View
-        style={[styles.suggestions, { height: this.state.suggestionsHeight }]}
-      >
+      <View style={styles.suggestions}>
         {suggestions.map((suggestion, i) => {
           const sepStyle =
-            !this.state.animation && i !== suggestions.length - 1
+            i !== suggestions.length - 1
               ? { borderRightWidth: 0.3, borderColor: colors.card_bg_text_sec }
               : {};
           return (
             <TouchableItem
               key={i}
               onPress={e => {
-                words[wordPosition] = suggestion;
-                this.props.onChangeText(words.join(' '));
+                const phrase = left.concat(suggestion, right).join(' ');
+
+                this.props.onChangeText(phrase);
               }}
             >
               <View key={suggestion} style={[styles.suggestion, sepStyle]}>
@@ -173,13 +119,12 @@ export default class AccountSeed extends Component {
             </TouchableItem>
           );
         })}
-      </Animated.View>
+      </View>
     );
   }
 
-  render() {
-    const { keyboard } = this.state;
-    const { valid } = this.props;
+  render () {
+    const { valid, value } = this.props;
     const invalidStyles = !valid ? styles.invalidInput : {};
     return (
       <View>
@@ -187,15 +132,10 @@ export default class AccountSeed extends Component {
           style={[styles.input, invalidStyles]}
           multiline
           autoCapitalize="none"
-          onBlur={this.keyboardDidHide}
           onSelectionChange={this.handleCursorPosition}
           {...this.props}
-          onFocus={(...args) => {
-            this.keyboardDidShow();
-            return this.props.onFocus(...args);
-          }}
         />
-        {keyboard && this.renderSuggestions()}
+        {value.length > 0 && this.renderSuggestions()}
       </View>
     );
   }
@@ -221,7 +161,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     height: 35,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   suggestion: {
     paddingVertical: 9,

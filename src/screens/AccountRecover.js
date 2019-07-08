@@ -36,7 +36,7 @@ export default class AccountRecover extends React.Component {
     title: 'Recover Account',
     headerBackTitle: 'Back'
   };
-  render() {
+  render () {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountRecoverView {...this.props} accounts={accounts} />}
@@ -50,10 +50,11 @@ class AccountRecoverView extends React.Component {
     super(...args);
   }
 
-  render() {
+  render () {
     const { accounts } = this.props;
     const selected = accounts.getNew();
     const chainId = selected.chainId;
+
     return (
       <View style={styles.body}>
         <Background />
@@ -109,7 +110,7 @@ class AccountRecoverView extends React.Component {
             onFocus={e => {
               this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
             }}
-            valid={validateSeed(selected.seed).valid}
+            valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
             onChangeText={seed => {
               accounts.updateNew({ seed });
             }}
@@ -120,15 +121,16 @@ class AccountRecoverView extends React.Component {
             address={selected.address || ''}
             chainId={selected.chainId || ''}
             title={selected.name}
+            seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
           />
           <Button
             buttonStyles={{ marginBottom: 40 }}
             title="Next Step"
             onPress={() => {
-              const validation = validateSeed(selected.seed);
+              const validation = validateSeed(selected.seed, selected.validBip39Seed);
               if (!validation.valid) {
                 Alert.alert(
-                  'Warning: seed phrase is not secure',
+                  'Warning:',
                   `${validation.reason}`,
                   [
                     {

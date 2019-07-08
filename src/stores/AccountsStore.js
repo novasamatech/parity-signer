@@ -31,7 +31,8 @@ export type Account = {
   encryptedSeed: string,
   createdAt: number,
   updatedAt: number,
-  archived: boolean
+  archived: boolean,
+  validBip39Seed: boolean
 };
 
 type AccountsState = {
@@ -69,17 +70,13 @@ export default class AccountsStore extends Container<AccountsState> {
     const { seed } = this.state.newAccount;
     if (typeof seed === 'string') {
       debounce(async () => {
-        Object.assign(this.state.newAccount, {
-          address: await brainWalletAddress(seed)
-        });
+        const { bip39, address } = await brainWalletAddress(seed);
+
+        Object.assign(this.state.newAccount, { address, validBip39Seed: bip39 });
         this.setState({});
       }, 200)();
     }
     this.setState({});
-  }
-
-  resetNew() {
-    this.setState({ newAccount: empty() });
   }
 
   getNew(): Account {
@@ -116,15 +113,21 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  async loadAccountTxs() {}
+  async loadAccountTxs() { }
 
   async save(account, pin = null) {
     try {
+      //only save an account if the seed isn't empty
+      if (account.seed === ''){
+        return;
+      }
+
       if (pin && account.seed) {
         let encryptedSeed = await encryptData(account.seed, pin);
         delete account.seed;
         account.encryptedSeed = encryptedSeed;
       }
+
       account.updatedAt = new Date().getTime();
       await saveAccount(account);
     } catch (e) {
