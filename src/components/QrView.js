@@ -17,11 +17,35 @@
 'use strict';
 
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
-import QRCode from 'react-native-qrcode';
+import { Dimensions, StyleSheet, Image, View } from 'react-native';
 import colors from '../colors';
+import { qrCode } from '../util/native';
+
 
 export default class QrView extends React.PureComponent {
+
+  state = {};
+
+  displayQrCode = async (data) => {
+    try {
+      let qr = await qrCode(data);
+      this.setState({
+        qr: qr
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  componentDidMount() {
+    this.displayQrCode(this.props.text);
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.text !== this.props.text) {
+      this.displayIcon(newProps.text);
+    }
+  }
 
   render() {
     if (this.props.screen) {
@@ -35,13 +59,12 @@ export default class QrView extends React.PureComponent {
     const { width: deviceWidth } = Dimensions.get('window');
     let size = this.props.size || deviceWidth - 80;
     let flexBasis = this.props.height || deviceWidth - 40;
+
     return (
       <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>
-        <QRCode
-          value={this.props.text}
-          size={size}
-          bgColor="black"
-          fgColor={colors.card_bg}
+        <Image
+          source={{ uri: this.state.qr }}
+          style={{ width: size, height: size }}
         />
       </View>
     );

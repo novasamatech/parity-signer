@@ -23,11 +23,12 @@ export function empty (account = {}) {
     updatedAt: new Date().getTime(),
     archived: false,
     encryptedSeed: null,
+    validBip39Seed: false,
     ...account
   };
 }
 
-export function validateSeed (seed) {
+export function validateSeed (seed, validBip39Seed) {
   if (seed.length === 0) {
     return {
       valid: false,
@@ -36,13 +37,6 @@ export function validateSeed (seed) {
   }
   const words = seed.split(' ');
 
-  if (words.length < 11) {
-    return {
-      valid: false,
-      reason: `Add ${11 - words.length} more unique word(s) to compose a secure seed phrase`
-    }
-  }
-
   for (let word of words) {
     if (word === '') {
       return {
@@ -50,6 +44,13 @@ export function validateSeed (seed) {
         reason: `Extra whitespace found`
       };
     }
+  }
+
+  if (!validBip39Seed) {
+    return {
+      valid: false,
+      reason: `This recovery phrase will be treated as a legacy Parity brain wallet`
+    };
   }
 
   return {

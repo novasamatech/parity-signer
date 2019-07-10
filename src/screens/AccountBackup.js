@@ -111,7 +111,7 @@ class AccountBackupView extends React.PureComponent {
           <Text
             style={{
               padding: 10,
-              height: 160,
+              minHeight: 160,
               lineHeight: 26,
               fontSize: 20,
               backgroundColor: colors.card_bg
