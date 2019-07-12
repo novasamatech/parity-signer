@@ -49,7 +49,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBrainwalletBIP39Address(seed));
         } catch (Exception e) {
-            promise.reject("invalid phrase", null, null);
+            promise.reject("invalid phrase", "invalid phrase", new Throwable("invalid phrase"));
         }
     }
 
@@ -63,7 +63,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyRlpItem(rlp, position));
         } catch (Exception e) {
-            promise.reject("invalid rlp", null, null);
+            promise.reject("invalid rlp", "invalid rlp", new Throwable("invalid rlp"));
 
         }
     }
@@ -98,7 +98,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyDecryptData(data, password));
         } catch (Exception e) {
-            promise.reject("invalid password", null, null);
+            promise.reject("invalid password", "invalid password", new Throwable("invalid password"));
         }
     }
 
@@ -107,7 +107,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyQrCode(data));
         } catch (Exception e) {
-            promise.reject("failed to create QR code", null, null);
+            promise.reject("failed to create QR code", "failed to create QR code", new Throwable("failed to create QR code"));
         }
     }
 
