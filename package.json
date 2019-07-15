@@ -10,8 +10,8 @@
   "scripts": {
     "build-rust-ios": "cd rust/signer && make ios",
     "build-rust-android": "cd rust/signer && make android",
-    "ios": "npm run build-rust-ios && react-native run-ios",
-    "android": "npm run build-rust-android && react-native run-android",
+    "ios": "yarn run build-rust-ios && react-native run-ios",
+    "android": "yarn run build-rust-android && react-native run-android",
     "start": "yarn run ios",
     "test": "jest",
     "lint": "eslint",
@@ -25,14 +25,14 @@
     "react": "16.8.6",
     "react-native": "0.60.2",
     "react-native-camera": "^2.1.1",
-    "react-native-keyboard-aware-scroll-view": "^0.5.0",
+    "react-native-keyboard-aware-scroll-view": "^0.8.0",
     "react-native-markdown-renderer": "^3.2.8",
-    "react-native-popup-menu": "^0.15.0",
+    "react-native-popup-menu": "^0.15.6",
     "react-native-secure-storage": "git+https://github.com/debris/react-native-secure-storage.git",
     "react-native-simple-picker": "^2.1.0",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^4.6.0",
-    "react-navigation": "^2.0.1",
+    "react-navigation": "^3.11.1",
     "unstated": "^2.1.1"
   },
   "devDependencies": {
