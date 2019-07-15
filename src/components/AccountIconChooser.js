@@ -34,65 +34,67 @@ export default class AccountIconChooser extends React.PureComponent<{
 
   constructor(props) {
     super(props);
-    this.icons = [];
-    const iconsDS = new FlatList.DataSource({
-      rowHasChanged: (r1, r2) => true
-    });
-    this.state = { iconsDS };
+
+    this.state = { icons: [] };
   }
-
-  refreshIcons = async () => {
-    try {
-      this.icons = [
-        ...this.icons,
-        ...(await Promise.all(
-          Array(10)
-            .join(' ')
-            .split(' ')
-            .map(async () => {
-              const seed = await words();
-              const { bip39, address } = await brainWalletAddress(seed);
-
-              return {
-                seed,
-                address,
-              };
-            })
-        ))
-      ];
-      this.setState({ iconsDS: this.state.iconsDS.cloneWithRows(this.icons) });
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   componentDidMount() {
     this.refreshIcons();
   }
 
+  refreshIcons = async () => {
+    try {
+      const icons = await Promise.all(
+        Array(10)
+          .join(' ')
+          .split(' ')
+          .map(async () => {
+            const seed = await words();
+            const { bip39, address } = await brainWalletAddress(seed);
+
+            return {
+              seed,
+              address,
+            };
+          })
+      );
+
+      this.setState({
+          icons
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   render() {
     const { value, onChange } = this.props;
-
+    const { icons } = this.state;
+    console.log(icons);
     return (
       <View style={styles.body}>
         <FlatList
           style={styles.icons}
-          dataSource={this.state.iconsDS}
-          horizontal={true}
-          renderRow={(
-            { address, seed },
-            sectionID: number,
-            rowID: number,
-            highlightRow
-          ) => {
-            const selected = address.toLowerCase() === value.toLowerCase();
+          data={icons}
+          horizontal
+          renderItem={({ item, index, separators }) => {
+            const selected = item.address.toLowerCase() === value.toLowerCase();
             const style = [styles.icon];
+
             return (
               <TouchableOpacity
+                key={index}
                 style={[styles.iconBorder, selected ? styles.selected : {}]}
-                onPress={() => this.props.onChange({ address, seed })}
+                onPress={() =>
+                  this.props.onChange({
+                    address: item.address,
+                    seed: item.seed,
+                  })
+                }
+                onShowUnderlay={separators.highlight}
+                onHideUnderlay={separators.unhighlight}
               >
-                <AccountIcon style={style} seed={'0x' + address} />
+                <AccountIcon style={style} seed={'0x' + item.address} />
               </TouchableOpacity>
             );
           }}
