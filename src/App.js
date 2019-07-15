@@ -20,6 +20,7 @@
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import {
+  createAppContainer,
   createStackNavigator,
   HeaderBackButton,
   withNavigation
@@ -59,7 +60,7 @@ export default class App extends Component {
         <MenuProvider backHandler={true}>
           <StatusBar barStyle="light-content" />
           <Background />
-          <Screens />
+          <ScreensContainer />
         </MenuProvider>
       </UnstatedProvider>
     );
@@ -219,3 +220,5 @@ const Screens = createStackNavigator(
     mode: 'card'
   }
 );
+
+const ScreensContainer = createAppContainer(Screens);
