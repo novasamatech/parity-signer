@@ -105,7 +105,7 @@ android {
 
     defaultConfig {
         applicationId "io.parity.signer"
-        minSdkVersion 16
+        minSdkVersion 26
         missingDimensionStrategy 'react-native-camera', 'general'
         targetSdkVersion 28
         versionCode 2
@@ -164,7 +164,8 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'com.facebook.react:react-native:0.60.2'
+    implementation 'com.facebook.react:react-native:0.60.3'
+    implementation project(':react-native-gesture-handler')
 
     if (useIntlJsc) {
         implementation 'org.webkit:android-jsc-intl:+'
