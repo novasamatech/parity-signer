@@ -106,9 +106,6 @@ class AccountRecoverView extends React.Component {
             ENTER RECOVERY WORDS
           </Text>
           <AccountSeed
-            onFocus={e => {
-              this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
-            }}
             valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
             onChangeText={seed => {
               accounts.updateNew({ seed });

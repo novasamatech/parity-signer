@@ -153,7 +153,7 @@ const Screens = createStackNavigator(
     },
     Welcome: {
       screen: createStackNavigator(
-        {
+          {
           AccountList: {
             screen: AccountList,
             navigationOptions: {
