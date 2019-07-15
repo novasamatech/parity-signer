@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ListView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import colors from '../colors';
 import { brainWalletAddress, words } from '../util/native';
 import AccountIcon from './AccountIcon';
@@ -35,7 +35,7 @@ export default class AccountIconChooser extends React.PureComponent<{
   constructor(props) {
     super(props);
     this.icons = [];
-    const iconsDS = new ListView.DataSource({
+    const iconsDS = new FlatList.DataSource({
       rowHasChanged: (r1, r2) => true
     });
     this.state = { iconsDS };
@@ -75,7 +75,7 @@ export default class AccountIconChooser extends React.PureComponent<{
 
     return (
       <View style={styles.body}>
-        <ListView
+        <FlatList
           style={styles.icons}
           dataSource={this.state.iconsDS}
           horizontal={true}

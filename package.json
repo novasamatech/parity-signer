@@ -18,7 +18,6 @@
     "commit": "commit-wizard"
   },
   "dependencies": {
-    "@babel/runtime": "^7.3.1",
     "bignumber.js": "^4.0.0",
     "debounce": "^1.0.0",
     "hoist-non-react-statics": "^2.5.0",
