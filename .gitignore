@@ -15,6 +15,9 @@ rust/.cargo
 #
 .DS_Store
 
+# CocoaPods
+/ios/Pods/
+
 # Xcode
 #
 build/
@@ -34,9 +37,6 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
-
-# CocoaPods
-/ios/Pods/
 
 # Android/IntelliJ
 #
