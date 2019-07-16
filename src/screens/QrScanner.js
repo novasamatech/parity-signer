@@ -113,7 +113,11 @@ export class QrScannerView extends React.PureComponent {
       return <View style={styles.inactive} />;
     }
     return (
-      <RNCamera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
+      <RNCamera
+        captureAudio={false}
+        onBarCodeRead={this.props.onBarCodeRead}
+        style={styles.view}
+      >
         <View style={styles.body}>
           <View style={styles.top}>
             <Text style={styles.titleTop}>SCANNER</Text>
