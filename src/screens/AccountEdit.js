@@ -28,7 +28,7 @@ import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountEdit extends React.PureComponent {
   static navigationOptions = {
-    title: 'Edito Account'
+    title: 'Edit Account'
   };
 
   constructor(props) {
