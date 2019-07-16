@@ -6,7 +6,7 @@ export default class HeaderLeftHome extends React.PureComponent {
   render() {
     return (
       <View
-        style={{ flexDirection: 'row', alignItems: 'center' }}
+        style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 14 }}
         accessibilityComponentType="button"
         accessibilityTraits="button"
         testID="header-back"
@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
     borderBottomWidth: 0.5,
     borderBottomColor: colors.bg_text_sec
   },
@@ -39,7 +38,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     fontSize: 25,
     fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
     color: colors.bg_text
   }
 });
