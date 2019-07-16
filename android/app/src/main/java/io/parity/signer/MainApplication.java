@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
+import org.reactnative.camera.RNCameraPackage;
 import com.reactlibrary.RNSecureStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new NetInfoPackage(),
+            new RNCameraPackage(),
             new RNSecureStoragePackage(),
           new EthkeyBridgePackage(),
           new RNGestureHandlerPackage()
