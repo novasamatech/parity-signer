@@ -75,12 +75,11 @@ const globalStackNavigationOptions = {
     height: 60,
     paddingTop: 0,
     paddingBottom: 0,
-    padding: 14,
     borderBottomWidth: 0.5,
     borderBottomColor: colors.bg_text_sec
   },
   headerTitleStyle: {
-    display: 'none'
+    display: 'none',
   },
   headerBackTitleStyle: {
     fontSize: 20,
@@ -118,17 +117,16 @@ const Screens = createStackNavigator(
           Security: {
             screen: Security,
             navigationOptions: {
-              headerTintColor: colors.card_bg,
-              headerLeft: <SecurityHeaderBackButton />,
+              headerLeft: <SecurityHeaderBackButton/>,
               headerRight: null
             }
           }
         },
-        {
+        { 
+          defaultNavigationOptions: globalStackNavigationOptions,
           headerMode: 'screen',
-          navigationOptions: globalStackNavigationOptions
         }
-      )
+      ),
     },
     TocAndPrivacyPolicy: {
       screen: createStackNavigator(
@@ -144,7 +142,6 @@ const Screens = createStackNavigator(
           }
         },
         {
-          navigationOptions: globalStackNavigationOptions,
           initialRouteParams: {
             isWelcome: true
           }
@@ -206,8 +203,8 @@ const Screens = createStackNavigator(
             screen: AccountEdit
           }
         },
-        {
-          navigationOptions: globalStackNavigationOptions,
+        { 
+          defaultNavigationOptions: globalStackNavigationOptions,
           initialRouteParams: {
             isWelcome: true
           }

@@ -3,6 +3,7 @@ package io.parity.signer;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.reactlibrary.RNSecureStoragePackage;
 import com.facebook.react.ReactNativeHost;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new NetInfoPackage(),
             new RNCameraPackage(),
             new RNSecureStoragePackage(),
           new EthkeyBridgePackage(),

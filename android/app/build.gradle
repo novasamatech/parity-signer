@@ -162,6 +162,7 @@ android {
 }
 
 dependencies {
+    implementation project(':@react-native-community_netinfo')
     implementation project(':react-native-camera')
     implementation project(':react-native-secure-storage')
     implementation fileTree(dir: "libs", include: ["*.jar"])
