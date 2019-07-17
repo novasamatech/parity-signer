@@ -27,7 +27,7 @@ export default class SecurityHeader extends React.Component {
   render() {
     return (
       <Subscribe to={[SecurityStore]}>
-        {securityStore => (
+         {securityStore => (
           <SecurityHeaderView level={securityStore.getLevel()} />
         )}
       </Subscribe>
@@ -72,7 +72,8 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: 'Roboto',
     fontWeight: 'bold',
-    color: colors.bg_text_positive
+    color: colors.bg_text_positive,
+    paddingRight: 14,
   }
 });
 

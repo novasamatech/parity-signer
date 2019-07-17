@@ -17,8 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountIconChooser from '../components/AccountIconChooser';
@@ -55,8 +54,9 @@ class AccountNewView extends React.Component {
     return (
       <View style={styles.body}>
         <Background />
-        <KeyboardAwareScrollView
+        <ScrollView
           style={{ padding: 20 }}
+          keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
           containerStyle={styles.bodyContainer}
         >
@@ -122,7 +122,7 @@ class AccountNewView extends React.Component {
               }}
             />
           </View>
-        </KeyboardAwareScrollView>
+        </ScrollView>
       </View>
     );
   }

@@ -17,8 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, findNodeHandle, StyleSheet, Text, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Alert, findNodeHandle, StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
@@ -58,7 +57,7 @@ class AccountRecoverView extends React.Component {
     return (
       <View style={styles.body}>
         <Background />
-        <KeyboardAwareScrollView
+        <ScrollView
           style={{ padding: 20 }}
           containerStyle={styles.bodyContainer}
           enableOnAndroid
@@ -107,9 +106,6 @@ class AccountRecoverView extends React.Component {
             ENTER RECOVERY WORDS
           </Text>
           <AccountSeed
-            onFocus={e => {
-              this.scroll.props.scrollToFocusedInput(findNodeHandle(e.target));
-            }}
             valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
             onChangeText={seed => {
               accounts.updateNew({ seed });
@@ -159,7 +155,7 @@ class AccountRecoverView extends React.Component {
               });
             }}
           />
-        </KeyboardAwareScrollView>
+        </ScrollView>
       </View>
     );
   }
