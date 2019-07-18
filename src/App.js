@@ -142,6 +142,7 @@ const Screens = createStackNavigator(
           }
         },
         {
+          defaultNavigationOptions: globalStackNavigationOptions,
           initialRouteParams: {
             isWelcome: true
           }
@@ -213,6 +214,7 @@ const Screens = createStackNavigator(
     },
   },
   {
+    defaultNavigationOptions: globalStackNavigationOptions,
     headerMode: 'none',
     mode: 'card'
   }
