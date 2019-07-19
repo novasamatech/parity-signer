@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, findNodeHandle, StyleSheet, ScrollView, Text, View } from 'react-native';
+import { Alert, findNodeHandle, KeyboardAvoidingView, StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
@@ -55,7 +55,7 @@ class AccountRecoverView extends React.Component {
     const chainId = selected.chainId;
 
     return (
-      <View style={styles.body}>
+      <KeyboardAvoidingView style={styles.body} behavior="padding" enabled>
         <Background />
         <ScrollView
           style={{ padding: 20 }}
@@ -156,7 +156,7 @@ class AccountRecoverView extends React.Component {
             }}
           />
         </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 }
