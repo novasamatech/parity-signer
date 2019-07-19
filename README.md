@@ -30,7 +30,7 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 
 ## Screenshots
 
-![Parity Signer Screenshots](https://i.imgur.com/HHnwyAp.jpg)
+![Parity Signer Screenshots](docs/screenshots.jpg)
 
 ## Build it
 ### Requirements
@@ -86,7 +86,7 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 
 ### Test Parity Signer
 
-For a quick test and to avoid the hurdle of creating an account, sending funds to it and finally create a transaction as described in the [Parity Fether Tutorial](https://wiki.parity.io/Parity-Signer-Mobile-App-Fether-tutorial), you can use a pre-funded account on Kovan Network. To get access to this account, you need to:
+For a super quick test and to avoid the hurdle of creating an account, sending funds to it and finally create a transaction as described in the [tutorial using Parity Fether](https://wiki.parity.io/Parity-Signer-Mobile-App-Fether-tutorial) or the [tutorial using MyCrypto](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial), you can use a pre-funded account on Kovan Network and the following workflow. To get access to this account, you need to:
 
 - Recover an account
 - Select `Kovan` network and choose a name
