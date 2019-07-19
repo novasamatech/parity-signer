@@ -92,7 +92,7 @@ class AccountListView extends React.PureComponent {
 
   showOnboardingMessage = () => {
     const { navigate } = this.props.navigation;
-    const creatLink = (text, navigation) => (
+    const createLink = (text, navigation) => (
       <Text 
         style={styles.link}
         onPress={() => navigate(navigation)}
