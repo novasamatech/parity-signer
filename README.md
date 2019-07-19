@@ -30,7 +30,7 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 
 ## Screenshots
 
-![Parity Signer Screenshots](https://i.imgur.com/HHnwyAp.jpg)
+![Parity Signer Screenshots](docs/screenshots.jpg)
 
 ## Build it
 ### Requirements
