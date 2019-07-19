@@ -104,7 +104,7 @@ class AccountListView extends React.PureComponent {
     return (
       <View style={styles.onboardingWrapper} >
         <Text style={styles.onboardingText}>
-          No account yet?{"\n"}{creatLink('Create','AccountNew')} or {creatLink('recover','AccountRecover')} an account to get started.
+          No account yet?{"\n"}{createLink('Create','AccountNew')} or {createLink('recover','AccountRecover')} an account to get started.
         </Text>
       </View>
     )
