@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, findNodeHandle, KeyboardAvoidingView, StyleSheet, ScrollView, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, StyleSheet, ScrollView, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
@@ -47,6 +47,10 @@ export default class AccountRecover extends React.Component {
 class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
+  }
+  componentWillUnmount = function () {
+    // called when the user goes back, or finishes the whole recovery process
+    this.props.accounts.updateNew({seed : ''});
   }
 
   render () {
@@ -107,9 +111,7 @@ class AccountRecoverView extends React.Component {
           </Text>
           <AccountSeed
             valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
-            onChangeText={seed => {
-              accounts.updateNew({ seed });
-            }}
+            onChangeText={seed => accounts.updateNew({ seed })}
             value={selected.seed}
           />
           <AccountCard
