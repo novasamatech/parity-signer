@@ -17,8 +17,10 @@
 'use strict';
 
 import React from 'react';
-import { Alert, findNodeHandle, KeyboardAvoidingView, StyleSheet, ScrollView, Text, View } from 'react-native';
+import { Alert, findNodeHandle, SafeAreaView, StyleSheet, ScrollView, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
@@ -55,120 +57,122 @@ class AccountRecoverView extends React.Component {
     const chainId = selected.chainId;
 
     return (
-      <KeyboardAvoidingView style={styles.body} behavior="padding" enabled>
-        <Background />
-        <ScrollView
-          style={{ padding: 20 }}
-          containerStyle={styles.bodyContainer}
-          enableOnAndroid
-          scrollEnabled
-          keyboardShouldPersistTaps="handled"
-          extraHeight={230}
-          innerRef={ref => {
-            this.scroll = ref;
-          }}
-        >
-          <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
-          <Text style={styles.title}>CHOOSE NETWORK</Text>
-          <TouchableItem
-            style={[
-              styles.card,
-              {
-                backgroundColor:
-                  NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR,
-                marginBottom: 20
-              }
-            ]}
-            onPress={() =>
-              this.props.navigation.navigate('AccountNetworkChooser')
-            }
+      <SafeAreaView style={styles.safeAreaView}>
+        <KeyboardAwareScrollView style={styles.bodyContainer}>
+          <Background />
+          <ScrollView
+            contentContainerStyle={{ justifyContent: 'flex-end' }}
+            style={{ flex: 1 }}
+            enableOnAndroid
+            scrollEnabled
+            keyboardShouldPersistTaps="handled"
+            extraHeight={230}
+            innerRef={ref => {
+              this.scroll = ref;
+            }}
           >
-            <Text
+            <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
+            <Text style={styles.title}>CHOOSE NETWORK</Text>
+            <TouchableItem
               style={[
-                styles.cardText,
+                styles.card,
                 {
-                  color: NETWORK_COLOR[chainId]
-                    ? colors.card_bg
-                    : colors.card_text
+                  backgroundColor:
+                    NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR,
+                  marginBottom: 20
                 }
               ]}
-            >
-              {NETWORK_TITLES[chainId]}
-            </Text>
-          </TouchableItem>
-          <Text style={styles.title}>ACCOUNT NAME</Text>
-          <TextInput
-            onChangeText={name => accounts.updateNew({ name })}
-            value={selected && selected.name}
-            placeholder="Enter an account name"
-          />
-          <Text style={[styles.title, { marginTop: 20 }]}>
-            ENTER RECOVERY WORDS
-          </Text>
-          <AccountSeed
-            valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
-            onChangeText={seed => {
-              accounts.updateNew({ seed });
-            }}
-            value={selected.seed}
-          />
-          <AccountCard
-            style={{ marginTop: 20 }}
-            address={selected.address || ''}
-            chainId={selected.chainId || ''}
-            title={selected.name}
-            seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
-          />
-          <Button
-            buttonStyles={{ marginBottom: 40 }}
-            title="Next Step"
-            onPress={() => {
-              const validation = validateSeed(selected.seed, selected.validBip39Seed);
-              if (!validation.valid) {
-                Alert.alert(
-                  'Warning:',
-                  `${validation.reason}`,
-                  [
-                    {
-                      text: 'I understand the risks',
-                      style: 'default',
-                      onPress: () => {
-                        this.props.navigation.navigate('AccountPin', {
-                          isWelcome: this.props.navigation.getParam(
-                            'isWelcome'
-                          ),
-                          isNew: true
-                        });
-                      }
-                    },
-                    {
-                      text: 'Back',
-                      style: 'cancel'
-                    }
-                  ]
-                );
-                return;
+              onPress={() =>
+                this.props.navigation.navigate('AccountNetworkChooser')
               }
-              this.props.navigation.navigate('AccountPin', {
-                isWelcome: this.props.navigation.getParam('isWelcome'),
-                isNew: true
-              });
-            }}
-          />
-        </ScrollView>
-      </KeyboardAvoidingView>
+            >
+              <Text
+                style={[
+                  styles.cardText,
+                  {
+                    color: NETWORK_COLOR[chainId]
+                      ? colors.card_bg
+                      : colors.card_text
+                  }
+                ]}
+              >
+                {NETWORK_TITLES[chainId]}
+              </Text>
+            </TouchableItem>
+            <Text style={styles.title}>ACCOUNT NAME</Text>
+            <TextInput
+              onChangeText={name => accounts.updateNew({ name })}
+              value={selected && selected.name}
+              placeholder="Enter an account name"
+            />
+            <Text style={[styles.title, { marginTop: 20 }]}>
+              ENTER RECOVERY WORDS
+            </Text>
+            <AccountSeed
+              valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
+              onChangeText={seed => {
+                accounts.updateNew({ seed });
+              }}
+              value={selected.seed}
+            />
+            <AccountCard
+              style={{ marginTop: 20 }}
+              address={selected.address || ''}
+              chainId={selected.chainId || ''}
+              title={selected.name}
+              seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
+            />
+            <Button
+              buttonStyles={{ marginBottom: 40 }}
+              title="Next Step"
+              onPress={() => {
+                const validation = validateSeed(selected.seed, selected.validBip39Seed);
+                if (!validation.valid) {
+                  Alert.alert(
+                    'Warning:',
+                    `${validation.reason}`,
+                    [
+                      {
+                        text: 'I understand the risks',
+                        style: 'default',
+                        onPress: () => {
+                          this.props.navigation.navigate('AccountPin', {
+                            isWelcome: this.props.navigation.getParam(
+                              'isWelcome'
+                            ),
+                            isNew: true
+                          });
+                        }
+                      },
+                      {
+                        text: 'Back',
+                        style: 'cancel'
+                      }
+                    ]
+                  );
+                  return;
+                }
+                this.props.navigation.navigate('AccountPin', {
+                  isWelcome: this.props.navigation.getParam('isWelcome'),
+                  isNew: true
+                });
+              }}
+            />
+          </ScrollView>
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  body: {
+  bodyContainer: {
     backgroundColor: colors.bg,
     flex: 1,
-    overflow: 'hidden'
+    padding: 20
   },
-  bodyContainer: {
-    paddingBottom: 20
+  safeAreaView: {
+    flex: 1
   },
   titleTop: {
     fontFamily: 'Manifold CF',
