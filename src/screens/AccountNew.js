@@ -19,8 +19,8 @@
 import React from 'react';
 import { StyleSheet, ScrollView, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
