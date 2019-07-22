@@ -65,7 +65,7 @@ class AccountRecoverView extends React.Component {
             style={{ flex: 1 }}
             enableOnAndroid
             scrollEnabled
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps="always"
             extraHeight={230}
             innerRef={ref => {
               this.scroll = ref;
