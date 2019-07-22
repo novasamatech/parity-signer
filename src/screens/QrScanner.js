@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
-
+import QrSigner from '@parity/qr-signer';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -43,6 +43,29 @@ export default class Scanner extends React.PureComponent {
                 if (scannerStore.isBusy()) {
                   return;
                 }
+                /*  
+                  TODO:
+                    assuming the txRequestData comes as raw binary:
+
+                    const buffer = new ArrayBuffer(txRequestData);
+                    const dataAsBytes = new Uint8Array(buffer);
+
+                    let payloadType = {
+                      '7B': 'ethereum_legacy',
+                      '53': 'substrate',
+                      '45': 'ethereum
+                    }
+
+                    switch(payloadType[dataAsBytes[0]]) {
+                      case 'ethereum':
+                        ...
+                      case 'ethereum_legacy':
+                        ... handle legacy Ethereum payload as JSON as done below
+                      case 'substrate':
+                        ...
+                    }
+                */
+
                 try {
                   const data = JSON.parse(txRequestData.data);
                   if (data.action === undefined) {
@@ -113,9 +136,10 @@ export class QrScannerView extends React.PureComponent {
       return <View style={styles.inactive} />;
     }
     return (
-      <RNCamera
-        captureAudio={false}
-        onBarCodeRead={this.props.onBarCodeRead}
+      <QrSigner
+        onScan={this.props.onBarCodeRead}
+        scan
+        size={300}
         style={styles.view}
       >
         <View style={styles.body}>
@@ -132,7 +156,7 @@ export class QrScannerView extends React.PureComponent {
             <Text style={styles.descSecondary}>To Sign a New Transaction</Text>
           </View>
         </View>
-      </RNCamera>
+      </QrSigner>
     );
   }
 }

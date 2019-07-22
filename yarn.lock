@@ -857,6 +857,20 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
+"@parity/erc681@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@parity/erc681/-/erc681-0.1.1.tgz#0ade5233751011c15d5e75bd2bb583a9ba450a5e"
+  integrity sha512-OGDAWbAcm4mh+wzw6uBYxw0OJtqJ+39W3pOXl0W93d2p/cH7ppfvunwf7irEPw0FPiAIuR/F77nU1zMKNhm8Dg==
+
+"@parity/qr-signer@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@parity/qr-signer/-/qr-signer-0.3.2.tgz#ad2ea95627c5fddb73f31a6950f8cf23c350c89f"
+  integrity sha512-6VMBzxkB2KecC8ZucAEy1DQ+4ZhcHwlffkMitbunn1Xw1duPXZ0b/suwDFBNZ3e9pRE3ErdxSUs2QKkIxDgt8w==
+  dependencies:
+    "@parity/erc681" "0.1.1"
+    qrcode-generator "1.4.1"
+    react-qr-reader "2.1.2"
+
 "@react-native-community/cli-platform-android@^2.0.1", "@react-native-community/cli-platform-android@^2.6.2":
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/@react-native-community/cli-platform-android/-/cli-platform-android-2.6.2.tgz#4e7ce8784e6b4a3139c739ce15672c9c4007b9fb"
@@ -4263,6 +4277,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jsqr@^1.1.1:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/jsqr/-/jsqr-1.2.0.tgz#f93fc65fa7d1ded78b1bcb020fa044352b04261a"
+  integrity sha512-wKcQS9QC2VHGk7aphWCp1RrFyC0CM6fMgC5prZZ2KV/Lk6OKNoCod9IR6bao+yx3KPY0gZFC5dc+h+KFzCI0Wg==
+
 jsx-ast-utils@^2.0.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-2.2.1.tgz#4d4973ebf8b9d2837ee91a8208cc66f3a2776cfb"
@@ -5685,7 +5704,7 @@ prompts@^2.0.1:
     kleur "^3.0.2"
     sisteransi "^1.0.0"
 
-prop-types@^15.5.10, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -5730,6 +5749,11 @@ q@2.0.3:
     asap "^2.0.0"
     pop-iterate "^1.0.1"
     weak-map "^1.0.5"
+
+qrcode-generator@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/qrcode-generator/-/qrcode-generator-1.4.1.tgz#bfb6760e05d12c39df8acd60a0d459bdb2fa0756"
+  integrity sha512-KOdSAyFBPf0/5Z3mra4JfSbjrDlUn2J3YH8Rm33tRGbptxP4vhogLWysvkQp8mp5ix9u80Wfr4vxHXTeR9o0Ug==
 
 qs@~6.5.2:
   version "6.5.2"
@@ -5952,6 +5976,15 @@ react-proxy@^1.1.7:
   dependencies:
     lodash "^4.6.1"
     react-deep-force-update "^1.0.0"
+
+react-qr-reader@2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/react-qr-reader/-/react-qr-reader-2.1.2.tgz#ff3d7d377d3ffbd9d78a0947ca04221c2f180e15"
+  integrity sha512-SyRrRRRS7XcIyX8x6tb+mgcMqYZw6Admf4vlnUO/Z21nJklf6WILmP4jstd1W5tNlonvuC/S8R8/doIuZBgVjA==
+  dependencies:
+    jsqr "^1.1.1"
+    prop-types "^15.5.8"
+    webrtc-adapter "^6.4.0"
 
 react-refresh@^0.2.0:
   version "0.2.0"
@@ -6302,6 +6335,13 @@ rsvp@^4.8.4:
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-4.8.5.tgz#c8f155311d167f68f21e168df71ec5b083113734"
   integrity sha512-nfMOlASu9OnRJo1mbEk2cz0D56a1MBNrJ7orjRZQG10XDyuvwksKbuXNp6qa+kbn839HwjwhBzhFmdsaEAfauA==
 
+rtcpeerconnection-shim@^1.2.14:
+  version "1.2.15"
+  resolved "https://registry.yarnpkg.com/rtcpeerconnection-shim/-/rtcpeerconnection-shim-1.2.15.tgz#e7cc189a81b435324c4949aa3dfb51888684b243"
+  integrity sha512-C6DxhXt7bssQ1nHb154lqeL0SXz5Dx4RczXZu2Aa/L1NJFnEVDxFwCBo3fqtuljhHIGceg5JKBV4XJ0gW5JKyw==
+  dependencies:
+    sdp "^2.6.0"
+
 run-async@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-0.1.0.tgz#c8ad4a5e110661e402a7d21b530e009f25f8e389"
@@ -6414,6 +6454,11 @@ scheduler@^0.13.6:
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
+
+sdp@^2.6.0, sdp@^2.9.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.9.0.tgz#2eed2d9c0b26c81ff87593107895c68d6fb9a0a6"
+  integrity sha512-XAVZQO4qsfzVTHorF49zCpkdxiGmPNjA8ps8RcJGtGP3QJ/A8I9/SVg/QnkAFDMXIyGbHZBBFwYBw6WdnhT96w==
 
 semver-regex@1.0.0:
   version "1.0.0"
@@ -7256,6 +7301,14 @@ webidl-conversions@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-4.0.2.tgz#a855980b1f0b6b359ba1d5d9fb39ae941faa63ad"
   integrity sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==
+
+webrtc-adapter@^6.4.0:
+  version "6.4.8"
+  resolved "https://registry.yarnpkg.com/webrtc-adapter/-/webrtc-adapter-6.4.8.tgz#eeca3f0d5b40c0e629b865ef2a936a0b658274de"
+  integrity sha512-YM8yl545c/JhYcjGHgaCoA7jRK/KZuMwEDFeP2AcP0Auv5awEd+gZE0hXy9z7Ed3p9HvAXp8jdbe+4ESb1zxAw==
+  dependencies:
+    rtcpeerconnection-shim "^1.2.14"
+    sdp "^2.9.0"
 
 whatwg-encoding@^1.0.1, whatwg-encoding@^1.0.3:
   version "1.0.5"
