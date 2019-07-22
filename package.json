@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "^4.1.1",
-    "add": "^2.0.6",
     "bignumber.js": "^4.0.0",
     "debounce": "^1.0.0",
     "hoist-non-react-statics": "^2.5.0",
