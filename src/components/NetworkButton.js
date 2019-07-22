@@ -43,7 +43,7 @@ const styles = {
   }
 };
 
-class NetworkButton extends React.Component<{
+class NetworkButton extends React.PureComponent<{
   network: {
     title: number,
     color: string,
