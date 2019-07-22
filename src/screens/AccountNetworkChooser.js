@@ -17,11 +17,12 @@
 'use strict';
 
 import React from 'react';
+import _ from 'lodash';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import TouchableItem from '../components/TouchableItem';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_LIST, NETWORK_TITLES } from '../constants';
+import { ETHEREUM_NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountNetworkChooser extends React.PureComponent {
@@ -45,21 +46,25 @@ class AccountNetworkChooserView extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { accounts } = this.props;
+    const availableEthereumNetworkList = _.filter(
+      ETHEREUM_NETWORK_LIST,
+      'available'
+    );
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
-        {NETWORK_LIST.map(chainId => (
+        {_.map(availableEthereumNetworkList, network => (
           <TouchableItem
-            key={chainId}
+            key={network.ethereumChainId}
             style={[
               styles.card,
               {
                 marginTop: 20,
-                backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                backgroundColor: network.color
               }
             ]}
             onPress={() => {
-              accounts.updateNew({ chainId });
+              accounts.updateNew({ chainId: network.ethereumChainId });
               navigation.goBack();
             }}
           >
@@ -67,13 +72,11 @@ class AccountNetworkChooserView extends React.PureComponent {
               style={[
                 styles.cardText,
                 {
-                  color: NETWORK_COLOR[chainId]
-                    ? colors.card_bg
-                    : colors.card_text
+                  color: network.secondaryColor
                 }
               ]}
             >
-              {NETWORK_TITLES[chainId]}
+              {network.title}
             </Text>
           </TouchableItem>
         ))}

@@ -27,9 +27,10 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import TouchableItem from '../components/TouchableItem';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
+import NetworkButton from '../components/NetworkButton';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -49,7 +50,7 @@ class AccountNewView extends React.Component {
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
-    const chainId = selected.chainId;
+    const network = NETWORK_LIST[selected.chainId];
     if (!selected) {
       return null;
     }
@@ -66,31 +67,7 @@ class AccountNewView extends React.Component {
             <View style={styles.top}>
               <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
               <Text style={styles.title}>CHOOSE NETWORK</Text>
-              <TouchableItem
-                style={[
-                  styles.card,
-                  {
-                    backgroundColor:
-                      NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
-                  }
-                ]}
-                onPress={() =>
-                  this.props.navigation.navigate('AccountNetworkChooser')
-                }
-              >
-                <Text
-                  style={[
-                    styles.cardText,
-                    {
-                      color: NETWORK_COLOR[chainId]
-                        ? colors.card_bg
-                        : colors.card_text
-                    }
-                  ]}
-                >
-                  {NETWORK_TITLES[chainId]}
-                </Text>
-              </TouchableItem>
+              <NetworkButton network={network}/>
               <Text style={[styles.title, { marginTop: 20 }]}>
                 CHOOSE AN IDENTICON
               </Text>
@@ -175,15 +152,5 @@ const styles = StyleSheet.create({
   },
   nextStep: {
     marginTop: 15
-  },
-  card: {
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    color: colors.card_text,
-    fontFamily: 'Manifold CF',
-    fontSize: 20,
-    fontWeight: 'bold'
   }
 });
