@@ -60,7 +60,7 @@ class AccountNewView extends React.Component {
           <ScrollView
             style={{ padding: 20 }}
             keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps="always"
             containerStyle={styles.bodyContainer}
           >
             <View style={styles.top}>
