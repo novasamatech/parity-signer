@@ -26,7 +26,7 @@ use rlp::decode_list;
 use rustc_hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
 use tiny_keccak::keccak256 as keccak;
-
+use blake2_rfc::blake2s::blake2s as blake;
 use std::num::NonZeroU32;
 
 // 10240 is always non-zero, ergo this is safe
@@ -140,6 +140,13 @@ export! {
         let data: Vec<u8> = data.from_hex().ok()?;
 
         Some(keccak(&data).to_hex())
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyBlake2s
+    fn blake2s(data: &str) -> Option<String> {
+        let data: Vec<u8> = data.from_hex().ok()?;
+
+        Some(blake(32, &[], &data).as_bytes().to_hex())
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyBlockiesIcon

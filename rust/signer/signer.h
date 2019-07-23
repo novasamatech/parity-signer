@@ -49,26 +49,18 @@ struct rust_string* ethkey_brainwallet_bip39_address(unsigned* error, const stru
 // returns message signed with keypair
 struct rust_string* ethkey_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* message);
 
-// rlp ffi
-
 // returns rlp item at given position
 struct rust_string* rlp_item(unsigned* error, const struct rust_string_ptr* rlp, const unsigned position);
 
-// sha3 ffi
-
 struct rust_string* keccak256(unsigned* error, const struct rust_string_ptr* data);
+
+struct rust_string* blake2s(unsigned* error, const struct rust_string_ptr* data);
 
 struct rust_string* eth_sign(unsigned* error, const struct rust_string_ptr* data);
 
-// blockies ffi
-
 struct rust_string* blockies_icon(unsigned* error, const struct rust_string_ptr* blockies_seed);
 
-// random phrase ffi
-
 struct rust_string* random_phrase(unsigned* error);
-
-// data encryption ffi
 
 struct rust_string* encrypt_data(unsigned* error, const struct rust_string_ptr* data, const struct rust_string_ptr* password);
 
