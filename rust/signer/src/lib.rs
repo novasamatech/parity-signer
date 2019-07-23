@@ -69,6 +69,33 @@ pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut St
     Box::into_raw(Box::new(signature))
 }
 
+fn qrcode_bytes(data: &[u8]) -> Option<String> {
+    use qrcodegen::{QrCode, QrCodeEcc};
+    use pixelate::{Image, Color, BLACK};
+
+    let qr = QrCode::encode_binary(data, QrCodeEcc::Medium).ok()?;
+
+    let palette = &[Color::Rgba(255,255,255,0), BLACK];
+    let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
+
+    for y in 0..qr.size() {
+        for x in 0..qr.size() {
+            pixels.push(qr.get_module(x, y) as u8);
+        }
+    }
+
+    let mut result = Vec::new();
+
+    Image {
+        palette,
+        pixels: &pixels,
+        width: qr.size() as usize,
+        scale: 16,
+    }.render(&mut result).ok()?;
+
+    Some(base64png(&result))
+}
+
 export! {
     @Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletAddress
     fn ethkey_brainwallet_address(seed: &str) -> String {
@@ -170,30 +197,12 @@ export! {
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyQrCode
     fn qrcode(data: &str) -> Option<String> {
-        use qrcodegen::{QrCode, QrCodeEcc};
-        use pixelate::{Image, Color, BLACK};
+        qrcode_bytes(data.as_bytes())
+    }
 
-        let qr = QrCode::encode_binary(data.as_bytes(), QrCodeEcc::Medium).ok()?;
-
-        let palette = &[Color::Rgba(255,255,255,0), BLACK];
-        let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
-
-        for y in 0..qr.size() {
-            for x in 0..qr.size() {
-                pixels.push(qr.get_module(x, y) as u8);
-            }
-        }
-
-        let mut result = Vec::new();
-
-        Image {
-            palette,
-            pixels: &pixels,
-            width: qr.size() as usize,
-            scale: 16,
-        }.render(&mut result).ok()?;
-
-        Some(base64png(&result))
+    @Java_io_parity_signer_EthkeyBridge_ethkeyQrCodeHex
+    fn qrcode_hex(data: &str) -> Option<String> {
+        qrcode_bytes(&data.from_hex::<Vec<u8>>().ok()?)
     }
 }
 

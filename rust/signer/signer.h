@@ -74,5 +74,8 @@ struct rust_string* encrypt_data(unsigned* error, const struct rust_string_ptr* 
 
 struct rust_string* decrypt_data(unsigned* error, const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password);
 
-// qr code generator
+// qr code generator for utf-8 strings
 struct rust_string* qrcode(unsigned* error, const struct rust_string_ptr* data);
+
+// qr code generator for hex-encoded binary
+struct rust_string* qrcode_hex(unsigned* error, const struct rust_string_ptr* data);
