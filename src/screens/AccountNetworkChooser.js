@@ -17,34 +17,38 @@
 'use strict';
 
 import React from 'react';
+import filter from 'lodash/filter';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import colors from '../colors';
 import TouchableItem from '../components/TouchableItem';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_LIST, NETWORK_TITLES } from '../constants';
+import { ETHEREUM_NETWORK_LIST } from '../constants';
 
 export default class AccountNetworkChooser extends React.PureComponent {
   static navigationOptions = {
     title: 'Choose a network',
     headerBackTitle: 'Back'
   };
-
   render() {
     const { navigation } = this.props;
+    const availableEthereumNetworkList = filter(
+      ETHEREUM_NETWORK_LIST,
+      'available'
+    );
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
-        {NETWORK_LIST.map(chainId => (
+        { availableEthereumNetworkList.map(network => (
           <TouchableItem
-            key={chainId}
+            key={network.ethereumChainId}
             style={[
               styles.card,
               {
                 marginTop: 20,
-                backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                backgroundColor: network.color
               }
             ]}
             onPress={() => {
-              navigation.getParam('onChange')(chainId);
+              navigation.getParam('onChange')(network.ethereumChainId);
               navigation.goBack();
             }}
           >
@@ -52,13 +56,11 @@ export default class AccountNetworkChooser extends React.PureComponent {
               style={[
                 styles.cardText,
                 {
-                  color: NETWORK_COLOR[chainId]
-                    ? colors.card_bg
-                    : colors.card_text
+                  color: network.secondaryColor
                 }
               ]}
             >
-              {NETWORK_TITLES[chainId]}
+              {network.title}
             </Text>
           </TouchableItem>
         ))}

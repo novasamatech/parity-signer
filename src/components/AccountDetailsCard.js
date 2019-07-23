@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
 
@@ -39,6 +39,7 @@ export default class AccountDetailsCard extends React.PureComponent<{
 
   render() {
     const { title, address, chainId, onPress } = this.props;
+    const network = NETWORK_LIST[chainId];
 
     return (
       <TouchableItem
@@ -50,7 +51,9 @@ export default class AccountDetailsCard extends React.PureComponent<{
           <View style={styles.content}>
             <AccountIcon style={styles.icon} seed={'0x' + address} />
             <View style={styles.desc}>
-              <Text numberOfLines={1} style={styles.titleText}>{title}</Text>
+              <Text numberOfLines={1} style={styles.titleText}>
+                {title}
+              </Text>
               <Text style={styles.editText}>Tap to edit account</Text>
             </View>
           </View>
@@ -69,7 +72,7 @@ export default class AccountDetailsCard extends React.PureComponent<{
           style={[
             styles.footer,
             {
-              backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+              backgroundColor: network.color
             }
           ]}
         >
@@ -77,13 +80,11 @@ export default class AccountDetailsCard extends React.PureComponent<{
             style={[
               styles.footerText,
               {
-                color: NETWORK_COLOR[chainId]
-                  ? colors.card_bg
-                  : colors.card_text
+                color: network.secondaryColor
               }
             ]}
           >
-            {NETWORK_TITLES[chainId]}
+            {network.title}
           </Text>
         </View>
       </TouchableItem>

@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
 
@@ -29,7 +29,7 @@ export default class AccountCard extends React.PureComponent<{
   chainId: string,
   onPress: () => any,
   title?: string,
-  seedType?: string,
+  seedType?: string
 }> {
   static propTypes = {
     address: PropTypes.string.isRequired,
@@ -37,7 +37,7 @@ export default class AccountCard extends React.PureComponent<{
     onPress: PropTypes.func,
     seedType: PropTypes.string,
     style: ViewPropTypes.style,
-    title: PropTypes.string,
+    title: PropTypes.string
   };
 
   static defaultProps = {
@@ -49,6 +49,7 @@ export default class AccountCard extends React.PureComponent<{
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
     const seedTypeDisplay = seedType || '';
+    const network = NETWORK_LIST[chainId];
 
     return (
       <TouchableItem
@@ -77,7 +78,7 @@ export default class AccountCard extends React.PureComponent<{
             style={[
               styles.footer,
               {
-                backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                backgroundColor: network.color
               }
             ]}
           >
@@ -85,9 +86,7 @@ export default class AccountCard extends React.PureComponent<{
               style={[
                 styles.footerSeedType,
                 {
-                  color: NETWORK_COLOR[chainId]
-                    ? colors.card_bg
-                    : colors.card_text
+                  color: network.secondaryColor
                 }
               ]}
             >
@@ -97,13 +96,11 @@ export default class AccountCard extends React.PureComponent<{
               style={[
                 styles.footerNetwork,
                 {
-                  color: NETWORK_COLOR[chainId]
-                    ? colors.card_bg
-                    : colors.card_text
+                  color: network.secondaryColor
                 }
               ]}
             >
-              {NETWORK_TITLES[chainId]}
+              {network.title}
             </Text>
           </View>
         </View>
