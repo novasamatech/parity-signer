@@ -18,7 +18,13 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from '../colors';
 import { brainWalletAddress, words } from '../util/native';
 import AccountIcon from './AccountIcon';
@@ -54,13 +60,13 @@ export default class AccountIconChooser extends React.PureComponent<{
 
             return {
               seed,
-              address,
+              address
             };
           })
       );
 
       this.setState({
-          icons
+        icons
       });
     } catch (e) {
       console.error(e);
@@ -76,6 +82,7 @@ export default class AccountIconChooser extends React.PureComponent<{
         <FlatList
           style={styles.icons}
           data={icons}
+          keyExtractor={item => item.address}
           horizontal
           renderItem={({ item, index, separators }) => {
             const selected = item.address.toLowerCase() === value.toLowerCase();
@@ -88,7 +95,7 @@ export default class AccountIconChooser extends React.PureComponent<{
                 onPress={() =>
                   this.props.onChange({
                     address: item.address,
-                    seed: item.seed,
+                    seed: item.seed
                   })
                 }
                 onShowUnderlay={separators.highlight}

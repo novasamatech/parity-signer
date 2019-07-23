@@ -16,7 +16,7 @@
 
 // @flow
 import { Container } from 'unstated';
-import { NETWORK_TITLES } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import { saveTx } from '../util/db';
 import { brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
@@ -106,7 +106,7 @@ export default class ScannerStore extends Container<ScannerState> {
       chainId,
       address: txRequest.data.account
     });
-    const networkTitle = NETWORK_TITLES[chainId];
+    const networkTitle = NETWORK_LIST[chainId].title;
 
     if (!sender || !sender.encryptedSeed) {
       throw new Error(
