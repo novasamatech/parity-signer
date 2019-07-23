@@ -50,7 +50,7 @@ export default class AccountIconChooser extends React.PureComponent<{
           .split(' ')
           .map(async () => {
             const seed = await words();
-            const { bip39, address } = await brainWalletAddress(seed);
+            const { address } = await brainWalletAddress(seed);
 
             return {
               seed,
@@ -70,14 +70,15 @@ export default class AccountIconChooser extends React.PureComponent<{
   render() {
     const { value, onChange } = this.props;
     const { icons } = this.state;
-    console.log(icons);
+
     return (
       <View style={styles.body}>
         <FlatList
+          extraData={value}
           style={styles.icons}
           data={icons}
           horizontal
-          renderItem={({ item, index, separators }) => {
+          renderItem={({ item, index }) => {
             const selected = item.address.toLowerCase() === value.toLowerCase();
             const style = [styles.icon];
 
@@ -85,14 +86,12 @@ export default class AccountIconChooser extends React.PureComponent<{
               <TouchableOpacity
                 key={index}
                 style={[styles.iconBorder, selected ? styles.selected : {}]}
-                onPress={() =>
-                  this.props.onChange({
+                onPress={() => {
+                  onChange({
                     address: item.address,
                     seed: item.seed,
-                  })
-                }
-                onShowUnderlay={separators.highlight}
-                onHideUnderlay={separators.unhighlight}
+                  });
+                }}
               >
                 <AccountIcon style={style} seed={'0x' + item.address} />
               </TouchableOpacity>

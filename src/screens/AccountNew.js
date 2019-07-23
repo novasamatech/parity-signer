@@ -29,7 +29,6 @@ import TextInput from '../components/TextInput';
 import TouchableItem from '../components/TouchableItem';
 import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
-import { validateSeed } from '../util/account';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -46,13 +45,21 @@ export default class AccountNew extends React.Component {
 }
 
 class AccountNewView extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { ...this.props.accounts.getNew() };
+  }
+
   render() {
-    const { accounts } = this.props;
-    const selected = accounts.getNew();
+    const { accounts, navigation } = this.props;
+    const selected = this.state
     const chainId = selected.chainId;
+
     if (!selected) {
       return null;
     }
+
     return (
       <View style={styles.body}>
         <KeyboardAwareScrollView>
@@ -75,7 +82,10 @@ class AccountNewView extends React.Component {
                   }
                 ]}
                 onPress={() =>
-                  this.props.navigation.navigate('AccountNetworkChooser')
+                  navigation.navigate(
+                    'AccountNetworkChooser',
+                    { onChange: (chainId) => this.setState({chainId}) }
+                  )
                 }
               >
                 <Text
@@ -96,13 +106,11 @@ class AccountNewView extends React.Component {
               </Text>
               <AccountIconChooser
                 value={selected && selected.seed && selected.address}
-                onChange={({ address, seed }) => {
-                  accounts.updateNew({ address, seed });
-                }}
+                onChange={({ address, seed }) => this.setState({ address, seed})}
               />
               <Text style={styles.title}>ACCOUNT NAME</Text>
               <TextInput
-                onChangeText={name => accounts.updateNew({ name })}
+                onChangeText={name => this.setState({name})}
                 value={selected && selected.name}
                 placeholder="Enter a new account name"
               />
@@ -115,13 +123,13 @@ class AccountNewView extends React.Component {
               <Button
                 buttonStyles={styles.nextStep}
                 title="Next Step"
-                disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
+                disabled={ !selected.seed || !selected.name }
                 onPress={() => {
-                  validateSeed(selected.seed, selected.validBip39Seed).valid &&
-                    this.props.navigation.navigate('AccountBackup', {
-                      isNew: true,
-                      isWelcome: this.props.navigation.getParam('isWelcome')
-                    });
+                  accounts.updateNew({...selected});
+                  navigation.navigate('AccountBackup', {
+                    isNew: true,
+                    isWelcome: navigation.getParam('isWelcome')
+                  });
                 }}
               />
             </View>

@@ -18,11 +18,9 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { Subscribe } from 'unstated';
 import colors from '../colors';
 import TouchableItem from '../components/TouchableItem';
 import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_LIST, NETWORK_TITLES } from '../constants';
-import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountNetworkChooser extends React.PureComponent {
   static navigationOptions = {
@@ -31,20 +29,7 @@ export default class AccountNetworkChooser extends React.PureComponent {
   };
 
   render() {
-    return (
-      <Subscribe to={[AccountsStore]}>
-        {accounts => (
-          <AccountNetworkChooserView {...this.props} accounts={accounts} />
-        )}
-      </Subscribe>
-    );
-  }
-}
-
-class AccountNetworkChooserView extends React.PureComponent {
-  render() {
     const { navigation } = this.props;
-    const { accounts } = this.props;
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
@@ -59,7 +44,7 @@ class AccountNetworkChooserView extends React.PureComponent {
               }
             ]}
             onPress={() => {
-              accounts.updateNew({ chainId });
+              navigation.getParam('onChange')(chainId);
               navigation.goBack();
             }}
           >

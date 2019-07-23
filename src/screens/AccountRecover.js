@@ -83,7 +83,10 @@ class AccountRecoverView extends React.Component {
                 }
               ]}
               onPress={() =>
-                this.props.navigation.navigate('AccountNetworkChooser')
+                this.props.navigation.navigate(
+                  'AccountNetworkChooser',
+                  { onChange: (chainId) => accounts.updateNew({chainId}) }
+                )
               }
             >
               <Text

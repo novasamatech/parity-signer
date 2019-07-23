@@ -39,6 +39,7 @@ export default class AccountList extends React.PureComponent {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => {
+          console.log(accounts)
           return (
             <AccountListView
               {...this.props}
