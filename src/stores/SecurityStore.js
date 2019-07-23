@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
-import { NetInfo } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import { Container } from 'unstated';
 
 type SecurityState = {

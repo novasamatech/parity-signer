@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 
@@ -91,17 +91,29 @@ class AccountListView extends React.PureComponent {
   }
 
   showOnboardingMessage = () => {
+    const { navigate } = this.props.navigation;
+    const createLink = (text, navigation) => (
+      <Text 
+        style={styles.link}
+        onPress={() => navigate(navigation)}
+      >
+        {text}
+      </Text>
+    );
+
     return (
       <View style={styles.onboardingWrapper} >
-        <Text style={styles.onboardingText}>Nothing here yet.
-        Click on the + to add an account</Text>
-        <View style={styles.onboardingArrowWrapper}><Image style={styles.onboardingArrow} source={require('../assets/img/onboardingArrow.png')}
-        /></View>
+        <Text style={styles.onboardingText}>
+          No account yet?{"\n"}{createLink('Create','AccountNew')} or {createLink('recover','AccountRecover')} an account to get started.
+        </Text>
       </View>
     )
   }
 
   render() {
+    const hasNoAccount = this.props.accounts.length < 1;
+    const { navigate } = this.props.navigation;
+
     return (
       <View style={styles.body}>
         <Background />
@@ -109,7 +121,7 @@ class AccountListView extends React.PureComponent {
           <Text style={styles.title}>ACCOUNTS</Text>
           <View style={styles.menuView}>
             <PopupMenu
-              onSelect={value => this.props.navigation.navigate(value)}
+              onSelect={value => navigate(value)}
               menuTriggerIconName={"add"}
               menuItems={[
                 { value: 'AccountNew', text: 'New Account' },
@@ -118,7 +130,7 @@ class AccountListView extends React.PureComponent {
             />
           </View>
         </View>
-        {this.props.accounts.length < 1 && this.showOnboardingMessage()}
+        { hasNoAccount && this.showOnboardingMessage()}
         <FlatList
           ref={list => {
             this.list = list;
@@ -142,13 +154,15 @@ class AccountListView extends React.PureComponent {
           }}
           enableEmptySections
         />
-        <View style={styles.bottom}>
-          <Button
-            buttonStyles={{ height: 60 }}
-            title="Scan"
-            onPress={() => this.props.navigation.navigate('QrScanner')}
-          />
-        </View>
+        { ! hasNoAccount && 
+          <View style={styles.bottom}>
+            <Button
+              buttonStyles={{ height: 60 }}
+              title="Scan"
+              onPress={() => navigate('QrScanner')}
+            />
+          </View>
+        }
       </View>
     );
   }
@@ -185,22 +199,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
+  link: {
+    textDecorationLine: 'underline'
+  },
   onboardingWrapper: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-end'
-  },
-  onboardingArrowWrapper:
-  {
-    flex: 1,
-    paddingBottom: 20,
-    paddingLeft: 5
-  },
-  onboardingArrow: {
-    resizeMode: 'contain'
+    alignItems: 'flex-end',
   },
   onboardingText: {
-    flex: 5,
     fontFamily: 'Roboto',
     fontSize: 20,
     color: colors.bg_text_sec,

@@ -19,7 +19,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
-import Camera from 'react-native-camera';
+import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountsStore from '../stores/AccountsStore';
@@ -113,7 +113,11 @@ export class QrScannerView extends React.PureComponent {
       return <View style={styles.inactive} />;
     }
     return (
-      <Camera onBarCodeRead={this.props.onBarCodeRead} style={styles.view}>
+      <RNCamera
+        captureAudio={false}
+        onBarCodeRead={this.props.onBarCodeRead}
+        style={styles.view}
+      >
         <View style={styles.body}>
           <View style={styles.top}>
             <Text style={styles.titleTop}>SCANNER</Text>
@@ -128,7 +132,7 @@ export class QrScannerView extends React.PureComponent {
             <Text style={styles.descSecondary}>To Sign a New Transaction</Text>
           </View>
         </View>
-      </Camera>
+      </RNCamera>
     );
   }
 }
