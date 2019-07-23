@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import mapValues from 'lodash/mapValues';
+import defaults from 'lodash/defaults';
 import colors from './colors';
 
 export const NetworkTypes = Object.freeze({
@@ -29,7 +30,7 @@ const substrateNetworkRaw = {
   [SubstrateNetworkIds.KUSAMA]: {
     name: 'kusama',
     ss58Prefix: 2,
-    balanceModuleId: 123
+    balanceModuleId: 123 // This id need to be checked
   }
 };
 
@@ -70,23 +71,23 @@ const ethereumNetworkRaw = {
   [EthereumNetworkIds.MUSICOIN]: {}
 };
 
-export const ETHEREUM_NETWORK_LIST = _.mapValues(
+export const ETHEREUM_NETWORK_LIST = mapValues(
   ethereumNetworkRaw,
-  (ethereumNetwork, networkId) =>
-    _.defaults(ethereumNetwork, {
+  (ethereumNetwork, ethereumChainId) =>
+    defaults(ethereumNetwork, {
       protocol: NetworkTypes.ETHEREUM,
       color: '#F2E265',
       secondaryColor: colors.card_text,
       available: false,
-      title: `Ethereum_${networkId}`,
-      ethereumChainId: networkId
+      title: `Ethereum_${ethereumChainId}`,
+      ethereumChainId: ethereumChainId
     })
 );
 
-const SUBSTRATE_NETWORK_LIST = _.mapValues(
+const SUBSTRATE_NETWORK_LIST = mapValues(
   substrateNetworkRaw,
-  (substrateNetwork, networkId) =>
-    _.defaults(substrateNetwork, {
+  (substrateNetwork, substrateNetworkId) =>
+    defaults(substrateNetwork, {
       protocol: NetworkTypes.SUBSTRATE,
       color: '#E6007A',
       secondaryColor: colors.card_bg,
@@ -95,5 +96,5 @@ const SUBSTRATE_NETWORK_LIST = _.mapValues(
 );
 
 export const NETWORK_LIST = Object.freeze(
-  _.assign({}, ETHEREUM_NETWORK_LIST, SUBSTRATE_NETWORK_LIST)
+  Object.assign({}, ETHEREUM_NETWORK_LIST, SUBSTRATE_NETWORK_LIST)
 );

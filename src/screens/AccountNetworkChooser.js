@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import _ from 'lodash';
+import filter from 'lodash/filter';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
@@ -30,7 +30,6 @@ export default class AccountNetworkChooser extends React.PureComponent {
     title: 'Choose a network',
     headerBackTitle: 'Back'
   };
-
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -46,14 +45,14 @@ class AccountNetworkChooserView extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { accounts } = this.props;
-    const availableEthereumNetworkList = _.filter(
+    const availableEthereumNetworkList = filter(
       ETHEREUM_NETWORK_LIST,
       'available'
     );
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
-        {_.map(availableEthereumNetworkList, network => (
+        { availableEthereumNetworkList.map(network => (
           <TouchableItem
             key={network.ethereumChainId}
             style={[
