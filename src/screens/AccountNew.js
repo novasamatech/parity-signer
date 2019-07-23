@@ -18,7 +18,9 @@
 
 import React from 'react';
 import { StyleSheet, ScrollView, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
@@ -53,76 +55,78 @@ class AccountNewView extends React.Component {
     }
     return (
       <View style={styles.body}>
-        <Background />
-        <ScrollView
-          style={{ padding: 20 }}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          containerStyle={styles.bodyContainer}
-        >
-          <View style={styles.top}>
-            <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-            <Text style={styles.title}>CHOOSE NETWORK</Text>
-            <TouchableItem
-              style={[
-                styles.card,
-                {
-                  backgroundColor:
-                    NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
-                }
-              ]}
-              onPress={() =>
-                this.props.navigation.navigate('AccountNetworkChooser')
-              }
-            >
-              <Text
+        <KeyboardAwareScrollView>
+          <Background />
+          <ScrollView
+            style={{ padding: 20 }}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="always"
+            containerStyle={styles.bodyContainer}
+          >
+            <View style={styles.top}>
+              <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
+              <Text style={styles.title}>CHOOSE NETWORK</Text>
+              <TouchableItem
                 style={[
-                  styles.cardText,
+                  styles.card,
                   {
-                    color: NETWORK_COLOR[chainId]
-                      ? colors.card_bg
-                      : colors.card_text
+                    backgroundColor:
+                      NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
                   }
                 ]}
+                onPress={() =>
+                  this.props.navigation.navigate('AccountNetworkChooser')
+                }
               >
-                {NETWORK_TITLES[chainId]}
+                <Text
+                  style={[
+                    styles.cardText,
+                    {
+                      color: NETWORK_COLOR[chainId]
+                        ? colors.card_bg
+                        : colors.card_text
+                    }
+                  ]}
+                >
+                  {NETWORK_TITLES[chainId]}
+                </Text>
+              </TouchableItem>
+              <Text style={[styles.title, { marginTop: 20 }]}>
+                CHOOSE AN IDENTICON
               </Text>
-            </TouchableItem>
-            <Text style={[styles.title, { marginTop: 20 }]}>
-              CHOOSE AN IDENTICON
-            </Text>
-            <AccountIconChooser
-              value={selected && selected.seed && selected.address}
-              onChange={({ address, seed }) => {
-                accounts.updateNew({ address, seed });
-              }}
-            />
-            <Text style={styles.title}>ACCOUNT NAME</Text>
-            <TextInput
-              onChangeText={name => accounts.updateNew({ name })}
-              value={selected && selected.name}
-              placeholder="Enter a new account name"
-            />
-          </View>
-          <View style={styles.bottom}>
-            <Text style={styles.hintText}>
-              On the next step you will be asked to backup your account, get pen
-              and paper ready
-            </Text>
-            <Button
-              buttonStyles={styles.nextStep}
-              title="Next Step"
-              disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
-              onPress={() => {
-                validateSeed(selected.seed, selected.validBip39Seed).valid &&
-                  this.props.navigation.navigate('AccountBackup', {
-                    isNew: true,
-                    isWelcome: this.props.navigation.getParam('isWelcome')
-                  });
-              }}
-            />
-          </View>
-        </ScrollView>
+              <AccountIconChooser
+                value={selected && selected.seed && selected.address}
+                onChange={({ address, seed }) => {
+                  accounts.updateNew({ address, seed });
+                }}
+              />
+              <Text style={styles.title}>ACCOUNT NAME</Text>
+              <TextInput
+                onChangeText={name => accounts.updateNew({ name })}
+                value={selected && selected.name}
+                placeholder="Enter a new account name"
+              />
+            </View>
+            <View style={styles.bottom}>
+              <Text style={styles.hintText}>
+                On the next step you will be asked to backup your account, get pen
+                and paper ready
+              </Text>
+              <Button
+                buttonStyles={styles.nextStep}
+                title="Next Step"
+                disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
+                onPress={() => {
+                  validateSeed(selected.seed, selected.validBip39Seed).valid &&
+                    this.props.navigation.navigate('AccountBackup', {
+                      isNew: true,
+                      isWelcome: this.props.navigation.getParam('isWelcome')
+                    });
+                }}
+              />
+            </View>
+          </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     );
   }
