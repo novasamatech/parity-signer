@@ -74,7 +74,7 @@ class AccountNewView extends React.Component {
               <AccountIconChooser
                 value={selected && selected.seed && selected.address}
                 onChange={({ address, seed, bip39 }) => {
-                  accounts.updateNew({ address, seed, validBip39Seed: bip39 }, false);
+                  accounts.updateNew({ address, seed, validBip39Seed: bip39 });
                 }}
               />
               <Text style={styles.title}>ACCOUNT NAME</Text>
