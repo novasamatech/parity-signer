@@ -85,15 +85,11 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async submitNew(pin) {
     const account = this.state.newAccount;
-
-    // only save the account if the seed isn't empty
-    if (account.seed) {
-      await this.save(account, pin);
-      this.setState({
-        accounts: this.state.accounts.set(accountId(account), account),
-        newAccount: empty()
-      });
-    }
+    await this.save(account, pin);
+    this.setState({
+      accounts: this.state.accounts.set(accountId(account), account),
+      newAccount: empty()
+    });
   }
 
   update(accountUpdate) {
