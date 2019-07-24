@@ -31,8 +31,9 @@ export function empty(account = {}) {
 export function validateSeed(seed, validBip39Seed) {
   if (seed.length === 0) {
     return {
-      valid: false,
-      reason: `You're trying to recover from an empty seed phrase`
+      accountRecoveryAllowed: false,
+      reason: `A seed phrase is required.`,
+      valid: false
     };
   }
   const words = seed.split(' ');
@@ -40,21 +41,24 @@ export function validateSeed(seed, validBip39Seed) {
   for (let word of words) {
     if (word === '') {
       return {
-        valid: false,
-        reason: `Extra whitespace found`
+        accountRecoveryAllowed: true,
+        reason: `Extra whitespace found.`,
+        valid: false
       };
     }
   }
 
   if (!validBip39Seed) {
     return {
-      valid: false,
-      reason: `This recovery phrase will be treated as a legacy Parity brain wallet`
+      accountRecoveryAllowed: true,
+      reason: `This recovery phrase will be treated as a legacy Parity brain wallet.`,
+      valid: false
+      
     };
   }
 
   return {
-    valid: true,
-    reason: null
+    reason: null,
+    valid: true
   };
 }
