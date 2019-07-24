@@ -16,10 +16,11 @@
 
 // @flow
 
+import debounce from 'debounce';
 import { Container } from 'unstated';
 import { accountId, empty } from '../util/account';
 import { loadAccounts, saveAccount } from '../util/db';
-import { decryptData, encryptData } from '../util/native';
+import { brainWalletAddress, decryptData, encryptData } from '../util/native';
 
 export type Account = {
   name: string,
@@ -64,8 +65,35 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  updateNew(accountUpdate: Object) {
-    this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
+  updateNew(accountUpdate: Object, recalculateAddress: boolean = true) {
+    // Object.assign(this.state.newAccount, accountUpdate);
+    // const { seed } = this.state.newAccount;
+    // if (typeof seed === 'string') {
+    //   debounce(async () => {
+    //     const { bip39, address } = await brainWalletAddress(seed);
+
+    //     Object.assign(this.state.newAccount, { address, validBip39Seed: bip39 });
+    //     this.setState({});
+    //   }, 200)();
+    // }
+    // this.setState({});
+    
+    const { newAccount } = this.state;
+    const { seed } = accountUpdate;
+    console.log('hop',accountUpdate)
+
+    if ( seed && recalculateAddress ){
+      this.setState({newAccount :{...newAccount, seed}});
+      debounce(async () => {
+        const { bip39, address } = await brainWalletAddress(seed);
+        console.log('back',{ newAccount : {...newAccount, ...accountUpdate, address, validBip39Seed: bip39} })
+        this.setState({ newAccount : {...newAccount, ...accountUpdate, address, validBip39Seed: bip39} })
+        console.log('we update to',{ newAccount : {...newAccount, ...accountUpdate, address, validBip39Seed: bip39} })
+      }, 200)()
+    } else {
+      this.setState({ newAccount : {...newAccount, ...accountUpdate} })
+      console.log('without calculation',{ newAccount : {...newAccount, ...accountUpdate} })
+    }
   }
 
   getNew(): Account {

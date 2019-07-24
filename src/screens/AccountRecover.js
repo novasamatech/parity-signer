@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, SafeAreaView, StyleSheet, ScrollView, Text } from 'react-native';
+import { Alert, findNodeHandle, SafeAreaView, StyleSheet, ScrollView, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Subscribe } from 'unstated';
 
@@ -26,13 +26,11 @@ import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
-import { debounce } from '../util/debounce'
-import { brainWalletAddress } from '../util/native';
+import NetworkButton from '../components/NetworkButton';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -51,19 +49,7 @@ export default class AccountRecover extends React.Component {
 class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
-
-    this.state = { seed: ''}
   }
-
-  addressGeneration = (seed) => {
-    const { accounts } = this.props;
-    
-    brainWalletAddress(seed)
-    .then(({ address, bip39 }) => accounts.updateNew({address, validBip39Seed: bip39}))
-    .catch(console.error);
-  }
-
-  debouncedAddressGeneration = debounce(this.addressGeneration, 200)
 
   render() {
     const { accounts } = this.props;
@@ -101,10 +87,9 @@ class AccountRecoverView extends React.Component {
             <AccountSeed
               valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
               onChangeText={seed => {
-                this.debouncedAddressGeneration(seed);
-                this.setState({seed});
+                accounts.updateNew({ seed });
               }}
-              value={this.state.seed}
+              value={selected.seed}
             />
             <AccountCard
               style={{ marginTop: 20 }}
