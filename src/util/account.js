@@ -3,19 +3,19 @@ import { EthereumNetworkIds, NetworkTypes } from '../constants';
 export function accountId({
   address,
   networkType = 'ethereum',
-  chainId = '1'
+  networkKey = EthereumNetworkIds.FRONTIER
 }) {
   if (typeof address !== 'string' || address.length === 0) {
     throw new Error(`Couldn't create an accountId, missing address`);
   }
-  return `${networkType}:0x${address.toLowerCase()}@${chainId}`;
+  return `${networkType}:0x${address.toLowerCase()}@${networkKey}`;
 }
 
 export function empty(account = {}) {
   return {
     name: '',
     networkType: NetworkTypes.ETHEREUM,
-    chainId: EthereumNetworkIds.FRONTIER,
+    networkKey: EthereumNetworkIds.FRONTIER,
     seed: '',
     // address for an empty seed phrase
     address: '00a329c0648769A73afAc7F9381E08FB43dBEA72',

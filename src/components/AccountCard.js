@@ -26,14 +26,14 @@ import TouchableItem from './TouchableItem';
 
 export default class AccountCard extends React.PureComponent<{
   address: string,
-  chainId: string,
-  onPress: () => any,
+  networkKey: string,
+  onPress?: () => any,
   title?: string,
   seedType?: string
 }> {
   static propTypes = {
     address: PropTypes.string.isRequired,
-    chainId: PropTypes.string,
+    networkKey: PropTypes.string,
     onPress: PropTypes.func,
     seedType: PropTypes.string,
     style: ViewPropTypes.style,
@@ -41,15 +41,16 @@ export default class AccountCard extends React.PureComponent<{
   };
 
   static defaultProps = {
-    title: 'no name'
+    title: 'no name',
+    onPress: () => {}
   };
 
   render() {
-    const { address, chainId, onPress, seedType, style } = this.props;
+    const { address, networkKey, onPress, seedType, style } = this.props;
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
     const seedTypeDisplay = seedType || '';
-    const network = NETWORK_LIST[chainId];
+    const network = NETWORK_LIST[networkKey];
 
     return (
       <TouchableItem

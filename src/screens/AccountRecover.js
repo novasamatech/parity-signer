@@ -54,8 +54,8 @@ class AccountRecoverView extends React.Component {
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
-    const chainId = selected.chainId;
-    const network = NETWORK_LIST[chainId];
+    const networkKey = selected.networkKey;
+    const network = NETWORK_LIST[networkKey];
 
     return (
       <SafeAreaView style={styles.safeAreaView}>
@@ -94,7 +94,7 @@ class AccountRecoverView extends React.Component {
             <AccountCard
               style={{ marginTop: 20 }}
               address={selected.address || ''}
-              chainId={selected.chainId || ''}
+              networkKey={selected.networkKey || ''}
               title={selected.name}
               seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
             />

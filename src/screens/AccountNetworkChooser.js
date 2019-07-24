@@ -63,7 +63,7 @@ class AccountNetworkChooserView extends React.PureComponent {
               }
             ]}
             onPress={() => {
-              accounts.updateNew({ chainId: network.ethereumChainId });
+              accounts.updateNew({ networkKey: network.ethereumChainId });
               navigation.goBack();
             }}
           >

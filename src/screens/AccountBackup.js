@@ -78,7 +78,7 @@ class AccountBackupView extends React.PureComponent {
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
         <AccountCard
           address={selected.address}
-          chainId={selected.chainId}
+          networkKey={selected.networkKey}
           title={selected.name}
         />
         <Text style={styles.titleTop}>RECOVERY PHRASE</Text>

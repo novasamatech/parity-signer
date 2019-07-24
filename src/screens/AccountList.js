@@ -145,7 +145,7 @@ class AccountListView extends React.PureComponent {
                 title={account.name}
                 style={{ paddingBottom: null }}
                 address={account.address}
-                chainId={account.chainId}
+                networkKey={account.networkKey}
                 onPress={() => {
                   this.props.onAccountSelected(account);
                 }}
