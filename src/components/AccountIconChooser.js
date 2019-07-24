@@ -56,12 +56,11 @@ export default class AccountIconChooser extends React.PureComponent<{
           .split(' ')
           .map(async () => {
             const seed = await words();
-            const { address, bip39 } = await brainWalletAddress(seed);
+            const { address } = await brainWalletAddress(seed);
 
             return {
-              address,
               seed,
-              bip39
+              address
             };
           })
       );
@@ -76,7 +75,6 @@ export default class AccountIconChooser extends React.PureComponent<{
 
   renderIcon = ({ item, index }) => {
     const { value, onChange } = this.props;
-    const { address, seed, bip39} = item;
     const iSelected = item.address.toLowerCase() === value.toLowerCase();
     const style = [styles.icon];
 
@@ -86,9 +84,8 @@ export default class AccountIconChooser extends React.PureComponent<{
         style={[styles.iconBorder, iSelected ? styles.selected : {}]}
         onPress={() =>
           onChange({
-            address,
-            seed,
-            bip39
+            address: item.address,
+            seed: item.seed
           })
         }
       >
