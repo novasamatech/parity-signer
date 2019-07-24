@@ -27,19 +27,19 @@ import TouchableItem from './TouchableItem';
 export default class AccountDetailsCard extends React.PureComponent<{
   title: string,
   address: string,
-  chainId: string,
+  networkKey: string,
   onPress: () => any
 }> {
   static propTypes = {
     title: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
-    chainId: PropTypes.string,
+    networkKey: PropTypes.string,
     onPress: PropTypes.func
   };
 
   render() {
-    const { title, address, chainId, onPress } = this.props;
-    const network = NETWORK_LIST[chainId];
+    const { title, address, networkKey, onPress } = this.props;
+    const network = NETWORK_LIST[networkKey];
 
     return (
       <TouchableItem

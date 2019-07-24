@@ -74,7 +74,7 @@ export class SignedTxView extends React.PureComponent {
         <AccountCard
           title={this.props.recipient.name}
           address={this.props.recipient.address}
-          chainId={this.props.recipient.chainId || ''}
+          networkKey={this.props.recipient.networkKey || ''}
         />
       </ScrollView>
     );

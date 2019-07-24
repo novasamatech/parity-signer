@@ -52,7 +52,7 @@ export default class AccountEdit extends React.PureComponent {
               <AccountCard
                 title={selected.name}
                 address={selected.address}
-                chainId={selected.chainId}
+                networkKey={selected.networkKey}
                 onPress={async () => {
                   await Clipboard.setString('0x' + selected.address);
                 }}

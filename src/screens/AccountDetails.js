@@ -129,7 +129,7 @@ This account can only be recovered with its associated recovery phrase.`,
         </View>
         <AccountCard
           address={account.address}
-          chainId={account.chainId}
+          networkKey={account.networkKey}
           title={account.name}
         />
         <View style={styles.qr}>

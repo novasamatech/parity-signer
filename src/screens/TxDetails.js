@@ -89,7 +89,7 @@ export class TxDetailsView extends React.PureComponent {
         <AccountCard
           title={this.props.sender.name}
           address={this.props.sender.address}
-          chainId={this.props.sender.chainId}
+          networkKey={this.props.sender.networkKey}
         />
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
         <TxDetailsCard
@@ -103,7 +103,7 @@ export class TxDetailsView extends React.PureComponent {
         <AccountCard
           title={this.props.recipient.name}
           address={this.props.recipient.address}
-          chainId={this.props.recipient.chainId || ''}
+          networkKey={this.props.recipient.networkKey || ''}
         />
         <Button
           buttonStyles={{ backgroundColor: colors.bg_positive, height: 60 }}

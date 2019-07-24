@@ -26,7 +26,7 @@ export type Account = {
   name: string,
   address: string,
   networkType: string,
-  chainId: string,
+  networkKey: string,
   seed: string,
   encryptedSeed: string,
   createdAt: number,
@@ -196,7 +196,7 @@ export default class AccountsStore extends Container<AccountsState> {
 
   getAccounts(): Array<Account> {
     return Array.from(this.state.accounts.values())
-      .filter(a => !a.archived && a.chainId)
+      .filter(a => !a.archived && a.networkKey)
       .sort((a, b) => {
         if (a.name < b.name) {
           return -1;

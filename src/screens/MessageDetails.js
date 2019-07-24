@@ -93,7 +93,7 @@ export class MessageDetailsView extends React.PureComponent {
         <AccountCard
           title={this.props.sender.name}
           address={this.props.sender.address}
-          chainId={this.props.sender.chainId}
+          networkKey={this.props.sender.networkKey}
           onPress={() => {
             this.props.onPressAccount(this.props.sender);
           }}

@@ -18,14 +18,14 @@ import { rlpItem } from './native';
 import { fromWei } from './units';
 
 class Transaction {
-  constructor(nonce, gasPrice, gas, action, value, data, chainId) {
+  constructor(nonce, gasPrice, gas, action, value, data, ethereumChainId) {
     this.nonce = nonce || '0';
     this.gasPrice = parseInt(gasPrice, 16).toString();
     this.gas = parseInt(gas, 16).toString();
     this.action = action;
     this.value = fromWei(value);
     this.data = data || '-';
-    this.chainId = parseInt(chainId, 16).toString();
+    this.ethereumChainId = parseInt(ethereumChainId, 16).toString();
     this.isSafe = true;
   }
 }
@@ -38,7 +38,7 @@ async function asyncTransaction(rlp, resolve, reject) {
     let action = await rlpItem(rlp, 3);
     let value = await rlpItem(rlp, 4);
     let data = await rlpItem(rlp, 5);
-    let chainId = await rlpItem(rlp, 6);
+    let ethereumChainId = await rlpItem(rlp, 6);
     let tx = new Transaction(
       nonce,
       gasPrice,
@@ -46,7 +46,7 @@ async function asyncTransaction(rlp, resolve, reject) {
       action,
       value,
       data,
-      chainId
+      ethereumChainId
     );
     resolve(tx);
   } catch (e) {
