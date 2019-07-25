@@ -108,29 +108,41 @@ class AccountRecoverView extends React.Component {
               onPress={() => {
                 const validation = validateSeed(selected.seed, selected.validBip39Seed);
                 if (!validation.valid) {
-                  Alert.alert(
-                    'Warning:',
-                    `${validation.reason}`,
-                    [
-                      {
-                        text: 'I understand the risks',
-                        style: 'default',
-                        onPress: () => {
-                          this.props.navigation.navigate('AccountPin', {
-                            isWelcome: this.props.navigation.getParam(
-                              'isWelcome'
-                            ),
-                            isNew: true
-                          });
+                  if (validation.accountRecoveryAllowed){
+                    return Alert.alert(
+                      'Warning:',
+                      `${validation.reason}`,
+                      [
+                        {
+                          text: 'I understand the risks',
+                          style: 'default',
+                          onPress: () => {
+                            this.props.navigation.navigate('AccountPin', {
+                              isWelcome: this.props.navigation.getParam(
+                                'isWelcome'
+                              ),
+                              isNew: true
+                            });
+                          }
+                        },
+                        {
+                          text: 'Back',
+                          style: 'cancel'
                         }
-                      },
-                      {
-                        text: 'Back',
-                        style: 'cancel'
-                      }
-                    ]
-                  );
-                  return;
+                      ]
+                    );
+                  } else {
+                    return Alert.alert(
+                      'Error:',
+                      `${validation.reason}`,
+                      [
+                        {
+                          text: 'Back',
+                          style: 'cancel'
+                        }
+                      ]
+                    );
+                  }
                 }
                 this.props.navigation.navigate('AccountPin', {
                   isWelcome: this.props.navigation.getParam('isWelcome'),
