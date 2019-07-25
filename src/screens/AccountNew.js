@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -73,7 +73,7 @@ class AccountNewView extends React.Component {
               </Text>
               <AccountIconChooser
                 value={selected && selected.seed && selected.address}
-                onChange={({ address, seed, bip39 }) => {
+                onSelect={({ address, bip39, seed }) => {
                   accounts.updateNew({ address, seed, validBip39Seed: bip39 });
                 }}
               />

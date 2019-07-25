@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -60,8 +60,8 @@ export default class AccountIconChooser extends React.PureComponent<{
 
             return {
               address,
+              bip39,
               seed,
-              bip39
             };
           })
       );
@@ -75,9 +75,9 @@ export default class AccountIconChooser extends React.PureComponent<{
   };
 
   renderIcon = ({ item, index }) => {
-    const { value, onChange } = this.props;
-    const { address, seed, bip39} = item;
-    const iSelected = item.address.toLowerCase() === value.toLowerCase();
+    const { value, onSelect } = this.props;
+    const { address, bip39, seed } = item;
+    const iSelected = address.toLowerCase() === value.toLowerCase();
     const style = [styles.icon];
 
     return (
@@ -85,14 +85,14 @@ export default class AccountIconChooser extends React.PureComponent<{
         key={index}
         style={[styles.iconBorder, iSelected ? styles.selected : {}]}
         onPress={() =>
-          onChange({
+          onSelect({
             address,
-            seed,
-            bip39
+            bip39,
+            seed
           })
         }
       >
-        <AccountIcon style={style} seed={'0x' + item.address} />
+        <AccountIcon style={style} seed={'0x' + address} />
       </TouchableOpacity>
     );
   }

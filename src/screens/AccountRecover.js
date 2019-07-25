@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, SafeAreaView, StyleSheet, ScrollView, Text } from 'react-native';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Subscribe } from 'unstated';
 
@@ -39,6 +39,7 @@ export default class AccountRecover extends React.Component {
     title: 'Recover Account',
     headerBackTitle: 'Back'
   };
+
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -64,6 +65,11 @@ class AccountRecoverView extends React.Component {
   }
 
   debouncedAddressGeneration = debounce(this.addressGeneration, 200)
+  
+  componentWillUnmount = function () {
+    // called when the user goes back, or finishes the whole recovery process
+    this.props.accounts.updateNew({seed : ''});
+  }
 
   render() {
     const { accounts } = this.props;
@@ -120,29 +126,41 @@ class AccountRecoverView extends React.Component {
                 const validation = validateSeed(selected.seed, selected.validBip39Seed);
 
                 if (!validation.valid) {
-                  Alert.alert(
-                    'Warning:',
-                    `${validation.reason}`,
-                    [
-                      {
-                        text: 'I understand the risks',
-                        style: 'default',
-                        onPress: () => {
-                          this.props.navigation.navigate('AccountPin', {
-                            isWelcome: this.props.navigation.getParam(
-                              'isWelcome'
-                            ),
-                            isNew: true
-                          });
+                  if (validation.accountRecoveryAllowed){
+                    return Alert.alert(
+                      'Warning:',
+                      `${validation.reason}`,
+                      [
+                        {
+                          text: 'I understand the risks',
+                          style: 'default',
+                          onPress: () => {
+                            this.props.navigation.navigate('AccountPin', {
+                              isWelcome: this.props.navigation.getParam(
+                                'isWelcome'
+                              ),
+                              isNew: true
+                            });
+                          }
+                        },
+                        {
+                          text: 'Back',
+                          style: 'cancel'
                         }
-                      },
-                      {
-                        text: 'Back',
-                        style: 'cancel'
-                      }
-                    ]
-                  );
-                  return;
+                      ]
+                    );
+                  } else {
+                    return Alert.alert(
+                      'Error:',
+                      `${validation.reason}`,
+                      [
+                        {
+                          text: 'Back',
+                          style: 'cancel'
+                        }
+                      ]
+                    );
+                  }
                 }
                 
                 this.props.navigation.navigate('AccountPin', {

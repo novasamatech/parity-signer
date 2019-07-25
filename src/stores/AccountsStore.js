@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -74,11 +74,15 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async submitNew(pin) {
     const account = this.state.newAccount;
-    await this.save(account, pin);
-    this.setState({
-      accounts: this.state.accounts.set(accountId(account), account),
-      newAccount: empty()
-    });
+
+    // only save the account if the seed isn't empty
+    if (account.seed) {
+      await this.save(account, pin);
+      this.setState({
+        accounts: this.state.accounts.set(accountId(account), account),
+        newAccount: empty()
+      });
+    }
   }
 
   update(accountUpdate) {
