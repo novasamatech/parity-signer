@@ -3,7 +3,7 @@
 //  NativeSigner
 //
 //  Created by Marek Kotewicz on 19/02/2017.
-//  Copyright © 2017 Facebook. All rights reserved.
+//  Copyright © 2019 Facebook. All rights reserved.
 //
 
 import Foundation

@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -56,7 +56,7 @@ export default class AccountIconChooser extends React.PureComponent<{
           .split(' ')
           .map(async () => {
             const seed = await words();
-            const { bip39, address } = await brainWalletAddress(seed);
+            const { address } = await brainWalletAddress(seed);
 
             return {
               seed,
@@ -73,38 +73,40 @@ export default class AccountIconChooser extends React.PureComponent<{
     }
   };
 
-  render() {
+  renderIcon = ({ item, index }) => {
     const { value, onChange } = this.props;
+    const iSelected = item.address.toLowerCase() === value.toLowerCase();
+    const style = [styles.icon];
+
+    return (
+      <TouchableOpacity
+        key={index}
+        style={[styles.iconBorder, iSelected ? styles.selected : {}]}
+        onPress={() =>
+          onChange({
+            address: item.address,
+            seed: item.seed
+          })
+        }
+      >
+        <AccountIcon style={style} seed={'0x' + item.address} />
+      </TouchableOpacity>
+    );
+  }
+
+  render() {
+    const { value } = this.props;
     const { icons } = this.state;
-    console.log(icons);
+
     return (
       <View style={styles.body}>
         <FlatList
-          style={styles.icons}
           data={icons}
-          keyExtractor={item => item.address}
+          extraData={value}
           horizontal
-          renderItem={({ item, index, separators }) => {
-            const selected = item.address.toLowerCase() === value.toLowerCase();
-            const style = [styles.icon];
-
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[styles.iconBorder, selected ? styles.selected : {}]}
-                onPress={() =>
-                  this.props.onChange({
-                    address: item.address,
-                    seed: item.seed
-                  })
-                }
-                onShowUnderlay={separators.highlight}
-                onHideUnderlay={separators.unhighlight}
-              >
-                <AccountIcon style={style} seed={'0x' + item.address} />
-              </TouchableOpacity>
-            );
-          }}
+          keyExtractor={item => item.address}
+          renderItem={this.renderIcon}
+          style={styles.icons}
         />
         <Text
           numberOfLines={1}
