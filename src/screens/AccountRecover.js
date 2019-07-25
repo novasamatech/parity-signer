@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, findNodeHandle, SafeAreaView, StyleSheet, ScrollView, Text, View } from 'react-native';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Subscribe } from 'unstated';
 
@@ -37,6 +37,7 @@ export default class AccountRecover extends React.Component {
     title: 'Recover Account',
     headerBackTitle: 'Back'
   };
+
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -49,6 +50,11 @@ export default class AccountRecover extends React.Component {
 class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
+  }
+
+  componentWillUnmount = function () {
+    // called when the user goes back, or finishes the whole recovery process
+    this.props.accounts.updateNew({seed : ''});
   }
 
   render() {
@@ -86,9 +92,7 @@ class AccountRecoverView extends React.Component {
             </Text>
             <AccountSeed
               valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
-              onChangeText={seed => {
-                accounts.updateNew({ seed });
-              }}
+              onChangeText={seed => accounts.updateNew({ seed })}
               value={selected.seed}
             />
             <AccountCard
