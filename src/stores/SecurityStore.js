@@ -18,31 +18,25 @@
 import NetInfo from '@react-native-community/netinfo';
 import { Container } from 'unstated';
 
-type SecurityState = {
-  signedTxs: Map<string, Object>
-};
-
-export default class SecurityStore extends Container<SecurityState> {
+export default class SecurityStore extends Container {
   state = {
-    level: 'green'
+    isConnected: false
   };
 
   constructor(...args) {
     super(...args);
-    this.connectionChangeListener = this.connectionChangeListener.bind(this);
-    NetInfo.addEventListener('connectionChange', this.connectionChangeListener);
-    NetInfo.getConnectionInfo().then(this.connectionChangeListener);
+    // Subscribe
+    const unsubscribe = NetInfo.addEventListener(state => {
+      this.setState({ isConnected: state.isConnected });
+    });
   }
 
-  connectionChangeListener(connectionInfo) {
-    if (connectionInfo.type !== 'none') {
-      this.setState({ level: 'red' });
-    } else {
-      this.setState({ level: 'green' });
-    }
+  componentWillUnmount() {
+    // Unsubscribe
+     // this.unsubscribe();
   }
 
-  getLevel() {
-    return this.state.level;
+  isConnected() {
+    return this.state.isConnected;
   }
 }

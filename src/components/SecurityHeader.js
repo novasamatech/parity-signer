@@ -28,7 +28,7 @@ export default class SecurityHeader extends React.Component {
     return (
       <Subscribe to={[SecurityStore]}>
          {securityStore => (
-          <SecurityHeaderView level={securityStore.getLevel()} />
+          <SecurityHeaderView isConnected={securityStore.isConnected()} />
         )}
       </Subscribe>
     );
@@ -37,22 +37,17 @@ export default class SecurityHeader extends React.Component {
 
 class _SecurityHeaderView extends React.PureComponent {
   render() {
-    const { level } = this.props;
-    const color = {
-      green: colors.bg_positive,
-      red: colors.bg_alert
-    }[level];
+    const { isConnected } = this.props;
 
-    const message = {
-      green: 'Secure',
-      red: 'Not Secure'
-    }[level];
+    if (!isConnected) {
+      return null
+    }
 
     return (
       <TouchableItem onPress={() => this.props.navigation.navigate('Security')}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Icon style={[styles.headerSecureIcon, { color }]} name="security" />
-          <Text style={[styles.headerTextRight, { color }]}>{message}</Text>
+          <Icon style={styles.headerSecureIcon} name="security" />
+          <Text style={styles.headerTextRight}>Not Secure</Text>
         </View>
       </TouchableItem>
     );
@@ -65,14 +60,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     paddingRight: 5,
-    color: colors.bg_text_positive
+    color: colors.bg_alert
   },
   headerTextRight: {
     marginLeft: 0,
     fontSize: 17,
     fontFamily: 'Roboto',
     fontWeight: 'bold',
-    color: colors.bg_text_positive,
+    color: colors.bg_alert,
     paddingRight: 14,
   }
 });
