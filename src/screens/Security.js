@@ -17,6 +17,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import colors from '../colors';
 
 export default class Security extends React.PureComponent {

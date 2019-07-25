@@ -14,30 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import NetInfo from '@react-native-community/netinfo';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { withNavigation } from 'react-navigation';
-import { Subscribe } from 'unstated';
+
 import colors from '../colors';
-import SecurityStore from '../stores/SecurityStore';
 import TouchableItem from './TouchableItem';
 
-export default class SecurityHeader extends React.Component {
-  render() {
-    return (
-      <Subscribe to={[SecurityStore]}>
-         {securityStore => (
-          <SecurityHeaderView isConnected={securityStore.isConnected()} />
-        )}
-      </Subscribe>
-    );
-  }
-}
+class SecurityHeader extends React.Component {
+  state = {
+    isConnected: false
+  };
 
-class _SecurityHeaderView extends React.PureComponent {
+  componentDidMount() {
+    this.unsubscribe = NetInfo.addEventListener(state => {
+      this.setState({ isConnected: state.isConnected });
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
   render() {
-    const { isConnected } = this.props;
+    const { isConnected } = this.state;
 
     if (!isConnected) {
       return null
@@ -72,4 +74,4 @@ const styles = StyleSheet.create({
   }
 });
 
-const SecurityHeaderView = withNavigation(_SecurityHeaderView);
+export default withNavigation(SecurityHeader);
