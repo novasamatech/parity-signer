@@ -59,7 +59,7 @@ class AccountRecoverView extends React.Component {
     const { accounts } = this.props;
     
     brainWalletAddress(seed)
-    .then(({ address, bip39 }) => accounts.updateNew({address, validBip39Seed: bip39}))
+    .then(({ address, bip39 }) => accounts.updateNew({address, seed, validBip39Seed: bip39}))
     .catch(console.error);
   }
 
@@ -118,6 +118,7 @@ class AccountRecoverView extends React.Component {
               title="Next Step"
               onPress={() => {
                 const validation = validateSeed(selected.seed, selected.validBip39Seed);
+
                 if (!validation.valid) {
                   Alert.alert(
                     'Warning:',
@@ -143,6 +144,7 @@ class AccountRecoverView extends React.Component {
                   );
                   return;
                 }
+                
                 this.props.navigation.navigate('AccountPin', {
                   isWelcome: this.props.navigation.getParam('isWelcome'),
                   isNew: true
