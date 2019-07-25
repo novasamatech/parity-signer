@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -18,16 +18,19 @@
 
 import React from 'react';
 import { StyleSheet, ScrollView, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import TouchableItem from '../components/TouchableItem';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
+import NetworkButton from '../components/NetworkButton';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -47,82 +50,60 @@ class AccountNewView extends React.Component {
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
-    const chainId = selected.chainId;
+    const network = NETWORK_LIST[selected.networkKey];
     if (!selected) {
       return null;
     }
     return (
       <View style={styles.body}>
-        <Background />
-        <ScrollView
-          style={{ padding: 20 }}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          containerStyle={styles.bodyContainer}
-        >
-          <View style={styles.top}>
-            <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-            <Text style={styles.title}>CHOOSE NETWORK</Text>
-            <TouchableItem
-              style={[
-                styles.card,
-                {
-                  backgroundColor:
-                    NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
-                }
-              ]}
-              onPress={() =>
-                this.props.navigation.navigate('AccountNetworkChooser')
-              }
-            >
-              <Text
-                style={[
-                  styles.cardText,
-                  {
-                    color: NETWORK_COLOR[chainId]
-                      ? colors.card_bg
-                      : colors.card_text
-                  }
-                ]}
-              >
-                {NETWORK_TITLES[chainId]}
+        <KeyboardAwareScrollView>
+          <Background />
+          <ScrollView
+            style={{ padding: 20 }}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="always"
+            containerStyle={styles.bodyContainer}
+          >
+            <View style={styles.top}>
+              <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
+              <Text style={styles.title}>CHOOSE NETWORK</Text>
+              <NetworkButton network={network}/>
+              <Text style={[styles.title, { marginTop: 20 }]}>
+                CHOOSE AN IDENTICON
               </Text>
-            </TouchableItem>
-            <Text style={[styles.title, { marginTop: 20 }]}>
-              CHOOSE AN IDENTICON
-            </Text>
-            <AccountIconChooser
-              value={selected && selected.seed && selected.address}
-              onChange={({ address, seed }) => {
-                accounts.updateNew({ address, seed });
-              }}
-            />
-            <Text style={styles.title}>ACCOUNT NAME</Text>
-            <TextInput
-              onChangeText={name => accounts.updateNew({ name })}
-              value={selected && selected.name}
-              placeholder="Enter a new account name"
-            />
-          </View>
-          <View style={styles.bottom}>
-            <Text style={styles.hintText}>
-              On the next step you will be asked to backup your account, get pen
-              and paper ready
-            </Text>
-            <Button
-              buttonStyles={styles.nextStep}
-              title="Next Step"
-              disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
-              onPress={() => {
-                validateSeed(selected.seed, selected.validBip39Seed).valid &&
-                  this.props.navigation.navigate('AccountBackup', {
-                    isNew: true,
-                    isWelcome: this.props.navigation.getParam('isWelcome')
-                  });
-              }}
-            />
-          </View>
-        </ScrollView>
+              <AccountIconChooser
+                value={selected && selected.seed && selected.address}
+                onChange={({ address, seed }) => {
+                  accounts.updateNew({ address, seed });
+                }}
+              />
+              <Text style={styles.title}>ACCOUNT NAME</Text>
+              <TextInput
+                onChangeText={name => accounts.updateNew({ name })}
+                value={selected && selected.name}
+                placeholder="Enter a new account name"
+              />
+            </View>
+            <View style={styles.bottom}>
+              <Text style={styles.hintText}>
+                On the next step you will be asked to backup your account, get pen
+                and paper ready
+              </Text>
+              <Button
+                buttonStyles={styles.nextStep}
+                title="Next Step"
+                disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
+                onPress={() => {
+                  validateSeed(selected.seed, selected.validBip39Seed).valid &&
+                    this.props.navigation.navigate('AccountBackup', {
+                      isNew: true,
+                      isWelcome: this.props.navigation.getParam('isWelcome')
+                    });
+                }}
+              />
+            </View>
+          </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     );
   }
@@ -171,15 +152,5 @@ const styles = StyleSheet.create({
   },
   nextStep: {
     marginTop: 15
-  },
-  card: {
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    color: colors.card_text,
-    fontFamily: 'Manifold CF',
-    fontSize: 20,
-    fontWeight: 'bold'
   }
 });

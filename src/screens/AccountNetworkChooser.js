@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -17,11 +17,12 @@
 'use strict';
 
 import React from 'react';
+import filter from 'lodash/filter';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import TouchableItem from '../components/TouchableItem';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_LIST, NETWORK_TITLES } from '../constants';
+import { ETHEREUM_NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountNetworkChooser extends React.PureComponent {
@@ -29,7 +30,6 @@ export default class AccountNetworkChooser extends React.PureComponent {
     title: 'Choose a network',
     headerBackTitle: 'Back'
   };
-
   render() {
     return (
       <Subscribe to={[AccountsStore]}>
@@ -45,21 +45,25 @@ class AccountNetworkChooserView extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { accounts } = this.props;
+    const availableEthereumNetworkList = filter(
+      ETHEREUM_NETWORK_LIST,
+      'available'
+    );
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
-        {NETWORK_LIST.map(chainId => (
+        { availableEthereumNetworkList.map(network => (
           <TouchableItem
-            key={chainId}
+            key={network.ethereumChainId}
             style={[
               styles.card,
               {
                 marginTop: 20,
-                backgroundColor: NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR
+                backgroundColor: network.color
               }
             ]}
             onPress={() => {
-              accounts.updateNew({ chainId });
+              accounts.updateNew({ networkKey: network.ethereumChainId });
               navigation.goBack();
             }}
           >
@@ -67,13 +71,11 @@ class AccountNetworkChooserView extends React.PureComponent {
               style={[
                 styles.cardText,
                 {
-                  color: NETWORK_COLOR[chainId]
-                    ? colors.card_bg
-                    : colors.card_text
+                  color: network.secondaryColor
                 }
               ]}
             >
-              {NETWORK_TITLES[chainId]}
+              {network.title}
             </Text>
           </TouchableItem>
         ))}

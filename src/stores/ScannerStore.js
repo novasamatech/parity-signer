@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 
 // @flow
 import { Container } from 'unstated';
-import { NETWORK_TITLES } from '../constants';
+import { NETWORK_LIST, NetworkTypes } from '../constants';
 import { saveTx } from '../util/db';
 import { brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
@@ -99,14 +99,14 @@ export default class ScannerStore extends Container<ScannerState> {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
     const tx = await transaction(txRequest.data.rlp);
-    const { chainId = '1' } = tx;
+    const { ethereumChainId: networkKey = '1' } = tx;
 
     const sender = accountsStore.getById({
-      networkType: 'ethereum',
-      chainId,
+      networkType: NetworkTypes.ETHEREUM,
+      networkKey,
       address: txRequest.data.account
     });
-    const networkTitle = NETWORK_TITLES[chainId];
+    const networkTitle = NETWORK_LIST[networkKey].title;
 
     if (!sender || !sender.encryptedSeed) {
       throw new Error(
@@ -117,8 +117,8 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     const recipient = accountsStore.getById({
-      networkType: 'ethereum',
-      chainId: tx.chainId,
+      networkType: NetworkTypes.ETHEREUM,
+      networkKey: tx.ethereumChainId,
       address: tx.action
     });
     const dataToSign = await keccak(txRequest.data.rlp);

@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ export default class AccountEdit extends React.PureComponent {
               <AccountCard
                 title={selected.name}
                 address={selected.address}
-                chainId={selected.chainId}
+                networkKey={selected.networkKey}
                 onPress={async () => {
                   await Clipboard.setString('0x' + selected.address);
                 }}

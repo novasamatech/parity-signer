@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -78,7 +78,7 @@ class AccountBackupView extends React.PureComponent {
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
         <AccountCard
           address={selected.address}
-          chainId={selected.chainId}
+          networkKey={selected.networkKey}
           title={selected.name}
         />
         <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
