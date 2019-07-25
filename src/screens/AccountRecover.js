@@ -105,7 +105,7 @@ class AccountRecoverView extends React.Component {
                 const validation = validateSeed(selected.seed, selected.validBip39Seed);
                 if (!validation.valid) {
                   if (validation.accountRecoveryAllowed){
-                    Alert.alert(
+                    return Alert.alert(
                       'Warning:',
                       `${validation.reason}`,
                       [
@@ -127,9 +127,8 @@ class AccountRecoverView extends React.Component {
                         }
                       ]
                     );
-                    return;
                   } else {
-                    Alert.alert(
+                    return Alert.alert(
                       'Error:',
                       `${validation.reason}`,
                       [
@@ -139,7 +138,6 @@ class AccountRecoverView extends React.Component {
                         }
                       ]
                     );
-                    return;
                   }
                 }
                 this.props.navigation.navigate('AccountPin', {
