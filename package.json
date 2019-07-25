@@ -19,7 +19,7 @@
     "commit": "commit-wizard"
   },
   "dependencies": {
-    "@parity/qr-signer": "^0.3.2",
+    "@polkadot/ui-qr": "^0.34.0-beta.86",
     "@react-native-community/netinfo": "^4.1.1",
     "bignumber.js": "^4.0.0",
     "debounce": "^1.0.0",
@@ -38,8 +38,7 @@
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^6.6.0",
     "react-navigation": "^3.11.1",
-    "unstated": "^2.1.1",
-    "yarn": "^1.17.3"
+    "unstated": "^2.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
