@@ -16,7 +16,8 @@
 
 'use strict';
 
-import QrScan from '@polkadot/ui-qr';
+// import QrScan from '@polkadot/ui-qr';
+// import { decodeAddress } from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -44,6 +45,8 @@ export default class Scanner extends React.PureComponent {
                 if (scannerStore.isBusy()) {
                   return;
                 }
+
+                debugger;
                 /*  
                   TODO:
                     assuming the txRequestData comes as raw binary:
@@ -138,9 +141,9 @@ export class QrScannerView extends React.PureComponent {
       return <View style={styles.inactive} />;
     }
     return (
-      <QrScan
-        onError={this.props.onError}
-        onScan={this.props.onBarCodeRead}
+      <RNCamera
+        captureAudio={false}
+        onBarCodeRead={this.props.onBarCodeRead}
         style={styles.view}
       >
         <View style={styles.body}>
@@ -157,7 +160,7 @@ export class QrScannerView extends React.PureComponent {
             <Text style={styles.descSecondary}>To Sign a New Transaction</Text>
           </View>
         </View>
-      </QrScan>
+      </RNCamera>
     );
   }
 }

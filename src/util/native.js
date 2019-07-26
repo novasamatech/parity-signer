@@ -111,9 +111,3 @@ export function decryptData (data, password) {
 export function qrCode (data) {
   return EthkeyBridge.qrCode(data)
 }
-
-/* Not yet implemented
-export function qrSubstrate (data) {
-  return SubkeyBridge.qrCode(data)
-}
-*/
