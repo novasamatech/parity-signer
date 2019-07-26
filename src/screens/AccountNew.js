@@ -51,6 +51,7 @@ class AccountNewView extends React.Component {
     const { accounts } = this.props;
     const selected = accounts.getNew();
     const network = NETWORK_LIST[selected.networkKey];
+
     if (!selected) {
       return null;
     }
