@@ -16,11 +16,10 @@
 
 // @flow
 
-import debounce from 'debounce';
 import { Container } from 'unstated';
 import { accountId, empty } from '../util/account';
 import { loadAccounts, saveAccount } from '../util/db';
-import { brainWalletAddress, decryptData, encryptData } from '../util/native';
+import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
   name: string,
@@ -66,17 +65,7 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   updateNew(accountUpdate: Object) {
-    Object.assign(this.state.newAccount, accountUpdate);
-    const { seed } = this.state.newAccount;
-    if (typeof seed === 'string') {
-      debounce(async () => {
-        const { bip39, address } = await brainWalletAddress(seed);
-
-        Object.assign(this.state.newAccount, { address, validBip39Seed: bip39 });
-        this.setState({});
-      }, 200)();
-    }
-    this.setState({});
+    this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
   }
 
   getNew(): Account {

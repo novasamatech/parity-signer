@@ -26,11 +26,13 @@ import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
-import NetworkButton from '../components/NetworkButton';
+import { debounce } from '../util/debounce'
+import { brainWalletAddress } from '../util/native';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -50,8 +52,20 @@ export default class AccountRecover extends React.Component {
 class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
+
+    this.state = { seed: ''}
   }
 
+  addressGeneration = (seed) => {
+    const { accounts } = this.props;
+    
+    brainWalletAddress(seed)
+    .then(({ address, bip39 }) => accounts.updateNew({address, seed, validBip39Seed: bip39}))
+    .catch(console.error);
+  }
+
+  debouncedAddressGeneration = debounce(this.addressGeneration, 200)
+  
   componentWillUnmount = function () {
     // called when the user goes back, or finishes the whole recovery process
     this.props.accounts.updateNew({seed : ''});
@@ -92,8 +106,11 @@ class AccountRecoverView extends React.Component {
             </Text>
             <AccountSeed
               valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
-              onChangeText={seed => accounts.updateNew({ seed })}
-              value={selected.seed}
+              onChangeText={seed => {
+                this.debouncedAddressGeneration(seed);
+                this.setState({seed});
+              }}
+              value={this.state.seed}
             />
             <AccountCard
               style={{ marginTop: 20 }}
@@ -107,6 +124,7 @@ class AccountRecoverView extends React.Component {
               title="Next Step"
               onPress={() => {
                 const validation = validateSeed(selected.seed, selected.validBip39Seed);
+
                 if (!validation.valid) {
                   if (validation.accountRecoveryAllowed){
                     return Alert.alert(
@@ -144,6 +162,7 @@ class AccountRecoverView extends React.Component {
                     );
                   }
                 }
+                
                 this.props.navigation.navigate('AccountPin', {
                   isWelcome: this.props.navigation.getParam('isWelcome'),
                   isNew: true
