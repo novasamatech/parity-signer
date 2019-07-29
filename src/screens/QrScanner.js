@@ -33,6 +33,16 @@ export default class Scanner extends React.PureComponent {
     headerBackTitle: 'Scanner'
   };
 
+  encodeString (value: string): Uint8Array {
+    const u8a = new Uint8Array(value.length);
+    
+    for (let i = 0; i < value.length; i++) {
+      u8a[i] = value.charCodeAt(i);
+    }
+
+    return u8a;
+  }
+
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
@@ -45,62 +55,66 @@ export default class Scanner extends React.PureComponent {
                 if (scannerStore.isBusy()) {
                   return;
                 }
-                const utf8Encoder = new TextEncoder('utf-8');
-                const utf8Encoded = utf8Encoder.encode(txRequestData.data);
-                const zerothByte = utf8Encoded[0].toString(16);
-                
                 let data = {};
+
+                if (txRequestData.data) { // then this is Ethereum Legacy
+                  if (data.action === undefined) {
+                    throw new Error('Could not determine action type.');
+                  }
+                  data = JSON.parse(txRequestData.data);
+                  
+                  if (!(await scannerStore.setData(data, accountsStore))) {
+                    return;
+                  } else {
+                    if (scannerStore.getType() === 'transaction') {
+                      this.props.navigation.navigate('TxDetails');
+                    } else { // message
+                      this.props.navigation.navigate('MessageDetails');
+                    }
+                  }
+                }
+                // parse past the frame information
+                let raw = txRequestData.rawData;
+                let rawAfterFrames = raw.slice(13);
+
+                // can't scope variables to switch case blocks....fml
+                let zerothByte = rawAfterFrames.slice(0, 2);
+                let firstByte = rawAfterFrames.slice(2, 4);
+                let action;
+                let address;
 
                 try {
                   // decode payload appropriately via UOS
-                  switch (zerothByte.toLowerCase()) {
-                    case '7b': // Legacy Ethereum payload is JSON format
-                      data = JSON.parse(txRequestData.data);
-                      if (data.action === undefined) {
-                        throw new Error('Could not determine action type.');
-                      }
-                      break;
+                  switch (zerothByte) {
                     case '45': // Ethereum UOS payload
-                      const firstByte = utf8Encoded[1].toString(16);
-                      const action = firstByte === '00' || firstByte === '02' ? 'signData' : firstByte === '01' ? 'signTransaction' : null;
-                      const address = utf8Encoded.slice(2, 22);
+                      action = firstByte === '00' || firstByte === '02' ? 'signData' : firstByte === '01' ? 'signTransaction' : null;
+                      address = rawAfterFrames.slice(2, 22);
 
                       data['action'] = action;
                       data['account'] = account;
 
                       if (action === 'signData') {
-                        data['rlp'] = utf8Encoded.slice(23);
+                        data['rlp'] = rawAfterFrames.slice(23);
                       } else if (action === 'signTransaction') {
-                        data['data'] = utf8Encoded.slice(23);
+                        data['data'] = rawAfterFrames.slice(23);
                       } else {
                         throw new Error('Could not determine action type.');
                       }
                       break;
                     case '53': // Substrate UOS payload
-                      const firstByte = utf8Encoded[1].toString(16);
-                      const secondByte = utf8Encoded[2].toString(16);
+                      const secondByte = rawAfterFrames.slice(4, 6);
                       const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
-                      const action = secondByte === '00' || secondByte === '01' ? 'signData': secondByte === '02' || secondByte === '03' ? 'signTransaction' : null;
+                      action = secondByte === '00' || secondByte === '01' ? 'signData': secondByte === '02' || secondByte === '03' ? 'signTransaction' : null;
 
                       data['crypto'] = crypto;
                       data['action'] = action;
-                      data['account'] = utf8Encoded.slice(2, 33);
-                      data['data'] = utf8Encoded.slice(33);
-
+                      data['account'] = rawAfterFrames.slice(6, 70);
+                      data['data'] = rawAfterFrames.slice(70);
+                      debugger;
                       break;
                     default:
-                      throw new Error('we cannot handle the payload: ', txRequestData.data);
+                      throw new Error('we cannot handle the payload: ', txRequestData);
                   }
-
-                  if (!(await scannerStore.setData(data, accountsStore))) {
-                        return;
-                      } else {
-                        if (scannerStore.getType() === 'transaction') {
-                          this.props.navigation.navigate('TxDetails');
-                        } else { // message
-                          this.props.navigation.navigate('MessageDetails');
-                        }
-                      }
                 } catch (e) {
                   scannerStore.setBusy();
                   Alert.alert('Unable to parse transaction', e.message, [
