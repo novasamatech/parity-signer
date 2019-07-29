@@ -19,10 +19,10 @@
 import React from 'react';
 import {
   Alert,
+  findNodeHandle,
   SafeAreaView,
   StyleSheet,
-  Text,
-  findNodeHandle
+  Text
 } from 'react-native';
 import { Subscribe } from 'unstated';
 
@@ -31,6 +31,7 @@ import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST } from '../constants';
@@ -38,7 +39,6 @@ import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress } from '../util/native';
-import KeyboardScrollView from '../components/KeyboardScrollView';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -80,7 +80,7 @@ class AccountRecoverView extends React.Component {
   };
 
   render() {
-    const { accounts } = this.props;
+    const { accounts, navigation } = this.props;
     const selected = accounts.getNew();
     const networkKey = selected.networkKey;
     const network = NETWORK_LIST[networkKey];
@@ -144,8 +144,8 @@ class AccountRecoverView extends React.Component {
                       text: 'I understand the risks',
                       style: 'default',
                       onPress: () => {
-                        this.props.navigation.navigate('AccountPin', {
-                          isWelcome: this.props.navigation.getParam(
+                        navigation.navigate('AccountPin', {
+                          isWelcome: navigation.getParam(
                             'isWelcome'
                           ),
                           isNew: true
@@ -167,8 +167,8 @@ class AccountRecoverView extends React.Component {
                 }
               }
 
-              this.props.navigation.navigate('AccountPin', {
-                isWelcome: this.props.navigation.getParam('isWelcome'),
+              navigation.navigate('AccountPin', {
+                isWelcome: navigation.getParam('isWelcome'),
                 isNew: true
               });
             }}

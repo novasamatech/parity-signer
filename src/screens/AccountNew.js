@@ -47,7 +47,7 @@ export default class AccountNew extends React.Component {
 
 class AccountNewView extends React.Component {
   render() {
-    const { accounts } = this.props;
+    const { accounts, navigation } = this.props;
     const selected = accounts.getNew();
     const network = NETWORK_LIST[selected.networkKey];
     if (!selected) {
@@ -90,9 +90,9 @@ class AccountNewView extends React.Component {
               }
               onPress={() => {
                 validateSeed(selected.seed, selected.validBip39Seed).valid &&
-                  this.props.navigation.navigate('AccountBackup', {
+                  navigation.navigate('AccountBackup', {
                     isNew: true,
-                    isWelcome: this.props.navigation.getParam('isWelcome')
+                    isWelcome: navigation.getParam('isWelcome')
                   });
               }}
             />
