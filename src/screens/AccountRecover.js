@@ -17,8 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {Alert, SafeAreaView, StyleSheet, Text, findNodeHandle} from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -80,6 +79,9 @@ class AccountRecoverView extends React.Component {
     return (
       <SafeAreaView style={styles.safeAreaView}>
         <KeyboardScrollView style={styles.bodyContainer}
+                            innerRef={ref => {
+                              this.scroll = ref
+                            }}
                             contentContainerStyle={{ justifyContent: 'flex-end' }}>
           <Background />
             <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
@@ -95,6 +97,10 @@ class AccountRecoverView extends React.Component {
               ENTER RECOVERY WORDS
             </Text>
             <AccountSeed
+              onFocus={(event)=> {
+                this.scroll.props.scrollToFocusedInput(findNodeHandle(event.target));
+              }}
+              ref={this._seed}
               valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
               onChangeText={seed => {
                 this.debouncedAddressGeneration(seed);
