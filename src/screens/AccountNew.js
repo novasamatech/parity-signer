@@ -56,14 +56,12 @@ class AccountNewView extends React.Component {
     }
     return (
       <View style={styles.body}>
-        <KeyboardAwareScrollView>
+        <KeyboardAwareScrollView
+          style={{ padding: 20 }}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+        >
           <Background />
-          <ScrollView
-            style={{ padding: 20 }}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps="always"
-            containerStyle={styles.bodyContainer}
-          >
             <View style={styles.top}>
               <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
               <Text style={styles.title}>CHOOSE NETWORK</Text>
@@ -102,7 +100,6 @@ class AccountNewView extends React.Component {
                 }}
               />
             </View>
-          </ScrollView>
         </KeyboardAwareScrollView>
       </View>
     );

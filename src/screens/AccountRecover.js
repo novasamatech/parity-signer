@@ -33,6 +33,7 @@ import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
 import { debounce } from '../util/debounce'
 import { brainWalletAddress } from '../util/native';
+import KeyboardScrollView from "../components/KeyboardScrollView";
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -62,36 +63,25 @@ class AccountRecoverView extends React.Component {
     brainWalletAddress(seed)
     .then(({ address, bip39 }) => accounts.updateNew({address, seed, validBip39Seed: bip39}))
     .catch(console.error);
-  }
+  };
 
   debouncedAddressGeneration = debounce(this.addressGeneration, 200)
   
   componentWillUnmount = function () {
     // called when the user goes back, or finishes the whole recovery process
     this.props.accounts.updateNew({seed : ''});
-  }
+  };
 
   render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
     const networkKey = selected.networkKey;
     const network = NETWORK_LIST[networkKey];
-
     return (
       <SafeAreaView style={styles.safeAreaView}>
-        <KeyboardAwareScrollView style={styles.bodyContainer}>
+        <KeyboardScrollView style={styles.bodyContainer}
+                            contentContainerStyle={{ justifyContent: 'flex-end' }}>
           <Background />
-          <ScrollView
-            contentContainerStyle={{ justifyContent: 'flex-end' }}
-            style={{ flex: 1 }}
-            enableOnAndroid
-            scrollEnabled
-            keyboardShouldPersistTaps="always"
-            extraHeight={230}
-            innerRef={ref => {
-              this.scroll = ref;
-            }}
-          >
             <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
             <Text style={styles.title}>CHOOSE NETWORK</Text>
             <NetworkButton network={network}/>
@@ -169,8 +159,7 @@ class AccountRecoverView extends React.Component {
                 });
               }}
             />
-          </ScrollView>
-        </KeyboardAwareScrollView>
+        </KeyboardScrollView>
       </SafeAreaView>
     );
   }
