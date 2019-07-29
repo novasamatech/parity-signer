@@ -56,12 +56,6 @@ class AccountBackupView extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    const { accounts } = this.props;
-    const selected =
-      accounts.getNew().address && accounts.getNew().address.length
-        ? accounts.getNew()
-        : accounts.getSelected();
-    accounts.lockAccount(selected);
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
 

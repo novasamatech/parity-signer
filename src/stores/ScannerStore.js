@@ -16,7 +16,7 @@
 
 // @flow
 import { Container } from 'unstated';
-import { NETWORK_LIST, NetworkTypes } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
 import { saveTx } from '../util/db';
 import { brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
@@ -99,10 +99,12 @@ export default class ScannerStore extends Container<ScannerState> {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
     const tx = await transaction(txRequest.data.rlp);
-    const { ethereumChainId: networkKey = '1' } = tx;
+    const { ethereumChainId = 1 } = tx;
+    const networkKey = 'e'+ethereumChainId;
 
+     // TODO cater for Substrate
     const sender = accountsStore.getById({
-      networkType: NetworkTypes.ETHEREUM,
+      protocol: NetworkProtocols.ETHEREUM,
       networkKey,
       address: txRequest.data.account
     });
@@ -116,9 +118,10 @@ export default class ScannerStore extends Container<ScannerState> {
       );
     }
 
+    // TODO cater for Substrate
     const recipient = accountsStore.getById({
-      networkType: NetworkTypes.ETHEREUM,
-      networkKey: tx.ethereumChainId,
+      protocol: NetworkProtocols.ETHEREUM,
+      networkKey: 'e'+tx.ethereumChainId,
       address: tx.action
     });
     const dataToSign = await keccak(txRequest.data.rlp);

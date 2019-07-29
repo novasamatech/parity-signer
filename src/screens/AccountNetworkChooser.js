@@ -17,12 +17,11 @@
 'use strict';
 
 import React from 'react';
-import filter from 'lodash/filter';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import TouchableItem from '../components/TouchableItem';
-import { ETHEREUM_NETWORK_LIST } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountNetworkChooser extends React.PureComponent {
@@ -45,25 +44,21 @@ class AccountNetworkChooserView extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { accounts } = this.props;
-    const availableEthereumNetworkList = filter(
-      ETHEREUM_NETWORK_LIST,
-      'available'
-    );
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
-        { availableEthereumNetworkList.map(network => (
+        { Object.entries(NETWORK_LIST).map(([networkKey, networkParams]) => (
           <TouchableItem
-            key={network.ethereumChainId}
+            key={networkKey}
             style={[
               styles.card,
               {
                 marginTop: 20,
-                backgroundColor: network.color
+                backgroundColor: networkParams.color
               }
             ]}
             onPress={() => {
-              accounts.updateNew({ networkKey: network.ethereumChainId });
+              accounts.updateNew({ networkKey, protocol: networkParams.protocol });
               navigation.goBack();
             }}
           >
@@ -71,11 +66,11 @@ class AccountNetworkChooserView extends React.PureComponent {
               style={[
                 styles.cardText,
                 {
-                  color: network.secondaryColor
+                  color: networkParams.secondaryColor
                 }
               ]}
             >
-              {network.title}
+              {networkParams.title}
             </Text>
           </TouchableItem>
         ))}
