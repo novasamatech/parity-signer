@@ -22,7 +22,6 @@ export default {
   bg_positive: '#72E762',
   bg_warning: '#FAE265',
   bg_alert: '#ED332B',
-  bg_text_positive: '#72E762',
   card_bg: '#F9F9F9',
   card_text: '#1A1A1A',
   card_bg_text_sec: '#B4B5B0'
