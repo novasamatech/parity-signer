@@ -105,7 +105,7 @@ export class MessageDetailsView extends React.PureComponent {
             : this.props.data}
         </Text>
         <Button
-          buttonStyles={{ backgroundColor: colors.bg_positive, height: 60 }}
+          buttonStyles={{ height: 60 }}
           title="Sign Message"
           textStyles={{ color: colors.card_text }}
           onPress={() => this.props.onNext()}
