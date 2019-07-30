@@ -92,6 +92,7 @@ export default class AccountIconChooser extends React.PureComponent<{
           })
         }
       >
+        {/* TODO Cater for Substrate */}
         <AccountIcon style={style} seed={'0x' + address} />
       </TouchableOpacity>
     );
@@ -117,6 +118,7 @@ export default class AccountIconChooser extends React.PureComponent<{
           minimumFontScale={0.01}
           style={styles.addressText}
         >
+          {/* TODO Cater for Substrate */}
           {value ? `0x${value}` : `Select an identicon`}
         </Text>
       </View>

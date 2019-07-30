@@ -17,11 +17,10 @@
 'use strict';
 
 import React from 'react';
-import { Clipboard, ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
-import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 
@@ -53,9 +52,6 @@ export default class AccountEdit extends React.PureComponent {
                 title={selected.name}
                 address={selected.address}
                 networkKey={selected.networkKey}
-                onPress={async () => {
-                  await Clipboard.setString('0x' + selected.address);
-                }}
               />
               <Text style={styles.title}>ACCOUNT NAME</Text>
               <TextInput

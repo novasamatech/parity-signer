@@ -27,7 +27,7 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import TouchableItem from '../components/TouchableItem';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, SubstrateNetworkKeys } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
 import NetworkButton from '../components/NetworkButton';
@@ -94,6 +94,11 @@ class AccountNewView extends React.Component {
                 title="Next Step"
                 disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
                 onPress={() => {
+                  // TODO remove this hardcoded address for SUBSTRATE
+                  if (selected.networkKey === SubstrateNetworkKeys.SUBSTRATE) {
+                    accounts.updateNew({ address:'5EjSNPzM9T6Nb19zb38TcwBQh5hNWG47noi7anXQT64BBJBx', seed:'this is sparta', publicKey:0x123 ,validBip39Seed: false });
+                  }
+
                   validateSeed(selected.seed, selected.validBip39Seed).valid &&
                     this.props.navigation.navigate('AccountBackup', {
                       isNew: true,

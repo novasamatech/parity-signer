@@ -17,14 +17,31 @@ export const EthereumNetworkKeys = Object.freeze({
 });
 
 export const SubstrateNetworkKeys = Object.freeze({
-  KUSAMA: 's2'
+  SUBSTRATE: 'substrate'
 });
 
-const substrateNetworkRaw = {
-  [SubstrateNetworkKeys.KUSAMA]: {
-    title: 'Kusama',
-    ss58Prefix: 2,
-    balanceModuleId: 123 // This id need to be checked
+export const SubstratePrefixKeys = Object.freeze({
+  KUSAMA: 'kusama',
+  POLKADOT: 'polkadot',
+});
+
+export const SubstratePrefixes = Object.freeze({
+  [SubstratePrefixKeys.KUSAMA]: {
+    prefix: 2,
+    color: '#1e1e1e'
+  },
+  [SubstratePrefixKeys.POLKADOT]: {
+    prefix: 0,
+    color: '#e6007a'
+  }
+});
+
+const SUBSTRATE_NETWORK_LIST = {
+  [SubstrateNetworkKeys.SUBSTRATE]: {
+    title: 'Substrate',
+    protocol: NetworkProtocols.SUBSTRATE,
+    color: '#4C4646',
+    secondaryColor: colors.card_bg
   }
 };
 
@@ -61,16 +78,6 @@ export const ETHEREUM_NETWORK_LIST = mapValues(
     })
 );
 
-const SUBSTRATE_NETWORK_LIST = mapValues(
-  substrateNetworkRaw,
-  (substrateNetwork, substrateNetworkId) =>
-    defaults(substrateNetwork, {
-      protocol: NetworkProtocols.SUBSTRATE,
-      color: '#4C4646',
-      secondaryColor: colors.card_bg
-    })
-);
-
 export const NETWORK_LIST = Object.freeze(
-  Object.assign({}, ETHEREUM_NETWORK_LIST, SUBSTRATE_NETWORK_LIST)
+  Object.assign({}, SUBSTRATE_NETWORK_LIST, ETHEREUM_NETWORK_LIST)
 );

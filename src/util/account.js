@@ -3,13 +3,14 @@ import { SubstrateNetworkKeys, NetworkProtocols } from '../constants';
 export function accountId({
   address,
   protocol = NetworkProtocols.SUBSTRATE,
-  networkKey = SubstrateNetworkKeys.KUSAMA
+  publicKey,
+  networkKey = SubstrateNetworkKeys.SUBSTRATE
 }) {
   if (typeof address !== 'string' || address.length === 0) {
     throw new Error(`Couldn't create an accountId, address missing`);
   }
   if (protocol === NetworkProtocols.SUBSTRATE){
-    return `${protocol}:${address.toLowerCase()}`;
+    return `${protocol}:${publicKey}`;
   } else {
     return `${protocol}:${address.toLowerCase()}@${networkKey}`;
   }
@@ -17,16 +18,17 @@ export function accountId({
 
 export function empty(account = {}) {
   return {
+    
+    address: '',
+    archived: false,
+    createdAt: new Date().getTime(),
+    encryptedSeed: null,
     name: '',
     protocol: NetworkProtocols.SUBSTRATE,
-    networkKey: SubstrateNetworkKeys.KUSAMA,
+    publicKey: 0x0,
+    networkKey: SubstrateNetworkKeys.SUBSTRATE,
     seed: '',
-    // address for an empty seed phrase
-    address: '',
-    createdAt: new Date().getTime(),
     updatedAt: new Date().getTime(),
-    archived: false,
-    encryptedSeed: null,
     validBip39Seed: false,
     ...account
   };

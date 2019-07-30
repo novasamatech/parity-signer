@@ -22,15 +22,16 @@ import { loadAccounts, saveAccount } from '../util/db';
 import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
-  name: string,
   address: string,
-  protocol: string,
-  networkKey: string,
-  seed: string,
-  encryptedSeed: string,
-  createdAt: number,
-  updatedAt: number,
   archived: boolean,
+  createdAt: number,
+  encryptedSeed: string,
+  name: string,
+  networkKey: string,
+  protocol: string,
+  publicKey: number,
+  seed: string,
+  updatedAt: number,
   validBip39Seed: boolean
 };
 
