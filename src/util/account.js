@@ -3,12 +3,16 @@ import { SubstrateNetworkKeys, NetworkProtocols } from '../constants';
 export function accountId({
   address,
   protocol = NetworkProtocols.SUBSTRATE,
-  networkKey = SubstrateNetworkKeys.FRONTIER
+  networkKey = SubstrateNetworkKeys.KUSAMA
 }) {
   if (typeof address !== 'string' || address.length === 0) {
     throw new Error(`Couldn't create an accountId, address missing`);
   }
-  return `${protocol}_${networkKey}_${address.toLowerCase()}`;
+  if (protocol === NetworkProtocols.SUBSTRATE){
+    return `${protocol}:${address.toLowerCase()}`;
+  } else {
+    return `${protocol}:${address.toLowerCase()}@${networkKey}`;
+  }
 }
 
 export function empty(account = {}) {

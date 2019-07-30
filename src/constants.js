@@ -8,12 +8,12 @@ export const NetworkProtocols = Object.freeze({
 });
 
 export const EthereumNetworkKeys = Object.freeze({
-  FRONTIER: 'e1',
-  ROPSTEN: 'e3',
-  RINKEBY: 'e4',
-  GOERLI: 'e5',
-  KOVAN: 'e42',
-  CLASSIC: 'e61',
+  FRONTIER: '1',
+  ROPSTEN: '3',
+  RINKEBY: '4',
+  GOERLI: '5',
+  KOVAN: '42',
+  CLASSIC: '61',
 });
 
 export const SubstrateNetworkKeys = Object.freeze({

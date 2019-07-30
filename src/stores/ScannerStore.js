@@ -100,7 +100,7 @@ export default class ScannerStore extends Container<ScannerState> {
     }
     const tx = await transaction(txRequest.data.rlp);
     const { ethereumChainId = 1 } = tx;
-    const networkKey = 'e'+ethereumChainId;
+    const networkKey = ethereumChainId;
 
      // TODO cater for Substrate
     const sender = accountsStore.getById({
@@ -121,7 +121,7 @@ export default class ScannerStore extends Container<ScannerState> {
     // TODO cater for Substrate
     const recipient = accountsStore.getById({
       protocol: NetworkProtocols.ETHEREUM,
-      networkKey: 'e'+tx.ethereumChainId,
+      networkKey: tx.ethereumChainId,
       address: tx.action
     });
     const dataToSign = await keccak(txRequest.data.rlp);
