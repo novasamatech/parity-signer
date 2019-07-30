@@ -136,21 +136,22 @@ const styles = StyleSheet.create({
     padding: 5
   },
   titleText: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
+    fontWeight: '600',
     fontSize: 20
   },
   secondaryText: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     color: colors.bg_text_sec,
     fontWeight: '500',
     fontSize: 14
   },
   footerSeedType: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     color: colors.card_bg
   },
   footerNetwork: {
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     color: colors.card_bg,
     fontWeight: 'bold'
   }
