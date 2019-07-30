@@ -25,7 +25,9 @@ import { decryptData, encryptData } from '../util/native';
 
 
 export type Account = {
-  address: string,
+  // `address` is a string for Ethereum accounts
+  // or a mapping { [SubstratePrefixKey] : address } e.g: { ['kusama']: 'FUwidsflk...', ['polkadot']: 'Exttskfj...'}
+  address: string | {[index:string]: string},
   archived: boolean,
   createdAt: number,
   derivationPassword: string,
