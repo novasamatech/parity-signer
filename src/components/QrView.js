@@ -16,20 +16,28 @@
 
 'use strict';
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Dimensions, StyleSheet, Image, View } from 'react-native';
 
 import colors from '../colors';
-import { qrCode } from '../util/native';
+import { qrCode, qrCodeHex } from '../util/native';
 
 export default class QrView extends React.PureComponent {
+  static propsTypes = {
+    data: PropTypes.string.isRequired // arbitrary message/txn string or `${networkType}:0x${address.toLowerCase()}@${networkKey}`
+  }
 
   state = {};
 
   displayQrCode = async (data) => {
     try {
-      // TODO: let qr = props.network === 'substrate' ? await qrSubstrate(data) : await qrCode(data);
-      let qr = await qrCode(data);
+      const networkType = new RegExp('/.+?(?=:)/').exec(data);
+      let qr = networkType === 'substrate'
+                ? await qrCodeHex(data)
+                : networkType === 'ethereum'
+                  ? await qrCode(data)
+                  : data;
       this.setState({
         qr: qr
       });
@@ -39,7 +47,7 @@ export default class QrView extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.displayQrCode(this.props.text);
+    this.displayQrCode(this.props.accountId);
   }
 
   componentWillReceiveProps(newProps) {
@@ -56,25 +64,10 @@ export default class QrView extends React.PureComponent {
     return this.renderQr();
   }
 
-  renderSubstrateQr() {
-    
-  }
-
   renderQr() {
     const { width: deviceWidth } = Dimensions.get('window');
     let size = this.props.size || deviceWidth - 80;
     let flexBasis = this.props.height || deviceWidth - 40;
-
-    /*
-    TODO:
-        <QrSigner
-          payload={this.state.qr}
-          network={this.props.network}
-          scan={false}
-          size={300}
-          style={{ width: size, height: size }}
-        />
-    */
 
     return (
       <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>

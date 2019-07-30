@@ -76,6 +76,7 @@ export default class ScannerStore extends Container<ScannerState> {
   async setDataToSign(signRequest, accountsStore) {
     const message = signRequest.data.data;
     const address = signRequest.data.account;
+
     const dataToSign = await ethSign(message);
     const sender = accountsStore.getByAddress(address);
     if (!sender || !sender.encryptedSeed) {
@@ -94,10 +95,14 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
-    console.log(txRequest);
+
     if (!(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
+
+    console.log(txRequest);
+    debugger;
+
     const tx = await transaction(txRequest.data.rlp);
     const { ethereumChainId: networkKey = '1' } = tx;
 

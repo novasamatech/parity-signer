@@ -55,13 +55,15 @@ export default class Scanner extends React.PureComponent {
                 if (scannerStore.isBusy()) {
                   return;
                 }
+
                 let data = {};
 
                 if (txRequestData.data) { // then this is Ethereum Legacy
+                  data = JSON.parse(txRequestData.data);
+
                   if (data.action === undefined) {
                     throw new Error('Could not determine action type.');
                   }
-                  data = JSON.parse(txRequestData.data);
                   
                   if (!(await scannerStore.setData(data, accountsStore))) {
                     return;
@@ -110,10 +112,22 @@ export default class Scanner extends React.PureComponent {
                       data['action'] = action;
                       data['account'] = rawAfterFrames.slice(6, 70);
                       data['data'] = rawAfterFrames.slice(70);
+
                       debugger;
+
                       break;
                     default:
                       throw new Error('we cannot handle the payload: ', txRequestData);
+                  }
+
+                  if (!(await scannerStore.setData(data, accountsStore))) {
+                    return;
+                  } else {
+                    if (scannerStore.getType() === 'transaction') {
+                      this.props.navigation.navigate('TxDetails');
+                    } else { // message
+                      this.props.navigation.navigate('MessageDetails');
+                    }
                   }
                 } catch (e) {
                   scannerStore.setBusy();

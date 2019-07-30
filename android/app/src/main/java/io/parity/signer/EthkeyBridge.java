@@ -74,6 +74,11 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void blake2s(String data, Promise promise) {
+        promise.resolve(ethkeyBlake2s(data));
+    }
+
+    @ReactMethod
     public void ethSign(String data, Promise promise) {
         promise.resolve(ethkeyEthSign(data));
     }
@@ -111,15 +116,26 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void qrCodeHex(String data, Promise promise) {
+        try {
+            promise.resolve(ethkeyQrCodeHex(data));
+        } catch (Exception e) {
+            promise.reject("failed to create QR code", "failed to create QR code");
+        }
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletBIP39Address(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
     private static native String ethkeyRlpItem(String data, int position);
     private static native String ethkeyKeccak(String data);
+    private static native String ethkeyBlake2s(String data);
     private static native String ethkeyEthSign(String data);
     private static native String ethkeyBlockiesIcon(String seed);
     private static native String ethkeyRandomPhrase();
     private static native String ethkeyEncryptData(String data, String password);
     private static native String ethkeyDecryptData(String data, String password);
     private static native String ethkeyQrCode(String data);
+    private static native String ethkeyQrCodeHex(String data);
 }

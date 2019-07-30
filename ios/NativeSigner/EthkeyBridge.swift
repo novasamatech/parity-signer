@@ -65,6 +65,17 @@ class EthkeyBridge: NSObject {
     resolve(hash)
   }
 
+  @objc func blake2s(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var data_ptr = data.asPtr()
+    let hash_rust_str = blake2s(&error, &data_ptr)
+    let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
+    let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(hash_rust_str_ptr)
+    rust_string_destroy(hash_rust_str)
+    resolve(hash)
+  }
+
   @objc func ethSign(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
     var data_ptr = data.asPtr()
@@ -133,6 +144,21 @@ class EthkeyBridge: NSObject {
     var error: UInt32 = 0
     var data_ptr = data.asPtr()
     let icon_rust_str = qrcode(&error, &data_ptr)
+    let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
+    let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(icon_rust_str_ptr)
+    rust_string_destroy(icon_rust_str)
+    if error == 0 {
+      resolve(icon)
+    } else {
+      reject("Failed to generate blockies", nil, nil)
+    }
+  }
+
+  @objc func qrCodeHex(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var data_ptr = data.asPtr()
+    let icon_rust_str = qrcode_hex(&error, &data_ptr)
     let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
     let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(icon_rust_str_ptr)

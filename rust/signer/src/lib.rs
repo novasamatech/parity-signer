@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 mod eth;
+mod strate;
 mod util;
 
 use util::StringPtr;
@@ -25,7 +26,7 @@ use rlp::decode_list;
 use rustc_hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
 use tiny_keccak::keccak256 as keccak;
-
+use blake2_rfc::blake2s::blake2s as blake;
 use std::num::NonZeroU32;
 
 // 10240 is always non-zero, ergo this is safe
@@ -66,6 +67,33 @@ pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut St
     let message: Vec<u8> = (*message).as_str().from_hex().unwrap();
     let signature = keypair.sign(&message).unwrap().to_hex();
     Box::into_raw(Box::new(signature))
+}
+
+fn qrcode_bytes(data: &[u8]) -> Option<String> {
+    use qrcodegen::{QrCode, QrCodeEcc};
+    use pixelate::{Image, Color, BLACK};
+
+    let qr = QrCode::encode_binary(data, QrCodeEcc::Medium).ok()?;
+
+    let palette = &[Color::Rgba(255,255,255,0), BLACK];
+    let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
+
+    for y in 0..qr.size() {
+        for x in 0..qr.size() {
+            pixels.push(qr.get_module(x, y) as u8);
+        }
+    }
+
+    let mut result = Vec::new();
+
+    Image {
+        palette,
+        pixels: &pixels,
+        width: qr.size() as usize,
+        scale: 16,
+    }.render(&mut result).ok()?;
+
+    Some(base64png(&result))
 }
 
 export! {
@@ -112,6 +140,13 @@ export! {
         let data: Vec<u8> = data.from_hex().ok()?;
 
         Some(keccak(&data).to_hex())
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyBlake2s
+    fn blake2s(data: &str) -> Option<String> {
+        let data: Vec<u8> = data.from_hex().ok()?;
+
+        Some(blake(32, &[], &data).as_bytes().to_hex())
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyBlockiesIcon
@@ -169,30 +204,12 @@ export! {
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyQrCode
     fn qrcode(data: &str) -> Option<String> {
-        use qrcodegen::{QrCode, QrCodeEcc};
-        use pixelate::{Image, Color, BLACK};
+        qrcode_bytes(data.as_bytes())
+    }
 
-        let qr = QrCode::encode_binary(data.as_bytes(), QrCodeEcc::Medium).ok()?;
-
-        let palette = &[Color::Rgba(255,255,255,0), BLACK];
-        let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
-
-        for y in 0..qr.size() {
-            for x in 0..qr.size() {
-                pixels.push(qr.get_module(x, y) as u8);
-            }
-        }
-
-        let mut result = Vec::new();
-
-        Image {
-            palette,
-            pixels: &pixels,
-            width: qr.size() as usize,
-            scale: 16,
-        }.render(&mut result).ok()?;
-
-        Some(base64png(&result))
+    @Java_io_parity_signer_EthkeyBridge_ethkeyQrCodeHex
+    fn qrcode_hex(data: &str) -> Option<String> {
+        qrcode_bytes(&data.from_hex::<Vec<u8>>().ok()?)
     }
 }
 

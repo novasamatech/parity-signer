@@ -60,7 +60,7 @@ export class SignedTxView extends React.PureComponent {
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
         <View style={styles.qr}>
-          <QrView text={this.props.data} />
+          <QrView data={this.props.data} />
         </View>
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
         <TxDetailsCard

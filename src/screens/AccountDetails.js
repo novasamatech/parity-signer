@@ -133,7 +133,7 @@ This account can only be recovered with its associated recovery phrase.`,
           title={account.name}
         />
         <View style={styles.qr}>
-          <QrView text={accountId(account)} />
+          <QrView data={accountId(account)} />
         </View>
       </ScrollView>
     );
