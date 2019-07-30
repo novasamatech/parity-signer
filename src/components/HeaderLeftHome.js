@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   },
   headerTextLeft: {
     flex: 1,
-    paddingLeft: 10,
+    paddingLeft: 4,
     fontSize: 25,
     fontFamily: 'Manifold CF',
     color: colors.bg_text

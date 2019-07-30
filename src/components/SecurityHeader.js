@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   headerTextRight: {
     marginLeft: 0,
     fontSize: 17,
-    fontFamily: 'Roboto',
+    fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     color: colors.bg_alert,
     paddingRight: 14,
