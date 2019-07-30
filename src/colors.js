@@ -16,6 +16,7 @@
 
 export default {
   bg: '#1D1D1D',
+  bg_button: '#48acf0',
   bg_text: '#FFFFFF',
   bg_text_sec: '#B4B5B0',
   bg_positive: '#72E762',

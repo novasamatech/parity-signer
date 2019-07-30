@@ -70,12 +70,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
-    backgroundColor: colors.bg_positive,
+    backgroundColor: colors.bg_button,
     height: 60
   },
   text: {
     fontFamily: 'Manifold CF',
-    color: 'black',
+    color: 'white',
     padding: 8,
     fontWeight: 'bold',
     fontSize: 20
