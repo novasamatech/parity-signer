@@ -18,7 +18,9 @@
 
 import React from 'react';
 import {
+  FlatList,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -41,81 +43,134 @@ export default class AccountIconChooser extends React.PureComponent {
   }
 
   refreshAccount = async () => {
-    const { onChange } = this.props;
     try {
-      const seed = await words();
-      const { address, bip39 } = await brainWalletAddress(seed);
+      const icons = await Promise.all(
+        Array(4)
+          .join(' ')
+          .split(' ')
+          .map(async () => {
+            const seed = await words();
+            const { address, bip39 } = await brainWalletAddress(seed);
 
-      const newAccountProperties = {
-          address,
-          bip39,
-          seed
-        };
-      this.setState(newAccountProperties);
-      onChange(newAccountProperties);
+            return {
+              address,
+              bip39,
+              seed,
+            };
+          })
+      );
+
+      this.setState({ icons });
     } catch (e) {
       console.error(e);
     }
-  };
+  }
 
-  renderIcon = () => {
-    const { address, bip39, seed } = this.state;
+  renderAddress = () => {
+    const {value} = this.props;
+
+    if (!!value) {
+      return (
+        <Address 
+          address={value}
+          style = {styles.addressText}
+        />
+      );
+    } else {
+      return <Text>Select an icon.</Text>
+    }
+  }
+ 
+  renderIcon = ({ item, index }) => {
+    const { value, onSelect } = this.props;
+    const { address, bip39, seed } = item;
+    const isSelected = address.toLowerCase() === value.toLowerCase();
 
     return (
-      <>
         <TouchableOpacity
-          onPress={this.refreshAccount}
-        ><Icon name={'refresh'} size={35} style={styles.refreshIcon} />
+          key={index}
+          style={[styles.iconBorder, isSelected ? styles.selected : {}]}
+          onPress={() => onSelect({ address, bip39, seed })}
+        >
+          <AccountIcon
+            style={styles.icon}
+            seed={'0x' + address}
+          />
         </TouchableOpacity>
-        <AccountIcon style={styles.icon} seed={'0x' + address} />
-      </>
     );
   }
 
-  render() {
-    const { address } = this.state;
+  onRefresh = () => {
+    const { onSelect } = this.props;
 
-    if (!address){
-      return null;
-    }
+    this.refreshAccount();
+    onSelect({ address: '', bip39: false, seed: ''});
+  }
+
+  render() {
+    const { value } = this.props;
+    const { icons } = this.state;
+
 
     return (
       <View style={styles.body}>
-        {this.renderIcon()}
-        <Address 
-          address={address}
-          short
-        />
-      </View>
+        <View style={styles.firstRow}>
+          <FlatList
+            data={icons}
+            extraData={value}
+            horizontal
+            keyExtractor={item => item.address}
+            renderItem={this.renderIcon}
+            style={styles.icons}
+          />
+          <TouchableOpacity
+            onPress={this.onRefresh}
+          >
+            <Icon
+              name={'refresh'}
+              size={35}
+              style={styles.refreshIcon}
+            />
+          </TouchableOpacity>
+        </View>
+          {this.renderAddress()}
+        </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   body: {
-    alignItems: 'center',
     backgroundColor: colors.card_bg,
     display: 'flex',
-    flexDirection:'row',
+    flexDirection:'column',
     marginBottom: 20,
     padding: 20,
-    paddingLeft: 10,
+  },
+  firstRow: {
+    flex: 1,
+    display: 'flex',
+    flexDirection:'row',
+    alignItems: 'center',
+    marginBottom: 10
+  },
+  iconBorder: {
+     borderWidth: 6,
+    borderColor: colors.card_bg
   },
   icon: {
+    width: 50,
     backgroundColor: colors.card_bg,
     height: 50,
-    margin: 6,
     padding: 5,
-    width: 50,
   },
   addressText: {
-    fontFamily: 'Roboto',
-    color: colors.bg,
-    fontWeight: '700',
-    fontSize: 14,
+    paddingLeft: 6
   },
   refreshIcon :{
     color: colors.bg,
-    marginRight: 5
+  },
+  selected: {
+    borderColor: colors.bg,
   }
 });

@@ -63,7 +63,8 @@ class AccountNewView extends React.Component {
             <NetworkButton network={network}/>
             <Text style={styles.title}>ICON & ADDRESS</Text>
             <AccountIconChooser
-              onChange={({ address, bip39, seed }) => {
+              value={selected && selected.seed && selected.address}
+              onSelect={({ address, bip39, seed }) => {
                 accounts.updateNew({ address, seed, validBip39Seed: bip39 });
               }}
             />

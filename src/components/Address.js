@@ -44,6 +44,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     color: colors.bg_text_sec,
     fontWeight: '500',
-    fontSize: 14
+    fontSize: 12
   }
 });
