@@ -17,8 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, ScrollView, Text, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -30,6 +29,7 @@ import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
 import NetworkButton from '../components/NetworkButton';
+import KeyboardScrollView from '../components/KeyboardScrollView';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -47,7 +47,7 @@ export default class AccountNew extends React.Component {
 
 class AccountNewView extends React.Component {
   render() {
-    const { accounts } = this.props;
+    const { accounts, navigation } = this.props;
     const selected = accounts.getNew();
     const network = NETWORK_LIST[selected.networkKey];
     if (!selected) {
@@ -55,51 +55,46 @@ class AccountNewView extends React.Component {
     }
     return (
       <View style={styles.body}>
-        <KeyboardAwareScrollView>
+        <KeyboardScrollView style={{ padding: 20 }}>
           <Background />
-          <ScrollView
-            style={{ padding: 20 }}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps="always"
-            containerStyle={styles.bodyContainer}
-          >
-            <View style={styles.top}>
-              <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-              <Text style={styles.title}>NETWORK</Text>
-              <NetworkButton network={network}/>
-              <Text style={styles.title}>ICON & ADDRESS</Text>
-              <AccountIconChooser
-                onChange={({ address, bip39, seed }) => {
-                  accounts.updateNew({ address, seed, validBip39Seed: bip39 });
-                }}
-              />
-              <Text style={styles.title}>NAME</Text>
-              <TextInput
-                onChangeText={name => accounts.updateNew({ name })}
-                value={selected && selected.name}
-                placeholder="Enter a new account name"
-              />
-            </View>
-            <View style={styles.bottom}>
-              <Text style={styles.hintText}>
-                On the next step you will be asked to backup your account, get pen
-                and paper ready
-              </Text>
-              <Button
-                buttonStyles={styles.nextStep}
-                title="Next Step"
-                disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
-                onPress={() => {
-                  validateSeed(selected.seed, selected.validBip39Seed).valid &&
-                    this.props.navigation.navigate('AccountBackup', {
-                      isNew: true,
-                      isWelcome: this.props.navigation.getParam('isWelcome')
-                    });
-                }}
-              />
-            </View>
-          </ScrollView>
-        </KeyboardAwareScrollView>
+          <View style={styles.top}>
+            <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
+            <Text style={styles.title}>NETWORK</Text>
+            <NetworkButton network={network}/>
+            <Text style={styles.title}>ICON & ADDRESS</Text>
+            <AccountIconChooser
+              onChange={({ address, bip39, seed }) => {
+                accounts.updateNew({ address, seed, validBip39Seed: bip39 });
+              }}
+            />
+            <Text style={styles.title}>NAME</Text>
+            <TextInput
+              onChangeText={name => accounts.updateNew({ name })}
+              value={selected && selected.name}
+              placeholder="Enter a new account name"
+            />
+          </View>
+          <View style={styles.bottom}>
+            <Text style={styles.hintText}>
+              On the next step you will be asked to backup your account, get pen
+              and paper ready
+            </Text>
+            <Button
+              buttonStyles={styles.nextStep}
+              title="Next Step"
+              disabled={
+                !validateSeed(selected.seed, selected.validBip39Seed).valid
+              }
+              onPress={() => {
+                validateSeed(selected.seed, selected.validBip39Seed).valid &&
+                  navigation.navigate('AccountBackup', {
+                    isNew: true,
+                    isWelcome: navigation.getParam('isWelcome')
+                  });
+              }}
+            />
+          </View>
+        </KeyboardScrollView>
       </View>
     );
   }

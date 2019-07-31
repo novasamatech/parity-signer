@@ -17,8 +17,13 @@
 'use strict';
 
 import React from 'react';
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {
+  Alert,
+  findNodeHandle,
+  SafeAreaView,
+  StyleSheet,
+  Text
+} from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -26,12 +31,13 @@ import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
-import { debounce } from '../util/debounce'
+import { debounce } from '../util/debounce';
 import { brainWalletAddress } from '../util/native';
 
 export default class AccountRecover extends React.Component {
@@ -53,124 +59,121 @@ class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
 
-    this.state = { seed: ''}
+    this.state = { seed: '' };
   }
 
-  addressGeneration = (seed) => {
+  addressGeneration = seed => {
     const { accounts } = this.props;
-    
-    brainWalletAddress(seed)
-    .then(({ address, bip39 }) => accounts.updateNew({address, seed, validBip39Seed: bip39}))
-    .catch(console.error);
-  }
 
-  debouncedAddressGeneration = debounce(this.addressGeneration, 200)
-  
-  componentWillUnmount = function () {
+    brainWalletAddress(seed)
+      .then(({ address, bip39 }) =>
+        accounts.updateNew({ address, seed, validBip39Seed: bip39 })
+      )
+      .catch(console.error);
+  };
+
+  debouncedAddressGeneration = debounce(this.addressGeneration, 200);
+
+  componentWillUnmount = function() {
     // called when the user goes back, or finishes the whole recovery process
-    this.props.accounts.updateNew({seed : ''});
-  }
+    this.props.accounts.updateNew({ seed: '' });
+  };
 
   render() {
-    const { accounts } = this.props;
+    const { accounts, navigation } = this.props;
     const selected = accounts.getNew();
     const networkKey = selected.networkKey;
     const network = NETWORK_LIST[networkKey];
-
     return (
       <SafeAreaView style={styles.safeAreaView}>
-        <KeyboardAwareScrollView style={styles.bodyContainer}>
+        <KeyboardScrollView
+          style={styles.bodyContainer}
+          innerRef={ref => {
+            this.scroll = ref;
+          }}
+          extraHeight={200}
+          contentContainerStyle={{ justifyContent: 'flex-end' }}
+        >
           <Background />
-          <ScrollView
-            contentContainerStyle={{ justifyContent: 'flex-end' }}
-            style={{ flex: 1 }}
-            enableOnAndroid
-            scrollEnabled
-            keyboardShouldPersistTaps="always"
-            extraHeight={230}
-            innerRef={ref => {
-              this.scroll = ref;
+          <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
+          <Text style={styles.title}>CHOOSE NETWORK</Text>
+          <NetworkButton network={network} />
+          <Text style={styles.title}>ACCOUNT NAME</Text>
+          <TextInput
+            onChangeText={name => accounts.updateNew({ name })}
+            value={selected && selected.name}
+            placeholder="Enter an account name"
+          />
+          <Text style={[styles.title, { marginTop: 20 }]}>
+            ENTER RECOVERY WORDS
+          </Text>
+          <AccountSeed
+            onFocus={event => {
+              this.scroll.props.scrollToFocusedInput(
+                findNodeHandle(event.target)
+              );
             }}
-          >
-            <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
-            <Text style={styles.title}>CHOOSE NETWORK</Text>
-            <NetworkButton network={network}/>
-            <Text style={styles.title}>ACCOUNT NAME</Text>
-            <TextInput
-              onChangeText={name => accounts.updateNew({ name })}
-              value={selected && selected.name}
-              placeholder="Enter an account name"
-            />
-            <Text style={[styles.title, { marginTop: 20 }]}>
-              ENTER RECOVERY WORDS
-            </Text>
-            <AccountSeed
-              valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
-              onChangeText={seed => {
-                this.debouncedAddressGeneration(seed);
-                this.setState({seed});
-              }}
-              value={this.state.seed}
-            />
-            <AccountCard
-              style={{ marginTop: 20 }}
-              address={selected.address || ''}
-              networkKey={selected.networkKey || ''}
-              title={selected.name}
-              seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
-            />
-            <Button
-              buttonStyles={{ marginBottom: 40 }}
-              title="Next Step"
-              onPress={() => {
-                const validation = validateSeed(selected.seed, selected.validBip39Seed);
+            ref={this._seed}
+            valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
+            onChangeText={seed => {
+              this.debouncedAddressGeneration(seed);
+              this.setState({ seed });
+            }}
+            value={this.state.seed}
+          />
+          <AccountCard
+            style={{ marginTop: 20 }}
+            address={selected.address || ''}
+            networkKey={selected.networkKey || ''}
+            title={selected.name}
+            seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
+          />
+          <Button
+            buttonStyles={{ marginBottom: 40 }}
+            title="Next Step"
+            onPress={() => {
+              const validation = validateSeed(
+                selected.seed,
+                selected.validBip39Seed
+              );
 
-                if (!validation.valid) {
-                  if (validation.accountRecoveryAllowed){
-                    return Alert.alert(
-                      'Warning:',
-                      `${validation.reason}`,
-                      [
-                        {
-                          text: 'I understand the risks',
-                          style: 'default',
-                          onPress: () => {
-                            this.props.navigation.navigate('AccountPin', {
-                              isWelcome: this.props.navigation.getParam(
-                                'isWelcome'
-                              ),
-                              isNew: true
-                            });
-                          }
-                        },
-                        {
-                          text: 'Back',
-                          style: 'cancel'
-                        }
-                      ]
-                    );
-                  } else {
-                    return Alert.alert(
-                      'Error:',
-                      `${validation.reason}`,
-                      [
-                        {
-                          text: 'Back',
-                          style: 'cancel'
-                        }
-                      ]
-                    );
-                  }
+              if (!validation.valid) {
+                if (validation.accountRecoveryAllowed) {
+                  return Alert.alert('Warning:', `${validation.reason}`, [
+                    {
+                      text: 'I understand the risks',
+                      style: 'default',
+                      onPress: () => {
+                        navigation.navigate('AccountPin', {
+                          isWelcome: navigation.getParam(
+                            'isWelcome'
+                          ),
+                          isNew: true
+                        });
+                      }
+                    },
+                    {
+                      text: 'Back',
+                      style: 'cancel'
+                    }
+                  ]);
+                } else {
+                  return Alert.alert('Error:', `${validation.reason}`, [
+                    {
+                      text: 'Back',
+                      style: 'cancel'
+                    }
+                  ]);
                 }
-                
-                this.props.navigation.navigate('AccountPin', {
-                  isWelcome: this.props.navigation.getParam('isWelcome'),
-                  isNew: true
-                });
-              }}
-            />
-          </ScrollView>
-        </KeyboardAwareScrollView>
+              }
+
+              navigation.navigate('AccountPin', {
+                isWelcome: navigation.getParam('isWelcome'),
+                isNew: true
+              });
+            }}
+          />
+        </KeyboardScrollView>
       </SafeAreaView>
     );
   }
