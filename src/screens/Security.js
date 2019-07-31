@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -17,68 +17,24 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Subscribe } from 'unstated';
+
 import colors from '../colors';
-import SecurityStore from '../stores/SecurityStore';
 
 export default class Security extends React.PureComponent {
   render() {
     return (
-      <Subscribe to={[SecurityStore]}>
-        {securityStore => <SecurityView level={securityStore.getLevel()} />}
-      </Subscribe>
-    );
-  }
-}
-
-class SecurityView extends React.PureComponent {
-  render() {
-    const { level } = this.props;
-    const backgroundColor = {
-      green: colors.bg_positive,
-      red: colors.bg_alert
-    }[level];
-
-    const message = {
-      green: 'Secure',
-      red: 'Not Secure'
-    }[level];
-
-    return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.title}>YOUR DEVICE IS</Text>
-        <View style={[styles.card, { backgroundColor, marginBottom: 20 }]}>
+        <View style={[styles.card, { backgroundColor: colors.bg_alert, marginBottom: 20 }]}>
           <Icon
             style={[styles.cardText, { marginRight: 10, fontSize: 30 }]}
             name="security"
           />
-          <Text style={styles.cardText}>{message}</Text>
-        </View>
-        <Text style={styles.title}>DEVICE SECURITY</Text>
-        <View style={styles.headerContainer}>
-          <Icon
-            style={[styles.headerSecureIcon, { color: colors.bg_positive }]}
-            name="security"
-          />
-          <Text style={[styles.headerTextRight, { color: colors.bg_positive }]}>
-            Secure
-          </Text>
+          <Text style={styles.cardText}>NOT SECURE</Text>
         </View>
         <Text style={styles.text}>
-          A device is considered secure if it does not have any internet access.
-        </Text>
-        <View style={styles.headerContainer}>
-          <Icon
-            style={[styles.headerSecureIcon, { color: colors.bg_alert }]}
-            name="security"
-          />
-          <Text style={[styles.headerTextRight, { color: colors.bg_alert }]}>
-            Not Secure
-          </Text>
-        </View>
-        <Text style={styles.text}>
-          A device is considered not secure if it has access to the internet. We recommend not keeping high balances
-          on this device.
+          A device is considered not secure if it has access to the internet or has any kind of connectivity enabled.
+          Parity Signer is meant to be used on a device that will be kept offline at any time. Enabling any connectivity such as 
+          wifi, cellular network, bluetooth, NFC, usb is a threat to the safety of the private keys stored on the device.
         </Text>
       </ScrollView>
     );
@@ -118,23 +74,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.card_bg
   },
-  headerContainer: {
-    marginBottom: 15,
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  headerSecureIcon: {
-    marginLeft: 0,
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingRight: 5,
-    color: colors.bg_text_positive
-  },
-  headerTextRight: {
-    marginLeft: 0,
-    fontSize: 17,
-    fontFamily: 'Roboto',
-    fontWeight: 'bold',
-    color: colors.bg_text_positive
-  }
 });

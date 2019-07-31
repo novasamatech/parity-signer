@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ export class SignedTxView extends React.PureComponent {
         <AccountCard
           title={this.props.recipient.name}
           address={this.props.recipient.address}
-          chainId={this.props.recipient.chainId || ''}
+          networkKey={this.props.recipient.networkKey || ''}
         />
       </ScrollView>
     );

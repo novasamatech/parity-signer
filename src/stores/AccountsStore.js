@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -16,17 +16,16 @@
 
 // @flow
 
-import debounce from 'debounce';
 import { Container } from 'unstated';
 import { accountId, empty } from '../util/account';
 import { loadAccounts, saveAccount } from '../util/db';
-import { brainWalletAddress, decryptData, encryptData } from '../util/native';
+import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
   name: string,
   address: string,
   networkType: string,
-  chainId: string,
+  networkKey: string,
   seed: string,
   encryptedSeed: string,
   createdAt: number,
@@ -66,17 +65,7 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   updateNew(accountUpdate: Object) {
-    Object.assign(this.state.newAccount, accountUpdate);
-    const { seed } = this.state.newAccount;
-    if (typeof seed === 'string') {
-      debounce(async () => {
-        const { bip39, address } = await brainWalletAddress(seed);
-
-        Object.assign(this.state.newAccount, { address, validBip39Seed: bip39 });
-        this.setState({});
-      }, 200)();
-    }
-    this.setState({});
+    this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
   }
 
   getNew(): Account {
@@ -85,11 +74,15 @@ export default class AccountsStore extends Container<AccountsState> {
 
   async submitNew(pin) {
     const account = this.state.newAccount;
-    await this.save(account, pin);
-    this.setState({
-      accounts: this.state.accounts.set(accountId(account), account),
-      newAccount: empty()
-    });
+
+    // only save the account if the seed isn't empty
+    if (account.seed) {
+      await this.save(account, pin);
+      this.setState({
+        accounts: this.state.accounts.set(accountId(account), account),
+        newAccount: empty()
+      });
+    }
   }
 
   update(accountUpdate) {
@@ -196,7 +189,7 @@ export default class AccountsStore extends Container<AccountsState> {
 
   getAccounts(): Array<Account> {
     return Array.from(this.state.accounts.values())
-      .filter(a => !a.archived && a.chainId)
+      .filter(a => !a.archived && a.networkKey)
       .sort((a, b) => {
         if (a.name < b.name) {
           return -1;

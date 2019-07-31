@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, findNodeHandle, SafeAreaView, StyleSheet, ScrollView, Text, View } from 'react-native';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Subscribe } from 'unstated';
 
@@ -26,18 +26,21 @@ import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
-import TouchableItem from '../components/TouchableItem';
-import { DEFAULT_NETWORK_COLOR, NETWORK_COLOR, NETWORK_TITLES } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
+import { debounce } from '../util/debounce'
+import { brainWalletAddress } from '../util/native';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
     title: 'Recover Account',
     headerBackTitle: 'Back'
   };
-  render () {
+
+  render() {
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => <AccountRecoverView {...this.props} accounts={accounts} />}
@@ -49,12 +52,30 @@ export default class AccountRecover extends React.Component {
 class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
+
+    this.state = { seed: ''}
   }
 
-  render () {
+  addressGeneration = (seed) => {
+    const { accounts } = this.props;
+    
+    brainWalletAddress(seed)
+    .then(({ address, bip39 }) => accounts.updateNew({address, seed, validBip39Seed: bip39}))
+    .catch(console.error);
+  }
+
+  debouncedAddressGeneration = debounce(this.addressGeneration, 200)
+  
+  componentWillUnmount = function () {
+    // called when the user goes back, or finishes the whole recovery process
+    this.props.accounts.updateNew({seed : ''});
+  }
+
+  render() {
     const { accounts } = this.props;
     const selected = accounts.getNew();
-    const chainId = selected.chainId;
+    const networkKey = selected.networkKey;
+    const network = NETWORK_LIST[networkKey];
 
     return (
       <SafeAreaView style={styles.safeAreaView}>
@@ -73,32 +94,7 @@ class AccountRecoverView extends React.Component {
           >
             <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
             <Text style={styles.title}>CHOOSE NETWORK</Text>
-            <TouchableItem
-              style={[
-                styles.card,
-                {
-                  backgroundColor:
-                    NETWORK_COLOR[chainId] || DEFAULT_NETWORK_COLOR,
-                  marginBottom: 20
-                }
-              ]}
-              onPress={() =>
-                this.props.navigation.navigate('AccountNetworkChooser')
-              }
-            >
-              <Text
-                style={[
-                  styles.cardText,
-                  {
-                    color: NETWORK_COLOR[chainId]
-                      ? colors.card_bg
-                      : colors.card_text
-                  }
-                ]}
-              >
-                {NETWORK_TITLES[chainId]}
-              </Text>
-            </TouchableItem>
+            <NetworkButton network={network}/>
             <Text style={styles.title}>ACCOUNT NAME</Text>
             <TextInput
               onChangeText={name => accounts.updateNew({ name })}
@@ -111,14 +107,15 @@ class AccountRecoverView extends React.Component {
             <AccountSeed
               valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
               onChangeText={seed => {
-                accounts.updateNew({ seed });
+                this.debouncedAddressGeneration(seed);
+                this.setState({seed});
               }}
-              value={selected.seed}
+              value={this.state.seed}
             />
             <AccountCard
               style={{ marginTop: 20 }}
               address={selected.address || ''}
-              chainId={selected.chainId || ''}
+              networkKey={selected.networkKey || ''}
               title={selected.name}
               seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
             />
@@ -127,31 +124,45 @@ class AccountRecoverView extends React.Component {
               title="Next Step"
               onPress={() => {
                 const validation = validateSeed(selected.seed, selected.validBip39Seed);
+
                 if (!validation.valid) {
-                  Alert.alert(
-                    'Warning:',
-                    `${validation.reason}`,
-                    [
-                      {
-                        text: 'I understand the risks',
-                        style: 'default',
-                        onPress: () => {
-                          this.props.navigation.navigate('AccountPin', {
-                            isWelcome: this.props.navigation.getParam(
-                              'isWelcome'
-                            ),
-                            isNew: true
-                          });
+                  if (validation.accountRecoveryAllowed){
+                    return Alert.alert(
+                      'Warning:',
+                      `${validation.reason}`,
+                      [
+                        {
+                          text: 'I understand the risks',
+                          style: 'default',
+                          onPress: () => {
+                            this.props.navigation.navigate('AccountPin', {
+                              isWelcome: this.props.navigation.getParam(
+                                'isWelcome'
+                              ),
+                              isNew: true
+                            });
+                          }
+                        },
+                        {
+                          text: 'Back',
+                          style: 'cancel'
                         }
-                      },
-                      {
-                        text: 'Back',
-                        style: 'cancel'
-                      }
-                    ]
-                  );
-                  return;
+                      ]
+                    );
+                  } else {
+                    return Alert.alert(
+                      'Error:',
+                      `${validation.reason}`,
+                      [
+                        {
+                          text: 'Back',
+                          style: 'cancel'
+                        }
+                      ]
+                    );
+                  }
                 }
+                
                 this.props.navigation.navigate('AccountPin', {
                   isWelcome: this.props.navigation.getParam('isWelcome'),
                   isNew: true
@@ -188,15 +199,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     paddingBottom: 20
-  },
-  card: {
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    color: colors.card_text,
-    fontFamily: 'Manifold CF',
-    fontSize: 20,
-    fontWeight: 'bold'
   }
 });

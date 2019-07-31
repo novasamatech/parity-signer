@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -43,8 +43,8 @@ const accountsStore = {
   sharedPreferencesName: 'accounts_v2'
 };
 
-function accountTxsKey({ address, networkType, chainId }) {
-  return 'account_txs_' + accountId({ address, networkType, chainId });
+function accountTxsKey({ address, networkType, networkKey }) {
+  return 'account_txs_' + accountId({ address, networkType, networkKey });
 }
 
 function txKey(hash) {

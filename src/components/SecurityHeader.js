@@ -1,4 +1,4 @@
-// Copyright 2015-2017 Parity Technologies (UK) Ltd.
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,45 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import NetInfo from '@react-native-community/netinfo';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { withNavigation } from 'react-navigation';
-import { Subscribe } from 'unstated';
+
 import colors from '../colors';
-import SecurityStore from '../stores/SecurityStore';
 import TouchableItem from './TouchableItem';
 
-export default class SecurityHeader extends React.Component {
-  render() {
-    return (
-      <Subscribe to={[SecurityStore]}>
-         {securityStore => (
-          <SecurityHeaderView level={securityStore.getLevel()} />
-        )}
-      </Subscribe>
-    );
+class SecurityHeader extends React.Component {
+  state = {
+    isConnected: false
+  };
+
+  componentDidMount() {
+    this.unsubscribe = NetInfo.addEventListener(state => {
+      this.setState({ isConnected: state.isConnected });
+    });
   }
-}
 
-class _SecurityHeaderView extends React.PureComponent {
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
   render() {
-    const { level } = this.props;
-    const color = {
-      green: colors.bg_positive,
-      red: colors.bg_alert
-    }[level];
+    const { isConnected } = this.state;
 
-    const message = {
-      green: 'Secure',
-      red: 'Not Secure'
-    }[level];
+    if (!isConnected) {
+      return null
+    }
 
     return (
       <TouchableItem onPress={() => this.props.navigation.navigate('Security')}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Icon style={[styles.headerSecureIcon, { color }]} name="security" />
-          <Text style={[styles.headerTextRight, { color }]}>{message}</Text>
+          <Icon style={styles.headerSecureIcon} name="security" />
+          <Text style={styles.headerTextRight}>Not Secure</Text>
         </View>
       </TouchableItem>
     );
@@ -65,16 +62,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     paddingRight: 5,
-    color: colors.bg_text_positive
+    color: colors.bg_alert
   },
   headerTextRight: {
     marginLeft: 0,
     fontSize: 17,
     fontFamily: 'Roboto',
     fontWeight: 'bold',
-    color: colors.bg_text_positive,
+    color: colors.bg_alert,
     paddingRight: 14,
   }
 });
 
-const SecurityHeaderView = withNavigation(_SecurityHeaderView);
+export default withNavigation(SecurityHeader);
