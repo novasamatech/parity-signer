@@ -212,6 +212,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   }
 });
+
 /*
 Example Full Raw Data
 ---
@@ -235,7 +236,7 @@ function rawDataToU8A(rawData) {
     return null;
   }
 
-  // Strip SQRC filler bytes
+  // Strip filler bytes padding at the end
   if (rawData.substr(-2) === 'ec') {
     rawData = rawData.substr(0, rawData.length - 2);
   }
