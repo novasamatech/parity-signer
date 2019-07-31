@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 export default {
-  regular: 'Manifold_CF',
+  regular: 'Manifold CF',
   semiBold: 'ManifoldCF-DemiBold',
-  bold: 'ManifoldCF-Bold'
+  bold: 'ManifoldCF-Bold',
 }
