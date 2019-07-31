@@ -19,14 +19,15 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
   TouchableOpacity,
   View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 import { brainWalletAddress, words } from '../util/native';
+
 import AccountIcon from './AccountIcon';
+import Address from './Address'
 
 export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
@@ -74,17 +75,17 @@ export default class AccountIconChooser extends React.PureComponent {
   render() {
     const { address } = this.state;
 
+    if (!address){
+      return null;
+    }
+
     return (
       <View style={styles.body}>
         {this.renderIcon()}
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.01}
-          style={styles.addressText}
-        >
-          {`0x${address}`}
-        </Text>
+        <Address 
+          address={address}
+          short
+        />
       </View>
     );
   }
