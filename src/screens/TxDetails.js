@@ -108,7 +108,6 @@ export class TxDetailsView extends React.PureComponent {
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Transaction"
-          textStyles={{ color: colors.card_text }}
           onPress={() => this.props.onNext()}
         />
       </ScrollView>

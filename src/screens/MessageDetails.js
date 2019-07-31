@@ -107,7 +107,6 @@ export class MessageDetailsView extends React.PureComponent {
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Message"
-          textStyles={{ color: colors.card_text }}
           onPress={() => this.props.onNext()}
         />
       </ScrollView>
