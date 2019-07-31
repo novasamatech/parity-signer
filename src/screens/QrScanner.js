@@ -219,6 +219,10 @@ function rawDataToU8A(rawData) {
   }
 
   // Strip SQRC filler bytes
+  if (rawData.substr(-2) === 'ec') {
+    rawData = rawData.substr(0, rawData.length - 2);
+  }
+
   while (rawData.substr(-4) === 'ec11') {
     rawData = rawData.substr(0, rawData.length - 4);
   }
@@ -236,10 +240,10 @@ function rawDataToU8A(rawData) {
   let length = 0;
 
   // Strip length prefix
-  if (length8 * 2 + 2 == rawData.length) {
+  if (length8 * 2 + 2 === rawData.length) {
     rawData = rawData.substr(2);
     length = length8;
-  } else if (length16 * 2 + 4 == rawData.length) {
+  } else if (length16 * 2 + 4 === rawData.length) {
     rawData = rawData.substr(4);
     length = length16;
   } else {
