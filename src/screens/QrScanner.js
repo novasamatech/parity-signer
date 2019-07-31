@@ -212,7 +212,24 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   }
 });
-
+/*
+Example Full Raw Data
+---
+4 // indicates binary
+37 // indicates data length
+00 // indicates multipart
+0001 // frame count
+0000 // first frame
+--- UOS Specific Data
+53 // indicates payload is for Substrate
+01 // crypto: sr25519
+00 // indicates action: signData
+f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
+544849532049532053504152544121 // actual payload message to sign (should be SCALE)
+0 // terminator
+--- SQRC Filler Bytes
+ec11ec11ec11ec // SQRC filler bytes
+*/
 function rawDataToU8A(rawData) {
   if (!rawData) {
     return null;
