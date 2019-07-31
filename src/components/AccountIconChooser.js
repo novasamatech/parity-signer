@@ -25,17 +25,17 @@ import {
   View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../colors';
-import { brainWalletAddress, words } from '../util/native';
 
 import AccountIcon from './AccountIcon';
 import Address from './Address'
+import colors from '../colors';
+import { brainWalletAddress, words } from '../util/native';
 
 export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = { icons: [] };
   }
 
   componentDidMount() {
@@ -110,7 +110,6 @@ export default class AccountIconChooser extends React.PureComponent {
   render() {
     const { value } = this.props;
     const { icons } = this.state;
-
 
     return (
       <View style={styles.body}>
