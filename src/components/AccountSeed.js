@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
   input: {
     height: 160,
     lineHeight: 26,
-    fontFamily: fonts.regular,
     fontSize: 20,
     backgroundColor: '#e4fee4'
   },
