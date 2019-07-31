@@ -19,6 +19,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
+import fonts from "../fonts";
 import PARITY_WORDS from '../../res/parity_wordlist.json';
 import BIP39_WORDS from '../../res/bip39_wordlist.json';;
 import TextInput from './TextInput';
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   suggestionText: {
-    fontFamily: 'Roboto',
+    fontFamily: fonts.regular,
     color: colors.card_bg_text
   }
 });

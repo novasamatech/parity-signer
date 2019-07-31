@@ -26,6 +26,7 @@ import {
   View
 } from 'react-native';
 import colors from '../colors';
+import fonts from "../fonts";
 import { brainWalletAddress, words } from '../util/native';
 import AccountIcon from './AccountIcon';
 
@@ -149,10 +150,9 @@ const styles = StyleSheet.create({
     borderColor: colors.bg
   },
   addressText: {
-    fontFamily: 'Roboto',
+    fontFamily: fonts.bold,
     paddingTop: 20,
     color: colors.bg,
-    fontWeight: '700',
     fontSize: 14
   }
 });

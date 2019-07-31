@@ -26,6 +26,7 @@ import {
 } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
+import fonts from "../fonts";
 
 export default class PopupMenu extends React.PureComponent {
     render() {
@@ -53,7 +54,7 @@ const menuOptionsStyles = {
         padding: 15,
     },
     optionText: {
-        fontFamily: 'Roboto',
+        fontFamily: fonts.regular,
         fontSize: 16
     },
 };
