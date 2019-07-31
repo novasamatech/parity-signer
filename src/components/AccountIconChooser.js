@@ -16,108 +16,74 @@
 
 // @flow
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {
-  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 import { brainWalletAddress, words } from '../util/native';
 import AccountIcon from './AccountIcon';
 
-export default class AccountIconChooser extends React.PureComponent<{
-  value: string,
-  onChange: () => any
-}> {
-  static propTypes = {
-    value: PropTypes.string,
-    onChange: PropTypes.func
-  };
-
+export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { icons: [] };
+    this.state = {};
   }
 
   componentDidMount() {
-    this.refreshIcons();
+    this.refreshAccount();
   }
 
-  refreshIcons = async () => {
+  refreshAccount = async () => {
+    const { onChange } = this.props;
     try {
-      const icons = await Promise.all(
-        Array(10)
-          .join(' ')
-          .split(' ')
-          .map(async () => {
-            const seed = await words();
-            const { address, bip39 } = await brainWalletAddress(seed);
+      const seed = await words();
+      const { address, bip39 } = await brainWalletAddress(seed);
 
-            return {
-              address,
-              bip39,
-              seed,
-            };
-          })
-      );
-
-      this.setState({
-        icons
-      });
+      const newAccountProperties = {
+          address,
+          bip39,
+          seed
+        };
+      this.setState(newAccountProperties);
+      onChange(newAccountProperties);
     } catch (e) {
       console.error(e);
     }
   };
 
-  renderIcon = ({ item, index }) => {
-    const { value, onSelect } = this.props;
-    const { address, bip39, seed } = item;
-    const iSelected = address.toLowerCase() === value.toLowerCase();
-    const style = [styles.icon];
+  renderIcon = () => {
+    const { address, bip39, seed } = this.state;
 
     return (
-      <TouchableOpacity
-        key={index}
-        style={[styles.iconBorder, iSelected ? styles.selected : {}]}
-        onPress={() =>
-          onSelect({
-            address,
-            bip39,
-            seed
-          })
-        }
-      >
-        <AccountIcon style={style} seed={'0x' + address} />
-      </TouchableOpacity>
+      <>
+        <TouchableOpacity
+          onPress={this.refreshAccount}
+        ><Icon name={'refresh'} size={35} style={styles.refreshIcon} />
+        </TouchableOpacity>
+        <AccountIcon style={styles.icon} seed={'0x' + address} />
+      </>
     );
   }
 
   render() {
-    const { value } = this.props;
-    const { icons } = this.state;
+    const { address } = this.state;
 
     return (
       <View style={styles.body}>
-        <FlatList
-          data={icons}
-          extraData={value}
-          horizontal
-          keyExtractor={item => item.address}
-          renderItem={this.renderIcon}
-          style={styles.icons}
-        />
+        {this.renderIcon()}
         <Text
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.01}
           style={styles.addressText}
         >
-          {value ? `0x${value}` : `Select an identicon`}
+          {`0x${address}`}
         </Text>
       </View>
     );
@@ -126,33 +92,29 @@ export default class AccountIconChooser extends React.PureComponent<{
 
 const styles = StyleSheet.create({
   body: {
-    flex: 1,
-    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: colors.card_bg,
+    display: 'flex',
+    flexDirection:'row',
     marginBottom: 20,
     padding: 20,
-    backgroundColor: colors.card_bg
-  },
-  icons: {
-    backgroundColor: colors.card_bg
+    paddingLeft: 10,
   },
   icon: {
-    width: 50,
+    backgroundColor: colors.card_bg,
     height: 50,
     margin: 6,
-    padding: 5
-  },
-  iconBorder: {
-    borderWidth: 6,
-    borderColor: colors.card_bg
-  },
-  selected: {
-    borderColor: colors.bg
+    padding: 5,
+    width: 50,
   },
   addressText: {
     fontFamily: 'Roboto',
-    paddingTop: 20,
     color: colors.bg,
     fontWeight: '700',
-    fontSize: 14
+    fontSize: 14,
+  },
+  refreshIcon :{
+    color: colors.bg,
+    marginRight: 5
   }
 });

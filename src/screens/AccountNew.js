@@ -26,7 +26,6 @@ import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
-import TouchableItem from '../components/TouchableItem';
 import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
@@ -66,18 +65,15 @@ class AccountNewView extends React.Component {
           >
             <View style={styles.top}>
               <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-              <Text style={styles.title}>CHOOSE NETWORK</Text>
+              <Text style={styles.title}>NETWORK</Text>
               <NetworkButton network={network}/>
-              <Text style={[styles.title, { marginTop: 20 }]}>
-                CHOOSE AN IDENTICON
-              </Text>
+              <Text style={styles.title}>ICON & ADDRESS</Text>
               <AccountIconChooser
-                value={selected && selected.seed && selected.address}
-                onSelect={({ address, bip39, seed }) => {
+                onChange={({ address, bip39, seed }) => {
                   accounts.updateNew({ address, seed, validBip39Seed: bip39 });
                 }}
               />
-              <Text style={styles.title}>ACCOUNT NAME</Text>
+              <Text style={styles.title}>NAME</Text>
               <TextInput
                 onChangeText={name => accounts.updateNew({ name })}
                 value={selected && selected.name}
