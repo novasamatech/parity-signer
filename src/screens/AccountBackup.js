@@ -109,15 +109,7 @@ class AccountBackupView extends React.PureComponent {
             );
           }}
         >
-          <Text
-            style={{
-              padding: 10,
-              minHeight: 160,
-              lineHeight: 26,
-              fontSize: 20,
-              backgroundColor: colors.card_bg
-            }}
-          >
+          <Text style={styles.seedText}>
             {selected.seed}
           </Text>
         </TouchableItem>
@@ -192,6 +184,14 @@ const styles = StyleSheet.create({
     color: colors.bg_text_sec,
     fontSize: 12,
     paddingBottom: 20
+  },
+  seedText: {
+    padding: 10,
+    minHeight: 160,
+    lineHeight: 26,
+    fontSize: 20,
+    fontFamily: fonts.regular,
+    backgroundColor: colors.card_bg
   },
   nextStep: {
     marginTop: 20
