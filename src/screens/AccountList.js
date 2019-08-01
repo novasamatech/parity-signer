@@ -29,6 +29,7 @@ import Button from '../components/Button';
 import AccountsStore from '../stores/AccountsStore';
 import { accountId } from '../util/account';
 import PopupMenu from '../components/PopupMenu';
+import { Identicon } from './Polkadot';
 
 export default class AccountList extends React.PureComponent {
   static navigationOptions = {
