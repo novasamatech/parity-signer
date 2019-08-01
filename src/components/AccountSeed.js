@@ -132,6 +132,7 @@ export default class AccountSeed extends Component {
           style={[styles.input, invalidStyles]}
           multiline
           autoCapitalize="none"
+          textAlignVertical="top"
           onSelectionChange={this.handleCursorPosition}
           {...this.props}
         />

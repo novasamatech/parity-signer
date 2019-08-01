@@ -106,9 +106,8 @@ export class TxDetailsView extends React.PureComponent {
           networkKey={this.props.recipient.networkKey || ''}
         />
         <Button
-          buttonStyles={{ backgroundColor: colors.bg_positive, height: 60 }}
+          buttonStyles={{ height: 60 }}
           title="Sign Transaction"
-          textStyles={{ color: colors.card_text }}
           onPress={() => this.props.onNext()}
         />
       </ScrollView>
