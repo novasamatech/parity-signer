@@ -47,7 +47,7 @@ export default class QrView extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.displayQrCode(this.props.accountId);
+    this.displayQrCode(this.props.data);
   }
 
   componentWillReceiveProps(newProps) {
