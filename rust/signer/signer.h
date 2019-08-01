@@ -54,7 +54,7 @@ struct rust_string* rlp_item(unsigned* error, const struct rust_string_ptr* rlp,
 
 struct rust_string* keccak256(unsigned* error, const struct rust_string_ptr* data);
 
-struct rust_string* blake2s(unsigned* error, const struct rust_string_ptr* data);
+struct rust_string* blake(unsigned* error, const struct rust_string_ptr* data);
 
 struct rust_string* eth_sign(unsigned* error, const struct rust_string_ptr* data);
 
@@ -71,3 +71,6 @@ struct rust_string* qrcode(unsigned* error, const struct rust_string_ptr* data);
 
 // qr code generator for hex-encoded binary
 struct rust_string* qrcode_hex(unsigned* error, const struct rust_string_ptr* data);
+
+// return keypair address, automatically picking BIP39 or parity phrases
+struct rust_string* substrate_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed, const unsigned prefix);

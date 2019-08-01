@@ -26,7 +26,7 @@ use rlp::decode_list;
 use rustc_hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
 use tiny_keccak::keccak256 as keccak;
-use blake2_rfc::blake2s::blake2s as blake;
+use blake2_rfc::blake2s::blake2s;
 use std::num::NonZeroU32;
 
 // 10240 is always non-zero, ergo this is safe
@@ -142,11 +142,11 @@ export! {
         Some(keccak(&data).to_hex())
     }
 
-    @Java_io_parity_signer_EthkeyBridge_ethkeyBlake2s
-    fn blake2s(data: &str) -> Option<String> {
+    @Java_io_parity_signer_EthkeyBridge_ethkeyBlake
+    fn blake(data: &str) -> Option<String> {
         let data: Vec<u8> = data.from_hex().ok()?;
 
-        Some(blake(32, &[], &data).as_bytes().to_hex())
+        Some(blake2s(32, &[], &data).as_bytes().to_hex())
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyBlockiesIcon
@@ -211,11 +211,18 @@ export! {
     fn qrcode_hex(data: &str) -> Option<String> {
         qrcode_bytes(&data.from_hex::<Vec<u8>>().ok()?)
     }
+
+    @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletAddress
+    fn substrate_brainwallet_address(seed: &str, prefix: u8) -> Option<String> {
+        let keypair = strate::KeyPair::from_bip39_phrase(seed)?;
+
+        Some(keypair.ss58_address(prefix))
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::rlp_item;
+    use super::*;
 
     #[test]
     fn test_rlp_item() {
@@ -226,5 +233,16 @@ mod tests {
         assert_eq!(rlp_item(rlp, 3), Some("095e7baea6a6c7c4c2dfeb977efac326af552d87".into()));
         assert_eq!(rlp_item(rlp, 4), Some("0a".into()));
         assert_eq!(rlp_item(rlp, 5), Some("".into()));
+    }
+
+    #[test]
+    fn test_substrate_brainwallet_address() {
+        let phrase = "grant jaguar wish bench exact find voice habit tank pony state salmon";
+        // Secret seed: 0xb139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224
+        // Public key (hex): 0x944eeb240615f4a94f673f240a256584ba178e22dd7b67503a753968e2f95761
+        let expected = "5FRAPSnpgmnXAnmPVv68fT6o7ntTvaZmkTED8jDttnXs9k4n";
+        let generated = substrate_brainwallet_address(phrase, 42).unwrap();
+
+        assert_eq!(expected, generated);
     }
 }

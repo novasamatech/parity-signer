@@ -83,6 +83,16 @@ impl Argument<'static> for u32 {
 }
 
 #[cfg(not(feature = "jni"))]
+impl Argument<'static> for u8 {
+    type Ext = u32;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        val as u8
+    }
+}
+
+#[cfg(not(feature = "jni"))]
 impl<'a> Argument<'static> for &'a str {
     type Ext = *const StringPtr;
     type Env = Cell<u32>;
@@ -140,6 +150,16 @@ impl<'jni> Argument<'jni> for u32 {
 
     fn convert(_: &Self::Env, val: Self::Ext) -> Self {
         val as u32
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Argument<'jni> for u8 {
+    type Ext = jint;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        val as u8
     }
 }
 
