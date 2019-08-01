@@ -633,6 +633,13 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@babel/runtime@^7.5.5":
+  version "7.5.5"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.5.5.tgz#74fba56d35efbeca444091c7850ccd494fd2f132"
+  integrity sha512-28QvEGyQyNkB0/m2B4FU7IEZGK2NUrcMtT6BZEFALTguLk+AUT6ofsHtPk5QyjAdUkpMJ+/Em+quwz4HOt30AQ==
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/template@^7.0.0", "@babel/template@^7.1.0", "@babel/template@^7.4.0", "@babel/template@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.4.4.tgz#f4b88d1225689a08f5bc3a17483545be9e4ed237"
@@ -856,6 +863,13 @@
     "@types/istanbul-lib-coverage" "^2.0.0"
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
+
+"@polkadot/ui-shared@^0.42.0-beta.24":
+  version "0.42.0-beta.24"
+  resolved "https://registry.yarnpkg.com/@polkadot/ui-shared/-/ui-shared-0.42.0-beta.24.tgz#0ae1c5951d73e5f2506395814dd28c4aeb4db26d"
+  integrity sha512-rS9sKAl42iZEPvdDPUs0UWjcTN/75uwJgEgrpYiERWjcR+s6HPrGDsiRIdGjSMsCYuMOmso/Sc/RT4+moYV5Vg==
+  dependencies:
+    "@babel/runtime" "^7.5.5"
 
 "@react-native-community/cli-platform-android@^2.0.1", "@react-native-community/cli-platform-android@^2.6.2":
   version "2.6.2"
@@ -5874,6 +5888,11 @@ react-native-simple-picker@^2.1.0:
   integrity sha512-CN5qIAre2qMeNo8JD0lAs+HY+UatoHbVFdu+0afCl+yXNHWGERCK4CQveArCL32vvVLPmOQuED+pKXSnAJRIRg==
   dependencies:
     prop-types "^15.5.10"
+
+react-native-svg@^9.5.3:
+  version "9.5.3"
+  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.5.3.tgz#2389f3ffd700c6441166496a1aeade31ead89c59"
+  integrity sha512-VUOe4TLz7RFdmm/XT9EH87VSwlRykx49qbwJMA+dh9eFM7KPY1qH3kEyN7uRCqJD2eE8toxt9NpjR6ByvtPNlA==
 
 react-native-tab-view@^1.2.0, react-native-tab-view@^1.4.1:
   version "1.4.1"

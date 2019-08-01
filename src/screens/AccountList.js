@@ -131,6 +131,12 @@ class AccountListView extends React.PureComponent {
           </View>
         </View>
         { hasNoAccount && this.showOnboardingMessage()}
+        <Text style={styles.title}>Give ma a Polkadot identicon</Text>
+        <Identicon
+          address={'5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV'}
+          publicKey={'0x46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a'}
+          size= {64}
+        />
         <FlatList
           ref={list => {
             this.list = list;
