@@ -15,16 +15,14 @@ interface Props extends BaseProps {
 
 export default class Identicon extends React.PureComponent<Props> {
   public render (): React.ReactNode {
-    const { address, className, sixPoint, size, style } = this.props;
+    const { address, sixPoint, size, style } = this.props;
 
     return (
       <View
-        className={`container ${className}`}
         style={style}
       >
         <Svg
           id={address}
-          name={address}
           width={size}
           height={size}
           viewBox='0 0 64 64'
