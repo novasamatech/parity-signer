@@ -117,3 +117,7 @@ export function qrCode (data) {
 export function qrCodeHex (data) {
   return EthkeyBridge.qrCodeHex(data)
 }
+
+export function substrateAddress (seed, prefix) {
+  return EthkeyBridge.substrateAddress(seed, prefix);
+}

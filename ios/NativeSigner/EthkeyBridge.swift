@@ -169,4 +169,15 @@ class EthkeyBridge: NSObject {
       reject("Failed to generate blockies", nil, nil)
     }
   }
+
+  @objc func substrateAddress(_ seed: String, version: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var seed_ptr = seed.asPtr()
+    let address_rust_str = substrate_brainwallet_address(&error, &seed_ptr, version)
+    let address_rust_str_ptr = rust_string_ptr(address_rust_str)
+    let address = String.fromStringPtr(ptr: address_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(address_rust_str_ptr)
+    rust_string_destroy(address_rust_str)
+    resolve(address)
+  }
 }

@@ -71,3 +71,6 @@ struct rust_string* qrcode(unsigned* error, const struct rust_string_ptr* data);
 
 // qr code generator for hex-encoded binary
 struct rust_string* qrcode_hex(unsigned* error, const struct rust_string_ptr* data);
+
+// return keypair address, automatically picking BIP39 or parity phrases
+struct rust_string* substrate_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed, const unsigned prefix);

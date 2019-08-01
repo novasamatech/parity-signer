@@ -5,6 +5,7 @@ authors = ["debris <marek.kotewicz@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+base58 = "0.1.0"
 base64 = "0.10.1"
 blake2-rfc = "0.2.18"
 blockies = "0.3"
@@ -13,9 +14,10 @@ jni = { version = "0.10.2", default-features = false, optional = true }
 libc = "0.2"
 rlp = { version = "0.3.0", features = ["ethereum"] }
 rustc-hex = "2.0.1"
-schnorrkel = "0.1.0"
+schnorrkel = "0.8"
 serde = "1.0"
 serde_json = "1.0"
+substrate-bip39 = "0.3.1"
 tiny-bip39 = { version = "0.6.1", default-features = false }
 tiny-hderive = "0.1"
 tiny-keccak = "1.4"
