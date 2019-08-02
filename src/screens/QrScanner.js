@@ -16,8 +16,7 @@
 
 'use strict';
 
-// import QrScan from '@polkadot/ui-qr';
-// import decodeAddress from '@polkadot/util-crypto';
+import { decodeAddress } from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -82,7 +81,11 @@ export default class Scanner extends React.PureComponent {
 
                       data['action'] = action;
                       data['data']['crypto'] = crypto;
-                      data['data']['account'] = uosAfterFrames.slice(3, 35);
+                      
+                      const addressAsBytes = uosAfterFrames.slice(3, 35);
+                      const decodedAddress = decodeAddress(addressAsBytes);
+
+                      data['data']['account'] = decodedAddress;
                       data['data']['data'] = uosAfterFrames.slice(35);
 
                       break;

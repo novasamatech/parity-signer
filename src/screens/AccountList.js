@@ -21,7 +21,6 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
-
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
@@ -29,10 +28,11 @@ import Button from '../components/Button';
 import AccountsStore from '../stores/AccountsStore';
 import { accountId } from '../util/account';
 import PopupMenu from '../components/PopupMenu';
+import Identicon from './Polkadot';
 
 export default class AccountList extends React.PureComponent {
   static navigationOptions = {
-    title: 'Accounts'
+    title: 'Accounts',
   };
 
   render() {
@@ -59,10 +59,10 @@ class AccountListView extends React.PureComponent {
   static propTypes = {
     accounts: PropTypes.arrayOf(
       PropTypes.shape({
-        address: PropTypes.string.isRequired
+        address: PropTypes.string.isRequired,
       })
     ).isRequired,
-    onAccountSelected: PropTypes.func.isRequired
+    onAccountSelected: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -93,22 +93,21 @@ class AccountListView extends React.PureComponent {
   showOnboardingMessage = () => {
     const { navigate } = this.props.navigation;
     const createLink = (text, navigation) => (
-      <Text 
-        style={styles.link}
-        onPress={() => navigate(navigation)}
-      >
+      <Text style={styles.link} onPress={() => navigate(navigation)}>
         {text}
       </Text>
     );
 
     return (
-      <View style={styles.onboardingWrapper} >
+      <View style={styles.onboardingWrapper}>
         <Text style={styles.onboardingText}>
-          No account yet?{"\n"}{createLink('Create','AccountNew')} or {createLink('recover','AccountRecover')} an account to get started.
+          No account yet?{'\n'}
+          {createLink('Create', 'AccountNew')} or{' '}
+          {createLink('recover', 'AccountRecover')} an account to get started.
         </Text>
       </View>
-    )
-  }
+    );
+  };
 
   render() {
     const hasNoAccount = this.props.accounts.length < 1;
@@ -122,15 +121,24 @@ class AccountListView extends React.PureComponent {
           <View style={styles.menuView}>
             <PopupMenu
               onSelect={value => navigate(value)}
-              menuTriggerIconName={"add"}
+              menuTriggerIconName={'add'}
               menuItems={[
                 { value: 'AccountNew', text: 'New Account' },
                 { value: 'AccountRecover', text: 'Recover Account' },
-                { value: 'About', text: 'About' }]}
+                { value: 'About', text: 'About' },
+              ]}
             />
           </View>
         </View>
-        { hasNoAccount && this.showOnboardingMessage()}
+        {hasNoAccount && this.showOnboardingMessage()}
+        <Text style={styles.title}>Give ma a Polkadot identicon</Text>
+        <Identicon
+          address={'5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV'}
+          publicKey={
+            '0x46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a'
+          }
+          size={64}
+        />
         <FlatList
           ref={list => {
             this.list = list;
@@ -154,7 +162,7 @@ class AccountListView extends React.PureComponent {
           }}
           enableEmptySections
         />
-        { ! hasNoAccount && 
+        {!hasNoAccount && (
           <View style={styles.bottom}>
             <Button
               buttonStyles={{ height: 60 }}
@@ -162,7 +170,7 @@ class AccountListView extends React.PureComponent {
               onPress={() => navigate('QrScanner')}
             />
           </View>
-        }
+        )}
       </View>
     );
   }
@@ -173,23 +181,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     flex: 1,
     flexDirection: 'column',
-    padding: 20
+    padding: 20,
   },
   bottom: {
-    marginTop: 20,
+    marginTop: 20
   },
   content: {
-    flex: 1
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingBottom: 20,
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   menuView: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'flex-end'
   },
   title: {
     color: colors.bg_text_sec,
@@ -197,19 +205,19 @@ const styles = StyleSheet.create({
     fontFamily: 'Manifold CF',
     fontWeight: 'bold',
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   link: {
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
   },
   onboardingWrapper: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-end'
   },
   onboardingText: {
     fontFamily: 'Roboto',
     fontSize: 20,
-    color: colors.bg_text_sec,
+    color: colors.bg_text_sec
   }
 });

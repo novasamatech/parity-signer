@@ -17,6 +17,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
+
+import '../shim';
+import 'crypto';
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import {
