@@ -98,8 +98,9 @@ export default class Scanner extends React.PureComponent {
                           
                           break;
                         case 1: // payload_hash MUST be the Blake2s 32-byte hash of the SCALE encoding of the tuple of transaction items (nonce, call, era_description, era_header).
-                          
-                         break;
+                          data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
+                          data['data']['data'] = encryptedData;
+                          break;
                         case 2: // immortal_payload must be (nonce, call)
                           break;
                         case 3: // Cold Signer should attempt to decode to utf8
@@ -153,7 +154,7 @@ export class QrScannerView extends React.PureComponent {
     onBarCodeRead: PropTypes.func.isRequired
   };
 
-  componentWillMount() {
+  componentDidMount() {
     this.setBusySubscription = this.props.navigation.addListener(
       'willFocus',
       () => {

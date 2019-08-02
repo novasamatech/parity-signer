@@ -60,7 +60,14 @@ export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
   async setData(data, accountsStore) {
-    console.log('setData => ', data);
+    // If payload is longer than 256 bytes, then it SHOULD instead sign the Blake2s hash of payload.
+    if (data.data.payload.length > 256) {
+      data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
+      data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
+      data['data']['data'] = blake2b(data.data.payload);
+    }
+
+    // - Cold Signer SHOULD (at the user's discretion) sign the message, immortal_payload, or payload if payload is of length 256 bytes or fewer.
     switch (data.action) {
       case 'signTransaction':
         return await this.setTXRequest(data, accountsStore);
