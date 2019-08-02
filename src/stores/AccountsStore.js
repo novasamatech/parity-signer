@@ -22,15 +22,16 @@ import { loadAccounts, saveAccount } from '../util/db';
 import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
-  name: string,
   address: string,
-  networkType: string,
-  networkKey: string,
-  seed: string,
-  encryptedSeed: string,
-  createdAt: number,
-  updatedAt: number,
   archived: boolean,
+  createdAt: number,
+  encryptedSeed: string,
+  name: string,
+  networkKey: string,
+  protocol: string,
+  publicKey: number,
+  seed: string,
+  updatedAt: number,
   validBip39Seed: boolean
 };
 
@@ -154,14 +155,6 @@ export default class AccountsStore extends Container<AccountsState> {
       return false;
     }
     return true;
-  }
-
-  lockAccount(account) {
-    const acc = this.state.accounts.get(accountId(account));
-    if (acc) {
-      delete acc.seed;
-    }
-    this.setState({});
   }
 
   async checkPinForSelected(pin) {

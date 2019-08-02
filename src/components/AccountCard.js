@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
 
@@ -71,7 +71,7 @@ export default class AccountCard extends React.PureComponent<{
                 minimumFontScale={0.01}
                 style={styles.secondaryText}
               >
-                0x{address}
+                {network.protocol === NetworkProtocols.ETHEREUM ? '0x' : ''}{address}
               </Text>
             </View>
           </View>

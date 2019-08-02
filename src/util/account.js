@@ -1,28 +1,34 @@
-import { EthereumNetworkIds, NetworkTypes } from '../constants';
+import { SubstrateNetworkKeys, NetworkProtocols } from '../constants';
 
 export function accountId({
   address,
-  networkType = 'ethereum',
-  networkKey = EthereumNetworkIds.FRONTIER
+  protocol = NetworkProtocols.SUBSTRATE,
+  publicKey,
+  networkKey = SubstrateNetworkKeys.SUBSTRATE
 }) {
   if (typeof address !== 'string' || address.length === 0) {
-    throw new Error(`Couldn't create an accountId, missing address`);
+    throw new Error(`Couldn't create an accountId, address missing`);
   }
-  return `${networkType}:0x${address.toLowerCase()}@${networkKey}`;
+  if (protocol === NetworkProtocols.SUBSTRATE){
+    return `${protocol}:${publicKey}`;
+  } else {
+    return `${protocol}:${address.toLowerCase()}@${networkKey}`;
+  }
 }
 
 export function empty(account = {}) {
   return {
-    name: '',
-    networkType: NetworkTypes.ETHEREUM,
-    networkKey: EthereumNetworkIds.FRONTIER,
-    seed: '',
-    // address for an empty seed phrase
-    address: '00a329c0648769A73afAc7F9381E08FB43dBEA72',
-    createdAt: new Date().getTime(),
-    updatedAt: new Date().getTime(),
+    
+    address: '',
     archived: false,
+    createdAt: new Date().getTime(),
     encryptedSeed: null,
+    name: '',
+    protocol: NetworkProtocols.SUBSTRATE,
+    publicKey: 0x0,
+    networkKey: SubstrateNetworkKeys.SUBSTRATE,
+    seed: '',
+    updatedAt: new Date().getTime(),
     validBip39Seed: false,
     ...account
   };
