@@ -131,6 +131,8 @@ export default class AccountSeed extends Component {
         <TextInput
           style={[styles.input, invalidStyles]}
           multiline
+          autoCorrect={false}
+          autoCompleteType="off"
           autoCapitalize="none"
           textAlignVertical="top"
           onSelectionChange={this.handleCursorPosition}
