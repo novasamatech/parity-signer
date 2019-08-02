@@ -109,7 +109,7 @@ class AccountNewView extends React.Component {
               />
             </View>
           </ScrollView>
-        </KeyboardAwareScrollView>
+        </KeyboardScrollView>
       </View>
     );
   }

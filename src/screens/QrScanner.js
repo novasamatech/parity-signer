@@ -33,16 +33,6 @@ export default class Scanner extends React.PureComponent {
     headerBackTitle: 'Scanner'
   };
 
-  encodeString (value: string): Uint8Array {
-    const u8a = new Uint8Array(value.length);
-    
-    for (let i = 0; i < value.length; i++) {
-      u8a[i] = value.charCodeAt(i);
-    }
-
-    return u8a;
-  }
-
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
@@ -66,21 +56,22 @@ export default class Scanner extends React.PureComponent {
                 let action;
                 let address;
                 let data = {};
+                data['data'] = {}; // for consistency with legacy data format.
 
                 try {
                   // decode payload appropriately via UOS
                   switch (zerothByte) {
                     case 45: // Ethereum UOS payload
                       action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
-                      address = rawAfterFrames.slice(2, 22);
+                      address = uosAfterFrames.slice(2, 22);
 
                       data['action'] = action;
-                      data['account'] = account;
+                      data['data']['account'] = account;
 
                       if (action === 'signData') {
-                        data['rlp'] = rawAfterFrames.slice(23);
+                        data['data']['rlp'] = uosAfterFrames[13];
                       } else if (action === 'signTransaction') {
-                        data['data'] = rawAfterFrames.slice(23);
+                        data['data']['data'] = rawAfterFrames[13];
                       } else {
                         throw new Error('Could not determine action type.');
                       }
@@ -89,10 +80,10 @@ export default class Scanner extends React.PureComponent {
                       const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
                       action = secondByte === 0 || secondByte === 1 ? 'signData': secondByte === 2 || secondByte === 3 ? 'signTransaction' : null;
 
-                      data['crypto'] = crypto;
                       data['action'] = action;
-                      data['account'] = uosAfterFrames.slice(3, 33);
-                      data['data'] = uosAfterFrames.slice(33);
+                      data['data']['crypto'] = crypto;
+                      data['data']['account'] = uosAfterFrames.slice(3, 35);
+                      data['data']['data'] = uosAfterFrames.slice(35);
 
                       break;
                     default:

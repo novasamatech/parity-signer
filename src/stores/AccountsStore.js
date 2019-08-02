@@ -171,7 +171,10 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   getByAddress(address): ?Account {
-    return this.getAccounts().find(
+    const accounts = this.getAccounts();
+    console.log('getByAddress => ', accounts);
+    debugger;
+    return accounts.find(
       a => a.address.toLowerCase() === address.toLowerCase()
     );
   }

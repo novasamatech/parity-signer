@@ -60,7 +60,7 @@ export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
   async setData(data, accountsStore) {
-    console.log(data);
+    console.log('setData => ', data);
     switch (data.action) {
       case 'signTransaction':
         return await this.setTXRequest(data, accountsStore);
@@ -76,9 +76,22 @@ export default class ScannerStore extends Container<ScannerState> {
   async setDataToSign(signRequest, accountsStore) {
     const message = signRequest.data.data;
     const address = signRequest.data.account;
+    const crypto = signRequest.data.crypto;
 
-    const dataToSign = await ethSign(message);
+    console.log('address as bytse => ', address);
+    debugger;
+
+    if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
+      const substrateSign = async () => { /* Placeholder function for now */ return message; }
+      const dataToSign = await substrateSign(message);
+
+    } else {
+      const dataToSign = await ethSign(message);
+    }
+
     const sender = accountsStore.getByAddress(address);
+
+    debugger;
     if (!sender || !sender.encryptedSeed) {
       throw new Error(
         `No private key found for ${address} found in your signer key storage.`
