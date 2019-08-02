@@ -11,7 +11,7 @@
     "build-rust-ios": "cd rust/signer && make ios",
     "build-rust-android": "cd rust/signer && make android",
     "ios": "yarn run build-rust-ios && react-native run-ios",
-    "android": "yarn run build-rust-android && react-native run-android",
+    "android": "yarn run build-rust-android && react-native run-android --appIdSuffix \"dev\"",
     "start": "yarn run ios",
     "postinstall": "npx jetify &&  npx rn-nodeify --install --hack",
     "test": "jest",
