@@ -136,17 +136,18 @@ class AccountListView extends React.PureComponent {
           value={'5D72CBH9DSi6gFoDY6DFNBtWVnk9Jt2mAs6aYPEV6HSNrmQy'}
           size={64}
         />
+        <Text style={styles.title}>small</Text>
+        <Identicon
+          value={'5D72CBH9DSi6gFoDY6DFNBtWVnk9Jt2mAs6aYPEV6HSNrmQy'}
+          size={32}
+        />
         <Text style={styles.title}>Empty</Text>
         <Identicon
           value={''}
           size={64}
         />
-        <Text style={styles.title}>Empty again</Text>
+        <Text style={styles.title}>Empty small</Text>
         <Identicon
-        />
-        <Text style={styles.title}>small</Text>
-        <Identicon
-          value={'5D72CBH9DSi6gFoDY6DFNBtWVnk9Jt2mAs6aYPEV6HSNrmQy'}
           size={32}
         />
         <FlatList
