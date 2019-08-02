@@ -864,13 +864,13 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
-"@polkadot/reactnative-identicon@^0.42.0-beta.25":
-  version "0.42.0-beta.25"
-  resolved "https://registry.yarnpkg.com/@polkadot/reactnative-identicon/-/reactnative-identicon-0.42.0-beta.25.tgz#fd66495a15280c2c040cc9f320499c301da70f67"
-  integrity sha512-eGcG/maggZSpZ5SzMZnvQzTnptNtxlVDFqwg3bZCOSCTRV9XF9UbvKwz7SzjmF5yTHiw5i2QeOeszFFd7Ut3Nw==
+"@polkadot/reactnative-identicon@^0.42.0-beta.26":
+  version "0.42.0-beta.26"
+  resolved "https://registry.yarnpkg.com/@polkadot/reactnative-identicon/-/reactnative-identicon-0.42.0-beta.26.tgz#256bfe0619baae828ceeac9d15b22a2c5ea30be6"
+  integrity sha512-85ODyfw2TqGw/IV6UDsUp7NeemKaSO0Kad1rLGxBAxe2lXIldtjA9fbpaJs7ik81sa5YHgVDAInxOtc+S3wgoQ==
   dependencies:
     "@babel/runtime" "^7.5.5"
-    "@polkadot/ui-shared" "^0.42.0-beta.25"
+    "@polkadot/ui-shared" "^0.42.0-beta.26"
     react-native-svg "^9.5.3"
 
 "@polkadot/ui-shared@^0.42.0-beta.24":
@@ -880,10 +880,10 @@
   dependencies:
     "@babel/runtime" "^7.5.5"
 
-"@polkadot/ui-shared@^0.42.0-beta.25":
-  version "0.42.0-beta.25"
-  resolved "https://registry.yarnpkg.com/@polkadot/ui-shared/-/ui-shared-0.42.0-beta.25.tgz#78332f5b1f955d1975d393f6e7ed9115f4aa1968"
-  integrity sha512-rlVjDAKAVt5gr+uLsBcV52V1it9rRf8mWcWiMn0Fb06q5rElvEyeR6e1IpzUXC67CycL0XGZ8cpQOQOb+++i5g==
+"@polkadot/ui-shared@^0.42.0-beta.26":
+  version "0.42.0-beta.26"
+  resolved "https://registry.yarnpkg.com/@polkadot/ui-shared/-/ui-shared-0.42.0-beta.26.tgz#3bb15e298e70fe38f0b7ec8e66206b706817fd4e"
+  integrity sha512-y/GcX2G0JH5bOgVB5b3lpXyd02yv5EU3PKGahfCXAhrOXPg+NDxUTj6A5yAomcIjxmo94UIAwcAx2j7CVhRCoA==
   dependencies:
     "@babel/runtime" "^7.5.5"
     "@types/color" "^3.0.0"
