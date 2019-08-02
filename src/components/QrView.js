@@ -21,6 +21,7 @@ import React from 'react';
 import { Dimensions, StyleSheet, Image, View } from 'react-native';
 
 import colors from '../colors';
+import { NETWORK_PROTOCOLS } from '../constants';
 import { qrCode, qrCodeHex } from '../util/native';
 
 export default class QrView extends React.PureComponent {
@@ -32,10 +33,11 @@ export default class QrView extends React.PureComponent {
 
   displayQrCode = async (data) => {
     try {
-      const networkType = new RegExp('/.+?(?=:)/').exec(data);
-      let qr = networkType === 'substrate'
+      const networkType = data.split(':')[0];
+
+      let qr = networkType === NETWORK_PROTOCOLS.SUBSTRATE
                 ? await qrCodeHex(data)
-                : networkType === 'ethereum'
+                : networkType === NETWORK_PROTOCOLS.ETHEREUM
                   ? await qrCode(data)
                   : data;
       this.setState({

@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { decodeAddress } from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -47,7 +47,7 @@ export default class Scanner extends React.PureComponent {
 
                 const bytes = rawDataToU8A(txRequestData.rawData);
                 const hex = bytes.map(byte => byte.toString(16));
-                const uosAfterFrames = hex.slice(5);
+                const uosAfterFrames = hex.slice(5); // FIXME handle multipart
 
                 const zerothByte = uosAfterFrames[0];
                 const firstByte = uosAfterFrames[1];
@@ -82,8 +82,8 @@ export default class Scanner extends React.PureComponent {
                       data['action'] = action;
                       data['data']['crypto'] = crypto;
                       
-                      const addressAsBytes = uosAfterFrames.slice(3, 35);
-                      const decodedAddress = decodeAddress(addressAsBytes);
+                      const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
+                      const ss58Encoded = encodeAddress(publicKeyAsBytes);
 
                       data['data']['account'] = decodedAddress;
                       data['data']['data'] = uosAfterFrames.slice(35);

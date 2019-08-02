@@ -19,7 +19,6 @@
 import React from 'react';
 import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
-import packageJson from '../../package.json';
 
 export default class About extends React.PureComponent {
   static navigationOptions = {
@@ -30,7 +29,7 @@ export default class About extends React.PureComponent {
   render() {
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.title}>PARITY SIGNER ({packageJson.version})</Text>
+        <Text style={styles.title}>PARITY SIGNER</Text>
         <View>
           <Text style={styles.text}>
             The Parity Signer mobile application is a secure air-gapped wallet
