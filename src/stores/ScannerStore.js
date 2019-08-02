@@ -78,9 +78,6 @@ export default class ScannerStore extends Container<ScannerState> {
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
 
-    console.log('address => ', address);
-    debugger;
-
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
       const substrateSign = async () => { /* Placeholder function for now */ return message; }
       const dataToSign = await substrateSign(message);
@@ -91,7 +88,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
     const sender = accountsStore.getByAddress(address);
 
-    debugger;
     if (!sender || !sender.encryptedSeed) {
       throw new Error(
         `No private key found for ${address} found in your signer key storage.`
@@ -109,23 +105,22 @@ export default class ScannerStore extends Container<ScannerState> {
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
 
-    if (!(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
+    const protocol = txRequest.data.data.crypto ? NetworkProtocols.SUBSTRATE : NetworkProtocols.ETHEREUM
+
+    if (protocol === NetworkProtocols.ETHEREUM && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
 
-    const protocol = txRequest.data.data.crypto ? NetworkProtocols.SUBSTRATE : NetworkProtocols.ETHEREUM
-
-    console.log(txRequest);
-    debugger;
-
-    const tx = await transaction(txRequest.data.rlp);
-    const { ethereumChainId = 1 } = tx;
-    const networkKey = ethereumChainId;
+    if (protocol === NetworkProtocols.ETHERUEM) {
+      const tx = await transaction(txRequest.data.rlp);
+      const { ethereumChainId = 1 } = tx;
+      const networkKey = ethereumChainId;
+    }
 
      // TODO cater for Substrate
     const sender = accountsStore.getById({
-      protocol: NetworkProtocols.ETHEREUM,
-      networkKey,
+      protocol,
+      networkKey: networkKey || NetworkProtocols.SUBSTRATE,
       address: txRequest.data.account
     });
     const networkTitle = NETWORK_LIST[networkKey].title;

@@ -10,7 +10,7 @@ export function accountId({
     throw new Error(`Couldn't create an accountId, address missing`);
   }
   if (protocol === NetworkProtocols.SUBSTRATE){
-    return `${protocol}:${publicKey}`;
+    return `${protocol}:${address.toLowerCase()}:${'GENESIS_HASH_PLACEHOLDER'}`;
   } else {
     return `${protocol}:${address.toLowerCase()}@${networkKey}`;
   }

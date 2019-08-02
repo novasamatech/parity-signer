@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -97,7 +97,7 @@ class AccountNewView extends React.Component {
                 onPress={() => {
                   // TODO remove this hardcoded address for SUBSTRATE
                   if (selected.networkKey === SubstrateNetworkKeys.SUBSTRATE) {
-                    accounts.updateNew({ address:'5EjSNPzM9T6Nb19zb38TcwBQh5hNWG47noi7anXQT64BBJBx', seed:'this is sparta', publicKey:0x123 ,validBip39Seed: false });
+                    accounts.updateNew({ address:'5EnxxUmEbw8DkENKiYuZ1DwQuMoB2UWEQJZZXrTsxoz7SpgG', seed:'this is sparta', publicKey:0x123 ,validBip39Seed: false });
                   }
 
                   validateSeed(selected.seed, selected.validBip39Seed).valid &&
