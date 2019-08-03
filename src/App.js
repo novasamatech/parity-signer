@@ -19,7 +19,6 @@
 'use strict';
 
 import '../shim';
-import 'crypto';
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import {
