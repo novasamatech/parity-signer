@@ -878,13 +878,6 @@
     "@polkadot/ui-shared" "^0.42.0-beta.26"
     react-native-svg "^9.5.3"
 
-"@polkadot/ui-shared@^0.42.0-beta.24":
-  version "0.42.0-beta.24"
-  resolved "https://registry.yarnpkg.com/@polkadot/ui-shared/-/ui-shared-0.42.0-beta.24.tgz#0ae1c5951d73e5f2506395814dd28c4aeb4db26d"
-  integrity sha512-rS9sKAl42iZEPvdDPUs0UWjcTN/75uwJgEgrpYiERWjcR+s6HPrGDsiRIdGjSMsCYuMOmso/Sc/RT4+moYV5Vg==
-  dependencies:
-    "@babel/runtime" "^7.5.5"
-
 "@polkadot/ui-shared@^0.42.0-beta.26":
   version "0.42.0-beta.26"
   resolved "https://registry.yarnpkg.com/@polkadot/ui-shared/-/ui-shared-0.42.0-beta.26.tgz#3bb15e298e70fe38f0b7ec8e66206b706817fd4e"
@@ -1171,9 +1164,9 @@
   integrity sha512-FWR7QB7EqBRq1s9BMk0ccOSOuRLfVEWYpHQYpFPaXtCoqN6dJx2ttdsdQbUxLLnAlKpYeVjveGGhQ3583TTa7g==
 
 "@types/node@*":
-  version "12.6.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.6.8.tgz#e469b4bf9d1c9832aee4907ba8a051494357c12c"
-  integrity sha512-aX+gFgA5GHcDi89KG5keey2zf0WfZk/HAQotEamsK2kbey+8yGKcson0hbK8E+v0NArlCJQCqMP161YhV6ZXLg==
+  version "12.6.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.6.9.tgz#ffeee23afdc19ab16e979338e7b536fdebbbaeaf"
+  integrity sha512-+YB9FtyxXGyD54p8rXwWaN1EWEyar5L58GlGWgtH2I9rGmLGBQcw63+0jw+ujqVavNuO47S1ByAjm9zdHMnskw==
 
 "@types/pbkdf2@^3.0.0":
   version "3.0.0"

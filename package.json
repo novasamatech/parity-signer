@@ -22,7 +22,6 @@
   "dependencies": {
     "@plugnet/wasm-crypto-js": "^0.11.102",
     "@polkadot/reactnative-identicon": "^0.42.0-beta.26",
-    "@polkadot/ui-shared": "^0.42.0-beta.24",
     "@polkadot/util-crypto": "^0.94.1",
     "@react-native-community/netinfo": "^4.1.1",
     "@tradle/react-native-http": "^2.0.1",
