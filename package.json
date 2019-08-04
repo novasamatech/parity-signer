@@ -32,7 +32,6 @@
     "lodash": "^4.17.15",
     "node-libs-react-native": "^1.0.3",
     "prop-types": "^15.6.1",
-    "punycode": "^1.4.1",
     "react": "16.8.6",
     "react-native": "0.60.3",
     "react-native-camera": "^2.11.1",
