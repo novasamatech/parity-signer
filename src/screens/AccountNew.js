@@ -59,7 +59,6 @@ class AccountNewView extends React.Component {
       <View style={styles.body}>
         <KeyboardScrollView style={{ padding: 20 }}>
           <Background />
-<<<<<<< HEAD
           <ScrollView
             style={{ padding: 20 }}
             keyboardDismissMode="on-drag"
@@ -110,46 +109,6 @@ class AccountNewView extends React.Component {
               />
             </View>
           </ScrollView>
-=======
-          <View style={styles.top}>
-            <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-            <Text style={styles.title}>NETWORK</Text>
-            <NetworkButton network={network}/>
-            <Text style={styles.title}>ICON & ADDRESS</Text>
-            <AccountIconChooser
-              value={selected && selected.seed && selected.address}
-              onSelect={({ address, bip39, seed }) => {
-                accounts.updateNew({ address, seed, validBip39Seed: bip39 });
-              }}
-            />
-            <Text style={styles.title}>NAME</Text>
-            <TextInput
-              onChangeText={name => accounts.updateNew({ name })}
-              value={selected && selected.name}
-              placeholder="Enter a new account name"
-            />
-          </View>
-          <View style={styles.bottom}>
-            <Text style={styles.hintText}>
-              On the next step you will be asked to backup your account, get pen
-              and paper ready
-            </Text>
-            <Button
-              buttonStyles={styles.nextStep}
-              title="Next Step"
-              disabled={
-                !validateSeed(selected.seed, selected.validBip39Seed).valid
-              }
-              onPress={() => {
-                validateSeed(selected.seed, selected.validBip39Seed).valid &&
-                  navigation.navigate('AccountBackup', {
-                    isNew: true,
-                    isWelcome: navigation.getParam('isWelcome')
-                  });
-              }}
-            />
-          </View>
->>>>>>> 0c62bf3805a52fbf0ec76f3395187d9cc06d0e73
         </KeyboardScrollView>
       </View>
     );

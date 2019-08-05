@@ -87,7 +87,6 @@ export default class AccountIconChooser extends React.PureComponent {
     const isSelected = address.toLowerCase() === value.toLowerCase();
 
     return (
-<<<<<<< HEAD
       <TouchableOpacity
         key={index}
         style={[styles.iconBorder, iSelected ? styles.selected : {}]}
@@ -102,18 +101,6 @@ export default class AccountIconChooser extends React.PureComponent {
         {/* TODO Cater for Substrate */}
         <AccountIcon style={style} seed={'0x' + address} />
       </TouchableOpacity>
-=======
-        <TouchableOpacity
-          key={index}
-          style={[styles.iconBorder, isSelected ? styles.selected : {}]}
-          onPress={() => onSelect({ address, bip39, seed })}
-        >
-          <AccountIcon
-            style={styles.icon}
-            seed={'0x' + address}
-          />
-        </TouchableOpacity>
->>>>>>> 0c62bf3805a52fbf0ec76f3395187d9cc06d0e73
     );
   }
 
@@ -130,26 +117,6 @@ export default class AccountIconChooser extends React.PureComponent {
 
     return (
       <View style={styles.body}>
-<<<<<<< HEAD
-        <FlatList
-          data={icons}
-          extraData={value}
-          horizontal
-          keyExtractor={item => item.address}
-          renderItem={this.renderIcon}
-          style={styles.icons}
-        />
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.01}
-          style={styles.addressText}
-        >
-          {/* TODO Cater for Substrate */}
-          {value ? `0x${value}` : `Select an identicon`}
-        </Text>
-      </View>
-=======
         <View style={styles.firstRow}>
           <FlatList
             data={icons}
@@ -171,7 +138,6 @@ export default class AccountIconChooser extends React.PureComponent {
         </View>
           {this.renderAddress()}
         </View>
->>>>>>> 0c62bf3805a52fbf0ec76f3395187d9cc06d0e73
     );
   }
 }
