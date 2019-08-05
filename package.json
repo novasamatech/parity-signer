@@ -45,7 +45,6 @@
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^6.6.0",
     "react-navigation": "^3.11.1",
-    "reactotron-react-native": "^3.6.4",
     "readable-stream": "^3.4.0",
     "unstated": "^2.1.1",
     "vm-browserify": "1.1.0",
@@ -68,6 +67,7 @@
     "metro-react-native-babel-preset": "^0.55.0",
     "pre-git": "^3.14.0",
     "prettier": "1.12.1",
+    "reactotron-react-native": "^3.6.4",
     "react-test-renderer": "16.8.6"
   },
   "rnpm": {
