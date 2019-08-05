@@ -21,6 +21,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
+import fonts from "../fonts";
 import TouchableItem from './TouchableItem';
 
 class SecurityHeader extends React.Component {
@@ -60,15 +61,14 @@ const styles = StyleSheet.create({
   headerSecureIcon: {
     marginLeft: 0,
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingRight: 5,
     color: colors.bg_alert
   },
   headerTextRight: {
     marginLeft: 0,
     fontSize: 17,
-    fontFamily: 'Roboto',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: colors.bg_alert,
     paddingRight: 14,
   }

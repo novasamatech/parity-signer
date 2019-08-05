@@ -20,6 +20,7 @@ import React from 'react';
 import { Clipboard, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -92,26 +93,23 @@ const styles = StyleSheet.create({
     paddingBottom: 15
   },
   title: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
     paddingBottom: 20
   },
   titleTop: {
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20,
     textAlign: 'center'
   },
   hintText: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     textAlign: 'center',
     paddingTop: 20,
     color: colors.bg_text_sec,
-    fontWeight: '800',
     fontSize: 12
   },
   deleteButton: {

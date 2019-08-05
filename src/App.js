@@ -30,6 +30,7 @@ import { MenuProvider } from 'react-native-popup-menu';
 
 import '../ReactotronConfig';
 import colors from './colors';
+import fonts from './fonts';
 import Background from './components/Background';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
@@ -83,8 +84,7 @@ const globalStackNavigationOptions = {
   },
   headerBackTitleStyle: {
     fontSize: 20,
-    fontWeight: '500',
-    fontFamily: 'Manifold CF'
+    fontFamily: fonts.semiBold
   }
 };
 

@@ -17,6 +17,7 @@
 import React from 'react';
 import { StyleSheet, TextInput as TextInputOrigin } from 'react-native';
 import colors from '../colors';
+import fonts from "../fonts";
 
 export default class TextInput extends React.PureComponent {
   static defaultProps = {
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 24,
     height: 60,
+    fontFamily: fonts.regular,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,

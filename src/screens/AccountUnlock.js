@@ -22,6 +22,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import fonts from "../fonts";
 import Background from '../components/Background';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
@@ -171,25 +172,22 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
   title: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
     paddingBottom: 10
   },
   titleTop: {
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20,
     textAlign: 'center'
   },
   errorText: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     textAlign: 'center',
     color: colors.bg_alert,
-    fontWeight: '700',
     fontSize: 12,
     paddingBottom: 20
   },

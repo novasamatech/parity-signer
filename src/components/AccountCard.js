@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
+import fonts from '../fonts';
 import { NETWORK_LIST } from '../constants';
 import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
@@ -136,22 +137,20 @@ const styles = StyleSheet.create({
     padding: 5
   },
   titleText: {
-    fontFamily: 'Roboto',
-    fontSize: 20
+    fontFamily: fonts.semiBold,
+    fontSize: 20,
   },
   secondaryText: {
-    fontFamily: 'Roboto',
+    fontFamily: fonts.semiBold,
     color: colors.bg_text_sec,
-    fontWeight: '500',
     fontSize: 14
   },
   footerSeedType: {
-    fontFamily: 'Roboto',
+    fontFamily: fonts.regular,
     color: colors.card_bg
   },
   footerNetwork: {
-    fontFamily: 'Roboto',
+    fontFamily: fonts.semiBold,
     color: colors.card_bg,
-    fontWeight: 'bold'
   }
 });

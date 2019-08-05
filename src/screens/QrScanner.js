@@ -22,6 +22,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
@@ -192,23 +193,20 @@ const styles = StyleSheet.create({
   titleTop: {
     color: colors.bg_text,
     fontSize: 26,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     textAlign: 'center'
   },
   descTitle: {
     color: colors.bg_text,
     fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 10,
     textAlign: 'center'
   },
   descSecondary: {
     color: colors.bg_text,
     fontSize: 14,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20,
   }
 });
