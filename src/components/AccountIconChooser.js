@@ -16,7 +16,6 @@
 
 // @flow
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {
   FlatList,
@@ -25,19 +24,15 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import colors from '../colors';
-import { brainWalletAddress, words } from '../util/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import AccountIcon from './AccountIcon';
+import Address from './Address'
+import colors from '../colors';
+import fonts from "../fonts";
+import { brainWalletAddress, words } from '../util/native';
 
-export default class AccountIconChooser extends React.PureComponent<{
-  value: string,
-  onChange: () => any
-}> {
-  static propTypes = {
-    value: PropTypes.string,
-    onChange: PropTypes.func
-  };
-
+export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -45,13 +40,13 @@ export default class AccountIconChooser extends React.PureComponent<{
   }
 
   componentDidMount() {
-    this.refreshIcons();
+    this.refreshAccount();
   }
 
-  refreshIcons = async () => {
+  refreshAccount = async () => {
     try {
       const icons = await Promise.all(
-        Array(10)
+        Array(4)
           .join(' ')
           .split(' ')
           .map(async () => {
@@ -66,36 +61,52 @@ export default class AccountIconChooser extends React.PureComponent<{
           })
       );
 
-      this.setState({
-        icons
-      });
+      this.setState({ icons });
     } catch (e) {
       console.error(e);
     }
-  };
+  }
 
+  renderAddress = () => {
+    const {value} = this.props;
+
+    if (value) {
+      return (
+        <Address 
+          address={value}
+          style = {styles.addressText}
+        />
+      );
+    } else {
+      return <Text style={styles.addressSelectionText} >Select an icon.</Text>
+    }
+  }
+ 
   renderIcon = ({ item, index }) => {
     const { value, onSelect } = this.props;
     const { address, bip39, seed } = item;
-    const iSelected = address.toLowerCase() === value.toLowerCase();
-    const style = [styles.icon];
+    const isSelected = address.toLowerCase() === value.toLowerCase();
 
     return (
-      <TouchableOpacity
-        key={index}
-        style={[styles.iconBorder, iSelected ? styles.selected : {}]}
-        onPress={() =>
-          onSelect({
-            address,
-            bip39,
-            seed
-          })
-        }
-      >
-        {/* TODO Cater for Substrate */}
-        <AccountIcon style={style} seed={'0x' + address} />
-      </TouchableOpacity>
+        <TouchableOpacity
+          key={index}
+          style={[styles.iconBorder, isSelected ? styles.selected : {}]}
+          onPress={() => onSelect({ address, bip39, seed })}
+        >
+          {/* TODO Cater for Substrate */}
+          <AccountIcon
+            style={styles.icon}
+            seed={'0x' + address}
+          />
+        </TouchableOpacity>
     );
+  }
+
+  onRefresh = () => {
+    const { onSelect } = this.props;
+
+    this.refreshAccount();
+    onSelect({ address: '', bip39: false, seed: ''});
   }
 
   render() {
@@ -104,57 +115,69 @@ export default class AccountIconChooser extends React.PureComponent<{
 
     return (
       <View style={styles.body}>
-        <FlatList
-          data={icons}
-          extraData={value}
-          horizontal
-          keyExtractor={item => item.address}
-          renderItem={this.renderIcon}
-          style={styles.icons}
-        />
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.01}
-          style={styles.addressText}
-        >
-          {/* TODO Cater for Substrate */}
-          {value ? `0x${value}` : `Select an identicon`}
-        </Text>
-      </View>
+        <View style={styles.firstRow}>
+          <FlatList
+            data={icons}
+            extraData={value}
+            horizontal
+            keyExtractor={item => item.address}
+            renderItem={this.renderIcon}
+            style={styles.icons}
+          />
+          <TouchableOpacity
+            onPress={this.onRefresh}
+          >
+            <Icon
+              name={'refresh'}
+              size={35}
+              style={styles.refreshIcon}
+            />
+          </TouchableOpacity>
+        </View>
+          {this.renderAddress()}
+        </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   body: {
-    flex: 1,
-    flexDirection: 'column',
+    backgroundColor: colors.card_bg,
+    display: 'flex',
+    flexDirection:'column',
     marginBottom: 20,
     padding: 20,
-    backgroundColor: colors.card_bg
   },
-  icons: {
-    backgroundColor: colors.card_bg
+  firstRow: {
+    flex: 1,
+    display: 'flex',
+    flexDirection:'row',
+    alignItems: 'center',
+    marginBottom: 10
+  },
+  iconBorder: {
+     borderWidth: 6,
+    borderColor: colors.card_bg
   },
   icon: {
     width: 50,
+    backgroundColor: colors.card_bg,
     height: 50,
-    margin: 6,
-    padding: 5
+    padding: 5,
   },
-  iconBorder: {
-    borderWidth: 6,
-    borderColor: colors.card_bg
-  },
-  selected: {
-    borderColor: colors.bg
+  addressSelectionText: {
+    fontFamily: fonts.bold,
+    color: colors.bg,
+    fontSize: 14,
+    paddingLeft: 6
   },
   addressText: {
-    fontFamily: 'Roboto',
-    paddingTop: 20,
+    paddingLeft: 6
+  },
+  refreshIcon :{
     color: colors.bg,
-    fontWeight: '700',
-    fontSize: 14
+  },
+  selected: {
+    borderColor: colors.bg,
   }
 });

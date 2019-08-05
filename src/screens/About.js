@@ -19,6 +19,7 @@
 import React from 'react';
 import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
+import fonts from "../fonts";
 import packageJson from '../../package.json';
 
 export default class About extends React.PureComponent {
@@ -110,21 +111,19 @@ const styles = StyleSheet.create({
   titleTop: {
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20,
     textAlign: 'center'
   },
   title: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
     paddingBottom: 20
   },
   text: {
     marginBottom: 20,
-    fontFamily: 'Roboto',
+    fontFamily: fonts.regular,
     fontSize: 14,
     color: colors.card_bg
   }

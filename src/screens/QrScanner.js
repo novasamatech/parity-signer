@@ -22,6 +22,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
@@ -43,6 +44,11 @@ export default class Scanner extends React.PureComponent {
                 if (scannerStore.isBusy()) {
                   return;
                 }
+
+                // TODO: Actually use this to read UOS
+                // type is Uint8Array or null
+                const bytes = rawDataToU8A(txRequestData.rawData);
+
                 try {
                   const data = JSON.parse(txRequestData.data);
                   if (data.action === undefined) {
@@ -187,23 +193,84 @@ const styles = StyleSheet.create({
   titleTop: {
     color: colors.bg_text,
     fontSize: 26,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     textAlign: 'center'
   },
   descTitle: {
     color: colors.bg_text,
     fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 10,
     textAlign: 'center'
   },
   descSecondary: {
     color: colors.bg_text,
     fontSize: 14,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20,
   }
 });
+
+/*
+Example Full Raw Data
+---
+4 // indicates binary
+37 // indicates data length
+00 // indicates multipart
+0001 // frame count
+0000 // first frame
+--- UOS Specific Data
+53 // indicates payload is for Substrate
+01 // crypto: sr25519
+00 // indicates action: signData
+f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
+544849532049532053504152544121 // actual payload message to sign (should be SCALE)
+0 // terminator
+--- SQRC Filler Bytes
+ec11ec11ec11ec // SQRC filler bytes
+*/
+function rawDataToU8A(rawData) {
+  if (!rawData) {
+    return null;
+  }
+
+  // Strip filler bytes padding at the end
+  if (rawData.substr(-2) === 'ec') {
+    rawData = rawData.substr(0, rawData.length - 2);
+  }
+
+  while (rawData.substr(-4) === 'ec11') {
+    rawData = rawData.substr(0, rawData.length - 4);
+  }
+
+  // Verify that the QR encoding is binary and it's ending with a proper terminator
+  if (rawData.substr(0, 1) !== '4' || rawData.substr(-1) !== '0') {
+    return null;
+  }
+
+  // Strip the encoding indicator and terminator for ease of reading
+  rawData = rawData.substr(1, rawData.length - 2);
+
+  const length8 = parseInt(rawData.substr(0, 2), 16) || 0;
+  const length16 = parseInt(rawData.substr(0, 4), 16) || 0;
+  let length = 0;
+
+  // Strip length prefix
+  if (length8 * 2 + 2 === rawData.length) {
+    rawData = rawData.substr(2);
+    length = length8;
+  } else if (length16 * 2 + 4 === rawData.length) {
+    rawData = rawData.substr(4);
+    length = length16;
+  } else {
+    return null;
+  }
+
+  const bytes = new Uint8Array(length);
+
+  for (let i = 0; i < length; i++) {
+    bytes[i] = parseInt(rawData.substr(i * 2, 2), 16);
+  }
+
+  return bytes;
+}

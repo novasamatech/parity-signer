@@ -20,6 +20,7 @@ import React from 'react';
 import { Alert, AppState, Clipboard, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -102,15 +103,7 @@ class AccountBackupView extends React.PureComponent {
             );
           }}
         >
-          <Text
-            style={{
-              padding: 10,
-              minHeight: 160,
-              lineHeight: 26,
-              fontSize: 20,
-              backgroundColor: colors.card_bg
-            }}
-          >
+          <Text style={styles.seedText}>
             {selected.seed}
           </Text>
         </TouchableItem>
@@ -167,27 +160,32 @@ const styles = StyleSheet.create({
     paddingBottom: 15
   },
   title: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
     paddingBottom: 20
   },
   titleTop: {
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20,
     textAlign: 'center'
   },
   hintText: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     textAlign: 'center',
     color: colors.bg_text_sec,
-    fontWeight: '700',
     fontSize: 12,
     paddingBottom: 20
+  },
+  seedText: {
+    padding: 10,
+    minHeight: 160,
+    lineHeight: 26,
+    fontSize: 20,
+    fontFamily: fonts.regular,
+    backgroundColor: colors.card_bg
   },
   nextStep: {
     marginTop: 20

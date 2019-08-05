@@ -21,6 +21,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -105,9 +106,8 @@ export class MessageDetailsView extends React.PureComponent {
             : this.props.data}
         </Text>
         <Button
-          buttonStyles={{ backgroundColor: colors.bg_positive, height: 60 }}
+          buttonStyles={{ height: 60 }}
           title="Sign Message"
-          textStyles={{ color: colors.card_text }}
           onPress={() => this.props.onNext()}
         />
       </ScrollView>
@@ -134,15 +134,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20
   },
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20
   },
   message: {
@@ -151,6 +149,7 @@ const styles = StyleSheet.create({
     height: 120,
     lineHeight: 26,
     fontSize: 20,
+    fontFamily: fonts.regular,
     backgroundColor: colors.card_bg
   },
   wrapper: {
