@@ -12,8 +12,8 @@
     "build-rust-android": "cd rust/signer && make android",
     "ios": "yarn run build-rust-ios && react-native run-ios",
     "android": "yarn run build-rust-android && react-native run-android",
-    "start": "yarn run ios",
-    "postinstall": "npx jetify &&  npx rn-nodeify --install --hack",
+    "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
+    "postinstall": "jetify",
     "test": "jest",
     "lint": "eslint",
     "commit": "commit-wizard"
