@@ -24,19 +24,20 @@ import {
 
 import colors from '../colors';
 import fonts from "../fonts";
+import {NetworkProtocols} from '../constants'
 
 export default function Address (props) {
-  const {address, short = false ,style = {}} = props;
+  const {address, networkProtocol = NetworkProtocols.SUBSTRATE, short = false ,style = {}} = props;
+  const prefix = networkProtocol === NetworkProtocols.ETHEREUM ? '0x' : '';
   let result = address;
 
   if (short) {
     result = `${address.slice(0, 6)}…${address.slice(-6)}`;
   }
 
-  /* TODO Cater for Substrate */
   return (
       <Text numberOfLines={1} style={[style, styles.secondaryText]}>
-        0x{result}
+        {prefix}{result}
       </Text>
   );
 }

@@ -17,35 +17,26 @@ export const EthereumNetworkKeys = Object.freeze({
 });
 
 export const SubstrateNetworkKeys = Object.freeze({
-  SUBSTRATE: 'substrate'
+  POLKADOT: 's0',
+  KUSAMA: 's2'
 });
 
-export const SubstratePrefixKeys = Object.freeze({
-  KUSAMA: 'kusama',
-  POLKADOT: 'polkadot',
-});
-
-export const SubstratePrefixes = Object.freeze({
-  [SubstratePrefixKeys.KUSAMA]: {
-    prefix: 2,
-    color: '#1e1e1e'
-  },
-  [SubstratePrefixKeys.POLKADOT]: {
-    prefix: 0,
-    color: '#e6007a'
-  }
-});
-
-const SUBSTRATE_NETWORK_LIST = {
-  [SubstrateNetworkKeys.SUBSTRATE]: {
-    title: 'Substrate',
-    protocol: NetworkProtocols.SUBSTRATE,
+const substrateNetworkBase = {
+  [SubstrateNetworkKeys.KUSAMA]: {
     color: '#4C4646',
-    secondaryColor: colors.card_bg
+    genesisHash: 0x123,
+    prefix: 2,
+    title: 'Kusama'
+  },
+  [SubstrateNetworkKeys.POLKADOT]: {
+    color: '#e6007a',
+    genesisHash: 0x456,
+    prefix: 0,
+    title: 'Polkadot'
   }
 };
 
-const ethereumNetworkRaw = {
+const ethereumNetworkBase = {
   [EthereumNetworkKeys.FRONTIER]: {
     title: 'Ethereum',
     color: '#977CF6',
@@ -68,13 +59,23 @@ const ethereumNetworkRaw = {
 };
 
 export const ETHEREUM_NETWORK_LIST = mapValues(
-  ethereumNetworkRaw,
-  (ethereumNetwork, ethereumChainId) =>
-    defaults(ethereumNetwork, {
+  ethereumNetworkBase,
+  (ethereumNetworkKey, ethereumChainId) =>
+    defaults(ethereumNetworkKey, {
       protocol: NetworkProtocols.ETHEREUM,
       color: '#F2E265',
       secondaryColor: colors.card_text,
-      ethereumChainId: ethereumChainId
+      ethereumChainId
+    })
+);
+
+export const SUBSTRATE_NETWORK_LIST = mapValues(
+  substrateNetworkBase,
+  (substrateNetworkKey) =>
+    defaults(substrateNetworkKey, {
+      color: '#4C4646',
+      protocol: NetworkProtocols.SUBSTRATE,
+      secondaryColor: colors.card_bg,
     })
 );
 

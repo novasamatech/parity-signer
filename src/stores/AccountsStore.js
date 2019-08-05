@@ -22,16 +22,13 @@ import { loadAccounts, saveAccount } from '../util/db';
 import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
-  // `address` is a string for Ethereum accounts
-  // or a mapping { [SubstratePrefixKey] : address } e.g: { ['kusama']: 'FUwidsflk...', ['polkadot']: 'Exttskfj...'}
-  address: string | {[index:string]: string},
+  address: string,
   archived: boolean,
   createdAt: number,
   encryptedSeed: string,
   name: string,
   networkKey: string,
   protocol: string,
-  publicKey: number,
   seed: string,
   updatedAt: number,
   validBip39Seed: boolean
