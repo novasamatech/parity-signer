@@ -60,18 +60,16 @@ class AccountNewView extends React.Component {
           <Background />
           <View style={styles.top}>
             <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-            <Text style={styles.title}>CHOOSE NETWORK</Text>
-            <NetworkButton network={network} />
-            <Text style={[styles.title, { marginTop: 20 }]}>
-              CHOOSE AN IDENTICON
-            </Text>
+            <Text style={styles.title}>NETWORK</Text>
+            <NetworkButton network={network}/>
+            <Text style={styles.title}>ICON & ADDRESS</Text>
             <AccountIconChooser
               value={selected && selected.seed && selected.address}
               onSelect={({ address, bip39, seed }) => {
                 accounts.updateNew({ address, seed, validBip39Seed: bip39 });
               }}
             />
-            <Text style={styles.title}>ACCOUNT NAME</Text>
+            <Text style={styles.title}>NAME</Text>
             <TextInput
               onChangeText={name => accounts.updateNew({ name })}
               value={selected && selected.name}
