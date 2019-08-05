@@ -6591,13 +6591,6 @@ react-native-safe-area-view@^0.14.1:
   version "1.0.0"
   resolved "git+https://github.com/debris/react-native-secure-storage.git#7751c428cb2ab3b292fd9942eef40a43c1611363"
 
-react-native-simple-picker@^2.1.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/react-native-simple-picker/-/react-native-simple-picker-2.3.1.tgz#a5bea2b26309575bb14414604cf99a6f19a0aa5a"
-  integrity sha512-CN5qIAre2qMeNo8JD0lAs+HY+UatoHbVFdu+0afCl+yXNHWGERCK4CQveArCL32vvVLPmOQuED+pKXSnAJRIRg==
-  dependencies:
-    prop-types "^15.5.10"
-
 react-native-svg@^9.5.3:
   version "9.5.3"
   resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-9.5.3.tgz#2389f3ffd700c6441166496a1aeade31ead89c59"
