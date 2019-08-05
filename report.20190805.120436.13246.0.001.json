@@ -1,0 +1,310 @@
+
+{
+  "header": {
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20190805.120436.13246.0.001.json",
+    "dumpEventTime": "2019-08-05T12:04:36Z",
+    "dumpEventTimeStamp": "1564999476691",
+    "processId": 13246,
+    "cwd": "/home/thib/github/paritytech/parity-signer",
+    "commandLine": [
+      "/home/thib/.nvm/versions/node/v11.15.0/bin/node",
+      "/home/thib/github/paritytech/parity-signer/node_modules/jest-worker/build/workers/processChild.js"
+    ],
+    "nodejsVersion": "v11.15.0",
+    "glibcVersionRuntime": "2.23",
+    "glibcVersionCompiler": "2.12",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "linux",
+    "componentVersions": {
+      "node": "11.15.0",
+      "v8": "7.0.276.38-node.19",
+      "uv": "1.27.0",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "67",
+      "nghttp2": "1.37.0",
+      "napi": "4",
+      "llhttp": "1.1.1",
+      "http_parser": "2.8.0",
+      "openssl": "1.1.1b",
+      "cldr": "34.0",
+      "icu": "63.1",
+      "tz": "2018e",
+      "unicode": "11.0"
+    },
+    "release": {
+      "name": "node",
+      "headersUrl": "https://nodejs.org/download/release/v11.15.0/node-v11.15.0-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v11.15.0/node-v11.15.0.tar.gz"
+    },
+    "osName": "Linux",
+    "osRelease": "4.15.0-55-generic",
+    "osVersion": "#60~16.04.2-Ubuntu SMP Thu Jul 4 09:03:09 UTC 2019",
+    "osMachine": "x86_64",
+    "host": "Thib"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x0000000000a702fd",
+      "symbol": "report::TriggerNodeReport(v8::Isolate*, node::Environment*, char const*, char const*, std::string const&, v8::Local<v8::String>) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x000000000095ccb3",
+      "symbol": "node::OnFatalError(char const*, char const*) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b3dbde",
+      "symbol": "v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, bool) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000b3de14",
+      "symbol": "v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, bool) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f3ce52",
+      "symbol": " [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f3cf58",
+      "symbol": "v8::internal::Heap::CheckIneffectiveMarkCompact(unsigned long, double) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f49678",
+      "symbol": "v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::GCCallbackFlags) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f4a18b",
+      "symbol": "v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f4cec1",
+      "symbol": "v8::internal::Heap::AllocateRawWithRetryOrFail(int, v8::internal::AllocationSpace, v8::internal::AllocationAlignment) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x0000000000f170f4",
+      "symbol": "v8::internal::Factory::NewFillerObject(int, bool, v8::internal::AllocationSpace) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x00000000011cd3fe",
+      "symbol": "v8::internal::Runtime_AllocateInNewSpace(int, v8::internal::Object**, v8::internal::Isolate*) [/home/thib/.nvm/versions/node/v11.15.0/bin/node]"
+    },
+    {
+      "pc": "0x000007021e2cfc5d",
+      "symbol": ""
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 1509171200,
+    "totalCommittedMemory": 1502911168,
+    "usedMemory": 1333533416,
+    "availableMemory": 36370280,
+    "memoryLimit": 1526909922,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 524288,
+        "committedMemory": 42224,
+        "capacity": 515584,
+        "used": 33520,
+        "available": 482064
+      },
+      "new_space": {
+        "memorySize": 33554432,
+        "committedMemory": 30460632,
+        "capacity": 16498688,
+        "used": 1654000,
+        "available": 14844688
+      },
+      "old_space": {
+        "memorySize": 1411584000,
+        "committedMemory": 1409700744,
+        "capacity": 1274607472,
+        "used": 1271110696,
+        "available": 3496776
+      },
+      "code_space": {
+        "memorySize": 2621440,
+        "committedMemory": 2528128,
+        "capacity": 2377856,
+        "used": 2377856,
+        "available": 0
+      },
+      "map_space": {
+        "memorySize": 2109440,
+        "committedMemory": 1401840,
+        "capacity": 1006400,
+        "used": 1006400,
+        "available": 0
+      },
+      "large_object_space": {
+        "memorySize": 58777600,
+        "committedMemory": 58777600,
+        "capacity": 74897696,
+        "used": 57350944,
+        "available": 17546752
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 147.241,
+    "kernelCpuSeconds": 1.64571,
+    "cpuConsumptionPercent": 102.68,
+    "maxRss": 1590702080,
+    "pageFaults": {
+      "IORequired": 283,
+      "IONotRequired": 603008
+    },
+    "fsActivity": {
+      "reads": 15808,
+      "writes": 16
+    }
+  },
+  "uvthreadResourceUsage": {
+    "userCpuSeconds": 81.0759,
+    "kernelCpuSeconds": 0.81923,
+    "cpuConsumptionPercent": 56.4794,
+    "fsActivity": {
+      "reads": 15808,
+      "writes": 16
+    }
+  },
+  "libuv": [
+  ],
+  "environmentVariables": {
+    "XDG_SEAT_PATH": "/org/freedesktop/DisplayManager/Seat0",
+    "XDG_CONFIG_DIRS": "/etc/xdg/xdg-cinnamon:/etc/xdg",
+    "LC_TELEPHONE": "de_DE.UTF-8",
+    "LANG": "en_US.UTF-8",
+    "DISPLAY": ":0",
+    "SHLVL": "1",
+    "LOGNAME": "thib",
+    "LANGUAGE": "en_US",
+    "MANDATORY_PATH": "/usr/share/gconf/cinnamon.mandatory.path",
+    "LC_NAME": "de_DE.UTF-8",
+    "XDG_VTNR": "7",
+    "USER": "thib",
+    "XAUTHORITY": "/home/thib/.Xauthority",
+    "QT_LINUX_ACCESSIBILITY_ALWAYS_ON": "1",
+    "QT_QPA_PLATFORMTHEME": "qgnomeplatform",
+    "XDG_GREETER_DATA_DIR": "/var/lib/lightdm-data/thib",
+    "XDG_SESSION_ID": "c2",
+    "DESKTOP_AUTOSTART_ID": "10836b1650b13d6cf0156499616655738700000018890012",
+    "DESKTOP_SESSION": "cinnamon",
+    "XDG_SESSION_DESKTOP": "cinnamon",
+    "GDMSESSION": "cinnamon",
+    "GNOME_DESKTOP_SESSION_ID": "this-is-deprecated",
+    "DEFAULTS_PATH": "/usr/share/gconf/cinnamon.default.path",
+    "LC_NUMERIC": "de_DE.UTF-8",
+    "LC_IDENTIFICATION": "de_DE.UTF-8",
+    "LC_PAPER": "de_DE.UTF-8",
+    "LC_MONETARY": "de_DE.UTF-8",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:abstract=/tmp/dbus-9ywslmZVGt,guid=00429c3013bf9939522bd0a05d47f246",
+    "LC_MEASUREMENT": "de_DE.UTF-8",
+    "VTE_VERSION": "4205",
+    "XDG_DATA_DIRS": "/home/thib/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share/:/usr/share/cinnamon:/usr/share/gnome:/home/thib/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share:/var/lib/snapd/desktop",
+    "GTK_OVERLAY_SCROLLING": "1",
+    "PWD": "/home/thib/github/paritytech/parity-signer",
+    "QT_STYLE_OVERRIDE": "gtk",
+    "QT_ACCESSIBILITY": "1",
+    "GDM_LANG": "en_US",
+    "XDG_SESSION_TYPE": "x11",
+    "SHELL": "/usr/bin/zsh",
+    "WINDOWID": "75497478",
+    "TERM": "xterm-256color",
+    "SESSION_MANAGER": "local/Thib:@/tmp/.ICE-unix/1889,unix/Thib:/tmp/.ICE-unix/1889",
+    "GTK_MODULES": "gail:atk-bridge",
+    "SSH_AGENT_PID": "1946",
+    "PATH": "/home/thib/.nvm/versions/node/v11.15.0/bin:/home/thib/.cargo/bin:/home/thib/bin:/home/thib/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/thib/Android/Sdk/emulator:/home/thib/Android/Sdk/tools:/home/thib/Android/Sdk/tools/bin:/home/thib/Android/Sdk/platform-tools:/usr/lib/jvm/java-8-openjdk-amd64/bin",
+    "SSH_AUTH_SOCK": "/run/user/1000/keyring/ssh",
+    "HOME": "/home/thib",
+    "XDG_CURRENT_DESKTOP": "X-Cinnamon",
+    "LC_ADDRESS": "de_DE.UTF-8",
+    "XDG_RUNTIME_DIR": "/run/user/1000",
+    "XDG_SESSION_PATH": "/org/freedesktop/DisplayManager/Session0",
+    "XDG_SEAT": "seat0",
+    "OLDPWD": "/home/thib/github/paritytech/parity-signer",
+    "NVM_CD_FLAGS": "-q",
+    "NVM_DIR": "/home/thib/.nvm",
+    "NVM_BIN": "/home/thib/.nvm/versions/node/v11.15.0/bin",
+    "ANDROID_HOME": "/home/thib/Android/Sdk",
+    "JAVA_HOME": "/usr/lib/jvm/java-8-openjdk-amd64",
+    "NDK_HOME": "/home/thib/Android/Sdk/ndk-bundle",
+    "ZSH": "/home/thib/.oh-my-zsh",
+    "PAGER": "less",
+    "LESS": "-R",
+    "LSCOLORS": "Gxfxcxdxbxegedabagacad",
+    "LS_COLORS": "rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:",
+    "LC_CTYPE": "en_US.UTF-8",
+    "_": "/home/thib/.nvm/versions/node/v11.15.0/bin/react-native",
+    "FORCE_COLOR": "1",
+    "BABEL_ENV": "undefined"
+  },
+  "userLimits": {
+    "core_file_size_blocks": {
+      "soft": 0,
+      "hard": "unlimited"
+    },
+    "data_seg_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "file_size_blocks": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_locked_memory_bytes": {
+      "soft": 65536,
+      "hard": 65536
+    },
+    "max_memory_size_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "open_files": {
+      "soft": 1048576,
+      "hard": 1048576
+    },
+    "stack_size_bytes": {
+      "soft": 8388608,
+      "hard": "unlimited"
+    },
+    "cpu_time_seconds": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_user_processes": {
+      "soft": 30755,
+      "hard": 30755
+    },
+    "virtual_memory_kbytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    }
+  },
+  "sharedObjects": [
+    "/lib/x86_64-linux-gnu/libdl.so.2",
+    "/lib/x86_64-linux-gnu/librt.so.1",
+    "/usr/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "/lib/x86_64-linux-gnu/libm.so.6",
+    "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/lib/x86_64-linux-gnu/libpthread.so.0",
+    "/lib/x86_64-linux-gnu/libc.so.6",
+    "/lib64/ld-linux-x86-64.so.2"
+  ]
+}
