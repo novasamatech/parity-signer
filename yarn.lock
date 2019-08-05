@@ -892,19 +892,19 @@
     "@polkadot/util" "^1.0.1"
     "@polkadot/util-crypto" "^1.0.1"
 
-"@polkadot/reactnative-identicon@^0.42.0-beta.26":
-  version "0.42.0-beta.26"
-  resolved "https://registry.yarnpkg.com/@polkadot/reactnative-identicon/-/reactnative-identicon-0.42.0-beta.26.tgz#256bfe0619baae828ceeac9d15b22a2c5ea30be6"
-  integrity sha512-85ODyfw2TqGw/IV6UDsUp7NeemKaSO0Kad1rLGxBAxe2lXIldtjA9fbpaJs7ik81sa5YHgVDAInxOtc+S3wgoQ==
+"@polkadot/reactnative-identicon@^0.42.0-beta.28":
+  version "0.42.0-beta.28"
+  resolved "https://registry.yarnpkg.com/@polkadot/reactnative-identicon/-/reactnative-identicon-0.42.0-beta.28.tgz#0a1b4047050b225d7605a64a0db0a6c87d0a8d6d"
+  integrity sha512-Cj7O2C0z2Zv3OX5lNE92KTvfrtd1DwXfkcU3P4YapIG7TI2RWiDyhYOzM+YGLGcSs80W13805U16+UfScaXqRw==
   dependencies:
     "@babel/runtime" "^7.5.5"
-    "@polkadot/ui-shared" "^0.42.0-beta.26"
+    "@polkadot/ui-shared" "^0.42.0-beta.28"
     react-native-svg "^9.5.3"
 
-"@polkadot/ui-shared@^0.42.0-beta.26":
-  version "0.42.0-beta.26"
-  resolved "https://registry.yarnpkg.com/@polkadot/ui-shared/-/ui-shared-0.42.0-beta.26.tgz#3bb15e298e70fe38f0b7ec8e66206b706817fd4e"
-  integrity sha512-y/GcX2G0JH5bOgVB5b3lpXyd02yv5EU3PKGahfCXAhrOXPg+NDxUTj6A5yAomcIjxmo94UIAwcAx2j7CVhRCoA==
+"@polkadot/ui-shared@^0.42.0-beta.28":
+  version "0.42.0-beta.28"
+  resolved "https://registry.yarnpkg.com/@polkadot/ui-shared/-/ui-shared-0.42.0-beta.28.tgz#da7f06b89288cd23b250b456c2b912190e374071"
+  integrity sha512-U6OeFkTFlVWn/04iG4oN3mVePK5WjhA8kZCvfoEu2Adkqv9Axs1vAHQTdPR87CRasd1WKRysg4SiXbEFboBlLw==
   dependencies:
     "@babel/runtime" "^7.5.5"
     "@types/color" "^3.0.0"
@@ -3934,11 +3934,6 @@ imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
   integrity sha1-khi5srkoojixPcT7a21XbyMUU+o=
-
-indexof@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/indexof/-/indexof-0.0.1.tgz#82dc336d232b9062179d05ab3293a66059fd435d"
-  integrity sha1-gtwzbSMrkGIXnQWrMpOmYFn9Q10=
 
 inflight@^1.0.4:
   version "1.0.6"
@@ -8122,12 +8117,10 @@ vlq@^1.0.0:
   resolved "https://registry.yarnpkg.com/vlq/-/vlq-1.0.1.tgz#c003f6e7c0b4c1edd623fd6ee50bbc0d6a1de468"
   integrity sha512-gQpnTgkubC6hQgdIcRdYGDSDc+SaujOdyesZQMv6JlfQee/9Mp0Qhnys6WxDWvQnL5WZdT7o2Ul187aSt0Rq+w==
 
-vm-browserify@0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-0.0.4.tgz#5d7ea45bbef9e4a6ff65f95438e0a87c357d5a73"
-  integrity sha1-XX6kW7755Kb/ZflUOOCofDV9WnM=
-  dependencies:
-    indexof "0.0.1"
+vm-browserify@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.0.tgz#bd76d6a23323e2ca8ffa12028dc04559c75f9019"
+  integrity sha512-iq+S7vZJE60yejDYM0ek6zg308+UZsdtPExWP9VZoCFCz1zkJoXFnAX7aZfd/ZwrkidzdUZL0C/ryW+JwAiIGw==
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"
