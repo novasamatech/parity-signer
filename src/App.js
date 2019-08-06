@@ -17,6 +17,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
+
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import {
@@ -28,12 +29,13 @@ import {
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
-import '../ReactotronConfig';
+import '../shim';
+import Background from './components/Background';
 import colors from './colors';
 import fonts from './fonts';
-import Background from './components/Background';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
+import '../ReactotronConfig';
 import About from './screens/About';
 import AccountBackup from './screens/AccountBackup';
 import AccountDetails from './screens/AccountDetails';
