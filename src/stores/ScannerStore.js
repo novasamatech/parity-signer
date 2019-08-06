@@ -42,7 +42,8 @@ type ScannerState = {
   dataToSign: string,
   signedData: string,
   scanErrorMsg: string,
-  signedTxList: [SignedTX]
+  signedTxList: [SignedTX],
+  unsignedData: {}
 };
 
 const defaultState = {
@@ -135,7 +136,9 @@ export default class ScannerStore extends Container<ScannerState> {
           throw new Error('we cannot handle the payload: ', rawData);
       }
 
-      return data;
+      this.setState({
+        unsignedData: data
+      });
     } catch (e) {
       scannerStore.setBusy();
       throw new Error('we cannot handle the payload: ', rawData);
