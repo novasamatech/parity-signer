@@ -170,13 +170,13 @@ export default class ScannerStore extends Container<ScannerState> {
     }
   }
 
-  async setData(data, accountsStore) {
+  async setData(accountsStore) {
     // - Cold Signer SHOULD (at the user's discretion) sign the message, immortal_payload, or payload if payload is of length 256 bytes or fewer.
     switch (data.action) {
       case 'signTransaction':
-        return await this.setTXRequest(data, accountsStore);
+        return await this.setTXRequest(this.state.unsignedData, accountsStore);
       case 'signData':
-        return await this.setDataToSign(data, accountsStore);
+        return await this.setDataToSign(this.state.unsignedData, accountsStore);
       default:
         throw new Error(
           `Scanned QR should contain either transaction or a message to sign`
