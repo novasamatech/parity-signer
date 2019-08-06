@@ -17,8 +17,8 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 import colors from '../colors';
+import fonts from "../fonts";
 
 export default class Security extends React.PureComponent {
   render() {
@@ -51,8 +51,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20
   },
   card: {
@@ -64,13 +63,12 @@ const styles = StyleSheet.create({
   },
   cardText: {
     color: colors.card_bg,
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     fontSize: 22,
-    fontWeight: 'bold'
   },
   text: {
     marginBottom: 20,
-    fontFamily: 'Roboto',
+    fontFamily: fonts.regular,
     fontSize: 14,
     color: colors.card_bg
   },

@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
+import fonts from "../fonts";
 
 const WEI_IN_ETH = 1000000000000000000;
 
@@ -106,21 +107,18 @@ const styles = StyleSheet.create({
   },
   titleText: {
     textAlign: 'center',
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     fontSize: 14,
-    fontWeight: '600',
     color: colors.card_bg_text
   },
   secondaryText: {
     textAlign: 'center',
     color: colors.card_bg_text,
-    fontFamily: 'Manifold CF',
-    fontWeight: '500',
+    fontFamily: fonts.semiBold,
     fontSize: 12
   },
   footerText: {
     color: colors.card_bg,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold'
+    fontFamily: fonts.bold
   }
 });

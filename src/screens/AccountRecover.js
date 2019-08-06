@@ -27,6 +27,7 @@ import {
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
@@ -189,18 +190,16 @@ const styles = StyleSheet.create({
     flex: 1
   },
   titleTop: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontWeight: 'bold',
     paddingBottom: 20,
     textAlign: 'center'
   },
   title: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
     paddingBottom: 20
   }
 });

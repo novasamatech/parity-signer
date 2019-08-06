@@ -20,6 +20,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import colors from '../colors';
+import fonts from "../fonts";
 import { empty } from '../util/account';
 import { loadAccounts, loadAccounts_v1, loadToCAndPPConfirmation, saveAccount } from '../util/db';
 
@@ -81,10 +82,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   titleTop: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontWeight: 'bold',
     paddingBottom: 20,
     textAlign: 'center'
   }

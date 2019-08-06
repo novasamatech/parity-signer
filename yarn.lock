@@ -6587,9 +6587,9 @@ react-native-safe-area-view@^0.14.1:
   dependencies:
     debounce "^1.2.0"
 
-"react-native-secure-storage@git+https://github.com/debris/react-native-secure-storage.git":
+"react-native-secure-storage@git+https://github.com/paritytech/react-native-secure-storage.git":
   version "1.0.0"
-  resolved "git+https://github.com/debris/react-native-secure-storage.git#7751c428cb2ab3b292fd9942eef40a43c1611363"
+  resolved "git+https://github.com/paritytech/react-native-secure-storage.git#3263537d637ddfc67e243b40ba50e5d05367d20b"
 
 react-native-svg@^9.5.3:
   version "9.5.3"

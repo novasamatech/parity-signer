@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
+import fonts from "../fonts";
 
 export default class HeaderLeftHome extends React.PureComponent {
   render() {
@@ -35,9 +36,9 @@ const styles = StyleSheet.create({
   },
   headerTextLeft: {
     flex: 1,
-    paddingLeft: 10,
+    paddingLeft: 4,
     fontSize: 25,
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.regular,
     color: colors.bg_text
   }
 });

@@ -22,6 +22,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -213,8 +214,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     flexDirection: 'column',
     justifyContent: 'center'
   },
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   onboardingText: {
-    fontFamily: 'Roboto',
+    fontFamily: fonts.regular,
     fontSize: 20,
     color: colors.bg_text_sec
   }
