@@ -22,14 +22,13 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import PopupMenu from '../components/PopupMenu';
+import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import { accountId } from '../util/account';
-import PopupMenu from '../components/PopupMenu';
-import Identicon from '@polkadot/reactnative-identicon';
 
 export default class AccountList extends React.PureComponent {
   static navigationOptions = {
@@ -132,25 +131,6 @@ class AccountListView extends React.PureComponent {
           </View>
         </View>
         {hasNoAccount && this.showOnboardingMessage()}
-        <Text style={styles.title}>Give ma a Polkadot identicon</Text>
-        <Identicon
-          value={'5D72CBH9DSi6gFoDY6DFNBtWVnk9Jt2mAs6aYPEV6HSNrmQy'}
-          size={64}
-        />
-        <Text style={styles.title}>small</Text>
-        <Identicon
-          value={'5D72CBH9DSi6gFoDY6DFNBtWVnk9Jt2mAs6aYPEV6HSNrmQy'}
-          size={32}
-        />
-        <Text style={styles.title}>Empty</Text>
-        <Identicon
-          value={''}
-          size={64}
-        />
-        <Text style={styles.title}>Empty small</Text>
-        <Identicon
-          size={32}
-        />
         <FlatList
           ref={list => {
             this.list = list;
