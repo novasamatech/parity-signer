@@ -16,7 +16,6 @@
 
 'use strict';
 
-import Payload from '@polkadot/api/SignerPayload';
 import { encodeAddress } from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -53,83 +52,9 @@ export default class Scanner extends React.PureComponent {
                   return;
                 }
 
-                const bytes = rawDataToU8A(txRequestData.rawData);
-                const hex = bytes.map(byte => byte.toString(16));
-                const uosAfterFrames = hex.slice(5); // FIXME handle multipart
-
-                const zerothByte = uosAfterFrames[0];
-                const firstByte = uosAfterFrames[1];
-                const secondByte = uosAfterFrames[2];
-                let action;
-                let address;
-                let data = {};
-                data['data'] = {}; // for consistency with legacy data format.
-
                 try {
-                  // decode payload appropriately via UOS
-                  switch (zerothByte) {
-                    case 45: // Ethereum UOS payload
-                      action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
-                      address = uosAfterFrames.slice(2, 22);
-
-                      data['action'] = action;
-                      data['data']['account'] = account;
-
-                      if (action === 'signData') {
-                        data['data']['rlp'] = uosAfterFrames[13];
-                      } else if (action === 'signTransaction') {
-                        data['data']['data'] = rawAfterFrames[13];
-                      } else {
-                        throw new Error('Could not determine action type.');
-                      }
-                      break;
-                    case 53: // Substrate UOS payload
-                      const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
-                      action = secondByte === 0 || secondByte === 1 ? 'signData': secondByte === 2 || secondByte === 3 ? 'signTransaction' : null;
-
-                      const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
-                      const ss58Encoded = encodeAddress(publicKeyAsBytes);
-                      const encryptedData: Uint8Array = uosAfterFrames.slice(35);
-
-                      data['action'] = action;
-                      data['data']['crypto'] = crypto;
-                      data['data']['account'] = ss58Encoded;
-
-                      switch(secondByte) {
-                        case 0:
-                          data['isHash'] = false;
-                          data['data']['data'] = Payload(encryptedData);
-                          break;
-                        case 1:
-                          data['isHash'] = true;
-                          data['data']['data'] = Payload(encryptedData);
-                          break;
-                        case 2:
-                          data['isHash'] = false;
-                          data['data']['data'] = Payload(encryptedData);
-                          break;
-                        case 3: // Cold Signer should attempt to decode message to utf8
-                          data['data']['data'] = decodeToString(encryptedData);
-                          break;
-                        default:
-                          break;
-                      }
-                      break;
-                    default:
-                      throw new Error('we cannot handle the payload: ', txRequestData);
-                  }
-
-                  if (!(await scannerStore.setData(data, accountsStore))) {
-                    return;
-                  } else {
-                    if (scannerStore.getType() === 'transaction') {
-                      this.props.navigation.navigate('TxDetails');
-                    } else { // message
-                      this.props.navigation.navigate('MessageDetails');
-                    }
-                  }
+                  const data = scannerStore.parseRawData(txRequestData.rawData);
                 } catch (e) {
-                  scannerStore.setBusy();
                   Alert.alert('Unable to parse transaction', e.message, [
                     {
                       text: 'Try again',
@@ -138,6 +63,16 @@ export default class Scanner extends React.PureComponent {
                       }
                     }
                   ]);
+                }
+
+                if (!(await scannerStore.setData(data, accountsStore))) {
+                  return;
+                } else {
+                  if (scannerStore.getType() === 'transaction') {
+                    this.props.navigation.navigate('TxDetails');
+                  } else { // message
+                    this.props.navigation.navigate('MessageDetails');
+                  }
                 }
               }}
             />
@@ -206,70 +141,6 @@ export class QrScannerView extends React.PureComponent {
       </RNCamera>
     );
   }
-}
-
-
-/*
-Example Full Raw Data
----
-4 // indicates binary
-37 // indicates data length
-0000 // frame count
-0100 // first frame
---- UOS Specific Data
-53 // indicates payload is for Substrate
-01 // crypto: sr25519
-00 // indicates action: signData
-f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
-544849532049532053504152544121 // actual payload message to sign (should be SCALE)
-0 // terminator
---- SQRC Filler Bytes
-ec11ec11ec11ec // SQRC filler bytes
-*/
-function rawDataToU8A(rawData) {
-  if (!rawData) {
-    return null;
-  }
-
-  // Strip filler bytes padding at the end
-  if (rawData.substr(-2) === 'ec') {
-    rawData = rawData.substr(0, rawData.length - 2);
-  }
-
-  while (rawData.substr(-4) === 'ec11') {
-    rawData = rawData.substr(0, rawData.length - 4);
-  }
-
-  // Verify that the QR encoding is binary and it's ending with a proper terminator
-  if (rawData.substr(0, 1) !== '4' || rawData.substr(-1) !== '0') {
-    return null;
-  }
-
-  // Strip the encoding indicator and terminator for ease of reading
-  rawData = rawData.substr(1, rawData.length - 2);
-
-  const length8 = parseInt(rawData.substr(0, 2), 16) || 0;
-  const length16 = parseInt(rawData.substr(0, 4), 16) || 0;
-  let length = 0;
-
-  // Strip length prefix
-  if (length8 * 2 + 2 === rawData.length) {
-    rawData = rawData.substr(2);
-    length = length8;
-  } else if (length16 * 2 + 4 === rawData.length) {
-    rawData = rawData.substr(4);
-    length = length16;
-  } else {
-    return null;
-  }
-
-  const bytes = new Uint8Array(length);
-
-  for (let i = 0; i < length; i++) {
-    bytes[i] = parseInt(rawData.substr(i * 2, 2), 16);
-  }
-
-  return bytes;
 }
 
 const styles = StyleSheet.create({

@@ -15,6 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
+
+import Payload from '@polkadot/api/SignerPayload';
 import { Container } from 'unstated';
 import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
 import { saveTx } from '../util/db';
@@ -48,7 +50,7 @@ const defaultState = {
   busy: false,
   txRequest: null,
   message: null,
-  multipartData: [], // array index is the frame index
+  multipartData: {},
   sender: null,
   recipient: null,
   tx: '',
@@ -60,29 +62,112 @@ const defaultState = {
 export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
-  async setPartData(frame, frameCount, partData) {
-    if (this.state.multipartData.length === 0) {
+  parseRawData(rawData) {
+    const bytes = rawDataToU8A(rawData);
+    const hex = bytes.map(byte => byte.toString(16));
+    const uosAfterFrames = hex.slice(5); // FIXME handle multipart
+
+    const zerothByte = uosAfterFrames[0];
+    const firstByte = uosAfterFrames[1];
+    const secondByte = uosAfterFrames[2];
+    let action;
+    let address;
+    let data = {};
+    data['data'] = {}; // for consistency with legacy data format.
+
+    try {
+      // decode payload appropriately via UOS
+      switch (zerothByte) {
+        case 45: // Ethereum UOS payload
+          action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
+          address = uosAfterFrames.slice(2, 22);
+
+          data['action'] = action;
+          data['data']['account'] = account;
+
+          if (action === 'signData') {
+            data['data']['rlp'] = uosAfterFrames[13];
+          } else if (action === 'signTransaction') {
+            data['data']['data'] = rawAfterFrames[13];
+          } else {
+            throw new Error('Could not determine action type.');
+          }
+          break;
+        case 53: // Substrate UOS payload
+          const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
+          action = secondByte === 0 || secondByte === 1 ? 'signData': secondByte === 2 || secondByte === 3 ? 'signTransaction' : null;
+
+          const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
+          const ss58Encoded = encodeAddress(publicKeyAsBytes);
+          const encryptedData: Uint8Array = uosAfterFrames.slice(35);
+
+          data['action'] = action;
+          data['data']['crypto'] = crypto;
+          data['data']['account'] = ss58Encoded;
+
+          switch(secondByte) {
+            case 0:
+              if (encryptedData.length > 256) {
+                data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
+                data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
+                data['data']['data'] = blake2b(data.data.payload); // FIXME: use native blake2b function
+              } else {
+                data['isHash'] = false;
+                data['data']['data'] = Payload(encryptedData);
+              }
+              break;
+            case 1:
+              data['isHash'] = true;
+              data['data']['data'] = Payload(encryptedData);
+              break;
+            case 2:
+              data['isHash'] = false;
+              data['data']['data'] = Payload(encryptedData);
+              break;
+            case 3: // Cold Signer should attempt to decode message to utf8
+              data['data']['data'] = decodeToString(encryptedData);
+              break;
+            default:
+              break;
+          }
+          break;
+        default:
+          throw new Error('we cannot handle the payload: ', rawData);
+      }
+
+      return data;
+    } catch (e) {
+      scannerStore.setBusy();
+      throw new Error('we cannot handle the payload: ', rawData);
+    }
+  }
+
+  setPartData(frame, frameCount, partData, accountsStore) {
+    if (partData[0] === new Uint8Array([0x00]) || partData[0] === new Uint8Array([0x7B])) {
+      // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
+      throw new Error('Error decoding invalid part data.');
+    }
+
+    // we havne't filled all the frames yet
+    if (Object.keys(this.state.multipartData.length) < frameCount) {
+      const nextDataState = this.state.multipartData;
+      
+      nextDataState[frame] = partData;
+
       this.setState({
-        ...state,
-        multipartData: Array(frameCount).join(' ').split(' ').map(() => 0)
+        multipartData: nextDataState
       });
     }
 
-    if (this.state.multipartData.length < frameCount) {
-      const currentDataState = this.state.multipartData;
-
-      currentDataState[frame]
+    // all the frames are filled
+    if (Object.keys(this.state.multipartData.length) === frameCount) {
+      const concatMultipartData = Object.keys(this.state.multipartData).reduce((result, data) => res.concat(this.state.multipartData[data]));
+      const data = this.parseRawData(data, accountsStore);
+      this.setData(data);
     }
   }
 
   async setData(data, accountsStore) {
-    // If payload is longer than 256 bytes, then it SHOULD instead sign the Blake2s hash of payload.
-    if (data.data.payload.length > 256) {
-      data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
-      data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
-      data['data']['data'] = blake2b(data.data.payload);
-    }
-
     // - Cold Signer SHOULD (at the user's discretion) sign the message, immortal_payload, or payload if payload is of length 256 bytes or fewer.
     switch (data.action) {
       case 'signTransaction':
@@ -249,5 +334,69 @@ export default class ScannerStore extends Container<ScannerState> {
 
   getErrorMsg() {
     return this.state.scanErrorMsg;
+  }
+
+
+  /*
+  Example Full Raw Data
+  ---
+  4 // indicates binary
+  37 // indicates data length
+  0000 // frame count
+  0100 // first frame
+  --- UOS Specific Data
+  53 // indicates payload is for Substrate
+  01 // crypto: sr25519
+  00 // indicates action: signData
+  f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
+  544849532049532053504152544121 // actual payload message to sign (should be SCALE)
+  0 // terminator
+  --- SQRC Filler Bytes
+  ec11ec11ec11ec // SQRC filler bytes
+  */
+  function rawDataToU8A(rawData) {
+    if (!rawData) {
+      return null;
+    }
+
+    // Strip filler bytes padding at the end
+    if (rawData.substr(-2) === 'ec') {
+      rawData = rawData.substr(0, rawData.length - 2);
+    }
+
+    while (rawData.substr(-4) === 'ec11') {
+      rawData = rawData.substr(0, rawData.length - 4);
+    }
+
+    // Verify that the QR encoding is binary and it's ending with a proper terminator
+    if (rawData.substr(0, 1) !== '4' || rawData.substr(-1) !== '0') {
+      return null;
+    }
+
+    // Strip the encoding indicator and terminator for ease of reading
+    rawData = rawData.substr(1, rawData.length - 2);
+
+    const length8 = parseInt(rawData.substr(0, 2), 16) || 0;
+    const length16 = parseInt(rawData.substr(0, 4), 16) || 0;
+    let length = 0;
+
+    // Strip length prefix
+    if (length8 * 2 + 2 === rawData.length) {
+      rawData = rawData.substr(2);
+      length = length8;
+    } else if (length16 * 2 + 4 === rawData.length) {
+      rawData = rawData.substr(4);
+      length = length16;
+    } else {
+      return null;
+    }
+
+    const bytes = new Uint8Array(length);
+
+    for (let i = 0; i < length; i++) {
+      bytes[i] = parseInt(rawData.substr(i * 2, 2), 16);
+    }
+
+    return bytes;
   }
 }
