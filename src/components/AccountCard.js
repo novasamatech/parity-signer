@@ -21,7 +21,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
 

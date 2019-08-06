@@ -48,6 +48,7 @@ const defaultState = {
   busy: false,
   txRequest: null,
   message: null,
+  multipartData: [], // array index is the frame index
   sender: null,
   recipient: null,
   tx: '',
@@ -58,6 +59,21 @@ const defaultState = {
 
 export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
+
+  async setPartData(frame, frameCount, partData) {
+    if (this.state.multipartData.length === 0) {
+      this.setState({
+        ...state,
+        multipartData: Array(frameCount).join(' ').split(' ').map(() => 0)
+      });
+    }
+
+    if (this.state.multipartData.length < frameCount) {
+      const currentDataState = this.state.multipartData;
+
+      currentDataState[frame]
+    }
+  }
 
   async setData(data, accountsStore) {
     // If payload is longer than 256 bytes, then it SHOULD instead sign the Blake2s hash of payload.
