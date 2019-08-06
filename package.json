@@ -20,33 +20,34 @@
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force"
   },
   "dependencies": {
+    "@plugnet/util": "^0.94.100",
     "@plugnet/wasm-crypto-js": "^0.11.102",
-    "@polkadot/reactnative-identicon": "^0.42.0-beta.26",
-    "@polkadot/util-crypto": "^0.94.1",
-    "@polkadot/wasm-crypto": "^0.13.1",
+    "@polkadot/keyring": "^1.0.1",
+    "@polkadot/reactnative-identicon": "^0.42.0-beta.28",
+    "@polkadot/util-crypto": "^1.0.1",
     "@react-native-community/netinfo": "^4.1.1",
     "@tradle/react-native-http": "^2.0.1",
-    "bignumber.js": "^4.0.0",
+    "bignumber.js": "^9.0.0",
+    "hoist-non-react-statics": "^3.3.0",
     "lodash": "^4.17.15",
     "node-libs-react-native": "^1.0.3",
     "prop-types": "^15.6.1",
     "react": "16.8.6",
-    "react-native": "0.60.3",
+    "react-native": "0.60.4",
     "react-native-camera": "^3.0.0",
     "react-native-gesture-handler": "^1.3.0",
     "react-native-keyboard-aware-scroll-view": "^0.8.0",
     "react-native-markdown-renderer": "^3.2.8",
     "react-native-popup-menu": "^0.15.6",
+    "react-native-randombytes": "^3.5.3",
     "react-native-secure-storage": "git+https://github.com/paritytech/react-native-secure-storage.git",
-    "react-native-simple-picker": "^2.1.0",
     "react-native-svg": "^9.5.3",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^6.6.0",
     "react-navigation": "^3.11.1",
     "readable-stream": "^3.4.0",
     "unstated": "^2.1.1",
-    "vm-browserify": "0.0.4",
-    "yarn": "^1.17.3"
+    "vm-browserify": "1.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",
@@ -65,8 +66,8 @@
     "metro-react-native-babel-preset": "^0.55.0",
     "pre-git": "^3.14.0",
     "prettier": "1.12.1",
-    "react-test-renderer": "16.8.6",
-    "reactotron-react-native": "^2.1.5"
+    "reactotron-react-native": "^3.6.4",
+    "react-test-renderer": "16.8.6"
   },
   "rnpm": {
     "assets": [

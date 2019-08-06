@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.horcrux.svg.SvgPackage;
+import com.bitgo.randombytes.RandomBytesPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
 import com.facebook.react.ReactNativeHost;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new SvgPackage(),
+            new RandomBytesPackage(),
             new NetInfoPackage(),
             new RandomBytesPackage(),
           new EthkeyBridgePackage(),

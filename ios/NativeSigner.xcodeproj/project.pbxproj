@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
@@ -65,6 +64,8 @@
 		EDCE1EC0CA1249279F03F2E2 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */; };
 		EE896FB251B94030AC713B6F /* Roboto-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */; };
 		F1569210427145DEBBB5B898 /* Manifold-CF-Extra-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */; };
+		9CE53E9B76FD4CE88D0778EC /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 170C0768897F45A7A496F2BE /* libRNRandomBytes.a */; };
+		D6EED2987CEF454F865C09E0 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D44E3C511D404074AF5AFDB9 /* libRNSVG.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -457,6 +458,10 @@
 		F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Extra-Bold.otf"; path = "../res/fonts/Manifold-CF-Extra-Bold.otf"; sourceTree = "<group>"; };
 		F2FB2DDD90964B3BB1FC813C /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ThinItalic.ttf"; path = "../res/fonts/Roboto-ThinItalic.ttf"; sourceTree = "<group>"; };
+		520CF0A85F434C3DA3D3EFF4 /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; name = "RNRandomBytes.xcodeproj"; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		170C0768897F45A7A496F2BE /* libRNRandomBytes.a */ = {isa = PBXFileReference; name = "libRNRandomBytes.a"; path = "libRNRandomBytes.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		C0205550495341279B513024 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; name = "RNSVG.xcodeproj"; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		D44E3C511D404074AF5AFDB9 /* libRNSVG.a */ = {isa = PBXFileReference; name = "libRNSVG.a"; path = "libRNSVG.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -485,9 +490,17 @@
 				1F426F92208D32FA00CA43DB /* libRCTImage.a in Frameworks */,
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
+<<<<<<< HEAD
 				3D86BAE04F0344F690894135 /* libRNRandomBytes.a in Frameworks */,
 				3BD66630E51B4021AE20B9F2 /* libRNCNetInfo.a in Frameworks */,
 				9ECCA47FFDB749D4B158580E /* libRNSVG.a in Frameworks */,
+=======
+				BB1BF6E8C2204EDEA0DEFB71 /* libRNSecureStorage.a in Frameworks */,
+				BC281020BE04470E86371E16 /* libRNCNetInfo.a in Frameworks */,
+				A174652260CA4A7785BEC78B /* libRNCamera.a in Frameworks */,
+				9CE53E9B76FD4CE88D0778EC /* libRNRandomBytes.a in Frameworks */,
+				D6EED2987CEF454F865C09E0 /* libRNSVG.a in Frameworks */,
+>>>>>>> 5e0332e2df224f0883bf91a4704d0c5293511b5d
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -753,9 +766,11 @@
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
-				99AC61BF1E3C4FE8B07077D3 /* RNRandomBytes.xcodeproj */,
-				BB0882DC34AE448DAA1E2320 /* RNCNetInfo.xcodeproj */,
-				31EA7650B3084F7080008B3C /* RNSVG.xcodeproj */,
+				8CC63279C525400CA35EAF96 /* RNSecureStorage.xcodeproj */,
+				28E4C30CA68041C98EE1012E /* RNCNetInfo.xcodeproj */,
+				8A220E0ECC914D32B35EF7FC /* RNCamera.xcodeproj */,
+				520CF0A85F434C3DA3D3EFF4 /* RNRandomBytes.xcodeproj */,
+				C0205550495341279B513024 /* RNSVG.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1383,6 +1398,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1405,6 +1421,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1432,6 +1449,8 @@
 					"$(SRCROOT)/../rust/signer",
 					"$(SRCROOT)/../node_modules/react-native-randombytes",
 					"$(SRCROOT)/../node_modules/@react-native-community/netinfo/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-randombytes",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
@@ -1468,6 +1487,8 @@
 					"$(SRCROOT)/../rust/signer",
 					"$(SRCROOT)/../node_modules/react-native-randombytes",
 					"$(SRCROOT)/../node_modules/@react-native-community/netinfo/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-randombytes",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
