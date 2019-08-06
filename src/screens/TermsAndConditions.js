@@ -21,6 +21,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
+import fonts from "../fonts";
 import Button from '../components/Button';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
@@ -126,21 +127,19 @@ const styles = StyleSheet.create({
   titleTop: {
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20,
     textAlign: 'center'
   },
   title: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
     paddingBottom: 20
   },
   text: {
     marginTop: 10,
-    fontFamily: 'Roboto',
+    fontFamily: fonts.regular,
     fontSize: 14,
     color: colors.card_bg
   }

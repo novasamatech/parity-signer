@@ -6550,7 +6550,7 @@ react-native-popup-menu@^0.15.6:
   resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.15.6.tgz#ebf885c289028e330dd66d887e685a8b0c2de970"
   integrity sha512-ILFbQEofZQThVYAtVcOEgHJ+9wvn8992J+Oy/ByX83PoP88Meq3iw3pG1AwxMOoAPm/LjihtsDBqZ1lxjvosDg==
 
-react-native-randombytes@^3.5.1, react-native-randombytes@^3.5.3:
+react-native-randombytes@^3.5.1:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/react-native-randombytes/-/react-native-randombytes-3.5.3.tgz#b3bdcd11473cce106551a586244b98855e443cd1"
   integrity sha512-n/7QwMrRJxHr+/3mt2KxqqacGylM+ssW+FfBTgXGzvwq5KzSohooEWf6Z6MTSByuJ/izP9VbSPtwomPwzvupKQ==
@@ -6572,9 +6572,9 @@ react-native-safe-area-view@^0.14.1:
   dependencies:
     debounce "^1.2.0"
 
-"react-native-secure-storage@git+https://github.com/debris/react-native-secure-storage.git":
+"react-native-secure-storage@git+https://github.com/paritytech/react-native-secure-storage.git":
   version "1.0.0"
-  resolved "git+https://github.com/debris/react-native-secure-storage.git#7751c428cb2ab3b292fd9942eef40a43c1611363"
+  resolved "git+https://github.com/paritytech/react-native-secure-storage.git#3263537d637ddfc67e243b40ba50e5d05367d20b"
 
 react-native-simple-picker@^2.1.0:
   version "2.3.1"

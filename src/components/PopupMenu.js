@@ -26,11 +26,13 @@ import {
 } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
+import fonts from "../fonts";
 
 export default class PopupMenu extends React.PureComponent {
     render() {
-        const { onSelect, menuTriggerIconName, menuItems } = this.props
-        const menuTriggerIcon = <Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />
+        const { onSelect, menuTriggerIconName, menuItems } = this.props;
+        const menuTriggerIcon = <Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />;
+        console.log('pop up menu items', menuItems);
         return (
             <Menu onSelect={onSelect}>
                 <MenuTrigger children={menuTriggerIcon} />
@@ -38,7 +40,7 @@ export default class PopupMenu extends React.PureComponent {
                     {
                         menuItems.map((menuItem, index) => (
                             <MenuOption key={index} value={menuItem.value} >
-                                <Text style={(menuItem.textStyle) ? menuItem.textStyle : null} >{menuItem.text}</Text>
+                                <Text style={[menuOptionsStyles.optionText, menuItem.textStyle]} >{menuItem.text}</Text>
                             </MenuOption>
                         ))
                     }
@@ -53,7 +55,7 @@ const menuOptionsStyles = {
         padding: 15,
     },
     optionText: {
-        fontFamily: 'Roboto',
+        fontFamily: fonts.regular,
         fontSize: 16
     },
 };

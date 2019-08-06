@@ -29,6 +29,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AccountIcon from './AccountIcon';
 import Address from './Address'
 import colors from '../colors';
+import fonts from "../fonts";
 import { brainWalletAddress, words } from '../util/native';
 
 export default class AccountIconChooser extends React.PureComponent {
@@ -77,7 +78,7 @@ export default class AccountIconChooser extends React.PureComponent {
         />
       );
     } else {
-      return <Text>Select an icon.</Text>
+      return <Text style={styles.addressSelectionText} >Select an icon.</Text>
     }
   }
  
@@ -166,6 +167,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card_bg,
     height: 50,
     padding: 5,
+  },
+  addressSelectionText: {
+    fontFamily: fonts.bold,
+    color: colors.bg,
+    fontSize: 14,
+    paddingLeft: 6
   },
   addressText: {
     paddingLeft: 6

@@ -21,6 +21,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
 import TxDetailsCard from '../components/TxDetailsCard';
@@ -96,15 +97,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.bg_text_sec,
     fontSize: 24,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20
   },
   title: {
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontFamily: 'Manifold CF',
-    fontWeight: 'bold',
+    fontFamily: fonts.bold,
     paddingBottom: 20
   }
 });

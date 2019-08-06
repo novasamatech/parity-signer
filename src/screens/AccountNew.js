@@ -21,6 +21,7 @@ import { StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
+import fonts from "../fonts";
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -135,25 +136,23 @@ const styles = StyleSheet.create({
     paddingBottom: 15
   },
   title: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: colors.bg_text_sec,
     fontSize: 18,
-    fontWeight: 'bold',
     paddingBottom: 20
   },
   titleTop: {
     color: colors.bg_text_sec,
+    fontFamily: fonts.bold,
     fontSize: 24,
-    fontWeight: 'bold',
     paddingBottom: 20,
     textAlign: 'center'
   },
   hintText: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     textAlign: 'center',
     paddingTop: 20,
     color: colors.bg_text_sec,
-    fontWeight: '800',
     fontSize: 12
   },
   nextStep: {

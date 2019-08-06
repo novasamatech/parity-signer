@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Platform, StyleSheet, Text, TouchableNativeFeedback, TouchableOpacity, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
+import fonts from "../fonts";
 
 export default class Button extends React.PureComponent<{
   title: string,
@@ -74,10 +75,9 @@ const styles = StyleSheet.create({
     height: 60
   },
   text: {
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     color: 'white',
     padding: 8,
-    fontWeight: 'bold',
     fontSize: 20
   },
   buttonDisabled: {

@@ -23,6 +23,7 @@ import { Text } from 'react-native';
 import React from 'react';
 import { withNavigation } from 'react-navigation';
 import colors from '../colors';
+import fonts from "../fonts";
 
 const styles = {
   card: {
@@ -31,9 +32,8 @@ const styles = {
   },
   cardText: {
     color: colors.card_text,
-    fontFamily: 'Manifold CF',
+    fontFamily: fonts.bold,
     fontSize: 20,
-    fontWeight: 'bold'
   },
   cardTwo: {
     backgroundColor: '#977CF6',
