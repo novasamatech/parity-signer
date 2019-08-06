@@ -53,7 +53,7 @@ export default class Scanner extends React.PureComponent {
                 }
 
                 try {
-                  const data = scannerStore.parseRawData(txRequestData.rawData);
+                  scannerStore.parseRawData(txRequestData.rawData);
                 } catch (e) {
                   Alert.alert('Unable to parse transaction', e.message, [
                     {
@@ -65,12 +65,12 @@ export default class Scanner extends React.PureComponent {
                   ]);
                 }
 
-                if (!(await scannerStore.setData(data, accountsStore))) {
+                if (!(await scannerStore.setData(accountsStore))) {
                   return;
                 } else {
                   if (scannerStore.getType() === 'transaction') {
                     this.props.navigation.navigate('TxDetails');
-                  } else { // message
+                  } else {
                     this.props.navigation.navigate('MessageDetails');
                   }
                 }
