@@ -29,8 +29,8 @@ import {
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
+import '../shim';
 import Background from './components/Background';
-import '../browser';
 import colors from './colors';
 import fonts from './fonts';
 import HeaderLeftHome from './components/HeaderLeftHome';
