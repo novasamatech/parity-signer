@@ -19,19 +19,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+
+import AccountIcon from './AccountIcon';
+import Address from './Address';
 import colors from '../colors';
 import fonts from '../fonts';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
 
-export default class AccountCard extends React.PureComponent<{
-  address: string,
-  networkKey: string,
-  onPress?: () => any,
-  title?: string,
-  seedType?: string
-}> {
+
+export default class AccountCard extends React.PureComponent {
   static propTypes = {
     address: PropTypes.string.isRequired,
     networkKey: PropTypes.string,
@@ -66,14 +64,11 @@ export default class AccountCard extends React.PureComponent<{
               <Text numberOfLines={1} style={styles.titleText}>
                 {title}
               </Text>
-              <Text
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.01}
-                style={styles.secondaryText}
-              >
-                {network.protocol === NetworkProtocols.ETHEREUM ? '0x' : ''}{address}
-              </Text>
+              <Address 
+                address={address}
+                networkProtocol={network.protocol}
+                short
+              />
             </View>
           </View>
           <View

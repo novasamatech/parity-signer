@@ -60,56 +60,49 @@ class AccountNewView extends React.Component {
       <View style={styles.body}>
         <KeyboardScrollView style={{ padding: 20 }}>
           <Background />
-          <ScrollView
-            style={{ padding: 20 }}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps="always"
-            containerStyle={styles.bodyContainer}
-          >
-            <View style={styles.top}>
-              <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-              <Text style={styles.title}>CHOOSE NETWORK</Text>
-              <NetworkButton network={network}/>
-              <Text style={[styles.title, { marginTop: 20 }]}>
-                CHOOSE AN IDENTICON
-              </Text>
-              <AccountIconChooser
-                value={selected && selected.seed && selected.address}
-                onSelect={({ address, bip39, seed }) => {
-                  accounts.updateNew({ address, seed, validBip39Seed: bip39 });
-                }}
-              />
-              <Text style={styles.title}>ACCOUNT NAME</Text>
-              <TextInput
-                onChangeText={name => accounts.updateNew({ name })}
-                value={selected && selected.name}
-                placeholder="Enter a new account name"
-              />
-            </View>
-            <View style={styles.bottom}>
-              <Text style={styles.hintText}>
-                On the next step you will be asked to backup your account, get pen
-                and paper ready
-              </Text>
-              <Button
-                buttonStyles={styles.nextStep}
-                title="Next Step"
-                disabled={ !validateSeed(selected.seed, selected.validBip39Seed).valid }
-                onPress={() => {
-                  // TODO remove this hardcoded address for SUBSTRATE
-                  if (selected.networkKey === SubstrateNetworkKeys.SUBSTRATE) {
-                    accounts.updateNew({ address:'5EnxxUmEbw8DkENKiYuZ1DwQuMoB2UWEQJZZXrTsxoz7SpgG', seed:'this is sparta', publicKey:0x123 ,validBip39Seed: false });
-                  }
+          <View style={styles.top}>
+            <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
+            <Text style={styles.title}>NETWORK</Text>
+            <NetworkButton network={network}/>
+            <Text style={styles.title}>ICON & ADDRESS</Text>
+            <AccountIconChooser
+              value={selected && selected.seed && selected.address}
+              onSelect={({ address, bip39, seed }) => {
+                accounts.updateNew({ address, seed, validBip39Seed: bip39 });
+              }}
+            />
+            <Text style={styles.title}>NAME</Text>
+            <TextInput
+              onChangeText={name => accounts.updateNew({ name })}
+              value={selected && selected.name}
+              placeholder="Enter a new account name"
+            />
+          </View>
+          <View style={styles.bottom}>
+            <Text style={styles.hintText}>
+              On the next step you will be asked to backup your account, get pen
+              and paper ready
+            </Text>
+            <Button
+              buttonStyles={styles.nextStep}
+              title="Next Step"
+              disabled={
+                !validateSeed(selected.seed, selected.validBip39Seed).valid
+              }
+              onPress={() => {
+                // TODO remove this hardcoded address for SUBSTRATE
+                if (selected.networkKey === SubstrateNetworkKeys.SUBSTRATE) {
+                  accounts.updateNew({ address:'5EjSNPzM9T6Nb19zb38TcwBQh5hNWG47noi7anXQT64BBJBx', seed:'this is sparta', validBip39Seed: false });
+                }
 
-                  validateSeed(selected.seed, selected.validBip39Seed).valid &&
-                    this.props.navigation.navigate('AccountBackup', {
-                      isNew: true,
-                      isWelcome: this.props.navigation.getParam('isWelcome')
-                    });
-                }}
-              />
-            </View>
-          </ScrollView>
+                validateSeed(selected.seed, selected.validBip39Seed).valid &&
+                  navigation.navigate('AccountBackup', {
+                    isNew: true,
+                    isWelcome: navigation.getParam('isWelcome')
+                  });
+              }}
+            />
+          </View>
         </KeyboardScrollView>
       </View>
     );

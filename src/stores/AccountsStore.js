@@ -29,7 +29,6 @@ export type Account = {
   name: string,
   networkKey: string,
   protocol: string,
-  publicKey: number,
   seed: string,
   updatedAt: number,
   validBip39Seed: boolean

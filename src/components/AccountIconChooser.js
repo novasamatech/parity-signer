@@ -88,20 +88,17 @@ export default class AccountIconChooser extends React.PureComponent {
     const isSelected = address.toLowerCase() === value.toLowerCase();
 
     return (
-      <TouchableOpacity
-        key={index}
-        style={[styles.iconBorder, isSelected ? styles.selected : {}]}
-        onPress={() =>
-          onSelect({
-            address,
-            bip39,
-            seed
-          })
-        }
-      >
-        {/* TODO Cater for Substrate */}
-        <AccountIcon seed={'0x' + address} />
-      </TouchableOpacity>
+        <TouchableOpacity
+          key={index}
+          style={[styles.iconBorder, isSelected ? styles.selected : {}]}
+          onPress={() => onSelect({ address, bip39, seed })}
+        >
+          {/* TODO Cater for Substrate */}
+          <AccountIcon
+            style={styles.icon}
+            seed={'0x' + address}
+          />
+        </TouchableOpacity>
     );
   }
 

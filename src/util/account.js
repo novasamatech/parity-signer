@@ -3,14 +3,14 @@ import { SubstrateNetworkKeys, NetworkProtocols } from '../constants';
 export function accountId({
   address,
   protocol = NetworkProtocols.SUBSTRATE,
-  publicKey,
-  networkKey = SubstrateNetworkKeys.SUBSTRATE
+  genesisHash,
+  networkKey = SubstrateNetworkKeys.KUSAMA
 }) {
   if (typeof address !== 'string' || address.length === 0) {
     throw new Error(`Couldn't create an accountId, address missing`);
   }
   if (protocol === NetworkProtocols.SUBSTRATE){
-    return `${protocol}:${address.toLowerCase()}:${'GENESIS_HASH_PLACEHOLDER'}`;
+    return `${protocol}:${address}:${genesisHash}`;
   } else {
     return `${protocol}:${address.toLowerCase()}@${networkKey}`;
   }
@@ -18,15 +18,13 @@ export function accountId({
 
 export function empty(account = {}) {
   return {
-    
     address: '',
     archived: false,
     createdAt: new Date().getTime(),
     encryptedSeed: null,
     name: '',
+    networkKey: SubstrateNetworkKeys.KUSAMA,
     protocol: NetworkProtocols.SUBSTRATE,
-    publicKey: 0x0,
-    networkKey: SubstrateNetworkKeys.SUBSTRATE,
     seed: '',
     updatedAt: new Date().getTime(),
     validBip39Seed: false,
