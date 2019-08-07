@@ -101,11 +101,14 @@ export default class ScannerStore extends Container<ScannerState> {
         case 53: // Substrate UOS payload
           const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
           const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
-          const ss58Encoded = encodeAddress(publicKeyAsBytes);
+
+          const ss58Encoded = encodeAddress(publicKeyAsBytes); // encode to kusama
           const hexEncodedData: Uint8Array = uosAfterFrames.slice(35);
 
           data['data']['crypto'] = crypto;
           data['data']['account'] = ss58Encoded;
+
+          debugger;
 
           switch(secondByte) {
             case 0:

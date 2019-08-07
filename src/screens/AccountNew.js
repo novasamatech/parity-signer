@@ -91,8 +91,8 @@ class AccountNewView extends React.Component {
               }
               onPress={() => {
                 // TODO remove this hardcoded address for SUBSTRATE
-                if (selected.networkKey === SubstrateNetworkKeys.SUBSTRATE) {
-                  accounts.updateNew({ address:'5EjSNPzM9T6Nb19zb38TcwBQh5hNWG47noi7anXQT64BBJBx', seed:'this is sparta', validBip39Seed: false });
+                if (selected.networkKey === SubstrateNetworkKeys.KUSAMA) {
+                  accounts.updateNew({ address:'FJaco77EJ99VtBmVFibuBJR3x5Qq9KQrgQJvWjqScCcCCae', seed:'this is sparta', validBip39Seed: false });
                 }
 
                 validateSeed(selected.seed, selected.validBip39Seed).valid &&

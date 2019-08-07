@@ -25,7 +25,6 @@ import Address from './Address';
 import colors from '../colors';
 import fonts from '../fonts';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import AccountIcon from './AccountIcon';
 import TouchableItem from './TouchableItem';
 
 
