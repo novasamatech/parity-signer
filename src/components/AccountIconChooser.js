@@ -90,7 +90,7 @@ export default class AccountIconChooser extends React.PureComponent {
     return (
       <TouchableOpacity
         key={index}
-        style={[styles.iconBorder, iSelected ? styles.selected : {}]}
+        style={[styles.iconBorder, isSelected ? styles.selected : {}]}
         onPress={() =>
           onSelect({
             address,
@@ -100,7 +100,7 @@ export default class AccountIconChooser extends React.PureComponent {
         }
       >
         {/* TODO Cater for Substrate */}
-        <AccountIcon style={style} seed={'0x' + address} />
+        <AccountIcon seed={'0x' + address} />
       </TouchableOpacity>
     );
   }
