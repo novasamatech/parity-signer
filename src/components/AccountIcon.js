@@ -18,72 +18,53 @@
 
 import Identicon from '@polkadot/reactnative-identicon';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 
 import { NetworkProtocols } from '../constants'
 import { blockiesIcon } from '../util/native';
 
-export default class AccountIcon extends React.PureComponent {
+export default function AccountIcon (props) {
 
-  static propTypes = {
+  AccountIcon.propTypes = {
     address: PropTypes.string.isRequired,
     protocol: PropTypes.string.isRequired
   };
 
-  constructor(props) {
-    super(props);
+  const {address, protocol, style} = props;
+  const [ethereumIconUri, setEthereumIconUri] = useState('');
 
-    this.state = { ethereumIconUri: '' };
-  }
-
-  componentDidMount() {
-    const {address, protocol} = this.props;
-
+  useEffect(() => {
     if (protocol === NetworkProtocols.ETHEREUM) {
-      this.loadEthereumIcon(address);
+      loadEthereumIcon(address);
     }
-  }
+  },[protocol, address])
 
-  componentDidUpdate (prevProps) {
-    const {address, protocol} = this.props
-    const {oldAddress} = prevProps;
-
-    if (protocol === NetworkProtocols.ETHEREUM && address !== oldAddress) {
-      this.loadEthereumIcon(address);
-    }
-  }
-
-  loadEthereumIcon(address){
+  const loadEthereumIcon = function (address){
     blockiesIcon('0x'+address)
     .then((ethereumIconUri) => {
-      this.setState({ethereumIconUri});
+      setEthereumIconUri(ethereumIconUri);
     })
     .catch(console.error)
   }
 
-  render() {
-    const { address, protocol, style } = this.props;
-    const { ethereumIconUri } = this.state;
+  if (protocol === NetworkProtocols.SUBSTRATE && address) {
 
-    if (protocol === NetworkProtocols.SUBSTRATE && address) {
+    return (
+      <Identicon
+        value={address}
+        size={style.width || 50 }
+      />
+    );
+  } else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri){
 
-      return (
-        <Identicon
-          value={address}
-          size={style.width || 50 }
-        />
-      );
-    } else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri){
-
-      return (
-        <Image 
-          source={{ uri: ethereumIconUri }} 
-          style={style || { width: 47, height: 47 }}
-        />
-      );
-    }
-
-    return null;
+    return (
+      <Image 
+        source={{ uri: ethereumIconUri }} 
+        style={style || { width: 47, height: 47 }}
+      />
+    );
   }
+
+  return null;
 }
