@@ -23,7 +23,7 @@ import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constant
 import { saveTx } from '../util/db';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
-import { rawDataToU8A } from '../util/rawDataToU8A';
+import { decodeToString, hexToAscii, rawDataToU8A } from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -100,37 +100,39 @@ export default class ScannerStore extends Container<ScannerState> {
           break;
         case 53: // Substrate UOS payload
           const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
-          action = secondByte === 0 || secondByte === 1 ? 'signData': secondByte === 2 || secondByte === 3 ? 'signTransaction' : null;
-
           const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
           const ss58Encoded = encodeAddress(publicKeyAsBytes);
-          const encryptedData: Uint8Array = uosAfterFrames.slice(35);
+          const hexEncodedData: Uint8Array = uosAfterFrames.slice(35);
 
-          data['action'] = action;
           data['data']['crypto'] = crypto;
           data['data']['account'] = ss58Encoded;
 
           switch(secondByte) {
             case 0:
+              data['action'] = 'signTransaction';
               if (encryptedData.length > 256) {
                 data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
                 data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
-                data['data']['data'] = blake2s(encryptedData);
+                data['data']['data'] = blake2s(hexEncodedData);
               } else {
                 data['isHash'] = false;
-                data['data']['data'] = Payload(encryptedData);
+                data['data']['data'] = Payload(hexEncodedData);
               }
               break;
             case 1:
+              data['action'] = 'signTransaction';
               data['isHash'] = true;
-              data['data']['data'] = Payload(encryptedData);
+              data['data']['data'] = hexEncodedData; // data is a hash
               break;
             case 2:
+              data['action'] = 'signTransaction';
               data['isHash'] = false;
-              data['data']['data'] = Payload(encryptedData);
+              data['data']['data'] = Payload(hexEncodedData);
               break;
             case 3: // Cold Signer should attempt to decode message to utf8
-              data['data']['data'] = decodeToString(encryptedData);
+              data['action'] = 'signData';
+              data['isHash'] = false;
+              data['data']['data'] = decodeToString(hexEncodedData.map(b => parseInt(b, 16)));
               break;
             default:
               break;
@@ -150,7 +152,6 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   setPartData(frame, frameCount, partData, accountsStore) {
-    debugger;
     if (partData[0] === new Uint8Array([0x00]) || partData[0] === new Uint8Array([0x7B])) {
       // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
       throw new Error('Error decoding invalid part data.');
@@ -177,7 +178,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setData(accountsStore) {
     // - Cold Signer SHOULD (at the user's discretion) sign the message, immortal_payload, or payload if payload is of length 256 bytes or fewer.
-    switch (data.action) {
+    switch (this.state.unsignedData.action) {
       case 'signTransaction':
         return await this.setTXRequest(this.state.unsignedData, accountsStore);
       case 'signData':
@@ -197,7 +198,6 @@ export default class ScannerStore extends Container<ScannerState> {
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
       const substrateSign = async () => { /* Placeholder function for now */ return message; }
       const dataToSign = await substrateSign(message);
-
     } else {
       const dataToSign = await ethSign(message);
     }

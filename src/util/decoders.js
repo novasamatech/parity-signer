@@ -21,14 +21,15 @@
   ---
   4 // indicates binary
   37 // indicates data length
-  0000 // frame count
-  0100 // first frame
+  0000
+  0100
+  00
   --- UOS Specific Data
   53 // indicates payload is for Substrate
   01 // crypto: sr25519
   00 // indicates action: signData
   f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
-  544849532049532053504152544121 // actual payload message to sign (should be SCALE)
+  544849532049532053504152544121 // actual payload to sign (should be SCALE or utf8)
   0 // terminator
   --- SQRC Filler Bytes
   ec11ec11ec11ec // SQRC filler bytes
@@ -78,3 +79,19 @@ export function rawDataToU8A(rawData) {
 
   return bytes;
 }
+
+export function decodeToString(message: Uint8Array): string {
+  const decoder = new TextDecoder('utf8');
+
+  return decoder.decode(message);
+}
+
+export function hexToAscii(hexBytes: Uint8Array): string {
+	var hex  = hexBytes.toString();
+	var str = '';
+	for (var n = 0; n < hex.length; n += 2) {
+		str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+	}
+  debugger;
+	return str;
+ }

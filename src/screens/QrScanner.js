@@ -32,12 +32,6 @@ export default class Scanner extends React.PureComponent {
     headerBackTitle: 'Scanner'
   };
 
-  decodeToString(message: Uint8Array): string {
-    const decoder = new TextDecoder('utf8');
-
-    return decoder.decode(message);
-  }
-
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
