@@ -27,8 +27,8 @@ import fonts from "../fonts";
 import {NetworkProtocols} from '../constants'
 
 export default function Address (props) {
-  const {address, networkProtocol = NetworkProtocols.SUBSTRATE, short = false ,style = {}} = props;
-  const prefix = networkProtocol === NetworkProtocols.ETHEREUM ? '0x' : '';
+  const {address, protocol = NetworkProtocols.SUBSTRATE, short = false ,style = {}} = props;
+  const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
   let result = address;
 
   if (short) {

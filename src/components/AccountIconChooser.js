@@ -31,49 +31,66 @@ import Address from './Address'
 import colors from '../colors';
 import fonts from "../fonts";
 import { brainWalletAddress, words } from '../util/native';
+import { NetworkProtocols } from '../constants';
 
 export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { icons: [] };
+    this.state = {
+      icons: []
+    };
   }
 
-  componentDidMount() {
-    this.refreshAccount();
-  }
+  refreshIcons = async () => {
+    const {protocol} = this.props;
 
-  refreshAccount = async () => {
-    try {
-      const icons = await Promise.all(
-        Array(4)
-          .join(' ')
-          .split(' ')
-          .map(async () => {
-            const seed = await words();
-            const { address, bip39 } = await brainWalletAddress(seed);
-
-            return {
-              address,
-              bip39,
-              seed,
-            };
-          })
-      );
-
-      this.setState({ icons });
-    } catch (e) {
-      console.error(e);
+    if (protocol === NetworkProtocols.ETHEREUM){
+      try {
+        const icons = await Promise.all(
+          Array(4)
+            .join(' ')
+            .split(' ')
+            .map(async () => {
+              const seed = await words();
+              const { address, bip39 } = await brainWalletAddress(seed);
+  
+              return {
+                address,
+                bip39,
+                seed,
+              };
+            })
+        );
+  
+        this.setState({ icons });
+      } catch (e) {
+        console.error(e);
+      }
+    } else { 
+      // TODO return a real list of Polkadot accounts 
+      try {
+        const icons = [
+          {address: "5EjSNPzM9T6Nb19zb38TcwBQh5hNWG47noi7anXQT64BBJBx", bip39: true, seed: "this is sparta"}, //need to fake the bip39: true here
+          {address: "5ExttMT4rtnYJ7TLn19d8C8sVdTH8exj7pxWPC5xepz7J9KF", bip39: true, seed: "act age neither fun public history flock improve lady sport high length solution meadow jar minor monster quick pelican indoor couch produce cage boy"},
+          {address: "5ECyNdxrwuzmsmfPJU64zMyJo8dV86hXfjjxK3PmZx1YCurj", bip39: true, seed: "act age neither fun public history flock improve lady sport high length solution meadow jar minor monster quick pelican indoor couch produce cage boy"},
+          {address: "5CeZD17KnQuk9cxF3uf9sE1LYJqdhPzuit4pDK2D5hCsXtQD", bip39: true, seed: "act age neither fun public history flock improve lady sport high length solution meadow jar minor monster quick pelican indoor couch produce cage boy"}
+        ]
+        this.setState({ icons });
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
   renderAddress = () => {
-    const {value} = this.props;
+    const {protocol, value} = this.props;
 
     if (value) {
       return (
         <Address 
           address={value}
+          protocol={protocol}
           style = {styles.addressText}
         />
       );
@@ -83,7 +100,7 @@ export default class AccountIconChooser extends React.PureComponent {
   }
  
   renderIcon = ({ item, index }) => {
-    const { value, onSelect } = this.props;
+    const { onSelect, protocol, value } = this.props;
     const { address, bip39, seed } = item;
     const isSelected = address.toLowerCase() === value.toLowerCase();
 
@@ -93,19 +110,29 @@ export default class AccountIconChooser extends React.PureComponent {
           style={[styles.iconBorder, isSelected ? styles.selected : {}]}
           onPress={() => onSelect({ address, bip39, seed })}
         >
-          {/* TODO Cater for Substrate */}
           <AccountIcon
+            address={address}
+            protocol={protocol}
             style={styles.icon}
-            seed={'0x' + address}
           />
         </TouchableOpacity>
     );
   }
 
+  componentDidMount() {
+    this.refreshIcons();
+  }
+
+  componentDidUpdate(prevProps){
+    if (prevProps.protocol !== this.props.protocol){
+      this.refreshIcons();
+    }
+  }
+
   onRefresh = () => {
     const { onSelect } = this.props;
 
-    this.refreshAccount();
+    this.refreshIcons();
     onSelect({ address: '', bip39: false, seed: ''});
   }
 

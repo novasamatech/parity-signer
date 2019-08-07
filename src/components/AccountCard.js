@@ -58,7 +58,11 @@ export default class AccountCard extends React.PureComponent {
       >
         <View style={[styles.body, style]}>
           <View style={styles.content}>
-            <AccountIcon style={styles.icon} seed={'0x' + address} />
+            <AccountIcon
+              address={address}
+              protocol={network.protocol}
+              style={styles.icon}
+            />
             <View style={styles.desc}>
               <Text numberOfLines={1} style={styles.titleText}>
                 {title}

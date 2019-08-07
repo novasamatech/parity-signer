@@ -21,16 +21,16 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import fonts from "../fonts";
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import KeyboardScrollView from '../components/KeyboardScrollView';
+import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
-import NetworkButton from '../components/NetworkButton';
-import KeyboardScrollView from '../components/KeyboardScrollView';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -51,9 +51,14 @@ class AccountNewView extends React.Component {
     const { accounts, navigation } = this.props;
     const selected = accounts.getNew();
     const network = NETWORK_LIST[selected.networkKey];
+
+    console.log('!validateSeed(selected.seed, selected.validBip39Seed).valid',!validateSeed(selected.seed, selected.validBip39Seed).valid);
+    console.log('selected.seed=="this is sparta"',selected.seed=="this is sparta")
+    console.log('!validateSeed(selected.seed, selected.validBip39Seed).valid || selected.seed=="this is sparta"',!validateSeed(selected.seed, selected.validBip39Seed).valid || selected.seed=="this is sparta")
     if (!selected) {
       return null;
     }
+
     return (
       <View style={styles.body}>
         <KeyboardScrollView style={{ padding: 20 }}>
@@ -64,10 +69,11 @@ class AccountNewView extends React.Component {
             <NetworkButton network={network}/>
             <Text style={styles.title}>ICON & ADDRESS</Text>
             <AccountIconChooser
-              value={selected && selected.seed && selected.address}
               onSelect={({ address, bip39, seed }) => {
                 accounts.updateNew({ address, seed, validBip39Seed: bip39 });
               }}
+              protocol={network.protocol}
+              value={selected && selected.seed && selected.address}
             />
             <Text style={styles.title}>NAME</Text>
             <TextInput
@@ -84,15 +90,8 @@ class AccountNewView extends React.Component {
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
-              disabled={
-                !validateSeed(selected.seed, selected.validBip39Seed).valid
-              }
+              disabled={!validateSeed(selected.seed, selected.validBip39Seed).valid}
               onPress={() => {
-                // TODO remove this hardcoded address for SUBSTRATE
-                if (selected.networkKey === SubstrateNetworkKeys.SUBSTRATE) {
-                  accounts.updateNew({ address:'5EjSNPzM9T6Nb19zb38TcwBQh5hNWG47noi7anXQT64BBJBx', seed:'this is sparta', validBip39Seed: false });
-                }
-
                 validateSeed(selected.seed, selected.validBip39Seed).valid &&
                   navigation.navigate('AccountBackup', {
                     isNew: true,
