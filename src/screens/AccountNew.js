@@ -17,7 +17,8 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -27,7 +28,7 @@ import Button from '../components/Button';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
-import { NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
@@ -47,14 +48,59 @@ export default class AccountNew extends React.Component {
 }
 
 class AccountNewView extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showAdvancedField: false,
+    };
+  }
+
+  renderAdvanced (network) {
+    const { showAdvancedField } = this.state;
+
+    if (network.protocol === NetworkProtocols.ETHEREUM){
+      return null;
+    }
+
+    return (
+      <>
+        <TouchableOpacity
+          onPress={this.toggleAdvancedField}
+          style={{diplay:'flex'}}
+        >
+          <View
+            style={{justifyContent:'center'}}
+          >
+            <Text style={[styles.title, styles.advancedText]}>
+              ADVANCED
+              <Icon 
+                name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
+                size={20}
+              />
+            </Text>
+          </View>
+        </TouchableOpacity>
+        {showAdvancedField && 
+          <TextInput
+            // onChangeText={name => this.setState({ derivationPath })}
+            placeholder="secret derivation path"
+          />
+        }
+      </>
+    )
+  }
+
+  toggleAdvancedField = () => {
+    this.setState({showAdvancedField: !this.state.showAdvancedField}) 
+  }
+
   render() {
     const { accounts, navigation } = this.props;
     const selected = accounts.getNew();
     const network = NETWORK_LIST[selected.networkKey];
 
-    console.log('!validateSeed(selected.seed, selected.validBip39Seed).valid',!validateSeed(selected.seed, selected.validBip39Seed).valid);
-    console.log('selected.seed=="this is sparta"',selected.seed=="this is sparta")
-    console.log('!validateSeed(selected.seed, selected.validBip39Seed).valid || selected.seed=="this is sparta"',!validateSeed(selected.seed, selected.validBip39Seed).valid || selected.seed=="this is sparta")
     if (!selected) {
       return null;
     }
@@ -81,11 +127,11 @@ class AccountNewView extends React.Component {
               value={selected && selected.name}
               placeholder="Enter a new account name"
             />
+            {this.renderAdvanced(network)}
           </View>
           <View style={styles.bottom}>
             <Text style={styles.hintText}>
-              On the next step you will be asked to backup your account, get pen
-              and paper ready
+              Next, you will be asked to backup your account, get a pen and some paper.
             </Text>
             <Button
               buttonStyles={styles.nextStep}
@@ -137,6 +183,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingBottom: 20,
     textAlign: 'center'
+  },
+  advancedText: {
+    paddingBottom: 0,
+    paddingTop:20
   },
   hintText: {
     fontFamily: fonts.bold,
