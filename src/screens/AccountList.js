@@ -142,13 +142,14 @@ class AccountListView extends React.PureComponent {
           renderItem={({ item: account }) => {
             return (
               <AccountCard
-                title={account.name}
-                style={{ paddingBottom: null }}
                 address={account.address}
                 networkKey={account.networkKey}
                 onPress={() => {
                   this.props.onAccountSelected(account);
                 }}
+                shortAddress
+                style={{ paddingBottom: null }}
+                title={account.name}
               />
             );
           }}

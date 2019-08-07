@@ -29,8 +29,6 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/message';
 
-const orUnknown = (value = 'Unknown') => value;
-
 export default class MessageDetails extends React.PureComponent {
   static navigationOptions = {
     title: 'Transaction Details',
@@ -83,6 +81,8 @@ export class MessageDetailsView extends React.PureComponent {
   };
 
   render() {
+    const {data, message, onNext, onPressAccount, sender} = this.props;
+
     return (
       <ScrollView
         contentContainerStyle={styles.bodyContent}
@@ -92,23 +92,23 @@ export class MessageDetailsView extends React.PureComponent {
         <Text style={styles.topTitle}>SIGN MESSAGE</Text>
         <Text style={styles.title}>FROM ACCOUNT</Text>
         <AccountCard
-          title={this.props.sender.name}
-          address={this.props.sender.address}
-          networkKey={this.props.sender.networkKey}
+          title={sender.name}
+          address={sender.address}
+          networkKey={sender.networkKey}
           onPress={() => {
-            this.props.onPressAccount(this.props.sender);
+            onPressAccount(sender);
           }}
         />
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
-          {isAscii(this.props.message)
-            ? hexToAscii(this.props.message)
-            : this.props.data}
+          {isAscii(message)
+            ? hexToAscii(message)
+            : data}
         </Text>
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Message"
-          onPress={() => this.props.onNext()}
+          onPress={() => onNext()}
         />
       </ScrollView>
     );
