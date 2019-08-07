@@ -69,7 +69,7 @@ export default class AccountCard extends React.PureComponent {
               </Text>
               <Address 
                 address={address}
-                networkProtocol={network.protocol}
+                protocol={network.protocol}
                 short = {shortAddress}
               />
             </View>

@@ -73,9 +73,9 @@ export class SignedTxView extends React.PureComponent {
         />
         <Text style={styles.title}>RECIPIENT</Text>
         <AccountCard
-          title={this.props.recipient.name}
           address={this.props.recipient.address}
           networkKey={this.props.recipient.networkKey || ''}
+          title={this.props.recipient.name}
         />
       </ScrollView>
     );
