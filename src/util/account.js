@@ -1,15 +1,16 @@
-import { SubstrateNetworkKeys, NetworkProtocols } from '../constants';
+import { SubstrateNetworkKeys, NetworkProtocols, NETWORK_LIST } from '../constants';
 
 export function accountId({
   address,
   protocol = NetworkProtocols.SUBSTRATE,
-  genesisHash,
   networkKey = SubstrateNetworkKeys.KUSAMA
 }) {
   if (typeof address !== 'string' || address.length === 0) {
     throw new Error(`Couldn't create an accountId, address missing`);
   }
   if (protocol === NetworkProtocols.SUBSTRATE){
+    const genesisHash = NETWORK_LIST[networkKey].genesisHash;
+    
     return `${protocol}:${address}:${genesisHash}`;
   } else {
     return `${protocol}:${address.toLowerCase()}@${networkKey}`;
