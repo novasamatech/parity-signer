@@ -24,13 +24,13 @@ export const SubstrateNetworkKeys = Object.freeze({
 const substrateNetworkBase = {
   [SubstrateNetworkKeys.KUSAMA]: {
     color: '#4C4646',
-    genesisHash: 0x123,
+    genesisHash: '123',
     prefix: 2,
     title: 'Kusama'
   },
   [SubstrateNetworkKeys.POLKADOT]: {
     color: '#e6007a',
-    genesisHash: 0x456,
+    genesisHash: '456',
     prefix: 0,
     title: 'Polkadot'
   }
