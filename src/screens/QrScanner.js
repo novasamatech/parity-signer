@@ -47,15 +47,11 @@ export default class Scanner extends React.PureComponent {
               navigation={this.props.navigation}
               scannerStore={scannerStore}
               onBarCodeRead={async txRequestData => {
-                debugger;
                 if (scannerStore.isBusy()) {
                   return;
                 }
 
-                debugger;
-
                 try {
-                  debugger;
                   scannerStore.parseRawData(txRequestData.rawData);
                 } catch (e) {
                   Alert.alert('Unable to parse transaction', e.message, [

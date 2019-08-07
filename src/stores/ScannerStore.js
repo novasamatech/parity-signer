@@ -21,7 +21,7 @@ import { encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
 import { saveTx } from '../util/db';
-import { brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
+import { blake2s, brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
 import { rawDataToU8A } from '../util/rawDataToU8A';
 import { Account } from './AccountsStore';
@@ -81,7 +81,6 @@ export default class ScannerStore extends Container<ScannerState> {
     data['data'] = {}; // for consistency with legacy data format.
 
     try {
-      debugger;
       // decode payload appropriately via UOS
       switch (zerothByte) {
         case 45: // Ethereum UOS payload
@@ -107,20 +106,16 @@ export default class ScannerStore extends Container<ScannerState> {
           const ss58Encoded = encodeAddress(publicKeyAsBytes);
           const encryptedData: Uint8Array = uosAfterFrames.slice(35);
 
-          debugger;
-
           data['action'] = action;
           data['data']['crypto'] = crypto;
           data['data']['account'] = ss58Encoded;
-
-          debugger;
 
           switch(secondByte) {
             case 0:
               if (encryptedData.length > 256) {
                 data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
                 data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
-                data['data']['data'] = blake2b(data.data.payload); // FIXME: use native blake2b function
+                data['data']['data'] = blake2s(encryptedData);
               } else {
                 data['isHash'] = false;
                 data['data']['data'] = Payload(encryptedData);
