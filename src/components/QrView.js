@@ -47,7 +47,7 @@ export default function QrView(props) {
   let size = props.size || deviceWidth - 80;
   let flexBasis = props.height || deviceWidth - 40;
 
-  const renderQr = () => (
+  return (
     <View
       style={[
         styles.rectangleContainer,
@@ -58,8 +58,6 @@ export default function QrView(props) {
       <Image source={{ uri: qr }} style={{ width: size, height: size }} />
     </View>
   );
-
-  return renderQr();
 }
 
 const styles = StyleSheet.create({
