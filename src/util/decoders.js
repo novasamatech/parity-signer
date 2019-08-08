@@ -16,7 +16,7 @@
 
 // @flow
 
-import { hexToU8a, u8aConcat, u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
+import { hexStripPrefix, hexToU8a, u8aConcat, u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 /*
@@ -25,10 +25,9 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
   4 // indicates binary
   37 // indicates data length
   --- UOS Specific Data
-  00 // multipart or not?
-  01 // number of frames in total
-  00 // the current frame index
-  00 // frame
+  00 + // is it multipart?
+  0001 + // how many parts in total?
+  0000 +  // which frame are we on?
   53 // indicates payload is for Substrate
   01 // crypto: sr25519
   00 // indicates action: signData
@@ -86,8 +85,23 @@ export function rawDataToU8A(rawData) {
 
 export function parseRawData(rawData) {
   const bytes = rawDataToU8A(rawData);
-  const frameInfo = bytes.slice(0, 5);
-  const uosAfterFrames = u8aToHex(bytes.slice(5)).slice(2);
+  
+  const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
+  const isMultipart = !!(parseInt(frameInfo.substr(0, 2), 16));
+  const frameCount = parseInt(frameInfo.substr(2, 4), 16);
+  const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
+  const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
+
+  if (isMultipart) {
+    const partData = {
+      currentFrame,
+      frameCount,
+      isMultipart: true,
+      partData: uosAfterFrames
+    };
+
+    return partData;
+  }
 
   const zerothByte = uosAfterFrames.substr(0, 2);
   const firstByte = uosAfterFrames.substr(2, 2);
@@ -101,8 +115,8 @@ export function parseRawData(rawData) {
     // decode payload appropriately via UOS
     switch (zerothByte) {
       case '45': // Ethereum UOS payload
-        action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
-        address = uosAfterFrames.slice(2, 22);
+        action = firstByte === '00' || firstByte === '01' ? 'signData' : firstByte === '01' ? 'signTransaction' : null;
+        address = uosAfterFrames.substr(4, 44);
 
         data['action'] = action;
         data['data']['account'] = account;

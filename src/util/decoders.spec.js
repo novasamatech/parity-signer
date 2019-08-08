@@ -28,15 +28,44 @@ const CMD_SIGN_IMMORTAL_TX = new Uint8Array([0x02]);
 const CMD_SIGN_MSG = new Uint8Array([0x03]);
 
 const RN_TX_REQUEST_RAW_DATA = 
-  '43' + 
-  '7' + 
-  '0000010000' + 
-  '53' + 
-  '01' +
-  '03' +
-  '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407' +
-  '765448495320495320535041525441210' +
+  '4' + // indicates data is binary encoded
+  '37' +  // length of data
+  '00' + // is it multipart?
+  '0001' + // how many parts in total?
+  '0000' +  // which frame are we on?
+  '53' + // S for Substrate
+  '01' + // sr25519
+  '03' + // sign message
+  '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea40776' + // key
+  '5448495320495320535041525441210' + // message
   'ec11ec11ec11ec';
+
+const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_1 = 
+  '4' + // indicates data is binary encoded
+  '37' +  // length of data
+  '01' + // is it multipart?
+  '0002' + // how many parts in total?
+  '0001' +  // which frame are we on?
+  '53' + // S for Substrate
+  '01' + // sr25519
+  '03' + // sign message
+  '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea40776' + // key
+  '5448495320495320535041525441210' + // THIS IS SPARTA!
+  'ec11ec11ec11ec';
+
+const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_2 = 
+  '4' + // indicates data is binary encoded
+  '37' +  // length of data
+  '01' + // is it multipart?
+  '0002' + // how many parts in total?
+  '0002' +  // which frame are we on?
+  '53' + // S for Substrate
+  '01' + // sr25519
+  '03' + // sign message
+  '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407' + // key
+  '686520736169642c20746f206e6f206f6e6520696e20706172746963756c61722e' + // he said, to no one in particular.
+  'ec11ec11ec11ec';
+
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
 
@@ -55,26 +84,36 @@ describe.skip('sanity check', () => {
 });
 
 describe('decoders', () => {
-  it('should properly extract only UOS relevant data from RNCamera txRequest.rawData', () => {
-    const strippedU8a = rawDataToU8A(RN_TX_REQUEST_RAW_DATA);
-    const frameInfo = strippedU8a.slice(0, 5);
-    const uos = strippedU8a.slice(5);
+  describe('rawDataToU8a', () => {
+    it('should properly extract only UOS relevant data from RNCamera txRequest.rawData', () => {
+      const strippedU8a = rawDataToU8A(RN_TX_REQUEST_RAW_DATA);
+      const frameInfo = strippedU8a.slice(0, 5);
+      const uos = strippedU8a.slice(5);
 
-    // console.log('frame info ', frameInfo);
-    // console.log('uos => ', uos);
+      expect(frameInfo).toEqual(new Uint8Array([0, 0, 1, 0, 0]));
+      expect(uos[0]).toEqual(SUBSTRATE_ID[0]);
+      expect(uos[1]).toEqual(CRYPTO_SR25519[0]);
+      expect(uos[2]).toEqual(CMD_SIGN_MSG[0]);
+    });
+  })
 
-    expect(frameInfo).toEqual(new Uint8Array([0, 0, 1, 0, 0]));
-    expect(uos[0]).toEqual(SUBSTRATE_ID[0]);
-    expect(uos[1]).toEqual(CRYPTO_SR25519[0]);
-    expect(uos[2]).toEqual(CMD_SIGN_MSG[0]);
-  });
+  describe('UOS parsing', () => {
+    it('should properly construct data from Substrate UOS message', () => {
+      const unsignedData = parseRawData(RN_TX_REQUEST_RAW_DATA);
 
-  it('should properly construct data from Substrate UOS message', () => {
-    const unsignedData = parseRawData(RN_TX_REQUEST_RAW_DATA);
+      expect(unsignedData).toBeDefined();
+      expect(unsignedData.data.crypto).toEqual('sr25519');
+      expect(unsignedData.data.data).toEqual('THIS IS SPARTA!');
+      expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
+    });
 
-    expect(unsignedData).toBeDefined();
-    expect(unsignedData.data.crypto).toEqual('sr25519');
-    expect(unsignedData.data.data).toEqual('THIS IS SPARTA!');
-    expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
-  });
+    it('should properly construct data from Substrate UOS Multipart Message', () => {
+      const partData1 = parseRawData(RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_1);
+      
+      expect(partData1).toBeDefined();
+      expect(partData1.isMultipart).toEqual(true);
+      expect(partData1.frameCount).toEqual(2);
+      expect(partData1.currentFrame).toEqual(1);
+    });
+  })
 });
