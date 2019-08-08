@@ -45,19 +45,22 @@ export default class Scanner extends React.PureComponent {
                   return;
                 }
 
-                try {
-                  scannerStore.setParsedData(txRequestData.rawData);
-                  
-                } catch (e) {
-                  Alert.alert('Unable to parse transaction', e.message, [
-                    {
-                      text: 'Try again',
-                      onPress: () => {
-                        scannerStore.cleanup();
+                if (txRequestData.data) { // Ethereum Legacy
+                  scannerStore.setUnsigned(txRequestData.data);
+                } else {
+                  try {
+                    scannerStore.setParsedData(txRequestData.rawData);
+                  } catch (e) {
+                    Alert.alert('Unable to parse transaction', e.message, [
+                      {
+                        text: 'Try again',
+                        onPress: () => {
+                          scannerStore.cleanup();
+                        }
                       }
-                    }
-                  ]);
-                }
+                    ]);
+                  }
+                }                
 
                 if (!(await scannerStore.setData(accountsStore))) {
                   return;

@@ -68,6 +68,12 @@ const defaultState = {
 export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
+  setUnsigned(data) {
+    this.setState({
+      unsignedData: data
+    });
+  }
+
   setParsedData(rawData) {
     const parsedData = parseRawData(rawData);
 
