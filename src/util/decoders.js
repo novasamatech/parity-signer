@@ -24,10 +24,11 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
   ---
   4 // indicates binary
   37 // indicates data length
-  0000
-  0100
-  00
   --- UOS Specific Data
+  00 // multipart or not?
+  01 // number of frames in total
+  00 // the current frame index
+  00 // frame
   53 // indicates payload is for Substrate
   01 // crypto: sr25519
   00 // indicates action: signData
@@ -117,14 +118,9 @@ export function parseRawData(rawData) {
       case '53': // Substrate UOS payload
         const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
         const pubKeyHex = uosAfterFrames.substr(6, 64)
-        const publicKeyAsBytes = hexToU8a('0x'+pubKeyHex);
-        console.log(publicKeyAsBytes);
-        
-        const a = 1;
-        debugger;
+        const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
         const ss58Encoded = encodeAddress(publicKeyAsBytes, 2); // encode to kusama
-
-        const hexEncodedData: Uint8Array = uosAfterFrames.slice(35);
+        const hexEncodedData = '0x' + uosAfterFrames.slice(70);
 
         data['data']['crypto'] = crypto;
         data['data']['account'] = ss58Encoded;
@@ -154,7 +150,7 @@ export function parseRawData(rawData) {
           case '03': // Cold Signer should attempt to decode message to utf8
             data['action'] = 'signData';
             data['isHash'] = false;
-            data['data']['data'] = decodeToString(hexEncodedData.map(b => parseInt(b, 16)));
+            data['data']['data'] = u8aToString(hexToU8a(hexEncodedData));
             break;
           default:
             break;

@@ -14,7 +14,7 @@
     "android": "yarn run build-rust-android && react-native run-android --appIdSuffix \"dev\"",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
     "postinstall": "npx jetify",
-    "test": "jest --watch",
+    "test": "jest",
     "lint": "eslint",
     "commit": "commit-wizard",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force"
