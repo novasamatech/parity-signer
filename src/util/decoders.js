@@ -80,6 +80,93 @@ export function rawDataToU8A(rawData) {
   return bytes;
 }
 
+export function parseRawData(rawData) {
+  const bytes = rawDataToU8A(rawData);
+  const hex = bytes.map(byte => byte.toString(16));
+  const uosAfterFrames = hex.slice(5); // FIXME handle multipart
+
+  const zerothByte = uosAfterFrames[0];
+  const firstByte = uosAfterFrames[1];
+  const secondByte = uosAfterFrames[2];
+  let action;
+  let address;
+  let data = {};
+  data['data'] = {}; // for consistency with legacy data format.
+
+  try {
+    // decode payload appropriately via UOS
+    switch (zerothByte) {
+      case 45: // Ethereum UOS payload
+        action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
+        address = uosAfterFrames.slice(2, 22);
+
+        data['action'] = action;
+        data['data']['account'] = account;
+
+        if (action === 'signData') {
+          data['data']['rlp'] = uosAfterFrames[13];
+        } else if (action === 'signTransaction') {
+          data['data']['data'] = rawAfterFrames[13];
+        } else {
+          throw new Error('Could not determine action type.');
+        }
+        break;
+      case 53: // Substrate UOS payload
+        const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
+        const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
+        console.log('raw => ', rawData);
+        console.log('uosafterframes => ', uosAfterFrames);
+
+        const ss58Encoded = encodeAddress(publicKeyAsBytes, 2); // encode to kusama
+        debugger;
+        const hexEncodedData: Uint8Array = uosAfterFrames.slice(35);
+
+        data['data']['crypto'] = crypto;
+        data['data']['account'] = ss58Encoded;
+
+        debugger;
+
+        switch(secondByte) {
+          case 0:
+            data['action'] = 'signTransaction';
+            if (encryptedData.length > 256) {
+              data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
+              data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
+              data['data']['data'] = blake2s(hexEncodedData);
+            } else {
+              data['isHash'] = false;
+              data['data']['data'] = Payload(hexEncodedData);
+            }
+            break;
+          case 1:
+            data['action'] = 'signTransaction';
+            data['isHash'] = true;
+            data['data']['data'] = hexEncodedData; // data is a hash
+            break;
+          case 2:
+            data['action'] = 'signTransaction';
+            data['isHash'] = false;
+            data['data']['data'] = Payload(hexEncodedData);
+            break;
+          case 3: // Cold Signer should attempt to decode message to utf8
+            data['action'] = 'signData';
+            data['isHash'] = false;
+            data['data']['data'] = decodeToString(hexEncodedData.map(b => parseInt(b, 16)));
+            break;
+          default:
+            break;
+        }
+        break;
+      default:
+        throw new Error('we cannot handle the payload: ', rawData);
+    }
+
+    return data;
+  } catch (e) {
+    throw new Error('we cannot handle the payload: ', rawData);
+  }
+}
+
 export function decodeToString(message: Uint8Array): string {
   const decoder = new TextDecoder('utf8');
 

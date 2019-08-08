@@ -18,6 +18,7 @@
 
 import React from 'react';
 import { StyleSheet, ScrollView, Text, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -65,7 +66,7 @@ class AccountNewView extends React.Component {
 
     return (
       <>
-        <TouchableOpacity
+        <TouchableItem
           onPress={this.toggleAdvancedField}
           style={{diplay:'flex'}}
         >
@@ -80,7 +81,7 @@ class AccountNewView extends React.Component {
               />
             </Text>
           </View>
-        </TouchableOpacity>
+        </TouchableItem>
         {showAdvancedField && 
           <TextInput
             // onChangeText={name => this.setState({ derivationPath })}
