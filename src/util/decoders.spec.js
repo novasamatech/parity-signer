@@ -17,7 +17,7 @@
 'use strict';
 
 import { hexToU8a, u8aConcat, u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { checkAddress, decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { parseRawData, rawDataToU8A } from './decoders';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
@@ -54,7 +54,11 @@ describe('decoders', () => {
     expect(uos[2]).toEqual(CMD_SIGN_MSG[0]);
   });
 
-  it('should properly construct data from Substrate UOS message', () => {
+  it('sanity check address is kusama', () => {
+    expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);
+  })
+
+  it.only('should properly construct data from Substrate UOS message', () => {
     const unsignedData = parseRawData(RN_TX_REQUEST_RAW_DATA);
 
     expect(unsignedData).toBeDefined();
