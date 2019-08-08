@@ -68,21 +68,26 @@ const defaultState = {
 export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
-  setUnsigned(data) {
+  async setUnsigned(data) {
     this.setState({
       unsignedData: data
     });
   }
 
-  setParsedData(rawData) {
+  async setParsedData(rawData, accountsStore) {
     const parsedData = parseRawData(rawData);
+
+    if (parsedData.isMultipart) {
+      this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
+      return;
+    }
 
     this.setState({
       unsignedData: parsedData
     });
   }
 
-  setPartData(frame, frameCount, partData, accountsStore) {
+  async setPartData(frame, frameCount, partData, accountsStore) {
     if (partData[0] === new Uint8Array([0x00]) || partData[0] === new Uint8Array([0x7B])) {
       // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
       throw new Error('Error decoding invalid part data.');
@@ -103,7 +108,7 @@ export default class ScannerStore extends Container<ScannerState> {
     if (Object.keys(this.state.multipartData.length) === frameCount) {
       // fixme: this needs to be concated to a binary blob
       const concatMultipartData = Object.keys(this.state.multipartData).reduce((result, data) => res.concat(this.state.multipartData[data]));
-      const data = this.parseRawData(data, accountsStore);
+      const data = this.setParsedData(concatMultipartData);
       this.setData(data);
     }
   }
