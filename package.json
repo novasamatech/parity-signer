@@ -8,16 +8,16 @@
     "yarn": "^1.3.2"
   },
   "scripts": {
+    "android": "yarn run build-rust-android && react-native run-android --appIdSuffix \"dev\"",
     "build-rust-ios": "cd rust/signer && make ios",
     "build-rust-android": "cd rust/signer && make android",
-    "ios": "yarn run build-rust-ios && react-native run-ios",
-    "android": "yarn run build-rust-android && react-native run-android --appIdSuffix \"dev\"",
-    "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
-    "postinstall": "npx jetify",
-    "test": "jest",
-    "lint": "eslint",
+    "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force",
     "commit": "commit-wizard",
-    "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force"
+    "ios": "yarn run build-rust-ios && react-native run-ios",
+    "lint": "eslint",
+    "postinstall": "npx jetify",
+    "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
+    "test": "jest"
   },
   "dependencies": {
     "@plugnet/util": "^0.94.100",
@@ -67,12 +67,14 @@
     "jetifier": "^1.6.3",
     "metro-react-native-babel-preset": "^0.55.0",
     "pre-git": "^3.14.0",
-    "prettier": "1.12.1",
-    "reactotron-react-native": "^3.6.4"
+    "prettier": "1.18.2",
+    "reactotron-react-native": "^3.6.4",
+    "react-test-renderer": "16.8.6"
   },
-  "rnpm": {
-    "assets": [
-      "./res/fonts"
+  "jest": {
+    "preset": "react-native",
+    "setupFiles": [
+      "<rootDir>/jest-setup.js"
     ]
   },
   "release": {

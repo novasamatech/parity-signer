@@ -29,7 +29,7 @@ const CMD_SIGN_MSG = new Uint8Array([0x03]);
 
 const RN_TX_REQUEST_RAW_DATA = 
   '4' + // indicates data is binary encoded
-  '37' +  // length of data
+  '37' +  // byte length of data
   '00' + // is it multipart?
   '0001' + // how many parts in total?
   '0000' +  // which frame are we on?
@@ -42,7 +42,7 @@ const RN_TX_REQUEST_RAW_DATA =
 
 const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_1 = 
   '4' + // indicates data is binary encoded
-  '37' +  // length of data
+  '37' +  // byte length of data
   '01' + // is it multipart?
   '0002' + // how many parts in total?
   '0001' +  // which frame are we on?
@@ -55,7 +55,7 @@ const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_1 =
 
 const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_2 = 
   '4' + // indicates data is binary encoded
-  '37' +  // length of data
+  '37' +  // byte length of data
   '01' + // is it multipart?
   '0002' + // how many parts in total?
   '0002' +  // which frame are we on?
@@ -66,6 +66,30 @@ const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_2 =
   '686520736169642c20746f206e6f206f6e6520696e20706172746963756c61722e' + // he said, to no one in particular.
   'ec11ec11ec11ec';
 
+const RN_SIGN_TX_RAW = 
+  '00' +
+  '0001' +
+  '0000' +
+  '53' +
+  '01' + // sr25519
+  '00' + // sign payload
+  '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407' + // key
+  '25511822302537215797235531988255106143113176252203114241521162237419025013623215816471182221431052381812241012251401058025511214112685311042201552451547197351031924015128941994829350000073220209521031202131150731108217039133177116141235109176149811833389220179224137145291502552158614295101262181031683814525555154196187164249201184892541191559370545997173451852291082097222689102' + // Signer SCALE Payload
+  'ec11ec11ec'
+
+const RN_OVERSIZED_TX_RAW = 
+
+const RN_SIGN_HASH_RAW = 
+  '00' +
+  '0001' +
+  '0000' +
+  '53' +
+  '01' + // sr25519
+  '01' + // sign payload hash
+  '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407' + // key
+  ''
+
+ 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
 
@@ -98,7 +122,7 @@ describe('decoders', () => {
   })
 
   describe('UOS parsing', () => {
-    it('should properly construct data from Substrate UOS message', () => {
+    it('from Substrate UOS message', () => {
       const unsignedData = parseRawData(RN_TX_REQUEST_RAW_DATA);
 
       expect(unsignedData).toBeDefined();
@@ -107,7 +131,19 @@ describe('decoders', () => {
       expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
     });
 
-    it('should properly construct data from Substrate UOS Multipart Message', () => {
+    it.only('from Substrate UOS Payload', () => {
+      const unsignedData = parseRawData(RN_SIGN_TX_RAW);
+
+      expect(unsignedData).toBeDefined();
+    });
+
+    it('from oversized Substrate UOS Message', () = {
+      const unsignedData = parseRawData(RN_OVERSIZED_TX_RAW);
+
+
+    })
+
+    it('from Substrate UOS Multipart Message', () => {
       const partData1 = parseRawData(RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_1);
       
       expect(partData1).toBeDefined();

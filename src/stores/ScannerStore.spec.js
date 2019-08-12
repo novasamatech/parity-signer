@@ -17,14 +17,14 @@
 // @flow
 
 import React from 'react';
-import * as renderer from 'react-test-renderer';
+import TestRenderer from 'react-test-renderer';
 import { Provider, Subscribe, Container } from 'unstated';
 
 import AccountsStore from './AccountsStore';
 import ScannerStore from './ScannerStore';
 
 function render(element) {
-  return renderer.create(element).toJSON();
+  return TestRenderer.create(element).toJSON();
 }
 
 describe('QrScanner', () => {
