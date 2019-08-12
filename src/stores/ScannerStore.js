@@ -131,12 +131,14 @@ export default class ScannerStore extends Container<ScannerState> {
     const message = signRequest.data.data;
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
+    let dataToSign = '';
 
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
-      const substrateSign = async () => { /* Placeholder function for now */ return message; }
-      const dataToSign = await substrateSign(message);
+      const substrateSign = async () => { /* Placeholder function for now */ return Promise.resolve(message); }
+      dataToSign = await substrateSign(message);
+      console.log('data to sign => ', dataToSign);
     } else {
-      const dataToSign = await ethSign(message);
+      dataToSign = await ethSign(message);
     }
 
     const sender = accountsStore.getByAddress(address);
@@ -146,6 +148,7 @@ export default class ScannerStore extends Container<ScannerState> {
         `No private key found for ${address} found in your signer key storage.`
       );
     }
+
     this.setState({
       type: 'message',
       sender,
@@ -170,6 +173,7 @@ export default class ScannerStore extends Container<ScannerState> {
       const networkKey = ethereumChainId;
     }
 
+    debugger;
      // TODO cater for Substrate
     const sender = accountsStore.getById({
       protocol,

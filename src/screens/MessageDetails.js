@@ -39,8 +39,9 @@ export default class MessageDetails extends React.PureComponent {
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scannerStore, accounts) => {
           const dataToSign = scannerStore.getDataToSign();
+
           if (dataToSign) {
-            const tx = scannerStore.getTx();
+            // const tx = scannerStore.getTx(); this does nothing????
             return (
               <MessageDetailsView
                 {...this.props}
@@ -102,8 +103,8 @@ export class MessageDetailsView extends React.PureComponent {
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
           {isAscii(message)
-            ? hexToAscii(message)
-            : data}
+            ? message
+            : hexToAscii(data)}
         </Text>
         <Button
           buttonStyles={{ height: 60 }}

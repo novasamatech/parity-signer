@@ -171,8 +171,6 @@ export default class AccountsStore extends Container<AccountsState> {
 
   getByAddress(address): ?Account {
     const accounts = this.getAccounts();
-    console.log('unlocked accounts => ', accounts);
-    debugger;
     return accounts.find(
       a => a.address.toLowerCase() === address.toLowerCase()
     );

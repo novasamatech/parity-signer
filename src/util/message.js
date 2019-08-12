@@ -1,12 +1,5 @@
 export function isAscii(data) {
-  for (var i = 2; i < data.length; i += 2) {
-    let n = parseInt(data.substr(i, 2), 16);
-
-    if (n < 32 || n >= 128) {
-      return false;
-    }
-  }
-  return true;
+  return (/^[\x00-\xFF]*$/).test(data);
 }
 
 export function hexToAscii(hexx) {
@@ -15,5 +8,6 @@ export function hexToAscii(hexx) {
   for (var i = 0; i < hex.length; i += 2) {
     str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
   }
+
   return str;
 }

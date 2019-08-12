@@ -71,10 +71,10 @@ export default class AccountIconChooser extends React.PureComponent {
       // TODO return a real list of Polkadot accounts 
       try {
         const icons = [
-          {address: "5EjSNPzM9T6Nb19zb38TcwBQh5hNWG47noi7anXQT64BBJBx", bip39: true, seed: "this is sparta"}, //need to fake the bip39: true here
-          {address: "5ExttMT4rtnYJ7TLn19d8C8sVdTH8exj7pxWPC5xepz7J9KF", bip39: true, seed: "act age neither fun public history flock improve lady sport high length solution meadow jar minor monster quick pelican indoor couch produce cage boy"},
-          {address: "5ECyNdxrwuzmsmfPJU64zMyJo8dV86hXfjjxK3PmZx1YCurj", bip39: true, seed: "act age neither fun public history flock improve lady sport high length solution meadow jar minor monster quick pelican indoor couch produce cage boy"},
-          {address: "5CeZD17KnQuk9cxF3uf9sE1LYJqdhPzuit4pDK2D5hCsXtQD", bip39: true, seed: "act age neither fun public history flock improve lady sport high length solution meadow jar minor monster quick pelican indoor couch produce cage boy"}
+          {address: "FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs", bip39: true, seed: "this is sparta"}, //need to fake the bip39: true here
+          {address: "E66jao5eg6VHPt9DPQYHuzhR2cA2kWX5NkxaawbnhauiFDV", bip39: true, seed: "today between dice desert sniff parent kiwi right clog crunch confirm gauge"},
+          {address: "FLokPrwV48RagFSznhgMpXpmQTaXaVijuUcn3U6NimdirbU", bip39: true, seed: "vote this glide journey foot hunt vendor opera quarter group loyal fetch"},
+          {address: "ESjtxHjDw2vWxUDEPCBphJN4mnXX1EwTURgfsfkDWyXKscz", bip39: true, seed: "bicycle sound require post tray monitor ramp until pass renew expect empower"}
         ]
         this.setState({ icons });
       } catch (e) {
