@@ -27,7 +27,7 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/message';
+import { isAscii } from '../util/message';
 
 export default class MessageDetails extends React.PureComponent {
   static navigationOptions = {
@@ -102,7 +102,7 @@ export class MessageDetailsView extends React.PureComponent {
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
           {isAscii(message)
-            ? hexToAscii(message)
+            ? message
             : data}
         </Text>
         <Button
