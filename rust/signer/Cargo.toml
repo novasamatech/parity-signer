@@ -14,7 +14,7 @@ jni = { version = "0.10.2", default-features = false, optional = true }
 libc = "0.2"
 rlp = { version = "0.3.0", features = ["ethereum"] }
 rustc-hex = "2.0.1"
-schnorrkel = "0.8"
+schnorrkel = "0.8.5"
 serde = "1.0"
 serde_json = "1.0"
 substrate-bip39 = "0.3.1"
