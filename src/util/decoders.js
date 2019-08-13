@@ -140,32 +140,27 @@ export function constructDataFromBytes(bytes) {
         data['data']['crypto'] = crypto;
         data['data']['account'] = ss58Encoded;
 
-        console.log('payload u8a => ', rawPayload);
         switch(secondByte) {
           case '00':
             data['action'] = 'signTransaction';
             if (rawPayload.length > 256) {
-              debugger;
               data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
               data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
               data['data']['data'] = blake2s(rawPayload);
             } else {
               data['isHash'] = false;
-              data['data']['data'] = new GenericExtrinsicPayload(rawPayload);
+              data['data']['data'] = new GenericExtrinsicPayload(rawPayload, { version: 3 });
             }
             break;
           case '01':
             data['action'] = 'signTransaction';
             data['isHash'] = true;
-            debugger;
             data['data']['data'] = rawPayload; // data is a hash
-            debugger;
             break;
           case '02': // immortal
             data['action'] = 'signTransaction';
             data['isHash'] = false;
-            debugger;
-            data['data']['data'] = new GenericExtrinsicPayload(rawPayload);
+            data['data']['data'] = new GenericExtrinsicPayload(rawPayload, { version: 3 });
             break;
           case '03': // Cold Signer should attempt to decode message to utf8
             data['action'] = 'signData';

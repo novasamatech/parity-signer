@@ -138,8 +138,13 @@ describe('decoders', () => {
       expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
     });
 
-    it.only('from Substrate UOS Payload', () => {
+    it('from Substrate UOS Payload', () => {
       const unsignedData = constructDataFromBytes(SIGN_TX_TEST);
+
+      const payload = new GenericExtrinsicPayload(SIGN_TX_TEST, { version: 3 });
+      const fromBytes = new GenericExtrinsicPayload(payload.toU8a(), { version: 3 });
+
+      expect(payload).toEqual(fromBytes);
 
       expect(unsignedData.data.data.era.toHex()).toEqual(SIGNER_PAYLOAD_TEST.era);
       expect(unsignedData.data.data.method.toHex()).toEqual(SIGNER_PAYLOAD_TEST.method);
