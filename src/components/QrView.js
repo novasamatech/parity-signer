@@ -20,20 +20,19 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Dimensions, StyleSheet, Image, View } from 'react-native';
 
+import { Button } from './Button';
 import colors from '../colors';
 import { NetworkProtocols } from '../constants';
 import { qrCode } from '../util/native';
 
 export default class QrView extends React.PureComponent {
-  static propsTypes = {
+  static propTypes = {
     data: PropTypes.string.isRequired // arbitrary message/txn string or `${networkType}:0x${address.toLowerCase()}@${networkKey}`
   }
 
-  state = {};
-
   componentDidMount() {
     const { data } = this.props;
-
+  
     this.displayQrCode(data);
   }
 

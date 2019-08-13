@@ -22,7 +22,7 @@
   "dependencies": {
     "@plugnet/util": "^0.94.100",
     "@plugnet/wasm-crypto-js": "^0.11.102",
-    "@polkadot/api": "^0.90.0-beta.24",
+    "@polkadot/api": "^0.90.0-beta.48",
     "@polkadot/reactnative-identicon": "^0.42.0-beta.26",
     "@polkadot/util": "^1.0.1",
     "@polkadot/util-crypto": "1.1.0-beta.1",
@@ -47,7 +47,6 @@
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^6.6.0",
     "react-navigation": "^3.11.1",
-    "react-test-renderer": "^16.9.0",
     "readable-stream": "^3.4.0",
     "unstated": "^2.1.1",
     "vm-browserify": "1.1.0"
@@ -70,12 +69,6 @@
     "prettier": "1.18.2",
     "reactotron-react-native": "^3.6.4",
     "react-test-renderer": "16.8.6"
-  },
-  "jest": {
-    "preset": "react-native",
-    "setupFiles": [
-      "<rootDir>/jest-setup.js"
-    ]
   },
   "release": {
     "analyzeCommits": "simple-commit-message"

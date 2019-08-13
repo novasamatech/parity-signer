@@ -49,7 +49,8 @@ export default class Scanner extends React.PureComponent {
                   await scannerStore.setUnsigned(txRequestData.data);
                 } else {
                   try {
-                    await scannerStore.setParsedData(txRequestData.rawData, accountsStore);
+                    const strippedData = rawDataToU8A(txRequestData.rawData);
+                    await scannerStore.setParsedData(strippedData, accountsStore);
                   } catch (e) {
                     Alert.alert('Unable to parse transaction', e.message, [
                       {
