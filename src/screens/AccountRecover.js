@@ -60,7 +60,22 @@ class AccountRecoverView extends React.Component {
   constructor(...args) {
     super(...args);
 
-    this.state = { seed: '' };
+    this.state = {
+      seed: '',
+      selectedAccount: undefined,
+      selectedNetwork: undefined
+    };
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const selectedAccount = nextProps.accounts.getNew();
+    const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
+
+    return {
+      selectedAccount,
+      selectedNetwork,
+      seed: prevState.seed
+    }
   }
 
   addressGeneration = seed => {
@@ -82,9 +97,9 @@ class AccountRecoverView extends React.Component {
 
   render() {
     const { accounts, navigation } = this.props;
-    const selected = accounts.getNew();
-    const networkKey = selected.networkKey;
-    const network = NETWORK_LIST[networkKey];
+    const { selectedAccount, selectedNetwork} = this.state;
+    const {address, name, networkKey, seed, validBip39Seed} = selectedAccount;
+
     return (
       <SafeAreaView style={styles.safeAreaView}>
         <KeyboardScrollView
@@ -98,11 +113,11 @@ class AccountRecoverView extends React.Component {
           <Background />
           <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
           <Text style={styles.title}>CHOOSE NETWORK</Text>
-          <NetworkButton network={network} />
+          <NetworkButton network={selectedNetwork} />
           <Text style={styles.title}>ACCOUNT NAME</Text>
           <TextInput
             onChangeText={name => accounts.updateNew({ name })}
-            value={selected && selected.name}
+            value={name}
             placeholder="Enter an account name"
           />
           <Text style={[styles.title, { marginTop: 20 }]}>
@@ -115,7 +130,7 @@ class AccountRecoverView extends React.Component {
               );
             }}
             ref={this._seed}
-            valid={validateSeed(selected.seed, selected.validBip39Seed).valid}
+            valid={validateSeed(seed, validBip39Seed).valid}
             onChangeText={seed => {
               this.debouncedAddressGeneration(seed);
               this.setState({ seed });
@@ -124,18 +139,18 @@ class AccountRecoverView extends React.Component {
           />
           <AccountCard
             style={{ marginTop: 20 }}
-            address={selected.address || ''}
-            networkKey={selected.networkKey || ''}
-            title={selected.name}
-            seedType={selected.validBip39Seed ? 'bip39' : 'brain wallet'}
+            address={address || ''}
+            networkKey={networkKey || ''}
+            title={name}
+            seedType={validBip39Seed ? 'bip39' : 'brain wallet'}
           />
           <Button
             buttonStyles={{ marginBottom: 40 }}
             title="Next Step"
             onPress={() => {
               const validation = validateSeed(
-                selected.seed,
-                selected.validBip39Seed
+                seed,
+                validBip39Seed
               );
 
               if (!validation.valid) {
