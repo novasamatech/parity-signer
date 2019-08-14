@@ -110,12 +110,16 @@ export function decryptData (data, password) {
 
 // Creates a QR code for the UTF-8 representation of a string
 export function qrCode (data) {
-  return EthkeyBridge.qrCode(data)
+  return EthkeyBridge.qrCode(data);
 }
 
 // Creates a QR code for binary data from a hex-encoded string
 export function qrCodeHex (data) {
-  return EthkeyBridge.qrCodeHex(data)
+  return EthkeyBridge.qrCodeHex(data);
+}
+
+export function blake2s (data) {
+  return EthkeyBridge.blake2s(data);
 }
 
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
