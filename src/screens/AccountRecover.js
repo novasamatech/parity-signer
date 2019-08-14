@@ -22,8 +22,11 @@ import {
   findNodeHandle,
   SafeAreaView,
   StyleSheet,
-  Text
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -61,9 +64,11 @@ class AccountRecoverView extends React.Component {
     super(...args);
 
     this.state = {
+      derivationPath: '',
       seed: '',
       selectedAccount: undefined,
-      selectedNetwork: undefined
+      selectedNetwork: undefined,
+      showAdvancedField: false
     };
   }
 
@@ -72,18 +77,18 @@ class AccountRecoverView extends React.Component {
     const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 
     return {
+      derivationPath: prevState.derivationPath,
+      seed: prevState.seed,
       selectedAccount,
       selectedNetwork,
-      seed: prevState.seed
+      showAdvancedField: prevState.showAdvancedField
     }
   }
 
-  addressGeneration = seed => {
+  addressGeneration = (seed, derivationPath = '') => {
     const { accounts } = this.props;
     const { selectedNetwork:{protocol, prefix} } = this.state;
 
-    console.log('protocol',protocol);
-    console.log('prefix', prefix);
     if (protocol === NetworkProtocols.ETHEREUM){
       brainWalletAddress(seed)
         .then(({ address, bip39 }) =>
@@ -91,7 +96,8 @@ class AccountRecoverView extends React.Component {
         )
         .catch(console.error);
     } else {
-      substrateAddress(seed, prefix)
+      console.log('seed+derivationPath',seed+derivationPath);
+      substrateAddress(seed+derivationPath, prefix)
         .then((address) => {
           accounts.updateNew({ address, seed, validBip39Seed: true })
         }   
@@ -111,13 +117,55 @@ class AccountRecoverView extends React.Component {
 
   componentDidUpdate(_, prevState){
     if (prevState.selectedNetwork !== this.state.selectedNetwork){
-      this.addressGeneration(this.state.seed);
+      this.addressGeneration(this.state.seed, this.state.derivationPath);
     }
+  }
+
+  renderAdvanced () {
+    const { seed, selectedNetwork:{protocol}, showAdvancedField } = this.state;
+
+    if (protocol === NetworkProtocols.ETHEREUM){
+      return null;
+    }
+
+    return (
+      <>
+        <TouchableOpacity
+          onPress={this.toggleAdvancedField}
+          style={{diplay:'flex'}}
+        >
+          <View
+            style={{justifyContent:'center'}}
+          >
+            <Text style={[styles.title, styles.advancedText]}>
+              ADVANCED
+              <Icon 
+                name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
+                size={20}
+              />
+            </Text>
+          </View>
+        </TouchableOpacity>
+        {showAdvancedField && 
+          <TextInput
+            onChangeText={derivationPath => {
+              this.debouncedAddressGeneration(seed, derivationPath);
+              this.setState({ derivationPath });
+            }}
+            placeholder="secret derivation path"
+          />
+        }
+      </>
+    )
+  }
+
+  toggleAdvancedField = () => {
+    this.setState({showAdvancedField: !this.state.showAdvancedField}) 
   }
 
   render() {
     const { accounts, navigation } = this.props;
-    const { selectedAccount, selectedNetwork} = this.state;
+    const { derivationPath, selectedAccount, selectedNetwork} = this.state;
     const {address, name, networkKey, seed, validBip39Seed} = selectedAccount;
 
     return (
@@ -152,11 +200,12 @@ class AccountRecoverView extends React.Component {
             ref={this._seed}
             valid={validateSeed(seed, validBip39Seed).valid}
             onChangeText={seed => {
-              this.debouncedAddressGeneration(seed);
+              this.debouncedAddressGeneration(seed, derivationPath);
               this.setState({ seed });
             }}
             value={this.state.seed}
           />
+          {this.renderAdvanced()}
           <AccountCard
             style={{ marginTop: 20 }}
             address={address || ''}
