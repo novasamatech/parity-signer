@@ -1,5 +1,3 @@
-import mapValues from 'lodash/mapValues';
-import defaults from 'lodash/defaults';
 import colors from './colors';
 
 export const NetworkProtocols = Object.freeze({
@@ -7,6 +5,7 @@ export const NetworkProtocols = Object.freeze({
   SUBSTRATE: 'substrate'
 });
 
+// ethereumChainId is used as Network key for Ethereum networks
 export const EthereumNetworkKeys = Object.freeze({
   FRONTIER: '1',
   ROPSTEN: '3',
@@ -16,21 +15,22 @@ export const EthereumNetworkKeys = Object.freeze({
   CLASSIC: '61',
 });
 
+// genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys = Object.freeze({
-  POLKADOT: 's0',
-  KUSAMA: 's2'
+  POLKADOT: '123',
+  KUSAMA: '456'
 });
 
 const substrateNetworkBase = {
   [SubstrateNetworkKeys.KUSAMA]: {
     color: '#4C4646',
-    genesisHash: '123',
+    genesisHash: SubstrateNetworkKeys.KUSAMA,
     prefix: 2,
     title: 'Kusama'
   },
   [SubstrateNetworkKeys.POLKADOT]: {
     color: '#e6007a',
-    genesisHash: '456',
+    genesisHash: SubstrateNetworkKeys.POLKADOT,
     prefix: 0,
     title: 'Polkadot'
   }
@@ -38,47 +38,57 @@ const substrateNetworkBase = {
 
 const ethereumNetworkBase = {
   [EthereumNetworkKeys.FRONTIER]: {
-    title: 'Ethereum',
     color: '#977CF6',
+    ethereumChainId: EthereumNetworkKeys.FRONTIER,
     secondaryColor: colors.card_bg,
+    title: 'Ethereum'
   },
   [EthereumNetworkKeys.CLASSIC]: {
-    title: 'Ethereum Classic',
     color: '#8C7166',
+    ethereumChainId: EthereumNetworkKeys.CLASSIC,
     secondaryColor: colors.card_bg,
+    title: 'Ethereum Classic'
   },
   [EthereumNetworkKeys.ROPSTEN]: {
-    title: 'Ropsten Testnet',
+    ethereumChainId: EthereumNetworkKeys.ROPSTEN,
+    title: 'Ropsten Testnet'
   },
   [EthereumNetworkKeys.GOERLI]: {
-    title: 'Görli Testnet',
+    ethereumChainId: EthereumNetworkKeys.GOERLI,
+    title: 'Görli Testnet'
   },
   [EthereumNetworkKeys.KOVAN]: {
-    title: 'Kovan Testnet',
+    ethereumChainId: EthereumNetworkKeys.KOVAN,
+    title: 'Kovan Testnet'
   }
 };
 
-export const ETHEREUM_NETWORK_LIST = mapValues(
-  ethereumNetworkBase,
-  (ethereumNetworkKey, ethereumChainId) =>
-    defaults(ethereumNetworkKey, {
-      protocol: NetworkProtocols.ETHEREUM,
-      color: '#F2E265',
-      secondaryColor: colors.card_text,
-      ethereumChainId
-    })
-);
+const ethereumDefaultValues = {
+  color: '#F2E265',
+  protocol: NetworkProtocols.ETHEREUM,
+  secondaryColor: colors.card_text
+};
 
-export const SUBSTRATE_NETWORK_LIST = mapValues(
-  substrateNetworkBase,
-  (substrateNetworkKey) =>
-    defaults(substrateNetworkKey, {
-      color: '#4C4646',
-      protocol: NetworkProtocols.SUBSTRATE,
-      secondaryColor: colors.card_bg,
-    })
-);
+const substrateDefaultValues = {
+  color: '#4C4646',
+  protocol: NetworkProtocols.SUBSTRATE,
+  secondaryColor: colors.card_bg
+}
 
+function setDefault(networkBase, defaultProps) {
+  return Object.keys(networkBase).reduce((acc,networkKey) => {
+      return {
+        ...acc,
+        [networkKey]: {
+          ...defaultProps,
+          ...networkBase[networkKey]
+        }
+      }
+    },{})
+}
+
+export const ETHEREUM_NETWORK_LIST = Object.freeze(setDefault(ethereumNetworkBase, ethereumDefaultValues));
+export const SUBSTRATE_NETWORK_LIST = Object.freeze(setDefault(substrateNetworkBase, substrateDefaultValues));
 export const NETWORK_LIST = Object.freeze(
   Object.assign({}, SUBSTRATE_NETWORK_LIST, ETHEREUM_NETWORK_LIST)
 );

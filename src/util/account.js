@@ -5,8 +5,8 @@ export function accountId({
   protocol = NetworkProtocols.SUBSTRATE,
   networkKey = SubstrateNetworkKeys.KUSAMA
 }) {
-  if (typeof address !== 'string' || address.length === 0) {
-    throw new Error(`Couldn't create an accountId, address missing`);
+  if (typeof address !== 'string' || address.length === 0 || !NETWORK_LIST[networkKey]) {
+    throw new Error(`Couldn't create an accountId, address missing or wrong networkKey`);
   }
   if (protocol === NetworkProtocols.SUBSTRATE){
     const genesisHash = NETWORK_LIST[networkKey].genesisHash;
@@ -41,6 +41,7 @@ export function validateSeed(seed, validBip39Seed) {
       valid: false
     };
   }
+
   const words = seed.split(' ');
 
   for (let word of words) {
@@ -58,7 +59,6 @@ export function validateSeed(seed, validBip39Seed) {
       accountRecoveryAllowed: true,
       reason: `This recovery phrase will be treated as a legacy Parity brain wallet.`,
       valid: false
-      
     };
   }
 
