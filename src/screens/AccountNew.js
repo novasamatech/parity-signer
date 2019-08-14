@@ -53,14 +53,27 @@ class AccountNewView extends React.Component {
     super(props);
 
     this.state = {
-      showAdvancedField: false,
+      selectedAccount: undefined,
+      selectedNetwork: undefined,
+      showAdvancedField: false
     };
   }
 
-  renderAdvanced (network) {
-    const { showAdvancedField } = this.state;
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const selectedAccount = nextProps.accounts.getNew();
+    const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 
-    if (network.protocol === NetworkProtocols.ETHEREUM){
+    return {
+      selectedAccount,
+      selectedNetwork,
+      showAdvancedField: prevState.showAdvancedField
+    }
+  }
+
+  renderAdvanced () {
+    const { selectedNetwork, showAdvancedField } = this.state;
+
+    if (selectedNetwork.protocol === NetworkProtocols.ETHEREUM){
       return null;
     }
 
@@ -98,10 +111,10 @@ class AccountNewView extends React.Component {
 
   render() {
     const { accounts, navigation } = this.props;
-    const selected = accounts.getNew();
-    const network = NETWORK_LIST[selected.networkKey];
+    const { selectedAccount, selectedNetwork } = this.state;
+    const {address, name, seed, validBip39Seed} = selectedAccount;
 
-    if (!selected) {
+    if (!selectedAccount) {
       return null;
     }
 
@@ -112,22 +125,26 @@ class AccountNewView extends React.Component {
           <View style={styles.top}>
             <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
             <Text style={styles.title}>NETWORK</Text>
-            <NetworkButton network={network}/>
+            <NetworkButton network={selectedNetwork}/>
             <Text style={styles.title}>ICON & ADDRESS</Text>
             <AccountIconChooser
-              onSelect={({ address, bip39, seed }) => {
-                accounts.updateNew({ address, seed, validBip39Seed: bip39 });
+              onSelect={({ newAddress, isBip39, newSeed }) => {
+                accounts.updateNew({ 
+                  address: newAddress,
+                  seed: newSeed,
+                  validBip39Seed: isBip39
+                });
               }}
-              protocol={network.protocol}
-              value={selected && selected.seed && selected.address}
+              protocol={selectedNetwork.protocol}
+              value={seed && address}
             />
             <Text style={styles.title}>NAME</Text>
             <TextInput
               onChangeText={name => accounts.updateNew({ name })}
-              value={selected && selected.name}
+              value={name}
               placeholder="Enter a new account name"
             />
-            {this.renderAdvanced(network)}
+            {this.renderAdvanced()}
           </View>
           <View style={styles.bottom}>
             <Text style={styles.hintText}>
@@ -136,9 +153,9 @@ class AccountNewView extends React.Component {
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
-              disabled={!validateSeed(selected.seed, selected.validBip39Seed).valid}
+              disabled={!validateSeed(seed, validBip39Seed).valid}
               onPress={() => {
-                validateSeed(selected.seed, selected.validBip39Seed).valid &&
+                validateSeed(seed, validBip39Seed).valid &&
                   navigation.navigate('AccountBackup', {
                     isNew: true,
                     isWelcome: navigation.getParam('isWelcome')
