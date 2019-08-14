@@ -35,11 +35,11 @@ import Button from '../components/Button';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
-import { brainWalletAddress } from '../util/native';
+import { brainWalletAddress, substrateAddress } from '../util/native';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -80,12 +80,26 @@ class AccountRecoverView extends React.Component {
 
   addressGeneration = seed => {
     const { accounts } = this.props;
+    const { selectedNetwork:{protocol, prefix} } = this.state;
 
-    brainWalletAddress(seed)
-      .then(({ address, bip39 }) =>
-        accounts.updateNew({ address, seed, validBip39Seed: bip39 })
-      )
-      .catch(console.error);
+    console.log('protocol',protocol);
+    console.log('prefix', prefix);
+    if (protocol === NetworkProtocols.ETHEREUM){
+      brainWalletAddress(seed)
+        .then(({ address, bip39 }) =>
+          accounts.updateNew({ address, seed, validBip39Seed: bip39 })
+        )
+        .catch(console.error);
+    } else {
+      substrateAddress(seed, prefix)
+        .then((address) => {
+          accounts.updateNew({ address, seed, validBip39Seed: true })
+        }   
+    ).catch(
+      //invalid phrase
+      accounts.updateNew({ address:'', validBip39Seed: false })
+    );
+    }
   };
 
   debouncedAddressGeneration = debounce(this.addressGeneration, 200);
@@ -94,6 +108,12 @@ class AccountRecoverView extends React.Component {
     // called when the user goes back, or finishes the whole recovery process
     this.props.accounts.updateNew({ seed: '' });
   };
+
+  componentDidUpdate(_, prevState){
+    if (prevState.selectedNetwork !== this.state.selectedNetwork){
+      this.addressGeneration(this.state.seed);
+    }
+  }
 
   render() {
     const { accounts, navigation } = this.props;

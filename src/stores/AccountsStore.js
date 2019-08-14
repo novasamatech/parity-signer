@@ -28,7 +28,7 @@ export type Account = {
   encryptedSeed: string,
   name: string,
   networkKey: string,
-  protocol: string,
+//  protocol: string,
   seed: string,
   updatedAt: number,
   validBip39Seed: boolean

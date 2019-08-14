@@ -43,7 +43,10 @@ export default class AccountIconChooser extends React.PureComponent {
   }
 
   refreshIcons = async () => {
-    const {derivationPath, network : {protocol, prefix}} = this.props;
+    const {derivationPath, network : {protocol, prefix}, onSelect} = this.props;
+
+    // clean previous values
+    onSelect({ newAddress: '', isBip39: false, newSeed: ''});
 
     if (protocol === NetworkProtocols.ETHEREUM){
       try {
@@ -141,13 +144,6 @@ export default class AccountIconChooser extends React.PureComponent {
     }
   }
 
-  onRefresh = () => {
-    const { onSelect } = this.props;
-
-    this.refreshIcons();
-    onSelect({ newAddress: '', isBip39: false, newSeed: ''});
-  }
-
   render() {
     const { value } = this.props;
     const { icons } = this.state;
@@ -164,7 +160,7 @@ export default class AccountIconChooser extends React.PureComponent {
             style={styles.icons}
           />
           <TouchableOpacity
-            onPress={this.onRefresh}
+            onPress={this.refreshIcons}
           >
             <Icon
               name={'refresh'}

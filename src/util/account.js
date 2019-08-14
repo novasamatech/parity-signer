@@ -1,19 +1,20 @@
-import { SubstrateNetworkKeys, NetworkProtocols, NETWORK_LIST } from '../constants';
+import { NetworkProtocols, NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 
 export function accountId({
   address,
-  protocol = NetworkProtocols.SUBSTRATE,
-  networkKey = SubstrateNetworkKeys.KUSAMA
+  networkKey
 }) {
-  if (typeof address !== 'string' || address.length === 0 || !NETWORK_LIST[networkKey]) {
-    throw new Error(`Couldn't create an accountId, address missing or wrong networkKey`);
+
+  const { ethereumChainId, protocol, genesisHash } = NETWORK_LIST[networkKey];
+
+  if (typeof address !== 'string' || address.length === 0 || !networkKey) {
+    throw new Error(`Couldn't create an accountId, address or networkKey missing`);
   }
-  if (protocol === NetworkProtocols.SUBSTRATE){
-    const genesisHash = NETWORK_LIST[networkKey].genesisHash;
-    
+
+  if (protocol === NetworkProtocols.SUBSTRATE){ 
     return `${protocol}:${address}:${genesisHash}`;
   } else {
-    return `${protocol}:${address.toLowerCase()}@${networkKey}`;
+    return `${protocol}:${address.toLowerCase()}@${ethereumChainId}`;
   }
 }
 
