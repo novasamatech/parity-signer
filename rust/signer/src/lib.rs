@@ -213,15 +213,15 @@ export! {
     }
 
     @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletAddress
-    fn substrate_brainwallet_address(seed: &str, prefix: u8) -> Option<String> {
-        let keypair = sr25519::KeyPair::from_bip39_phrase(seed)?;
+    fn substrate_brainwallet_address(suri: &str, prefix: u8) -> Option<String> {
+        let keypair = sr25519::KeyPair::from_suri(suri)?;
 
         Some(keypair.ss58_address(prefix))
     }
 
     @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
-    fn substrate_brainwallet_sign(seed: &str, message: &str) -> Option<String> {
-        let keypair = sr25519::KeyPair::from_bip39_phrase(seed)?;
+    fn substrate_brainwallet_sign(suri: &str, message: &str) -> Option<String> {
+        let keypair = sr25519::KeyPair::from_suri(suri)?;
 
         let message: Vec<u8> = message.from_hex().ok()?;
         let signature = keypair.sign(&message);
@@ -247,11 +247,20 @@ mod tests {
 
     #[test]
     fn test_substrate_brainwallet_address() {
-        let phrase = "grant jaguar wish bench exact find voice habit tank pony state salmon";
+        let suri = "grant jaguar wish bench exact find voice habit tank pony state salmon";
         // Secret seed: 0xb139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224
         // Public key (hex): 0x944eeb240615f4a94f673f240a256584ba178e22dd7b67503a753968e2f95761
         let expected = "5FRAPSnpgmnXAnmPVv68fT6o7ntTvaZmkTED8jDttnXs9k4n";
-        let generated = substrate_brainwallet_address(phrase, 42).unwrap();
+        let generated = substrate_brainwallet_address(suri, 42).unwrap();
+
+        assert_eq!(expected, generated);
+    }
+
+    #[test]
+    fn test_substrate_brainwallet_address_suri() {
+        let suri = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
+        let expected = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
+        let generated = substrate_brainwallet_address(suri, 42).unwrap();
 
         assert_eq!(expected, generated);
     }
