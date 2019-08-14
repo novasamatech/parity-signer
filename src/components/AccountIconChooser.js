@@ -30,7 +30,7 @@ import AccountIcon from './AccountIcon';
 import Address from './Address'
 import colors from '../colors';
 import fonts from "../fonts";
-import { brainWalletAddress, words } from '../util/native';
+import { brainWalletAddress, substrateAddress, words } from '../util/native';
 import { NetworkProtocols } from '../constants';
 
 export default class AccountIconChooser extends React.PureComponent {
@@ -43,7 +43,7 @@ export default class AccountIconChooser extends React.PureComponent {
   }
 
   refreshIcons = async () => {
-    const {protocol} = this.props;
+    const {derivationPath, network : {protocol, prefix}} = this.props;
 
     if (protocol === NetworkProtocols.ETHEREUM){
       try {
@@ -67,15 +67,27 @@ export default class AccountIconChooser extends React.PureComponent {
       } catch (e) {
         console.error(e);
       }
-    } else { 
-      // TODO return a real list of Polkadot accounts 
+    } else {
       try {
-        const icons = [
-          {address: "FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs", bip39: true, seed: "this is sparta"}, //need to fake the bip39: true here
-          {address: "E66jao5eg6VHPt9DPQYHuzhR2cA2kWX5NkxaawbnhauiFDV", bip39: true, seed: "today between dice desert sniff parent kiwi right clog crunch confirm gauge"},
-          {address: "FLokPrwV48RagFSznhgMpXpmQTaXaVijuUcn3U6NimdirbU", bip39: true, seed: "vote this glide journey foot hunt vendor opera quarter group loyal fetch"},
-          {address: "ESjtxHjDw2vWxUDEPCBphJN4mnXX1EwTURgfsfkDWyXKscz", bip39: true, seed: "bicycle sound require post tray monitor ramp until pass renew expect empower"}
-        ]
+        const icons = await Promise.all(
+          Array(4)
+            .join(' ')
+            .split(' ')
+            .map(async () => {
+              const seed = await words();
+              // const seedWords = await words();
+              // const seed = seedWords+derivationPath;
+              console.log('seed',seed)
+              const address = await substrateAddress(seed, prefix);
+  
+              return {
+                address,
+                bip39: true,
+                seed,
+              };
+            })
+        );
+  
         this.setState({ icons });
       } catch (e) {
         console.error(e);
@@ -84,7 +96,7 @@ export default class AccountIconChooser extends React.PureComponent {
   }
 
   renderAddress = () => {
-    const {protocol, value} = this.props;
+    const {network: {protocol}, value} = this.props;
 
     if (value) {
       return (
@@ -100,7 +112,7 @@ export default class AccountIconChooser extends React.PureComponent {
   }
  
   renderIcon = ({ item, index }) => {
-    const { onSelect, protocol, value } = this.props;
+    const { onSelect, network : {protocol}, value } = this.props;
     const { address, bip39, seed } = item;
     const isSelected = address.toLowerCase() === value.toLowerCase();
 
@@ -124,7 +136,7 @@ export default class AccountIconChooser extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps){
-    if (prevProps.protocol !== this.props.protocol){
+    if (prevProps.network !== this.props.network){
       this.refreshIcons();
     }
   }
