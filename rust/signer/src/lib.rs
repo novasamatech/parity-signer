@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 mod eth;
-mod strate;
+mod sr25519;
 mod util;
 
 use util::StringPtr;
@@ -214,9 +214,19 @@ export! {
 
     @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletAddress
     fn substrate_brainwallet_address(seed: &str, prefix: u8) -> Option<String> {
-        let keypair = strate::KeyPair::from_bip39_phrase(seed)?;
+        let keypair = sr25519::KeyPair::from_bip39_phrase(seed)?;
 
         Some(keypair.ss58_address(prefix))
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
+    fn substrate_brainwallet_sign(seed: &str, message: &str) -> Option<String> {
+        let keypair = sr25519::KeyPair::from_bip39_phrase(seed)?;
+
+        let message: Vec<u8> = message.from_hex().ok()?;
+        let signature = keypair.sign(&message);
+
+        Some(signature.to_hex())
     }
 }
 

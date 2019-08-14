@@ -1,9 +1,12 @@
 use schnorrkel::keys::ExpansionMode;
+// use schnorrkel::signing_context;
 use substrate_bip39::mini_secret_from_entropy;
 use bip39::{Mnemonic, Language};
 use base58::ToBase58;
 
 pub struct KeyPair(schnorrkel::Keypair);
+
+const SIGNING_CTX: &[u8] = b"substrate";
 
 impl KeyPair {
 	pub fn from_bip39_phrase(phrase: &str) -> Option<KeyPair> {
@@ -19,6 +22,11 @@ impl KeyPair {
         let r = ss58hash(&v);
         v.extend_from_slice(&r.as_bytes()[0..2]);
         v.to_base58()
+    }
+
+    pub fn sign(&self, message: &[u8]) -> [u8; 64] {
+        let context = schnorrkel::signing_context(SIGNING_CTX);
+        self.0.sign(context.bytes(message)).to_bytes()
     }
 }
 

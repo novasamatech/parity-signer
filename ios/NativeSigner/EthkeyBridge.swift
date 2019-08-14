@@ -28,7 +28,6 @@ class EthkeyBridge: NSObject {
 
   @objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
-    print(seed, " + ", message)
     var seed_ptr = seed.asPtr()
     var message_ptr = message.asPtr()
     let signature_rust_str = ethkey_brainwallet_sign(&error, &seed_ptr, &message_ptr)
@@ -179,5 +178,17 @@ class EthkeyBridge: NSObject {
     rust_string_ptr_destroy(address_rust_str_ptr)
     rust_string_destroy(address_rust_str)
     resolve(address)
+  }
+
+  @objc func substrateSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var seed_ptr = seed.asPtr()
+    var message_ptr = message.asPtr()
+    let signature_rust_str = substrate_brainwallet_sign(&error, &seed_ptr, &message_ptr)
+    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
+    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(signature_rust_str_ptr)
+    rust_string_destroy(signature_rust_str)
+    resolve(signature)
   }
 }

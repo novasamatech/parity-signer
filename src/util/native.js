@@ -122,6 +122,17 @@ export function qrCodeHex (data) {
   return EthkeyBridge.qrCodeHex(data)
 }
 
+// Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
+// Prefix is a number used in the SS58 encoding:
+//
+//   Polkadot proper = 0
+//   Kusama = 2
+//   Default (testnets) = 42
 export function substrateAddress (seed, prefix) {
   return EthkeyBridge.substrateAddress(seed, prefix);
+}
+
+// Sign data using sr25519 crypto for a BIP39 phrase. Message is hex-encoded byte array.
+export function substrateSign (seed, message) {
+  return EthkeyBridge.substrateSign(seed, message);
 }

@@ -55,7 +55,11 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void brainWalletSign(String seed, String message, Promise promise) {
-        promise.resolve(ethkeyBrainwalletSign(seed, message));
+        try {
+            promise.resolve(ethkeyBrainwalletSign(seed, message));
+        } catch (Exception e) {
+            promise.reject("invalid phrase", "invalid phrase");
+        }
     }
 
     @ReactMethod
@@ -134,6 +138,15 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void substrateSign(String seed, String message, Promise promise) {
+        try {
+            promise.resolve(substrateBrainwalletSign(seed, message));
+        } catch (Exception e) {
+            promise.reject("invalid phrase", "invalid phrase");
+        }
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletBIP39Address(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
@@ -148,4 +161,5 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native String ethkeyQrCode(String data);
     private static native String ethkeyQrCodeHex(String data);
     private static native String substrateBrainwalletAddress(String seed, int prefix);
+    private static native String substrateBrainwalletSign(String seed, String message);
 }
