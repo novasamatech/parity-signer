@@ -24,7 +24,7 @@ import {
   findNodeHandle,
   SafeAreaView,
   StyleSheet,
-  Text
+  Text,
 } from 'react-native';
 import { Subscribe } from 'unstated';
 
@@ -34,6 +34,7 @@ import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import DerivationPathField from '../components/DerivationPathField';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
@@ -63,9 +64,10 @@ class AccountRecoverView extends React.Component {
     super(...args);
 
     this.state = {
+      derivationPath: '',
       seed: '',
       selectedAccount: undefined,
-      selectedNetwork: undefined
+      selectedNetwork: undefined,
     };
   }
 
@@ -74,18 +76,17 @@ class AccountRecoverView extends React.Component {
     const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 
     return {
+      derivationPath: prevState.derivationPath,
+      seed: prevState.seed,
       selectedAccount,
       selectedNetwork,
-      seed: prevState.seed
     }
   }
 
-  addressGeneration = seed => {
+  addressGeneration = (seed, derivationPath = '') => {
     const { accounts } = this.props;
     const { selectedNetwork:{protocol, prefix} } = this.state;
 
-    console.log('protocol',protocol);
-    console.log('prefix', prefix);
     if (protocol === NetworkProtocols.ETHEREUM){
       brainWalletAddress(seed)
         .then(({ address, bip39 }) =>
@@ -93,14 +94,14 @@ class AccountRecoverView extends React.Component {
         )
         .catch(console.error);
     } else {
-      substrateAddress(seed, prefix)
+      substrateAddress(seed+derivationPath, prefix)
         .then((address) => {
           accounts.updateNew({ address, seed, validBip39Seed: true })
-        }   
-    ).catch(
-      //invalid phrase
-      accounts.updateNew({ address:'', validBip39Seed: false })
-    );
+        })
+        .catch(
+          //invalid phrase
+          accounts.updateNew({ address:'', validBip39Seed: false })
+        );
     }
   };
 
@@ -113,14 +114,19 @@ class AccountRecoverView extends React.Component {
 
   componentDidUpdate(_, prevState){
     if (prevState.selectedNetwork !== this.state.selectedNetwork){
-      this.addressGeneration(this.state.seed);
+      this.addressGeneration(this.state.seed, this.state.derivationPath);
     }
+  }
+
+  toggleAdvancedField = () => {
+    this.setState({showAdvancedField: !this.state.showAdvancedField}) 
   }
 
   render() {
     const { accounts, navigation } = this.props;
-    const { selectedAccount, selectedNetwork} = this.state;
+    const { derivationPath, selectedAccount, selectedNetwork} = this.state;
     const {address, name, networkKey, seed, validBip39Seed} = selectedAccount;
+    const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
     return (
       <SafeAreaView style={styles.safeAreaView}>
@@ -154,11 +160,18 @@ class AccountRecoverView extends React.Component {
             ref={this._seed}
             valid={validateSeed(seed, validBip39Seed).valid}
             onChangeText={seed => {
-              this.debouncedAddressGeneration(seed);
+              this.debouncedAddressGeneration(seed, derivationPath);
               this.setState({ seed });
             }}
             value={this.state.seed}
           />
+          {isSubstrate && <DerivationPathField
+            onChange = { derivationPath => {
+              this.debouncedAddressGeneration(seed, derivationPath);
+              this.setState({ derivationPath });
+            }}
+            styles={styles}
+          />}
           <AccountCard
             style={{ marginTop: 20 }}
             address={address || ''}
