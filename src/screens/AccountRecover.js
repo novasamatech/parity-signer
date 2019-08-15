@@ -62,6 +62,7 @@ class AccountRecoverView extends React.Component {
     super(...args);
 
     this.state = {
+      derivationPassword: '',
       derivationPath: '',
       seedPhrase: '',
       selectedAccount: undefined,

@@ -124,7 +124,7 @@ class AccountBackupView extends React.PureComponent {
             <Icon name={'info'} size={20} color={colors.bg_text_sec} />
              This account countains a derivation password. <Text style={styles.link}  onPress={() => navigate('derivePasswordCheck')} >Verify it here.</Text>
           </Text>}
-        {(isNew) &&
+        {isNew &&
           <Button
             buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
             title="Backup Done"

@@ -113,7 +113,7 @@ class AccountListView extends React.PureComponent {
   render() {
     const hasNoAccount = this.props.accounts.length < 1;
     const { navigate } = this.props.navigation;
-    console.log('accounts',this.props.accounts)
+
     return (
       <View style={styles.body}>
         <Background />

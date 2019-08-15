@@ -27,11 +27,12 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import AccountIcon from './AccountIcon';
-import Address from './Address'
+import Address from './Address';
 import colors from '../colors';
-import fonts from "../fonts";
-import { brainWalletAddress, substrateAddress, words } from '../util/native';
 import { NetworkProtocols } from '../constants';
+import fonts from "../fonts";
+import { debounce } from '../util/debounce';
+import { brainWalletAddress, substrateAddress, words } from '../util/native';
 
 export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
@@ -43,9 +44,9 @@ export default class AccountIconChooser extends React.PureComponent {
   }
 
   refreshIcons = async () => {
-    const {derivationPath, network : {protocol, prefix}, onSelect} = this.props;
+    const {derivationPassword, derivationPath, network : {protocol, prefix}, onSelect} = this.props;
 
-    // clean previous values
+    // clean previous selection
     onSelect({ newAddress: '', isBip39: false, newSeed: ''});
 
     try {
@@ -65,17 +66,16 @@ export default class AccountIconChooser extends React.PureComponent {
               result = await brainWalletAddress(result.seed);
             } else {
               try {
-                result.address = await substrateAddress(result.seed+derivationPath, prefix);
+                result.address = await substrateAddress(`${result.seed}${derivationPath}///${derivationPassword}`, prefix);
                 result.bip39 = true;
               } catch (e){
                 // invalid seed or derivation path
-                console.error(e);
+                // console.error(e);
               }
             }
             return result;
           })
       );
-
       this.setState({ icons });
     } catch (e) {
       console.error(e);
@@ -103,6 +103,13 @@ export default class AccountIconChooser extends React.PureComponent {
     const { address, bip39, seed } = item;
     const isSelected = address.toLowerCase() === value.toLowerCase();
 
+    if (!address) {
+      //return an empty view to prevent the screen from jumping
+      return <View
+        style={styles.icon}
+      />
+    }
+
     return (
         <TouchableOpacity
           key={index}
@@ -122,10 +129,16 @@ export default class AccountIconChooser extends React.PureComponent {
     this.refreshIcons();
   }
 
+  debouncedRefreshIcons = debounce(this.refreshIcons, 200);
+
   componentDidUpdate(prevProps){
-    if (prevProps.network !== this.props.network){
-      this.refreshIcons();
-    }
+    const {derivationPassword, derivationPath, network} = this.props;
+
+    if ((prevProps.network !== network) || 
+      (prevProps.derivationPassword !== derivationPassword) ||
+      (prevProps.derivationPath !== derivationPath)){
+        this.debouncedRefreshIcons();
+      }
   }
 
   render() {
@@ -139,7 +152,7 @@ export default class AccountIconChooser extends React.PureComponent {
             data={icons}
             extraData={value}
             horizontal
-            keyExtractor={item => item.address}
+            keyExtractor={item => item.seed}
             renderItem={this.renderIcon}
             style={styles.icons}
           />

@@ -53,6 +53,7 @@ class AccountNewView extends React.Component {
     super(props);
 
     this.state = {
+      derivationPassword: '',
       derivationPath: '',
       selectedAccount: undefined,
       selectedNetwork: undefined,
@@ -64,16 +65,16 @@ class AccountNewView extends React.Component {
     const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 
     return {
+      derivationPassword: prevState.derivationPassword,
       derivationPath: prevState.derivationPath,
       selectedAccount,
-      selectedNetwork,
-      showAdvancedField: prevState.showAdvancedField
+      selectedNetwork
     }
   }
 
   render() {
     const { accounts, navigation } = this.props;
-    const { derivationPath, selectedAccount, selectedNetwork } = this.state;
+    const { derivationPassword, derivationPath, selectedAccount, selectedNetwork } = this.state;
     const {address, name, seed, validBip39Seed} = selectedAccount;
     const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
@@ -91,11 +92,15 @@ class AccountNewView extends React.Component {
             <NetworkButton network={selectedNetwork}/>
             <Text style={styles.title}>ICON & ADDRESS</Text>
             <AccountIconChooser
+              derivationPassword={derivationPassword}
               derivationPath={derivationPath}
               onSelect={({ newAddress, isBip39, newSeed }) => {
                 accounts.updateNew({ 
                   address: newAddress,
-                  seed: newSeed,
+                  derivationPassword,
+                  derivationPath,
+                  seed: `${newSeed}${derivationPath}///${derivationPassword}`,
+                  seedPhrase: newSeed,
                   validBip39Seed: isBip39
                 });
               }}
@@ -109,9 +114,9 @@ class AccountNewView extends React.Component {
               placeholder="Enter a new account name"
             />
             {isSubstrate && <DerivationPathField
-              onChange = { derivationPath => 
-                this.setState({ derivationPath})
-              }
+              onChange = { ({derivationPassword, derivationPath}) => {
+                this.setState({ derivationPath, derivationPassword });
+              }}
               styles={styles}
           />}
           </View>
