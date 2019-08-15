@@ -48,59 +48,38 @@ export default class AccountIconChooser extends React.PureComponent {
     // clean previous values
     onSelect({ newAddress: '', isBip39: false, newSeed: ''});
 
-    if (protocol === NetworkProtocols.ETHEREUM){
-      try {
-        const icons = await Promise.all(
-          Array(4)
-            .join(' ')
-            .split(' ')
-            .map(async () => {
-              const seed = await words();
-              const { address, bip39 } = await brainWalletAddress(seed);
-  
-              return {
-                address,
-                bip39,
-                seed,
-              };
-            })
-        );
-  
-        this.setState({ icons });
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      try {
-        const icons = await Promise.all(
-          Array(4)
-            .join(' ')
-            .split(' ')
-            .map(async () => {
-              const seed = await words();
-              console.log('seed+derivationPAth',seed+derivationPath)
-              let address = '';
-              let bip39 = false;
-              try {
-                address = await substrateAddress(seed+derivationPath, prefix);
-                bip39 = true;
-              } catch {
-                // invalid seed or derivation path
-                bip39 = false;
-              }
+    try {
+      const icons = await Promise.all(
+        Array(4)
+          .join(' ')
+          .split(' ')
+          .map(async () => {
+            let result = {
+              address: '',
+              bip39: false,
+              seed: ''
+            }
+            result.seed = await words();
 
-              return {
-                address,
-                bip39,
-                seed,
-              };
-            })
-        );
-  
-        this.setState({ icons });
-      } catch (e) {
-        console.error(e);
-      }
+            if (protocol === NetworkProtocols.ETHEREUM) {
+              result = await brainWalletAddress(result.seed);
+            } else {
+              try {
+                result.address = await substrateAddress(result.seed+derivationPath, prefix);
+                result.bip39 = true;
+              } catch (e){
+                // invalid seed or derivation path
+                console.error(e);
+              }
+            }
+            console.log('result',result)
+            return result;
+          })
+      );
+
+      this.setState({ icons });
+    } catch (e) {
+      console.error(e);
     }
   }
 

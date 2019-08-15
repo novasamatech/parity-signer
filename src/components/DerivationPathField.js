@@ -25,16 +25,19 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import keyExtract from '../util/keyExtract'
 import TextInput from './TextInput';
 
   export default function DerivationPathField(props) {
     const { onChange, styles } = props;
     const [showAdvancedField, setShowAdvancedField] =  useState(false)
+    const [isValidPath, setIsValidPath] = useState(true);
 
     const toggleShowAdvancedField = () => {
       setShowAdvancedField(!showAdvancedField)
     }
 
+    console.log('isValidPath',isValidPath)
     return (
       <>
         <TouchableOpacity
@@ -55,9 +58,12 @@ import TextInput from './TextInput';
         </TouchableOpacity>
         {showAdvancedField && 
           <TextInput
-            onChangeText={ onChange }
-            placeholder="secret derivation path"
-            //value={ value }
+            onChangeText={(text) => {
+              onChange(text);
+              setIsValidPath(!!keyExtract(text));
+            }}
+            placeholder="optional derivation path"
+            style={isValidPath ? ownStyles.validInput: ownStyles.invalidInput}
           />
         }
       </>
@@ -70,5 +76,11 @@ import TextInput from './TextInput';
     advancedText: {
       paddingBottom: 0,
       paddingTop:20
+    },
+    invalidInput: {
+      backgroundColor: '#fee3e3'
+    },
+    validInput: {
+      backgroundColor: '#e4fee4'
     }
   });
