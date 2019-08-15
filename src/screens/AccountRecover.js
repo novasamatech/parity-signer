@@ -23,10 +23,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -35,6 +32,7 @@ import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import DerivationPathField from '../components/DerivationPathField';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
@@ -68,7 +66,6 @@ class AccountRecoverView extends React.Component {
       seed: '',
       selectedAccount: undefined,
       selectedNetwork: undefined,
-      showAdvancedField: false
     };
   }
 
@@ -81,7 +78,6 @@ class AccountRecoverView extends React.Component {
       seed: prevState.seed,
       selectedAccount,
       selectedNetwork,
-      showAdvancedField: prevState.showAdvancedField
     }
   }
 
@@ -96,15 +92,14 @@ class AccountRecoverView extends React.Component {
         )
         .catch(console.error);
     } else {
-      console.log('seed+derivationPath',seed+derivationPath);
       substrateAddress(seed+derivationPath, prefix)
         .then((address) => {
           accounts.updateNew({ address, seed, validBip39Seed: true })
-        }   
-    ).catch(
-      //invalid phrase
-      accounts.updateNew({ address:'', validBip39Seed: false })
-    );
+        })
+        .catch(
+          //invalid phrase
+          accounts.updateNew({ address:'', validBip39Seed: false })
+        );
     }
   };
 
@@ -121,44 +116,6 @@ class AccountRecoverView extends React.Component {
     }
   }
 
-  renderAdvanced () {
-    const { seed, selectedNetwork:{protocol}, showAdvancedField } = this.state;
-
-    if (protocol === NetworkProtocols.ETHEREUM){
-      return null;
-    }
-
-    return (
-      <>
-        <TouchableOpacity
-          onPress={this.toggleAdvancedField}
-          style={{diplay:'flex'}}
-        >
-          <View
-            style={{justifyContent:'center'}}
-          >
-            <Text style={[styles.title, styles.advancedText]}>
-              ADVANCED
-              <Icon 
-                name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
-                size={20}
-              />
-            </Text>
-          </View>
-        </TouchableOpacity>
-        {showAdvancedField && 
-          <TextInput
-            onChangeText={derivationPath => {
-              this.debouncedAddressGeneration(seed, derivationPath);
-              this.setState({ derivationPath });
-            }}
-            placeholder="secret derivation path"
-          />
-        }
-      </>
-    )
-  }
-
   toggleAdvancedField = () => {
     this.setState({showAdvancedField: !this.state.showAdvancedField}) 
   }
@@ -167,6 +124,7 @@ class AccountRecoverView extends React.Component {
     const { accounts, navigation } = this.props;
     const { derivationPath, selectedAccount, selectedNetwork} = this.state;
     const {address, name, networkKey, seed, validBip39Seed} = selectedAccount;
+    const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
     return (
       <SafeAreaView style={styles.safeAreaView}>
@@ -205,7 +163,13 @@ class AccountRecoverView extends React.Component {
             }}
             value={this.state.seed}
           />
-          {this.renderAdvanced()}
+          {isSubstrate && <DerivationPathField
+            onChange = { derivationPath => {
+              this.debouncedAddressGeneration(seed, derivationPath);
+              this.setState({ derivationPath });
+            }}
+            styles={styles}
+          />}
           <AccountCard
             style={{ marginTop: 20 }}
             address={address || ''}

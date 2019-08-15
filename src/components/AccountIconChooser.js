@@ -78,14 +78,20 @@ export default class AccountIconChooser extends React.PureComponent {
             .split(' ')
             .map(async () => {
               const seed = await words();
-              // const seedWords = await words();
-              // const seed = seedWords+derivationPath;
-              console.log('seed',seed)
-              const address = await substrateAddress(seed, prefix);
-  
+              console.log('seed+derivationPAth',seed+derivationPath)
+              let address = '';
+              let bip39 = false;
+              try {
+                address = await substrateAddress(seed+derivationPath, prefix);
+                bip39 = true;
+              } catch {
+                // invalid seed or derivation path
+                bip39 = false;
+              }
+
               return {
                 address,
-                bip39: true,
+                bip39,
                 seed,
               };
             })

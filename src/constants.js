@@ -31,7 +31,7 @@ const substrateNetworkBase = {
   [SubstrateNetworkKeys.POLKADOT]: {
     color: '#e6007a',
     genesisHash: SubstrateNetworkKeys.POLKADOT,
-    prefix: 0,
+    prefix: 42,
     title: 'Polkadot'
   }
 };

@@ -17,14 +17,14 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import DerivationPathField from '../components/DerivationPathField'
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
@@ -56,7 +56,6 @@ class AccountNewView extends React.Component {
       derivationPath: '',
       selectedAccount: undefined,
       selectedNetwork: undefined,
-      showAdvancedField: false
     };
   }
 
@@ -72,49 +71,11 @@ class AccountNewView extends React.Component {
     }
   }
 
-  renderAdvanced () {
-    const { selectedNetwork, showAdvancedField } = this.state;
-
-    if (selectedNetwork.protocol === NetworkProtocols.ETHEREUM){
-      return null;
-    }
-
-    return (
-      <>
-        <TouchableOpacity
-          onPress={this.toggleAdvancedField}
-          style={{diplay:'flex'}}
-        >
-          <View
-            style={{justifyContent:'center'}}
-          >
-            <Text style={[styles.title, styles.advancedText]}>
-              ADVANCED
-              <Icon 
-                name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
-                size={20}
-              />
-            </Text>
-          </View>
-        </TouchableOpacity>
-        {showAdvancedField && 
-          <TextInput
-            onChangeText={derivationPath => this.setState({ derivationPath })}
-            placeholder="secret derivation path"
-          />
-        }
-      </>
-    )
-  }
-
-  toggleAdvancedField = () => {
-    this.setState({showAdvancedField: !this.state.showAdvancedField}) 
-  }
-
   render() {
     const { accounts, navigation } = this.props;
-    const { selectedAccount, selectedNetwork } = this.state;
+    const { derivationPath, selectedAccount, selectedNetwork } = this.state;
     const {address, name, seed, validBip39Seed} = selectedAccount;
+    const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
     if (!selectedAccount) {
       return null;
@@ -130,6 +91,7 @@ class AccountNewView extends React.Component {
             <NetworkButton network={selectedNetwork}/>
             <Text style={styles.title}>ICON & ADDRESS</Text>
             <AccountIconChooser
+              derivationPath={derivationPath}
               onSelect={({ newAddress, isBip39, newSeed }) => {
                 accounts.updateNew({ 
                   address: newAddress,
@@ -138,7 +100,7 @@ class AccountNewView extends React.Component {
                 });
               }}
               network={selectedNetwork}
-              value={seed && address}
+              value={address && address}
             />
             <Text style={styles.title}>NAME</Text>
             <TextInput
@@ -146,7 +108,12 @@ class AccountNewView extends React.Component {
               value={name}
               placeholder="Enter a new account name"
             />
-            {this.renderAdvanced()}
+            {isSubstrate && <DerivationPathField
+              onChange = { derivationPath => 
+                this.setState({ derivationPath})
+              }
+              styles={styles}
+          />}
           </View>
           <View style={styles.bottom}>
             <Text style={styles.hintText}>
@@ -202,10 +169,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingBottom: 20,
     textAlign: 'center'
-  },
-  advancedText: {
-    paddingBottom: 0,
-    paddingTop:20
   },
   hintText: {
     fontFamily: fonts.bold,
