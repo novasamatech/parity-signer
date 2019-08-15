@@ -1,19 +1,20 @@
-import { SubstrateNetworkKeys, NetworkProtocols, NETWORK_LIST } from '../constants';
+import { NetworkProtocols, NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 
 export function accountId({
   address,
-  protocol = NetworkProtocols.SUBSTRATE,
-  networkKey = SubstrateNetworkKeys.KUSAMA
+  networkKey
 }) {
-  if (typeof address !== 'string' || address.length === 0) {
-    throw new Error(`Couldn't create an accountId, address missing`);
+
+  const { ethereumChainId, protocol, genesisHash } = NETWORK_LIST[networkKey];
+
+  if (typeof address !== 'string' || address.length === 0 || !networkKey) {
+    throw new Error(`Couldn't create an accountId, address or networkKey missing`);
   }
-  if (protocol === NetworkProtocols.SUBSTRATE){
-    const genesisHash = NETWORK_LIST[networkKey].genesisHash;
-    
+
+  if (protocol === NetworkProtocols.SUBSTRATE){ 
     return `${protocol}:${address}:${genesisHash}`;
   } else {
-    return `${protocol}:${address.toLowerCase()}@${networkKey}`;
+    return `${protocol}:${address.toLowerCase()}@${ethereumChainId}`;
   }
 }
 
@@ -41,6 +42,7 @@ export function validateSeed(seed, validBip39Seed) {
       valid: false
     };
   }
+
   const words = seed.split(' ');
 
   for (let word of words) {
@@ -58,7 +60,6 @@ export function validateSeed(seed, validBip39Seed) {
       accountRecoveryAllowed: true,
       reason: `This recovery phrase will be treated as a legacy Parity brain wallet.`,
       valid: false
-      
     };
   }
 

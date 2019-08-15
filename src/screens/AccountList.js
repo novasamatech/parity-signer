@@ -36,6 +36,7 @@ export default class AccountList extends React.PureComponent {
   };
 
   render() {
+
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => {

@@ -53,6 +53,7 @@ class AccountNewView extends React.Component {
     super(props);
 
     this.state = {
+      derivationPath: '',
       selectedAccount: undefined,
       selectedNetwork: undefined,
       showAdvancedField: false
@@ -64,6 +65,7 @@ class AccountNewView extends React.Component {
     const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 
     return {
+      derivationPath: prevState.derivationPath,
       selectedAccount,
       selectedNetwork,
       showAdvancedField: prevState.showAdvancedField
@@ -97,7 +99,7 @@ class AccountNewView extends React.Component {
         </TouchableItem>
         {showAdvancedField && 
           <TextInput
-            // onChangeText={name => this.setState({ derivationPath })}
+            onChangeText={derivationPath => this.setState({ derivationPath })}
             placeholder="secret derivation path"
           />
         }
@@ -135,7 +137,7 @@ class AccountNewView extends React.Component {
                   validBip39Seed: isBip39
                 });
               }}
-              protocol={selectedNetwork.protocol}
+              network={selectedNetwork}
               value={seed && address}
             />
             <Text style={styles.title}>NAME</Text>
