@@ -72,7 +72,6 @@ export default class AccountIconChooser extends React.PureComponent {
                 console.error(e);
               }
             }
-            console.log('result',result)
             return result;
           })
       );

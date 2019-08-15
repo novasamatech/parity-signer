@@ -25,11 +25,13 @@ export type Account = {
   address: string,
   archived: boolean,
   createdAt: number,
+  derivationPassword: string,
+  derivationPath: string, // doesn't contain the ///password
   encryptedSeed: string,
   name: string,
   networkKey: string,
-//  protocol: string,
-  seed: string,
+  seed: string, //this is the SURI (seedPhrase + /soft//hard///password derivation)
+  seedPhrase: string, //contains only the BIP39 words, no derivation path
   updatedAt: number,
   validBip39Seed: boolean
 };
@@ -65,6 +67,7 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   updateNew(accountUpdate: Object) {
+    console.log('accountUpdate',accountUpdate);
     this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
   }
 
@@ -105,8 +108,6 @@ export default class AccountsStore extends Container<AccountsState> {
       this.setState({ accounts });
     });
   }
-
-  async loadAccountTxs() { }
 
   async save(account, pin = null) {
     try {

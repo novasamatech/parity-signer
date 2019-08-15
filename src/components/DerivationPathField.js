@@ -37,7 +37,6 @@ import TextInput from './TextInput';
       setShowAdvancedField(!showAdvancedField)
     }
 
-    console.log('isValidPath',isValidPath)
     return (
       <>
         <TouchableOpacity
@@ -59,8 +58,13 @@ import TextInput from './TextInput';
         {showAdvancedField && 
           <TextInput
             onChangeText={(text) => {
-              onChange(text);
-              setIsValidPath(!!keyExtract(text));
+              const derivationPath = keyExtract(text);
+
+              onChange({
+                derivationPassword: derivationPath.password,
+                derivationPath: derivationPath.derivePath
+              });
+              setIsValidPath(!!derivationPath);
             }}
             placeholder="optional derivation path"
             style={isValidPath ? ownStyles.validInput: ownStyles.invalidInput}
