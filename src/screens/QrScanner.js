@@ -21,10 +21,12 @@ import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
 import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import { rawDataToU8A } from '../util/decoders';
 
 export default class Scanner extends React.PureComponent {
   static navigationOptions = {

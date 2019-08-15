@@ -22,7 +22,7 @@ import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
 import { saveTx } from '../util/db';
-import { blake2s, brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
+import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
 import transaction from '../util/transaction';
 import { constructDataFromBytes, decodeToString, hexToAscii, rawDataToU8A } from '../util/decoders';
 import { Account } from './AccountsStore';
@@ -131,15 +131,12 @@ export default class ScannerStore extends Container<ScannerState> {
     const message = signRequest.data.data;
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
-    debugger;
+
     let dataToSign = '';
 
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
-      const substrateSign = async () => { /* Placeholder function for now */ return Promise.resolve(message); }
-      dataToSign = await substrateSign(message);
-      console.log('data to sign => ', dataToSign);
+      dataToSign = message;
     } else {
-      debugger;
       dataToSign = await ethSign(message);
     }
 
@@ -174,7 +171,6 @@ export default class ScannerStore extends Container<ScannerState> {
       const { ethereumChainId = 1 } = tx;
       const networkKey = ethereumChainId;
     }
-
     debugger;
      // TODO cater for Substrate
     const sender = accountsStore.getById({
@@ -198,7 +194,10 @@ export default class ScannerStore extends Container<ScannerState> {
       networkKey: tx.ethereumChainId,
       address: tx.action
     });
-    const dataToSign = await keccak(txRequest.data.rlp);
+
+    // For Eth, always sign the keccak hash.
+    // For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
+    const dataToSign = sender.protocol === NetworkProtocols.ETHEREUM ? await keccak(txRequest.data.rlp) : txRequest.data.data;
     this.setState({
       type: 'transaction',
       sender,
@@ -213,7 +212,14 @@ export default class ScannerStore extends Container<ScannerState> {
   async signData(pin = '1') {
     const { type, sender } = this.state;
     const seed = await decryptData(sender.encryptedSeed, pin);
-    const signedData = await brainWalletSign(seed, this.state.dataToSign); // fixme: support substrate
+    let signedData;
+
+    if (sender.protocol === NetworkProtocols.ETHEREUM) {
+      signedData = await brainWalletSign(seed, this.state.dataToSign);
+    } else {
+      signedData = await substrateSign(seed, this.state.dataToSign);
+    }
+
     this.setState({ signedData });
     if (type == 'transaction') {
       await saveTx({
