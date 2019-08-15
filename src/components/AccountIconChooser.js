@@ -85,6 +85,8 @@ export default class AccountIconChooser extends React.PureComponent {
   renderAddress = () => {
     const {network: {protocol}, value} = this.props;
 
+    console.log('address-< ', value);
+
     if (value) {
       return (
         <Address 
