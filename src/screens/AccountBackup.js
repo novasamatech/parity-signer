@@ -18,7 +18,6 @@
 
 import React from 'react';
 import { Alert, AppState, Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -27,7 +26,9 @@ import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TouchableItem from '../components/TouchableItem';
+import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
 import AccountsStore from '../stores/AccountsStore';
+
 
 export default class AccountBackup extends React.PureComponent {
   static navigationOptions = {
@@ -119,11 +120,7 @@ class AccountBackupView extends React.PureComponent {
           <Text style={styles.derivationText}>
             {derivationPath}
           </Text>}
-        {!!derivationPassword &&
-          <Text style={styles.passwordText}>
-            <Icon name={'info'} size={20} color={colors.bg_text_sec} />
-             This account countains a derivation password. <Text style={styles.link}  onPress={() => navigate('derivePasswordCheck')} >Verify it here.</Text>
-          </Text>}
+        {!!derivationPassword && <DerivationPasswordVerify password={derivationPassword}/>}
         {isNew &&
           <Button
             buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
@@ -195,15 +192,6 @@ const styles = StyleSheet.create({
     color: colors.bg_text_sec,
     fontSize: 12,
     paddingBottom: 20
-  },
-  link: {
-    textDecorationLine: 'underline',
-  },
-  passwordText: {
-    fontFamily: fonts.regular,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    marginTop: 20
   },
   seedText: {
     padding: 10,
