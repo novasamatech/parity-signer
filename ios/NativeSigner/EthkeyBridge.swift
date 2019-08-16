@@ -28,7 +28,6 @@ class EthkeyBridge: NSObject {
 
   @objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
-    print(seed, " + ", message)
     var seed_ptr = seed.asPtr()
     var message_ptr = message.asPtr()
     let signature_rust_str = ethkey_brainwallet_sign(&error, &seed_ptr, &message_ptr)
@@ -58,6 +57,17 @@ class EthkeyBridge: NSObject {
     var error: UInt32 = 0
     var data_ptr = data.asPtr()
     let hash_rust_str = keccak256(&error, &data_ptr)
+    let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
+    let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(hash_rust_str_ptr)
+    rust_string_destroy(hash_rust_str)
+    resolve(hash)
+  }
+
+  @objc func blake2s(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var data_ptr = data.asPtr()
+    let hash_rust_str = blake(&error, &data_ptr)
     let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
     let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(hash_rust_str_ptr)
@@ -142,5 +152,43 @@ class EthkeyBridge: NSObject {
     } else {
       reject("Failed to generate blockies", nil, nil)
     }
+  }
+
+  @objc func qrCodeHex(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var data_ptr = data.asPtr()
+    let icon_rust_str = qrcode_hex(&error, &data_ptr)
+    let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
+    let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(icon_rust_str_ptr)
+    rust_string_destroy(icon_rust_str)
+    if error == 0 {
+      resolve(icon)
+    } else {
+      reject("Failed to generate blockies", nil, nil)
+    }
+  }
+
+  @objc func substrateAddress(_ seed: String, version: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var seed_ptr = seed.asPtr()
+    let address_rust_str = substrate_brainwallet_address(&error, &seed_ptr, version)
+    let address_rust_str_ptr = rust_string_ptr(address_rust_str)
+    let address = String.fromStringPtr(ptr: address_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(address_rust_str_ptr)
+    rust_string_destroy(address_rust_str)
+    resolve(address)
+  }
+
+  @objc func substrateSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var seed_ptr = seed.asPtr()
+    var message_ptr = message.asPtr()
+    let signature_rust_str = substrate_brainwallet_sign(&error, &seed_ptr, &message_ptr)
+    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
+    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(signature_rust_str_ptr)
+    rust_string_destroy(signature_rust_str)
+    resolve(signature)
   }
 }

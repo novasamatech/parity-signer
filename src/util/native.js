@@ -108,6 +108,31 @@ export function decryptData (data, password) {
   return EthkeyBridge.decryptData(data, password);
 }
 
+// Creates a QR code for the UTF-8 representation of a string
 export function qrCode (data) {
-  return EthkeyBridge.qrCode(data)
+  return EthkeyBridge.qrCode(data);
+}
+
+// Creates a QR code for binary data from a hex-encoded string
+export function qrCodeHex (data) {
+  return EthkeyBridge.qrCodeHex(data);
+}
+
+export function blake2s (data) {
+  return EthkeyBridge.blake2s(data);
+}
+
+// Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
+// Prefix is a number used in the SS58 encoding:
+//
+//   Polkadot proper = 0
+//   Kusama = 2
+//   Default (testnets) = 42
+export function substrateAddress (seed, prefix) {
+  return EthkeyBridge.substrateAddress(seed, prefix);
+}
+
+// Sign data using sr25519 crypto for a BIP39 phrase. Message is hex-encoded byte array.
+export function substrateSign (seed, message) {
+  return EthkeyBridge.substrateSign(seed, message);
 }
