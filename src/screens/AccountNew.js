@@ -94,6 +94,7 @@ class AccountNewView extends React.Component {
             <AccountIconChooser
               derivationPath={derivationPath}
               onSelect={({ newAddress, isBip39, newSeed }) => {
+                console.log('address =>< ', newAddress);
                 accounts.updateNew({ 
                   address: newAddress,
                   seed: newSeed,

@@ -40,6 +40,8 @@ export default class MessageDetails extends React.PureComponent {
         {(scannerStore, accounts) => {
           const dataToSign = scannerStore.getDataToSign();
 
+          debugger;
+
           if (dataToSign) {
             // const tx = scannerStore.getTx(); this does nothing????
             return (
