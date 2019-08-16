@@ -74,12 +74,20 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void keccak(String data, Promise promise) {
-        promise.resolve(ethkeyKeccak(data));
+        try {
+            promise.resolve(ethkeyKeccak(data));
+        } catch (Exception e) {
+            promise.reject("invalid data, expected hex-encoded string", "invalid data, expected hex-encoded string");
+        }
     }
 
     @ReactMethod
     public void blake2s(String data, Promise promise) {
-        promise.resolve(ethkeyBlake(data));
+        try {
+            promise.resolve(ethkeyBlake(data));
+        } catch (Exception e) {
+            promise.reject("invalid data, expected hex-encoded string", "invalid data, expected hex-encoded string");
+        }
     }
 
     @ReactMethod
