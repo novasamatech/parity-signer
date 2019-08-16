@@ -61,7 +61,11 @@ class EthkeyBridge: NSObject {
     let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(hash_rust_str_ptr)
     rust_string_destroy(hash_rust_str)
-    resolve(hash)
+    if (error == 0) {
+      resolve(hash)
+    } else {
+      reject("invalid data, expected hex-encoded string", nil, nil)
+    }
   }
 
   @objc func blake2s(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
@@ -72,7 +76,11 @@ class EthkeyBridge: NSObject {
     let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(hash_rust_str_ptr)
     rust_string_destroy(hash_rust_str)
-    resolve(hash)
+    if (error == 0) {
+      resolve(hash)
+    } else {
+      reject("invalid data, expected hex-encoded string", nil, nil)
+    }
   }
 
   @objc func ethSign(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
