@@ -48,7 +48,7 @@ export default function AccountIcon (props) {
     .catch(console.error)
   }
 
-  if (protocol === NetworkProtocols.SUBSTRATE && address) {
+  if (protocol === NetworkProtocols.SUBSTRATE) {
 
     return (
       <Identicon
