@@ -16,10 +16,11 @@
 
 // @flow
 
-import { Address, Balance, BlockNumber, Call, ExtrinsicEra, Hash, Index } from '@polkadot/types/interfaces';
-import { ClassOf, Compact, GenericExtrinsicPayload, Struct, u8 } from '@polkadot/types';
-import { hexStripPrefix, hexToU8a, u8aConcat, u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { GenericExtrinsicPayload } from '@polkadot/types';
+import { hexStripPrefix, hexToU8a, u8aToHex, u8aToString } from '@polkadot/util';
+import { encodeAddress } from '@polkadot/util-crypto';
+
+import { blake2s } from './native';
 
 /*
   Example Full Raw Data
@@ -85,12 +86,15 @@ export function rawDataToU8A(rawData) {
   return bytes;
 }
 
-export function constructDataFromBytes(bytes) {
+export async function constructDataFromBytes(bytes) {
   const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
   const isMultipart = !!(parseInt(frameInfo.substr(0, 2), 16));
   const frameCount = parseInt(frameInfo.substr(2, 4), 16);
   const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
   const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
+  
+  console.log('123 - > ', await blake2s('0x123'));
+  debugger;
 
   if (isMultipart) {
     const partData = {
@@ -136,6 +140,7 @@ export function constructDataFromBytes(bytes) {
         const ss58Encoded = encodeAddress(publicKeyAsBytes, 2); // encode to kusama
         const hexEncodedData = '0x' + uosAfterFrames.slice(70);
         const rawPayload = hexToU8a(hexEncodedData);
+        const isOversized = rawPayload.length > 256;
 
         data['data']['crypto'] = crypto;
         data['data']['account'] = ss58Encoded;
@@ -143,29 +148,32 @@ export function constructDataFromBytes(bytes) {
         switch(secondByte) {
           case '00':
             data['action'] = 'signTransaction';
-            if (rawPayload.length > 256) {
-              data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
-              data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
-              data['data']['data'] = blake2s(rawPayload);
-            } else {
-              data['isHash'] = false;
-              data['data']['data'] = new GenericExtrinsicPayload(rawPayload, { version: 3 });
-            }
+            data['oversized'] = isOversized;
+            data['isHash'] = isOversized;
+            data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : new GenericExtrinsicPayload(rawPayload, { version: 3 });
             break;
           case '01':
             data['action'] = 'signTransaction';
+            data['oversized'] = false;
             data['isHash'] = true;
             data['data']['data'] = rawPayload; // data is a hash
             break;
           case '02': // immortal
             data['action'] = 'signTransaction';
-            data['isHash'] = false;
-            data['data']['data'] = new GenericExtrinsicPayload(rawPayload, { version: 3 });
+            data['oversized'] = isOversized;
+            data['isHash'] = isOversized;
+            data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : new GenericExtrinsicPayload(rawPayload, { version: 3 });
             break;
           case '03': // Cold Signer should attempt to decode message to utf8
             data['action'] = 'signData';
-            data['isHash'] = false;
-            data['data']['data'] = u8aToString(rawPayload);
+            data['oversized'] = isOversized;
+            data['isHash'] = isOversized;
+
+            console.log('to hex -> ', u8aToHex(rawPayload));
+            debugger;
+            console.log(await blake2s(u8aToHex(rawPayload)));
+            debugger;
+            data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : u8aToString(rawPayload);
             break;
           default:
             break;

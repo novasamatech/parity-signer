@@ -37,6 +37,7 @@ type SignedTX = {
 
 type ScannerState = {
   dataToSign: string,
+  isOversized: boolean,
   message: string,
   multipartData: any,
   recipient: Account,
@@ -52,6 +53,7 @@ type ScannerState = {
 
 const defaultState = {
   busy: false,
+  isOversized: false,
   dataToSign: '',
   message: null,
   multipartData: {},
@@ -75,7 +77,9 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async setParsedData(strippedData, accountsStore) {
-    const parsedData = constructDataFromBytes(strippedData);
+    const parsedData = await constructDataFromBytes(strippedData);
+
+    debugger;
 
     if (parsedData.isMultipart) {
       this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
@@ -114,11 +118,11 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async setData(accountsStore) {
-    // - Cold Signer SHOULD (at the user's discretion) sign the message, immortal_payload, or payload if payload is of length 256 bytes or fewer.
     switch (this.state.unsignedData.action) {
       case 'signTransaction':
         return await this.setTXRequest(this.state.unsignedData, accountsStore);
       case 'signData':
+        debugger;
         return await this.setDataToSign(this.state.unsignedData, accountsStore);
       default:
         throw new Error(
@@ -128,11 +132,14 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async setDataToSign(signRequest, accountsStore) {
-    const message = signRequest.data.data;
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
+    const message = signRequest.data.data;
+    const isOversized = signRequest.data.isOversized || false;
 
     let dataToSign = '';
+
+    debugger;
 
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
       dataToSign = message;
@@ -142,17 +149,22 @@ export default class ScannerStore extends Container<ScannerState> {
 
     const sender = accountsStore.getByAddress(address);
 
+    debugger;
+
     if (!sender || !sender.encryptedSeed) {
       throw new Error(
         `No private key found for ${address} found in your signer key storage.`
       );
     }
 
+    debugger;
+
     this.setState({
-      type: 'message',
-      sender,
+      dataToSign,
+      isOversized,
       message,
-      dataToSign
+      sender,
+      type: 'message',
     });
     return true;
   }
@@ -160,24 +172,23 @@ export default class ScannerStore extends Container<ScannerState> {
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
 
-    const protocol = txRequest.data.data.crypto ? NetworkProtocols.SUBSTRATE : NetworkProtocols.ETHEREUM
+    const protocol = txRequest.data.rlp ? NetworkProtocols.ETHEREUM : NetworkProtocols.SUBSTRATE
 
     if (protocol === NetworkProtocols.ETHEREUM && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
 
-    if (protocol === NetworkProtocols.ETHERUEM) {
-      const tx = await transaction(txRequest.data.rlp);
-      const { ethereumChainId = 1 } = tx;
-      const networkKey = ethereumChainId;
-    }
-    debugger;
-     // TODO cater for Substrate
+    const tx = protocol === NetworkProtocols.ETHEREUM ? await transaction(txRequest.data.rlp) : null;
+    const networkKey = tx ? tx.ethereumChainId : '123';
+
     const sender = accountsStore.getById({
       protocol,
-      networkKey: networkKey || NetworkProtocols.SUBSTRATE,
+      networkKey,
       address: txRequest.data.account
     });
+
+    debugger;
+
     const networkTitle = NETWORK_LIST[networkKey].title;
 
     if (!sender || !sender.encryptedSeed) {
@@ -187,13 +198,15 @@ export default class ScannerStore extends Container<ScannerState> {
         } found in your signer key storage for the ${networkTitle} chain.`
       );
     }
+    debugger;
 
-    // TODO cater for Substrate
     const recipient = accountsStore.getById({
       protocol: NetworkProtocols.ETHEREUM,
       networkKey: tx.ethereumChainId,
       address: tx.action
     });
+
+    debugger;
 
     // For Eth, always sign the keccak hash.
     // For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
