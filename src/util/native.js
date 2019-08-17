@@ -96,10 +96,6 @@ export function blockiesIcon (seed) {
   return EthkeyBridge.blockiesIcon(seed.toLowerCase());
 }
 
-export function blake2s(data) {
-  return EthkeyBridge.blake2s(asString(data));
-}
-
 export function words () {
   return EthkeyBridge.randomPhrase();
 }
