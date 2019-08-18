@@ -16,15 +16,13 @@
 
 // @flow
 
-import Payload from '@polkadot/api/SignerPayload';
-import { encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
 import { saveTx } from '../util/db';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
 import transaction from '../util/transaction';
-import { constructDataFromBytes, decodeToString, hexToAscii, rawDataToU8A } from '../util/decoders';
+import { constructDataFromBytes } from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -78,7 +76,8 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
-
+    
+    console.log('parsed data -> ', parsedData);
     debugger;
 
     if (parsedData.isMultipart) {
@@ -122,7 +121,6 @@ export default class ScannerStore extends Container<ScannerState> {
       case 'signTransaction':
         return await this.setTXRequest(this.state.unsignedData, accountsStore);
       case 'signData':
-        debugger;
         return await this.setDataToSign(this.state.unsignedData, accountsStore);
       default:
         throw new Error(

@@ -20,7 +20,7 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import { hexStripPrefix, hexToU8a, u8aToHex, u8aToString } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 
-import { blake2s } from './native';
+import { blake2s, keccak } from './native';
 
 /*
   Example Full Raw Data
@@ -92,9 +92,6 @@ export async function constructDataFromBytes(bytes) {
   const frameCount = parseInt(frameInfo.substr(2, 4), 16);
   const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
   const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
-  
-  console.log('123 - > ', await blake2s('0x123'));
-  debugger;
 
   if (isMultipart) {
     const partData = {
@@ -171,8 +168,8 @@ export async function constructDataFromBytes(bytes) {
 
             console.log('to hex -> ', u8aToHex(rawPayload));
             debugger;
-            console.log(await blake2s(u8aToHex(rawPayload)));
-            debugger;
+            console.log('blake function -> ', blake2s);
+            
             data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : u8aToString(rawPayload);
             break;
           default:
