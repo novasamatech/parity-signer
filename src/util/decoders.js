@@ -165,11 +165,6 @@ export async function constructDataFromBytes(bytes) {
             data['action'] = 'signData';
             data['oversized'] = isOversized;
             data['isHash'] = isOversized;
-
-            console.log('to hex -> ', u8aToHex(rawPayload));
-            debugger;
-            console.log('blake function -> ', blake2s);
-            
             data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : u8aToString(rawPayload);
             break;
           default:

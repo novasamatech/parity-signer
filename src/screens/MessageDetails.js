@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from "../fonts";
@@ -40,10 +40,7 @@ export default class MessageDetails extends React.PureComponent {
         {(scannerStore, accounts) => {
           const dataToSign = scannerStore.getDataToSign();
 
-          debugger;
-
           if (dataToSign) {
-            // const tx = scannerStore.getTx(); this does nothing????
             return (
               <MessageDetailsView
                 {...this.props}
@@ -51,6 +48,7 @@ export default class MessageDetails extends React.PureComponent {
                 sender={scannerStore.getSender()}
                 message={scannerStore.getMessage()}
                 dataToSign={dataToSign}
+                isOversized={scannerStore.getIsOversized()}
                 onPressAccount={async account => {
                   await accounts.select(account);
                   this.props.navigation.navigate('AccountDetails');
@@ -79,12 +77,15 @@ export class MessageDetailsView extends React.PureComponent {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,
+    isOversized: PropTypes.bool.isRequired,
     sender: PropTypes.object.isRequired,
     message: PropTypes.string.isRequired
   };
 
   render() {
-    const {data, message, onNext, onPressAccount, sender} = this.props;
+    const {data, isOversized, message, onNext, onPressAccount, sender} = this.props;
+
+    console.log('is Oversized => ', isOversized);
 
     return (
       <ScrollView
@@ -107,11 +108,28 @@ export class MessageDetailsView extends React.PureComponent {
           {isAscii(message)
             ? message
             : data}
-        </Text>
+        </Text>        
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Message"
-          onPress={() => onNext()}
+          onPress={() => {
+            isOversized
+              ? Alert.alert(
+                  "Warning",
+                  "You are signing a transaction hash, which is inherently unsafe. If possible, it is recommended that you construct a multipart payload instead.",
+                  [
+                    {
+                      text: 'Proceed',
+                      onPress: () => onNext()
+                    },
+                    {
+                      text: 'Cancel',
+                      style: 'cancel'
+                    }
+                  ]
+                )
+              : onNext()
+          }}
         />
       </ScrollView>
     );

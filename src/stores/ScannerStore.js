@@ -18,9 +18,9 @@
 
 import { Container } from 'unstated';
 
-import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { saveTx } from '../util/db';
-import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
+import { brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
 import transaction from '../util/transaction';
 import { constructDataFromBytes } from '../util/decoders';
 import { Account } from './AccountsStore';
@@ -77,9 +77,6 @@ export default class ScannerStore extends Container<ScannerState> {
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
     
-    console.log('parsed data -> ', parsedData);
-    debugger;
-
     if (parsedData.isMultipart) {
       this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
       return;
@@ -133,11 +130,9 @@ export default class ScannerStore extends Container<ScannerState> {
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
     const message = signRequest.data.data;
-    const isOversized = signRequest.data.isOversized || false;
+    const isOversized = signRequest.oversized;
 
     let dataToSign = '';
-
-    debugger;
 
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
       dataToSign = message;
@@ -147,15 +142,11 @@ export default class ScannerStore extends Container<ScannerState> {
 
     const sender = accountsStore.getByAddress(address);
 
-    debugger;
-
     if (!sender || !sender.encryptedSeed) {
       throw new Error(
         `No private key found for ${address} found in your signer key storage.`
       );
     }
-
-    debugger;
 
     this.setState({
       dataToSign,
@@ -170,6 +161,8 @@ export default class ScannerStore extends Container<ScannerState> {
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
 
+    const isOversized = txRequest.oversized;
+
     const protocol = txRequest.data.rlp ? NetworkProtocols.ETHEREUM : NetworkProtocols.SUBSTRATE
 
     if (protocol === NetworkProtocols.ETHEREUM && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
@@ -177,15 +170,13 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     const tx = protocol === NetworkProtocols.ETHEREUM ? await transaction(txRequest.data.rlp) : null;
-    const networkKey = tx ? tx.ethereumChainId : '123';
+    const networkKey = tx ? tx.ethereumChainId : '456';
 
     const sender = accountsStore.getById({
       protocol,
       networkKey,
       address: txRequest.data.account
     });
-
-    debugger;
 
     const networkTitle = NETWORK_LIST[networkKey].title;
 
@@ -196,12 +187,14 @@ export default class ScannerStore extends Container<ScannerState> {
         } found in your signer key storage for the ${networkTitle} chain.`
       );
     }
+
+    console.log(txRequest.data);
     debugger;
 
     const recipient = accountsStore.getById({
-      protocol: NetworkProtocols.ETHEREUM,
-      networkKey: tx.ethereumChainId,
-      address: tx.action
+      protocol,
+      networkKey: networkKey,
+      address: tx ? tx.action : txRequest.data.account
     });
 
     debugger;
@@ -215,7 +208,8 @@ export default class ScannerStore extends Container<ScannerState> {
       recipient,
       txRequest,
       tx,
-      dataToSign
+      dataToSign,
+      isOversized
     });
     return true;
   }
@@ -266,6 +260,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
   cleanup() {
     this.setState(defaultState);
+  }
+  
+  getIsOversized() {
+    return this.state.isOversized;
   }
 
   getSender() {

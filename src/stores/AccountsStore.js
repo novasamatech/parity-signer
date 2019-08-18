@@ -66,8 +66,7 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  updateNew(accountUpdate: Object) {
-    console.log('accountUpdate',accountUpdate);
+  updateNew(accountUpdate: Object) {;
     this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
   }
 
@@ -87,7 +86,6 @@ export default class AccountsStore extends Container<AccountsState> {
       });
     }
   }
-
   update(accountUpdate) {
     let account = this.state.accounts.get(accountId(accountUpdate));
     if (!account) {
@@ -128,6 +126,7 @@ export default class AccountsStore extends Container<AccountsState> {
       console.error(e);
     }
   }
+
 
   async deleteAccount(account) {
     account.archived = true;
