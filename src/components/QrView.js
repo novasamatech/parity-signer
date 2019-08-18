@@ -21,9 +21,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Dimensions, StyleSheet, Image, View } from 'react-native';
 
-import { Button } from './Button';
-import colors from '../colors';
-import { NetworkProtocols } from '../constants';
 import { qrCode, qrHex } from '../util/native';
 
 export default class QrView extends React.PureComponent {
@@ -41,8 +38,6 @@ export default class QrView extends React.PureComponent {
 
   componentDidMount() {
     const { data } = this.props;
-
-    debugger;
   
     this.displayQrCode(data);
   }
@@ -57,8 +52,6 @@ export default class QrView extends React.PureComponent {
     try {
       // if payload was oversized, data could be a hex encoded string
       const qr = isHex(data) ? await qrHex(data) : await qrCode(data);
-
-      debugger;
 
       this.setState({
         qr: qr
@@ -84,8 +77,6 @@ export default class QrView extends React.PureComponent {
     const { width: deviceWidth } = Dimensions.get('window');
     let size = this.props.size || deviceWidth - 80;
     let flexBasis = this.props.height || deviceWidth - 40;
-
-    debugger;
 
     return (
       <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>

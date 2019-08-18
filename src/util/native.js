@@ -85,7 +85,7 @@ export function rlpItem (rlp, position) {
 }
 
 export function keccak (data) {
-  return EthkeyBridge.keccak(data);
+  return EthkeyBridge.keccak(asString(data));
 }
 
 export function ethSign (data) {
@@ -119,7 +119,7 @@ export function qrCodeHex (data) {
 }
 
 export function blake2s (data) {
-  return EthkeyBridge.blake2s(data);
+  return EthkeyBridge.blake2s(asString(data));
 }
 
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
