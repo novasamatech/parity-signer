@@ -16,14 +16,16 @@
 
 // @flow
 
+import { createType } from '@polkadot/types';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { saveTx } from '../util/db';
-import { brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
+import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
 import transaction from '../util/transaction';
 import { constructDataFromBytes } from '../util/decoders';
 import { Account } from './AccountsStore';
+
 
 type TXRequest = Object;
 
@@ -164,13 +166,14 @@ export default class ScannerStore extends Container<ScannerState> {
     const isOversized = txRequest.oversized;
 
     const protocol = txRequest.data.rlp ? NetworkProtocols.ETHEREUM : NetworkProtocols.SUBSTRATE
+    const isEthereum = protocol === NetworkProtocols.ETHEREUM;
 
-    if (protocol === NetworkProtocols.ETHEREUM && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
+    if (isEthereum && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
 
-    const tx = protocol === NetworkProtocols.ETHEREUM ? await transaction(txRequest.data.rlp) : null;
-    const networkKey = tx ? tx.ethereumChainId : '456';
+    const tx = isEthereum ? await transaction(txRequest.data.rlp) : txRequest.data.data;
+    const networkKey = isEthereum ? tx.ethereumChainId : '456';
 
     const sender = accountsStore.getById({
       protocol,
@@ -188,20 +191,16 @@ export default class ScannerStore extends Container<ScannerState> {
       );
     }
 
-    console.log(txRequest.data);
-    debugger;
-
     const recipient = accountsStore.getById({
       protocol,
       networkKey: networkKey,
-      address: tx ? tx.action : txRequest.data.account
+      address: isEthereum ? tx.action : txRequest.data.account
     });
-
-    debugger;
 
     // For Eth, always sign the keccak hash.
     // For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
     const dataToSign = sender.protocol === NetworkProtocols.ETHEREUM ? await keccak(txRequest.data.rlp) : txRequest.data.data;
+
     this.setState({
       type: 'transaction',
       sender,
@@ -222,19 +221,23 @@ export default class ScannerStore extends Container<ScannerState> {
     if (sender.protocol === NetworkProtocols.ETHEREUM) {
       signedData = await brainWalletSign(seed, this.state.dataToSign);
     } else {
-      signedData = await substrateSign(seed, this.state.dataToSign);
+      signedData = await substrateSign(seed, this.state.dataToSign.toHex());
     }
 
     this.setState({ signedData });
+
+    debugger;
+
     if (type == 'transaction') {
       await saveTx({
-        hash: this.state.dataToSign,
+        hash: isEthereum ? this.state.dataToSign : await blake2s(this.state.dataToSign.toHex()),
         tx: this.state.tx,
         sender: this.state.sender,
-        recipient: this.state.recipient,
+        recipient: isEthereum ? this.state.recipient : null,
         signature: signedData,
         createdAt: new Date().getTime()
       });
+      debugger;
     }
   }
 

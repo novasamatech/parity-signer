@@ -65,14 +65,14 @@ export default class Scanner extends React.PureComponent {
                   }
                 }                
 
-                if (!(await scannerStore.setData(accountsStore))) {
-                  return;
-                } else {
+                if (await scannerStore.setData(accountsStore)) {
                   if (scannerStore.getType() === 'transaction') {
                     this.props.navigation.navigate('TxDetails');
                   } else {
                     this.props.navigation.navigate('MessageDetails');
                   }
+                } else {
+                  return;
                 }
               }}
             />
