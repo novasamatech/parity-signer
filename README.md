@@ -71,6 +71,14 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 
 ### Usage
 
+- First start React Native server with increased heap to prevent out of memory error
+
+    ```
+    yarn start
+    ```
+
+Then:
+ 
 - iOS
 
     ```
