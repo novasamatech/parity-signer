@@ -26,6 +26,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import colors from '../colors';
+import fonts from "../fonts";
 import TextInput from './TextInput';
 
   export default function DerivationPasswordVerify(props) {
@@ -37,7 +38,7 @@ import TextInput from './TextInput';
     const toggleVerifyField = () => {
       setVerifyField(!verifyField)
     }
-
+  
     return (
       <>
         <TouchableOpacity
@@ -70,7 +71,6 @@ import TextInput from './TextInput';
       </>
     )
   }
-  
 
   const styles = StyleSheet.create({
     link: {

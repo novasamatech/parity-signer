@@ -43,8 +43,8 @@ const accountsStore = {
   sharedPreferencesName: 'accounts_v2'
 };
 
-function accountTxsKey({ address, protocol, networkKey }) {
-  return 'account_txs_' + accountId({ address, protocol, networkKey });
+function accountTxsKey({ address, networkKey }) {
+  return 'account_txs_' + accountId({ address, networkKey });
 }
 
 function txKey(hash) {

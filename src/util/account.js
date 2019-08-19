@@ -23,7 +23,7 @@ export function empty(account = {}) {
     address: '',
     archived: false,
     createdAt: new Date().getTime(),
-    derivationPassword: undefined, 
+    derivationPassword: '', 
     derivationPath:'',
     encryptedSeed: null,
     name: '',

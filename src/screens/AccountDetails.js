@@ -105,6 +105,7 @@ This account can only be recovered with its associated recovery phrase.`,
 
   render() {
     const account = this.props.accounts.getSelected();
+
     if (!account) {
       return null;
     }
