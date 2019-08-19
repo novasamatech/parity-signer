@@ -176,7 +176,7 @@ export default class AccountsStore extends Container {
       this.setState({ accounts });
     }
   }
-  
+
   async checkPinForSelected(pin) {
     const account = this.getSelected();
 

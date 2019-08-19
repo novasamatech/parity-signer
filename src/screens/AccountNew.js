@@ -31,7 +31,7 @@ import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
-import { validateSeed } from '../util/account';
+import { empty, validateSeed } from '../util/account';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -59,6 +59,11 @@ class AccountNewView extends React.Component {
       selectedNetwork: undefined,
     };
   }
+
+  componentWillUnmount = function() {
+    // called when the user goes back, or finishes the whole process
+    this.props.accounts.updateNew(empty());
+  };
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const selectedAccount = nextProps.accounts.getNew();
