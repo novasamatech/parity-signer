@@ -59,12 +59,12 @@ export default function DerivationPathField(props) {
         <TextInput
           onChangeText={(text) => {
             const derivationPath = keyExtract(text);
-
+            console.log('derivationPath',derivationPath)
             onChange({
               derivationPassword: derivationPath.password || '',
-              derivationPath: derivationPath.derivePath
+              derivationPath: derivationPath.derivePath || ''
             });
-            setIsValidPath(!!derivationPath);
+            setIsValidPath(!!derivationPath.password || !!derivationPath.derivePath);
           }}
           placeholder="optional derivation path"
           style={isValidPath ? ownStyles.validInput: ownStyles.invalidInput}

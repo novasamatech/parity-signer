@@ -17,8 +17,10 @@
 // @flow
 
 import { Container } from 'unstated';
+
 import { accountId, empty } from '../util/account';
 import { loadAccounts, saveAccount } from '../util/db';
+import keyExtract from '../util/keyExtract'
 import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
@@ -66,6 +68,7 @@ export default class AccountsStore extends Container<AccountsState> {
   }
 
   updateNew(accountUpdate: Object) {
+    console.log('accountUpdate',accountUpdate);
     this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
   }
 
@@ -155,7 +158,12 @@ export default class AccountsStore extends Container<AccountsState> {
 
     try {
       account.seed = await decryptData(account.encryptedSeed, pin);
-      // parse things here
+
+      const {phrase, derivePath, password} = keyExtract(account.seed)
+
+      account.seedPhrase = phrase || '';
+      account.derivationPath = derivePath || '';
+      account.derivationPassword = password || '';
       this.setState({
         accounts: this.state.accounts.set(accountId(account), account)
       });
@@ -168,6 +176,7 @@ export default class AccountsStore extends Container<AccountsState> {
   lockAccount(account) {
 
     if (this.state.accounts.get(accountId(account))) {
+      console.log('locking',account.name);
       delete account.seed;
       delete account.seedPhrase;
       delete account.derivationPassword;
