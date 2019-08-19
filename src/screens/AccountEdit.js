@@ -40,9 +40,11 @@ export default class AccountEdit extends React.PureComponent {
       <Subscribe to={[AccountsStore]}>
         {accounts => {
           const selected = accounts.getSelected();
+
           if (!selected) {
             return null;
           }
+
           return (
             <ScrollView
               style={styles.body}
@@ -57,8 +59,10 @@ export default class AccountEdit extends React.PureComponent {
               <Text style={styles.title}>ACCOUNT NAME</Text>
               <TextInput
                 style={{ marginBottom: 40 }}
-                onChangeText={name => accounts.updateSelected({ name })}
-                onEndEditing={text => accounts.saveSelected()}
+                onChangeText={async (name) => {
+                  accounts.updateSelected({ name });
+                  await accounts.save(accounts.getSelected())
+                }}
                 value={selected.name}
                 placeholder="New name"
               />
