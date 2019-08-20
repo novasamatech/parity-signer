@@ -191,14 +191,8 @@ export default class AccountsStore extends Container {
     return this.state.accounts.get(accountId(account)) || empty(account);
   }
 
-<<<<<<< HEAD
-  getByAddress(address): ?Account {
-    const accounts = this.getAccounts();
-    return accounts.find(
-=======
   getByAddress(address) {
     return this.getAccounts().find(
->>>>>>> origin/tbaut-substrate-accounts
       a => a.address.toLowerCase() === address.toLowerCase()
     );
   }

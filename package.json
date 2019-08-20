@@ -66,8 +66,8 @@
     "metro-react-native-babel-preset": "^0.55.0",
     "pre-git": "^3.14.0",
     "prettier": "1.18.2",
-    "reactotron-react-native": "^3.6.4",
-    "react-test-renderer": "16.8.6"
+    "react-test-renderer": "16.8.6",
+    "reactotron-react-native": "^3.6.4"
   },
   "release": {
     "analyzeCommits": "simple-commit-message"
