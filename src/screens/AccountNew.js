@@ -100,7 +100,7 @@ class AccountNewView extends React.Component {
               derivationPassword={derivationPassword}
               derivationPath={derivationPath}
               onSelect={({ newAddress, isBip39, newSeed }) => {
-                if (selectedNetwork === NetworkProtocols.SUBSTRATE) {
+                if (isSubstrate) {
                   accounts.updateNew({ 
                     address: newAddress,
                     derivationPassword,
