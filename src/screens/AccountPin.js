@@ -55,22 +55,24 @@ class AccountPinView extends React.PureComponent {
     const { accounts, navigation } = this.props;
     const accountCreation = navigation.getParam('isNew');
     const { pin } = this.state;
+    debugger;
     const account = accountCreation
       ? accounts.getNew()
       : accounts.getSelected();
-    if (
-      this.state.pin.length >= 6 &&
-      this.state.pin === this.state.confirmation
-    ) {
+    if (this.state.pin.length >= 6 && this.state.pin === this.state.confirmation) {
+      debugger;
       if (accountCreation) {
+        debugger;
         await accounts.submitNew(pin);
         const resetAction = StackActions.reset({
           index: 0,
           key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
           actions: [NavigationActions.navigate({ routeName: 'AccountList' })]
         });
+        debugger;
         this.props.navigation.dispatch(resetAction);
       } else {
+        debugger;
         await accounts.save(account, pin);
         const resetAction = StackActions.reset({
           index: 1,

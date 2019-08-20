@@ -17,15 +17,13 @@
 'use strict';
 
 import { createType, GenericExtrinsicPayload } from '@polkadot/types';
-import { hexToU8a, u8aConcat, u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
-import { checkAddress, decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { u8aConcat } from '@polkadot/util';
+import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { constructDataFromBytes, rawDataToU8A } from './decoders';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_TX = new Uint8Array([0]);
-const CMD_SIGN_TX_HASH = new Uint8Array([1]);
-const CMD_SIGN_IMMORTAL_TX = new Uint8Array([2]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
@@ -60,6 +58,7 @@ const SIGNER_PAYLOAD_TEST = {
   genesisHash: '0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b',
   method: '0x0500ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
   nonce: '0x00001234',
+  specVersion: 3,
   tip: '0x00000000000000000000000000005678'
 };
 
@@ -71,42 +70,6 @@ const SIGN_TX_TEST = u8aConcat(
   decodeAddress(KUSAMA_ADDRESS),
   createType('ExtrinsicPayload', SIGNER_PAYLOAD_TEST, { version: 3 }).toU8a()
 );
-
-// const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_1 = 
-//   '4' + // indicates data is binary encoded
-//   '37' +  // byte length of data
-//   '01' + // is it multipart?
-//   '0002' + // how many parts in total?
-//   '0001' +  // which frame are we on?
-//   '53' + // S for Substrate
-//   '01' + // sr25519
-//   '03' + // sign message
-//   '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea40776' + // key
-//   '5448495320495320535041525441210' + // THIS IS SPARTA!
-//   'ec11ec11ec11ec';
-
-// const RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_2 = 
-//   '4' + // indicates data is binary encoded
-//   '37' +  // byte length of data
-//   '01' + // is it multipart?
-//   '0002' + // how many parts in total?
-//   '0002' +  // which frame are we on?
-//   '53' + // S for Substrate
-//   '01' + // sr25519
-//   '03' + // sign message
-//   '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407' + // key
-//   '686520736169642c20746f206e6f206f6e6520696e20706172746963756c61722e' + // he said, to no one in particular.
-//   'ec11ec11ec11ec';
-
-// const RN_SIGN_HASH_RAW = 
-//   '00' +
-//   '0001' +
-//   '0000' +
-//   '53' +
-//   '01' + // sr25519
-//   '01' + // sign payload hash
-//   '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407' + // key
-//   ''
 
 describe.skip('sanity check', () => {
   it('sanity check address is kusama', () => {
@@ -151,16 +114,8 @@ describe('decoders', () => {
       expect(unsignedData.data.data.method.toHex()).toEqual(SIGNER_PAYLOAD_TEST.method);
       expect(unsignedData.data.data.blockHash.toHex()).toEqual(SIGNER_PAYLOAD_TEST.blockHash);
       expect(unsignedData.data.data.nonce.eq(SIGNER_PAYLOAD_TEST.nonce)).toBe(true);
+      expect(unsignedData.data.data.specVersion.eq(SIGNER_PAYLOAD_TEST.specVersion)).toBe(true);
       expect(unsignedData.data.data.tip.eq(SIGNER_PAYLOAD_TEST.tip)).toBe(true);
     });
-
-    // it('from Substrate UOS Multipart Message', () => {
-    //   const partData1 = parseRawData(RN_MULTIPART_TX_REQUEST_RAW_DATA_PT_1);
-      
-    //   expect(partData1).toBeDefined();
-    //   expect(partData1.isMultipart).toEqual(true);
-    //   expect(partData1.frameCount).toEqual(2);
-    //   expect(partData1.currentFrame).toEqual(1);
-    // });
   })
 });
