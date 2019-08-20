@@ -25,6 +25,35 @@ import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import fonts from "../fonts";
 
+class NetworkButton extends React.PureComponent<{
+  network: {
+    title: number,
+    color: string,
+    secondaryColor: string
+  }
+}> {
+  render() {
+    const { navigation, network } = this.props;
+
+    return (
+      <TouchableItem
+        style={[
+          styles.card,
+          {
+            backgroundColor: network.color,
+            marginBottom: 20
+          }
+        ]}
+        onPress={() => navigation.navigate('AccountNetworkChooser')}
+      >
+        <Text style={[styles.cardText, { color: network.secondaryColor }]}>
+          {network.title}
+        </Text>
+      </TouchableItem>
+    );
+  }
+}
+
 const styles = {
   card: {
     backgroundColor: colors.card_bg,
@@ -42,33 +71,5 @@ const styles = {
     padding: 5
   }
 };
-
-class NetworkButton extends React.PureComponent<{
-  network: {
-    title: number,
-    color: string,
-    secondaryColor: string
-  }
-}> {
-  render() {
-    const { network } = this.props;
-    return (
-      <TouchableItem
-        style={[
-          styles.card,
-          {
-            backgroundColor: network.color,
-            marginBottom: 20
-          }
-        ]}
-        onPress={() => this.props.navigation.navigate('AccountNetworkChooser')}
-      >
-        <Text style={[styles.cardText, { color: network.secondaryColor }]}>
-          {network.title}
-        </Text>
-      </TouchableItem>
-    );
-  }
-}
 
 export default withNavigation(NetworkButton);

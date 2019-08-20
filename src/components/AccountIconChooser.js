@@ -46,6 +46,7 @@ export default class AccountIconChooser extends React.PureComponent {
   refreshIcons = async () => {
     const {derivationPassword, derivationPath, network : {protocol, prefix}, onSelect} = this.props;
 
+    console.log('protocol,prefix', protocol, prefix);
     // clean previous selection
     onSelect({ newAddress: '', isBip39: false, newSeed: ''});
 
@@ -63,7 +64,7 @@ export default class AccountIconChooser extends React.PureComponent {
             result.seed = await words();
 
             if (protocol === NetworkProtocols.ETHEREUM) {
-              result = await brainWalletAddress(result.seed);
+              Object.assign(result, await brainWalletAddress(result.seed));
             } else {
               try {
                 result.address = await substrateAddress(`${result.seed}${derivationPath}///${derivationPassword}`, prefix);

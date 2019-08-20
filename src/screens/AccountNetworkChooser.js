@@ -45,6 +45,7 @@ class AccountNetworkChooserView extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { accounts } = this.props;
+    
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>

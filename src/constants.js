@@ -19,7 +19,7 @@ export const EthereumNetworkKeys = Object.freeze({
 export const SubstrateNetworkKeys = Object.freeze({
   // POLKADOT: '123',
   KUSAMA: '456',
-  POLKADOT_TEST: '42',
+  POLKADOT_TEST: 's42', // needs a dummy genesis different than any other id (Eth chain id included)
 });
 
 const substrateNetworkBase = {
@@ -31,7 +31,7 @@ const substrateNetworkBase = {
   },
   [SubstrateNetworkKeys.POLKADOT_TEST]: {
     color: '#ff8c00',
-    genesisHash: SubstrateNetworkKeys.KUSAMA,
+    genesisHash: SubstrateNetworkKeys.POLKADOT_TEST,
     prefix: 42,
     title: 'Polkadot Testnet'
   },

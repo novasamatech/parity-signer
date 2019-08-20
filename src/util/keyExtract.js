@@ -9,8 +9,6 @@ export default function keyExtract (suri) {
   const matches = suri.match(RE_CAPTURE);
 
   let phrase, derivePath, password = '';
-  console.log('suri',suri);
-  console.log('matches',matches);
 
   if (matches) {
     [, phrase = '', , derivePath = '', , , password = ''] = matches;
