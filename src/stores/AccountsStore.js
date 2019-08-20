@@ -113,7 +113,7 @@ export default class AccountsStore extends Container {
   async save(account, pin = null) {
     try {
       // for account creation
-      if (pin && account.seed) {
+      if (!!pin && !!account.seed) {
         account.encryptedSeed = await encryptData(account.seed, pin);
       }
       
