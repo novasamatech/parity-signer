@@ -46,7 +46,6 @@ export default class AccountIconChooser extends React.PureComponent {
   refreshIcons = async () => {
     const {derivationPassword, derivationPath, network : {protocol, prefix}, onSelect} = this.props;
 
-    console.log('protocol,prefix', protocol, prefix);
     // clean previous selection
     onSelect({ newAddress: '', isBip39: false, newSeed: ''});
 
