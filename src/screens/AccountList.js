@@ -111,8 +111,9 @@ class AccountListView extends React.PureComponent {
   };
 
   render() {
-    const hasNoAccount = this.props.accounts.length < 1;
-    const { navigate } = this.props.navigation;
+    const { accounts, navigation, onAccountSelected } = this.props;
+    const hasNoAccount = accounts.length < 1;
+    const { navigate } = navigation;
 
     return (
       <View style={styles.body}>
@@ -137,7 +138,7 @@ class AccountListView extends React.PureComponent {
             this.list = list;
           }}
           style={styles.content}
-          data={this.props.accounts}
+          data={accounts}
           keyExtractor={account => accountId(account)}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
           renderItem={({ item: account }) => {
@@ -146,7 +147,7 @@ class AccountListView extends React.PureComponent {
                 address={account.address}
                 networkKey={account.networkKey}
                 onPress={() => {
-                  this.props.onAccountSelected(account);
+                  onAccountSelected(account);
                 }}
                 shortAddress
                 style={{ paddingBottom: null }}

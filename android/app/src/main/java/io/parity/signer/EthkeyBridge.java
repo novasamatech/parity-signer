@@ -91,11 +91,6 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void blake2s(String data, Promise promise) {
-        promise.resolve(ethkeyBlake(data));
-    }
-
-    @ReactMethod
     public void ethSign(String data, Promise promise) {
         promise.resolve(ethkeyEthSign(data));
     }
