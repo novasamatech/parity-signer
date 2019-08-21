@@ -24,29 +24,42 @@ import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
 
-export default class PayloadDetailsCard extends React.PureComponent<{
-  description: string,
-  payload: GenericExtrinsicPayload,
-  style: Object
-}> {
+export default class PayloadDetailsCard extends React.PureComponent {
   static propTypes = {
     description: PropTypes.string.isRequired,
-    payload: PropTypes.object.isRequired,
+    payload: PropTypes.object,
+    signature: PropTypes.string,
     style: ViewPropTypes.style
   };
 
   render() {
-    const { description, payload, style } = this.props;
-
+    const { description, payload, signature, style } = this.props;
+    
     return (
       <View style={[styles.body, style]}>
         <Text style={styles.titleText}>{description}</Text>
-        <ExtrinsicPart label='Block Hash' value={payload.blockHash.toString()} />
-        <ExtrinsicPart label='Method' value={payload.method.toString()} />
-        <ExtrinsicPart label='Era' value={payload.era.toString()} />
-        <ExtrinsicPart label='Nonce' value={payload.nonce.toString()} />
-        <ExtrinsicPart label='Tip' value={payload.tip.toString()} />
-        <ExtrinsicPart label='Genesis Hash' value={payload.genesisHash.toString()} />
+        {
+          payload && (
+            <View style={{ padding: 5, paddingVertical: 2 }}>
+              <ExtrinsicPart label='Block Hash' value={payload.blockHash.toString()} />
+              <ExtrinsicPart label='Method' value={payload.method.toString()} />
+              <ExtrinsicPart label='Era' value={payload.era.toString()} />
+              <ExtrinsicPart label='Nonce' value={payload.nonce.toString()} />
+              <ExtrinsicPart label='Tip' value={payload.tip.toString()} />
+              <ExtrinsicPart label='Genesis Hash' value={payload.genesisHash.toString()} />
+            </View>
+          )
+        }
+        {
+          signature && (
+            <View style={{ padding: 5, paddingVertical: 2 }}>
+              <Text style={{ backgroundColor: colors.bg, color: colors.card_bg, textAlign: 'left', fontSize: 20, fontWeight: '800' }}>
+                Signature
+              </Text>
+              <Text style={{ color: colors.card_bg_text }}>{signature}</Text>
+            </View>
+          )
+        }
       </View>
     );
   }
@@ -56,15 +69,13 @@ function ExtrinsicPart({ label, style, value }) {
 
   return (
     <View style={[{ justifyContent: 'center', alignItems: 'flex-start' }, style]}>
-      <View>
-        <View
-          style={{ padding: 5, paddingVertical: 2 }}
-        >
-          <Text style={{ backgroundColor: colors.bg, color: colors.card_bg, textAlign: 'left', fontSize: 20, fontWeight: '800' }}>
-            {label}
-          </Text>
-          <Text style={{ color: colors.card_bg_text }}>{value}</Text>
-        </View>
+      <View
+        style={{ padding: 5, paddingVertical: 2 }}
+      >
+        <Text style={{ backgroundColor: colors.bg, color: colors.card_bg, textAlign: 'left', fontSize: 20, fontWeight: '800' }}>
+          {label}
+        </Text>
+        <Text style={{ color: colors.card_bg_text }}>{value}</Text>
       </View>
     </View>
   );

@@ -187,6 +187,15 @@ export function decodeToString(message: Uint8Array): string {
   return decoder.decode(message);
 }
 
+export function asciiToHex(message: string): string {
+  var result = [];
+	for (let i = 0; i < message.length; i++) {
+		var hex = Number(message.charCodeAt(i)).toString(16);
+		result.push(hex);
+  }
+	return result.join('');
+}
+
 export function hexToAscii(hexBytes: Uint8Array): string {
 	var hex  = hexBytes.toString();
 	var str = '';
@@ -195,4 +204,4 @@ export function hexToAscii(hexBytes: Uint8Array): string {
 	}
 
 	return str;
- }
+}

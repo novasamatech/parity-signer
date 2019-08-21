@@ -21,9 +21,10 @@ import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { saveTx } from '../util/db';
+import { isAscii } from '../util/message';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
 import transaction from '../util/transaction';
-import { constructDataFromBytes } from '../util/decoders';
+import { constructDataFromBytes, asciiToHex } from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -36,7 +37,7 @@ type SignedTX = {
 
 type ScannerState = {
   dataToSign: string,
-  isHash: Boolean,
+  isHash: boolean,
   isOversized: boolean,
   message: string,
   multipartData: any,
@@ -218,32 +219,30 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async signData(pin = '1') {
-    const { type, sender } = this.state;
+    const { isHash, sender, type } = this.state;
+
     const seed = await decryptData(sender.encryptedSeed, pin);
-    console.log('signe data seed => ', seed);
-    debugger;
+    const isEthereum = sender.protocol === NetworkProtocols.ETHEREUM;
+
     let signedData;
 
-    if (sender.protocol === NetworkProtocols.ETHEREUM) {
+    if (isEthereum) {
       signedData = await brainWalletSign(seed, this.state.dataToSign);
     } else {
-      signedData = await substrateSign(seed, this.state.dataToSign.toHex());
+      signedData = await substrateSign(seed, isAscii(this.state.dataToSign) ? asciiToHex(this.state.dataToSign) : this.state.dataToSign.toHex());
     }
 
     this.setState({ signedData });
 
-    debugger;
-
     if (type == 'transaction') {
       await saveTx({
-        hash: isEthereum ? this.state.dataToSign : await blake2s(this.state.dataToSign.toHex()),
+        hash: (isEthereum || isHash) ? this.state.dataToSign : await blake2s(this.state.dataToSign.toHex()),
         tx: this.state.tx,
-        sender: this.state.sender,
-        recipient: isEthereum ? this.state.recipient : null,
+        sender,
+        recipient: this.state.recipient,
         signature: signedData,
         createdAt: new Date().getTime()
       });
-      debugger;
     }
   }
 

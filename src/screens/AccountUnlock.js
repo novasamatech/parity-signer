@@ -42,8 +42,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
             accounts={accounts}
             checkPin={async pin => {
               try {
-                console.log('pin ', pin);
-                debugger;
                 await scannerStore.signData(pin);
                 return true;
               } catch (e) {

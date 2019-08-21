@@ -19,7 +19,8 @@
 import { createType, GenericExtrinsicPayload } from '@polkadot/types';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
-import { constructDataFromBytes, rawDataToU8A } from './decoders';
+import { constructDataFromBytes, rawDataToU8A, asciiToHex, hexToAscii, decodeToString } from './decoders';
+import { isAscii } from './message';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
@@ -75,9 +76,41 @@ describe.skip('sanity check', () => {
   it('sanity check address is kusama', () => {
     expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);
   });
+
+  it('sanity check payload encodes as expected', () => {
+    const payload = new GenericExtrinsicPayload(SIGN_TX_TEST, { version: 3 });
+    const fromBytes = new GenericExtrinsicPayload(payload.toU8a(), { version: 3 });
+
+    expect(payload).toEqual(fromBytes);
+  });
 });
 
 describe('decoders', () => {
+  describe('strings', () => {
+    it('check if string is ascii', () => {
+      const message = 'hello world';
+      const numbers = 123;
+
+      expect(isAscii(message)).toBe(true);
+      expect(isAscii(numbers)).toBe(true);
+    });
+
+    it('converts ascii to hex', () => {
+      const message = 'hello world';
+      const messageHex = asciiToHex(message);
+
+      expect(hexToAscii(messageHex)).toBe(message);
+    });
+
+    it('converts bytes to ascii', () => {
+      const messageBytes = new Uint8Array([84,  72,  73,  83,  32, 73,  83,  32,  83,  80,  65,  82,  84,  65,  33]);
+      const message = decodeToString(messageBytes);
+
+      expect(message).toBeDefined();
+      expect(message).toBe('THIS IS SPARTA!');
+    })
+  });
+
   describe('rawDataToU8a', () => {
     it('should properly extract only UOS relevant data from RNCamera txRequest.rawData', () => {
       const strippedU8a = rawDataToU8A(RN_TX_REQUEST_RAW_DATA);
@@ -102,13 +135,8 @@ describe('decoders', () => {
       expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
     });
 
-    it('from Substrate UOS Payload', async () => {
+    it('from Substrate UOS Payload Mortal', async () => {
       const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
-
-      const payload = new GenericExtrinsicPayload(SIGN_TX_TEST, { version: 3 });
-      const fromBytes = new GenericExtrinsicPayload(payload.toU8a(), { version: 3 });
-
-      expect(payload).toEqual(fromBytes);
 
       expect(unsignedData.data.data.era.toHex()).toEqual(SIGNER_PAYLOAD_TEST.era);
       expect(unsignedData.data.data.method.toHex()).toEqual(SIGNER_PAYLOAD_TEST.method);

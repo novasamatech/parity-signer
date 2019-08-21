@@ -73,7 +73,7 @@ export default class TxDetails extends React.PureComponent {
 export class TxDetailsView extends React.PureComponent {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
-    dataToSign: PropTypes.string.isRequired,
+    dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
     sender: PropTypes.object.isRequired,
     recipient: PropTypes.object.isRequired,
     value: PropTypes.string,
