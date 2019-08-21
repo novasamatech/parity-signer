@@ -77,7 +77,6 @@ export class AccountUnlock extends React.Component {
           <AccountUnlockView
             {...this.props}
             checkPin={async pin => {
-              console.log(accounts.getSelected());
               return await accounts.unlockAccount(accounts.getSelected(), pin);
             }}
             navigate={() => {
