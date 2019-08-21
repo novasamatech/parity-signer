@@ -37,7 +37,6 @@ export default class PayloadDetailsCard extends React.PureComponent<{
 
   render() {
     const { description, payload, style } = this.props;
-    debugger;
 
     return (
       <View style={[styles.body, style]}>

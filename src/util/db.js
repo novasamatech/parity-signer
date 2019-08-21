@@ -80,7 +80,6 @@ export async function saveTx(tx) {
   if (!tx.recipient) {
     throw new Error('Tx should contain recipient to save');
   }
-  debugger;
   await [
     storagePushValue(accountTxsKey(tx.sender), tx.hash),
     storagePushValue(accountTxsKey(tx.recipient), tx.hash),
@@ -89,16 +88,12 @@ export async function saveTx(tx) {
 }
 
 export async function loadAccountTxHashes(account) {
-  debugger;
   const result = await AsyncStorage.getItem(accountTxsKey(account));
-  debugger;
   return result ? JSON.parse(result) : [];
 }
 
 export async function loadAccountTxs(account) {
-  debugger;
   const hashes = await loadAccountTxHashes(account);
-  debugger;
   return (await AsyncStorage.multiGet(hashes.map(txKey))).map(v => [
     v[0],
     JSON.parse(v[1])

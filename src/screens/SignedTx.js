@@ -34,7 +34,6 @@ export default class SignedTx extends React.PureComponent {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scanner, accounts) => {
-          debugger;
           return (
             <SignedTxView
               {...scanner.getTx()}
@@ -59,7 +58,7 @@ export class SignedTxView extends React.PureComponent {
   };
 
   render() {
-    debugger;
+
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.topTitle}>SCAN SIGNATURE</Text>

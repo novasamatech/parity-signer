@@ -163,7 +163,7 @@ class AccountRecoverView extends React.Component {
               );
             }}
             ref={this._seed}
-            valid={validateSeed(seedPhrase, validBip39Seed).valid}
+            valid={validateSeed(seedPhrase, validBip39Seed).valid || (isSubstrate && address)}
             onChangeText={seedPhrase => {
               this.debouncedAddressGeneration(seedPhrase, derivationPath, derivationPassword);
               this.setState({ seedPhrase });
@@ -186,6 +186,7 @@ class AccountRecoverView extends React.Component {
           />
           <Button
             buttonStyles={{ marginBottom: 40 }}
+            disabled={isSubstrate && !address}
             title="Next Step"
             onPress={() => {
               const validation = validateSeed(

@@ -26,7 +26,6 @@ import transaction from '../util/transaction';
 import { constructDataFromBytes } from '../util/decoders';
 import { Account } from './AccountsStore';
 
-
 type TXRequest = Object;
 
 type SignedTX = {
@@ -37,6 +36,7 @@ type SignedTX = {
 
 type ScannerState = {
   dataToSign: string,
+  isHash: Boolean,
   isOversized: boolean,
   message: string,
   multipartData: any,
@@ -53,6 +53,7 @@ type ScannerState = {
 
 const defaultState = {
   busy: false,
+  isHash: false,
   isOversized: false,
   dataToSign: '',
   message: null,
@@ -132,6 +133,7 @@ export default class ScannerStore extends Container<ScannerState> {
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
     const message = signRequest.data.data;
+    const isHash = signRequest.isHash;
     const isOversized = signRequest.oversized;
 
     let dataToSign = '';
@@ -152,6 +154,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
     this.setState({
       dataToSign,
+      isHash,
       isOversized,
       message,
       sender,
@@ -191,6 +194,7 @@ export default class ScannerStore extends Container<ScannerState> {
       );
     }
 
+    // TODO cater for Substrate
     const recipient = accountsStore.getById({
       protocol,
       networkKey: networkKey,
@@ -216,6 +220,8 @@ export default class ScannerStore extends Container<ScannerState> {
   async signData(pin = '1') {
     const { type, sender } = this.state;
     const seed = await decryptData(sender.encryptedSeed, pin);
+    console.log('signe data seed => ', seed);
+    debugger;
     let signedData;
 
     if (sender.protocol === NetworkProtocols.ETHEREUM) {

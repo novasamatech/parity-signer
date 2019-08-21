@@ -28,8 +28,7 @@ import DerivationPathField from '../components/DerivationPathField'
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
-import TouchableItem from '../components/TouchableItem';
-import { NETWORK_LIST, NetworkProtocols, SubstrateNetworkKeys } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';

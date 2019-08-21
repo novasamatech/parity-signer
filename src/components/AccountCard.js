@@ -23,8 +23,8 @@ import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
 import colors from '../colors';
+import { NETWORK_LIST } from '../constants';
 import fonts from '../fonts';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import TouchableItem from './TouchableItem';
 
 

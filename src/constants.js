@@ -17,9 +17,9 @@ export const EthereumNetworkKeys = Object.freeze({
 
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys = Object.freeze({
-  // POLKADOT: '123',
   KUSAMA: '456',
-  POLKADOT_TEST: 's42', // needs a dummy genesis different than any other id (Eth chain id included)
+  // POLKADOT: '123',
+  // POLKADOT_TEST: 's42', // needs a dummy genesis different than any other id (Eth chain id included)
 });
 
 const substrateNetworkBase = {
@@ -29,12 +29,12 @@ const substrateNetworkBase = {
     prefix: 2,
     title: 'Kusama'
   },
-  [SubstrateNetworkKeys.POLKADOT_TEST]: {
-    color: '#ff8c00',
-    genesisHash: SubstrateNetworkKeys.POLKADOT_TEST,
-    prefix: 42,
-    title: 'Polkadot Testnet'
-  },
+  // [SubstrateNetworkKeys.POLKADOT_TEST]: {
+  //   color: '#ff8c00',
+  //   genesisHash: SubstrateNetworkKeys.POLKADOT_TEST,
+  //   prefix: 42,
+  //   title: 'Polkadot Testnet'
+  // },
   // [SubstrateNetworkKeys.POLKADOT]: {
   //   color: '#e6007a',
   //   genesisHash: SubstrateNetworkKeys.POLKADOT,
