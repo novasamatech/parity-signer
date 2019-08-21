@@ -119,6 +119,8 @@ class AccountUnlockView extends React.PureComponent {
   };
 
   render() {
+    const {checkPin, navigate} = this.props;
+
     return (
       <View style={styles.body}>
         <Background />
@@ -131,8 +133,8 @@ class AccountUnlockView extends React.PureComponent {
             if (pin.length < 4) {
               return;
             }
-            if (await this.props.checkPin(pin)) {
-              this.props.navigate();
+            if (await checkPin(pin)) {
+              navigate();
             } else if (pin.length > 5) {
               this.setState({ hasWrongPin: true });
             }

@@ -136,3 +136,4 @@ export function substrateAddress (seed, prefix) {
 export function substrateSign (seed, message) {
   return EthkeyBridge.substrateSign(seed, message);
 }
+

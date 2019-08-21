@@ -27,40 +27,55 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import AccountIcon from './AccountIcon';
-import Address from './Address'
+import Address from './Address';
 import colors from '../colors';
+import { NetworkProtocols } from '../constants';
 import fonts from "../fonts";
-import { brainWalletAddress, words } from '../util/native';
+import { debounce } from '../util/debounce';
+import { brainWalletAddress, substrateAddress, words } from '../util/native';
 
 export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { icons: [] };
+    this.state = {
+      icons: []
+    };
   }
 
-  componentDidMount() {
-    this.refreshAccount();
-  }
+  refreshIcons = async () => {
+    const {derivationPassword, derivationPath, network : {protocol, prefix}, onSelect} = this.props;
 
-  refreshAccount = async () => {
+    // clean previous selection
+    onSelect({ newAddress: '', isBip39: false, newSeed: ''});
+
     try {
       const icons = await Promise.all(
         Array(4)
           .join(' ')
           .split(' ')
           .map(async () => {
-            const seed = await words();
-            const { address, bip39 } = await brainWalletAddress(seed);
+            let result = {
+              address: '',
+              bip39: false,
+              seed: ''
+            }
+            result.seed = await words();
 
-            return {
-              address,
-              bip39,
-              seed,
-            };
+            if (protocol === NetworkProtocols.ETHEREUM) {
+              Object.assign(result, await brainWalletAddress(result.seed));
+            } else {
+              try {
+                result.address = await substrateAddress(`${result.seed}${derivationPath}///${derivationPassword}`, prefix);
+                result.bip39 = true;
+              } catch (e){
+                // invalid seed or derivation path
+                // console.error(e);
+              }
+            }
+            return result;
           })
       );
-
       this.setState({ icons });
     } catch (e) {
       console.error(e);
@@ -68,12 +83,13 @@ export default class AccountIconChooser extends React.PureComponent {
   }
 
   renderAddress = () => {
-    const {value} = this.props;
+    const {network: {protocol}, value} = this.props;
 
     if (value) {
       return (
         <Address 
           address={value}
+          protocol={protocol}
           style = {styles.addressText}
         />
       );
@@ -83,29 +99,46 @@ export default class AccountIconChooser extends React.PureComponent {
   }
  
   renderIcon = ({ item, index }) => {
-    const { value, onSelect } = this.props;
+    const { onSelect, network : {protocol}, value } = this.props;
     const { address, bip39, seed } = item;
     const isSelected = address.toLowerCase() === value.toLowerCase();
+
+    if (!address) {
+      //return an empty view to prevent the screen from jumping
+      return <View
+        style={styles.icon}
+      />
+    }
 
     return (
         <TouchableOpacity
           key={index}
           style={[styles.iconBorder, isSelected ? styles.selected : {}]}
-          onPress={() => onSelect({ address, bip39, seed })}
+          onPress={() => onSelect({ newAddress: address, isBip39: bip39, newSeed: seed })}
         >
           <AccountIcon
+            address={address}
+            protocol={protocol}
             style={styles.icon}
-            seed={'0x' + address}
           />
         </TouchableOpacity>
     );
   }
 
-  onRefresh = () => {
-    const { onSelect } = this.props;
+  componentDidMount() {
+    this.refreshIcons();
+  }
 
-    this.refreshAccount();
-    onSelect({ address: '', bip39: false, seed: ''});
+  debouncedRefreshIcons = debounce(this.refreshIcons, 200);
+
+  componentDidUpdate(prevProps){
+    const {derivationPassword, derivationPath, network} = this.props;
+
+    if ((prevProps.network !== network) || 
+      (prevProps.derivationPassword !== derivationPassword) ||
+      (prevProps.derivationPath !== derivationPath)){
+        this.debouncedRefreshIcons();
+      }
   }
 
   render() {
@@ -119,12 +152,12 @@ export default class AccountIconChooser extends React.PureComponent {
             data={icons}
             extraData={value}
             horizontal
-            keyExtractor={item => item.address}
+            keyExtractor={item => item.seed}
             renderItem={this.renderIcon}
             style={styles.icons}
           />
           <TouchableOpacity
-            onPress={this.onRefresh}
+            onPress={this.refreshIcons}
           >
             <Icon
               name={'refresh'}

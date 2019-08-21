@@ -19,19 +19,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
-import colors from '../colors';
-import fonts from '../fonts';
-import { NETWORK_LIST } from '../constants';
+
 import AccountIcon from './AccountIcon';
+import Address from './Address';
+import colors from '../colors';
+import { NETWORK_LIST } from '../constants';
+import fonts from '../fonts';
 import TouchableItem from './TouchableItem';
 
-export default class AccountCard extends React.PureComponent<{
-  address: string,
-  networkKey: string,
-  onPress?: () => any,
-  title?: string,
-  seedType?: string
-}> {
+
+export default class AccountCard extends React.PureComponent {
   static propTypes = {
     address: PropTypes.string.isRequired,
     networkKey: PropTypes.string,
@@ -47,7 +44,7 @@ export default class AccountCard extends React.PureComponent<{
   };
 
   render() {
-    const { address, networkKey, onPress, seedType, style } = this.props;
+    const { address, networkKey, onPress, seedType, shortAddress = false, style } = this.props;
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
     const seedTypeDisplay = seedType || '';
@@ -61,19 +58,20 @@ export default class AccountCard extends React.PureComponent<{
       >
         <View style={[styles.body, style]}>
           <View style={styles.content}>
-            <AccountIcon style={styles.icon} seed={'0x' + address} />
+            <AccountIcon
+              address={address}
+              protocol={network.protocol}
+              style={styles.icon}
+            />
             <View style={styles.desc}>
               <Text numberOfLines={1} style={styles.titleText}>
                 {title}
               </Text>
-              <Text
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.01}
-                style={styles.secondaryText}
-              >
-                0x{address}
-              </Text>
+              <Address 
+                address={address}
+                protocol={network.protocol}
+                short = {shortAddress}
+              />
             </View>
           </View>
           <View

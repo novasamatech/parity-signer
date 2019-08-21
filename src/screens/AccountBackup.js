@@ -17,15 +17,18 @@
 'use strict';
 
 import React from 'react';
-import { Alert, AppState, Clipboard, ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, AppState, Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
 import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TouchableItem from '../components/TouchableItem';
+import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
 import AccountsStore from '../stores/AccountsStore';
+
 
 export default class AccountBackup extends React.PureComponent {
   static navigationOptions = {
@@ -57,19 +60,22 @@ class AccountBackupView extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    const { accounts } = this.props;
-    const selected =
-      accounts.getNew().address && accounts.getNew().address.length
-        ? accounts.getNew()
-        : accounts.getSelected();
-    accounts.lockAccount(selected);
+    const {accounts} = this.props;
+    const selected = accounts.getSelected();
+
+    if (selected) {
+      accounts.lockAccount(selected);
+    }
+
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
   render() {
     const { accounts, navigation } = this.props;
+    const {navigate} = navigation;
     const isNew = navigation.getParam('isNew');
-    const selected = isNew ? accounts.getNew() : accounts.getSelected();
+    const {address, derivationPassword, derivationPath, name, networkKey, seed, seedPhrase} = isNew ? accounts.getNew() : accounts.getSelected();
+    
     return (
       <ScrollView
         style={styles.body}
@@ -78,15 +84,19 @@ class AccountBackupView extends React.PureComponent {
         <Background />
         <Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
         <AccountCard
-          address={selected.address}
-          networkKey={selected.networkKey}
-          title={selected.name}
+          address={address}
+          networkKey={networkKey}
+          title={name}
         />
-        <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
-        <Text style={styles.hintText}>
-          Write these words down on paper. Keep it safe. These words allow
-          anyone to recover and access the funds of this account.
-        </Text>
+        {isNew &&
+          <View>
+            <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
+            <Text style={styles.hintText}>
+              Write these words down on paper. Keep it safe. These words allow
+              anyone to recover and access the funds of this account.
+            </Text>
+          </View>
+        }
         <TouchableItem
           onPress={() => {
             Alert.alert(
@@ -98,7 +108,7 @@ class AccountBackupView extends React.PureComponent {
                   text: 'Copy anyway',
                   style: 'default',
                   onPress: () => {
-                    Clipboard.setString(selected.seed);
+                    Clipboard.setString(`${seedPhrase}${derivationPath}`);
                   }
                 },
                 {
@@ -110,10 +120,15 @@ class AccountBackupView extends React.PureComponent {
           }}
         >
           <Text style={styles.seedText}>
-            {selected.seed}
+            {seedPhrase || seed}
           </Text>
         </TouchableItem>
-        {(isNew) &&
+        {!!derivationPath &&
+          <Text style={styles.derivationText}>
+            {derivationPath}
+          </Text>}
+        {!!derivationPassword && <DerivationPasswordVerify password={derivationPassword}/>}
+        {isNew &&
           <Button
             buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
             title="Backup Done"
@@ -126,7 +141,7 @@ class AccountBackupView extends React.PureComponent {
                   {
                     text: 'Proceed',
                     onPress: () => {
-                      this.props.navigation.navigate('AccountPin', { isNew });
+                      navigate('AccountPin', { isNew });
                     }
                   },
                   {
@@ -188,6 +203,15 @@ const styles = StyleSheet.create({
   seedText: {
     padding: 10,
     minHeight: 160,
+    lineHeight: 26,
+    fontSize: 20,
+    fontFamily: fonts.regular,
+    backgroundColor: colors.card_bg
+  },
+  derivationText: {
+    padding: 10,
+    marginTop: 20,
+    minHeight: 30,
     lineHeight: 26,
     fontSize: 20,
     fontFamily: fonts.regular,

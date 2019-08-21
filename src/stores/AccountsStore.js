@@ -17,35 +17,40 @@
 // @flow
 
 import { Container } from 'unstated';
+
 import { accountId, empty } from '../util/account';
 import { loadAccounts, saveAccount } from '../util/db';
+import keyExtract from '../util/keyExtract'
 import { decryptData, encryptData } from '../util/native';
 
+
 export type Account = {
-  name: string,
   address: string,
-  networkType: string,
-  networkKey: string,
-  seed: string,
-  encryptedSeed: string,
-  createdAt: number,
-  updatedAt: number,
   archived: boolean,
+  createdAt: number,
+  derivationPassword: string,
+  derivationPath: string, // doesn't contain the ///password
+  encryptedSeed: string,
+  name: string,
+  networkKey: string,
+  seed: string, //this is the SURI (seedPhrase + /soft//hard///password derivation)
+  seedPhrase: string, //contains only the BIP39 words, no derivation path
+  updatedAt: number,
   validBip39Seed: boolean
 };
 
 type AccountsState = {
   accounts: Map<string, Account>,
   newAccount: Account,
-  selected: string,
-  accountTxs: [Object]
+  selected: Account
 };
 
-export default class AccountsStore extends Container<AccountsState> {
+
+export default class AccountsStore extends Container {
   state = {
     accounts: new Map(),
     newAccount: empty(),
-    selected: ''
+    selected: undefined
   };
 
   constructor(props) {
@@ -64,18 +69,18 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  updateNew(accountUpdate: Object) {
+  updateNew(accountUpdate) {
     this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
   }
 
-  getNew(): Account {
+  getNew() {
     return this.state.newAccount;
   }
 
   async submitNew(pin) {
     const account = this.state.newAccount;
 
-    // only save the account if the seed isn't empty
+    // only save a new account if the seed isn't empty
     if (account.seed) {
       await this.save(account, pin);
       this.setState({
@@ -106,47 +111,44 @@ export default class AccountsStore extends Container<AccountsState> {
     });
   }
 
-  async loadAccountTxs() { }
-
   async save(account, pin = null) {
     try {
-      //only save an account if the seed isn't empty
-      if (account.seed === ''){
-        return;
-      }
-
+      // for account creation
       if (pin && account.seed) {
-        let encryptedSeed = await encryptData(account.seed, pin);
-        delete account.seed;
-        account.encryptedSeed = encryptedSeed;
+        account.encryptedSeed = await encryptData(account.seed, pin);
       }
+      
+      const accountToSave = this.deleteSensitiveData(account);
 
-      account.updatedAt = new Date().getTime();
-      await saveAccount(account);
+      accountToSave.updatedAt = new Date().getTime();
+      await saveAccount(accountToSave);
     } catch (e) {
       console.error(e);
     }
   }
 
   async deleteAccount(account) {
-    account.archived = true;
-    this.state.accounts.set(accountId(account), account);
-    this.setState({
-      accounts: this.state.accounts
-    });
-    await this.save(account);
-  }
+    const { accounts } = this.state;
 
-  async saveSelected(pin) {
-    await this.save(this.getSelected(), pin);
+    account.archived = true;
+    accounts.set(accountId(account), account);
+    this.setState({ accounts });
+    await this.save(account);
   }
 
   async unlockAccount(account, pin) {
     if (!account || !account.encryptedSeed) {
       return false;
     }
+
     try {
       account.seed = await decryptData(account.encryptedSeed, pin);
+
+      const {phrase, derivePath, password} = keyExtract(account.seed)
+
+      account.seedPhrase = phrase || '';
+      account.derivationPath = derivePath || '';
+      account.derivationPassword = password || '';
       this.setState({
         accounts: this.state.accounts.set(accountId(account), account)
       });
@@ -156,16 +158,28 @@ export default class AccountsStore extends Container<AccountsState> {
     return true;
   }
 
+  deleteSensitiveData (account){
+    delete account.seed;
+    delete account.seedPhrase;
+    delete account.derivationPassword;
+    delete account.derivationPath;
+    
+    return account
+  }
+
   lockAccount(account) {
-    const acc = this.state.accounts.get(accountId(account));
-    if (acc) {
-      delete acc.seed;
+    const {accounts} = this.state
+
+    if (accounts.get(accountId(account))) {
+      const lockedAccount = this.deleteSensitiveData(account)
+      accounts.set(accountId(account), lockedAccount);
+      this.setState({ accounts });
     }
-    this.setState({});
   }
 
   async checkPinForSelected(pin) {
     const account = this.getSelected();
+
     if (account && account.encryptedSeed) {
       return await decryptData(account.encryptedSeed, pin);
     } else {
@@ -173,21 +187,21 @@ export default class AccountsStore extends Container<AccountsState> {
     }
   }
 
-  getById(account): ?Account {
+  getById(account) {
     return this.state.accounts.get(accountId(account)) || empty(account);
   }
 
-  getByAddress(address): ?Account {
+  getByAddress(address) {
     return this.getAccounts().find(
       a => a.address.toLowerCase() === address.toLowerCase()
     );
   }
 
-  getSelected(): ?Account {
+  getSelected() {
     return this.state.accounts.get(this.state.selected);
   }
 
-  getAccounts(): Array<Account> {
+  getAccounts() {
     return Array.from(this.state.accounts.values())
       .filter(a => !a.archived && a.networkKey)
       .sort((a, b) => {

@@ -21,16 +21,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import fonts from "../fonts";
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import TextInput from '../components/TextInput';
-import { NETWORK_LIST } from '../constants';
-import AccountsStore from '../stores/AccountsStore';
-import { validateSeed } from '../util/account';
-import NetworkButton from '../components/NetworkButton';
+import DerivationPathField from '../components/DerivationPathField'
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import NetworkButton from '../components/NetworkButton';
+import TextInput from '../components/TextInput';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import fonts from "../fonts";
+import AccountsStore from '../stores/AccountsStore';
+import { empty, validateSeed } from '../util/account';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -47,13 +48,45 @@ export default class AccountNew extends React.Component {
 }
 
 class AccountNewView extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      derivationPassword: '',
+      derivationPath: '',
+      selectedAccount: undefined,
+      selectedNetwork: undefined,
+    };
+  }
+
+  componentWillUnmount = function() {
+    // called when the user goes back, or finishes the whole process
+    this.props.accounts.updateNew(empty());
+  };
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const selectedAccount = nextProps.accounts.getNew();
+    const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
+
+    return {
+      derivationPassword: prevState.derivationPassword,
+      derivationPath: prevState.derivationPath,
+      selectedAccount,
+      selectedNetwork
+    }
+  }
+
   render() {
     const { accounts, navigation } = this.props;
-    const selected = accounts.getNew();
-    const network = NETWORK_LIST[selected.networkKey];
-    if (!selected) {
+    const { derivationPassword, derivationPath, selectedAccount, selectedNetwork } = this.state;
+    const {address, name, seed, validBip39Seed} = selectedAccount;
+    const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
+
+    if (!selectedAccount) {
       return null;
     }
+
     return (
       <View style={styles.body}>
         <KeyboardScrollView style={{ padding: 20 }}>
@@ -61,34 +94,54 @@ class AccountNewView extends React.Component {
           <View style={styles.top}>
             <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
             <Text style={styles.title}>NETWORK</Text>
-            <NetworkButton network={network}/>
+            <NetworkButton network={selectedNetwork}/>
             <Text style={styles.title}>ICON & ADDRESS</Text>
             <AccountIconChooser
-              value={selected && selected.seed && selected.address}
-              onSelect={({ address, bip39, seed }) => {
-                accounts.updateNew({ address, seed, validBip39Seed: bip39 });
-              }}
+              derivationPassword={derivationPassword}
+              derivationPath={derivationPath}
+              onSelect={({ newAddress, isBip39, newSeed }) => {
+                if (isSubstrate) {
+                  accounts.updateNew({ 
+                    address: newAddress,
+                    derivationPassword,
+                    derivationPath,
+                    seed: `${newSeed}${derivationPath}///${derivationPassword}`,
+                    seedPhrase: newSeed,
+                    validBip39Seed: isBip39
+                  });
+                } else {
+                  accounts.updateNew({
+                    address: newAddress,
+                    seed: newSeed,
+                    validBip39Seed: isBip39
+                });
+              }}}
+              network={selectedNetwork}
+              value={address && address}
             />
             <Text style={styles.title}>NAME</Text>
             <TextInput
               onChangeText={name => accounts.updateNew({ name })}
-              value={selected && selected.name}
+              value={name}
               placeholder="Enter a new account name"
             />
+            {isSubstrate && <DerivationPathField
+              onChange = { ({derivationPassword, derivationPath}) => {
+                this.setState({ derivationPath, derivationPassword });
+              }}
+              styles={styles}
+          />}
           </View>
           <View style={styles.bottom}>
             <Text style={styles.hintText}>
-              On the next step you will be asked to backup your account, get pen
-              and paper ready
+              Next, you will be asked to backup your account, get a pen and some paper.
             </Text>
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
-              disabled={
-                !validateSeed(selected.seed, selected.validBip39Seed).valid
-              }
+              disabled={!validateSeed(seed, validBip39Seed).valid}
               onPress={() => {
-                validateSeed(selected.seed, selected.validBip39Seed).valid &&
+                validateSeed(seed, validBip39Seed).valid &&
                   navigation.navigate('AccountBackup', {
                     isNew: true,
                     isWelcome: navigation.getParam('isWelcome')
