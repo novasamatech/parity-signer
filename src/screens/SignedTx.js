@@ -20,15 +20,16 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
-import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
+import { NetworkProtocols, TX_DETAILS_MSG } from '../constants';
+import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { NetworkProtocols } from '../constants';
 
 export default class SignedTx extends React.PureComponent {
   render() {
@@ -76,7 +77,7 @@ export class SignedTxView extends React.PureComponent {
               <React.Fragment>
                 <TxDetailsCard
                   style={{ marginBottom: 20 }}
-                  description="After scanning and publishing you will have sent"
+                  description={TX_DETAILS_MSG}
                   value={value}
                   gas={gas}
                   gasPrice={gasPrice}
@@ -92,7 +93,7 @@ export class SignedTxView extends React.PureComponent {
             : (
               <PayloadDetailsCard 
                 style={{ marginBottom: 20 }}
-                description="After signing and publishing you will have sent"
+                description={TX_DETAILS_MSG}
                 signature={data}
               />
             )

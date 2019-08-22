@@ -16,7 +16,6 @@
 
 // @flow
 
-import { GenericExtrinsicPayload } from '@polkadot/types';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
@@ -53,10 +52,8 @@ export default class PayloadDetailsCard extends React.PureComponent {
         {
           signature && (
             <View style={{ padding: 5, paddingVertical: 2 }}>
-              <Text style={{ backgroundColor: colors.bg, color: colors.card_bg, textAlign: 'left', fontSize: 20, fontWeight: '800' }}>
-                Signature
-              </Text>
-              <Text style={{ color: colors.card_bg_text }}>{signature}</Text>
+              <Text style={styles.label}>Signature</Text>
+              <Text style={styles.secondaryText}>{signature}</Text>
             </View>
           )
         }
@@ -72,10 +69,10 @@ function ExtrinsicPart({ label, style, value }) {
       <View
         style={{ padding: 5, paddingVertical: 2 }}
       >
-        <Text style={{ backgroundColor: colors.bg, color: colors.card_bg, textAlign: 'left', fontSize: 20, fontWeight: '800' }}>
+        <Text style={styles.label}>
           {label}
         </Text>
-        <Text style={{ color: colors.card_bg_text }}>{value}</Text>
+        <Text style={styles.secondaryText}>{value}</Text>
       </View>
     </View>
   );
@@ -89,14 +86,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card_bg
   },
   content: {},
-  icon: {
-    width: 47,
-    height: 47
-  },
   footer: {
     backgroundColor: '#977CF6',
     flexDirection: 'row-reverse',
     padding: 5
+  },
+  label: {
+    backgroundColor: colors.bg,
+    color: colors.card_bg,
+    textAlign: 'left', 
+    fontSize: 20, 
+    fontWeight: fonts.bold
+  },
+  icon: {
+    width: 47,
+    height: 47
   },
   titleText: {
     textAlign: 'center',
