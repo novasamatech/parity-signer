@@ -17,7 +17,7 @@
 'use strict';
 
 // import QrScan from '@polkadot/ui-qr';
-// import { decodeAddress } from '@polkadot/util-crypto';
+// import decodeAddress from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -46,25 +46,62 @@ export default class Scanner extends React.PureComponent {
                 if (scannerStore.isBusy()) {
                   return;
                 }
-
-                // TODO: Actually use this to read UOS
-                // type is Uint8Array or null
-                const bytes = rawDataToU8A(txRequestData.rawData);
+                const utf8Encoder = new TextEncoder('utf-8');
+                const utf8Encoded = utf8Encoder.encode(txRequestData.data);
+                const zerothByte = utf8Encoded[0].toString(16);
+                
+                let data = {};
 
                 try {
-                  const data = JSON.parse(txRequestData.data);
-                  if (data.action === undefined) {
-                    return;
+                  // decode payload appropriately via UOS
+                  switch (zerothByte.toLowerCase()) {
+                    case '7b': // Legacy Ethereum payload is JSON format
+                      data = JSON.parse(txRequestData.data);
+                      if (data.action === undefined) {
+                        throw new Error('Could not determine action type.');
+                      }
+                      break;
+                    case '45': // Ethereum UOS payload
+                      const firstByte = utf8Encoded[1].toString(16);
+                      const action = firstByte === '00' || firstByte === '02' ? 'signData' : firstByte === '01' ? 'signTransaction' : null;
+                      const address = utf8Encoded.slice(2, 22);
+
+                      data['action'] = action;
+                      data['account'] = account;
+
+                      if (action === 'signData') {
+                        data['rlp'] = utf8Encoded.slice(23);
+                      } else if (action === 'signTransaction') {
+                        data['data'] = utf8Encoded.slice(23);
+                      } else {
+                        throw new Error('Could not determine action type.');
+                      }
+                      break;
+                    case '53': // Substrate UOS payload
+                      const firstByte = utf8Encoded[1].toString(16);
+                      const secondByte = utf8Encoded[2].toString(16);
+                      const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
+                      const action = secondByte === '00' || secondByte === '01' ? 'signData': secondByte === '02' || secondByte === '03' ? 'signTransaction' : null;
+
+                      data['crypto'] = crypto;
+                      data['action'] = action;
+                      data['account'] = utf8Encoded.slice(2, 33);
+                      data['data'] = utf8Encoded.slice(33);
+
+                      break;
+                    default:
+                      throw new Error('we cannot handle the payload: ', txRequestData.data);
                   }
+
                   if (!(await scannerStore.setData(data, accountsStore))) {
-                    return;
-                  } else {
-                    if ('transaction' === scannerStore.getType()) {
-                      this.props.navigation.navigate('TxDetails');
-                    } else { // message
-                      this.props.navigation.navigate('MessageDetails');
-                    }
-                  }
+                        return;
+                      } else {
+                        if (scannerStore.getType() === 'transaction') {
+                          this.props.navigation.navigate('TxDetails');
+                        } else { // message
+                          this.props.navigation.navigate('MessageDetails');
+                        }
+                      }
                 } catch (e) {
                   scannerStore.setBusy();
                   Alert.alert('Unable to parse transaction', e.message, [
@@ -93,8 +130,7 @@ export class QrScannerView extends React.PureComponent {
   }
 
   static propTypes = {
-    onBarCodeRead: PropTypes.func.isRequired,
-    onError: PropTypes.func.isRequired
+    onBarCodeRead: PropTypes.func.isRequired
   };
 
   componentWillMount() {
