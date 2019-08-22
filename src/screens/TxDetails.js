@@ -28,6 +28,8 @@ import Button from '../components/Button';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import { NetworkProtocols } from '../constants';
+import PayloadDetailsCard from '../components/PayloadDetailsCard';
 
 export default class TxDetails extends React.PureComponent {
   static navigationOptions = {
@@ -39,8 +41,10 @@ export default class TxDetails extends React.PureComponent {
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scannerStore) => {
           const txRequest = scannerStore.getTXRequest();
+
           if (txRequest) {
             const tx = scannerStore.getTx();
+
             return (
               <TxDetailsView
                 {...{ ...this.props, ...tx }}
@@ -69,7 +73,7 @@ export default class TxDetails extends React.PureComponent {
 export class TxDetailsView extends React.PureComponent {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
-    dataToSign: PropTypes.string.isRequired,
+    dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
     sender: PropTypes.object.isRequired,
     recipient: PropTypes.object.isRequired,
     value: PropTypes.string,
@@ -93,19 +97,35 @@ export class TxDetailsView extends React.PureComponent {
           networkKey={this.props.sender.networkKey}
         />
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
-        <TxDetailsCard
-          style={{ marginBottom: 20 }}
-          description="You are about to send the following amount"
-          value={this.props.value}
-          gas={this.props.gas}
-          gasPrice={this.props.gasPrice}
-        />
-        <Text style={styles.title}>RECIPIENT</Text>
-        <AccountCard
-          title={this.props.recipient.name}
-          address={this.props.recipient.address}
-          networkKey={this.props.recipient.networkKey || ''}
-        />
+
+        {
+          this.props.sender.protocol === NetworkProtocols.ETHEREUM
+            ? (
+              <React.Fragment>
+                <TxDetailsCard
+                  style={{ marginBottom: 20 }}
+                  description="You are about to send the following amount"
+                  value={this.props.value}
+                  gas={this.props.gas}
+                  gasPrice={this.props.gasPrice}
+                />
+                <Text style={styles.title}>RECIPIENT</Text>
+                <AccountCard
+                  title={this.props.recipient.name}
+                  address={this.props.recipient.address}
+                  networkKey={this.props.recipient.networkKey || ''}
+                />
+              </React.Fragment>
+            )
+            : (
+              <PayloadDetailsCard
+                style={{ marginBottom: 20 }}
+                description="You are about to confirm sending the following extrinsic"
+                payload={this.props.dataToSign}
+                />
+            )
+        }
+
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Transaction"

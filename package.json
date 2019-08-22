@@ -22,7 +22,7 @@
   "dependencies": {
     "@plugnet/util": "^0.94.100",
     "@plugnet/wasm-crypto-js": "^0.11.102",
-    "@polkadot/api": "^0.90.0-beta.49",
+    "@polkadot/api": "^0.90.0-beta.66",
     "@polkadot/reactnative-identicon": "^0.42.0-beta.26",
     "@polkadot/util": "^1.0.1",
     "@polkadot/util-crypto": "1.1.0-beta.1",
@@ -33,9 +33,9 @@
     "hoist-non-react-statics": "^3.3.0",
     "node-libs-react-native": "^1.0.3",
     "prop-types": "^15.6.1",
-    "react": "16.8.6",
-    "react-native-camera": "^3.0.0",
+    "react": "^16.9.0",
     "react-native": "0.60.4",
+    "react-native-camera": "^3.0.0",
     "react-native-gesture-handler": "^1.3.0",
     "react-native-keyboard-aware-scroll-view": "^0.8.0",
     "react-native-markdown-renderer": "^3.2.8",
@@ -66,8 +66,8 @@
     "metro-react-native-babel-preset": "^0.55.0",
     "pre-git": "^3.14.0",
     "prettier": "1.18.2",
-    "reactotron-react-native": "^3.6.4",
-    "react-test-renderer": "16.8.6"
+    "react-test-renderer": "16.8.6",
+    "reactotron-react-native": "^3.6.4"
   },
   "release": {
     "analyzeCommits": "simple-commit-message"

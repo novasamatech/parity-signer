@@ -34,7 +34,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
     const { navigation } = this.props;
     const next = navigation.getParam('next', 'SignedTx');
 
-    debugger; 
     return (
       <Subscribe to={[AccountsStore, ScannerStore]}>
         {(accounts, scannerStore) => (
@@ -43,7 +42,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
             accounts={accounts}
             checkPin={async pin => {
               try {
-                scannerStore.getTXRequest();
                 await scannerStore.signData(pin);
                 return true;
               } catch (e) {

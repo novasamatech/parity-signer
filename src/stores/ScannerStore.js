@@ -16,13 +16,15 @@
 
 // @flow
 
+import { createType } from '@polkadot/types';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { saveTx } from '../util/db';
-import { brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
+import { isAscii } from '../util/message';
+import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
 import transaction from '../util/transaction';
-import { constructDataFromBytes } from '../util/decoders';
+import { constructDataFromBytes, asciiToHex } from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -35,6 +37,7 @@ type SignedTX = {
 
 type ScannerState = {
   dataToSign: string,
+  isHash: boolean,
   isOversized: boolean,
   message: string,
   multipartData: any,
@@ -51,6 +54,7 @@ type ScannerState = {
 
 const defaultState = {
   busy: false,
+  isHash: false,
   isOversized: false,
   dataToSign: '',
   message: null,
@@ -130,6 +134,7 @@ export default class ScannerStore extends Container<ScannerState> {
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
     const message = signRequest.data.data;
+    const isHash = signRequest.isHash;
     const isOversized = signRequest.oversized;
 
     let dataToSign = '';
@@ -150,6 +155,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
     this.setState({
       dataToSign,
+      isHash,
       isOversized,
       message,
       sender,
@@ -164,13 +170,14 @@ export default class ScannerStore extends Container<ScannerState> {
     const isOversized = txRequest.oversized;
 
     const protocol = txRequest.data.rlp ? NetworkProtocols.ETHEREUM : NetworkProtocols.SUBSTRATE
+    const isEthereum = protocol === NetworkProtocols.ETHEREUM;
 
-    if (protocol === NetworkProtocols.ETHEREUM && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
+    if (isEthereum && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
 
-    const tx = protocol === NetworkProtocols.ETHEREUM ? await transaction(txRequest.data.rlp) : null;
-    const networkKey = tx ? tx.ethereumChainId : '456';
+    const tx = isEthereum ? await transaction(txRequest.data.rlp) : txRequest.data.data;
+    const networkKey = isEthereum ? tx.ethereumChainId : '456';
 
     const sender = accountsStore.getById({
       protocol,
@@ -194,14 +201,13 @@ export default class ScannerStore extends Container<ScannerState> {
     const recipient = accountsStore.getById({
       protocol,
       networkKey: networkKey,
-      address: tx ? tx.action : txRequest.data.account
+      address: isEthereum ? tx.action : txRequest.data.account
     });
-
-    debugger;
 
     // For Eth, always sign the keccak hash.
     // For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
     const dataToSign = sender.protocol === NetworkProtocols.ETHEREUM ? await keccak(txRequest.data.rlp) : txRequest.data.data;
+
     this.setState({
       type: 'transaction',
       sender,
@@ -215,22 +221,26 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async signData(pin = '1') {
-    const { type, sender } = this.state;
+    const { isHash, sender, type } = this.state;
+
     const seed = await decryptData(sender.encryptedSeed, pin);
+    const isEthereum = sender.protocol === NetworkProtocols.ETHEREUM;
+
     let signedData;
 
-    if (sender.protocol === NetworkProtocols.ETHEREUM) {
+    if (isEthereum) {
       signedData = await brainWalletSign(seed, this.state.dataToSign);
     } else {
-      signedData = await substrateSign(seed, this.state.dataToSign);
+      signedData = await substrateSign(seed, isAscii(this.state.dataToSign) ? asciiToHex(this.state.dataToSign) : this.state.dataToSign.toHex());
     }
 
     this.setState({ signedData });
+
     if (type == 'transaction') {
       await saveTx({
-        hash: this.state.dataToSign,
+        hash: (isEthereum || isHash) ? this.state.dataToSign : await blake2s(this.state.dataToSign.toHex()),
         tx: this.state.tx,
-        sender: this.state.sender,
+        sender,
         recipient: this.state.recipient,
         signature: signedData,
         createdAt: new Date().getTime()

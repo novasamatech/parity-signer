@@ -32,7 +32,7 @@ import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
 

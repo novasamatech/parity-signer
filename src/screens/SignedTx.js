@@ -23,10 +23,12 @@ import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
-import QrView from '../components/QrView';
+import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
+import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import { NetworkProtocols } from '../constants';
 
 export default class SignedTx extends React.PureComponent {
   render() {
@@ -38,6 +40,7 @@ export default class SignedTx extends React.PureComponent {
               {...scanner.getTx()}
               data={scanner.getSignedTxData()}
               recipient={scanner.getRecipient()}
+              sender={scanner.getSender()}
             />
           );
         }}
@@ -49,34 +52,51 @@ export default class SignedTx extends React.PureComponent {
 export class SignedTxView extends React.PureComponent {
   static propTypes = {
     data: PropTypes.string.isRequired,
-    recipient: PropTypes.object.isRequired,
-    value: PropTypes.string,
-    nonce: PropTypes.string,
     gas: PropTypes.string,
-    gasPrice: PropTypes.string
+    gasPrice: PropTypes.string,
+    nonce: PropTypes.string,
+    recipient: PropTypes.object,
+    sender: PropTypes.object,
+    value: PropTypes.string,
   };
 
   render() {
+    const { data, gas, gasPrice, nonce, recipient, sender, value } = this.props;
+
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
         <View style={styles.qr}>
-          <QrView text={this.props.data} />
+          <QrView data={data} />
         </View>
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
-        <TxDetailsCard
-          style={{ marginBottom: 20 }}
-          description="After scanning and publishing you will have sent"
-          value={this.props.value}
-          gas={this.props.gas}
-          gasPrice={this.props.gasPrice}
-        />
-        <Text style={styles.title}>RECIPIENT</Text>
-        <AccountCard
-          address={this.props.recipient.address}
-          networkKey={this.props.recipient.networkKey || ''}
-          title={this.props.recipient.name}
-        />
+        {
+          sender.protocol === NetworkProtocols.ETHEREUM
+            ? (
+              <React.Fragment>
+                <TxDetailsCard
+                  style={{ marginBottom: 20 }}
+                  description="After scanning and publishing you will have sent"
+                  value={value}
+                  gas={gas}
+                  gasPrice={gasPrice}
+                />
+                <Text style={styles.title}>RECIPIENT</Text>
+                <AccountCard
+                  address={recipient.address}
+                  networkKey={recipient.networkKey || ''}
+                  title={recipient.name}
+                />
+              </React.Fragment>
+            )
+            : (
+              <PayloadDetailsCard 
+                style={{ marginBottom: 20 }}
+                description="After signing and publishing you will have sent"
+                signature={data}
+              />
+            )
+        }   
       </ScrollView>
     );
   }

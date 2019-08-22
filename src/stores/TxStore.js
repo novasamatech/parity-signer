@@ -40,7 +40,6 @@ export default class TxStore extends Container<State> {
   }
 
   getTxList({ address }) {
-    // console.log(Array.from(this.state.signedTxs.values()))
     return Array.from(this.state.signedTxs.values()).filter(
       tx => tx.sender === address || tx.recipient === address
     );
