@@ -28,6 +28,7 @@ export default class QrView extends React.PureComponent {
 
   displayQrCode = async (data) => {
     try {
+      // TODO: let qr = props.network === 'substrate' ? await qrSubstrate(data) : await qrCode(data);
       let qr = await qrCode(data);
       this.setState({
         qr: qr
@@ -59,6 +60,17 @@ export default class QrView extends React.PureComponent {
     const { width: deviceWidth } = Dimensions.get('window');
     let size = this.props.size || deviceWidth - 80;
     let flexBasis = this.props.height || deviceWidth - 40;
+
+    /*
+    TODO:
+        <QrSigner
+          payload={this.state.qr}
+          network={this.props.network}
+          scan={false}
+          size={300}
+          style={{ width: size, height: size }}
+        />
+    */
 
     return (
       <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>
