@@ -80,6 +80,45 @@ class AccountNewView extends React.Component {
     }
   }
 
+  renderAdvanced () {
+    const { selectedNetwork, showAdvancedField } = this.state;
+
+    if (selectedNetwork.protocol === NetworkProtocols.ETHEREUM){
+      return null;
+    }
+
+    return (
+      <>
+        <TouchableOpacity
+          onPress={this.toggleAdvancedField}
+          style={{diplay:'flex'}}
+        >
+          <View
+            style={{justifyContent:'center'}}
+          >
+            <Text style={[styles.title, styles.advancedText]}>
+              ADVANCED
+              <Icon 
+                name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
+                size={20}
+              />
+            </Text>
+          </View>
+        </TouchableOpacity>
+        {showAdvancedField && 
+          <TextInput
+            onChangeText={derivationPath => this.setState({ derivationPath })}
+            placeholder="secret derivation path"
+          />
+        }
+      </>
+    )
+  }
+
+  toggleAdvancedField = () => {
+    this.setState({showAdvancedField: !this.state.showAdvancedField}) 
+  }
+
   render() {
     const { accounts, navigation } = this.props;
     const { derivationPassword, derivationPath, selectedAccount, selectedNetwork } = this.state;
@@ -118,9 +157,9 @@ class AccountNewView extends React.Component {
                     seed: newSeed,
                     validBip39Seed: isBip39
                 });
-              }}}
+              }}
               network={selectedNetwork}
-              value={address && address}
+              value={seed && address}
             />
             <Text style={styles.title}>NAME</Text>
             <TextInput
