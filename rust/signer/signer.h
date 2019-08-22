@@ -54,7 +54,7 @@ struct rust_string* rlp_item(unsigned* error, const struct rust_string_ptr* rlp,
 
 struct rust_string* keccak256(unsigned* error, const struct rust_string_ptr* data);
 
-struct rust_string* blake(unsigned* error, const struct rust_string_ptr* data);
+struct rust_string* blake2s(unsigned* error, const struct rust_string_ptr* data);
 
 struct rust_string* eth_sign(unsigned* error, const struct rust_string_ptr* data);
 
