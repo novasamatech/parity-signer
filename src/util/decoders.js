@@ -147,6 +147,7 @@ export function parseRawData(rawData) {
               data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
               data['data']['data'] = blake2s(hexEncodedData);
             } else {
+              debugger;
               data['isHash'] = false;
               data['data']['data'] = Payload(hexEncodedData);
             }
@@ -159,6 +160,7 @@ export function parseRawData(rawData) {
           case '02':
             data['action'] = 'signTransaction';
             data['isHash'] = false;
+            debugger;
             data['data']['data'] = Payload(hexEncodedData);
             break;
           case '03': // Cold Signer should attempt to decode message to utf8

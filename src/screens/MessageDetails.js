@@ -39,8 +39,9 @@ export default class MessageDetails extends React.PureComponent {
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scannerStore, accounts) => {
           const dataToSign = scannerStore.getDataToSign();
+
           if (dataToSign) {
-            const tx = scannerStore.getTx();
+            // const tx = scannerStore.getTx(); this does nothing????
             return (
               <MessageDetailsView
                 {...this.props}
