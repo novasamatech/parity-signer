@@ -27,9 +27,18 @@ const CMD_SIGN_TX_HASH = new Uint8Array([0x01]);
 const CMD_SIGN_IMMORTAL_TX = new Uint8Array([0x02]);
 const CMD_SIGN_MSG = new Uint8Array([0x03]);
 
-const RN_TX_REQUEST_RAW_DATA = '43700000100005301037602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407765448495320495320535041525441210ec11ec11ec11ec';
+const RN_TX_REQUEST_RAW_DATA = 
+  '43' + 
+  '7' + 
+  '0000010000' + 
+  '53' + 
+  '01' +
+  '03' +
+  '7602e6fd489d61eb35c652376a8f71b0fccb72189874df4abefa88e89ea407' +
+  '765448495320495320535041525441210' +
+  'ec11ec11ec11ec';
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
-const TEST_MESSAGE = 'this is sparta!';
+const TEST_MESSAGE = 'THIS IS SPARTA!';
 
 const TEST_SUBSTRATE_MSG = u8aToHex(u8aConcat(
     SUBSTRATE_ID,
@@ -38,6 +47,12 @@ const TEST_SUBSTRATE_MSG = u8aToHex(u8aConcat(
     decodeAddress(KUSAMA_ADDRESS),
     u8aToU8a(TEST_MESSAGE)
   ));
+
+describe.skip('sanity check', () => {
+  it('sanity check address is kusama', () => {
+    expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);
+  });
+});
 
 describe('decoders', () => {
   it('should properly extract only UOS relevant data from RNCamera txRequest.rawData', () => {
@@ -54,16 +69,12 @@ describe('decoders', () => {
     expect(uos[2]).toEqual(CMD_SIGN_MSG[0]);
   });
 
-  it('sanity check address is kusama', () => {
-    expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);
-  })
-
-  it.only('should properly construct data from Substrate UOS message', () => {
+  it('should properly construct data from Substrate UOS message', () => {
     const unsignedData = parseRawData(RN_TX_REQUEST_RAW_DATA);
 
     expect(unsignedData).toBeDefined();
-    expect(unsignedData.crypto).toEqual(CRYPTO_SR25519);
-    expect(unsignedData.data.data).toEqual(TEST_MESSAGE);
+    expect(unsignedData.data.crypto).toEqual('sr25519');
+    expect(unsignedData.data.data).toEqual('THIS IS SPARTA!');
     expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
   });
 });
