@@ -75,10 +75,12 @@
     ]
   },
   "react-native": {
-    "crypto": "react-native-crypto"
+    "crypto": "react-native-crypto",
+    "stream": "stream-browserify"
   },
   "browser": {
-    "crypto": "react-native-crypto"
+    "crypto": "react-native-crypto",
+    "stream": "stream-browserify"
   },
   "release": {
     "analyzeCommits": "simple-commit-message"
