@@ -74,6 +74,12 @@
       "<rootDir>/jest-setup.js"
     ]
   },
+  "react-native": {
+    "crypto": "react-native-crypto"
+  },
+  "browser": {
+    "crypto": "react-native-crypto"
+  },
   "release": {
     "analyzeCommits": "simple-commit-message"
   },
