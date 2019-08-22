@@ -17,47 +17,51 @@
 // @flow
 
 import Payload from '@polkadot/api/SignerPayload';
+import { encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
 import { saveTx } from '../util/db';
 import { brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
+import { rawDataToU8A } from '../util/rawDataToU8A';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
 
 type SignedTX = {
-  txRequest: TXRequest,
+  recipient: Account,
   sender: Account,
-  recipient: Account
+  txRequest: TXRequest,
 };
 
 type ScannerState = {
-  type: 'transaction' | 'message',
-  txRequest: TXRequest | null,
-  message: string,
-  tx: Object,
-  sender: Account,
-  recipient: Account,
   dataToSign: string,
-  signedData: string,
+  message: string,
+  multipartData: any,
+  recipient: Account,
   scanErrorMsg: string,
+  sender: Account,
+  signedData: string,
   signedTxList: [SignedTX],
-  unsignedData: {}
+  tx: Object,
+  txRequest: TXRequest | null,
+  type: 'transaction' | 'message',
+  unsignedData: any
 };
 
 const defaultState = {
-  type: null,
   busy: false,
-  txRequest: null,
+  dataToSign: '',
   message: null,
   multipartData: {},
-  sender: null,
   recipient: null,
-  tx: '',
-  dataToSign: '',
+  scanErrorMsg: '',
+  sender: null,
   signedData: '',
-  scanErrorMsg: ''
+  tx: '',
+  txRequest: null,
+  type: null,
+  unsignedData: {}
 };
 
 export default class ScannerStore extends Container<ScannerState> {
@@ -77,6 +81,7 @@ export default class ScannerStore extends Container<ScannerState> {
     data['data'] = {}; // for consistency with legacy data format.
 
     try {
+      debugger;
       // decode payload appropriately via UOS
       switch (zerothByte) {
         case 45: // Ethereum UOS payload
@@ -102,9 +107,13 @@ export default class ScannerStore extends Container<ScannerState> {
           const ss58Encoded = encodeAddress(publicKeyAsBytes);
           const encryptedData: Uint8Array = uosAfterFrames.slice(35);
 
+          debugger;
+
           data['action'] = action;
           data['data']['crypto'] = crypto;
           data['data']['account'] = ss58Encoded;
+
+          debugger;
 
           switch(secondByte) {
             case 0:
@@ -146,6 +155,7 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   setPartData(frame, frameCount, partData, accountsStore) {
+    debugger;
     if (partData[0] === new Uint8Array([0x00]) || partData[0] === new Uint8Array([0x7B])) {
       // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
       throw new Error('Error decoding invalid part data.');
@@ -337,69 +347,5 @@ export default class ScannerStore extends Container<ScannerState> {
 
   getErrorMsg() {
     return this.state.scanErrorMsg;
-  }
-
-
-  /*
-  Example Full Raw Data
-  ---
-  4 // indicates binary
-  37 // indicates data length
-  0000 // frame count
-  0100 // first frame
-  --- UOS Specific Data
-  53 // indicates payload is for Substrate
-  01 // crypto: sr25519
-  00 // indicates action: signData
-  f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
-  544849532049532053504152544121 // actual payload message to sign (should be SCALE)
-  0 // terminator
-  --- SQRC Filler Bytes
-  ec11ec11ec11ec // SQRC filler bytes
-  */
-  function rawDataToU8A(rawData) {
-    if (!rawData) {
-      return null;
-    }
-
-    // Strip filler bytes padding at the end
-    if (rawData.substr(-2) === 'ec') {
-      rawData = rawData.substr(0, rawData.length - 2);
-    }
-
-    while (rawData.substr(-4) === 'ec11') {
-      rawData = rawData.substr(0, rawData.length - 4);
-    }
-
-    // Verify that the QR encoding is binary and it's ending with a proper terminator
-    if (rawData.substr(0, 1) !== '4' || rawData.substr(-1) !== '0') {
-      return null;
-    }
-
-    // Strip the encoding indicator and terminator for ease of reading
-    rawData = rawData.substr(1, rawData.length - 2);
-
-    const length8 = parseInt(rawData.substr(0, 2), 16) || 0;
-    const length16 = parseInt(rawData.substr(0, 4), 16) || 0;
-    let length = 0;
-
-    // Strip length prefix
-    if (length8 * 2 + 2 === rawData.length) {
-      rawData = rawData.substr(2);
-      length = length8;
-    } else if (length16 * 2 + 4 === rawData.length) {
-      rawData = rawData.substr(4);
-      length = length16;
-    } else {
-      return null;
-    }
-
-    const bytes = new Uint8Array(length);
-
-    for (let i = 0; i < length; i++) {
-      bytes[i] = parseInt(rawData.substr(i * 2, 2), 16);
-    }
-
-    return bytes;
   }
 }
