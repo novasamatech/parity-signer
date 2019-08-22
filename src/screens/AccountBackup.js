@@ -200,15 +200,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     paddingBottom: 20
   },
-  link: {
-    textDecorationLine: 'underline',
-  },
-  passwordText: {
-    fontFamily: fonts.regular,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    marginTop: 20
-  },
   seedText: {
     padding: 10,
     minHeight: 160,
