@@ -16,7 +16,6 @@
 
 'use strict';
 
-import Payload from '@polkadot/api/SignerPayload';
 import { encodeAddress } from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -54,73 +53,9 @@ export default class Scanner extends React.PureComponent {
                 }
                 let data = {};
 
-                const bytes = rawDataToU8A(txRequestData.rawData);
-                const hex = bytes.map(byte => byte.toString(16));
-                const uosAfterFrames = hex.slice(5); // FIXME handle multipart
-
-                // can't scope variables to switch case blocks....fml
-                let zerothByte = rawAfterFrames.slice(0, 2);
-                let firstByte = rawAfterFrames.slice(2, 4);
-                let action;
-                let address;
-                let data = {};
-                data['data'] = {}; // for consistency with legacy data format.
-
                 try {
-                  // decode payload appropriately via UOS
-                  switch (zerothByte) {
-                    case 45: // Ethereum UOS payload
-                      action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
-                      address = uosAfterFrames.slice(2, 22);
-
-                      data['action'] = action;
-                      data['data']['account'] = account;
-
-                      if (action === 'signData') {
-                        data['data']['rlp'] = uosAfterFrames[13];
-                      } else if (action === 'signTransaction') {
-                        data['data']['data'] = rawAfterFrames[13];
-                      } else {
-                        throw new Error('Could not determine action type.');
-                      }
-                      break;
-                    case 53: // Substrate UOS payload
-                      const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
-                      action = secondByte === 0 || secondByte === 1 ? 'signData': secondByte === 2 || secondByte === 3 ? 'signTransaction' : null;
-
-                      const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
-                      const ss58Encoded = encodeAddress(publicKeyAsBytes);
-                      const encryptedData: Uint8Array = uosAfterFrames.slice(35);
-
-                      data['action'] = action;
-                      data['data']['crypto'] = crypto;
-                      data['data']['account'] = ss58Encoded;
-
-                      switch(secondByte) {
-                        case 0:
-                          data['isHash'] = false;
-                          data['data']['data'] = Payload(encryptedData);
-                          break;
-                        case 1:
-                          data['isHash'] = true;
-                          data['data']['data'] = Payload(encryptedData);
-                          break;
-                        case 2:
-                          data['isHash'] = false;
-                          data['data']['data'] = Payload(encryptedData);
-                          break;
-                        case 3: // Cold Signer should attempt to decode message to utf8
-                          data['data']['data'] = decodeToString(encryptedData);
-                          break;
-                        default:
-                          break;
-                      }
-                      break;
-                    default:
-                      throw new Error('we cannot handle the payload: ', txRequestData);
-                  }
+                  const data = scannerStore.parseRawData(txRequestData.rawData);
                 } catch (e) {
-                  scannerStore.setBusy();
                   Alert.alert('Unable to parse transaction', e.message, [
                     {
                       text: 'Try again',
@@ -129,6 +64,16 @@ export default class Scanner extends React.PureComponent {
                       }
                     }
                   ]);
+                }
+
+                if (!(await scannerStore.setData(data, accountsStore))) {
+                  return;
+                } else {
+                  if (scannerStore.getType() === 'transaction') {
+                    this.props.navigation.navigate('TxDetails');
+                  } else { // message
+                    this.props.navigation.navigate('MessageDetails');
+                  }
                 }
               }}
             />
