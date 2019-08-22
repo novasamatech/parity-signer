@@ -24,7 +24,7 @@ import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constant
 import { saveTx } from '../util/db';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
-import { decodeToString, hexToAscii, rawDataToU8A, parseRawData } from '../util/decoders';
+import { constructDataFromBytes, decodeToString, hexToAscii, rawDataToU8A } from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -70,12 +70,12 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setUnsigned(data) {
     this.setState({
-      unsignedData: data
+      unsignedData: JSON.parse(data)
     });
   }
 
-  async setParsedData(rawData, accountsStore) {
-    const parsedData = parseRawData(rawData);
+  async setParsedData(strippedData, accountsStore) {
+    const parsedData = constructDataFromBytes(strippedData);
 
     if (parsedData.isMultipart) {
       this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
@@ -131,6 +131,7 @@ export default class ScannerStore extends Container<ScannerState> {
     const message = signRequest.data.data;
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
+    debugger;
     let dataToSign = '';
 
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
@@ -138,6 +139,7 @@ export default class ScannerStore extends Container<ScannerState> {
       dataToSign = await substrateSign(message);
       console.log('data to sign => ', dataToSign);
     } else {
+      debugger;
       dataToSign = await ethSign(message);
     }
 

@@ -14,20 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-const { defaults } = require('jest-config');
+/* global jest */
+// import mockCamera from './__mocks__/Camera'
 
-module.exports = {
-  preset: "react-native",
-  moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts', 'tsx'],
-  verbose: true,
-  roots: [
-    "<rootDir>/src"
-  ],
-  setupFiles: [
-    "<rootDir>/jest-setup.js"
-  ],
-  testEnvironment: "node",
-  testPathIgnorePatterns: [
-    "/node_modules/"
-  ]
-}
+jest.doMock('react-native', () => 'reactNativeMock')

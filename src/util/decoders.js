@@ -16,6 +16,8 @@
 
 // @flow
 
+import { Address, Balance, BlockNumber, Call, ExtrinsicEra, Hash, Index } from '@polkadot/types/interfaces';
+import { ClassOf, Compact, GenericExtrinsicPayload, Struct, u8 } from '@polkadot/types';
 import { hexStripPrefix, hexToU8a, u8aConcat, u8aToU8a, u8aToHex, u8aToString } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
@@ -83,9 +85,7 @@ export function rawDataToU8A(rawData) {
   return bytes;
 }
 
-export function parseRawData(rawData) {
-  const bytes = rawDataToU8A(rawData);
-  
+export function constructDataFromBytes(bytes) {
   const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
   const isMultipart = !!(parseInt(frameInfo.substr(0, 2), 16));
   const frameCount = parseInt(frameInfo.substr(2, 4), 16);
@@ -135,50 +135,54 @@ export function parseRawData(rawData) {
         const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
         const ss58Encoded = encodeAddress(publicKeyAsBytes, 2); // encode to kusama
         const hexEncodedData = '0x' + uosAfterFrames.slice(70);
+        const rawPayload = hexToU8a(hexEncodedData);
 
         data['data']['crypto'] = crypto;
         data['data']['account'] = ss58Encoded;
 
+        console.log('payload u8a => ', rawPayload);
         switch(secondByte) {
           case '00':
             data['action'] = 'signTransaction';
-            if (encryptedData.length > 256) {
+            if (rawPayload.length > 256) {
+              debugger;
               data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
               data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
-              data['data']['data'] = blake2s(hexEncodedData);
+              data['data']['data'] = blake2s(rawPayload);
             } else {
-              debugger;
               data['isHash'] = false;
-              data['data']['data'] = Payload(hexEncodedData);
+              data['data']['data'] = new GenericExtrinsicPayload(rawPayload);
             }
             break;
           case '01':
             data['action'] = 'signTransaction';
             data['isHash'] = true;
-            data['data']['data'] = hexEncodedData; // data is a hash
+            debugger;
+            data['data']['data'] = rawPayload; // data is a hash
+            debugger;
             break;
-          case '02':
+          case '02': // immortal
             data['action'] = 'signTransaction';
             data['isHash'] = false;
             debugger;
-            data['data']['data'] = Payload(hexEncodedData);
+            data['data']['data'] = new GenericExtrinsicPayload(rawPayload);
             break;
           case '03': // Cold Signer should attempt to decode message to utf8
             data['action'] = 'signData';
             data['isHash'] = false;
-            data['data']['data'] = u8aToString(hexToU8a(hexEncodedData));
+            data['data']['data'] = u8aToString(rawPayload);
             break;
           default:
             break;
         }
         break;
       default:
-        throw new Error('we cannot handle the payload: ', rawData);
+        throw new Error('we cannot handle the payload: ', bytes);
     }
 
     return data;
   } catch (e) {
-    throw new Error('we cannot handle the payload: ', rawData);
+    throw new Error('we cannot handle the payload: ', bytes);
   }
 }
 
