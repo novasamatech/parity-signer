@@ -18,9 +18,6 @@
 
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { StyleSheet, ScrollView, Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -118,7 +115,7 @@ class AccountNewView extends React.Component {
                     seed: newSeed,
                     validBip39Seed: isBip39
                 });
-              }}
+              }}}
               network={selectedNetwork}
               value={address && address}
             />

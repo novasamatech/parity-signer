@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
@@ -188,49 +189,7 @@
 			remoteGlobalIDString = 3D383D621EBD27B9005632C8;
 			remoteInfo = "double-conversion-tvOS";
 		};
-		391AD39B22F9D007005136A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 520CF0A85F434C3DA3D3EFF4 /* RNRandomBytes.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 73EEC9391BFE4B1D00D468EB;
-			remoteInfo = RNRandomBytes;
-		};
-		391AD39D22F9D007005136A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 520CF0A85F434C3DA3D3EFF4 /* RNRandomBytes.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 163CDE4E2087CAD3001065FB;
-			remoteInfo = "RNRandomBytes-tvOS";
-		};
-		391AD3A322F9D007005136A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C0205550495341279B513024 /* RNSVG.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 0CF68AC11AF0540F00FF9E5C;
-			remoteInfo = RNSVG;
-		};
-		391AD3A522F9D007005136A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = C0205550495341279B513024 /* RNSVG.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 94DDAC5C1F3D024300EED511;
-			remoteInfo = "RNSVG-tvOS";
-		};
 		391AD3E222F9D7F0005136A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7F019AE07E4148359A2FBCAB /* RNCNetInfo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = RNCNetInfo;
-		};
-		391AD3E422F9D7F0005136A0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7F019AE07E4148359A2FBCAB /* RNCNetInfo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = B5027B1B2237B30F00F1AABA;
-			remoteInfo = "RNCNetInfo-tvOS";
-		};
-		3955110622F4547F00078B17 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7F019AE07E4148359A2FBCAB /* RNCNetInfo.xcodeproj */;
 			proxyType = 2;
@@ -719,9 +678,10 @@
 			children = (
 				DDFA123E816A46BBB8DF60B6 /* libRCTCamera.a */,
 				5099F906199C4A1DB534B2F2 /* libRNRandomBytes.a */,
-				BB2E5464ABBA4980832D5514 /* libRNCNetInfo.a */,
 				AB66C405057A41298E1FC8BB /* libRNSVG.a */,
-				9AFB9B36F67549FE85C83E49 /* libRNSecureStorage.a */
+				9AFB9B36F67549FE85C83E49 /* libRNSecureStorage.a */,
+				170C0768897F45A7A496F2BE /* libRNRandomBytes.a */,
+				D44E3C511D404074AF5AFDB9 /* libRNSVG.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -736,34 +696,29 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		391AD39722F9D007005136A0 /* Products */ = {
+		391AD3B922F9D7F0005136A0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				391AD39C22F9D007005136A0 /* libRNRandomBytes.a */,
-				391AD39E22F9D007005136A0 /* libRNRandomBytes-tvOS.a */,
 				391AD3E322F9D7F0005136A0 /* libRNCNetInfo.a */,
 				391AD3E522F9D7F0005136A0 /* libRNCNetInfo-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		391AD39F22F9D007005136A0 /* Products */ = {
+		3955110222F4547F00078B17 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				391AD3A422F9D007005136A0 /* libRNSVG.a */,
-				391AD3A622F9D007005136A0 /* libRNSVG-tvOS.a */,
 				3955110722F4547F00078B17 /* libRNRandomBytes.a */,
 				3955110922F4547F00078B17 /* libRNRandomBytes-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		391AD3B922F9D7F0005136A0 /* Products */ = {
+		3972BA37230C4CBD00202B52 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				391AD3E322F9D7F0005136A0 /* libRNCNetInfo.a */,
-				391AD3E522F9D7F0005136A0 /* libRNCNetInfo-tvOS.a */,
 				3972BA68230C4CBE00202B52 /* libRNSecureStorage.a */,
+			);
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -790,14 +745,6 @@
 			children = (
 				39D36A4E22F45ABF00EDA4F1 /* libRNSVG.a */,
 				39D36A5022F45ABF00EDA4F1 /* libRNSVG-tvOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		39D36A6122F4A07200EDA4F1 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				39D36A8722F4A07200EDA4F1 /* libRNCamera.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1073,10 +1020,6 @@
 					ProjectRef = 7F019AE07E4148359A2FBCAB /* RNCNetInfo.xcodeproj */;
 				},
 				{
-					ProductGroup = 391AD3B922F9D7F0005136A0 /* Products */;
-					ProjectRef = 7F019AE07E4148359A2FBCAB /* RNCNetInfo.xcodeproj */;
-				},
-				{
 					ProductGroup = 39D36A0A22F458DD00EDA4F1 /* Products */;
 					ProjectRef = 39D36A0922F458DD00EDA4F1 /* RNGestureHandler.xcodeproj */;
 				},
@@ -1097,15 +1040,7 @@
 					ProjectRef = 31EA7650B3084F7080008B3C /* RNSVG.xcodeproj */;
 				},
 				{
-					ProductGroup = 391AD39722F9D007005136A0 /* Products */;
-					ProjectRef = 520CF0A85F434C3DA3D3EFF4 /* RNRandomBytes.xcodeproj */;
-				},
-				{
-					ProductGroup = 39D36A4922F45ABF00EDA4F1 /* Products */;
-					ProjectRef = 31EA7650B3084F7080008B3C /* RNSVG.xcodeproj */;
-				},
-				{
-					ProductGroup = 391AD39F22F9D007005136A0 /* Products */;
+					ProductGroup = 88043C742301BD2B00340AB7 /* Products */;
 					ProjectRef = C0205550495341279B513024 /* RNSVG.xcodeproj */;
 				},
 			);
@@ -1230,49 +1165,7 @@
 			remoteRef = 1FE167BE2088EA11004A6284 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		391AD39C22F9D007005136A0 /* libRNRandomBytes.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNRandomBytes.a;
-			remoteRef = 391AD39B22F9D007005136A0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		391AD39E22F9D007005136A0 /* libRNRandomBytes-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRNRandomBytes-tvOS.a";
-			remoteRef = 391AD39D22F9D007005136A0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		391AD3A422F9D007005136A0 /* libRNSVG.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNSVG.a;
-			remoteRef = 391AD3A322F9D007005136A0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		391AD3A622F9D007005136A0 /* libRNSVG-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRNSVG-tvOS.a";
-			remoteRef = 391AD3A522F9D007005136A0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		391AD3E322F9D7F0005136A0 /* libRNCNetInfo.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNCNetInfo.a;
-			remoteRef = 391AD3E222F9D7F0005136A0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		391AD3E522F9D7F0005136A0 /* libRNCNetInfo-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRNCNetInfo-tvOS.a";
-			remoteRef = 391AD3E422F9D7F0005136A0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3955110722F4547F00078B17 /* libRNRandomBytes.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRNCNetInfo.a;
@@ -1375,13 +1268,6 @@
 			fileType = archive.ar;
 			path = "libRNSVG-tvOS.a";
 			remoteRef = 39D36A4F22F45ABF00EDA4F1 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		39D36A8722F4A07200EDA4F1 /* libRNCamera.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNCamera.a;
-			remoteRef = 39D36A8622F4A07200EDA4F1 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		39D36A8722F4A07200EDA4F1 /* libRNCamera.a */ = {
@@ -1714,10 +1600,7 @@
 					"$(SRCROOT)/../node_modules/react-native-randombytes",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/netinfo/ios",
-<<<<<<< HEAD
-=======
 					"$(SRCROOT)/../node_modules/react-native-secure-storage/ios/**",
->>>>>>> 0289082451e04c48cccf7d73b1438ccc2f8eb16a
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
