@@ -83,12 +83,13 @@ export default class Scanner extends React.PureComponent {
                 let firstByte = rawAfterFrames.slice(2, 4);
                 let action;
                 let address;
+                let data = {};
 
                 try {
                   // decode payload appropriately via UOS
                   switch (zerothByte) {
-                    case '45': // Ethereum UOS payload
-                      action = firstByte === '00' || firstByte === '02' ? 'signData' : firstByte === '01' ? 'signTransaction' : null;
+                    case 45: // Ethereum UOS payload
+                      action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
                       address = rawAfterFrames.slice(2, 22);
 
                       data['action'] = action;
@@ -102,10 +103,9 @@ export default class Scanner extends React.PureComponent {
                         throw new Error('Could not determine action type.');
                       }
                       break;
-                    case '53': // Substrate UOS payload
-                      const secondByte = rawAfterFrames.slice(4, 6);
-                      const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
-                      action = secondByte === '00' || secondByte === '01' ? 'signData': secondByte === '02' || secondByte === '03' ? 'signTransaction' : null;
+                    case 53: // Substrate UOS payload
+                      const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
+                      action = secondByte === 0 || secondByte === 1 ? 'signData': secondByte === 2 || secondByte === 3 ? 'signTransaction' : null;
 
                       data['crypto'] = crypto;
                       data['action'] = action;
