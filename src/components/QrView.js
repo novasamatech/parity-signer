@@ -19,7 +19,7 @@
 import { isHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Dimensions, StyleSheet, Image, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 
 import { qrCode, qrHex } from '../util/native';
 
@@ -50,7 +50,6 @@ export default class QrView extends React.PureComponent {
 
   async displayQrCode (data) {
     try {
-      // if payload was oversized, data could be a hex encoded string
       const qr = isHex(data) ? await qrHex(data) : await qrCode(data);
 
       this.setState({
