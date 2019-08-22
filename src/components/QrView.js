@@ -16,11 +16,12 @@
 
 'use strict';
 
+// import { QrDisplayAddress } from '@polkadot/ui-qr';
 import React from 'react';
 import { Dimensions, StyleSheet, Image, View } from 'react-native';
+
 import colors from '../colors';
 import { qrCode } from '../util/native';
-
 
 export default class QrView extends React.PureComponent {
 
@@ -28,6 +29,8 @@ export default class QrView extends React.PureComponent {
 
   displayQrCode = async (data) => {
     try {
+      console.log(props);
+      debugger;
       // TODO: let qr = props.network === 'substrate' ? await qrSubstrate(data) : await qrCode(data);
       let qr = await qrCode(data);
       this.setState({
@@ -54,6 +57,10 @@ export default class QrView extends React.PureComponent {
     }
 
     return this.renderQr();
+  }
+
+  renderSubstrateQr() {
+    
   }
 
   renderQr() {
