@@ -16,8 +16,7 @@
 
 'use strict';
 
-// import QrScan from '@polkadot/ui-qr';
-// import decodeAddress from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -48,25 +47,9 @@ export default class Scanner extends React.PureComponent {
                 }
                 let data = {};
 
-                if (txRequestData.data) { // then this is Ethereum Legacy
-                  if (data.action === undefined) {
-                    throw new Error('Could not determine action type.');
-                  }
-                  data = JSON.parse(txRequestData.data);
-                  
-                  if (!(await scannerStore.setData(data, accountsStore))) {
-                    return;
-                  } else {
-                    if (scannerStore.getType() === 'transaction') {
-                      this.props.navigation.navigate('TxDetails');
-                    } else { // message
-                      this.props.navigation.navigate('MessageDetails');
-                    }
-                  }
-                }
-                // parse past the frame information
-                let raw = txRequestData.rawData;
-                let rawAfterFrames = raw.slice(13);
+                const bytes = rawDataToU8A(txRequestData.rawData);
+                const hex = bytes.map(byte => byte.toString(16));
+                const uosAfterFrames = hex.slice(5); // FIXME handle multipart
 
                 // can't scope variables to switch case blocks....fml
                 let zerothByte = rawAfterFrames.slice(0, 2);
@@ -100,7 +83,11 @@ export default class Scanner extends React.PureComponent {
 
                       data['action'] = action;
                       data['data']['crypto'] = crypto;
-                      data['data']['account'] = uosAfterFrames.slice(3, 35);
+                      
+                      const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
+                      const ss58Encoded = encodeAddress(publicKeyAsBytes);
+
+                      data['data']['account'] = decodedAddress;
                       data['data']['data'] = uosAfterFrames.slice(35);
 
                       break;

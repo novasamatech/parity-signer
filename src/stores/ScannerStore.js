@@ -78,7 +78,7 @@ export default class ScannerStore extends Container<ScannerState> {
     const address = signRequest.data.account;
     const crypto = signRequest.data.crypto;
 
-    console.log('address as bytse => ', address);
+    console.log('address => ', address);
     debugger;
 
     if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
@@ -112,6 +112,12 @@ export default class ScannerStore extends Container<ScannerState> {
     if (!(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
+
+    const protocol = txRequest.data.data.crypto ? NetworkProtocols.SUBSTRATE : NetworkProtocols.ETHEREUM
+
+    console.log(txRequest);
+    debugger;
+
     const tx = await transaction(txRequest.data.rlp);
     const { ethereumChainId = 1 } = tx;
     const networkKey = ethereumChainId;
