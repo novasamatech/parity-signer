@@ -26,6 +26,7 @@ import {
   StyleSheet,
   Text,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
