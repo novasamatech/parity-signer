@@ -85,8 +85,6 @@ export class MessageDetailsView extends React.PureComponent {
   render() {
     const {data, isOversized, message, onNext, onPressAccount, sender} = this.props;
 
-    console.log('is Oversized => ', isOversized);
-
     return (
       <ScrollView
         contentContainerStyle={styles.bodyContent}

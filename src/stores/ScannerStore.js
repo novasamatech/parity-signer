@@ -195,9 +195,6 @@ export default class ScannerStore extends Container<ScannerState> {
       );
     }
 
-    console.log(txRequest.data);
-    debugger;
-
     const recipient = accountsStore.getById({
       protocol,
       networkKey: networkKey,

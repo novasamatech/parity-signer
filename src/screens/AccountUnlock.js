@@ -70,7 +70,7 @@ export class AccountUnlock extends React.Component {
   render() {
     const { navigation } = this.props;
     const next = navigation.getParam('next', 'AccountList');
-    debugger;
+
     return (
       <Subscribe to={[AccountsStore]}>
         {accounts => (
