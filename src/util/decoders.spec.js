@@ -54,12 +54,13 @@ const SIGN_MSG_TEST = new Uint8Array([
   ]);
 
 const SIGNER_PAYLOAD_TEST = {
-  method: '0x0500ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
+  address: '5DTestUPts3kjeXSTMyerHihn1uwMfLj8vU8sqF7qYrFabHE',
+  blockHash: '0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
   era: '0x0703',
-  nonce: '0x00001234',
-  tip: '0x00000000000000000000000000005678',
   genesisHash: '0xdcd1346701ca8396496e52aa2785b1748deb6db09551b72159dcb3e08991025b',
-  blockHash: '0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7'
+  method: '0x0500ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
+  nonce: '0x00001234',
+  tip: '0x00000000000000000000000000005678'
 };
 
 const SIGN_TX_TEST = u8aConcat(
@@ -129,8 +130,8 @@ describe('decoders', () => {
 
   describe('UOS parsing', () => {
     // after stripping
-    it('from Substrate UOS message', () => {
-      const unsignedData = constructDataFromBytes(SIGN_MSG_TEST);
+    it('from Substrate UOS message', async () => {
+      const unsignedData = await constructDataFromBytes(SIGN_MSG_TEST);
 
       expect(unsignedData).toBeDefined();
       expect(unsignedData.data.crypto).toEqual('sr25519');
@@ -138,8 +139,8 @@ describe('decoders', () => {
       expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
     });
 
-    it('from Substrate UOS Payload', () => {
-      const unsignedData = constructDataFromBytes(SIGN_TX_TEST);
+    it('from Substrate UOS Payload', async () => {
+      const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
 
       const payload = new GenericExtrinsicPayload(SIGN_TX_TEST, { version: 3 });
       const fromBytes = new GenericExtrinsicPayload(payload.toU8a(), { version: 3 });

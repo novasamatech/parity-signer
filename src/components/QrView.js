@@ -16,21 +16,33 @@
 
 'use strict';
 
+import { isHex } from '@polkadot/util';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Dimensions, StyleSheet, Image, View } from 'react-native';
 
 import { Button } from './Button';
 import colors from '../colors';
 import { NetworkProtocols } from '../constants';
-import { qrCode } from '../util/native';
+import { qrCode, qrHex } from '../util/native';
 
 export default class QrView extends React.PureComponent {
   static propTypes = {
     data: PropTypes.string.isRequired // arbitrary message/txn string or `${networkType}:0x${address.toLowerCase()}@${networkKey}`
   }
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      qr: null
+    };
+  }
+
   componentDidMount() {
     const { data } = this.props;
+
+    debugger;
   
     this.displayQrCode(data);
   }
@@ -43,7 +55,10 @@ export default class QrView extends React.PureComponent {
 
   async displayQrCode (data) {
     try {
-      const qr = await qrCode(data);
+      // if payload was oversized, data could be a hex encoded string
+      const qr = isHex(data) ? await qrHex(data) : await qrCode(data);
+
+      debugger;
 
       this.setState({
         qr: qr
@@ -70,16 +85,7 @@ export default class QrView extends React.PureComponent {
     let size = this.props.size || deviceWidth - 80;
     let flexBasis = this.props.height || deviceWidth - 40;
 
-    /*
-    TODO:
-        <QrSigner
-          payload={this.state.qr}
-          network={this.props.network}
-          scan={false}
-          size={300}
-          style={{ width: size, height: size }}
-        />
-    */
+    debugger;
 
     return (
       <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>
