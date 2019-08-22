@@ -16,6 +16,7 @@
 
 'use strict';
 
+import Payload from '@polkadot/api/SignerPayload';
 import { encodeAddress } from '@polkadot/util-crypto';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -96,16 +97,19 @@ export default class Scanner extends React.PureComponent {
                       data['data']['account'] = ss58Encoded;
 
                       switch(secondByte) {
-                        case 0: // payload must be (nonce, call, era_description, era_header)
-                          
+                        case 0:
+                          data['isHash'] = false;
+                          data['data']['data'] = Payload(encryptedData);
                           break;
-                        case 1: // payload_hash MUST be the Blake2s 32-byte hash of the SCALE encoding of the tuple of transaction items (nonce, call, era_description, era_header).
-                          data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
-                          data['data']['data'] = encryptedData;
+                        case 1:
+                          data['isHash'] = true;
+                          data['data']['data'] = Payload(encryptedData);
                           break;
-                        case 2: // immortal_payload must be (nonce, call)
+                        case 2:
+                          data['isHash'] = false;
+                          data['data']['data'] = Payload(encryptedData);
                           break;
-                        case 3: // Cold Signer should attempt to decode to utf8
+                        case 3: // Cold Signer should attempt to decode message to utf8
                           data['data']['data'] = decodeToString(encryptedData);
                           break;
                         default:
