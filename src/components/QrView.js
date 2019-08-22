@@ -68,10 +68,6 @@ export default class QrView extends React.PureComponent {
     return this.renderQr();
   }
 
-  renderSubstrateQr() {
-    
-  }
-
   renderQr() {
     const { width: deviceWidth } = Dimensions.get('window');
     let size = this.props.size || deviceWidth - 80;
