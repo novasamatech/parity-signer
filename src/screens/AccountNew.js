@@ -17,6 +17,8 @@
 'use strict';
 
 import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
@@ -186,6 +188,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingBottom: 20,
     textAlign: 'center'
+  },
+  advancedText: {
+    paddingBottom: 0,
+    paddingTop:20
   },
   hintText: {
     fontFamily: fonts.bold,
