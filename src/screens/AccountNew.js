@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, ScrollView, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';

@@ -20,31 +20,34 @@ import React from 'react';
 import { Dimensions, StyleSheet, Image, View } from 'react-native';
 
 import colors from '../colors';
+import { NetworkProtocols } from '../constants';
 import { qrCode } from '../util/native';
 
 export default class QrView extends React.PureComponent {
 
   state = {};
 
-  displayQrCode = async (data) => {
-    try {
-      // TODO: let qr = props.network === 'substrate' ? await qrSubstrate(data) : await qrCode(data);
-      let qr = await qrCode(data);
-      this.setState({
-        qr: qr
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   componentDidMount() {
-    this.displayQrCode(this.props.data);
+    const { data } = this.props;
+
+    this.displayQrCode(data);
   }
 
   componentWillReceiveProps(newProps) {
     if (newProps.text !== this.props.text) {
       this.displayIcon(newProps.text);
+    }
+  }
+
+  async displayQrCode (data) {
+    try {
+      const qr = await qrCode(data);
+
+      this.setState({
+        qr: qr
+      })
+    } catch (e) {
+      console.error(e);
     }
   }
 

@@ -33,6 +33,12 @@ export default class Scanner extends React.PureComponent {
     headerBackTitle: 'Scanner'
   };
 
+  decodeToString(message: Uint8Array): string {
+    const decoder = new TextDecoder('utf8');
+
+    return decoder.decode(message);
+  }
+
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
@@ -81,15 +87,29 @@ export default class Scanner extends React.PureComponent {
                       const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
                       action = secondByte === 0 || secondByte === 1 ? 'signData': secondByte === 2 || secondByte === 3 ? 'signTransaction' : null;
 
-                      data['action'] = action;
-                      data['data']['crypto'] = crypto;
-                      
                       const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
                       const ss58Encoded = encodeAddress(publicKeyAsBytes);
+                      const encryptedData: Uint8Array = uosAfterFrames.slice(35);
 
-                      data['data']['account'] = decodedAddress;
-                      data['data']['data'] = uosAfterFrames.slice(35);
+                      data['action'] = action;
+                      data['data']['crypto'] = crypto;
+                      data['data']['account'] = ss58Encoded;
 
+                      switch(secondByte) {
+                        case 0: // payload must be (nonce, call, era_description, era_header)
+                          
+                          break;
+                        case 1: // payload_hash MUST be the Blake2s 32-byte hash of the SCALE encoding of the tuple of transaction items (nonce, call, era_description, era_header).
+                          
+                         break;
+                        case 2: // immortal_payload must be (nonce, call)
+                          break;
+                        case 3: // Cold Signer should attempt to decode to utf8
+                          data['data']['data'] = decodeToString(encryptedData);
+                          break;
+                        default:
+                          break;
+                      }
                       break;
                     default:
                       throw new Error('we cannot handle the payload: ', txRequestData);
