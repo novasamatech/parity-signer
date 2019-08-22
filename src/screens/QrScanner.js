@@ -15,7 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
-import QrSigner from '@parity/qr-signer';
+
+import QrScan from '@polkadot/ui-qr';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -91,7 +92,8 @@ export class QrScannerView extends React.PureComponent {
   }
 
   static propTypes = {
-    onBarCodeRead: PropTypes.func.isRequired
+    onBarCodeRead: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired
   };
 
   componentWillMount() {
@@ -119,10 +121,9 @@ export class QrScannerView extends React.PureComponent {
       return <View style={styles.inactive} />;
     }
     return (
-      <QrSigner
+      <QrScan
+        onError={this.props.onError}
         onScan={this.props.onBarCodeRead}
-        scan
-        size={300}
         style={styles.view}
       >
         <View style={styles.body}>
@@ -139,7 +140,7 @@ export class QrScannerView extends React.PureComponent {
             <Text style={styles.descSecondary}>To Sign a New Transaction</Text>
           </View>
         </View>
-      </QrSigner>
+      </QrScan>
     );
   }
 }
