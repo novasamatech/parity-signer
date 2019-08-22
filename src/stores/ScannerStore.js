@@ -19,11 +19,12 @@
 import Payload from '@polkadot/api/SignerPayload';
 import { encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
+
 import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
 import { saveTx } from '../util/db';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
 import transaction from '../util/transaction';
-import { decodeToString, hexToAscii, rawDataToU8A } from '../util/decoders';
+import { decodeToString, hexToAscii, rawDataToU8A, parseRawData } from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -67,91 +68,12 @@ const defaultState = {
 export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
-  parseRawData(rawData) {
-    const bytes = rawDataToU8A(rawData);
-    const hex = bytes.map(byte => byte.toString(16));
-    const uosAfterFrames = hex.slice(5); // FIXME handle multipart
+  setParsedData(rawData) {
+    const parsedData = parseRawData(rawData);
 
-    const zerothByte = uosAfterFrames[0];
-    const firstByte = uosAfterFrames[1];
-    const secondByte = uosAfterFrames[2];
-    let action;
-    let address;
-    let data = {};
-    data['data'] = {}; // for consistency with legacy data format.
-
-    try {
-      // decode payload appropriately via UOS
-      switch (zerothByte) {
-        case 45: // Ethereum UOS payload
-          action = firstByte === 0 || firstByte === 2 ? 'signData' : firstByte === 1 ? 'signTransaction' : null;
-          address = uosAfterFrames.slice(2, 22);
-
-          data['action'] = action;
-          data['data']['account'] = account;
-
-          if (action === 'signData') {
-            data['data']['rlp'] = uosAfterFrames[13];
-          } else if (action === 'signTransaction') {
-            data['data']['data'] = rawAfterFrames[13];
-          } else {
-            throw new Error('Could not determine action type.');
-          }
-          break;
-        case 53: // Substrate UOS payload
-          const crypto = firstByte === 0 ? 'ed25519' : firstByte === 1 ? 'sr25519' : null;
-          const publicKeyAsBytes = uosAfterFrames.slice(3, 35);
-
-          const ss58Encoded = encodeAddress(publicKeyAsBytes); // encode to kusama
-          const hexEncodedData: Uint8Array = uosAfterFrames.slice(35);
-
-          data['data']['crypto'] = crypto;
-          data['data']['account'] = ss58Encoded;
-
-          debugger;
-
-          switch(secondByte) {
-            case 0:
-              data['action'] = 'signTransaction';
-              if (encryptedData.length > 256) {
-                data['oversized'] = true; // flag and warn that we are signing the hash because payload was too big.
-                data['isHash'] = true; // flag and warn that signing a hash is inherently dangerous
-                data['data']['data'] = blake2s(hexEncodedData);
-              } else {
-                data['isHash'] = false;
-                data['data']['data'] = Payload(hexEncodedData);
-              }
-              break;
-            case 1:
-              data['action'] = 'signTransaction';
-              data['isHash'] = true;
-              data['data']['data'] = hexEncodedData; // data is a hash
-              break;
-            case 2:
-              data['action'] = 'signTransaction';
-              data['isHash'] = false;
-              data['data']['data'] = Payload(hexEncodedData);
-              break;
-            case 3: // Cold Signer should attempt to decode message to utf8
-              data['action'] = 'signData';
-              data['isHash'] = false;
-              data['data']['data'] = decodeToString(hexEncodedData.map(b => parseInt(b, 16)));
-              break;
-            default:
-              break;
-          }
-          break;
-        default:
-          throw new Error('we cannot handle the payload: ', rawData);
-      }
-
-      this.setState({
-        unsignedData: data
-      });
-    } catch (e) {
-      scannerStore.setBusy();
-      throw new Error('we cannot handle the payload: ', rawData);
-    }
+    this.setState({
+      unsignedData: parsedData
+    });
   }
 
   setPartData(frame, frameCount, partData, accountsStore) {
@@ -173,6 +95,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
     // all the frames are filled
     if (Object.keys(this.state.multipartData.length) === frameCount) {
+      // fixme: this needs to be concated to a binary blob
       const concatMultipartData = Object.keys(this.state.multipartData).reduce((result, data) => res.concat(this.state.multipartData[data]));
       const data = this.parseRawData(data, accountsStore);
       this.setData(data);
@@ -273,7 +196,7 @@ export default class ScannerStore extends Container<ScannerState> {
   async signData(pin = '1') {
     const { type, sender } = this.state;
     const seed = await decryptData(sender.encryptedSeed, pin);
-    const signedData = await brainWalletSign(seed, this.state.dataToSign);
+    const signedData = await brainWalletSign(seed, this.state.dataToSign); // fixme: support substrate
     this.setState({ signedData });
     if (type == 'transaction') {
       await saveTx({

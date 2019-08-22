@@ -47,7 +47,8 @@ export default class Scanner extends React.PureComponent {
                 let data = {};
 
                 try {
-                  scannerStore.parseRawData(txRequestData.rawData);
+                  scannerStore.setParsedData(txRequestData.rawData);
+                  
                 } catch (e) {
                   Alert.alert('Unable to parse transaction', e.message, [
                     {

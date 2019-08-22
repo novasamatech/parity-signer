@@ -20,6 +20,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { StyleSheet, ScrollView, Text, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
