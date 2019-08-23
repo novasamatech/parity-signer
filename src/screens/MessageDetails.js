@@ -106,7 +106,7 @@ export class MessageDetailsView extends React.PureComponent {
           {isAscii(message)
             ? message
             : data}
-        </Text>        
+        </Text>
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Message"
