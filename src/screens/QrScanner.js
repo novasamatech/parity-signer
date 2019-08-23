@@ -26,7 +26,7 @@ import colors from '../colors';
 import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { rawDataToU8A } from '../util/decoders';
+import { isJsonString, rawDataToU8A } from '../util/decoders';
 
 export default class Scanner extends React.PureComponent {
   static navigationOptions = {
@@ -46,9 +46,8 @@ export default class Scanner extends React.PureComponent {
                 if (scannerStore.isBusy()) {
                   return;
                 }
-                let data = {};
 
-                if (txRequestData.data) { // Ethereum Legacy
+                if (isJsonString(txRequestData.data)) { // Ethereum Legacy
                   await scannerStore.setUnsigned(txRequestData.data);
                 } else {
                   try {

@@ -205,3 +205,12 @@ export function hexToAscii(hexBytes: Uint8Array): string {
 
 	return str;
 }
+
+export function isJsonString(str) {
+  try {
+      JSON.parse(str);
+  } catch (e) {
+      return false;
+  }
+  return true;
+}

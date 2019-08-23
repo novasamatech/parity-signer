@@ -19,7 +19,7 @@
 import { createType, GenericExtrinsicPayload } from '@polkadot/types';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
-import { constructDataFromBytes, rawDataToU8A, asciiToHex, hexToAscii, decodeToString } from './decoders';
+import { constructDataFromBytes, rawDataToU8A, asciiToHex, hexToAscii, decodeToString, isJsonString } from './decoders';
 import { isAscii } from './message';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
@@ -108,6 +108,16 @@ describe('decoders', () => {
 
       expect(message).toBeDefined();
       expect(message).toBe('THIS IS SPARTA!');
+    })
+
+    it('checks if string is JSON parseable', () => {
+      const jsonString = JSON.stringify({ a: 1, b: 2 });
+      const notJsonString = "0x90u23jaiof";
+      const validExample = isJsonString(jsonString);
+      const inValidExample = isJsonString(notJsonString);
+
+      expect(validExample).toBe(true);
+      expect(inValidExample).toBe(false);
     })
   });
 
