@@ -33,6 +33,7 @@ import { NetworkProtocols } from '../constants';
 import fonts from "../fonts";
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress, words } from '../util/native';
+import {constructSURI} from '../util/suri'
 
 export default class AccountIconChooser extends React.PureComponent {
   constructor(props) {
@@ -48,7 +49,6 @@ export default class AccountIconChooser extends React.PureComponent {
 
     // clean previous selection
     onSelect({ newAddress: '', isBip39: false, newSeed: ''});
-
     try {
       const icons = await Promise.all(
         Array(4)
@@ -66,7 +66,14 @@ export default class AccountIconChooser extends React.PureComponent {
               Object.assign(result, await brainWalletAddress(result.seed));
             } else {
               try {
-                result.address = await substrateAddress(`${result.seed}${derivationPath}///${derivationPassword}`, prefix);
+
+                const suri = constructSURI({
+                  phrase: result.seed,
+                  derivePath: derivationPath,
+                  password:derivationPassword
+                });
+                
+                result.address = await substrateAddress(suri, prefix);
                 result.bip39 = true;
               } catch (e){
                 // invalid seed or derivation path

@@ -32,6 +32,7 @@ import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
+import {constructSURI} from "../util/suri";
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -101,11 +102,17 @@ class AccountNewView extends React.Component {
               derivationPath={derivationPath}
               onSelect={({ newAddress, isBip39, newSeed }) => {
                 if (isSubstrate) {
+                  const suri = constructSURI({
+                    phrase: newSeed,
+                    derivePath: derivationPath,
+                    password:derivationPassword
+                  });
+
                   accounts.updateNew({ 
                     address: newAddress,
                     derivationPassword,
                     derivationPath,
-                    seed: `${newSeed}${derivationPath}///${derivationPassword}`,
+                    seed: suri,
                     seedPhrase: newSeed,
                     validBip39Seed: isBip39
                   });

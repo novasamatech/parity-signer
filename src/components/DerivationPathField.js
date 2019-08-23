@@ -25,7 +25,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import keyExtract from '../util/keyExtract'
+import {parseSURI} from '../util/suri'
 import TextInput from './TextInput';
 
 export default function DerivationPathField(props) {
@@ -58,7 +58,7 @@ export default function DerivationPathField(props) {
       {showAdvancedField && 
         <TextInput
           onChangeText={(text) => {
-            const derivationPath = keyExtract(text);
+            const derivationPath = parseSURI(text);
             console.log('derivationPath',derivationPath)
             onChange({
               derivationPassword: derivationPath.password || '',

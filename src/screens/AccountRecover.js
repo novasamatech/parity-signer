@@ -41,6 +41,7 @@ import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress } from '../util/native';
+import {constructSURI} from "../util/suri";
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -94,7 +95,11 @@ class AccountRecoverView extends React.Component {
         )
         .catch(console.error);
     } else {
-      const suri = `${seedPhrase}${derivationPath}///${derivationPassword}`
+      const suri = constructSURI({
+        phrase: seedPhrase,
+        derivePath: derivationPath,
+        password:derivationPassword
+      });
       substrateAddress(suri, prefix)
         .then((address) => {
           accounts.updateNew({ address, derivationPath, derivationPassword, seed: suri, seedPhrase, validBip39Seed: true })
