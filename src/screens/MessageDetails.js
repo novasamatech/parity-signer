@@ -114,7 +114,7 @@ export class MessageDetailsView extends React.PureComponent {
             isOversized
               ? Alert.alert(
                   "Warning",
-                  "You are signing a transaction hash, which is inherently unsafe. If possible, it is recommended that you construct a multipart payload instead.",
+                  "The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.",
                   [
                     {
                       text: 'Proceed',
