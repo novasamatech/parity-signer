@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.reactlibrary.RNSecureStoragePackage;
+import org.reactnative.camera.RNCameraPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.horcrux.svg.SvgPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
@@ -29,7 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNSecureStoragePackage(),
+          new RNSecureStoragePackage(),
+          new RNCameraPackage(),
           new SvgPackage(),
           new NetInfoPackage(),
           new RandomBytesPackage(),
