@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     color: colors.card_bg,
     textAlign: 'left', 
     fontSize: 20, 
-    fontWeight: fonts.bold
+    fontFamily: fonts.bold,
   },
   icon: {
     width: 47,
