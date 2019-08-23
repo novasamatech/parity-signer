@@ -117,7 +117,7 @@ export class MessageDetailsView extends React.PureComponent {
                   "The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.",
                   [
                     {
-                      text: 'Proceed',
+                      text: 'I take the risk',
                       onPress: () => onNext()
                     },
                     {
