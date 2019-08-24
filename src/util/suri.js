@@ -1,5 +1,3 @@
-
-
 /**
  * @typedef {Object} SURIObject
  * @property {string} phrase - The valid bip39 seed phrase
@@ -19,7 +17,9 @@ export function parseSURI (suri) {
   let phrase, derivePath, password = '';
 
   if (matches) {
-    [, phrase = '', derivePath = '', password = ''] = matches;
+    [_, phrase = '', derivePath = '', password = ''] = matches;
+  } else {
+    throw new Error('suri input was not valid');
   }
 
   return {
@@ -36,6 +36,10 @@ export function parseSURI (suri) {
  */
 
 export function constructSURI ({ derivePath = '', password = '', phrase = '' }) {
+
+  if(derivePath === null || phrase === null) {
+    throw new Error('derivePath and phrase should not be null.');
+  }
   
   return `${phrase}${derivePath}///${password}`;
 }
