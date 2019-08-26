@@ -26,7 +26,6 @@ import {
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import { blake2s, keccak } from './native';
-import { ScanError } from './errors';
 
 /*
   Example Full Raw Data
