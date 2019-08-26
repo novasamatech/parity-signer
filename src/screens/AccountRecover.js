@@ -43,7 +43,7 @@ import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress } from '../util/native';
-import {constructSURI} from "../util/suri";
+import {constructSURI} from '../util/suri';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
