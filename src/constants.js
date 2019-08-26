@@ -17,7 +17,7 @@ export const EthereumNetworkKeys = Object.freeze({
 
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys = Object.freeze({
-  KUSAMA: '456',
+  KUSAMA: '0x3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf', // https://polkascan.io/pre/kusama/block/0
   // POLKADOT: '123',
   // POLKADOT_TEST: 's42', // needs a dummy genesis different than any other id (Eth chain id included)
 });
