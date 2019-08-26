@@ -32,7 +32,7 @@ import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
-import {constructSURI} from "../util/suri";
+import {constructSURI} from '../util/suri';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
