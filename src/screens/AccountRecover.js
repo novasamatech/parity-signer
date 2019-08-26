@@ -43,6 +43,7 @@ import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress } from '../util/native';
+import {constructSURI} from '../util/suri';
 
 export default class AccountRecover extends React.Component {
   static navigationOptions = {
@@ -66,6 +67,7 @@ class AccountRecoverView extends React.Component {
     this.state = {
       derivationPassword: '',
       derivationPath: '',
+      isDerivationPathValid: true,
       seedPhrase: '',
       selectedAccount: undefined,
       selectedNetwork: undefined,
@@ -85,9 +87,21 @@ class AccountRecoverView extends React.Component {
     }
   }
 
+  clearNewAccount = function () {
+    const { accounts } = this.props;
+
+    accounts.updateNew({ address:'', derivationPath:'', derivationPassword:'', seed:'', seedPhrase:'', validBip39Seed: false })
+  }
+
   addressGeneration = (seedPhrase, derivationPath = '', derivationPassword = '') => {
     const { accounts } = this.props;
     const { selectedNetwork:{protocol, prefix} } = this.state;
+
+    if (!seedPhrase){
+      this.clearNewAccount();
+      
+      return;
+    }
 
     if (protocol === NetworkProtocols.ETHEREUM){
       brainWalletAddress(seedPhrase)
@@ -96,15 +110,27 @@ class AccountRecoverView extends React.Component {
         )
         .catch(console.error);
     } else {
-      const suri = `${seedPhrase}${derivationPath}///${derivationPassword}`
-      substrateAddress(suri, prefix)
-        .then((address) => {
-          accounts.updateNew({ address, derivationPath, derivationPassword, seed: suri, seedPhrase, validBip39Seed: true })
-        })
-        .catch(
-          //invalid phrase
-          accounts.updateNew({ address:'', derivationPath:'', derivationPassword:'', seed:'', seedPhrase:'', validBip39Seed: false })
-        );
+      // Substrate
+      try {
+        const suri = constructSURI({
+          derivePath: derivationPath,
+          password: derivationPassword,
+          phrase: seedPhrase
+        });
+
+        substrateAddress(suri, prefix)
+          .then((address) => {
+            accounts.updateNew({ address, derivationPath, derivationPassword, seed: suri, seedPhrase, validBip39Seed: true })
+          })
+          .catch(() => {
+            //invalid phrase
+            this.clearNewAccount();
+          });
+      } catch (e) {
+        // invalid phrase or derivation path
+        this.clearNewAccount();
+      }
+      
     }
   };
 
@@ -129,7 +155,7 @@ class AccountRecoverView extends React.Component {
 
   render() {
     const { accounts, navigation } = this.props;
-    const { derivationPassword, derivationPath, selectedAccount, selectedNetwork} = this.state;
+    const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork} = this.state;
     const {address, name, networkKey, seedPhrase, validBip39Seed} = selectedAccount;
     const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
@@ -171,9 +197,9 @@ class AccountRecoverView extends React.Component {
             value={this.state.seedPhrase}
           />
           {isSubstrate && <DerivationPathField
-            onChange = { ({derivationPassword, derivationPath}) => {
+            onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
               this.debouncedAddressGeneration(seedPhrase, derivationPath, derivationPassword);
-              this.setState({ derivationPath, derivationPassword });
+              this.setState({ derivationPath, derivationPassword, isDerivationPathValid });
             }}
             styles={styles}
           />}
@@ -186,7 +212,7 @@ class AccountRecoverView extends React.Component {
           />
           <Button
             buttonStyles={{ marginBottom: 40 }}
-            disabled={isSubstrate && !address}
+            disabled={isSubstrate && (!address || !isDerivationPathValid)}
             title="Next Step"
             onPress={() => {
               const validation = validateSeed(

@@ -20,7 +20,7 @@ import { Container } from 'unstated';
 
 import { accountId, empty } from '../util/account';
 import { loadAccounts, saveAccount } from '../util/db';
-import keyExtract from '../util/keyExtract'
+import {parseSURI} from '../util/suri'
 import { decryptData, encryptData } from '../util/native';
 
 
@@ -144,7 +144,7 @@ export default class AccountsStore extends Container {
     try {
       account.seed = await decryptData(account.encryptedSeed, pin);
 
-      const {phrase, derivePath, password} = keyExtract(account.seed)
+      const {phrase, derivePath, password} = parseSURI(account.seed)
 
       account.seedPhrase = phrase || '';
       account.derivationPath = derivePath || '';

@@ -25,7 +25,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import keyExtract from '../util/keyExtract'
+import {parseDerivationPath} from '../util/suri'
 import TextInput from './TextInput';
 
 export default function DerivationPathField(props) {
@@ -58,12 +58,24 @@ export default function DerivationPathField(props) {
       {showAdvancedField && 
         <TextInput
           onChangeText={(text) => {
-            const derivationPath = keyExtract(text);
-            onChange({
-              derivationPassword: derivationPath.password || '',
-              derivationPath: derivationPath.derivePath || ''
-            });
-            setIsValidPath(!!derivationPath.password || !!derivationPath.derivePath);
+            try {
+              const derivationPath = parseDerivationPath(text);
+
+              onChange({
+                derivationPassword: derivationPath.password || '',
+                derivationPath: derivationPath.derivePath || '',
+                isDerivationPathValid: true
+              });
+              setIsValidPath(true);
+            } catch (e) {
+              // wrong derivationPath
+              onChange({
+                derivationPassword: '',
+                derivationPath: '',
+                isDerivationPathValid: false
+              });
+              setIsValidPath(false);
+            }
           }}
           placeholder="optional derivation path"
           style={isValidPath ? ownStyles.validInput: ownStyles.invalidInput}

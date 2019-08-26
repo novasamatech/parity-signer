@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -32,6 +32,7 @@ import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
+import {constructSURI} from '../util/suri';
 
 export default class AccountNew extends React.Component {
   static navigationOptions = {
@@ -55,6 +56,7 @@ class AccountNewView extends React.Component {
     this.state = {
       derivationPassword: '',
       derivationPath: '',
+      isDerivationPathValid: true,
       selectedAccount: undefined,
       selectedNetwork: undefined,
     };
@@ -79,7 +81,7 @@ class AccountNewView extends React.Component {
 
   render() {
     const { accounts, navigation } = this.props;
-    const { derivationPassword, derivationPath, selectedAccount, selectedNetwork } = this.state;
+    const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork } = this.state;
     const {address, name, seed, validBip39Seed} = selectedAccount;
     const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
@@ -100,22 +102,38 @@ class AccountNewView extends React.Component {
               derivationPassword={derivationPassword}
               derivationPath={derivationPath}
               onSelect={({ newAddress, isBip39, newSeed }) => {
-                if (isSubstrate) {
-                  accounts.updateNew({ 
-                    address: newAddress,
-                    derivationPassword,
-                    derivationPath,
-                    seed: `${newSeed}${derivationPath}///${derivationPassword}`,
-                    seedPhrase: newSeed,
-                    validBip39Seed: isBip39
-                  });
+                if (newAddress && isBip39 && newSeed){
+                  if (isSubstrate) {
+                    try {
+                      const suri = constructSURI({
+                        derivePath: derivationPath,
+                        password: derivationPassword,
+                        phrase: newSeed
+                      });
+
+                      accounts.updateNew({ 
+                        address: newAddress,
+                        derivationPassword,
+                        derivationPath,
+                        seed: suri,
+                        seedPhrase: newSeed,
+                        validBip39Seed: isBip39
+                      });
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  } else {
+                    // Ethereum account
+                    accounts.updateNew({
+                      address: newAddress,
+                      seed: newSeed,
+                      validBip39Seed: isBip39
+                    });
+                  }
                 } else {
-                  accounts.updateNew({
-                    address: newAddress,
-                    seed: newSeed,
-                    validBip39Seed: isBip39
-                });
-              }}}
+                  accounts.updateNew({ address: '', seed: '', validBip39Seed: false})
+                }
+              }}
               network={selectedNetwork}
               value={address && address}
             />
@@ -126,8 +144,8 @@ class AccountNewView extends React.Component {
               placeholder="Enter a new account name"
             />
             {isSubstrate && <DerivationPathField
-              onChange = { ({derivationPassword, derivationPath}) => {
-                this.setState({ derivationPath, derivationPassword });
+              onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
+                this.setState({ derivationPath, derivationPassword, isDerivationPathValid });
               }}
               styles={styles}
           />}
@@ -139,7 +157,7 @@ class AccountNewView extends React.Component {
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
-              disabled={!validateSeed(seed, validBip39Seed).valid}
+              disabled={!validateSeed(seed, validBip39Seed).valid || !isDerivationPathValid}
               onPress={() => {
                 validateSeed(seed, validBip39Seed).valid &&
                   navigation.navigate('AccountBackup', {
