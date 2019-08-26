@@ -168,15 +168,15 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-svg')
-    implementation project(':react-native-randombytes')
-    implementation project(':@react-native-community_netinfo')
     implementation project(':react-native-camera')
     implementation project(':react-native-secure-storage')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-svg')
+    implementation project(':@react-native-community_netinfo')
+    implementation project(':react-native-randombytes')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.facebook.react:react-native:0.60.3'
-    implementation project(':react-native-gesture-handler')
 
     if (useIntlJsc) {
         implementation 'org.webkit:android-jsc-intl:+'

@@ -89,7 +89,6 @@ export default class AccountsStore extends Container {
       });
     }
   }
-
   update(accountUpdate) {
     let account = this.state.accounts.get(accountId(accountUpdate));
     if (!account) {
@@ -126,6 +125,7 @@ export default class AccountsStore extends Container {
       console.error(e);
     }
   }
+
 
   async deleteAccount(account) {
     const { accounts } = this.state;

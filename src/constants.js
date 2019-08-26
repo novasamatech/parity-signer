@@ -99,3 +99,5 @@ export const SUBSTRATE_NETWORK_LIST = Object.freeze(setDefault(substrateNetworkB
 export const NETWORK_LIST = Object.freeze(
   Object.assign({}, SUBSTRATE_NETWORK_LIST, ETHEREUM_NETWORK_LIST)
 );
+
+export const TX_DETAILS_MSG = "After signing and publishing you will have sent";

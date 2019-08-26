@@ -59,7 +59,7 @@ export default function DerivationPathField(props) {
         <TextInput
           onChangeText={(text) => {
             const derivationPath = parseSURI(text);
-            console.log('derivationPath',derivationPath)
+    
             onChange({
               derivationPassword: derivationPath.password || '',
               derivationPath: derivationPath.derivePath || ''

@@ -50,17 +50,19 @@ export class SignedMessageView extends React.PureComponent {
   };
 
   render() {
+    const { data, message } = this.props;
+
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
         <View style={styles.qr}>
-          <QrView text={this.props.data} />
+          <QrView data={this.props.data} />
         </View>
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
-          {isAscii(this.props.message)
-            ? hexToAscii(this.props.message)
-            : this.props.data}
+          {isAscii(message)
+            ? message
+            : hexToAscii(data)}
         </Text>
       </ScrollView>
     );
