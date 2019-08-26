@@ -90,7 +90,7 @@ export default class AccountsStore extends Container {
     }
   }
   update(accountUpdate) {
-    let account = this.state.accounts.get(accountId(accountUpdate));
+    let account = this.safeGet(accountId(accountUpdate));
     if (!account) {
       this.state.accounts.set(accountId(accountUpdate), accountUpdate);
       account = this.state.accounts.get(accountId(accountUpdate));
@@ -116,7 +116,7 @@ export default class AccountsStore extends Container {
       if (pin && account.seed) {
         account.encryptedSeed = await encryptData(account.seed, pin);
       }
-      
+
       const accountToSave = this.deleteSensitiveData(account);
 
       accountToSave.updatedAt = new Date().getTime();
@@ -163,7 +163,7 @@ export default class AccountsStore extends Container {
     delete account.seedPhrase;
     delete account.derivationPassword;
     delete account.derivationPath;
-    
+
     return account
   }
 
@@ -188,7 +188,7 @@ export default class AccountsStore extends Container {
   }
 
   getById(account) {
-    return this.state.accounts.get(accountId(account)) || empty(account);
+    return this.safeGet(accountId(account)) || empty(account);
   }
 
   getByAddress(address) {
@@ -198,7 +198,15 @@ export default class AccountsStore extends Container {
   }
 
   getSelected() {
-    return this.state.accounts.get(this.state.selected);
+    return this.safeGet(this.state.selected);
+  }
+
+  safeGet(key) {
+    const account = this.state.accounts.get(key);
+    if (account !== undefined && account.archived === false) {
+      return account;
+    }
+    return undefined;
   }
 
   getAccounts() {
