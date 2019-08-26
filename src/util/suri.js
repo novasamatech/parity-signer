@@ -17,9 +17,13 @@ export function parseSURI (suri) {
   let phrase, derivePath, password = '';
 
   if (matches) {
-    [_, phrase = '', derivePath = '', password = ''] = matches;
+    [_, phrase, derivePath = '', password = ''] = matches;
   } else {
-    throw new Error('suri input was not valid');
+    throw new Error('SURI input was not valid.');
+  }
+
+  if (!phrase) {
+    throw new Error('SURI must contain a phrase.');
   }
 
   return {
@@ -35,10 +39,10 @@ export function parseSURI (suri) {
  * @returns {string}
  */
 
-export function constructSURI ({ derivePath = '', password = '', phrase = '' }) {
+export function constructSURI ({ derivePath = '', password = '', phrase }) {
 
-  if(derivePath === null || phrase === null) {
-    throw new Error('derivePath and phrase should not be null.');
+  if(!phrase) {
+    throw new Error('cannot construct an SURI from emtpy phrase.');
   }
   
   return `${phrase}${derivePath}///${password}`;

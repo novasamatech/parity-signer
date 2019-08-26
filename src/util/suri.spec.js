@@ -32,8 +32,14 @@ describe('suri', () => {
     it('should throw if the string is not a valid suri', () => {
         const malformed = '1!,#(&(/)!_c.';
         
-        expect(() => parseSURI(malformed)).toThrowError('suri input was not valid');
+        expect(() => parseSURI(malformed)).toThrowError('SURI input was not valid');
     });
+
+    it('should throw if phrase was empty', () => {
+      const missingPhrase = '//hard/soft///password';
+
+      expect(() => parseSURI(missingPhrase)).toThrowError('SURI must contain a phrase.');
+    })
   });
 
   describe('constructing', () => {
@@ -51,12 +57,13 @@ describe('suri', () => {
     });
 
     it('should throw if the suri object is not valid', () => {
+        const empty = {}
+
         const malformed = {
-            phrase: null,
-            derivePath: null
+          phrase: null
         }
 
-        expect(() => constructSURI(malformed)).toThrow('derivePath and phrase should not be null.');
+        expect(() => constructSURI(empty)).toThrow('cannot construct an SURI from emtpy phrase.');expect(() => constructSURI(malformed)).toThrow('cannot construct an SURI from emtpy phrase.');
     });
   });
 });
