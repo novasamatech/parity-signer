@@ -67,6 +67,7 @@ class AccountRecoverView extends React.Component {
     this.state = {
       derivationPassword: '',
       derivationPath: '',
+      isDerivationPathValid: true,
       seedPhrase: '',
       selectedAccount: undefined,
       selectedNetwork: undefined,
@@ -88,7 +89,7 @@ class AccountRecoverView extends React.Component {
 
   clearNewAccount = function () {
     const { accounts } = this.props;
-    
+
     accounts.updateNew({ address:'', derivationPath:'', derivationPassword:'', seed:'', seedPhrase:'', validBip39Seed: false })
   }
 
@@ -112,9 +113,9 @@ class AccountRecoverView extends React.Component {
       // Substrate
       try {
         const suri = constructSURI({
-          phrase: seedPhrase,
           derivePath: derivationPath,
-          password:derivationPassword
+          password: derivationPassword,
+          phrase: seedPhrase
         });
 
         substrateAddress(suri, prefix)
@@ -154,7 +155,7 @@ class AccountRecoverView extends React.Component {
 
   render() {
     const { accounts, navigation } = this.props;
-    const { derivationPassword, derivationPath, selectedAccount, selectedNetwork} = this.state;
+    const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork} = this.state;
     const {address, name, networkKey, seedPhrase, validBip39Seed} = selectedAccount;
     const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
@@ -196,9 +197,9 @@ class AccountRecoverView extends React.Component {
             value={this.state.seedPhrase}
           />
           {isSubstrate && <DerivationPathField
-            onChange = { ({derivationPassword, derivationPath}) => {
+            onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
               this.debouncedAddressGeneration(seedPhrase, derivationPath, derivationPassword);
-              this.setState({ derivationPath, derivationPassword });
+              this.setState({ derivationPath, derivationPassword, isDerivationPathValid });
             }}
             styles={styles}
           />}
@@ -211,7 +212,7 @@ class AccountRecoverView extends React.Component {
           />
           <Button
             buttonStyles={{ marginBottom: 40 }}
-            disabled={isSubstrate && !address}
+            disabled={isSubstrate && (!address || !isDerivationPathValid)}
             title="Next Step"
             onPress={() => {
               const validation = validateSeed(

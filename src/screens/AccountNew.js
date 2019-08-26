@@ -56,6 +56,7 @@ class AccountNewView extends React.Component {
     this.state = {
       derivationPassword: '',
       derivationPath: '',
+      isDerivationPathValid: true,
       selectedAccount: undefined,
       selectedNetwork: undefined,
     };
@@ -80,7 +81,7 @@ class AccountNewView extends React.Component {
 
   render() {
     const { accounts, navigation } = this.props;
-    const { derivationPassword, derivationPath, selectedAccount, selectedNetwork } = this.state;
+    const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork } = this.state;
     const {address, name, seed, validBip39Seed} = selectedAccount;
     const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
@@ -106,7 +107,7 @@ class AccountNewView extends React.Component {
                     try {
                       const suri = constructSURI({
                         derivePath: derivationPath,
-                        password:derivationPassword,
+                        password: derivationPassword,
                         phrase: newSeed
                       });
 
@@ -143,8 +144,8 @@ class AccountNewView extends React.Component {
               placeholder="Enter a new account name"
             />
             {isSubstrate && <DerivationPathField
-              onChange = { ({derivationPassword, derivationPath}) => {
-                this.setState({ derivationPath, derivationPassword });
+              onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
+                this.setState({ derivationPath, derivationPassword, isDerivationPathValid });
               }}
               styles={styles}
           />}
@@ -156,7 +157,7 @@ class AccountNewView extends React.Component {
             <Button
               buttonStyles={styles.nextStep}
               title="Next Step"
-              disabled={!validateSeed(seed, validBip39Seed).valid}
+              disabled={!validateSeed(seed, validBip39Seed).valid || !isDerivationPathValid}
               onPress={() => {
                 validateSeed(seed, validBip39Seed).valid &&
                   navigation.navigate('AccountBackup', {

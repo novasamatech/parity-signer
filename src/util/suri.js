@@ -1,4 +1,3 @@
-
 /**
  * @typedef {Object} SURIObject
  * @property {string} phrase - The valid bip39 seed phrase
@@ -23,6 +22,7 @@ export function parseSURI (suri) {
   const matches = suri.match(RE_CAPTURE);
   let phrase, derivationPath = '';
   const ERROR = 'Invalid SURI input.';
+  
   if (matches) {
     [_, phrase, derivationPath = ''] = matches;
     try {

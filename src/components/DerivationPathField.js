@@ -60,17 +60,19 @@ export default function DerivationPathField(props) {
           onChangeText={(text) => {
             try {
               const derivationPath = parseDerivationPath(text);
-              console.log('derivationPath', derivationPath)
+
               onChange({
                 derivationPassword: derivationPath.password || '',
-                derivationPath: derivationPath.derivePath || ''
+                derivationPath: derivationPath.derivePath || '',
+                isDerivationPathValid: true
               });
               setIsValidPath(true);
             } catch (e) {
               // wrong derivationPath
               onChange({
                 derivationPassword: '',
-                derivationPath: ''
+                derivationPath: '',
+                isDerivationPathValid: false
               });
               setIsValidPath(false);
             }
