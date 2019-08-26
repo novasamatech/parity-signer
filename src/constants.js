@@ -19,7 +19,7 @@ export const EthereumNetworkKeys = Object.freeze({
 export const SubstrateNetworkKeys = Object.freeze({
   KUSAMA: '456',
   // POLKADOT: '123',
-  // POLKADOT_TEST: 's42', // needs a dummy genesis different than any other id (Eth chain id included)
+  POLKADOT_TEST: '0xe4e7807c233645b910c8db58e99ed53dc71fbfff5bbe8a5534fb7e83db449210', // genesis hash from v0.5.1 polkadot --dev commit e086465916c2778a7dede7dc62e551d801dc12ca
 });
 
 const substrateNetworkBase = {
@@ -29,12 +29,12 @@ const substrateNetworkBase = {
     prefix: 2,
     title: 'Kusama'
   },
-  // [SubstrateNetworkKeys.POLKADOT_TEST]: {
-  //   color: '#ff8c00',
-  //   genesisHash: SubstrateNetworkKeys.POLKADOT_TEST,
-  //   prefix: 42,
-  //   title: 'Polkadot Testnet'
-  // },
+  [SubstrateNetworkKeys.POLKADOT_TEST]: {
+    color: '#ff8c00',
+    genesisHash: SubstrateNetworkKeys.POLKADOT_TEST,
+    prefix: 42,
+    title: 'Polkadot Dev'
+  },
   // [SubstrateNetworkKeys.POLKADOT]: {
   //   color: '#e6007a',
   //   genesisHash: SubstrateNetworkKeys.POLKADOT,
