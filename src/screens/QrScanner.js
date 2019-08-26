@@ -78,7 +78,7 @@ export default class Scanner extends React.PureComponent {
                       accountsStore
                     );
                   } catch (e) {
-                    this.showErrorMessage(scannerStore, text.PARSE_ERROR_TITLE, e.message);
+                    return this.showErrorMessage(scannerStore, text.PARSE_ERROR_TITLE, e.message);
                   }
                 }
 
