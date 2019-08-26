@@ -16,7 +16,33 @@
 
 'use strict';
 
-import { constructSURI, parseSURI } from './suri';
+import { constructSURI, parseDerivationPath, parseSURI } from './suri';
+
+describe('derivation path', () => {
+  describe('parsing', () => {
+    it('should properly parse and return a derivation path object from a string containing soft, hard and password', () => {
+        const parsedDerivationPath = parseDerivationPath('/soft/soft//hard///mypassword');
+    
+        expect(parsedDerivationPath).toBeDefined();
+        expect(parsedDerivationPath.derivePath).toBe('/soft/soft//hard');
+        expect(parsedDerivationPath.password).toBe('mypassword');
+      });
+
+    it('should throw if the string is not a valid derivation path', () => {
+        const malformed = 'wrong/bla';
+        
+        expect(() => parseDerivationPath(malformed)).toThrowError('Invalid derivation path input.');
+    });
+
+    it('should accept a password alone', () => {
+      const passwordAlone = '///mypassword';
+      const parsedDerivationPath = parseDerivationPath(passwordAlone);
+    
+      expect(parsedDerivationPath).toBeDefined();
+      expect(parsedDerivationPath.password).toBe('mypassword');
+    })
+  });
+});
 
 describe('suri', () => {
   describe('parsing', () => {
@@ -32,7 +58,7 @@ describe('suri', () => {
     it('should throw if the string is not a valid suri', () => {
         const malformed = '1!,#(&(/)!_c.';
         
-        expect(() => parseSURI(malformed)).toThrowError('SURI input was not valid');
+        expect(() => parseSURI(malformed)).toThrowError('Invalid SURI input.');
     });
 
     it('should throw if phrase was empty', () => {
@@ -63,7 +89,8 @@ describe('suri', () => {
           phrase: null
         }
 
-        expect(() => constructSURI(empty)).toThrow('cannot construct an SURI from emtpy phrase.');expect(() => constructSURI(malformed)).toThrow('cannot construct an SURI from emtpy phrase.');
+        expect(() => constructSURI(empty)).toThrow('Cannot construct an SURI from emtpy phrase.');
+        expect(() => constructSURI(malformed)).toThrow('Cannot construct an SURI from emtpy phrase.');
     });
   });
 });

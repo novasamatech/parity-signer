@@ -86,9 +86,21 @@ class AccountRecoverView extends React.Component {
     }
   }
 
+  clearNewAccount = function () {
+    const { accounts } = this.props;
+    
+    accounts.updateNew({ address:'', derivationPath:'', derivationPassword:'', seed:'', seedPhrase:'', validBip39Seed: false })
+  }
+
   addressGeneration = (seedPhrase, derivationPath = '', derivationPassword = '') => {
     const { accounts } = this.props;
     const { selectedNetwork:{protocol, prefix} } = this.state;
+
+    if (!seedPhrase){
+      this.clearNewAccount();
+      
+      return;
+    }
 
     if (protocol === NetworkProtocols.ETHEREUM){
       brainWalletAddress(seedPhrase)
@@ -97,19 +109,27 @@ class AccountRecoverView extends React.Component {
         )
         .catch(console.error);
     } else {
-      const suri = constructSURI({
-        phrase: seedPhrase,
-        derivePath: derivationPath,
-        password:derivationPassword
-      });
-      substrateAddress(suri, prefix)
-        .then((address) => {
-          accounts.updateNew({ address, derivationPath, derivationPassword, seed: suri, seedPhrase, validBip39Seed: true })
-        })
-        .catch(
-          //invalid phrase
-          accounts.updateNew({ address:'', derivationPath:'', derivationPassword:'', seed:'', seedPhrase:'', validBip39Seed: false })
-        );
+      // Substrate
+      try {
+        const suri = constructSURI({
+          phrase: seedPhrase,
+          derivePath: derivationPath,
+          password:derivationPassword
+        });
+
+        substrateAddress(suri, prefix)
+          .then((address) => {
+            accounts.updateNew({ address, derivationPath, derivationPassword, seed: suri, seedPhrase, validBip39Seed: true })
+          })
+          .catch(() => {
+            //invalid phrase
+            this.clearNewAccount();
+          });
+      } catch (e) {
+        // invalid phrase or derivation path
+        this.clearNewAccount();
+      }
+      
     }
   };
 

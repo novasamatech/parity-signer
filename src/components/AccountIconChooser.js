@@ -65,8 +65,8 @@ export default class AccountIconChooser extends React.PureComponent {
             if (protocol === NetworkProtocols.ETHEREUM) {
               Object.assign(result, await brainWalletAddress(result.seed));
             } else {
+              // Substrate
               try {
-
                 const suri = constructSURI({
                   phrase: result.seed,
                   derivePath: derivationPath,
@@ -77,7 +77,7 @@ export default class AccountIconChooser extends React.PureComponent {
                 result.bip39 = true;
               } catch (e){
                 // invalid seed or derivation path
-                // console.error(e);
+                console.error(e);
               }
             }
             return result;
