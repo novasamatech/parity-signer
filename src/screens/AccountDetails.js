@@ -71,7 +71,7 @@ class AccountDetailsView extends React.Component {
 This account can only be recovered with its associated recovery phrase.`,
       [
         {
-          text: 'Delete',
+          text: 'Delete & Archive Account',
           style: 'destructive',
           onPress: () => {
             accounts.deleteAccount(selected);
@@ -125,7 +125,7 @@ This account can only be recovered with its associated recovery phrase.`,
                 { value: 'AccountEdit', text: 'Edit' },
                 { value: 'AccountPin', text: 'Change Pin' },
                 { value: 'AccountBackup', text: 'View Recovery Phrase' },
-                { value: 'AccountDelete', text: 'Delete', textStyle: styles.deleteText }]}
+                { value: 'AccountDelete', text: 'Delete & Archive Account', textStyle: styles.deleteText }]}
             />
           </View>
         </View>
