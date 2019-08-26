@@ -23,7 +23,7 @@ import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { isJsonString, rawDataToU8A } from '../util/decoders';
@@ -34,6 +34,11 @@ export default class Scanner extends React.PureComponent {
     headerBackTitle: 'Scanner'
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { enableScan: true };
+  }
+
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
@@ -43,27 +48,33 @@ export default class Scanner extends React.PureComponent {
               navigation={this.props.navigation}
               scannerStore={scannerStore}
               onBarCodeRead={async txRequestData => {
-                if (scannerStore.isBusy()) {
+                if (scannerStore.isBusy() || !this.state.enableScan) {
                   return;
                 }
 
-                if (isJsonString(txRequestData.data)) { // Ethereum Legacy
+                if (isJsonString(txRequestData.data)) {
+                  // Ethereum Legacy
                   await scannerStore.setUnsigned(txRequestData.data);
                 } else {
                   try {
                     const strippedData = rawDataToU8A(txRequestData.rawData);
-                    await scannerStore.setParsedData(strippedData, accountsStore);
+                    await scannerStore.setParsedData(
+                      strippedData,
+                      accountsStore
+                    );
                   } catch (e) {
+                    this.setState({ enableScan: false });
                     Alert.alert('Unable to parse transaction', e.message, [
                       {
                         text: 'Try again',
                         onPress: () => {
                           scannerStore.cleanup();
+                          this.setState({ enableScan: true });
                         }
                       }
                     ]);
                   }
-                }                
+                }
 
                 if (await scannerStore.setData(accountsStore)) {
                   if (scannerStore.getType() === 'transaction') {
@@ -207,6 +218,6 @@ const styles = StyleSheet.create({
     color: colors.bg_text,
     fontSize: 14,
     fontFamily: fonts.bold,
-    paddingBottom: 20,
+    paddingBottom: 20
   }
 });
