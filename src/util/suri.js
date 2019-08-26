@@ -70,7 +70,7 @@ export function parseDerivationPath (input) {
 
 /**
  * @description Return a SURI format from a bip39 phrase, a derivePath, e.g `//hard/soft` and a password.
- * @param {SURIObject} SURIObject  const ERROR = 'Invalid SURI input.';
+ * @param {SURIObject} SURIObject
  * @returns {string}
  */
 
