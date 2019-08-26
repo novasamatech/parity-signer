@@ -15,57 +15,114 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
+
+import { createType } from '@polkadot/types';
 import { Container } from 'unstated';
-import { NETWORK_LIST, NetworkProtocols, EthereumNetworkKeys } from '../constants';
+
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { saveTx } from '../util/db';
-import { brainWalletSign, decryptData, keccak, ethSign } from '../util/native';
+import { isAscii } from '../util/message';
+import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
 import transaction from '../util/transaction';
+import { constructDataFromBytes, asciiToHex } from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
 
 type SignedTX = {
-  txRequest: TXRequest,
+  recipient: Account,
   sender: Account,
-  recipient: Account
+  txRequest: TXRequest,
 };
 
 type ScannerState = {
-  type: 'transaction' | 'message',
-  txRequest: TXRequest | null,
-  message: string,
-  tx: Object,
-  sender: Account,
-  recipient: Account,
   dataToSign: string,
-  signedData: string,
+  isHash: boolean,
+  isOversized: boolean,
+  message: string,
+  multipartData: any,
+  recipient: Account,
   scanErrorMsg: string,
-  signedTxList: [SignedTX]
+  sender: Account,
+  signedData: string,
+  signedTxList: [SignedTX],
+  tx: Object,
+  txRequest: TXRequest | null,
+  type: 'transaction' | 'message',
+  unsignedData: any
 };
 
 const defaultState = {
-  type: null,
   busy: false,
-  txRequest: null,
-  message: null,
-  sender: null,
-  recipient: null,
-  tx: '',
+  isHash: false,
+  isOversized: false,
   dataToSign: '',
+  message: null,
+  multipartData: {},
+  recipient: null,
+  scanErrorMsg: '',
+  sender: null,
   signedData: '',
-  scanErrorMsg: ''
+  tx: '',
+  txRequest: null,
+  type: null,
+  unsignedData: {}
 };
 
 export default class ScannerStore extends Container<ScannerState> {
   state = defaultState;
 
-  async setData(data, accountsStore) {
-    console.log(data);
-    switch (data.action) {
+  async setUnsigned(data) {
+    this.setState({
+      unsignedData: JSON.parse(data)
+    });
+  }
+
+  async setParsedData(strippedData, accountsStore) {
+    const parsedData = await constructDataFromBytes(strippedData);
+    
+    if (parsedData.isMultipart) {
+      this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
+      return;
+    }
+
+    this.setState({
+      unsignedData: parsedData
+    });
+  }
+
+  async setPartData(frame, frameCount, partData, accountsStore) {
+    if (partData[0] === new Uint8Array([0x00]) || partData[0] === new Uint8Array([0x7B])) {
+      // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
+      throw new Error('Error decoding invalid part data.');
+    }
+
+    // we havne't filled all the frames yet
+    if (Object.keys(this.state.multipartData.length) < frameCount) {
+      const nextDataState = this.state.multipartData;
+      
+      nextDataState[frame] = partData;
+
+      this.setState({
+        multipartData: nextDataState
+      });
+    }
+
+    // all the frames are filled
+    if (Object.keys(this.state.multipartData.length) === frameCount) {
+      // fixme: this needs to be concated to a binary blob
+      const concatMultipartData = Object.keys(this.state.multipartData).reduce((result, data) => res.concat(this.state.multipartData[data]));
+      const data = this.setParsedData(concatMultipartData);
+      this.setData(data);
+    }
+  }
+
+  async setData(accountsStore) {
+    switch (this.state.unsignedData.action) {
       case 'signTransaction':
-        return await this.setTXRequest(data, accountsStore);
+        return await this.setTXRequest(this.state.unsignedData, accountsStore);
       case 'signData':
-        return await this.setDataToSign(data, accountsStore);
+        return await this.setDataToSign(this.state.unsignedData, accountsStore);
       default:
         throw new Error(
           `Scanned QR should contain either transaction or a message to sign`
@@ -74,40 +131,60 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async setDataToSign(signRequest, accountsStore) {
-    const message = signRequest.data.data;
     const address = signRequest.data.account;
-    const dataToSign = await ethSign(message);
+    const crypto = signRequest.data.crypto;
+    const message = signRequest.data.data;
+    const isHash = signRequest.isHash;
+    const isOversized = signRequest.oversized;
+
+    let dataToSign = '';
+
+    if (crypto === 'sr25519' || crypto === 'ed25519') { // only Substrate payload has crypto field
+      dataToSign = message;
+    } else {
+      dataToSign = await ethSign(message);
+    }
+
     const sender = accountsStore.getByAddress(address);
+
     if (!sender || !sender.encryptedSeed) {
       throw new Error(
         `No private key found for ${address} found in your signer key storage.`
       );
     }
+
     this.setState({
-      type: 'message',
-      sender,
+      dataToSign,
+      isHash,
+      isOversized,
       message,
-      dataToSign
+      sender,
+      type: 'message',
     });
     return true;
   }
 
   async setTXRequest(txRequest, accountsStore) {
     this.setBusy();
-    console.log(txRequest);
-    if (!(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
+
+    const isOversized = txRequest.oversized;
+
+    const protocol = txRequest.data.rlp ? NetworkProtocols.ETHEREUM : NetworkProtocols.SUBSTRATE
+    const isEthereum = protocol === NetworkProtocols.ETHEREUM;
+
+    if (isEthereum && !(txRequest.data && txRequest.data.rlp && txRequest.data.account)) {
       throw new Error(`Scanned QR contains no valid transaction`);
     }
-    const tx = await transaction(txRequest.data.rlp);
-    const { ethereumChainId = 1 } = tx;
-    const networkKey = ethereumChainId;
 
-     // TODO cater for Substrate
+    const tx = isEthereum ? await transaction(txRequest.data.rlp) : txRequest.data.data;
+    const networkKey = isEthereum ? tx.ethereumChainId : '456';
+
     const sender = accountsStore.getById({
-      protocol: NetworkProtocols.ETHEREUM,
+      protocol,
       networkKey,
       address: txRequest.data.account
     });
+
     const networkTitle = NETWORK_LIST[networkKey].title;
 
     if (!sender || !sender.encryptedSeed) {
@@ -118,34 +195,49 @@ export default class ScannerStore extends Container<ScannerState> {
       );
     }
 
-    // TODO cater for Substrate
     const recipient = accountsStore.getById({
-      protocol: NetworkProtocols.ETHEREUM,
-      networkKey: tx.ethereumChainId,
-      address: tx.action
+      protocol,
+      networkKey: networkKey,
+      address: isEthereum ? tx.action : txRequest.data.account
     });
-    const dataToSign = await keccak(txRequest.data.rlp);
+
+    // For Eth, always sign the keccak hash.
+    // For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
+    const dataToSign = sender.protocol === NetworkProtocols.ETHEREUM ? await keccak(txRequest.data.rlp) : txRequest.data.data;
+
     this.setState({
       type: 'transaction',
       sender,
       recipient,
       txRequest,
       tx,
-      dataToSign
+      dataToSign,
+      isOversized
     });
     return true;
   }
 
   async signData(pin = '1') {
-    const { type, sender } = this.state;
+    const { isHash, sender, type } = this.state;
+
     const seed = await decryptData(sender.encryptedSeed, pin);
-    const signedData = await brainWalletSign(seed, this.state.dataToSign);
+    const isEthereum = sender.protocol === NetworkProtocols.ETHEREUM;
+
+    let signedData;
+
+    if (isEthereum) {
+      signedData = await brainWalletSign(seed, this.state.dataToSign);
+    } else {
+      signedData = await substrateSign(seed, isAscii(this.state.dataToSign) ? asciiToHex(this.state.dataToSign) : this.state.dataToSign.toHex());
+    }
+
     this.setState({ signedData });
+
     if (type == 'transaction') {
       await saveTx({
-        hash: this.state.dataToSign,
+        hash: (isEthereum || isHash) ? this.state.dataToSign : await blake2s(this.state.dataToSign.toHex()),
         tx: this.state.tx,
-        sender: this.state.sender,
+        sender,
         recipient: this.state.recipient,
         signature: signedData,
         createdAt: new Date().getTime()
@@ -175,6 +267,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
   cleanup() {
     this.setState(defaultState);
+  }
+  
+  getIsOversized() {
+    return this.state.isOversized;
   }
 
   getSender() {

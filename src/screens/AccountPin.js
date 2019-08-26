@@ -58,10 +58,7 @@ class AccountPinView extends React.PureComponent {
     const account = accountCreation
       ? accounts.getNew()
       : accounts.getSelected();
-    if (
-      this.state.pin.length >= 6 &&
-      this.state.pin === this.state.confirmation
-    ) {
+    if (this.state.pin.length >= 6 && this.state.pin === this.state.confirmation) {
       if (accountCreation) {
         await accounts.submitNew(pin);
         const resetAction = StackActions.reset({

@@ -16,34 +16,47 @@
 
 'use strict';
 
+import { isHex } from '@polkadot/util';
+import PropTypes from 'prop-types';
 import React from 'react';
-import { Dimensions, StyleSheet, Image, View } from 'react-native';
-import colors from '../colors';
-import { qrCode } from '../util/native';
+import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 
+import { qrCode, qrHex } from '../util/native';
 
 export default class QrView extends React.PureComponent {
+  static propTypes = {
+    data: PropTypes.string.isRequired // arbitrary message/txn string or `${networkType}:0x${address.toLowerCase()}@${networkKey}`
+  }
 
-  state = {};
+  constructor(props) {
+    super(props);
 
-  displayQrCode = async (data) => {
-    try {
-      let qr = await qrCode(data);
-      this.setState({
-        qr: qr
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    this.state = {
+      qr: null
+    };
   }
 
   componentDidMount() {
-    this.displayQrCode(this.props.text);
+    const { data } = this.props;
+  
+    this.displayQrCode(data);
   }
 
   componentWillReceiveProps(newProps) {
     if (newProps.text !== this.props.text) {
       this.displayIcon(newProps.text);
+    }
+  }
+
+  async displayQrCode (data) {
+    try {
+      const qr = isHex(data) ? await qrHex(data) : await qrCode(data);
+
+      this.setState({
+        qr: qr
+      })
+    } catch (e) {
+      console.error(e);
     }
   }
 
