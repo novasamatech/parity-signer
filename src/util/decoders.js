@@ -17,7 +17,12 @@
 // @flow
 
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { hexStripPrefix, hexToU8a, u8aToHex, u8aToString } from '@polkadot/util';
+import {
+  hexStripPrefix,
+  hexToU8a,
+  u8aToHex,
+  u8aToString
+} from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import { blake2s, keccak } from './native';
@@ -88,7 +93,7 @@ export function rawDataToU8A(rawData) {
 
 export async function constructDataFromBytes(bytes) {
   const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
-  const isMultipart = !!(parseInt(frameInfo.substr(0, 2), 16));
+  const isMultipart = !!parseInt(frameInfo.substr(0, 2), 16);
   const frameCount = parseInt(frameInfo.substr(2, 4), 16);
   const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
   const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
@@ -116,7 +121,12 @@ export async function constructDataFromBytes(bytes) {
     // decode payload appropriately via UOS
     switch (zerothByte) {
       case '45': // Ethereum UOS payload
-        action = firstByte === '00' || firstByte === '01' ? 'signData' : firstByte === '01' ? 'signTransaction' : null;
+        action =
+          firstByte === '00' || firstByte === '01'
+            ? 'signData'
+            : firstByte === '01'
+            ? 'signTransaction'
+            : null;
         address = uosAfterFrames.substr(4, 44);
 
         data['action'] = action;
@@ -142,12 +152,14 @@ export async function constructDataFromBytes(bytes) {
         data['data']['crypto'] = crypto;
         data['data']['account'] = ss58Encoded;
 
-        switch(secondByte) {
+        switch (secondByte) {
           case '00':
             data['action'] = 'signTransaction';
             data['oversized'] = isOversized;
             data['isHash'] = isOversized;
-            data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : new GenericExtrinsicPayload(rawPayload, { version: 3 });
+            data['data']['data'] = isOversized
+              ? await blake2s(u8aToHex(rawPayload))
+              : new GenericExtrinsicPayload(rawPayload, { version: 3 });
             break;
           case '01':
             data['action'] = 'signTransaction';
@@ -159,13 +171,17 @@ export async function constructDataFromBytes(bytes) {
             data['action'] = 'signTransaction';
             data['oversized'] = isOversized;
             data['isHash'] = isOversized;
-            data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : new GenericExtrinsicPayload(rawPayload, { version: 3 });
+            data['data']['data'] = isOversized
+              ? await blake2s(u8aToHex(rawPayload))
+              : new GenericExtrinsicPayload(rawPayload, { version: 3 });
             break;
           case '03': // Cold Signer should attempt to decode message to utf8
             data['action'] = 'signData';
             data['oversized'] = isOversized;
             data['isHash'] = isOversized;
-            data['data']['data'] = isOversized ? await blake2s(u8aToHex(rawPayload)) : u8aToString(rawPayload);
+            data['data']['data'] = isOversized
+              ? await blake2s(u8aToHex(rawPayload))
+              : u8aToString(rawPayload);
             break;
           default:
             break;
@@ -188,29 +204,35 @@ export function decodeToString(message: Uint8Array): string {
 }
 
 export function asciiToHex(message: string): string {
-  var result = [];
-	for (let i = 0; i < message.length; i++) {
-		var hex = Number(message.charCodeAt(i)).toString(16);
-		result.push(hex);
+  let result = [];
+  for (let i = 0; i < message.length; i++) {
+    const hex = Number(message.charCodeAt(i)).toString(16);
+    result.push(hex);
   }
-	return result.join('');
+  return result.join('');
 }
 
 export function hexToAscii(hexBytes: Uint8Array): string {
-	var hex  = hexBytes.toString();
-	var str = '';
-	for (var n = 0; n < hex.length; n += 2) {
-		str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
-	}
+  const hex = hexBytes.toString();
+  let str = '';
+  for (let n = 0; n < hex.length; n += 2) {
+    str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+  }
 
-	return str;
+  return str;
 }
 
 export function isJsonString(str) {
   try {
-      JSON.parse(str);
+    JSON.parse(str);
   } catch (e) {
-      return false;
+    return false;
   }
   return true;
+}
+
+export function isAddressString(str) {
+  return str.substr(0, 2) === '0x' ||
+    str.substr(0, 9) === 'ethereum:' ||
+    str.substr(0, 10) === 'substrate:'
 }

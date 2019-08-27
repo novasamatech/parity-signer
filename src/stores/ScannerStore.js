@@ -80,7 +80,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
-    
+
     if (parsedData.isMultipart) {
       this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
       return;
@@ -100,7 +100,7 @@ export default class ScannerStore extends Container<ScannerState> {
     // we havne't filled all the frames yet
     if (Object.keys(this.state.multipartData.length) < frameCount) {
       const nextDataState = this.state.multipartData;
-      
+
       nextDataState[frame] = partData;
 
       this.setState({
@@ -268,7 +268,7 @@ export default class ScannerStore extends Container<ScannerState> {
   cleanup() {
     this.setState(defaultState);
   }
-  
+
   getIsOversized() {
     return this.state.isOversized;
   }
