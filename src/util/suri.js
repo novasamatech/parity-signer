@@ -22,7 +22,7 @@ export function parseSURI (suri) {
   const matches = suri.match(RE_CAPTURE);
   let phrase, derivationPath = '';
   const ERROR = 'Invalid SURI input.';
-  
+
   if (matches) {
     [_, phrase, derivationPath = ''] = matches;
     try {
@@ -76,7 +76,7 @@ export function parseDerivationPath (input) {
 
 export function constructSURI ({ derivePath = '', password = '', phrase }) {
 
-  if(!phrase) {
+  if (!phrase) {
     throw new Error('Cannot construct an SURI from emtpy phrase.');
   }
   
