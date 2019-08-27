@@ -19,7 +19,7 @@
 import { isHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 
 import { qrCode, qrHex } from '../util/native';
 
