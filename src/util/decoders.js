@@ -204,18 +204,18 @@ export function decodeToString(message: Uint8Array): string {
 }
 
 export function asciiToHex(message: string): string {
-  var result = [];
+  let result = [];
   for (let i = 0; i < message.length; i++) {
-    var hex = Number(message.charCodeAt(i)).toString(16);
+    const hex = Number(message.charCodeAt(i)).toString(16);
     result.push(hex);
   }
   return result.join('');
 }
 
 export function hexToAscii(hexBytes: Uint8Array): string {
-  var hex = hexBytes.toString();
-  var str = '';
-  for (var n = 0; n < hex.length; n += 2) {
+  const hex = hexBytes.toString();
+  let str = '';
+  for (let n = 0; n < hex.length; n += 2) {
     str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
   }
 

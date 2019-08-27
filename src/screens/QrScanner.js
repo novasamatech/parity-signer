@@ -162,7 +162,7 @@ export class QrScannerView extends React.PureComponent {
 
 const text = {
   ADDRESS_ERROR_TITLE: 'Address detected',
-  ADDRESS_ERROR_MESSAGE: 'Please create a raw transaction using a software such as MyCrypto or Fether so that Parity Signer can sign it.',
+  ADDRESS_ERROR_MESSAGE: 'Please create a transaction using a software such as MyCrypto or Fether so that Parity Signer can sign it.',
   PARSE_ERROR_TITLE: 'Unable to parse transaction'
 };
 
