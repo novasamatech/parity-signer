@@ -14,7 +14,7 @@ export function accountId({
   if (protocol === NetworkProtocols.SUBSTRATE){ 
     return `${protocol}:${address}:${genesisHash}`;
   } else {
-    return `${protocol}:${address.toLowerCase()}@${ethereumChainId}`;
+    return `${protocol}:0x${address.toLowerCase()}@${ethereumChainId}`;
   }
 }
 
