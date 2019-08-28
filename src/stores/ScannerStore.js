@@ -16,7 +16,6 @@
 
 // @flow
 
-import { createType } from '@polkadot/types';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
@@ -267,6 +266,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
   cleanup() {
     this.setState(defaultState);
+  }
+
+  getIsHash() {
+    return this.state.isHash;
   }
 
   getIsOversized() {

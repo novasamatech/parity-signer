@@ -155,21 +155,21 @@ export async function constructDataFromBytes(bytes) {
   
           switch (secondByte) {
             case '00':
-              data['action'] = 'signTransaction';
+              data['action'] = isOversized ? 'signData' : 'signTransaction';
               data['oversized'] = isOversized;
               data['isHash'] = isOversized;
               data['data']['data'] = isOversized
                 ? await blake2s(u8aToHex(rawPayload))
                 : new GenericExtrinsicPayload(rawPayload, { version: 3 });
               break;
-            case '01':
-              data['action'] = 'signTransaction';
+            case '01': // data is a hash
+              data['action'] = 'signData';
               data['oversized'] = false;
               data['isHash'] = true;
-              data['data']['data'] = rawPayload; // data is a hash
+              data['data']['data'] = rawPayload;
               break;
             case '02': // immortal
-              data['action'] = 'signTransaction';
+              data['action'] = isOversized ? 'signData' : 'signTransaction';
               data['oversized'] = isOversized;
               data['isHash'] = isOversized;
               data['data']['data'] = isOversized
@@ -230,7 +230,7 @@ export function isJsonString(str) {
   if (!str) { 
     return false; 
   }
-  
+
   try {
     JSON.parse(str);
   } catch (e) {

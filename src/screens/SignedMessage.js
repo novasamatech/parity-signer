@@ -29,6 +29,7 @@ import { hexToAscii, isAscii } from '../util/message';
 
 export default class SignedMessage extends React.PureComponent {
   render() {
+    debugger;
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scanner, accounts) => {
@@ -52,6 +53,8 @@ export class SignedMessageView extends React.PureComponent {
   render() {
     const { data, message } = this.props;
 
+    debugger;
+
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
@@ -62,7 +65,7 @@ export class SignedMessageView extends React.PureComponent {
         <Text style={styles.message}>
           {isAscii(message)
             ? message
-            : hexToAscii(data)}
+            : data}
         </Text>
       </ScrollView>
     );
