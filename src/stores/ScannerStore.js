@@ -25,6 +25,8 @@ import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign }
 import transaction from '../util/transaction';
 import { constructDataFromBytes, asciiToHex } from '../util/decoders';
 import { Account } from './AccountsStore';
+import { GenericExtrinsicPayload } from '@polkadot/types';
+import { isU8a, u8aToHex } from '@polkadot/util';
 
 type TXRequest = Object;
 
@@ -227,7 +229,15 @@ export default class ScannerStore extends Container<ScannerState> {
     if (isEthereum) {
       signedData = await brainWalletSign(seed, this.state.dataToSign);
     } else {
-      signedData = await substrateSign(seed, isAscii(this.state.dataToSign) ? asciiToHex(this.state.dataToSign) : this.state.dataToSign.toHex());
+      let signable;
+      if (this.state.dataToSign instanceof GenericExtrinsicPayload) {
+        signable = asciiToHex(this.state.dataToSign);
+      } else if (isU8a(this.state.dataToSign)) {
+        signable = u8aToHex(this.state.dataToSign);
+      } else if (isAscii(this.state.dataToSign)) {
+        signable = this.state.dataToSign.toHex();
+      }
+      signedData = await substrateSign(seed, signable);
     }
 
     this.setState({ signedData });

@@ -43,14 +43,12 @@ export default class MessageDetails extends React.PureComponent {
           const message = scannerStore.getMessage();
 
           if (dataToSign) {
-
-            debugger;
             return (
               <MessageDetailsView
                 {...this.props}
                 scannerStore={scannerStore}
                 sender={scannerStore.getSender()}
-                message={message}
+                message={isU8a(message) ? u8aToHex(message) : message}
                 dataToSign={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign}
                 isHash={scannerStore.getIsHash()}
                 onPressAccount={async account => {

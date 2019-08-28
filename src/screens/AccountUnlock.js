@@ -29,12 +29,9 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
 export class AccountUnlockAndSign extends React.PureComponent {
-
   render() {
     const { navigation } = this.props;
     const next = navigation.getParam('next', 'SignedTx');
-
-    debugger;
 
     return (
       <Subscribe to={[AccountsStore, ScannerStore]}>

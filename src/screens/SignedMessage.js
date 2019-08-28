@@ -25,11 +25,10 @@ import fonts from "../fonts";
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/message';
+import { isAscii } from '../util/message';
 
 export default class SignedMessage extends React.PureComponent {
   render() {
-    debugger;
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scanner, accounts) => {
@@ -52,8 +51,6 @@ export class SignedMessageView extends React.PureComponent {
 
   render() {
     const { data, message } = this.props;
-
-    debugger;
 
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
