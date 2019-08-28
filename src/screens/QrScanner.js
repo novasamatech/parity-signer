@@ -65,31 +65,32 @@ export default class Scanner extends React.PureComponent {
                   return;
                 }
 
-                if(isAddressString(txRequestData.data)){
-                  return this.showErrorMessage(scannerStore, text.ADDRESS_ERROR_TITLE, text.ADDRESS_ERROR_MESSAGE);
-                } else if (isJsonString(txRequestData.data)) {
-                  // Ethereum Legacy
-                  await scannerStore.setUnsigned(txRequestData.data);
-                } else {
-                  try {
+                try {
+                  if(isAddressString(txRequestData.data)) {
+                    return this.showErrorMessage(scannerStore, text.ADDRESS_ERROR_TITLE, text.ADDRESS_ERROR_MESSAGE);
+                  } else if (isJsonString(txRequestData.data)) {
+                    // Ethereum Legacy
+                    await scannerStore.setUnsigned(txRequestData.data);
+                  } else {
                     const strippedData = rawDataToU8A(txRequestData.rawData);
                     await scannerStore.setParsedData(
                       strippedData,
                       accountsStore
                     );
-                  } catch (e) {
-                    return this.showErrorMessage(scannerStore, text.PARSE_ERROR_TITLE, e.message);
                   }
-                }
-
-                if (await scannerStore.setData(accountsStore)) {
-                  if (scannerStore.getType() === 'transaction') {
-                    this.props.navigation.navigate('TxDetails');
+  
+                  if (scannerStore.getUnsigned()) {
+                    await scannerStore.setData(accountsStore);
+                    if (scannerStore.getType() === 'transaction') {
+                      this.props.navigation.navigate('TxDetails');
+                    } else {
+                      this.props.navigation.navigate('MessageDetails');
+                    }
                   } else {
-                    this.props.navigation.navigate('MessageDetails');
+                    return;
                   }
-                } else {
-                  return;
+                } catch (e) {
+                  return this.showErrorMessage(scannerStore, text.PARSE_ERROR_TITLE, e.message);
                 }
               }}
             />

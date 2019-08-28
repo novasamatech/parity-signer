@@ -141,50 +141,54 @@ export async function constructDataFromBytes(bytes) {
         }
         break;
       case '53': // Substrate UOS payload
-        const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
-        const pubKeyHex = uosAfterFrames.substr(6, 64)
-        const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
-        const ss58Encoded = encodeAddress(publicKeyAsBytes, 2); // encode to kusama
-        const hexEncodedData = '0x' + uosAfterFrames.slice(70);
-        const rawPayload = hexToU8a(hexEncodedData);
-        const isOversized = rawPayload.length > 256;
-
-        data['data']['crypto'] = crypto;
-        data['data']['account'] = ss58Encoded;
-
-        switch (secondByte) {
-          case '00':
-            data['action'] = 'signTransaction';
-            data['oversized'] = isOversized;
-            data['isHash'] = isOversized;
-            data['data']['data'] = isOversized
-              ? await blake2s(u8aToHex(rawPayload))
-              : new GenericExtrinsicPayload(rawPayload, { version: 3 });
-            break;
-          case '01':
-            data['action'] = 'signTransaction';
-            data['oversized'] = false;
-            data['isHash'] = true;
-            data['data']['data'] = rawPayload; // data is a hash
-            break;
-          case '02': // immortal
-            data['action'] = 'signTransaction';
-            data['oversized'] = isOversized;
-            data['isHash'] = isOversized;
-            data['data']['data'] = isOversized
-              ? await blake2s(u8aToHex(rawPayload))
-              : new GenericExtrinsicPayload(rawPayload, { version: 3 });
-            break;
-          case '03': // Cold Signer should attempt to decode message to utf8
-            data['action'] = 'signData';
-            data['oversized'] = isOversized;
-            data['isHash'] = isOversized;
-            data['data']['data'] = isOversized
-              ? await blake2s(u8aToHex(rawPayload))
-              : u8aToString(rawPayload);
-            break;
-          default:
-            break;
+        try {
+          const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
+          const pubKeyHex = uosAfterFrames.substr(6, 64)
+          const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
+          const ss58Encoded = encodeAddress(publicKeyAsBytes, 2); // encode to kusama
+          const hexEncodedData = '0x' + uosAfterFrames.slice(70);
+          const rawPayload = hexToU8a(hexEncodedData);
+          const isOversized = rawPayload.length > 256;
+  
+          data['data']['crypto'] = crypto;
+          data['data']['account'] = ss58Encoded;
+  
+          switch (secondByte) {
+            case '00':
+              data['action'] = 'signTransaction';
+              data['oversized'] = isOversized;
+              data['isHash'] = isOversized;
+              data['data']['data'] = isOversized
+                ? await blake2s(u8aToHex(rawPayload))
+                : new GenericExtrinsicPayload(rawPayload, { version: 3 });
+              break;
+            case '01':
+              data['action'] = 'signTransaction';
+              data['oversized'] = false;
+              data['isHash'] = true;
+              data['data']['data'] = rawPayload; // data is a hash
+              break;
+            case '02': // immortal
+              data['action'] = 'signTransaction';
+              data['oversized'] = isOversized;
+              data['isHash'] = isOversized;
+              data['data']['data'] = isOversized
+                ? await blake2s(u8aToHex(rawPayload))
+                : new GenericExtrinsicPayload(rawPayload, { version: 3 });
+              break;
+            case '03': // Cold Signer should attempt to decode message to utf8
+              data['action'] = 'signData';
+              data['oversized'] = isOversized;
+              data['isHash'] = isOversized;
+              data['data']['data'] = isOversized
+                ? await blake2s(u8aToHex(rawPayload))
+                : u8aToString(rawPayload);
+              break;
+            default:
+              break;
+          }
+        } catch (e) {
+          throw new Error('we cannot handle the payload: ', bytes);
         }
         break;
       default:
@@ -223,6 +227,10 @@ export function hexToAscii(hexBytes: Uint8Array): string {
 }
 
 export function isJsonString(str) {
+  if (!str) { 
+    return false; 
+  }
+  
   try {
     JSON.parse(str);
   } catch (e) {
@@ -232,6 +240,10 @@ export function isJsonString(str) {
 }
 
 export function isAddressString(str) {
+  if (!str) { 
+    return false; 
+  }
+
   return str.substr(0, 2) === '0x' ||
     str.substr(0, 9) === 'ethereum:' ||
     str.substr(0, 10) === 'substrate:'

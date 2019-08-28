@@ -66,7 +66,7 @@ const defaultState = {
   tx: '',
   txRequest: null,
   type: null,
-  unsignedData: {}
+  unsignedData: null
 };
 
 export default class ScannerStore extends Container<ScannerState> {
@@ -177,14 +177,14 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     const tx = isEthereum ? await transaction(txRequest.data.rlp) : txRequest.data.data;
-    const networkKey = isEthereum ? tx.ethereumChainId : '456';
+    const networkKey = isEthereum ? tx.ethereumChainId : txRequest.data.data.genesisHash.toHex();
 
     const sender = accountsStore.getById({
       protocol,
       networkKey,
       address: txRequest.data.account
     });
-
+    
     const networkTitle = NETWORK_LIST[networkKey].title;
 
     if (!sender || !sender.encryptedSeed) {
@@ -287,6 +287,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
   getMessage() {
     return this.state.message;
+  }
+
+  getUnsigned() {
+    return this.state.unsignedData;
   }
 
   getTx() {
