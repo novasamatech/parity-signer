@@ -19,13 +19,12 @@
 import { Container } from 'unstated';
 
 import { accountId, empty } from '../util/account';
-import { loadAccounts, saveAccount } from '../util/db';
+import { loadAccounts, saveAccount, deleteAccount as deleteDbAccount} from '../util/db';
 import {parseSURI} from '../util/suri'
 import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
   address: string,
-  archived: boolean,
   createdAt: number,
   derivationPassword: string,
   derivationPath: string, // doesn't contain the ///password
@@ -116,7 +115,7 @@ export default class AccountsStore extends Container {
       if (pin && account.seed) {
         account.encryptedSeed = await encryptData(account.seed, pin);
       }
-      
+
       const accountToSave = this.deleteSensitiveData(account);
 
       accountToSave.updatedAt = new Date().getTime();
@@ -130,10 +129,9 @@ export default class AccountsStore extends Container {
   async deleteAccount(account) {
     const { accounts } = this.state;
 
-    account.archived = true;
-    accounts.set(accountId(account), account);
+    accounts.delete(accountId(account));
     this.setState({ accounts });
-    await this.save(account);
+    await deleteDbAccount(account);
   }
 
   async unlockAccount(account, pin) {
@@ -163,7 +161,7 @@ export default class AccountsStore extends Container {
     delete account.seedPhrase;
     delete account.derivationPassword;
     delete account.derivationPath;
-    
+
     return account
   }
 
@@ -203,7 +201,7 @@ export default class AccountsStore extends Container {
 
   getAccounts() {
     return Array.from(this.state.accounts.values())
-      .filter(a => !a.archived && a.networkKey)
+      .filter(a => !!a.networkKey)
       .sort((a, b) => {
         if (a.name < b.name) {
           return -1;

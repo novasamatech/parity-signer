@@ -13,7 +13,7 @@ export function accountId({
 
   const { ethereumChainId='', protocol, genesisHash } = NETWORK_LIST[networkKey];
 
-  if (protocol === NetworkProtocols.SUBSTRATE) { 
+  if (protocol === NetworkProtocols.SUBSTRATE) {
     return `${protocol}:${address}:${genesisHash}`;
   } else {
     return `${protocol}:0x${address.toLowerCase()}@${ethereumChainId}`;
@@ -23,9 +23,8 @@ export function accountId({
 export function empty(account = {}) {
   return {
     address: '',
-    archived: false,
     createdAt: new Date().getTime(),
-    derivationPassword: '', 
+    derivationPassword: '',
     derivationPath:'',
     encryptedSeed: null,
     name: '',
