@@ -4,12 +4,14 @@ export function accountId({
   address,
   networkKey
 }) {
-  console.log(NETWORK_LIST[networkKey]);
-  const { ethereumChainId='', protocol, genesisHash } = NETWORK_LIST[networkKey];
+  console.log('address => ', address);
+  console.log('netwokr list -> ', NETWORK_LIST);
 
-  if (typeof address !== 'string' || address.length === 0 || !networkKey) {
-    throw new Error(`Couldn't create an accountId, address or networkKey missing`);
+  if (typeof address !== 'string' || address.length === 0 || !networkKey || !NETWORK_LIST[networkKey]) {
+    throw new Error(`Couldn't create an accountId. Address or networkKey missing, or network key was invalid.`);
   }
+
+  const { ethereumChainId='', protocol, genesisHash } = NETWORK_LIST[networkKey];
 
   if (protocol === NetworkProtocols.SUBSTRATE) { 
     return `${protocol}:${address}:${genesisHash}`;

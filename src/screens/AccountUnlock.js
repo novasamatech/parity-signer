@@ -22,7 +22,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import Background from '../components/Background';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';

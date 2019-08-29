@@ -250,7 +250,7 @@ export default class ScannerStore extends Container<ScannerState> {
         tx: this.state.tx,
         sender,
         recipient: this.state.recipient,
-        signature: signedData,
+        signature: this.state.signedData,
         createdAt: new Date().getTime()
       });
     }
