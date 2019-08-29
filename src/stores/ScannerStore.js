@@ -15,7 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
-
+import { GenericExtrinsicPayload } from '@polkadot/types';
+import { isU8a, u8aToHex } from '@polkadot/util';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
@@ -25,8 +26,6 @@ import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign }
 import transaction from '../util/transaction';
 import { constructDataFromBytes, asciiToHex } from '../util/decoders';
 import { Account } from './AccountsStore';
-import { GenericExtrinsicPayload } from '@polkadot/types';
-import { isU8a, u8aToHex } from '@polkadot/util';
 
 type TXRequest = Object;
 
@@ -228,15 +227,18 @@ export default class ScannerStore extends Container<ScannerState> {
 
     if (isEthereum) {
       signedData = await brainWalletSign(seed, this.state.dataToSign);
+      
     } else {
       let signable;
+
       if (this.state.dataToSign instanceof GenericExtrinsicPayload) {
-        signable = asciiToHex(this.state.dataToSign);
+        signable = this.state.dataToSign.toHex();
       } else if (isU8a(this.state.dataToSign)) {
         signable = u8aToHex(this.state.dataToSign);
       } else if (isAscii(this.state.dataToSign)) {
-        signable = this.state.dataToSign.toHex();
+        signable = asciiToHex(this.state.dataToSign);
       }
+
       signedData = await substrateSign(seed, signable);
     }
 

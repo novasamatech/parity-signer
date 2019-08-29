@@ -4,6 +4,7 @@ export function accountId({
   address,
   networkKey
 }) {
+  console.log(NETWORK_LIST[networkKey]);
   const { ethereumChainId='', protocol, genesisHash } = NETWORK_LIST[networkKey];
 
   if (typeof address !== 'string' || address.length === 0 || !networkKey) {

@@ -154,7 +154,7 @@ export async function constructDataFromBytes(bytes) {
           data['data']['account'] = ss58Encoded;
   
           switch (secondByte) {
-            case '00':
+            case '00': // sign mortal extrinsic
               data['action'] = isOversized ? 'signData' : 'signTransaction';
               data['oversized'] = isOversized;
               data['isHash'] = isOversized;
@@ -201,13 +201,13 @@ export async function constructDataFromBytes(bytes) {
   }
 }
 
-export function decodeToString(message: Uint8Array): string {
+export function decodeToString(message) {
   const decoder = new TextDecoder('utf8');
 
   return decoder.decode(message);
 }
 
-export function asciiToHex(message: string): string {
+export function asciiToHex(message) {
   let result = [];
   for (let i = 0; i < message.length; i++) {
     const hex = Number(message.charCodeAt(i)).toString(16);
@@ -216,7 +216,7 @@ export function asciiToHex(message: string): string {
   return result.join('');
 }
 
-export function hexToAscii(hexBytes: Uint8Array): string {
+export function hexToAscii(hexBytes) {
   const hex = hexBytes.toString();
   let str = '';
   for (let n = 0; n < hex.length; n += 2) {

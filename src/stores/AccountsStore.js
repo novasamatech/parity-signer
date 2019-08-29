@@ -23,7 +23,6 @@ import { loadAccounts, saveAccount } from '../util/db';
 import {parseSURI} from '../util/suri'
 import { decryptData, encryptData } from '../util/native';
 
-
 export type Account = {
   address: string,
   archived: boolean,
@@ -71,6 +70,7 @@ export default class AccountsStore extends Container {
 
   updateNew(accountUpdate) {
     this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
+    console.log(this.state.newAccount);
   }
 
   getNew() {
