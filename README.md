@@ -8,7 +8,7 @@
 
 Parity Signer is a mobile application that allows any smartphone to act as an air-gapped crypto wallet. This is also known as "cold storage".
 
-Once the app has been installed, users can create Ethereum accounts, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
+Once the app has been installed, users can create Kusama or Ethereum accounts, sign messages/transactions, and transfer funds to and from these accounts without any sort of connectivity enabled on the device.
 
 Users can opt to shut off and even physically remove the smartphone's Wifi, Mobile Network, and Bluetooth to ensure that the mobile phone containing these accounts will not be exposed to any online threat.
 
@@ -16,7 +16,7 @@ Users can opt to shut off and even physically remove the smartphone's Wifi, Mobi
 
 Have a look at the tutorial on our wiki to learn how to use [Parity Signer together with Fether](https://wiki.parity.io/Parity-Signer-Mobile-App-Fether-tutorial) or [MyCrypto app](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial).
 
-Any data transfer from or to the app will happen using QR code scanning. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Ethereum account, this includes ETH, ETC as well as Ether from various testnets (Kovan, Ropsten...).
+Any data transfer from or to the app will happen using QR code scanning. By doing so, the most sensitive piece of information, the private keys, will never leave the phone. The Parity Signer mobile app can be used to store any Kusama or Ethereum account, this includes ETH, ETC as well as Ether from various testnets (Kovan, Ropsten...).
 
 ## Device security
 
