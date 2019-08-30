@@ -69,7 +69,6 @@ export default class AccountsStore extends Container {
 
   updateNew(accountUpdate) {
     this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
-    console.log(this.state.newAccount);
   }
 
   getNew() {
