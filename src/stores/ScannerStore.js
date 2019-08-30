@@ -15,8 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
-
-import { createType } from '@polkadot/types';
+import { GenericExtrinsicPayload } from '@polkadot/types';
+import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
@@ -66,7 +66,7 @@ const defaultState = {
   tx: '',
   txRequest: null,
   type: null,
-  unsignedData: {}
+  unsignedData: null
 };
 
 export default class ScannerStore extends Container<ScannerState> {
@@ -177,14 +177,14 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     const tx = isEthereum ? await transaction(txRequest.data.rlp) : txRequest.data.data;
-    const networkKey = isEthereum ? tx.ethereumChainId : '456';
+    const networkKey = isEthereum ? tx.ethereumChainId : txRequest.data.data.genesisHash.toHex();
 
     const sender = accountsStore.getById({
       protocol,
       networkKey,
       address: txRequest.data.account
     });
-
+    
     const networkTitle = NETWORK_LIST[networkKey].title;
 
     if (!sender || !sender.encryptedSeed) {
@@ -227,8 +227,19 @@ export default class ScannerStore extends Container<ScannerState> {
 
     if (isEthereum) {
       signedData = await brainWalletSign(seed, this.state.dataToSign);
+      
     } else {
-      signedData = await substrateSign(seed, isAscii(this.state.dataToSign) ? asciiToHex(this.state.dataToSign) : this.state.dataToSign.toHex());
+      let signable;
+
+      if (this.state.dataToSign instanceof GenericExtrinsicPayload) {
+        signable = hexStripPrefix(this.state.dataToSign.toHex());
+      } else if (isU8a(this.state.dataToSign)) {
+        signable = hexStripPrefix(u8aToHex(this.state.dataToSign));
+      } else if (isAscii(this.state.dataToSign)) {
+        signable = hexStripPrefix(asciiToHex(this.state.dataToSign));
+      }
+
+      signedData = await substrateSign(seed, signable);
     }
 
     this.setState({ signedData });
@@ -239,7 +250,7 @@ export default class ScannerStore extends Container<ScannerState> {
         tx: this.state.tx,
         sender,
         recipient: this.state.recipient,
-        signature: signedData,
+        signature: this.state.signedData,
         createdAt: new Date().getTime()
       });
     }
@@ -269,6 +280,10 @@ export default class ScannerStore extends Container<ScannerState> {
     this.setState(defaultState);
   }
 
+  getIsHash() {
+    return this.state.isHash;
+  }
+
   getIsOversized() {
     return this.state.isOversized;
   }
@@ -287,6 +302,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
   getMessage() {
     return this.state.message;
+  }
+
+  getUnsigned() {
+    return this.state.unsignedData;
   }
 
   getTx() {

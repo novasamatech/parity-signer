@@ -33,12 +33,12 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
   render() {
     const { description, payload, signature, style } = this.props;
-    
+
     return (
       <View style={[styles.body, style]}>
         <Text style={styles.titleText}>{description}</Text>
         {
-          payload && (
+          !!payload && (
             <View style={{ padding: 5, paddingVertical: 2 }}>
               <ExtrinsicPart label='Block Hash' value={payload.blockHash.toString()} />
               <ExtrinsicPart label='Method' value={payload.method.toString()} />
@@ -50,7 +50,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
           )
         }
         {
-          signature && (
+          !!signature && (
             <View style={{ padding: 5, paddingVertical: 2 }}>
               <Text style={styles.label}>Signature</Text>
               <Text style={styles.secondaryText}>{signature}</Text>
@@ -62,13 +62,11 @@ export default class PayloadDetailsCard extends React.PureComponent {
   }
 }
 
-function ExtrinsicPart({ label, style, value }) {
+function ExtrinsicPart({ label, value }) {
 
   return (
-    <View style={[{ justifyContent: 'center', alignItems: 'flex-start' }, style]}>
-      <View
-        style={{ padding: 5, paddingVertical: 2 }}
-      >
+    <View style={[{ justifyContent: 'center', alignItems: 'flex-start' }]}>
+      <View style={{ padding: 5, paddingVertical: 2 }}>
         <Text style={styles.label}>
           {label}
         </Text>

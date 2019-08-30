@@ -55,14 +55,13 @@ export class SignedTxView extends React.PureComponent {
     data: PropTypes.string.isRequired,
     gas: PropTypes.string,
     gasPrice: PropTypes.string,
-    nonce: PropTypes.string,
     recipient: PropTypes.object,
     sender: PropTypes.object,
     value: PropTypes.string,
   };
 
   render() {
-    const { data, gas, gasPrice, nonce, recipient, sender, value } = this.props;
+    const { data, gas, gasPrice, recipient, sender, value } = this.props;
 
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>

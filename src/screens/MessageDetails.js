@@ -16,6 +16,7 @@
 
 'use strict';
 
+import { isU8a, u8aToHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
@@ -39,6 +40,7 @@ export default class MessageDetails extends React.PureComponent {
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scannerStore, accounts) => {
           const dataToSign = scannerStore.getDataToSign();
+          const message = scannerStore.getMessage();
 
           if (dataToSign) {
             return (
@@ -46,9 +48,9 @@ export default class MessageDetails extends React.PureComponent {
                 {...this.props}
                 scannerStore={scannerStore}
                 sender={scannerStore.getSender()}
-                message={scannerStore.getMessage()}
-                dataToSign={dataToSign}
-                isOversized={scannerStore.getIsOversized()}
+                message={isU8a(message) ? u8aToHex(message) : message}
+                dataToSign={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign}
+                isHash={scannerStore.getIsHash()}
                 onPressAccount={async account => {
                   await accounts.select(account);
                   this.props.navigation.navigate('AccountDetails');
@@ -77,13 +79,13 @@ export class MessageDetailsView extends React.PureComponent {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,
-    isOversized: PropTypes.bool.isRequired,
+    isHash: PropTypes.bool.isRequired,
     sender: PropTypes.object.isRequired,
     message: PropTypes.string.isRequired
   };
 
   render() {
-    const {data, isOversized, message, onNext, onPressAccount, sender} = this.props;
+    const {dataToSign, isHash, message, onNext, onPressAccount, sender} = this.props;
 
     return (
       <ScrollView
@@ -105,13 +107,13 @@ export class MessageDetailsView extends React.PureComponent {
         <Text style={styles.message}>
           {isAscii(message)
             ? message
-            : data}
+            : dataToSign}
         </Text>
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Message"
           onPress={() => {
-            isOversized
+            isHash
               ? Alert.alert(
                   "Warning",
                   "The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.",
