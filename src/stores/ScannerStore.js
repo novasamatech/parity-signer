@@ -16,7 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { isU8a, u8aToHex } from '@polkadot/util';
+import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
@@ -232,11 +232,11 @@ export default class ScannerStore extends Container<ScannerState> {
       let signable;
 
       if (this.state.dataToSign instanceof GenericExtrinsicPayload) {
-        signable = this.state.dataToSign.toHex();
+        signable = hexStripPrefix(this.state.dataToSign.toHex());
       } else if (isU8a(this.state.dataToSign)) {
-        signable = u8aToHex(this.state.dataToSign);
+        signable = hexStripPrefix(u8aToHex(this.state.dataToSign));
       } else if (isAscii(this.state.dataToSign)) {
-        signable = asciiToHex(this.state.dataToSign);
+        signable = hexStripPrefix(asciiToHex(this.state.dataToSign));
       }
 
       signedData = await substrateSign(seed, signable);
