@@ -25,8 +25,8 @@ import {
 } from '@polkadot/util';
 import { encodeAddress, checkAddress } from '@polkadot/util-crypto';
 
-import { blake2s, keccak } from './native';
-import { NETWORK_LIST } from '../constants';
+import { blake2s } from './native';
+import { NETWORK_LIST, SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 
 /*
   Example Full Raw Data
@@ -144,18 +144,17 @@ export async function constructDataFromBytes(bytes) {
       case '53': // Substrate UOS payload
         try {
           const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
-          
-          const pubKeyHex = uosAfterFrames.substr(6, 64)
-          const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
-          
-          const hexEncodedData = '0x' + uosAfterFrames.slice(70);
-          const rawPayload = hexToU8a(hexEncodedData);
-
-          const isOversized = rawPayload.length > 256;
           data['data']['crypto'] = crypto;
 
-          let network;
+          const pubKeyHex = uosAfterFrames.substr(6, 64)
+          const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
+          const hexEncodedData = '0x' + uosAfterFrames.slice(70);
+          const rawPayload = hexToU8a(hexEncodedData);
+          
+          const isOversized = rawPayload.length > 256;
+          const defaultPrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
           let extrinsicPayload;
+          let network;
 
           switch (secondByte) {
             case '00': // sign mortal extrinsic
@@ -177,7 +176,7 @@ export async function constructDataFromBytes(bytes) {
               data['oversized'] = false;
               data['isHash'] = true;
               data['data']['data'] = rawPayload;
-              data['data']['account'] = encodeAddress(publicKeyAsBytes, 2); // default to Kusama
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, defaultPrefix); // default to Kusama
               break;
             case '02': // immortal
               extrinsicPayload = new GenericExtrinsicPayload(rawPayload, { version: 3 });
@@ -200,7 +199,7 @@ export async function constructDataFromBytes(bytes) {
               data['data']['data'] = isOversized
                 ? await blake2s(u8aToHex(rawPayload))
                 : u8aToString(rawPayload);
-              data['data']['account'] = encodeAddress(publicKeyAsBytes, 2); // default to Kusama
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, defaultPrefix); // default to Kusama
               break;
             default:
               break;
