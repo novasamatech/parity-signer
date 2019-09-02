@@ -20,27 +20,25 @@ import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { accountId } from './account';
 
-const accountsStore_v1 = {
-  keychainService: 'accounts',
-  sharedPreferencesName: 'accounts'
-};
-
-export const deleteAccount_v1 = async account =>
-  SecureStorage.deleteItem(account.address, accountsStore_v1);
-
-export async function loadAccounts_v1() {
+export async function loadAccounts( version = 3 ) {
   if (!SecureStorage) {
     return Promise.resolve([]);
   }
 
-  return SecureStorage.getAllItems(accountsStore_v1).then(accounts =>
+  const accountStoreVersion = version == 1 ? 'accounts' : `accounts_v${version}`
+  const accountsStore = {
+    keychainService: accountStoreVersion,
+    sharedPreferencesName: accountStoreVersion
+  };
+
+  return SecureStorage.getAllItems(accountsStore).then(accounts =>
     Object.values(accounts).map(account => JSON.parse(account))
   );
 }
 
 const accountsStore = {
-  keychainService: 'accounts_v2',
-  sharedPreferencesName: 'accounts_v2'
+  keychainService: "accounts_v3",
+  sharedPreferencesName: "accounts_v3"
 };
 
 function accountTxsKey({ address, networkKey }) {
@@ -62,16 +60,6 @@ export const saveAccount = account =>
   );
 
 export const saveAccounts = accounts => accounts.forEach(saveAccount);
-
-export async function loadAccounts() {
-  if (!SecureStorage) {
-    return Promise.resolve([]);
-  }
-
-  return SecureStorage.getAllItems(accountsStore).then(accounts =>
-    Object.values(accounts).map(account => JSON.parse(account))
-  );
-}
 
 export async function saveTx(tx) {
   if (!tx.sender) {
@@ -112,10 +100,10 @@ async function storagePushValue(key, value) {
 }
 
 export async function loadToCAndPPConfirmation() {
-  const result = await AsyncStorage.getItem('ToCAndPPConfirmation');
+  const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v3');
   return !!result;
 }
 
 export async function saveToCAndPPConfirmation() {
-  await AsyncStorage.setItem('ToCAndPPConfirmation', 'yes');
+  await AsyncStorage.setItem('ToCAndPPConfirmation_v3', 'yes');
 }

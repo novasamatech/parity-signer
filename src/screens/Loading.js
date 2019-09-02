@@ -19,10 +19,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
+
 import colors from '../colors';
-import fonts from "../fonts";
 import { empty } from '../util/account';
-import { loadAccounts, loadAccounts_v1, loadToCAndPPConfirmation, saveAccount } from '../util/db';
+import { loadAccounts, loadToCAndPPConfirmation, saveAccount } from '../util/db';
 
 export default class Loading extends React.PureComponent {
   static navigationOptions = {
@@ -31,28 +31,20 @@ export default class Loading extends React.PureComponent {
   };
 
   async componentDidMount() {
-    let [tocPP, accounts] = [
-      await loadToCAndPPConfirmation(),
-      await loadAccounts()
-    ];
-    if (0 === accounts.length) {
-      // Try to migrate v1 accounts
-      const oldAccounts = await loadAccounts_v1();
-
-      accounts = oldAccounts.map(empty).map(a => ({ ...a, v1recov: true }));
-      accounts.forEach(saveAccount);
-      accounts = await loadAccounts();
-    }
-
+    const tocPP = await loadToCAndPPConfirmation();
     const firstScreen = 'Welcome';
     const firstScreenActions = StackActions.reset({
       index: 0,
       actions: [NavigationActions.navigate({ routeName: firstScreen })],
       key: null
     });
+    let tocActions;
 
     if (!tocPP) {
-      const tocAction = StackActions.reset({
+      this.migrateAccount_v1();
+      this.migrateAccount_v2();
+
+      tocActions = StackActions.reset({
         index: 0,
         actions: [
           NavigationActions.navigate({
@@ -63,10 +55,33 @@ export default class Loading extends React.PureComponent {
           })
         ]
       });
-      this.props.navigation.dispatch(tocAction);
-      return;
+    } else {
+      tocActions = firstScreenActions;
     }
-    this.props.navigation.dispatch(firstScreenActions);
+    
+    await loadAccounts()
+    this.props.navigation.dispatch(tocActions);
+  }
+
+  async migrateAccount_v1 () {
+    const oldAccounts_v1 = await loadAccounts(1);
+    const accounts = oldAccounts_v1.map(empty).map(a => ({ ...a, v1recov: true }));
+    accounts.forEach(saveAccount);
+  }
+
+  // only ethereum account with chainId and networkType properties
+  async migrateAccount_v2 () {
+    const oldAccounts_v2 = await loadAccounts(2);
+    const accounts = oldAccounts_v2.map(empty).map(a => {
+      let result = a
+      if (a.chainId) {
+        result = { ...a, networkKey: a.chainId, v2recov: true };
+        delete result.chainId;
+        delete result.networkType;
+      }
+      return result
+    })
+    accounts.forEach(saveAccount);
   }
 
   render() {
@@ -80,12 +95,5 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
     flexDirection: 'column'
-  },
-  titleTop: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    paddingBottom: 20,
-    textAlign: 'center'
   }
 });
