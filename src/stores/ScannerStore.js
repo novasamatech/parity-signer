@@ -20,7 +20,7 @@ import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
 import { checkAddress, decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import { saveTx } from '../util/db';
 import { isAscii } from '../util/message';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
@@ -82,21 +82,17 @@ export default class ScannerStore extends Container<ScannerState> {
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
 
-    const chainName = checkAddress(parsedData.data.account, 2)[0] ? 'Kusama' : checkAddress(parsedData.data.account, 42)[0] ? 'Polkadot' : null;
-
     if (!accountsStore.getByAddress(parsedData.data.account)) {
-      let otherEncoding;
-      let account;
-      if (chainName === 'Kusama') { // we checked kusama addresses
-        otherEncoding = encodeAddress(decodeAddress(parsedData.data.account, false, 2), 42); // try the other
-        account = accountsStore.getByAddress(otherEncoding);
-      } else if (chainName === 'Polkadot') { // we checked the polkadot dev addresses
-        otherEncoding = encodeAddress(decodeAddress(parsedData.data.account, false, 42), 2); // try the other
-        account = accountsStore.getByAddress(otherEncoding);
-      }
+      let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
 
-      if (account) {
-        parsedData['data']['account'] = account.address;
+      for (let i = 0; i < networks.length; i++) {
+        let key =  networks[i];
+        let account = accountsStore.getByAddress(encodeAddress(decodeAddress(parsedData.data.account), SUBSTRATE_NETWORK_LIST[key].prefix));
+
+        if (account) {
+          parsedData['data']['account'] = account.address;
+          break;
+        }
       }
     }
 
