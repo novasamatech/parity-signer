@@ -17,6 +17,7 @@
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
+import { checkAddress, decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
@@ -80,6 +81,24 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
+
+    const chainName = checkAddress(parsedData.data.account, 2)[0] ? 'Kusama' : checkAddress(parsedData.data.account, 42)[0] ? 'Polkadot' : null;
+
+    if (!accountsStore.getByAddress(parsedData.data.account)) {
+      let otherEncoding;
+      let account;
+      if (chainName === 'Kusama') { // we checked kusama addresses
+        otherEncoding = encodeAddress(decodeAddress(parsedData.data.account, false, 2), 42); // try the other
+        account = accountsStore.getByAddress(otherEncoding);
+      } else if (chainName === 'Polkadot') { // we checked the polkadot dev addresses
+        otherEncoding = encodeAddress(decodeAddress(parsedData.data.account, false, 42), 2); // try the other
+        account = accountsStore.getByAddress(otherEncoding);
+      }
+
+      if (account) {
+        parsedData['data']['account'] = account.address;
+      }
+    }
 
     if (parsedData.isMultipart) {
       this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);

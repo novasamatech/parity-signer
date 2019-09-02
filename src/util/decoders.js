@@ -23,7 +23,7 @@ import {
   u8aToHex,
   u8aToString
 } from '@polkadot/util';
-import { encodeAddress } from '@polkadot/util-crypto';
+import { encodeAddress, checkAddress } from '@polkadot/util-crypto';
 
 import { blake2s, keccak } from './native';
 import { NETWORK_LIST } from '../constants';
@@ -150,31 +150,38 @@ export async function constructDataFromBytes(bytes) {
           
           const hexEncodedData = '0x' + uosAfterFrames.slice(70);
           const rawPayload = hexToU8a(hexEncodedData);
-          const extrinsicPayload = new GenericExtrinsicPayload(rawPayload, { version: 3 });
 
           const isOversized = rawPayload.length > 256;
-  
           data['data']['crypto'] = crypto;
-  
+
+          let network;
+          let extrinsicPayload;
+
           switch (secondByte) {
             case '00': // sign mortal extrinsic
+              extrinsicPayload = new GenericExtrinsicPayload(rawPayload, { version: 3 });
+
               data['action'] = isOversized ? 'signData' : 'signTransaction';
               data['oversized'] = isOversized;
               data['isHash'] = isOversized;
               data['data']['data'] = isOversized
                 ? await blake2s(u8aToHex(rawPayload))
                 : extrinsicPayload;
-              const network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
+
+              network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
               data['data']['account'] = encodeAddress(publicKeyAsBytes, network.prefix); // encode to the prefix;
+
               break;
             case '01': // data is a hash
               data['action'] = 'signData';
               data['oversized'] = false;
               data['isHash'] = true;
               data['data']['data'] = rawPayload;
-              // FIXME: dont know genesis hash here
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, 2); // default to Kusama
               break;
             case '02': // immortal
+              extrinsicPayload = new GenericExtrinsicPayload(rawPayload, { version: 3 });
+
               data['action'] = isOversized ? 'signData' : 'signTransaction';
               data['oversized'] = isOversized;
               data['isHash'] = isOversized;
@@ -182,11 +189,8 @@ export async function constructDataFromBytes(bytes) {
                 ? await blake2s(u8aToHex(rawPayload))
                 : extrinsicPayload;
 
-                if (extrinsicPayload.genesisHash.toHex() === NETWORK_LIST.KUSAMA) {
-                data['data']['account'] = encodeAddress(publicKeyAsBytes, 2); // encode to kusama;
-              } else if (extrinsicPayload.genesisHash === NETWORK_LIST.POLKADOT_TEST) {
-                data['data']['account'] = encodeAddress(publicKeyAsBytes, 42); // encode to polkadot;
-              }
+              network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, network.prefix); // encode to the prefix;
 
               break;
             case '03': // Cold Signer should attempt to decode message to utf8
@@ -196,7 +200,7 @@ export async function constructDataFromBytes(bytes) {
               data['data']['data'] = isOversized
                 ? await blake2s(u8aToHex(rawPayload))
                 : u8aToString(rawPayload);
-              // FIXME: dont know genesis hash here
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, 2); // default to Kusama
               break;
             default:
               break;
