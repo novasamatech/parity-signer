@@ -17,9 +17,10 @@
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
+import { checkAddress, decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import { saveTx } from '../util/db';
 import { isAscii } from '../util/message';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
@@ -80,6 +81,20 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
+
+    if (!accountsStore.getByAddress(parsedData.data.account)) {
+      let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
+
+      for (let i = 0; i < networks.length; i++) {
+        let key =  networks[i];
+        let account = accountsStore.getByAddress(encodeAddress(decodeAddress(parsedData.data.account), SUBSTRATE_NETWORK_LIST[key].prefix));
+
+        if (account) {
+          parsedData['data']['account'] = account.address;
+          break;
+        }
+      }
+    }
 
     if (parsedData.isMultipart) {
       this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);

@@ -23,9 +23,10 @@ import {
   u8aToHex,
   u8aToString
 } from '@polkadot/util';
-import { encodeAddress } from '@polkadot/util-crypto';
+import { encodeAddress, checkAddress } from '@polkadot/util-crypto';
 
-import { blake2s, keccak } from './native';
+import { blake2s } from './native';
+import { NETWORK_LIST, SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 
 /*
   Example Full Raw Data
@@ -143,38 +144,53 @@ export async function constructDataFromBytes(bytes) {
       case '53': // Substrate UOS payload
         try {
           const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
+          data['data']['crypto'] = crypto;
+
           const pubKeyHex = uosAfterFrames.substr(6, 64)
           const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
-          const ss58Encoded = encodeAddress(publicKeyAsBytes, 2); // encode to kusama
           const hexEncodedData = '0x' + uosAfterFrames.slice(70);
           const rawPayload = hexToU8a(hexEncodedData);
+          
           const isOversized = rawPayload.length > 256;
-  
-          data['data']['crypto'] = crypto;
-          data['data']['account'] = ss58Encoded;
-  
+          const defaultPrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+          let extrinsicPayload;
+          let network;
+
           switch (secondByte) {
             case '00': // sign mortal extrinsic
+              extrinsicPayload = new GenericExtrinsicPayload(rawPayload, { version: 3 });
+
               data['action'] = isOversized ? 'signData' : 'signTransaction';
               data['oversized'] = isOversized;
               data['isHash'] = isOversized;
               data['data']['data'] = isOversized
                 ? await blake2s(u8aToHex(rawPayload))
-                : new GenericExtrinsicPayload(rawPayload, { version: 3 });
+                : extrinsicPayload;
+
+              network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, network.prefix); // encode to the prefix;
+
               break;
             case '01': // data is a hash
               data['action'] = 'signData';
               data['oversized'] = false;
               data['isHash'] = true;
               data['data']['data'] = rawPayload;
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, defaultPrefix); // default to Kusama
               break;
             case '02': // immortal
+              extrinsicPayload = new GenericExtrinsicPayload(rawPayload, { version: 3 });
+
               data['action'] = isOversized ? 'signData' : 'signTransaction';
               data['oversized'] = isOversized;
               data['isHash'] = isOversized;
               data['data']['data'] = isOversized
                 ? await blake2s(u8aToHex(rawPayload))
-                : new GenericExtrinsicPayload(rawPayload, { version: 3 });
+                : extrinsicPayload;
+
+              network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, network.prefix); // encode to the prefix;
+
               break;
             case '03': // Cold Signer should attempt to decode message to utf8
               data['action'] = 'signData';
@@ -183,6 +199,7 @@ export async function constructDataFromBytes(bytes) {
               data['data']['data'] = isOversized
                 ? await blake2s(u8aToHex(rawPayload))
                 : u8aToString(rawPayload);
+              data['data']['account'] = encodeAddress(publicKeyAsBytes, defaultPrefix); // default to Kusama
               break;
             default:
               break;
