@@ -106,7 +106,7 @@ async function storagePushValue(key, value) {
 
 export async function loadToCAndPPConfirmation() {
   const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v3');
-  
+
   return !!result;
 }
 

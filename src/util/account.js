@@ -17,7 +17,7 @@ export function accountId({
   }
 }
 
-export function empty(account = {}) {
+export function empty() {
   return {
     address: '',
     createdAt: new Date().getTime(),
@@ -30,7 +30,6 @@ export function empty(account = {}) {
     seedPhrase: '',
     updatedAt: new Date().getTime(),
     validBip39Seed: false,
-    ...account
   };
 }
 

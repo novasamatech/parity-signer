@@ -21,7 +21,6 @@ import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 
 import colors from '../colors';
-import { empty } from '../util/account';
 import { loadAccounts, loadToCAndPPConfirmation, saveAccount } from '../util/db';
 
 export default class Loading extends React.PureComponent {
@@ -41,8 +40,7 @@ export default class Loading extends React.PureComponent {
     let tocActions;
 
     if (!tocPP) {
-      this.migrateAccount_v1();
-      this.migrateAccount_v2();
+      this.migrateAccounts();
 
       tocActions = StackActions.reset({
         index: 0,
@@ -63,19 +61,18 @@ export default class Loading extends React.PureComponent {
     this.props.navigation.dispatch(tocActions);
   }
 
-  async migrateAccount_v1 () {
+  async migrateAccounts() {
     const oldAccounts_v1 = await loadAccounts(1);
-    const accounts = oldAccounts_v1.map(empty).map(a => ({ ...a, v1recov: true }));
-    accounts.forEach(saveAccount);
-  }
-
-  // only ethereum account with chainId and networkType properties
-  async migrateAccount_v2 () {
+    // v2 accounts are only ethereum account 
+    // with deprectaded `chainId` and `networkType: 'ethereum'` properties
+    // no networkKey property
     const oldAccounts_v2 = await loadAccounts(2);
-    const accounts = oldAccounts_v2.map(empty).map(a => {
+    const oldAccounts = [...oldAccounts_v1, ...oldAccounts_v2]
+
+    const accounts = oldAccounts.map(a => {
       let result = {}
       if (a.chainId) {
-        result = { ...a, networkKey: a.chainId, v2recov: true };
+        result = { ...a, networkKey: a.chainId, recovery: true };
         delete result.chainId;
         delete result.networkType;
       }
