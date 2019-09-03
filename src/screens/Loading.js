@@ -73,7 +73,7 @@ export default class Loading extends React.PureComponent {
   async migrateAccount_v2 () {
     const oldAccounts_v2 = await loadAccounts(2);
     const accounts = oldAccounts_v2.map(empty).map(a => {
-      let result = a
+      let result = {}
       if (a.chainId) {
         result = { ...a, networkKey: a.chainId, v2recov: true };
         delete result.chainId;

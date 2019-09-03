@@ -37,8 +37,8 @@ export async function loadAccounts( version = 3 ) {
 }
 
 const accountsStore = {
-  keychainService: "accounts_v3",
-  sharedPreferencesName: "accounts_v3"
+  keychainService: 'accounts_v3',
+  sharedPreferencesName: 'accounts_v3'
 };
 
 function accountTxsKey({ address, networkKey }) {
@@ -65,9 +65,11 @@ export async function saveTx(tx) {
   if (!tx.sender) {
     throw new Error('Tx should contain sender to save');
   }
+
   if (!tx.recipient) {
     throw new Error('Tx should contain recipient to save');
   }
+
   await [
     storagePushValue(accountTxsKey(tx.sender), tx.hash),
     storagePushValue(accountTxsKey(tx.recipient), tx.hash),
@@ -77,11 +79,13 @@ export async function saveTx(tx) {
 
 export async function loadAccountTxHashes(account) {
   const result = await AsyncStorage.getItem(accountTxsKey(account));
+
   return result ? JSON.parse(result) : [];
 }
 
 export async function loadAccountTxs(account) {
   const hashes = await loadAccountTxHashes(account);
+
   return (await AsyncStorage.multiGet(hashes.map(txKey))).map(v => [
     v[0],
     JSON.parse(v[1])
@@ -90,6 +94,7 @@ export async function loadAccountTxs(account) {
 
 async function storagePushValue(key, value) {
   let currentVal = await AsyncStorage.getItem(key);
+
   if (currentVal === null) {
     return AsyncStorage.setItem(key, JSON.stringify([value]));
   } else {
@@ -101,6 +106,7 @@ async function storagePushValue(key, value) {
 
 export async function loadToCAndPPConfirmation() {
   const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v3');
+  
   return !!result;
 }
 
