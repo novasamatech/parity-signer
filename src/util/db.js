@@ -25,7 +25,7 @@ export async function loadAccounts( version = 3 ) {
     return Promise.resolve([]);
   }
 
-  const accountStoreVersion = version == 1 ? 'accounts' : `accounts_v${version}`
+  const accountStoreVersion = version === 1 ? 'accounts' : `accounts_v${version}`
   const accountsStore = {
     keychainService: accountStoreVersion,
     sharedPreferencesName: accountStoreVersion
