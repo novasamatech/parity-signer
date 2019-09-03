@@ -115,8 +115,6 @@ class AccountListView extends React.PureComponent {
     const hasNoAccount = accounts.length < 1;
     const { navigate } = navigation;
 
-    console.log('accounts',accounts);
-
     return (
       <View style={styles.body}>
         <Background />
