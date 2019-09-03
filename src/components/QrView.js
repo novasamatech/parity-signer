@@ -19,8 +19,8 @@
 import { isHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, Image, View } from 'react-native';
-import { qrCode } from '../util/native';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { qrCode, qrHex } from '../util/native';
 
 QrView.propTypes = {
   data: PropTypes.string.isRequired
