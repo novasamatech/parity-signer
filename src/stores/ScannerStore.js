@@ -17,9 +17,10 @@
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
+import { checkAddress, decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import { saveTx } from '../util/db';
 import { isAscii } from '../util/message';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
@@ -80,6 +81,20 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
+
+    if (!accountsStore.getByAddress(parsedData.data.account)) {
+      let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
+
+      for (let i = 0; i < networks.length; i++) {
+        let key =  networks[i];
+        let account = accountsStore.getByAddress(encodeAddress(decodeAddress(parsedData.data.account), SUBSTRATE_NETWORK_LIST[key].prefix));
+
+        if (account) {
+          parsedData['data']['account'] = account.address;
+          break;
+        }
+      }
+    }
 
     if (parsedData.isMultipart) {
       this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
@@ -180,7 +195,6 @@ export default class ScannerStore extends Container<ScannerState> {
     const networkKey = isEthereum ? tx.ethereumChainId : txRequest.data.data.genesisHash.toHex();
 
     const sender = accountsStore.getById({
-      protocol,
       networkKey,
       address: txRequest.data.account
     });
@@ -196,14 +210,13 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     const recipient = accountsStore.getById({
-      protocol,
       networkKey: networkKey,
       address: isEthereum ? tx.action : txRequest.data.account
     });
 
     // For Eth, always sign the keccak hash.
     // For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
-    const dataToSign = sender.protocol === NetworkProtocols.ETHEREUM ? await keccak(txRequest.data.rlp) : txRequest.data.data;
+    const dataToSign = NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM ? await keccak(txRequest.data.rlp) : txRequest.data.data;
 
     this.setState({
       type: 'transaction',
@@ -221,7 +234,7 @@ export default class ScannerStore extends Container<ScannerState> {
     const { isHash, sender, type } = this.state;
 
     const seed = await decryptData(sender.encryptedSeed, pin);
-    const isEthereum = sender.protocol === NetworkProtocols.ETHEREUM;
+    const isEthereum = NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 
     let signedData;
 
