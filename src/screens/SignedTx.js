@@ -26,7 +26,7 @@ import AccountCard from '../components/AccountCard';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
-import { NetworkProtocols, TX_DETAILS_MSG } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, TX_DETAILS_MSG } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
@@ -71,7 +71,7 @@ export class SignedTxView extends React.PureComponent {
         </View>
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
         {
-          sender.protocol === NetworkProtocols.ETHEREUM
+          NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM
             ? (
               <React.Fragment>
                 <TxDetailsCard
