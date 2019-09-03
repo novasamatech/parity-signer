@@ -29,8 +29,8 @@ export default class TextInput extends React.PureComponent {
     this.input.focus();
   }
 
-  componentDidUpdate(prevProps) {
-    const { focus } = prevProps;
+  componentDidUpdate() {
+    const { focus } = this.props;
     focus && this.focus();
   }
 
