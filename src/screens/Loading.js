@@ -72,7 +72,7 @@ export default class Loading extends React.PureComponent {
     const accounts = oldAccounts.map(a => {
       let result = {}
       if (a.chainId) {
-        result = { ...a, networkKey: a.chainId, recovery: true };
+        result = { ...a, networkKey: a.chainId, recovered: true };
         delete result.chainId;
         delete result.networkType;
       }
