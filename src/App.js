@@ -19,6 +19,9 @@
 'use strict';
 
 import '../shim';
+
+import { GenericCall } from '@polkadot/types';
+import extrinsics from '@polkadot/api-metadata/extrinsics/static';
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import {
@@ -56,6 +59,8 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
+
+GenericCall.injectMethods(extrinsics);
 
 export default class App extends Component {
   render() {

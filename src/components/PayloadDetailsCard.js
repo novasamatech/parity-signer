@@ -16,8 +16,9 @@
 
 // @flow
 
+import Call from '@polkadot/types/primitive/Generic/Call';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
 import colors from '../colors';
@@ -41,8 +42,8 @@ export default class PayloadDetailsCard extends React.PureComponent {
           !!payload && (
             <View style={{ padding: 5, paddingVertical: 2 }}>
               <ExtrinsicPart label='Block Hash' value={payload.blockHash.toString()} />
-              <ExtrinsicPart label='Method' value={payload.method.toString()} />
-              <ExtrinsicPart label='Era' value={payload.era.toString()} />
+              <ExtrinsicPart label='Method' value={payload.method} />
+              <ExtrinsicPart label='Era' value={payload.era} />
               <ExtrinsicPart label='Nonce' value={payload.nonce.toString()} />
               <ExtrinsicPart label='Tip' value={payload.tip.toString()} />
               <ExtrinsicPart label='Genesis Hash' value={payload.genesisHash.toString()} />
@@ -63,14 +64,90 @@ export default class PayloadDetailsCard extends React.PureComponent {
 }
 
 function ExtrinsicPart({ label, value }) {
+  const [argNameValue, setArgNameValue] = useState();
+  const [period, setPeriod] = useState();
+  const [phase, setPhase] = useState();
+  const [sectionMethod, setSectionMethod] = useState();
+
+  useEffect(() => {
+    if (label === 'Method') {
+      const call = new Call(value);
+      const { args, meta, methodName, sectionName } = call;
+      
+      const result = {};
+      for (let i = 0; i < meta.args.length; i ++) {
+          result[meta.args[i].name.toString()] = args[i].toString();
+      }
+
+      setArgNameValue(result);
+      setSectionMethod(`${sectionName}.${methodName}`);
+    };
+
+    if (label === 'Era') {
+      if (value.isMortalEra) {
+        setPeriod(value.asMortalEra.period.toString());
+        setPhase(value.asMortalEra.phase.toString());
+      }
+    }
+  }, []);
+
+  const renderEraDetails = () => {
+    if (period && phase) {
+      return (
+        <View style={{ display: 'flex', flexDirection: 'column', padding: 5 }}>
+          <View style={{ display: 'flex', flexDirection: 'row' }}>
+            <Text style={styles.subLabel}>With Phase:</Text>
+            <Text style={styles.secondaryText}>{phase}</Text>
+          </View>
+          <View style={{ display: 'flex', flexDirection: 'row' }}>
+            <Text style={styles.subLabel}>And Period:</Text>
+            <Text style={styles.secondaryText}>{period}</Text>
+          </View>
+        </View>
+      )
+    } else {
+      return (
+        <View style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 5 }}>
+          <Text style={{...styles.subLabel, flex: 1}}>Immortal Era</Text>
+          <Text style={{...styles.secondaryText, flex: 3}}>{value.toString()}</Text>
+        </View>
+      )
+    }
+  }
+
+  const renderMethodDetails = () => {
+    return (
+      argNameValue && sectionMethod && (
+        <View style={{ display: 'flex', flexDirection: 'column' }}>
+          <Text style={styles.secondaryText}>
+            You are calling <Text style={styles.secondaryText}>{sectionMethod}</Text> with the following arguments:
+          </Text>
+            {
+              Object.entries(argNameValue).map(([key, value]) => { return (
+                <View key={key} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 5 }}>
+                  <Text style={{...styles.subLabel, flex: 1}}>{key}: </Text>
+                  <Text style={{...styles.secondaryText, flex: 3}}>{value}</Text>
+                </View>
+              )})
+            }
+        </View>
+      )
+    );
+  }
 
   return (
-    <View style={[{ justifyContent: 'center', alignItems: 'flex-start' }]}>
-      <View style={{ padding: 5, paddingVertical: 2 }}>
+    <View style={[{ justifyContent: 'flex-start', alignItems: 'baseline' }]}>
+      <View style={{ margin: 5, padding: 5, paddingVertical: 2 }}>
         <Text style={styles.label}>
           {label}
         </Text>
-        <Text style={styles.secondaryText}>{value}</Text>
+        {
+          label === 'Method'
+            ? renderMethodDetails()
+            : label === 'Era'
+              ? renderEraDetails()
+              : <Text style={styles.secondaryText}>{value}</Text>
+        }
       </View>
     </View>
   );
@@ -92,6 +169,13 @@ const styles = StyleSheet.create({
   label: {
     backgroundColor: colors.bg,
     color: colors.card_bg,
+    textAlign: 'left', 
+    fontSize: 20, 
+    fontFamily: fonts.bold,
+  },
+  subLabel: {
+    backgroundColor: null,
+    color: colors.card_bg_text,
     textAlign: 'left', 
     fontSize: 20, 
     fontFamily: fonts.bold,

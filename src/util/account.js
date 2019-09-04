@@ -8,6 +8,8 @@ export function accountId({
     throw new Error(`Couldn't create an accountId. Address or networkKey missing, or network key was invalid.`);
   }
 
+  console.log(address);
+
   const { ethereumChainId='', protocol, genesisHash='' } = NETWORK_LIST[networkKey];
 
   if (protocol === NetworkProtocols.SUBSTRATE) {
