@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { createType, GenericExtrinsicEra, GenericExtrinsicPayload } from '@polkadot/types';
+import { createType, GenericExtrinsicPayload } from '@polkadot/types';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { constructDataFromBytes, rawDataToU8A, asciiToHex, hexToAscii, decodeToString, isJsonString } from './decoders';
@@ -72,7 +72,7 @@ const SIGN_TX_TEST = u8aConcat(
   createType('ExtrinsicPayload', SIGNER_PAYLOAD_TEST, { version: 3 }).toU8a()
 );
 
-describe.only('sanity check', () => {
+describe.skip('sanity check', () => {
   it('sanity check address is kusama', () => {
     expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);
   });
@@ -83,13 +83,6 @@ describe.only('sanity check', () => {
 
     expect(payload).toEqual(fromBytes);
   });
-
-  it.only('sanity check era can be decoded', () => {
-    const payload = new GenericExtrinsicPayload(SIGN_TX_TEST, { version: 3 });
-    const era = new GenericExtrinsicEra(payload.era);
-    
-    expect(era).toBeDefined();
-  })
 });
 
 describe('decoders', () => {

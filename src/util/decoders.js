@@ -23,7 +23,7 @@ import {
   u8aToHex,
   u8aToString
 } from '@polkadot/util';
-import { encodeAddress, checkAddress } from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 
 import { blake2s } from './native';
 import { NETWORK_LIST, SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
@@ -168,6 +168,11 @@ export async function constructDataFromBytes(bytes) {
                 : extrinsicPayload;
 
               network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
+
+              if (!network) {
+                throw new Error(`Signer does not currently support a chain with genesis hash: ${extrinsicPayload.genesisHash.toHex()}`);
+              }
+
               data['data']['account'] = encodeAddress(publicKeyAsBytes, network.prefix); // encode to the prefix;
 
               break;
@@ -189,6 +194,11 @@ export async function constructDataFromBytes(bytes) {
                 : extrinsicPayload;
 
               network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
+
+              if (!network) {
+                throw new Error(`Signer does not currently support a chain with genesis hash: ${extrinsicPayload.genesisHash.toHex()}`);
+              }
+
               data['data']['account'] = encodeAddress(publicKeyAsBytes, network.prefix); // encode to the prefix;
 
               break;
@@ -205,7 +215,11 @@ export async function constructDataFromBytes(bytes) {
               break;
           }
         } catch (e) {
-          throw new Error('we cannot handle the payload: ', bytes);
+          if (e) {
+            throw new Error(e);
+          } else {
+            throw new Error('we cannot handle the payload: ', bytes);
+          }
         }
         break;
       default:
@@ -214,7 +228,11 @@ export async function constructDataFromBytes(bytes) {
 
     return data;
   } catch (e) {
-    throw new Error('we cannot handle the payload: ', bytes);
+    if (e) {
+      throw new Error(e);
+    } else {
+      throw new Error('we cannot handle the payload: ', bytes);
+    }
   }
 }
 
