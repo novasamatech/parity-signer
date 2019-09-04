@@ -95,11 +95,11 @@ function ExtrinsicPart({ label, value }) {
     if (period && phase) {
       return (
         <View style={{ display: 'flex', flexDirection: 'column', padding: 5 }}>
-          <View style={{ display: 'flex', flexDirection: 'row' }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'stretch' }}>
             <Text style={styles.subLabel}>With Phase:</Text>
             <Text style={styles.secondaryText}>{phase}</Text>
           </View>
-          <View style={{ display: 'flex', flexDirection: 'row' }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'stretch' }}>
             <Text style={styles.subLabel}>And Period:</Text>
             <Text style={styles.secondaryText}>{period}</Text>
           </View>
