@@ -78,7 +78,13 @@ export default class Loading extends React.PureComponent {
       }
       return result
     })
-    accounts.forEach(saveAccount);
+    accounts.forEach(account => {
+      try{
+        saveAccount(account);
+      } catch(e){
+        console.error(e);
+      }
+    });
   }
 
   render() {
