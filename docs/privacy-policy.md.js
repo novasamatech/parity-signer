@@ -7,7 +7,7 @@ This policy (together with our terms of use on our websites [https://parity.io](
 
 ## What data do we collect from you?
 
-The Ethereum client written in the programming language Rust known as Parity does not collect information from you, however any information you publish onto a blockchain like Ethereum is public by design.
+The Ethereum and Substrate based blockchain clients written in the programming language Rust known as Parity does not collect information from you, however any information you publish onto a blockchain like Ethereum is public by design.
 
 If you go to our Sites or utilise other services, we may collect and process the following personal data about you:
 

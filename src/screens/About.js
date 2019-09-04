@@ -39,11 +39,18 @@ export default class About extends React.PureComponent {
             smartphone as cold storage.
           </Text>
           <Text style={styles.text}>
+            This application is meant to be used on a phone that will remain offline at any point in time.
+            To upgrade the app, you need to make sure you backup your accounts (e.g by writing the recovery phrase on paper),
+            then factory reset the phone, then install Parity Signer's new version either from the store 
+            (iPhone or android) or from a sd card, and finally turn your phone offline for good
+            before recoveing or generating new accounts.
+          </Text>
+          <Text style={styles.text}>
             Any data transfer from or to the App will happen using QR code
             scanning. By doing so, the most sensitive piece of information, the
             private keys, will never leave the phone. The Parity Signer mobile
-            app can be used to store any Ethereum account. This includes ETH,
-            ETC as well as Ether from various testnets (Kovan, Ropsten…).
+            app can be used to store Ethereum or Kusama accounts. This includes ETH,
+            ETC or Ether from various testnets (Kovan, Ropsten…) as well as KSMs.
           </Text>
           <Text style={styles.text}>
             This app does not send any data to Parity Technologies or any
@@ -58,21 +65,6 @@ export default class About extends React.PureComponent {
             >
               {'https://github.com/paritytech/parity-signer'}
             </Text>) and licensed under GNU General Public License v3.0.
-          </Text>
-          <Text style={styles.text}>
-            The cryptographic library used by Parity Signer has been audited and
-            the report is available at
-            <Text
-              style={[styles.text, { textDecorationLine: 'underline' }]}
-              onPress={() =>
-                Linking.openURL(
-                  'https://www.trailofbits.com/reports/parity.pdf'
-                )
-              }
-            >
-              {' https://www.trailofbits.com/reports/parity.pdf'}
-            </Text>. Although the most critical part of this app has been
-            audited, bear in mind that the entirety of this application hasn't.
           </Text>
           <Text style={styles.text}>
             Find on the Parity Signer wiki more information about this
