@@ -17,12 +17,14 @@
 // @flow
 
 import Call from '@polkadot/types/primitive/Generic/Call';
+
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
 import colors from '../colors';
 import fonts from '../fonts';
+
 
 export default class PayloadDetailsCard extends React.PureComponent {
   static propTypes = {
@@ -71,9 +73,9 @@ function ExtrinsicPart({ label, value }) {
 
   useEffect(() => {
     if (label === 'Method') {
-      const call = new Call(value);
+      const call = new Call(value.toU8a());
       const { args, meta, methodName, sectionName } = call;
-      
+      debugger;
       const result = {};
       for (let i = 0; i < meta.args.length; i ++) {
           result[meta.args[i].name.toString()] = args[i].toString();

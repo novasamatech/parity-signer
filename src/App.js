@@ -20,8 +20,9 @@
 
 import '../shim';
 
-import { GenericCall } from '@polkadot/types';
-import extrinsics from '@polkadot/api-metadata/extrinsics/static';
+import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
+import { GenericCall, Metadata } from '@polkadot/types';
+import kusamaData from '@polkadot/types/Metadata/v7/static';
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';
 import {
@@ -60,9 +61,14 @@ import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 
-GenericCall.injectMethods(extrinsics);
-
 export default class App extends Component {
+  componentDidMount () {
+    const metadata = new Metadata(kusamaData);
+    const extrinsics = extrinsicsFromMeta(metadata);
+
+    GenericCall.injectMethods(extrinsics);
+  }
+
   render() {
     return (
       <UnstatedProvider>
