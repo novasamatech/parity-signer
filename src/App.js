@@ -22,6 +22,7 @@ import '../shim';
 
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, Metadata } from '@polkadot/types';
+import '@polkadot/types/injector';
 import kusamaData from '@polkadot/types/Metadata/v7/static';
 import React, { Component } from 'react';
 import { StatusBar } from 'react-native';

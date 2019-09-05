@@ -73,9 +73,9 @@ function ExtrinsicPart({ label, value }) {
 
   useEffect(() => {
     if (label === 'Method') {
-      const call = new Call(value.toU8a());
+      const call = new Call(value);
       const { args, meta, methodName, sectionName } = call;
-      debugger;
+
       const result = {};
       for (let i = 0; i < meta.args.length; i ++) {
           result[meta.args[i].name.toString()] = args[i].toString();

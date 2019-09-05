@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
+import '@polkadot/types/injector';
 
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { createType, GenericExtrinsicPayload, GenericCall, Metadata } from '@polkadot/types';
@@ -61,7 +62,7 @@ const SIGNER_PAYLOAD_TEST = {
   blockHash: '0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
   era: '0x0703',
   genesisHash: '0x3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf',
-  method: '0400ffee5a3c1f409c4ad69cd7a477419bf3fd1bc2e72f3c43ba5c4a9896de1d8bf94200',
+  method: '0x0400ffee5a3c1f409c4ad69cd7a477419bf3fd1bc2e72f3c43ba5c4a9896de1d8bf94200',
   nonce: '0x00001234',
   specVersion: 3,
   tip: '0x00000000000000000000000000005678'
@@ -141,7 +142,7 @@ describe('decoders', () => {
   describe('UOS parsing', () => {
     beforeAll(() => {
       const metadata = new Metadata(kusamaData);
-      console.log(metadata);
+
       const extrinsics = extrinsicsFromMeta(metadata);
 
       GenericCall.injectMethods(extrinsics);
@@ -167,7 +168,7 @@ describe('decoders', () => {
       expect(unsignedData.data.data.tip.eq(SIGNER_PAYLOAD_TEST.tip)).toBe(true);
     });
 
-    it.only('decodes Method to human readable', () => {
+    it('decodes Method to human readable', () => {
       const payload = new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, { version: 3 });
 
       const call = new Call(payload.method);
