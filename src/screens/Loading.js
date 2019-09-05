@@ -19,10 +19,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
+
 import colors from '../colors';
-import fonts from "../fonts";
-import { empty } from '../util/account';
-import { loadAccounts, loadAccounts_v1, loadToCAndPPConfirmation, saveAccount } from '../util/db';
+import { loadAccounts, loadToCAndPPConfirmation, saveAccount } from '../util/db';
 
 export default class Loading extends React.PureComponent {
   static navigationOptions = {
@@ -31,28 +30,19 @@ export default class Loading extends React.PureComponent {
   };
 
   async componentDidMount() {
-    let [tocPP, accounts] = [
-      await loadToCAndPPConfirmation(),
-      await loadAccounts()
-    ];
-    if (0 === accounts.length) {
-      // Try to migrate v1 accounts
-      const oldAccounts = await loadAccounts_v1();
-
-      accounts = oldAccounts.map(empty).map(a => ({ ...a, v1recov: true }));
-      accounts.forEach(saveAccount);
-      accounts = await loadAccounts();
-    }
-
+    const tocPP = await loadToCAndPPConfirmation();
     const firstScreen = 'Welcome';
     const firstScreenActions = StackActions.reset({
       index: 0,
       actions: [NavigationActions.navigate({ routeName: firstScreen })],
       key: null
     });
+    let tocActions;
 
     if (!tocPP) {
-      const tocAction = StackActions.reset({
+      this.migrateAccounts();
+
+      tocActions = StackActions.reset({
         index: 0,
         actions: [
           NavigationActions.navigate({
@@ -63,10 +53,39 @@ export default class Loading extends React.PureComponent {
           })
         ]
       });
-      this.props.navigation.dispatch(tocAction);
-      return;
+    } else {
+      tocActions = firstScreenActions;
     }
-    this.props.navigation.dispatch(firstScreenActions);
+    
+    await loadAccounts()
+    this.props.navigation.dispatch(tocActions);
+  }
+
+  async migrateAccounts() {
+    const oldAccounts_v1 = await loadAccounts(1);
+    // v2 (up to v2.2.2) are only ethereum accounts 
+    // with now deprectaded `chainId` and `networkType: 'ethereum'` properties
+    // networkKey property is missing since it was introduced in v3.
+    const oldAccounts_v2 = await loadAccounts(2);
+    const oldAccounts = [...oldAccounts_v1, ...oldAccounts_v2]
+    const accounts = oldAccounts.map(a => {
+      let result = {}
+      if (a.chainId) {
+        // The networkKey for Ethereum accounts is the chain id
+        result = { ...a, networkKey: a.chainId, recovered: true };
+        delete result.chainId;
+        delete result.networkType;
+      }
+      return result
+    })
+
+    accounts.forEach(account => {
+      try{
+        saveAccount(account);
+      } catch(e){
+        console.error(e);
+      }
+    });
   }
 
   render() {
@@ -80,12 +99,5 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
     flexDirection: 'column'
-  },
-  titleTop: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    paddingBottom: 20,
-    textAlign: 'center'
   }
 });

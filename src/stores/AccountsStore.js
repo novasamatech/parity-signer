@@ -185,7 +185,7 @@ export default class AccountsStore extends Container {
   }
 
   getById(account) {
-    return this.state.accounts.get(accountId(account)) || empty(account);
+    return this.state.accounts.get(accountId(account)) || empty();
   }
 
   getByAddress(address) {
