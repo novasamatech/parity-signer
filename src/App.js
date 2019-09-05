@@ -22,8 +22,6 @@ import '../shim';
 
 import '@polkadot/types/injector';
 
-import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
-import { GenericCall, Metadata } from '@polkadot/types';
 import React, { Component } from 'react';
 import {StatusBar, YellowBox} from 'react-native';
 import {
@@ -61,7 +59,6 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
-import kusamaData from './util/static-kusama';
 
 export default class App extends Component {
   constructor() {
@@ -73,11 +70,6 @@ export default class App extends Component {
         'Warning: componentWillUpdate'
       ]);
     }
-
-    const metadata = new Metadata(kusamaData);
-    const extrinsics = extrinsicsFromMeta(metadata);
-
-    GenericCall.injectMethods(extrinsics);
   }
 
   render() {

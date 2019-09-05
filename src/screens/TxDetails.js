@@ -30,7 +30,7 @@ import Button from '../components/Button';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { NetworkProtocols } from '../constants';
+import { NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 
 export default class TxDetails extends React.PureComponent {
@@ -58,7 +58,7 @@ export default class TxDetails extends React.PureComponent {
                   try {
                     this.props.navigation.navigate('AccountUnlockAndSign');
                   } catch (e) {
-                    scannerStore.setErrorMsg(e.message);
+                    this.props.scannerStore.setErrorMsg(e.message);
                   }
                 }}
               />
@@ -85,6 +85,11 @@ export class TxDetailsView extends React.PureComponent {
   };
 
   render() {
+    const { dataToSign, sender, recipient, value, nonce, gas, gasPrice, onNext } = this.props;
+
+    const isEthereum = NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
+    const prefix = !isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
+
     return (
       <ScrollView
         contentContainerStyle={styles.bodyContent}
@@ -94,28 +99,28 @@ export class TxDetailsView extends React.PureComponent {
         <Text style={styles.topTitle}>SIGN TRANSACTION</Text>
         <Text style={styles.title}>FROM ACCOUNT</Text>
         <AccountCard
-          title={this.props.sender.name}
-          address={this.props.sender.address}
-          networkKey={this.props.sender.networkKey}
+          title={sender.name}
+          address={sender.address}
+          networkKey={sender.networkKey}
         />
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
 
         {
-          NETWORK_LIST[this.props.sender.networkKey].protocol === NetworkProtocols.ETHEREUM
+          isEthereum
             ? (
               <React.Fragment>
                 <TxDetailsCard
                   style={{ marginBottom: 20 }}
                   description="You are about to send the following amount"
-                  value={this.props.value}
-                  gas={this.props.gas}
-                  gasPrice={this.props.gasPrice}
+                  value={value}
+                  gas={gas}
+                  gasPrice={gasPrice}
                 />
                 <Text style={styles.title}>RECIPIENT</Text>
                 <AccountCard
-                  title={this.props.recipient.name}
-                  address={this.props.recipient.address}
-                  networkKey={this.props.recipient.networkKey || ''}
+                  title={recipient.name}
+                  address={recipient.address}
+                  networkKey={recipient.networkKey || ''}
                 />
               </React.Fragment>
             )
@@ -123,7 +128,8 @@ export class TxDetailsView extends React.PureComponent {
               <PayloadDetailsCard
                 style={{ marginBottom: 20 }}
                 description="You are about to confirm sending the following extrinsic"
-                payload={this.props.dataToSign}
+                payload={dataToSign}
+                prefix={prefix}
                 />
             )
         }
@@ -131,7 +137,7 @@ export class TxDetailsView extends React.PureComponent {
         <Button
           buttonStyles={{ height: 60 }}
           title="Sign Transaction"
-          onPress={() => this.props.onNext()}
+          onPress={() => onNext()}
         />
       </ScrollView>
     );

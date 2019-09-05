@@ -26,7 +26,7 @@ import AccountCard from '../components/AccountCard';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
-import { NETWORK_LIST, NetworkProtocols, TX_DETAILS_MSG } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST, TX_DETAILS_MSG } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
@@ -93,6 +93,8 @@ export class SignedTxView extends React.PureComponent {
               <PayloadDetailsCard 
                 style={{ marginBottom: 20 }}
                 description={TX_DETAILS_MSG}
+                protocol={SUBSTRATE_NETWORK_LIST[sender.networkKey].protocol}
+                prefix={SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix}
                 signature={data}
               />
             )

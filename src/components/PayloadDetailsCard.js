@@ -16,25 +16,56 @@
 
 // @flow
 
+import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
+import { GenericCall, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
-import colors from '../colors';
 import fonts from '../fonts';
-
+import colors from '../colors';
+import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import kusamaMetadata from '../util/static-kusama';
+import substrateDevMetadata from '../util/static-substrate';
 
 export default class PayloadDetailsCard extends React.PureComponent {
   static propTypes = {
     description: PropTypes.string.isRequired,
     payload: PropTypes.object,
+    prefix: PropTypes.number.isRequired,
     signature: PropTypes.string,
     style: ViewPropTypes.style
   };
 
+  state = {
+    fallback: false
+  };
+
+  constructor(props) {
+    super(props);
+
+    let metadata;
+    if (this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix) {
+      metadata = new Metadata(kusamaMetadata);
+    } else if (this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix) {
+      metadata = new Metadata(substrateDevMetadata);
+    } 
+    
+    if (!metadata) {
+      this.setState({
+        fallback: true
+      });
+    }
+
+    const extrinsics = extrinsicsFromMeta(metadata);
+    GenericCall.injectMethods(extrinsics);
+  }
+
+
   render() {
+    const { fallback } = this.state;
     const { description, payload, signature, style } = this.props;
 
     return (
@@ -44,8 +75,8 @@ export default class PayloadDetailsCard extends React.PureComponent {
           !!payload && (
             <View style={{ padding: 5, paddingVertical: 2 }}>
               <ExtrinsicPart label='Block Hash' value={payload.blockHash.toString()} />
-              <ExtrinsicPart label='Method' value={payload.method} />
-              <ExtrinsicPart label='Era' value={payload.era} />
+              <ExtrinsicPart label='Method' value={fallback ? payload.method.toString() : payload.method} />
+              <ExtrinsicPart label='Era' value={fallback ? payload.era.toString() : payload.era} />
               <ExtrinsicPart label='Nonce' value={payload.nonce.toString()} />
               <ExtrinsicPart label='Tip' value={payload.tip.toString()} />
               <ExtrinsicPart label='Genesis Hash' value={payload.genesisHash.toString()} />
@@ -65,14 +96,14 @@ export default class PayloadDetailsCard extends React.PureComponent {
   }
 }
 
-function ExtrinsicPart({ label, value }) {
+function ExtrinsicPart({ label, fallback, value }) {
   const [argNameValue, setArgNameValue] = useState();
   const [period, setPeriod] = useState();
   const [phase, setPhase] = useState();
   const [sectionMethod, setSectionMethod] = useState();
 
   useEffect(() => {
-    if (label === 'Method') {
+    if (label === 'Method' && !fallback) {
       const call = new Call(value);
       const { args, meta, methodName, sectionName } = call;
 
@@ -85,7 +116,7 @@ function ExtrinsicPart({ label, value }) {
       setSectionMethod(`${sectionName}.${methodName}`);
     };
 
-    if (label === 'Era') {
+    if (label === 'Era' && !fallback) {
       if (value.isMortalEra) {
         setPeriod(value.asMortalEra.period.toString());
         setPhase(value.asMortalEra.phase.toString());
