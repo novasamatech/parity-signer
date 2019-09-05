@@ -245,7 +245,7 @@ export default class ScannerStore extends Container<ScannerState> {
       let signable;
 
       if (this.state.dataToSign instanceof GenericExtrinsicPayload) {
-        signable = hexStripPrefix(this.state.dataToSign.toHex());
+        signable = u8aToHex(this.state.dataToSign.toU8a(true), -1, false);
       } else if (isU8a(this.state.dataToSign)) {
         signable = hexStripPrefix(u8aToHex(this.state.dataToSign));
       } else if (isAscii(this.state.dataToSign)) {

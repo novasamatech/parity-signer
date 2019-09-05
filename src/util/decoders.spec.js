@@ -15,16 +15,22 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
+import '@polkadot/types/injector';
 
-import { createType, GenericExtrinsicPayload } from '@polkadot/types';
+import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
+import { createType, GenericExtrinsicPayload, GenericCall, Metadata } from '@polkadot/types';
+import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
+
+import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import { constructDataFromBytes, rawDataToU8A, asciiToHex, hexToAscii, decodeToString, isJsonString } from './decoders';
 import { isAscii } from './message';
+import kusamaData from './static-kusama';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
-const CMD_SIGN_TX = new Uint8Array([0]);
+const CMD_SIGN_MORTAL = new Uint8Array([2]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
@@ -57,7 +63,7 @@ const SIGNER_PAYLOAD_TEST = {
   blockHash: '0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
   era: '0x0703',
   genesisHash: '0x3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf',
-  method: '0x0500ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
+  method: '0x0400ffee5a3c1f409c4ad69cd7a477419bf3fd1bc2e72f3c43ba5c4a9896de1d8bf94200',
   nonce: '0x00001234',
   specVersion: 3,
   tip: '0x00000000000000000000000000005678'
@@ -67,7 +73,7 @@ const SIGN_TX_TEST = u8aConcat(
   new Uint8Array([0, 0, 1, 0, 0]),
   SUBSTRATE_ID,
   CRYPTO_SR25519,
-  CMD_SIGN_TX,
+  CMD_SIGN_MORTAL,
   decodeAddress(KUSAMA_ADDRESS),
   createType('ExtrinsicPayload', SIGNER_PAYLOAD_TEST, { version: 3 }).toU8a()
 );
@@ -155,5 +161,33 @@ describe('decoders', () => {
       expect(unsignedData.data.data.specVersion.eq(SIGNER_PAYLOAD_TEST.specVersion)).toBe(true);
       expect(unsignedData.data.data.tip.eq(SIGNER_PAYLOAD_TEST.tip)).toBe(true);
     });
+  });
+
+  describe('Type injection from metadata', () => {
+    beforeAll(() => {
+      const metadata = new Metadata(kusamaData);
+    
+      const extrinsics = extrinsicsFromMeta(metadata);
+
+      GenericCall.injectMethods(extrinsics);
+    });
+
+    it.only('can fetch the prefix matching to a hash', () => {
+      const kusamaPrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+      // const substratePrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
+
+      expect(kusamaPrefix).toBe(2);
+      // expect(substrate).toBe(42);
+    });
+
+    it('decodes Payload Method to something human readable with Kusama metadata', () => {
+      const payload = new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, { version: 3 });
+
+      const call = new Call(payload.method);
+
+      expect(call).toBeDefined();
+      expect(call.args).toBeDefined();
+      expect(call.meta).toBeDefined();
+    })
   })
 });

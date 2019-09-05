@@ -19,6 +19,9 @@
 'use strict';
 
 import '../shim';
+
+import '@polkadot/types/injector';
+
 import React, { Component } from 'react';
 import {StatusBar, YellowBox} from 'react-native';
 import {
@@ -58,8 +61,7 @@ import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 
 export default class App extends Component {
-
-  constructor(){
+  constructor() {
     super();
     if (__DEV__) {
       YellowBox.ignoreWarnings([
