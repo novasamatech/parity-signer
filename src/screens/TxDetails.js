@@ -58,7 +58,7 @@ export default class TxDetails extends React.PureComponent {
                   try {
                     this.props.navigation.navigate('AccountUnlockAndSign');
                   } catch (e) {
-                    this.props.scannerStore.setErrorMsg(e.message);
+                    scannerStore.setErrorMsg(e.message);
                   }
                 }}
               />
