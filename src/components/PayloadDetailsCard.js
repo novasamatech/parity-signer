@@ -85,7 +85,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
         }
         {
           !!signature && (
-            <View style={{ padding: 5, paddingVertical: 2 }}>
+            <View style={{ padding: 5, paddingVertical: 2, alignItems: 'baseline' }}>
               <Text style={styles.label}>Signature</Text>
               <Text style={styles.secondaryText}>{signature}</Text>
             </View>
@@ -128,13 +128,11 @@ function ExtrinsicPart({ label, fallback, value }) {
     if (period && phase) {
       return (
         <View style={{ display: 'flex', flexDirection: 'column', padding: 5 }}>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'stretch' }}>
-            <Text style={styles.subLabel}>With Phase:</Text>
-            <Text style={styles.secondaryText}>{phase}</Text>
-          </View>
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'stretch' }}>
-            <Text style={styles.subLabel}>And Period:</Text>
-            <Text style={styles.secondaryText}>{period}</Text>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end' }}>
+            <Text style={{...styles.subLabel, flex: 1}}>phase: </Text>
+            <Text style={{...styles.secondaryText, flex: 1}}>{phase}</Text>
+            <Text style={{...styles.subLabel, flex: 1}}>period: </Text>
+            <Text style={{...styles.secondaryText, flex: 1}}>{period}</Text>
           </View>
         </View>
       )
@@ -157,7 +155,7 @@ function ExtrinsicPart({ label, fallback, value }) {
           </Text>
             {
               Object.entries(argNameValue).map(([key, value]) => { return (
-                <View key={key} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 5 }}>
+                <View key={key} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 5, alignItems: 'flex-start' }}>
                   <Text style={{...styles.subLabel, flex: 1}}>{key}: </Text>
                   <Text style={{...styles.secondaryText, flex: 3}}>{value}</Text>
                 </View>
@@ -170,7 +168,7 @@ function ExtrinsicPart({ label, fallback, value }) {
 
   return (
     <View style={[{ justifyContent: 'flex-start', alignItems: 'baseline' }]}>
-      <View style={{ margin: 5, padding: 5, paddingVertical: 2 }}>
+      <View style={{ margin: 5, padding: 5, paddingVertical: 2, width:'100%' }}>
         <Text style={styles.label}>
           {label}
         </Text>
@@ -193,12 +191,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: colors.card_bg
   },
-  content: {},
-  footer: {
-    backgroundColor: '#977CF6',
-    flexDirection: 'row-reverse',
-    padding: 5
-  },
   label: {
     backgroundColor: colors.bg,
     color: colors.card_bg,
@@ -209,8 +201,8 @@ const styles = StyleSheet.create({
   subLabel: {
     backgroundColor: null,
     color: colors.card_bg_text,
-    textAlign: 'left', 
-    fontSize: 20, 
+    textAlign: 'right', 
+    fontSize: 14, 
     fontFamily: fonts.bold,
   },
   icon: {
@@ -224,13 +216,9 @@ const styles = StyleSheet.create({
     color: colors.card_bg_text
   },
   secondaryText: {
-    textAlign: 'center',
+    textAlign: 'left',
     color: colors.card_bg_text,
     fontFamily: fonts.semiBold,
-    fontSize: 12
-  },
-  footerText: {
-    color: colors.card_bg,
-    fontFamily: fonts.bold
+    fontSize: 14
   }
 });
