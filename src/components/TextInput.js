@@ -17,7 +17,7 @@
 import React from 'react';
 import { StyleSheet, TextInput as TextInputOrigin } from 'react-native';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 
 export default class TextInput extends React.PureComponent {
   static defaultProps = {
@@ -29,11 +29,11 @@ export default class TextInput extends React.PureComponent {
     this.input.focus();
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { focus } = nextProps;
-
+  componentDidUpdate() {
+    const { focus } = this.props;
     focus && this.focus();
   }
+
   render() {
     return (
       <TextInputOrigin
@@ -41,7 +41,7 @@ export default class TextInput extends React.PureComponent {
           this.input = input;
         }}
         keyboardAppearance="dark"
-        underlineColorAndroid='transparent'
+        underlineColorAndroid="transparent"
         {...this.props}
         style={[styles.input, this.props.style]}
       />

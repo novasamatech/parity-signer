@@ -20,12 +20,12 @@
 
 import '../shim';
 
+import '@polkadot/types/injector';
+
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, Metadata } from '@polkadot/types';
-import '@polkadot/types/injector';
-import kusamaData from '@polkadot/types/Metadata/v7/static';
 import React, { Component } from 'react';
-import { StatusBar } from 'react-native';
+import {StatusBar, YellowBox} from 'react-native';
 import {
   createAppContainer,
   createStackNavigator,
@@ -61,9 +61,19 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
+import kusamaData from './util/static-kusama';
 
 export default class App extends Component {
-  componentDidMount () {
+  constructor() {
+    super();
+    if (__DEV__) {
+      YellowBox.ignoreWarnings([
+        'Warning: componentWillReceiveProps',
+        'Warning: componentWillMount',
+        'Warning: componentWillUpdate'
+      ]);
+    }
+
     const metadata = new Metadata(kusamaData);
     const extrinsics = extrinsicsFromMeta(metadata);
 
@@ -137,7 +147,7 @@ const Screens = createStackNavigator(
             }
           }
         },
-        { 
+        {
           defaultNavigationOptions: globalStackNavigationOptions,
           headerMode: 'screen',
         }
@@ -219,7 +229,7 @@ const Screens = createStackNavigator(
             screen: AccountEdit
           }
         },
-        { 
+        {
           defaultNavigationOptions: globalStackNavigationOptions,
           initialRouteParams: {
             isWelcome: true

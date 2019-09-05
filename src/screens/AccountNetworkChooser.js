@@ -60,7 +60,7 @@ class AccountNetworkChooserView extends React.PureComponent {
               }
             ]}
             onPress={() => {
-              accounts.updateNew({ networkKey, protocol: networkParams.protocol });
+              accounts.updateNew({ networkKey });
               navigation.goBack();
             }}
           >

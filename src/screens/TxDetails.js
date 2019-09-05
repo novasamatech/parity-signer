@@ -20,7 +20,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
+
 import colors from '../colors';
+import { NETWORK_LIST } from '../constants';
 import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
@@ -99,7 +101,7 @@ export class TxDetailsView extends React.PureComponent {
         <Text style={styles.title}>TRANSACTION DETAILS</Text>
 
         {
-          this.props.sender.protocol === NetworkProtocols.ETHEREUM
+          NETWORK_LIST[this.props.sender.networkKey].protocol === NetworkProtocols.ETHEREUM
             ? (
               <React.Fragment>
                 <TxDetailsCard

@@ -18,70 +18,46 @@
 
 import { isHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
-import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
-
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { qrCode, qrHex } from '../util/native';
 
-export default class QrView extends React.PureComponent {
-  static propTypes = {
-    data: PropTypes.string.isRequired // arbitrary message/txn string or `${networkType}:0x${address.toLowerCase()}@${networkKey}`
-  }
+QrView.propTypes = {
+  data: PropTypes.string.isRequired
+};
 
-  constructor(props) {
-    super(props);
+export default function QrView(props) {
 
-    this.state = {
-      qr: null
-    };
-  }
+  const [qr, setQr] = useState(null);
 
-  componentDidMount() {
-    const { data } = this.props;
-  
-    this.displayQrCode(data);
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.text !== this.props.text) {
-      this.displayIcon(newProps.text);
+  useEffect(() => {
+    async function displayQrCode(data) {
+      try {
+        const qr = isHex(data) ? await qrHex(data) : await qrCode(data);
+        setQr(qr);
+      } catch (e) {
+        console.error(e);
+      }
     }
-  }
+    displayQrCode(props.data);
+  }, [props.data]);
 
-  async displayQrCode (data) {
-    try {
-      const qr = isHex(data) ? await qrHex(data) : await qrCode(data);
 
-      this.setState({
-        qr: qr
-      })
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  const { width: deviceWidth } = Dimensions.get('window');
+  let size = props.size || deviceWidth - 80;
+  let flexBasis = props.height || deviceWidth - 40;
 
-  render() {
-    if (this.props.screen) {
-      return <View style={AppStyles.view}>{this.renderQr()}</View>;
-    }
-
-    return this.renderQr();
-  }
-
-  renderQr() {
-    const { width: deviceWidth } = Dimensions.get('window');
-    let size = this.props.size || deviceWidth - 80;
-    let flexBasis = this.props.height || deviceWidth - 40;
-
-    return (
-      <View style={[styles.rectangleContainer, { flexBasis, height: flexBasis }, this.props.style]}>
-        <Image
-          source={{ uri: this.state.qr }}
-          style={{ width: size, height: size }}
-        />
-      </View>
-    );
-  }
+  return (
+    <View
+      style={[
+        styles.rectangleContainer,
+        { flexBasis, height: flexBasis },
+        props.style
+      ]}
+    >
+      <Image source={{ uri: qr }} style={{ width: size, height: size }} />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
