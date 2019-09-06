@@ -136,7 +136,7 @@ export async function constructDataFromBytes(bytes) {
         if (action === 'signData') {
           data['data']['rlp'] = uosAfterFrames[13];
         } else if (action === 'signTransaction') {
-          data['data']['data'] = rawAfterFrames[13];
+          data['data']['data'] = uosAfterFrames[13];
         } else {
           throw new Error('Could not determine action type.');
         }
@@ -150,7 +150,7 @@ export async function constructDataFromBytes(bytes) {
           const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
           const hexEncodedData = '0x' + uosAfterFrames.slice(70);
           const rawPayload = hexToU8a(hexEncodedData);
-          
+
           const isOversized = rawPayload.length > 256;
           const defaultPrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
           let extrinsicPayload;
@@ -262,8 +262,8 @@ export function hexToAscii(hexBytes) {
 }
 
 export function isJsonString(str) {
-  if (!str) { 
-    return false; 
+  if (!str) {
+    return false;
   }
 
   try {
@@ -275,8 +275,8 @@ export function isJsonString(str) {
 }
 
 export function isAddressString(str) {
-  if (!str) { 
-    return false; 
+  if (!str) {
+    return false;
   }
 
   return str.substr(0, 2) === '0x' ||
