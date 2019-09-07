@@ -216,7 +216,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
     // For Eth, always sign the keccak hash.
     // For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
-    const dataToSign = NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM ? await keccak(txRequest.data.rlp) : txRequest.data.data;
+    const dataToSign = isEthereum ? await keccak(txRequest.data.rlp) : txRequest.data.data;
 
     this.setState({
       type: 'transaction',
@@ -240,7 +240,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
     if (isEthereum) {
       signedData = await brainWalletSign(seed, this.state.dataToSign);
-      
     } else {
       let signable;
 
@@ -263,7 +262,7 @@ export default class ScannerStore extends Container<ScannerState> {
         tx: this.state.tx,
         sender,
         recipient: this.state.recipient,
-        signature: this.state.signedData,
+        signature: signedData,
         createdAt: new Date().getTime()
       });
     }
