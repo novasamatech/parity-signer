@@ -62,7 +62,7 @@ export class SignedTxView extends React.PureComponent {
 
   render() {
     const { data, gas, gasPrice, recipient, sender, value } = this.props;
-
+    
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
