@@ -88,35 +88,36 @@ class AccountBackupView extends React.PureComponent {
           networkKey={networkKey}
           title={name}
         />
-        {isNew &&
-          <View>
-            <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
-            <Text style={styles.hintText}>
-              Write these words down on paper. Keep it safe. These words allow
-              anyone to recover and access the funds of this account.
-            </Text>
-          </View>
-        }
+        <View>
+          <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
+          <Text style={styles.hintText}>
+            Write these words down on paper. Keep the backup paper safe. These words allow
+            anyone to recover this account and access its funds.
+          </Text>
+        </View>
         <TouchableItem
           onPress={() => {
-            Alert.alert(
-              'Write this recovery phrase on paper',
-              `It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
-              `,
-              [
-                {
-                  text: 'Copy anyway',
-                  style: 'default',
-                  onPress: () => {
-                    Clipboard.setString(`${seedPhrase}${derivationPath}`);
+            // only allow the copy of the recovery phrase in dev environment
+            if (__DEV__) {
+              Alert.alert(
+                'Write this recovery phrase on paper',
+                `It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
+                `,
+                [
+                  {
+                    text: 'Copy anyway',
+                    style: 'default',
+                    onPress: () => {
+                      Clipboard.setString(`${seedPhrase}${derivationPath}`);
+                    }
+                  },
+                  {
+                    text: 'Cancel',
+                    style: 'cancel'
                   }
-                },
-                {
-                  text: 'Cancel',
-                  style: 'cancel'
-                }
-              ]
-            );
+                ]
+              );
+            } 
           }}
         >
           <Text style={styles.seedText}>
