@@ -70,7 +70,6 @@ export function zip(left, right) {
       rindex += 1;
     } else {
       out[oindex] = lword;
-      result.push(lword);
       lindex += 1;
       rindex += 1;
     }

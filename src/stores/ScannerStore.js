@@ -97,7 +97,7 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     if (parsedData.isMultipart) {
-      this.setPartData(parseData.frame, parsedData.frameCount, parseData.partData, accountsStore);
+      this.setPartData(parsedData.frame, parsedData.frameCount, parsedData.partData, accountsStore);
       return;
     }
 
@@ -198,7 +198,7 @@ export default class ScannerStore extends Container<ScannerState> {
       networkKey,
       address: txRequest.data.account
     });
-    
+
     const networkTitle = NETWORK_LIST[networkKey].title;
 
     if (!sender || !sender.encryptedSeed) {
@@ -256,7 +256,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
     this.setState({ signedData });
 
-    if (type == 'transaction') {
+    if (type === 'transaction') {
       await saveTx({
         hash: (isEthereum || isHash) ? this.state.dataToSign : await blake2s(this.state.dataToSign.toHex()),
         tx: this.state.tx,
