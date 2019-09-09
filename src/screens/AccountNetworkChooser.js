@@ -24,6 +24,7 @@ import fonts from "../fonts";
 import TouchableItem from '../components/TouchableItem';
 import { NETWORK_LIST } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
+import { empty } from '../util/account';
 
 export default class AccountNetworkChooser extends React.PureComponent {
   static navigationOptions = {
@@ -45,7 +46,7 @@ class AccountNetworkChooserView extends React.PureComponent {
   render() {
     const { navigation } = this.props;
     const { accounts } = this.props;
-    
+
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
@@ -60,7 +61,7 @@ class AccountNetworkChooserView extends React.PureComponent {
               }
             ]}
             onPress={() => {
-              accounts.updateNew({ networkKey });
+              accounts.updateNew({ ...empty('', networkKey) });
               navigation.goBack();
             }}
           >
