@@ -28,7 +28,7 @@ import Button from '../components/Button';
 import TouchableItem from '../components/TouchableItem';
 import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
 import AccountsStore from '../stores/AccountsStore';
-import {NETWORK_LIST, NetworkProtocols} from "../constants";
+import { NetworkProtocols, NETWORK_LIST } from '../constants';
 
 
 export default class AccountBackup extends React.PureComponent {
