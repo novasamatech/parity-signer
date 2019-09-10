@@ -19,6 +19,7 @@
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
+import { formatBalance } from '@polkadot/util';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
@@ -46,11 +47,24 @@ export default class PayloadDetailsCard extends React.PureComponent {
   constructor(props) {
     super(props);
 
+    const isKusama = this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+    const isSubstrateDev = this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
+
     let metadata;
-    if (this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix) {
+    if (isKusama) {
       metadata = new Metadata(kusamaMetadata);
-    } else if (this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix) {
+      
+      formatBalance.setDefaults({
+        decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
+        unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
+      });
+    } else if (isSubstrateDev) {
       metadata = new Metadata(substrateDevMetadata);
+      
+      formatBalance.setDefaults({
+        decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
+        unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].unit
+      });
     } 
     
     if (!metadata) {
@@ -107,9 +121,15 @@ function ExtrinsicPart({ label, fallback, value }) {
       const call = new Call(value);
       const { args, meta, methodName, sectionName } = call;
 
-      const result = {};
+      let result = {};
       for (let i = 0; i < meta.args.length; i ++) {
-          result[meta.args[i].name.toString()] = args[i].toString();
+        let value;
+        if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
+          value = formatBalance(args[i].toString());
+        } else {
+          value = args[i].toString();
+        }
+        result[meta.args[i].name.toString()] = value;
       }
 
       setArgNameValue(result);
