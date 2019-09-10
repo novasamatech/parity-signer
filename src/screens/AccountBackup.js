@@ -28,6 +28,7 @@ import Button from '../components/Button';
 import TouchableItem from '../components/TouchableItem';
 import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
 import AccountsStore from '../stores/AccountsStore';
+import { NetworkProtocols, NETWORK_LIST } from '../constants';
 
 
 export default class AccountBackup extends React.PureComponent {
@@ -75,7 +76,8 @@ class AccountBackupView extends React.PureComponent {
     const {navigate} = navigation;
     const isNew = navigation.getParam('isNew');
     const {address, derivationPassword, derivationPath, name, networkKey, seed, seedPhrase} = isNew ? accounts.getNew() : accounts.getSelected();
-    
+    const {protocol} = NETWORK_LIST[networkKey];
+
     return (
       <ScrollView
         style={styles.body}
@@ -108,7 +110,11 @@ class AccountBackupView extends React.PureComponent {
                     text: 'Copy anyway',
                     style: 'default',
                     onPress: () => {
-                      Clipboard.setString(`${seedPhrase}${derivationPath}`);
+                      if (protocol === NetworkProtocols.SUBSTRATE) {
+                        Clipboard.setString(`${seedPhrase}${derivationPath}`);
+                      } else {
+                        Clipboard.setString(seed)
+                      }
                     }
                   },
                   {
@@ -117,7 +123,7 @@ class AccountBackupView extends React.PureComponent {
                   }
                 ]
               );
-            } 
+            }
           }}
         >
           <Text style={styles.seedText}>
