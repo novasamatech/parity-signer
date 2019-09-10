@@ -24,15 +24,19 @@ export const SubstrateNetworkKeys = Object.freeze({
 const substrateNetworkBase = {
   [SubstrateNetworkKeys.KUSAMA]: {
     color: '#4C4646',
+    decimals: 12,
     genesisHash: SubstrateNetworkKeys.KUSAMA,
     prefix: 2,
-    title: 'Kusama'
+    title: 'Kusama',
+    unit: 'KSM'
   },
   [SubstrateNetworkKeys.SUBSTRATE_DEV]: {
     color: '#ff8c00',
+    decimals: 15,
     genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
     prefix: 42,
-    title: 'Substrate Development'
+    title: 'Substrate Development',
+    unit: 'UNIT'
   },
   // [SubstrateNetworkKeys.POLKADOT]: {
   //   color: '#e6007a',
