@@ -28,6 +28,7 @@ import Button from '../components/Button';
 import TouchableItem from '../components/TouchableItem';
 import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
 import AccountsStore from '../stores/AccountsStore';
+import { NetworkProtocols, NETWORK_LIST } from '../constants';
 
 
 export default class AccountBackup extends React.PureComponent {
@@ -75,7 +76,8 @@ class AccountBackupView extends React.PureComponent {
     const {navigate} = navigation;
     const isNew = navigation.getParam('isNew');
     const {address, derivationPassword, derivationPath, name, networkKey, seed, seedPhrase} = isNew ? accounts.getNew() : accounts.getSelected();
-    
+    const {protocol} = NETWORK_LIST[networkKey];
+
     return (
       <ScrollView
         style={styles.body}
@@ -88,35 +90,40 @@ class AccountBackupView extends React.PureComponent {
           networkKey={networkKey}
           title={name}
         />
-        {isNew &&
-          <View>
-            <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
-            <Text style={styles.hintText}>
-              Write these words down on paper. Keep it safe. These words allow
-              anyone to recover and access the funds of this account.
-            </Text>
-          </View>
-        }
+        <View>
+          <Text style={styles.titleTop}>RECOVERY PHRASE</Text>
+          <Text style={styles.hintText}>
+            Write these words down on paper. Keep the backup paper safe. These words allow
+            anyone to recover this account and access its funds.
+          </Text>
+        </View>
         <TouchableItem
           onPress={() => {
-            Alert.alert(
-              'Write this recovery phrase on paper',
-              `It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
-              `,
-              [
-                {
-                  text: 'Copy anyway',
-                  style: 'default',
-                  onPress: () => {
-                    Clipboard.setString(`${seedPhrase}${derivationPath}`);
+            // only allow the copy of the recovery phrase in dev environment
+            if (__DEV__) {
+              Alert.alert(
+                'Write this recovery phrase on paper',
+                `It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
+                `,
+                [
+                  {
+                    text: 'Copy anyway',
+                    style: 'default',
+                    onPress: () => {
+                      if (protocol === NetworkProtocols.SUBSTRATE) {
+                        Clipboard.setString(`${seedPhrase}${derivationPath}`);
+                      } else {
+                        Clipboard.setString(seed)
+                      }
+                    }
+                  },
+                  {
+                    text: 'Cancel',
+                    style: 'cancel'
                   }
-                },
-                {
-                  text: 'Cancel',
-                  style: 'cancel'
-                }
-              ]
-            );
+                ]
+              );
+            }
           }}
         >
           <Text style={styles.seedText}>

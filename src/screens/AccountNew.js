@@ -111,7 +111,7 @@ class AccountNewView extends React.Component {
                         phrase: newSeed
                       });
 
-                      accounts.updateNew({ 
+                      accounts.updateNew({
                         address: newAddress,
                         derivationPassword,
                         derivationPath,
@@ -176,7 +176,6 @@ class AccountNewView extends React.Component {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: colors.bg,
-    paddingBottom: 20,
     flex: 1,
     overflow: 'hidden'
   },
