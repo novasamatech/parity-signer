@@ -19,6 +19,7 @@
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
+import { formatBalance } from '@polkadot/util';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
@@ -106,12 +107,17 @@ function ExtrinsicPart({ label, fallback, value }) {
     if (label === 'Method' && !fallback) {
       const call = new Call(value);
       const { args, meta, methodName, sectionName } = call;
+      
+      formatBalance.setDefaults({
+        decimals: 12,
+        unit: 'KSM'
+      });
 
       let result = {};
       for (let i = 0; i < meta.args.length; i ++) {
         let value;
         if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
-          value = formatDecimal(args[i].toString());
+          value = formatBalance(args[i].toString());
         } else {
           value = args[i].toString();
         }

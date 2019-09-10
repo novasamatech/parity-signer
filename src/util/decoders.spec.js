@@ -63,7 +63,7 @@ const SIGNER_PAYLOAD_TEST = {
   blockHash: '0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
   era: '0x0703',
   genesisHash: '0x3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf',
-  method: '0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f',
+  method: '0x0400ffee5a3c1f409c4ad69cd7a477419bf3fd1bc2e72f3c43ba5c4a9896de1d8bf94200',
   nonce: '0x00001234',
   specVersion: 3,
   tip: '0x00000000000000000000000000005678'
@@ -172,7 +172,7 @@ describe('decoders', () => {
       GenericCall.injectMethods(extrinsics);
     });
 
-    it('can fetch the prefix matching to a hash', () => {
+    it.only('can fetch the prefix matching to a hash', () => {
       const kusamaPrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
       // const substratePrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
 

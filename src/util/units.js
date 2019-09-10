@@ -57,16 +57,3 @@ export function fromWei(number, unit) {
     .dividedBy(getValueOfUnit(unit))
     .toString(10);
 }
-
-export function formatDecimal (value) {
-  const NUMBER_REGEX = new RegExp('(\\d+?)(?=(\\d{3})+(?!\\d)|$)', 'g');
-
-  const isNegative = value[0].startsWith('-');
-  const matched = isNegative
-    ? value.substr(1).match(NUMBER_REGEX)
-    : value.match(NUMBER_REGEX);
-
-  return matched
-    ? `${isNegative ? '-' : ''}${matched.join(' ')}`
-    : value;
-}

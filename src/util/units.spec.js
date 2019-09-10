@@ -19,10 +19,12 @@
 import '@polkadot/types/injector';
 
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
-import { Balance, Compact, createType, GenericCall, Metadata } from '@polkadot/types';
+import { GenericCall, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
+import { formatBalance } from '@polkadot/util';
+
 import kusamaData from './static-kusama';
-import { formatDecimal, fromWei } from './units';
+import { fromWei } from './units';
 
 describe('units', () => {
   describe('ethereum', () => {
@@ -42,33 +44,35 @@ describe('units', () => {
   });
 
   describe('kusama', () => {
+    let method_1;
+    let method_2;
+    let method_3;
+
     beforeAll(() => {
       const metadata = new Metadata(kusamaData);
     
       const extrinsics = extrinsicsFromMeta(metadata);
 
       GenericCall.injectMethods(extrinsics);
+
+      formatBalance.setDefaults({
+        decimals: 12,
+        unit: 'KSM'
+      });
+
+      method_1 = new Call('0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f');
+      method_2 = new Call('0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110ae2d45a1d');
+      method_3 = new Call('0x0400ffd9d249ea49e9ae53fc0df3df40d3b070c88e387c265841fe2f3362970d864fdf1f0000606b82534ae05e4508');
     });
 
-    it('should properly format from Balance', () => {
-      let hugeBalance = createType('Balance', 1234567898771);
-      let formattedHuge = formatDecimal(hugeBalance.toString());
-
-      expect(hugeBalance).toBeDefined();
-      expect(hugeBalance.toString()).toBe('1234567898771');
-      expect(formattedHuge).toBeDefined();
-      expect(formattedHuge).toBe('1 234 567 898 771');
-    });
-
-    it('should work', () => {
-      let method = new Call('0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f');
-      const { args, meta } = method;
+    it('should format KSM', () => {
+      const { args, meta } = method_1;
 
       let result = {};
       for (let i = 0; i < meta.args.length; i ++) {
         let value;
         if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
-          value = formatDecimal(args[i].toString());
+          value = formatBalance(args[i].toString());
         } else {
           value = args[i].toString();
         }
@@ -76,7 +80,43 @@ describe('units', () => {
       }
 
       expect(result.dest).toBe('5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc');
-      expect(result.value).toBe('123 000 000 000 000');
+      expect(result.value).toBe('123.000 KSM');
     })
+
+    it('should format decimals for less than one KSM', () => {
+      const { args, meta } = method_2;
+
+      let result = {};
+      for (let i = 0; i < meta.args.length; i ++) {
+        let value;
+        if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
+          value = formatBalance(args[i].toString(), true, 12);
+        } else {
+          value = args[i].toString();
+        }
+        result[meta.args[i].name.toString()] = value;
+      }
+
+      expect(result.dest).toBe('5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc');
+      expect(result.value).toBe('123.123µ KSM');
+    });
+
+    it('should format absurdly large KSM', () => {
+      const { args, meta } = method_3;
+
+      let result = {};
+      for (let i = 0; i < meta.args.length; i ++) {
+        let value;
+        if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
+          value = formatBalance(args[i].toString(), true, 12);
+        } else {
+          value = args[i].toString();
+        }
+        result[meta.args[i].name.toString()] = value;
+      }
+
+      expect(result.dest).toBe('5GzJiY3oG9LcyDiJbEJ6UF8jDF1AGeE2MgeXgSwgGCPopWsb');
+      expect(result.value).toBe('9.999T KSM');
+    });
   });
 });
