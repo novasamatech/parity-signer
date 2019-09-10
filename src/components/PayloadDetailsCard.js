@@ -107,9 +107,15 @@ function ExtrinsicPart({ label, fallback, value }) {
       const call = new Call(value);
       const { args, meta, methodName, sectionName } = call;
 
-      const result = {};
+      let result = {};
       for (let i = 0; i < meta.args.length; i ++) {
-          result[meta.args[i].name.toString()] = args[i].toString();
+        let value;
+        if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
+          value = formatDecimal(args[i].toString());
+        } else {
+          value = args[i].toString();
+        }
+        result[meta.args[i].name.toString()] = value;
       }
 
       setArgNameValue(result);
