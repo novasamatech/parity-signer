@@ -47,11 +47,24 @@ export default class PayloadDetailsCard extends React.PureComponent {
   constructor(props) {
     super(props);
 
+    const isKusama = this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+    const isSubstrateDev = this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
+
     let metadata;
-    if (this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix) {
+    if (isKusama) {
       metadata = new Metadata(kusamaMetadata);
-    } else if (this.props.prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix) {
+      
+      formatBalance.setDefaults({
+        decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
+        unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
+      });
+    } else if (isSubstrateDev) {
       metadata = new Metadata(substrateDevMetadata);
+      
+      formatBalance.setDefaults({
+        decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
+        unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].unit
+      });
     } 
     
     if (!metadata) {
@@ -107,11 +120,6 @@ function ExtrinsicPart({ label, fallback, value }) {
     if (label === 'Method' && !fallback) {
       const call = new Call(value);
       const { args, meta, methodName, sectionName } = call;
-      
-      formatBalance.setDefaults({
-        decimals: 12,
-        unit: 'KSM'
-      });
 
       let result = {};
       for (let i = 0; i < meta.args.length; i ++) {
