@@ -14,7 +14,7 @@
     "build-rust-android": "cd rust/signer && make android",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force",
     "commit": "commit-wizard",
-    "ios": "yarn run build-rust-ios && NODE_OPTIONS=--max_old_space_size=8192 react-native run-ios",
+    "ios": "yarn run build-rust-ios && react-native run-ios",
     "lint": "eslint",
     "postinstall": "npx jetify",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",

@@ -20,6 +20,7 @@ import React from 'react';
 import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
+import packageJson from '../../package.json';
 
 export default class About extends React.PureComponent {
   static navigationOptions = {
@@ -30,7 +31,7 @@ export default class About extends React.PureComponent {
   render() {
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.title}>PARITY SIGNER </Text>
+        <Text style={styles.title}>PARITY SIGNER  ({packageJson.version})</Text>
         <View>
           <Text style={styles.text}>
             The Parity Signer mobile application is a secure air-gapped wallet
@@ -40,7 +41,7 @@ export default class About extends React.PureComponent {
           <Text style={styles.text}>
             This application is meant to be used on a phone that will remain offline at any point in time.
             To upgrade the app, you need to make sure you backup your accounts (e.g by writing the recovery phrase on paper),
-            then factory reset the phone, then install Parity Signer's new version either from the store
+            then factory reset the phone, then install Parity Signer's new version either from the store 
             (iPhone or android) or from a sd card, and finally turn your phone offline for good
             before recoveing or generating new accounts.
           </Text>
