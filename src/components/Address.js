@@ -36,7 +36,7 @@ export default function Address (props) {
   }
 
   return (
-      <Text numberOfLines={1} style={[style, styles.secondaryText]}>
+      <Text numberOfLines={1} style={[styles.secondaryText, style]}>
         {prefix}{result}
       </Text>
   );

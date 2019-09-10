@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
     paddingLeft: 6
   },
   addressText: {
+    fontSize: 14,
     paddingLeft: 6
   },
   refreshIcon :{
