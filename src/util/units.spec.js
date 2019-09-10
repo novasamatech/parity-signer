@@ -41,7 +41,7 @@ describe('units', () => {
     });
   });
 
-  describe.only('kusama', () => {
+  describe('kusama', () => {
     beforeAll(() => {
       const metadata = new Metadata(kusamaData);
     
