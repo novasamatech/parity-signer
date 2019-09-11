@@ -1,5 +1,5 @@
 export function isAscii(data) {
-  return (/^[\x00-\xFF]*$/).test(data);
+  return /^[\x00-\x7F]*$/.test(data);
 }
 
 export function hexToAscii(hexx) {
