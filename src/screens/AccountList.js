@@ -149,7 +149,6 @@ class AccountListView extends React.PureComponent {
                 onPress={() => {
                   onAccountSelected(account);
                 }}
-                shortAddress
                 style={{ paddingBottom: null }}
                 title={account.name}
               />

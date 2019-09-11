@@ -44,7 +44,7 @@ export default class AccountCard extends React.PureComponent {
   };
 
   render() {
-    const { address, networkKey, onPress, seedType, shortAddress = false, style } = this.props;
+    const { address, networkKey, onPress, seedType, style } = this.props;
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
     const seedTypeDisplay = seedType || '';
@@ -67,10 +67,9 @@ export default class AccountCard extends React.PureComponent {
               <Text numberOfLines={1} style={styles.titleText}>
                 {title}
               </Text>
-              <Address 
+              <Address
                 address={address}
                 protocol={network.protocol}
-                short = {shortAddress}
               />
             </View>
           </View>

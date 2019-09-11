@@ -27,13 +27,9 @@ import fonts from "../fonts";
 import {NetworkProtocols} from '../constants'
 
 export default function Address (props) {
-  const {address, protocol = NetworkProtocols.SUBSTRATE, short = false ,style = {}} = props;
+  const {address, protocol = NetworkProtocols.SUBSTRATE ,style = {}} = props;
   const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
   let result = address;
-
-  if (short) {
-    result = `${address.slice(0, 6)}…${address.slice(-6)}`;
-  }
 
   return (
     <Text
