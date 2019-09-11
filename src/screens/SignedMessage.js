@@ -25,7 +25,7 @@ import fonts from "../fonts";
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { isAscii } from '../util/message';
+import { hexToAscii, isAscii } from '../util/message';
 
 export default class SignedMessage extends React.PureComponent {
   render() {
@@ -61,7 +61,7 @@ export class SignedMessageView extends React.PureComponent {
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
           {isAscii(message)
-            ? message
+            ? hexToAscii(message)
             : data}
         </Text>
       </ScrollView>
