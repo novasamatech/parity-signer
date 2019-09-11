@@ -36,9 +36,13 @@ export default function Address (props) {
   }
 
   return (
-      <Text numberOfLines={1} style={[styles.secondaryText, style]}>
-        {prefix}{result}
-      </Text>
+    <Text
+      numberOfLines={1}
+      style={[styles.secondaryText, style]}
+      ellipsizeMode="middle"
+      >
+      {prefix}{result}
+    </Text>
   );
 }
 
@@ -46,6 +50,7 @@ const styles = StyleSheet.create({
   secondaryText: {
     fontFamily: fonts.regular,
     color: colors.bg_text_sec,
-    fontSize: 12
+    fontSize: 12,
+    lineHeight: 16,
   }
 });
