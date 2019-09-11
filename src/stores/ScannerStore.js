@@ -176,6 +176,7 @@ export default class ScannerStore extends Container<ScannerState> {
       sender,
       type: 'message',
     });
+
     return true;
   }
 
@@ -227,11 +228,12 @@ export default class ScannerStore extends Container<ScannerState> {
       dataToSign,
       isOversized
     });
+
     return true;
   }
 
   async signData(pin = '1') {
-    const { isHash, sender, type } = this.state;
+    const { dataToSign, isHash, sender, recipient, tx, type } = this.state;
 
     const seed = await decryptData(sender.encryptedSeed, pin);
     const isEthereum = NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
@@ -239,18 +241,17 @@ export default class ScannerStore extends Container<ScannerState> {
     let signedData;
 
     if (isEthereum) {
-      signedData = await brainWalletSign(seed, this.state.dataToSign);
+      signedData = await brainWalletSign(seed, dataToSign);
     } else {
       let signable;
 
-      if (this.state.dataToSign instanceof GenericExtrinsicPayload) {
-        signable = u8aToHex(this.state.dataToSign.toU8a(true), -1, false);
-      } else if (isU8a(this.state.dataToSign)) {
-        signable = hexStripPrefix(u8aToHex(this.state.dataToSign));
-      } else if (isAscii(this.state.dataToSign)) {
-        signable = hexStripPrefix(asciiToHex(this.state.dataToSign));
+      if (dataToSign instanceof GenericExtrinsicPayload) {
+        signable = u8aToHex(dataToSign.toU8a(true), -1, false);
+      } else if (isU8a(dataToSign)) {
+        signable = hexStripPrefix(u8aToHex(dataToSign));
+      } else if (isAscii(dataToSign)) {
+        signable = hexStripPrefix(asciiToHex(dataToSign));
       }
-
       signedData = await substrateSign(seed, signable);
     }
 
@@ -258,10 +259,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
     if (type === 'transaction') {
       await saveTx({
-        hash: (isEthereum || isHash) ? this.state.dataToSign : await blake2s(this.state.dataToSign.toHex()),
-        tx: this.state.tx,
+        hash: (isEthereum || isHash) ? dataToSign : await blake2s(dataToSign.toHex()),
+        tx,
         sender,
-        recipient: this.state.recipient,
+        recipient,
         signature: signedData,
         createdAt: new Date().getTime()
       });
