@@ -61,8 +61,8 @@ export class SignedMessageView extends React.PureComponent {
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
           {isAscii(message)
-            ? message
-            : data}
+            ? hexToAscii(message)
+            : dataToSign}
         </Text>
       </ScrollView>
     );
