@@ -96,7 +96,7 @@ class AccountPinView extends React.PureComponent {
     return (<Text style={styles.hintText}>Choose a PIN code with 6 or more digits</Text>)
   }
 
-  onPinInputChange = stateName => pinInput => {
+  onPinInputChange = (stateName, pinInput) => {
     if (/^\d+$|^$/.test(pinInput)) {
       this.setState({[stateName]: pinInput, pinMismatch: false, pinTooShort: false})
     }
@@ -117,14 +117,14 @@ class AccountPinView extends React.PureComponent {
           onSubmitEditing={() => {
             this.setState({ focusConfirmation: true });
           }}
-          onChangeText={this.onPinInputChange('pin')}
+          onChangeText={pin => this.onPinInputChange('pin', pin)}
           value={this.state.pin}
         />
         <Text style={styles.title}>CONFIRM PIN</Text>
         <PinInput
           returnKeyType="done"
           focus={this.state.focusConfirmation}
-          onChangeText={this.onPinInputChange('confirmation')}
+          onChangeText={confirmation => this.onPinInputChange('confirmation', confirmation)}
           value={this.state.confirmation}
         />
         <Button
