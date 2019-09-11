@@ -20,6 +20,7 @@ import { isHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
+
 import { qrCode, qrHex } from '../util/native';
 
 QrView.propTypes = {
@@ -27,7 +28,6 @@ QrView.propTypes = {
 };
 
 export default function QrView(props) {
-
   const [qr, setQr] = useState(null);
 
   useEffect(() => {

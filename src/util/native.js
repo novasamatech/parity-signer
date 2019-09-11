@@ -85,7 +85,7 @@ export function rlpItem (rlp, position) {
 }
 
 export function keccak (data) {
-  return EthkeyBridge.keccak(asString(data));
+  return EthkeyBridge.keccak(data);
 }
 
 export function ethSign (data) {
