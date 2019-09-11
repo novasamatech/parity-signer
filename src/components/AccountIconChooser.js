@@ -195,8 +195,9 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   iconBorder: {
-     borderWidth: 6,
-    borderColor: colors.card_bg
+    borderWidth: 6,
+    borderColor: colors.card_bg,
+    height: 62 // height = icon height + borderWidth * 2
   },
   icon: {
     width: 50,
