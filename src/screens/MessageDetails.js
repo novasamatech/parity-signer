@@ -79,7 +79,7 @@ export class MessageDetailsView extends React.PureComponent {
   static propTypes = {
     onNext: PropTypes.func.isRequired,
     dataToSign: PropTypes.string.isRequired,
-    isHash: PropTypes.bool.isRequired,
+    isHash: PropTypes.bool,
     sender: PropTypes.object.isRequired,
     message: PropTypes.string.isRequired
   };
