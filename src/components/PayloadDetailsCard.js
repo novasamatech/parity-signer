@@ -115,25 +115,30 @@ function ExtrinsicPart({ label, fallback, value }) {
   const [period, setPeriod] = useState();
   const [phase, setPhase] = useState();
   const [sectionMethod, setSectionMethod] = useState();
+  const [useFallback, setUseFallBack] = useState(false);
 
   useEffect(() => {
     if (label === 'Method' && !fallback) {
       const call = new Call(value);
       const { args, meta, methodName, sectionName } = call;
 
-      let result = {};
-      for (let i = 0; i < meta.args.length; i ++) {
-        let value;
-        if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
-          value = formatBalance(args[i].toString());
-        } else {
-          value = args[i].toString();
+      if (!meta || !meta.args || !args) {
+        setUseFallBack(true);
+      } else {
+        let result = {};
+        for (let i = 0; i < meta.args.length; i ++) {
+          let value;
+          if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
+            value = formatBalance(args[i].toString());
+          } else {
+            value = args[i].toString();
+          }
+          result[meta.args[i].name.toString()] = value;
         }
-        result[meta.args[i].name.toString()] = value;
-      }
 
-      setArgNameValue(result);
-      setSectionMethod(`${sectionName}.${methodName}`);
+        setArgNameValue(result);
+        setSectionMethod(`${sectionName}.${methodName}`);
+      }
     };
 
     if (label === 'Era' && !fallback) {
@@ -193,7 +198,7 @@ function ExtrinsicPart({ label, fallback, value }) {
           {label}
         </Text>
         {
-          label === 'Method'
+          (label === 'Method' && !useFallback)
             ? renderMethodDetails()
             : label === 'Era'
               ? renderEraDetails()
