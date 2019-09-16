@@ -24,7 +24,6 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 - Get a separate mobile device.
 - Make a factory reset.
 - Enable full-disk encryption on the device, with a reasonable password (might not be on by default, for example for older Android devices).
-- Do not use any kind of biometrics such as fingerprint or face recognition for device decryption/unlocking, as those may be less secure than regular passwords.
 - Once the app has been installed, enable airplane mode and make sure to switch off Wifi, Bluetooth or any connection ability of the device.
 - Only charge the phone on a power outlet that is never connected to the internet. Only charge the phone with the manufacturer's charging adapter. Do not charge the phone on public USB chargers.
 

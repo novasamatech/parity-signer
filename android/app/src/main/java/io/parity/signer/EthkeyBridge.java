@@ -21,6 +21,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 
+import android.app.Activity;
+
 /**
  * Created by marek on 20/02/2017.
  */
@@ -170,4 +172,79 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native String ethkeyQrCodeHex(String data);
     private static native String substrateBrainwalletAddress(String seed, int prefix);
     private static native String substrateBrainwalletSign(String seed, String message);
+
+    /* secure native */
+
+    @ReactMethod
+    public void securePut(String app, String key, String seed, Promise promise) {
+        try {
+            promise.resolve(snPut(this.getCurrentActivity(), app, key, seed));
+        } catch (Exception e) {
+            String[] sp = e.getMessage().split(": ");
+            String s = sp[sp.length - 1].trim().replace("\"", "");
+            promise.reject("put", s);
+        }
+    }
+
+    @ReactMethod
+    public void secureGet(String app, String key, Promise promise) {
+        try {
+            promise.resolve(snGet(this.getCurrentActivity(), app, key));
+        } catch (Exception e) {
+            String[] sp = e.getMessage().split(": ");
+            String s = sp[sp.length - 1].trim().replace("\"", "");
+            promise.reject("get", s);
+        }
+    }
+
+    @ReactMethod
+    public void secureContains(String app, String key, Promise promise) {
+        try {
+            promise.resolve(snContains(this.getCurrentActivity(), app, key));
+        } catch (Exception e) {
+            String[] sp = e.getMessage().split(": ");
+            String s = sp[sp.length - 1].trim().replace("\"", "");
+            promise.reject("contains", s);
+        }
+    }
+
+    @ReactMethod
+    public void secureDelete(String app, String key, Promise promise) {
+        try {
+            promise.resolve(snDelete(this.getCurrentActivity(), app, key));
+        } catch (Exception e) {
+            String[] sp = e.getMessage().split(": ");
+            String s = sp[sp.length - 1].trim().replace("\"", "");
+            promise.reject("delete", s);
+        }
+    }
+
+    @ReactMethod
+    public void secureEthkeySign(String app, String key, String message, String encrypted, Promise promise) {
+        try {
+            promise.resolve(snEthkeyBrainwalletSign(this.getCurrentActivity(), app, key, message, encrypted));
+        } catch (Exception e) {
+            String[] sp = e.getMessage().split(": ");
+            String s = sp[sp.length - 1].trim().replace("\"", "");
+            promise.reject("ethkeysign", s);
+        }
+    }
+
+    @ReactMethod
+    public void secureSubstrateSign(String app, String key, String message, String encrypted, Promise promise) {
+        try {
+            promise.resolve(snSubstrateBrainwalletSign(this.getCurrentActivity(), app, key, message, encrypted));
+        } catch (Exception e) {
+            String[] sp = e.getMessage().split(": ");
+            String s = sp[sp.length - 1].trim().replace("\"", "");
+            promise.reject("substratesign", s);
+        }
+    }
+
+    private static native boolean snPut(Activity activity, String app, String key, String seed);
+    private static native String snGet(Activity activity, String app, String key);
+    private static native boolean snContains(Activity activity, String app, String key);
+    private static native boolean snDelete(Activity activity, String app, String key);
+    private static native String snEthkeyBrainwalletSign(Activity activity, String app, String key, String message, String encrypted);
+    private static native String snSubstrateBrainwalletSign(Activity activity, String app, String key, String message, String encrypted);
 }

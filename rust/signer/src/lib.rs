@@ -96,6 +96,17 @@ fn qrcode_bytes(data: &[u8]) -> Option<String> {
     Some(base64png(&result))
 }
 
+fn construct_suri(seed: &str, path: &str, password: &str) -> String {
+    format!("{}{}///{}", seed, path, password)
+}
+
+fn decrypt(data: &str, password: &str) -> Result<String, String> {
+    let password = Protected::new(password.as_bytes());
+    let crypto: Crypto = serde_json::from_str(data).map_err(|e| format!("{}", e))?;
+    let decrypted = crypto.decrypt(&password).map_err(|e| format!("{}", e))?;
+    String::from_utf8(decrypted).map_err(|e| format!("{}", e))
+}
+
 export! {
     @Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletAddress
     fn ethkey_brainwallet_address(seed: &str) -> String {
@@ -185,21 +196,15 @@ export! {
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyEncryptData
-    fn encrypt_data(data: &str, password: String) -> Option<String> {
+    fn encrypt_data(data: &str, password: String) -> Result<String, String> {
         let password = Protected::new(password.into_bytes());
-        let crypto = Crypto::encrypt(data.as_bytes(), &password, CRYPTO_ITERATIONS).ok()?;
-
-        serde_json::to_string(&crypto).ok()
+        let crypto = Crypto::encrypt(data.as_bytes(), &password, CRYPTO_ITERATIONS).map_err(|e| format!("{}", e))?;
+        serde_json::to_string(&crypto).map_err(|e| format!("{}", e))
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyDecryptData
-    fn decrypt_data(data: &str, password: String) -> Option<String> {
-        let password = Protected::new(password.into_bytes());
-
-        let crypto: Crypto = serde_json::from_str(data).ok()?;
-        let decrypted = crypto.decrypt(&password).ok()?;
-
-        String::from_utf8(decrypted).ok()
+    fn decrypt_data(data: &str, password: String) -> Result<String, String> {
+        decrypt(data, &password)
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyQrCode
@@ -229,6 +234,57 @@ export! {
         Some(signature.to_hex())
     }
 }
+
+secure_native::export_put! {
+    @Java_io_parity_signer_EthkeyBridge_snPut
+    fn sn_put(success: Result<(), String>) -> Result<(), String> {
+        success
+    }
+}
+
+secure_native::export_get! {
+    @Java_io_parity_signer_EthkeyBridge_snEthkeyBrainwalletSign
+    fn sn_ethkey_brainwallet_sign(pin: Result<String, String>, message: String, encrypted: String) -> Result<String, String> {
+        let seed = decrypt(&encrypted, &pin?);
+        let (_, keypair) = KeyPair::from_auto_phrase(&seed?);
+        let message: Vec<u8> = message.from_hex().map_err(|e| format!("{}", e))?;
+        let signature = keypair.sign(&message).map_err(|e| format!("{}", e))?;
+        Ok(signature.to_hex())
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_snSubstrateBrainwalletSign
+    fn sn_substrate_brainwallet_sign(pin: Result<String, String>, path: String, password: String, message: String, encrypted: String) -> Result<String, String> {
+        let seed = decrypt(&encrypted, &pin?);
+        let suri = construct_suri(&seed?, &path, &password);
+        let keypair = sr25519::KeyPair::from_suri(&suri).ok_or(format!("KeyPair from suri"))?;
+        let message: Vec<u8> = message.from_hex().map_err(|e| format!("{}", e))?;
+        let signature = keypair.sign(&message);
+        Ok(signature.to_hex())
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_snGet
+    fn sn_get(seed: Result<String, String>) -> Result<String, String> {
+        seed
+    }
+}
+
+secure_native::export_contains! {
+    @Java_io_parity_signer_EthkeyBridge_snContains
+    fn sn_contains(success: Result<bool, String>) -> Result<bool, String> {
+        success
+    }
+}
+
+secure_native::export_delete! {
+    @Java_io_parity_signer_EthkeyBridge_snDelete
+    fn sn_delete(success: Result<(), String>) -> Result<(), String> {
+        success
+    }
+}
+
+secure_native::define_cresult_destructor!(destroy_cresult_string, String);
+secure_native::define_cresult_destructor!(destroy_cresult_bool, bool);
+secure_native::define_cresult_destructor!(destroy_cresult_void, ());
 
 #[cfg(test)]
 mod tests {

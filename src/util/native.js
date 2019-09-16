@@ -122,7 +122,7 @@ export function blake2s (data) {
   return EthkeyBridge.blake2s(asString(data));
 }
 
-// Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
+// Get an SS58 encoded address for a sr25519 key from a BIP39 phrase and a prefix.
 // Prefix is a number used in the SS58 encoding:
 //
 //   Polkadot proper = 0
@@ -136,3 +136,31 @@ export function substrateAddress (seed, prefix) {
 export function substrateSign (seed, message) {
   return EthkeyBridge.substrateSign(seed, message);
 }
+
+/* secure native */
+
+export function securePut(app, key, seed) {
+  return EthkeyBridge.securePut(app, key, seed);
+}
+
+export function secureGet(app, key) {
+  return EthkeyBridge.secureGet(app, key);
+}
+
+export function secureContains(app, key) {
+  return EthkeyBridge.secureContains(app, key);
+}
+
+export function secureDelete(app, key) {
+  return EthkeyBridge.secureDelete(app, key);
+}
+
+export function secureEthkeySign(app, key, message, encrypted) {
+  return EthkeyBridge.secureEthkeySign(app, key, message, encrypted);
+}
+
+// Message is hex-encoded byte array.
+export function secureSubstrateSign(app, key, message, encrypted) {
+  return EthkeyBridge.secureSubstrateSign(app, key, message, encrypted);
+}
+

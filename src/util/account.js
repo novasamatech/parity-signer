@@ -17,6 +17,7 @@
 // @flow
 
 import { NetworkProtocols, NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import { v4 } from 'react-native-uuid';
 
 export function accountId({
   address,
@@ -41,13 +42,14 @@ export function empty(address = '', networkKey = SubstrateNetworkKeys.KUSAMA) {
     createdAt: new Date().getTime(),
     derivationPassword: '',
     derivationPath:'',
-    encryptedSeed: null,
     name: '',
     networkKey: networkKey,
     seed: '',
     seedPhrase: '',
     updatedAt: new Date().getTime(),
     validBip39Seed: false,
+    pinKey: v4(),
+    biometricEnabled: false,
   };
 }
 

@@ -17,7 +17,7 @@
 use libc::size_t;
 
 #[cfg(feature = "jni")]
-use jni::{JNIEnv, objects::JString, sys::{jstring, jint}};
+use jni::{JNIEnv, objects::JString, sys::{jstring, jint, jboolean}};
 #[cfg(not(feature = "jni"))]
 use std::cell::Cell;
 
@@ -93,6 +93,26 @@ impl Argument<'static> for u8 {
 }
 
 #[cfg(not(feature = "jni"))]
+impl Argument<'static> for bool {
+    type Ext = u8;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        val != 0
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl Return<'static> for bool {
+    type Ext = u8;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
+        val as u8
+    }
+}
+
+#[cfg(not(feature = "jni"))]
 impl<'a> Argument<'static> for &'a str {
     type Ext = *const StringPtr;
     type Env = Cell<u32>;
@@ -143,6 +163,25 @@ impl<Inner: Return<'static, Env = Cell<u32>> + Default> Return<'static> for Opti
     }
 }
 
+#[cfg(not(feature = "jni"))]
+impl<Inner: Return<'static, Env = Cell<u32>> + Default> Return<'static> for Result<Inner, String> {
+    type Ext = Inner::Ext;
+    type Env = Inner::Env;
+
+    fn convert(env: &Self::Env, val: Self) -> Self::Ext {
+        let val = match val {
+            Ok(inner) => inner,
+            Err(e) => {
+                println!("{}", e);
+                env.set(1);
+                Inner::default()
+            }
+        };
+
+        Return::convert(env, val)
+    }
+}
+
 #[cfg(feature = "jni")]
 impl<'jni> Argument<'jni> for u32 {
     type Ext = jint;
@@ -160,6 +199,26 @@ impl<'jni> Argument<'jni> for u8 {
 
     fn convert(_: &Self::Env, val: Self::Ext) -> Self {
         val as u8
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Argument<'jni> for bool {
+    type Ext = jboolean;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        val != 0
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Return<'jni> for bool {
+    type Ext = jboolean;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
+        val as jboolean
     }
 }
 
@@ -212,6 +271,41 @@ impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni> for O
         match val {
             Some(inner) => Return::convert(env, inner),
             None => {
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // !!!!                                                              !!!!
+                // !!!! RETURN VALUE HAS TO BE CREATED BEFORE THROWING THE EXCEPTION !!!!
+                // !!!!                                                              !!!!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                let ret = Return::convert(env, Inner::default());
+
+                let class = env.find_class("java/lang/Exception").expect("Must have the Exception class; qed");
+                let exception: JThrowable<'jni> = env.new_object(class, "()V", &[]).expect("Must be able to instantiate the Exception; qed").into();
+
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // !!!!                                                        !!!!
+                // !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THIS POINT !!!!
+                // !!!!                                                        !!!!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                env.throw(exception).expect("Must be able to throw the Exception; qed");
+
+                ret
+            }
+        }
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni> for Result<Inner, String> {
+    type Ext = Inner::Ext;
+    type Env = Inner::Env;
+
+    fn convert(env: &Self::Env, val: Self) -> Self::Ext {
+        use jni::objects::JThrowable;
+
+        match val {
+            Ok(inner) => Return::convert(env, inner),
+            Err(e) => {
+                println!("{}", e);
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // !!!!                                                              !!!!
                 // !!!! RETURN VALUE HAS TO BE CREATED BEFORE THROWING THE EXCEPTION !!!!

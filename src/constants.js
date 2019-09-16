@@ -106,3 +106,4 @@ export const NETWORK_LIST = Object.freeze(
 );
 
 export const TX_DETAILS_MSG = "After signing and publishing you will have sent";
+export const APP_ID = "signer";

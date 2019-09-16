@@ -32,6 +32,7 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
+import { NavigationActions, StackActions } from 'react-navigation';
 
 export default class TxDetails extends React.PureComponent {
   static navigationOptions = {
@@ -56,7 +57,21 @@ export default class TxDetails extends React.PureComponent {
                 dataToSign={scannerStore.getDataToSign()}
                 onNext={async () => {
                   try {
-                    this.props.navigation.navigate('AccountUnlockAndSign');
+                    if (scannerStore.getSender().biometricEnabled && await scannerStore.signData(null)) {
+                      const resetAction = StackActions.reset({
+                        index: 1,
+                        key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+                        actions: [
+                          NavigationActions.navigate({ routeName: 'AccountList' }),
+                          NavigationActions.navigate({ routeName: 'SignedTx' }),
+                        ]
+                      });
+                      this.props.navigation.dispatch(resetAction);
+                    } else {
+                      this.props.navigation.navigate('AccountUnlockAndSign', {
+                        next: 'SignedTx'
+                      });
+                    }
                   } catch (e) {
                     scannerStore.setErrorMsg(e.message);
                   }

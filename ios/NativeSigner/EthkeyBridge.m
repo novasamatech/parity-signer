@@ -51,4 +51,12 @@ RCT_EXTERN_METHOD(substrateAddress:(NSString*)seed version:(NSUInteger*)version 
 RCT_EXTERN_METHOD(substrateSign:(NSString*)seed message:(NSString*)message resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(blake2s:(NSString*)data resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 
+/* secure native */
+RCT_EXTERN_METHOD(securePut:(NSString*)app key:(NSString*)key seed:(NSString*)seed resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(secureGet:(NSString*)app key:(NSString*)key resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(secureContains:(NSString*)app key:(NSString*)key resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(secureDelete:(NSString*)app key:(NSString*)key resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(secureEthkeySign:(NSString*)app key:(NSString*)key message:(NSString*)message encrypted:(NSString*)encrypted resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(secureSubstrateSign:(NSString*)app key:(NSString*)key message:(NSString*)message encrypted:(NSString*)encrypted resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+
 @end
