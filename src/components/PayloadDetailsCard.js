@@ -17,7 +17,7 @@
 // @flow
 
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
-import { GenericCall, Metadata } from '@polkadot/types';
+import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 
@@ -73,6 +73,10 @@ export default class PayloadDetailsCard extends React.PureComponent {
         fallback: true
       });
     }
+    
+    getTypeRegistry().register({
+      Keys: 'SessionKeysPolkadot'
+    });
 
     const extrinsics = extrinsicsFromMeta(metadata);
     GenericCall.injectMethods(extrinsics);
@@ -139,8 +143,8 @@ function ExtrinsicPart({ label, fallback, value }) {
         setSectionMethod(`${sectionName}.${methodName}`);
       } catch (e) {
         Alert.alert(
-          'Could not decode method with available metadata',
-          `Falling back to raw bytes. For your safety, we advise you decode this carefully yourself before signing and submitting the extrinsic.`,
+          'Could not decode method with available metadata.',
+          `Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.`,
           [
             {
               text: 'Okay',
