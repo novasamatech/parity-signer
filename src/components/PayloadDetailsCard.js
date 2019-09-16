@@ -23,7 +23,7 @@ import { formatBalance } from '@polkadot/util';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import { Alert, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
 import fonts from '../fonts';
 import colors from '../colors';
@@ -119,12 +119,11 @@ function ExtrinsicPart({ label, fallback, value }) {
 
   useEffect(() => {
     if (label === 'Method' && !fallback) {
-      const call = new Call(value);
-      const { args, meta, methodName, sectionName } = call;
+      try {
+        const call = new Call(value);
 
-      if (!meta || !meta.args || !args) {
-        setUseFallBack(true);
-      } else {
+        const { args, meta, methodName, sectionName } = call;
+
         let result = {};
         for (let i = 0; i < meta.args.length; i ++) {
           let value;
@@ -138,6 +137,18 @@ function ExtrinsicPart({ label, fallback, value }) {
 
         setArgNameValue(result);
         setSectionMethod(`${sectionName}.${methodName}`);
+      } catch (e) {
+        Alert.alert(
+          'Could not decode method with available metadata',
+          `Falling back to raw bytes. For your safety, we advise you decode this carefully yourself before signing and submitting the extrinsic.`,
+          [
+            {
+              text: 'Okay',
+              style: 'default',
+            }
+          ]
+        );
+        setUseFallBack(true);
       }
     };
 
@@ -202,7 +213,7 @@ function ExtrinsicPart({ label, fallback, value }) {
             ? renderMethodDetails()
             : label === 'Era'
               ? renderEraDetails()
-              : <Text style={styles.secondaryText}>{value}</Text>
+              : <Text style={styles.secondaryText}>{useFallback ? value.toString() : value}</Text>
         }
       </View>
     </View>

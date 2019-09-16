@@ -17,7 +17,7 @@
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
-import { checkAddress, decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
+import { decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
