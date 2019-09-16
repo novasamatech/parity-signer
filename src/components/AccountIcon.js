@@ -20,7 +20,9 @@ import Identicon from '@polkadot/reactnative-identicon';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Image } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import colors from '../colors';
 import { NetworkProtocols } from '../constants'
 import { blockiesIcon } from '../util/native';
 
@@ -64,7 +66,14 @@ export default function AccountIcon (props) {
         style={style || { width: 47, height: 47 }}
       />
     );
+  } else {
+    // if there's no protocol or it's unknown we return a warning
+    return (
+      <Icon
+        color={colors.bg}
+        name={'error'}
+        size={style.width || 50 }
+      />
+    )
   }
-
-  return null;
 }

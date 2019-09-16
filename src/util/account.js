@@ -22,8 +22,8 @@ export function accountId({
   address,
   networkKey
 }) {
-  if (typeof address !== 'string' || address.length === 0 || !networkKey || !NETWORK_LIST[networkKey]) {
-    throw new Error(`Couldn't create an accountId. Address or networkKey missing, or network key was invalid.`);
+  if (!networkKey || !NETWORK_LIST[networkKey]) {
+    return `${NetworkProtocols.UNKNOWN}:${address}`;
   }
 
   const { ethereumChainId='', protocol, genesisHash='' } = NETWORK_LIST[networkKey];

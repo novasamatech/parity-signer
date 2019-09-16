@@ -87,6 +87,7 @@ export default class AccountsStore extends Container {
       });
     }
   }
+  
   update(accountUpdate) {
     let account = this.state.accounts.get(accountId(accountUpdate));
     if (!account) {
