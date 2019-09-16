@@ -72,7 +72,7 @@ export default class AccountIconChooser extends React.PureComponent {
                   password: derivationPassword,
                   phrase: result.seed
                 });
-                
+
                 result.address = await substrateAddress(suri, prefix);
                 result.bip39 = true;
               } catch (e){
@@ -94,7 +94,7 @@ export default class AccountIconChooser extends React.PureComponent {
 
     if (value) {
       return (
-        <Address 
+        <Address
           address={value}
           protocol={protocol}
           style = {styles.addressText}
@@ -104,7 +104,7 @@ export default class AccountIconChooser extends React.PureComponent {
       return <Text style={styles.addressSelectionText} >Select an icon.</Text>
     }
   }
- 
+
   renderIcon = ({ item, index }) => {
     const { onSelect, network : {protocol}, value } = this.props;
     const { address, bip39, seed } = item;
@@ -141,7 +141,7 @@ export default class AccountIconChooser extends React.PureComponent {
   componentDidUpdate(prevProps){
     const {derivationPassword, derivationPath, network} = this.props;
 
-    if ((prevProps.network !== network) || 
+    if ((prevProps.network !== network) ||
       (prevProps.derivationPassword !== derivationPassword) ||
       (prevProps.derivationPath !== derivationPath)){
         this.debouncedRefreshIcons();
@@ -195,8 +195,9 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   iconBorder: {
-     borderWidth: 6,
-    borderColor: colors.card_bg
+    borderWidth: 6,
+    borderColor: colors.card_bg,
+    height: 62 // height = icon height + borderWidth * 2
   },
   icon: {
     width: 50,
@@ -205,12 +206,14 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   addressSelectionText: {
-    fontFamily: fonts.bold,
+    fontFamily: fonts.regular,
     color: colors.bg,
+    lineHeight: 16,
     fontSize: 14,
     paddingLeft: 6
   },
   addressText: {
+    fontSize: 14,
     paddingLeft: 6
   },
   refreshIcon :{

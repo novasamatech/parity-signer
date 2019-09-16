@@ -27,18 +27,18 @@ import fonts from "../fonts";
 import {NetworkProtocols} from '../constants'
 
 export default function Address (props) {
-  const {address, protocol = NetworkProtocols.SUBSTRATE, short = false ,style = {}} = props;
+  const {address, protocol = NetworkProtocols.SUBSTRATE ,style = {}} = props;
   const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
   let result = address;
 
-  if (short) {
-    result = `${address.slice(0, 6)}…${address.slice(-6)}`;
-  }
-
   return (
-      <Text numberOfLines={1} style={[style, styles.secondaryText]}>
-        {prefix}{result}
-      </Text>
+    <Text
+      numberOfLines={1}
+      style={[styles.secondaryText, style]}
+      ellipsizeMode="middle"
+      >
+      {prefix}{result}
+    </Text>
   );
 }
 
@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
   secondaryText: {
     fontFamily: fonts.regular,
     color: colors.bg_text_sec,
-    fontSize: 12
+    fontSize: 12,
+    lineHeight: 16,
   }
 });
