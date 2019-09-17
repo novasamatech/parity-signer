@@ -126,7 +126,7 @@ export default class ScannerStore extends Container<ScannerState> {
     // all the frames are filled
     if (Object.keys(this.state.multipartData.length) === frameCount) {
       // fixme: this needs to be concated to a binary blob
-      const concatMultipartData = Object.keys(this.state.multipartData).reduce((result, data) => res.concat(this.state.multipartData[data]));
+      const concatMultipartData = Object.keys(this.state.multipartData).reduce((result, data) => result.concat(this.state.multipartData[data]));
       const data = this.setParsedData(concatMultipartData);
       this.setData(data);
     }

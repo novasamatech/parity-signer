@@ -30,11 +30,17 @@ export async function loadAccounts( version = 3 ) {
     keychainService: accountStoreVersion,
     sharedPreferencesName: accountStoreVersion
   };
+ 
+  return SecureStorage.getAllItems(accountsStore).then(accounts => {
+      // Object.values(accounts).map(account => JSON.parse(account))
+      let accountMap = new Map();
+      for (let [key, value] of Object.entries(accounts)) {
+        const account = JSON.parse(value)
+        accountMap.set(key, {...account, dbKey: key})
+      }
 
-  return SecureStorage.getAllItems(accountsStore)
-  // .then(accounts =>
-  //   Object.values(accounts).map(account => JSON.parse(account))
-  // );
+      return accountMap
+  });
 }
 
 const accountsStore = {

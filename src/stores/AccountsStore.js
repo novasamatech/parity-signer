@@ -104,15 +104,17 @@ export default class AccountsStore extends Container {
   }
 
   async refreshList() {
-    loadAccounts().then(res => {
+    loadAccounts().then(accounts => {
         // .then(accounts =>
         // Object.values(accounts).map(account => JSON.parse(account))
         // );
-        let accounts = new Map();
-        for (let [key, value] of Object.entries(res)) {
-          const account = JSON.parse(value)
-          accounts.set(key, {...account, dbKey: key})
-        }
+
+        // let accounts = new Map();
+        // for (let [key, value] of Object.entries(res)) {
+        //   const account = JSON.parse(value)
+        //   accounts.set(key, {...account, dbKey: key})
+        // }
+
       // const accounts = Object.entries(res).map(() => {
       //   new Map(res.map(a => [accountId(a), a]));
       // }) 

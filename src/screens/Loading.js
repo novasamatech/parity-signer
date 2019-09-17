@@ -22,6 +22,7 @@ import { NavigationActions, StackActions } from 'react-navigation';
 
 import colors from '../colors';
 import { loadAccounts, loadToCAndPPConfirmation, saveAccount } from '../util/db';
+import { object } from 'prop-types';
 
 export default class Loading extends React.PureComponent {
   static navigationOptions = {
@@ -68,8 +69,19 @@ export default class Loading extends React.PureComponent {
     // with now deprectaded `chainId` and `networkType: 'ethereum'` properties
     // networkKey property is missing since it was introduced in v3.
     const oldAccounts_v2 = await loadAccounts(2);
-    const oldAccounts = [...oldAccounts_v1, ...oldAccounts_v2]
-    const accounts = oldAccounts.map(a => {
+    const oldAccounts = new Map([...oldAccounts_v1, ...oldAccounts_v2]);
+
+    // let accountMap = new Map();
+    // for (let [key, value] of Object.entries(oldAccounts)) {
+    //   let account = JSON.parse(value)
+    //   // The networkKey for Ethereum accounts is the chain id
+    //   account = {...account, networkKey: a.chainId, recovered: true}
+    //   delete account.chainId;
+    //   delete account.networkType;
+    //   accountMap.set(key,account)
+    // }
+
+    const accounts = Object.values(oldAccounts).map(a => {
       let result = {}
       if (a.chainId) {
         // The networkKey for Ethereum accounts is the chain id
