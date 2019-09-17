@@ -62,6 +62,7 @@ export default class Loading extends React.PureComponent {
   }
 
   async migrateAccounts() {
+    //FIXME NOW THIS WILL BREAK
     const oldAccounts_v1 = await loadAccounts(1);
     // v2 (up to v2.2.2) are only ethereum accounts 
     // with now deprectaded `chainId` and `networkType: 'ethereum'` properties

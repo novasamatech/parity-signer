@@ -26,6 +26,7 @@ import { decryptData, encryptData } from '../util/native';
 export type Account = {
   address: string,
   createdAt: number,
+  dbKey: string, // this is the key that is used in the db to save / delete.
   derivationPassword: string,
   derivationPath: string, // doesn't contain the ///password
   encryptedSeed: string,
@@ -59,7 +60,7 @@ export default class AccountsStore extends Container {
   async select(account) {
     return new Promise((res, rej) => {
       this.setState(
-        state => ({ selected: accountId(account) }),
+        state => ({ selected: account.dbKey }),
         state => {
           res(state);
         }
@@ -89,10 +90,10 @@ export default class AccountsStore extends Container {
   }
   
   update(accountUpdate) {
-    let account = this.state.accounts.get(accountId(accountUpdate));
+    let account = this.state.accounts.get(accountUpdate.dbKey);
     if (!account) {
-      this.state.accounts.set(accountId(accountUpdate), accountUpdate);
-      account = this.state.accounts.get(accountId(accountUpdate));
+      this.state.accounts.set(accountUpdate.dbKey, accountUpdate);
+      account = this.state.accounts.get(accountUpdate.dbKey);
     }
     Object.assign(account, accountUpdate);
     this.setState({});
@@ -104,7 +105,18 @@ export default class AccountsStore extends Container {
 
   async refreshList() {
     loadAccounts().then(res => {
-      const accounts = new Map(res.map(a => [accountId(a), a]));
+        // .then(accounts =>
+        // Object.values(accounts).map(account => JSON.parse(account))
+        // );
+        let accounts = new Map();
+        for (let [key, value] of Object.entries(res)) {
+          const account = JSON.parse(value)
+          accounts.set(key, {...account, dbKey: key})
+        }
+      // const accounts = Object.entries(res).map(() => {
+      //   new Map(res.map(a => [accountId(a), a]));
+      // }) 
+      console.log('accounts',accounts)
       this.setState({ accounts });
     });
   }
@@ -129,7 +141,7 @@ export default class AccountsStore extends Container {
   async deleteAccount(account) {
     const { accounts } = this.state;
 
-    accounts.delete(accountId(account));
+    accounts.delete(account.dbKey);
     this.setState({ accounts });
     await deleteDbAccount(account);
   }
@@ -148,7 +160,7 @@ export default class AccountsStore extends Container {
       account.derivationPath = derivePath || '';
       account.derivationPassword = password || '';
       this.setState({
-        accounts: this.state.accounts.set(accountId(account), account)
+        accounts: this.state.accounts.set(account.dbKey, account)
       });
     } catch (e) {
       return false;
@@ -168,9 +180,9 @@ export default class AccountsStore extends Container {
   lockAccount(account) {
     const {accounts} = this.state
 
-    if (accounts.get(accountId(account))) {
+    if (accounts.get(account.dbKey)) {
       const lockedAccount = this.deleteSensitiveData(account)
-      accounts.set(accountId(account), lockedAccount);
+      accounts.set(account.dbKey, lockedAccount);
       this.setState({ accounts });
     }
   }
@@ -186,7 +198,7 @@ export default class AccountsStore extends Container {
   }
 
   getById(account) {
-    return this.state.accounts.get(accountId(account)) || empty(account.address, account.networkKey);
+    return this.state.accounts.get(account.dbKey) || empty(account.address, account.networkKey);
   }
 
   getByAddress(address) {

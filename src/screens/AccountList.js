@@ -28,7 +28,6 @@ import Button from '../components/Button';
 import PopupMenu from '../components/PopupMenu';
 import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
-import { accountId } from '../util/account';
 
 export default class AccountList extends React.PureComponent {
   static navigationOptions = {
@@ -75,7 +74,7 @@ class AccountListView extends React.PureComponent {
     const { accounts, navigation } = this.props;
     const id = navigation.getParam('accountId');
     const index = id
-      ? accounts.findIndex(a => id === accountId(a))
+      ? accounts.findIndex(a => id === a.dbKey)
       : navigation.getParam('index', -1);
     if (this.list && typeof index === 'number' && index !== -1) {
       navigation.setParams({ accountId: undefined, index: undefined });
@@ -139,7 +138,7 @@ class AccountListView extends React.PureComponent {
           }}
           style={styles.content}
           data={accounts}
-          keyExtractor={account => accountId(account)}
+          keyExtractor={account => account.dbKey}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
           renderItem={({ item: account }) => {
             return (

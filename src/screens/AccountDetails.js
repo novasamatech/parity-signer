@@ -27,7 +27,6 @@ import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import TxStore from '../stores/TxStore';
-import { accountId } from '../util/account';
 import PopupMenu from '../components/PopupMenu'
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 
@@ -164,7 +163,7 @@ This account can only be recovered with its associated recovery phrase.`,
         <View style={styles.qr}>
           {
             protocol !== NetworkProtocols.UNKNOWN
-            ? <QrView data={accountId(account)} />
+            ? <QrView data={account.dbKey} />
             : this.renderWarningUnknownAccount()
           }
         </View>

@@ -31,9 +31,10 @@ export async function loadAccounts( version = 3 ) {
     sharedPreferencesName: accountStoreVersion
   };
 
-  return SecureStorage.getAllItems(accountsStore).then(accounts =>
-    Object.values(accounts).map(account => JSON.parse(account))
-  );
+  return SecureStorage.getAllItems(accountsStore)
+  // .then(accounts =>
+  //   Object.values(accounts).map(account => JSON.parse(account))
+  // );
 }
 
 const accountsStore = {
@@ -50,11 +51,11 @@ function txKey(hash) {
 }
 
 export const deleteAccount = async account =>
-  SecureStorage.deleteItem(accountId(account), accountsStore);
+  SecureStorage.deleteItem(account.dbKey, accountsStore);
 
 export const saveAccount = account => 
   SecureStorage.setItem(
-    accountId(account),
+    account.dbKey,
     JSON.stringify(account, null, 0),
     accountsStore
   );
