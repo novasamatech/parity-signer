@@ -43,8 +43,8 @@ export default class AccountList extends React.PureComponent {
             <AccountListView
               {...this.props}
               accounts={accounts.getAccounts()}
-              onAccountSelected={async address => {
-                await accounts.select(address);
+              onAccountSelected={async account => {
+                await accounts.select(account);
                 this.props.navigation.navigate('AccountDetails');
               }}
             />

@@ -41,7 +41,7 @@ export type Account = {
 type AccountsState = {
   accounts: Map<string, Account>,
   newAccount: Account,
-  selected: Account
+  selectedKey: string
 };
 
 
@@ -49,7 +49,7 @@ export default class AccountsStore extends Container {
   state = {
     accounts: new Map(),
     newAccount: empty(),
-    selected: undefined
+    selectedKey: ''
   };
 
   constructor(props) {
@@ -60,7 +60,7 @@ export default class AccountsStore extends Container {
   async select(account) {
     return new Promise((res, rej) => {
       this.setState(
-        state => ({ selected: account.dbKey }),
+        state => ({ selectedKey: account.dbKey }),
         state => {
           res(state);
         }
@@ -82,6 +82,7 @@ export default class AccountsStore extends Container {
     // only save a new account if the seed isn't empty
     if (account.seed) {
       await this.save(account, pin);
+      account.dbKey = accountId(account);
       this.setState({
         accounts: this.state.accounts.set(accountId(account), account),
         newAccount: empty()
@@ -210,7 +211,11 @@ export default class AccountsStore extends Container {
   }
 
   getSelected() {
-    return this.state.accounts.get(this.state.selected);
+    return this.state.accounts.get(this.state.selectedKey);
+  }
+
+  getSelectedKey() {
+    return this.state.selectedKey
   }
 
   getAccounts() {

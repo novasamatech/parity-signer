@@ -61,7 +61,7 @@ export const deleteAccount = async account =>
 
 export const saveAccount = account => 
   SecureStorage.setItem(
-    account.dbKey,
+    accountId(account),
     JSON.stringify(account, null, 0),
     accountsStore
   );
