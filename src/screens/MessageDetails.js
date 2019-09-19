@@ -51,10 +51,6 @@ export default class MessageDetails extends React.PureComponent {
                 message={isU8a(message) ? u8aToHex(message) : message}
                 dataToSign={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign}
                 isHash={scannerStore.getIsHash()}
-                onPressAccount={async account => {
-                  await accounts.select(account);
-                  this.props.navigation.navigate('AccountDetails');
-                }}
                 onNext={async () => {
                   try {
                     this.props.navigation.navigate('AccountUnlockAndSign', {
@@ -85,7 +81,7 @@ export class MessageDetailsView extends React.PureComponent {
   };
 
   render() {
-    const {dataToSign, isHash, message, onNext, onPressAccount, sender} = this.props;
+    const {dataToSign, isHash, message, onNext, sender} = this.props;
 
     return (
       <ScrollView
@@ -99,9 +95,6 @@ export class MessageDetailsView extends React.PureComponent {
           title={sender.name}
           address={sender.address}
           networkKey={sender.networkKey}
-          onPress={() => {
-            onPressAccount(sender);
-          }}
         />
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
