@@ -137,10 +137,12 @@ class AccountListView extends React.PureComponent {
             this.list = list;
           }}
           style={styles.content}
-          data={accounts}
-          keyExtractor={account => account.dbKey}
+          data={[...accounts.entries()]}
+          keyExtractor={([key, value]) => key}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item: account }) => {
+          renderItem={({ item: [key, value] }) => {
+            const account = value;
+            console.log('key',key,'value',value)
             return (
               <AccountCard
                 address={account.address}

@@ -39,7 +39,7 @@ export type Account = {
 };
 
 type AccountsState = {
-  accounts: Map<string, Account>,
+  accounts: Object,
   newAccount: Account,
   selectedKey: string
 };
@@ -47,7 +47,7 @@ type AccountsState = {
 
 export default class AccountsStore extends Container {
   state = {
-    accounts: new Map(),
+    accounts: {},
     newAccount: empty(),
     selectedKey: ''
   };
@@ -84,17 +84,17 @@ export default class AccountsStore extends Container {
       await this.save(account, pin);
       account.dbKey = accountId(account);
       this.setState({
-        accounts: this.state.accounts.set(accountId(account), account),
+        accounts: {...accounts, account},
         newAccount: empty()
       });
     }
   }
   
   update(accountUpdate) {
-    let account = this.state.accounts.get(accountUpdate.dbKey);
+    let account = this.state.accounts[accountUpdate.dbKey];
     if (!account) {
-      this.state.accounts.set(accountUpdate.dbKey, accountUpdate);
-      account = this.state.accounts.get(accountUpdate.dbKey);
+      this.state.accounts[accountUpdate.dbKey] = accountUpdate;
+      account = this.state.accounts[accountUpdate.dbKey];
     }
     Object.assign(account, accountUpdate);
     this.setState({});
@@ -163,7 +163,7 @@ export default class AccountsStore extends Container {
       account.derivationPath = derivePath || '';
       account.derivationPassword = password || '';
       this.setState({
-        accounts: this.state.accounts.set(account.dbKey, account)
+        accounts: {...accounts, [account.dbKey]: account}
       });
     } catch (e) {
       return false;
@@ -183,10 +183,9 @@ export default class AccountsStore extends Container {
   lockAccount(account) {
     const {accounts} = this.state
 
-    if (accounts.get(account.dbKey)) {
+    if (accounts[account.dbKey]) {
       const lockedAccount = this.deleteSensitiveData(account)
-      accounts.set(account.dbKey, lockedAccount);
-      this.setState({ accounts });
+      this.setState({ accounts: {...accounts, [account.dbKey]: lockedAccount} });
     }
   }
 
@@ -201,7 +200,7 @@ export default class AccountsStore extends Container {
   }
 
   getById(account) {
-    return this.state.accounts.get(account.dbKey) || empty(account.address, account.networkKey);
+    return this.state.accounts[account.dbKey] || empty(account.address, account.networkKey);
   }
 
   getByAddress(address) {
@@ -211,7 +210,7 @@ export default class AccountsStore extends Container {
   }
 
   getSelected() {
-    return this.state.accounts.get(this.state.selectedKey);
+    return this.state.accounts[this.state.selectedKey];
   }
 
   getSelectedKey() {
