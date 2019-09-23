@@ -18,17 +18,18 @@
 
 import { isU8a, u8aToHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
-import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, Dimensions, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/message';
+import rnTextSize from 'react-native-text-size';
 
 export default class MessageDetails extends React.PureComponent {
   static navigationOptions = {
@@ -75,65 +76,80 @@ export default class MessageDetails extends React.PureComponent {
   }
 }
 
-export class MessageDetailsView extends React.PureComponent {
-  static propTypes = {
-    onNext: PropTypes.func.isRequired,
-    dataToSign: PropTypes.string.isRequired,
-    isHash: PropTypes.bool,
-    sender: PropTypes.object.isRequired,
-    message: PropTypes.string.isRequired
-  };
+export function MessageDetailsView(props) {
+	MessageDetailsView.propTypes = {
+		onNext: PropTypes.func.isRequired,
+		dataToSign: PropTypes.string.isRequired,
+		isHash: PropTypes.bool,
+		sender: PropTypes.object.isRequired,
+		message: PropTypes.string.isRequired
+	};
 
-  render() {
-    const {dataToSign, isHash, message, onNext, onPressAccount, sender} = this.props;
+	const { dataToSign, isHash, message, onNext, onPressAccount, sender } = props;
+	const [textLinesNumber, setTextLinesNumber] = useState(4);
+	const messageText = isAscii(message) ? hexToAscii(message) : dataToSign;
+	const textHeight =
+		textLinesNumber * styles.message.lineHeight + styles.message.padding * 2;
 
-    return (
-      <ScrollView
-        contentContainerStyle={styles.bodyContent}
-        style={styles.body}
-      >
-        <Background />
-        <Text style={styles.topTitle}>SIGN MESSAGE</Text>
-        <Text style={styles.title}>FROM ACCOUNT</Text>
-        <AccountCard
-          title={sender.name}
-          address={sender.address}
-          networkKey={sender.networkKey}
-          onPress={() => {
-            onPressAccount(sender);
-          }}
-        />
-        <Text style={styles.title}>MESSAGE</Text>
-        <Text style={styles.message}>
-          {isAscii(message)
-            ? hexToAscii(message)
-            : dataToSign}
-        </Text>
-        <Button
-          buttonStyles={{ height: 60 }}
-          title="Sign Message"
-          onPress={() => {
-            isHash
-              ? Alert.alert(
-                  "Warning",
-                  "The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.",
-                  [
-                    {
-                      text: 'I take the risk',
-                      onPress: () => onNext()
-                    },
-                    {
-                      text: 'Cancel',
-                      style: 'cancel'
-                    }
-                  ]
-                )
-              : onNext()
-          }}
-        />
-      </ScrollView>
-    );
-  }
+	const calculateTextLinesNumber = async () => {
+		const screenWidth = Math.round(Dimensions.get('window').width);
+		const width =
+			screenWidth - styles.body.padding * 2 - styles.message.padding * 2;
+		const { lineCount } = await rnTextSize.measure({
+			text: messageText,
+			width,
+			...styles.messageFont
+		});
+		setTextLinesNumber(lineCount > 4 ? lineCount : 4);
+	};
+
+	useEffect(() => {
+		calculateTextLinesNumber();
+	}, []);
+
+	return (
+		<ScrollView contentContainerStyle={styles.bodyContent} style={styles.body}>
+			<Background />
+			<Text style={styles.topTitle}>SIGN MESSAGE</Text>
+			<Text style={styles.title}>FROM ACCOUNT</Text>
+			<AccountCard
+				title={sender.name}
+				address={sender.address}
+				networkKey={sender.networkKey}
+				onPress={() => {
+					onPressAccount(sender);
+				}}
+			/>
+			<Text style={styles.title}>MESSAGE</Text>
+			<Text
+				style={[styles.message, styles.messageFont, { height: textHeight }]}
+			>
+				{messageText}
+			</Text>
+			<Button
+				buttonStyles={{ height: 60 }}
+				title="Sign Message"
+				onPress={() => {
+					isHash
+						? Alert.alert(
+								'Warning',
+								'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
+								[
+									{
+										text: 'I take the risk',
+										onPress: () => onNext()
+									},
+									{
+										text: 'Cancel',
+										style: 'cancel'
+									}
+								]
+						  )
+						: onNext();
+				}}
+			/>
+		</ScrollView>
+	);
 }
 
 const styles = StyleSheet.create({
@@ -165,13 +181,14 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   message: {
+    lineHeight: 25,
     marginBottom: 20,
     padding: 10,
-    height: 120,
-    lineHeight: 26,
-    fontSize: 20,
+  },
+  messageFont: {
+    backgroundColor: colors.card_bg,
     fontFamily: fonts.regular,
-    backgroundColor: colors.card_bg
+		fontSize: 20,
   },
   wrapper: {
     borderRadius: 5

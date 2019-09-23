@@ -164,6 +164,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-text-size')
     implementation project(':react-native-camera')
     implementation project(':react-native-secure-storage')
     implementation project(':react-native-gesture-handler')

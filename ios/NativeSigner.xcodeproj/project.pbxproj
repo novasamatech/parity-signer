@@ -68,6 +68,7 @@
 		EDCE1EC0CA1249279F03F2E2 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */; };
 		EE896FB251B94030AC713B6F /* Roboto-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */; };
 		F1569210427145DEBBB5B898 /* Manifold-CF-Extra-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */; };
+		72D939E0DF3846529EF61763 /* libRNTextSize.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0C44B3058D64E7A8987C947 /* libRNTextSize.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -517,6 +518,8 @@
 		F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Extra-Bold.otf"; path = "../res/fonts/Manifold-CF-Extra-Bold.otf"; sourceTree = "<group>"; };
 		F2FB2DDD90964B3BB1FC813C /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ThinItalic.ttf"; path = "../res/fonts/Roboto-ThinItalic.ttf"; sourceTree = "<group>"; };
+		431403E276374075950014AC /* RNTextSize.xcodeproj */ = {isa = PBXFileReference; name = "RNTextSize.xcodeproj"; path = "../node_modules/react-native-text-size/ios/RNTextSize.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		A0C44B3058D64E7A8987C947 /* libRNTextSize.a */ = {isa = PBXFileReference; name = "libRNTextSize.a"; path = "libRNTextSize.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -550,6 +553,7 @@
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				9CE53E9B76FD4CE88D0778EC /* libRNRandomBytes.a in Frameworks */,
 				D6EED2987CEF454F865C09E0 /* libRNSVG.a in Frameworks */,
+				72D939E0DF3846529EF61763 /* libRNTextSize.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -838,6 +842,7 @@
 				C0205550495341279B513024 /* RNSVG.xcodeproj */,
 				7F019AE07E4148359A2FBCAB /* RNCNetInfo.xcodeproj */,
 				23407C2347C34F7D9EF80F09 /* RNSecureStorage.xcodeproj */,
+				431403E276374075950014AC /* RNTextSize.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1553,6 +1558,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1575,6 +1581,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1608,6 +1615,7 @@
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/netinfo/ios",
 					"$(SRCROOT)/../node_modules/react-native-secure-storage/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-text-size/ios",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -1648,6 +1656,7 @@
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/netinfo/ios",
 					"$(SRCROOT)/../node_modules/react-native-secure-storage/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-text-size/ios",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
