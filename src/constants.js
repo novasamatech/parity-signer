@@ -17,7 +17,7 @@ export const EthereumNetworkKeys = Object.freeze({
 
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys = Object.freeze({
-  KUSAMA: '0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636', // hhttps://polkascan.io/pre/kusama-cc2/block/0
+  KUSAMA: '0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636', // https://polkascan.io/pre/kusama-cc2/block/0
   // SUBSTRATE_DEV: '0x4393a679e1830a487e8ae92733f089a80f3e24ba515b08dd8adb40fc6cedee8d', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 });
 
