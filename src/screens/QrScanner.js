@@ -73,6 +73,7 @@ export default class Scanner extends React.PureComponent {
                     await scannerStore.setUnsigned(txRequestData.data);
                   } else {
                     const strippedData = rawDataToU8A(txRequestData.rawData);
+
                     await scannerStore.setParsedData(
                       strippedData,
                       accountsStore

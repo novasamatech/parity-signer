@@ -17,13 +17,13 @@
 // @flow
 
 import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
-import { GenericCall, Metadata } from '@polkadot/types';
+import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import { Alert, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
 import fonts from '../fonts';
 import colors from '../colors';
@@ -73,6 +73,10 @@ export default class PayloadDetailsCard extends React.PureComponent {
         fallback: true
       });
     }
+    
+    getTypeRegistry().register({
+      Keys: 'SessionKeysPolkadot'
+    });
 
     const extrinsics = extrinsicsFromMeta(metadata);
     GenericCall.injectMethods(extrinsics);
@@ -115,25 +119,41 @@ function ExtrinsicPart({ label, fallback, value }) {
   const [period, setPeriod] = useState();
   const [phase, setPhase] = useState();
   const [sectionMethod, setSectionMethod] = useState();
+  const [useFallback, setUseFallBack] = useState(false);
 
   useEffect(() => {
     if (label === 'Method' && !fallback) {
-      const call = new Call(value);
-      const { args, meta, methodName, sectionName } = call;
+      try {
+        const call = new Call(value);
 
-      let result = {};
-      for (let i = 0; i < meta.args.length; i ++) {
-        let value;
-        if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
-          value = formatBalance(args[i].toString());
-        } else {
-          value = args[i].toString();
+        const { args, meta, methodName, sectionName } = call;
+
+        let result = {};
+        for (let i = 0; i < meta.args.length; i ++) {
+          let value;
+          if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
+            value = formatBalance(args[i].toString());
+          } else {
+            value = args[i].toString();
+          }
+          result[meta.args[i].name.toString()] = value;
         }
-        result[meta.args[i].name.toString()] = value;
-      }
 
-      setArgNameValue(result);
-      setSectionMethod(`${sectionName}.${methodName}`);
+        setArgNameValue(result);
+        setSectionMethod(`${sectionName}.${methodName}`);
+      } catch (e) {
+        Alert.alert(
+          'Could not decode method with available metadata.',
+          `Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.`,
+          [
+            {
+              text: 'Okay',
+              style: 'default',
+            }
+          ]
+        );
+        setUseFallBack(true);
+      }
     };
 
     if (label === 'Era' && !fallback) {
@@ -193,11 +213,11 @@ function ExtrinsicPart({ label, fallback, value }) {
           {label}
         </Text>
         {
-          label === 'Method'
+          (label === 'Method' && !useFallback)
             ? renderMethodDetails()
             : label === 'Era'
               ? renderEraDetails()
-              : <Text style={styles.secondaryText}>{value}</Text>
+              : <Text style={styles.secondaryText}>{useFallback ? value.toString() : value}</Text>
         }
       </View>
     </View>

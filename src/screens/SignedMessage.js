@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   message: {
     marginBottom: 20,
     padding: 10,
-    height: 120,
+    minHeight: 120,
     lineHeight: 26,
     fontFamily: fonts.regular,
     fontSize: 20,
