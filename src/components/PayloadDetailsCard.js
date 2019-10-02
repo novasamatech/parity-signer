@@ -132,7 +132,6 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
         let result = {};
         for (let i = 0; i < meta.args.length; i ++) {
           let value;
-          console.log('arg type => ', args[i].toRawType());
           if (args[i].toRawType() === 'Balance' || args[i].toRawType() === 'Compact<Balance>') {
             value = formatBalance(args[i].toString());
           } else if (args[i].toRawType() === 'Address') {
