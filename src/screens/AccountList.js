@@ -43,8 +43,8 @@ export default class AccountList extends React.PureComponent {
             <AccountListView
               {...this.props}
               accounts={accounts.getAccounts()}
-              onAccountSelected={async account => {
-                await accounts.select(account);
+              onAccountSelected={key => {
+                accounts.select(key);
                 this.props.navigation.navigate('AccountDetails');
               }}
             />
@@ -57,11 +57,7 @@ export default class AccountList extends React.PureComponent {
 
 class AccountListView extends React.PureComponent {
   static propTypes = {
-    accounts: PropTypes.arrayOf(
-      PropTypes.shape({
-        address: PropTypes.string.isRequired,
-      })
-    ).isRequired,
+    accounts: PropTypes.object.isRequired,
     onAccountSelected: PropTypes.func.isRequired,
   };
 
@@ -112,8 +108,8 @@ class AccountListView extends React.PureComponent {
   render() {
     const { accounts, navigation, onAccountSelected } = this.props;
     const hasNoAccount = accounts.length < 1;
-    const { navigate } = navigation;
-
+    const { navigate } = navigation;;
+console.log('account list',accounts)
     return (
       <View style={styles.body}>
         <Background />
@@ -142,13 +138,13 @@ class AccountListView extends React.PureComponent {
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
           renderItem={({ item: [key, value] }) => {
             const account = value;
-            console.log('key',key,'value',value)
+            // console.log('key',key,'value',value)
             return (
               <AccountCard
                 address={account.address}
                 networkKey={account.networkKey}
                 onPress={() => {
-                  onAccountSelected(account);
+                  onAccountSelected(key);
                 }}
                 style={{ paddingBottom: null }}
                 title={account.name}

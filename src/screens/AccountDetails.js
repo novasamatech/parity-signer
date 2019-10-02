@@ -56,11 +56,11 @@ class AccountDetailsView extends React.Component {
     super(props);
   }
 
-  componentDidMount() {
-    this.subscription = this.props.navigation.addListener('willFocus', t => {
-      this.props.txStore.loadTxsForAccount(this.props.accounts.getSelected());
-    });
-  }
+  // componentDidMount() {
+  //   this.subscription = this.props.navigation.addListener('willFocus', t => {
+  //     this.props.txStore.loadTxsForAccount(this.props.accounts.getSelected());
+  //   });
+  // }
 
   onDelete = () => {
     const accounts = this.props.accounts
@@ -92,9 +92,9 @@ This account can only be recovered with its associated recovery phrase.`,
     );
   }
 
-  componentWillUnmount() {
-    this.subscription.remove();
-  }
+  // componentWillUnmount() {
+  //   this.subscription.remove();
+  // }
 
   onOptionSelect = (value) => {
     const navigate = this.props.navigation.navigate
@@ -127,7 +127,6 @@ This account can only be recovered with its associated recovery phrase.`,
   }
 
   render() {
-    console.log('render account details');
     const account = this.props.accounts.getSelected();
 
     if (!account) {

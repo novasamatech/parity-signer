@@ -39,7 +39,7 @@ export type Account = {
 };
 
 type AccountsState = {
-  accounts: Object,
+  accounts: Map<string, Account>,
   newAccount: Account,
   selectedKey: string
 };
@@ -47,7 +47,7 @@ type AccountsState = {
 
 export default class AccountsStore extends Container {
   state = {
-    accounts: {},
+    accounts: new Map(),
     newAccount: empty(),
     selectedKey: ''
   };
@@ -57,15 +57,8 @@ export default class AccountsStore extends Container {
     this.refreshList();
   }
 
-  async select(account) {
-    return new Promise((res, rej) => {
-      this.setState(
-        state => ({ selectedKey: account.dbKey }),
-        state => {
-          res(state);
-        }
-      );
-    });
+  async select(accountKey) {
+    this.setState({ selectedKey: accountKey });
   }
 
   updateNew(accountUpdate) {
@@ -84,28 +77,30 @@ export default class AccountsStore extends Container {
       await this.save(account, pin);
       account.dbKey = accountId(account);
       this.setState({
-        accounts: {...accounts, account},
+        accounts: this.state.accounts.set(accountId(account), account),
         newAccount: empty()
       });
     }
   }
   
-  update(accountUpdate) {
-    let account = this.state.accounts[accountUpdate.dbKey];
-    if (!account) {
-      this.state.accounts[accountUpdate.dbKey] = accountUpdate;
-      account = this.state.accounts[accountUpdate.dbKey];
+  updateAccount(accountKey, updatedAccount) {
+    const accounts = this.state.accounts;
+    const account = accounts.get(accountKey);
+
+    if (account && updatedAccount) {
+      this.setState({ accounts: accounts.set(accountKey, {...account, ...updatedAccount}) });
     }
-    Object.assign(account, accountUpdate);
-    this.setState({});
+    debugger;
+    // Object.assign(account, accountUpdate);
+    // this.setState({});
   }
 
-  updateSelected(accountUpdate) {
-    this.update(Object.assign(this.getSelected(), accountUpdate));
+  updateSelectedAccount(updatedAccount) {
+    this.updateAccount(this.state.selectedKey, updatedAccount)
   }
 
   async refreshList() {
-    loadAccounts().then(accounts => {
+    // loadAccounts().then(accounts => {
         // .then(accounts =>
         // Object.values(accounts).map(account => JSON.parse(account))
         // );
@@ -119,7 +114,9 @@ export default class AccountsStore extends Container {
       // const accounts = Object.entries(res).map(() => {
       //   new Map(res.map(a => [accountId(a), a]));
       // }) 
-      console.log('accounts',accounts)
+    loadAccounts().then(accounts => {
+      // const accounts = new Map(res.map(a => [accountId(a), a]));
+      // console.log('accounts refreshList',accounts)
       this.setState({ accounts });
     });
   }
@@ -149,21 +146,23 @@ export default class AccountsStore extends Container {
     await deleteDbAccount(account);
   }
 
-  async unlockAccount(account, pin) {
-    if (!account || !account.encryptedSeed) {
+  async unlockAccount(accountKey, pin) {
+    const {accounts} = this.state;
+    const account = accounts.get(accountKey);
+
+    if (!accountKey || !account || !account.encryptedSeed) {
       return false;
     }
 
     try {
       account.seed = await decryptData(account.encryptedSeed, pin);
-
       const {phrase, derivePath, password} = parseSURI(account.seed)
 
       account.seedPhrase = phrase || '';
       account.derivationPath = derivePath || '';
       account.derivationPassword = password || '';
       this.setState({
-        accounts: {...accounts, [account.dbKey]: account}
+        accounts: this.state.accounts.set(accountKey, account)
       });
     } catch (e) {
       return false;
@@ -180,12 +179,15 @@ export default class AccountsStore extends Container {
     return account
   }
 
-  lockAccount(account) {
+  lockAccount(accountKey) {
     const {accounts} = this.state
+    const account = accounts.get(accountKey);
 
-    if (accounts[account.dbKey]) {
+    if (account) {
       const lockedAccount = this.deleteSensitiveData(account)
-      this.setState({ accounts: {...accounts, [account.dbKey]: lockedAccount} });
+      this.setState({
+        accounts: this.state.accounts.set(accountKey, lockedAccount)
+      });
     }
   }
 
@@ -210,7 +212,7 @@ export default class AccountsStore extends Container {
   }
 
   getSelected() {
-    return this.state.accounts[this.state.selectedKey];
+    return this.state.accounts.get(this.state.selectedKey);
   }
 
   getSelectedKey() {
@@ -218,16 +220,18 @@ export default class AccountsStore extends Container {
   }
 
   getAccounts() {
-    return Array.from(this.state.accounts.values())
-      .filter(a => !!a.networkKey)
-      .sort((a, b) => {
-        if (a.name < b.name) {
-          return -1;
-        }
-        if (a.name > b.name) {
-          return 1;
-        }
-        return 0;
-      });
+    // console.log('this.state.accounts',this.state.accounts)
+    return this.state.accounts
+    // return Array.from(this.state.accounts.values())
+    //   .filter(a => !!a.networkKey)
+    //   .sort((a, b) => {
+    //     if (a.name < b.name) {
+    //       return -1;
+    //     }
+    //     if (a.name > b.name) {
+    //       return 1;
+    //     }
+    //     return 0;
+    //   });
   }
 }

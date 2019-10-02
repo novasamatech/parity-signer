@@ -60,7 +60,7 @@ export default class AccountEdit extends React.PureComponent {
               <TextInput
                 style={{ marginBottom: 40 }}
                 onChangeText={async (name) => {
-                  accounts.updateSelected({ name });
+                  accounts.updateSelectedAccount({ name });
                   await accounts.save(accounts.getSelected())
                 }}
                 value={selected.name}

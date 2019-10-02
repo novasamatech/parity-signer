@@ -22,7 +22,6 @@ import { NavigationActions, StackActions } from 'react-navigation';
 
 import colors from '../colors';
 import { loadAccounts, loadToCAndPPConfirmation, saveAccount } from '../util/db';
-import { object } from 'prop-types';
 
 export default class Loading extends React.PureComponent {
   static navigationOptions = {
@@ -81,7 +80,7 @@ export default class Loading extends React.PureComponent {
     //   accountMap.set(key,account)
     // }
 
-      const accounts = oldAccounts.entries(([_,value]) => {
+      const accounts = Object.entries(oldAccounts).map(([_,value]) => {
       let result = {}
       if (value.chainId) {
         // The networkKey for Ethereum accounts is the chain id

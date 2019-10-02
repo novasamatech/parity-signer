@@ -32,23 +32,22 @@ export async function loadAccounts( version = 3 ) {
   };
  
   return SecureStorage.getAllItems(accountsStore).then(accounts => {
-      // Object.values(accounts).map(account => JSON.parse(account))
-
-      let accountGood = {};
-      for (let [key, value] of Object.entries(accounts)) {
-        const account = JSON.parse(value)
-        accountGood = {...accountGood, [key]:{...account, dbKey: key}}
-      }
-
-      // let accountMap = new Map();
+      //Object.values(accounts).map(account => JSON.parse(account))
+      // console.log('accounts db',accounts);
+      // let accountGood = {};
       // for (let [key, value] of Object.entries(accounts)) {
       //   const account = JSON.parse(value)
-      //   accountMap.set(key, {...account, dbKey: key})
+      //   accountGood = {...accountGood, [key]:{...account, dbKey: key}}
       // }
-      // console.log('accounts db',accounts)
+
+      let accountMap = new Map();
+      for (let [key, value] of Object.entries(accounts)) {
+        const account = JSON.parse(value)
+        accountMap.set(key, {...account, dbKey: key})
+      }
       // console.log('accountGood db',accountGood)
 
-      return accountGood
+      return accountMap
   });
 }
 
