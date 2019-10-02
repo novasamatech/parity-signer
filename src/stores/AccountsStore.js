@@ -202,9 +202,8 @@ export default class AccountsStore extends Container {
   }
 
   getById(account) {
-    const acc = this.state.accounts[account.dbKey] || empty(account.address, account.networkKey)
-    debugger;
-    return acc;
+    //const acc = this.state.accounts[account.dbKey] || empty(account.address, account.networkKey)
+    return this.state.accounts.get(accountId(account)) || empty(account.address, account.networkKey);
   }
 
   getByAddress(address) {

@@ -21,6 +21,7 @@ import { decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
 import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
+import { accountId } from '../util/account';
 import { saveTx } from '../util/db';
 import { isAscii } from '../util/message';
 import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
@@ -211,7 +212,7 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     const recipient = accountsStore.getById({
-      networkKey: networkKey,
+      networkKey,
       address: isEthereum ? tx.action : txRequest.data.account
     });
 
