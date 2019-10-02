@@ -205,18 +205,6 @@ export default class AccountsStore extends Container {
   }
 
   getAccounts() {
-    // console.log('this.state.accounts',this.state.accounts)
     return this.state.accounts
-    // return Array.from(this.state.accounts.values())
-    //   .filter(a => !!a.networkKey)
-    //   .sort((a, b) => {
-    //     if (a.name < b.name) {
-    //       return -1;
-    //     }
-    //     if (a.name > b.name) {
-    //       return 1;
-    //     }
-    //     return 0;
-    //   });
   }
 }
