@@ -58,14 +58,12 @@ function txKey(hash) {
 export const deleteAccount = async accountKey =>
   SecureStorage.deleteItem(accountKey, accountsStore);
 
-export const saveAccount = account => 
+export const saveAccount = (accountKey, account) => 
   SecureStorage.setItem(
-    accountId(account),
+    accountKey,
     JSON.stringify(account, null, 0),
     accountsStore
   );
-
-export const saveAccounts = accounts => accounts.forEach(saveAccount);
 
 export async function saveTx(tx) {
   if (!tx.sender) {

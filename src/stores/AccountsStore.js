@@ -73,9 +73,11 @@ export default class AccountsStore extends Container {
 
     // only save a new account if the seed isn't empty
     if (account.seed) {
-      await this.save(account, pin);
+      const accountKey = accountId(account);
+
+      await this.save(accountKey, account, pin);
       this.setState({
-        accounts: this.state.accounts.set(accountId(account), account),
+        accounts: this.state.accounts.set(accountKey, account),
         newAccount: empty()
       });
     }
@@ -100,7 +102,7 @@ export default class AccountsStore extends Container {
     });
   }
 
-  async save(account, pin = null) {
+  async save(accountKey, account, pin = null) {
     try {
       // for account creation
       if (pin && account.seed) {
@@ -110,7 +112,7 @@ export default class AccountsStore extends Container {
       const accountToSave = this.deleteSensitiveData(account);
 
       accountToSave.updatedAt = new Date().getTime();
-      await saveAccount(accountToSave);
+      await saveAccount(accountKey, accountToSave);
     } catch (e) {
       console.error(e);
     }

@@ -61,7 +61,7 @@ export default class AccountEdit extends React.PureComponent {
                 style={{ marginBottom: 40 }}
                 onChangeText={async (name) => {
                   accounts.updateSelectedAccount({ name });
-                  await accounts.save(accounts.getSelected())
+                  await accounts.save(accounts.getSelectedKey(), accounts.getSelected())
                 }}
                 value={selected.name}
                 placeholder="New name"

@@ -76,7 +76,7 @@ class AccountBackupView extends React.PureComponent {
     const {navigate} = navigation;
     const isNew = navigation.getParam('isNew');
     const {address, derivationPassword, derivationPath, name, networkKey, seed, seedPhrase} = isNew ? accounts.getNew() : accounts.getSelected();
-    const protocol = NETWORK_LIST[networkKey].protocol || '';
+    const protocol = NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol || '';
 
     return (
       <ScrollView

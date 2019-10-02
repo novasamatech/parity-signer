@@ -68,7 +68,7 @@ class AccountPinView extends React.PureComponent {
         });
         this.props.navigation.dispatch(resetAction);
       } else {
-        await accounts.save(account, pin);
+        await accounts.save(accounts.getSelectedKey(), account, pin);
         const resetAction = StackActions.reset({
           index: 1,
           key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343

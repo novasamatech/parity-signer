@@ -93,6 +93,7 @@ export default class Loading extends React.PureComponent {
     
     accounts.forEach(account => {
       try{
+        // will break, needs accountKey
         saveAccount(account);
       } catch(e){
         console.error(e);
