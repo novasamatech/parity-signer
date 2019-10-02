@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   message: {
     marginBottom: 20,
     padding: 10,
-    height: 120,
+    minHeight: 120,
     lineHeight: 26,
     fontSize: 20,
     fontFamily: fonts.regular,
