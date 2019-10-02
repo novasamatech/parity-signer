@@ -20,6 +20,7 @@ import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
+import { decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
@@ -84,7 +85,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
   render() {
     const { fallback } = this.state;
-    const { description, payload, signature, style } = this.props;
+    const { description, payload, prefix, signature, style } = this.props;
 
     return (
       <View style={[styles.body, style]}>
@@ -92,12 +93,12 @@ export default class PayloadDetailsCard extends React.PureComponent {
         {
           !!payload && (
             <View style={{ padding: 5, paddingVertical: 2 }}>
-              <ExtrinsicPart label='Block Hash' value={payload.blockHash.toString()} />
-              <ExtrinsicPart label='Method' value={fallback ? payload.method.toString() : payload.method} />
-              <ExtrinsicPart label='Era' value={fallback ? payload.era.toString() : payload.era} />
-              <ExtrinsicPart label='Nonce' value={payload.nonce.toString()} />
-              <ExtrinsicPart label='Tip' value={payload.tip.toString()} />
-              <ExtrinsicPart label='Genesis Hash' value={payload.genesisHash.toString()} />
+              <ExtrinsicPart label='Block Hash' prefix={prefix} value={payload.blockHash.toString()} />
+              <ExtrinsicPart label='Method' prefix={prefix} value={fallback ? payload.method.toString() : payload.method} />
+              <ExtrinsicPart label='Era' prefix={prefix} value={fallback ? payload.era.toString() : payload.era} />
+              <ExtrinsicPart label='Nonce' prefix={prefix} value={payload.nonce.toString()} />
+              <ExtrinsicPart label='Tip' prefix={prefix} value={payload.tip.toString()} />
+              <ExtrinsicPart label='Genesis Hash' prefix={prefix} value={payload.genesisHash.toString()} />
             </View>
           )
         }
@@ -114,25 +115,29 @@ export default class PayloadDetailsCard extends React.PureComponent {
   }
 }
 
-function ExtrinsicPart({ label, fallback, value }) {
+function ExtrinsicPart({ label, fallback, prefix, value }) {
   const [argNameValue, setArgNameValue] = useState();
   const [period, setPeriod] = useState();
   const [phase, setPhase] = useState();
   const [sectionMethod, setSectionMethod] = useState();
+  const [tip, setTip] = useState();
   const [useFallback, setUseFallBack] = useState(false);
 
   useEffect(() => {
     if (label === 'Method' && !fallback) {
       try {
         const call = new Call(value);
-
         const { args, meta, methodName, sectionName } = call;
 
         let result = {};
         for (let i = 0; i < meta.args.length; i ++) {
           let value;
-          if (args[i].toRawType() === 'Balance' || args[i].toRawType() == 'Compact<Balance>') {
+          console.log('arg type => ', args[i].toRawType());
+          if (args[i].toRawType() === 'Balance' || args[i].toRawType() === 'Compact<Balance>') {
             value = formatBalance(args[i].toString());
+          } else if (args[i].toRawType() === 'Address') {
+            // encode AccountId to the appropriate prefix
+            value = encodeAddress(decodeAddress(args[i].toString()), prefix);
           } else {
             value = args[i].toString();
           }
@@ -161,6 +166,10 @@ function ExtrinsicPart({ label, fallback, value }) {
         setPeriod(value.asMortalEra.period.toString());
         setPhase(value.asMortalEra.phase.toString());
       }
+    }
+
+    if (label === 'Tip' && !fallback) {
+      setTip(formatBalance(value));
     }
   }, []);
 
@@ -206,6 +215,14 @@ function ExtrinsicPart({ label, fallback, value }) {
     );
   }
 
+  const renderTipDetails = () => {
+    return (
+      <View style={{ display: 'flex', flexDirection: 'column' }}>
+          <Text style={styles.secondaryText}>{tip}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={[{ justifyContent: 'flex-start', alignItems: 'baseline' }]}>
       <View style={{ margin: 5, padding: 5, paddingVertical: 2, width:'100%' }}>
@@ -217,7 +234,9 @@ function ExtrinsicPart({ label, fallback, value }) {
             ? renderMethodDetails()
             : label === 'Era'
               ? renderEraDetails()
-              : <Text style={styles.secondaryText}>{useFallback ? value.toString() : value}</Text>
+              : label === 'Tip'
+                ? renderTipDetails()
+                : <Text style={styles.secondaryText}>{useFallback ? value.toString() : value}</Text>
         }
       </View>
     </View>
