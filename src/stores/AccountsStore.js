@@ -90,7 +90,7 @@ export default class AccountsStore extends Container {
     if (account && updatedAccount) {
       this.setState({ accounts: accounts.set(accountKey, {...account, ...updatedAccount}) });
     }
-    debugger;
+    // debugger;
     // Object.assign(account, accountUpdate);
     // this.setState({});
   }
@@ -202,14 +202,24 @@ export default class AccountsStore extends Container {
   }
 
   getById(account) {
-    return this.state.accounts[account.dbKey] || empty(account.address, account.networkKey);
+    const acc = this.state.accounts[account.dbKey] || empty(account.address, account.networkKey)
+    debugger;
+    return acc;
   }
 
   getByAddress(address) {
-    return this.getAccounts().find(
-      a => a.address.toLowerCase() === address.toLowerCase()
-    );
-  }
+  //   const account = this.getAccounts().find(
+  //     a => a.address.toLowerCase() === address.toLowerCase()
+  //  );
+
+   for (let v of this.state.accounts.values()) {
+      if (v.address.toLowerCase() === address.toLowerCase()){
+        return v;
+      } 
+    }
+
+    throw new Error(`no account found for the address: ${address}`);
+}
 
   getSelected() {
     return this.state.accounts.get(this.state.selectedKey);
