@@ -65,6 +65,7 @@ class AccountDetailsView extends React.Component {
   onDelete = () => {
     const accounts = this.props.accounts
     const selected = accounts.getSelected();
+    const selectedKey = accounts.getSelectedKey();
 
     Alert.alert(
       'Delete Account',
@@ -75,7 +76,7 @@ This account can only be recovered with its associated recovery phrase.`,
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            accounts.deleteAccount(selected);
+            accounts.deleteAccount(selectedKey);
             const resetAction = StackActions.reset({
               index: 0,
               key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
@@ -127,7 +128,9 @@ This account can only be recovered with its associated recovery phrase.`,
   }
 
   render() {
-    const account = this.props.accounts.getSelected();
+    const { accounts } = this.props
+    const account = accounts.getSelected();
+    const selectedKey = accounts.getSelectedKey();
 
     if (!account) {
       return null;
@@ -162,7 +165,7 @@ This account can only be recovered with its associated recovery phrase.`,
         <View style={styles.qr}>
           {
             protocol !== NetworkProtocols.UNKNOWN
-            ? <QrView data={account.dbKey} />
+            ? <QrView data={selectedKey} />
             : this.renderWarningUnknownAccount()
           }
         </View>

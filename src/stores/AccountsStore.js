@@ -26,7 +26,6 @@ import { decryptData, encryptData } from '../util/native';
 export type Account = {
   address: string,
   createdAt: number,
-  dbKey: string, // this is the key that is used in the db to save / delete.
   derivationPassword: string,
   derivationPath: string, // doesn't contain the ///password
   encryptedSeed: string,
@@ -75,7 +74,6 @@ export default class AccountsStore extends Container {
     // only save a new account if the seed isn't empty
     if (account.seed) {
       await this.save(account, pin);
-      account.dbKey = accountId(account);
       this.setState({
         accounts: this.state.accounts.set(accountId(account), account),
         newAccount: empty()
@@ -90,9 +88,6 @@ export default class AccountsStore extends Container {
     if (account && updatedAccount) {
       this.setState({ accounts: accounts.set(accountKey, {...account, ...updatedAccount}) });
     }
-    // debugger;
-    // Object.assign(account, accountUpdate);
-    // this.setState({});
   }
 
   updateSelectedAccount(updatedAccount) {
@@ -100,23 +95,7 @@ export default class AccountsStore extends Container {
   }
 
   async refreshList() {
-    // loadAccounts().then(accounts => {
-        // .then(accounts =>
-        // Object.values(accounts).map(account => JSON.parse(account))
-        // );
-
-        // let accounts = new Map();
-        // for (let [key, value] of Object.entries(res)) {
-        //   const account = JSON.parse(value)
-        //   accounts.set(key, {...account, dbKey: key})
-        // }
-
-      // const accounts = Object.entries(res).map(() => {
-      //   new Map(res.map(a => [accountId(a), a]));
-      // }) 
     loadAccounts().then(accounts => {
-      // const accounts = new Map(res.map(a => [accountId(a), a]));
-      // console.log('accounts refreshList',accounts)
       this.setState({ accounts });
     });
   }
@@ -138,12 +117,12 @@ export default class AccountsStore extends Container {
   }
 
 
-  async deleteAccount(account) {
+  async deleteAccount(accountKey) {
     const { accounts } = this.state;
 
-    accounts.delete(account.dbKey);
+    accounts.delete(accountKey);
     this.setState({ accounts });
-    await deleteDbAccount(account);
+    await deleteDbAccount(accountKey);
   }
 
   async unlockAccount(accountKey, pin) {
@@ -202,15 +181,10 @@ export default class AccountsStore extends Container {
   }
 
   getById(account) {
-    //const acc = this.state.accounts[account.dbKey] || empty(account.address, account.networkKey)
     return this.state.accounts.get(accountId(account)) || empty(account.address, account.networkKey);
   }
 
   getByAddress(address) {
-  //   const account = this.getAccounts().find(
-  //     a => a.address.toLowerCase() === address.toLowerCase()
-  //  );
-
    for (let v of this.state.accounts.values()) {
       if (v.address.toLowerCase() === address.toLowerCase()){
         return v;

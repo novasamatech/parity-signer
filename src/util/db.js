@@ -32,20 +32,11 @@ export async function loadAccounts( version = 3 ) {
   };
  
   return SecureStorage.getAllItems(accountsStore).then(accounts => {
-      //Object.values(accounts).map(account => JSON.parse(account))
-      // console.log('accounts db',accounts);
-      // let accountGood = {};
-      // for (let [key, value] of Object.entries(accounts)) {
-      //   const account = JSON.parse(value)
-      //   accountGood = {...accountGood, [key]:{...account, dbKey: key}}
-      // }
-
       let accountMap = new Map();
       for (let [key, value] of Object.entries(accounts)) {
         const account = JSON.parse(value)
-        accountMap.set(key, {...account, dbKey: key})
+        accountMap.set(key, {...account})
       }
-      // console.log('accountGood db',accountGood)
 
       return accountMap
   });
@@ -64,8 +55,8 @@ function txKey(hash) {
   return 'tx_' + hash;
 }
 
-export const deleteAccount = async account =>
-  SecureStorage.deleteItem(account.dbKey, accountsStore);
+export const deleteAccount = async accountKey =>
+  SecureStorage.deleteItem(accountKey, accountsStore);
 
 export const saveAccount = account => 
   SecureStorage.setItem(

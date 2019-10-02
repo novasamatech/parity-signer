@@ -63,27 +63,6 @@ class AccountListView extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.scrollToIndex = this.scrollToIndex.bind(this);
-  }
-
-  scrollToIndex() {
-    const { accounts, navigation } = this.props;
-    const id = navigation.getParam('accountId');
-    const index = id
-      ? accounts.findIndex(a => id === a.dbKey)
-      : navigation.getParam('index', -1);
-    if (this.list && typeof index === 'number' && index !== -1) {
-      navigation.setParams({ accountId: undefined, index: undefined });
-      this.list.scrollToIndex({ index });
-    }
-  }
-
-  componentDidMount() {
-    this.scrollToIndex();
-  }
-
-  componentDidUpdate() {
-    this.scrollToIndex();
   }
 
   showOnboardingMessage = () => {
