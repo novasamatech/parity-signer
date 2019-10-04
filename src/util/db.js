@@ -35,7 +35,7 @@ export async function loadAccounts( version = 3 ) {
       const accountMap = new Map();
       for (let [key, value] of Object.entries(accounts)) {
         const account = JSON.parse(value);
-        accountMap.set(key, {...account})
+        accountMap.set(key, {...account});
       }
 
       return accountMap
