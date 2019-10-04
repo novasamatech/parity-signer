@@ -123,7 +123,7 @@ export default class AccountsStore extends Container {
     const { accounts } = this.state;
 
     accounts.delete(accountKey);
-    this.setState({ accounts });
+    this.setState({ accounts, selectedKey: '' });
     await deleteDbAccount(accountKey);
   }
 

@@ -104,7 +104,7 @@ This account can only be recovered with its associated recovery phrase.`,
     return (
       <View style={styles.warningView}>
         <Text style={{...styles.title, ...styles.warningTitle}}>Warning</Text>
-        <Text style={styles.warning}>
+        <Text>
           This account wasn't retrieved successfully. This could be because its network isn't supported,
           or you upgraded Parity Signer without wiping your device and this account couldn't be migrated.
           {'\n'}{'\n'}
