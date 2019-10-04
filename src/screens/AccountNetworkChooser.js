@@ -22,7 +22,7 @@ import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from "../fonts";
 import TouchableItem from '../components/TouchableItem';
-import { NETWORK_LIST, UnKnownNetworkKeys } from '../constants';
+import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { empty } from '../util/account';
 
