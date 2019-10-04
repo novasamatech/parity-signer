@@ -65,22 +65,8 @@
     "jest": "^24.9.0",
     "jetifier": "^1.6.4",
     "metro-react-native-babel-preset": "^0.56.0",
-    "pre-git": "^3.14.0",
     "prettier": "1.18.2",
     "react-test-renderer": "16.9.0",
     "reactotron-react-native": "^3.6.5"
-  },
-  "release": {
-    "analyzeCommits": "simple-commit-message"
-  },
-  "config": {
-    "pre-git": {
-      "commit-msg": "simple",
-      "pre-commit": [],
-      "pre-push": [],
-      "post-commit": [],
-      "post-checkout": [],
-      "post-merge": []
-    }
   }
 }
