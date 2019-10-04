@@ -155,8 +155,8 @@ This account can only be recovered with its associated recovery phrase.`,
         <View style={styles.qr}>
           {
             protocol !== NetworkProtocols.UNKNOWN
-            ? <QrView data={selectedKey} />
-            : this.renderWarningUnknownAccount()
+              ? <QrView data={selectedKey} />
+              : this.renderWarningUnknownAccount()
           }
         </View>
       </ScrollView>
