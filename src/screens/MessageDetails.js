@@ -81,7 +81,7 @@ export class MessageDetailsView extends React.PureComponent {
   };
 
   render() {
-    const {dataToSign, isHash, message, onNext, sender} = this.props;
+    const { dataToSign, isHash, message, onNext, sender} = this.props;
 
     return (
       <ScrollView
