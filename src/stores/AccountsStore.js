@@ -201,7 +201,7 @@ export default class AccountsStore extends Container {
   }
 
   getSelectedKey() {
-    return this.state.selectedKey
+    return this.state.selectedKey;
   }
 
   getAccounts() {
