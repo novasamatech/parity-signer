@@ -38,7 +38,7 @@ export async function loadAccounts( version = 3 ) {
         accountMap.set(key, {...account});
       }
 
-      return accountMap
+      return accountMap;
   });
 }
 
