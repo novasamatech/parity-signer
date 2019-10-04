@@ -205,6 +205,6 @@ export default class AccountsStore extends Container {
   }
 
   getAccounts() {
-    return this.state.accounts
+    return this.state.accounts;
   }
 }
