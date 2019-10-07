@@ -28,9 +28,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import AccountIcon from './AccountIcon';
 import Address from './Address';
-import colors from '../colors';
+import styles from '../styles';
 import { NetworkProtocols } from '../constants';
-import fonts from "../fonts";
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress, words } from '../util/native';
 import {constructSURI} from '../util/suri'
@@ -97,11 +96,11 @@ export default class AccountIconChooser extends React.PureComponent {
         <Address
           address={value}
           protocol={protocol}
-          style = {styles.addressText}
+          style = {[styles.t_text, styles.t_color_sec]}
         />
       );
     } else {
-      return <Text style={styles.addressSelectionText} >Select an icon.</Text>
+      return <Text style={[styles.t_text, styles.t_color_sec]} >Select an icon.</Text>
     }
   }
 
@@ -113,20 +112,20 @@ export default class AccountIconChooser extends React.PureComponent {
     if (!address) {
       //return an empty view to prevent the screen from jumping
       return <View
-        style={styles.icon}
+      style={styles.el_icon}
       />
     }
 
     return (
         <TouchableOpacity
           key={index}
-          style={[styles.iconBorder, isSelected ? styles.selected : {}]}
+          style={[styles.el_iconBorder, isSelected ? styles.el_iconBorder_selected : {}]}
           onPress={() => onSelect({ newAddress: address, isBip39: bip39, newSeed: seed })}
         >
           <AccountIcon
             address={address}
             protocol={protocol}
-            style={styles.icon}
+            style={styles.el_icon}
           />
         </TouchableOpacity>
     );
@@ -153,8 +152,8 @@ export default class AccountIconChooser extends React.PureComponent {
     const { icons } = this.state;
 
     return (
-      <View style={styles.body}>
-        <View style={styles.firstRow}>
+      <View style={styles.b_paddingH}>
+        <View style={[styles.b_row, styles.b_paddingV, styles.b_borderBottom]}>
           <FlatList
             data={icons}
             extraData={value}
@@ -169,7 +168,7 @@ export default class AccountIconChooser extends React.PureComponent {
             <Icon
               name={'refresh'}
               size={35}
-              style={styles.refreshIcon}
+              style={styles.t_color_sec}
             />
           </TouchableOpacity>
         </View>
@@ -178,48 +177,3 @@ export default class AccountIconChooser extends React.PureComponent {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.card_bg,
-    display: 'flex',
-    flexDirection:'column',
-    marginBottom: 20,
-    padding: 20,
-  },
-  firstRow: {
-    flex: 1,
-    display: 'flex',
-    flexDirection:'row',
-    alignItems: 'center',
-    marginBottom: 10
-  },
-  iconBorder: {
-    borderWidth: 6,
-    borderColor: colors.card_bg,
-    height: 62 // height = icon height + borderWidth * 2
-  },
-  icon: {
-    width: 50,
-    backgroundColor: colors.card_bg,
-    height: 50,
-    padding: 5,
-  },
-  addressSelectionText: {
-    fontFamily: fonts.regular,
-    color: colors.bg,
-    lineHeight: 16,
-    fontSize: 14,
-    paddingLeft: 6
-  },
-  addressText: {
-    fontSize: 14,
-    paddingLeft: 6
-  },
-  refreshIcon :{
-    color: colors.bg,
-  },
-  selected: {
-    borderColor: colors.bg,
-  }
-});

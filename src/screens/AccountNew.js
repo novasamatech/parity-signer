@@ -20,7 +20,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
+import styles from '../styles';
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -29,7 +29,6 @@ import KeyboardScrollView from '../components/KeyboardScrollView';
 import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import { empty, validateSeed } from '../util/account';
 import {constructSURI} from '../util/suri';
@@ -90,14 +89,20 @@ class AccountNewView extends React.Component {
     }
 
     return (
-      <View style={styles.body}>
-        <KeyboardScrollView style={{ padding: 20 }}>
+      <View style={[styles.b_flex, styles.b_bg]}>
+        <KeyboardScrollView>
           <Background />
-          <View style={styles.top}>
-            <Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-            <Text style={styles.title}>NETWORK</Text>
+          <View style={styles.b_paddingH}>
+            <Text style={[styles.t_h1, styles.header]}>Create Account</Text>
+            <Text style={[styles.t_text, styles.b_marginV_xs, {marginTop:0}]}>Network</Text>
+          </View>
+          <View style={styles.b_marginBottom}>
             <NetworkButton network={selectedNetwork}/>
-            <Text style={styles.title}>ICON & ADDRESS</Text>
+          </View>
+          <View style={styles.b_paddingH}>
+            <Text style={styles.t_text}>Icon & Address</Text>
+          </View>
+          <View style={styles.b_marginBottom}>
             <AccountIconChooser
               derivationPassword={derivationPassword}
               derivationPath={derivationPath}
@@ -137,11 +142,14 @@ class AccountNewView extends React.Component {
               network={selectedNetwork}
               value={address && address}
             />
-            <Text style={styles.title}>NAME</Text>
+          </View>
+          <View style={[styles.b_paddingH, styles.b_marginBottom]}>
+            <Text style={styles.t_text}>NAME</Text>
             <TextInput
               onChangeText={name => accounts.updateNew({ name })}
               value={name}
               placeholder="Enter a new account name"
+              style={[styles.b_textInput, styles.b_marginBottom, styles.t_h2] }
             />
             {isSubstrate && <DerivationPathField
               onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
@@ -150,8 +158,8 @@ class AccountNewView extends React.Component {
               styles={styles}
           />}
           </View>
-          <View style={styles.bottom}>
-            <Text style={styles.hintText}>
+          <View style={styles.b_paddingH}>
+            <Text style={styles.t_hintText}>
               Next, you will be asked to backup your account, get a pen and some paper.
             </Text>
             <Button
@@ -172,46 +180,3 @@ class AccountNewView extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    overflow: 'hidden'
-  },
-  bodyContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 20
-  },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontFamily: fonts.bold,
-    fontSize: 24,
-    paddingBottom: 20,
-    textAlign: 'center'
-  },
-  hintText: {
-    fontFamily: fonts.bold,
-    textAlign: 'center',
-    paddingTop: 20,
-    color: colors.bg_text_sec,
-    fontSize: 12
-  },
-  nextStep: {
-    marginTop: 15
-  }
-});

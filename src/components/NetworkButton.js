@@ -22,8 +22,7 @@ import TouchableItem from './TouchableItem';
 import { Text } from 'react-native';
 import React from 'react';
 import { withNavigation } from 'react-navigation';
-import colors from '../colors';
-import fonts from "../fonts";
+import styles from '../styles';
 
 class NetworkButton extends React.PureComponent<{
   network: {
@@ -41,35 +40,16 @@ class NetworkButton extends React.PureComponent<{
           styles.card,
           {
             backgroundColor: network.color,
-            marginBottom: 20
           }
         ]}
         onPress={() => navigation.navigate('AccountNetworkChooser')}
       >
-        <Text style={[styles.cardText, { color: network.secondaryColor }]}>
+        <Text style={[styles.t_h2, styles.t_bold, styles.t_center, { color: network.secondaryColor }]}>
           {network.title}
         </Text>
       </TouchableItem>
     );
   }
 }
-
-const styles = {
-  card: {
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    color: colors.card_text,
-    fontFamily: fonts.bold,
-    fontSize: 20,
-  },
-  cardTwo: {
-    backgroundColor: '#977CF6',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 5
-  }
-};
 
 export default withNavigation(NetworkButton);

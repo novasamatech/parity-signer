@@ -38,7 +38,7 @@ export default function DerivationPathField(props) {
   }
 
   return (
-    <>
+    <View style={styles.b_marginBottom}>
       <TouchableOpacity
         onPress={toggleShowAdvancedField}
         style={{diplay:'flex'}}
@@ -46,11 +46,10 @@ export default function DerivationPathField(props) {
         <View
           style={{justifyContent:'center'}}
         >
-          <Text style={[styles.title, ownStyles.advancedText]}>
-            ADVANCED
+          <Text style={[styles.t_text, styles.b_row, styles.b_marginV_xs]}>
+            Advanced
             <Icon 
               name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
-              size={20}
             />
           </Text>
         </View>
@@ -78,10 +77,10 @@ export default function DerivationPathField(props) {
             }
           }}
           placeholder="optional derivation path"
-          style={isValidPath ? ownStyles.validInput: ownStyles.invalidInput}
+          style={[styles.seedText, styles.t_parityS, styles.pinInput, {minHeight: 30, marginBottom: 0}, isValidPath ? {}: styles.seedText_invalid]}
         />
       }
-    </>
+    </View>
   )
 }
 
