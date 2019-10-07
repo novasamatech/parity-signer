@@ -22,7 +22,7 @@ import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from "../fonts";
 import TouchableItem from '../components/TouchableItem';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { empty } from '../util/account';
 
@@ -50,32 +50,34 @@ class AccountNetworkChooserView extends React.PureComponent {
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
         <Text style={styles.title}>CHOOSE NETWORK</Text>
-        { Object.entries(NETWORK_LIST).map(([networkKey, networkParams]) => (
-          <TouchableItem
-            key={networkKey}
-            style={[
-              styles.card,
-              {
-                marginTop: 20,
-                backgroundColor: networkParams.color
-              }
-            ]}
-            onPress={() => {
-              accounts.updateNew(empty('', networkKey));
-              navigation.goBack();
-            }}
-          >
-            <Text
+        { Object.entries(NETWORK_LIST)
+          .filter(([networkKey]) => networkKey !== UnKnownNetworkKeys.UNKNOWN )
+          .map(([networkKey, networkParams]) => (
+            <TouchableItem
+              key={networkKey}
               style={[
-                styles.cardText,
+                styles.card,
                 {
-                  color: networkParams.secondaryColor
+                  marginTop: 20,
+                  backgroundColor: networkParams.color
                 }
               ]}
+              onPress={() => {
+                accounts.updateNew(empty('', networkKey));
+                navigation.goBack();
+              }}
             >
-              {networkParams.title}
-            </Text>
-          </TouchableItem>
+              <Text
+                style={[
+                  styles.cardText,
+                  {
+                    color: networkParams.secondaryColor
+                  }
+                ]}
+              >
+                {networkParams.title}
+              </Text>
+            </TouchableItem>
         ))}
       </ScrollView>
     );

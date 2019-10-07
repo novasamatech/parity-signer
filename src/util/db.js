@@ -30,10 +30,16 @@ export async function loadAccounts( version = 3 ) {
     keychainService: accountStoreVersion,
     sharedPreferencesName: accountStoreVersion
   };
+ 
+  return SecureStorage.getAllItems(accountsStore).then(accounts => {
+      const accountMap = new Map();
+      for (let [key, value] of Object.entries(accounts)) {
+        const account = JSON.parse(value);
+        accountMap.set(key, {...account});
+      }
 
-  return SecureStorage.getAllItems(accountsStore).then(accounts =>
-    Object.values(accounts).map(account => JSON.parse(account))
-  );
+      return accountMap;
+  });
 }
 
 const accountsStore = {
@@ -49,17 +55,15 @@ function txKey(hash) {
   return 'tx_' + hash;
 }
 
-export const deleteAccount = async account =>
-  SecureStorage.deleteItem(accountId(account), accountsStore);
+export const deleteAccount = async accountKey =>
+  SecureStorage.deleteItem(accountKey, accountsStore);
 
-export const saveAccount = account => 
+export const saveAccount = (accountKey, account) => 
   SecureStorage.setItem(
-    accountId(account),
+    accountKey,
     JSON.stringify(account, null, 0),
     accountsStore
   );
-
-export const saveAccounts = accounts => accounts.forEach(saveAccount);
 
 export async function saveTx(tx) {
   if (!tx.sender) {

@@ -62,10 +62,10 @@ class AccountBackupView extends React.PureComponent {
 
   componentWillUnmount() {
     const {accounts} = this.props;
-    const selected = accounts.getSelected();
+    const selectedKey = accounts.getSelectedKey();
 
-    if (selected) {
-      accounts.lockAccount(selected);
+    if (selectedKey) {
+      accounts.lockAccount(selectedKey);
     }
 
     AppState.removeEventListener('change', this._handleAppStateChange);
@@ -76,7 +76,7 @@ class AccountBackupView extends React.PureComponent {
     const {navigate} = navigation;
     const isNew = navigation.getParam('isNew');
     const {address, derivationPassword, derivationPath, name, networkKey, seed, seedPhrase} = isNew ? accounts.getNew() : accounts.getSelected();
-    const {protocol} = NETWORK_LIST[networkKey];
+    const protocol = NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol || '';
 
     return (
       <ScrollView
