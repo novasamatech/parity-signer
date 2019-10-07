@@ -16,8 +16,7 @@
 
 import React from 'react';
 import { StyleSheet, TextInput as TextInputOrigin } from 'react-native';
-import colors from '../colors';
-import fonts from '../fonts';
+import styles from '../styles';
 
 export default class TextInput extends React.PureComponent {
   static defaultProps = {
@@ -44,20 +43,8 @@ export default class TextInput extends React.PureComponent {
         underlineColorAndroid="transparent"
         {...this.props}
         style={[styles.input, this.props.style]}
+        placeholderTextColor = {styles.t_color_sec.color}
       />
     );
   }
 }
-
-const styles = StyleSheet.create({
-  input: {
-    fontSize: 24,
-    height: 60,
-    fontFamily: fonts.regular,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    paddingHorizontal: 18,
-    backgroundColor: colors.card_bg
-  }
-});

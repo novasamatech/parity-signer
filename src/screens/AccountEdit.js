@@ -17,10 +17,9 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import fonts from "../fonts";
+import styles from '../styles';
 import AccountCard from '../components/AccountCard';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
@@ -46,26 +45,28 @@ export default class AccountEdit extends React.PureComponent {
           }
 
           return (
-            <ScrollView
-              style={styles.body}
-              contentContainerStyle={styles.bodyContainer}
-            >
-              <Text style={styles.titleTop}>EDIT ACCOUNT</Text>
+            <ScrollView style={styles.b_flex}>
+              <View style={styles.b_paddingH}>
+                <Text style={[styles.t_h1, styles.header]}>Edit Account</Text>
+              </View>
               <AccountCard
                 title={selected.name}
                 address={selected.address}
                 networkKey={selected.networkKey}
               />
-              <Text style={styles.title}>ACCOUNT NAME</Text>
-              <TextInput
-                style={{ marginBottom: 40 }}
-                onChangeText={async (name) => {
-                  accounts.updateSelectedAccount({ name });
-                  await accounts.save(accounts.getSelectedKey(), accounts.getSelected())
-                }}
-                value={selected.name}
-                placeholder="New name"
-              />
+
+              <View style={[styles.b_paddingH, {marginTop:16}]}>
+                <Text style={styles.t_text}>Account Name</Text>
+                <TextInput
+                  style={[styles.b_textInput, styles.t_h2]}
+                  onChangeText={async (name) => {
+                    accounts.updateSelectedAccount({ name });
+                    await accounts.save(accounts.getSelectedKey(), accounts.getSelected())
+                  }}
+                  value={selected.name}
+                  placeholder="New name"
+                />
+              </View>
             </ScrollView>
           );
         }}
@@ -73,46 +74,3 @@ export default class AccountEdit extends React.PureComponent {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    overflow: 'hidden'
-  },
-  bodyContainer: {
-    flex: 1,
-    padding: 20
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 20
-  },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20,
-    textAlign: 'center'
-  },
-  hintText: {
-    fontFamily: fonts.bold,
-    textAlign: 'center',
-    paddingTop: 20,
-    color: colors.bg_text_sec,
-    fontSize: 12
-  },
-  deleteButton: {
-    backgroundColor: 'red'
-  }
-});
