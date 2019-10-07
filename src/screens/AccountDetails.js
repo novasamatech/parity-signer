@@ -21,8 +21,7 @@ import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
-import fonts from "../fonts";
+import styles from '../styles';
 import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
@@ -129,12 +128,9 @@ This account can only be recovered with its associated recovery phrase.`,
     const protocol = account.networkKey && NETWORK_LIST[account.networkKey] && NETWORK_LIST[account.networkKey].protocol || NetworkProtocols.UNKNOWN ;
 
     return (
-      <ScrollView
-        contentContainerStyle={styles.bodyContent}
-        style={styles.body}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title}>ACCOUNT</Text>
+      <ScrollView style={styles.b_flex}>
+        <View style={[styles.header, styles.b_paddingH]}>
+          <Text style={styles.t_h1}>Account</Text>
           <View style={styles.menuView}>
             <PopupMenu
               onSelect={this.onOptionSelect}
@@ -152,7 +148,7 @@ This account can only be recovered with its associated recovery phrase.`,
           networkKey={account.networkKey}
           title={account.name}
         />
-        <View style={styles.qr}>
+        <View style={styles.b_flex}>
           {
             protocol !== NetworkProtocols.UNKNOWN
               ? <QrView data={selectedKey} />
@@ -163,47 +159,3 @@ This account can only be recovered with its associated recovery phrase.`,
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    padding: 20
-  },
-  bodyContent: {
-    paddingBottom: 40
-  },
-  qr: {
-    marginTop: 20,
-    backgroundColor: colors.card_bg
-  },
-  deleteText: {
-    color: colors.bg_alert
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 20,
-    justifyContent: 'center',
-  },
-  menuView: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  warningTitle: {
-    color: colors.bg_alert,
-    fontSize: 20,
-    marginBottom: 10
-  },
-  warningView: {
-    padding: 20
-  }
-});

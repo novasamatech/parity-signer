@@ -44,14 +44,21 @@ export default function QrView(props) {
 
 
   const { width: deviceWidth } = Dimensions.get('window');
-  let size = props.size || deviceWidth - 80;
+  let size = props.size || deviceWidth - 64;
   let flexBasis = props.height || deviceWidth - 40;
 
   return (
     <View
       style={[
-        styles.rectangleContainer,
-        { flexBasis, height: flexBasis },
+        {
+          backgroundColor: '#FFFFFF',
+          height: size + 32,
+          width: size + 32,
+          margin: 16,
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
         props.style
       ]}
     >
@@ -59,12 +66,3 @@ export default function QrView(props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  rectangleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent'
-  }
-});
