@@ -38,7 +38,7 @@ const unknownNetworkBase = {
 
 const substrateNetworkBase = {
   [SubstrateNetworkKeys.KUSAMA]: {
-    color: '#4C4646',
+    color: '#000000',
     decimals: 12,
     genesisHash: SubstrateNetworkKeys.KUSAMA,
     prefix: 2,
@@ -65,13 +65,13 @@ const substrateNetworkBase = {
 
 const ethereumNetworkBase = {
   [EthereumNetworkKeys.FRONTIER]: {
-    color: '#977CF6',
+    color: '#64A2F4',
     ethereumChainId: EthereumNetworkKeys.FRONTIER,
     secondaryColor: colors.card_bg,
     title: 'Ethereum'
   },
   [EthereumNetworkKeys.CLASSIC]: {
-    color: '#8C7166',
+    color: '#8C4C9C',
     ethereumChainId: EthereumNetworkKeys.CLASSIC,
     secondaryColor: colors.card_bg,
     title: 'Ethereum Classic'
@@ -91,7 +91,7 @@ const ethereumNetworkBase = {
 };
 
 const ethereumDefaultValues = {
-  color: '#F2E265',
+  color: '#2968C7',
   protocol: NetworkProtocols.ETHEREUM,
   secondaryColor: colors.card_text
 };

@@ -17,10 +17,9 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import fonts from "../fonts";
+import styles from '../styles';
 import TouchableItem from '../components/TouchableItem';
 import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
@@ -48,8 +47,11 @@ class AccountNetworkChooserView extends React.PureComponent {
     const { accounts } = this.props;
 
     return (
-      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.title}>CHOOSE NETWORK</Text>
+      <ScrollView style={styles.b_flex}>
+        <View style={styles.b_paddingH}>
+          <Text style={[styles.t_h1, styles.header]}></Text>
+          <Text style={styles.t_text}>Choose network</Text>
+        </View>
         { Object.entries(NETWORK_LIST)
           .filter(([networkKey]) => networkKey !== UnKnownNetworkKeys.UNKNOWN )
           .map(([networkKey, networkParams]) => (
@@ -58,7 +60,6 @@ class AccountNetworkChooserView extends React.PureComponent {
               style={[
                 styles.card,
                 {
-                  marginTop: 20,
                   backgroundColor: networkParams.color
                 }
               ]}
@@ -69,7 +70,9 @@ class AccountNetworkChooserView extends React.PureComponent {
             >
               <Text
                 style={[
-                  styles.cardText,
+                  styles.t_h2,
+                  styles.t_bold,
+                  styles.t_center,
                   {
                     color: networkParams.secondaryColor
                   }
@@ -83,41 +86,3 @@ class AccountNetworkChooserView extends React.PureComponent {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    flexDirection: 'column',
-    overflow: 'hidden',
-    backgroundColor: colors.bg
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20,
-    textAlign: 'center'
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 20
-  },
-  card: {
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    color: colors.card_text,
-    fontFamily: fonts.bold,
-    fontSize: 20,
-  }
-});
