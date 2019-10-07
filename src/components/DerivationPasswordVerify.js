@@ -27,6 +27,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import colors from '../colors';
 import fonts from "../fonts";
+import styles from "../styles";
 import TextInput from './TextInput';
 
   export default function DerivationPasswordVerify(props) {
@@ -43,51 +44,26 @@ import TextInput from './TextInput';
       <>
         <TouchableOpacity
           onPress={toggleVerifyField}
-          style={{diplay:'flex'}}
         >
-          <View
-            style={{justifyContent:'center'}}
-          >
-            <Text style={styles.passwordText}>
-              <Icon name={'info'} size={20} color={colors.bg_text_sec} />
-              {' '}This account countains a derivation password.{' '}
-              <Text style={styles.link}  onPress={toggleVerifyField} >Verify it here </Text>
-              <Icon 
-                name={verifyField ? 'arrow-drop-up' : 'arrow-drop-down'}
-                size={20}
-              />
-            </Text>
-          </View>
+          <Text style={[styles.t_hintText, {marginTop:16}]}>
+            <Icon name={'info'} size={15} color={colors.bg_text_sec} />
+            {' '}This account countains a derivation password.{' '}
+            <Text style={styles.t_underline}  onPress={toggleVerifyField} >Verify it here </Text>
+            <Icon 
+              name={verifyField ? 'arrow-drop-up' : 'arrow-drop-down'}
+              size={20}
+            />
+          </Text>
         </TouchableOpacity>
         {verifyField && 
           <>
             <TextInput
               onChangeText={setEnteredPassword}
               placeholder="derivation password"
-              style={isMatching ? styles.validInput: styles.invalidInput}
+              style={[styles.seedText, styles.t_parityS, styles.pinInput, {minHeight: 30, marginBottom: 0}, isMatching ? {}: styles.seedText_invalid]}
             />
           </>
         }
       </>
     )
   }
-
-  const styles = StyleSheet.create({
-    link: {
-      textDecorationLine: 'underline',
-    },
-    passwordText: {
-      color: colors.bg_text_sec,
-      fontFamily: fonts.regular,
-      fontSize: 18,
-      marginBottom: 10,
-      marginTop: 20,
-      paddingBottom: 0
-    },
-    invalidInput: {
-      backgroundColor: '#fee3e3'
-    },
-    validInput: {
-      backgroundColor: '#e4fee4'
-    }
-  });

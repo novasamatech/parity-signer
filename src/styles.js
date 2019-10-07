@@ -248,6 +248,7 @@ export default StyleSheet.create({
   t_hintText: {
     fontFamily: fonts.robotoBold,
     fontSize: 13,
+    lineHeight: 17,
     marginBottom: 16,
     color: colors.bg_text,
   },
