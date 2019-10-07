@@ -20,8 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import fonts from "../fonts";
+import styles from '../styles';
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
@@ -53,53 +52,20 @@ export class SignedMessageView extends React.PureComponent {
     const { data, message } = this.props;
 
     return (
-      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
-        <View style={styles.qr}>
-          <QrView data={this.props.data} />
+      <ScrollView style={styles.b_flex}>
+        <View style={styles.b_paddingH}>
+          <Text style={[styles.header, styles.t_h1]}>Scan Signature</Text>
         </View>
-        <Text style={styles.title}>MESSAGE</Text>
-        <Text style={styles.message}>
-          {isAscii(message)
-            ? hexToAscii(message)
-            : data}
-        </Text>
+        <QrView data={this.props.data} />
+        <View style={[styles.b_paddingH, styles.b_marginBottom]}>
+          <Text style={[styles.t_text, styles.b_marginV_xs]}>Message</Text>
+          <Text style={[styles.t_parityS, styles.seedText]}>
+            {isAscii(message)
+              ? hexToAscii(message)
+              : data}
+          </Text>
+        </View>
       </ScrollView>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    overflow: 'hidden'
-  },
-  qr: {
-    marginBottom: 20,
-    backgroundColor: colors.card_bg
-  },
-  topTitle: {
-    textAlign: 'center',
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  message: {
-    marginBottom: 20,
-    padding: 10,
-    minHeight: 120,
-    lineHeight: 26,
-    fontFamily: fonts.regular,
-    fontSize: 20,
-    backgroundColor: colors.card_bg
-  }
-});

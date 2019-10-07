@@ -68,8 +68,9 @@ export default StyleSheet.create({
   },
   seedText: {
     paddingVertical: 12,
+    paddingBottom: 16,
     paddingHorizontal: 16, 
-    minHeight: 120,
+    minHeight: 100,
     borderWidth: 0.3,
     borderColor: colors.bg_button,
     color: colors.bg_button,
