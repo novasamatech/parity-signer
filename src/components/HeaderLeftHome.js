@@ -14,8 +14,7 @@ export default class HeaderLeftHome extends React.PureComponent {
         delayPressIn={0}
         onPress={() => this.props.onPress && this.props.onPress()}
       >
-        <Image source={require('../../icon.png')} style={styles.logo} />
-        <Text style={styles.headerTextLeft}>parity</Text>
+        <Image source={require('../../icon_logotype.png')} style={styles.logo} />
       </View>
     );
   }
@@ -31,8 +30,8 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.bg_text_sec
   },
   logo: {
-    width: 42,
-    height: 42
+    width: 120,
+    height: 30
   },
   headerTextLeft: {
     flex: 1,

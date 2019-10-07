@@ -15,13 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 export default {
-  bg: '#1D1D1D',
-  bg_button: '#48acf0',
+  bg: '#282828',
+  bg_button: '#48BBC2',
+  bg_button_inactive: '#353535',
   bg_text: '#FFFFFF',
-  bg_text_sec: '#B4B5B0',
-  bg_warning: '#FAE265',
-  bg_alert: '#ED332B',
+  bg_text_sec: '#B4B5B1',
+  bg_warning: '#EB5757',
+  bg_alert: '#EB5757',
   card_bg: '#F9F9F9',
   card_text: '#1A1A1A',
-  card_bg_text_sec: '#B4B5B0'
+  card_bg_text_sec: '#B4B5B0',
 };

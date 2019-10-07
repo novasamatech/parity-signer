@@ -18,4 +18,7 @@ export default {
   regular: 'Manifold CF',
   semiBold: 'ManifoldCF-DemiBold',
   bold: 'ManifoldCF-Bold',
+  roboto: 'Roboto-Regular',
+  robotoLight: 'Roboto-Light',
+  robotoBold:'Roboto-Bold'
 }
