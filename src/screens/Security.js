@@ -17,59 +17,28 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import styles from '../styles';
 import colors from '../colors';
-import fonts from "../fonts";
 
 export default class Security extends React.PureComponent {
   render() {
     return (
-      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <View style={[styles.card, { backgroundColor: colors.bg_alert, marginBottom: 20 }]}>
+      <ScrollView style={styles.b_flex}>
+        <View style={[styles.card, { backgroundColor: colors.bg_alert, marginBottom: 16}]}>
           <Icon
-            style={[styles.cardText, { marginRight: 10, fontSize: 30 }]}
+            style={[styles.t_h2, styles.t_bold, styles. t_center]}
             name="security"
           />
-          <Text style={styles.cardText}>NOT SECURE</Text>
+          <Text style={[styles.t_h2, styles.t_bold, styles. t_center]}>NOT SECURE</Text>
         </View>
-        <Text style={styles.text}>
-          A device is considered not secure if it has access to the internet or has any kind of connectivity enabled.
-          Parity Signer is meant to be used on a device that will be kept offline at any time. Enabling any connectivity such as 
-          wifi, cellular network, bluetooth, NFC, usb is a threat to the safety of the private keys stored on the device.
-        </Text>
+        <View style={styles.b_paddingH}>
+          <Text style={[styles.t_text, styles.t_light]}>
+            A device is considered not secure if it has access to the internet or has any kind of connectivity enabled.
+            Parity Signer is meant to be used on a device that will be kept offline at any time. Enabling any connectivity such as 
+            wifi, cellular network, bluetooth, NFC, usb is a threat to the safety of the private keys stored on the device.
+          </Text>
+        </View>
       </ScrollView>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    flexDirection: 'column',
-    overflow: 'hidden',
-    backgroundColor: colors.bg
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  card: {
-    flex: 1,
-    alignItems: 'center',
-    flexDirection: 'row',
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    color: colors.card_bg,
-    fontFamily: fonts.bold,
-    fontSize: 22,
-  },
-  text: {
-    marginBottom: 20,
-    fontFamily: fonts.regular,
-    fontSize: 14,
-    color: colors.card_bg
-  },
-});

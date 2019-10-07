@@ -280,6 +280,9 @@ export default StyleSheet.create({
   t_bold: {
     fontFamily: fonts.robotoBold,
   },
+  t_light: {
+    fontFamily: fonts.robotoLight,
+  },
   t_center: {
     textAlign: 'center',
   },
