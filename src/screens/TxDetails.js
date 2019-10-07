@@ -18,10 +18,10 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
+import styles from '../styles';
 import { NETWORK_LIST } from '../constants';
 import fonts from "../fonts";
 import AccountCard from '../components/AccountCard';
@@ -92,104 +92,58 @@ export class TxDetailsView extends React.PureComponent {
 
     return (
       <ScrollView
-        contentContainerStyle={styles.bodyContent}
-        style={styles.body}
+        style={styles.b_flex}
       >
-        <Background />
-        <Text style={styles.topTitle}>SIGN TRANSACTION</Text>
-        <Text style={styles.title}>FROM ACCOUNT</Text>
-        <AccountCard
-          title={sender.name}
-          address={sender.address}
-          networkKey={sender.networkKey}
-        />
-        <Text style={styles.title}>TRANSACTION DETAILS</Text>
-
-        {
-          isEthereum
-            ? (
-              <React.Fragment>
-                <TxDetailsCard
-                  style={{ marginBottom: 20 }}
-                  description="You are about to send the following amount"
-                  value={value}
-                  gas={gas}
-                  gasPrice={gasPrice}
-                />
-                <Text style={styles.title}>RECIPIENT</Text>
-                <AccountCard
-                  title={recipient.name}
-                  address={recipient.address}
-                  networkKey={recipient.networkKey || ''}
-                />
-              </React.Fragment>
-            )
-            : (
-              <PayloadDetailsCard
-                style={{ marginBottom: 20 }}
-                description="You are about to confirm sending the following extrinsic"
-                payload={dataToSign}
-                prefix={prefix}
-                />
-            )
-        }
-
-        <Button
-          buttonStyles={{ height: 60 }}
-          title="Sign Transaction"
-          onPress={() => onNext()}
-        />
+        <View style={styles.b_paddingH}>
+          <Background />
+          <Text style={[styles.header, styles.t_h1]}>Sign Transaction</Text>
+          <Text style={styles.t_text}>From Account</Text>
+        </View>
+        <View style={styles.b_marginBottom}>
+          <AccountCard
+            title={sender.name}
+            address={sender.address}
+            networkKey={sender.networkKey}
+          />
+        </View>
+        <Text style={[styles.b_paddingH, styles.t_text]}>Transaction Details</Text>
+        <View style={styles.b_marginBottom}>
+          {
+            isEthereum
+              ? (
+                <React.Fragment>
+                  <TxDetailsCard
+                    style={{ marginVertical: 16 }}
+                    description="You are about to send the following amount"
+                    value={value}
+                    gas={gas}
+                    gasPrice={gasPrice}
+                  />
+                  <Text style={[styles.b_paddingH, styles.t_text]}>Recipient</Text>
+                  <AccountCard
+                    title={recipient.name}
+                    address={recipient.address}
+                    networkKey={recipient.networkKey || ''}
+                  />
+                </React.Fragment>
+              )
+              : (
+                <PayloadDetailsCard
+                  style={{ marginVertical: 16 }}
+                  description="You are about to confirm sending the following extrinsic"
+                  payload={dataToSign}
+                  prefix={prefix}
+                  />
+              )
+          }
+        </View>
+        <View style={styles.b_paddingH}>
+          <Button
+            title="Sign Transaction"
+            onPress={() => onNext()}
+          />
+        </View>
       </ScrollView>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    padding: 20,
-    overflow: 'hidden'
-  },
-  bodyContent: {
-    paddingBottom: 40
-  },
-  transactionDetails: {
-    flex: 1,
-    backgroundColor: colors.card_bg
-  },
-  topTitle: {
-    textAlign: 'center',
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  wrapper: {
-    borderRadius: 5
-  },
-  address: {
-    flex: 1
-  },
-  deleteText: {
-    textAlign: 'right'
-  },
-  changePinText: {
-    textAlign: 'left',
-    color: 'green'
-  },
-  actionsContainer: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  actionButtonContainer: {
-    flex: 1
-  }
-});

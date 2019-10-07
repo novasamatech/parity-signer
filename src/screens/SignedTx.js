@@ -21,13 +21,12 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
+import styles from '../styles';
 import AccountCard from '../components/AccountCard';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
 import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST, TX_DETAILS_MSG } from '../constants';
-import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
@@ -64,24 +63,22 @@ export class SignedTxView extends React.PureComponent {
     const { data, gas, gasPrice, recipient, sender, value } = this.props;
     
     return (
-      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <Text style={styles.topTitle}>SCAN SIGNATURE</Text>
-        <View style={styles.qr}>
-          <QrView data={data} />
-        </View>
-        <Text style={styles.title}>TRANSACTION DETAILS</Text>
+      <ScrollView style={styles.b_flex}>
+        <Text style={[styles.b_paddingH, styles.header, styles.t_h1]}>Scan Signature</Text>
+        <QrView data={data} />
+        <Text style={[styles.b_paddingH, styles.b_marginBottom, styles.t_text]}>Transaction Details</Text>
         {
           NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM
             ? (
               <React.Fragment>
                 <TxDetailsCard
-                  style={{ marginBottom: 20 }}
+                  style={{ marginBottom: 16 }}
                   description={TX_DETAILS_MSG}
                   value={value}
                   gas={gas}
                   gasPrice={gasPrice}
                 />
-                <Text style={styles.title}>RECIPIENT</Text>
+                <Text style={[styles.b_paddingH, styles.t_text]}>Recipient</Text>
                 <AccountCard
                   address={recipient.address}
                   networkKey={recipient.networkKey || ''}
@@ -91,7 +88,7 @@ export class SignedTxView extends React.PureComponent {
             )
             : (
               <PayloadDetailsCard 
-                style={{ marginBottom: 20 }}
+                style={{ marginBottom: 16 }}
                 description={TX_DETAILS_MSG}
                 protocol={SUBSTRATE_NETWORK_LIST[sender.networkKey].protocol}
                 prefix={SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix}
@@ -103,29 +100,3 @@ export class SignedTxView extends React.PureComponent {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    overflow: 'hidden'
-  },
-  qr: {
-    marginBottom: 20,
-    backgroundColor: colors.card_bg
-  },
-  topTitle: {
-    textAlign: 'center',
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  }
-});
