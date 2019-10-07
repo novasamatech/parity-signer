@@ -21,8 +21,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import fonts from '../fonts';
+import styles from '../styles';
 import Background from '../components/Background';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
@@ -121,11 +120,11 @@ class AccountUnlockView extends React.PureComponent {
     const {checkPin, navigate} = this.props;
 
     return (
-      <View style={styles.body}>
+      <View style={[styles.b_flex, styles.b_paddingH]}>
         <Background />
-        <Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
-        <Text style={styles.errorText}>{this.showErrorMessage()}</Text>
-        <Text style={styles.title}>PIN</Text>
+        <Text style={[styles.header, styles.t_h1]}>Unlock Account</Text>
+        <Text style={[styles.t_hintText, styles.t_errorText]}>{this.showErrorMessage()}</Text>
+        <Text style={[styles.t_text, styles.b_marginV_xs]}>PIN</Text>
         <PinInput
           onChangeText={async pin => {
             this.setState({ pin: pin });
@@ -159,40 +158,8 @@ function PinInput(props) {
       numberOfLines={1}
       returnKeyType="next"
       secureTextEntry
-      style={styles.pinInput}
+      style={[styles.t_parityXL, styles.pinInput]}
       {...props}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    padding: 20,
-    flex: 1,
-    overflow: 'hidden'
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 10
-  },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20,
-    textAlign: 'center'
-  },
-  errorText: {
-    fontFamily: fonts.bold,
-    textAlign: 'center',
-    color: colors.bg_alert,
-    fontSize: 12,
-    paddingBottom: 20
-  },
-  pinInput: {
-    marginBottom: 20
-  }
-});

@@ -44,7 +44,7 @@ export default StyleSheet.create({
     flex: 1
   },
   bottom: {
-    marginTop: 24,
+    marginTop: 16,
   },
   safeAreaView: {
     //flex: 1
@@ -273,7 +273,7 @@ export default StyleSheet.create({
   },
   t_parityXL: {
     fontFamily: fonts.regular,
-    fontSize: 24,
+    fontSize: 26,
     marginBottom: 8,
     color: colors.bg_text,
   },

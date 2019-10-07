@@ -20,8 +20,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import fonts from "../fonts";
+import styles from '../styles';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -89,11 +88,11 @@ class AccountPinView extends React.PureComponent {
 
   showHintOrError = () => {
     if (this.state.pinTooShort) {
-      return <Text style={styles.errorText}>Your pin must be at least 6 digits long!</Text>
+      return <Text style={[styles.t_hintText, styles.t_errorText]}>Your pin must be at least 6 digits long!</Text>
     } else if (this.state.pinMismatch) {
-      return <Text style={styles.errorText}>Pin codes don't match!</Text>
+      return <Text style={[styles.t_hintText, styles.t_errorText]}>Pin codes don't match!</Text>
     }
-    return (<Text style={styles.hintText}>Choose a PIN code with 6 or more digits</Text>)
+    return (<Text style={styles.t_hintText}>Choose a PIN code with 6 or more digits</Text>)
   }
 
   onPinInputChange = (stateName, pinInput) => {
@@ -103,13 +102,13 @@ class AccountPinView extends React.PureComponent {
   }
 
   render() {
-    const title = 'ACCOUNT PIN';
+    const title = 'Account PIN';
     return (
-      <View style={styles.body}>
+      <View style={[styles.b_flex, styles.b_paddingH]}>
         <Background />
-        <Text style={styles.titleTop}>{title}</Text>
+        <Text style={[styles.t_h1, styles.header]}>{title}</Text>
         {this.showHintOrError()}
-        <Text style={styles.title}>PIN</Text>
+        <Text style={[styles.t_text, styles.b_marginV_xs]}>PIN</Text>
         <PinInput
           autoFocus
           returnKeyType="next"
@@ -120,19 +119,21 @@ class AccountPinView extends React.PureComponent {
           onChangeText={pin => this.onPinInputChange('pin', pin)}
           value={this.state.pin}
         />
-        <Text style={styles.title}>CONFIRM PIN</Text>
+        <Text style={[styles.t_text, styles.b_marginV_xs]}>Confirm PIN</Text>
         <PinInput
           returnKeyType="done"
           focus={this.state.focusConfirmation}
           onChangeText={confirmation => this.onPinInputChange('confirmation', confirmation)}
           value={this.state.confirmation}
         />
-        <Button
-          onPress={this.submit}
-          color="green"
-          title="Done"
-          accessibilityLabel={'Done'}
-        />
+        <View style={styles.bottom}>
+          <Button
+            onPress={this.submit}
+            color="green"
+            title="Done"
+            accessibilityLabel={'Done'}
+          />
+        </View>
       </View>
     );
   }
@@ -152,48 +153,9 @@ class PinInput extends Component {
         numberOfLines={1}
         returnKeyType="next"
         secureTextEntry
-        style={styles.pinInput}
+        style={[styles.t_parityXL, styles.pinInput]}
         {...this.props}
       />
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    padding: 20,
-    flex: 1,
-    overflow: 'hidden'
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 10
-  },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20,
-    textAlign: 'center'
-  },
-  hintText: {
-    fontFamily: fonts.bold,
-    textAlign: 'center',
-    color: colors.bg_text_sec,
-    fontSize: 12,
-    paddingBottom: 20
-  },
-  errorText: {
-    fontFamily: fonts.bold,
-    textAlign: 'center',
-    color: colors.bg_alert,
-    fontSize: 12,
-    paddingBottom: 20
-  },
-  pinInput: {
-    marginBottom: 20
-  }
-});
