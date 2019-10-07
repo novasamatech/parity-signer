@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import styles from '../styles';
 import {parseDerivationPath} from '../util/suri'
 import TextInput from './TextInput';
 
@@ -43,16 +44,13 @@ export default function DerivationPathField(props) {
         onPress={toggleShowAdvancedField}
         style={{diplay:'flex'}}
       >
-        <View
-          style={{justifyContent:'center'}}
-        >
-          <Text style={[styles.t_text, styles.b_row, styles.b_marginV_xs]}>
-            Advanced
-            <Icon 
-              name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
-            />
-          </Text>
-        </View>
+        <Text style={[styles.t_text, styles.b_row, styles.b_marginV_xs]}>
+          Advanced
+          <Icon 
+            name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
+          />
+        </Text>
+
       </TouchableOpacity>
       {showAdvancedField && 
         <TextInput
@@ -83,18 +81,3 @@ export default function DerivationPathField(props) {
     </View>
   )
 }
-
-
-
-const ownStyles = StyleSheet.create({
-  advancedText: {
-    paddingBottom: 0,
-    paddingTop:20
-  },
-  invalidInput: {
-    backgroundColor: '#fee3e3'
-  },
-  validInput: {
-    backgroundColor: '#e4fee4'
-  }
-});

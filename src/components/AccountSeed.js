@@ -20,6 +20,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from "../fonts";
+import styles from "../styles";
 import PARITY_WORDS from '../../res/parity_wordlist.json';
 import BIP39_WORDS from '../../res/bip39_wordlist.json';
 import TextInput from './TextInput';
@@ -99,7 +100,7 @@ export default class AccountSeed extends Component {
     const suggestions = this.generateSuggestions(input.toLowerCase(), wordList);
 
     return (
-      <View style={styles.suggestions}>
+      <View style={[styles.t_parityS, ownStyles.suggestions]}>
         {suggestions.map((suggestion, i) => {
           const sepStyle =
             i !== suggestions.length - 1
@@ -114,8 +115,8 @@ export default class AccountSeed extends Component {
                 this.props.onChangeText(phrase);
               }}
             >
-              <View key={suggestion} style={[styles.suggestion, sepStyle]}>
-                <Text style={styles.suggestionText}>{suggestion}</Text>
+              <View key={suggestion} style={[ownStyles.suggestion, sepStyle]}>
+                <Text style={ownStyles.suggestionText}>{suggestion}</Text>
               </View>
             </TouchableItem>
           );
@@ -126,11 +127,11 @@ export default class AccountSeed extends Component {
 
   render () {
     const { valid, value } = this.props;
-    const invalidStyles = !valid ? styles.invalidInput : {};
+    const invalidStyles = !valid ? ownStyles.invalidInput : {};
     return (
-      <View>
+      <View style={styles.b_marginBottom}>
         <TextInput
-          style={[styles.input, invalidStyles]}
+          style={[styles.t_parityS, styles.seedText, invalidStyles]}
           multiline
           autoCorrect={false}
           autoCompleteType="off"
@@ -145,34 +146,18 @@ export default class AccountSeed extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  body: {
-    flexDirection: 'column'
-  },
-  input: {
-    height: 160,
-    lineHeight: 26,
-    fontSize: 20,
-    backgroundColor: '#e4fee4'
-  },
-  invalidInput: {
-    backgroundColor: '#fee3e3'
-  },
+const ownStyles = StyleSheet.create({
   suggestions: {
-    backgroundColor: colors.card_bg,
-    borderTopWidth: 0.3,
-    borderColor: colors.card_bg_text_sec,
-    paddingHorizontal: 5,
-    height: 35,
     flexDirection: 'row',
     alignItems: 'center',
   },
   suggestion: {
-    paddingVertical: 9,
-    padding: 10
+    paddingHorizontal: 16,
+    paddingTop: 9,
+    paddingBottom: 11,
+    backgroundColor: colors.bg_button_inactive
   },
   suggestionText: {
-    fontFamily: fonts.regular,
-    color: colors.card_bg_text
+    color: colors.bg_button
   }
 });

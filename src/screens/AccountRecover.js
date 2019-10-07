@@ -25,11 +25,11 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  View,
 } from 'react-native';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
-import fonts from "../fonts";
+import styles from '../styles';
 import AccountCard from '../components/AccountCard';
 import AccountSeed from '../components/AccountSeed';
 import Background from '../components/Background';
@@ -160,49 +160,53 @@ class AccountRecoverView extends React.Component {
     const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
     return (
-      <SafeAreaView style={styles.safeAreaView}>
+      <SafeAreaView style={styles.b_flex}>
         <KeyboardScrollView
-          style={styles.bodyContainer}
           innerRef={ref => {
             this.scroll = ref;
           }}
-          extraHeight={200}
-          contentContainerStyle={{ justifyContent: 'flex-end' }}
         >
-          <Background />
-          <Text style={styles.titleTop}>RECOVER ACCOUNT</Text>
-          <Text style={styles.title}>CHOOSE NETWORK</Text>
-          <NetworkButton network={selectedNetwork} />
-          <Text style={styles.title}>ACCOUNT NAME</Text>
-          <TextInput
-            onChangeText={name => accounts.updateNew({ name })}
-            value={name}
-            placeholder="Enter an account name"
-          />
-          <Text style={[styles.title, { marginTop: 20 }]}>
-            ENTER RECOVERY WORDS
-          </Text>
-          <AccountSeed
-            onFocus={event => {
-              this.scroll.props.scrollToFocusedInput(
-                findNodeHandle(event.target)
-              );
-            }}
-            ref={this._seed}
-            valid={validateSeed(seedPhrase, validBip39Seed).valid || (isSubstrate && address)}
-            onChangeText={seedPhrase => {
-              this.debouncedAddressGeneration(seedPhrase, derivationPath, derivationPassword);
-              this.setState({ seedPhrase });
-            }}
-            value={this.state.seedPhrase}
-          />
-          {isSubstrate && <DerivationPathField
-            onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
-              this.debouncedAddressGeneration(seedPhrase, derivationPath, derivationPassword);
-              this.setState({ derivationPath, derivationPassword, isDerivationPathValid });
-            }}
-            styles={styles}
-          />}
+          <View style={styles.b_paddingH}>
+            <Background />
+            <Text style={[styles.t_h1, styles.header]}>Recover Account</Text>
+            <Text style={[styles.t_text, styles.b_marginV_xs, {marginTop: 0}]}>Choose Network</Text>
+          </View>
+          <View style={styles.b_marginBottom}>
+            <NetworkButton network={selectedNetwork} />
+          </View>
+          <View style={styles.b_paddingH}>
+            <Text style={styles.t_text}>Account Name</Text>
+            <TextInput
+              onChangeText={name => accounts.updateNew({ name })}
+              value={name}
+              placeholder="Enter an account name"
+              style={[styles.t_h2, styles.b_textInput]}
+            />
+            <Text style={[styles.t_text, styles.b_marginV_xs, { marginTop: 20 }]}>
+              Enter Recovery Words
+            </Text>
+            <AccountSeed
+              onFocus={event => {
+                this.scroll.props.scrollToFocusedInput(
+                  findNodeHandle(event.target)
+                );
+              }}
+              ref={this._seed}
+              valid={validateSeed(seedPhrase, validBip39Seed).valid || (isSubstrate && address)}
+              onChangeText={seedPhrase => {
+                this.debouncedAddressGeneration(seedPhrase, derivationPath, derivationPassword);
+                this.setState({ seedPhrase });
+              }}
+              value={this.state.seedPhrase}
+            />
+            {isSubstrate && <DerivationPathField
+              onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
+                this.debouncedAddressGeneration(seedPhrase, derivationPath, derivationPassword);
+                this.setState({ derivationPath, derivationPassword, isDerivationPathValid });
+              }}
+              styles={styles}
+            />}
+          </View>
           <AccountCard
             style={{ marginTop: 20 }}
             address={address || ''}
@@ -261,27 +265,3 @@ class AccountRecoverView extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  bodyContainer: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    padding: 20
-  },
-  safeAreaView: {
-    flex: 1
-  },
-  titleTop: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    paddingBottom: 20,
-    textAlign: 'center'
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 20
-  }
-});
