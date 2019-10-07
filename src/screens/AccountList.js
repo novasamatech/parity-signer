@@ -131,7 +131,7 @@ class AccountListView extends React.PureComponent {
           enableEmptySections
         />
         {!hasNoAccount && (
-          <View style={[styles.b_paddingH, styles.b_marginBottom]}>
+          <View style={[styles.b_paddingH]}>
             <Button
               title="Scan"
               onPress={() => navigate('QrScanner')}

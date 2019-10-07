@@ -103,7 +103,8 @@ export default StyleSheet.create({
     elevation: 4,
     height: 62,
     backgroundColor: colors.bg_button,
-    borderRadius: 60
+    borderRadius: 60,
+    marginVertical: 24
   },
   buttonDisabled: {
     elevation: 0,

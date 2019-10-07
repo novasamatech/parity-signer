@@ -127,7 +127,7 @@ export default class AccountSeed extends Component {
 
   render () {
     const { valid, value } = this.props;
-    const invalidStyles = !valid ? ownStyles.invalidInput : {};
+    const invalidStyles = !valid ? styles.seedText_invalid : {};
     return (
       <View style={styles.b_marginBottom}>
         <TextInput

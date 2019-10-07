@@ -100,7 +100,7 @@ export class MessageDetailsView extends React.PureComponent {
         </View>
           <View style={styles.b_paddingH} >
           <Text style={[styles.t_text, styles.b_marginV_xs]}>Message</Text>
-          <Text style={[styles.t_parityS, styles.seedText, styles.b_marginBottom]}>
+          <Text style={[styles.t_parityS, styles.seedText]}>
             {isAscii(message)
               ? hexToAscii(message)
               : dataToSign}

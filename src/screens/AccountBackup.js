@@ -134,7 +134,7 @@ class AccountBackupView extends React.PureComponent {
           {!!derivationPassword && <DerivationPasswordVerify password={derivationPassword}/>}
           {isNew &&
             <Button
-              buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
+              buttonStyles={[styles.nextStep]}
               title="Backup Done"
               onPress={() => {
 

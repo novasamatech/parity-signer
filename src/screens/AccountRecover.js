@@ -208,58 +208,58 @@ class AccountRecoverView extends React.Component {
             />}
           </View>
           <AccountCard
-            style={{ marginTop: 20 }}
             address={address || ''}
             networkKey={networkKey || ''}
             title={name}
             seedType={validBip39Seed ? 'bip39' : 'brain wallet'}
           />
-          <Button
-            buttonStyles={{ marginBottom: 40 }}
-            disabled={isSubstrate && (!address || !isDerivationPathValid)}
-            title="Next Step"
-            onPress={() => {
-              const validation = validateSeed(
-                seedPhrase,
-                validBip39Seed
-              );
+          <View style={styles.b_paddingH}>
+            <Button
+              disabled={isSubstrate && (!address || !isDerivationPathValid)}
+              title="Next Step"
+              onPress={() => {
+                const validation = validateSeed(
+                  seedPhrase,
+                  validBip39Seed
+                );
 
-              if (!validation.valid) {
-                if (validation.accountRecoveryAllowed) {
-                  return Alert.alert('Warning', `${validation.reason}`, [
-                    {
-                      text: 'I understand the risks',
-                      style: 'default',
-                      onPress: () => {
-                        navigation.navigate('AccountPin', {
-                          isWelcome: navigation.getParam(
-                            'isWelcome'
-                          ),
-                          isNew: true
-                        });
+                if (!validation.valid) {
+                  if (validation.accountRecoveryAllowed) {
+                    return Alert.alert('Warning', `${validation.reason}`, [
+                      {
+                        text: 'I understand the risks',
+                        style: 'default',
+                        onPress: () => {
+                          navigation.navigate('AccountPin', {
+                            isWelcome: navigation.getParam(
+                              'isWelcome'
+                            ),
+                            isNew: true
+                          });
+                        }
+                      },
+                      {
+                        text: 'Back',
+                        style: 'cancel'
                       }
-                    },
-                    {
-                      text: 'Back',
-                      style: 'cancel'
-                    }
-                  ]);
-                } else {
-                  return Alert.alert('Error', `${validation.reason}`, [
-                    {
-                      text: 'Back',
-                      style: 'cancel'
-                    }
-                  ]);
+                    ]);
+                  } else {
+                    return Alert.alert('Error', `${validation.reason}`, [
+                      {
+                        text: 'Back',
+                        style: 'cancel'
+                      }
+                    ]);
+                  }
                 }
-              }
 
-              navigation.navigate('AccountPin', {
-                isWelcome: navigation.getParam('isWelcome'),
-                isNew: true
-              });
-            }}
-          />
+                navigation.navigate('AccountPin', {
+                  isWelcome: navigation.getParam('isWelcome'),
+                  isNew: true
+                });
+              }}
+            />
+          </View>
         </KeyboardScrollView>
       </SafeAreaView>
     );

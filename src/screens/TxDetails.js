@@ -107,36 +107,34 @@ export class TxDetailsView extends React.PureComponent {
           />
         </View>
         <Text style={[styles.b_paddingH, styles.t_text]}>Transaction Details</Text>
-        <View style={styles.b_marginBottom}>
-          {
-            isEthereum
-              ? (
-                <React.Fragment>
-                  <TxDetailsCard
-                    style={{ marginVertical: 16 }}
-                    description="You are about to send the following amount"
-                    value={value}
-                    gas={gas}
-                    gasPrice={gasPrice}
-                  />
-                  <Text style={[styles.b_paddingH, styles.t_text]}>Recipient</Text>
-                  <AccountCard
-                    title={recipient.name}
-                    address={recipient.address}
-                    networkKey={recipient.networkKey || ''}
-                  />
-                </React.Fragment>
-              )
-              : (
-                <PayloadDetailsCard
+        {
+          isEthereum
+            ? (
+              <React.Fragment>
+                <TxDetailsCard
                   style={{ marginVertical: 16 }}
-                  description="You are about to confirm sending the following extrinsic"
-                  payload={dataToSign}
-                  prefix={prefix}
-                  />
-              )
-          }
-        </View>
+                  description="You are about to send the following amount"
+                  value={value}
+                  gas={gas}
+                  gasPrice={gasPrice}
+                />
+                <Text style={[styles.b_paddingH, styles.t_text]}>Recipient</Text>
+                <AccountCard
+                  title={recipient.name}
+                  address={recipient.address}
+                  networkKey={recipient.networkKey || ''}
+                />
+              </React.Fragment>
+            )
+            : (
+              <PayloadDetailsCard
+                style={{ marginVertical: 16 }}
+                description="You are about to confirm sending the following extrinsic"
+                payload={dataToSign}
+                prefix={prefix}
+                />
+            )
+        }
         <View style={styles.b_paddingH}>
           <Button
             title="Sign Transaction"

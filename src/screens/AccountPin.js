@@ -126,14 +126,12 @@ class AccountPinView extends React.PureComponent {
           onChangeText={confirmation => this.onPinInputChange('confirmation', confirmation)}
           value={this.state.confirmation}
         />
-        <View style={styles.bottom}>
-          <Button
-            onPress={this.submit}
-            color="green"
-            title="Done"
-            accessibilityLabel={'Done'}
-          />
-        </View>
+        <Button
+          onPress={this.submit}
+          color="green"
+          title="Done"
+          accessibilityLabel={'Done'}
+        />
       </View>
     );
   }
