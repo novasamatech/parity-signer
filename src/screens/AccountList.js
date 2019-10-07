@@ -21,12 +21,11 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
+import styles from '../styles';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import PopupMenu from '../components/PopupMenu';
-import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountList extends React.PureComponent {
@@ -90,31 +89,32 @@ class AccountListView extends React.PureComponent {
     const { navigate } = navigation;
 
     return (
-      <View style={styles.body}>
+      <View style={styles.b_flex}>
         <Background />
-        <View style={styles.header}>
-          <Text style={styles.title}>ACCOUNTS</Text>
-          <View style={styles.menuView}>
-            <PopupMenu
-              onSelect={value => navigate(value)}
-              menuTriggerIconName={'add'}
-              menuItems={[
-                { value: 'AccountNew', text: 'New Account' },
-                { value: 'AccountRecover', text: 'Recover Account' },
-                { value: 'About', text: 'About' },
-              ]}
-            />
+        <View style={styles.b_paddingH}>
+          <View style={styles.header}>
+            <Text style={styles.t_h1}>Accounts</Text>
+            <View style={styles.menuView}>
+              <PopupMenu
+                onSelect={value => navigate(value)}
+                menuTriggerIconName={'add'}
+                menuItems={[
+                  { value: 'AccountNew', text: 'New Account' },
+                  { value: 'AccountRecover', text: 'Recover Account' },
+                  { value: 'About', text: 'About' },
+                ]}
+              />
+            </View>
           </View>
+          {hasNoAccount && this.showOnboardingMessage()}
         </View>
-        {hasNoAccount && this.showOnboardingMessage()}
         <FlatList
           ref={list => {
             this.list = list;
           }}
-          style={styles.content}
+          style={styles.b_flex}
           data={[...accounts.entries()]}
           keyExtractor={([key]) => key}
-          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
           renderItem={({ item: [accountKey, account] }) => {
             return (
               <AccountCard
@@ -131,9 +131,8 @@ class AccountListView extends React.PureComponent {
           enableEmptySections
         />
         {!hasNoAccount && (
-          <View style={styles.bottom}>
+          <View style={[styles.b_paddingH, styles.b_marginBottom]}>
             <Button
-              buttonStyles={{ height: 60 }}
               title="Scan"
               onPress={() => navigate('QrScanner')}
             />
@@ -143,48 +142,3 @@ class AccountListView extends React.PureComponent {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    padding: 20,
-  },
-  bottom: {
-    marginTop: 20
-  },
-  content: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 20,
-    justifyContent: 'center'
-  },
-  menuView: {
-    flex: 1,
-    alignItems: 'flex-end'
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    flexDirection: 'column',
-    justifyContent: 'center'
-  },
-  link: {
-    textDecorationLine: 'underline',
-  },
-  onboardingWrapper: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end'
-  },
-  onboardingText: {
-    fontFamily: fonts.regular,
-    fontSize: 20,
-    color: colors.bg_text_sec
-  }
-});

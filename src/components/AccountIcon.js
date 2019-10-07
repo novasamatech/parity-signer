@@ -19,9 +19,10 @@
 import Identicon from '@polkadot/reactnative-identicon';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import styles from '../styles';
 import colors from '../colors';
 import { NetworkProtocols } from '../constants'
 import { blockiesIcon } from '../util/native';
@@ -53,27 +54,33 @@ export default function AccountIcon (props) {
   if (protocol === NetworkProtocols.SUBSTRATE) {
 
     return (
-      <Identicon
-        value={address}
-        size={style.width || 50 }
-      />
+      <View style={[styles.el_icon,  {borderRadius:styles.el_icon.width, overflow:'hidden'}]}>
+        <Identicon
+          value={address}
+          size={styles.el_icon.width}
+        />
+      </View>
     );
   } else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri){
 
     return (
-      <Image 
-        source={{ uri: ethereumIconUri }} 
-        style={style || { width: 47, height: 47 }}
-      />
+      <View style={[styles.el_icon,  {borderRadius:styles.el_icon.width, overflow:'hidden'}]}>
+        <Image 
+          source={{ uri: ethereumIconUri }} 
+          style={styles.el_icon}
+        />
+      </View>
     );
   } else {
     // if there's no protocol or it's unknown we return a warning
     return (
-      <Icon
-        color={colors.bg}
-        name={'error'}
-        size={style.width || 50 }
-      />
+      <View style={[styles.el_icon,  {borderRadius:styles.el_icon.width, overflow:'hidden', backgroundColor:'black'}]}>
+        <Icon
+          color={colors.bg}
+          name={'error'}
+          size={style.width || 56 }
+        />
+      </View>
     )
   }
 }

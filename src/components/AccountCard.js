@@ -22,9 +22,8 @@ import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
 import AccountIcon from './AccountIcon';
 import Address from './Address';
-import colors from '../colors';
+import styles from '../styles';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import fonts from '../fonts';
 import TouchableItem from './TouchableItem';
 
 
@@ -56,98 +55,44 @@ export default class AccountCard extends React.PureComponent {
         disabled={false}
         onPress={onPress}
       >
-        <View style={[styles.body, style]}>
-          <View style={styles.content}>
-            <AccountIcon
-              address={address}
-              protocol={network.protocol}
-              style={styles.icon}
-            />
-            <View style={styles.desc}>
-              <Text numberOfLines={1} style={styles.titleText}>
-                {title}
-              </Text>
+        <View style={[styles.b_row, {borderBottomWidth: 1, borderBottomColor: 'black'}]}>
+          <View style={[{flex:1, alignItems:'center'}, styles.b_row]}>
+            <View style={styles.b_paddingH}>
+              <AccountIcon
+                address={address}
+                protocol={network.protocol}
+                style={[styles.el_icon, styles.b_paddingH]}
+              />
+            </View>
+            <View style={[styles.b_flex, {justifyContent:'space-between'}]}>
               <Address
+                style={[styles.t_text, styles.t_color_sec]}
                 address={address}
                 protocol={network.protocol}
               />
+              <View style={[styles.b_row, {alignItems:'center'}]}>
+                <Text style={[styles.t_h2, styles.b_marginV_xs]}>{title}</Text>
+                <Text style={[styles.t_text]}>{network.title}</Text>
+              </View>
+              <View style={[styles.b_row]}>
+                <Text style={[styles.t_text, styles.t_color_sec]}>{seedTypeDisplay}</Text>
+              </View>
+
+              </View>
+              <View
+                style={[
+                  {
+                    width: 8,
+                    height: 80,
+                    marginLeft: 8,
+                    backgroundColor: network.color
+                  }
+                ]}
+                >
+              </View>
             </View>
           </View>
-          <View
-            style={[
-              styles.footer,
-              {
-                backgroundColor: network.color
-              }
-            ]}
-          >
-            <Text
-              style={[
-                styles.footerSeedType,
-                {
-                  color: network.secondaryColor
-                }
-              ]}
-            >
-              {seedTypeDisplay}
-            </Text>
-            <Text
-              style={[
-                styles.footerNetwork,
-                {
-                  color: network.secondaryColor
-                }
-              ]}
-            >
-              {network.title}
-            </Text>
-          </View>
-        </View>
       </TouchableItem>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    paddingBottom: 20
-  },
-  content: {
-    flexDirection: 'row',
-    backgroundColor: colors.card_bg,
-    padding: 10
-  },
-  icon: {
-    width: 47,
-    height: 47
-  },
-  desc: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    flex: 1
-  },
-  footer: {
-    backgroundColor: '#977CF6',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 5
-  },
-  titleText: {
-    fontFamily: fonts.semiBold,
-    fontSize: 20,
-  },
-  secondaryText: {
-    fontFamily: fonts.semiBold,
-    color: colors.bg_text_sec,
-    fontSize: 14
-  },
-  footerSeedType: {
-    fontFamily: fonts.regular,
-    color: colors.card_bg
-  },
-  footerNetwork: {
-    fontFamily: fonts.semiBold,
-    color: colors.card_bg,
-  }
-});
