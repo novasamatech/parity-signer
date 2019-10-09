@@ -86,20 +86,18 @@ export default class ScannerStore extends Container<ScannerState> {
   }
 
   async setParsedData(strippedData, accountsStore) {
-    const parsedData = await constructDataFromBytes(strippedData);
-    debugger;
-    if (parsedData.isMultipart && !this.state.multipartComplete) {
-      debugger;
+    const { multipartComplete } = this.state;
+
+    const parsedData = await constructDataFromBytes(strippedData, multipartComplete);
+
+    if (parsedData.isMultipart && !multipartComplete) {
       this.setPartData(parsedData.currentFrame, parsedData.frameCount, parsedData.partData, accountsStore);
-      this.setState({
-        totalFrameCount: parsedData.frameCount
-      })
       return;
     }
-    debugger;
+
     if (!accountsStore.getByAddress(parsedData.data.account)) {
       let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
-      debugger;
+
       for (let i = 0; i < networks.length; i++) {
         let key =  networks[i];
         let account = accountsStore.getByAddress(encodeAddress(decodeAddress(parsedData.data.account), SUBSTRATE_NETWORK_LIST[key].prefix));
@@ -116,10 +114,23 @@ export default class ScannerStore extends Container<ScannerState> {
     });
   }
 
-  async setPartData(frame, frameCount, partData) {
-    const { multipartData } = this.state;
+  async setPartData(frame, frameCount, partData, accountsStore) {
+    const { multipartComplete, multipartData, totalFrameCount } = this.state;
 
-    if (partData[0] === new Uint8Array([0x00]) || partData[0] === new Uint8Array([0x7B])) {
+    // set it once only
+    if (!totalFrameCount) {
+      this.setState({
+        totalFrameCount: frameCount
+      });
+    }
+
+    const partDataAsBytes = new Uint8Array(partData.length / 2);
+
+    for (let i = 0; i < partDataAsBytes.length; i++) {
+      partDataAsBytes[i] = parseInt(partData.substr(i * 2, 2), 16);
+    }
+
+    if (partDataAsBytes[0] === new Uint8Array([0x00]) || partDataAsBytes[0] === new Uint8Array([0x7B])) {
       // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
       throw new Error('Error decoding invalid part data.');
     }
@@ -134,22 +145,18 @@ export default class ScannerStore extends Container<ScannerState> {
     // we havne't filled all the frames yet
     if (completedFramesCount < frameCount) {
       const nextDataState = multipartData;
-      nextDataState[frame] = partData;
+      nextDataState[frame] = partDataAsBytes;
       this.setState({
         multipartData: nextDataState
       });
-    }
-    
-    // all the frames are filled
-    if (completedFramesCount === frameCount) {
+    } else if (completedFramesCount === frameCount && !multipartComplete) { // all the frames are filled
       this.setState({
         multipartComplete: true
-      })
-      const concatMultipartData = Object.values(multipartData).reduce((acc, partData) => acc.concat(partData));
+      });
 
-      const data = this.setParsedData(concatMultipartData);
-      debugger;
-      this.setData(data);
+      const concatMultipartData = Object.values(multipartData).reduce((acc, part) => [...acc, ...part]);
+
+      this.setParsedData(concatMultipartData, accountsStore);
     }
   }
 

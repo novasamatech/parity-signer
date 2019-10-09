@@ -92,16 +92,15 @@ export function rawDataToU8A(rawData) {
   return bytes;
 }
 
-export async function constructDataFromBytes(bytes) {
+export async function constructDataFromBytes(bytes, multipartComplete = false) {
   const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
   const frameCount = parseInt(frameInfo.substr(2, 4), 16);
   const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
   const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
   const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
-  debugger;
-  
+
   // UOS after frames can be metadata json
-  if (isMultipart) {
+  if (isMultipart && !multipartComplete) {
     const partData = {
       currentFrame,
       frameCount,
@@ -114,6 +113,7 @@ export async function constructDataFromBytes(bytes) {
   const zerothByte = uosAfterFrames.substr(0, 2);
   const firstByte = uosAfterFrames.substr(2, 2);
   const secondByte = uosAfterFrames.substr(4, 2);
+
   let action;
   let data = {};
   data['data'] = {}; // for consistency with legacy data format.
@@ -154,7 +154,7 @@ export async function constructDataFromBytes(bytes) {
           const defaultPrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
           let extrinsicPayload;
           let network;
-
+          
           switch (secondByte) {
             case '00': // sign mortal extrinsic
               extrinsicPayload = new GenericExtrinsicPayload(rawPayload, { version: 3 });
@@ -203,11 +203,13 @@ export async function constructDataFromBytes(bytes) {
               break;
             case '03': // Cold Signer should attempt to decode message to utf8
               data['action'] = 'signData';
-              data['oversized'] = isOversized;
-              data['isHash'] = isOversized;
-              data['data']['data'] = isOversized
-                ? await blake2s(u8aToHex(rawPayload))
-                : u8aToString(rawPayload);
+              if (isOversized) {
+                data['data']['data'] = await blake2s(u8aToHex(rawPayload));
+                data['isHash'] = isOversized;
+                data['oversized'] = isOversized;
+              } else {
+                data['data']['data'] = u8aToString(rawPayload);
+              }
               data['data']['account'] = encodeAddress(publicKeyAsBytes, defaultPrefix); // default to Kusama
               break;
             default:
@@ -217,13 +219,12 @@ export async function constructDataFromBytes(bytes) {
           if (e) {
             throw new Error(e);
           } else {
-            debugger;
-            throw new Error('we cannot handle the payload: ', bytes);
+            throw new Error('Error: we cannot handle this payload: ', bytes);
           }
         }
         break;
       default:
-        throw new Error('we cannot handle the payload: ', bytes);
+        throw new Error('we cannot handle the pasta: ', bytes);
     }
 
     return data;
@@ -231,7 +232,6 @@ export async function constructDataFromBytes(bytes) {
     if (e) {
       throw new Error(e);
     } else {
-      debugger;
       throw new Error('we cannot handle the payload: ', bytes);
     }
   }

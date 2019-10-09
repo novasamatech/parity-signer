@@ -31,11 +31,12 @@ export default class SignedMessage extends React.PureComponent {
   render() {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
-        {(scanner, accounts) => {
+        {(scannerStore, accountsStore) => {
           return (
             <SignedMessageView
-              data={scanner.getSignedTxData()}
-              message={scanner.getMessage()}
+              data={scannerStore.getSignedTxData()}
+              isHash={scannerStore.getIsHash()}
+              message={scannerStore.getMessage()}
             />
           );
         }}
@@ -46,11 +47,13 @@ export default class SignedMessage extends React.PureComponent {
 
 export class SignedMessageView extends React.PureComponent {
   static propTypes = {
-    data: PropTypes.string.isRequired
+    data: PropTypes.string.isRequired,
+    isHash: PropTypes.bool,
+    message: PropTypes.string
   };
 
   render() {
-    const { data, message } = this.props;
+    const { data, isHash, message } = this.props;
 
     return (
       <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
@@ -60,9 +63,13 @@ export class SignedMessageView extends React.PureComponent {
         </View>
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
-          {isAscii(message)
-            ? hexToAscii(message)
-            : data}
+          {
+             isHash
+             ? message
+             : isAscii(message)
+              ? hexToAscii(message)
+              : data
+          }
         </Text>
       </ScrollView>
     );

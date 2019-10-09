@@ -105,9 +105,13 @@ export class MessageDetailsView extends React.PureComponent {
         />
         <Text style={styles.title}>MESSAGE</Text>
         <Text style={styles.message}>
-          {isAscii(message)
-            ? hexToAscii(message)
-            : dataToSign}
+          {
+            isHash
+              ? message
+              : isAscii(message)
+                ? hexToAscii(message)
+                : dataToSign
+          }
         </Text>
         <Button
           buttonStyles={{ height: 60 }}
