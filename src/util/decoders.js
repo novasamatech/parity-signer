@@ -94,19 +94,20 @@ export function rawDataToU8A(rawData) {
 
 export async function constructDataFromBytes(bytes) {
   const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
-  const isMultipart = !!parseInt(frameInfo.substr(0, 2), 16);
   const frameCount = parseInt(frameInfo.substr(2, 4), 16);
+  const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
   const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
   const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
-
+  debugger;
+  
+  // UOS after frames can be metadata json
   if (isMultipart) {
     const partData = {
       currentFrame,
       frameCount,
-      isMultipart: true,
+      isMultipart,
       partData: uosAfterFrames
     };
-
     return partData;
   }
 
@@ -114,7 +115,6 @@ export async function constructDataFromBytes(bytes) {
   const firstByte = uosAfterFrames.substr(2, 2);
   const secondByte = uosAfterFrames.substr(4, 2);
   let action;
-  let address;
   let data = {};
   data['data'] = {}; // for consistency with legacy data format.
 
@@ -145,7 +145,6 @@ export async function constructDataFromBytes(bytes) {
         try {
           const crypto = firstByte === '00' ? 'ed25519' : firstByte === '01' ? 'sr25519' : null;
           data['data']['crypto'] = crypto;
-
           const pubKeyHex = uosAfterFrames.substr(6, 64)
           const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
           const hexEncodedData = '0x' + uosAfterFrames.slice(70);
@@ -218,6 +217,7 @@ export async function constructDataFromBytes(bytes) {
           if (e) {
             throw new Error(e);
           } else {
+            debugger;
             throw new Error('we cannot handle the payload: ', bytes);
           }
         }
@@ -231,6 +231,7 @@ export async function constructDataFromBytes(bytes) {
     if (e) {
       throw new Error(e);
     } else {
+      debugger;
       throw new Error('we cannot handle the payload: ', bytes);
     }
   }

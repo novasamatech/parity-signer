@@ -56,8 +56,12 @@ export default class Scanner extends React.PureComponent {
     return (
       <Subscribe to={[ScannerStore, AccountsStore]}>
         {(scannerStore, accountsStore) => {
+          let framesCount = scannerStore.getTotalFramesCount();
           return (
             <QrScannerView
+              completedFramesCount={scannerStore.getCompletedFramesCount()}
+              totalFramesCount={framesCount}
+              isMultipart={framesCount > 1}
               navigation={this.props.navigation}
               scannerStore={scannerStore}
               onBarCodeRead={async txRequestData => {
@@ -73,13 +77,12 @@ export default class Scanner extends React.PureComponent {
                     await scannerStore.setUnsigned(txRequestData.data);
                   } else {
                     const strippedData = rawDataToU8A(txRequestData.rawData);
-
                     await scannerStore.setParsedData(
                       strippedData,
                       accountsStore
                     );
                   }
-  
+
                   if (scannerStore.getUnsigned()) {
                     await scannerStore.setData(accountsStore);
                     if (scannerStore.getType() === 'transaction') {
@@ -102,7 +105,7 @@ export default class Scanner extends React.PureComponent {
   }
 }
 
-export class QrScannerView extends React.PureComponent {
+export class QrScannerView extends React.Component {
   constructor(props) {
     super(props);
     this.setBusySubscription = null;
@@ -152,10 +155,21 @@ export class QrScannerView extends React.PureComponent {
             <View style={styles.middleCenter} />
             <View style={styles.middleRight} />
           </View>
-          <View style={styles.bottom}>
-            <Text style={styles.descTitle}>Scan QR Code</Text>
-            <Text style={styles.descSecondary}>To Sign a New Transaction</Text>
-          </View>
+          {
+            this.props.isMultipart
+              ? (
+                <View style={styles.progress}>
+                  <Text style={styles.descTitle}>Scanning Multipart Data, Please Hold Still...</Text>
+                  <Text style={styles.descSecondary}>{this.props.completedFramesCount} / {this.props.totalFramesCount} Completed.</Text>
+                </View>
+              ):
+              (
+                <View style={styles.bottom}>
+                  <Text style={styles.descTitle}>Scan QR Code</Text>
+                  <Text style={styles.descSecondary}>To Sign a New Transaction</Text>
+                </View>
+              )
+          }
         </View>
       </RNCamera>
     );
@@ -207,6 +221,12 @@ const styles = StyleSheet.create({
   },
   middleRight: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  progress: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   bottom: {

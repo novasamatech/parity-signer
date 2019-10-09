@@ -37,11 +37,14 @@ type SignedTX = {
 };
 
 type ScannerState = {
+  completedFramesCount: number,
+  totalFrameCount: number,
   dataToSign: string,
   isHash: boolean,
   isOversized: boolean,
   message: string,
   multipartData: any,
+  multipartComplete: boolean,
   recipient: Account,
   scanErrorMsg: string,
   sender: Account,
@@ -55,11 +58,14 @@ type ScannerState = {
 
 const defaultState = {
   busy: false,
+  completedFramesCount: 0,
+  totalFrameCount: 0,
   isHash: false,
   isOversized: false,
   dataToSign: '',
   message: null,
   multipartData: {},
+  multipartComplete: false,
   recipient: null,
   scanErrorMsg: '',
   sender: null,
@@ -81,10 +87,19 @@ export default class ScannerStore extends Container<ScannerState> {
 
   async setParsedData(strippedData, accountsStore) {
     const parsedData = await constructDataFromBytes(strippedData);
-
+    debugger;
+    if (parsedData.isMultipart && !this.state.multipartComplete) {
+      debugger;
+      this.setPartData(parsedData.currentFrame, parsedData.frameCount, parsedData.partData, accountsStore);
+      this.setState({
+        totalFrameCount: parsedData.frameCount
+      })
+      return;
+    }
+    debugger;
     if (!accountsStore.getByAddress(parsedData.data.account)) {
       let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
-
+      debugger;
       for (let i = 0; i < networks.length; i++) {
         let key =  networks[i];
         let account = accountsStore.getByAddress(encodeAddress(decodeAddress(parsedData.data.account), SUBSTRATE_NETWORK_LIST[key].prefix));
@@ -96,38 +111,44 @@ export default class ScannerStore extends Container<ScannerState> {
       }
     }
 
-    if (parsedData.isMultipart) {
-      this.setPartData(parsedData.frame, parsedData.frameCount, parsedData.partData, accountsStore);
-      return;
-    }
-
     this.setState({
       unsignedData: parsedData
     });
   }
 
-  async setPartData(frame, frameCount, partData, accountsStore) {
+  async setPartData(frame, frameCount, partData) {
+    const { multipartData } = this.state;
+
     if (partData[0] === new Uint8Array([0x00]) || partData[0] === new Uint8Array([0x7B])) {
       // part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
       throw new Error('Error decoding invalid part data.');
     }
 
+    const completedFramesCount = Object.keys(multipartData).length;
+
+    this.setState({
+      completedFramesCount,
+      frameCount
+    })
+
     // we havne't filled all the frames yet
-    if (Object.keys(this.state.multipartData.length) < frameCount) {
-      const nextDataState = this.state.multipartData;
-
+    if (completedFramesCount < frameCount) {
+      const nextDataState = multipartData;
       nextDataState[frame] = partData;
-
       this.setState({
         multipartData: nextDataState
       });
     }
-
+    
     // all the frames are filled
-    if (Object.keys(this.state.multipartData.length) === frameCount) {
-      // fixme: this needs to be concated to a binary blob
-      const concatMultipartData = Object.keys(this.state.multipartData).reduce((result, data) => res.concat(this.state.multipartData[data]));
+    if (completedFramesCount === frameCount) {
+      this.setState({
+        multipartComplete: true
+      })
+      const concatMultipartData = Object.values(multipartData).reduce((acc, partData) => acc.concat(partData));
+
       const data = this.setParsedData(concatMultipartData);
+      debugger;
       this.setData(data);
     }
   }
@@ -268,17 +289,26 @@ export default class ScannerStore extends Container<ScannerState> {
       });
     }
   }
-
+  
+  /**
+   * @dev signing payload type can be either transaction or message
+   */
   getType() {
     return this.state.type;
   }
 
+  /**
+   * @dev sets a lock on writes
+   */
   setBusy() {
     this.setState({
       busy: true
     });
   }
 
+  /**
+   * @dev allow write operations
+   */
   setReady() {
     this.setState({
       busy: false
@@ -293,12 +323,32 @@ export default class ScannerStore extends Container<ScannerState> {
     this.setState(defaultState);
   }
 
+  /**
+   * @dev is the payload a hash
+   */
   getIsHash() {
     return this.state.isHash;
   }
 
+  /**
+   * @dev is the payload size greater than 256 (in Substrate chains)
+   */
   getIsOversized() {
     return this.state.isOversized;
+  }
+
+  /**
+   * @dev returns the number of completed frames so far
+   */
+  getCompletedFramesCount() {
+    return this.state.completedFramesCount;
+  }
+
+  /**
+   * @dev returns the number of frames to fill in total 
+   */
+  getTotalFramesCount() {
+    return this.state.totalFrameCount;
   }
 
   getSender() {
@@ -317,6 +367,9 @@ export default class ScannerStore extends Container<ScannerState> {
     return this.state.message;
   }
 
+  /**
+   * @dev unsigned data, not yet formatted as signable payload
+   */
   getUnsigned() {
     return this.state.unsignedData;
   }
@@ -325,6 +378,9 @@ export default class ScannerStore extends Container<ScannerState> {
     return this.state.tx;
   }
 
+  /**
+   * @dev unsigned date, formatted as signable payload
+   */
   getDataToSign() {
     return this.state.dataToSign;
   }
