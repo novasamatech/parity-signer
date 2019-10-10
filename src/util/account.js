@@ -18,10 +18,8 @@
 
 import { NetworkProtocols, NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 
-export function accountId({
-  address,
-  networkKey
-}) {
+export function accountId({ address, networkKey }) {
+
   if (typeof address !== 'string' || address.length === 0 || !networkKey || !NETWORK_LIST[networkKey]) {
     throw new Error(`Couldn't create an accountId. Address or networkKey missing, or network key was invalid.`);
   }

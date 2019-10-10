@@ -28,7 +28,6 @@ import Button from '../components/Button';
 import PopupMenu from '../components/PopupMenu';
 import fonts from "../fonts";
 import AccountsStore from '../stores/AccountsStore';
-import { accountId } from '../util/account';
 
 export default class AccountList extends React.PureComponent {
   static navigationOptions = {
@@ -44,8 +43,8 @@ export default class AccountList extends React.PureComponent {
             <AccountListView
               {...this.props}
               accounts={accounts.getAccounts()}
-              onAccountSelected={async address => {
-                await accounts.select(address);
+              onAccountSelected={key => {
+                accounts.select(key);
                 this.props.navigation.navigate('AccountDetails');
               }}
             />
@@ -58,37 +57,12 @@ export default class AccountList extends React.PureComponent {
 
 class AccountListView extends React.PureComponent {
   static propTypes = {
-    accounts: PropTypes.arrayOf(
-      PropTypes.shape({
-        address: PropTypes.string.isRequired,
-      })
-    ).isRequired,
+    accounts: PropTypes.object.isRequired,
     onAccountSelected: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.scrollToIndex = this.scrollToIndex.bind(this);
-  }
-
-  scrollToIndex() {
-    const { accounts, navigation } = this.props;
-    const id = navigation.getParam('accountId');
-    const index = id
-      ? accounts.findIndex(a => id === accountId(a))
-      : navigation.getParam('index', -1);
-    if (this.list && typeof index === 'number' && index !== -1) {
-      navigation.setParams({ accountId: undefined, index: undefined });
-      this.list.scrollToIndex({ index });
-    }
-  }
-
-  componentDidMount() {
-    this.scrollToIndex();
-  }
-
-  componentDidUpdate() {
-    this.scrollToIndex();
   }
 
   showOnboardingMessage = () => {
@@ -138,16 +112,16 @@ class AccountListView extends React.PureComponent {
             this.list = list;
           }}
           style={styles.content}
-          data={accounts}
-          keyExtractor={account => accountId(account)}
+          data={[...accounts.entries()]}
+          keyExtractor={([key]) => key}
           ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item: account }) => {
+          renderItem={({ item: [accountKey, account] }) => {
             return (
               <AccountCard
                 address={account.address}
                 networkKey={account.networkKey}
                 onPress={() => {
-                  onAccountSelected(account);
+                  onAccountSelected(accountKey);
                 }}
                 style={{ paddingBottom: null }}
                 title={account.name}

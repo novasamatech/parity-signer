@@ -23,7 +23,7 @@ import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
 import colors from '../colors';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import TouchableItem from './TouchableItem';
 
@@ -48,7 +48,7 @@ export default class AccountCard extends React.PureComponent {
     let { title } = this.props;
     title = title.length ? title : AccountCard.defaultProps.title;
     const seedTypeDisplay = seedType || '';
-    const network = NETWORK_LIST[networkKey];
+    const network = NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
 
     return (
       <TouchableItem

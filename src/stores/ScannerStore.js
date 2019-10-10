@@ -239,7 +239,7 @@ export default class ScannerStore extends Container<ScannerState> {
     }
 
     const recipient = accountsStore.getById({
-      networkKey: networkKey,
+      networkKey,
       address: isEthereum ? tx.action : txRequest.data.account
     });
 
