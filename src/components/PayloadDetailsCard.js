@@ -127,21 +127,31 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
     if (label === 'Method' && !fallback) {
       try {
         const call = new Call(value);
-        const { args, meta, methodName, sectionName } = call;
+        const { methodName, sectionName } = call;
 
         let result = {};
-        for (let i = 0; i < meta.args.length; i ++) {
-          let value;
-          if (args[i].toRawType() === 'Balance' || args[i].toRawType() === 'Compact<Balance>') {
-            value = formatBalance(args[i].toString());
-          } else if (args[i].toRawType() === 'Address') {
-            // encode AccountId to the appropriate prefix
-            value = encodeAddress(decodeAddress(args[i].toString()), prefix);
-          } else {
-            value = args[i].toString();
+
+        function formatArgs(callInstance, result) {
+          const { args, meta } = callInstance;
+
+          for (let i = 0; i < meta.args.length; i ++) {
+            let value;
+            if (args[i].toRawType() === 'Balance' || args[i].toRawType() === 'Compact<Balance>') {
+              value = formatBalance(args[i].toString());
+            } else if (args[i].toRawType() === 'Address') {
+              // encode AccountId to the appropriate prefix
+              value = encodeAddress(decodeAddress(args[i].toString()), prefix);
+            } else if (args[i] instanceof Call) {
+              // go deeper into the nested call arguments, particularly for sudo proposals
+              formatArgs(args[i], result);
+            } else {
+              value = args[i].toString();
+            }
+            result[meta.args[i].name.toString()] = value;
           }
-          result[meta.args[i].name.toString()] = value;
         }
+
+        formatArgs(call, result);
 
         setArgNameValue(result);
         setSectionMethod(`${sectionName}.${methodName}`);
