@@ -167,6 +167,13 @@ const Screens = createStackNavigator(
 		Welcome: {
 			screen: createStackNavigator(
 				{
+					/* eslint-disable sort-keys */
+					AccountList: {
+						navigationOptions: {
+							headerLeft: <HeaderLeftHome />
+						},
+						screen: AccountList
+					},
 					About: {
 						screen: About
 					},
@@ -178,12 +185,6 @@ const Screens = createStackNavigator(
 					},
 					AccountEdit: {
 						screen: AccountEdit
-					},
-					AccountList: {
-						navigationOptions: {
-							headerLeft: <HeaderLeftHome />
-						},
-						screen: AccountList
 					},
 					AccountNetworkChooser: {
 						screen: AccountNetworkChooser
