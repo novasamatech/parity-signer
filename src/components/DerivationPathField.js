@@ -17,85 +17,76 @@
 'use strict';
 
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import {parseDerivationPath} from '../util/suri'
+import { parseDerivationPath } from '../util/suri';
 import TextInput from './TextInput';
 
 export default function DerivationPathField(props) {
-  const { onChange, styles } = props;
-  const [showAdvancedField, setShowAdvancedField] =  useState(false)
-  const [isValidPath, setIsValidPath] = useState(true);
+	const { onChange, styles } = props;
+	const [showAdvancedField, setShowAdvancedField] = useState(false);
+	const [isValidPath, setIsValidPath] = useState(true);
 
-  const toggleShowAdvancedField = () => {
-    setShowAdvancedField(!showAdvancedField)
-  }
+	const toggleShowAdvancedField = () => {
+		setShowAdvancedField(!showAdvancedField);
+	};
 
-  return (
-    <>
-      <TouchableOpacity
-        onPress={toggleShowAdvancedField}
-        style={{diplay:'flex'}}
-      >
-        <View
-          style={{justifyContent:'center'}}
-        >
-          <Text style={[styles.title, ownStyles.advancedText]}>
-            ADVANCED
-            <Icon 
-              name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
-              size={20}
-            />
-          </Text>
-        </View>
-      </TouchableOpacity>
-      {showAdvancedField && 
-        <TextInput
-          onChangeText={(text) => {
-            try {
-              const derivationPath = parseDerivationPath(text);
+	return (
+		<>
+			<TouchableOpacity
+				onPress={toggleShowAdvancedField}
+				style={{ diplay: 'flex' }}
+			>
+				<View style={{ justifyContent: 'center' }}>
+					<Text style={[styles.title, ownStyles.advancedText]}>
+						ADVANCED
+						<Icon
+							name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
+							size={20}
+						/>
+					</Text>
+				</View>
+			</TouchableOpacity>
+			{showAdvancedField && (
+				<TextInput
+					onChangeText={text => {
+						try {
+							const derivationPath = parseDerivationPath(text);
 
-              onChange({
-                derivationPassword: derivationPath.password || '',
-                derivationPath: derivationPath.derivePath || '',
-                isDerivationPathValid: true
-              });
-              setIsValidPath(true);
-            } catch (e) {
-              // wrong derivationPath
-              onChange({
-                derivationPassword: '',
-                derivationPath: '',
-                isDerivationPathValid: false
-              });
-              setIsValidPath(false);
-            }
-          }}
-          placeholder="optional derivation path"
-          style={isValidPath ? ownStyles.validInput: ownStyles.invalidInput}
-        />
-      }
-    </>
-  )
+							onChange({
+								derivationPassword: derivationPath.password || '',
+								derivationPath: derivationPath.derivePath || '',
+								isDerivationPathValid: true
+							});
+							setIsValidPath(true);
+						} catch (e) {
+							// wrong derivationPath
+							onChange({
+								derivationPassword: '',
+								derivationPath: '',
+								isDerivationPathValid: false
+							});
+							setIsValidPath(false);
+						}
+					}}
+					placeholder="optional derivation path"
+					style={isValidPath ? ownStyles.validInput : ownStyles.invalidInput}
+				/>
+			)}
+		</>
+	);
 }
 
-
-
 const ownStyles = StyleSheet.create({
-  advancedText: {
-    paddingBottom: 0,
-    paddingTop:20
-  },
-  invalidInput: {
-    backgroundColor: '#fee3e3'
-  },
-  validInput: {
-    backgroundColor: '#e4fee4'
-  }
+	advancedText: {
+		paddingBottom: 0,
+		paddingTop: 20
+	},
+	invalidInput: {
+		backgroundColor: '#fee3e3'
+	},
+	validInput: {
+		backgroundColor: '#e4fee4'
+	}
 });

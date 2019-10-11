@@ -19,78 +19,92 @@
 import { constructSURI, parseDerivationPath, parseSURI } from './suri';
 
 describe('derivation path', () => {
-  describe('parsing', () => {
-    it('should properly parse and return a derivation path object from a string containing soft, hard and password', () => {
-        const parsedDerivationPath = parseDerivationPath('/soft/soft//hard///mypassword');
-    
-        expect(parsedDerivationPath).toBeDefined();
-        expect(parsedDerivationPath.derivePath).toBe('/soft/soft//hard');
-        expect(parsedDerivationPath.password).toBe('mypassword');
-      });
+	describe('parsing', () => {
+		it('should properly parse and return a derivation path object from a string containing soft, hard and password', () => {
+			const parsedDerivationPath = parseDerivationPath(
+				'/soft/soft//hard///mypassword'
+			);
 
-    it('should throw if the string is not a valid derivation path', () => {
-        const malformed = 'wrong/bla';
-        
-        expect(() => parseDerivationPath(malformed)).toThrowError('Invalid derivation path input.');
-    });
+			expect(parsedDerivationPath).toBeDefined();
+			expect(parsedDerivationPath.derivePath).toBe('/soft/soft//hard');
+			expect(parsedDerivationPath.password).toBe('mypassword');
+		});
 
-    it('should accept a password alone', () => {
-      const passwordAlone = '///mypassword';
-      const parsedDerivationPath = parseDerivationPath(passwordAlone);
-    
-      expect(parsedDerivationPath).toBeDefined();
-      expect(parsedDerivationPath.password).toBe('mypassword');
-    })
-  });
+		it('should throw if the string is not a valid derivation path', () => {
+			const malformed = 'wrong/bla';
+
+			expect(() => parseDerivationPath(malformed)).toThrowError(
+				'Invalid derivation path input.'
+			);
+		});
+
+		it('should accept a password alone', () => {
+			const passwordAlone = '///mypassword';
+			const parsedDerivationPath = parseDerivationPath(passwordAlone);
+
+			expect(parsedDerivationPath).toBeDefined();
+			expect(parsedDerivationPath.password).toBe('mypassword');
+		});
+	});
 });
 
 describe('suri', () => {
-  describe('parsing', () => {
-    it('should properly parse and return an SURI object from a string', () => {
-        const suri = parseSURI('six nine great ball dog over moon light//hard/soft///mypassword');
-    
-        expect(suri).toBeDefined();
-        expect(suri.phrase).toBe('six nine great ball dog over moon light');
-        expect(suri.derivePath).toBe('//hard/soft');
-        expect(suri.password).toBe('mypassword');
-      });
+	describe('parsing', () => {
+		it('should properly parse and return an SURI object from a string', () => {
+			const suri = parseSURI(
+				'six nine great ball dog over moon light//hard/soft///mypassword'
+			);
 
-    it('should throw if the string is not a valid suri', () => {
-        const malformed = '1!,#(&(/)!_c.';
-        
-        expect(() => parseSURI(malformed)).toThrowError('Invalid SURI input.');
-    });
+			expect(suri).toBeDefined();
+			expect(suri.phrase).toBe('six nine great ball dog over moon light');
+			expect(suri.derivePath).toBe('//hard/soft');
+			expect(suri.password).toBe('mypassword');
+		});
 
-    it('should throw if phrase was empty', () => {
-      const missingPhrase = '//hard/soft///password';
+		it('should throw if the string is not a valid suri', () => {
+			const malformed = '1!,#(&(/)!_c.';
 
-      expect(() => parseSURI(missingPhrase)).toThrowError('SURI must contain a phrase.');
-    })
-  });
+			expect(() => parseSURI(malformed)).toThrowError('Invalid SURI input.');
+		});
 
-  describe('constructing', () => {
-    it('should properly construct SURI string from object', () => {
-        const suriObject = {
-            derivePath: '//hard/soft',
-            phrase: 'six nine great ball dog over moon light',
-            password: 'mypassword'
-        };
-  
-        const suri = constructSURI(suriObject);
-  
-        expect(suri).toBeDefined();
-        expect(suri).toBe('six nine great ball dog over moon light//hard/soft///mypassword');
-    });
+		it('should throw if phrase was empty', () => {
+			const missingPhrase = '//hard/soft///password';
 
-    it('should throw if the suri object is not valid', () => {
-        const empty = {}
+			expect(() => parseSURI(missingPhrase)).toThrowError(
+				'SURI must contain a phrase.'
+			);
+		});
+	});
 
-        const malformed = {
-          phrase: null
-        }
+	describe('constructing', () => {
+		it('should properly construct SURI string from object', () => {
+			const suriObject = {
+				derivePath: '//hard/soft',
+				password: 'mypassword',
+				phrase: 'six nine great ball dog over moon light'
+			};
 
-        expect(() => constructSURI(empty)).toThrow('Cannot construct an SURI from emtpy phrase.');
-        expect(() => constructSURI(malformed)).toThrow('Cannot construct an SURI from emtpy phrase.');
-    });
-  });
+			const suri = constructSURI(suriObject);
+
+			expect(suri).toBeDefined();
+			expect(suri).toBe(
+				'six nine great ball dog over moon light//hard/soft///mypassword'
+			);
+		});
+
+		it('should throw if the suri object is not valid', () => {
+			const empty = {};
+
+			const malformed = {
+				phrase: null
+			};
+
+			expect(() => constructSURI(empty)).toThrow(
+				'Cannot construct an SURI from emtpy phrase.'
+			);
+			expect(() => constructSURI(malformed)).toThrow(
+				'Cannot construct an SURI from emtpy phrase.'
+			);
+		});
+	});
 });

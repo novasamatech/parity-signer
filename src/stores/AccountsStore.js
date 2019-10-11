@@ -19,192 +19,201 @@
 import { Container } from 'unstated';
 
 import { accountId, empty } from '../util/account';
-import { loadAccounts, saveAccount, deleteAccount as deleteDbAccount} from '../util/db';
-import {parseSURI} from '../util/suri'
+import {
+	loadAccounts,
+	saveAccount,
+	deleteAccount as deleteDbAccount
+} from '../util/db';
+import { parseSURI } from '../util/suri';
 import { decryptData, encryptData } from '../util/native';
 
 export type Account = {
-  address: string,
-  createdAt: number,
-  derivationPassword: string,
-  derivationPath: string, // doesn't contain the ///password
-  encryptedSeed: string,
-  name: string,
-  networkKey: string,
-  seed: string, //this is the SURI (seedPhrase + /soft//hard///password derivation)
-  seedPhrase: string, //contains only the BIP39 words, no derivation path
-  updatedAt: number,
-  validBip39Seed: boolean
+	address: string,
+	createdAt: number,
+	derivationPassword: string,
+	derivationPath: string, // doesn't contain the ///password
+	encryptedSeed: string,
+	name: string,
+	networkKey: string,
+	seed: string, //this is the SURI (seedPhrase + /soft//hard///password derivation)
+	seedPhrase: string, //contains only the BIP39 words, no derivation path
+	updatedAt: number,
+	validBip39Seed: boolean
 };
 
 type AccountsState = {
-  accounts: Map<string, Account>,
-  newAccount: Account,
-  selectedKey: string
+	accounts: Map<string, Account>,
+	newAccount: Account,
+	selectedKey: string
 };
 
+export default class AccountsStore extends Container<AccountsState> {
+	state = {
+		accounts: new Map(),
+		newAccount: empty(),
+		selectedKey: ''
+	};
 
-export default class AccountsStore extends Container {
-  state = {
-    accounts: new Map(),
-    newAccount: empty(),
-    selectedKey: ''
-  };
+	constructor(props) {
+		super(props);
+		this.refreshList();
+	}
 
-  constructor(props) {
-    super(props);
-    this.refreshList();
-  }
+	async select(accountKey) {
+		this.setState({ selectedKey: accountKey });
+	}
 
-  async select(accountKey) {
-    this.setState({ selectedKey: accountKey });
-  }
+	updateNew(accountUpdate) {
+		this.setState({
+			newAccount: { ...this.state.newAccount, ...accountUpdate }
+		});
+	}
 
-  updateNew(accountUpdate) {
-    this.setState({ newAccount : {...this.state.newAccount, ...accountUpdate} })
-  }
+	getNew() {
+		return this.state.newAccount;
+	}
 
-  getNew() {
-    return this.state.newAccount;
-  }
+	async submitNew(pin) {
+		const account = this.state.newAccount;
 
-  async submitNew(pin) {
-    const account = this.state.newAccount;
+		// only save a new account if the seed isn't empty
+		if (account.seed) {
+			const accountKey = accountId(account);
 
-    // only save a new account if the seed isn't empty
-    if (account.seed) {
-      const accountKey = accountId(account);
+			await this.save(accountKey, account, pin);
+			this.setState({
+				accounts: this.state.accounts.set(accountKey, account),
+				newAccount: empty()
+			});
+		}
+	}
 
-      await this.save(accountKey, account, pin);
-      this.setState({
-        accounts: this.state.accounts.set(accountKey, account),
-        newAccount: empty()
-      });
-    }
-  }
-  
-  updateAccount(accountKey, updatedAccount) {
-    const accounts = this.state.accounts;
-    const account = accounts.get(accountKey);
+	updateAccount(accountKey, updatedAccount) {
+		const accounts = this.state.accounts;
+		const account = accounts.get(accountKey);
 
-    if (account && updatedAccount) {
-      this.setState({ accounts: accounts.set(accountKey, {...account, ...updatedAccount}) });
-    }
-  }
+		if (account && updatedAccount) {
+			this.setState({
+				accounts: accounts.set(accountKey, { ...account, ...updatedAccount })
+			});
+		}
+	}
 
-  updateSelectedAccount(updatedAccount) {
-    this.updateAccount(this.state.selectedKey, updatedAccount)
-  }
+	updateSelectedAccount(updatedAccount) {
+		this.updateAccount(this.state.selectedKey, updatedAccount);
+	}
 
-  async refreshList() {
-    loadAccounts().then(accounts => {
-      this.setState({ accounts });
-    });
-  }
+	async refreshList() {
+		loadAccounts().then(accounts => {
+			this.setState({ accounts });
+		});
+	}
 
-  async save(accountKey, account, pin = null) {
-    try {
-      // for account creation
-      if (pin && account.seed) {
-        account.encryptedSeed = await encryptData(account.seed, pin);
-      }
+	async save(accountKey, account, pin = null) {
+		try {
+			// for account creation
+			if (pin && account.seed) {
+				account.encryptedSeed = await encryptData(account.seed, pin);
+			}
 
-      const accountToSave = this.deleteSensitiveData(account);
+			const accountToSave = this.deleteSensitiveData(account);
 
-      accountToSave.updatedAt = new Date().getTime();
-      await saveAccount(accountKey, accountToSave);
-    } catch (e) {
-      console.error(e);
-    }
-  }
+			accountToSave.updatedAt = new Date().getTime();
+			await saveAccount(accountKey, accountToSave);
+		} catch (e) {
+			console.error(e);
+		}
+	}
 
+	async deleteAccount(accountKey) {
+		const { accounts } = this.state;
 
-  async deleteAccount(accountKey) {
-    const { accounts } = this.state;
+		accounts.delete(accountKey);
+		this.setState({ accounts, selectedKey: '' });
+		await deleteDbAccount(accountKey);
+	}
 
-    accounts.delete(accountKey);
-    this.setState({ accounts, selectedKey: '' });
-    await deleteDbAccount(accountKey);
-  }
+	async unlockAccount(accountKey, pin) {
+		const { accounts } = this.state;
+		const account = accounts.get(accountKey);
 
-  async unlockAccount(accountKey, pin) {
-    const {accounts} = this.state;
-    const account = accounts.get(accountKey);
+		if (!accountKey || !account || !account.encryptedSeed) {
+			return false;
+		}
 
-    if (!accountKey || !account || !account.encryptedSeed) {
-      return false;
-    }
+		try {
+			account.seed = await decryptData(account.encryptedSeed, pin);
+			const { phrase, derivePath, password } = parseSURI(account.seed);
 
-    try {
-      account.seed = await decryptData(account.encryptedSeed, pin);
-      const {phrase, derivePath, password} = parseSURI(account.seed)
+			account.seedPhrase = phrase || '';
+			account.derivationPath = derivePath || '';
+			account.derivationPassword = password || '';
+			this.setState({
+				accounts: this.state.accounts.set(accountKey, account)
+			});
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
 
-      account.seedPhrase = phrase || '';
-      account.derivationPath = derivePath || '';
-      account.derivationPassword = password || '';
-      this.setState({
-        accounts: this.state.accounts.set(accountKey, account)
-      });
-    } catch (e) {
-      return false;
-    }
-    return true;
-  }
+	deleteSensitiveData(account) {
+		delete account.seed;
+		delete account.seedPhrase;
+		delete account.derivationPassword;
+		delete account.derivationPath;
 
-  deleteSensitiveData (account){
-    delete account.seed;
-    delete account.seedPhrase;
-    delete account.derivationPassword;
-    delete account.derivationPath;
+		return account;
+	}
 
-    return account
-  }
+	lockAccount(accountKey) {
+		const { accounts } = this.state;
+		const account = accounts.get(accountKey);
 
-  lockAccount(accountKey) {
-    const {accounts} = this.state
-    const account = accounts.get(accountKey);
+		if (account) {
+			const lockedAccount = this.deleteSensitiveData(account);
+			this.setState({
+				accounts: this.state.accounts.set(accountKey, lockedAccount)
+			});
+		}
+	}
 
-    if (account) {
-      const lockedAccount = this.deleteSensitiveData(account)
-      this.setState({
-        accounts: this.state.accounts.set(accountKey, lockedAccount)
-      });
-    }
-  }
+	async checkPinForSelected(pin) {
+		const account = this.getSelected();
 
-  async checkPinForSelected(pin) {
-    const account = this.getSelected();
+		if (account && account.encryptedSeed) {
+			return await decryptData(account.encryptedSeed, pin);
+		} else {
+			return false;
+		}
+	}
 
-    if (account && account.encryptedSeed) {
-      return await decryptData(account.encryptedSeed, pin);
-    } else {
-      return false;
-    }
-  }
+	getById(account) {
+		return (
+			this.state.accounts.get(accountId(account)) ||
+			empty(account.address, account.networkKey)
+		);
+	}
 
-  getById(account) {
-    return this.state.accounts.get(accountId(account)) || empty(account.address, account.networkKey);
-  }
+	getByAddress(address) {
+		for (let v of this.state.accounts.values()) {
+			if (v.address.toLowerCase() === address.toLowerCase()) {
+				return v;
+			}
+		}
 
-  getByAddress(address) {
-   for (let v of this.state.accounts.values()) {
-      if (v.address.toLowerCase() === address.toLowerCase()){
-        return v;
-      } 
-    }
+		throw new Error(`no account found for the address: ${address}`);
+	}
 
-    throw new Error(`no account found for the address: ${address}`);
-}
+	getSelected() {
+		return this.state.accounts.get(this.state.selectedKey);
+	}
 
-  getSelected() {
-    return this.state.accounts.get(this.state.selectedKey);
-  }
+	getSelectedKey() {
+		return this.state.selectedKey;
+	}
 
-  getSelectedKey() {
-    return this.state.selectedKey;
-  }
-
-  getAccounts() {
-    return this.state.accounts;
-  }
+	getAccounts() {
+		return this.state.accounts;
+	}
 }

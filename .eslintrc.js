@@ -13,11 +13,7 @@ module.exports = {
       "version": "16.9.0", // React version, default to the latest React stable release
     },
   },
-  "plugins": [
-    "sort-keys-fix"
-  ],
   rules: {
-    "sort-keys-fix/sort-keys-fix": 2,
     "comma-dangle": ["error", "never"],
     "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "single",  { "avoidEscape": true }],
