@@ -116,10 +116,9 @@ export default class PayloadDetailsCard extends React.PureComponent {
 }
 
 function ExtrinsicPart({ label, fallback, prefix, value }) {
-  const [argNameValue, setArgNameValue] = useState();
   const [period, setPeriod] = useState();
   const [phase, setPhase] = useState();
-  const [sectionMethod, setSectionMethod] = useState();
+  const [formattedCallArgs, setFormattedCallArgs] = useState();
   const [tip, setTip] = useState();
   const [useFallback, setUseFallBack] = useState(false);
 
@@ -127,40 +126,42 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
     if (label === 'Method' && !fallback) {
       try {
         const call = new Call(value);
-        const { methodName, sectionName } = call;
+        
+        let methodArgs = {};
 
-        let kvArray = [];
+        function formatArgs(callInstance, methodArgs, depth) {
+          const { args, meta, methodName, sectionName } = callInstance;
+          let paramArgKvArray = [];
 
-        function formatArgs(callInstance, result, depth) {
-          const { args, meta } = callInstance;
-
+          if (!meta.args.length) {
+            const sectionMethod = `${sectionName}.${methodName}`;
+            methodArgs[sectionMethod] = null;
+            return;
+          }
+        
           for (let i = 0; i < meta.args.length; i++) {
-            let argument;
-            console.log('result -> ', result);
+            let argument = undefined;
+
             if (args[i].toRawType() === 'Balance' || args[i].toRawType() === 'Compact<Balance>') {
               argument = formatBalance(args[i].toString());
-            } else if (args[i].toRawType() === 'Address') {
-              // encode AccountId to the appropriate prefix
+            } else if (args[i].toRawType() === 'Address' || args[i].toRawType() === 'AccountId') {
+              // encode Address and AccountId to the appropriate prefix
               argument = encodeAddress(decodeAddress(args[i].toString()), prefix);
             } else if (args[i] instanceof Call) {
-              formatArgs(args[i], result, depth++); // go deeper into the nested calls
+              argument = formatArgs(args[i], methodArgs, depth++); // go deeper into the nested calls
             } else {
               argument = args[i].toString();
             }
             const param = meta.args[i].name.toString();
-            
-            if (depth > 0) {
-              kvArray.unshift([param, argument]);
-            } else {
-              kvArray.push([param, argument]);
-            }
+            const sectionMethod = `${sectionName}.${methodName}`;
+            paramArgKvArray.push([param, argument]);
+            methodArgs[sectionMethod] = paramArgKvArray;
           }
         }
 
-        formatArgs(call, kvArray, 0);
+        formatArgs(call, methodArgs, 0);
+        setFormattedCallArgs(methodArgs);
 
-        setArgNameValue(kvArray);
-        setSectionMethod(`${sectionName}.${methodName}`);
       } catch (e) {
         Alert.alert(
           'Could not decode method with available metadata.',
@@ -211,23 +212,26 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
   }
 
   const renderMethodDetails = () => {
-    return (
-      argNameValue && sectionMethod && (
-        <View style={{ display: 'flex', flexDirection: 'column' }}>
-          <Text style={styles.secondaryText}>
-            You are calling <Text style={styles.secondaryText}>{sectionMethod}</Text> with the following arguments:
-          </Text>
+    if (formattedCallArgs) {
+      return Object.entries(formattedCallArgs).reverse().map((entry, index) => {
+        const sectionMethod = entry[0];
+        const paramArgs = entry[1];
+  
+        return (
+          <View key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft  : 5, width: '100%' }}>
+            <Text>Call <Text style={styles.secondaryText}>{sectionMethod}</Text> with the following arguments:</Text>
             {
-              argNameValue.map(([key, value]) => { return (
-                <View key={key} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 5, alignItems: 'flex-start' }}>
-                  <Text style={{...styles.subLabel, flex: 1}}>{key}: </Text>
-                  <Text style={{...styles.secondaryText, flex: 3}}>{value}</Text>
-                </View>
-              )})
+              paramArgs.map(([param, arg]) => (
+                <React.Fragment key={param}>
+                  <Text style={{...styles.subLabel, flex: 1}}>{param}: </Text>
+                  <Text style={{...styles.secondaryText, flex: 3}}>{arg || undefined}</Text>
+                </React.Fragment>
+              ))
             }
-        </View>
-      )
-    );
+          </View>
+        );
+      })
+    }
   }
 
   const renderTipDetails = () => {
@@ -275,9 +279,10 @@ const styles = StyleSheet.create({
   subLabel: {
     backgroundColor: null,
     color: colors.card_bg_text,
-    textAlign: 'right', 
+    textAlign: 'left', 
     fontSize: 14, 
     fontFamily: fonts.bold,
+    paddingLeft: 5
   },
   icon: {
     width: 47,
@@ -293,6 +298,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     color: colors.card_bg_text,
     fontFamily: fonts.semiBold,
-    fontSize: 14
+    fontSize: 14,
+    paddingLeft: 8
   }
 });
