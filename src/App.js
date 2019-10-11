@@ -121,6 +121,7 @@ const SecurityHeaderBackButton = withNavigation(
 	}
 );
 
+/* eslint-disable sort-keys */
 const Screens = createStackNavigator(
 	{
 		Loading: {
@@ -146,14 +147,14 @@ const Screens = createStackNavigator(
 		TocAndPrivacyPolicy: {
 			screen: createStackNavigator(
 				{
-					PrivacyPolicy: {
-						screen: PrivacyPolicy
-					},
 					TermsAndConditions: {
 						navigationOptions: {
 							headerLeft: <HeaderLeftHome />
 						},
 						screen: TermsAndConditions
+					},
+					PrivacyPolicy: {
+						screen: PrivacyPolicy
 					}
 				},
 				{
@@ -167,7 +168,6 @@ const Screens = createStackNavigator(
 		Welcome: {
 			screen: createStackNavigator(
 				{
-					/* eslint-disable sort-keys */
 					AccountList: {
 						navigationOptions: {
 							headerLeft: <HeaderLeftHome />
