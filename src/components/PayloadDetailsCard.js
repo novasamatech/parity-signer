@@ -129,31 +129,37 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
         const call = new Call(value);
         const { methodName, sectionName } = call;
 
-        let result = {};
+        let kvArray = [];
 
-        function formatArgs(callInstance, result) {
+        function formatArgs(callInstance, result, depth) {
           const { args, meta } = callInstance;
 
-          for (let i = 0; i < meta.args.length; i ++) {
-            let value;
+          for (let i = 0; i < meta.args.length; i++) {
+            let argument;
+            console.log('result -> ', result);
             if (args[i].toRawType() === 'Balance' || args[i].toRawType() === 'Compact<Balance>') {
-              value = formatBalance(args[i].toString());
+              argument = formatBalance(args[i].toString());
             } else if (args[i].toRawType() === 'Address') {
               // encode AccountId to the appropriate prefix
-              value = encodeAddress(decodeAddress(args[i].toString()), prefix);
+              argument = encodeAddress(decodeAddress(args[i].toString()), prefix);
             } else if (args[i] instanceof Call) {
-              // go deeper into the nested call arguments, particularly for sudo proposals
-              formatArgs(args[i], result);
+              formatArgs(args[i], result, depth++); // go deeper into the nested calls
             } else {
-              value = args[i].toString();
+              argument = args[i].toString();
             }
-            result[meta.args[i].name.toString()] = value;
+            const param = meta.args[i].name.toString();
+            
+            if (depth > 0) {
+              kvArray.unshift([param, argument]);
+            } else {
+              kvArray.push([param, argument]);
+            }
           }
         }
 
-        formatArgs(call, result);
+        formatArgs(call, kvArray, 0);
 
-        setArgNameValue(result);
+        setArgNameValue(kvArray);
         setSectionMethod(`${sectionName}.${methodName}`);
       } catch (e) {
         Alert.alert(
@@ -212,7 +218,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
             You are calling <Text style={styles.secondaryText}>{sectionMethod}</Text> with the following arguments:
           </Text>
             {
-              Object.entries(argNameValue).map(([key, value]) => { return (
+              argNameValue.map(([key, value]) => { return (
                 <View key={key} style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 5, alignItems: 'flex-start' }}>
                   <Text style={{...styles.subLabel, flex: 1}}>{key}: </Text>
                   <Text style={{...styles.secondaryText, flex: 3}}>{value}</Text>
