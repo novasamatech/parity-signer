@@ -76,3 +76,28 @@ struct rust_string* qrcode_hex(unsigned* error, const struct rust_string_ptr* da
 struct rust_string* substrate_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed, const unsigned prefix);
 
 struct rust_string* substrate_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* data);
+
+/* secure native */
+
+struct CResultString {
+    char* value;
+    char* error_msg;
+};
+void destroy_cresult_string(struct CResultString* x);
+struct CResultBool {
+    uint8_t* value;
+    char* error_msg;
+};
+void destroy_cresult_bool(struct CResultBool* x);
+struct CResultVoid {
+    void* value; // always null
+    char* error_msg;
+};
+void destroy_cresult_void(struct CResultVoid* x);
+
+struct CResultVoid* sn_put(unsigned* error, const char* app, const char* key, const char* value);
+struct CResultString* sn_get(unsigned* error, const char* app, const char* key);
+struct CResultBool* sn_contains(unsigned* error, const char* app, const char* key);
+struct CResultVoid* sn_delete(unsigned* error, const char* app, const char* key);
+struct CResultString* sn_ethkey_brainwallet_sign(unsigned* error, const char* app, const char* key, const char* message, const char* encrypted);
+struct CResultString* sn_substrate_brainwallet_sign(unsigned* error, const char* app, const char* key, const char* message, const char* encrypted);

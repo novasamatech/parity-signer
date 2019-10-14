@@ -87,14 +87,48 @@ This account can only be recovered with its associated recovery phrase.`,
     );
   }
 
-  onOptionSelect = (value) => {
-    const navigate = this.props.navigation.navigate
+  onOptionSelect = async (value) => {
+    const navigate = this.props.navigation.navigate;
+    const accounts = this.props.accounts;
+    const account = this.props.accounts.getSelected();
 
     if (value !== 'AccountEdit') {
-      navigate('AccountUnlock', {
-        next: value,
-        onDelete: this.onDelete
-      });
+      if (account.biometricEnabled) { 
+          try {
+              await accounts.unlockAccountWithBiometric(account);
+              if (value === 'AccountDelete') {
+                  this.onDelete();
+              } else if (value === 'AccountBiometric') {
+                  await accounts.disableBiometricForSelected();
+              } else {
+                  navigate(value);
+              }
+          } catch (e) {
+              Alert.alert('Biometric Error', e.message, [
+                  { 
+                      text: 'Ok',
+                      style: 'default',
+                      onPress: () => {
+                          navigate('AccountUnlock', {
+                            next: value,
+                            onDelete: this.onDelete
+                          });
+                      },
+                      onDismiss: () => {
+                          navigate('AccountUnlock', {
+                            next: value,
+                            onDelete: this.onDelete
+                          });
+                      }
+                  }
+              ]);
+          }
+      } else {
+          navigate('AccountUnlock', {
+            next: value,
+            onDelete: this.onDelete
+          });
+      }
     } else {
       navigate(value);
     }
@@ -129,21 +163,30 @@ This account can only be recovered with its associated recovery phrase.`,
     const protocol = account.networkKey && NETWORK_LIST[account.networkKey] && NETWORK_LIST[account.networkKey].protocol || NetworkProtocols.UNKNOWN ;
 
     return (
-      <ScrollView
-        contentContainerStyle={styles.bodyContent}
-        style={styles.body}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title}>ACCOUNT</Text>
-          <View style={styles.menuView}>
-            <PopupMenu
-              onSelect={this.onOptionSelect}
-              menuTriggerIconName={"more-vert"}
-              menuItems={[
-                { value: 'AccountEdit', text: 'Edit' },
-                { value: 'AccountPin', text: 'Change Pin' },
-                { value: 'AccountBackup', text: 'View Recovery Phrase' },
-                { value: 'AccountDelete', text: 'Delete', textStyle: styles.deleteText }]}
+      <Subscribe to={[AccountsStore]}>
+        {(accounts) => (
+          <ScrollView
+            contentContainerStyle={styles.bodyContent}
+            style={styles.body}>
+            <View style={styles.header}>
+              <Text style={styles.title}>ACCOUNT</Text>
+              <View style={styles.menuView}>
+                <PopupMenu
+                  onSelect={this.onOptionSelect}
+                  menuTriggerIconName={"more-vert"}
+                  menuItems={[
+                    { value: 'AccountEdit', text: 'Edit' },
+                    { value: 'AccountPin', text: 'Change Pin' },
+                    { value: 'AccountBiometric', text: accounts.getSelected().biometricEnabled ? "Disable Biometric" : "Enable Biometric" },
+                    { value: 'AccountBackup', text: 'View Recovery Phrase' },
+                    { value: 'AccountDelete', text: 'Delete', textStyle: styles.deleteText }]}
+                />
+              </View>
+            </View>
+            <AccountCard
+              address={account.address}
+              networkKey={account.networkKey}
+              title={account.name}
             />
           </View>
         </View>
@@ -160,6 +203,8 @@ This account can only be recovered with its associated recovery phrase.`,
           }
         </View>
       </ScrollView>
+        )}
+        </Subscribe>
     );
   }
 }

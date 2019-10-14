@@ -20,10 +20,10 @@ import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
 import { decodeAddress, encodeAddress  } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
-import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols, SUBSTRATE_NETWORK_LIST, APP_ID } from '../constants';
 import { saveTx } from '../util/db';
 import { isAscii } from '../util/message';
-import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign } from '../util/native';
+import { blake2s, brainWalletSign, decryptData, keccak, ethSign, substrateSign, secureEthkeySign, secureSubstrateSign } from '../util/native';
 import transaction from '../util/transaction';
 import { constructDataFromBytes, asciiToHex } from '../util/decoders';
 import { Account } from './AccountsStore';
@@ -235,16 +235,14 @@ export default class ScannerStore extends Container<ScannerState> {
   async signData(pin = '1') {
     const { dataToSign, isHash, sender, recipient, tx, type } = this.state;
 
-    const seed = await decryptData(sender.encryptedSeed, pin);
     const isEthereum = NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
+      console.log("biometric " + sender.biometricEnabled);
+      console.log("is ethereum " + isEthereum);
 
-    let signedData;
-
+    let signable;
     if (isEthereum) {
-      signedData = await brainWalletSign(seed, dataToSign);
+      signable = dataToSign;
     } else {
-      let signable;
-
       if (dataToSign instanceof GenericExtrinsicPayload) {
         signable = u8aToHex(dataToSign.toU8a(true), -1, false);
       } else if (isU8a(dataToSign)) {
@@ -252,20 +250,42 @@ export default class ScannerStore extends Container<ScannerState> {
       } else if (isAscii(dataToSign)) {
         signable = hexStripPrefix(asciiToHex(dataToSign));
       }
-      signedData = await substrateSign(seed, signable);
     }
 
-    this.setState({ signedData });
+    let signedData;
+    try {
+      if (sender.biometricEnabled) {
+        if (isEthereum) {
+          signedData = await secureEthkeySign(APP_ID, sender.pinKey, signable, sender.encryptedSeed);
+        } else {
+          signedData = await secureSubstrateSign(APP_ID, sender.pinKey, signable, sender.encryptedSeed);
+        }
+      } else {
+        const seed = await decryptData(sender.encryptedSeed, pin);
+        if (isEthereum) {
+          signedData = await brainWalletSign(seed, signable);
+        } else {
+          signedData = await substrateSign(seed, signable);
+        }
+      }
 
-    if (type === 'transaction') {
-      await saveTx({
-        hash: (isEthereum || isHash) ? dataToSign : await blake2s(dataToSign.toHex()),
-        tx,
-        sender,
-        recipient,
-        signature: signedData,
-        createdAt: new Date().getTime()
-      });
+      this.setState({ signedData });
+
+      if (type === 'transaction') {
+        await saveTx({
+          hash: (isEthereum || isHash) ? dataToSign : await blake2s(dataToSign.toHex()),
+          tx,
+          sender,
+          recipient,
+          signature: signedData,
+          createdAt: new Date().getTime()
+        });
+      }
+
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
     }
   }
 

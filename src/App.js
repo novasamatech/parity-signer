@@ -219,7 +219,7 @@ const Screens = createStackNavigator(
           },
           AccountEdit: {
             screen: AccountEdit
-          }
+          },
         },
         {
           defaultNavigationOptions: globalStackNavigationOptions,

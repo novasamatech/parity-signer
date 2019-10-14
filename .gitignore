@@ -1,5 +1,6 @@
 yarn-error.log
 package-lock.json
+report.*
 
 # NDK
 NDK/

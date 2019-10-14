@@ -78,8 +78,15 @@ export class AccountUnlock extends React.Component {
             checkPin={async pin => {
               return await accounts.unlockAccount(accounts.getSelectedKey(), pin);
             }}
-            navigate={() => {
-              if (next === 'AccountDelete') {
+            navigate={async pin => {
+              if (next === 'AccountBiometric') {
+                navigation.goBack();
+                if (accounts.getSelected().biometricEnabled) {
+                    await accounts.disableBiometricForSelected();
+                } else {
+                    await accounts.enableBiometricForSelected(pin);
+                }
+              } else if (next === 'AccountDelete') {
                 navigation.goBack();
                 navigation.state.params.onDelete();
               } else {
@@ -89,7 +96,7 @@ export class AccountUnlock extends React.Component {
                   actions: [
                     NavigationActions.navigate({ routeName: 'AccountList' }),
                     NavigationActions.navigate({ routeName: 'AccountDetails' }),
-                    NavigationActions.navigate({ routeName: next })
+                    NavigationActions.navigate({ routeName: next, params: next === 'AccountBiometric' ? { pin: pin } : {} })
                   ]
                 });
                 this.props.navigation.dispatch(resetAction);
@@ -133,7 +140,7 @@ class AccountUnlockView extends React.PureComponent {
               return;
             }
             if (await checkPin(pin)) {
-              navigate();
+              navigate(pin);
             } else if (pin.length > 5) {
               this.setState({ hasWrongPin: true });
             }

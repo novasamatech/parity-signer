@@ -199,4 +199,82 @@ class EthkeyBridge: NSObject {
     rust_string_destroy(signature_rust_str)
     resolve(signature)
   }
+  
+/* secure native */
+
+  @objc func securePut(_ app: String, key: String, seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let res = sn_put(&error, app, key, seed)
+    let error_msg = String(cString: res!.pointee.error_msg!)
+    destroy_cresult_void(res)
+    if error == 0 {
+      resolve(nil)
+    } else {
+      reject("put", error_msg, nil)
+    }
+  }
+  
+  @objc func secureGet(_ app: String, key: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let res = sn_get(&error, app, key)
+    let value = String(cString: res!.pointee.value!)
+    let error_msg = String(cString: res!.pointee.error_msg!)
+    destroy_cresult_string(res)
+    if error == 0 {
+      resolve(value)
+    } else {
+      reject("get", error_msg, nil)
+    }
+  }
+
+  @objc func secureContains(_ app: String, key: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let res = sn_contains(&error, app, key)
+    let value = res!.pointee.value.pointee
+    let error_msg = String(cString: res!.pointee.error_msg!)
+    destroy_cresult_bool(res)
+    if error == 0 {
+      resolve(value)
+    } else {
+      reject("contains", error_msg, nil)
+    }
+  }
+
+  @objc func secureDelete(_ app: String, key: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let res = sn_delete(&error, app, key)
+    let error_msg = String(cString: res!.pointee.error_msg!)
+    destroy_cresult_void(res)
+    if error == 0 {
+      resolve(nil)
+    } else {
+      reject("delete", error_msg, nil)
+    }
+  }
+
+  @objc func secureEthkeySign(_ app: String, key: String, message: String, encrypted: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let res = sn_ethkey_brainwallet_sign(&error, app, key, message, encrypted)
+    let value = String(cString: res!.pointee.value!)
+    let error_msg = String(cString: res!.pointee.error_msg!)
+    destroy_cresult_string(res)
+    if error == 0 {
+      resolve(value)
+    } else {
+      reject("ethkey_sign", error_msg, nil)
+    }
+  }
+
+  @objc func secureSubstrateSign(_ app: String, key: String, message: String, encrypted: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let res = sn_substrate_brainwallet_sign(&error, app, key, message, encrypted)
+    let value = String(cString: res!.pointee.value!)
+    let error_msg = String(cString: res!.pointee.error_msg!)
+    destroy_cresult_string(res)
+    if error == 0 {
+      resolve(value)
+    } else {
+      reject("substrate_sign", error_msg, nil)
+    }
+  }
 }

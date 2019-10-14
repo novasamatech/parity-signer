@@ -29,6 +29,7 @@ import Button from '../components/Button';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/message';
+import { NavigationActions, StackActions } from 'react-navigation';
 
 export default class MessageDetails extends React.PureComponent {
   static navigationOptions = {
@@ -53,9 +54,21 @@ export default class MessageDetails extends React.PureComponent {
                 isHash={scannerStore.getIsHash()}
                 onNext={async () => {
                   try {
-                    this.props.navigation.navigate('AccountUnlockAndSign', {
-                      next: 'SignedMessage'
-                    });
+                    if (scannerStore.getSender().biometricEnabled && await scannerStore.signData(null)) {
+                      const resetAction = StackActions.reset({
+                        index: 1,
+                        key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+                        actions: [
+                          NavigationActions.navigate({ routeName: 'AccountList' }),
+                          NavigationActions.navigate({ routeName: 'SignedMessage' })
+                        ]
+                      });
+                      this.props.navigation.dispatch(resetAction);
+                    } else {
+                      this.props.navigation.navigate('AccountUnlockAndSign', {
+                        next: 'SignedMessage'
+                      });
+                    }
                   } catch (e) {
                     scannerStore.setErrorMsg(e.message);
                   }
