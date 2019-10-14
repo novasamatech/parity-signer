@@ -202,11 +202,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		overflow: 'hidden'
 	},
-	bodyContainer: {
-		flex: 1,
-		flexDirection: 'column',
-		justifyContent: 'space-between'
-	},
 	bottom: {
 		flexBasis: 50,
 		paddingBottom: 15

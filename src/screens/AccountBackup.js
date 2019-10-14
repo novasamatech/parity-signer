@@ -182,11 +182,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		padding: 20
 	},
-	bodyContainer: {
-		flex: 1,
-		flexDirection: 'column',
-		justifyContent: 'space-between'
-	},
 	bodyContent: {
 		paddingBottom: 40
 	},
