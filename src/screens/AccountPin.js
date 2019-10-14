@@ -17,7 +17,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
@@ -26,6 +26,7 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
+import KeyboardScrollView from '../components/KeyboardScrollView';
 
 export default class AccountPin extends React.PureComponent {
 	render() {
@@ -120,7 +121,7 @@ class AccountPinView extends React.PureComponent {
 	render() {
 		const title = 'ACCOUNT PIN';
 		return (
-			<View style={styles.body}>
+			<KeyboardScrollView style={styles.body} extraHeight={120}>
 				<Background />
 				<Text style={styles.titleTop}>{title}</Text>
 				{this.showHintOrError()}
@@ -150,7 +151,7 @@ class AccountPinView extends React.PureComponent {
 					title="Done"
 					accessibilityLabel={'Done'}
 				/>
-			</View>
+			</KeyboardScrollView>
 		);
 	}
 }
