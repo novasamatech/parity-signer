@@ -17,6 +17,7 @@ module.exports = {
     "comma-dangle": ["error", "never"],
     "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "single",  { "avoidEscape": true }],
+    "no-unused-vars": ["error", { "args": "none" }],
     "react-native/no-inline-styles": "off",
     "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}]
   }

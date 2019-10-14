@@ -91,7 +91,7 @@ export class TxDetailsView extends React.PureComponent {
 			sender,
 			recipient,
 			value,
-			nonce,
+			// nonce,
 			gas,
 			gasPrice,
 			onNext
