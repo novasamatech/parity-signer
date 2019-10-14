@@ -102,10 +102,13 @@ class DeriveNewView extends React.Component {
 						<Text style={styles.titleTop}>DERIVE ACCOUNT</Text>
 						<Text style={styles.title}>NAME</Text>
 						<TextInput
-							onChangeText={newName => accounts.updateNew({ newName })}
+							onChangeText={newName => accounts.updateNew({ name: newName })}
 							value={name}
 							placeholder="Enter a new account name"
 						/>
+						<Text style={[styles.title, { paddingTop: 20 }]}>
+							DERIVATION PATH
+						</Text>
 						<DerivationPathField
 							onChange={async ({
 								derivationPassword,
@@ -131,6 +134,7 @@ class DeriveNewView extends React.Component {
 									isDerivationPathValid
 								});
 							}}
+							defaultExpand={true}
 							defaultPath={accounts.getSelected().derivationPath}
 							styles={styles}
 						/>

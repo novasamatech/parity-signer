@@ -24,8 +24,8 @@ import { parseDerivationPath } from '../util/suri';
 import TextInput from './TextInput';
 
 export default function DerivationPathField(props) {
-	const { onChange, styles, defaultPath } = props;
-	const [showAdvancedField, setShowAdvancedField] = useState(false);
+	const { onChange, styles, defaultPath, defaultExpand } = props;
+	const [showAdvancedField, setShowAdvancedField] = useState(defaultExpand);
 	const [isValidPath, setIsValidPath] = useState(true);
 	const [path, setPath] = useState(defaultPath);
 
@@ -35,20 +35,22 @@ export default function DerivationPathField(props) {
 
 	return (
 		<>
-			<TouchableOpacity
-				onPress={toggleShowAdvancedField}
-				style={{ diplay: 'flex' }}
-			>
-				<View style={{ justifyContent: 'center' }}>
-					<Text style={[styles.title, ownStyles.advancedText]}>
-						ADVANCED
-						<Icon
-							name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
-							size={20}
-						/>
-					</Text>
-				</View>
-			</TouchableOpacity>
+			{!defaultExpand && (
+				<TouchableOpacity
+					onPress={toggleShowAdvancedField}
+					style={{ diplay: 'flex' }}
+				>
+					<View style={{ justifyContent: 'center' }}>
+						<Text style={[styles.title, ownStyles.advancedText]}>
+							ADVANCED
+							<Icon
+								name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
+								size={20}
+							/>
+						</Text>
+					</View>
+				</TouchableOpacity>
+			)}
 			{showAdvancedField && (
 				<TextInput
 					onChangeText={text => {
