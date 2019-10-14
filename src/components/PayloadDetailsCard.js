@@ -277,7 +277,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 								<React.Fragment key={param}>
 									<Text style={{ ...styles.subLabel, flex: 1 }}>{param}: </Text>
 									<Text style={{ ...styles.secondaryText, flex: 3 }}>
-										{arg || undefined}
+										{arg}
 									</Text>
 								</React.Fragment>
 							))}
@@ -338,13 +338,13 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		backgroundColor: colors.bg,
-		color: colors.card_bg,
+		color: colors.card_bg_text_sec,
 		fontFamily: fonts.bold,
 		fontSize: 20,
 		textAlign: 'left'
 	},
 	secondaryText: {
-		color: colors.card_bg_text,
+		color: colors.card_bg_text_sec,
 		fontFamily: fonts.semiBold,
 		fontSize: 14,
 		paddingLeft: 8,
@@ -352,14 +352,14 @@ const styles = StyleSheet.create({
 	},
 	subLabel: {
 		backgroundColor: null,
-		color: colors.card_bg_text,
+		color: colors.card_bg_text_sec,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		paddingLeft: 5,
 		textAlign: 'left'
 	},
 	titleText: {
-		color: colors.card_bg_text,
+		color: colors.card_bg_text_sec,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		textAlign: 'center'

@@ -110,13 +110,13 @@ const styles = StyleSheet.create({
 		width: 47
 	},
 	secondaryText: {
-		color: colors.card_bg_text,
+		color: colors.card_bg_text_sec,
 		fontFamily: fonts.semiBold,
 		fontSize: 12,
 		textAlign: 'center'
 	},
 	titleText: {
-		color: colors.card_bg_text,
+		color: colors.card_bg_text_sec,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		textAlign: 'center'
