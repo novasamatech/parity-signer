@@ -121,7 +121,7 @@ class AccountPinView extends React.PureComponent {
 	render() {
 		const title = 'ACCOUNT PIN';
 		return (
-			<KeyboardScrollView style={styles.body}>
+			<KeyboardScrollView style={styles.body} extraHeight={120}>
 				<Background />
 				<Text style={styles.titleTop}>{title}</Text>
 				{this.showHintOrError()}
@@ -168,7 +168,7 @@ class PinInput extends Component {
 				multiline={false}
 				autoCorrect={false}
 				numberOfLines={1}
-				returnKeyType="next"
+				returnKeyType="done"
 				secureTextEntry
 				style={styles.pinInput}
 				{...this.props}
