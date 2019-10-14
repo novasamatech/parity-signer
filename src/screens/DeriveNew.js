@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { AppState, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -50,6 +50,7 @@ export default class DeriveNew extends React.Component {
 class DeriveNewView extends React.Component {
 	constructor(props) {
 		super(props);
+		this.handleAppStateChange = this.handleAppStateChange.bind(this);
 		const { accounts } = this.props;
 		const { seedPhrase, derivationPath, networkKey } = accounts.getSelected();
 		accounts.updateNew({ derivationPath, networkKey, seedPhrase });
@@ -59,9 +60,27 @@ class DeriveNewView extends React.Component {
 		};
 	}
 
-	componentWillUnmount = function() {
+	componentDidMount() {
+		AppState.addEventListener('change', this.handleAppStateChange);
+	}
+
+	componentWillUnmount() {
 		// called when the user goes back, or finishes the whole process
+		const { accounts } = this.props;
+		const selectedKey = accounts.getSelectedKey();
+
+		if (selectedKey) {
+			accounts.lockAccount(selectedKey);
+		}
+
 		this.props.accounts.updateNew(empty());
+		AppState.removeEventListener('change', this.handleAppStateChange);
+	}
+
+	handleAppStateChange = nextAppState => {
+		if (nextAppState === 'inactive') {
+			this.props.navigation.goBack();
+		}
 	};
 
 	render() {
