@@ -150,6 +150,7 @@ This account can only be recovered with its associated recovery phrase.`,
 							menuItems={[
 								{ text: 'Edit', value: 'AccountEdit' },
 								{ text: 'Change Pin', value: 'AccountPin' },
+								{ value: 'DeriveNew', text: 'Derive More Keys'},
 								{ text: 'View Recovery Phrase', value: 'AccountBackup' },
 								{
 									text: 'Delete',
