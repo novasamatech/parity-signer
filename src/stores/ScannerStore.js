@@ -341,6 +341,19 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 	}
 
+	cleanup() {
+		this.setState(defaultState);
+	}
+
+	clearMultipartProgress() {
+		this.setState({
+			completedFramesCount: 0,
+			multipartComplete: false,
+			multipartData: {},
+			totalFrameCount: 0
+		});
+	}
+
 	/**
 	 * @dev signing payload type can be either transaction or message
 	 */
@@ -368,10 +381,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	isBusy() {
 		return this.state.busy;
-	}
-
-	cleanup() {
-		this.setState(defaultState);
 	}
 
 	/**

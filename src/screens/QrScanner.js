@@ -142,6 +142,7 @@ export class QrScannerView extends React.Component {
 	componentWillUnmount() {
 		this.setBusySubscription.remove();
 		this.setReadySubscription.remove();
+		this.props.scannerStore.clearMultipartProgress();
 	}
 
 	render() {
@@ -242,6 +243,10 @@ const styles = StyleSheet.create({
 	middleRight: {
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 		flex: 1
+	},
+	progress: {
+		alignItems: 'center',
+		justifyContent: 'center'
 	},
 	titleTop: {
 		color: colors.bg_text,
