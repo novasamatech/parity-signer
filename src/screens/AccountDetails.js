@@ -88,22 +88,22 @@ This account can only be recovered with its associated recovery phrase.`,
   }
 
   onOptionSelect = async (value) => {
-    const navigate = this.props.navigation.navigate;
+    const navigate = this.props.navigation.navigate
     const accounts = this.props.accounts;
-    const account = this.props.accounts.getSelected();
 
     if (value !== 'AccountEdit') {
-      if (account.biometricEnabled) { 
+      if (accounts.getSelected().biometricEnabled) { 
           try {
-              await accounts.unlockAccountWithBiometric(account);
+              await accounts.unlockAccountWithBiometric(accounts.getSelectedKey());
               if (value === 'AccountDelete') {
                   this.onDelete();
               } else if (value === 'AccountBiometric') {
-                  await accounts.disableBiometricForSelected();
+                  await accounts.disableBiometric(accounts.getSelectedKey());
               } else {
                   navigate(value);
               }
           } catch (e) {
+              console.log(e);
               Alert.alert('Biometric Error', e.message, [
                   { 
                       text: 'Ok',
@@ -183,28 +183,21 @@ This account can only be recovered with its associated recovery phrase.`,
                 />
               </View>
             </View>
-            <AccountCard
-              address={account.address}
-              networkKey={account.networkKey}
-              title={account.name}
-            />
-          </View>
-        </View>
-        <AccountCard
-          address={account.address}
-          networkKey={account.networkKey}
-          title={account.name}
-        />
-        <View style={styles.qr}>
+          <AccountCard
+            address={account.address}
+            networkKey={account.networkKey}
+            title={account.name}
+          />
+          <View style={styles.qr}>
           {
             protocol !== NetworkProtocols.UNKNOWN
               ? <QrView data={selectedKey} />
               : this.renderWarningUnknownAccount()
-          }
-        </View>
-      </ScrollView>
-        )}
-        </Subscribe>
+           }
+           </View>
+         </ScrollView>
+       )}
+       </Subscribe>
     );
   }
 }

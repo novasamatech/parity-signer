@@ -17,7 +17,6 @@
 // @flow
 
 import { Container } from 'unstated';
-import { Alert } from 'react-native';
 
 import { accountId, empty } from '../util/account';
 import { loadAccounts, saveAccount, deleteAccount as deleteDbAccount} from '../util/db';
@@ -108,6 +107,7 @@ export default class AccountsStore extends Container {
   }
 
   async save(accountKey, account, pin = null) {
+    account = account ? account : this.state.accounts.get(accountKey);
     try {
       // for account creation
       if (pin && account.seed) {
@@ -134,7 +134,10 @@ export default class AccountsStore extends Container {
     }
   }
 
-  async unlockAccountWithBiometric(account) {
+  async unlockAccountWithBiometric(accountKey) {
+    const {accounts} = this.state;
+    const account = accounts.get(accountKey);
+
     if (!account || !account.encryptedSeed || !account.biometricEnabled) {
       return false;
     }
@@ -142,7 +145,7 @@ export default class AccountsStore extends Container {
     try { 
       const keyExists = await secureContains(APP_ID, account.pinKey);
       if (!keyExists) {
-        throw("Invalid state: biometric auth is enabled but no corresponding key exists in storage");
+        throw({ message: "Invalid state: biometry is enabled but no corresponding key found in storage." });
       } else {
         const pin = await secureGet(APP_ID, account.pinKey);
         account.seed = await decryptData(account.encryptedSeed, pin);
@@ -185,7 +188,7 @@ export default class AccountsStore extends Container {
     return true;
   }
 
-  deleteSensitiveData (account){
+  deleteSensitiveData(account) {
     delete account.seed;
     delete account.seedPhrase;
     delete account.derivationPassword;
@@ -242,37 +245,23 @@ export default class AccountsStore extends Container {
     return this.state.accounts;
   }
 
-  async enableBiometricForSelected(pin) {
-      try {
-          if (this.getSelected().pinKey && pin) {
-              await securePut(APP_ID, this.getSelected().pinKey, pin);
-              this.updateSelected({ biometricEnabled: true });
-              await this.save(this.getSelected());
-              return true;
-          }
-      } catch (e) {
-          // error here is likely no fingerprints/biometrics enrolled, so should be displayed to the user 
-          Alert.alert('Error', e.message, [
-              { 
-                  text: 'Ok',
-                  style: 'default'
-              }
-          ]);
-      }
-      return false
+  async enableBiometric(accountKey, pin) {
+      const account = this.state.accounts.get(accountKey);
+      return securePut(APP_ID, account.pinKey, pin)
+          .then(() => {
+              this.updateAccount(accountKey, { biometricEnabled: true });
+              return this.save(accountKey);
+          });
   }
 
-  async disableBiometricForSelected() {
-    try {
-        if (this.getSelected().pinKey) {
-            await secureDelete(APP_ID, this.getSelected().pinKey);
-            this.updateSelected({ biometricEnabled: false });
-            await this.save(this.getSelected());
-            return true;
-        }
-    } catch (e) {}
-    this.updateSelected({ pinKey: v4(), biometricEnabled: false });
-    await this.save(this.getSelected());
-    return false
+  async disableBiometric(accountKey) {
+      const account = this.state.accounts.get(accountKey);
+      return secureDelete(APP_ID, account.pinKey)
+          .catch((e) => console.log(e))
+          .finally(() => {
+              // incase delete failed, overwrite the pinKey and forget the encrypted pin
+              this.updateAccount(accountKey, { pinKey: v4(), biometricEnabled: false });
+              return this.save(accountKey);
+          });
   }
 }
