@@ -224,7 +224,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
         }
         break;
       default:
-        throw new Error('we cannot handle the pasta: ', bytes);
+        throw new Error('we cannot handle this payload: ', bytes);
     }
 
     return data;
