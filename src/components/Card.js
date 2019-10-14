@@ -18,80 +18,89 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Platform, StyleSheet, Text, TouchableNativeFeedback, TouchableOpacity, View, ViewPropTypes } from 'react-native';
+import {
+	Image,
+	Platform,
+	StyleSheet,
+	Text,
+	TouchableNativeFeedback,
+	TouchableOpacity,
+	View,
+	ViewPropTypes
+} from 'react-native';
 import colors from '../colors';
 
 export default class Card extends React.PureComponent<{
-  title: string,
-  secondaryText?: ?string,
-  labelText?: ?string,
-  footerStyle?: ?StyleSheet.Styles,
-  style: ?StyleSheet.Styles,
-  onPress: () => any
+	title: string,
+	secondaryText?: ?string,
+	labelText?: ?string,
+	footerStyle?: ?StyleSheet.Styles,
+	style: ?StyleSheet.Styles,
+	onPress: () => any
 }> {
-  static propTypes = {
-    title: PropTypes.string.isRequired,
-    secondaryText: PropTypes.string,
-    labelText: PropTypes.string,
-    style: ViewPropTypes.style,
-    footerStyle: ViewPropTypes.style,
-    onPress: PropTypes.func
-  };
+	static propTypes = {
+		footerStyle: ViewPropTypes.style,
+		labelText: PropTypes.string,
+		onPress: PropTypes.func,
+		secondaryText: PropTypes.string,
+		style: ViewPropTypes.style,
+		title: PropTypes.string.isRequired
+	};
 
-  render() {
-    const {
-      title,
-      secondaryText,
-      labelText,
-      footerStyle,
-      style,
-      onPress
-    } = this.props;
+	render() {
+		const {
+			title,
+			secondaryText,
+			labelText,
+			footerStyle,
+			style,
+			onPress
+		} = this.props;
 
-    const finalBodyStyle = [style.body, FooterStyle];
-    const finalContentStyle = [style.content];
-    const finalFooterStyle = [styles.footer, footerStyle];
-    const finalTitleTextStyle = [styles.titleText];
-    const finalSecondaryTextStyle = [styles.secondaryText];
-    const finalFooterTextStyle = [styles.footerText];
+		const finalBodyStyle = [style.body, footerStyle];
+		const finalContentStyle = [style.content];
+		const finalFooterStyle = [styles.footer, footerStyle];
+		const finalTitleTextStyle = [styles.titleText];
+		const finalSecondaryTextStyle = [styles.secondaryText];
+		const finalFooterTextStyle = [styles.footerText];
 
-    const Touchable =
-      Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
-    return (
-      <Touchable
-        accessibilityComponentType="button"
-        disabled={false}
-        onPress={onPress}
-      >
-        <View style={finalBodyStyle}>
-          <View style={finalContentStyle}>
-            <Image source={require('../../icon.png')} style={styles.image} />
-            <View>
-              <Text style={finalTitleTextStyle}>{title}</Text>
-              <Text style={finalSecondaryTextStyle}>{secondaryText}</Text>
-            </View>
-          </View>
-          <View style={finalFooterStyle}>
-            <Text style={finalFooterTextStyle}>{labelText}</Text>
-          </View>
-        </View>
-      </Touchable>
-    );
-  }
+		const Touchable =
+			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+		return (
+			<Touchable
+				accessibilityComponentType="button"
+				disabled={false}
+				onPress={onPress}
+			>
+				<View style={finalBodyStyle}>
+					<View style={finalContentStyle}>
+						<Image source={require('../../icon.png')} style={styles.image} />
+						<View>
+							<Text style={finalTitleTextStyle}>{title}</Text>
+							<Text style={finalSecondaryTextStyle}>{secondaryText}</Text>
+						</View>
+					</View>
+					<View style={finalFooterStyle}>
+						<Text style={finalFooterTextStyle}>{labelText}</Text>
+					</View>
+				</View>
+			</Touchable>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  body: {},
-  content: {
-    backgroundColor: colors.card_bg,
-    padding: 10
-  },
-  footer: {},
-  image: {
-    width: 80,
-    height: 80
-  },
-  titleText: {},
-  secondaryText: {},
-  footerText: {}
+	body: {},
+	content: {
+		backgroundColor: colors.card_bg,
+		padding: 10
+	},
+	footer: {},
+	footerText: {},
+	image: {
+		height: 80,
+		width: 80
+	},
+	secondaryText: {},
+	titleText: {}
 });
