@@ -21,50 +21,42 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import DerivationPathField from '../components/DerivationPathField'
+import DerivationPathField from '../components/DerivationPathField';
 import KeyboardScrollView from '../components/KeyboardScrollView';
-import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
-import { empty, validateSeed } from '../util/account';
-import {constructSURI} from '../util/suri';
+import { empty } from '../util/account';
+import { constructSURI } from '../util/suri';
+import { substrateAddress } from '../util/native';
 
-export default class AccountNew extends React.Component {
+export default class DeriveNew extends React.Component {
 	static navigationOptions = {
-		title: 'New Account',
-		headerBackTitle: 'Back'
+		headerBackTitle: 'Back',
+		title: 'Derive New Account'
 	};
 	render() {
 		return (
 			<Subscribe to={[AccountsStore]}>
-				{accounts => <AccountNewView {...this.props} accounts={accounts} />}
+				{accounts => <DeriveNewView {...this.props} accounts={accounts} />}
 			</Subscribe>
 		);
 	}
 }
 
-class AccountNewView extends React.Component {
-
+class DeriveNewView extends React.Component {
 	constructor(props) {
 		super(props);
+		const { accounts } = this.props;
+		const { seedPhrase, derivationPath, networkKey } = accounts.getSelected();
+		accounts.updateNew({ derivationPath, networkKey, seedPhrase });
 
 		this.state = {
-			derivationPassword: '',
-			derivationPath: '',
-			isDerivationPathValid: true,
-			selectedAccount: undefined,
-			selectedNetwork: undefined,
+			isDerivationPathValid: true
 		};
-	}
-
-	componentDidMount(): void {
-		const { accounts } = this.props;
-		accounts.updateNew(accounts.getSelected());
 	}
 
 	componentWillUnmount = function() {
@@ -74,9 +66,10 @@ class AccountNewView extends React.Component {
 
 	render() {
 		const { accounts, navigation } = this.props;
-		const { derivationPassword, derivationPath, isDerivationPathValid } = this.state;
+		const { isDerivationPathValid } = this.state;
 		const selectedAccount = accounts.getSelected();
-		const {address, name, seed, seedPhrase, validBip39Seed, networkKey} = selectedAccount;
+		const { seedPhrase, networkKey } = selectedAccount;
+		const { name } = accounts.getNew();
 
 		if (!selectedAccount) {
 			return null;
@@ -90,30 +83,51 @@ class AccountNewView extends React.Component {
 						<Text style={styles.titleTop}>DERIVE ACCOUNT</Text>
 						<Text style={styles.title}>NAME</Text>
 						<TextInput
-							onChangeText={name => accounts.updateNew({ name })}
+							onChangeText={newName => accounts.updateNew({ newName })}
 							value={name}
 							placeholder="Enter a new account name"
 						/>
 						<DerivationPathField
-							onChange = { ({derivationPassword, derivationPath, isDerivationPathValid}) => {
-								this.setState({ derivationPath, derivationPassword, isDerivationPathValid });
+							onChange={async ({
+								derivationPassword,
+								derivationPath,
+								isDerivationPathValid
+							}) => {
+								const prefix = NETWORK_LIST[networkKey].prefix;
+								const suri = constructSURI({
+									derivePath: derivationPath,
+									password: derivationPassword,
+									phrase: seedPhrase
+								});
+								const address = await substrateAddress(suri, prefix);
+								accounts.updateNew({
+									address,
+									derivationPassword,
+									derivationPath,
+									seed: suri,
+									seedPhrase: seedPhrase,
+									validBip39Seed: true
+								});
+								this.setState({
+									isDerivationPathValid
+								});
 							}}
+							defaultPath={accounts.getSelected().derivationPath}
 							styles={styles}
 						/>
 					</View>
 					<View style={styles.bottom}>
 						<Text style={styles.hintText}>
-							Next, you will be asked to backup your account, get a pen and some paper.
+							Next, you will be asked to backup your account, get a pen and some
+							paper.
 						</Text>
 						<Button
 							buttonStyles={styles.nextStep}
-							title="Next Step"
-							disabled={!validateSeed(seed, validBip39Seed).valid || !isDerivationPathValid}
-							onPress={() => {
-								validateSeed(seed, validBip39Seed).valid &&
-								navigation.navigate('AccountBackup', {
-									isNew: true,
-									isWelcome: navigation.getParam('isWelcome')
+							title="Unlock to create"
+							disabled={!isDerivationPathValid}
+							onPress={async () => {
+								navigation.navigate('AccountUnlock', {
+									isDerived: true
 								});
 							}}
 						/>
@@ -130,16 +144,23 @@ const styles = StyleSheet.create({
 		flex: 1,
 		overflow: 'hidden'
 	},
-	top: {
-		flex: 1
-	},
 	bottom: {
 		flexBasis: 50,
 		paddingBottom: 15
 	},
-	title: {
-		fontFamily: fonts.bold,
+	hintText: {
 		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 12,
+		paddingTop: 20,
+		textAlign: 'center'
+	},
+	nextStep: {
+		marginTop: 15
+	},
+	title: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20
 	},
@@ -150,14 +171,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 20,
 		textAlign: 'center'
 	},
-	hintText: {
-		fontFamily: fonts.bold,
-		textAlign: 'center',
-		paddingTop: 20,
-		color: colors.bg_text_sec,
-		fontSize: 12
-	},
-	nextStep: {
-		marginTop: 15
+	top: {
+		flex: 1
 	}
 });

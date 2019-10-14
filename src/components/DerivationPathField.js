@@ -24,9 +24,10 @@ import { parseDerivationPath } from '../util/suri';
 import TextInput from './TextInput';
 
 export default function DerivationPathField(props) {
-	const { onChange, styles } = props;
+	const { onChange, styles, defaultPath } = props;
 	const [showAdvancedField, setShowAdvancedField] = useState(false);
 	const [isValidPath, setIsValidPath] = useState(true);
+	const [path, setPath] = useState(defaultPath);
 
 	const toggleShowAdvancedField = () => {
 		setShowAdvancedField(!showAdvancedField);
@@ -51,6 +52,7 @@ export default function DerivationPathField(props) {
 			{showAdvancedField && (
 				<TextInput
 					onChangeText={text => {
+						setPath(text);
 						try {
 							const derivationPath = parseDerivationPath(text);
 
@@ -70,6 +72,7 @@ export default function DerivationPathField(props) {
 							setIsValidPath(false);
 						}
 					}}
+					value={path}
 					placeholder="optional derivation path"
 					style={isValidPath ? ownStyles.validInput : ownStyles.invalidInput}
 				/>

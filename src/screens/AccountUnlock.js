@@ -69,6 +69,7 @@ export class AccountUnlock extends React.Component {
 	render() {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'AccountList');
+		const isAccountDerivation = navigation.getParam('isDerived');
 
 		return (
 			<Subscribe to={[AccountsStore]}>
@@ -76,6 +77,10 @@ export class AccountUnlock extends React.Component {
 					<AccountUnlockView
 						{...this.props}
 						checkPin={async pin => {
+							if (isAccountDerivation) {
+								await accounts.submitNew(pin);
+								return true;
+							}
 							return await accounts.unlockAccount(
 								accounts.getSelectedKey(),
 								pin

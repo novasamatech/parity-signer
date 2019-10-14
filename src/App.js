@@ -48,6 +48,7 @@ import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
 import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
+import DeriveNew from './screens/DeriveNew';
 import Loading from './screens/Loading';
 import MessageDetails from './screens/MessageDetails';
 import PrivacyPolicy from './screens/PrivacyPolicy';
@@ -203,6 +204,9 @@ const Screens = createStackNavigator(
 					},
 					AccountUnlockAndSign: {
 						screen: AccountUnlockAndSign
+					},
+					DeriveNew: {
+						screen: DeriveNew
 					},
 					MessageDetails: {
 						screen: MessageDetails
