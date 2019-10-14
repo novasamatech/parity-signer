@@ -26,165 +26,164 @@ import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import PopupMenu from '../components/PopupMenu';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountList extends React.PureComponent {
-  static navigationOptions = {
-    title: 'Accounts',
-  };
+	static navigationOptions = {
+		title: 'Accounts'
+	};
 
-  render() {
-
-    return (
-      <Subscribe to={[AccountsStore]}>
-        {accounts => {
-          return (
-            <AccountListView
-              {...this.props}
-              accounts={accounts.getAccounts()}
-              onAccountSelected={key => {
-                accounts.select(key);
-                this.props.navigation.navigate('AccountDetails');
-              }}
-            />
-          );
-        }}
-      </Subscribe>
-    );
-  }
+	render() {
+		return (
+			<Subscribe to={[AccountsStore]}>
+				{accounts => {
+					return (
+						<AccountListView
+							{...this.props}
+							accounts={accounts.getAccounts()}
+							onAccountSelected={key => {
+								accounts.select(key);
+								this.props.navigation.navigate('AccountDetails');
+							}}
+						/>
+					);
+				}}
+			</Subscribe>
+		);
+	}
 }
 
 class AccountListView extends React.PureComponent {
-  static propTypes = {
-    accounts: PropTypes.object.isRequired,
-    onAccountSelected: PropTypes.func.isRequired,
-  };
+	static propTypes = {
+		accounts: PropTypes.object.isRequired,
+		onAccountSelected: PropTypes.func.isRequired
+	};
 
-  constructor(props) {
-    super(props);
-  }
+	constructor(props) {
+		super(props);
+	}
 
-  showOnboardingMessage = () => {
-    const { navigate } = this.props.navigation;
-    const createLink = (text, navigation) => (
-      <Text style={styles.link} onPress={() => navigate(navigation)}>
-        {text}
-      </Text>
-    );
+	showOnboardingMessage = () => {
+		const { navigate } = this.props.navigation;
+		const createLink = (text, navigation) => (
+			<Text style={styles.link} onPress={() => navigate(navigation)}>
+				{text}
+			</Text>
+		);
 
-    return (
-      <View style={styles.onboardingWrapper}>
-        <Text style={styles.onboardingText}>
-          No account yet?{'\n'}
-          {createLink('Create', 'AccountNew')} or{' '}
-          {createLink('recover', 'AccountRecover')} an account to get started.
-        </Text>
-      </View>
-    );
-  };
+		return (
+			<View style={styles.onboardingWrapper}>
+				<Text style={styles.onboardingText}>
+					No account yet?{'\n'}
+					{createLink('Create', 'AccountNew')} or{' '}
+					{createLink('recover', 'AccountRecover')} an account to get started.
+				</Text>
+			</View>
+		);
+	};
 
-  render() {
-    const { accounts, navigation, onAccountSelected } = this.props;
-    const hasNoAccount = accounts.length < 1;
-    const { navigate } = navigation;
+	render() {
+		const { accounts, navigation, onAccountSelected } = this.props;
+		const hasNoAccount = accounts.length < 1;
+		const { navigate } = navigation;
 
-    return (
-      <View style={styles.body}>
-        <Background />
-        <View style={styles.header}>
-          <Text style={styles.title}>ACCOUNTS</Text>
-          <View style={styles.menuView}>
-            <PopupMenu
-              onSelect={value => navigate(value)}
-              menuTriggerIconName={'add'}
-              menuItems={[
-                { value: 'AccountNew', text: 'New Account' },
-                { value: 'AccountRecover', text: 'Recover Account' },
-                { value: 'About', text: 'About' },
-              ]}
-            />
-          </View>
-        </View>
-        {hasNoAccount && this.showOnboardingMessage()}
-        <FlatList
-          ref={list => {
-            this.list = list;
-          }}
-          style={styles.content}
-          data={[...accounts.entries()]}
-          keyExtractor={([key]) => key}
-          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-          renderItem={({ item: [accountKey, account] }) => {
-            return (
-              <AccountCard
-                address={account.address}
-                networkKey={account.networkKey}
-                onPress={() => {
-                  onAccountSelected(accountKey);
-                }}
-                style={{ paddingBottom: null }}
-                title={account.name}
-              />
-            );
-          }}
-          enableEmptySections
-        />
-        {!hasNoAccount && (
-          <View style={styles.bottom}>
-            <Button
-              buttonStyles={{ height: 60 }}
-              title="Scan"
-              onPress={() => navigate('QrScanner')}
-            />
-          </View>
-        )}
-      </View>
-    );
-  }
+		return (
+			<View style={styles.body}>
+				<Background />
+				<View style={styles.header}>
+					<Text style={styles.title}>ACCOUNTS</Text>
+					<View style={styles.menuView}>
+						<PopupMenu
+							onSelect={value => navigate(value)}
+							menuTriggerIconName={'add'}
+							menuItems={[
+								{ text: 'New Account', value: 'AccountNew' },
+								{ text: 'Recover Account', value: 'AccountRecover' },
+								{ text: 'About', value: 'About' }
+							]}
+						/>
+					</View>
+				</View>
+				{hasNoAccount && this.showOnboardingMessage()}
+				<FlatList
+					ref={list => {
+						this.list = list;
+					}}
+					style={styles.content}
+					data={[...accounts.entries()]}
+					keyExtractor={([key]) => key}
+					ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+					renderItem={({ item: [accountKey, account] }) => {
+						return (
+							<AccountCard
+								address={account.address}
+								networkKey={account.networkKey}
+								onPress={() => {
+									onAccountSelected(accountKey);
+								}}
+								style={{ paddingBottom: null }}
+								title={account.name}
+							/>
+						);
+					}}
+					enableEmptySections
+				/>
+				{!hasNoAccount && (
+					<View style={styles.bottom}>
+						<Button
+							buttonStyles={{ height: 60 }}
+							title="Scan"
+							onPress={() => navigate('QrScanner')}
+						/>
+					</View>
+				)}
+			</View>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    padding: 20,
-  },
-  bottom: {
-    marginTop: 20
-  },
-  content: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 20,
-    justifyContent: 'center'
-  },
-  menuView: {
-    flex: 1,
-    alignItems: 'flex-end'
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    flexDirection: 'column',
-    justifyContent: 'center'
-  },
-  link: {
-    textDecorationLine: 'underline',
-  },
-  onboardingWrapper: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end'
-  },
-  onboardingText: {
-    fontFamily: fonts.regular,
-    fontSize: 20,
-    color: colors.bg_text_sec
-  }
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column',
+		padding: 20
+	},
+	bottom: {
+		marginTop: 20
+	},
+	content: {
+		flex: 1
+	},
+	header: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		paddingBottom: 20
+	},
+	link: {
+		textDecorationLine: 'underline'
+	},
+	menuView: {
+		alignItems: 'flex-end',
+		flex: 1
+	},
+	onboardingText: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.regular,
+		fontSize: 20
+	},
+	onboardingWrapper: {
+		alignItems: 'flex-end',
+		flex: 1,
+		flexDirection: 'row'
+	},
+	title: {
+		color: colors.bg_text_sec,
+		flexDirection: 'column',
+		fontFamily: fonts.bold,
+		fontSize: 18,
+		justifyContent: 'center'
+	}
 });

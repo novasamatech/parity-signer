@@ -17,36 +17,34 @@
 // @flow
 
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-} from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import colors from '../colors';
-import fonts from "../fonts";
-import {NetworkProtocols} from '../constants'
+import fonts from '../fonts';
+import { NetworkProtocols } from '../constants';
 
-export default function Address (props) {
-  const {address, protocol = NetworkProtocols.SUBSTRATE ,style = {}} = props;
-  const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
-  let result = address;
+export default function Address(props) {
+	const { address, protocol = NetworkProtocols.SUBSTRATE, style = {} } = props;
+	const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
+	let result = address;
 
-  return (
-    <Text
-      numberOfLines={1}
-      style={[styles.secondaryText, style]}
-      ellipsizeMode="middle"
-      >
-      {prefix}{result}
-    </Text>
-  );
+	return (
+		<Text
+			numberOfLines={1}
+			style={[styles.secondaryText, style]}
+			ellipsizeMode="middle"
+		>
+			{prefix}
+			{result}
+		</Text>
+	);
 }
 
 const styles = StyleSheet.create({
-  secondaryText: {
-    fontFamily: fonts.regular,
-    color: colors.bg_text_sec,
-    fontSize: 12,
-    lineHeight: 16,
-  }
+	secondaryText: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.regular,
+		fontSize: 12,
+		lineHeight: 16
+	}
 });

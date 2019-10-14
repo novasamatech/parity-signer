@@ -20,44 +20,44 @@ import colors from '../colors';
 import fonts from '../fonts';
 
 export default class TextInput extends React.PureComponent {
-  static defaultProps = {
-    focus: false
-  };
+	static defaultProps = {
+		focus: false
+	};
 
-  // Methods:
-  focus() {
-    this.input.focus();
-  }
+	// Methods:
+	focus() {
+		this.input.focus();
+	}
 
-  componentDidUpdate() {
-    const { focus } = this.props;
-    focus && this.focus();
-  }
+	componentDidUpdate() {
+		const { focus } = this.props;
+		focus && this.focus();
+	}
 
-  render() {
-    return (
-      <TextInputOrigin
-        ref={input => {
-          this.input = input;
-        }}
-        keyboardAppearance="dark"
-        underlineColorAndroid="transparent"
-        {...this.props}
-        style={[styles.input, this.props.style]}
-      />
-    );
-  }
+	render() {
+		return (
+			<TextInputOrigin
+				ref={input => {
+					this.input = input;
+				}}
+				keyboardAppearance="dark"
+				underlineColorAndroid="transparent"
+				{...this.props}
+				style={[styles.input, this.props.style]}
+			/>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  input: {
-    fontSize: 24,
-    height: 60,
-    fontFamily: fonts.regular,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    paddingHorizontal: 18,
-    backgroundColor: colors.card_bg
-  }
+	input: {
+		alignItems: 'center',
+		backgroundColor: colors.card_bg,
+		elevation: 4,
+		fontFamily: fonts.regular,
+		fontSize: 24,
+		height: 60,
+		justifyContent: 'center',
+		paddingHorizontal: 18
+	}
 });

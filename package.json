@@ -15,10 +15,16 @@
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force",
     "commit": "commit-wizard",
     "ios": "yarn run build-rust-ios && react-native run-ios",
-    "lint": "eslint",
+    "lint": "npx eslint ./src/ --ext .js,.jsx",
+    "lint:fix": "npx eslint ./src/ --ext .js,.jsx --fix",
     "postinstall": "npx jetify",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
     "test": "jest"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run lint"
+    }
   },
   "dependencies": {
     "@plugnet/util": "^1.1.100",
@@ -58,10 +64,13 @@
     "@babel/plugin-transform-runtime": "^7.5.0",
     "@babel/runtime": "^7.5.4",
     "@react-native-community/eslint-config": "^0.0.5",
-    "babel-eslint": "^10.0.3",
+    "babel-eslint": "10.0.3",
     "babel-jest": "^24.9.0",
     "babel-plugin-rewrite-require": "^1.14.5",
-    "eslint": "^6.2.2",
+    "eslint": "^6.3.0",
+    "eslint-config-prettier": "^6.2.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "husky": "^3.0.8",
     "jest": "^24.9.0",
     "jetifier": "^1.6.4",
     "metro-react-native-babel-preset": "^0.56.0",

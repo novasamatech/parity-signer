@@ -24,102 +24,101 @@ import { checksummedAddress } from './checksum';
  * to an object, marking if it was generated with BIP39.
  */
 function untagAddress(address) {
-  let bip39 = false;
+	let bip39 = false;
 
-  const colonIdx = address.indexOf(':');
+	const colonIdx = address.indexOf(':');
 
-  if (colonIdx !== -1) {
-    bip39 = address.substring(0, colonIdx) === 'bip39';
-    address = address.substring(colonIdx + 1);
-  }
+	if (colonIdx !== -1) {
+		bip39 = address.substring(0, colonIdx) === 'bip39';
+		address = address.substring(colonIdx + 1);
+	}
 
-  return {
-    bip39,
-    address,
-  };
+	return {
+		address,
+		bip39
+	};
 }
 
-function asString (x) {
-  return x
-    .split('')
-    .map(x => x.charCodeAt(0).toString(16))
-    .map(n => n.length < 2 ? `0${n}` : n)
-    .join('');
+function asString(x) {
+	return x
+		.split('')
+		.map(c => c.charCodeAt(0).toString(16))
+		.map(n => (n.length < 2 ? `0${n}` : n))
+		.join('');
 }
 
-export async function brainWalletAddress (seed) {
-  const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
-  const { bip39, address } = untagAddress(taggedAddress);
-  const hash = await keccak(asString(address));
+export async function brainWalletAddress(seed) {
+	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
+	const { bip39, address } = untagAddress(taggedAddress);
+	const hash = await keccak(asString(address));
 
-  return {
-    bip39,
-    address: checksummedAddress(address, hash),
-  };
+	return {
+		address: checksummedAddress(address, hash),
+		bip39
+	};
 }
 
-export function brainWalletBIP39Address (seed) {
-  return EthkeyBridge
-    .brainWalletBIP(seed)
-    .then(async (taggedAddress) => {
-      const { bip39, address } = untagAddress(taggedAddress);
+export function brainWalletBIP39Address(seed) {
+	return EthkeyBridge.brainWalletBIP(seed)
+		.then(async taggedAddress => {
+			const { bip39, address } = untagAddress(taggedAddress);
 
-      const hash = await keccak(asString(address));
+			const hash = await keccak(asString(address));
 
-      return {
-        bip39,
-        address: checksummedAddress(address, hash),
-      };
-    })
-    .catch((_) => {
-      return null;
-    });
+			return {
+				address: checksummedAddress(address, hash),
+				bip39
+			};
+		})
+		.catch(_ => {
+			return null;
+		});
 }
 
-export function brainWalletSign (seed, message) {
-  return EthkeyBridge.brainWalletSign(seed, message);
+export function brainWalletSign(seed, message) {
+	return EthkeyBridge.brainWalletSign(seed, message);
 }
 
-export function rlpItem (rlp, position) {
-  return EthkeyBridge.rlpItem(rlp, position);
+export function rlpItem(rlp, position) {
+	return EthkeyBridge.rlpItem(rlp, position);
 }
 
-export function keccak (data) {
-  return EthkeyBridge.keccak(data);
+export function keccak(data) {
+	return EthkeyBridge.keccak(data);
 }
 
-export function ethSign (data) {
-  return EthkeyBridge.ethSign(data);
+export function ethSign(data) {
+	return EthkeyBridge.ethSign(data);
 }
 
-export function blockiesIcon (seed) {
-  return EthkeyBridge.blockiesIcon(seed.toLowerCase());
+export function blockiesIcon(seed) {
+	return EthkeyBridge.blockiesIcon(seed.toLowerCase());
 }
 
-export function words () {
-  return EthkeyBridge.randomPhrase();
+export function words() {
+	return EthkeyBridge.randomPhrase();
 }
 
-export function encryptData (data, password) {
-  return EthkeyBridge.encryptData(data, password);
+export function encryptData(data, password) {
+	return EthkeyBridge.encryptData(data, password);
 }
 
-export function decryptData (data, password) {
-  return EthkeyBridge.decryptData(data, password);
+export function decryptData(data, password) {
+	return EthkeyBridge.decryptData(data, password);
 }
 
 // Creates a QR code for the UTF-8 representation of a string
-export function qrCode (data) {
-  return EthkeyBridge.qrCode(data);
+export function qrCode(data) {
+	return EthkeyBridge.qrCode(data);
 }
 
 // Creates a QR code for binary data from a hex-encoded string
-export function qrCodeHex (data) {
-  return EthkeyBridge.qrCodeHex(data);
+export function qrCodeHex(data) {
+	return EthkeyBridge.qrCodeHex(data);
 }
 
-export function blake2s (data) {
-  return EthkeyBridge.blake2s(asString(data));
+export function blake2s(data) {
+	return EthkeyBridge.blake2s(asString(data));
 }
 
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
@@ -128,11 +127,11 @@ export function blake2s (data) {
 //   Polkadot proper = 0
 //   Kusama = 2
 //   Default (testnets) = 42
-export function substrateAddress (seed, prefix) {
-  return EthkeyBridge.substrateAddress(seed, prefix);
+export function substrateAddress(seed, prefix) {
+	return EthkeyBridge.substrateAddress(seed, prefix);
 }
 
 // Sign data using sr25519 crypto for a BIP39 phrase. Message is hex-encoded byte array.
-export function substrateSign (seed, message) {
-  return EthkeyBridge.substrateSign(seed, message);
+export function substrateSign(seed, message) {
+	return EthkeyBridge.substrateSign(seed, message);
 }

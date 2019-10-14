@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 // Copyright 2015-2019 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
@@ -23,12 +21,12 @@ import '../shim';
 import '@polkadot/types/injector';
 
 import React, { Component } from 'react';
-import {StatusBar, YellowBox} from 'react-native';
+import { StatusBar, YellowBox } from 'react-native';
 import {
-  createAppContainer,
-  createStackNavigator,
-  HeaderBackButton,
-  withNavigation
+	createAppContainer,
+	createStackNavigator,
+	HeaderBackButton,
+	withNavigation
 } from 'react-navigation';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
@@ -61,180 +59,181 @@ import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 
 export default class App extends Component {
-  constructor() {
-    super();
-    if (__DEV__) {
-      YellowBox.ignoreWarnings([
-        'Warning: componentWillReceiveProps',
-        'Warning: componentWillMount',
-        'Warning: componentWillUpdate'
-      ]);
-    }
-  }
+	constructor() {
+		super();
+		if (__DEV__) {
+			YellowBox.ignoreWarnings([
+				'Warning: componentWillReceiveProps',
+				'Warning: componentWillMount',
+				'Warning: componentWillUpdate'
+			]);
+		}
+	}
 
-  render() {
-    return (
-      <UnstatedProvider>
-        <MenuProvider backHandler={true}>
-          <StatusBar barStyle="light-content" />
-          <Background />
-          <ScreensContainer />
-        </MenuProvider>
-      </UnstatedProvider>
-    );
-  }
+	render() {
+		return (
+			<UnstatedProvider>
+				<MenuProvider backHandler={true}>
+					<StatusBar barStyle="light-content" />
+					<Background />
+					<ScreensContainer />
+				</MenuProvider>
+			</UnstatedProvider>
+		);
+	}
 }
 
 const globalStackNavigationOptions = {
-  headerTintColor: colors.card_bg,
-  headerRight: <SecurityHeader />,
-  headerStyle: {
-    backgroundColor: colors.bg,
-    height: 60,
-    paddingTop: 0,
-    paddingBottom: 0,
-    borderBottomWidth: 0.5,
-    borderBottomColor: colors.bg_text_sec
-  },
-  headerTitleStyle: {
-    display: 'none',
-  },
-  headerBackTitleStyle: {
-    fontSize: 20,
-    fontFamily: fonts.semiBold
-  }
+	headerBackTitleStyle: {
+		fontFamily: fonts.semiBold,
+		fontSize: 20
+	},
+	headerRight: <SecurityHeader />,
+	headerStyle: {
+		backgroundColor: colors.bg,
+		borderBottomColor: colors.bg_text_sec,
+		borderBottomWidth: 0.5,
+		height: 60,
+		paddingBottom: 0,
+		paddingTop: 0
+	},
+	headerTintColor: colors.card_bg,
+	headerTitleStyle: {
+		display: 'none'
+	}
 };
 
 // A workaround for https://github.com/react-navigation/react-navigation/issues/88
 const SecurityHeaderBackButton = withNavigation(
-  class _HeaderBackButton extends Component {
-    render() {
-      const { navigation } = this.props;
-      return (
-        <HeaderBackButton
-          {...this.props}
-          titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
-          title="Back"
-          tintColor={colors.card_bg}
-          onPress={() => navigation.goBack(null)}
-        />
-      );
-    }
-  }
+	class _HeaderBackButton extends Component {
+		render() {
+			const { navigation } = this.props;
+			return (
+				<HeaderBackButton
+					{...this.props}
+					titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
+					title="Back"
+					tintColor={colors.card_bg}
+					onPress={() => navigation.goBack(null)}
+				/>
+			);
+		}
+	}
 );
 
+/* eslint-disable sort-keys */
 const Screens = createStackNavigator(
-  {
-    Loading: {
-      screen: Loading
-    },
-    Security: {
-      screen: createStackNavigator(
-        {
-          Security: {
-            screen: Security,
-            navigationOptions: {
-              headerLeft: <SecurityHeaderBackButton/>,
-              headerRight: null
-            }
-          }
-        },
-        {
-          defaultNavigationOptions: globalStackNavigationOptions,
-          headerMode: 'screen',
-        }
-      ),
-    },
-    TocAndPrivacyPolicy: {
-      screen: createStackNavigator(
-        {
-          TermsAndConditions: {
-            screen: TermsAndConditions,
-            navigationOptions: {
-              headerLeft: <HeaderLeftHome />
-            }
-          },
-          PrivacyPolicy: {
-            screen: PrivacyPolicy
-          }
-        },
-        {
-          defaultNavigationOptions: globalStackNavigationOptions,
-          initialRouteParams: {
-            isWelcome: true
-          }
-        }
-      )
-    },
-    Welcome: {
-      screen: createStackNavigator(
-          {
-          AccountList: {
-            screen: AccountList,
-            navigationOptions: {
-              headerLeft: <HeaderLeftHome />
-            }
-          },
-          AccountNetworkChooser: {
-            screen: AccountNetworkChooser
-          },
-          AccountNew: {
-            screen: AccountNew
-          },
-          AccountRecover: {
-            screen: AccountRecover
-          },
-          AccountBackup: {
-            screen: AccountBackup
-          },
-          AccountPin: {
-            screen: AccountPin
-          },
-          QrScanner: {
-            screen: QrScanner,
-          },
-          TxDetails: {
-            screen: TxDetails
-          },
-          AccountUnlockAndSign: {
-            screen: AccountUnlockAndSign
-          },
-          SignedTx: {
-            screen: SignedTx
-          },
-          SignedMessage: {
-            screen: SignedMessage
-          },
-          MessageDetails: {
-            screen: MessageDetails
-          },
-          About: {
-            screen: About
-          },
-          AccountDetails: {
-            screen: AccountDetails
-          },
-          AccountUnlock: {
-            screen: AccountUnlock
-          },
-          AccountEdit: {
-            screen: AccountEdit
-          }
-        },
-        {
-          defaultNavigationOptions: globalStackNavigationOptions,
-          initialRouteParams: {
-            isWelcome: true
-          }
-        }
-      )
-    },
-  },
-  {
-    defaultNavigationOptions: globalStackNavigationOptions,
-    headerMode: 'none',
-    mode: 'card'
-  }
+	{
+		Loading: {
+			screen: Loading
+		},
+		Security: {
+			screen: createStackNavigator(
+				{
+					Security: {
+						navigationOptions: {
+							headerLeft: <SecurityHeaderBackButton />,
+							headerRight: null
+						},
+						screen: Security
+					}
+				},
+				{
+					defaultNavigationOptions: globalStackNavigationOptions,
+					headerMode: 'screen'
+				}
+			)
+		},
+		TocAndPrivacyPolicy: {
+			screen: createStackNavigator(
+				{
+					TermsAndConditions: {
+						navigationOptions: {
+							headerLeft: <HeaderLeftHome />
+						},
+						screen: TermsAndConditions
+					},
+					PrivacyPolicy: {
+						screen: PrivacyPolicy
+					}
+				},
+				{
+					defaultNavigationOptions: globalStackNavigationOptions,
+					initialRouteParams: {
+						isWelcome: true
+					}
+				}
+			)
+		},
+		Welcome: {
+			screen: createStackNavigator(
+				{
+					AccountList: {
+						navigationOptions: {
+							headerLeft: <HeaderLeftHome />
+						},
+						screen: AccountList
+					},
+					About: {
+						screen: About
+					},
+					AccountBackup: {
+						screen: AccountBackup
+					},
+					AccountDetails: {
+						screen: AccountDetails
+					},
+					AccountEdit: {
+						screen: AccountEdit
+					},
+					AccountNetworkChooser: {
+						screen: AccountNetworkChooser
+					},
+					AccountNew: {
+						screen: AccountNew
+					},
+					AccountPin: {
+						screen: AccountPin
+					},
+					AccountRecover: {
+						screen: AccountRecover
+					},
+					AccountUnlock: {
+						screen: AccountUnlock
+					},
+					AccountUnlockAndSign: {
+						screen: AccountUnlockAndSign
+					},
+					MessageDetails: {
+						screen: MessageDetails
+					},
+					QrScanner: {
+						screen: QrScanner
+					},
+					SignedMessage: {
+						screen: SignedMessage
+					},
+					SignedTx: {
+						screen: SignedTx
+					},
+					TxDetails: {
+						screen: TxDetails
+					}
+				},
+				{
+					defaultNavigationOptions: globalStackNavigationOptions,
+					initialRouteParams: {
+						isWelcome: true
+					}
+				}
+			)
+		}
+	},
+	{
+		defaultNavigationOptions: globalStackNavigationOptions,
+		headerMode: 'none',
+		mode: 'card'
+	}
 );
 
 const ScreensContainer = createAppContainer(Screens);
