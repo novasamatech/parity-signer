@@ -26,7 +26,7 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
-import KeyboardScrollView from "../components/KeyboardScrollView";
+import KeyboardScrollView from '../components/KeyboardScrollView';
 
 export default class AccountPin extends React.PureComponent {
 	render() {
@@ -168,7 +168,7 @@ class PinInput extends Component {
 				multiline={false}
 				autoCorrect={false}
 				numberOfLines={1}
-				returnKeyType="done"
+				returnKeyType="next"
 				secureTextEntry
 				style={styles.pinInput}
 				{...this.props}
