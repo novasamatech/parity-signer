@@ -19,43 +19,45 @@
 import React from 'react';
 import { Text } from 'react-native';
 import {
-    Menu,
-    MenuOptions,
-    MenuOption,
-    MenuTrigger,
+	Menu,
+	MenuOptions,
+	MenuOption,
+	MenuTrigger
 } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 
 export default class PopupMenu extends React.PureComponent {
-    render() {
-        const { onSelect, menuTriggerIconName, menuItems } = this.props;
-        const menuTriggerIcon = <Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />;
+	render() {
+		const { onSelect, menuTriggerIconName, menuItems } = this.props;
+		const menuTriggerIcon = (
+			<Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />
+		);
 
-        return (
-            <Menu onSelect={onSelect}>
-                <MenuTrigger children={menuTriggerIcon} />
-                <MenuOptions customStyles={menuOptionsStyles}>
-                    {
-                        menuItems.map((menuItem, index) => (
-                            <MenuOption key={index} value={menuItem.value} >
-                                <Text style={[menuOptionsStyles.optionText, menuItem.textStyle]} >{menuItem.text}</Text>
-                            </MenuOption>
-                        ))
-                    }
-                </MenuOptions>
-            </Menu>
-        );
-    }
+		return (
+			<Menu onSelect={onSelect}>
+				<MenuTrigger children={menuTriggerIcon} />
+				<MenuOptions customStyles={menuOptionsStyles}>
+					{menuItems.map((menuItem, index) => (
+						<MenuOption key={index} value={menuItem.value}>
+							<Text style={[menuOptionsStyles.optionText, menuItem.textStyle]}>
+								{menuItem.text}
+							</Text>
+						</MenuOption>
+					))}
+				</MenuOptions>
+			</Menu>
+		);
+	}
 }
 
 const menuOptionsStyles = {
-    optionWrapper: {
-        padding: 15,
-    },
-    optionText: {
-        fontFamily: fonts.regular,
-        fontSize: 16
-    },
+	optionText: {
+		fontFamily: fonts.regular,
+		fontSize: 16
+	},
+	optionWrapper: {
+		padding: 15
+	}
 };

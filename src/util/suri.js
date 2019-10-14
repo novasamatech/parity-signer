@@ -5,7 +5,7 @@
  * @property {string} password - The optionnal password password without the `///`
  */
 
- /**
+/**
  * @typedef {Object} DerivationPathObject
  * @property {string} derivePath - The derivation path consisting in `/soft` and or `//hard`, can be repeated and interchanges
  * @property {string} password - The optionnal password password without the `///`
@@ -17,32 +17,34 @@
  * @returns {SURIObject}
  */
 
-export function parseSURI (suri) {
-  const RE_CAPTURE = /^(\w+(?: \w+)*)?(.*)$/;
-  const matches = suri.match(RE_CAPTURE);
-  let phrase, derivationPath = '';
-  const ERROR = 'Invalid SURI input.';
+export function parseSURI(suri) {
+	const RE_CAPTURE = /^(\w+(?: \w+)*)?(.*)$/;
+	const matches = suri.match(RE_CAPTURE);
+	let phrase,
+		parsedDerivationPath,
+		derivationPath = '';
+	const ERROR = 'Invalid SURI input.';
 
-  if (matches) {
-    [_, phrase, derivationPath = ''] = matches;
-    try {
-      parsedDerivationPath = parseDerivationPath(derivationPath)
-    } catch {
-      throw new Error(ERROR);
-    }
-  } else {
-    throw new Error(ERROR);
-  }
+	if (matches) {
+		[, phrase, derivationPath = ''] = matches;
+		try {
+			parsedDerivationPath = parseDerivationPath(derivationPath);
+		} catch {
+			throw new Error(ERROR);
+		}
+	} else {
+		throw new Error(ERROR);
+	}
 
-  if(!phrase) {
-    throw new Error('SURI must contain a phrase.')
-  }
+	if (!phrase) {
+		throw new Error('SURI must contain a phrase.');
+	}
 
-  return {
-    phrase,
-    derivePath: parsedDerivationPath.derivePath || '',
-    password: parsedDerivationPath.password || ''
-  };
+	return {
+		derivePath: parsedDerivationPath.derivePath || '',
+		password: parsedDerivationPath.password || '',
+		phrase
+	};
 }
 
 /**
@@ -51,21 +53,21 @@ export function parseSURI (suri) {
  * @returns {DerivationPathObject}
  */
 
-export function parseDerivationPath (input) {
-  const RE_CAPTURE = /^((?:\/\/?[^/]+)*)(?:\/\/\/(.*))?$/;
-  const matches = input.match(RE_CAPTURE);
-  let derivePath, password;
+export function parseDerivationPath(input) {
+	const RE_CAPTURE = /^((?:\/\/?[^/]+)*)(?:\/\/\/(.*))?$/;
+	const matches = input.match(RE_CAPTURE);
+	let derivePath, password;
 
-  if (matches) {
-    [_,derivePath = '', password = ''] = matches;
-  } else {
-    throw new Error('Invalid derivation path input.');
-  }
+	if (matches) {
+		[, derivePath = '', password = ''] = matches;
+	} else {
+		throw new Error('Invalid derivation path input.');
+	}
 
-  return {
-    derivePath,
-    password
-  };
+	return {
+		derivePath,
+		password
+	};
 }
 
 /**
@@ -74,11 +76,10 @@ export function parseDerivationPath (input) {
  * @returns {string}
  */
 
-export function constructSURI ({ derivePath = '', password = '', phrase }) {
+export function constructSURI({ derivePath = '', password = '', phrase }) {
+	if (!phrase) {
+		throw new Error('Cannot construct an SURI from emtpy phrase.');
+	}
 
-  if (!phrase) {
-    throw new Error('Cannot construct an SURI from emtpy phrase.');
-  }
-  
-  return `${phrase}${derivePath}///${password}`;
+	return `${phrase}${derivePath}///${password}`;
 }

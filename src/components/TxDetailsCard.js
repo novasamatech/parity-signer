@@ -20,105 +20,105 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 
 const WEI_IN_ETH = 1000000000000000000;
 
 export default class TxDetailsCard extends React.PureComponent<{
-  value: string,
-  description: string,
-  gas: string,
-  gasPrice: string,
-  style: Object
+	value: string,
+	description: string,
+	gas: string,
+	gasPrice: string,
+	style: Object
 }> {
-  static propTypes = {
-    value: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    gas: PropTypes.string.isRequired,
-    gasPrice: PropTypes.string.isRequired,
-    style: ViewPropTypes.style
-  };
+	static propTypes = {
+		description: PropTypes.string.isRequired,
+		gas: PropTypes.string.isRequired,
+		gasPrice: PropTypes.string.isRequired,
+		style: ViewPropTypes.style,
+		value: PropTypes.string.isRequired
+	};
 
-  render() {
-    const { value, description, gas, gasPrice, style } = this.props;
+	render() {
+		const { value, description, gas, gasPrice, style } = this.props;
 
-    return (
-      <View style={[styles.body, style]}>
-        <Text style={styles.titleText}>{description}</Text>
-        <Amount
-          style={{ marginTop: 10 }}
-          value={value}
-          gas={gas}
-          gasPrice={gasPrice}
-        />
-      </View>
-    );
-  }
+		return (
+			<View style={[styles.body, style]}>
+				<Text style={styles.titleText}>{description}</Text>
+				<Amount
+					style={{ marginTop: 10 }}
+					value={value}
+					gas={gas}
+					gasPrice={gasPrice}
+				/>
+			</View>
+		);
+	}
 }
 
 function Amount({ style, value, gas, gasPrice }) {
-  const fee = parseInt(gas) * parseInt(gasPrice) / WEI_IN_ETH;
-  return (
-    <View style={[{ justifyContent: 'center', alignItems: 'center' }, style]}>
-      <View>
-        <View
-          style={{ padding: 5, paddingVertical: 2, backgroundColor: colors.bg }}
-        >
-          <Text
-            style={{ textAlign: 'center', fontSize: 20, fontWeight: '800' }}
-          >
-            <Text style={{ color: colors.card_bg }}>{value}</Text>
-            <Text style={{ color: colors.bg_text_sec }}> ETH</Text>
-          </Text>
-        </View>
-        <View style={{ padding: 5, backgroundColor: colors.bg_text_sec }}>
-          <Text
-            style={{
-              textAlign: 'center',
-              fontSize: 12,
-              fontWeight: '800',
-              color: colors.card_bg
-            }}
-          >
-            fee: {fee} ETH
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
+	const fee = (parseInt(gas, 10) * parseInt(gasPrice, 10)) / WEI_IN_ETH;
+	return (
+		<View style={[{ alignItems: 'center', justifyContent: 'center' }, style]}>
+			<View>
+				<View
+					style={{ backgroundColor: colors.bg, padding: 5, paddingVertical: 2 }}
+				>
+					<Text
+						style={{ fontSize: 20, fontWeight: '800', textAlign: 'center' }}
+					>
+						<Text style={{ color: colors.card_bg }}>{value}</Text>
+						<Text style={{ color: colors.bg_text_sec }}> ETH</Text>
+					</Text>
+				</View>
+				<View style={{ backgroundColor: colors.bg_text_sec, padding: 5 }}>
+					<Text
+						style={{
+							color: colors.card_bg,
+							fontSize: 12,
+							fontWeight: '800',
+							textAlign: 'center'
+						}}
+					>
+						fee: {fee} ETH
+					</Text>
+				</View>
+			</View>
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-  body: {
-    padding: 20,
-    paddingTop: 10,
-    flexDirection: 'column',
-    backgroundColor: colors.card_bg
-  },
-  content: {},
-  icon: {
-    width: 47,
-    height: 47
-  },
-  footer: {
-    backgroundColor: '#977CF6',
-    flexDirection: 'row-reverse',
-    padding: 5
-  },
-  titleText: {
-    textAlign: 'center',
-    fontFamily: fonts.bold,
-    fontSize: 14,
-    color: colors.card_bg_text
-  },
-  secondaryText: {
-    textAlign: 'center',
-    color: colors.card_bg_text,
-    fontFamily: fonts.semiBold,
-    fontSize: 12
-  },
-  footerText: {
-    color: colors.card_bg,
-    fontFamily: fonts.bold
-  }
+	body: {
+		backgroundColor: colors.card_bg,
+		flexDirection: 'column',
+		padding: 20,
+		paddingTop: 10
+	},
+	content: {},
+	footer: {
+		backgroundColor: '#977CF6',
+		flexDirection: 'row-reverse',
+		padding: 5
+	},
+	footerText: {
+		color: colors.card_bg,
+		fontFamily: fonts.bold
+	},
+	icon: {
+		height: 47,
+		width: 47
+	},
+	secondaryText: {
+		color: colors.card_bg_text,
+		fontFamily: fonts.semiBold,
+		fontSize: 12,
+		textAlign: 'center'
+	},
+	titleText: {
+		color: colors.card_bg_text,
+		fontFamily: fonts.bold,
+		fontSize: 14,
+		textAlign: 'center'
+	}
 });

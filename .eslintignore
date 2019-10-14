@@ -1,0 +1,4 @@
+# /node_modules/* and /bower_components/* in the project root are ignored by default
+
+/NDK
+**/build

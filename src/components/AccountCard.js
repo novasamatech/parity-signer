@@ -27,127 +27,124 @@ import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import TouchableItem from './TouchableItem';
 
-
 export default class AccountCard extends React.PureComponent {
-  static propTypes = {
-    address: PropTypes.string.isRequired,
-    networkKey: PropTypes.string,
-    onPress: PropTypes.func,
-    seedType: PropTypes.string,
-    style: ViewPropTypes.style,
-    title: PropTypes.string
-  };
+	static propTypes = {
+		address: PropTypes.string.isRequired,
+		networkKey: PropTypes.string,
+		onPress: PropTypes.func,
+		seedType: PropTypes.string,
+		style: ViewPropTypes.style,
+		title: PropTypes.string
+	};
 
-  static defaultProps = {
-    title: 'no name',
-    onPress: () => {}
-  };
+	static defaultProps = {
+		onPress: () => {},
+		title: 'no name'
+	};
 
-  render() {
-    const { address, networkKey, onPress, seedType, style } = this.props;
-    let { title } = this.props;
-    title = title.length ? title : AccountCard.defaultProps.title;
-    const seedTypeDisplay = seedType || '';
-    const network = NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
+	render() {
+		const { address, networkKey, onPress, seedType, style } = this.props;
+		let { title } = this.props;
+		title = title.length ? title : AccountCard.defaultProps.title;
+		const seedTypeDisplay = seedType || '';
+		const network =
+			NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
 
-    return (
-      <TouchableItem
-        accessibilityComponentType="button"
-        disabled={false}
-        onPress={onPress}
-      >
-        <View style={[styles.body, style]}>
-          <View style={styles.content}>
-            <AccountIcon
-              address={address}
-              protocol={network.protocol}
-              style={styles.icon}
-            />
-            <View style={styles.desc}>
-              <Text numberOfLines={1} style={styles.titleText}>
-                {title}
-              </Text>
-              <Address
-                address={address}
-                protocol={network.protocol}
-              />
-            </View>
-          </View>
-          <View
-            style={[
-              styles.footer,
-              {
-                backgroundColor: network.color
-              }
-            ]}
-          >
-            <Text
-              style={[
-                styles.footerSeedType,
-                {
-                  color: network.secondaryColor
-                }
-              ]}
-            >
-              {seedTypeDisplay}
-            </Text>
-            <Text
-              style={[
-                styles.footerNetwork,
-                {
-                  color: network.secondaryColor
-                }
-              ]}
-            >
-              {network.title}
-            </Text>
-          </View>
-        </View>
-      </TouchableItem>
-    );
-  }
+		return (
+			<TouchableItem
+				accessibilityComponentType="button"
+				disabled={false}
+				onPress={onPress}
+			>
+				<View style={[styles.body, style]}>
+					<View style={styles.content}>
+						<AccountIcon
+							address={address}
+							protocol={network.protocol}
+							style={styles.icon}
+						/>
+						<View style={styles.desc}>
+							<Text numberOfLines={1} style={styles.titleText}>
+								{title}
+							</Text>
+							<Address address={address} protocol={network.protocol} />
+						</View>
+					</View>
+					<View
+						style={[
+							styles.footer,
+							{
+								backgroundColor: network.color
+							}
+						]}
+					>
+						<Text
+							style={[
+								styles.footerSeedType,
+								{
+									color: network.secondaryColor
+								}
+							]}
+						>
+							{seedTypeDisplay}
+						</Text>
+						<Text
+							style={[
+								styles.footerNetwork,
+								{
+									color: network.secondaryColor
+								}
+							]}
+						>
+							{network.title}
+						</Text>
+					</View>
+				</View>
+			</TouchableItem>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  body: {
-    paddingBottom: 20
-  },
-  content: {
-    flexDirection: 'row',
-    backgroundColor: colors.card_bg,
-    padding: 10
-  },
-  icon: {
-    width: 47,
-    height: 47
-  },
-  desc: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    flex: 1
-  },
-  footer: {
-    backgroundColor: '#977CF6',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 5
-  },
-  titleText: {
-    fontFamily: fonts.semiBold,
-    fontSize: 20,
-  },
-  secondaryText: {
-    fontFamily: fonts.semiBold,
-    color: colors.bg_text_sec,
-    fontSize: 14
-  },
-  footerSeedType: {
-    fontFamily: fonts.regular,
-    color: colors.card_bg
-  },
-  footerNetwork: {
-    fontFamily: fonts.semiBold,
-    color: colors.card_bg,
-  }
+	body: {
+		paddingBottom: 20
+	},
+	content: {
+		backgroundColor: colors.card_bg,
+		flexDirection: 'row',
+		padding: 10
+	},
+	desc: {
+		flex: 1,
+		flexDirection: 'column',
+		justifyContent: 'space-between',
+		paddingLeft: 10
+	},
+	footer: {
+		backgroundColor: '#977CF6',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		padding: 5
+	},
+	footerNetwork: {
+		color: colors.card_bg,
+		fontFamily: fonts.semiBold
+	},
+	footerSeedType: {
+		color: colors.card_bg,
+		fontFamily: fonts.regular
+	},
+	icon: {
+		height: 47,
+		width: 47
+	},
+	secondaryText: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.semiBold,
+		fontSize: 14
+	},
+	titleText: {
+		fontFamily: fonts.semiBold,
+		fontSize: 20
+	}
 });

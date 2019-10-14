@@ -18,44 +18,44 @@ import { rlpItem } from './native';
 import { fromWei } from './units';
 
 class Transaction {
-  constructor(nonce, gasPrice, gas, action, value, data, ethereumChainId) {
-    this.nonce = nonce || '0';
-    this.gasPrice = parseInt(gasPrice, 16).toString();
-    this.gas = parseInt(gas, 16).toString();
-    this.action = action;
-    this.value = fromWei(value);
-    this.data = data || '-';
-    this.ethereumChainId = parseInt(ethereumChainId, 16).toString();
-    this.isSafe = true;
-  }
+	constructor(nonce, gasPrice, gas, action, value, data, ethereumChainId) {
+		this.nonce = nonce || '0';
+		this.gasPrice = parseInt(gasPrice, 16).toString();
+		this.gas = parseInt(gas, 16).toString();
+		this.action = action;
+		this.value = fromWei(value);
+		this.data = data || '-';
+		this.ethereumChainId = parseInt(ethereumChainId, 16).toString();
+		this.isSafe = true;
+	}
 }
 
 async function asyncTransaction(rlp, resolve, reject) {
-  try {
-    let nonce = await rlpItem(rlp, 0);
-    let gasPrice = await rlpItem(rlp, 1);
-    let gas = await rlpItem(rlp, 2);
-    let action = await rlpItem(rlp, 3);
-    let value = await rlpItem(rlp, 4);
-    let data = await rlpItem(rlp, 5);
-    let ethereumChainId = await rlpItem(rlp, 6);
-    let tx = new Transaction(
-      nonce,
-      gasPrice,
-      gas,
-      action,
-      value,
-      data,
-      ethereumChainId
-    );
-    resolve(tx);
-  } catch (e) {
-    reject(e);
-  }
+	try {
+		let nonce = await rlpItem(rlp, 0);
+		let gasPrice = await rlpItem(rlp, 1);
+		let gas = await rlpItem(rlp, 2);
+		let action = await rlpItem(rlp, 3);
+		let value = await rlpItem(rlp, 4);
+		let data = await rlpItem(rlp, 5);
+		let ethereumChainId = await rlpItem(rlp, 6);
+		let tx = new Transaction(
+			nonce,
+			gasPrice,
+			gas,
+			action,
+			value,
+			data,
+			ethereumChainId
+		);
+		resolve(tx);
+	} catch (e) {
+		reject(e);
+	}
 }
 
 export default function transaction(rlp) {
-  return new Promise((resolve, reject) =>
-    asyncTransaction(rlp, resolve, reject)
-  );
+	return new Promise((resolve, reject) =>
+		asyncTransaction(rlp, resolve, reject)
+	);
 }

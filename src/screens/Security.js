@@ -18,58 +18,65 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 
 export default class Security extends React.PureComponent {
-  render() {
-    return (
-      <ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-        <View style={[styles.card, { backgroundColor: colors.bg_alert, marginBottom: 20 }]}>
-          <Icon
-            style={[styles.cardText, { marginRight: 10, fontSize: 30 }]}
-            name="security"
-          />
-          <Text style={styles.cardText}>NOT SECURE</Text>
-        </View>
-        <Text style={styles.text}>
-          A device is considered not secure if it has access to the internet or has any kind of connectivity enabled.
-          Parity Signer is meant to be used on a device that will be kept offline at any time. Enabling any connectivity such as 
-          wifi, cellular network, bluetooth, NFC, usb is a threat to the safety of the private keys stored on the device.
-        </Text>
-      </ScrollView>
-    );
-  }
+	render() {
+		return (
+			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
+				<View
+					style={[
+						styles.card,
+						{ backgroundColor: colors.bg_alert, marginBottom: 20 }
+					]}
+				>
+					<Icon
+						style={[styles.cardText, { fontSize: 30, marginRight: 10 }]}
+						name="security"
+					/>
+					<Text style={styles.cardText}>NOT SECURE</Text>
+				</View>
+				<Text style={styles.text}>
+					A device is considered not secure if it has access to the internet or
+					has any kind of connectivity enabled. Parity Signer is meant to be
+					used on a device that will be kept offline at any time. Enabling any
+					connectivity such as wifi, cellular network, bluetooth, NFC, usb is a
+					threat to the safety of the private keys stored on the device.
+				</Text>
+			</ScrollView>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    flexDirection: 'column',
-    overflow: 'hidden',
-    backgroundColor: colors.bg
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  card: {
-    flex: 1,
-    alignItems: 'center',
-    flexDirection: 'row',
-    backgroundColor: colors.card_bg,
-    padding: 20
-  },
-  cardText: {
-    color: colors.card_bg,
-    fontFamily: fonts.bold,
-    fontSize: 22,
-  },
-  text: {
-    marginBottom: 20,
-    fontFamily: fonts.regular,
-    fontSize: 14,
-    color: colors.card_bg
-  },
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column',
+		overflow: 'hidden'
+	},
+	card: {
+		alignItems: 'center',
+		backgroundColor: colors.card_bg,
+		flex: 1,
+		flexDirection: 'row',
+		padding: 20
+	},
+	cardText: {
+		color: colors.card_bg,
+		fontFamily: fonts.bold,
+		fontSize: 22
+	},
+	text: {
+		color: colors.card_bg,
+		fontFamily: fonts.regular,
+		fontSize: 14,
+		marginBottom: 20
+	},
+	title: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 18,
+		paddingBottom: 20
+	}
 });

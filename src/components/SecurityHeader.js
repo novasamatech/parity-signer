@@ -21,57 +21,57 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import TouchableItem from './TouchableItem';
 
 class SecurityHeader extends React.Component {
-  state = {
-    isConnected: false
-  };
+	state = {
+		isConnected: false
+	};
 
-  componentDidMount() {
-    this.unsubscribe = NetInfo.addEventListener(state => {
-      this.setState({ isConnected: state.isConnected });
-    });
-  }
+	componentDidMount() {
+		this.unsubscribe = NetInfo.addEventListener(state => {
+			this.setState({ isConnected: state.isConnected });
+		});
+	}
 
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
+	componentWillUnmount() {
+		this.unsubscribe();
+	}
 
-  render() {
-    const { isConnected } = this.state;
+	render() {
+		const { isConnected } = this.state;
 
-    if (!isConnected) {
-      return null
-    }
+		if (!isConnected) {
+			return null;
+		}
 
-    return (
-      <TouchableItem onPress={() => this.props.navigation.navigate('Security')}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Icon style={styles.headerSecureIcon} name="security" />
-          <Text style={styles.headerTextRight}>Not Secure</Text>
-        </View>
-      </TouchableItem>
-    );
-  }
+		return (
+			<TouchableItem onPress={() => this.props.navigation.navigate('Security')}>
+				<View style={{ alignItems: 'center', flexDirection: 'row' }}>
+					<Icon style={styles.headerSecureIcon} name="security" />
+					<Text style={styles.headerTextRight}>Not Secure</Text>
+				</View>
+			</TouchableItem>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  headerSecureIcon: {
-    marginLeft: 0,
-    fontSize: 20,
-    fontFamily: fonts.bold,
-    paddingRight: 5,
-    color: colors.bg_alert
-  },
-  headerTextRight: {
-    marginLeft: 0,
-    fontSize: 17,
-    fontFamily: fonts.bold,
-    color: colors.bg_alert,
-    paddingRight: 14,
-  }
+	headerSecureIcon: {
+		color: colors.bg_alert,
+		fontFamily: fonts.bold,
+		fontSize: 20,
+		marginLeft: 0,
+		paddingRight: 5
+	},
+	headerTextRight: {
+		color: colors.bg_alert,
+		fontFamily: fonts.bold,
+		fontSize: 17,
+		marginLeft: 0,
+		paddingRight: 14
+	}
 });
 
 export default withNavigation(SecurityHeader);

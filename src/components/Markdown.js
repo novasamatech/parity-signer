@@ -20,33 +20,33 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { default as MarkdownRender } from 'react-native-markdown-renderer';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 
 export default class Markdown extends React.PureComponent {
-  render() {
-    return (
-      <MarkdownRender
-        style={StyleSheet.create({
-          text: {
-            marginTop: 10,
-            fontFamily: fonts.regular,
-            fontSize: 14,
-            color: colors.card_bg
-          },
-          listUnorderedItemIcon: {
-            color: colors.card_bg,
-            fontFamily: fonts.bold,
-            marginRight: 3,
-            marginTop: 19
-          },
-          listOrderedItemIcon: {
-            color: colors.card_bg,
-            marginTop: 19,
-            marginRight: 3
-          }
-        })}
-        {...this.props}
-      />
-    );
-  }
+	render() {
+		return (
+			<MarkdownRender
+				style={StyleSheet.create({
+					listOrderedItemIcon: {
+						color: colors.card_bg,
+						marginRight: 3,
+						marginTop: 19
+					},
+					listUnorderedItemIcon: {
+						color: colors.card_bg,
+						fontFamily: fonts.bold,
+						marginRight: 3,
+						marginTop: 19
+					},
+					text: {
+						color: colors.card_bg,
+						fontFamily: fonts.regular,
+						fontSize: 14,
+						marginTop: 10
+					}
+				})}
+				{...this.props}
+			/>
+		);
+	}
 }

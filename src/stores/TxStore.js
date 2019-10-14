@@ -19,29 +19,29 @@ import { Container } from 'unstated';
 import { loadAccountTxs, saveTx } from '../util/db';
 
 type State = {
-  signedTxs: Map<string, Object>
+	signedTxs: Map<string, Object>
 };
 
 export default class TxStore extends Container<State> {
-  state = {
-    signedTxs: new Map()
-  };
+	state = {
+		signedTxs: new Map()
+	};
 
-  async saveTx(tx) {
-    await saveTx(tx);
-    this.setState({ signedTxs: this.state.signedTxs.set(tx.hash, tx) });
-  }
+	async saveTx(tx) {
+		await saveTx(tx);
+		this.setState({ signedTxs: this.state.signedTxs.set(tx.hash, tx) });
+	}
 
-  async loadTxsForAccount(account) {
-    const txs = await loadAccountTxs(account);
-    this.setState({
-      signedTxs: new Map([...this.state.signedTxs, ...txs])
-    });
-  }
+	async loadTxsForAccount(account) {
+		const txs = await loadAccountTxs(account);
+		this.setState({
+			signedTxs: new Map([...this.state.signedTxs, ...txs])
+		});
+	}
 
-  getTxList({ address }) {
-    return Array.from(this.state.signedTxs.values()).filter(
-      tx => tx.sender === address || tx.recipient === address
-    );
-  }
+	getTxList({ address }) {
+		return Array.from(this.state.signedTxs.values()).filter(
+			tx => tx.sender === address || tx.recipient === address
+		);
+	}
 }
