@@ -225,14 +225,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		if (period && phase) {
 			return (
 				<View style={{ display: 'flex', flexDirection: 'column', padding: 5 }}>
-					<View
-						style={{
-							alignItems: 'flex-end',
-							display: 'flex',
-							flexDirection: 'row',
-							justifyContent: 'space-around'
-						}}
-					>
+					<View style={styles.era}>
 						<Text style={{ ...styles.subLabel, flex: 1 }}>phase: </Text>
 						<Text style={{ ...styles.secondaryText, flex: 1 }}>{phase}</Text>
 						<Text style={{ ...styles.subLabel, flex: 1 }}>period: </Text>
@@ -270,17 +263,21 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 					return (
 						<View key={index} style={styles.callDetails}>
 							<Text>
-								Call <Text style={styles.secondaryText}>{sectionMethod}</Text>{' '}
-								with the following arguments:
+								Call <Text style={styles.titleText}>{sectionMethod}</Text> with
+								the following arguments:
 							</Text>
-							{paramArgs.map(([param, arg]) => (
-								<React.Fragment key={param}>
-									<Text style={{ ...styles.subLabel, flex: 1 }}>{param}: </Text>
-									<Text style={{ ...styles.secondaryText, flex: 3 }}>
-										{arg}
-									</Text>
-								</React.Fragment>
-							))}
+							{paramArgs ? (
+								paramArgs.map(([param, arg]) => (
+									<View key={param} style={styles.callDetails}>
+										<Text style={styles.subLabel}>{param}: </Text>
+										<Text style={styles.secondaryText}>{arg}</Text>
+									</View>
+								))
+							) : (
+								<Text style={styles.secondaryText}>
+									This method takes 0 arguments.
+								</Text>
+							)}
 						</View>
 					);
 				});
@@ -327,10 +324,17 @@ const styles = StyleSheet.create({
 	callDetails: {
 		alignItems: 'flex-start',
 		display: 'flex',
+		flex: 3,
 		flexDirection: 'column',
 		justifyContent: 'flex-start',
 		paddingLeft: 5,
 		width: '100%'
+	},
+	era: {
+		alignItems: 'flex-end',
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-around'
 	},
 	icon: {
 		height: 47,
@@ -338,13 +342,13 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		backgroundColor: colors.bg,
-		color: colors.card_bg_text_sec,
+		color: colors.card_bg,
 		fontFamily: fonts.bold,
 		fontSize: 20,
 		textAlign: 'left'
 	},
 	secondaryText: {
-		color: colors.card_bg_text_sec,
+		color: colors.card_text,
 		fontFamily: fonts.semiBold,
 		fontSize: 14,
 		paddingLeft: 8,
@@ -352,14 +356,14 @@ const styles = StyleSheet.create({
 	},
 	subLabel: {
 		backgroundColor: null,
-		color: colors.card_bg_text_sec,
+		color: colors.card_text,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		paddingLeft: 5,
 		textAlign: 'left'
 	},
 	titleText: {
-		color: colors.card_bg_text_sec,
+		color: colors.card_text,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		textAlign: 'center'
