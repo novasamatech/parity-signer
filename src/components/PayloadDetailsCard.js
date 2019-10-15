@@ -156,7 +156,6 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 				function formatArgs(callInstance, methodArgs, depth) {
 					const { args, meta, methodName, sectionName } = callInstance;
 					let paramArgKvArray = [];
-
 					if (!meta.args.length) {
 						const sectionMethod = `${sectionName}.${methodName}`;
 						methodArgs[sectionMethod] = null;
@@ -165,7 +164,6 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 					for (let i = 0; i < meta.args.length; i++) {
 						let argument;
-
 						if (
 							args[i].toRawType() === 'Balance' ||
 							args[i].toRawType() === 'Compact<Balance>'
@@ -254,33 +252,43 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 	const renderMethodDetails = () => {
 		if (formattedCallArgs) {
-			return Object.entries(formattedCallArgs)
-				.reverse()
-				.map((entry, index) => {
-					const sectionMethod = entry[0];
-					const paramArgs = entry[1];
+			const formattedArgs = Object.entries(formattedCallArgs);
 
-					return (
-						<View key={index} style={styles.callDetails}>
-							<Text>
-								Call <Text style={styles.titleText}>{sectionMethod}</Text> with
-								the following arguments:
+			// HACK: if there's a sudo method just put it to the front. Better way would be to order by depth but currently this is only relevant for a single extrinsic, so seems like overkill.
+			for (let i = 1; i < formattedArgs.length; i++) {
+				if (formattedArgs[i][0].includes('sudo')) {
+					let tmp = formattedArgs[i];
+					formattedArgs.splice(i, 1);
+					formattedArgs.unshift(tmp);
+					break;
+				}
+			}
+
+			return formattedArgs.map((entry, index) => {
+				const sectionMethod = entry[0];
+				const paramArgs = entry[1];
+
+				return (
+					<View key={index} style={styles.callDetails}>
+						<Text>
+							Call <Text style={styles.titleText}>{sectionMethod}</Text> with
+							the following arguments:
+						</Text>
+						{paramArgs ? (
+							paramArgs.map(([param, arg]) => (
+								<View key={param} style={styles.callDetails}>
+									<Text style={styles.subLabel}>{param}: </Text>
+									<Text style={styles.secondaryText}>{arg}</Text>
+								</View>
+							))
+						) : (
+							<Text style={styles.secondaryText}>
+								This method takes 0 arguments.
 							</Text>
-							{paramArgs ? (
-								paramArgs.map(([param, arg]) => (
-									<View key={param} style={styles.callDetails}>
-										<Text style={styles.subLabel}>{param}: </Text>
-										<Text style={styles.secondaryText}>{arg}</Text>
-									</View>
-								))
-							) : (
-								<Text style={styles.secondaryText}>
-									This method takes 0 arguments.
-								</Text>
-							)}
-						</View>
-					);
-				});
+						)}
+					</View>
+				);
+			});
 		}
 	};
 
