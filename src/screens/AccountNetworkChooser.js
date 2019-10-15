@@ -22,7 +22,11 @@ import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
 import TouchableItem from '../components/TouchableItem';
-import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
+import {
+	NETWORK_LIST,
+	UnknownNetworkKeys,
+	SubstrateNetworkKeys
+} from '../constants';
 import AccountsStore from '../stores/AccountsStore';
 import { empty } from '../util/account';
 
@@ -51,7 +55,12 @@ class AccountNetworkChooserView extends React.PureComponent {
 			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
 				<Text style={styles.title}>CHOOSE NETWORK</Text>
 				{Object.entries(NETWORK_LIST)
-					.filter(([networkKey]) => networkKey !== UnknownNetworkKeys.UNKNOWN)
+					.filter(
+						([networkKey]) =>
+							(__DEV__ && networkKey !== UnknownNetworkKeys.UNKNOWN) ||
+							(networkKey !== SubstrateNetworkKeys.SUBSTRATE_DEV &&
+								networkKey !== UnknownNetworkKeys.UNKNOWN)
+					)
 					.map(([networkKey, networkParams]) => (
 						<TouchableItem
 							key={networkKey}
