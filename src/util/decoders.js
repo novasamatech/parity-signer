@@ -117,7 +117,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 	const zerothByte = uosAfterFrames.substr(0, 2);
 	const firstByte = uosAfterFrames.substr(2, 2);
 	const secondByte = uosAfterFrames.substr(4, 2);
-	debugger;
+
 	let action;
 	let data = {};
 	data.data = {}; // for consistency with legacy data format.
@@ -264,7 +264,6 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 
 		return data;
 	} catch (e) {
-		debugger;
 		throw new Error('we cannot handle the payload: ', bytes);
 	}
 }
