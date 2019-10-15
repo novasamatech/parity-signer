@@ -16,7 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
+import { hexStripPrefix, isU8a, u8aToHex, u8aConcat } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
@@ -36,7 +36,11 @@ import {
 	substrateSign
 } from '../util/native';
 import transaction from '../util/transaction';
-import { constructDataFromBytes, asciiToHex } from '../util/decoders';
+import {
+	constructDataFromBytes,
+	asciiToHex,
+	encodeNumber
+} from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -87,6 +91,8 @@ const defaultState = {
 	unsignedData: null
 };
 
+const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicity's sake. Consistent with @polkadot/react-qr
+
 export default class ScannerStore extends Container<ScannerState> {
 	state = defaultState;
 
@@ -96,21 +102,22 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
-	async setParsedData(strippedData, accountsStore) {
-		const { multipartComplete } = this.state;
-
+	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
 		);
 
-		if (parsedData.isMultipart && !multipartComplete) {
+		console.log('parsed data -> ', parsedData);
+
+		if (!multipartComplete && parsedData.isMultipart) {
 			this.setPartData(
 				parsedData.currentFrame,
 				parsedData.frameCount,
 				parsedData.partData,
 				accountsStore
 			);
+			console.log('current frame => ', parsedData.currentFrame);
 			return;
 		}
 
@@ -165,30 +172,43 @@ export default class ScannerStore extends Container<ScannerState> {
 		const completedFramesCount = Object.keys(multipartData).length;
 
 		this.setState({
-			completedFramesCount,
-			frameCount
+			completedFramesCount
 		});
 
-		// we havne't filled all the frames yet
-		if (completedFramesCount < frameCount) {
-			const nextDataState = multipartData;
-			nextDataState[frame] = partDataAsBytes;
-			this.setState({
-				multipartData: nextDataState
-			});
-		} else if (completedFramesCount === frameCount && !multipartComplete) {
+		if (
+			completedFramesCount > 0 &&
+			totalFrameCount > 0 &&
+			completedFramesCount === totalFrameCount &&
+			!multipartComplete
+		) {
 			// all the frames are filled
+
 			this.setState({
 				multipartComplete: true
 			});
 
 			// concatenate all the parts into one binary blob
-			const concatMultipartData = Object.values(multipartData).reduce(
+			let concatMultipartData = Object.values(multipartData).reduce(
 				(acc, part) => [...acc, ...part]
 			);
 
+			// unshift the frame info
+			const frameInfo = u8aConcat(
+				MULTIPART,
+				encodeNumber(totalFrameCount),
+				encodeNumber(frame)
+			);
+			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
+
 			// handle the binary blob as a single UOS payload
-			this.setParsedData(concatMultipartData, accountsStore);
+			this.setParsedData(concatMultipartData, accountsStore, true);
+		} else if (completedFramesCount < totalFrameCount) {
+			// we havne't filled all the frames yet
+			const nextDataState = multipartData;
+			nextDataState[frame] = partDataAsBytes;
+			this.setState({
+				multipartData: nextDataState
+			});
 		}
 	}
 
@@ -346,12 +366,14 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	clearMultipartProgress() {
+		console.log('clearing progress...');
 		this.setState({
 			completedFramesCount: 0,
 			multipartComplete: false,
 			multipartData: {},
 			totalFrameCount: 0
 		});
+		console.log(this.state);
 	}
 
 	/**
@@ -381,6 +403,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	isBusy() {
 		return this.state.busy;
+	}
+
+	isMultipartComplete() {
+		return this.state.multipartComplete;
 	}
 
 	/**

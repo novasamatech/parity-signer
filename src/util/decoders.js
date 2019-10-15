@@ -117,7 +117,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 	const zerothByte = uosAfterFrames.substr(0, 2);
 	const firstByte = uosAfterFrames.substr(2, 2);
 	const secondByte = uosAfterFrames.substr(4, 2);
-
+	debugger;
 	let action;
 	let data = {};
 	data.data = {}; // for consistency with legacy data format.
@@ -230,6 +230,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							break;
 						case '03': // Cold Signer should attempt to decode message to utf8
 							data.action = 'signData';
+
 							if (isOversized) {
 								data.data.data = await blake2s(u8aToHex(rawPayload));
 								data.isHash = isOversized;
@@ -237,33 +238,34 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							} else {
 								data.data.data = u8aToString(rawPayload);
 							}
+
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,
 								defaultPrefix
 							); // default to Kusama
 							break;
 						default:
+							console.log(
+								'secondByte byte needs to be correct.... ',
+								secondByte
+							);
 							break;
 					}
 				} catch (e) {
-					if (e) {
-						throw new Error(e);
-					} else {
-						throw new Error('Error: we cannot handle this payload: ', bytes);
-					}
+					throw new Error(
+						'Error: something went wrong decoding the Substrate UOS payload: ',
+						uosAfterFrames
+					);
 				}
 				break;
 			default:
-				throw new Error('we cannot handle this payload: ', bytes);
+				throw new Error('Error: Payload is not formatted correctly: ', bytes);
 		}
 
 		return data;
 	} catch (e) {
-		if (e) {
-			throw new Error(e);
-		} else {
-			throw new Error('we cannot handle the payload: ', bytes);
-		}
+		debugger;
+		throw new Error('we cannot handle the payload: ', bytes);
 	}
 }
 
@@ -314,4 +316,8 @@ export function isAddressString(str) {
 		str.substr(0, 9) === 'ethereum:' ||
 		str.substr(0, 10) === 'substrate:'
 	);
+}
+
+export function encodeNumber(value) {
+	return new Uint8Array([value >> 8, value & 0xff]);
 }

@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+// @flow
+
 'use strict';
 
 import PropTypes from 'prop-types';
@@ -56,12 +58,11 @@ export default class Scanner extends React.PureComponent {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
 				{(scannerStore, accountsStore) => {
-					let framesCount = scannerStore.getTotalFramesCount();
 					return (
 						<QrScannerView
 							completedFramesCount={scannerStore.getCompletedFramesCount()}
-							totalFramesCount={framesCount}
-							isMultipart={framesCount > 1}
+							totalFramesCount={scannerStore.getTotalFramesCount()}
+							isMultipart={scannerStore.getTotalFramesCount() > 1}
 							navigation={this.props.navigation}
 							scannerStore={scannerStore}
 							onBarCodeRead={async txRequestData => {
@@ -90,14 +91,17 @@ export default class Scanner extends React.PureComponent {
 									if (scannerStore.getUnsigned()) {
 										await scannerStore.setData(accountsStore);
 										if (scannerStore.getType() === 'transaction') {
+											scannerStore.clearMultipartProgress();
 											this.props.navigation.navigate('TxDetails');
 										} else {
+											scannerStore.clearMultipartProgress();
 											this.props.navigation.navigate('MessageDetails');
 										}
 									} else {
 										return;
 									}
 								} catch (e) {
+									scannerStore.clearMultipartProgress();
 									return this.showErrorMessage(
 										scannerStore,
 										text.PARSE_ERROR_TITLE,
@@ -165,7 +169,7 @@ export class QrScannerView extends React.Component {
 						<View style={styles.middleRight} />
 					</View>
 					{this.props.isMultipart ? (
-						<View style={styles.progress}>
+						<View style={styles.bottom}>
 							<Text style={styles.descTitle}>
 								Scanning Multipart Data, Please Hold Still...
 							</Text>
