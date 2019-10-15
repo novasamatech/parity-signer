@@ -324,7 +324,6 @@ const styles = StyleSheet.create({
 	callDetails: {
 		alignItems: 'flex-start',
 		display: 'flex',
-		flex: 3,
 		flexDirection: 'column',
 		justifyContent: 'flex-start',
 		paddingLeft: 5,
