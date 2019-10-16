@@ -245,10 +245,6 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							); // default to Kusama
 							break;
 						default:
-							console.log(
-								'secondByte byte needs to be correct.... ',
-								secondByte
-							);
 							break;
 					}
 				} catch (e) {

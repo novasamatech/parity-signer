@@ -80,32 +80,29 @@ export default class Scanner extends React.PureComponent {
 									} else if (isJsonString(txRequestData.data)) {
 										// Ethereum Legacy
 										await scannerStore.setUnsigned(txRequestData.data);
-									} else {
+									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
-										try {
-											await scannerStore.setParsedData(
-												strippedData,
-												accountsStore
-											);
-										} catch (e) {
-											throw new Error(e.message);
-										}
-									}
 
-									if (scannerStore.getUnsigned()) {
+										await scannerStore.setParsedData(
+											strippedData,
+											accountsStore
+										);
+									} else if (scannerStore.getErrorMsg()) {
+										throw new Error(scannerStore.getErrorMsg());
+									} else if (scannerStore.getUnsigned()) {
+										console.log('got unsigned');
 										await scannerStore.setData(accountsStore);
+										console.log('set the data');
 										if (scannerStore.getType() === 'transaction') {
+											console.log('type is txn');
 											scannerStore.clearMultipartProgress();
 											this.props.navigation.navigate('TxDetails');
 										} else {
 											scannerStore.clearMultipartProgress();
 											this.props.navigation.navigate('MessageDetails');
 										}
-									} else {
-										return;
 									}
 								} catch (e) {
-									scannerStore.clearMultipartProgress();
 									return this.showErrorMessage(
 										scannerStore,
 										text.PARSE_ERROR_TITLE,
@@ -150,7 +147,6 @@ export class QrScannerView extends React.Component {
 	componentWillUnmount() {
 		this.setBusySubscription.remove();
 		this.setReadySubscription.remove();
-		this.props.scannerStore.clearMultipartProgress();
 	}
 
 	render() {

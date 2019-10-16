@@ -118,11 +118,16 @@ export default class ScannerStore extends Container<ScannerState> {
 			return;
 		}
 
-		// If the address is not found on device in its current encoding,
-		// try decoding the public key and encoding it to all the other known network prefixes.
-		if (!accountsStore.getByAddress(parsedData.data.account)) {
+		if (accountsStore.getByAddress(parsedData.data.account)) {
+			this.setState({
+				unsignedData: parsedData
+			});
+			return;
+		} else {
+			// If the address is not found on device in its current encoding,
+			// try decoding the public key and encoding it to all the other known network prefixes.
 			let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
-			debugger;
+
 			for (let i = 0; i < networks.length; i++) {
 				let key = networks[i];
 				let account = accountsStore.getByAddress(
@@ -132,27 +137,19 @@ export default class ScannerStore extends Container<ScannerState> {
 					)
 				);
 
-				debugger;
-
 				if (account) {
 					parsedData.data.account = account.address;
 					this.setState({
 						unsignedData: parsedData
 					});
-					break;
+					return;
 				}
 			}
 
 			// if the account was not found, unsignedData was never set, alert the user appropriately.
-			if (!this.state.unsignedData) {
-				throw new Error(
-					`No private key found for ${parsedData.data.account} found in your signer key storage.`
-				);
-			}
-		} else {
-			this.setState({
-				unsignedData: parsedData
-			});
+			this.setErrorMsg(
+				`No private key found for ${parsedData.data.account} in your signer key storage.`
+			);
 		}
 	}
 
@@ -214,7 +211,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			// handle the binary blob as a single UOS payload
 			this.setParsedData(concatMultipartData, accountsStore, true);
 		} else if (completedFramesCount < totalFrameCount) {
-			// we havne't filled all the frames yet
+			// we haven't filled all the frames yet
 			const nextDataState = multipartData;
 			nextDataState[frame] = partDataAsBytes;
 			this.setState({
@@ -237,6 +234,8 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setDataToSign(signRequest, accountsStore) {
+		this.setBusy();
+
 		const address = signRequest.data.account;
 		const crypto = signRequest.data.crypto;
 		const message = signRequest.data.data;
@@ -377,7 +376,6 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	clearMultipartProgress() {
-		console.log('clearing multipart ....');
 		this.setState({
 			completedFramesCount: 0,
 			multipartComplete: false,
