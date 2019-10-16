@@ -101,7 +101,9 @@ export default class Scanner extends React.PureComponent {
 										return;
 									}
 								} catch (e) {
+									debugger;
 									scannerStore.clearMultipartProgress();
+									debugger;
 									return this.showErrorMessage(
 										scannerStore,
 										text.PARSE_ERROR_TITLE,

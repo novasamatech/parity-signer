@@ -202,7 +202,7 @@ export default class AccountsStore extends Container<AccountsState> {
 			}
 		}
 
-		throw new Error(`no account found for the address: ${address}`);
+		return false;
 	}
 
 	getSelected() {

@@ -108,8 +108,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			multipartComplete
 		);
 
-		console.log('parsed data -> ', parsedData);
-
 		if (!multipartComplete && parsedData.isMultipart) {
 			this.setPartData(
 				parsedData.currentFrame,
@@ -117,10 +115,11 @@ export default class ScannerStore extends Container<ScannerState> {
 				parsedData.partData,
 				accountsStore
 			);
-			console.log('current frame => ', parsedData.currentFrame);
 			return;
 		}
 
+		// If the address is not found on device in its current encoding,
+		// try decoding the public key and encoding it to all the other known network prefixes.
 		if (!accountsStore.getByAddress(parsedData.data.account)) {
 			let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
 
@@ -135,14 +134,20 @@ export default class ScannerStore extends Container<ScannerState> {
 
 				if (account) {
 					parsedData.data.account = account.address;
+					this.setState({
+						unsignedData: parsedData
+					});
 					break;
 				}
 			}
-		}
 
-		this.setState({
-			unsignedData: parsedData
-		});
+			// if the account was not found, unsignedData was never set, alert the user appropriately.
+			if (!this.state.unsignedData) {
+				throw new Error(
+					`No private key found for ${parsedData.data.account} found in your signer key storage.`
+				);
+			}
+		}
 	}
 
 	async setPartData(frame, frameCount, partData, accountsStore) {
@@ -366,14 +371,13 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	clearMultipartProgress() {
-		console.log('clearing progress...');
 		this.setState({
 			completedFramesCount: 0,
 			multipartComplete: false,
 			multipartData: {},
-			totalFrameCount: 0
+			totalFrameCount: 0,
+			unsignedData: null
 		});
-		console.log(this.state);
 	}
 
 	/**
