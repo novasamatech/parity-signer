@@ -196,6 +196,10 @@ export default class AccountsStore extends Container<AccountsState> {
 	}
 
 	getByAddress(address) {
+		if (!address) {
+			return false;
+		}
+
 		for (let v of this.state.accounts.values()) {
 			if (v.address.toLowerCase() === address.toLowerCase()) {
 				return v;

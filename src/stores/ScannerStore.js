@@ -122,7 +122,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		// try decoding the public key and encoding it to all the other known network prefixes.
 		if (!accountsStore.getByAddress(parsedData.data.account)) {
 			let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
-
+			debugger;
 			for (let i = 0; i < networks.length; i++) {
 				let key = networks[i];
 				let account = accountsStore.getByAddress(
@@ -131,6 +131,8 @@ export default class ScannerStore extends Container<ScannerState> {
 						SUBSTRATE_NETWORK_LIST[key].prefix
 					)
 				);
+
+				debugger;
 
 				if (account) {
 					parsedData.data.account = account.address;
@@ -147,6 +149,10 @@ export default class ScannerStore extends Container<ScannerState> {
 					`No private key found for ${parsedData.data.account} found in your signer key storage.`
 				);
 			}
+		} else {
+			this.setState({
+				unsignedData: parsedData
+			});
 		}
 	}
 
@@ -371,6 +377,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	clearMultipartProgress() {
+		console.log('clearing multipart ....');
 		this.setState({
 			completedFramesCount: 0,
 			multipartComplete: false,

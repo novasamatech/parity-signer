@@ -20,7 +20,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
 
@@ -82,10 +82,14 @@ export default class Scanner extends React.PureComponent {
 										await scannerStore.setUnsigned(txRequestData.data);
 									} else {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
-										await scannerStore.setParsedData(
-											strippedData,
-											accountsStore
-										);
+										try {
+											await scannerStore.setParsedData(
+												strippedData,
+												accountsStore
+											);
+										} catch (e) {
+											throw new Error(e.message);
+										}
 									}
 
 									if (scannerStore.getUnsigned()) {
@@ -101,9 +105,7 @@ export default class Scanner extends React.PureComponent {
 										return;
 									}
 								} catch (e) {
-									debugger;
 									scannerStore.clearMultipartProgress();
-									debugger;
 									return this.showErrorMessage(
 										scannerStore,
 										text.PARSE_ERROR_TITLE,
@@ -179,6 +181,11 @@ export class QrScannerView extends React.Component {
 								{this.props.completedFramesCount} /{' '}
 								{this.props.totalFramesCount} Completed.
 							</Text>
+							<Button
+								onPress={() => this.props.scannerStore.clearMultipartProgress()}
+								style={styles.descSecondary}
+								title="Start Over"
+							/>
 						</View>
 					) : (
 						<View style={styles.bottom}>
