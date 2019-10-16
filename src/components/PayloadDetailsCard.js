@@ -140,10 +140,9 @@ export default class PayloadDetailsCard extends React.PureComponent {
 }
 
 function ExtrinsicPart({ label, fallback, prefix, value }) {
-	const [argNameValue, setArgNameValue] = useState();
 	const [period, setPeriod] = useState();
 	const [phase, setPhase] = useState();
-	const [sectionMethod, setSectionMethod] = useState();
+	const [formattedCallArgs, setFormattedCallArgs] = useState();
 	const [tip, setTip] = useState();
 	const [useFallback, setUseFallBack] = useState(false);
 
@@ -151,30 +150,48 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		if (label === 'Method' && !fallback) {
 			try {
 				const call = new Call(value);
-				const { args, meta, methodName, sectionName } = call;
 
-				let result = {};
-				for (let i = 0; i < meta.args.length; i++) {
-					let balanceValue;
-					if (
-						args[i].toRawType() === 'Balance' ||
-						args[i].toRawType() === 'Compact<Balance>'
-					) {
-						balanceValue = formatBalance(args[i].toString());
-					} else if (args[i].toRawType() === 'Address') {
-						// encode AccountId to the appropriate prefix
-						balanceValue = encodeAddress(
-							decodeAddress(args[i].toString()),
-							prefix
-						);
-					} else {
-						balanceValue = args[i].toString();
+				let methodArgs = {};
+
+				function formatArgs(callInstance, methodArgs, depth) {
+					const { args, meta, methodName, sectionName } = callInstance;
+					let paramArgKvArray = [];
+					if (!meta.args.length) {
+						const sectionMethod = `${sectionName}.${methodName}`;
+						methodArgs[sectionMethod] = null;
+						return;
 					}
-					result[meta.args[i].name.toString()] = balanceValue;
+
+					for (let i = 0; i < meta.args.length; i++) {
+						let argument;
+						if (
+							args[i].toRawType() === 'Balance' ||
+							args[i].toRawType() === 'Compact<Balance>'
+						) {
+							argument = formatBalance(args[i].toString());
+						} else if (
+							args[i].toRawType() === 'Address' ||
+							args[i].toRawType() === 'AccountId'
+						) {
+							// encode Address and AccountId to the appropriate prefix
+							argument = encodeAddress(
+								decodeAddress(args[i].toString()),
+								prefix
+							);
+						} else if (args[i] instanceof Call) {
+							argument = formatArgs(args[i], methodArgs, depth++); // go deeper into the nested calls
+						} else {
+							argument = args[i].toString();
+						}
+						const param = meta.args[i].name.toString();
+						const sectionMethod = `${sectionName}.${methodName}`;
+						paramArgKvArray.push([param, argument]);
+						methodArgs[sectionMethod] = paramArgKvArray;
+					}
 				}
 
-				setArgNameValue(result);
-				setSectionMethod(`${sectionName}.${methodName}`);
+				formatArgs(call, methodArgs, 0);
+				setFormattedCallArgs(methodArgs);
 			} catch (e) {
 				Alert.alert(
 					'Could not decode method with available metadata.',
@@ -206,14 +223,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		if (period && phase) {
 			return (
 				<View style={{ display: 'flex', flexDirection: 'column', padding: 5 }}>
-					<View
-						style={{
-							alignItems: 'flex-end',
-							display: 'flex',
-							flexDirection: 'row',
-							justifyContent: 'space-around'
-						}}
-					>
+					<View style={styles.era}>
 						<Text style={{ ...styles.subLabel, flex: 1 }}>phase: </Text>
 						<Text style={{ ...styles.secondaryText, flex: 1 }}>{phase}</Text>
 						<Text style={{ ...styles.subLabel, flex: 1 }}>period: </Text>
@@ -241,37 +251,45 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 	};
 
 	const renderMethodDetails = () => {
-		return (
-			argNameValue &&
-			sectionMethod && (
-				<View style={{ display: 'flex', flexDirection: 'column' }}>
-					<Text style={styles.secondaryText}>
-						You are calling{' '}
-						<Text style={styles.secondaryText}>{sectionMethod}</Text> with the
-						following arguments:
-					</Text>
-					{Object.entries(argNameValue).map(([key, argValue]) => {
-						return (
-							<View
-								key={key}
-								style={{
-									alignItems: 'flex-start',
-									display: 'flex',
-									flexDirection: 'row',
-									flexWrap: 'wrap',
-									padding: 5
-								}}
-							>
-								<Text style={{ ...styles.subLabel, flex: 1 }}>{key}: </Text>
-								<Text style={{ ...styles.secondaryText, flex: 3 }}>
-									{argValue}
-								</Text>
-							</View>
-						);
-					})}
-				</View>
-			)
-		);
+		if (formattedCallArgs) {
+			const formattedArgs = Object.entries(formattedCallArgs);
+
+			// HACK: if there's a sudo method just put it to the front. Better way would be to order by depth but currently this is only relevant for a single extrinsic, so seems like overkill.
+			for (let i = 1; i < formattedArgs.length; i++) {
+				if (formattedArgs[i][0].includes('sudo')) {
+					let tmp = formattedArgs[i];
+					formattedArgs.splice(i, 1);
+					formattedArgs.unshift(tmp);
+					break;
+				}
+			}
+
+			return formattedArgs.map((entry, index) => {
+				const sectionMethod = entry[0];
+				const paramArgs = entry[1];
+
+				return (
+					<View key={index} style={styles.callDetails}>
+						<Text>
+							Call <Text style={styles.titleText}>{sectionMethod}</Text> with
+							the following arguments:
+						</Text>
+						{paramArgs ? (
+							paramArgs.map(([param, arg]) => (
+								<View key={param} style={styles.callDetails}>
+									<Text style={styles.subLabel}>{param}: </Text>
+									<Text style={styles.secondaryText}>{arg}</Text>
+								</View>
+							))
+						) : (
+							<Text style={styles.secondaryText}>
+								This method takes 0 arguments.
+							</Text>
+						)}
+					</View>
+				);
+			});
+		}
 	};
 
 	const renderTipDetails = () => {
@@ -311,6 +329,20 @@ const styles = StyleSheet.create({
 		padding: 20,
 		paddingTop: 10
 	},
+	callDetails: {
+		alignItems: 'flex-start',
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'flex-start',
+		paddingLeft: 5,
+		width: '100%'
+	},
+	era: {
+		alignItems: 'flex-end',
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-around'
+	},
 	icon: {
 		height: 47,
 		width: 47
@@ -323,20 +355,22 @@ const styles = StyleSheet.create({
 		textAlign: 'left'
 	},
 	secondaryText: {
-		color: colors.card_bg_text,
+		color: colors.card_text,
 		fontFamily: fonts.semiBold,
 		fontSize: 14,
+		paddingLeft: 8,
 		textAlign: 'left'
 	},
 	subLabel: {
 		backgroundColor: null,
-		color: colors.card_bg_text,
+		color: colors.card_text,
 		fontFamily: fonts.bold,
 		fontSize: 14,
-		textAlign: 'right'
+		paddingLeft: 5,
+		textAlign: 'left'
 	},
 	titleText: {
-		color: colors.card_bg_text,
+		color: colors.card_text,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		textAlign: 'center'
