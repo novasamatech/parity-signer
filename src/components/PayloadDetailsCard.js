@@ -51,6 +51,9 @@ export default class PayloadDetailsCard extends React.PureComponent {
 		const isKusama =
 			this.props.prefix ===
 			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+		const isSubstrateDev =
+			this.props.prefix ===
+			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
 
 		let metadata;
 		if (isKusama) {
@@ -60,7 +63,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 				decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
 				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
 			});
-		} else if (__DEV__) {
+		} else if (__DEV__ && isSubstrateDev) {
 			metadata = new Metadata(substrateDevMetadata);
 			formatBalance.setDefaults({
 				decimals:
