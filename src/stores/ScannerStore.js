@@ -122,7 +122,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			this.setState({
 				unsignedData: parsedData
 			});
-			return;
 		} else {
 			// If the address is not found on device in its current encoding,
 			// try decoding the public key and encoding it to all the other known network prefixes.

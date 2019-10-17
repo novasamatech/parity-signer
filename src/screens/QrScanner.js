@@ -89,7 +89,9 @@ export default class Scanner extends React.PureComponent {
 										);
 									} else if (scannerStore.getErrorMsg()) {
 										throw new Error(scannerStore.getErrorMsg());
-									} else if (scannerStore.getUnsigned()) {
+									}
+
+									if (scannerStore.getUnsigned()) {
 										await scannerStore.setData(accountsStore);
 										if (scannerStore.getType() === 'transaction') {
 											scannerStore.clearMultipartProgress();
