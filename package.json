@@ -67,6 +67,7 @@
     "babel-eslint": "10.0.3",
     "babel-jest": "^24.9.0",
     "babel-plugin-rewrite-require": "^1.14.5",
+    "detox": "^14.5.0",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-plugin-prettier": "^3.1.0",
@@ -80,5 +81,19 @@
   },
   "resolutions": {
     "@react-native-community/eslint-config/babel-eslint": "10.0.3"
+  },
+  "detox": {
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "ios/build/NativeSigner/Build/Products/Debug-iphonesimulator/NativeSigner.app",
+        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
+        "type": "ios.simulator",
+        "device": {
+          "type": "iPhone X"
+        }
+      }
+    },
+    "runner-config": "e2e/config.json",
+    "test-runner": "jest"
   }
 }
