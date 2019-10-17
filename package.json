@@ -19,7 +19,13 @@
     "lint:fix": "npx eslint ./src/ --ext .js,.jsx --fix",
     "postinstall": "npx jetify",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
-    "test": "jest"
+    "test": "jest",
+    "build-e2e:android": "detox build -c android.emu.debug",
+    "test-e2e:android": "detox test -c android.emu.debug",
+    "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
+    "build-e2e:ios": "detox build -c ios.sim.debug",
+    "test-e2e:ios": "detox test -c ios.sim.debug",
+    "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios"
   },
   "husky": {
     "hooks": {
@@ -90,6 +96,23 @@
         "type": "ios.simulator",
         "device": {
           "type": "iPhone X"
+        }
+      },
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "build":
+        "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "type": "android.emulator",
+        "device": {
+          "avdName": "Pixel_2_API_28"
+        }
+      },
+      "android.emu.release": {
+        "binaryPath": "android/app/build/outputs/apk/release/app-release.apk",
+        "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
+        "type": "android.emulator",
+        "device": {
+          "avdName": "Nexus_5X_API_28"
         }
       }
     },
