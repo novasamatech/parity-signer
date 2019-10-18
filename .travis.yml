@@ -24,6 +24,7 @@ matrix:
       - npm install -g yarn
       - npm install -g react-native-cli
       - npm install -g detox-cli
+      - gem install xcpretty
       - yarn
 
     script:
