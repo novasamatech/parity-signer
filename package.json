@@ -95,7 +95,15 @@
         "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone X"
+          "type": "iPhone 6 SE"
+        }
+      },
+      "ios.sim.release": {
+        "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
+        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build",
+        "type": "ios.simulator",
+        "device": {
+          "type": "iPhone 6 SE"
         }
       },
       "android.emu.debug": {
