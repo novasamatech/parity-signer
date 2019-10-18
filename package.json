@@ -17,7 +17,7 @@
     "ios": "yarn run build-rust-ios && react-native run-ios",
     "lint": "npx eslint ./src/ --ext .js,.jsx",
     "lint:fix": "npx eslint ./src/ --ext .js,.jsx --fix",
-    "postinstall": "npx jetify && ./scripts/fix-rn-camera-path.sh ./node_modules/react-native-camera/ios/RNCamera.xcodeproj/project.pbxproj",
+    "postinstall": "npx jetify && chmod +x ./scripts/fix-rn-camera-path.sh && ./scripts/fix-rn-camera-path.sh ./node_modules/react-native-camera/ios/RNCamera.xcodeproj/project.pbxproj",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
     "test": "jest",
     "build-e2e:android": "detox build -c android.emu.debug",
@@ -112,7 +112,7 @@
         "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Nexus_5X_API_28"
+          "avdName": "Pixel_2_API_28"
         }
       }
     },
