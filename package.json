@@ -95,15 +95,15 @@
         "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone 6 SE"
+          "type": "iPhone SE"
         }
       },
       "ios.sim.release": {
         "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
-        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -UseModernBuildSystem=NO | xcpretty && exit ${PIPESTATUS[0]}",
+        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -UseModernBuildSystem=NO | xcpretty -t && exit ${PIPESTATUS[0]}",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone 6 SE"
+          "type": "iPhone SE"
         }
       },
       "android.emu.debug": {
@@ -112,7 +112,7 @@
         "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Pixel_2_API_28"
+          "avdName": "Nexus_5_API_28"
         }
       },
       "android.emu.release": {
@@ -120,7 +120,7 @@
         "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Pixel_2_API_28"
+          "avdName": "Nexus_5_API_28"
         }
       }
     },
