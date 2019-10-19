@@ -121,6 +121,12 @@ Corresponding data:
 
 Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. And Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
 
+First make sure `detox-cli` is installed as global dependency with
+
+```
+npm install -g detox-cli
+```
+
 To just test it, you may run `yarn e2e:ios` or `yarn e2e:android`.
 
 To test it during the develop, once you have run `yarn ios` you do not need to build it, just run:
