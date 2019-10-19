@@ -117,6 +117,23 @@ Corresponding data:
 }
 ```
 
+#### Integration Test
+
+Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. And Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
+
+To just test it, you may run `yarn e2e:ios` or `yarn e2e:android`.
+
+To test it during the develop, once you have run `yarn ios` you do not need to build it, just run:
+```shell
+yarn test-e2e:ios
+```
+
+Re-run tests without re-installing the app
+```
+yarn test-e2e:ios --reuse
+```
+On Android is same, just replace `ios` with `android`.
+
 ### Troubleshooting
 
 #### `No dimension set for key window` on Android < 5.0
