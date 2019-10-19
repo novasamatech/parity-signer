@@ -1,15 +1,15 @@
-import testIds from "./testIds";
+import testIDs from "./testIDs";
 
 describe('Example', () => {
   beforeEach(async () => {
-    // await device.reloadReactNative();
+    await device.reloadReactNative();
   });
 
   it('should have account list screen', async () => {
-    await expect(element(by.id(testIds.TacScreen.tacView))).toBeVisible();
-    await element(by.id(testIds.TacScreen.agreePrivacyButton)).tap();
-    await element(by.id(testIds.TacScreen.agreeTacButton)).tap();
-    await element(by.id(testIds.TacScreen.nextButton)).tap();
-    await expect(element(by.id(testIds.AccountListScreen.accountList))).toBeVisible();
+    await expect(element(by.id(testIDs.TacScreen.tacView))).toBeVisible();
+    await element(by.id(testIDs.TacScreen.agreePrivacyButton)).tap();
+    await element(by.id(testIDs.TacScreen.agreeTacButton)).tap();
+    await element(by.id(testIDs.TacScreen.nextButton)).tap();
+    await expect(element(by.id(testIDs.AccountListScreen.accountList))).toBeVisible();
   });
 });
