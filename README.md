@@ -127,18 +127,23 @@ First make sure `detox-cli` is installed as global dependency with
 npm install -g detox-cli
 ```
 
-To just test it, you may run `yarn e2e:ios` or `yarn e2e:android`.
+##### Complete Test
+just run `yarn e2e:ios` or `yarn e2e:android`.
 
-To test it during the develop, once you have run `yarn ios` you do not need to build it, just run:
+##### Develop and Test
+Details please refer to Detox official [Documentation](https://github.com/wix/Detox/blob/master/docs/Guide.DevelopingWhileWritingTests.md)
+
+Once you have run `yarn ios` you do not need to build it, just run:
 ```shell
 yarn test-e2e:ios
 ```
+This command will open another simulator with the pre-defined configurations.
 
 Re-run tests without re-installing the app
 ```
 yarn test-e2e:ios --reuse
 ```
-On Android is same, just replace `ios` with `android`.
+On Android is same, just replace `ios` with `android`, since Detox's Android support is in progress, when there is an error just build it again with `yarn build-e2e:android`
 
 ### Troubleshooting
 

@@ -1,6 +1,6 @@
 import testIDs from "./testIDs";
 
-describe('Example', () => {
+describe('Load test', () => {
   beforeEach(async () => {
     await device.reloadReactNative();
   });
