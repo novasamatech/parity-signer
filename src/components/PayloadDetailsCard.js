@@ -31,6 +31,7 @@ import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import kusamaMetadata from '../util/static-kusama';
 import substrateDevMetadata from '../util/static-substrate';
+import { shortString } from '../util/strings';
 
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
@@ -279,7 +280,9 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 							paramArgs.map(([param, arg]) => (
 								<View key={param} style={styles.callDetails}>
 									<Text style={styles.subLabel}>{param}: </Text>
-									<Text style={styles.secondaryText}>{arg}</Text>
+									<Text style={styles.secondaryText}>
+										{arg && arg.length > 50 ? shortString(arg) : arg}
+									</Text>
 								</View>
 							))
 						) : (

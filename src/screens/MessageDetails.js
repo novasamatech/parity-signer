@@ -34,7 +34,7 @@ import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/message';
+import { hexToAscii, isAscii } from '../util/strings';
 
 export default class MessageDetails extends React.PureComponent {
 	static navigationOptions = {
@@ -97,10 +97,7 @@ export class MessageDetailsView extends React.PureComponent {
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 		const prefix =
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
-		console.log('prehash -> ', prehash);
-		console.log('prefix -> ', prefix);
-		console.log('isEthereum -> ', isEthereum);
-		debugger;
+
 		return (
 			<ScrollView
 				contentContainerStyle={styles.bodyContent}

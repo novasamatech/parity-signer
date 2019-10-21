@@ -25,7 +25,7 @@ import fonts from '../fonts';
 import QrView from '../components/QrView';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/message';
+import { hexToAscii, isAscii } from '../util/strings';
 
 export default class SignedMessage extends React.PureComponent {
 	render() {

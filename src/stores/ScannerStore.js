@@ -16,7 +16,6 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import Call from '@polkadot/types/primitive/Generic/Call';
 import { hexStripPrefix, isU8a, u8aToHex, u8aConcat } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
@@ -27,7 +26,7 @@ import {
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
 import { saveTx } from '../util/db';
-import { isAscii } from '../util/message';
+import { isAscii } from '../util/strings';
 import {
 	blake2s,
 	brainWalletSign,
@@ -257,7 +256,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		} else {
 			dataToSign = await ethSign(message);
 		}
-		debugger;
+
 		const sender = accountsStore.getByAddress(address);
 
 		if (!sender || !sender.encryptedSeed) {
@@ -307,16 +306,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			address: txRequest.data.account,
 			networkKey
 		});
-
-		console.log(this.isMultipartComplete());
-		debugger;
-		// need to figure out the Call information *before* the payload gets hashed
-		if (this.isMultipartComplete()) {
-			debugger;
-			const call = new Call(txRequest.data.data);
-			console.log(call);
-			debugger;
-		}
 
 		const networkTitle = NETWORK_LIST[networkKey].title;
 
