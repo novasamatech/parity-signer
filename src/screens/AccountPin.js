@@ -17,183 +17,201 @@
 'use strict';
 
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
+import KeyboardScrollView from '../components/KeyboardScrollView';
 
 export default class AccountPin extends React.PureComponent {
-  render() {
-    return (
-      <Subscribe to={[AccountsStore]}>
-        {accounts => <AccountPinView {...this.props} accounts={accounts} />}
-      </Subscribe>
-    );
-  }
+	render() {
+		return (
+			<Subscribe to={[AccountsStore]}>
+				{accounts => <AccountPinView {...this.props} accounts={accounts} />}
+			</Subscribe>
+		);
+	}
 }
 
 class AccountPinView extends React.PureComponent {
-  constructor(...args) {
-    super(...args);
-    this.submit = this.submit.bind(this);
-  }
+	constructor(...args) {
+		super(...args);
+		this.submit = this.submit.bind(this);
+	}
 
-  state = {
-    pin: '',
-    confirmation: '',
-    focusConfirmation: false,
-    pinTooShort: false,
-    pinMismatch: false
-  };
+	state = {
+		confirmation: '',
+		focusConfirmation: false,
+		pin: '',
+		pinMismatch: false,
+		pinTooShort: false
+	};
 
-  async submit() {
-    const { accounts, navigation } = this.props;
-    const accountCreation = navigation.getParam('isNew');
-    const { pin } = this.state;
-    const account = accountCreation
-      ? accounts.getNew()
-      : accounts.getSelected();
-    if (this.state.pin.length >= 6 && this.state.pin === this.state.confirmation) {
-      if (accountCreation) {
-        await accounts.submitNew(pin);
-        const resetAction = StackActions.reset({
-          index: 0,
-          key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-          actions: [NavigationActions.navigate({ routeName: 'AccountList' })]
-        });
-        this.props.navigation.dispatch(resetAction);
-      } else {
-        await accounts.save(accounts.getSelectedKey(), account, pin);
-        const resetAction = StackActions.reset({
-          index: 1,
-          key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-          actions: [
-            NavigationActions.navigate({ routeName: 'AccountList' }),
-            NavigationActions.navigate({ routeName: 'AccountDetails' })
-          ]
-        });
-        this.props.navigation.dispatch(resetAction);
-      }
-    } else {
-      if (this.state.pin.length < 6) {
-        this.setState({ pinTooShort: true });
-      } else if (this.state.pin !== this.state.confirmation)
-        this.setState({ pinMismatch: true });
-    }
-  }
+	async submit() {
+		const { accounts, navigation } = this.props;
+		const accountCreation = navigation.getParam('isNew');
+		const { pin } = this.state;
+		const account = accountCreation
+			? accounts.getNew()
+			: accounts.getSelected();
+		if (
+			this.state.pin.length >= 6 &&
+			this.state.pin === this.state.confirmation
+		) {
+			if (accountCreation) {
+				await accounts.submitNew(pin);
+				const resetAction = StackActions.reset({
+					actions: [NavigationActions.navigate({ routeName: 'AccountList' })],
+					index: 0, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+					key: undefined
+				});
+				this.props.navigation.dispatch(resetAction);
+			} else {
+				await accounts.save(accounts.getSelectedKey(), account, pin);
+				const resetAction = StackActions.reset({
+					actions: [
+						NavigationActions.navigate({ routeName: 'AccountList' }),
+						NavigationActions.navigate({ routeName: 'AccountDetails' })
+					],
+					index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+					key: undefined
+				});
+				this.props.navigation.dispatch(resetAction);
+			}
+		} else {
+			if (this.state.pin.length < 6) {
+				this.setState({ pinTooShort: true });
+			} else if (this.state.pin !== this.state.confirmation)
+				this.setState({ pinMismatch: true });
+		}
+	}
 
-  showHintOrError = () => {
-    if (this.state.pinTooShort) {
-      return <Text style={styles.errorText}>Your pin must be at least 6 digits long!</Text>
-    } else if (this.state.pinMismatch) {
-      return <Text style={styles.errorText}>Pin codes don't match!</Text>
-    }
-    return (<Text style={styles.hintText}>Choose a PIN code with 6 or more digits</Text>)
-  }
+	showHintOrError = () => {
+		if (this.state.pinTooShort) {
+			return (
+				<Text style={styles.errorText}>
+					Your pin must be at least 6 digits long!
+				</Text>
+			);
+		} else if (this.state.pinMismatch) {
+			return <Text style={styles.errorText}>Pin codes don't match!</Text>;
+		}
+		return (
+			<Text style={styles.hintText}>
+				Choose a PIN code with 6 or more digits
+			</Text>
+		);
+	};
 
-  onPinInputChange = (stateName, pinInput) => {
-    if (/^\d+$|^$/.test(pinInput)) {
-      this.setState({[stateName]: pinInput, pinMismatch: false, pinTooShort: false})
-    }
-  }
+	onPinInputChange = (stateName, pinInput) => {
+		if (/^\d+$|^$/.test(pinInput)) {
+			this.setState({
+				pinMismatch: false,
+				pinTooShort: false,
+				[stateName]: pinInput
+			});
+		}
+	};
 
-  render() {
-    const title = 'ACCOUNT PIN';
-    return (
-      <View style={styles.body}>
-        <Background />
-        <Text style={styles.titleTop}>{title}</Text>
-        {this.showHintOrError()}
-        <Text style={styles.title}>PIN</Text>
-        <PinInput
-          autoFocus
-          returnKeyType="next"
-          onFocus={() => this.setState({ focusConfirmation: false })}
-          onSubmitEditing={() => {
-            this.setState({ focusConfirmation: true });
-          }}
-          onChangeText={pin => this.onPinInputChange('pin', pin)}
-          value={this.state.pin}
-        />
-        <Text style={styles.title}>CONFIRM PIN</Text>
-        <PinInput
-          returnKeyType="done"
-          focus={this.state.focusConfirmation}
-          onChangeText={confirmation => this.onPinInputChange('confirmation', confirmation)}
-          value={this.state.confirmation}
-        />
-        <Button
-          onPress={this.submit}
-          color="green"
-          title="Done"
-          accessibilityLabel={'Done'}
-        />
-      </View>
-    );
-  }
+	render() {
+		const title = 'ACCOUNT PIN';
+		return (
+			<KeyboardScrollView style={styles.body} extraHeight={120}>
+				<Background />
+				<Text style={styles.titleTop}>{title}</Text>
+				{this.showHintOrError()}
+				<Text style={styles.title}>PIN</Text>
+				<PinInput
+					autoFocus
+					returnKeyType="next"
+					onFocus={() => this.setState({ focusConfirmation: false })}
+					onSubmitEditing={() => {
+						this.setState({ focusConfirmation: true });
+					}}
+					onChangeText={pin => this.onPinInputChange('pin', pin)}
+					value={this.state.pin}
+				/>
+				<Text style={styles.title}>CONFIRM PIN</Text>
+				<PinInput
+					returnKeyType="done"
+					focus={this.state.focusConfirmation}
+					onChangeText={confirmation =>
+						this.onPinInputChange('confirmation', confirmation)
+					}
+					value={this.state.confirmation}
+				/>
+				<Button
+					onPress={this.submit}
+					color="green"
+					title="Done"
+					accessibilityLabel={'Done'}
+				/>
+			</KeyboardScrollView>
+		);
+	}
 }
 
 class PinInput extends Component {
-  render() {
-    return (
-      <TextInput
-        keyboardAppearance="dark"
-        clearTextOnFocus
-        editable
-        fontSize={24}
-        keyboardType="numeric"
-        multiline={false}
-        autoCorrect={false}
-        numberOfLines={1}
-        returnKeyType="next"
-        secureTextEntry
-        style={styles.pinInput}
-        {...this.props}
-      />
-    );
-  }
+	render() {
+		return (
+			<TextInput
+				keyboardAppearance="dark"
+				clearTextOnFocus
+				editable
+				fontSize={24}
+				keyboardType="numeric"
+				multiline={false}
+				autoCorrect={false}
+				numberOfLines={1}
+				returnKeyType="next"
+				secureTextEntry
+				style={styles.pinInput}
+				{...this.props}
+			/>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    padding: 20,
-    flex: 1,
-    overflow: 'hidden'
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 10
-  },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20,
-    textAlign: 'center'
-  },
-  hintText: {
-    fontFamily: fonts.bold,
-    textAlign: 'center',
-    color: colors.bg_text_sec,
-    fontSize: 12,
-    paddingBottom: 20
-  },
-  errorText: {
-    fontFamily: fonts.bold,
-    textAlign: 'center',
-    color: colors.bg_alert,
-    fontSize: 12,
-    paddingBottom: 20
-  },
-  pinInput: {
-    marginBottom: 20
-  }
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		overflow: 'hidden',
+		padding: 20
+	},
+	errorText: {
+		color: colors.bg_alert,
+		fontFamily: fonts.bold,
+		fontSize: 12,
+		paddingBottom: 20,
+		textAlign: 'center'
+	},
+	hintText: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 12,
+		paddingBottom: 20,
+		textAlign: 'center'
+	},
+	pinInput: {
+		marginBottom: 20
+	},
+	title: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 18,
+		paddingBottom: 10
+	},
+	titleTop: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 24,
+		paddingBottom: 20,
+		textAlign: 'center'
+	}
 });

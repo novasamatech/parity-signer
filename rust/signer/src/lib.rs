@@ -27,10 +27,8 @@ use rustc_hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
 use tiny_keccak::keccak256 as keccak;
 use blake2_rfc::blake2s::blake2s;
-use std::num::NonZeroU32;
 
-// 10240 is always non-zero, ergo this is safe
-const CRYPTO_ITERATIONS: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(10240) };
+const CRYPTO_ITERATIONS: u32 = 10240;
 
 fn base64png(png: &[u8]) -> String {
     static HEADER: &str = "data:image/png;base64,";

@@ -17,77 +17,69 @@
 'use strict';
 
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import TextInput from './TextInput';
 
-  export default function DerivationPasswordVerify(props) {
-    const { password } = props;
-    const [enteredPassword, setEnteredPassword] =  useState('')
-    const [verifyField, setVerifyField] = useState(false);
-    const isMatching = enteredPassword === password;
+export default function DerivationPasswordVerify(props) {
+	const { password } = props;
+	const [enteredPassword, setEnteredPassword] = useState('');
+	const [verifyField, setVerifyField] = useState(false);
+	const isMatching = enteredPassword === password;
 
-    const toggleVerifyField = () => {
-      setVerifyField(!verifyField)
-    }
-  
-    return (
-      <>
-        <TouchableOpacity
-          onPress={toggleVerifyField}
-          style={{diplay:'flex'}}
-        >
-          <View
-            style={{justifyContent:'center'}}
-          >
-            <Text style={styles.passwordText}>
-              <Icon name={'info'} size={20} color={colors.bg_text_sec} />
-              {' '}This account countains a derivation password.{' '}
-              <Text style={styles.link}  onPress={toggleVerifyField} >Verify it here </Text>
-              <Icon 
-                name={verifyField ? 'arrow-drop-up' : 'arrow-drop-down'}
-                size={20}
-              />
-            </Text>
-          </View>
-        </TouchableOpacity>
-        {verifyField && 
-          <>
-            <TextInput
-              onChangeText={setEnteredPassword}
-              placeholder="derivation password"
-              style={isMatching ? styles.validInput: styles.invalidInput}
-            />
-          </>
-        }
-      </>
-    )
-  }
+	const toggleVerifyField = () => {
+		setVerifyField(!verifyField);
+	};
 
-  const styles = StyleSheet.create({
-    link: {
-      textDecorationLine: 'underline',
-    },
-    passwordText: {
-      color: colors.bg_text_sec,
-      fontFamily: fonts.regular,
-      fontSize: 18,
-      marginBottom: 10,
-      marginTop: 20,
-      paddingBottom: 0
-    },
-    invalidInput: {
-      backgroundColor: '#fee3e3'
-    },
-    validInput: {
-      backgroundColor: '#e4fee4'
-    }
-  });
+	return (
+		<>
+			<TouchableOpacity onPress={toggleVerifyField} style={{ diplay: 'flex' }}>
+				<View style={{ justifyContent: 'center' }}>
+					<Text style={styles.passwordText}>
+						<Icon name={'info'} size={20} color={colors.bg_text_sec} /> This
+						account countains a derivation password.{' '}
+						<Text style={styles.link} onPress={toggleVerifyField}>
+							Verify it here{' '}
+						</Text>
+						<Icon
+							name={verifyField ? 'arrow-drop-up' : 'arrow-drop-down'}
+							size={20}
+						/>
+					</Text>
+				</View>
+			</TouchableOpacity>
+			{verifyField && (
+				<>
+					<TextInput
+						onChangeText={setEnteredPassword}
+						placeholder="derivation password"
+						style={isMatching ? styles.validInput : styles.invalidInput}
+					/>
+				</>
+			)}
+		</>
+	);
+}
+
+const styles = StyleSheet.create({
+	invalidInput: {
+		backgroundColor: '#fee3e3'
+	},
+	link: {
+		textDecorationLine: 'underline'
+	},
+	passwordText: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.regular,
+		fontSize: 18,
+		marginBottom: 10,
+		marginTop: 20,
+		paddingBottom: 0
+	},
+	validInput: {
+		backgroundColor: '#e4fee4'
+	}
+});

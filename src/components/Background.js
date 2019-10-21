@@ -19,40 +19,40 @@ import { StyleSheet, View } from 'react-native';
 import colors from '../colors';
 
 export default class Background extends React.PureComponent {
-  render() {
-    // const lines = new Array(100)
-    //   .fill(0)
-    //   .map((_, i) => <View key={i} style={styles.line} />);
-    return (
-      <View style={styles.bg}>
-        {/* <View style={styles.lines}>{lines}</View> */}
-      </View>
-    );
-  }
+	render() {
+		// const lines = new Array(100)
+		//   .fill(0)
+		//   .map((_, i) => <View key={i} style={styles.line} />);
+		return (
+			<View style={styles.bg}>
+				{/* <View style={styles.lines}>{lines}</View> */}
+			</View>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  bg: {
-    position: 'absolute',
-    backgroundColor: colors.bg,
-    flex: 1
-  },
-  lines: {
-    position: 'absolute',
-    zIndex: -1000,
-    transform: [
-      { rotate: '-30deg' },
-      { translateX: -300 },
-      { translateY: -3100 },
-      { scale: 0.2 }
-    ]
-  },
-  line: {
-    zIndex: -1000,
-    height: 60,
-    width: 4000,
-    borderBottomWidth: 2,
-    borderBottomColor: '#3d3d3d',
-    backgroundColor: colors.bg
-  }
+	bg: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		position: 'absolute'
+	},
+	line: {
+		backgroundColor: colors.bg,
+		borderBottomColor: '#3d3d3d',
+		borderBottomWidth: 2,
+		height: 60,
+		width: 4000,
+		zIndex: -1000
+	},
+	lines: {
+		position: 'absolute',
+		transform: [
+			{ rotate: '-30deg' },
+			{ translateX: -300 },
+			{ translateY: -3100 },
+			{ scale: 0.2 }
+		],
+		zIndex: -1000
+	}
 });

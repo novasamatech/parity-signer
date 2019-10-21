@@ -23,57 +23,43 @@ import { Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import colors from '../colors';
-import { NetworkProtocols } from '../constants'
+import { NetworkProtocols } from '../constants';
 import { blockiesIcon } from '../util/native';
 
-export default function AccountIcon (props) {
+export default function AccountIcon(props) {
+	AccountIcon.propTypes = {
+		address: PropTypes.string.isRequired,
+		protocol: PropTypes.string.isRequired
+	};
 
-  AccountIcon.propTypes = {
-    address: PropTypes.string.isRequired,
-    protocol: PropTypes.string.isRequired
-  };
+	const { address, protocol, style } = props;
+	const [ethereumIconUri, setEthereumIconUri] = useState('');
 
-  const {address, protocol, style} = props;
-  const [ethereumIconUri, setEthereumIconUri] = useState('');
+	useEffect(() => {
+		if (protocol === NetworkProtocols.ETHEREUM) {
+			loadEthereumIcon(address);
+		}
+	}, [protocol, address]);
 
-  useEffect(() => {
-    if (protocol === NetworkProtocols.ETHEREUM) {
-      loadEthereumIcon(address);
-    }
-  },[protocol, address])
+	const loadEthereumIcon = function(ethereumAddress) {
+		blockiesIcon('0x' + ethereumAddress)
+			.then(uri => {
+				setEthereumIconUri(uri);
+			})
+			.catch(console.error);
+	};
 
-  const loadEthereumIcon = function (address){
-    blockiesIcon('0x'+address)
-    .then((ethereumIconUri) => {
-      setEthereumIconUri(ethereumIconUri);
-    })
-    .catch(console.error)
-  }
-
-  if (protocol === NetworkProtocols.SUBSTRATE) {
-
-    return (
-      <Identicon
-        value={address}
-        size={style.width || 50 }
-      />
-    );
-  } else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri){
-
-    return (
-      <Image 
-        source={{ uri: ethereumIconUri }} 
-        style={style || { width: 47, height: 47 }}
-      />
-    );
-  } else {
-    // if there's no protocol or it's unknown we return a warning
-    return (
-      <Icon
-        color={colors.bg}
-        name={'error'}
-        size={style.width || 50 }
-      />
-    )
-  }
+	if (protocol === NetworkProtocols.SUBSTRATE) {
+		return <Identicon value={address} size={style.width || 50} />;
+	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
+		return (
+			<Image
+				source={{ uri: ethereumIconUri }}
+				style={style || { height: 47, width: 47 }}
+			/>
+		);
+	} else {
+		// if there's no protocol or it's unknown we return a warning
+		return <Icon color={colors.bg} name={'error'} size={style.width || 50} />;
+	}
 }

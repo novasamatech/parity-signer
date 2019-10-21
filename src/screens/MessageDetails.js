@@ -22,7 +22,7 @@ import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -32,171 +32,182 @@ import { hexToAscii, isAscii } from '../util/message';
 import { NavigationActions, StackActions } from 'react-navigation';
 
 export default class MessageDetails extends React.PureComponent {
-  static navigationOptions = {
-    title: 'Transaction Details',
-    headerBackTitle: 'Transaction details'
-  };
-  render() {
-    return (
-      <Subscribe to={[ScannerStore, AccountsStore]}>
-        {(scannerStore, accounts) => {
-          const dataToSign = scannerStore.getDataToSign();
-          const message = scannerStore.getMessage();
+	static navigationOptions = {
+		headerBackTitle: 'Transaction details',
+		title: 'Transaction Details'
+	};
+	render() {
+		return (
+			<Subscribe to={[ScannerStore, AccountsStore]}>
+				{(scannerStore, accounts) => {
+					const dataToSign = scannerStore.getDataToSign();
+					const message = scannerStore.getMessage();
 
-          if (dataToSign) {
-            return (
-              <MessageDetailsView
-                {...this.props}
-                scannerStore={scannerStore}
-                sender={scannerStore.getSender()}
-                message={isU8a(message) ? u8aToHex(message) : message}
-                dataToSign={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign}
-                isHash={scannerStore.getIsHash()}
-                onNext={async () => {
-                  try {
-                    if (scannerStore.getSender().biometricEnabled && await scannerStore.signData(null)) {
-                      const resetAction = StackActions.reset({
-                        index: 1,
-                        key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-                        actions: [
-                          NavigationActions.navigate({ routeName: 'AccountList' }),
-                          NavigationActions.navigate({ routeName: 'SignedMessage' })
-                        ]
-                      });
-                      this.props.navigation.dispatch(resetAction);
-                    } else {
-                      this.props.navigation.navigate('AccountUnlockAndSign', {
-                        next: 'SignedMessage'
-                      });
-                    }
-                  } catch (e) {
-                    scannerStore.setErrorMsg(e.message);
-                  }
-                }}
-              />
-            );
-          } else {
-            return null;
-          }
-        }}
-      </Subscribe>
-    );
-  }
+					if (dataToSign) {
+						return (
+							<MessageDetailsView
+								{...this.props}
+								scannerStore={scannerStore}
+								sender={scannerStore.getSender()}
+								message={isU8a(message) ? u8aToHex(message) : message}
+								dataToSign={
+									isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign
+								}
+								isHash={scannerStore.getIsHash()}
+								onNext={async () => {
+									try {
+										if (
+											scannerStore.getSender().biometricEnabled &&
+											(await scannerStore.signData(null))
+										) {
+											const resetAction = StackActions.reset({
+												index: 1,
+												key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+												actions: [
+													NavigationActions.navigate({
+														routeName: 'AccountList'
+													}),
+													NavigationActions.navigate({
+														routeName: 'SignedMessage'
+													})
+												]
+											});
+											this.props.navigation.dispatch(resetAction);
+										} else {
+											this.props.navigation.navigate('AccountUnlockAndSign', {
+												next: 'SignedMessage'
+											});
+										}
+									} catch (e) {
+										scannerStore.setErrorMsg(e.message);
+									}
+								}}
+							/>
+						);
+					} else {
+						return null;
+					}
+				}}
+			</Subscribe>
+		);
+	}
 }
 
 export class MessageDetailsView extends React.PureComponent {
-  static propTypes = {
-    onNext: PropTypes.func.isRequired,
-    dataToSign: PropTypes.string.isRequired,
-    isHash: PropTypes.bool,
-    sender: PropTypes.object.isRequired,
-    message: PropTypes.string.isRequired
-  };
+	static propTypes = {
+		dataToSign: PropTypes.string.isRequired,
+		isHash: PropTypes.bool,
+		message: PropTypes.string.isRequired,
+		onNext: PropTypes.func.isRequired,
+		sender: PropTypes.object.isRequired
+	};
 
-  render() {
-    const { dataToSign, isHash, message, onNext, sender} = this.props;
+	render() {
+		const { dataToSign, isHash, message, onNext, sender } = this.props;
 
-    return (
-      <ScrollView
-        contentContainerStyle={styles.bodyContent}
-        style={styles.body}
-      >
-        <Background />
-        <Text style={styles.topTitle}>SIGN MESSAGE</Text>
-        <Text style={styles.title}>FROM ACCOUNT</Text>
-        <AccountCard
-          title={sender.name}
-          address={sender.address}
-          networkKey={sender.networkKey}
-        />
-        <Text style={styles.title}>MESSAGE</Text>
-        <Text style={styles.message}>
-          {isAscii(message)
-            ? hexToAscii(message)
-            : dataToSign}
-        </Text>
-        <Button
-          buttonStyles={{ height: 60 }}
-          title="Sign Message"
-          onPress={() => {
-            isHash
-              ? Alert.alert(
-                  "Warning",
-                  "The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.",
-                  [
-                    {
-                      text: 'I take the risk',
-                      onPress: () => onNext()
-                    },
-                    {
-                      text: 'Cancel',
-                      style: 'cancel'
-                    }
-                  ]
-                )
-              : onNext()
-          }}
-        />
-      </ScrollView>
-    );
-  }
+		return (
+			<ScrollView
+				contentContainerStyle={styles.bodyContent}
+				style={styles.body}
+			>
+				<Background />
+				<Text style={styles.topTitle}>SIGN MESSAGE</Text>
+				<Text style={styles.title}>FROM ACCOUNT</Text>
+				<AccountCard
+					title={sender.name}
+					address={sender.address}
+					networkKey={sender.networkKey}
+				/>
+				<Text style={styles.title}>MESSAGE</Text>
+				<Text style={styles.message}>
+					{isHash
+						? message
+						: isAscii(message)
+						? hexToAscii(message)
+						: dataToSign}
+				</Text>
+				<Button
+					buttonStyles={{ height: 60 }}
+					title="Sign Message"
+					onPress={() => {
+						isHash
+							? Alert.alert(
+									'Warning',
+									'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
+									[
+										{
+											onPress: () => onNext(),
+											text: 'I take the risk'
+										},
+										{
+											style: 'cancel',
+											text: 'Cancel'
+										}
+									]
+							  )
+							: onNext();
+					}}
+				/>
+			</ScrollView>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  body: {
-    backgroundColor: colors.bg,
-    flex: 1,
-    flexDirection: 'column',
-    padding: 20,
-    overflow: 'hidden'
-  },
-  bodyContent: {
-    paddingBottom: 40
-  },
-  transactionDetails: {
-    flex: 1,
-    backgroundColor: colors.card_bg
-  },
-  topTitle: {
-    textAlign: 'center',
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  title: {
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    paddingBottom: 20
-  },
-  message: {
-    marginBottom: 20,
-    padding: 10,
-    minHeight: 120,
-    lineHeight: 26,
-    fontSize: 20,
-    fontFamily: fonts.regular,
-    backgroundColor: colors.card_bg
-  },
-  wrapper: {
-    borderRadius: 5
-  },
-  address: {
-    flex: 1
-  },
-  deleteText: {
-    textAlign: 'right'
-  },
-  changePinText: {
-    textAlign: 'left',
-    color: 'green'
-  },
-  actionsContainer: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  actionButtonContainer: {
-    flex: 1
-  }
+	actionButtonContainer: {
+		flex: 1
+	},
+	actionsContainer: {
+		flex: 1,
+		flexDirection: 'row'
+	},
+	address: {
+		flex: 1
+	},
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column',
+		overflow: 'hidden',
+		padding: 20
+	},
+	bodyContent: {
+		paddingBottom: 40
+	},
+	changePinText: {
+		color: 'green',
+		textAlign: 'left'
+	},
+	deleteText: {
+		textAlign: 'right'
+	},
+	message: {
+		backgroundColor: colors.card_bg,
+		fontFamily: fonts.regular,
+		fontSize: 20,
+		lineHeight: 26,
+		marginBottom: 20,
+		minHeight: 120,
+		padding: 10
+	},
+	title: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 18,
+		paddingBottom: 20
+	},
+	topTitle: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 24,
+		paddingBottom: 20,
+		textAlign: 'center'
+	},
+	transactionDetails: {
+		backgroundColor: colors.card_bg,
+		flex: 1
+	},
+	wrapper: {
+		borderRadius: 5
+	}
 });

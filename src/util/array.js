@@ -2,15 +2,15 @@
  * Default comparator, should work for strings and numbers
  */
 function defaultCompare(a, b) {
-  if (a > b) {
-      return 1;
-  }
+	if (a > b) {
+		return 1;
+	}
 
-  if (a < b) {
-      return -1;
-  }
+	if (a < b) {
+		return -1;
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -26,56 +26,57 @@ function defaultCompare(a, b) {
  *                                        if `hit` is `false` -> index at which the item can be inserted
  */
 export function binarySearch(array, item, compare = defaultCompare) {
-  if (array.length === 0) {
-    return { hit: false, index: 0 };
-  }
+	if (array.length === 0) {
+		return { hit: false, index: 0 };
+	}
 
-  let min = 0;
-  let max = array.length - 1;
+	let min = 0;
+	let max = array.length - 1;
 
-  while (min <= max) {
-    let guess = (min + max) >> 1; // fast integer division by 2
+	while (min <= max) {
+		/* eslint-disable-next-line no-bitwise */
+		let guess = (min + max) >> 1; // fast integer division by 2
 
-    const result = compare(item, array[guess]);
+		const result = compare(item, array[guess]);
 
-    if (result < 0) {
-      max = guess - 1;
-    } else if (result > 0) {
-      min = guess + 1;
-    } else {
-      return { hit: true, index: guess };
-    }
-  }
+		if (result < 0) {
+			max = guess - 1;
+		} else if (result > 0) {
+			min = guess + 1;
+		} else {
+			return { hit: true, index: guess };
+		}
+	}
 
-  return { hit: false, index: min };
+	return { hit: false, index: min };
 }
 
 export function zip(left, right) {
-  let lindex = 0;
-  let rindex = 0;
-  let oindex = 0;
+	let lindex = 0;
+	let rindex = 0;
+	let oindex = 0;
 
-  // allocate enough memory to merge two arrays
-  const out = new Array(left.length + right.length);
+	// allocate enough memory to merge two arrays
+	const out = new Array(left.length + right.length);
 
-  while (lindex < left.length && rindex < right.length) {
-    let lword = left[lindex];
-    let rword = right[rindex];
+	while (lindex < left.length && rindex < right.length) {
+		let lword = left[lindex];
+		let rword = right[rindex];
 
-    if (lword < rword) {
-      out[oindex] = lword;
-      lindex += 1;
-    } else if (lword > rword) {
-      out[oindex] = rword;
-      rindex += 1;
-    } else {
-      out[oindex] = lword;
-      lindex += 1;
-      rindex += 1;
-    }
+		if (lword < rword) {
+			out[oindex] = lword;
+			lindex += 1;
+		} else if (lword > rword) {
+			out[oindex] = rword;
+			rindex += 1;
+		} else {
+			out[oindex] = lword;
+			lindex += 1;
+			rindex += 1;
+		}
 
-    oindex += 1;
-  }
+		oindex += 1;
+	}
 
-  return out.slice(0, oindex);
+	return out.slice(0, oindex);
 }

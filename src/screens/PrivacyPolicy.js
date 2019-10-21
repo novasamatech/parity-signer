@@ -20,58 +20,58 @@ import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import privacyPolicy from '../../docs/privacy-policy.md';
 import colors from '../colors';
-import fonts from "../fonts";
+import fonts from '../fonts';
 import Markdown from '../components/Markdown';
 
 export default class PrivacyPolicy extends React.PureComponent {
-  static navigationOptions = {
-    title: 'Privacy policy',
-    headerBackTitle: 'Back'
-  };
+	static navigationOptions = {
+		headerBackTitle: 'Back',
+		title: 'Privacy policy'
+	};
 
-  render() {
-    return (
-      <View style={styles.body}>
-        <ScrollView contentContainerStyle={{}}>
-          <Markdown>{privacyPolicy}</Markdown>
-        </ScrollView>
-      </View>
-    );
-  }
+	render() {
+		return (
+			<View style={styles.body}>
+				<ScrollView contentContainerStyle={{}}>
+					<Markdown>{privacyPolicy}</Markdown>
+				</ScrollView>
+			</View>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
-  body: {
-    flex: 1,
-    flexDirection: 'column',
-    overflow: 'hidden',
-    backgroundColor: colors.bg,
-    padding: 20
-  },
-  top: {
-    flex: 1
-  },
-  bottom: {
-    flexBasis: 50,
-    paddingBottom: 15
-  },
-  titleTop: {
-    color: colors.bg_text_sec,
-    fontSize: 24,
-    fontFamily: fonts.bold,
-    fontWeight: 'bold',
-    textAlign: 'center'
-  },
-  title: {
-    fontFamily: fonts.bold,
-    color: colors.bg_text_sec,
-    fontSize: 18,
-    paddingBottom: 20
-  },
-  text: {
-    marginTop: 10,
-    fontFamily: fonts.regular,
-    fontSize: 14,
-    color: colors.card_bg
-  }
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column',
+		overflow: 'hidden',
+		padding: 20
+	},
+	bottom: {
+		flexBasis: 50,
+		paddingBottom: 15
+	},
+	text: {
+		color: colors.card_bg,
+		fontFamily: fonts.regular,
+		fontSize: 14,
+		marginTop: 10
+	},
+	title: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 18,
+		paddingBottom: 20
+	},
+	titleTop: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 24,
+		fontWeight: 'bold',
+		textAlign: 'center'
+	},
+	top: {
+		flex: 1
+	}
 });

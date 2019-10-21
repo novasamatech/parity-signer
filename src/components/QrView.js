@@ -24,47 +24,48 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { qrCode, qrHex } from '../util/native';
 
 QrView.propTypes = {
-  data: PropTypes.string.isRequired
+	data: PropTypes.string.isRequired
 };
 
 export default function QrView(props) {
-  const [qr, setQr] = useState(null);
+	const [qr, setQr] = useState(null);
 
-  useEffect(() => {
-    async function displayQrCode(data) {
-      try {
-        const qr = isHex(data) ? await qrHex(data) : await qrCode(data);
-        setQr(qr);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    displayQrCode(props.data);
-  }, [props.data]);
+	useEffect(() => {
+		async function displayQrCode(data) {
+			try {
+				const generatedQr = isHex(data)
+					? await qrHex(data)
+					: await qrCode(data);
+				setQr(generatedQr);
+			} catch (e) {
+				console.error(e);
+			}
+		}
+		displayQrCode(props.data);
+	}, [props.data]);
 
+	const { width: deviceWidth } = Dimensions.get('window');
+	let size = props.size || deviceWidth - 80;
+	let flexBasis = props.height || deviceWidth - 40;
 
-  const { width: deviceWidth } = Dimensions.get('window');
-  let size = props.size || deviceWidth - 80;
-  let flexBasis = props.height || deviceWidth - 40;
-
-  return (
-    <View
-      style={[
-        styles.rectangleContainer,
-        { flexBasis, height: flexBasis },
-        props.style
-      ]}
-    >
-      <Image source={{ uri: qr }} style={{ width: size, height: size }} />
-    </View>
-  );
+	return (
+		<View
+			style={[
+				styles.rectangleContainer,
+				{ flexBasis, height: flexBasis },
+				props.style
+			]}
+		>
+			<Image source={{ uri: qr }} style={{ height: size, width: size }} />
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-  rectangleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent'
-  }
+	rectangleContainer: {
+		alignItems: 'center',
+		backgroundColor: 'transparent',
+		flex: 1,
+		justifyContent: 'center'
+	}
 });
