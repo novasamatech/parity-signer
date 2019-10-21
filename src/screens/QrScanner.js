@@ -202,7 +202,7 @@ export class QrScannerView extends React.Component {
 					) : missedFrames.length > 1 ? (
 						<View style={styles.bottom}>
 							<Text style={styles.descTitle}>
-								You missed some frames:{' '}
+								You missed the following frames:{' '}
 								{missedFrames.map(frame => `${frame}, `)}
 							</Text>
 						</View>
