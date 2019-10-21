@@ -151,6 +151,7 @@ export class QrScannerView extends React.Component {
 
 	render() {
 		const missedFrames = this.props.scannerStore.getMissedFrames();
+		const missedFramesMessage = missedFrames && missedFrames.join(', ');
 
 		if (this.props.scannerStore.isBusy()) {
 			return <View style={styles.inactive} />;
@@ -193,17 +194,10 @@ export class QrScannerView extends React.Component {
 							</Text>
 						</View>
 					)}
-					{missedFrames && missedFrames.length === 1 ? (
+					{missedFrames && missedFrames.length >= 1 ? (
 						<View style={styles.bottom}>
 							<Text style={styles.descTitle}>
-								You missed a frame: {missedFrames.map(frame => frame)}
-							</Text>
-						</View>
-					) : missedFrames.length > 1 ? (
-						<View style={styles.bottom}>
-							<Text style={styles.descTitle}>
-								You missed the following frames:{' '}
-								{missedFrames.map(frame => `${frame}, `)}
+								You missed the following frames: {missedFramesMessage}
 							</Text>
 						</View>
 					) : (
