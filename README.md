@@ -128,7 +128,10 @@ yarn global add detox-cli
 ```
 
 ##### Complete Test
-just run `yarn e2e:ios` or `yarn e2e:android`.
+
+1. run react native server with `yarn start`
+
+2. run `yarn e2e:ios` or `yarn e2e:android`.
 
 ##### Develop and Test
 Details please refer to Detox official [Documentation](https://github.com/wix/Detox/blob/master/docs/Guide.DevelopingWhileWritingTests.md)
@@ -149,7 +152,7 @@ If you want to use another specific device than defined in the configuration, ad
 yarn test-e2e:android --device-name Pixel_2_API_28
 ```
 
-On Android please replace `ios` with `android`, currently Detox's Android 0.60.x support is in progress, need to run `yarn start` to start a react-native server before testing. If there is an error, try build it again with `yarn build-e2e:android`
+On Android please replace `ios` with `android`, currently Detox's Android 0.60.x support is in progress, if there is an error, try build it again with `yarn build-e2e:android`
 
 ### Troubleshooting
 
