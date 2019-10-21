@@ -124,7 +124,7 @@ Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testi
 First make sure `detox-cli` is installed as global dependency with
 
 ```
-npm install -g detox-cli
+yarn global add detox-cli
 ```
 
 ##### Complete Test
