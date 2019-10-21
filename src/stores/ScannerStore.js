@@ -35,6 +35,7 @@ import {
 	ethSign,
 	substrateSign
 } from '../util/native';
+import { mod } from '../util/numbers';
 import transaction from '../util/transaction';
 import {
 	constructDataFromBytes,
@@ -57,7 +58,9 @@ type ScannerState = {
 	dataToSign: string,
 	isHash: boolean,
 	isOversized: boolean,
+	latestFrame: number,
 	message: string,
+	missedFrames: Array<number>,
 	multipartData: any,
 	multipartComplete: boolean,
 	prehash: GenericExtrinsicPayload,
@@ -78,9 +81,12 @@ const defaultState = {
 	dataToSign: '',
 	isHash: false,
 	isOversized: false,
+	latestFrame: null,
 	message: null,
+	missedFrames: [],
 	multipartComplete: false,
 	multipartData: {},
+	prehash: null,
 	recipient: null,
 	scanErrorMsg: '',
 	sender: null,
@@ -137,7 +143,7 @@ export default class ScannerStore extends Container<ScannerState> {
 						SUBSTRATE_NETWORK_LIST[key].prefix
 					)
 				);
-				debugger;
+
 				if (account) {
 					parsedData.data.account = account.address;
 
@@ -160,7 +166,12 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setPartData(frame, frameCount, partData, accountsStore) {
-		const { multipartComplete, multipartData, totalFrameCount } = this.state;
+		const {
+			lastFrame,
+			multipartComplete,
+			multipartData,
+			totalFrameCount
+		} = this.state;
 
 		// set it once only
 		if (!totalFrameCount) {
@@ -220,7 +231,22 @@ export default class ScannerStore extends Container<ScannerState> {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData;
 			nextDataState[frame] = partDataAsBytes;
+
+			// we skipped at least one frame
+			if (lastFrame && mod(frame - lastFrame, totalFrameCount) > 1) {
+				// enumerate all the frames between frame and lastFram
+				const range = frame - lastFrame;
+				const missedFrames = Array.from(
+					new Array(range),
+					(_, i) => i + lastFrame - 1
+				);
+				this.setState({
+					missedFrames: [...this.state.missedFrames, missedFrames]
+				});
+			}
+
 			this.setState({
+				lastFrame: frame,
 				multipartData: nextDataState
 			});
 		}
@@ -385,6 +411,8 @@ export default class ScannerStore extends Container<ScannerState> {
 	clearMultipartProgress() {
 		this.setState({
 			completedFramesCount: 0,
+			lastFrame: null,
+			missedFrames: [],
 			multipartComplete: false,
 			multipartData: {},
 			totalFrameCount: 0,
@@ -497,6 +525,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getErrorMsg() {
 		return this.state.scanErrorMsg;
+	}
+
+	getMissedFrames() {
+		return this.state.missedFrames;
 	}
 
 	getPrehashPayload() {

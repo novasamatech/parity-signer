@@ -61,10 +61,11 @@ export default class Scanner extends React.PureComponent {
 					return (
 						<QrScannerView
 							completedFramesCount={scannerStore.getCompletedFramesCount()}
-							totalFramesCount={scannerStore.getTotalFramesCount()}
 							isMultipart={scannerStore.getTotalFramesCount() > 1}
+							missedFrames={scannerStore.getMissedFrames()}
 							navigation={this.props.navigation}
 							scannerStore={scannerStore}
+							totalFramesCount={scannerStore.getTotalFramesCount()}
 							onBarCodeRead={async txRequestData => {
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
@@ -149,6 +150,8 @@ export class QrScannerView extends React.Component {
 	}
 
 	render() {
+		const missedFrames = this.props.scannerStore.getMissedFrames();
+
 		if (this.props.scannerStore.isBusy()) {
 			return <View style={styles.inactive} />;
 		}
@@ -189,6 +192,22 @@ export class QrScannerView extends React.Component {
 								To Sign a New Transaction
 							</Text>
 						</View>
+					)}
+					{missedFrames && missedFrames.length === 1 ? (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								You missed a frame: {missedFrames.map(frame => frame)}
+							</Text>
+						</View>
+					) : missedFrames.length > 1 ? (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								You missed some frames:{' '}
+								{missedFrames.map(frame => `${frame}, `)}
+							</Text>
+						</View>
+					) : (
+						undefined
 					)}
 				</View>
 			</RNCamera>
