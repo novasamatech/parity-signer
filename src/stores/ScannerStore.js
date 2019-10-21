@@ -16,6 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
+import Call from '@polkadot/types/primitive/Generic/Call';
 import { hexStripPrefix, isU8a, u8aToHex, u8aConcat } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
@@ -60,6 +61,7 @@ type ScannerState = {
 	message: string,
 	multipartData: any,
 	multipartComplete: boolean,
+	prehash: GenericExtrinsicPayload,
 	recipient: Account,
 	scanErrorMsg: string,
 	sender: Account,
@@ -103,6 +105,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
+		// N.B. Substrate oversized/multipart payloads will already be hashed at this point.
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
@@ -135,9 +138,10 @@ export default class ScannerStore extends Container<ScannerState> {
 						SUBSTRATE_NETWORK_LIST[key].prefix
 					)
 				);
-
+				debugger;
 				if (account) {
 					parsedData.data.account = account.address;
+
 					this.setState({
 						unsignedData: parsedData
 					});
@@ -150,6 +154,10 @@ export default class ScannerStore extends Container<ScannerState> {
 				`No private key found for ${parsedData.data.account} in your signer key storage.`
 			);
 		}
+
+		// set payload before it got hashed.
+		// signature will be generated from the hash, but we still want to display it.
+		this.setPrehashPayload(parsedData.preHash);
 	}
 
 	async setPartData(frame, frameCount, partData, accountsStore) {
@@ -249,7 +257,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		} else {
 			dataToSign = await ethSign(message);
 		}
-
+		debugger;
 		const sender = accountsStore.getByAddress(address);
 
 		if (!sender || !sender.encryptedSeed) {
@@ -290,6 +298,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		const tx = isEthereum
 			? await transaction(txRequest.data.rlp)
 			: txRequest.data.data;
+
 		const networkKey = isEthereum
 			? tx.ethereumChainId
 			: txRequest.data.data.genesisHash.toHex();
@@ -298,6 +307,16 @@ export default class ScannerStore extends Container<ScannerState> {
 			address: txRequest.data.account,
 			networkKey
 		});
+
+		console.log(this.isMultipartComplete());
+		debugger;
+		// need to figure out the Call information *before* the payload gets hashed
+		if (this.isMultipartComplete()) {
+			debugger;
+			const call = new Call(txRequest.data.data);
+			console.log(call);
+			debugger;
+		}
 
 		const networkTitle = NETWORK_LIST[networkKey].title;
 
@@ -489,5 +508,15 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getErrorMsg() {
 		return this.state.scanErrorMsg;
+	}
+
+	getPrehashPayload() {
+		return this.state.prehash;
+	}
+
+	setPrehashPayload(prehash) {
+		this.setState({
+			prehash
+		});
 	}
 }

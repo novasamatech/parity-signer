@@ -22,10 +22,16 @@ import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import {
+	NETWORK_LIST,
+	NetworkProtocols,
+	SUBSTRATE_NETWORK_LIST
+} from '../constants';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/message';
@@ -52,6 +58,7 @@ export default class MessageDetails extends React.PureComponent {
 								dataToSign={
 									isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign
 								}
+								prehash={scannerStore.getPrehashPayload()}
 								isHash={scannerStore.getIsHash()}
 								onNext={async () => {
 									try {
@@ -79,12 +86,21 @@ export class MessageDetailsView extends React.PureComponent {
 		isHash: PropTypes.bool,
 		message: PropTypes.string.isRequired,
 		onNext: PropTypes.func.isRequired,
+		prehash: PropTypes.object,
 		sender: PropTypes.object.isRequired
 	};
 
 	render() {
-		const { dataToSign, isHash, message, onNext, sender } = this.props;
+		const { dataToSign, isHash, message, onNext, prehash, sender } = this.props;
 
+		const isEthereum =
+			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
+		const prefix =
+			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
+		console.log('prehash -> ', prehash);
+		console.log('prefix -> ', prefix);
+		console.log('isEthereum -> ', isEthereum);
+		debugger;
 		return (
 			<ScrollView
 				contentContainerStyle={styles.bodyContent}
@@ -98,7 +114,12 @@ export class MessageDetailsView extends React.PureComponent {
 					address={sender.address}
 					networkKey={sender.networkKey}
 				/>
-				<Text style={styles.title}>MESSAGE</Text>
+
+				{prehash ? (
+					<Text style={styles.title}>HASH TO SIGN</Text>
+				) : (
+					<Text style={styles.title}>MESSAGE</Text>
+				)}
 				<Text style={styles.message}>
 					{isHash
 						? message
@@ -106,6 +127,14 @@ export class MessageDetailsView extends React.PureComponent {
 						? hexToAscii(message)
 						: dataToSign}
 				</Text>
+				{prehash ? (
+					<PayloadDetailsCard
+						style={{ marginBottom: 20 }}
+						description="You are about to confirm sending the following extrinsic. We will sign the hash instead of the payload as it is oversized."
+						payload={prehash}
+						prefix={prefix}
+					/>
+				) : null}
 				<Button
 					buttonStyles={{ height: 60 }}
 					title="Sign Message"

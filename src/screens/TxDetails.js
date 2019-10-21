@@ -22,7 +22,11 @@ import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import { NETWORK_LIST } from '../constants';
+import {
+	NETWORK_LIST,
+	NetworkProtocols,
+	SUBSTRATE_NETWORK_LIST
+} from '../constants';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
@@ -30,7 +34,6 @@ import Button from '../components/Button';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 
 export default class TxDetails extends React.PureComponent {
