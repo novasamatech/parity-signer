@@ -143,7 +143,13 @@ Re-run tests without re-installing the app
 ```
 yarn test-e2e:ios --reuse
 ```
-On Android is same, just replace `ios` with `android`, since Detox's Android support is in progress, when there is an error just build it again with `yarn build-e2e:android`
+
+If you want to use another specific device than defined in the configuration, add `--device-name` flag (on Android API version is needed), for example:
+```
+yarn test-e2e:android --device-name Pixel_2_API_28
+```
+
+On Android please replace `ios` with `android`, currently Detox's Android 0.60.x support is in progress, need to run `yarn start` to start a react-native server before testing. If there is an error, try build it again with `yarn build-e2e:android`
 
 ### Troubleshooting
 
