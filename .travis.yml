@@ -37,7 +37,7 @@ matrix:
       - rustup target add armv7s-apple-ios
       - rustup target add aarch64-apple-ios
       - yarn
-      - cd rust/signer && make ios && cd ..
+      - cd rust/signer && make ios && cd ../..
 
     script:
       - detox build -c ios.sim.release
