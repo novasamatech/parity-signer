@@ -96,29 +96,29 @@ export function rawDataToU8A(rawData) {
 	return bytes;
 }
 
-export async function constructDataFromBytes(bytes) {
+export async function constructDataFromBytes(bytes, multipartComplete = false) {
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
-	const isMultipart = !!parseInt(frameInfo.substr(0, 2), 16);
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
+	const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
 	const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
 	const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
 
-	if (isMultipart) {
+	// UOS after frames can be metadata json
+	if (isMultipart && !multipartComplete) {
 		const partData = {
 			currentFrame,
 			frameCount,
-			isMultipart: true,
+			isMultipart,
 			partData: uosAfterFrames
 		};
-
 		return partData;
 	}
 
 	const zerothByte = uosAfterFrames.substr(0, 2);
 	const firstByte = uosAfterFrames.substr(2, 2);
 	const secondByte = uosAfterFrames.substr(4, 2);
+
 	let action;
-	let address;
 	let data = {};
 	data.data = {}; // for consistency with legacy data format.
 
@@ -132,7 +132,7 @@ export async function constructDataFromBytes(bytes) {
 						: firstByte === '01'
 						? 'signTransaction'
 						: null;
-				address = uosAfterFrames.substr(4, 44);
+				let address = uosAfterFrames.substr(4, 44);
 
 				data.action = action;
 				data.data.account = address;
@@ -154,7 +154,6 @@ export async function constructDataFromBytes(bytes) {
 							? 'sr25519'
 							: null;
 					data.data.crypto = crypto;
-
 					const pubKeyHex = uosAfterFrames.substr(6, 64);
 					const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
 					const hexEncodedData = '0x' + uosAfterFrames.slice(70);
@@ -231,11 +230,15 @@ export async function constructDataFromBytes(bytes) {
 							break;
 						case '03': // Cold Signer should attempt to decode message to utf8
 							data.action = 'signData';
-							data.oversized = isOversized;
-							data.isHash = isOversized;
-							data.data.data = isOversized
-								? await blake2s(u8aToHex(rawPayload))
-								: u8aToString(rawPayload);
+
+							if (isOversized) {
+								data.data.data = await blake2s(u8aToHex(rawPayload));
+								data.isHash = isOversized;
+								data.oversized = isOversized;
+							} else {
+								data.data.data = u8aToString(rawPayload);
+							}
+
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,
 								defaultPrefix
@@ -245,24 +248,19 @@ export async function constructDataFromBytes(bytes) {
 							break;
 					}
 				} catch (e) {
-					if (e) {
-						throw new Error(e);
-					} else {
-						throw new Error('we cannot handle the payload: ', bytes);
-					}
+					throw new Error(
+						'Error: something went wrong decoding the Substrate UOS payload: ',
+						uosAfterFrames
+					);
 				}
 				break;
 			default:
-				throw new Error('we cannot handle the payload: ', bytes);
+				throw new Error('Error: Payload is not formatted correctly: ', bytes);
 		}
 
 		return data;
 	} catch (e) {
-		if (e) {
-			throw new Error(e);
-		} else {
-			throw new Error('we cannot handle the payload: ', bytes);
-		}
+		throw new Error('we cannot handle the payload: ', bytes);
 	}
 }
 
@@ -313,4 +311,8 @@ export function isAddressString(str) {
 		str.substr(0, 9) === 'ethereum:' ||
 		str.substr(0, 10) === 'substrate:'
 	);
+}
+
+export function encodeNumber(value) {
+	return new Uint8Array([value >> 8, value & 0xff]);
 }
