@@ -48,7 +48,7 @@ script:
 #
 #  - language: android
 ##    env:
-##      - REACT_NATIVE_VERSION=0.59.4
+##      - REACT_NATIVE_VERSION=0.60.5
 #    android:
 #      components:
 #        - tools
