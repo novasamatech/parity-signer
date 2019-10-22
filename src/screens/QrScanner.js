@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+// @flow
+
 'use strict';
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
 
@@ -58,6 +60,9 @@ export default class Scanner extends React.PureComponent {
 				{(scannerStore, accountsStore) => {
 					return (
 						<QrScannerView
+							completedFramesCount={scannerStore.getCompletedFramesCount()}
+							totalFramesCount={scannerStore.getTotalFramesCount()}
+							isMultipart={scannerStore.getTotalFramesCount() > 1}
 							navigation={this.props.navigation}
 							scannerStore={scannerStore}
 							onBarCodeRead={async txRequestData => {
@@ -75,24 +80,26 @@ export default class Scanner extends React.PureComponent {
 									} else if (isJsonString(txRequestData.data)) {
 										// Ethereum Legacy
 										await scannerStore.setUnsigned(txRequestData.data);
-									} else {
+									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
 
 										await scannerStore.setParsedData(
 											strippedData,
 											accountsStore
 										);
+									} else if (scannerStore.getErrorMsg()) {
+										throw new Error(scannerStore.getErrorMsg());
 									}
 
 									if (scannerStore.getUnsigned()) {
 										await scannerStore.setData(accountsStore);
 										if (scannerStore.getType() === 'transaction') {
+											scannerStore.clearMultipartProgress();
 											this.props.navigation.navigate('TxDetails');
 										} else {
+											scannerStore.clearMultipartProgress();
 											this.props.navigation.navigate('MessageDetails');
 										}
-									} else {
-										return;
 									}
 								} catch (e) {
 									return this.showErrorMessage(
@@ -110,7 +117,7 @@ export default class Scanner extends React.PureComponent {
 	}
 }
 
-export class QrScannerView extends React.PureComponent {
+export class QrScannerView extends React.Component {
 	constructor(props) {
 		super(props);
 		this.setBusySubscription = null;
@@ -160,10 +167,29 @@ export class QrScannerView extends React.PureComponent {
 						<View style={styles.middleCenter} />
 						<View style={styles.middleRight} />
 					</View>
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>Scan QR Code</Text>
-						<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
-					</View>
+					{this.props.isMultipart ? (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								Scanning Multipart Data, Please Hold Still...
+							</Text>
+							<Text style={styles.descSecondary}>
+								{this.props.completedFramesCount} /{' '}
+								{this.props.totalFramesCount} Completed.
+							</Text>
+							<Button
+								onPress={() => this.props.scannerStore.clearMultipartProgress()}
+								style={styles.descSecondary}
+								title="Start Over"
+							/>
+						</View>
+					) : (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>Scan QR Code</Text>
+							<Text style={styles.descSecondary}>
+								To Sign a New Transaction
+							</Text>
+						</View>
+					)}
 				</View>
 			</RNCamera>
 		);
@@ -225,6 +251,10 @@ const styles = StyleSheet.create({
 	middleRight: {
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 		flex: 1
+	},
+	progress: {
+		alignItems: 'center',
+		justifyContent: 'center'
 	},
 	titleTop: {
 		color: colors.bg_text,
