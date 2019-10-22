@@ -38,13 +38,13 @@ export type NetworkSpec = {
 	prefix: number
 };
 
-export type NetworkSpecState = {
+type State = {
 	networkSpecs: Map<string, NetworkSpec>,
 	newNetworkSpec: NetworkSpec,
 	selectedKey: string
 };
 
-export default class NetworksStore extends Container<NetworkSpecState> {
+export default class NetworksStore extends Container<State> {
 	state = {
 		networkSpecs: new Map(),
 		newNetworkSpec: empty(),
