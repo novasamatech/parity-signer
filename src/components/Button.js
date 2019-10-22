@@ -25,7 +25,8 @@ import {
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	View,
-	ViewPropTypes
+	ViewPropTypes,
+	PixelRatio
 } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
@@ -46,7 +47,7 @@ export default class Button extends React.PureComponent<{
 	};
 
 	render() {
-		const { onPress, title, disabled, textStyles, buttonStyles } = this.props;
+		const { buttonStyles, disabled, onPress, textStyles, title } = this.props;
 
 		const finalTextStyles = [styles.text, textStyles];
 		const finalButtonStyles = [styles.button, buttonStyles];
@@ -78,9 +79,11 @@ const styles = StyleSheet.create({
 	button: {
 		alignItems: 'center',
 		backgroundColor: colors.bg_button,
+		borderRadius: 60 / PixelRatio.get(),
 		elevation: 4,
 		height: 60,
-		justifyContent: 'center'
+		justifyContent: 'center',
+		width: 100
 	},
 	buttonDisabled: {
 		backgroundColor: '#dfdfdf',

@@ -19,13 +19,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import PopupMenu from '../components/PopupMenu';
+// import PopupMenu from '../components/PopupMenu';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 
@@ -94,14 +95,11 @@ class AccountListView extends React.PureComponent {
 				<View style={styles.header}>
 					<Text style={styles.title}>ACCOUNTS</Text>
 					<View style={styles.menuView}>
-						<PopupMenu
-							onSelect={value => navigate(value)}
-							menuTriggerIconName={'add'}
-							menuItems={[
-								{ text: 'New Account', value: 'AccountNew' },
-								{ text: 'Recover Account', value: 'AccountRecover' },
-								{ text: 'About', value: 'About' }
-							]}
+						<Icon
+							onPress={() => navigate('Settings')}
+							name="settings"
+							size={35}
+							color={colors.bg_text_sec}
 						/>
 					</View>
 				</View>
@@ -130,11 +128,7 @@ class AccountListView extends React.PureComponent {
 				/>
 				{!hasNoAccount && (
 					<View style={styles.bottom}>
-						<Button
-							buttonStyles={{ height: 60 }}
-							title="Scan"
-							onPress={() => navigate('QrScanner')}
-						/>
+						<Button title="Scan" onPress={() => navigate('QrScanner')} />
 					</View>
 				)}
 			</View>
@@ -149,6 +143,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'column'
 	},
 	bottom: {
+		alignItems: 'center',
+		display: 'flex',
+		justifyContent: 'space-between',
 		marginTop: 20
 	},
 	content: {
@@ -163,8 +160,11 @@ const styles = StyleSheet.create({
 		textDecorationLine: 'underline'
 	},
 	menuView: {
-		alignItems: 'flex-end',
-		flex: 1
+		alignItems: 'stretch',
+		display: 'flex',
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'flex-end'
 	},
 	onboardingText: {
 		color: colors.bg_text_sec,

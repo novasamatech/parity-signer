@@ -19,7 +19,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {
-	Image,
 	Platform,
 	StyleSheet,
 	Text,
@@ -29,13 +28,13 @@ import {
 	ViewPropTypes
 } from 'react-native';
 import colors from '../colors';
+import fonts from '../fonts';
 
 export default class Card extends React.PureComponent<{
 	title: string,
 	secondaryText?: ?string,
 	labelText?: ?string,
 	footerStyle?: ?StyleSheet.Styles,
-	style: ?StyleSheet.Styles,
 	onPress: () => any
 }> {
 	static propTypes = {
@@ -43,7 +42,6 @@ export default class Card extends React.PureComponent<{
 		labelText: PropTypes.string,
 		onPress: PropTypes.func,
 		secondaryText: PropTypes.string,
-		style: ViewPropTypes.style,
 		title: PropTypes.string.isRequired
 	};
 
@@ -53,12 +51,11 @@ export default class Card extends React.PureComponent<{
 			secondaryText,
 			labelText,
 			footerStyle,
-			style,
 			onPress
 		} = this.props;
 
-		const finalBodyStyle = [style.body, footerStyle];
-		const finalContentStyle = [style.content];
+		const finalBodyStyle = [styles.body, footerStyle];
+		const finalContentStyle = [styles.content];
 		const finalFooterStyle = [styles.footer, footerStyle];
 		const finalTitleTextStyle = [styles.titleText];
 		const finalSecondaryTextStyle = [styles.secondaryText];
@@ -74,7 +71,6 @@ export default class Card extends React.PureComponent<{
 			>
 				<View style={finalBodyStyle}>
 					<View style={finalContentStyle}>
-						<Image source={require('../../icon.png')} style={styles.image} />
 						<View>
 							<Text style={finalTitleTextStyle}>{title}</Text>
 							<Text style={finalSecondaryTextStyle}>{secondaryText}</Text>
@@ -93,7 +89,7 @@ const styles = StyleSheet.create({
 	body: {},
 	content: {
 		backgroundColor: colors.card_bg,
-		padding: 10
+		padding: 30
 	},
 	footer: {},
 	footerText: {},
@@ -101,6 +97,10 @@ const styles = StyleSheet.create({
 		height: 80,
 		width: 80
 	},
-	secondaryText: {},
-	titleText: {}
+	secondaryText: {
+		fontFamily: fonts.regular
+	},
+	titleText: {
+		fontFamily: fonts.bold
+	}
 });

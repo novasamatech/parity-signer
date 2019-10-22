@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+// @flow
 'use strict';
 
 import { AsyncStorage } from 'react-native';
@@ -129,15 +130,42 @@ export async function saveToCAndPPConfirmation() {
 }
 
 /*
- * @dev mapping of networkKey => metadata blob, where the blob is the calls-only SCALE encoded metadata, base64 encoded for more compactness
+ @param networkSpec: {
+	 prefix: number,
+	 chainName?: string,
+	 identiconFn: func,
+	 networkKey: string, // genesisHash
+	 derivationPath?: string 
+ }
  */
-export async function addMetadata(networkKey, blob) {
-	await AsyncStorage.setItem(networkKey, blob);
+export async function addNetworkSpec(networkKey, networkSpec) {
+	if (!networkKey) {
+		throw new Error('Must supply a network key to add new network spec.');
+	}
+
+	if (!networkSpec.prefix) {
+		throw new Error('Network spec must include prefix to be valid.');
+	}
+
+	if (!networkSpec.identiconFn) {
+		throw new Error(
+			'Network spec must include a valid identicon generation function.'
+		);
+	}
+
+	await AsyncStorage.setItem(networkKey, networkSpec);
 }
 
 /*
- * @dev fetch metadata for a specific network key
+ * @dev fetch all networks specs
  */
-export async function fetchMetadata(networkKey) {
+export async function loadNetworkSpecs() {
+	await AsyncStorage.getItem('network_specs');
+}
+
+/*
+ * @dev get a specific network spec by networkKey (genesisHash)
+ */
+export async function getNetworkSpecByKey(networkKey) {
 	await AsyncStorage.getItem(networkKey);
 }
