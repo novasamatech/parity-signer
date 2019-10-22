@@ -18,11 +18,14 @@
 
 // import PropTypes from 'prop-types';
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import { NetworksStore } from '../stores/NetworksStore';
+import Background from '../components/Background';
+import Card from '../components/Card';
+import fonts from '../fonts';
+import NetworksStore from '../stores/NetworksStore';
 
 export default class NetworkSettings extends React.PureComponent {
 	render() {
@@ -31,7 +34,8 @@ export default class NetworkSettings extends React.PureComponent {
 				{networksStore => {
 					return (
 						<NetworkListView
-							networksStore={networksStore}
+							{...this.props}
+							networkSpecs={networksStore.getNetworkSpecs()}
 							onSelect={() =>
 								this.props.navigation.navigate('NetworkSpecDetailsView')
 							}
@@ -44,22 +48,43 @@ export default class NetworkSettings extends React.PureComponent {
 }
 
 class NetworkListView extends React.PureComponent {
-	render() {
-		// const { networksStore, onSelect } = this.props;
+	constructor(props) {
+		super(props);
+	}
 
-		debugger;
+	render() {
+		const { networkSpecs, onSelect } = this.props;
 
 		return (
-			// <ScrollView contentContainerStyle={styles.bodyContent} style={styles.body}>
-			//   <Background />
-			<Text style={styles.topTitle}>Supported Networks</Text>
-			// {
-			// for each network key in NetworksStore
-			// show network name, genesis hash
-			// onselect, go to the details page
-			// onAddNew, go to QRScanner with prop flag (scan new network spec)
-			// }
-			// </ScrollView>
+			<ScrollView
+				contentContainerStyle={styles.bodyContent}
+				style={styles.body}
+			>
+				<Background />
+				<Text style={styles.titleTop}>Supported Networks</Text>
+				{networkSpecs ? (
+					networkSpecs.forEach((networkSpec, networkKey) => {
+						<Card
+							title={networkSpec.chainName}
+							secondaryText={networkKey}
+							onPress={onSelect}
+						/>;
+					})
+				) : (
+					<View>
+						<Text style={styles.descTitle}>
+							It looks like no networks are supported...
+						</Text>
+						<Text style={styles.descSecondary}>
+							Press the button below to add a new network spec.
+						</Text>
+						<Button
+							title="Add new network"
+							onPress={() => this.props.navigation.navigate('QrScanner')}
+						/>
+					</View>
+				)}
+			</ScrollView>
 		);
 	}
 }
@@ -74,5 +99,25 @@ const styles = StyleSheet.create({
 	},
 	bodyContent: {
 		paddingBottom: 40
+	},
+	descSecondary: {
+		color: colors.bg_text,
+		fontFamily: fonts.bold,
+		fontSize: 14,
+		paddingBottom: 20
+	},
+	descTitle: {
+		color: colors.bg_text,
+		fontFamily: fonts.bold,
+		fontSize: 18,
+		paddingBottom: 10,
+		textAlign: 'center'
+	},
+	titleTop: {
+		color: colors.bg_text,
+		fontFamily: fonts.bold,
+		fontSize: 26,
+		paddingBottom: 10,
+		textAlign: 'center'
 	}
 });
