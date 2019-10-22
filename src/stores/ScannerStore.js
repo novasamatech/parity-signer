@@ -243,7 +243,7 @@ export default class ScannerStore extends Container<ScannerState> {
 				const range = mod(frame - lastFrame, totalFrameCount) - 1;
 				const missedFrames = Array.from(
 					new Array(range),
-					(_, i) => i + lastFrame
+					(_, i) => (i + lastFrame) % totalFrameCount
 				);
 				this.setState({
 					missedFrames: [...this.state.missedFrames, ...missedFrames]
