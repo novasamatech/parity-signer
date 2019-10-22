@@ -127,3 +127,17 @@ export async function loadToCAndPPConfirmation() {
 export async function saveToCAndPPConfirmation() {
 	await AsyncStorage.setItem('ToCAndPPConfirmation_v3', 'yes');
 }
+
+/*
+ * @dev mapping of networkKey => metadata blob, where the blob is the calls-only SCALE encoded metadata, base64 encoded for more compactness
+ */
+export async function addMetadata(networkKey, blob) {
+	await AsyncStorage.setItem(networkKey, blob);
+}
+
+/*
+ * @dev fetch metadata for a specific network key
+ */
+export async function fetchMetadata(networkKey) {
+	await AsyncStorage.getItem(networkKey);
+}
