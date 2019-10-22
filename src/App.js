@@ -47,12 +47,15 @@ import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
 import AccountRecover from './screens/AccountRecover';
+import AccountSettings from './screens/AccountSettings';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import Loading from './screens/Loading';
 import MessageDetails from './screens/MessageDetails';
+import NetworkSettings from './screens/NetworkSettings';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
+import Settings from './screens/Settings';
 import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
@@ -198,6 +201,9 @@ const Screens = createStackNavigator(
 					AccountRecover: {
 						screen: AccountRecover
 					},
+					AccountSettings: {
+						screen: AccountSettings
+					},
 					AccountUnlock: {
 						screen: AccountUnlock
 					},
@@ -207,8 +213,14 @@ const Screens = createStackNavigator(
 					MessageDetails: {
 						screen: MessageDetails
 					},
+					NetworkSettings: {
+						screen: NetworkSettings
+					},
 					QrScanner: {
 						screen: QrScanner
+					},
+					Settings: {
+						screen: Settings
 					},
 					SignedMessage: {
 						screen: SignedMessage
