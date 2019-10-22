@@ -69,23 +69,23 @@ class AccountDetailsView extends React.Component {
 This account can only be recovered with its associated recovery phrase.`,
 			[
 				{
-					text: 'Delete',
-					style: 'destructive',
 					onPress: () => {
 						accounts.deleteAccount(selectedKey);
 						const resetAction = StackActions.reset({
-							index: 0,
-							key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 							actions: [
 								NavigationActions.navigate({ routeName: 'AccountList' })
-							]
+							],
+							index: 0,
+							key: undefined // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 						});
 						this.props.navigation.dispatch(resetAction);
-					}
+					},
+					style: 'destructive',
+					text: 'Delete'
 				},
 				{
-					text: 'Cancel',
-					style: 'cancel'
+					style: 'cancel',
+					text: 'Cancel'
 				}
 			]
 		);
@@ -110,20 +110,20 @@ This account can only be recovered with its associated recovery phrase.`,
 					console.log(e);
 					Alert.alert('Biometric Error', e.message, [
 						{
-							text: 'Ok',
-							style: 'default',
+							onDismiss: () => {
+								navigate('AccountUnlock', {
+									next: value,
+									onDelete: this.onDelete
+								});
+							},
 							onPress: () => {
 								navigate('AccountUnlock', {
 									next: value,
 									onDelete: this.onDelete
 								});
 							},
-							onDismiss: () => {
-								navigate('AccountUnlock', {
-									next: value,
-									onDelete: this.onDelete
-								});
-							}
+							style: 'default',
+							text: 'Ok'
 						}
 					]);
 				}
@@ -184,19 +184,19 @@ This account can only be recovered with its associated recovery phrase.`,
 									onSelect={this.onOptionSelect}
 									menuTriggerIconName={'more-vert'}
 									menuItems={[
-										{ value: 'AccountEdit', text: 'Edit' },
-										{ value: 'AccountPin', text: 'Change Pin' },
+										{ text: 'Edit', value: 'AccountEdit' },
+										{ text: 'Change Pin', value: 'AccountPin' },
 										{
-											value: 'AccountBiometric',
 											text: accounts.getSelected().biometricEnabled
 												? 'Disable Biometric'
-												: 'Enable Biometric'
+												: 'Enable Biometric',
+											value: 'AccountBiometric'
 										},
-										{ value: 'AccountBackup', text: 'View Recovery Phrase' },
+										{ text: 'View Recovery Phrase', value: 'AccountBackup' },
 										{
-											value: 'AccountDelete',
 											text: 'Delete',
-											textStyle: styles.deleteText
+											textStyle: styles.deleteText,
+											value: 'AccountDelete'
 										}
 									]}
 								/>
@@ -231,28 +231,28 @@ const styles = StyleSheet.create({
 	bodyContent: {
 		paddingBottom: 40
 	},
-	qr: {
-		marginTop: 20,
-		backgroundColor: colors.card_bg
-	},
 	deleteText: {
 		color: colors.bg_alert
 	},
 	header: {
-		flexDirection: 'row',
 		alignItems: 'center',
-		paddingBottom: 20,
-		justifyContent: 'center'
+		flexDirection: 'row',
+		justifyContent: 'center',
+		paddingBottom: 20
 	},
 	menuView: {
-		flex: 1,
-		alignItems: 'flex-end'
+		alignItems: 'flex-end',
+		flex: 1
+	},
+	qr: {
+		backgroundColor: colors.card_bg,
+		marginTop: 20
 	},
 	title: {
 		color: colors.bg_text_sec,
-		fontSize: 18,
-		fontFamily: fonts.bold,
 		flexDirection: 'column',
+		fontFamily: fonts.bold,
+		fontSize: 18,
 		justifyContent: 'center'
 	},
 	warningTitle: {

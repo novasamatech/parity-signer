@@ -291,8 +291,8 @@ export default class AccountsStore extends Container<AccountsState> {
 			.finally(() => {
 				// incase delete failed, overwrite the pinKey and forget the encrypted pin
 				this.updateAccount(accountKey, {
-					pinKey: v4(),
-					biometricEnabled: false
+					biometricEnabled: false,
+					pinKey: v4()
 				});
 				return this.save(accountKey);
 			});

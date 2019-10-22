@@ -49,18 +49,18 @@ export function accountId({ address, networkKey }) {
 export function empty(address = '', networkKey = SubstrateNetworkKeys.KUSAMA) {
 	return {
 		address: address,
+		biometricEnabled: false,
 		createdAt: new Date().getTime(),
 		derivationPassword: '',
 		derivationPath: '',
 		encryptedSeed: null,
 		name: '',
 		networkKey: networkKey,
+		pinKey: v4(),
 		seed: '',
 		seedPhrase: '',
 		updatedAt: new Date().getTime(),
-		validBip39Seed: false,
-		pinKey: v4(),
-		biometricEnabled: false
+		validBip39Seed: false
 	};
 }
 

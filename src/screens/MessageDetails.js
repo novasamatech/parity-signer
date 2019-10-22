@@ -61,8 +61,6 @@ export default class MessageDetails extends React.PureComponent {
 											(await scannerStore.signData(null))
 										) {
 											const resetAction = StackActions.reset({
-												index: 1,
-												key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 												actions: [
 													NavigationActions.navigate({
 														routeName: 'AccountList'
@@ -70,7 +68,9 @@ export default class MessageDetails extends React.PureComponent {
 													NavigationActions.navigate({
 														routeName: 'SignedMessage'
 													})
-												]
+												],
+												index: 1,
+												key: undefined // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 											});
 											this.props.navigation.dispatch(resetAction);
 										} else {

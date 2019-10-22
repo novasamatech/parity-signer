@@ -384,15 +384,15 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			if (type === 'transaction') {
 				await saveTx({
+					createdAt: new Date().getTime(),
 					hash:
 						isEthereum || isHash
 							? dataToSign
 							: await blake2s(dataToSign.toHex()),
-					tx,
-					sender,
 					recipient,
+					sender,
 					signature: signedData,
-					createdAt: new Date().getTime()
+					tx
 				});
 			}
 

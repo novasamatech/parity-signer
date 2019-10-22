@@ -49,12 +49,12 @@ export class AccountUnlockAndSign extends React.PureComponent {
 						}}
 						navigate={() => {
 							const resetAction = StackActions.reset({
-								index: 1,
-								key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 								actions: [
 									NavigationActions.navigate({ routeName: 'AccountList' }),
 									NavigationActions.navigate({ routeName: next })
-								]
+								],
+								index: 1,
+								key: undefined // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 							});
 							navigation.dispatch(resetAction);
 						}}
@@ -94,8 +94,8 @@ export class AccountUnlock extends React.Component {
 											console.log(error);
 											Alert.alert('Biometric Error', error.message, [
 												{
-													text: 'Ok',
-													style: 'default'
+													style: 'default',
+													text: 'Ok'
 												}
 											]);
 										});
@@ -105,16 +105,16 @@ export class AccountUnlock extends React.Component {
 								navigation.state.params.onDelete();
 							} else {
 								const resetAction = StackActions.reset({
-									index: 2,
-									key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 									actions: [
 										NavigationActions.navigate({ routeName: 'AccountList' }),
 										NavigationActions.navigate({ routeName: 'AccountDetails' }),
 										NavigationActions.navigate({
-											routeName: next,
-											params: next === 'AccountBiometric' ? { pin: pin } : {}
+											params: next === 'AccountBiometric' ? { pin: pin } : {},
+											routeName: next
 										})
-									]
+									],
+									index: 2,
+									key: undefined // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 								});
 								this.props.navigation.dispatch(resetAction);
 							}
@@ -133,8 +133,8 @@ class AccountUnlockView extends React.PureComponent {
 	};
 
 	state = {
-		pin: '',
-		hasWrongPin: false
+		hasWrongPin: false,
+		pin: ''
 	};
 
 	showErrorMessage = () => {
@@ -192,31 +192,31 @@ function PinInput(props) {
 const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
-		padding: 20,
 		flex: 1,
-		overflow: 'hidden'
+		overflow: 'hidden',
+		padding: 20
+	},
+	errorText: {
+		color: colors.bg_alert,
+		fontFamily: fonts.bold,
+		fontSize: 12,
+		paddingBottom: 20,
+		textAlign: 'center'
+	},
+	pinInput: {
+		marginBottom: 20
 	},
 	title: {
-		fontFamily: fonts.bold,
 		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 10
 	},
 	titleTop: {
 		color: colors.bg_text_sec,
-		fontSize: 24,
 		fontFamily: fonts.bold,
+		fontSize: 24,
 		paddingBottom: 20,
 		textAlign: 'center'
-	},
-	errorText: {
-		fontFamily: fonts.bold,
-		textAlign: 'center',
-		color: colors.bg_alert,
-		fontSize: 12,
-		paddingBottom: 20
-	},
-	pinInput: {
-		marginBottom: 20
 	}
 });

@@ -62,14 +62,14 @@ export default class TxDetails extends React.PureComponent {
 											(await scannerStore.signData(null))
 										) {
 											const resetAction = StackActions.reset({
-												index: 1,
-												key: undefined, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 												actions: [
 													NavigationActions.navigate({
 														routeName: 'AccountList'
 													}),
 													NavigationActions.navigate({ routeName: 'SignedTx' })
-												]
+												],
+												index: 1,
+												key: undefined // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 											});
 											this.props.navigation.dispatch(resetAction);
 										} else {
