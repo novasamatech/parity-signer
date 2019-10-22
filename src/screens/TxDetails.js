@@ -36,8 +36,8 @@ import { NavigationActions, StackActions } from 'react-navigation';
 
 export default class TxDetails extends React.PureComponent {
 	static navigationOptions = {
-		title: 'Transaction Details',
-		headerBackTitle: 'Transaction details'
+		headerBackTitle: 'Transaction details',
+		title: 'Transaction Details'
 	};
 	render() {
 		return (
@@ -94,15 +94,15 @@ export default class TxDetails extends React.PureComponent {
 
 export class TxDetailsView extends React.PureComponent {
 	static propTypes = {
-		onNext: PropTypes.func.isRequired,
 		dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
 			.isRequired,
-		sender: PropTypes.object.isRequired,
-		recipient: PropTypes.object.isRequired,
-		value: PropTypes.string,
-		nonce: PropTypes.string,
 		gas: PropTypes.string,
-		gasPrice: PropTypes.string
+		gasPrice: PropTypes.string,
+		nonce: PropTypes.string,
+		onNext: PropTypes.func.isRequired,
+		recipient: PropTypes.object.isRequired,
+		sender: PropTypes.object.isRequired,
+		value: PropTypes.string
 	};
 
 	render() {
@@ -111,7 +111,7 @@ export class TxDetailsView extends React.PureComponent {
 			sender,
 			recipient,
 			value,
-			nonce,
+			// nonce,
 			gas,
 			gasPrice,
 			onNext
@@ -173,51 +173,51 @@ export class TxDetailsView extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		padding: 20,
-		overflow: 'hidden'
-	},
-	bodyContent: {
-		paddingBottom: 40
-	},
-	transactionDetails: {
-		flex: 1,
-		backgroundColor: colors.card_bg
-	},
-	topTitle: {
-		textAlign: 'center',
-		color: colors.bg_text_sec,
-		fontSize: 24,
-		fontFamily: fonts.bold,
-		paddingBottom: 20
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontSize: 18,
-		fontFamily: fonts.bold,
-		paddingBottom: 20
-	},
-	wrapper: {
-		borderRadius: 5
-	},
-	address: {
+	actionButtonContainer: {
 		flex: 1
-	},
-	deleteText: {
-		textAlign: 'right'
-	},
-	changePinText: {
-		textAlign: 'left',
-		color: 'green'
 	},
 	actionsContainer: {
 		flex: 1,
 		flexDirection: 'row'
 	},
-	actionButtonContainer: {
+	address: {
 		flex: 1
+	},
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column',
+		overflow: 'hidden',
+		padding: 20
+	},
+	bodyContent: {
+		paddingBottom: 40
+	},
+	changePinText: {
+		color: 'green',
+		textAlign: 'left'
+	},
+	deleteText: {
+		textAlign: 'right'
+	},
+	title: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 18,
+		paddingBottom: 20
+	},
+	topTitle: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 24,
+		paddingBottom: 20,
+		textAlign: 'center'
+	},
+	transactionDetails: {
+		backgroundColor: colors.card_bg,
+		flex: 1
+	},
+	wrapper: {
+		borderRadius: 5
 	}
 });

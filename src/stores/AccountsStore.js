@@ -58,7 +58,7 @@ type AccountsState = {
 	selectedKey: string
 };
 
-export default class AccountsStore extends Container {
+export default class AccountsStore extends Container<AccountsState> {
 	state = {
 		accounts: new Map(),
 		newAccount: empty(),
@@ -123,9 +123,15 @@ export default class AccountsStore extends Container {
 	async save(accountKey, account, pin = null) {
 		account = account ? account : this.state.accounts.get(accountKey);
 		try {
-			// for account creation
-			if (pin && account.seed) {
-				account.encryptedSeed = await encryptData(account.seed, pin);
+			if (pin) {
+				if (account.biometricEnabled) {
+					await this.updateBiometric(accountKey, account, pin);
+				}
+
+				// for account creation
+				if (account.seed) {
+					account.encryptedSeed = await encryptData(account.seed, pin);
+				}
 			}
 
 			const accountToSave = this.deleteSensitiveData(account);
@@ -286,5 +292,14 @@ export default class AccountsStore extends Container {
 				});
 				return this.save(accountKey);
 			});
+	}
+
+	async updateBiometric(accountKey, account, pin) {
+		return secureDelete(APP_ID, account.pinKey)
+			.catch(e => {
+				console.log(e);
+				account.pinKey = v4();
+			})
+			.finally(() => securePut(APP_ID, account.pinKey, pin));
 	}
 }

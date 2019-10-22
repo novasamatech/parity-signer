@@ -121,7 +121,7 @@ export function blake2s(data) {
 	return EthkeyBridge.blake2s(asString(data));
 }
 
-// Get an SS58 encoded address for a sr25519 key from a BIP39 phrase and a prefix.
+// Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
 // Prefix is a number used in the SS58 encoding:
 //
 //   Polkadot proper = 0

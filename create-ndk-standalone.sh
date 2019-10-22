@@ -29,7 +29,7 @@ cd NDK
 
 for ARCH in arm64 arm x86; do
     echo "($ARCH)..."
-    "$MAKER" --arch $ARCH --api 28 --install-dir $ARCH
+    "$MAKER" --arch $ARCH --install-dir $ARCH
 done
 
 echo 'Updating ./rust/.cargo/config.toml...'

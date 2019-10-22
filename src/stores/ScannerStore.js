@@ -69,9 +69,9 @@ type ScannerState = {
 
 const defaultState = {
 	busy: false,
+	dataToSign: '',
 	isHash: false,
 	isOversized: false,
-	dataToSign: '',
 	message: null,
 	multipartData: {},
 	recipient: null,
@@ -235,8 +235,8 @@ export default class ScannerStore extends Container<ScannerState> {
 			: txRequest.data.data.genesisHash.toHex();
 
 		const sender = accountsStore.getById({
-			networkKey,
-			address: txRequest.data.account
+			address: txRequest.data.account,
+			networkKey
 		});
 
 		const networkTitle = NETWORK_LIST[networkKey].title;
@@ -248,8 +248,8 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		const recipient = accountsStore.getById({
-			networkKey,
-			address: isEthereum ? tx.action : txRequest.data.account
+			address: isEthereum ? tx.action : txRequest.data.account,
+			networkKey
 		});
 
 		// For Eth, always sign the keccak hash.
@@ -259,13 +259,13 @@ export default class ScannerStore extends Container<ScannerState> {
 			: txRequest.data.data;
 
 		this.setState({
-			type: 'transaction',
-			sender,
-			recipient,
-			txRequest,
-			tx,
 			dataToSign,
-			isOversized
+			isOversized,
+			recipient,
+			sender,
+			tx,
+			txRequest,
+			type: 'transaction'
 		});
 
 		return true;
@@ -276,8 +276,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
-		console.log('biometric ' + sender.biometricEnabled);
-		console.log('is ethereum ' + isEthereum);
 
 		let signable;
 		if (isEthereum) {
