@@ -226,7 +226,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 		flex: 1,
-		justifyContent: 'center'
+		justifyContent: 'center',
+		paddingHorizontal: 15
 	},
 	descSecondary: {
 		color: colors.bg_text,

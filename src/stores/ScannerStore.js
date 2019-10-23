@@ -233,17 +233,17 @@ export default class ScannerStore extends Container<ScannerState> {
 			const nextDataState = multipartData;
 			nextDataState[frame] = partDataAsBytes;
 
+			const missedFramesRange = mod(frame - lastFrame, totalFrameCount) - 1;
+
 			// we skipped at least one frame that we haven't already scanned before
 			if (
 				lastFrame &&
-				mod(frame - lastFrame, totalFrameCount) > 1 &&
+				missedFramesRange >= 1 &&
 				!missedFrames.includes(frame)
 			) {
-				// enumerate all the frames between frame and lastFrame
-				const range = mod(frame - lastFrame, totalFrameCount) - 1;
-				const missedFrames = Array.from(
-					new Array(range),
-					(_, i) => (i + lastFrame) % totalFrameCount
+				// enumerate all the frames between (current)frame and lastFrame
+				const missedFrames = Array.from(new Array(missedFramesRange), (_, i) =>
+					mod(i + lastFrame, totalFrameCount)
 				);
 				this.setState({
 					missedFrames: [...this.state.missedFrames, ...missedFrames]
@@ -251,8 +251,8 @@ export default class ScannerStore extends Container<ScannerState> {
 			}
 
 			// if we just filled a frame that was previously missed, remove it from the missedFrames list
-			if (missedFrames && missedFrames.includes(frame)) {
-				missedFrames.splice(missedFrames.indexOf(frame), 1);
+			if (missedFrames && missedFrames.includes(frame - 1)) {
+				missedFrames.splice(missedFrames.indexOf(frame - 1), 1);
 			}
 
 			this.setState({
