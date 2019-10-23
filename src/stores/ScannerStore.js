@@ -90,7 +90,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
-	async setParsedData(strippedData, accountsStore) {
+	async setParsedData(strippedData, accountsStore, isNetworkSpec = false) {
 		const parsedData = await constructDataFromBytes(strippedData);
 
 		if (!accountsStore.getByAddress(parsedData.data.account)) {
@@ -116,8 +116,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			this.setPartData(
 				parsedData.frame,
 				parsedData.frameCount,
-				parsedData.partData,
-				accountsStore
+				parsedData.partData
 			);
 			return;
 		}
@@ -127,7 +126,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
-	async setPartData(frame, frameCount, partData, accountsStore) {
+	async setPartData(frame, frameCount, partData) {
 		if (
 			partData[0] === new Uint8Array([0x00]) ||
 			partData[0] === new Uint8Array([0x7b])

@@ -80,7 +80,11 @@ class NetworkListView extends React.PureComponent {
 						</Text>
 						<Button
 							title="Add new network"
-							onPress={() => this.props.navigation.navigate('QrScanner')}
+							onPress={() =>
+								this.props.navigation.navigate('QrScanner', {
+									isScanningNetworkSpec: true
+								})
+							}
 						/>
 					</View>
 				)}
