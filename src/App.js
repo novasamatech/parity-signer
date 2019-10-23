@@ -42,7 +42,7 @@ import About from './screens/About';
 import AccountBackup from './screens/AccountBackup';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
-import AccountList from './screens/AccountList';
+import LegacyAccountList from './screens/LegacyAccountList';
 import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
@@ -172,7 +172,7 @@ const Screens = createStackNavigator(
 						navigationOptions: {
 							headerLeft: <HeaderLeftHome />
 						},
-						screen: AccountList
+						screen: LegacyAccountList
 					},
 					About: {
 						screen: About

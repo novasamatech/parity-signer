@@ -28,8 +28,9 @@ import Button from '../components/Button';
 import PopupMenu from '../components/PopupMenu';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
+import IdentitiesSwitch from '../components/IdentitiesSwitch';
 
-export default class AccountList extends React.PureComponent {
+export default class LegacyAccountList extends React.PureComponent {
 	static navigationOptions = {
 		title: 'Accounts'
 	};
@@ -91,6 +92,7 @@ class AccountListView extends React.PureComponent {
 		return (
 			<View style={styles.body}>
 				<Background />
+				<IdentitiesSwitch />
 				<View style={styles.header}>
 					<Text style={styles.title}>ACCOUNTS</Text>
 					<View style={styles.menuView}>
