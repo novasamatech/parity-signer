@@ -25,7 +25,7 @@ cache:
 #    - npm install
 #    - npm run test
 #  tags:
-#    - rust 
+#    - linux-docker
 android-build:
   stage: build
   image: parity/android-sdk
@@ -47,7 +47,7 @@ android-build:
     - pwd
     - ls
   tags:
-    - rust 
+    - linux-docker
   artifacts:
     paths:
     - ./android/app/build/outputs/apk/release/app-release.apk 
