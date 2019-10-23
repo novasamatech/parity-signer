@@ -36,7 +36,7 @@ matrix:
       - rustup target add armv7-apple-ios
       - rustup target add armv7s-apple-ios
       - rustup target add aarch64-apple-ios
-      - travis_wait 10 mvn install
+      - travis_wait mvn install
       - yarn
       - cd rust/signer && make ios && cd ../..
 
