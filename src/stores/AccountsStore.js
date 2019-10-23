@@ -26,6 +26,7 @@ import {
 } from '../util/db';
 import { parseSURI } from '../util/suri';
 import { decryptData, encryptData } from '../util/native';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 
 export type Account = {
 	address: string,
@@ -41,7 +42,22 @@ export type Account = {
 	validBip39Seed: boolean
 };
 
+type AccountMeta = {
+	address: string,
+	createdAt: number,
+	name: string,
+	updatedAt: number
+};
+
+type Identity = {
+	encryptedSeedPhrase: string,
+	derivationPassword: string,
+	meta: Map<string, AccountMeta>,
+	addresses: Map<string, string>
+};
+
 type AccountsState = {
+	identities: [Identity],
 	accounts: Map<string, Account>,
 	newAccount: Account,
 	selectedKey: string
@@ -50,6 +66,7 @@ type AccountsState = {
 export default class AccountsStore extends Container<AccountsState> {
 	state = {
 		accounts: new Map(),
+		identities: [],
 		newAccount: empty(),
 		selectedKey: ''
 	};
@@ -75,17 +92,24 @@ export default class AccountsStore extends Container<AccountsState> {
 
 	async submitNew(pin) {
 		const account = this.state.newAccount;
+		if (!account.seed) return;
 
-		// only save a new account if the seed isn't empty
-		if (account.seed) {
-			const accountKey = accountId(account);
+		const { ethereumChainId = '', protocol, genesisHash = '' } = NETWORK_LIST[
+			account.networkKey
+		];
 
-			await this.save(accountKey, account, pin);
-			this.setState({
-				accounts: this.state.accounts.set(accountKey, account),
-				newAccount: empty()
-			});
+		if (protocol === NetworkProtocols.SUBSTRATE) {
+			const lockedAccount = this.encryptSeedPhraseAndLockAccount(account, pin);
+			// TODO save into identities;
+		} else {
+			await this.save(accountId(account), account, pin);
 		}
+		// only save a new account if the seed isn't empty
+
+		this.setState({
+			accounts: this.state.accounts.set(accountId(account), account),
+			newAccount: empty()
+		});
 	}
 
 	updateAccount(accountKey, updatedAccount) {
@@ -107,6 +131,24 @@ export default class AccountsStore extends Container<AccountsState> {
 		loadAccounts().then(accounts => {
 			this.setState({ accounts });
 		});
+	}
+
+	async encryptSeedPhraseAndLockAccount(account, pin = null) {
+		try {
+			// for account creation
+			if (pin && account.seedPhrase) {
+				account.encryptedSeedPhrase = await encryptData(
+					account.seedPhrase,
+					pin
+				);
+			}
+			const encryptedAccount = this.deleteSensitiveData(account);
+
+			encryptedAccount.updatedAt = new Date().getTime();
+			return encryptedAccount;
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	async save(accountKey, account, pin = null) {
@@ -220,4 +262,16 @@ export default class AccountsStore extends Container<AccountsState> {
 	getAccounts() {
 		return this.state.accounts;
 	}
+
+	getLegacySubstrateAccounts() {
+		const result = [];
+		const accounts = this.state.accounts[Symbol.iterator]();
+		for (let [key, value] of accounts) {
+			if (key.split(':')[0] === NetworkProtocols.SUBSTRATE) {
+				result.push([key, value]);
+			}
+		}
+		return result;
+	}
+
 }
