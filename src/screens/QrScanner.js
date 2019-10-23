@@ -82,10 +82,14 @@ export default class Scanner extends React.PureComponent {
 										await scannerStore.setUnsigned(txRequestData.data);
 									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
+										const isNetworkSpec = this.props.navigation.getParam(
+											'isScanningNetworkSpec'
+										);
 
 										await scannerStore.setParsedData(
 											strippedData,
-											accountsStore
+											accountsStore,
+											isNetworkSpec
 										);
 									} else if (scannerStore.getErrorMsg()) {
 										throw new Error(scannerStore.getErrorMsg());
@@ -148,14 +152,35 @@ export class QrScannerView extends React.Component {
 		this.setReadySubscription.remove();
 	}
 
+	renderScanningNetworkSpecMessage() {
+		return (
+			<View style={styles.bottom}>
+				<Text style={styles.descTitle}>Scan QR Code</Text>
+				<Text style={styles.descSecondary}>To Add a New Network Spec</Text>
+			</View>
+		);
+	}
+
+	renderScanningTransactionMessage() {
+		return (
+			<View style={styles.bottom}>
+				<Text style={styles.descTitle}>Scan QR Code</Text>
+				<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
+			</View>
+		);
+	}
+
 	render() {
-		if (this.props.scannerStore.isBusy()) {
+		const { onBarCodeRead, scannerStore, navigation } = this.props;
+		const isScanningNetworkSpec = navigation.getParam('isScanningNetworkSpec');
+
+		if (scannerStore.isBusy()) {
 			return <View style={styles.inactive} />;
 		}
 		return (
 			<RNCamera
 				captureAudio={false}
-				onBarCodeRead={this.props.onBarCodeRead}
+				onBarCodeRead={onBarCodeRead}
 				style={styles.view}
 			>
 				<View style={styles.body}>
@@ -167,6 +192,9 @@ export class QrScannerView extends React.Component {
 						<View style={styles.middleCenter} />
 						<View style={styles.middleRight} />
 					</View>
+					{isScanningNetworkSpec
+						? this.renderScanningNetworkSpecMessage()
+						: this.renderScanningTransactionMessage()}
 					{this.props.isMultipart ? (
 						<View style={styles.bottom}>
 							<Text style={styles.descTitle}>
