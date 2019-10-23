@@ -147,8 +147,9 @@ Re-run tests without re-installing the app
 yarn test-e2e:ios --reuse
 ```
 
-If you want to use another specific device than defined in the configuration, add `--device-name` flag (on Android API version is needed), for example:
+If you want to use another specific emulator/simulator than defined in the configuration, add `--device-name` flag (on Android API version is needed), for example:
 ```
+yarn test-e2e:ios --device-name iPhone X
 yarn test-e2e:android --device-name Pixel_2_API_28
 ```
 
