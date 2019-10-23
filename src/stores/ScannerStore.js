@@ -102,7 +102,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
-	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
+	async setParsedData(
+		strippedData,
+		accountsStore,
+		multipartComplete = false,
+		isNetworkSpec
+	) {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
@@ -113,7 +118,8 @@ export default class ScannerStore extends Container<ScannerState> {
 				parsedData.currentFrame,
 				parsedData.frameCount,
 				parsedData.partData,
-				accountsStore
+				accountsStore,
+				isNetworkSpec
 			);
 			return;
 		}
@@ -152,7 +158,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 	}
 
-	async setPartData(frame, frameCount, partData, accountsStore) {
+	async setPartData(frame, frameCount, partData, accountsStore, isNetworkSpec) {
 		const { multipartComplete, multipartData, totalFrameCount } = this.state;
 
 		// set it once only
@@ -168,12 +174,15 @@ export default class ScannerStore extends Container<ScannerState> {
 			partDataAsBytes[i] = parseInt(partData.substr(i * 2, 2), 16);
 		}
 
-		if (
-			partDataAsBytes[0] === new Uint8Array([0x00]) ||
-			partDataAsBytes[0] === new Uint8Array([0x7b])
-		) {
-			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
-			throw new Error('Error decoding invalid part data.');
+		// Network spec is expected to be a JSON.
+		if (!isNetworkSpec) {
+			if (
+				partDataAsBytes[0] === new Uint8Array([0x00]) ||
+				partDataAsBytes[0] === new Uint8Array([0x7b])
+			) {
+				// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
+				throw new Error('Error decoding invalid part data.');
+			}
 		}
 
 		const completedFramesCount = Object.keys(multipartData).length;
@@ -208,7 +217,12 @@ export default class ScannerStore extends Container<ScannerState> {
 			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
 			// handle the binary blob as a single UOS payload
-			this.setParsedData(concatMultipartData, accountsStore, true);
+			this.setParsedData(
+				concatMultipartData,
+				accountsStore,
+				true,
+				isNetworkSpec
+			);
 		} else if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData;
