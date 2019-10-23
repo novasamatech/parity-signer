@@ -16,7 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { hexStripPrefix, isU8a, u8aToHex } from '@polkadot/util';
+import { hexStripPrefix, isU8a, u8aToHex, u8aConcat } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
@@ -36,7 +36,11 @@ import {
 	substrateSign
 } from '../util/native';
 import transaction from '../util/transaction';
-import { constructDataFromBytes, asciiToHex } from '../util/decoders';
+import {
+	constructDataFromBytes,
+	asciiToHex,
+	encodeNumber
+} from '../util/decoders';
 import { Account } from './AccountsStore';
 
 type TXRequest = Object;
@@ -48,11 +52,14 @@ type SignedTX = {
 };
 
 type ScannerState = {
+	completedFramesCount: number,
+	totalFrameCount: number,
 	dataToSign: string,
 	isHash: boolean,
 	isOversized: boolean,
 	message: string,
 	multipartData: any,
+	multipartComplete: boolean,
 	recipient: Account,
 	scanErrorMsg: string,
 	sender: Account,
@@ -66,20 +73,25 @@ type ScannerState = {
 
 const defaultState = {
 	busy: false,
+	completedFramesCount: 0,
 	dataToSign: '',
 	isHash: false,
 	isOversized: false,
 	message: null,
+	multipartComplete: false,
 	multipartData: {},
 	recipient: null,
 	scanErrorMsg: '',
 	sender: null,
 	signedData: '',
+	totalFrameCount: 0,
 	tx: '',
 	txRequest: null,
 	type: null,
 	unsignedData: null
 };
+
+const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicity's sake. Consistent with @polkadot/react-qr
 
 export default class ScannerStore extends Container<ScannerState> {
 	state = defaultState;
@@ -90,10 +102,29 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
-	async setParsedData(strippedData, accountsStore, isNetworkSpec = false) {
-		const parsedData = await constructDataFromBytes(strippedData);
+	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
+		const parsedData = await constructDataFromBytes(
+			strippedData,
+			multipartComplete
+		);
 
-		if (!accountsStore.getByAddress(parsedData.data.account)) {
+		if (!multipartComplete && parsedData.isMultipart) {
+			this.setPartData(
+				parsedData.currentFrame,
+				parsedData.frameCount,
+				parsedData.partData,
+				accountsStore
+			);
+			return;
+		}
+
+		if (accountsStore.getByAddress(parsedData.data.account)) {
+			this.setState({
+				unsignedData: parsedData
+			});
+		} else {
+			// If the address is not found on device in its current encoding,
+			// try decoding the public key and encoding it to all the other known network prefixes.
 			let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
 
 			for (let i = 0; i < networks.length; i++) {
@@ -107,53 +138,84 @@ export default class ScannerStore extends Container<ScannerState> {
 
 				if (account) {
 					parsedData.data.account = account.address;
-					break;
+					this.setState({
+						unsignedData: parsedData
+					});
+					return;
 				}
 			}
-		}
 
-		if (parsedData.isMultipart) {
-			this.setPartData(
-				parsedData.frame,
-				parsedData.frameCount,
-				parsedData.partData
+			// if the account was not found, unsignedData was never set, alert the user appropriately.
+			this.setErrorMsg(
+				`No private key found for ${parsedData.data.account} in your signer key storage.`
 			);
-			return;
 		}
-
-		this.setState({
-			unsignedData: parsedData
-		});
 	}
 
-	async setPartData(frame, frameCount, partData) {
+	async setPartData(frame, frameCount, partData, accountsStore) {
+		const { multipartComplete, multipartData, totalFrameCount } = this.state;
+
+		// set it once only
+		if (!totalFrameCount) {
+			this.setState({
+				totalFrameCount: frameCount
+			});
+		}
+
+		const partDataAsBytes = new Uint8Array(partData.length / 2);
+
+		for (let i = 0; i < partDataAsBytes.length; i++) {
+			partDataAsBytes[i] = parseInt(partData.substr(i * 2, 2), 16);
+		}
+
 		if (
-			partData[0] === new Uint8Array([0x00]) ||
-			partData[0] === new Uint8Array([0x7b])
+			partDataAsBytes[0] === new Uint8Array([0x00]) ||
+			partDataAsBytes[0] === new Uint8Array([0x7b])
 		) {
 			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
 			throw new Error('Error decoding invalid part data.');
 		}
 
-		// we havne't filled all the frames yet
-		if (Object.keys(this.state.multipartData.length) < frameCount) {
-			const nextDataState = this.state.multipartData;
+		const completedFramesCount = Object.keys(multipartData).length;
 
-			nextDataState[frame] = partData;
+		this.setState({
+			completedFramesCount
+		});
 
+		if (
+			completedFramesCount > 0 &&
+			totalFrameCount > 0 &&
+			completedFramesCount === totalFrameCount &&
+			!multipartComplete
+		) {
+			// all the frames are filled
+
+			this.setState({
+				multipartComplete: true
+			});
+
+			// concatenate all the parts into one binary blob
+			let concatMultipartData = Object.values(multipartData).reduce(
+				(acc, part) => [...acc, ...part]
+			);
+
+			// unshift the frame info
+			const frameInfo = u8aConcat(
+				MULTIPART,
+				encodeNumber(totalFrameCount),
+				encodeNumber(frame)
+			);
+			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
+
+			// handle the binary blob as a single UOS payload
+			this.setParsedData(concatMultipartData, accountsStore, true);
+		} else if (completedFramesCount < totalFrameCount) {
+			// we haven't filled all the frames yet
+			const nextDataState = multipartData;
+			nextDataState[frame] = partDataAsBytes;
 			this.setState({
 				multipartData: nextDataState
 			});
-		}
-
-		// all the frames are filled
-		if (Object.keys(this.state.multipartData.length) === frameCount) {
-			// fixme: this needs to be concated to a binary blob
-			const concatMultipartData = Object.keys(this.state.multipartData).reduce(
-				(result, data) => result.concat(this.state.multipartData[data])
-			);
-			const data = this.setParsedData(concatMultipartData);
-			this.setData(data);
 		}
 	}
 
@@ -171,6 +233,8 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setDataToSign(signRequest, accountsStore) {
+		this.setBusy();
+
 		const address = signRequest.data.account;
 		const crypto = signRequest.data.crypto;
 		const message = signRequest.data.data;
@@ -306,16 +370,39 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 	}
 
+	cleanup() {
+		this.setState(defaultState);
+	}
+
+	clearMultipartProgress() {
+		this.setState({
+			completedFramesCount: 0,
+			multipartComplete: false,
+			multipartData: {},
+			totalFrameCount: 0,
+			unsignedData: null
+		});
+	}
+
+	/**
+	 * @dev signing payload type can be either transaction or message
+	 */
 	getType() {
 		return this.state.type;
 	}
 
+	/**
+	 * @dev sets a lock on writes
+	 */
 	setBusy() {
 		this.setState({
 			busy: true
 		});
 	}
 
+	/**
+	 * @dev allow write operations
+	 */
 	setReady() {
 		this.setState({
 			busy: false
@@ -326,16 +413,36 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.busy;
 	}
 
-	cleanup() {
-		this.setState(defaultState);
+	isMultipartComplete() {
+		return this.state.multipartComplete;
 	}
 
+	/**
+	 * @dev is the payload a hash
+	 */
 	getIsHash() {
 		return this.state.isHash;
 	}
 
+	/**
+	 * @dev is the payload size greater than 256 (in Substrate chains)
+	 */
 	getIsOversized() {
 		return this.state.isOversized;
+	}
+
+	/**
+	 * @dev returns the number of completed frames so far
+	 */
+	getCompletedFramesCount() {
+		return this.state.completedFramesCount;
+	}
+
+	/**
+	 * @dev returns the number of frames to fill in total
+	 */
+	getTotalFramesCount() {
+		return this.state.totalFrameCount;
 	}
 
 	getSender() {
@@ -354,6 +461,9 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.message;
 	}
 
+	/**
+	 * @dev unsigned data, not yet formatted as signable payload
+	 */
 	getUnsigned() {
 		return this.state.unsignedData;
 	}
@@ -362,6 +472,9 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.tx;
 	}
 
+	/**
+	 * @dev unsigned date, formatted as signable payload
+	 */
 	getDataToSign() {
 		return this.state.dataToSign;
 	}
