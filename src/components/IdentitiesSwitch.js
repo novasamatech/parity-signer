@@ -17,8 +17,9 @@
 import React, { useState } from 'react';
 import Button from './Button';
 import { Modal, Text, View } from 'react-native';
+import { withNavigation } from 'react-navigation';
 
-export default function IdentitiesSwitch(props) {
+function IdentitiesSwitch(props) {
 	const [visible, setVisible] = useState(false);
 
 	return (
@@ -27,6 +28,10 @@ export default function IdentitiesSwitch(props) {
 			<Modal animationType="fade" visible={visible} transparent={true}>
 				<View style={styles.container}>
 					<Text>Identities Switch</Text>
+					<Button
+						title="Add new Identity"
+						onPress={() => props.navigation.navigate('IdentityNew')}
+					/>
 					<Button
 						title="Close"
 						onPress={() => {
@@ -47,3 +52,5 @@ const styles = {
 		justifyContent: 'center'
 	}
 };
+
+export default withNavigation(IdentitiesSwitch);

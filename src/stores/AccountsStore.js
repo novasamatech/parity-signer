@@ -273,5 +273,4 @@ export default class AccountsStore extends Container<AccountsState> {
 		}
 		return result;
 	}
-
 }

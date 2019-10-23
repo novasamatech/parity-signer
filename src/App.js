@@ -42,13 +42,14 @@ import About from './screens/About';
 import AccountBackup from './screens/AccountBackup';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
-import LegacyAccountList from './screens/LegacyAccountList';
 import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
 import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
+import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
+import IdentityNew from './screens/IdentityNew';
 import MessageDetails from './screens/MessageDetails';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
@@ -203,6 +204,9 @@ const Screens = createStackNavigator(
 					},
 					AccountUnlockAndSign: {
 						screen: AccountUnlockAndSign
+					},
+					IdentityNew: {
+						screen: IdentityNew
 					},
 					MessageDetails: {
 						screen: MessageDetails
