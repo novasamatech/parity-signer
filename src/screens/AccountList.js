@@ -145,9 +145,6 @@ const styles = StyleSheet.create({
 		padding: 20
 	},
 	bottom: {
-		alignItems: 'center',
-		display: 'flex',
-		justifyContent: 'space-between',
 		marginTop: 20
 	},
 	content: {

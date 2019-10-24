@@ -71,9 +71,9 @@ class NetworkListView extends React.PureComponent {
 						/>;
 					})
 				) : (
-					<View>
+					<View style={styles.bodyContent2}>
 						<Text style={styles.descTitle}>
-							It looks like no networks are supported...
+							It looks like no networks are supported yet...
 						</Text>
 						<Text style={styles.descSecondary}>
 							Press the button below to add a new network spec.
@@ -104,8 +104,15 @@ const styles = StyleSheet.create({
 	bodyContent: {
 		paddingBottom: 40
 	},
+	bodyContent2: {
+		display: 'flex',
+		flexDirection: 'column',
+		height: '100%',
+		justifyContent: 'space-between'
+	},
 	descSecondary: {
 		color: colors.bg_text,
+		flex: 1,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		paddingBottom: 20
@@ -119,6 +126,7 @@ const styles = StyleSheet.create({
 	},
 	titleTop: {
 		color: colors.bg_text,
+		flex: 1,
 		fontFamily: fonts.bold,
 		fontSize: 26,
 		paddingBottom: 10,

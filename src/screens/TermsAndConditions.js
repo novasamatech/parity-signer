@@ -25,7 +25,7 @@ import fonts from '../fonts';
 import Button from '../components/Button';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
-import { saveToCAndPPConfirmation } from '../util/db';
+import { saveDefaultNetworks, saveToCAndPPConfirmation } from '../util/db';
 
 export default class TermsAndConditions extends React.PureComponent {
 	static navigationOptions = {
@@ -101,6 +101,7 @@ export default class TermsAndConditions extends React.PureComponent {
 							'firstScreenActions'
 						);
 						await saveToCAndPPConfirmation();
+						await saveDefaultNetworks(); // save the default networks to AsyncStorage;
 						navigation.dispatch(firstScreenActions);
 					}}
 				/>

@@ -49,6 +49,11 @@ export default class Settings extends React.PureComponent {
 						secondaryText="Add, update, or delete network specs."
 						style={{ padding: 10 }}
 					/>
+					<Card
+						onPress={() => navigate('About')}
+						title="About"
+						style={{ padding: 10 }}
+					/>
 				</View>
 			</View>
 		);

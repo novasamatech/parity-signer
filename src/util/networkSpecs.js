@@ -16,12 +16,23 @@
 
 // @flow
 
+import { SUBSTRATE_NETWORK_LIST } from '../constants';
+
 export function empty() {
 	return {
-		chainName: undefined,
-		derivationPath: undefined,
-		identiconFn: undefined,
-		networkKey: undefined,
-		prefix: undefined
+		color: undefined,
+		decimals: undefined,
+		genesisHash: undefined,
+		prefix: undefined,
+		protocol: undefined,
+		secondaryColor: undefined,
+		title: undefined,
+		unit: undefined
+	};
+}
+
+export function defaultNetworkSpecs() {
+	return {
+		...SUBSTRATE_NETWORK_LIST
 	};
 }
