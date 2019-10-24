@@ -19,7 +19,12 @@
 
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
+
 import { accountId } from './account';
+import { defaultNetworkSpecs } from './networkSpecs';
+import kusamaMeta from './static-kusama';
+import substrateMeta from './static-substrate';
+import { SubstrateNetworkKeys } from '../constants';
 
 export async function loadAccounts(version = 3) {
 	if (!SecureStorage) {
@@ -130,13 +135,24 @@ export async function saveToCAndPPConfirmation() {
 }
 
 /*
- @param networkSpec: {
-	 prefix: number,
-	 chainName?: string,
-	 identiconFn: func,
-	 networkKey: string, // genesisHash
-	 derivationPath?: string 
- }
+ * Populate the local storage with the default network specs so it can be updated, deleted.
+ */
+export async function saveDefaultNetworks() {
+	Object.entries(defaultNetworkSpecs()).forEach(async ([key, value], index) => {
+		await AsyncStorage.setItem(key, value);
+	});
+}
+
+/*
+ * @dev map: networkKey => metadata blob
+ */
+export async function saveDefaultMetadata() {
+	await AsyncStorage.setItem(SubstrateNetworkKeys.KUSAMA, kusamaMeta);
+	await AsyncStorage.setItem(SubstrateNetworkKeys.SUBSTRATE_DEV, substrateMeta);
+}
+
+/*
+ * @dev add or update a networkSpec at index of networkKey
  */
 export async function addNetworkSpec(networkKey, networkSpec) {
 	if (!networkKey) {
@@ -157,10 +173,17 @@ export async function addNetworkSpec(networkKey, networkSpec) {
 }
 
 /*
+ * @dev get all the network keys
+ */
+export async function getAllNetworkKeys() {
+	return await AsyncStorage.multiGet('network_keys');
+}
+
+/*
  * @dev fetch all networks specs
  */
-export async function loadNetworkSpecs() {
-	await AsyncStorage.getItem('network_specs');
+export async function getAlNetworkSpecs() {
+	await AsyncStorage.multiGet();
 }
 
 /*

@@ -49,11 +49,6 @@ export default class AccountSettings extends React.PureComponent {
 						title="Recover Account"
 						style={{ padding: 10 }}
 					/>
-					<Card
-						onPress={() => navigate('About')}
-						title="About"
-						style={{ padding: 10 }}
-					/>
 				</View>
 			</View>
 		);

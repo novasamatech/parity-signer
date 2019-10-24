@@ -143,9 +143,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'column'
 	},
 	bottom: {
-		alignItems: 'center',
-		display: 'flex',
-		justifyContent: 'space-between',
 		marginTop: 20
 	},
 	content: {

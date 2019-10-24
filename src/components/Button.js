@@ -25,8 +25,7 @@ import {
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	View,
-	ViewPropTypes,
-	PixelRatio
+	ViewPropTypes
 } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
@@ -79,11 +78,9 @@ const styles = StyleSheet.create({
 	button: {
 		alignItems: 'center',
 		backgroundColor: colors.bg_button,
-		borderRadius: 60 / PixelRatio.get(),
 		elevation: 4,
 		height: 60,
-		justifyContent: 'center',
-		width: 100
+		justifyContent: 'center'
 	},
 	buttonDisabled: {
 		backgroundColor: '#dfdfdf',
