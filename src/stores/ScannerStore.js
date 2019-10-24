@@ -52,16 +52,19 @@ type SignedTX = {
 	txRequest: TXRequest
 };
 
+type MultipartData = {
+	[x: string]: Uint8Array
+};
+
 type ScannerState = {
 	completedFramesCount: number,
-	totalFrameCount: number,
 	dataToSign: string,
 	isHash: boolean,
 	isOversized: boolean,
 	latestFrame: number,
 	message: string,
 	missedFrames: Array<number>,
-	multipartData: any,
+	multipartData: MultipartData,
 	multipartComplete: boolean,
 	prehash: GenericExtrinsicPayload,
 	recipient: Account,
@@ -69,13 +72,14 @@ type ScannerState = {
 	sender: Account,
 	signedData: string,
 	signedTxList: [SignedTX],
+	totalFrameCount: number,
 	tx: Object,
 	txRequest: TXRequest | null,
 	type: 'transaction' | 'message',
-	unsignedData: any
+	unsignedData: Object
 };
 
-const defaultState = {
+const DEFAULT_STATE = Object.freeze({
 	busy: false,
 	completedFramesCount: 0,
 	dataToSign: '',
@@ -96,12 +100,12 @@ const defaultState = {
 	txRequest: null,
 	type: null,
 	unsignedData: null
-};
+});
 
 const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicity's sake. Consistent with @polkadot/react-qr
 
 export default class ScannerStore extends Container<ScannerState> {
-	state = defaultState;
+	state = DEFAULT_STATE;
 
 	async setUnsigned(data) {
 		this.setState({
@@ -109,8 +113,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
+	/*
+	 * @param strippedData: the rawBytes from react-native-camera, stripped of the ec11 padding to fill the frame size. See: decoders.js
+	 * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
+	 */
+
 	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
-		// N.B. Substrate oversized/multipart payloads will already be hashed at this point.
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
@@ -167,7 +175,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	async setPartData(frame, frameCount, partData, accountsStore) {
 		const {
-			lastFrame,
+			latestFrame,
 			missedFrames,
 			multipartComplete,
 			multipartData,
@@ -233,20 +241,26 @@ export default class ScannerStore extends Container<ScannerState> {
 			const nextDataState = multipartData;
 			nextDataState[frame] = partDataAsBytes;
 
-			const missedFramesRange = mod(frame - lastFrame, totalFrameCount) - 1;
+			const missedFramesRange = mod(frame - latestFrame, totalFrameCount) - 1;
 
 			// we skipped at least one frame that we haven't already scanned before
 			if (
-				lastFrame &&
+				latestFrame &&
 				missedFramesRange >= 1 &&
 				!missedFrames.includes(frame)
 			) {
-				// enumerate all the frames between (current)frame and lastFrame
+				// enumerate all the frames between (current)frame and latestFrame
 				const missedFrames = Array.from(new Array(missedFramesRange), (_, i) =>
-					mod(i + lastFrame, totalFrameCount)
+					mod(i + latestFrame, totalFrameCount)
 				);
+
+				const dedupMissedFrames = new Set([
+					...this.state.missedFrames,
+					...missedFrames
+				]);
+
 				this.setState({
-					missedFrames: [...this.state.missedFrames, ...missedFrames]
+					missedFrames: Array.from(dedupMissedFrames)
 				});
 			}
 
@@ -256,7 +270,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			}
 
 			this.setState({
-				lastFrame: frame,
+				latestFrame: frame,
 				multipartData: nextDataState
 			});
 		}
@@ -415,18 +429,22 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	cleanup() {
-		this.setState(defaultState);
+		return new Promise(resolve => {
+			this.setState(DEFAULT_STATE, resolve);
+			this.clearMultipartProgress();
+		});
 	}
 
 	clearMultipartProgress() {
 		this.setState({
-			completedFramesCount: 0,
-			lastFrame: null,
-			missedFrames: [],
-			multipartComplete: false,
+			completedFramesCount: DEFAULT_STATE.completedFramesCount,
+			latestFrame: DEFAULT_STATE.latestFrame,
+			missedFrames: DEFAULT_STATE.missedFrames,
+			multipartComplete: DEFAULT_STATE.multipartComplete,
 			multipartData: {},
-			totalFrameCount: 0,
-			unsignedData: null
+			prehash: DEFAULT_STATE.prehash,
+			totalFrameCount: DEFAULT_STATE.totalFrameCount,
+			unsignedData: DEFAULT_STATE.unsignedData
 		});
 	}
 

@@ -45,8 +45,8 @@ export default class Scanner extends React.PureComponent {
 		this.setState({ enableScan: false });
 		Alert.alert(title, message, [
 			{
-				onPress: () => {
-					scannerStore.cleanup();
+				onPress: async () => {
+					await scannerStore.cleanup();
 					this.setState({ enableScan: true });
 				},
 				text: 'Try again'
