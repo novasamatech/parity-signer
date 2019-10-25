@@ -17,7 +17,7 @@
 'use strict';
 import '@polkadot/types/injector';
 
-import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
+// import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import {
 	createType,
 	GenericExtrinsicPayload,
@@ -78,7 +78,7 @@ const SIGNER_PAYLOAD_TEST = {
 		'0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
 	era: '0x0703',
 	genesisHash:
-		'0x3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf',
+		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
 	method:
 		'0x0400ffee5a3c1f409c4ad69cd7a477419bf3fd1bc2e72f3c43ba5c4a9896de1d8bf94200',
 	nonce: '0x00001234',
@@ -92,7 +92,9 @@ const SIGN_TX_TEST = u8aConcat(
 	CRYPTO_SR25519,
 	CMD_SIGN_MORTAL,
 	decodeAddress(KUSAMA_ADDRESS),
-	createType('ExtrinsicPayload', SIGNER_PAYLOAD_TEST, { version: 3 }).toU8a()
+	createType('ExtrinsicPayload', SIGNER_PAYLOAD_TEST, { version: 3 }).toU8a(
+		true
+	)
 );
 
 describe.skip('sanity check', () => {
@@ -171,7 +173,7 @@ describe('decoders', () => {
 			expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
 		});
 
-		it('from Substrate UOS Payload Mortal', async () => {
+		it.only('from Substrate UOS Payload Mortal', async () => {
 			const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
 
 			expect(unsignedData.data.data.era.toHex()).toEqual(
@@ -197,12 +199,10 @@ describe('decoders', () => {
 		beforeAll(() => {
 			const metadata = new Metadata(kusamaData);
 
-			const extrinsics = extrinsicsFromMeta(metadata);
-
-			GenericCall.injectMethods(extrinsics);
+			GenericCall.injectMetadata(metadata);
 		});
 
-		it.only('can fetch the prefix matching to a hash', () => {
+		it('can fetch the prefix matching to a hash', () => {
 			const kusamaPrefix =
 				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
 			// const substratePrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
@@ -213,7 +213,7 @@ describe('decoders', () => {
 
 		it('decodes Payload Method to something human readable with Kusama metadata', () => {
 			const payload = new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, {
-				version: 3
+				version: 4
 			});
 
 			const call = new Call(payload.method);

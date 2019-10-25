@@ -204,7 +204,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							break;
 						case '02': // immortal
 							extrinsicPayload = new GenericExtrinsicPayload(rawPayload, {
-								version: 3
+								version: 4
 							});
 
 							data.action = isOversized ? 'signData' : 'signTransaction';
