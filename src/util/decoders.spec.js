@@ -176,7 +176,7 @@ describe('decoders', () => {
 			expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
 		});
 
-		it.only('from Substrate UOS Payload Mortal', async () => {
+		it('from Substrate UOS Payload Mortal', async () => {
 			const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
 
 			expect(unsignedData.data.data.era.toHex()).toEqual(
