@@ -17,7 +17,6 @@
 'use strict';
 import '@polkadot/types/injector';
 
-import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import {
 	createType,
 	GenericExtrinsicPayload,
@@ -42,11 +41,14 @@ import kusamaData from './static-kusama';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
-const CMD_SIGN_MORTAL = new Uint8Array([2]);
+const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
+
+const metadata = new Metadata(kusamaData);
+GenericCall.injectMetadata(metadata);
 
 const RN_TX_REQUEST_RAW_DATA =
 	'4' + // indicates data is binary encoded
@@ -73,17 +75,17 @@ const SIGN_MSG_TEST = new Uint8Array([
 /* eslint-enable prettier/prettier */
 
 const SIGNER_PAYLOAD_TEST = {
-	address: '5DTestUPts3kjeXSTMyerHihn1uwMfLj8vU8sqF7qYrFabHE',
+	address: KUSAMA_ADDRESS,
 	blockHash:
 		'0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
-	era: '0x0703',
-	genesisHash:
-		'0x3fd7b9eb6a00376e5be61f01abb429ffb0b104be05eaff4d458da48fcd425baf',
+	blockNumber: '0x231d30',
+	era: createType('ExtrinsicEra', { current: 2301232, period: 200 }),
+	genesisHash: SubstrateNetworkKeys.KUSAMA,
 	method:
-		'0x0400ffee5a3c1f409c4ad69cd7a477419bf3fd1bc2e72f3c43ba5c4a9896de1d8bf94200',
-	nonce: '0x00001234',
-	specVersion: 3,
-	tip: '0x00000000000000000000000000005678'
+		'0x0600ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
+	nonce: 0x1234,
+	specVersion: 123,
+	tip: 0x5678
 };
 
 const SIGN_TX_TEST = u8aConcat(
@@ -92,7 +94,7 @@ const SIGN_TX_TEST = u8aConcat(
 	CRYPTO_SR25519,
 	CMD_SIGN_MORTAL,
 	decodeAddress(KUSAMA_ADDRESS),
-	createType('ExtrinsicPayload', SIGNER_PAYLOAD_TEST, { version: 3 }).toU8a()
+	new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, { version: 4 }).toU8a()
 );
 
 describe.skip('sanity check', () => {
@@ -101,12 +103,15 @@ describe.skip('sanity check', () => {
 	});
 
 	it('sanity check payload encodes as expected', () => {
-		const payload = new GenericExtrinsicPayload(SIGN_TX_TEST, { version: 3 });
+		const payload = new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, {
+			version: 4
+		});
 		const fromBytes = new GenericExtrinsicPayload(payload.toU8a(), {
-			version: 3
+			version: 4
 		});
 
-		expect(payload).toEqual(fromBytes);
+		expect(payload).toMatchObject(fromBytes);
+		expect(payload.genesisHash.toHex()).toEqual(SubstrateNetworkKeys.KUSAMA);
 	});
 });
 
@@ -171,11 +176,11 @@ describe('decoders', () => {
 			expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
 		});
 
-		it('from Substrate UOS Payload Mortal', async () => {
+		it.only('from Substrate UOS Payload Mortal', async () => {
 			const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
 
 			expect(unsignedData.data.data.era.toHex()).toEqual(
-				SIGNER_PAYLOAD_TEST.era
+				SIGNER_PAYLOAD_TEST.era.toHex()
 			);
 			expect(unsignedData.data.data.method.toHex()).toEqual(
 				SIGNER_PAYLOAD_TEST.method
@@ -194,15 +199,7 @@ describe('decoders', () => {
 	});
 
 	describe('Type injection from metadata', () => {
-		beforeAll(() => {
-			const metadata = new Metadata(kusamaData);
-
-			const extrinsics = extrinsicsFromMeta(metadata);
-
-			GenericCall.injectMethods(extrinsics);
-		});
-
-		it.only('can fetch the prefix matching to a hash', () => {
+		it('can fetch the prefix matching to a hash', () => {
 			const kusamaPrefix =
 				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
 			// const substratePrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
@@ -213,7 +210,7 @@ describe('decoders', () => {
 
 		it('decodes Payload Method to something human readable with Kusama metadata', () => {
 			const payload = new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, {
-				version: 3
+				version: 4
 			});
 
 			const call = new Call(payload.method);
