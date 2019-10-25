@@ -167,8 +167,9 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 
 					switch (secondByte) {
 						case '00': // sign mortal extrinsic
+						case '02': // sign immortal extrinsic
 							extrinsicPayload = new GenericExtrinsicPayload(rawPayload, {
-								version: 3
+								version: 4
 							});
 
 							data.action = isOversized ? 'signData' : 'signTransaction';
@@ -201,32 +202,6 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 								publicKeyAsBytes,
 								defaultPrefix
 							); // default to Kusama
-							break;
-						case '02': // immortal
-							extrinsicPayload = new GenericExtrinsicPayload(rawPayload, {
-								version: 4
-							});
-
-							data.action = isOversized ? 'signData' : 'signTransaction';
-							data.oversized = isOversized;
-							data.isHash = isOversized;
-							data.data.data = isOversized
-								? await blake2s(u8aToHex(rawPayload))
-								: extrinsicPayload;
-
-							network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
-
-							if (!network) {
-								throw new Error(
-									`Signer does not currently support a chain with genesis hash: ${extrinsicPayload.genesisHash.toHex()}`
-								);
-							}
-
-							data.data.account = encodeAddress(
-								publicKeyAsBytes,
-								network.prefix
-							); // encode to the prefix;
-
 							break;
 						case '03': // Cold Signer should attempt to decode message to utf8
 							data.action = 'signData';
