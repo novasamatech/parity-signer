@@ -16,10 +16,10 @@
 
 'use strict';
 
-import { NaitveModules } from 'react-native';
+import { NativeModules } from 'react-native';
 import { checksummedAddress } from './checksum';
 
-const { EthkeyBridge } = NaitveModules;
+const { EthkeyBridge } = NativeModules;
 
 /**
  * Turn an address string tagged with either 'legacy:' or 'bip39:' prefix
