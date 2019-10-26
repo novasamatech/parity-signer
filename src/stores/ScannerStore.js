@@ -16,7 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import ExtrinsicSignatureV4 from '@polkadot/types/primitive/Extrinsic/v4/ExtrinsicSignature';
+
 import {
 	hexStripPrefix,
 	hexToU8a,
@@ -364,24 +364,14 @@ export default class ScannerStore extends Container<ScannerState> {
 			} else if (isAscii(dataToSign)) {
 				signable = hexStripPrefix(asciiToHex(dataToSign));
 			}
-			// const sig = dataToSign.crypto === 'sr25519' ? await substrateSign(seed, signable) : dataToSign.crypto === 'ed25519' ? await brainWalletSign(seed, signable) : await substrateSign(seed, signable);
+
+			// TODO: tweak the first byte if and when sig type is not sr25519
 			const sig = u8aConcat(
 				SIG_TYPE_SR25519,
 				hexToU8a('0x' + (await substrateSign(seed, signable)))
 			);
 
-			const extrinsicSignature = {
-				era: dataToSign.era,
-				nonce: dataToSign.nonce,
-				signature: sig,
-				signer: sender.address,
-				tip: dataToSign.tip
-			};
-
-			const signature = hexStripPrefix(
-				new ExtrinsicSignatureV4(extrinsicSignature, { isSigned: true }).toHex()
-			);
-			signedData = signature;
+			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
 
 		this.setState({ signedData });
