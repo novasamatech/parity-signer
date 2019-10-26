@@ -16,7 +16,6 @@
 
 // @flow
 
-import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
@@ -65,6 +64,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			});
 		} else if (__DEV__ && isSubstrateDev) {
 			metadata = new Metadata(substrateDevMetadata);
+
 			formatBalance.setDefaults({
 				decimals:
 					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
@@ -82,8 +82,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			Keys: 'SessionKeysPolkadot'
 		});
 
-		const extrinsics = extrinsicsFromMeta(metadata);
-		GenericCall.injectMethods(extrinsics);
+		GenericCall.injectMetadata(metadata);
 	}
 
 	render() {
