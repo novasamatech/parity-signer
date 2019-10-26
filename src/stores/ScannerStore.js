@@ -16,7 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { hexStripPrefix, isU8a, u8aToHex, u8aConcat } from '@polkadot/util';
+import { hexStripPrefix, hexToU8a, isU8a, u8aToHex, u8aConcat } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
@@ -92,6 +92,11 @@ const defaultState = {
 };
 
 const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicity's sake. Consistent with @polkadot/react-qr
+
+const SIG_TYPE_NONE = new Uint8Array();
+const SIG_TYPE_ED25519 = new Uint8Array([0]);
+const SIG_TYPE_SR25519 = new Uint8Array([1]);
+// const SIG_TYPE_ECDSA = new Uint8Array([2]);
 
 export default class ScannerStore extends Container<ScannerState> {
 	state = defaultState;
@@ -352,7 +357,12 @@ export default class ScannerStore extends Container<ScannerState> {
 			} else if (isAscii(dataToSign)) {
 				signable = hexStripPrefix(asciiToHex(dataToSign));
 			}
-			signedData = await substrateSign(seed, signable);
+			// const sig = dataToSign.crypto === 'sr25519' ? await substrateSign(seed, signable) : dataToSign.crypto === 'ed25519' ? await brainWalletSign(seed, signable) : await substrateSign(seed, signable);
+			const sig = '0x' + await substrateSign(seed, signable);
+
+			console.log('signature => ', sig);
+			console.log('as u8a => ', hexToU8a(sig));
+			signedData = u8aConcat(SIG_TYPE_SR25519, hexToU8a(sig));
 		}
 
 		this.setState({ signedData });
