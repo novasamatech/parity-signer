@@ -1,6 +1,6 @@
 {
   "name": "NativeSigner",
-  "version": "3.0.8-beta",
+  "version": "3.0.9-beta",
   "private": true,
   "license": "GPL-3.0",
   "engines": {
