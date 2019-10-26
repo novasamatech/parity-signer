@@ -21,6 +21,8 @@ import { checksummedAddress } from './checksum';
 
 const { EthkeyBridge } = NativeModules;
 
+console.log(EthkeyBridge);
+
 /**
  * Turn an address string tagged with either 'legacy:' or 'bip39:' prefix
  * to an object, marking if it was generated with BIP39.

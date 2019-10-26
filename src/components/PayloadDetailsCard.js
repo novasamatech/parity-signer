@@ -64,7 +64,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			});
 		} else if (__DEV__ && isSubstrateDev) {
 			metadata = new Metadata(substrateDevMetadata);
-			
+
 			formatBalance.setDefaults({
 				decimals:
 					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,

@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
 
-import { qrCode, qrHex } from '../util/native';
+import { qrCode, qrCodeHex } from '../util/native';
 
 QrView.propTypes = {
 	data: PropTypes.string.isRequired
@@ -32,10 +32,13 @@ export default function QrView(props) {
 
 	useEffect(() => {
 		async function displayQrCode(data) {
+			console.log(data);
 			try {
+				debugger;
 				const generatedQr = isHex(data)
-					? await qrHex(data)
+					? await qrCodeHex(data)
 					: await qrCode(data);
+				debugger;
 				setQr(generatedQr);
 			} catch (e) {
 				console.error(e);

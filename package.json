@@ -41,7 +41,7 @@
     "node-libs-react-native": "^1.0.3",
     "prop-types": "^15.6.1",
     "react": "^16.9.0",
-    "react-native": "0.61.2",
+    "react-native": "0.60.5",
     "react-native-camera": "^3.4.0",
     "react-native-gesture-handler": "^1.4.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
