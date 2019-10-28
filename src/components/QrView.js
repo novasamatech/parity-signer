@@ -16,6 +16,7 @@
 
 'use strict';
 
+import { isHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
@@ -23,25 +24,27 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { qrCode, qrCodeHex } from '../util/native';
 
 QrView.propTypes = {
-	data: PropTypes.string.isRequired,
-	isHash: PropTypes.boolean
+	data: PropTypes.string.isRequired
 };
 
 export default function QrView(props) {
 	const [qr, setQr] = useState(null);
 
 	useEffect(() => {
-		async function displayQrCode(data, isHash) {
+		async function displayQrCode(data) {
+			console.log('data in qr view -> ', data);
 			try {
-				const generatedQr = isHash ? await qrCodeHex(data) : await qrCode(data);
+				const generatedQr = isHex(data)
+					? await qrCodeHex(data)
+					: await qrCode(data);
 				setQr(generatedQr);
 			} catch (e) {
 				console.error(e);
 			}
 		}
 
-		displayQrCode(props.data, props.isHash);
-	}, [props.data, props.isHash]);
+		displayQrCode(props.data);
+	}, [props]);
 
 	const { width: deviceWidth } = Dimensions.get('window');
 	let size = props.size || deviceWidth - 80;

@@ -16,7 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-
+// import { schnorrkelVerify } from '@polkadot/util-crypto';
 import {
 	hexStripPrefix,
 	hexToU8a,
@@ -35,7 +35,7 @@ import {
 import { saveTx } from '../util/db';
 import { isAscii } from '../util/strings';
 import {
-	blake2s,
+	blake2b,
 	brainWalletSign,
 	decryptData,
 	keccak,
@@ -417,6 +417,8 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			if (dataToSign instanceof GenericExtrinsicPayload) {
 				signable = u8aToHex(dataToSign.toU8a(true), -1, false);
+			} else if (isHash) {
+				signable = dataToSign; // pass the hash through direct
 			} else if (isU8a(dataToSign)) {
 				signable = hexStripPrefix(u8aToHex(dataToSign));
 			} else if (isAscii(dataToSign)) {
@@ -438,7 +440,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			await saveTx({
 				createdAt: new Date().getTime(),
 				hash:
-					isEthereum || isHash ? dataToSign : await blake2s(dataToSign.toHex()),
+					isEthereum || isHash ? dataToSign : await blake2b(dataToSign.toHex()),
 				recipient,
 				sender,
 				signature: signedData,

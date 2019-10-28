@@ -26,7 +26,7 @@ use rlp::decode_list;
 use rustc_hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
 use tiny_keccak::keccak256 as keccak;
-use blake2_rfc::blake2s::blake2s;
+use blake2_rfc::blake2b::blake2b;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
 
@@ -144,7 +144,7 @@ export! {
     fn blake(data: &str) -> Option<String> {
         let data: Vec<u8> = data.from_hex().ok()?;
 
-        Some(blake2s(32, &[], &data).as_bytes().to_hex())
+        Some(blake2b(32, &[], &data).as_bytes().to_hex())
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyBlockiesIcon

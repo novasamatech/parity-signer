@@ -47,9 +47,9 @@ export default class SignedMessage extends React.PureComponent {
 
 export class SignedMessageView extends React.PureComponent {
 	static propTypes = {
-		data: PropTypes.string.isRequired,
+		data: PropTypes.string.isRequired, // post sign
 		isHash: PropTypes.bool,
-		message: PropTypes.string
+		message: PropTypes.string // pre sign
 	};
 
 	render() {
@@ -59,9 +59,9 @@ export class SignedMessageView extends React.PureComponent {
 			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
 				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
 				<View style={styles.qr}>
-					<QrView data={data} isHash={isHash} />
+					<QrView data={data} />
 				</View>
-				<Text style={styles.title}>MESSAGE</Text>
+				<Text style={styles.title}>{isHash ? 'HASH TO SIGN' : 'MESSAGE'}</Text>
 				<Text style={styles.message}>
 					{isHash ? message : isAscii(message) ? hexToAscii(message) : data}
 				</Text>

@@ -119,8 +119,8 @@ export function qrCodeHex(data) {
 	return EthkeyBridge.qrCodeHex(data);
 }
 
-export function blake2s(data) {
-	return EthkeyBridge.blake2s(asString(data));
+export function blake2b(data) {
+	return EthkeyBridge.blake2b(asString(data));
 }
 
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
