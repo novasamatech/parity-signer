@@ -19,7 +19,7 @@ import Button from './Button';
 import { Modal, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-function IdentitiesSwitch(props) {
+function IdentitiesSwitch({ navigation }) {
 	const [visible, setVisible] = useState(false);
 
 	return (
@@ -30,7 +30,10 @@ function IdentitiesSwitch(props) {
 					<Text>Identities Switch</Text>
 					<Button
 						title="Add new Identity"
-						onPress={() => props.navigation.navigate('IdentityNew')}
+						onPress={() => {
+							setVisible(false);
+							navigation.navigate('IdentityNew');
+						}}
 					/>
 					<Button
 						title="Close"
