@@ -109,11 +109,13 @@ export function decryptData(data, password) {
 
 // Creates a QR code for the UTF-8 representation of a string
 export function qrCode(data) {
+	console.log('Nothex qr code generating from -> ', data);
 	return EthkeyBridge.qrCode(data);
 }
 
 // Creates a QR code for binary data from a hex-encoded string
 export function qrCodeHex(data) {
+	console.log('hex qr code generating from -> ', data);
 	return EthkeyBridge.qrCodeHex(data);
 }
 
