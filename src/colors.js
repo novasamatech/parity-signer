@@ -21,7 +21,7 @@ export default {
 	bg_text: '#FFFFFF',
 	bg_text_sec: '#FFFFFF',
 	bg_warning: '#FAE265',
-	card_bg: '#282828',
+	card_bg: 'rgba(255, 255, 255, 0.15)',
 	card_bg_text_sec: '#B4B5B0',
 	card_text: '#1A1A1A'
 };
