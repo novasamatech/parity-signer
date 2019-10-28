@@ -16,7 +16,7 @@
 
 'use strict';
 
-import { EthkeyBridge } from 'NativeModules';
+import { EthkeyBridge, ECCrypto } from 'NativeModules';
 import { checksummedAddress } from './checksum';
 
 /**
@@ -105,6 +105,14 @@ export function encryptData(data, password) {
 
 export function decryptData(data, password) {
 	return EthkeyBridge.decryptData(data, password);
+}
+
+export function encryptWithSecureKeystore(data, label) {
+	return ECCrypto.encrypt({ data, label });
+}
+
+export function decryptWithSecureKeystore(data, label) {
+	return ECCrypto.decrypt({ data, label });
 }
 
 // Creates a QR code for the UTF-8 representation of a string

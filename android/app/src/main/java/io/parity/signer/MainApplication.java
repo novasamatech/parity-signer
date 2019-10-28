@@ -36,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
           new NetInfoPackage(),
           new RandomBytesPackage(),
           new EthkeyBridgePackage(),
+          new ECCryptoPackage(),
           new RNGestureHandlerPackage()
       );
     }

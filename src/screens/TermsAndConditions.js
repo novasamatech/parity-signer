@@ -17,7 +17,13 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+	TouchableOpacity
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
@@ -108,6 +114,14 @@ export default class TermsAndConditions extends React.PureComponent {
 						navigation.dispatch(firstScreenActions);
 					}}
 				/>
+				{__DEV__ && (
+					<TouchableOpacity
+						onPress={() => navigation.navigate('NativeModuleTest')}
+						testID={testIDs.TacScreen.nativeModuleTestButton}
+					>
+						<View style={{ height: 1, width: 1 }} />
+					</TouchableOpacity>
+				)}
 			</View>
 		);
 	}

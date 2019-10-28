@@ -50,6 +50,7 @@ import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import Loading from './screens/Loading';
 import MessageDetails from './screens/MessageDetails';
+import NativeModuleTest from '../e2e/screens/NativeModuleTest';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
@@ -206,6 +207,9 @@ const Screens = createStackNavigator(
 					},
 					MessageDetails: {
 						screen: MessageDetails
+					},
+					NativeModuleTest: {
+						screen: NativeModuleTest
 					},
 					QrScanner: {
 						screen: QrScanner
