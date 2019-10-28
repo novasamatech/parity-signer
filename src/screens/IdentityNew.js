@@ -36,7 +36,7 @@ export default class IdentityNew extends React.Component {
 	}
 }
 
-function IdentityNewView({ accounts }) {
+function IdentityNewView({ accounts, navigation }) {
 	useEffect(() => {
 		accounts.updateNewIdentity(emptyIdentity());
 		return function() {
@@ -55,7 +55,14 @@ function IdentityNewView({ accounts }) {
 				value={accounts.getNewIdentity().name}
 				placeholder="Enter a new identity name"
 			/>
-			<Button title="create" onPress={() => {}} />
+			<Button
+				title="create"
+				onPress={() => {
+					navigation.navigate('IdentityBackup', {
+						isNew: true
+					});
+				}}
+			/>
 			<Button title="recover account" onPress={() => {}} />
 		</View>
 	);

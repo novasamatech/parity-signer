@@ -49,6 +49,7 @@ import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
+import IdentityBackup from './screens/IdentityBackup';
 import IdentityNew from './screens/IdentityNew';
 import MessageDetails from './screens/MessageDetails';
 import PrivacyPolicy from './screens/PrivacyPolicy';
@@ -204,6 +205,9 @@ const Screens = createStackNavigator(
 					},
 					IdentityNew: {
 						screen: IdentityNew
+					},
+					IdentityBackup: {
+						screen: IdentityBackup
 					},
 					MessageDetails: {
 						screen: MessageDetails
