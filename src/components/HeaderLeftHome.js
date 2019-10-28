@@ -15,7 +15,8 @@ export default class HeaderLeftHome extends React.PureComponent {
 				onPress={() => this.props.onPress && this.props.onPress()}
 			>
 				<Image source={require('../../icon.png')} style={styles.logo} />
-				<Text style={styles.headerTextLeft}>parity</Text>
+				<Text style={[styles.headerTextLeft, styles.t_bold]}>parity</Text>
+				<Text style={styles.headerTextLeft}>signer</Text>
 			</View>
 		);
 	}
@@ -33,12 +34,16 @@ const styles = StyleSheet.create({
 	headerTextLeft: {
 		color: colors.bg_text,
 		flex: 1,
-		fontFamily: fonts.regular,
-		fontSize: 25,
-		paddingLeft: 4
+		fontFamily: fonts.light,
+		fontSize: 16,
+		marginRight: 3,
+		marginTop: 15
 	},
 	logo: {
-		height: 42,
-		width: 42
+		height: 25,
+		width: 25
+	},
+	t_bold: {
+		fontFamily: fonts.semiBold
 	}
 });

@@ -16,6 +16,7 @@
 
 export default {
 	bold: 'ManifoldCF-Bold',
+	light: 'ManifoldCF-Light',
 	regular: 'Manifold CF',
 	semiBold: 'ManifoldCF-DemiBold'
 };
