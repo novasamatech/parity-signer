@@ -16,14 +16,12 @@
 
 import NetInfo from '@react-native-community/netinfo';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
-import fonts from '../fonts';
-import TouchableItem from './TouchableItem';
 import IdentitiesSwitch from '../components/IdentitiesSwitch';
+import ButtonIcon from './ButtonIcon';
 
 class SecurityHeader extends React.Component {
 	state = {
@@ -48,30 +46,23 @@ class SecurityHeader extends React.Component {
 		}
 
 		return (
-			<TouchableItem onPress={() => this.props.navigation.navigate('Security')}>
-				<View
-					style={{
-						alignItems: 'center',
-						flexDirection: 'row',
-						paddingRight: 14
-					}}
-				>
-					<Icon style={styles.headerSecureIcon} name="security" />
-					<IdentitiesSwitch />
-				</View>
-			</TouchableItem>
+			<View
+				style={{
+					alignItems: 'center',
+					flexDirection: 'row',
+					paddingRight: 14
+				}}
+			>
+				<IdentitiesSwitch />
+				<ButtonIcon
+					onPress={() => this.props.navigation.navigate('Security')}
+					iconName="security"
+					iconColor={colors.bg_alert}
+				/>
+				<ButtonIcon iconType="ionicon" iconName="md-more" />
+			</View>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	headerSecureIcon: {
-		color: colors.bg_alert,
-		fontFamily: fonts.bold,
-		fontSize: 20,
-		marginLeft: 0,
-		paddingRight: 5
-	}
-});
 
 export default withNavigation(SecurityHeader);

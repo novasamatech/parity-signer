@@ -25,7 +25,11 @@ function IdentitiesSwitch(props) {
 
 	return (
 		<View>
-			<ButtonIcon onPress={() => setVisible(!visible)} iconName="fingerprint" />
+			<ButtonIcon
+				onPress={() => setVisible(!visible)}
+				iconName="md-finger-print"
+				iconType="ionicon"
+			/>
 			<Modal animationType="fade" visible={visible} transparent={true}>
 				<View style={styles.container}>
 					<Text>Identities Switch</Text>

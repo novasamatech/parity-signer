@@ -33,14 +33,15 @@ export default class ButtonIcon extends React.PureComponent<{
 	onPress: () => any
 }> {
 	static propTypes = {
+		iconColor: PropTypes.string,
 		iconName: PropTypes.string.isRequired,
 		iconType: PropTypes.string,
-		onPress: PropTypes.func.isRequired,
+		onPress: PropTypes.func,
 		style: ViewPropTypes.style
 	};
 
 	render() {
-		const { iconName, iconType, onPress } = this.props;
+		const { iconColor, iconName, iconType, onPress } = this.props;
 
 		const Touchable =
 			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
@@ -48,8 +49,8 @@ export default class ButtonIcon extends React.PureComponent<{
 			<Touchable accessibilityComponentType="button" onPress={onPress}>
 				<View style={styles.button}>
 					<Icon
-						color={colors.bg_text_sec}
-						size={24}
+						color={iconColor || colors.bg_text_sec}
+						size={26}
 						name={iconName}
 						type={iconType}
 					/>
@@ -66,6 +67,7 @@ const styles = StyleSheet.create({
 		borderRadius: 24,
 		height: 32,
 		justifyContent: 'center',
+		marginLeft: 8,
 		width: 32
 	}
 });
