@@ -88,7 +88,9 @@ export default class Scanner extends React.PureComponent {
 											strippedData,
 											accountsStore
 										);
-									} else if (scannerStore.getErrorMsg()) {
+									}
+
+									if (scannerStore.getErrorMsg()) {
 										throw new Error(scannerStore.getErrorMsg());
 									}
 
@@ -102,6 +104,7 @@ export default class Scanner extends React.PureComponent {
 											this.props.navigation.navigate('MessageDetails');
 										}
 									}
+									('');
 								} catch (e) {
 									return this.showErrorMessage(
 										scannerStore,
