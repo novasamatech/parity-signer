@@ -280,8 +280,7 @@ class AccountRecoverView extends React.Component {
 										{
 											onPress: () => {
 												navigation.navigate('AccountPin', {
-													isNew: true,
-													isWelcome: navigation.getParam('isWelcome')
+													isNew: true
 												});
 											},
 											style: 'default',
@@ -303,8 +302,7 @@ class AccountRecoverView extends React.Component {
 							}
 
 							navigation.navigate('AccountPin', {
-								isNew: true,
-								isWelcome: navigation.getParam('isWelcome')
+								isNew: true
 							});
 						}}
 					/>

@@ -159,10 +159,7 @@ const Screens = createStackNavigator(
 					}
 				},
 				{
-					defaultNavigationOptions: globalStackNavigationOptions,
-					initialRouteParams: {
-						isWelcome: true
-					}
+					defaultNavigationOptions: globalStackNavigationOptions
 				}
 			)
 		},
@@ -225,10 +222,7 @@ const Screens = createStackNavigator(
 					}
 				},
 				{
-					defaultNavigationOptions: globalStackNavigationOptions,
-					initialRouteParams: {
-						isWelcome: true
-					}
+					defaultNavigationOptions: globalStackNavigationOptions
 				}
 			)
 		}

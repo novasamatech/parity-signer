@@ -72,13 +72,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const account = this.state.newAccount;
 		if (!account.seed) return;
 
-		const { ethereumChainId = '', protocol, genesisHash = '' } = NETWORK_LIST[
-			account.networkKey
-		];
+		const { protocol } = NETWORK_LIST[account.networkKey];
 
 		if (protocol === NetworkProtocols.SUBSTRATE) {
-			const lockedAccount = this.encryptSeedPhraseAndLockAccount(account, pin);
-			// TODO save into identities;
+			// TODO unlock save into identities;
+			// const lockedAccount = this.encryptSeedPhraseAndLockAccount(account, pin);
 		} else {
 			await this.save(accountId(account), account, pin);
 		}
