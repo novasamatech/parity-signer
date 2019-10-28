@@ -31,7 +31,7 @@ import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
-import { empty, validateSeed } from '../util/account';
+import { emptyAccount, validateSeed } from '../util/account';
 import { constructSURI } from '../util/suri';
 
 export default class AccountNew extends React.Component {
@@ -63,7 +63,7 @@ class AccountNewView extends React.Component {
 
 	componentWillUnmount = function() {
 		// called when the user goes back, or finishes the whole process
-		this.props.accounts.updateNew(empty());
+		this.props.accounts.updateNew(emptyAccount());
 	};
 
 	static getDerivedStateFromProps(nextProps, prevState) {

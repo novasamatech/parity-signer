@@ -28,7 +28,7 @@ import {
 	SubstrateNetworkKeys
 } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
-import { empty } from '../util/account';
+import { emptyAccount } from '../util/account';
 
 export default class AccountNetworkChooser extends React.PureComponent {
 	static navigationOptions = {
@@ -72,7 +72,7 @@ class AccountNetworkChooserView extends React.PureComponent {
 								}
 							]}
 							onPress={() => {
-								accounts.updateNew(empty('', networkKey));
+								accounts.updateNew(emptyAccount('', networkKey));
 								navigation.goBack();
 							}}
 						>
