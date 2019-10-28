@@ -45,7 +45,10 @@ export function accountId({ address, networkKey }) {
 	}
 }
 
-export function empty(address = '', networkKey = SubstrateNetworkKeys.KUSAMA) {
+export function emptyAccount(
+	address = '',
+	networkKey = SubstrateNetworkKeys.KUSAMA
+) {
 	return {
 		address: address,
 		createdAt: new Date().getTime(),

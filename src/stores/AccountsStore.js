@@ -18,7 +18,7 @@
 
 import { Container } from 'unstated';
 
-import { accountId, empty } from '../util/account';
+import { accountId, emptyAccount } from '../util/account';
 import {
 	loadAccounts,
 	saveAccount,
@@ -27,47 +27,15 @@ import {
 import { parseSURI } from '../util/suri';
 import { decryptData, encryptData } from '../util/native';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import type { AccountsStoreState } from './types';
+import { emptyIdentity } from '../util/identity';
 
-export type Account = {
-	address: string,
-	createdAt: number,
-	derivationPassword: string,
-	derivationPath: string, // doesn't contain the ///password
-	encryptedSeed: string,
-	name: string,
-	networkKey: string,
-	seed: string, //this is the SURI (seedPhrase + /soft//hard///password derivation)
-	seedPhrase: string, //contains only the BIP39 words, no derivation path
-	updatedAt: number,
-	validBip39Seed: boolean
-};
-
-type AccountMeta = {
-	address: string,
-	createdAt: number,
-	name: string,
-	updatedAt: number
-};
-
-type Identity = {
-	encryptedSeedPhrase: string,
-	derivationPassword: string,
-	meta: Map<string, AccountMeta>,
-	addresses: Map<string, string>
-};
-
-type AccountsState = {
-	identities: [Identity],
-	accounts: Map<string, Account>,
-	newAccount: Account,
-	selectedKey: string
-};
-
-export default class AccountsStore extends Container<AccountsState> {
+export default class AccountsStore extends Container<AccountsStoreState> {
 	state = {
 		accounts: new Map(),
 		identities: [],
-		newAccount: empty(),
+		newAccount: emptyAccount(),
+		newIdentity: emptyIdentity(),
 		selectedKey: ''
 	};
 
@@ -86,8 +54,18 @@ export default class AccountsStore extends Container<AccountsState> {
 		});
 	}
 
+	updateNewIdentity(identityUpdate) {
+		this.setState({
+			newIdentity: { ...this.state.newIdentity, ...identityUpdate }
+		});
+	}
+
 	getNew() {
 		return this.state.newAccount;
+	}
+
+	getNewIdentity() {
+		return this.state.newIdentity;
 	}
 
 	async submitNew(pin) {
@@ -108,7 +86,7 @@ export default class AccountsStore extends Container<AccountsState> {
 
 		this.setState({
 			accounts: this.state.accounts.set(accountId(account), account),
-			newAccount: empty()
+			newAccount: emptyAccount()
 		});
 	}
 
@@ -233,7 +211,7 @@ export default class AccountsStore extends Container<AccountsState> {
 	getById(account) {
 		return (
 			this.state.accounts.get(accountId(account)) ||
-			empty(account.address, account.networkKey)
+			emptyAccount(account.address, account.networkKey)
 		);
 	}
 

@@ -40,7 +40,7 @@ import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
-import { empty, validateSeed } from '../util/account';
+import { emptyAccount, validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress } from '../util/native';
 import { constructSURI } from '../util/suri';
@@ -162,7 +162,7 @@ class AccountRecoverView extends React.Component {
 
 	componentWillUnmount = function() {
 		// called when the user goes back, or finishes the whole recovery process
-		this.props.accounts.updateNew(empty());
+		this.props.accounts.updateNew(emptyAccount());
 	};
 
 	componentDidUpdate(_, prevState) {
