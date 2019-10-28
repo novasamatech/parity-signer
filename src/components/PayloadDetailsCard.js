@@ -47,9 +47,11 @@ export default class PayloadDetailsCard extends React.PureComponent {
 	constructor(props) {
 		super(props);
 
+		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
 		const isKusama =
 			this.props.prefix ===
-			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix ||
+			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA_DEV].prefix;
 		const isSubstrateDev =
 			this.props.prefix ===
 			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;

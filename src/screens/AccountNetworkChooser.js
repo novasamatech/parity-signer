@@ -50,17 +50,18 @@ class AccountNetworkChooserView extends React.PureComponent {
 	render() {
 		const { navigation } = this.props;
 		const { accounts } = this.props;
+		const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
+
+		if (!__DEV__) {
+			excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+			excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+		}
 
 		return (
 			<ScrollView style={styles.body}>
 				<Text style={styles.title}>CHOOSE NETWORK</Text>
 				{Object.entries(NETWORK_LIST)
-					.filter(
-						([networkKey]) =>
-							(__DEV__ && networkKey !== UnknownNetworkKeys.UNKNOWN) ||
-							(networkKey !== SubstrateNetworkKeys.SUBSTRATE_DEV &&
-								networkKey !== UnknownNetworkKeys.UNKNOWN)
-					)
+					.filter(([networkKey]) => !excludedNetworks.includes(networkKey))
 					.map(([networkKey, networkParams]) => (
 						<AccountCard
 							address={''}
