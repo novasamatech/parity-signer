@@ -183,7 +183,7 @@ class AccountNewView extends React.Component {
 							}
 							onPress={() => {
 								validateSeed(seed, validBip39Seed).valid &&
-									navigation.navigate('AccountBackup', {
+									navigation.navigate('LegacyAccountBackup', {
 										isNew: true
 									});
 							}}

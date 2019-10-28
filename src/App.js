@@ -39,7 +39,7 @@ import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import '../ReactotronConfig';
 import About from './screens/About';
-import AccountBackup from './screens/AccountBackup';
+import LegacyAccountBackup from './screens/LegacyAccountBackup';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
 import AccountNetworkChooser from './screens/AccountNetworkChooser';
@@ -175,9 +175,6 @@ const Screens = createStackNavigator(
 					About: {
 						screen: About
 					},
-					AccountBackup: {
-						screen: AccountBackup
-					},
 					AccountDetails: {
 						screen: AccountDetails
 					},
@@ -201,6 +198,9 @@ const Screens = createStackNavigator(
 					},
 					AccountUnlockAndSign: {
 						screen: AccountUnlockAndSign
+					},
+					LegacyAccountBackup: {
+						screen: LegacyAccountBackup
 					},
 					IdentityNew: {
 						screen: IdentityNew
