@@ -43,6 +43,7 @@
     "react": "^16.9.0",
     "react-native": "0.60.5",
     "react-native-camera": "^3.4.0",
+    "react-native-elements": "^1.2.6",
     "react-native-gesture-handler": "^1.4.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-markdown-renderer": "^3.2.8",

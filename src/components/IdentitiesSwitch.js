@@ -16,6 +16,7 @@
 
 import React, { useState } from 'react';
 import Button from './Button';
+import ButtonIcon from './ButtonIcon';
 import { Modal, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
@@ -24,7 +25,7 @@ function IdentitiesSwitch({ navigation }) {
 
 	return (
 		<View>
-			<Button title="identities" onPress={() => setVisible(!visible)} />
+			<ButtonIcon onPress={() => setVisible(!visible)} iconName="fingerprint" />
 			<Modal animationType="fade" visible={visible} transparent={true}>
 				<View style={styles.container}>
 					<Text>Identities Switch</Text>
