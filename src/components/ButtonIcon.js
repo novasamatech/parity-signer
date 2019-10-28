@@ -20,11 +20,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {
 	Platform,
-	StyleSheet,
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	View,
-	ViewPropTypes
+	ViewPropTypes,
+	Text
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import colors from '../colors';
@@ -33,41 +33,58 @@ export default class ButtonIcon extends React.PureComponent<{
 	onPress: () => any
 }> {
 	static propTypes = {
-		iconColor: PropTypes.string,
 		iconName: PropTypes.string.isRequired,
+		iconSize: PropTypes.number,
 		iconType: PropTypes.string,
 		onPress: PropTypes.func,
-		style: ViewPropTypes.style
+		style: ViewPropTypes.style,
+		title: PropTypes.string
 	};
 
 	render() {
-		const { iconColor, iconName, iconType, onPress } = this.props;
-
+		const { iconName, iconType, onPress, iconSize, title } = this.props;
 		const Touchable =
 			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 		return (
 			<Touchable accessibilityComponentType="button" onPress={onPress}>
-				<View style={styles.button}>
-					<Icon
-						color={iconColor || colors.bg_text_sec}
-						size={26}
-						name={iconName}
-						type={iconType}
-					/>
+				<View
+					style={{
+						alignItems: 'center',
+						flexDirection: 'row'
+					}}
+				>
+					<View
+						style={{
+							alignItems: 'center',
+							backgroundColor: colors.card_bg,
+							borderRadius: iconSize || 32,
+							height: iconSize || 32,
+							justifyContent: 'center',
+							marginLeft: 8,
+							width: iconSize || 32
+						}}
+					>
+						<Icon
+							color={colors.bg_text_sec}
+							size={iconSize - 4 || 28}
+							name={iconName}
+							type={iconType}
+						/>
+					</View>
+
+					{title && (
+						<Text
+							style={{
+								color: colors.bg_text_sec,
+								fontSize: { iconSize } - 4 || 28,
+								marginLeft: 8
+							}}
+						>
+							{title}
+						</Text>
+					)}
 				</View>
 			</Touchable>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	button: {
-		alignItems: 'center',
-		backgroundColor: colors.card_bg,
-		borderRadius: 24,
-		height: 32,
-		justifyContent: 'center',
-		marginLeft: 8,
-		width: 32
-	}
-});
