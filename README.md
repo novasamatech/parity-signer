@@ -119,7 +119,7 @@ Corresponding data:
 
 #### Integration Test
 
-Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. And Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
+Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
 
 First make sure `detox-cli` is installed as global dependency with
 
@@ -134,7 +134,7 @@ yarn global add detox-cli
 2. run `yarn e2e:ios` or `yarn e2e:android`.
 
 ##### Develop and Test
-Details please refer to Detox official [Documentation](https://github.com/wix/Detox/blob/master/docs/Guide.DevelopingWhileWritingTests.md)
+Details please refer to Detox official guide [here](https://github.com/wix/Detox/blob/master/docs/Guide.DevelopingWhileWritingTests.md)
 
 Once you have run `yarn ios` you do not need to build it, just run:
 ```shell
@@ -147,13 +147,13 @@ Re-run tests without re-installing the app
 yarn test-e2e:ios --reuse
 ```
 
-If you want to use another specific emulator/simulator than defined in the configuration, add `--device-name` flag (on Android API version is needed), for example:
+If you want to use another specific emulator/simulator than those defined in the configuration, add `--device-name` flag (on Android API version is needed), for example:
 ```
 yarn test-e2e:ios --device-name iPhone X
 yarn test-e2e:android --device-name Pixel_2_API_28
 ```
 
-On Android please replace `ios` with `android`, currently Detox's Android 0.60.x support is in progress, if there is an error, try build it again with `yarn build-e2e:android`
+On Android please replace `ios` with `android`, currently Detox's Android 0.60.x support is in progress, if there is an error, try to build it again with `yarn build-e2e:android`
 
 ### Troubleshooting
 
