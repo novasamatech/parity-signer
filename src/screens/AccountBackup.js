@@ -75,7 +75,7 @@ class AccountBackupView extends React.PureComponent {
 			accounts.lockAccount(selectedKey);
 		}
 
-		AppState.removeEventListener('change', this._handleAppStateChange);
+		AppState.removeEventListener('change', this.handleAppStateChange);
 	}
 
 	render() {
