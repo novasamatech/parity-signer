@@ -21,6 +21,7 @@ export const EthereumNetworkKeys = Object.freeze({
 	KOVAN: '42',
 	CLASSIC: '61'
 });
+
 /* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
