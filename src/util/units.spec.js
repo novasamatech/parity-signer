@@ -18,7 +18,6 @@
 
 import '@polkadot/types/injector';
 
-import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
@@ -51,9 +50,7 @@ describe('units', () => {
 		beforeAll(() => {
 			const metadata = new Metadata(kusamaData);
 
-			const extrinsics = extrinsicsFromMeta(metadata);
-
-			GenericCall.injectMethods(extrinsics);
+			GenericCall.injectMetadata(metadata);
 
 			formatBalance.setDefaults({
 				decimals: 12,

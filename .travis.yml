@@ -1,7 +1,6 @@
 ---
 language: node_js
-node_js:
-  - 8
+node_js: 8
 
 cache:
   directories:
@@ -13,3 +12,85 @@ install:
 script:
   - yarn run lint
   - yarn run test
+
+# TODO complete following part to Integrate E2E test
+
+#matrix:
+#  include:
+#  - language: objective-c
+#    osx_image: xcode10.3
+#
+#    branches:
+#      only:
+#        - master
+#
+#    cache:
+#      directories:
+#        - node_modules
+#
+#    install:
+#      - brew tap wix/brew
+#      - brew install applesimutils
+#      - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+#      - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+#      - nvm install 8
+#      - nvm use 8
+#      - nvm alias default 8
+#      - npm install -g yarn
+#      - npm install -g react-native-cli
+#      - npm install -g detox-cli
+#      - gem install xcpretty
+#      - yarn
+#
+#    script:
+#      - detox build -c ios.sim.release
+#      - detox test -c ios.sim.release
+#
+#  - language: android
+##    env:
+##      - REACT_NATIVE_VERSION=0.60.5
+#    android:
+#      components:
+#        - tools
+#        - platform-tools
+#        - build-tools-28.0.3
+#        - android-28
+#        - extra-google-google_play_services
+#        - extra-google-m2repository
+#        - extra-android-m2repository
+##        - sys-img-x86-android-26
+#        - sys-img-x86-android-28
+#
+#    cache:
+#      directories:
+#        - node_modules
+#
+#    install:
+#      - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+#      - export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+#      - nvm install 8
+#      - nvm use 8
+#      - nvm alias default 8
+#      - npm install -g yarn
+#      - npm install -g react-native-cli
+#      - npm install -g detox-cli
+#      - yes | sdkmanager "build-tools;28.0.3"
+#      - yarn
+#
+#    script:
+#      - detox build -c android.emu.release
+#      - detox test -c android.emu.release
+#
+#  - language: node_js
+#    node_js: 8
+#
+#    cache:
+#      directories:
+#        - node_modules
+#
+#    install:
+#      - yarn
+#
+#    script:
+#      - yarn run lint
+#      - yarn run test
