@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import Button from './Button';
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import fontStyles from '../fontStyles';
@@ -35,6 +34,16 @@ function IdentitiesSwitch({ navigation }) {
 			/>
 			<Modal animationType="fade" visible={visible} transparent={true}>
 				<View style={styles.container}>
+					<View style={styles.headerStyle}>
+						<ButtonIcon
+							onPress={() => {
+								setVisible(false);
+							}}
+							iconName="md-close"
+							iconType="ionicon"
+							iconBgStyle={{ backgroundColor: colors.card_bgSolid }}
+						/>
+					</View>
 					<View style={styles.card}>
 						<ButtonIcon
 							title="Current Identity Title"
@@ -54,12 +63,12 @@ function IdentitiesSwitch({ navigation }) {
 								setVisible(false);
 								//go to current IdentityManage
 							}}
-							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
-							iconName="md-arrow-forward"
+							iconBgStyle={styles.i_arrowBg}
+							iconName="ios-arrow-round-forward"
 							iconType="ionicon"
-							iconSize={18}
+							iconSize={24}
 							textStyle={fontStyles.t_regular}
-							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
+							style={styles.i_arrowStyle}
 						/>
 						<ButtonIcon
 							title="Backup Identity"
@@ -67,12 +76,12 @@ function IdentitiesSwitch({ navigation }) {
 								setVisible(false);
 								//go to current IdentityBackup
 							}}
-							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
-							iconName="md-arrow-forward"
+							iconBgStyle={styles.i_arrowBg}
+							iconName="ios-arrow-round-forward"
 							iconType="ionicon"
-							iconSize={18}
+							iconSize={24}
 							textStyle={fontStyles.t_regular}
-							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
+							style={styles.i_arrowStyle}
 						/>
 						<Separator />
 						<ButtonIcon
@@ -106,12 +115,12 @@ function IdentitiesSwitch({ navigation }) {
 								setVisible(false);
 								navigation.navigate('TermsAndConditions');
 							}}
-							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
-							iconName="md-arrow-forward"
+							iconBgStyle={styles.i_arrowBg}
+							iconName="ios-arrow-round-forward"
 							iconType="ionicon"
-							iconSize={18}
+							iconSize={24}
 							textStyle={fontStyles.t_regular}
-							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
+							style={styles.i_arrowStyle}
 						/>
 						<ButtonIcon
 							title="Privacy Policy"
@@ -119,18 +128,12 @@ function IdentitiesSwitch({ navigation }) {
 								setVisible(false);
 								navigation.navigate('PrivacyPolicy');
 							}}
-							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
-							iconName="md-arrow-forward"
+							iconBgStyle={styles.i_arrowBg}
+							iconName="ios-arrow-round-forward"
 							iconType="ionicon"
-							iconSize={18}
+							iconSize={24}
 							textStyle={fontStyles.t_regular}
-							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
-						/>
-						<Button
-							title="Close"
-							onPress={() => {
-								setVisible(false);
-							}}
+							style={styles.i_arrowStyle}
 						/>
 					</View>
 				</View>
@@ -143,15 +146,30 @@ const styles = {
 	card: {
 		backgroundColor: colors.bg,
 		borderRadius: 5,
+		marginTop: 16,
 		paddingBottom: 8,
 		paddingTop: 8
 	},
 	container: {
-		backgroundColor: 'rgba(0,0,0,0.7)',
+		backgroundColor: 'rgba(0,0,0,0.8)',
 		flex: 1,
-		justifyContent: 'center',
 		paddingLeft: 16,
 		paddingRight: 16
+	},
+	headerStyle: {
+		alignItems: 'flex-end',
+		height: 60,
+		justifyContent: 'center',
+		paddingRight: 62
+	},
+	i_arrowBg: {
+		backgroundColor: 'rgba(0,0,0,0)',
+		width: 12
+	},
+	i_arrowStyle: {
+		marginTop: 0,
+		opacity: 0.7,
+		paddingLeft: 8 * 8
 	}
 };
 

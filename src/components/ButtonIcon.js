@@ -33,9 +33,9 @@ export default class ButtonIcon extends React.PureComponent<{
 	onPress: () => any
 }> {
 	static propTypes = {
+		iconBgStyle: ViewPropTypes.style,
 		iconName: PropTypes.string.isRequired,
 		iconSize: PropTypes.number,
-		iconStyle: ViewPropTypes.style,
 		iconType: PropTypes.string,
 		onPress: PropTypes.func.isRequired,
 		style: ViewPropTypes.style,
@@ -48,7 +48,7 @@ export default class ButtonIcon extends React.PureComponent<{
 			iconName,
 			iconType,
 			onPress,
-			iconStyle,
+			iconBgStyle,
 			iconSize,
 			textStyle,
 			title,
@@ -62,7 +62,9 @@ export default class ButtonIcon extends React.PureComponent<{
 					style={[
 						{
 							alignItems: 'center',
-							flexDirection: 'row'
+							flexDirection: 'row',
+							marginLeft: 8,
+							marginVertical: 8
 						},
 						style
 					]}
@@ -75,11 +77,9 @@ export default class ButtonIcon extends React.PureComponent<{
 								borderRadius: iconSize || 24,
 								height: iconSize || 24,
 								justifyContent: 'center',
-								marginLeft: 8,
-								marginVertical: 8,
 								width: iconSize || 24
 							},
-							iconStyle
+							iconBgStyle
 						]}
 					>
 						<Icon
