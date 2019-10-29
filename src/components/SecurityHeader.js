@@ -59,7 +59,11 @@ class SecurityHeader extends React.Component {
 					iconName="security"
 					iconColor={colors.bg_alert}
 				/>
-				<ButtonIcon iconType="ionicon" iconName="md-more" />
+				<ButtonIcon
+					onPress={() => this.props.navigation.navigate('IdentityBackup')}
+					iconType="ionicon"
+					iconName="md-more"
+				/>
 			</View>
 		);
 	}

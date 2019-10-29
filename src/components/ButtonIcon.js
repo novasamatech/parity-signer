@@ -36,7 +36,7 @@ export default class ButtonIcon extends React.PureComponent<{
 		iconName: PropTypes.string.isRequired,
 		iconSize: PropTypes.number,
 		iconType: PropTypes.string,
-		onPress: PropTypes.func,
+		onPress: PropTypes.func.isRequired,
 		style: ViewPropTypes.style,
 		title: PropTypes.string
 	};
