@@ -32,7 +32,6 @@ export default function QrView(props) {
 
 	useEffect(() => {
 		async function displayQrCode(data) {
-			console.log('data in qr view -> ', data);
 			try {
 				const generatedQr = isHex(data)
 					? await qrCodeHex(data)

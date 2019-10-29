@@ -108,8 +108,6 @@ export class TxDetailsView extends React.PureComponent {
 		const prefix =
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
 
-		debugger;
-
 		return (
 			<ScrollView
 				contentContainerStyle={styles.bodyContent}
