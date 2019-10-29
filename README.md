@@ -71,7 +71,7 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 
 ### Usage
 
-- First start React Native server with increased heap to prevent out of memory error
+- First start React Native server with the increased heap to prevent out of memory error
 
     ```
     yarn start
@@ -121,7 +121,7 @@ Corresponding data:
 
 Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
 
-First make sure `detox-cli` is installed as global dependency with
+First make sure `detox-cli` is installed as a global dependency with
 
 ```
 yarn global add detox-cli
@@ -161,7 +161,7 @@ On Android please replace `ios` with `android`, currently Detox's Android 0.60.x
 
 This error should be accompanied with `error: closed` in terminal when deploying the debug version of the signer on a device that runs Android older than 5.0. It happens because the Android API does not support the reverse proxy that would allow the phone to communicate with the debug server on your computer.
 
-A suitable workaround is to run both devices on the same WiFi and use your local WiFi IP address. Check your WiFi settings for your local IP address (eg. `192.168.1.42`), then, while having the app open on the phone (either on error page or blank screen) run a command in terminal:
+A suitable workaround is to run both devices on the same WiFi and use your local WiFi IP address. Check your WiFi settings for your local IP address (eg. `192.168.1.42`), then, while having the app open on the phone (either on an error page or blank screen) run a command in terminal:
 
 ```
 adb shell input keyevent 82
