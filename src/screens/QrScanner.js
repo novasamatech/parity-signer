@@ -91,7 +91,9 @@ export default class Scanner extends React.PureComponent {
 											accountsStore,
 											isNetworkSpec
 										);
-									} else if (scannerStore.getErrorMsg()) {
+									}
+
+									if (scannerStore.getErrorMsg()) {
 										throw new Error(scannerStore.getErrorMsg());
 									}
 
@@ -105,6 +107,7 @@ export default class Scanner extends React.PureComponent {
 											this.props.navigation.navigate('MessageDetails');
 										}
 									}
+									('');
 								} catch (e) {
 									return this.showErrorMessage(
 										scannerStore,

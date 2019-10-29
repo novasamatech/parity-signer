@@ -29,6 +29,7 @@ import Button from '../components/Button';
 // import PopupMenu from '../components/PopupMenu';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
+import testIDs from '../../e2e/testIDs';
 
 export default class AccountList extends React.PureComponent {
 	static navigationOptions = {
@@ -90,7 +91,7 @@ class AccountListView extends React.PureComponent {
 		const { navigate } = navigation;
 
 		return (
-			<View style={styles.body}>
+			<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
 				<Background />
 				<View style={styles.header}>
 					<Text style={styles.title}>ACCOUNTS</Text>

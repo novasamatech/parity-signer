@@ -16,7 +16,6 @@
 
 // @flow
 
-import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
@@ -48,9 +47,11 @@ export default class PayloadDetailsCard extends React.PureComponent {
 	constructor(props) {
 		super(props);
 
+		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
 		const isKusama =
 			this.props.prefix ===
-			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix ||
+			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA_DEV].prefix;
 		const isSubstrateDev =
 			this.props.prefix ===
 			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
@@ -65,6 +66,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			});
 		} else if (__DEV__ && isSubstrateDev) {
 			metadata = new Metadata(substrateDevMetadata);
+
 			formatBalance.setDefaults({
 				decimals:
 					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
@@ -82,8 +84,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			Keys: 'SessionKeysPolkadot'
 		});
 
-		const extrinsics = extrinsicsFromMeta(metadata);
-		GenericCall.injectMethods(extrinsics);
+		GenericCall.injectMetadata(metadata);
 	}
 
 	render() {

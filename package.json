@@ -1,6 +1,6 @@
 {
   "name": "NativeSigner",
-  "version": "3.0.8-beta",
+  "version": "3.0.9-beta",
   "private": true,
   "license": "GPL-3.0",
   "engines": {
@@ -17,9 +17,15 @@
     "ios": "yarn run build-rust-ios && react-native run-ios",
     "lint": "npx eslint ./src/ --ext .js,.jsx",
     "lint:fix": "npx eslint ./src/ --ext .js,.jsx --fix",
-    "postinstall": "npx jetify",
+    "postinstall": "npx jetify && chmod +x ./scripts/fix-rn-camera-path.sh && ./scripts/fix-rn-camera-path.sh ./node_modules/react-native-camera/ios/RNCamera.xcodeproj/project.pbxproj",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
-    "test": "jest"
+    "test": "jest",
+    "build-e2e:android": "detox build -c android.emu.debug",
+    "test-e2e:android": "detox test -c android.emu.debug",
+    "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
+    "build-e2e:ios": "detox build -c ios.sim.debug",
+    "test-e2e:ios": "detox test -c ios.sim.debug",
+    "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios"
   },
   "husky": {
     "hooks": {
@@ -29,11 +35,11 @@
   "dependencies": {
     "@plugnet/util": "^1.1.100",
     "@plugnet/wasm-crypto-js": "^0.11.102",
-    "@polkadot/api": "^0.91.1",
-    "@polkadot/reactnative-identicon": "^0.42.1",
-    "@polkadot/util": "^1.2.1",
-    "@polkadot/util-crypto": "1.2.1",
-    "@polkadot/wasm-crypto": "^0.13.1",
+    "@polkadot/api": "^0.95.2",
+    "@polkadot/reactnative-identicon": "^0.46.1",
+    "@polkadot/util": "^1.6.1",
+    "@polkadot/util-crypto": "1.6.1",
+    "@polkadot/wasm-crypto": "^0.14.1",
     "@react-native-community/netinfo": "^4.1.5",
     "@tradle/react-native-http": "^2.0.1",
     "bignumber.js": "^9.0.0",
@@ -67,6 +73,7 @@
     "babel-eslint": "10.0.3",
     "babel-jest": "^24.9.0",
     "babel-plugin-rewrite-require": "^1.14.5",
+    "detox": "^14.5.0",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-plugin-prettier": "^3.1.0",
@@ -80,5 +87,44 @@
   },
   "resolutions": {
     "@react-native-community/eslint-config/babel-eslint": "10.0.3"
+  },
+  "detox": {
+    "configurations": {
+      "ios.sim.debug": {
+        "binaryPath": "ios/build/NativeSigner/Build/Products/Debug-iphonesimulator/NativeSigner.app",
+        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
+        "type": "ios.simulator",
+        "device": {
+          "type": "iPhone SE"
+        }
+      },
+      "ios.sim.release": {
+        "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
+        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=NO | xcpretty -t && exit ${PIPESTATUS[0]}",
+        "type": "ios.simulator",
+        "device": {
+          "type": "iPhone SE"
+        }
+      },
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "build":
+        "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "type": "android.emulator",
+        "device": {
+          "avdName": "Nexus_5_API_28"
+        }
+      },
+      "android.emu.release": {
+        "binaryPath": "android/app/build/outputs/apk/release/app-release.apk",
+        "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
+        "type": "android.emulator",
+        "device": {
+          "avdName": "Nexus_5_API_28"
+        }
+      }
+    },
+    "runner-config": "e2e/config.json",
+    "test-runner": "jest"
   }
 }
