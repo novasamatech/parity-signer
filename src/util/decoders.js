@@ -25,7 +25,7 @@ import {
 } from '@polkadot/util';
 import { blake2AsHex, encodeAddress } from '@polkadot/util-crypto';
 
-// import { blake2b } from './native';
+import { blake2b } from './native';
 import {
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
@@ -175,13 +175,11 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;
-
-							// console.log('extrinsict payload -> ', extrinsicPayload);
-							// console.log('@polkadot/util-crypto hash -> ', await blake2AsHex(extrinsicPayload.toU8a(true)));
-							// console.log('native hash -> ', await blake2b(u8aToHex(extrinsicPayload.toU8a(true), -1, false)));
-
+							'';
 							data.data.data = isOversized
-								? await blake2AsHex(u8aToHex(extrinsicPayload.toU8a(true)))
+								? await blake2b(
+										u8aToHex(extrinsicPayload.toU8a(true), -1, false)
+								  )
 								: extrinsicPayload;
 
 							// while we are signing a hash, we still have the ability to know what the signing payload is, so we should get that information into the store.

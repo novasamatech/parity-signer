@@ -144,6 +144,8 @@ export! {
     fn blake(data: &str) -> Option<String> {
         let data: Vec<u8> = data.from_hex().ok()?;
 
+        println!("{:?}", data);
+
         Some(blake2b(32, &[], &data).as_bytes().to_hex())
     }
 
@@ -231,6 +233,18 @@ export! {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+     #[test]
+    fn test_blake() {
+        let data = "454545454545454545454545454545454545454545454545454545454545454501\
+                    000000000000002481853da20b9f4322f34650fea5f240dcbfb266d02db94bfa01\
+                    53c31f4a29dbdbf025dd4a69a6f4ee6e1577b251b655097e298b692cb34c18d318\
+                    2cac3de0dc00000000";
+        let expected = "1025e5db74fdaf4d2818822dccf0e1604ae9ccc62f26cecfde23448ff0248abf";
+        let result = blake(data);
+
+        assert_eq!(Some(expected.to_string()), result);
+    }
 
     #[test]
     fn test_rlp_item() {

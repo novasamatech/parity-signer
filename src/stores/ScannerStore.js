@@ -427,10 +427,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			let signed = await substrateSign(seed, signable);
 			signed = '0x' + signed;
-
+			debugger;
 			// TODO: tweak the first byte if and when sig type is not sr25519
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
-
+			debugger;
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
 

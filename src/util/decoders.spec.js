@@ -25,11 +25,7 @@ import {
 } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
-import {
-	blake2AsHex,
-	checkAddress,
-	decodeAddress
-} from '@polkadot/util-crypto';
+import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import {
@@ -53,9 +49,6 @@ const TEST_MESSAGE = 'THIS IS SPARTA!';
 
 const metadata = new Metadata(kusamaData);
 GenericCall.injectMetadata(metadata);
-
-const EXTRINSIC =
-	'0x3d0604000129067b226e616d65223a22496e6372656d656e746572222c226465706c6f79223a7b2261726773223a5b7b226e616d65223a22696e69745f76616c7565222c2274797065223a22753332227d5d7d2c226d65737361676573223a5b7b226e616d65223a22696e63222c2273656c6563746f72223a3235373534343432332c226d757461746573223a747275652c2261726773223a5b7b226e616d65223a226279222c2274797065223a22753332227d5d2c2272657475726e5f74797065223a6e756c6c7d2c7b226e616d65223a22676574222c2273656c6563746f72223a343236363237393937332c226d757461746573223a66616c73652c2261726773223a5b5d2c2272657475726e5f74797065223a22753332227d2c7b226e616d65223a22636f6d70617265222c2273656c6563746f72223a3336333930363331362c226d757461746573223a66616c73652c2261726773223a5b7b226e616d65223a2277697468222c2274797065223a22753332227d5d2c2272657475726e5f74797065223a22626f6f6c227d5d7d';
 
 const RN_TX_REQUEST_RAW_DATA =
 	'4' + // indicates data is binary encoded
@@ -104,11 +97,7 @@ const SIGN_TX_TEST = u8aConcat(
 	new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, { version: 4 }).toU8a()
 );
 
-describe.only('sanity check', () => {
-	it.only('blake2 hasher works', () => {
-		console.log(blake2AsHex(EXTRINSIC));
-	});
-
+describe.skip('sanity check', () => {
 	it('sanity check address is kusama', () => {
 		expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);
 	});
@@ -187,7 +176,7 @@ describe('decoders', () => {
 			expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
 		});
 
-		it.only('from Substrate UOS Payload Mortal', async () => {
+		it('from Substrate UOS Payload Mortal', async () => {
 			const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
 
 			expect(unsignedData.data.data.era.toHex()).toEqual(

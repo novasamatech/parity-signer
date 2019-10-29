@@ -39,7 +39,7 @@ function untagAddress(address) {
 	};
 }
 
-function asString(x) {
+function toHex(x) {
 	return x
 		.split('')
 		.map(c => c.charCodeAt(0).toString(16))
@@ -50,7 +50,7 @@ function asString(x) {
 export async function brainWalletAddress(seed) {
 	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
 	const { bip39, address } = untagAddress(taggedAddress);
-	const hash = await keccak(asString(address));
+	const hash = await keccak(toHex(address));
 
 	return {
 		address: checksummedAddress(address, hash),
@@ -63,7 +63,7 @@ export function brainWalletBIP39Address(seed) {
 		.then(async taggedAddress => {
 			const { bip39, address } = untagAddress(taggedAddress);
 
-			const hash = await keccak(asString(address));
+			const hash = await keccak(toHex(address));
 
 			return {
 				address: checksummedAddress(address, hash),
@@ -109,18 +109,16 @@ export function decryptData(data, password) {
 
 // Creates a QR code for the UTF-8 representation of a string
 export function qrCode(data) {
-	console.log('Nothex qr code generating from -> ', data);
 	return EthkeyBridge.qrCode(data);
 }
 
 // Creates a QR code for binary data from a hex-encoded string
 export function qrCodeHex(data) {
-	console.log('hex qr code generating from -> ', data);
 	return EthkeyBridge.qrCodeHex(data);
 }
 
 export function blake2b(data) {
-	return EthkeyBridge.blake2b(asString(data));
+	return EthkeyBridge.blake2b(data);
 }
 
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
