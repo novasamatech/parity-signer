@@ -217,10 +217,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		const completedFramesCount = Object.keys(multipartData).length;
 
-		this.setState({
-			completedFramesCount
-		});
-
 		if (
 			completedFramesCount > 0 &&
 			totalFrameCount > 0 &&
@@ -286,6 +282,10 @@ export default class ScannerStore extends Container<ScannerState> {
 				multipartData: nextDataState
 			});
 		}
+
+		this.setState({
+			completedFramesCount
+		});
 	}
 
 	async setData(accountsStore) {
