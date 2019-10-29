@@ -23,7 +23,7 @@ import {
 	u8aToHex,
 	u8aToString
 } from '@polkadot/util';
-import { blake2AsHex, encodeAddress } from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 
 import { blake2b } from './native';
 import {
@@ -213,7 +213,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							data.action = 'signData';
 
 							if (isOversized) {
-								data.data.data = await blake2AsHex(rawPayload);
+								data.data.data = await blake2b(u8aToHex(rawPayload, -1, false));
 								data.isHash = isOversized;
 								data.oversized = isOversized;
 							} else {

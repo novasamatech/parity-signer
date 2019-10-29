@@ -35,6 +35,7 @@ import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
+import { GenericExtrinsicPayload } from '@polkadot/types';
 
 export default class TxDetails extends React.PureComponent {
 	static navigationOptions = {
@@ -56,7 +57,8 @@ export default class TxDetails extends React.PureComponent {
 								scannerStore={scannerStore}
 								sender={scannerStore.getSender()}
 								recipient={scannerStore.getRecipient()}
-								dataToSign={scannerStore.getDataToSign()}
+								// dataToSign={scannerStore.getDataToSign()}
+								prehash={scannerStore.getPrehashPayload()}
 								onNext={async () => {
 									try {
 										this.props.navigation.navigate('AccountUnlockAndSign');
@@ -77,12 +79,13 @@ export default class TxDetails extends React.PureComponent {
 
 export class TxDetailsView extends React.PureComponent {
 	static propTypes = {
-		dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
-			.isRequired,
+		// dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+		// .isRequired,
 		gas: PropTypes.string,
 		gasPrice: PropTypes.string,
 		nonce: PropTypes.string,
 		onNext: PropTypes.func.isRequired,
+		prehash: PropTypes.instanceOf(GenericExtrinsicPayload),
 		recipient: PropTypes.object.isRequired,
 		sender: PropTypes.object.isRequired,
 		value: PropTypes.string
@@ -90,13 +93,13 @@ export class TxDetailsView extends React.PureComponent {
 
 	render() {
 		const {
-			dataToSign,
-			sender,
-			recipient,
-			value,
-			// nonce,
+			// dataToSign,
 			gas,
 			gasPrice,
+			prehash,
+			recipient,
+			sender,
+			value,
 			onNext
 		} = this.props;
 
@@ -104,6 +107,8 @@ export class TxDetailsView extends React.PureComponent {
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 		const prefix =
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
+
+		debugger;
 
 		return (
 			<ScrollView
@@ -140,7 +145,7 @@ export class TxDetailsView extends React.PureComponent {
 					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
 						description="You are about to confirm sending the following extrinsic"
-						payload={dataToSign}
+						payload={prehash}
 						prefix={prefix}
 					/>
 				)}

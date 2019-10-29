@@ -16,6 +16,7 @@
 
 'use strict';
 
+import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -32,7 +33,6 @@ import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
-import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/strings';
 
@@ -43,8 +43,8 @@ export default class MessageDetails extends React.PureComponent {
 	};
 	render() {
 		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scannerStore, accounts) => {
+			<Subscribe to={[ScannerStore]}>
+				{scannerStore => {
 					const dataToSign = scannerStore.getDataToSign();
 					const message = scannerStore.getMessage();
 
@@ -86,7 +86,7 @@ export class MessageDetailsView extends React.PureComponent {
 		isHash: PropTypes.bool,
 		message: PropTypes.string.isRequired,
 		onNext: PropTypes.func.isRequired,
-		prehash: PropTypes.object,
+		prehash: PropTypes.instanceOf(GenericExtrinsicPayload).isRequired,
 		sender: PropTypes.object.isRequired
 	};
 
@@ -111,9 +111,16 @@ export class MessageDetailsView extends React.PureComponent {
 					address={sender.address}
 					networkKey={sender.networkKey}
 				/>
-
 				{prehash ? (
-					<Text style={styles.title}>HASH TO SIGN</Text>
+					<PayloadDetailsCard
+						style={{ marginBottom: 20 }}
+						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
+						payload={prehash}
+						prefix={prefix}
+					/>
+				) : null}
+				{isHash ? (
+					<Text style={styles.title}>HASH</Text>
 				) : (
 					<Text style={styles.title}>MESSAGE</Text>
 				)}
@@ -124,14 +131,6 @@ export class MessageDetailsView extends React.PureComponent {
 						? hexToAscii(message)
 						: dataToSign}
 				</Text>
-				{prehash ? (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						description="You are about to confirm sending the following extrinsic. We will sign the hash instead of the payload as it is oversized."
-						payload={prehash}
-						prefix={prefix}
-					/>
-				) : null}
 				<Button
 					buttonStyles={{ height: 60 }}
 					title="Sign Message"

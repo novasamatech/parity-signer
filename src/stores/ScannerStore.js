@@ -16,7 +16,7 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-// import { schnorrkelVerify } from '@polkadot/util-crypto';
+
 import {
 	hexStripPrefix,
 	hexToU8a,
@@ -427,10 +427,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			let signed = await substrateSign(seed, signable);
 			signed = '0x' + signed;
-			debugger;
+
 			// TODO: tweak the first byte if and when sig type is not sr25519
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
-			debugger;
+
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
 
@@ -451,7 +451,14 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	cleanup() {
 		return new Promise(resolve => {
-			this.setState(DEFAULT_STATE, resolve);
+			const prehash = this.state.prehash;
+			this.setState(
+				{
+					...DEFAULT_STATE,
+					prehash
+				},
+				resolve
+			);
 			this.clearMultipartProgress();
 		});
 	}
@@ -463,7 +470,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			missedFrames: DEFAULT_STATE.missedFrames,
 			multipartComplete: DEFAULT_STATE.multipartComplete,
 			multipartData: {},
-			prehash: DEFAULT_STATE.prehash,
 			totalFrameCount: DEFAULT_STATE.totalFrameCount,
 			unsignedData: DEFAULT_STATE.unsignedData
 		});
