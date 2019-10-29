@@ -144,8 +144,6 @@ export! {
     fn blake(data: &str) -> Option<String> {
         let data: Vec<u8> = data.from_hex().ok()?;
 
-        println!("{:?}", data);
-
         Some(blake2b(32, &[], &data).as_bytes().to_hex())
     }
 
