@@ -35,54 +35,62 @@ export default class ButtonIcon extends React.PureComponent<{
 	static propTypes = {
 		iconName: PropTypes.string.isRequired,
 		iconSize: PropTypes.number,
+		iconStyle: ViewPropTypes.style,
 		iconType: PropTypes.string,
 		onPress: PropTypes.func.isRequired,
 		style: ViewPropTypes.style,
+		textStyle: Text.propTypes.style,
 		title: PropTypes.string
 	};
 
 	render() {
-		const { iconName, iconType, onPress, iconSize, title } = this.props;
+		const {
+			iconName,
+			iconType,
+			onPress,
+			iconStyle,
+			iconSize,
+			textStyle,
+			title,
+			style
+		} = this.props;
 		const Touchable =
 			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 		return (
 			<Touchable accessibilityComponentType="button" onPress={onPress}>
 				<View
-					style={{
-						alignItems: 'center',
-						flexDirection: 'row'
-					}}
+					style={[
+						{
+							alignItems: 'center',
+							flexDirection: 'row'
+						},
+						style
+					]}
 				>
 					<View
-						style={{
-							alignItems: 'center',
-							backgroundColor: colors.card_bg,
-							borderRadius: iconSize || 32,
-							height: iconSize || 32,
-							justifyContent: 'center',
-							marginLeft: 8,
-							width: iconSize || 32
-						}}
+						style={[
+							{
+								alignItems: 'center',
+								backgroundColor: colors.card_bg,
+								borderRadius: iconSize || 24,
+								height: iconSize || 24,
+								justifyContent: 'center',
+								marginLeft: 8,
+								marginVertical: 8,
+								width: iconSize || 24
+							},
+							iconStyle
+						]}
 					>
 						<Icon
 							color={colors.bg_text_sec}
-							size={iconSize - 4 || 28}
+							size={iconSize - 4 || 20}
 							name={iconName}
 							type={iconType}
 						/>
 					</View>
 
-					{title && (
-						<Text
-							style={{
-								color: colors.bg_text_sec,
-								fontSize: { iconSize } - 4 || 28,
-								marginLeft: 8
-							}}
-						>
-							{title}
-						</Text>
-					)}
+					{title && <Text style={[{ marginLeft: 8 }, textStyle]}>{title}</Text>}
 				</View>
 			</Touchable>
 		);

@@ -17,6 +17,9 @@
 import React, { useState } from 'react';
 import Button from './Button';
 import ButtonIcon from './ButtonIcon';
+import Separator from './Separator';
+import fontStyles from '../fontStyles';
+import colors from '../colors';
 import { Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
@@ -32,22 +35,104 @@ function IdentitiesSwitch({ navigation }) {
 			/>
 			<Modal animationType="fade" visible={visible} transparent={true}>
 				<View style={styles.container}>
-					<ButtonIcon
-						onPress={() => {
-							setVisible(false);
-							navigation.navigate('IdentityNew');
-						}}
-						iconName="md-finger-print"
-						iconType="ionicon"
-						iconSize={56}
-						title="Add new Identity"
-					/>
-					<Button
-						title="Close"
-						onPress={() => {
-							setVisible(false);
-						}}
-					/>
+					<View style={styles.card}>
+						<ButtonIcon
+							title="Current Identity Title"
+							onPress={() => {
+								setVisible(false);
+								//go to current Identity
+							}}
+							iconName="md-finger-print"
+							iconType="ionicon"
+							iconSize={40}
+							style={{ paddingLeft: 8 * 2 }}
+							textStyle={fontStyles.h1}
+						/>
+						<ButtonIcon
+							title="Manage Identity"
+							onPress={() => {
+								setVisible(false);
+								//go to current IdentityManage
+							}}
+							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
+							iconName="md-arrow-forward"
+							iconType="ionicon"
+							iconSize={18}
+							textStyle={fontStyles.t_regular}
+							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
+						/>
+						<ButtonIcon
+							title="Backup Identity"
+							onPress={() => {
+								setVisible(false);
+								//go to current IdentityBackup
+							}}
+							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
+							iconName="md-arrow-forward"
+							iconType="ionicon"
+							iconSize={18}
+							textStyle={fontStyles.t_regular}
+							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
+						/>
+						<Separator />
+						<ButtonIcon
+							title="Add new Identity"
+							onPress={() => {
+								setVisible(false);
+								navigation.navigate('IdentityNew');
+							}}
+							iconName="md-finger-print"
+							iconType="ionicon"
+							iconSize={24}
+							textStyle={fontStyles.t_big}
+							style={{ paddingLeft: 8 * 4 }}
+						/>
+						<Separator />
+						<ButtonIcon
+							title="Settings"
+							onPress={() => {
+								setVisible(false);
+								// go to Settings;
+							}}
+							iconName="md-settings"
+							iconType="ionicon"
+							iconSize={24}
+							textStyle={fontStyles.t_big}
+							style={{ paddingLeft: 8 * 4 }}
+						/>
+						<ButtonIcon
+							title="Terms and Conditions"
+							onPress={() => {
+								setVisible(false);
+								navigation.navigate('TermsAndConditions');
+							}}
+							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
+							iconName="md-arrow-forward"
+							iconType="ionicon"
+							iconSize={18}
+							textStyle={fontStyles.t_regular}
+							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
+						/>
+						<ButtonIcon
+							title="Privacy Policy"
+							onPress={() => {
+								setVisible(false);
+								navigation.navigate('PrivacyPolicy');
+							}}
+							iconStyle={{ backgroundColor: 'rgba(0,0,0,0)' }}
+							iconName="md-arrow-forward"
+							iconType="ionicon"
+							iconSize={18}
+							textStyle={fontStyles.t_regular}
+							style={{ opacity: 0.7, paddingLeft: 8 * 8 }}
+						/>
+						<Button
+							title="Close"
+							onPress={() => {
+								setVisible(false);
+							}}
+						/>
+					</View>
 				</View>
 			</Modal>
 		</View>
@@ -55,11 +140,18 @@ function IdentitiesSwitch({ navigation }) {
 }
 
 const styles = {
+	card: {
+		backgroundColor: colors.bg,
+		borderRadius: 5,
+		paddingBottom: 8,
+		paddingTop: 8
+	},
 	container: {
-		alignItems: 'center',
 		backgroundColor: 'rgba(0,0,0,0.7)',
 		flex: 1,
-		justifyContent: 'center'
+		justifyContent: 'center',
+		paddingLeft: 16,
+		paddingRight: 16
 	}
 };
 
