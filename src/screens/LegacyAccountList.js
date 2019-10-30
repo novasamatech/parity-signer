@@ -25,6 +25,7 @@ import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import Separator from '../components/Separator';
 import PopupMenu from '../components/PopupMenu';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
@@ -113,7 +114,9 @@ class AccountListView extends React.PureComponent {
 					style={styles.content}
 					data={accounts}
 					keyExtractor={([key]) => key}
-					ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+					ItemSeparatorComponent={() => (
+						<Separator style={{ marginVertical: 0 }} />
+					)}
 					renderItem={({ item: [accountKey, account] }) => {
 						return (
 							<AccountCard
@@ -147,8 +150,7 @@ const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		padding: 20
+		flexDirection: 'column'
 	},
 	bottom: {
 		marginTop: 20
@@ -184,6 +186,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		fontFamily: fonts.bold,
 		fontSize: 18,
-		justifyContent: 'center'
+		justifyContent: 'center',
+		marginTop: 16,
+		paddingLeft: 72
 	}
 });
