@@ -86,7 +86,7 @@ export class MessageDetailsView extends React.PureComponent {
 		isHash: PropTypes.bool,
 		message: PropTypes.string.isRequired,
 		onNext: PropTypes.func.isRequired,
-		prehash: PropTypes.instanceOf(GenericExtrinsicPayload).isRequired,
+		prehash: PropTypes.instanceOf(GenericExtrinsicPayload),
 		sender: PropTypes.object.isRequired
 	};
 
