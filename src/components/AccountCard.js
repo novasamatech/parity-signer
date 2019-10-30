@@ -22,9 +22,8 @@ import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
 import AccountIcon from './AccountIcon';
 import Address from './Address';
-import colors from '../colors';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
 
 export default class AccountCard extends React.PureComponent {
@@ -43,7 +42,7 @@ export default class AccountCard extends React.PureComponent {
 	};
 
 	render() {
-		const { address, networkKey, onPress, seedType, style } = this.props;
+		const { address, networkKey, onPress, seedType } = this.props;
 		let { title } = this.props;
 		title = title.length ? title : AccountCard.defaultProps.title;
 		const seedTypeDisplay = seedType || '';
@@ -56,19 +55,22 @@ export default class AccountCard extends React.PureComponent {
 				disabled={false}
 				onPress={onPress}
 			>
-				<View style={[styles.body, style]}>
-					<View style={styles.content}>
-						<AccountIcon
-							address={address}
-							protocol={network.protocol}
-							style={styles.icon}
-						/>
-						<View style={styles.desc}>
-							<Text numberOfLines={1} style={styles.titleText}>
-								{title}
+				<View style={styles.content}>
+					<AccountIcon
+						address={address}
+						protocol={network.protocol}
+						style={styles.icon}
+					/>
+					<View style={styles.desc}>
+						<View>
+							<Text style={fontStyles.t_codeS}>
+								{network.title} {seedTypeDisplay}{' '}
 							</Text>
-							<Address address={address} protocol={network.protocol} />
 						</View>
+						<Text numberOfLines={1} style={fontStyles.h2}>
+							{title}
+						</Text>
+						<Address address={address} protocol={network.protocol} />
 					</View>
 					<View
 						style={[
@@ -77,28 +79,7 @@ export default class AccountCard extends React.PureComponent {
 								backgroundColor: network.color
 							}
 						]}
-					>
-						<Text
-							style={[
-								styles.footerSeedType,
-								{
-									color: network.secondaryColor
-								}
-							]}
-						>
-							{seedTypeDisplay}
-						</Text>
-						<Text
-							style={[
-								styles.footerNetwork,
-								{
-									color: network.secondaryColor
-								}
-							]}
-						>
-							{network.title}
-						</Text>
-					</View>
+					/>
 				</View>
 			</TouchableItem>
 		);
@@ -106,45 +87,25 @@ export default class AccountCard extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-	body: {
-		paddingBottom: 20
-	},
 	content: {
-		backgroundColor: colors.card_bg,
+		alignItems: 'center',
 		flexDirection: 'row',
-		padding: 10
+		paddingLeft: 16
 	},
 	desc: {
 		flex: 1,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-		paddingLeft: 10
+		paddingLeft: 16
 	},
 	footer: {
+		alignSelf: 'stretch',
 		backgroundColor: '#977CF6',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		padding: 5
-	},
-	footerNetwork: {
-		color: colors.card_bg,
-		fontFamily: fonts.semiBold
-	},
-	footerSeedType: {
-		color: colors.card_bg,
-		fontFamily: fonts.regular
+		height: 88,
+		width: 8
 	},
 	icon: {
-		height: 47,
-		width: 47
-	},
-	secondaryText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.semiBold,
-		fontSize: 14
-	},
-	titleText: {
-		fontFamily: fonts.semiBold,
-		fontSize: 20
+		height: 40,
+		width: 40
 	}
 });

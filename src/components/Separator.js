@@ -15,22 +15,27 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { View } from 'react-native';
+import { View, ViewPropTypes } from 'react-native';
 
 export default class Separator extends React.PureComponent {
-	static defaultProps = {
-		focus: false
+	static propTypes = {
+		style: ViewPropTypes.style
 	};
 
 	render() {
+		const { style } = this.props;
+
 		return (
 			<View
-				style={{
-					alignSelf: 'stretch',
-					backgroundColor: 'black',
-					height: 1,
-					marginVertical: 8
-				}}
+				style={[
+					{
+						alignSelf: 'stretch',
+						backgroundColor: 'black',
+						height: 1,
+						marginVertical: 8
+					},
+					style
+				]}
 			/>
 		);
 	}

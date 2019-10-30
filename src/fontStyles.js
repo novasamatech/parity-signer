@@ -37,6 +37,10 @@ export default {
 		fontFamily: fonts.roboto,
 		fontSize: 16
 	},
+	t_codeS: {
+		color: colors.bg_text_sec,
+		fontFamily: 'monospace'
+	},
 	t_important: {
 		color: colors.bg_text,
 		fontFamily: fonts.robotoBold,

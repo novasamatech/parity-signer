@@ -50,16 +50,16 @@ export default function AccountIcon(props) {
 	};
 
 	if (protocol === NetworkProtocols.SUBSTRATE) {
-		return <Identicon value={address} size={style.width || 50} />;
+		return <Identicon value={address} size={style.width || 40} />;
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
 			<Image
 				source={{ uri: ethereumIconUri }}
-				style={style || { height: 47, width: 47 }}
+				style={style || { height: 40, width: 40 }}
 			/>
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <Icon color={colors.bg} name={'error'} size={style.width || 50} />;
+		return <Icon color={colors.bg} name={'error'} size={style.width || 40} />;
 	}
 }
