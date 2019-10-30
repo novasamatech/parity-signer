@@ -80,7 +80,7 @@ export class SignedMessageView extends React.PureComponent {
 					<QrView data={data} />
 				</View>
 				<Text style={styles.title}>{!isHash && 'MESSAGE'}</Text>
-				{prehash ? (
+				{!isEthereum && prehash ? (
 					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
 						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."

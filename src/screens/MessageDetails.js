@@ -111,7 +111,7 @@ export class MessageDetailsView extends React.PureComponent {
 					address={sender.address}
 					networkKey={sender.networkKey}
 				/>
-				{prehash ? (
+				{!isEthereum && prehash ? (
 					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
 						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
