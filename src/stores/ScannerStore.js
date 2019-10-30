@@ -32,10 +32,9 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import { saveTx } from '../util/db';
+
 import { isAscii } from '../util/strings';
 import {
-	blake2b,
 	brainWalletSign,
 	decryptData,
 	keccak,
@@ -402,7 +401,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async signData(pin = '1') {
-		const { dataToSign, isHash, sender, recipient, tx, type } = this.state;
+		const { dataToSign, isHash, sender } = this.state;
 
 		const seed = await decryptData(sender.encryptedSeed, pin);
 		const isEthereum =
@@ -435,18 +434,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		this.setState({ signedData });
-
-		if (type === 'transaction') {
-			await saveTx({
-				createdAt: new Date().getTime(),
-				hash:
-					isEthereum || isHash ? dataToSign : await blake2b(dataToSign.toHex()),
-				recipient,
-				sender,
-				signature: signedData,
-				tx
-			});
-		}
 	}
 
 	cleanup() {
