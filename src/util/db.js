@@ -44,8 +44,17 @@ export async function loadAccounts(version = 3) {
 }
 
 const accountsStore = {
-	keychainService: 'accounts_v3',
-	sharedPreferencesName: 'accounts_v3'
+	identitiesLabel: 'identities_v4',
+	keychainService: 'accounts_v4',
+	sharedPreferencesName: 'accounts_v4'
+};
+
+export const saveIdentities = identities => {
+	SecureStorage.setItem(
+		accountsStore.identitiesLabel,
+		JSON.stringify(identities),
+		accountsStore
+	);
 };
 
 function accountTxsKey({ address, networkKey }) {

@@ -22,7 +22,8 @@ import { accountId, emptyAccount } from '../util/account';
 import {
 	loadAccounts,
 	saveAccount,
-	deleteAccount as deleteDbAccount
+	deleteAccount as deleteDbAccount,
+	saveIdentities
 } from '../util/db';
 import { parseSURI } from '../util/suri';
 import { decryptData, encryptData } from '../util/native';
@@ -54,18 +55,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		});
 	}
 
-	updateNewIdentity(identityUpdate) {
-		this.setState({
-			newIdentity: { ...this.state.newIdentity, ...identityUpdate }
-		});
-	}
-
 	getNew() {
 		return this.state.newAccount;
-	}
-
-	getNewIdentity() {
-		return this.state.newIdentity;
 	}
 
 	async submitNew(pin) {
@@ -136,7 +127,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 			const accountToSave = this.deleteSensitiveData(account);
 
-			accountToSave.updatedAt = new Date().getTime();
 			await saveAccount(accountKey, accountToSave);
 		} catch (e) {
 			console.error(e);
@@ -248,5 +238,24 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			}
 		}
 		return result;
+	}
+
+	getSelectedIdentity() {}
+
+	getNewIdentity() {
+		return this.state.newIdentity;
+	}
+
+	async saveNewIdentity(seedPhrase, pin) {
+		this.state.newIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
+		const newIdentities = this.state.identities.concat(this.state.newIdentity);
+		this.setState(newIdentities);
+		await saveIdentities(newIdentities);
+	}
+
+	updateNewIdentity(identityUpdate) {
+		this.setState({
+			newIdentity: { ...this.state.newIdentity, ...identityUpdate }
+		});
 	}
 }

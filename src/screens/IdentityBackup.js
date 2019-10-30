@@ -31,6 +31,7 @@ import colors from '../colors';
 import fonts from '../fonts';
 import Button from '../components/Button';
 import { NavigationActions, StackActions } from 'react-navigation';
+import { setPin } from '../util/navigationHelpers';
 
 export default class IdentityBackup extends React.PureComponent {
 	static navigationOptions = {
@@ -45,27 +46,27 @@ export default class IdentityBackup extends React.PureComponent {
 	}
 }
 
-function IdentityBackupView({ navigation }) {
-	const [seed, setSeed] = useState('');
+function IdentityBackupView({ navigation, accounts }) {
+	const [seedPhrase, setSeedPhrase] = useState('');
 	useEffect(() => {
-		const setSeedAsync = async () => {
-			const newSeed = await words();
-			setSeed(newSeed);
+		const setSeedPhraseAsync = async () => {
+			const newSeedPhrase = await words();
+			setSeedPhrase(newSeedPhrase);
 		};
 
-		setSeedAsync();
+		setSeedPhraseAsync();
 		return () => {
-			setSeed('');
+			setSeedPhrase('');
 		};
 	}, []);
 
-	const resetStack = () => {
+	const resetStackToNetwork = () => {
 		const resetAction = StackActions.reset({
 			actions: [
-				NavigationActions.navigate({ routeName: 'AccountList' }),
-				NavigationActions.navigate({ routeName: 'IdentityNew' })
+				NavigationActions.navigate({ routeName: 'PathsList' }),
+				NavigationActions.navigate({ routeName: 'AccountNetworkChooser' })
 			],
-			index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+			index: 1,
 			key: undefined
 		});
 		navigation.dispatch(resetAction);
@@ -92,7 +93,7 @@ function IdentityBackupView({ navigation }) {
 							[
 								{
 									onPress: () => {
-										Clipboard.setString(seed);
+										Clipboard.setString(seedPhrase);
 									},
 									style: 'default',
 									text: 'Copy anyway'
@@ -106,12 +107,14 @@ function IdentityBackupView({ navigation }) {
 					}
 				}}
 			>
-				<Text style={styles.seedText}>{seed}</Text>
+				<Text style={styles.seedPhraseText}>{seedPhrase}</Text>
 			</TouchableItem>
 			<Button
 				title="Next"
-				onPress={() => {
-					resetStack();
+				onPress={async () => {
+					const pin = await setPin(navigation);
+					await accounts.saveNewIdentity(pin);
+					resetStackToNetwork();
 				}}
 			/>
 		</ScrollView>
@@ -132,7 +135,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 20,
 		textAlign: 'center'
 	},
-	seedText: {
+	seedPhraseText: {
 		backgroundColor: colors.card_bg,
 		fontFamily: fonts.regular,
 		fontSize: 20,

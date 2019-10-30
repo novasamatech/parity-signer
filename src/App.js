@@ -59,6 +59,8 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
+import IdentityPin from './screens/IdentityPin';
+import PathsList from './screens/PathsList';
 
 export default class App extends Component {
 	constructor() {
@@ -173,6 +175,15 @@ const Screens = createStackNavigator(
 						},
 						screen: LegacyAccountList
 					},
+					IdentityPin: {
+						screen: IdentityPin
+					},
+					AccountPin: {
+						screen: AccountPin
+					},
+					AccountUnlock: {
+						screen: AccountUnlock
+					},
 					About: {
 						screen: About
 					},
@@ -188,14 +199,8 @@ const Screens = createStackNavigator(
 					AccountNew: {
 						screen: AccountNew
 					},
-					AccountPin: {
-						screen: AccountPin
-					},
 					AccountRecover: {
 						screen: AccountRecover
-					},
-					AccountUnlock: {
-						screen: AccountUnlock
 					},
 					AccountUnlockAndSign: {
 						screen: AccountUnlockAndSign
@@ -211,6 +216,9 @@ const Screens = createStackNavigator(
 					},
 					MessageDetails: {
 						screen: MessageDetails
+					},
+					PathsList: {
+						screen: PathsList
 					},
 					QrScanner: {
 						screen: QrScanner
