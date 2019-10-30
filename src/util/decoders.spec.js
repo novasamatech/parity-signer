@@ -36,7 +36,7 @@ import {
 	decodeToString,
 	isJsonString
 } from './decoders';
-import { isAscii } from './message';
+import { isAscii } from './strings';
 import kusamaData from './static-kusama';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);

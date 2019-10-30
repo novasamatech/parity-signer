@@ -23,15 +23,14 @@ import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
 import QrView from '../components/QrView';
-import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/message';
+import { hexToAscii, isAscii } from '../util/strings';
 
 export default class SignedMessage extends React.PureComponent {
 	render() {
 		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scannerStore, accountsStore) => {
+			<Subscribe to={[ScannerStore]}>
+				{scannerStore => {
 					return (
 						<SignedMessageView
 							data={scannerStore.getSignedTxData()}
@@ -47,9 +46,9 @@ export default class SignedMessage extends React.PureComponent {
 
 export class SignedMessageView extends React.PureComponent {
 	static propTypes = {
-		data: PropTypes.string.isRequired,
+		data: PropTypes.string.isRequired, // post sign
 		isHash: PropTypes.bool,
-		message: PropTypes.string
+		message: PropTypes.string // pre sign
 	};
 
 	render() {
@@ -59,9 +58,14 @@ export class SignedMessageView extends React.PureComponent {
 			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
 				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
 				<View style={styles.qr}>
-					<QrView data={this.props.data} />
+					<QrView data={data} />
 				</View>
-				<Text style={styles.title}>MESSAGE</Text>
+				<Text style={styles.title}>{!isHash && 'MESSAGE'}</Text>
+				{isHash ? (
+					<Text style={styles.title}>HASH</Text>
+				) : (
+					<Text style={styles.title}>MESSAGE</Text>
+				)}
 				<Text style={styles.message}>
 					{isHash ? message : isAscii(message) ? hexToAscii(message) : data}
 				</Text>

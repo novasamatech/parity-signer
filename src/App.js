@@ -99,7 +99,7 @@ const globalStackNavigationOptions = {
 	},
 	headerTintColor: colors.card_bg,
 	headerTitleStyle: {
-		display: 'none'
+		// display: 'none'
 	}
 };
 
