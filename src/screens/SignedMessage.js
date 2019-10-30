@@ -64,8 +64,9 @@ export class SignedMessageView extends React.PureComponent {
 		const { data, isHash, message, prehash } = this.props;
 
 		let prefix;
+		let isEthereum;
 		if (prehash) {
-			const isEthereum =
+			isEthereum =
 				NETWORK_LIST[prehash.genesisHash.toString()].protocol ===
 				NetworkProtocols.ETHEREUM;
 			prefix =
