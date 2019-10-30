@@ -16,20 +16,13 @@
 
 'use strict';
 
-import { GenericExtrinsicPayload } from '@polkadot/types';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
-import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import QrView from '../components/QrView';
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST
-} from '../constants';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/strings';
 
@@ -43,7 +36,6 @@ export default class SignedMessage extends React.PureComponent {
 							data={scannerStore.getSignedTxData()}
 							isHash={scannerStore.getIsHash()}
 							message={scannerStore.getMessage()}
-							prehash={scannerStore.getPrehashPayload()}
 						/>
 					);
 				}}
@@ -56,23 +48,11 @@ export class SignedMessageView extends React.PureComponent {
 	static propTypes = {
 		data: PropTypes.string.isRequired, // post sign
 		isHash: PropTypes.bool,
-		message: PropTypes.string, // pre sign
-		prehash: PropTypes.instanceOf(GenericExtrinsicPayload)
+		message: PropTypes.string // pre sign
 	};
 
 	render() {
-		const { data, isHash, message, prehash } = this.props;
-
-		let prefix;
-		let isEthereum;
-		if (prehash) {
-			isEthereum =
-				NETWORK_LIST[prehash.genesisHash.toString()].protocol ===
-				NetworkProtocols.ETHEREUM;
-			prefix =
-				!isEthereum &&
-				SUBSTRATE_NETWORK_LIST[prehash.genesisHash.toString()].prefix;
-		}
+		const { data, isHash, message } = this.props;
 
 		return (
 			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
@@ -81,14 +61,6 @@ export class SignedMessageView extends React.PureComponent {
 					<QrView data={data} />
 				</View>
 				<Text style={styles.title}>{!isHash && 'MESSAGE'}</Text>
-				{!isEthereum && prehash ? (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
-						payload={prehash}
-						prefix={prefix}
-					/>
-				) : null}
 				{isHash ? (
 					<Text style={styles.title}>HASH</Text>
 				) : (
