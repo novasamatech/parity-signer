@@ -392,15 +392,11 @@ export default class ScannerStore extends Container<ScannerState> {
 				}
 			}
 
-                        if (isEthereum) {
-                                // TODO: tweak the first byte if and when sig type is not sr25519
-                                const sig = u8aConcat(
-                                        SIG_TYPE_SR25519,
-                                        hexToU8a('0x' + (await substrateSign(seed, signable)))
-                                );
-                        }
-
-			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
+			if (isEthereum) {
+				// TODO: tweak the first byte if and when sig type is not sr25519
+				const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a('0x' + signedData));
+				signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
+			}
 
 			this.setState({ signedData });
 
