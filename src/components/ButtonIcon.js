@@ -83,7 +83,7 @@ export default class ButtonIcon extends React.PureComponent<{
 						]}
 					>
 						<Icon
-							color={colors.bg_text_sec}
+							color={colors.bg_text}
 							size={iconSize - 4 || 20}
 							name={iconName}
 							type={iconType}
