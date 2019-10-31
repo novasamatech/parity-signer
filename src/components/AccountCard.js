@@ -19,7 +19,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
-
+import Separator from '../components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
@@ -43,7 +43,7 @@ export default class AccountCard extends React.PureComponent {
 	};
 
 	render() {
-		const { address, networkKey, onPress, seedType } = this.props;
+		const { address, networkKey, onPress, seedType, style } = this.props;
 		let { title } = this.props;
 		title = title.length ? title : AccountCard.defaultProps.title;
 		const seedTypeDisplay = seedType || '';
@@ -56,24 +56,37 @@ export default class AccountCard extends React.PureComponent {
 				disabled={false}
 				onPress={onPress}
 			>
-				<View style={styles.content}>
+				<Separator
+					shadow={true}
+					style={{
+						backgroundColor: 'transparent',
+						height: 0,
+						marginVertical: 0
+					}}
+				/>
+				<View style={[styles.content, style]}>
 					<AccountIcon
 						address={address}
 						protocol={network.protocol}
+						network={network}
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
-						<View>
-							<Text
-								style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
-							>
-								{network.title} {seedTypeDisplay}{' '}
-							</Text>
-						</View>
+						{address !== '' && (
+							<View>
+								<Text
+									style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
+								>
+									{network.title} {seedTypeDisplay}{' '}
+								</Text>
+							</View>
+						)}
 						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 							{title}
 						</Text>
-						<Address address={address} protocol={network.protocol} />
+						{address !== '' && (
+							<Address address={address} protocol={network.protocol} />
+						)}
 					</View>
 					<View
 						style={[
@@ -92,6 +105,7 @@ export default class AccountCard extends React.PureComponent {
 const styles = StyleSheet.create({
 	content: {
 		alignItems: 'center',
+		backgroundColor: colors.bg,
 		flexDirection: 'row',
 		paddingLeft: 16
 	},

@@ -19,7 +19,7 @@
 import Identicon from '@polkadot/reactnative-identicon';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import colors from '../colors';
@@ -29,10 +29,11 @@ import { blockiesIcon } from '../util/native';
 export default function AccountIcon(props) {
 	AccountIcon.propTypes = {
 		address: PropTypes.string.isRequired,
+		network: PropTypes.string,
 		protocol: PropTypes.string.isRequired
 	};
 
-	const { address, protocol, style } = props;
+	const { address, protocol, style, network } = props;
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 
 	useEffect(() => {
@@ -49,6 +50,21 @@ export default function AccountIcon(props) {
 			.catch(console.error);
 	};
 
+	if (address === '') {
+		return (
+			<View>
+				<Image
+					source={network.logo}
+					style={{
+						backgroundColor: colors.card_bg,
+						borderRadius: 40,
+						height: 40,
+						width: 40
+					}}
+				/>
+			</View>
+		);
+	}
 	if (protocol === NetworkProtocols.SUBSTRATE) {
 		return <Identicon value={address} size={style.width || 40} />;
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {

@@ -20,8 +20,8 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import AccountCard from '../components/AccountCard';
 import fonts from '../fonts';
-import TouchableItem from '../components/TouchableItem';
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
@@ -52,7 +52,7 @@ class AccountNetworkChooserView extends React.PureComponent {
 		const { accounts } = this.props;
 
 		return (
-			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
+			<ScrollView style={styles.body}>
 				<Text style={styles.title}>CHOOSE NETWORK</Text>
 				{Object.entries(NETWORK_LIST)
 					.filter(
@@ -62,31 +62,15 @@ class AccountNetworkChooserView extends React.PureComponent {
 								networkKey !== UnknownNetworkKeys.UNKNOWN)
 					)
 					.map(([networkKey, networkParams]) => (
-						<TouchableItem
-							key={networkKey}
-							style={[
-								styles.card,
-								{
-									backgroundColor: networkParams.color,
-									marginTop: 20
-								}
-							]}
+						<AccountCard
+							address={''}
+							networkKey={networkKey}
 							onPress={() => {
 								accounts.updateNew(emptyAccount('', networkKey));
 								navigation.goBack();
 							}}
-						>
-							<Text
-								style={[
-									styles.cardText,
-									{
-										color: networkParams.secondaryColor
-									}
-								]}
-							>
-								{networkParams.title}
-							</Text>
-						</TouchableItem>
+							title={networkParams.title}
+						/>
 					))}
 			</ScrollView>
 		);
@@ -100,33 +84,20 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		overflow: 'hidden'
 	},
-	bottom: {
-		flexBasis: 50,
-		paddingBottom: 15
-	},
-	card: {
-		backgroundColor: colors.card_bg,
-		padding: 20
-	},
-	cardText: {
-		color: colors.card_text,
-		fontFamily: fonts.bold,
-		fontSize: 20
+
+	header: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		paddingBottom: 20
 	},
 	title: {
 		color: colors.bg_text_sec,
+		flexDirection: 'column',
 		fontFamily: fonts.bold,
 		fontSize: 18,
-		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	top: {
-		flex: 1
+		justifyContent: 'center',
+		marginTop: 16,
+		paddingLeft: 72
 	}
 });
