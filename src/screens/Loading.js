@@ -62,7 +62,7 @@ export default class Loading extends React.PureComponent {
 			tocActions = firstScreenActions;
 		}
 
-		await loadAccounts();
+		// await loadAccounts();
 		this.props.navigation.dispatch(tocActions);
 	}
 

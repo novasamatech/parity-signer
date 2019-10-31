@@ -28,7 +28,7 @@ import {
 	SubstrateNetworkKeys
 } from '../constants';
 import AccountsStore from '../stores/AccountsStore';
-import { emptyAccount } from '../util/account';
+import { resetToPathsList, unlockSeed } from '../util/navigationHelpers';
 
 export default class AccountNetworkChooser extends React.PureComponent {
 	static navigationOptions = {
@@ -50,10 +50,13 @@ class AccountNetworkChooserView extends React.PureComponent {
 	render() {
 		const { navigation } = this.props;
 		const { accounts } = this.props;
+		const isNew = navigation.getParam('isNew', false);
 
 		return (
 			<ScrollView style={styles.body}>
-				<Text style={styles.title}>CHOOSE NETWORK</Text>
+				<Text style={styles.title}>
+					{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
+				</Text>
 				{Object.entries(NETWORK_LIST)
 					.filter(
 						([networkKey]) =>
@@ -65,9 +68,17 @@ class AccountNetworkChooserView extends React.PureComponent {
 						<AccountCard
 							address={''}
 							networkKey={networkKey}
-							onPress={() => {
-								accounts.updateNew(emptyAccount('', networkKey));
-								navigation.goBack();
+							onPress={async () => {
+								if (isNew) {
+									const { prefix, pathId } = networkParams;
+									const seed = await unlockSeed(navigation);
+									const derivationSucceed = await accounts.deriveNewPath(
+										`//${pathId}//default`,
+										seed,
+										prefix
+									);
+									if (derivationSucceed) resetToPathsList(navigation);
+								}
 							}}
 							title={networkParams.title}
 						/>

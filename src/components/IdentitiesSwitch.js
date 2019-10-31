@@ -21,9 +21,13 @@ import fontStyles from '../fontStyles';
 import colors from '../colors';
 import { Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
+import { withAccountStore } from '../util/HOC';
+import Button from './Button';
+import { resetToPathsList } from '../util/navigationHelpers';
 
-function IdentitiesSwitch({ navigation }) {
+function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
+	console.log('identities are', accounts.state.identities);
 
 	return (
 		<View>
@@ -84,6 +88,21 @@ function IdentitiesSwitch({ navigation }) {
 							style={styles.i_arrowStyle}
 						/>
 						<Separator />
+						{accounts.state.identities &&
+							accounts.state.identities.map((identity, index) => {
+								const title = identity.name || `identity_${index.toString()}`;
+								return (
+									<Button
+										title={title}
+										onPress={async () => {
+											await accounts.selectIdentity(identity);
+											setVisible(false);
+											// const seed = await unlockSeed(navigation);
+											resetToPathsList(navigation);
+										}}
+									/>
+								);
+							})}
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {
@@ -173,4 +192,4 @@ const styles = {
 	}
 };
 
-export default withNavigation(IdentitiesSwitch);
+export default withAccountStore(withNavigation(IdentitiesSwitch));

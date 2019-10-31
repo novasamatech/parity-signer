@@ -63,10 +63,12 @@ function IdentityBackupView({ navigation, accounts }) {
 	const resetStackToNetwork = () => {
 		const resetAction = StackActions.reset({
 			actions: [
-				NavigationActions.navigate({ routeName: 'PathsList' }),
-				NavigationActions.navigate({ routeName: 'AccountNetworkChooser' })
+				NavigationActions.navigate({
+					params: { isNew: true },
+					routeName: 'AccountNetworkChooser'
+				})
 			],
-			index: 1,
+			index: 0,
 			key: undefined
 		});
 		navigation.dispatch(resetAction);
@@ -113,7 +115,7 @@ function IdentityBackupView({ navigation, accounts }) {
 				title="Next"
 				onPress={async () => {
 					const pin = await setPin(navigation);
-					await accounts.saveNewIdentity(pin);
+					await accounts.saveNewIdentity(seedPhrase, pin);
 					resetStackToNetwork();
 				}}
 			/>
