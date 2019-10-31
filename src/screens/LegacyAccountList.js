@@ -115,7 +115,14 @@ class AccountListView extends React.PureComponent {
 					data={accounts}
 					keyExtractor={([key]) => key}
 					ItemSeparatorComponent={() => (
-						<Separator style={{ marginVertical: 0 }} />
+						<Separator
+							shadow={true}
+							style={{
+								backgroundColor: 'transparent',
+								height: 0,
+								marginVertical: 0
+							}}
+						/>
 					)}
 					renderItem={({ item: [accountKey, account] }) => {
 						return (

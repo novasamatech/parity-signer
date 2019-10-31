@@ -25,6 +25,7 @@ import Address from './Address';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
+import colors from '../colors';
 
 export default class AccountCard extends React.PureComponent {
 	static propTypes = {
@@ -63,11 +64,13 @@ export default class AccountCard extends React.PureComponent {
 					/>
 					<View style={styles.desc}>
 						<View>
-							<Text style={fontStyles.t_codeS}>
+							<Text
+								style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
+							>
 								{network.title} {seedTypeDisplay}{' '}
 							</Text>
 						</View>
-						<Text numberOfLines={1} style={fontStyles.h2}>
+						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 							{title}
 						</Text>
 						<Address address={address} protocol={network.protocol} />
@@ -101,7 +104,8 @@ const styles = StyleSheet.create({
 	footer: {
 		alignSelf: 'stretch',
 		backgroundColor: '#977CF6',
-		height: 88,
+		height: 100,
+		marginLeft: 8,
 		width: 8
 	},
 	icon: {
