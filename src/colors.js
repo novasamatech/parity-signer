@@ -23,6 +23,6 @@ export default {
 	bg_warning: '#FAE265',
 	card_bg: 'rgba(255, 255, 255, 0.15)',
 	card_bgSolid: '#323232',
-	card_bg_text_sec: '#B4B5B0',
+	card_bg_text_sec: '#999',
 	card_text: '#1A1A1A'
 };

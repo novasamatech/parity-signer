@@ -35,7 +35,7 @@ const unknownNetworkBase = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.bg_alert,
 		protocol: NetworkProtocols.UNKNOWN,
-		secondaryColor: colors.card_bg,
+		secondaryColor: colors.card_bgSolid,
 		title: 'Unknown network'
 	}
 };
@@ -45,6 +45,7 @@ const substrateNetworkBase = {
 		color: '#e6007a',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
+		logo: require('../res/img/logos/kusama.png'),
 		prefix: 2,
 		title: 'Kusama CC2',
 		unit: 'KSM'
@@ -71,13 +72,14 @@ const ethereumNetworkBase = {
 	[EthereumNetworkKeys.FRONTIER]: {
 		color: '#977CF6',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
-		secondaryColor: colors.card_bg,
+		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.CLASSIC]: {
 		color: '#8C7166',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
-		secondaryColor: colors.card_bg,
+		logo: require('../res/img/logos/eth-classic.png'),
+		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum Classic'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
@@ -96,14 +98,16 @@ const ethereumNetworkBase = {
 
 const ethereumDefaultValues = {
 	color: '#F2E265',
+	logo: require('../res/img/logos/eth.png'),
 	protocol: NetworkProtocols.ETHEREUM,
 	secondaryColor: colors.card_text
 };
 
 const substrateDefaultValues = {
 	color: '#4C4646',
+	logo: require('../res/img/logos/substrate-dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
-	secondaryColor: colors.card_bg
+	secondaryColor: colors.card_bgSolid
 };
 
 function setDefault(networkBase, defaultProps) {

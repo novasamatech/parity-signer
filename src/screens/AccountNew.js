@@ -26,13 +26,13 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import DerivationPathField from '../components/DerivationPathField';
 import KeyboardScrollView from '../components/KeyboardScrollView';
-import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import { emptyAccount, validateSeed } from '../util/account';
 import { constructSURI } from '../util/suri';
+import AccountCard from '../components/AccountCard';
 
 export default class AccountNew extends React.Component {
 	static navigationOptions = {
@@ -95,80 +95,85 @@ class AccountNewView extends React.Component {
 		}
 
 		return (
-			<View style={styles.body}>
-				<KeyboardScrollView style={{ padding: 20 }}>
+			<KeyboardScrollView>
+				<View style={styles.body}>
 					<Background />
-					<View style={styles.top}>
-						<Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-						<Text style={styles.title}>NETWORK</Text>
-						<NetworkButton network={selectedNetwork} />
-						<Text style={styles.title}>ICON & ADDRESS</Text>
-						<AccountIconChooser
-							derivationPassword={derivationPassword}
-							derivationPath={derivationPath}
-							onSelect={({ newAddress, isBip39, newSeed }) => {
-								if (newAddress && isBip39 && newSeed) {
-									if (isSubstrate) {
-										try {
-											const suri = constructSURI({
-												derivePath: derivationPath,
-												password: derivationPassword,
-												phrase: newSeed
-											});
+					<Text style={styles.titleTop}>CREATE ACCOUNT</Text>
+					<Text style={styles.title}>NETWORK</Text>
+				</View>
+				<AccountCard
+					address={''}
+					title={selectedNetwork.title}
+					networkKey={selectedAccount.networkKey}
+					onPress={() => navigation.navigate('AccountNetworkChooser')}
+				/>
+				<View style={styles.body}>
+					<Text style={styles.title}>ICON & ADDRESS</Text>
+					<AccountIconChooser
+						derivationPassword={derivationPassword}
+						derivationPath={derivationPath}
+						onSelect={({ newAddress, isBip39, newSeed }) => {
+							if (newAddress && isBip39 && newSeed) {
+								if (isSubstrate) {
+									try {
+										const suri = constructSURI({
+											derivePath: derivationPath,
+											password: derivationPassword,
+											phrase: newSeed
+										});
 
-											accounts.updateNew({
-												address: newAddress,
-												derivationPassword,
-												derivationPath,
-												seed: suri,
-												seedPhrase: newSeed,
-												validBip39Seed: isBip39
-											});
-										} catch (e) {
-											console.error(e);
-										}
-									} else {
-										// Ethereum account
 										accounts.updateNew({
 											address: newAddress,
-											seed: newSeed,
+											derivationPassword,
+											derivationPath,
+											seed: suri,
+											seedPhrase: newSeed,
 											validBip39Seed: isBip39
 										});
+									} catch (e) {
+										console.error(e);
 									}
 								} else {
+									// Ethereum account
 									accounts.updateNew({
-										address: '',
-										seed: '',
-										validBip39Seed: false
+										address: newAddress,
+										seed: newSeed,
+										validBip39Seed: isBip39
 									});
 								}
-							}}
-							network={selectedNetwork}
-							value={address && address}
-						/>
-						<Text style={styles.title}>NAME</Text>
-						<TextInput
-							onChangeText={name => accounts.updateNew({ name })}
-							value={name}
-							placeholder="Enter a new account name"
-						/>
-						{isSubstrate && (
-							<DerivationPathField
-								onChange={({
+							} else {
+								accounts.updateNew({
+									address: '',
+									seed: '',
+									validBip39Seed: false
+								});
+							}
+						}}
+						network={selectedNetwork}
+						value={address && address}
+					/>
+					<Text style={styles.title}>NAME</Text>
+					<TextInput
+						onChangeText={name => accounts.updateNew({ name })}
+						value={name}
+						placeholder="Enter a new account name"
+					/>
+					{isSubstrate && (
+						<DerivationPathField
+							onChange={({
+								derivationPassword,
+								derivationPath,
+								isDerivationPathValid
+							}) => {
+								this.setState({
 									derivationPassword,
 									derivationPath,
 									isDerivationPathValid
-								}) => {
-									this.setState({
-										derivationPassword,
-										derivationPath,
-										isDerivationPathValid
-									});
-								}}
-								styles={styles}
-							/>
-						)}
-					</View>
+								});
+							}}
+							styles={styles}
+						/>
+					)}
 					<View style={styles.bottom}>
 						<Text style={styles.hintText}>
 							Next, you will be asked to backup your account, get a pen and some
@@ -189,8 +194,8 @@ class AccountNewView extends React.Component {
 							}}
 						/>
 					</View>
-				</KeyboardScrollView>
-			</View>
+				</View>
+			</KeyboardScrollView>
 		);
 	}
 }
@@ -199,7 +204,8 @@ const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		overflow: 'hidden'
+		overflow: 'hidden',
+		padding: 16
 	},
 	bodyContainer: {
 		flex: 1,
@@ -223,8 +229,7 @@ const styles = StyleSheet.create({
 	title: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
+		fontSize: 18
 	},
 	titleTop: {
 		color: colors.bg_text_sec,
@@ -232,8 +237,5 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 		paddingBottom: 20,
 		textAlign: 'center'
-	},
-	top: {
-		flex: 1
 	}
 });
