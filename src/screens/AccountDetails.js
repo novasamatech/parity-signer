@@ -137,27 +137,29 @@ This account can only be recovered with its associated recovery phrase.`,
 			NetworkProtocols.UNKNOWN;
 
 		return (
-			<ScrollView
-				contentContainerStyle={styles.bodyContent}
-				style={styles.body}
-			>
-				<View style={styles.header}>
-					<Text style={styles.title}>ACCOUNT</Text>
-					<View style={styles.menuView}>
-						<PopupMenu
-							onSelect={this.onOptionSelect}
-							menuTriggerIconName={'more-vert'}
-							menuItems={[
-								{ text: 'Edit', value: 'AccountEdit' },
-								{ text: 'Change Pin', value: 'AccountPin' },
-								{ text: 'View Recovery Phrase', value: 'LegacyAccountBackup' },
-								{
-									text: 'Delete',
-									textStyle: styles.deleteText,
-									value: 'AccountDelete'
-								}
-							]}
-						/>
+			<ScrollView contentContainerStyle={styles.body}>
+				<View style={styles.bodyContent}>
+					<View style={styles.header}>
+						<Text style={styles.title}>ACCOUNT</Text>
+						<View style={styles.menuView}>
+							<PopupMenu
+								onSelect={this.onOptionSelect}
+								menuTriggerIconName={'more-vert'}
+								menuItems={[
+									{ text: 'Edit', value: 'AccountEdit' },
+									{ text: 'Change Pin', value: 'AccountPin' },
+									{
+										text: 'View Recovery Phrase',
+										value: 'LegacyAccountBackup'
+									},
+									{
+										text: 'Delete',
+										textStyle: styles.deleteText,
+										value: 'AccountDelete'
+									}
+								]}
+							/>
+						</View>
 					</View>
 				</View>
 				<AccountCard
@@ -165,12 +167,14 @@ This account can only be recovered with its associated recovery phrase.`,
 					networkKey={account.networkKey}
 					title={account.name}
 				/>
-				<View style={styles.qr}>
-					{protocol !== NetworkProtocols.UNKNOWN ? (
-						<QrView data={selectedKey} />
-					) : (
-						this.renderWarningUnknownAccount()
-					)}
+				<View style={styles.bodyContent}>
+					<View style={styles.qr}>
+						{protocol !== NetworkProtocols.UNKNOWN ? (
+							<QrView data={selectedKey} />
+						) : (
+							this.renderWarningUnknownAccount()
+						)}
+					</View>
 				</View>
 			</ScrollView>
 		);
@@ -179,13 +183,14 @@ This account can only be recovered with its associated recovery phrase.`,
 
 const styles = StyleSheet.create({
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		padding: 20
+		paddingBottom: 40,
+		paddingTop: 8
 	},
 	bodyContent: {
-		paddingBottom: 40
+		padding: 16
 	},
 	deleteText: {
 		color: colors.bg_alert
@@ -193,8 +198,7 @@ const styles = StyleSheet.create({
 	header: {
 		alignItems: 'center',
 		flexDirection: 'row',
-		justifyContent: 'center',
-		paddingBottom: 20
+		justifyContent: 'center'
 	},
 	menuView: {
 		alignItems: 'flex-end',

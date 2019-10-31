@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flex: 1,
 		flexDirection: 'column',
-		padding: 20
+		padding: 16
 	},
 	hintText: {
 		color: colors.bg_text_sec,

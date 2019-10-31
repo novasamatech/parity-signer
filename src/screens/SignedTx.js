@@ -69,12 +69,15 @@ export class SignedTxView extends React.PureComponent {
 		const { data, gas, gasPrice, recipient, sender, value } = this.props;
 
 		return (
-			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
+			<ScrollView style={styles.body}>
 				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
-				<View style={styles.qr}>
-					<QrView data={data} />
+				<View style={styles.bodyContent}>
+					<View style={styles.qr}>
+						<QrView data={data} />
+					</View>
+
+					<Text style={styles.title}>TRANSACTION DETAILS</Text>
 				</View>
-				<Text style={styles.title}>TRANSACTION DETAILS</Text>
 				{NETWORK_LIST[sender.networkKey].protocol ===
 				NetworkProtocols.ETHEREUM ? (
 					<React.Fragment>
@@ -108,10 +111,14 @@ export class SignedTxView extends React.PureComponent {
 
 const styles = StyleSheet.create({
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
+		paddingBottom: 40,
+		paddingTop: 24
+	},
+	bodyContent: {
+		padding: 16
 	},
 	qr: {
 		backgroundColor: colors.card_bg,
