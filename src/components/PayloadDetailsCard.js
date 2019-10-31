@@ -156,6 +156,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 				let methodArgs = {};
 
+				// todo: clean this up
 				function formatArgs(callInstance, methodArgs, depth) {
 					const { args, meta, methodName, sectionName } = callInstance;
 					let paramArgKvArray = [];
@@ -183,6 +184,18 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 							);
 						} else if (args[i] instanceof Call) {
 							argument = formatArgs(args[i], methodArgs, depth++); // go deeper into the nested calls
+						} else if (
+							args[i].toRawType() === 'Vec<AccountId>' ||
+							args[i].toRawType() === 'Vec<Address>'
+						) {
+							// FIXME: lord forgive me for i have sinned. this is all a mess but rushing to get this out the door.
+							for (let p = 0; p < args[i].length; p++) {
+								args[i][p] = encodeAddress(
+									decodeAddress(args[i][p].toString()),
+									prefix
+								);
+							}
+							argument = args[i];
 						} else {
 							argument = args[i].toString();
 						}
@@ -282,7 +295,11 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 								<View key={param} style={styles.callDetails}>
 									<Text style={styles.subLabel}>{param}: </Text>
 									<Text style={styles.secondaryText}>
-										{arg && arg.length > 50 ? shortString(arg) : arg}
+										{arg && arg.length > 50
+											? shortString(arg)
+											: arg instanceof Array
+											? arg.join(', ')
+											: arg}
 									</Text>
 								</View>
 							))
