@@ -19,7 +19,7 @@ export default {
 	bg_alert: '#EB5757',
 	bg_button: '#48A5C2',
 	bg_text: '#FFFFFF',
-	bg_text_sec: '#999999',
+	bg_text_sec: '#BBB',
 	bg_warning: '#FAE265',
 	card_bg: 'rgba(255, 255, 255, 0.15)',
 	card_bgSolid: '#323232',

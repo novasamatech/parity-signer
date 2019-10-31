@@ -42,7 +42,7 @@ const unknownNetworkBase = {
 
 const substrateNetworkBase = {
 	[SubstrateNetworkKeys.KUSAMA]: {
-		color: '#4C4646',
+		color: '#e6007a',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		prefix: 2,

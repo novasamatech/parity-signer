@@ -39,7 +39,8 @@ export default {
 	},
 	t_codeS: {
 		color: colors.bg_text_sec,
-		fontFamily: 'monospace'
+		fontFamily: 'monospace',
+		fontSize: 11
 	},
 	t_important: {
 		color: colors.bg_text,
