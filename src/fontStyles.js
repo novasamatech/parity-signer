@@ -57,5 +57,16 @@ export default {
 		color: colors.bg_text,
 		fontFamily: fonts.robotoRegular,
 		fontSize: 12
+	},
+	t_seed: {
+		borderColor: colors.card_bg_text_sec,
+		borderWidth: 1,
+		color: colors.bg_button,
+		fontFamily: fonts.light,
+		fontSize: 20,
+		lineHeight: 24,
+		minHeight: 160,
+		paddingHorizontal: 16,
+		paddingVertical: 10
 	}
 };

@@ -30,6 +30,7 @@ import { Subscribe } from 'unstated';
 
 import colors from '../colors';
 import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -131,7 +132,7 @@ function LegacyAccountBackupView(props) {
 						}
 					}}
 				>
-					<Text style={styles.seedText}>{seedPhrase || seed}</Text>
+					<Text style={fontStyles.t_seed}>{seedPhrase || seed}</Text>
 				</TouchableItem>
 				{!!derivationPath && (
 					<Text style={styles.derivationText}>{derivationPath}</Text>
@@ -204,14 +205,6 @@ const styles = StyleSheet.create({
 	},
 	nextStep: {
 		marginTop: 20
-	},
-	seedText: {
-		backgroundColor: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 20,
-		lineHeight: 26,
-		minHeight: 160,
-		padding: 10
 	},
 	title: {
 		color: colors.bg_text_sec,
