@@ -118,12 +118,10 @@ function IdentityPinView({ navigation, accounts }) {
 		}
 	};
 
-	const title = 'ACCOUNT PIN';
-
 	const renderPinInput = () =>
 		navigation.getParam('isUnlock', false) ? (
 			<>
-				<Text style={styles.titleTop}>{title}</Text>
+				<Text style={styles.titleTop}>UNLOCK IDENTITY</Text>
 				{showHintOrError()}
 				<Text style={styles.title}>PIN</Text>
 				<PinInput
@@ -141,7 +139,7 @@ function IdentityPinView({ navigation, accounts }) {
 			</>
 		) : (
 			<>
-				<Text style={styles.titleTop}>{title}</Text>
+				<Text style={styles.titleTop}>SET IDENTITY PIN</Text>
 				{showHintOrError()}
 				<Text style={styles.title}>PIN</Text>
 				<PinInput

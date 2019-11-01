@@ -15,31 +15,26 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
 import { Text } from 'react-native';
+import { UnknownNetworkKeys } from '../constants';
+import { withAccountStore } from '../util/HOC';
+import { withNavigation } from 'react-navigation';
+import { getPathsWithNetwork } from '../util/identitiesUtils';
 
-export default class PathsList extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Paths List'
-	};
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <PathsListView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
-
-function PathsListView({ accounts }) {
+function PathsList({ accounts, navigation }) {
+	const networkKey = navigation.getParam(
+		'networkKey',
+		UnknownNetworkKeys.UNKNOWN
+	);
 	const paths = Array.from(accounts.state.currentIdentity.meta.keys());
+	const listedPath = getPathsWithNetwork(paths, networkKey);
 	return (
 		<>
-			{paths.map(path => (
+			{listedPath.map(path => (
 				<Text>{path}</Text>
 			))}
 		</>
 	);
 }
+
+export default withAccountStore(withNavigation(PathsList));
