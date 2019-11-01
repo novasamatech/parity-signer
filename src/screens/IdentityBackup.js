@@ -29,12 +29,11 @@ import colors from '../colors';
 import fonts from '../fonts';
 import fontStyles from '../fontStyles';
 import Button from '../components/Button';
+import { withNavigation } from 'react-navigation';
 import {
-	NavigationActions,
-	StackActions,
-	withNavigation
-} from 'react-navigation';
-import { setPin } from '../util/navigationHelpers';
+	navigateToNewIdentityNetwork,
+	setPin
+} from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 
 function IdentityBackup({ navigation, accounts }) {
@@ -50,20 +49,6 @@ function IdentityBackup({ navigation, accounts }) {
 			setSeedPhrase('');
 		};
 	}, []);
-
-	const resetStackToNetwork = () => {
-		const resetAction = StackActions.reset({
-			actions: [
-				NavigationActions.navigate({
-					params: { isNew: true },
-					routeName: 'AccountNetworkChooser'
-				})
-			],
-			index: 0,
-			key: undefined
-		});
-		navigation.dispatch(resetAction);
-	};
 
 	return (
 		<ScrollView style={styles.body}>
@@ -107,7 +92,8 @@ function IdentityBackup({ navigation, accounts }) {
 				onPress={async () => {
 					const pin = await setPin(navigation);
 					await accounts.saveNewIdentity(seedPhrase, pin);
-					resetStackToNetwork();
+					setSeedPhrase('');
+					navigateToNewIdentityNetwork(navigation);
 				}}
 			/>
 		</ScrollView>

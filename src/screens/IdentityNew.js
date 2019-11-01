@@ -14,31 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
-import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
 import { emptyIdentity } from '../util/identitiesUtils';
 import colors from '../colors';
 import fonts from '../fonts';
+import { withAccountStore } from '../util/HOC';
+import { validateSeed } from '../util/account';
+import AccountSeed from '../components/AccountSeed';
+import {
+	navigateToNewIdentityNetwork,
+	setPin
+} from '../util/navigationHelpers';
 
-export default class IdentityNew extends React.Component {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'New Identity'
-	};
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <IdentityNewView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
+function IdentityNew({ accounts, navigation }) {
+	const [isRecover, setIsRecover] = useState(false);
+	const [seedPhrase, setSeedPhrase] = useState('');
 
-function IdentityNewView({ accounts, navigation }) {
 	useEffect(() => {
 		accounts.updateNewIdentity(emptyIdentity());
 		return function() {
@@ -50,6 +45,57 @@ function IdentityNewView({ accounts, navigation }) {
 		accounts.updateNewIdentity({ name });
 	};
 
+	const renderRecoverView = () => (
+		<>
+			<AccountSeed
+				valid={validateSeed(seedPhrase, true).valid}
+				onChangeText={setSeedPhrase}
+				value={seedPhrase}
+			/>
+			<View style={styles.btnBox}>
+				<Button
+					title="Create"
+					onPress={() => {
+						setIsRecover(false);
+					}}
+					small={true}
+					onlyText={true}
+				/>
+				<Button
+					title="Recover Identity"
+					onPress={async () => {
+						const pin = await setPin(navigation);
+						await accounts.saveNewIdentity(seedPhrase, pin);
+						setSeedPhrase('');
+						navigateToNewIdentityNetwork(navigation);
+					}}
+					small={true}
+				/>
+			</View>
+		</>
+	);
+
+	const renderCreateView = () => (
+		<View style={styles.btnBox}>
+			<Button
+				title="Recover Identity"
+				onPress={() => setIsRecover(true)}
+				small={true}
+				onlyText={true}
+			/>
+			<Button
+				title="Create"
+				onPress={() => {
+					setSeedPhrase('');
+					navigation.navigate('IdentityBackup', {
+						isNew: true
+					});
+				}}
+				small={true}
+			/>
+		</View>
+	);
+
 	return (
 		<View style={styles.body}>
 			<Text style={styles.titleTop}>NEW IDENTITY</Text>
@@ -59,22 +105,12 @@ function IdentityNewView({ accounts, navigation }) {
 				placeholder="Enter a new identity name"
 				focus={true}
 			/>
-			<View style={styles.btnBox}>
-				<Button
-					title="Recover Identity"
-					onPress={() => {
-						navigation.navigate('IdentityBackup', {
-							isNew: true
-						});
-					}}
-					small={true}
-					onlyText={true}
-				/>
-				<Button title="Create" onPress={() => {}} small={true} />
-			</View>
+			{isRecover ? renderRecoverView() : renderCreateView()}
 		</View>
 	);
 }
+
+export default withAccountStore(withNavigation(IdentityNew));
 
 const styles = StyleSheet.create({
 	body: {

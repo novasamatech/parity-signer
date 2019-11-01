@@ -27,3 +27,17 @@ export const resetToPathsList = (navigation, networkKey) => {
 	});
 	navigation.dispatch(resetAction);
 };
+
+export const navigateToNewIdentityNetwork = navigation => {
+	const resetAction = StackActions.reset({
+		actions: [
+			NavigationActions.navigate({
+				params: { isNew: true },
+				routeName: 'AccountNetworkChooser'
+			})
+		],
+		index: 0,
+		key: undefined
+	});
+	navigation.dispatch(resetAction);
+};
