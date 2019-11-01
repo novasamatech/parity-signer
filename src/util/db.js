@@ -19,6 +19,7 @@
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { accountId } from './account';
+import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 export async function loadAccounts(version = 3) {
 	if (!SecureStorage) {
@@ -60,7 +61,7 @@ export async function loadIdentities(version = 3) {
 			identitiesStore
 		);
 		if (identities === undefined) return handleError('database not set');
-		return JSON.parse(identities).identities;
+		return deserializeIdentities(identities);
 	} catch (e) {
 		handleError(e);
 	}
@@ -74,7 +75,7 @@ const accountsStore = {
 export const saveIdentities = identities => {
 	SecureStorage.setItem(
 		identityStorageLabel,
-		JSON.stringify({ identities }),
+		serializeIdentities(identities),
 		identitiesStore
 	);
 };

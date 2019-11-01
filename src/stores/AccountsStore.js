@@ -30,7 +30,7 @@ import { parseSURI } from '../util/suri';
 import { decryptData, encryptData, substrateAddress } from '../util/native';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import type { AccountsStoreState } from './types';
-import { emptyIdentity } from '../util/identity';
+import { emptyIdentity } from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
 	state = {
