@@ -19,7 +19,7 @@ import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
-import { Modal, View } from 'react-native';
+import { ScrollView, Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 function IdentitiesSwitch({ navigation }) {
@@ -83,14 +83,37 @@ function IdentitiesSwitch({ navigation }) {
 							textStyle={fontStyles.t_regular}
 							style={styles.i_arrowStyle}
 						/>
-						<Separator />
+
+						{
+							// if [identities].lenghts > 4
+							// <Separator />
+							// else: scrollView
+						}
+
+						<Separator style={{ marginBottom: 0 }} />
+						<ScrollView style={styles.idListContent}>
+							<ButtonIcon
+								title="Legacy Seeds"
+								onPress={() => {
+									setVisible(false);
+									navigation.navigate('IdentityNew');
+								}}
+								iconName="ios-snow"
+								iconType="ionicon"
+								iconSize={24}
+								textStyle={fontStyles.h2}
+								style={{ paddingLeft: 8 * 4 }}
+							/>
+						</ScrollView>
+						<Separator shadow={true} style={{ marginTop: 0 }} />
+
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {
 								setVisible(false);
 								navigation.navigate('IdentityNew');
 							}}
-							iconName="md-finger-print"
+							iconName="ios-add"
 							iconType="ionicon"
 							iconSize={24}
 							textStyle={fontStyles.t_big}
@@ -103,7 +126,7 @@ function IdentitiesSwitch({ navigation }) {
 								setVisible(false);
 								// go to Settings;
 							}}
-							iconName="md-settings"
+							iconName="ios-cog"
 							iconType="ionicon"
 							iconSize={24}
 							textStyle={fontStyles.t_big}
@@ -170,6 +193,11 @@ const styles = {
 		marginTop: 0,
 		opacity: 0.7,
 		paddingLeft: 8 * 8
+	},
+	idListContent: {
+		maxHeight: 200,
+		paddingBottom: 8,
+		paddingTop: 8
 	}
 };
 
