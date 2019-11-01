@@ -28,6 +28,7 @@ import { defaultNetworkKey } from '../util/identitiesUtils';
 
 function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
+	console.log('identities are', accounts.state.identities);
 
 	return (
 		<View>
@@ -110,7 +111,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								setVisible(false);
 								navigation.navigate('IdentityNew');
 							}}
-							iconName="md-finger-print"
+							iconName="ios-add"
 							iconType="ionicon"
 							iconSize={24}
 							textStyle={fontStyles.t_big}
@@ -123,7 +124,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								setVisible(false);
 								// go to Settings;
 							}}
-							iconName="md-settings"
+							iconName="ios-cog"
 							iconType="ionicon"
 							iconSize={24}
 							textStyle={fontStyles.t_big}
@@ -190,6 +191,11 @@ const styles = {
 		marginTop: 0,
 		opacity: 0.7,
 		paddingLeft: 8 * 8
+	},
+	idListContent: {
+		maxHeight: 200,
+		paddingBottom: 8,
+		paddingTop: 8
 	}
 };
 
