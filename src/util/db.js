@@ -19,6 +19,7 @@
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { accountId } from './account';
+import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 export async function loadAccounts(version = 3) {
 	if (!SecureStorage) {
@@ -43,17 +44,39 @@ export async function loadAccounts(version = 3) {
 	});
 }
 
+const identitiesStore = {
+	keychainService: 'parity_signer_identities',
+	sharedPreferencesName: 'parity_signer_identities'
+};
+const identityStorageLabel = 'identities_v4';
+
+export async function loadIdentities(version = 3) {
+	function handleError(e) {
+		console.warn('loading identities error', e);
+		return [];
+	}
+	try {
+		const identities = await SecureStorage.getItem(
+			identityStorageLabel,
+			identitiesStore
+		);
+		if (identities === undefined) return handleError('database not set');
+		return deserializeIdentities(identities);
+	} catch (e) {
+		handleError(e);
+	}
+}
+
 const accountsStore = {
-	identitiesLabel: 'identities_v4',
-	keychainService: 'accounts_v4',
-	sharedPreferencesName: 'accounts_v4'
+	keychainService: 'accounts_v3',
+	sharedPreferencesName: 'accounts_v3'
 };
 
 export const saveIdentities = identities => {
 	SecureStorage.setItem(
-		accountsStore.identitiesLabel,
-		JSON.stringify(identities),
-		accountsStore
+		identityStorageLabel,
+		serializeIdentities(identities),
+		identitiesStore
 	);
 };
 

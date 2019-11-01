@@ -19,11 +19,15 @@ import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
-import { ScrollView, Modal, View } from 'react-native';
+import { Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
+import { withAccountStore } from '../util/HOC';
+import Button from './Button';
+import { resetToPathsList } from '../util/navigationHelpers';
 
-function IdentitiesSwitch({ navigation }) {
+function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
+	console.log('identities are', accounts.state.identities);
 
 	return (
 		<View>
@@ -83,30 +87,22 @@ function IdentitiesSwitch({ navigation }) {
 							textStyle={fontStyles.t_regular}
 							style={styles.i_arrowStyle}
 						/>
-
-						{
-							// if [identities].lenghts > 4
-							// <Separator />
-							// else: scrollView
-						}
-
-						<Separator style={{ marginBottom: 0 }} />
-						<ScrollView style={styles.idListContent}>
-							<ButtonIcon
-								title="Legacy Seeds"
-								onPress={() => {
-									setVisible(false);
-									navigation.navigate('IdentityNew');
-								}}
-								iconName="ios-snow"
-								iconType="ionicon"
-								iconSize={24}
-								textStyle={fontStyles.h2}
-								style={{ paddingLeft: 8 * 4 }}
-							/>
-						</ScrollView>
-						<Separator shadow={true} style={{ marginTop: 0 }} />
-
+						<Separator />
+						{accounts.state.identities &&
+							accounts.state.identities.map((identity, index) => {
+								const title = identity.name || `identity_${index.toString()}`;
+								return (
+									<Button
+										title={title}
+										onPress={async () => {
+											await accounts.selectIdentity(identity);
+											setVisible(false);
+											// const seed = await unlockSeed(navigation);
+											resetToPathsList(navigation);
+										}}
+									/>
+								);
+							})}
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {
@@ -201,4 +197,4 @@ const styles = {
 	}
 };
 
-export default withNavigation(IdentitiesSwitch);
+export default withAccountStore(withNavigation(IdentitiesSwitch));

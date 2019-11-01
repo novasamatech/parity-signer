@@ -15,7 +15,31 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
+import { Subscribe } from 'unstated';
+import AccountsStore from '../stores/AccountsStore';
+import { Text } from 'react-native';
 
-export default function PathsList() {
-	return <></>;
+export default class PathsList extends React.PureComponent {
+	static navigationOptions = {
+		headerBackTitle: 'Back',
+		title: 'Paths List'
+	};
+	render() {
+		return (
+			<Subscribe to={[AccountsStore]}>
+				{accounts => <PathsListView {...this.props} accounts={accounts} />}
+			</Subscribe>
+		);
+	}
+}
+
+function PathsListView({ accounts }) {
+	const paths = Array.from(accounts.state.currentIdentity.meta.keys());
+	return (
+		<>
+			{paths.map(path => (
+				<Text>{path}</Text>
+			))}
+		</>
+	);
 }

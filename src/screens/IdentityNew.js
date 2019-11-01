@@ -20,7 +20,7 @@ import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
-import { emptyIdentity } from '../util/identity';
+import { emptyIdentity } from '../util/identitiesUtils';
 import colors from '../colors';
 import fonts from '../fonts';
 

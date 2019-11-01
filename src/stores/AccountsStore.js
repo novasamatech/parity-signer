@@ -23,17 +23,20 @@ import {
 	loadAccounts,
 	saveAccount,
 	deleteAccount as deleteDbAccount,
-	saveIdentities
+	saveIdentities,
+	loadIdentities
 } from '../util/db';
 import { parseSURI } from '../util/suri';
-import { decryptData, encryptData } from '../util/native';
+import { decryptData, encryptData, substrateAddress } from '../util/native';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import type { AccountsStoreState } from './types';
-import { emptyIdentity } from '../util/identity';
+import { emptyIdentity } from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
 	state = {
 		accounts: new Map(),
+		currentIdentity: null,
+		currentPath: '',
 		identities: [],
 		newAccount: emptyAccount(),
 		newIdentity: emptyIdentity(),
@@ -95,9 +98,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async refreshList() {
-		loadAccounts().then(accounts => {
-			this.setState({ accounts });
-		});
+		const accounts = await loadAccounts();
+		const identities = await loadIdentities();
+		this.setState({ accounts, identities });
 	}
 
 	async encryptSeedPhraseAndLockAccount(account, pin = null) {
@@ -240,7 +243,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return result;
 	}
 
-	getSelectedIdentity() {}
+	async unlockIdentitySeed(pin) {
+		const { encryptedSeed } = this.state.currentIdentity;
+		const seed = await decryptData(encryptedSeed, pin);
+		const { phrase } = parseSURI(seed);
+		return phrase;
+	}
 
 	getNewIdentity() {
 		return this.state.newIdentity;
@@ -249,13 +257,61 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async saveNewIdentity(seedPhrase, pin) {
 		this.state.newIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
 		const newIdentities = this.state.identities.concat(this.state.newIdentity);
-		this.setState(newIdentities);
+		this.setState({
+			currentIdentity: this.state.newIdentity,
+			identities: newIdentities,
+			newIdentity: emptyIdentity()
+		});
 		await saveIdentities(newIdentities);
+	}
+
+	async selectIdentity(identity) {
+		await this.setState({ currentIdentity: identity });
 	}
 
 	updateNewIdentity(identityUpdate) {
 		this.setState({
 			newIdentity: { ...this.state.newIdentity, ...identityUpdate }
 		});
+	}
+
+	async updateCurrentToIdentities() {
+		const identityIndex = this.state.identities.findIndex(identity => {
+			identity.encryptedSeed = this.state.currentIdentity.encryptedSeed;
+		});
+		const updatedIdentities = this.state.identities.splice(
+			identityIndex,
+			1,
+			this.state.currentIdentity
+		);
+		this.setState({ identities: updatedIdentities });
+		await saveIdentities(updatedIdentities);
+	}
+
+	async deriveNewPath(newPath, seed, prefix) {
+		const updatedCurrentIdentity = Object.assign(
+			{},
+			this.state.currentIdentity
+		);
+		const pathAddress = substrateAddress(seed, prefix);
+		if (updatedCurrentIdentity.meta.has(newPath)) return false;
+		updatedCurrentIdentity.meta.set(newPath, {
+			address: pathAddress,
+			createdAt: new Date().getTime(),
+			name: '',
+			updatedAt: new Date().getTime()
+		});
+		updatedCurrentIdentity.addresses.set(pathAddress, newPath);
+		try {
+			await this.setState({
+				currentIdentity: updatedCurrentIdentity,
+				currentPath: newPath
+			});
+			await this.updateCurrentToIdentities();
+		} catch (e) {
+			console.warn('derive new Path error', e);
+			return false;
+		}
+		return true;
 	}
 }
