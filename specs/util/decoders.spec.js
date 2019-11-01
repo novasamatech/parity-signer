@@ -28,7 +28,10 @@ import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 
-import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from '../../src/constants';
 import {
 	constructDataFromBytes,
 	rawDataToU8A,
@@ -36,9 +39,9 @@ import {
 	hexToAscii,
 	decodeToString,
 	isJsonString
-} from './decoders';
-import { isAscii } from './message';
-import kusamaData from './static-kusama';
+} from '../../src/util/decoders';
+import { isAscii } from '../../src/util/message';
+import kusamaData from '../../src/util/static-kusama';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);

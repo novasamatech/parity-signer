@@ -16,7 +16,11 @@
 
 'use strict';
 
-import { constructSURI, parseDerivationPath, parseSURI } from './suri';
+import {
+	constructSURI,
+	parseDerivationPath,
+	parseSURI
+} from '../../src/util/suri';
 
 describe('derivation path', () => {
 	describe('parsing', () => {
