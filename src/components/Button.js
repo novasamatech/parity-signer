@@ -28,7 +28,7 @@ import {
 	ViewPropTypes
 } from 'react-native';
 import colors from '../colors';
-import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 
 export default class Button extends React.PureComponent<{
 	title: string,
@@ -40,17 +40,35 @@ export default class Button extends React.PureComponent<{
 	static propTypes = {
 		disabled: PropTypes.bool,
 		onPress: PropTypes.func.isRequired,
+		onlyText: PropTypes.bool,
+		small: PropTypes.bool,
 		style: ViewPropTypes.style,
 		textStyles: Text.propTypes.style,
 		title: PropTypes.string.isRequired
 	};
 
 	render() {
-		const { onPress, title, disabled, textStyles, buttonStyles } = this.props;
+		const {
+			onPress,
+			title,
+			disabled,
+			small,
+			textStyles,
+			onlyText,
+			buttonStyles
+		} = this.props;
 
-		const finalTextStyles = [styles.text, textStyles];
+		const finalTextStyles = [textStyles];
 		const finalButtonStyles = [styles.button, buttonStyles];
 
+		if (small) {
+			finalTextStyles.push(fontStyles.t_important);
+			finalButtonStyles.push(styles.buttonSmall);
+		}
+		if (onlyText) {
+			finalTextStyles.push({ color: colors.bg_button });
+			finalButtonStyles.push(styles.buttonOnlyText);
+		}
 		if (disabled) {
 			finalTextStyles.push(styles.textDisabled);
 			finalButtonStyles.push(styles.buttonDisabled);
@@ -65,7 +83,7 @@ export default class Button extends React.PureComponent<{
 				onPress={onPress}
 			>
 				<View style={finalButtonStyles}>
-					<Text style={finalTextStyles} disabled={disabled}>
+					<Text style={[fontStyles.h1, finalTextStyles]} disabled={disabled}>
 						{title}
 					</Text>
 				</View>
@@ -78,21 +96,27 @@ const styles = StyleSheet.create({
 	button: {
 		alignItems: 'center',
 		backgroundColor: colors.bg_button,
+		borderRadius: 60,
 		elevation: 4,
-		height: 60,
-		justifyContent: 'center'
+		height: 56,
+		justifyContent: 'center',
+		marginHorizontal: 8,
+		marginVertical: 8,
+		paddingHorizontal: 56
 	},
 	buttonDisabled: {
-		backgroundColor: '#dfdfdf',
+		backgroundColor: colors.card_bgSolid,
 		elevation: 0
 	},
-	text: {
-		color: 'white',
-		fontFamily: fonts.bold,
-		fontSize: 20,
-		padding: 8
+	buttonOnlyText: {
+		backgroundColor: colors.bg,
+		elevation: 0
+	},
+	buttonSmall: {
+		height: 48,
+		paddingHorizontal: 48
 	},
 	textDisabled: {
-		color: '#a1a1a1'
+		color: colors.card_bg
 	}
 });

@@ -39,13 +39,13 @@ export default {
 	},
 	t_codeS: {
 		color: colors.bg_text_sec,
-		fontFamily: 'monospace',
+		fontFamily: fonts.RobotoMono,
 		fontSize: 11
 	},
 	t_important: {
 		color: colors.bg_text,
 		fontFamily: fonts.robotoBold,
-		fontSize: 12
+		fontSize: 13
 	},
 	t_prefix: {
 		color: colors.bg_text,
