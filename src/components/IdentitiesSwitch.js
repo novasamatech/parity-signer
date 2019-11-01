@@ -94,6 +94,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								return (
 									<Button
 										title={title}
+										key={identity.encryptedSeed}
 										onPress={async () => {
 											await accounts.selectIdentity(identity);
 											setVisible(false);

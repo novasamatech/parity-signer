@@ -52,6 +52,8 @@ import Loading from './screens/Loading';
 import IdentityBackup from './screens/IdentityBackup';
 import IdentityNew from './screens/IdentityNew';
 import MessageDetails from './screens/MessageDetails';
+import PathDerivation from './screens/PathDerivation';
+import PathsList from './screens/PathsList';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
@@ -60,7 +62,6 @@ import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 import IdentityPin from './screens/IdentityPin';
-import PathsList from './screens/PathsList';
 
 export default class App extends Component {
 	constructor() {
@@ -216,6 +217,9 @@ const Screens = createStackNavigator(
 					},
 					MessageDetails: {
 						screen: MessageDetails
+					},
+					PathDerivation: {
+						screen: PathDerivation
 					},
 					PathsList: {
 						screen: PathsList

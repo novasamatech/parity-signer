@@ -15,11 +15,12 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Text } from 'react-native';
+import { ScrollView, Text } from 'react-native';
 import { UnknownNetworkKeys } from '../constants';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import { getPathsWithNetwork } from '../util/identitiesUtils';
+import Button from '../components/Button';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -29,11 +30,16 @@ function PathsList({ accounts, navigation }) {
 	const paths = Array.from(accounts.state.currentIdentity.meta.keys());
 	const listedPath = getPathsWithNetwork(paths, networkKey);
 	return (
-		<>
+		<ScrollView>
 			{listedPath.map(path => (
 				<Text>{path}</Text>
 			))}
-		</>
+			<Button
+				title="Create New Derivation"
+				onPress={() => navigation.navigate('PathDerivation', { networkKey })}
+			/>
+			<Button title="Scan" onPress={() => {}} />
+		</ScrollView>
 	);
 }
 
