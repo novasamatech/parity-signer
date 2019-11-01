@@ -31,10 +31,6 @@ import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 
 export default class AccountDetails extends React.Component {
-	static navigationOptions = {
-		title: 'Account Details'
-	};
-
 	render() {
 		return (
 			<Subscribe to={[AccountsStore, TxStore]}>

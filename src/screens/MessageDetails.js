@@ -31,10 +31,6 @@ import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/message';
 
 export default class MessageDetails extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Transaction details',
-		title: 'Transaction Details'
-	};
 	render() {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>

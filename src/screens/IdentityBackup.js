@@ -15,8 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
 import { words } from '../util/native';
 import {
 	Alert,
@@ -31,23 +29,15 @@ import colors from '../colors';
 import fonts from '../fonts';
 import fontStyles from '../fontStyles';
 import Button from '../components/Button';
-import { NavigationActions, StackActions } from 'react-navigation';
+import {
+	NavigationActions,
+	StackActions,
+	withNavigation
+} from 'react-navigation';
 import { setPin } from '../util/navigationHelpers';
+import { withAccountStore } from '../util/HOC';
 
-export default class IdentityBackup extends React.PureComponent {
-	static navigationOptions = {
-		title: 'Identity Backup'
-	};
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <IdentityBackupView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
-
-function IdentityBackupView({ navigation, accounts }) {
+function IdentityBackup({ navigation, accounts }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	useEffect(() => {
 		const setSeedPhraseAsync = async () => {
@@ -123,6 +113,8 @@ function IdentityBackupView({ navigation, accounts }) {
 		</ScrollView>
 	);
 }
+
+export default withAccountStore(withNavigation(IdentityBackup));
 
 const styles = StyleSheet.create({
 	body: {

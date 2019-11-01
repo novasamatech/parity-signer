@@ -21,6 +21,11 @@ import SecureStorage from 'react-native-secure-storage';
 import { accountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
+const currentAccountsStore = {
+	keychainService: 'accounts_v3',
+	sharedPreferencesName: 'accounts_v3'
+};
+
 export async function loadAccounts(version = 3) {
 	if (!SecureStorage) {
 		return Promise.resolve([]);
@@ -67,11 +72,6 @@ export async function loadIdentities(version = 3) {
 	}
 }
 
-const accountsStore = {
-	keychainService: 'accounts_v3',
-	sharedPreferencesName: 'accounts_v3'
-};
-
 export const saveIdentities = identities => {
 	SecureStorage.setItem(
 		identityStorageLabel,
@@ -89,13 +89,13 @@ function txKey(hash) {
 }
 
 export const deleteAccount = async accountKey =>
-	SecureStorage.deleteItem(accountKey, accountsStore);
+	SecureStorage.deleteItem(accountKey, currentAccountsStore);
 
 export const saveAccount = (accountKey, account) =>
 	SecureStorage.setItem(
 		accountKey,
 		JSON.stringify(account, null, 0),
-		accountsStore
+		currentAccountsStore
 	);
 
 export async function saveTx(tx) {

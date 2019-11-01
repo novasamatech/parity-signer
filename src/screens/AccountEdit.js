@@ -26,10 +26,6 @@ import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 
 export default class AccountEdit extends React.PureComponent {
-	static navigationOptions = {
-		title: 'Edit Account'
-	};
-
 	constructor(props) {
 		super(props);
 	}

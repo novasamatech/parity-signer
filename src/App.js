@@ -51,6 +51,7 @@ import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
 import IdentityBackup from './screens/IdentityBackup';
 import IdentityNew from './screens/IdentityNew';
+import IdentityPin from './screens/IdentityPin';
 import MessageDetails from './screens/MessageDetails';
 import PathDerivation from './screens/PathDerivation';
 import PathsList from './screens/PathsList';
@@ -61,7 +62,6 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
-import IdentityPin from './screens/IdentityPin';
 
 export default class App extends Component {
 	constructor() {
@@ -176,9 +176,6 @@ const Screens = createStackNavigator(
 						},
 						screen: LegacyAccountList
 					},
-					IdentityPin: {
-						screen: IdentityPin
-					},
 					AccountPin: {
 						screen: AccountPin
 					},
@@ -209,11 +206,14 @@ const Screens = createStackNavigator(
 					LegacyAccountBackup: {
 						screen: LegacyAccountBackup
 					},
+					IdentityBackup: {
+						screen: IdentityBackup
+					},
 					IdentityNew: {
 						screen: IdentityNew
 					},
-					IdentityBackup: {
-						screen: IdentityBackup
+					IdentityPin: {
+						screen: IdentityPin
 					},
 					MessageDetails: {
 						screen: MessageDetails

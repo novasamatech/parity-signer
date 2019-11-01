@@ -28,11 +28,6 @@ import TouchableItem from '../components/TouchableItem';
 import { saveToCAndPPConfirmation } from '../util/db';
 
 export default class TermsAndConditions extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Terms and conditions'
-	};
-
 	state = {
 		ppAgreement: false,
 		tocAgreement: false

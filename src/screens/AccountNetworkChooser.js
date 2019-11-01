@@ -18,7 +18,7 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { Subscribe } from 'unstated';
+import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import fonts from '../fonts';
@@ -27,69 +27,50 @@ import {
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
 } from '../constants';
-import AccountsStore from '../stores/AccountsStore';
 import { resetToPathsList, unlockSeed } from '../util/navigationHelpers';
+import { withAccountStore } from '../util/HOC';
 
-export default class AccountNetworkChooser extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Choose a network'
-	};
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => (
-					<AccountNetworkChooserView {...this.props} accounts={accounts} />
-				)}
-			</Subscribe>
-		);
-	}
+function AccountNetworkChooser({ navigation, accounts }) {
+	const isNew = navigation.getParam('isNew', false);
+
+	return (
+		<ScrollView style={styles.body}>
+			<Text style={styles.title}>
+				{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
+			</Text>
+			{Object.entries(NETWORK_LIST)
+				.filter(
+					([networkKey]) =>
+						(__DEV__ && networkKey !== UnknownNetworkKeys.UNKNOWN) ||
+						(networkKey !== SubstrateNetworkKeys.SUBSTRATE_DEV &&
+							networkKey !== UnknownNetworkKeys.UNKNOWN)
+				)
+				.map(([networkKey, networkParams]) => (
+					<AccountCard
+						address={''}
+						networkKey={networkKey}
+						onPress={async () => {
+							if (isNew) {
+								const { prefix, pathId } = networkParams;
+								const seed = await unlockSeed(navigation);
+								const derivationSucceed = await accounts.deriveNewPath(
+									`//${pathId}//default`,
+									seed,
+									prefix
+								);
+								if (derivationSucceed) resetToPathsList(navigation, networkKey);
+							} else {
+								navigation.navigate('PathsList', { networkKey });
+							}
+						}}
+						title={networkParams.title}
+					/>
+				))}
+		</ScrollView>
+	);
 }
 
-class AccountNetworkChooserView extends React.PureComponent {
-	render() {
-		const { navigation } = this.props;
-		const { accounts } = this.props;
-		const isNew = navigation.getParam('isNew', false);
-
-		return (
-			<ScrollView style={styles.body}>
-				<Text style={styles.title}>
-					{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
-				</Text>
-				{Object.entries(NETWORK_LIST)
-					.filter(
-						([networkKey]) =>
-							(__DEV__ && networkKey !== UnknownNetworkKeys.UNKNOWN) ||
-							(networkKey !== SubstrateNetworkKeys.SUBSTRATE_DEV &&
-								networkKey !== UnknownNetworkKeys.UNKNOWN)
-					)
-					.map(([networkKey, networkParams]) => (
-						<AccountCard
-							address={''}
-							networkKey={networkKey}
-							onPress={async () => {
-								if (isNew) {
-									const { prefix, pathId } = networkParams;
-									const seed = await unlockSeed(navigation);
-									const derivationSucceed = await accounts.deriveNewPath(
-										`//${pathId}//default`,
-										seed,
-										prefix
-									);
-									if (derivationSucceed)
-										resetToPathsList(navigation, networkKey);
-								} else {
-									navigation.navigate('PathsList', { networkKey });
-								}
-							}}
-							title={networkParams.title}
-						/>
-					))}
-			</ScrollView>
-		);
-	}
-}
+export default withAccountStore(withNavigation(AccountNetworkChooser));
 
 const styles = StyleSheet.create({
 	body: {

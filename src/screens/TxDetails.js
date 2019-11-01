@@ -34,10 +34,6 @@ import { NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 
 export default class TxDetails extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Transaction details',
-		title: 'Transaction Details'
-	};
 	render() {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>

@@ -17,26 +17,18 @@
 
 import React, { Component, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { Subscribe } from 'unstated';
+import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import fonts from '../fonts';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
-import AccountsStore from '../stores/AccountsStore';
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import { withAccountStore } from '../util/HOC';
 
-export default class IdentityPin extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <IdentityPinView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
+export default withAccountStore(withNavigation(IdentityPin));
 
-function IdentityPinView({ navigation, accounts }) {
+function IdentityPin({ navigation, accounts }) {
 	const initialState = {
 		confirmation: '',
 		focusConfirmation: false,

@@ -25,15 +25,10 @@ import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import PopupMenu from '../components/PopupMenu';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 
 export default class LegacyAccountList extends React.PureComponent {
-	static navigationOptions = {
-		title: 'Accounts'
-	};
-
 	render() {
 		return (
 			<Subscribe to={[AccountsStore]}>
@@ -91,20 +86,6 @@ class AccountListView extends React.PureComponent {
 		return (
 			<View style={styles.body}>
 				<Background />
-				<View style={styles.header}>
-					<Text style={styles.title}>ACCOUNTS</Text>
-					<View style={styles.menuView}>
-						<PopupMenu
-							onSelect={value => navigate(value)}
-							menuTriggerIconName={'add'}
-							menuItems={[
-								{ text: 'New Account', value: 'AccountNew' },
-								{ text: 'Recover Account', value: 'AccountRecover' },
-								{ text: 'About', value: 'About' }
-							]}
-						/>
-					</View>
-				</View>
 				{hasNoAccount && this.showOnboardingMessage()}
 				<FlatList
 					ref={list => {
