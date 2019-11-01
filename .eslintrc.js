@@ -14,6 +14,7 @@ module.exports = {
     },
   },
   rules: {
+  	"no-bitwise": "off",
     "comma-dangle": ["error", "never"],
     "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "single",  { "avoidEscape": true }],

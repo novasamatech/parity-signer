@@ -206,7 +206,7 @@ class AccountRecoverView extends React.Component {
 					<NetworkButton network={selectedNetwork} />
 					<Text style={styles.title}>ACCOUNT NAME</Text>
 					<TextInput
-						onChangeText={name => accounts.updateNew({ name })}
+						onChangeText={input => accounts.updateNew({ name: input })}
 						value={name}
 						placeholder="Enter an account name"
 					/>
@@ -224,32 +224,28 @@ class AccountRecoverView extends React.Component {
 							validateSeed(seedPhrase, validBip39Seed).valid ||
 							(isSubstrate && address)
 						}
-						onChangeText={seedPhrase => {
+						onChangeText={newSeedPhrase => {
 							this.debouncedAddressGeneration(
-								seedPhrase,
+								newSeedPhrase,
 								derivationPath,
 								derivationPassword
 							);
-							this.setState({ seedPhrase });
+							this.setState({ seedPhrase: newSeedPhrase });
 						}}
 						value={this.state.seedPhrase}
 					/>
 					{isSubstrate && (
 						<DerivationPathField
-							onChange={({
-								derivationPassword,
-								derivationPath,
-								isDerivationPathValid
-							}) => {
+							onChange={newDerivationPath => {
 								this.debouncedAddressGeneration(
 									seedPhrase,
-									derivationPath,
-									derivationPassword
+									newDerivationPath.derivationPath,
+									newDerivationPath.derivationPassword
 								);
 								this.setState({
-									derivationPassword,
-									derivationPath,
-									isDerivationPathValid
+									derivationPassword: newDerivationPath.derivationPassword,
+									derivationPath: newDerivationPath.derivationPath,
+									isDerivationPathValid: newDerivationPath.isDerivationPathValid
 								});
 							}}
 							styles={styles}

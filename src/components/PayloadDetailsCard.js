@@ -154,12 +154,12 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 				let methodArgs = {};
 
-				function formatArgs(callInstance, methodArgs, depth) {
+				function formatArgs(callInstance, callMethodArgs, depth) {
 					const { args, meta, methodName, sectionName } = callInstance;
 					let paramArgKvArray = [];
 					if (!meta.args.length) {
 						const sectionMethod = `${sectionName}.${methodName}`;
-						methodArgs[sectionMethod] = null;
+						callMethodArgs[sectionMethod] = null;
 						return;
 					}
 
@@ -180,14 +180,14 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 								prefix
 							);
 						} else if (args[i] instanceof Call) {
-							argument = formatArgs(args[i], methodArgs, depth++); // go deeper into the nested calls
+							argument = formatArgs(args[i], callMethodArgs, depth++); // go deeper into the nested calls
 						} else {
 							argument = args[i].toString();
 						}
 						const param = meta.args[i].name.toString();
 						const sectionMethod = `${sectionName}.${methodName}`;
 						paramArgKvArray.push([param, argument]);
-						methodArgs[sectionMethod] = paramArgKvArray;
+						callMethodArgs[sectionMethod] = paramArgKvArray;
 					}
 				}
 

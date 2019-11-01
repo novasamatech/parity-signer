@@ -1,4 +1,5 @@
 export function isAscii(data) {
+	/* eslint-disable no-control-regex */
 	return /^[\x00-\x7F]*$/.test(data);
 }
 

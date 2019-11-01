@@ -34,7 +34,6 @@ export function binarySearch(array, item, compare = defaultCompare) {
 	let max = array.length - 1;
 
 	while (min <= max) {
-		/* eslint-disable-next-line no-bitwise */
 		let guess = (min + max) >> 1; // fast integer division by 2
 
 		const result = compare(item, array[guess]);

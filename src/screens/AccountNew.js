@@ -136,7 +136,7 @@ function AccountNew({ accounts, navigation }) {
 				/>
 				<Text style={styles.title}>NAME</Text>
 				<TextInput
-					onChangeText={name => accounts.updateNew({ name })}
+					onChangeText={input => accounts.updateNew({ name: input })}
 					value={name}
 					placeholder="Enter a new account name"
 				/>
