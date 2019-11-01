@@ -14,14 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import PropTypes from 'prop-types';
 import React from 'react';
-import { StyleSheet, TextInput as TextInputOrigin } from 'react-native';
+import {
+	StyleSheet,
+	TextInput as TextInputOrigin,
+	View,
+	Text
+} from 'react-native';
+import fontStyles from '../fontStyles';
 import colors from '../colors';
-import fonts from '../fonts';
 
 export default class TextInput extends React.PureComponent {
 	static defaultProps = {
 		focus: false
+	};
+	static propTypes = {
+		fixedPrefix: PropTypes.string
 	};
 
 	// Methods:
@@ -35,29 +44,41 @@ export default class TextInput extends React.PureComponent {
 	}
 
 	render() {
+		const { fixedPrefix } = this.props;
 		return (
-			<TextInputOrigin
-				ref={input => {
-					this.input = input;
-				}}
-				keyboardAppearance="dark"
-				underlineColorAndroid="transparent"
-				{...this.props}
-				style={[styles.input, this.props.style]}
-			/>
+			<View style={{ flexDirection: 'row' }}>
+				{fixedPrefix && (
+					<Text style={[fontStyles.h2, styles.input, styles.inputFixed]}>
+						{fixedPrefix}
+					</Text>
+				)}
+				<TextInputOrigin
+					ref={input => {
+						this.input = input;
+					}}
+					keyboardAppearance="dark"
+					underlineColorAndroid="transparent"
+					{...this.props}
+					style={[fontStyles.h2, styles.input, this.props.style]}
+					placeholderTextColor={colors.card_bg_text_sec}
+				/>
+			</View>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
 	input: {
-		alignItems: 'center',
-		backgroundColor: colors.card_bg,
-		elevation: 4,
-		fontFamily: fonts.regular,
-		fontSize: 24,
-		height: 60,
-		justifyContent: 'center',
-		paddingHorizontal: 18
+		borderBottomColor: colors.card_bg_text_sec,
+		borderBottomWidth: 1,
+		flex: 1,
+		height: 40,
+		padding: 0,
+		paddingTop: 8
+	},
+	inputFixed: {
+		color: colors.card_bg_text_sec,
+		flex: 0,
+		paddingTop: 11.5
 	}
 });

@@ -95,12 +95,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		overflow: 'hidden'
 	},
-
 	header: {
 		alignItems: 'center',
 		flexDirection: 'row',
-		justifyContent: 'center',
-		paddingBottom: 20
+		justifyContent: 'center'
 	},
 	title: {
 		color: colors.bg_text_sec,

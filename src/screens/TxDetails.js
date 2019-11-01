@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -103,50 +103,51 @@ export class TxDetailsView extends React.PureComponent {
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
 
 		return (
-			<ScrollView
-				contentContainerStyle={styles.bodyContent}
-				style={styles.body}
-			>
+			<ScrollView style={styles.body}>
 				<Background />
 				<Text style={styles.topTitle}>SIGN TRANSACTION</Text>
-				<Text style={styles.title}>FROM ACCOUNT</Text>
+				<View style={styles.bodyContent}>
+					<Text style={styles.title}>FROM ACCOUNT</Text>
+				</View>
 				<AccountCard
 					title={sender.name}
 					address={sender.address}
 					networkKey={sender.networkKey}
 				/>
-				<Text style={styles.title}>TRANSACTION DETAILS</Text>
+				<View style={styles.bodyContent}>
+					<Text style={styles.title}>TRANSACTION DETAILS</Text>
 
-				{isEthereum ? (
-					<React.Fragment>
-						<TxDetailsCard
+					{isEthereum ? (
+						<React.Fragment>
+							<TxDetailsCard
+								style={{ marginBottom: 20 }}
+								description="You are about to send the following amount"
+								value={value}
+								gas={gas}
+								gasPrice={gasPrice}
+							/>
+							<Text style={styles.title}>RECIPIENT</Text>
+							<AccountCard
+								title={recipient.name}
+								address={recipient.address}
+								networkKey={recipient.networkKey || ''}
+							/>
+						</React.Fragment>
+					) : (
+						<PayloadDetailsCard
 							style={{ marginBottom: 20 }}
-							description="You are about to send the following amount"
-							value={value}
-							gas={gas}
-							gasPrice={gasPrice}
+							description="You are about to confirm sending the following extrinsic"
+							payload={dataToSign}
+							prefix={prefix}
 						/>
-						<Text style={styles.title}>RECIPIENT</Text>
-						<AccountCard
-							title={recipient.name}
-							address={recipient.address}
-							networkKey={recipient.networkKey || ''}
-						/>
-					</React.Fragment>
-				) : (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						description="You are about to confirm sending the following extrinsic"
-						payload={dataToSign}
-						prefix={prefix}
-					/>
-				)}
+					)}
 
-				<Button
-					buttonStyles={{ height: 60 }}
-					title="Sign Transaction"
-					onPress={() => onNext()}
-				/>
+					<Button
+						buttonStyles={{ height: 60 }}
+						title="Sign Transaction"
+						onPress={() => onNext()}
+					/>
+				</View>
 			</ScrollView>
 		);
 	}
@@ -164,14 +165,14 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden',
-		padding: 20
+		paddingBottom: 40,
+		paddingTop: 24
 	},
 	bodyContent: {
-		paddingBottom: 40
+		padding: 16
 	},
 	changePinText: {
 		color: 'green',

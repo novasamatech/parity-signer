@@ -30,6 +30,7 @@ import { Subscribe } from 'unstated';
 
 import colors from '../colors';
 import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -90,96 +91,94 @@ function LegacyAccountBackupView(props) {
 		(NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol) || '';
 
 	return (
-		<ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+		<ScrollView style={styles.body}>
 			<Background />
 			<Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
 			<AccountCard address={address} networkKey={networkKey} title={name} />
-			<View>
-				<Text style={styles.titleTop}>RECOVERY PHRASE</Text>
-				<Text style={styles.hintText}>
-					Write these words down on paper. Keep the backup paper safe. These
-					words allow anyone to recover this account and access its funds.
-				</Text>
-			</View>
-			<TouchableItem
-				onPress={() => {
-					// only allow the copy of the recovery phrase in dev environment
-					if (__DEV__) {
-						Alert.alert(
-							'Write this recovery phrase on paper',
-							`It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
-                `,
-							[
-								{
-									onPress: () => {
-										if (protocol === NetworkProtocols.SUBSTRATE) {
-											Clipboard.setString(`${seedPhrase}${derivationPath}`);
-										} else {
-											Clipboard.setString(seed);
-										}
-									},
-									style: 'default',
-									text: 'Copy anyway'
-								},
-								{
-									style: 'cancel',
-									text: 'Cancel'
-								}
-							]
-						);
-					}
-				}}
-			>
-				<Text style={styles.seedText}>{seedPhrase || seed}</Text>
-			</TouchableItem>
-			{!!derivationPath && (
-				<Text style={styles.derivationText}>{derivationPath}</Text>
-			)}
-			{!!derivationPassword && (
-				<DerivationPasswordVerify password={derivationPassword} />
-			)}
-			{isNew && (
-				<Button
-					buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
-					title="Backup Done"
+			<View style={styles.bodyContent}>
+				<View>
+					<Text style={styles.titleTop}>RECOVERY PHRASE</Text>
+					<Text style={styles.hintText}>
+						Write these words down on paper. Keep the backup paper safe. These
+						words allow anyone to recover this account and access its funds.
+					</Text>
+				</View>
+				<TouchableItem
 					onPress={() => {
-						Alert.alert(
-							'Important',
-							"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",
-							[
-								{
-									onPress: () => {
-										navigate('AccountPin', { isNew });
+						// only allow the copy of the recovery phrase in dev environment
+						if (__DEV__) {
+							Alert.alert(
+								'Write this recovery phrase on paper',
+								`It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
+                `,
+								[
+									{
+										onPress: () => {
+											if (protocol === NetworkProtocols.SUBSTRATE) {
+												Clipboard.setString(`${seedPhrase}${derivationPath}`);
+											} else {
+												Clipboard.setString(seed);
+											}
+										},
+										style: 'default',
+										text: 'Copy anyway'
 									},
-									text: 'Proceed'
-								},
-								{
-									style: 'cancel',
-									text: 'Cancel'
-								}
-							]
-						);
+									{
+										style: 'cancel',
+										text: 'Cancel'
+									}
+								]
+							);
+						}
 					}}
-				/>
-			)}
+				>
+					<Text style={fontStyles.t_seed}>{seedPhrase || seed}</Text>
+				</TouchableItem>
+				{!!derivationPath && (
+					<Text style={styles.derivationText}>{derivationPath}</Text>
+				)}
+				{!!derivationPassword && (
+					<DerivationPasswordVerify password={derivationPassword} />
+				)}
+				{isNew && (
+					<Button
+						buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
+						title="Backup Done"
+						onPress={() => {
+							Alert.alert(
+								'Important',
+								"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",
+								[
+									{
+										onPress: () => {
+											navigate('AccountPin', { isNew });
+										},
+										text: 'Proceed'
+									},
+									{
+										style: 'cancel',
+										text: 'Cancel'
+									}
+								]
+							);
+						}}
+					/>
+				)}
+			</View>
 		</ScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		padding: 20
-	},
-	bodyContainer: {
-		flex: 1,
-		flexDirection: 'column',
-		justifyContent: 'space-between'
+		paddingBottom: 40,
+		paddingTop: 24
 	},
 	bodyContent: {
-		paddingBottom: 40
+		padding: 16
 	},
 	bottom: {
 		flexBasis: 50,
@@ -206,14 +205,6 @@ const styles = StyleSheet.create({
 	},
 	nextStep: {
 		marginTop: 20
-	},
-	seedText: {
-		backgroundColor: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 20,
-		lineHeight: 26,
-		minHeight: 160,
-		padding: 10
 	},
 	title: {
 		color: colors.bg_text_sec,

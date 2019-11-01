@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
@@ -45,29 +45,28 @@ export default class AccountEdit extends React.PureComponent {
 					}
 
 					return (
-						<ScrollView
-							style={styles.body}
-							contentContainerStyle={styles.bodyContainer}
-						>
+						<ScrollView style={styles.body}>
 							<Text style={styles.titleTop}>EDIT ACCOUNT</Text>
 							<AccountCard
 								title={selected.name}
 								address={selected.address}
 								networkKey={selected.networkKey}
 							/>
-							<Text style={styles.title}>ACCOUNT NAME</Text>
-							<TextInput
-								style={{ marginBottom: 40 }}
-								onChangeText={async name => {
-									accounts.updateSelectedAccount({ name });
-									await accounts.save(
-										accounts.getSelectedKey(),
-										accounts.getSelected()
-									);
-								}}
-								value={selected.name}
-								placeholder="New name"
-							/>
+							<View style={styles.bodyContent}>
+								<Text style={styles.title}>ACCOUNT NAME</Text>
+								<TextInput
+									style={{ marginBottom: 40 }}
+									onChangeText={async name => {
+										accounts.updateSelectedAccount({ name });
+										await accounts.save(
+											accounts.getSelectedKey(),
+											accounts.getSelected()
+										);
+									}}
+									value={selected.name}
+									placeholder="New name"
+								/>
+							</View>
 						</ScrollView>
 					);
 				}}
@@ -78,14 +77,14 @@ export default class AccountEdit extends React.PureComponent {
 
 const styles = StyleSheet.create({
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
+		paddingBottom: 40,
+		paddingTop: 24
 	},
-	bodyContainer: {
-		flex: 1,
-		padding: 20
+	bodyContent: {
+		padding: 16
 	},
 	bottom: {
 		flexBasis: 50,

@@ -157,8 +157,7 @@ const styles = StyleSheet.create({
 	header: {
 		alignItems: 'center',
 		flexDirection: 'row',
-		justifyContent: 'center',
-		paddingBottom: 20
+		justifyContent: 'center'
 	},
 	link: {
 		textDecorationLine: 'underline'

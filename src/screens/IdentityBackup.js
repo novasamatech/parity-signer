@@ -29,6 +29,7 @@ import {
 import TouchableItem from '../components/TouchableItem';
 import colors from '../colors';
 import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import Button from '../components/Button';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { setPin } from '../util/navigationHelpers';
@@ -109,7 +110,7 @@ function IdentityBackupView({ navigation, accounts }) {
 					}
 				}}
 			>
-				<Text style={styles.seedPhraseText}>{seedPhrase}</Text>
+				<Text style={fontStyles.t_seed}>{seedPhrase}</Text>
 			</TouchableItem>
 			<Button
 				title="Next"
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flex: 1,
 		flexDirection: 'column',
-		padding: 20
+		padding: 16
 	},
 	hintText: {
 		color: colors.bg_text_sec,
@@ -136,14 +137,6 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		paddingBottom: 20,
 		textAlign: 'center'
-	},
-	seedPhraseText: {
-		backgroundColor: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 20,
-		lineHeight: 26,
-		minHeight: 160,
-		padding: 10
 	},
 	title: {
 		color: colors.bg_text_sec,
