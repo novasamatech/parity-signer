@@ -77,7 +77,10 @@ class AccountNetworkChooserView extends React.PureComponent {
 										seed,
 										prefix
 									);
-									if (derivationSucceed) resetToPathsList(navigation);
+									if (derivationSucceed)
+										resetToPathsList(navigation, networkKey);
+								} else {
+									navigation.navigate('PathsList', { networkKey });
 								}
 							}}
 							title={networkParams.title}

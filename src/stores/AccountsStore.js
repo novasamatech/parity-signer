@@ -36,7 +36,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	state = {
 		accounts: new Map(),
 		currentIdentity: null,
-		currentPath: '',
+		currentPath: '', //TODO to be removed
 		identities: [],
 		newAccount: emptyAccount(),
 		newIdentity: emptyIdentity(),
@@ -276,16 +276,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async updateCurrentToIdentities() {
-		const identityIndex = this.state.identities.findIndex(identity => {
+		const newIdentities = Array.from(this.state.identities);
+		const identityIndex = newIdentities.findIndex(identity => {
 			identity.encryptedSeed = this.state.currentIdentity.encryptedSeed;
 		});
-		const updatedIdentities = this.state.identities.splice(
-			identityIndex,
-			1,
-			this.state.currentIdentity
-		);
-		this.setState({ identities: updatedIdentities });
-		await saveIdentities(updatedIdentities);
+		newIdentities.splice(identityIndex, 1, this.state.currentIdentity);
+		this.setState({ identities: newIdentities });
+		await saveIdentities(newIdentities);
 	}
 
 	async deriveNewPath(newPath, seed, prefix) {

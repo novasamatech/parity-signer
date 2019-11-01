@@ -10,7 +10,7 @@ export const unlockSeed = async navigation =>
 		navigation.navigate('IdentityPin', { isUnlock: true, resolve });
 	});
 
-export const resetToPathsList = navigation => {
+export const resetToPathsList = (navigation, networkKey) => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
@@ -18,7 +18,7 @@ export const resetToPathsList = navigation => {
 				routeName: 'AccountNetworkChooser'
 			}),
 			NavigationActions.navigate({
-				params: { isNew: true },
+				params: { networkKey },
 				routeName: 'PathsList'
 			})
 		],

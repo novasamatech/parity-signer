@@ -24,10 +24,10 @@ import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
 import Button from './Button';
 import { resetToPathsList } from '../util/navigationHelpers';
+import { defaultNetworkKey } from '../util/identitiesUtils';
 
 function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
-	console.log('identities are', accounts.state.identities);
 
 	return (
 		<View>
@@ -98,7 +98,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 											await accounts.selectIdentity(identity);
 											setVisible(false);
 											// const seed = await unlockSeed(navigation);
-											resetToPathsList(navigation);
+											resetToPathsList(navigation, defaultNetworkKey);
 										}}
 									/>
 								);

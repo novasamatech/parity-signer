@@ -16,6 +16,10 @@
 
 // import { NetworkProtocols } from '../constants';
 
+import { NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+
+export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
+
 export function emptyIdentity() {
 	return {
 		addresses: new Map(),
@@ -55,6 +59,9 @@ export const deserializeIdentities = identitiesJSON => {
 		}, {});
 	return identitiesWithObject.map(changeObjectToMap);
 };
+
+export const getPathsWithNetwork = (paths, networkKey) =>
+	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
 
 // export function omit(object, omitKeys) {
 // 	const result = Object.assign({}, object);
