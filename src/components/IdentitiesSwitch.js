@@ -24,11 +24,62 @@ import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
 import Button from './Button';
 import { resetToPathsList } from '../util/navigationHelpers';
-import { defaultNetworkKey } from '../util/identitiesUtils';
+import { defaultNetworkKey, getIdentityName } from '../util/identitiesUtils';
 
 function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
 	console.log('identities are', accounts.state.identities);
+	const { currentIdentity, identities } = accounts.state;
+
+	const renderCurrentIdentityCard = () => {
+		if (!currentIdentity) return;
+		const currentIdentityTitle = getIdentityName(currentIdentity, identities);
+
+		return (
+			<>
+				<ButtonIcon
+					title={currentIdentityTitle}
+					onPress={async () => {
+						setVisible(false);
+						await accounts.selectIdentity(currentIdentity);
+						navigation.navigate('AccountNetworkChooser');
+					}}
+					iconName="md-finger-print"
+					iconType="ionicon"
+					iconSize={40}
+					style={{ paddingLeft: 8 * 2 }}
+					textStyle={fontStyles.h1}
+				/>
+				<ButtonIcon
+					title="Manage Identity"
+					onPress={() => {
+						setVisible(false);
+						//go to current IdentityManage
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+				<ButtonIcon
+					title="Backup Identity"
+					onPress={() => {
+						setVisible(false);
+						//go to current IdentityBackup
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+				<Separator />
+			</>
+		);
+	};
 
 	return (
 		<View>
@@ -50,61 +101,27 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						/>
 					</View>
 					<View style={styles.card}>
-						<ButtonIcon
-							title="Current Identity Title"
-							onPress={() => {
-								setVisible(false);
-								//go to current Identity
-							}}
-							iconName="md-finger-print"
-							iconType="ionicon"
-							iconSize={40}
-							style={{ paddingLeft: 8 * 2 }}
-							textStyle={fontStyles.h1}
-						/>
-						<ButtonIcon
-							title="Manage Identity"
-							onPress={() => {
-								setVisible(false);
-								//go to current IdentityManage
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
-						<ButtonIcon
-							title="Backup Identity"
-							onPress={() => {
-								setVisible(false);
-								//go to current IdentityBackup
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
-						<Separator />
-						{accounts.state.identities &&
-							accounts.state.identities.map((identity, index) => {
-								const title = identity.name || `identity_${index.toString()}`;
-								return (
-									<Button
-										title={title}
-										key={identity.encryptedSeed}
-										onPress={async () => {
-											await accounts.selectIdentity(identity);
-											setVisible(false);
-											// const seed = await unlockSeed(navigation);
-											resetToPathsList(navigation, defaultNetworkKey);
-										}}
-									/>
-								);
-							})}
+						{renderCurrentIdentityCard()}
+						{identities.map((identity, index) => {
+							if (
+								currentIdentity &&
+								identity.encryptedSeed === currentIdentity.encryptedSeed
+							)
+								return null;
+							const title = identity.name || `identity_${index.toString()}`;
+							return (
+								<Button
+									title={title}
+									key={identity.encryptedSeed}
+									onPress={async () => {
+										await accounts.selectIdentity(identity);
+										setVisible(false);
+										// const seed = await unlockSeed(navigation);
+										resetToPathsList(navigation, defaultNetworkKey);
+									}}
+								/>
+							);
+						})}
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {

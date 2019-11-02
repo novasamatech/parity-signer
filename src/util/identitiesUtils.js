@@ -30,35 +30,42 @@ export function emptyIdentity() {
 	};
 }
 
+export const serializeIdentity = identity =>
+	Object.entries(identity).reduce((newIdentity, entry) => {
+		let [key, value] = entry;
+		if (value instanceof Map) {
+			newIdentity[key] = Array.from(value.entries());
+		} else {
+			newIdentity[key] = value;
+		}
+		return newIdentity;
+	}, {});
+
+export const deserializeIdentity = identityJSON =>
+	Object.entries(identityJSON).reduce((newIdentity, entry) => {
+		let [key, value] = entry;
+		if (value instanceof Array) {
+			newIdentity[key] = new Map(value);
+		} else {
+			newIdentity[key] = value;
+		}
+		return newIdentity;
+	}, {});
+
 export const serializeIdentities = identities => {
-	const changeMapToObject = identity =>
-		Object.entries(identity).reduce((newIdentity, entry) => {
-			let [key, value] = entry;
-			if (value instanceof Map) {
-				newIdentity[key] = Array.from(value.entries());
-			} else {
-				newIdentity[key] = value;
-			}
-			return newIdentity;
-		}, {});
-	const identitiesWithObject = identities.map(changeMapToObject);
-	return JSON.stringify({ identities: identitiesWithObject });
+	const identitiesWithObject = identities.map(serializeIdentity);
+	return JSON.stringify(identitiesWithObject);
 };
 
 export const deserializeIdentities = identitiesJSON => {
-	const identitiesWithObject = JSON.parse(identitiesJSON).identities;
-	const changeObjectToMap = identity =>
-		Object.entries(identity).reduce((newIdentity, entry) => {
-			let [key, value] = entry;
-			if (value instanceof Array) {
-				newIdentity[key] = new Map(value);
-			} else {
-				newIdentity[key] = value;
-			}
-			return newIdentity;
-		}, {});
-	return identitiesWithObject.map(changeObjectToMap);
+	const identitiesWithObject = JSON.parse(identitiesJSON);
+	return identitiesWithObject.map(deserializeIdentity);
 };
+
+export const deepCopyIdentities = identities =>
+	deserializeIdentities(serializeIdentities(identities));
+export const deepCopyIdentity = identity =>
+	deserializeIdentity(serializeIdentity(identity));
 
 export const getPathsWithNetwork = (paths, networkKey) =>
 	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
@@ -76,6 +83,14 @@ export const validatePath = path =>
 
 export const validateDerivedPath = derivedPath =>
 	/^(\/\/?([\w-_])+)+$/.test(derivedPath);
+
+export const getIdentityName = (identity, identities) => {
+	if (identity.name) return identity.name;
+	const identityIndex = identities.findIndex(
+		i => i.encryptedSeed === identity.encryptedSeed
+	);
+	return `Identity_${identityIndex}`;
+};
 
 // export function omit(object, omitKeys) {
 // 	const result = Object.assign({}, object);

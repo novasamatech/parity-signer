@@ -29,7 +29,7 @@ import { blockiesIcon } from '../util/native';
 export default function AccountIcon(props) {
 	AccountIcon.propTypes = {
 		address: PropTypes.string.isRequired,
-		network: PropTypes.string,
+		network: PropTypes.object,
 		protocol: PropTypes.string.isRequired
 	};
 

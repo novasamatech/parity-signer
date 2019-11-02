@@ -30,7 +30,11 @@ import { parseSURI } from '../util/suri';
 import { decryptData, encryptData, substrateAddress } from '../util/native';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import type { AccountsStoreState } from './types';
-import { emptyIdentity } from '../util/identitiesUtils';
+import {
+	deepCopyIdentities,
+	deepCopyIdentity,
+	emptyIdentity
+} from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
 	state = {
@@ -255,10 +259,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async saveNewIdentity(seedPhrase, pin) {
-		this.state.newIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
-		const newIdentities = this.state.identities.concat(this.state.newIdentity);
+		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
+		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
+		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
-			currentIdentity: this.state.newIdentity,
+			currentIdentity: updatedIdentity,
 			identities: newIdentities,
 			newIdentity: emptyIdentity()
 		});
@@ -276,20 +281,18 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async updateCurrentToIdentities() {
-		const newIdentities = Array.from(this.state.identities);
-		const identityIndex = newIdentities.findIndex(identity => {
-			identity.encryptedSeed = this.state.currentIdentity.encryptedSeed;
-		});
+		const newIdentities = deepCopyIdentities(this.state.identities);
+		const identityIndex = newIdentities.findIndex(
+			identity =>
+				identity.encryptedSeed === this.state.currentIdentity.encryptedSeed
+		);
 		newIdentities.splice(identityIndex, 1, this.state.currentIdentity);
 		this.setState({ identities: newIdentities });
 		await saveIdentities(newIdentities);
 	}
 
 	async deriveNewPath(newPath, seed, prefix) {
-		const updatedCurrentIdentity = Object.assign(
-			{},
-			this.state.currentIdentity
-		);
+		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const pathAddress = substrateAddress(seed, prefix);
 		if (updatedCurrentIdentity.meta.has(newPath)) return false;
 		updatedCurrentIdentity.meta.set(newPath, {

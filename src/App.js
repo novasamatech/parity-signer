@@ -50,6 +50,7 @@ import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
 import IdentityBackup from './screens/IdentityBackup';
+import IdentityManagement from './screens/IdentityManagement';
 import IdentityNew from './screens/IdentityNew';
 import IdentityPin from './screens/IdentityPin';
 import MessageDetails from './screens/MessageDetails';
@@ -208,6 +209,9 @@ const Screens = createStackNavigator(
 					},
 					IdentityBackup: {
 						screen: IdentityBackup
+					},
+					IdentityManagement: {
+						screen: IdentityManagement
 					},
 					IdentityNew: {
 						screen: IdentityNew

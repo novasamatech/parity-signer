@@ -65,7 +65,7 @@ export async function loadIdentities(version = 3) {
 			identityStorageLabel,
 			identitiesStore
 		);
-		if (identities === undefined) return handleError('database not set');
+		if (identities === undefined) return [];
 		return deserializeIdentities(identities);
 	} catch (e) {
 		handleError(e);
