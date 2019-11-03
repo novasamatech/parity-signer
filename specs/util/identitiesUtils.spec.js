@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	deserializeIdentities, getPathName, groupPaths,
+	deserializeIdentities, getNetworkKeyByPath, getPathName, groupPaths,
 	serializeIdentities
 } from '../../src/util/identitiesUtils';
 
@@ -84,5 +84,9 @@ describe('IdentitiesUtils', () => {
 		expect(gotIdentity1PathName).toEqual('funding account1');
 		const gotStacking1PathName = getPathName(paths[3], testIdentities[0]);
 		expect(gotStacking1PathName).toEqual('stacking1');
-	})
+	});
+
+	it('get the networkKey by the path', ()=> {
+		const networkKey = getNetworkKeyByPath('paths[0]')
+	});
 });

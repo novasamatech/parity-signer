@@ -27,7 +27,7 @@ import {
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
 } from '../constants';
-import { resetToPathsList, unlockSeed } from '../util/navigationHelpers';
+import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
 
@@ -60,7 +60,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 									prefix
 								);
 								if (derivationSucceed) {
-									resetToPathsList(navigation, networkKey);
+									navigateToPathsList(navigation, networkKey);
 								} else {
 									alertPathDerivationError();
 								}

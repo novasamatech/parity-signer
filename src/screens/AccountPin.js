@@ -27,6 +27,7 @@ import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import { navigateToLegacyAccountList } from '../util/navigationHelpers';
 
 export default class AccountPin extends React.PureComponent {
 	render() {
@@ -65,12 +66,7 @@ class AccountPinView extends React.PureComponent {
 		) {
 			if (accountCreation) {
 				await accounts.submitNew(pin);
-				const resetAction = StackActions.reset({
-					actions: [NavigationActions.navigate({ routeName: 'AccountList' })],
-					index: 0, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-					key: undefined
-				});
-				this.props.navigation.dispatch(resetAction);
+				navigateToLegacyAccountList(this.props.navigation);
 			} else {
 				await accounts.save(accounts.getSelectedKey(), account, pin);
 				const resetAction = StackActions.reset({

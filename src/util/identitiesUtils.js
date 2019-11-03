@@ -16,7 +16,11 @@
 
 // import { NetworkProtocols } from '../constants';
 
-import { NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import {
+	NETWORK_LIST,
+	SubstrateNetworkKeys,
+	UnknownNetworkKeys
+} from '../constants';
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
 
@@ -70,13 +74,13 @@ export const deepCopyIdentity = identity =>
 export const getPathsWithNetwork = (paths, networkKey) =>
 	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
 
-// export const getNetworkKeyByPath = path => {
-// 	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
-// 		networkParams => networkParams.pathId === path.split('//'[1])
-// 	);
-// 	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
-// 	return UnknownNetworkKeys.UNKNOWN;
-// };
+export const getNetworkKeyByPath = path => {
+	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
+		networkParams => networkParams.pathId === path.split('//')[1]
+	);
+	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
+	return UnknownNetworkKeys.UNKNOWN;
+};
 
 export const validatePath = path =>
 	/^\/\/([\w-_])+(\/\/?([\w-_])+)+$/.test(path);

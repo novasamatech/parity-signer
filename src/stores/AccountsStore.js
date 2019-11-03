@@ -40,7 +40,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	state = {
 		accounts: new Map(),
 		currentIdentity: null,
-		currentPath: '', //TODO to be removed
 		identities: [],
 		newAccount: emptyAccount(),
 		newIdentity: emptyIdentity(),
@@ -321,8 +320,24 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.addresses.set(pathAddress, newPath);
 		try {
 			await this.setState({
-				currentIdentity: updatedCurrentIdentity,
-				currentPath: newPath
+				currentIdentity: updatedCurrentIdentity
+			});
+			await this.updateCurrentToIdentities();
+		} catch (e) {
+			console.warn('derive new Path error', e);
+			return false;
+		}
+		return true;
+	}
+
+	async deletePath(path) {
+		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
+		const { address } = updatedCurrentIdentity.meta.get(path);
+		updatedCurrentIdentity.meta.delete(path);
+		updatedCurrentIdentity.addresses.delete(address);
+		try {
+			await this.setState({
+				currentIdentity: updatedCurrentIdentity
 			});
 			await this.updateCurrentToIdentities();
 		} catch (e) {

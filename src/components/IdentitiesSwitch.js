@@ -23,7 +23,7 @@ import { Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
 import Button from './Button';
-import { resetToPathsList } from '../util/navigationHelpers';
+import { navigateToPathsList } from '../util/navigationHelpers';
 import { defaultNetworkKey, getIdentityName } from '../util/identitiesUtils';
 
 function IdentitiesSwitch({ navigation, accounts }) {
@@ -88,7 +88,12 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				iconName="md-finger-print"
 				iconType="ionicon"
 			/>
-			<Modal animationType="fade" visible={visible} transparent={true}>
+			<Modal
+				animationType="fade"
+				visible={visible}
+				transparent={true}
+				onRequestClose={() => setVisible(false)}
+			>
 				<View style={styles.container}>
 					<View style={styles.headerStyle}>
 						<ButtonIcon
@@ -116,7 +121,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 									onPress={async () => {
 										await accounts.selectIdentity(identity);
 										setVisible(false);
-										resetToPathsList(navigation, defaultNetworkKey);
+										navigateToPathsList(navigation, defaultNetworkKey);
 									}}
 								/>
 							);

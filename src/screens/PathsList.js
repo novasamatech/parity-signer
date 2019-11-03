@@ -19,31 +19,29 @@ import { ScrollView, Text, View } from 'react-native';
 import { UnknownNetworkKeys } from '../constants';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
-import {
-	getPathName,
-	getPathsWithNetwork,
-	groupPaths
-} from '../util/identitiesUtils';
+import { getPathsWithNetwork, groupPaths } from '../util/identitiesUtils';
 import Button from '../components/Button';
+import PathCard from '../components/PathCard';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
 		'networkKey',
 		UnknownNetworkKeys.UNKNOWN
 	);
-	const paths = Array.from(accounts.state.currentIdentity.meta.keys());
+	const { currentIdentity } = accounts.state;
+	const paths = Array.from(currentIdentity.meta.keys());
 	const listedPaths = getPathsWithNetwork(paths, networkKey);
 	const pathsGroups = groupPaths(listedPaths);
 	const { navigate } = navigation;
 
 	const renderSinglePath = pathsGroup => {
 		const path = pathsGroup.paths[0];
-		const pathName = getPathName(path, accounts.state.currentIdentity);
 		return (
-			<>
-				<Text>{pathName}</Text>
-				<Button title={path} onPress={navigate('PathDetails', { path })} />
-			</>
+			<PathCard
+				identity={currentIdentity}
+				path={path}
+				onPress={() => navigate('PathDetails', { path })}
+			/>
 		);
 	};
 
@@ -51,10 +49,11 @@ function PathsList({ accounts, navigation }) {
 		<View>
 			<Text>{pathsGroup.title}</Text>
 			{pathsGroup.paths.map(path => (
-				<>
-					<Text>{getPathName(path, accounts.state.currentIdentity)}</Text>
-					<Button title={path} onPress={navigate('PathDetails', { path })} />
-				</>
+				<PathCard
+					identity={currentIdentity}
+					path={path}
+					onPress={() => navigate('PathDetails', { path })}
+				/>
 			))}
 		</View>
 	);

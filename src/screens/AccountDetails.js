@@ -17,10 +17,8 @@
 'use strict';
 
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { NavigationActions, StackActions } from 'react-navigation';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-
 import colors from '../colors';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
@@ -29,6 +27,8 @@ import AccountsStore from '../stores/AccountsStore';
 import TxStore from '../stores/TxStore';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { alertDeleteAccount } from '../util/alertUtils';
+import { navigateToLegacyAccountList } from '../util/navigationHelpers';
 
 export default class AccountDetails extends React.Component {
 	render() {
@@ -57,33 +57,12 @@ class AccountDetailsView extends React.Component {
 		const selected = accounts.getSelected();
 		const selectedKey = accounts.getSelectedKey();
 
-		Alert.alert(
-			'Delete Account',
-			`Do you really want to delete ${selected.name ||
-				selected.address ||
-				'this account'}?
-This account can only be recovered with its associated recovery phrase.`,
-			[
-				{
-					onPress: () => {
-						accounts.deleteAccount(selectedKey);
-						const resetAction = StackActions.reset({
-							actions: [
-								NavigationActions.navigate({ routeName: 'AccountList' })
-							],
-							index: 0, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-							key: undefined
-						});
-						this.props.navigation.dispatch(resetAction);
-					},
-					style: 'destructive',
-					text: 'Delete'
-				},
-				{
-					style: 'cancel',
-					text: 'Cancel'
-				}
-			]
+		alertDeleteAccount(
+			selected.name || selected.address || 'this account',
+			async () => {
+				await accounts.deleteAccount(selectedKey);
+				navigateToLegacyAccountList(this.props.navigation);
+			}
 		);
 	};
 

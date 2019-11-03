@@ -15,3 +15,24 @@ export const alertPathDerivationError = () =>
 			text: 'Try again'
 		}
 	]);
+
+export const alertDeleteAccount = (accountName, onDelete) => {
+	Alert.alert(
+		'Delete',
+		`Do you really want to delete ${accountName}?
+This account can only be recovered with its associated recovery phrase.`,
+		[
+			{
+				onPress: () => {
+					onDelete();
+				},
+				style: 'destructive',
+				text: 'Delete'
+			},
+			{
+				style: 'cancel',
+				text: 'Cancel'
+			}
+		]
+	);
+};
