@@ -19,7 +19,11 @@ import { ScrollView, Text, View } from 'react-native';
 import { UnknownNetworkKeys } from '../constants';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
-import { getPathsWithNetwork, groupPaths } from '../util/identitiesUtils';
+import {
+	getPathName,
+	getPathsWithNetwork,
+	groupPaths
+} from '../util/identitiesUtils';
 import Button from '../components/Button';
 
 function PathsList({ accounts, navigation }) {
@@ -34,14 +38,23 @@ function PathsList({ accounts, navigation }) {
 
 	const renderSinglePath = pathsGroup => {
 		const path = pathsGroup.paths[0];
-		return <Button title={path} onPress={navigate('PathDetails', { path })} />;
+		const pathName = getPathName(path, accounts.state.currentIdentity);
+		return (
+			<>
+				<Text>{pathName}</Text>
+				<Button title={path} onPress={navigate('PathDetails', { path })} />
+			</>
+		);
 	};
 
 	const renderGroupPaths = pathsGroup => (
 		<View>
 			<Text>{pathsGroup.title}</Text>
 			{pathsGroup.paths.map(path => (
-				<Button title={path} onPress={navigate('PathDetails', { path })} />
+				<>
+					<Text>{getPathName(path, accounts.state.currentIdentity)}</Text>
+					<Button title={path} onPress={navigate('PathDetails', { path })} />
+				</>
 			))}
 		</View>
 	);

@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	deserializeIdentities, groupPaths,
+	deserializeIdentities, getPathName, groupPaths,
 	serializeIdentities
 } from '../../src/util/identitiesUtils';
 
@@ -24,7 +24,7 @@ const address1 = 'address1',
 	paths = ['//kusama//default',
 	'//kusama//funding/1',
 	'//kusama//funding/2',
-	'//kusama//stacking'],
+	'//kusama//stacking/1'],
 	pathMeta1 = {
 		address: address1,
 		createdAt: 1571068850409,
@@ -75,5 +75,14 @@ describe('IdentitiesUtils', () => {
 			title: 'funding',
 			paths: [paths[1], paths[2]]
 		}])
+	});
+
+	it('get the path name', ()=> {
+		const gotDefaultPathName = getPathName(paths[0],testIdentities[0]);
+		expect(gotDefaultPathName).toEqual('default');
+		const gotIdentity1PathName = getPathName(paths[1], testIdentities[0]);
+		expect(gotIdentity1PathName).toEqual('funding account1');
+		const gotStacking1PathName = getPathName(paths[3], testIdentities[0]);
+		expect(gotStacking1PathName).toEqual('stacking1');
 	})
 });

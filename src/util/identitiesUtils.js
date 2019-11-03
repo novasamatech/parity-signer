@@ -92,6 +92,19 @@ export const getIdentityName = (identity, identities) => {
 	return `Identity_${identityIndex}`;
 };
 
+export const getPathName = (path, lookUpIdentity) => {
+	if (
+		lookUpIdentity &&
+		lookUpIdentity.meta.has(path) &&
+		lookUpIdentity.meta.get(path).name !== ''
+	) {
+		return lookUpIdentity.meta.get(path).name;
+	}
+	const networkName = path.split('//')[1];
+	const restPath = path.slice(4 + networkName.length).split('///')[0];
+	return restPath.replace(/\//g, '');
+};
+
 export const groupPaths = paths => {
 	const unSortedPaths = paths.reduce((groupedPath, path) => {
 		const subPath = path.split('//')[2] || '';
