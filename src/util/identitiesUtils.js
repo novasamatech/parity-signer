@@ -92,6 +92,21 @@ export const getIdentityName = (identity, identities) => {
 	return `Identity_${identityIndex}`;
 };
 
+export const groupPaths = paths => {
+	const unSortedPaths = paths.reduce((groupedPath, path) => {
+		const subPath = path.split('//')[2] || '';
+		const hardSubPath = subPath.split('/')[0] || '';
+		const existedItem = groupedPath.find(p => p.title === hardSubPath);
+		if (existedItem) {
+			existedItem.paths.push(path);
+		} else {
+			groupedPath.push({ paths: [path], title: hardSubPath });
+		}
+		return groupedPath;
+	}, []);
+	return unSortedPaths.sort((a, b) => a.paths.length - b.paths.length);
+};
+
 // export function omit(object, omitKeys) {
 // 	const result = Object.assign({}, object);
 // 	for (const omitKey of omitKeys) {

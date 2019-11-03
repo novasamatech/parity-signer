@@ -35,7 +35,8 @@ function PathDerivation({ accounts, navigation }) {
 	const [derivationPath, setDerivationPath] = useState('');
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
-	const completePath = `//${NETWORK_LIST[networkKey].pathId}${derivationPath}`;
+	const existedNetworkPath = `//${NETWORK_LIST[networkKey].pathId}`;
+	const completePath = `${existedNetworkPath}${derivationPath}`;
 
 	return (
 		<View style={styles.container}>
@@ -47,6 +48,7 @@ function PathDerivation({ accounts, navigation }) {
 				onChangeText={keyParisName => setKeyPairsName(keyParisName.trim())}
 			/>
 			<Text>Path</Text>
+			<Text>{existedNetworkPath}</Text>
 			<TextInput value={derivationPath} onChangeText={setDerivationPath} />
 			{networkKey !== '' && (
 				<AccountCard

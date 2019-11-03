@@ -15,14 +15,16 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	deserializeIdentities,
+	deserializeIdentities, groupPaths,
 	serializeIdentities
 } from '../../src/util/identitiesUtils';
 
 const address1 = 'address1',
 	address2 = 'address2',
-	path1 = '//kusama//funding/1',
-	path2 = '//kusama//funding/2',
+	paths = ['//kusama//default',
+	'//kusama//funding/1',
+	'//kusama//funding/2',
+	'//kusama//stacking'],
 	pathMeta1 = {
 		address: address1,
 		createdAt: 1571068850409,
@@ -35,8 +37,8 @@ const address1 = 'address1',
 		name: 'funding account2',
 		updatedAt: 1571078850509
 	};
-const addressMap = new Map([[address1, path1], [address2, path2]]);
-const metaMap = new Map([[path1, pathMeta1], [path2, pathMeta2]]);
+const addressMap = new Map([[address1, paths[1]], [address2, paths[2]]]);
+const metaMap = new Map([[paths[1], pathMeta1], [paths[2], pathMeta2]]);
 const testIdentities = [
 	{
 		addresses: addressMap,
@@ -60,4 +62,18 @@ describe('IdentitiesUtils', () => {
 		const originItem = deserializeIdentities(serializedJson);
 		expect(originItem).toEqual(testIdentities);
 	});
+
+	it('regroup the paths', () => {
+		const groupResult = groupPaths(paths);
+		expect(groupResult).toEqual([{
+			title: 'default',
+			paths: [paths[0]],
+		}, {
+			title: 'stacking',
+			paths: [paths[3]]
+		}, {
+			title: 'funding',
+			paths: [paths[1], paths[2]]
+		}])
+	})
 });

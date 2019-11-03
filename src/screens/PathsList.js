@@ -15,11 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { UnknownNetworkKeys } from '../constants';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
-import { getPathsWithNetwork } from '../util/identitiesUtils';
+import { getPathsWithNetwork, groupPaths } from '../util/identitiesUtils';
 import Button from '../components/Button';
 
 function PathsList({ accounts, navigation }) {
@@ -28,12 +28,31 @@ function PathsList({ accounts, navigation }) {
 		UnknownNetworkKeys.UNKNOWN
 	);
 	const paths = Array.from(accounts.state.currentIdentity.meta.keys());
-	const listedPath = getPathsWithNetwork(paths, networkKey);
+	const listedPaths = getPathsWithNetwork(paths, networkKey);
+	const pathsGroups = groupPaths(listedPaths);
+	const { navigate } = navigation;
+
+	const renderSinglePath = pathsGroup => {
+		const path = pathsGroup.paths[0];
+		return <Button title={path} onPress={navigate('PathDetails', { path })} />;
+	};
+
+	const renderGroupPaths = pathsGroup => (
+		<View>
+			<Text>{pathsGroup.title}</Text>
+			{pathsGroup.paths.map(path => (
+				<Button title={path} onPress={navigate('PathDetails', { path })} />
+			))}
+		</View>
+	);
+
 	return (
 		<ScrollView>
-			{listedPath.map(path => (
-				<Text>{path}</Text>
-			))}
+			{pathsGroups.map(pathsGroup =>
+				pathsGroup.paths.length === 1
+					? renderSinglePath(pathsGroup)
+					: renderGroupPaths(pathsGroup)
+			)}
 			<Button
 				title="Create New Derivation"
 				onPress={() => navigation.navigate('PathDerivation', { networkKey })}

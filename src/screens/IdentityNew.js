@@ -108,7 +108,7 @@ function IdentityNew({ accounts, navigation }) {
 				onChangeText={updateName}
 				value={accounts.getNewIdentity().name}
 				placeholder="Enter a new identity name"
-				focus={true}
+				focus={false}
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
 		</View>
