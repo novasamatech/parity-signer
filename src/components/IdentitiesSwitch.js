@@ -54,7 +54,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					title="Manage Identity"
 					onPress={() => {
 						setVisible(false);
-						//go to current IdentityManage
+						navigation.navigate('IdentityManagement');
 					}}
 					iconBgStyle={styles.i_arrowBg}
 					iconName="ios-arrow-round-forward"
@@ -67,7 +67,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					title="Backup Identity"
 					onPress={() => {
 						setVisible(false);
-						//go to current IdentityBackup
+						navigation.navigate('IdentityBackup', { isNew: false });
 					}}
 					iconBgStyle={styles.i_arrowBg}
 					iconName="ios-arrow-round-forward"
@@ -116,7 +116,6 @@ function IdentitiesSwitch({ navigation, accounts }) {
 									onPress={async () => {
 										await accounts.selectIdentity(identity);
 										setVisible(false);
-										// const seed = await unlockSeed(navigation);
 										resetToPathsList(navigation, defaultNetworkKey);
 									}}
 								/>

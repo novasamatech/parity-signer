@@ -32,23 +32,31 @@ import Button from '../components/Button';
 import { withNavigation } from 'react-navigation';
 import {
 	navigateToNewIdentityNetwork,
-	setPin
+	setPin,
+	unlockSeed
 } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 
 function IdentityBackup({ navigation, accounts }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const isNew = navigation.getParam('isNew', false);
+
 	useEffect(() => {
 		const setSeedPhraseAsync = async () => {
-			const newSeedPhrase = await words();
-			setSeedPhrase(newSeedPhrase);
+			if (isNew) {
+				setSeedPhrase(await words());
+			} else {
+				const backupSeedPhrase = await unlockSeed(navigation);
+				navigation.pop();
+				setSeedPhrase(backupSeedPhrase);
+			}
 		};
 
 		setSeedPhraseAsync();
 		return () => {
 			setSeedPhrase('');
 		};
-	}, []);
+	}, [isNew, navigation]);
 
 	return (
 		<ScrollView style={styles.body}>
@@ -87,15 +95,17 @@ function IdentityBackup({ navigation, accounts }) {
 			>
 				<Text style={fontStyles.t_seed}>{seedPhrase}</Text>
 			</TouchableItem>
-			<Button
-				title="Next"
-				onPress={async () => {
-					const pin = await setPin(navigation);
-					await accounts.saveNewIdentity(seedPhrase, pin);
-					setSeedPhrase('');
-					navigateToNewIdentityNetwork(navigation);
-				}}
-			/>
+			{isNew && (
+				<Button
+					title="Next"
+					onPress={async () => {
+						const pin = await setPin(navigation);
+						await accounts.saveNewIdentity(seedPhrase, pin);
+						setSeedPhrase('');
+						navigateToNewIdentityNetwork(navigation);
+					}}
+				/>
+			)}
 		</ScrollView>
 	);
 }

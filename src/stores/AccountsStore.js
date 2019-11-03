@@ -291,6 +291,17 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await saveIdentities(newIdentities);
 	}
 
+	async updateIdentityName(name) {
+		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
+		updatedCurrentIdentity.name = name;
+		try {
+			await this.setState({ currentIdentity: updatedCurrentIdentity });
+			await this.updateCurrentToIdentities();
+		} catch (e) {
+			console.warn('update identity name error', e);
+		}
+	}
+
 	async deriveNewPath(newPath, seed, prefix) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const pathAddress = substrateAddress(seed, prefix);
