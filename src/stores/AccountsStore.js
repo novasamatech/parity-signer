@@ -26,7 +26,7 @@ import {
 	saveIdentities,
 	loadIdentities
 } from '../util/db';
-import { parseSURI } from '../util/suri';
+import { constructSURI, parseSURI } from '../util/suri';
 import { decryptData, encryptData, substrateAddress } from '../util/native';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import type { AccountsStoreState } from './types';
@@ -304,7 +304,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async deriveNewPath(newPath, seed, prefix) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const pathAddress = substrateAddress(seed, prefix);
+		const suri = constructSURI({
+			derivePath: newPath,
+			password: '',
+			phrase: seed
+		});
+		const pathAddress = await substrateAddress(suri, prefix);
+		if (pathAddress === '') return false;
 		if (updatedCurrentIdentity.meta.has(newPath)) return false;
 		updatedCurrentIdentity.meta.set(newPath, {
 			address: pathAddress,

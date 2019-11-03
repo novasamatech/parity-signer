@@ -29,6 +29,7 @@ import {
 } from '../constants';
 import { resetToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
+import { alertPathDerivationError } from '../util/alertUtils';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
@@ -58,7 +59,11 @@ function AccountNetworkChooser({ navigation, accounts }) {
 									seed,
 									prefix
 								);
-								if (derivationSucceed) resetToPathsList(navigation, networkKey);
+								if (derivationSucceed) {
+									resetToPathsList(navigation, networkKey);
+								} else {
+									alertPathDerivationError();
+								}
 							} else {
 								navigation.navigate('PathsList', { networkKey });
 							}

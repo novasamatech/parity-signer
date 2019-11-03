@@ -17,13 +17,14 @@
 import React, { useState } from 'react';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import { validateDerivedPath } from '../util/identitiesUtils';
 import { unlockSeed } from '../util/navigationHelpers';
 import AccountCard from '../components/AccountCard';
 import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
+import { alertPathDerivationError } from '../util/alertUtils';
 
 function PathDerivation({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -37,7 +38,7 @@ function PathDerivation({ accounts, navigation }) {
 	const completePath = `//${NETWORK_LIST[networkKey].pathId}${derivationPath}`;
 
 	return (
-		<View>
+		<View style={styles.container}>
 			<Text>Derivation</Text>
 			{!isPathValid && <Text>Invalid Path</Text>}
 			<Text>Display Name</Text>
@@ -71,11 +72,19 @@ function PathDerivation({ accounts, navigation }) {
 						navigation.navigate('PathsList', { networkKey });
 					} else {
 						setIsPathValid(false);
+						alertPathDerivationError();
 					}
 				}}
 			/>
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: {
+		backgroundColor: 'rgba(0,0,0,0.8)',
+		flex: 1
+	}
+});
 
 export default withAccountStore(withNavigation(PathDerivation));

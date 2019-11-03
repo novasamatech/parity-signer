@@ -29,6 +29,7 @@ import {
 	navigateToNewIdentityNetwork,
 	setPin
 } from '../util/navigationHelpers';
+import { alertIdentityCreationError } from '../util/alertUtils';
 
 function IdentityNew({ accounts, navigation }) {
 	const [isRecover, setIsRecover] = useState(false);
@@ -48,7 +49,7 @@ function IdentityNew({ accounts, navigation }) {
 	const renderRecoverView = () => (
 		<>
 			<AccountSeed
-				valid={validateSeed(seedPhrase, true).valid}
+				valid={validateSeed(seedPhrase, true).valid} //TODO: validation need to be improved.
 				onChangeText={setSeedPhrase}
 				value={seedPhrase}
 			/>
@@ -65,9 +66,13 @@ function IdentityNew({ accounts, navigation }) {
 					title="Recover Identity"
 					onPress={async () => {
 						const pin = await setPin(navigation);
-						await accounts.saveNewIdentity(seedPhrase, pin);
-						setSeedPhrase('');
-						navigateToNewIdentityNetwork(navigation);
+						try {
+							await accounts.saveNewIdentity(seedPhrase, pin);
+							setSeedPhrase('');
+							navigateToNewIdentityNetwork(navigation);
+						} catch (e) {
+							alertIdentityCreationError();
+						}
 					}}
 					small={true}
 				/>
