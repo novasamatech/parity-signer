@@ -25,7 +25,8 @@ import fonts from '../fonts';
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
-	SubstrateNetworkKeys
+	SubstrateNetworkKeys,
+	NetworkProtocols
 } from '../constants';
 import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
@@ -52,17 +53,21 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						networkKey={networkKey}
 						onPress={async () => {
 							if (isNew) {
-								const { prefix, pathId } = networkParams;
+								const { prefix, pathId, protocol } = networkParams;
 								const seed = await unlockSeed(navigation);
-								const derivationSucceed = await accounts.deriveNewPath(
-									`//${pathId}//default`,
-									seed,
-									prefix
-								);
-								if (derivationSucceed) {
-									navigateToPathsList(navigation, networkKey);
-								} else {
-									alertPathDerivationError();
+								if (protocol === NetworkProtocols.SUBSTRATE) {
+									const derivationSucceed = await accounts.deriveNewPath(
+										`//${pathId}//default`,
+										seed,
+										prefix,
+										networkKey
+									);
+									if (derivationSucceed) {
+										navigateToPathsList(navigation, networkKey);
+									} else {
+										alertPathDerivationError();
+									}
+								} else if (protocol === NetworkProtocols.ETHEREUM) {
 								}
 							} else {
 								navigation.navigate('PathsList', { networkKey });

@@ -68,7 +68,8 @@ function PathDerivation({ accounts, navigation }) {
 					const derivationSucceed = await accounts.deriveNewPath(
 						completePath,
 						seed,
-						NETWORK_LIST[networkKey].prefix
+						NETWORK_LIST[networkKey].prefix,
+						networkKey
 					);
 					if (derivationSucceed) {
 						navigation.navigate('PathsList', { networkKey });

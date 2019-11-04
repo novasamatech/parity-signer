@@ -8,7 +8,6 @@ import colors from '../colors';
 import fonts from '../fonts';
 import QrView from '../components/QrView';
 import { getNetworkKeyByPath } from '../util/identitiesUtils';
-import { accountId } from '../util/account';
 import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
@@ -51,7 +50,7 @@ function PathDetails({ accounts, navigation }) {
 				</View>
 			</View>
 			{networkKey !== UnknownNetworkKeys.UNKNOWN && address && (
-				<QrView data={accountId({ address, networkKey })} />
+				<QrView data={address} />
 			)}
 		</ScrollView>
 	);
