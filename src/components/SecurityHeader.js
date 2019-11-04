@@ -41,10 +41,6 @@ class SecurityHeader extends React.Component {
 	render() {
 		const { isConnected } = this.state;
 
-		if (!isConnected) {
-			return null;
-		}
-
 		return (
 			<View
 				style={{
@@ -54,11 +50,13 @@ class SecurityHeader extends React.Component {
 				}}
 			>
 				<IdentitiesSwitch />
-				<ButtonIcon
-					onPress={() => this.props.navigation.navigate('Security')}
-					iconName="security"
-					iconColor={colors.bg_alert}
-				/>
+				{!isConnected && (
+					<ButtonIcon
+						onPress={() => this.props.navigation.navigate('Security')}
+						iconName="security"
+						iconColor={colors.bg_alert}
+					/>
+				)}
 				<ButtonIcon
 					onPress={() => this.props.navigation.navigate('IdentityBackup')}
 					iconType="ionicon"
