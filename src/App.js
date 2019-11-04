@@ -57,6 +57,7 @@ import MessageDetails from './screens/MessageDetails';
 import PathDerivation from './screens/PathDerivation';
 import PathDetails from './screens/PathDetails';
 import PathsList from './screens/PathsList';
+import PathManagement from './screens/PathManagement';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
@@ -231,6 +232,9 @@ const Screens = createStackNavigator(
 					},
 					PathsList: {
 						screen: PathsList
+					},
+					PathManagement: {
+						screen: PathManagement
 					},
 					QrScanner: {
 						screen: QrScanner

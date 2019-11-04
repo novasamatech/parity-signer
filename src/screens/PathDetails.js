@@ -26,7 +26,7 @@ function PathDetails({ accounts, navigation }) {
 				if (deleteSucceed) navigateToPathsList(navigation, networkKey);
 			});
 		} else {
-			navigation.navigate(value);
+			navigation.navigate('PathManagement', { path });
 		}
 	};
 

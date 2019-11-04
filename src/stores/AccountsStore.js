@@ -301,6 +301,22 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
+	async updatePathName(path, name) {
+		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
+		const updatedPathMeta = Object.assign(
+			{},
+			updatedCurrentIdentity.meta.get(path),
+			{ name }
+		);
+		updatedCurrentIdentity.meta.set(path, updatedPathMeta);
+		try {
+			await this.setState({ currentIdentity: updatedCurrentIdentity });
+			await this.updateCurrentToIdentities();
+		} catch (e) {
+			console.warn('update path name error', e);
+		}
+	}
+
 	async deriveNewPath(newPath, seed, prefix) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const suri = constructSURI({
