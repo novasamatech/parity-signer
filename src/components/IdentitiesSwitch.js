@@ -107,25 +107,26 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					</View>
 					<View style={styles.card}>
 						{renderCurrentIdentityCard()}
-						{identities.map((identity, index) => {
-							if (
-								currentIdentity &&
-								identity.encryptedSeed === currentIdentity.encryptedSeed
-							)
-								return null;
-							const title = identity.name || `identity_${index.toString()}`;
-							return (
-								<Button
-									title={title}
-									key={identity.encryptedSeed}
-									onPress={async () => {
-										await accounts.selectIdentity(identity);
-										setVisible(false);
-										navigateToPathsList(navigation, defaultNetworkKey);
-									}}
-								/>
-							);
-						})}
+						{identities.length > 0 &&
+							identities.map((identity, index) => {
+								if (
+									currentIdentity &&
+									identity.encryptedSeed === currentIdentity.encryptedSeed
+								)
+									return null;
+								const title = identity.name || `identity_${index.toString()}`;
+								return (
+									<Button
+										title={title}
+										key={identity.encryptedSeed}
+										onPress={async () => {
+											await accounts.selectIdentity(identity);
+											setVisible(false);
+											navigateToPathsList(navigation, defaultNetworkKey);
+										}}
+									/>
+								);
+							})}
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {

@@ -107,7 +107,7 @@ function PathsList({ accounts, navigation }) {
 				title="Create New Derivation"
 				onPress={() => navigation.navigate('PathDerivation', { networkKey })}
 			/>
-			<Button title="Scan" onPress={() => {}} />
+			<Button title="Scan" onPress={() => navigate('QrScanner')} />
 		</ScrollView>
 	);
 }

@@ -11,6 +11,7 @@ import { getNetworkKeyByPath } from '../util/identitiesUtils';
 import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
+import Button from '../components/Button';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
@@ -50,6 +51,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			{networkKey !== UnknownNetworkKeys.UNKNOWN && address && (
 				<QrView data={address} />
 			)}
+			<Button title="Scan" onPress={() => navigation.navigate('QrScanner')} />
 		</ScrollView>
 	);
 }

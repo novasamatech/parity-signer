@@ -61,11 +61,13 @@ export async function loadIdentities(version = 3) {
 		return [];
 	}
 	try {
+		// TODO to be deleted before merging, used for clean the keychain.
+		// await SecureStorage.deleteItem(identityStorageLabel, identitiesStore);
 		const identities = await SecureStorage.getItem(
 			identityStorageLabel,
 			identitiesStore
 		);
-		if (identities === undefined) return [];
+		if (!identities) return [];
 		return deserializeIdentities(identities);
 	} catch (e) {
 		handleError(e);

@@ -18,7 +18,11 @@
 
 import { Container } from 'unstated';
 
-import { accountId, emptyAccount } from '../util/account';
+import {
+	accountId,
+	emptyAccount,
+	extractAddressFromAccountId
+} from '../util/account';
 import {
 	loadAccounts,
 	saveAccount,
@@ -38,7 +42,8 @@ import type { AccountsStoreState } from './types';
 import {
 	deepCopyIdentities,
 	deepCopyIdentity,
-	emptyIdentity
+	emptyIdentity,
+	getNetworkKeyByPath
 } from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
@@ -228,25 +233,56 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	getById(account) {
+	async getById({ address, networkKey }) {
+		const generateAccountId = accountId({ address, networkKey });
+		const legacyAccount = this.state.accounts.get(generateAccountId);
+		if (legacyAccount) return;
 		return (
-			this.state.accounts.get(accountId(account)) ||
-			emptyAccount(account.address, account.networkKey)
+			this.getAccountFromIdentity(generateAccountId) ||
+			emptyAccount(address, networkKey)
 		);
 	}
 
-	getByAddress(address) {
+	async getAccountFromIdentity(address) {
+		const isAccountId = address.split(':').length > 1;
+		const mapFunction = isAccountId ? i => i : extractAddressFromAccountId;
+		let targetPath = null;
+		let targetIdentity = null;
+		for (const identity of this.state.identities) {
+			const addressIndex = Array.from(identity.addresses.keys())
+				.map(mapFunction)
+				.indexOf(address);
+			if (addressIndex !== -1) {
+				await this.setState({ currentIdentity: identity });
+				targetPath = Array.from(identity.addresses.values())[addressIndex];
+				targetIdentity = identity;
+				break;
+			}
+		}
+		if (!targetPath || !targetIdentity) return false;
+
+		const metaData = targetIdentity.meta.get(targetPath);
+		const networkKey = getNetworkKeyByPath(targetPath);
+		return {
+			...metaData,
+			encryptedSeed: targetIdentity.encryptedSeed,
+			isBip39: true,
+			isLegacy: false,
+			networkKey
+		};
+	}
+
+	async getAccountByAddress(address) {
 		if (!address) {
 			return false;
 		}
 
 		for (let v of this.state.accounts.values()) {
 			if (v.address.toLowerCase() === address.toLowerCase()) {
-				return v;
+				return { ...v, isLegacy: true };
 			}
 		}
-
-		return false;
+		return await this.getAccountFromIdentity(address);
 	}
 
 	getSelected() {
@@ -366,7 +402,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const address = await substrateAddress(suri, prefix);
 		if (address === '') return false;
 		if (updatedCurrentIdentity.meta.has(newPath)) return false;
-		const accountAddress = accountId(address, networkKey);
+		const accountAddress = accountId({ address, networkKey });
 		updatedCurrentIdentity.meta.set(newPath, {
 			address: accountAddress,
 			createdAt: new Date().getTime(),

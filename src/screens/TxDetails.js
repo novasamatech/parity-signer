@@ -32,6 +32,7 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
+import { unlockSeed } from '../util/navigationHelpers';
 
 export default class TxDetails extends React.PureComponent {
 	render() {
@@ -52,7 +53,16 @@ export default class TxDetails extends React.PureComponent {
 								dataToSign={scannerStore.getDataToSign()}
 								onNext={async () => {
 									try {
-										this.props.navigation.navigate('AccountUnlockAndSign');
+										if (scannerStore.getSender().isLegacy) {
+											return this.props.navigation.navigate(
+												'AccountUnlockAndSign',
+												{
+													next: 'SignedMessage'
+												}
+											);
+										}
+										const seed = await unlockSeed(this.props.navigation);
+										await scannerStore.signDataWithSeed(seed);
 									} catch (e) {
 										scannerStore.setErrorMsg(e.message);
 									}
