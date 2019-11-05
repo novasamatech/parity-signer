@@ -45,8 +45,8 @@ export default class Scanner extends React.PureComponent {
 		this.setState({ enableScan: false });
 		Alert.alert(title, message, [
 			{
-				onPress: () => {
-					scannerStore.cleanup();
+				onPress: async () => {
+					await scannerStore.cleanup();
 					this.setState({ enableScan: true });
 				},
 				text: 'Try again'
@@ -61,10 +61,11 @@ export default class Scanner extends React.PureComponent {
 					return (
 						<QrScannerView
 							completedFramesCount={scannerStore.getCompletedFramesCount()}
-							totalFramesCount={scannerStore.getTotalFramesCount()}
 							isMultipart={scannerStore.getTotalFramesCount() > 1}
+							missedFrames={scannerStore.getMissedFrames()}
 							navigation={this.props.navigation}
 							scannerStore={scannerStore}
+							totalFramesCount={scannerStore.getTotalFramesCount()}
 							onBarCodeRead={async txRequestData => {
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
@@ -178,46 +179,62 @@ export class QrScannerView extends React.Component {
 		const isScanningNetworkSpec = navigation.getParam('isScanningNetworkSpec');
 
 		if (scannerStore.isBusy()) {
-			return <View style={styles.inactive} />;
-		}
-		return (
-			<RNCamera
-				captureAudio={false}
-				onBarCodeRead={onBarCodeRead}
-				style={styles.view}
-			>
-				<View style={styles.body}>
-					<View style={styles.top}>
-						<Text style={styles.titleTop}>SCANNER</Text>
-					</View>
-					<View style={styles.middle}>
-						<View style={styles.middleLeft} />
-						<View style={styles.middleCenter} />
-						<View style={styles.middleRight} />
-					</View>
-					{this.props.isMultipart ? (
-						<View style={styles.bottom}>
-							<Text style={styles.descTitle}>
-								Scanning Multipart Data, Please Hold Still...
-							</Text>
-							<Text style={styles.descSecondary}>
-								{this.props.completedFramesCount} /{' '}
-								{this.props.totalFramesCount} Completed.
-							</Text>
-							<Button
-								onPress={() => this.props.scannerStore.clearMultipartProgress()}
-								style={styles.descSecondary}
-								title="Start Over"
-							/>
+			const missedFrames = this.props.scannerStore.getMissedFrames();
+			const missedFramesMessage = missedFrames && missedFrames.join(', ');
+
+			if (this.props.scannerStore.isBusy()) {
+				return <View style={styles.inactive} />;
+			}
+			return (
+				<RNCamera
+					captureAudio={false}
+					onBarCodeRead={onBarCodeRead}
+					style={styles.view}
+				>
+					<View style={styles.body}>
+						<View style={styles.top}>
+							<Text style={styles.titleTop}>SCANNER</Text>
 						</View>
-					) : isScanningNetworkSpec ? (
-						this.renderScanningNetworkSpecMessage()
-					) : (
-						this.renderScanningTransactionMessage()
-					)}
-				</View>
-			</RNCamera>
-		);
+						<View style={styles.middle}>
+							<View style={styles.middleLeft} />
+							<View style={styles.middleCenter} />
+							<View style={styles.middleRight} />
+						</View>
+						{this.props.isMultipart ? (
+							<View style={styles.bottom}>
+								<Text style={styles.descTitle}>
+									Scanning Multipart Data, Please Hold Still...
+								</Text>
+								<Text style={styles.descSecondary}>
+									{this.props.completedFramesCount} /{' '}
+									{this.props.totalFramesCount} Completed.
+								</Text>
+								<Button
+									onPress={() =>
+										this.props.scannerStore.clearMultipartProgress()
+									}
+									style={styles.descSecondary}
+									title="Start Over"
+								/>
+							</View>
+						) : isScanningNetworkSpec ? (
+							this.renderScanningNetworkSpecMessage()
+						) : (
+							this.renderScanningTransactionMessage()
+						)}
+						{missedFrames && missedFrames.length >= 1 ? (
+							<View style={styles.bottom}>
+								<Text style={styles.descTitle}>
+									You missed the following frames: {missedFramesMessage}
+								</Text>
+							</View>
+						) : (
+							undefined
+						)}
+					</View>
+				</RNCamera>
+			);
+		}
 	}
 }
 
@@ -238,7 +255,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 		flex: 1,
-		justifyContent: 'center'
+		justifyContent: 'center',
+		paddingHorizontal: 15
 	},
 	descSecondary: {
 		color: colors.bg_text,

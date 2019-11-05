@@ -82,7 +82,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void blake2s(String data, Promise promise) {
+    public void blake2b(String data, Promise promise) {
         try {
             promise.resolve(ethkeyBlake(data));
         } catch (Exception e) {
