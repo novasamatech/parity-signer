@@ -15,16 +15,20 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	deserializeIdentities, getNetworkKeyByPath, getPathName, groupPaths,
+	deserializeIdentities,
+	getPathName,
+	groupPaths,
 	serializeIdentities
 } from '../../src/util/identitiesUtils';
 
 const address1 = 'address1',
 	address2 = 'address2',
-	paths = ['//kusama//default',
-	'//kusama//funding/1',
-	'//kusama//funding/2',
-	'//kusama//stacking/1'],
+	paths = [
+		'//kusama//default',
+		'//kusama//funding/1',
+		'//kusama//funding/2',
+		'//kusama//stacking/1'
+	],
 	pathMeta1 = {
 		address: address1,
 		createdAt: 1571068850409,
@@ -65,28 +69,28 @@ describe('IdentitiesUtils', () => {
 
 	it('regroup the paths', () => {
 		const groupResult = groupPaths(paths);
-		expect(groupResult).toEqual([{
-			title: 'default',
-			paths: [paths[0]],
-		}, {
-			title: 'stacking',
-			paths: [paths[3]]
-		}, {
-			title: 'funding',
-			paths: [paths[1], paths[2]]
-		}])
+		expect(groupResult).toEqual([
+			{
+				paths: [paths[0]],
+				title: 'default'
+			},
+			{
+				paths: [paths[3]],
+				title: 'stacking'
+			},
+			{
+				paths: [paths[1], paths[2]],
+				title: 'funding'
+			}
+		]);
 	});
 
-	it('get the path name', ()=> {
-		const gotDefaultPathName = getPathName(paths[0],testIdentities[0]);
+	it('get the path name', () => {
+		const gotDefaultPathName = getPathName(paths[0], testIdentities[0]);
 		expect(gotDefaultPathName).toEqual('default');
 		const gotIdentity1PathName = getPathName(paths[1], testIdentities[0]);
 		expect(gotIdentity1PathName).toEqual('funding account1');
 		const gotStacking1PathName = getPathName(paths[3], testIdentities[0]);
 		expect(gotStacking1PathName).toEqual('stacking1');
-	});
-
-	it('get the networkKey by the path', ()=> {
-		const networkKey = getNetworkKeyByPath('paths[0]')
 	});
 });

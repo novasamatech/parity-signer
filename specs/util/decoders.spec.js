@@ -100,7 +100,7 @@ const SIGN_TX_TEST = u8aConcat(
 	new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, { version: 4 }).toU8a()
 );
 
-describe.skip('sanity check', () => {
+describe('sanity check', () => {
 	it('sanity check address is kusama', () => {
 		expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);
 	});

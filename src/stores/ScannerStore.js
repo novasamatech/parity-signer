@@ -257,13 +257,14 @@ export default class ScannerStore extends Container<ScannerState> {
 				!missedFrames.includes(frame)
 			) {
 				// enumerate all the frames between (current)frame and latestFrame
-				const missedFrames = Array.from(new Array(missedFramesRange), (_, i) =>
-					mod(i + latestFrame, totalFrameCount)
+				const updatedMissedFrames = Array.from(
+					new Array(missedFramesRange),
+					(_, i) => mod(i + latestFrame, totalFrameCount)
 				);
 
 				const dedupMissedFrames = new Set([
 					...this.state.missedFrames,
-					...missedFrames
+					updatedMissedFrames
 				]);
 
 				this.setState({
