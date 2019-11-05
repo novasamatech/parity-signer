@@ -12,10 +12,8 @@ import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
 
-function PathDetails({ accounts, navigation }) {
+export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
-	const path = navigation.getParam('path', '');
-	const networkKey = getNetworkKeyByPath(path);
 	const { address } = currentIdentity.meta.get(path) || {};
 
 	const onOptionSelect = value => {
@@ -53,6 +51,19 @@ function PathDetails({ accounts, navigation }) {
 				<QrView data={address} />
 			)}
 		</ScrollView>
+	);
+}
+
+function PathDetails({ accounts, navigation }) {
+	const path = navigation.getParam('path', '');
+	const networkKey = getNetworkKeyByPath(path);
+	return (
+		<PathDetailsView
+			accounts={accounts}
+			navigation={navigation}
+			path={path}
+			networkKey={networkKey}
+		/>
 	);
 }
 

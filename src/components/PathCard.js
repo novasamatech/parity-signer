@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Text, View } from 'react-native';
 import Button from './Button';
-import { getPathName } from '../util/identitiesUtils';
+import { getPathName, isSubstratePath } from '../util/identitiesUtils';
 
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
@@ -12,11 +12,13 @@ PathCard.propTypes = {
 
 export default function PathCard({ onPress, identity, path }) {
 	const pathName = getPathName(path, identity);
+	const address = identity.meta.get(path).address;
 
 	return (
 		<View>
 			<Text>{pathName}</Text>
-			<Button onPress={onPress} title={path} />
+			{isSubstratePath(path) && <Button onPress={onPress} title={path} />}
+			<Text>{address}</Text>
 		</View>
 	);
 }

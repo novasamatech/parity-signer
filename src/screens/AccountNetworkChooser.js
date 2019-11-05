@@ -55,19 +55,24 @@ function AccountNetworkChooser({ navigation, accounts }) {
 							if (isNew) {
 								const { prefix, pathId, protocol } = networkParams;
 								const seed = await unlockSeed(navigation);
+								let derivationSucceed;
 								if (protocol === NetworkProtocols.SUBSTRATE) {
-									const derivationSucceed = await accounts.deriveNewPath(
+									derivationSucceed = await accounts.deriveNewPath(
 										`//${pathId}//default`,
 										seed,
 										prefix,
 										networkKey
 									);
-									if (derivationSucceed) {
-										navigateToPathsList(navigation, networkKey);
-									} else {
-										alertPathDerivationError();
-									}
-								} else if (protocol === NetworkProtocols.ETHEREUM) {
+								} else {
+									derivationSucceed = await accounts.deriveEthereumAccount(
+										seed,
+										networkKey
+									);
+								}
+								if (derivationSucceed) {
+									navigateToPathsList(navigation, networkKey);
+								} else {
+									alertPathDerivationError();
 								}
 							} else {
 								navigation.navigate('PathsList', { networkKey });

@@ -24,6 +24,8 @@ import {
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
 
+export const isSubstratePath = path => path.split('//')[1] !== undefined;
+
 export function emptyIdentity() {
 	return {
 		addresses: new Map(),
@@ -103,6 +105,9 @@ export const getPathName = (path, lookUpIdentity) => {
 		lookUpIdentity.meta.get(path).name !== ''
 	) {
 		return lookUpIdentity.meta.get(path).name;
+	}
+	if (!isSubstratePath(path)) {
+		return 'New Account';
 	}
 	const networkName = path.split('//')[1];
 	const restPath = path.slice(4 + networkName.length).split('///')[0];

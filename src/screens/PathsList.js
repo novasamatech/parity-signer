@@ -16,18 +16,56 @@
 
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { UnknownNetworkKeys } from '../constants';
+import {
+	NETWORK_LIST,
+	NetworkProtocols,
+	UnknownNetworkKeys
+} from '../constants';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import { getPathsWithNetwork, groupPaths } from '../util/identitiesUtils';
 import Button from '../components/Button';
 import PathCard from '../components/PathCard';
+import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
+import { alertLegacyAccountCreationError } from '../util/alertUtils';
+import { PathDetailsView } from './PathDetails';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
 		'networkKey',
 		UnknownNetworkKeys.UNKNOWN
 	);
+	if (NETWORK_LIST[networkKey].protocol !== NetworkProtocols.SUBSTRATE) {
+		const accountMeta = accounts.state.currentIdentity.meta.get(networkKey);
+
+		if (accountMeta) {
+			return (
+				<PathDetailsView
+					networkKey={networkKey}
+					path={networkKey}
+					navigation={navigation}
+					accounts={accounts}
+				/>
+			);
+		}
+		return (
+			<Button
+				title="createNew"
+				onPress={async () => {
+					const seed = await unlockSeed(navigation);
+					const derivationSucceed = await accounts.deriveEthereumAccount(
+						seed,
+						networkKey
+					);
+					if (derivationSucceed) {
+						navigateToPathsList(navigation, networkKey);
+					} else {
+						alertLegacyAccountCreationError();
+					}
+				}}
+			/>
+		);
+	}
 	const { currentIdentity } = accounts.state;
 	const paths = Array.from(currentIdentity.meta.keys());
 	const listedPaths = getPathsWithNetwork(paths, networkKey);

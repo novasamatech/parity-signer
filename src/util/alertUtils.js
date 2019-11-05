@@ -16,6 +16,14 @@ export const alertPathDerivationError = () =>
 		}
 	]);
 
+export const alertLegacyAccountCreationError = () =>
+	Alert.alert('Error', "Can't Derive key pairs from the seed", [
+		{
+			style: 'Cancel',
+			text: 'Try again'
+		}
+	]);
+
 export const alertDeleteAccount = (accountName, onDelete) => {
 	Alert.alert(
 		'Delete',
