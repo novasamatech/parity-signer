@@ -17,17 +17,11 @@
 const { defaults } = require('jest-config');
 
 module.exports = {
-  preset: "react-native",
-  moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts', 'tsx'],
-  verbose: true,
-  roots: [
-    "<rootDir>/src"
-  ],
-  setupFiles: [
-    "<rootDir>/jest-setup.js"
-  ],
-  testEnvironment: "node",
-  testPathIgnorePatterns: [
-    "/node_modules/"
-  ]
-}
+	moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts', 'tsx'],
+	preset: 'react-native',
+	roots: ['<rootDir>/src'],
+	setupFiles: ['<rootDir>/jest-setup.js'],
+	testEnvironment: 'node',
+	testPathIgnorePatterns: ['/node_modules/'],
+	verbose: true
+};

@@ -1,12 +1,12 @@
 const testIDs = {
-	TacScreen: {
-		tacView: 'tac_view',
-		agreeTacButton: 'tac_agree',
-		agreePrivacyButton: 'tac_privacy',
-		nextButton: 'tac_next'
-	},
 	AccountListScreen: {
-		accountList: 'accountList',
+		accountList: 'accountList'
+	},
+	TacScreen: {
+		agreePrivacyButton: 'tac_privacy',
+		agreeTacButton: 'tac_agree',
+		nextButton: 'tac_next',
+		tacView: 'tac_view'
 	}
 };
 
