@@ -16,7 +16,14 @@
 
 // @flow
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { hexStripPrefix, isU8a, u8aToHex, u8aConcat } from '@polkadot/util';
+
+import {
+	hexStripPrefix,
+	hexToU8a,
+	isU8a,
+	u8aToHex,
+	u8aConcat
+} from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 
@@ -25,16 +32,16 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import { saveTx } from '../util/db';
-import { isAscii } from '../util/message';
+
+import { isAscii } from '../util/strings';
 import {
-	blake2s,
 	brainWalletSign,
 	decryptData,
 	keccak,
 	ethSign,
 	substrateSign
 } from '../util/native';
+import { mod } from '../util/numbers';
 import transaction from '../util/transaction';
 import {
 	constructDataFromBytes,
@@ -51,35 +58,45 @@ type SignedTX = {
 	txRequest: TXRequest
 };
 
+type MultipartData = {
+	[x: string]: Uint8Array
+};
+
 type ScannerState = {
 	completedFramesCount: number,
-	totalFrameCount: number,
 	dataToSign: string,
 	isHash: boolean,
 	isOversized: boolean,
+	latestFrame: number,
 	message: string,
-	multipartData: any,
+	missedFrames: Array<number>,
+	multipartData: MultipartData,
 	multipartComplete: boolean,
+	prehash: GenericExtrinsicPayload,
 	recipient: Account,
 	scanErrorMsg: string,
 	sender: Account,
 	signedData: string,
 	signedTxList: [SignedTX],
+	totalFrameCount: number,
 	tx: Object,
 	txRequest: TXRequest | null,
 	type: 'transaction' | 'message',
-	unsignedData: any
+	unsignedData: Object
 };
 
-const defaultState = {
+const DEFAULT_STATE = Object.freeze({
 	busy: false,
 	completedFramesCount: 0,
 	dataToSign: '',
 	isHash: false,
 	isOversized: false,
+	latestFrame: null,
 	message: null,
+	missedFrames: [],
 	multipartComplete: false,
 	multipartData: {},
+	prehash: null,
 	recipient: null,
 	scanErrorMsg: '',
 	sender: null,
@@ -89,18 +106,28 @@ const defaultState = {
 	txRequest: null,
 	type: null,
 	unsignedData: null
-};
+});
 
 const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicity's sake. Consistent with @polkadot/react-qr
 
+// const SIG_TYPE_NONE = new Uint8Array();
+// const SIG_TYPE_ED25519 = new Uint8Array([0]);
+const SIG_TYPE_SR25519 = new Uint8Array([1]);
+// const SIG_TYPE_ECDSA = new Uint8Array([2]);
+
 export default class ScannerStore extends Container<ScannerState> {
-	state = defaultState;
+	state = DEFAULT_STATE;
 
 	async setUnsigned(data) {
 		this.setState({
 			unsignedData: JSON.parse(data)
 		});
 	}
+
+	/*
+	 * @param strippedData: the rawBytes from react-native-camera, stripped of the ec11 padding to fill the frame size. See: decoders.js
+	 * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
+	 */
 
 	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
 		const parsedData = await constructDataFromBytes(
@@ -138,6 +165,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 				if (account) {
 					parsedData.data.account = account.address;
+
 					this.setState({
 						unsignedData: parsedData
 					});
@@ -150,10 +178,20 @@ export default class ScannerStore extends Container<ScannerState> {
 				`No private key found for ${parsedData.data.account} in your signer key storage.`
 			);
 		}
+
+		// set payload before it got hashed.
+		// signature will be generated from the hash, but we still want to display it.
+		this.setPrehashPayload(parsedData.preHash);
 	}
 
 	async setPartData(frame, frameCount, partData, accountsStore) {
-		const { multipartComplete, multipartData, totalFrameCount } = this.state;
+		const {
+			latestFrame,
+			missedFrames,
+			multipartComplete,
+			multipartData,
+			totalFrameCount
+		} = this.state;
 
 		// set it once only
 		if (!totalFrameCount) {
@@ -177,10 +215,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		const completedFramesCount = Object.keys(multipartData).length;
-
-		this.setState({
-			completedFramesCount
-		});
 
 		if (
 			completedFramesCount > 0 &&
@@ -213,10 +247,44 @@ export default class ScannerStore extends Container<ScannerState> {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData;
 			nextDataState[frame] = partDataAsBytes;
+
+			const missedFramesRange = mod(frame - latestFrame, totalFrameCount) - 1;
+
+			// we skipped at least one frame that we haven't already scanned before
+			if (
+				latestFrame &&
+				missedFramesRange >= 1 &&
+				!missedFrames.includes(frame)
+			) {
+				// enumerate all the frames between (current)frame and latestFrame
+				const missedFrames = Array.from(new Array(missedFramesRange), (_, i) =>
+					mod(i + latestFrame, totalFrameCount)
+				);
+
+				const dedupMissedFrames = new Set([
+					...this.state.missedFrames,
+					...missedFrames
+				]);
+
+				this.setState({
+					missedFrames: Array.from(dedupMissedFrames)
+				});
+			}
+
+			// if we just filled a frame that was previously missed, remove it from the missedFrames list
+			if (missedFrames && missedFrames.includes(frame - 1)) {
+				missedFrames.splice(missedFrames.indexOf(frame - 1), 1);
+			}
+
 			this.setState({
+				latestFrame: frame,
 				multipartData: nextDataState
 			});
 		}
+
+		this.setState({
+			completedFramesCount
+		});
 	}
 
 	async setData(accountsStore) {
@@ -290,6 +358,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		const tx = isEthereum
 			? await transaction(txRequest.data.rlp)
 			: txRequest.data.data;
+
 		const networkKey = isEthereum
 			? tx.ethereumChainId
 			: txRequest.data.data.genesisHash.toHex();
@@ -332,7 +401,8 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async signDataWithSeed(seed) {
-		const { dataToSign, isHash, sender, recipient, tx, type } = this.state;
+		const { dataToSign, isHash, sender } = this.state;
+
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 
@@ -345,27 +415,24 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			if (dataToSign instanceof GenericExtrinsicPayload) {
 				signable = u8aToHex(dataToSign.toU8a(true), -1, false);
+			} else if (isHash) {
+				signable = hexStripPrefix(dataToSign);
 			} else if (isU8a(dataToSign)) {
 				signable = hexStripPrefix(u8aToHex(dataToSign));
 			} else if (isAscii(dataToSign)) {
 				signable = hexStripPrefix(asciiToHex(dataToSign));
 			}
-			signedData = await substrateSign(seed, signable);
+
+			let signed = await substrateSign(seed, signable);
+			signed = '0x' + signed;
+
+			// TODO: tweak the first byte if and when sig type is not sr25519
+			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
+
+			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
 
 		this.setState({ signedData });
-
-		if (type === 'transaction') {
-			await saveTx({
-				createdAt: new Date().getTime(),
-				hash:
-					isEthereum || isHash ? dataToSign : await blake2s(dataToSign.toHex()),
-				recipient,
-				sender,
-				signature: signedData,
-				tx
-			});
-		}
 	}
 
 	async signData(pin = '1') {
@@ -375,16 +442,28 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	cleanup() {
-		this.setState(defaultState);
+		return new Promise(resolve => {
+			const prehash = this.state.prehash;
+			this.setState(
+				{
+					...DEFAULT_STATE,
+					prehash
+				},
+				resolve
+			);
+			this.clearMultipartProgress();
+		});
 	}
 
 	clearMultipartProgress() {
 		this.setState({
-			completedFramesCount: 0,
-			multipartComplete: false,
+			completedFramesCount: DEFAULT_STATE.completedFramesCount,
+			latestFrame: DEFAULT_STATE.latestFrame,
+			missedFrames: DEFAULT_STATE.missedFrames,
+			multipartComplete: DEFAULT_STATE.multipartComplete,
 			multipartData: {},
-			totalFrameCount: 0,
-			unsignedData: null
+			totalFrameCount: DEFAULT_STATE.totalFrameCount,
+			unsignedData: DEFAULT_STATE.unsignedData
 		});
 	}
 
@@ -493,5 +572,19 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getErrorMsg() {
 		return this.state.scanErrorMsg;
+	}
+
+	getMissedFrames() {
+		return this.state.missedFrames;
+	}
+
+	getPrehashPayload() {
+		return this.state.prehash;
+	}
+
+	setPrehashPayload(prehash) {
+		this.setState({
+			prehash
+		});
 	}
 }

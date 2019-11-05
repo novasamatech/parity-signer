@@ -1,5 +1,13 @@
 module.exports = {
   extends: ["@react-native-community", "plugin:prettier/recommended"],
+  overrides: [
+    {
+      "files": ["e2e/*.spec.js", "e2e/init.js"],
+      "rules": {
+        "no-undef": "off"
+      }
+    }
+  ],
   parserOptions: {
     "ecmaVersion": 6,
     "sourceType": "module",

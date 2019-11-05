@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
 
-import { qrCode, qrHex } from '../util/native';
+import { qrCode, qrCodeHex } from '../util/native';
 
 QrView.propTypes = {
 	data: PropTypes.string.isRequired
@@ -34,15 +34,16 @@ export default function QrView(props) {
 		async function displayQrCode(data) {
 			try {
 				const generatedQr = isHex(data)
-					? await qrHex(data)
+					? await qrCodeHex(data)
 					: await qrCode(data);
 				setQr(generatedQr);
 			} catch (e) {
 				console.error(e);
 			}
 		}
+
 		displayQrCode(props.data);
-	}, [props.data]);
+	}, [props]);
 
 	const { width: deviceWidth } = Dimensions.get('window');
 	let size = props.size || deviceWidth - 80;

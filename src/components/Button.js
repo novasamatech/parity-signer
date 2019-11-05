@@ -55,7 +55,8 @@ export default class Button extends React.PureComponent<{
 			small,
 			textStyles,
 			onlyText,
-			buttonStyles
+			buttonStyles,
+			testID
 		} = this.props;
 
 		const finalTextStyles = [textStyles];
@@ -81,6 +82,7 @@ export default class Button extends React.PureComponent<{
 				accessibilityComponentType="button"
 				disabled={disabled}
 				onPress={onPress}
+				testID={testID}
 			>
 				<View style={finalButtonStyles}>
 					<Text style={[fontStyles.h1, finalTextStyles]} disabled={disabled}>

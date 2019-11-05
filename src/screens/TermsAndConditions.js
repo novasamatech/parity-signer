@@ -26,6 +26,7 @@ import Button from '../components/Button';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
 import { saveToCAndPPConfirmation } from '../util/db';
+import testIDs from '../../e2e/testIDs';
 
 export default class TermsAndConditions extends React.PureComponent {
 	state = {
@@ -37,12 +38,13 @@ export default class TermsAndConditions extends React.PureComponent {
 		const { navigation } = this.props;
 		const { tocAgreement, ppAgreement } = this.state;
 		return (
-			<View style={styles.body}>
+			<View style={styles.body} testID={testIDs.TacScreen.tacView}>
 				<ScrollView contentContainerStyle={{}}>
 					<Markdown>{toc}</Markdown>
 				</ScrollView>
 
 				<TouchableItem
+					testID={testIDs.TacScreen.agreeTacButton}
 					style={{
 						alignItems: 'center',
 						flexDirection: 'row'
@@ -70,6 +72,7 @@ export default class TermsAndConditions extends React.PureComponent {
 					}}
 				>
 					<Icon
+						testID={testIDs.TacScreen.agreePrivacyButton}
 						name={ppAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
 						style={[styles.text, { fontSize: 30 }]}
 					/>
@@ -89,6 +92,7 @@ export default class TermsAndConditions extends React.PureComponent {
 
 				<Button
 					buttonStyles={{ height: 60, marginTop: 10 }}
+					testID={testIDs.TacScreen.nextButton}
 					title="Next"
 					disabled={!ppAgreement || !tocAgreement}
 					onPress={async () => {

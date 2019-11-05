@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
@@ -25,13 +26,13 @@
 		1F426F8F208D2CC500CA43DB /* EthkeyBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F8E208D2CC500CA43DB /* EthkeyBridge.m */; };
 		1F426F92208D32FA00CA43DB /* libRCTImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302C01ABCB91800DB3ED1 /* libRCTImage.a */; };
 		1F426F93208D332A00CA43DB /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
-		1F426F94208D333700CA43DB /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		1F426F95208D334200CA43DB /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		1F426F9C208D358500CA43DB /* EthkeyBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F99208D358500CA43DB /* EthkeyBridge.swift */; };
 		1F426F9D208D358500CA43DB /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F9A208D358500CA43DB /* String.swift */; };
 		1F73EE2721777A1D00706E91 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F426F39208B7CC000CA43DB /* libsigner.a */; };
 		391AD32122F9BF6F005136A0 /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39D36A8722F4A07200EDA4F1 /* libRNCamera.a */; };
 		391AD3F022F9D848005136A0 /* libRNCNetInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39D36A0622F4588C00EDA4F1 /* libRNCNetInfo.a */; };
+		3946D2A52364A7E700BAC371 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		3972BABE230D88B200202B52 /* libRNSecureStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3972BA68230C4CBE00202B52 /* libRNSecureStorage.a */; };
 		399D1B0E22DDDE1B00A815EB /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */; };
 		39B6F6432315B550009C3C05 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 39B6F6102315B550009C3C05 /* main.jsbundle */; };
@@ -133,20 +134,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 83CBBA2E1A601D0E00E9B192;
 			remoteInfo = React;
-		};
-		1FE167A02088EA11004A6284 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3DBE0D001F3B181A0099AA32;
-			remoteInfo = fishhook;
-		};
-		1FE167A22088EA11004A6284 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3DBE0D0D1F3B181C0099AA32;
-			remoteInfo = "fishhook-tvOS";
 		};
 		1FE167B42088EA11004A6284 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -532,6 +519,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F426F93208D332A00CA43DB /* libRCTAnimation.a in Frameworks */,
+				3946D2A52364A7E700BAC371 /* libRCTActionSheet.a in Frameworks */,
 				3972BABE230D88B200202B52 /* libRNSecureStorage.a in Frameworks */,
 				391AD3F022F9D848005136A0 /* libRNCNetInfo.a in Frameworks */,
 				391AD32122F9BF6F005136A0 /* libRNCamera.a in Frameworks */,
@@ -539,8 +528,6 @@
 				399D1B0E22DDDE1B00A815EB /* JavaScriptCore.framework in Frameworks */,
 				1F73EE2721777A1D00706E91 /* libsigner.a in Frameworks */,
 				1F426F95208D334200CA43DB /* libReact.a in Frameworks */,
-				1F426F94208D333700CA43DB /* libRCTActionSheet.a in Frameworks */,
-				1F426F93208D332A00CA43DB /* libRCTAnimation.a in Frameworks */,
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
 				139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
@@ -629,8 +616,6 @@
 			children = (
 				139FDEF41B06529B00C62182 /* libRCTWebSocket.a */,
 				3DAD3E991DF850E9000B6D8A /* libRCTWebSocket-tvOS.a */,
-				1FE167A12088EA11004A6284 /* libfishhook.a */,
-				1FE167A32088EA11004A6284 /* libfishhook-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1112,20 +1097,6 @@
 			fileType = archive.ar;
 			path = libReact.a;
 			remoteRef = 146834031AC3E56700842450 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		1FE167A12088EA11004A6284 /* libfishhook.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libfishhook.a;
-			remoteRef = 1FE167A02088EA11004A6284 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		1FE167A32088EA11004A6284 /* libfishhook-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libfishhook-tvOS.a";
-			remoteRef = 1FE167A22088EA11004A6284 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		1FE167B52088EA11004A6284 /* libjsinspector.a */ = {

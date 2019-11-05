@@ -22,7 +22,11 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import { NETWORK_LIST } from '../constants';
+import {
+	NETWORK_LIST,
+	NetworkProtocols,
+	SUBSTRATE_NETWORK_LIST
+} from '../constants';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
@@ -30,9 +34,9 @@ import Button from '../components/Button';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
-import { NetworkProtocols, SUBSTRATE_NETWORK_LIST } from '../constants';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import { unlockSeed } from '../util/navigationHelpers';
+import { GenericExtrinsicPayload } from '@polkadot/types';
 
 export default class TxDetails extends React.PureComponent {
 	render() {
@@ -50,7 +54,8 @@ export default class TxDetails extends React.PureComponent {
 								scannerStore={scannerStore}
 								sender={scannerStore.getSender()}
 								recipient={scannerStore.getRecipient()}
-								dataToSign={scannerStore.getDataToSign()}
+								// dataToSign={scannerStore.getDataToSign()}
+								prehash={scannerStore.getPrehashPayload()}
 								onNext={async () => {
 									try {
 										if (scannerStore.getSender().isLegacy) {
@@ -80,12 +85,13 @@ export default class TxDetails extends React.PureComponent {
 
 export class TxDetailsView extends React.PureComponent {
 	static propTypes = {
-		dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
-			.isRequired,
+		// dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+		// .isRequired,
 		gas: PropTypes.string,
 		gasPrice: PropTypes.string,
 		nonce: PropTypes.string,
 		onNext: PropTypes.func.isRequired,
+		prehash: PropTypes.instanceOf(GenericExtrinsicPayload),
 		recipient: PropTypes.object.isRequired,
 		sender: PropTypes.object.isRequired,
 		value: PropTypes.string
@@ -93,13 +99,13 @@ export class TxDetailsView extends React.PureComponent {
 
 	render() {
 		const {
-			dataToSign,
-			sender,
-			recipient,
-			value,
-			// nonce,
+			// dataToSign,
 			gas,
 			gasPrice,
+			prehash,
+			recipient,
+			sender,
+			value,
 			onNext
 		} = this.props;
 
@@ -143,7 +149,7 @@ export class TxDetailsView extends React.PureComponent {
 						<PayloadDetailsCard
 							style={{ marginBottom: 20 }}
 							description="You are about to confirm sending the following extrinsic"
-							payload={dataToSign}
+							payload={prehash}
 							prefix={prefix}
 						/>
 					)}

@@ -68,7 +68,7 @@ class EthkeyBridge: NSObject {
     }
   }
 
-  @objc func blake2s(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func blake2b(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
     var data_ptr = data.asPtr()
     let hash_rust_str = blake(&error, &data_ptr)

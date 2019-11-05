@@ -16,26 +16,32 @@
 
 'use strict';
 
+import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
+import {
+	NETWORK_LIST,
+	NetworkProtocols,
+	SUBSTRATE_NETWORK_LIST
+} from '../constants';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import AccountsStore from '../stores/AccountsStore';
+import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/message';
+import { hexToAscii, isAscii } from '../util/strings';
 import { unlockSeed } from '../util/navigationHelpers';
 
 export default class MessageDetails extends React.PureComponent {
 	render() {
 		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scannerStore, accounts) => {
+			<Subscribe to={[ScannerStore]}>
+				{scannerStore => {
 					const dataToSign = scannerStore.getDataToSign();
 					const message = scannerStore.getMessage();
 
@@ -49,6 +55,7 @@ export default class MessageDetails extends React.PureComponent {
 								dataToSign={
 									isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign
 								}
+								prehash={scannerStore.getPrehashPayload()}
 								isHash={scannerStore.getIsHash()}
 								onNext={async () => {
 									try {
@@ -83,11 +90,17 @@ export class MessageDetailsView extends React.PureComponent {
 		isHash: PropTypes.bool,
 		message: PropTypes.string.isRequired,
 		onNext: PropTypes.func.isRequired,
+		prehash: PropTypes.instanceOf(GenericExtrinsicPayload),
 		sender: PropTypes.object.isRequired
 	};
 
 	render() {
-		const { dataToSign, isHash, message, onNext, sender } = this.props;
+		const { dataToSign, isHash, message, onNext, prehash, sender } = this.props;
+
+		const isEthereum =
+			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
+		const prefix =
+			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
 
 		return (
 			<ScrollView
@@ -102,7 +115,19 @@ export class MessageDetailsView extends React.PureComponent {
 					address={sender.address}
 					networkKey={sender.networkKey}
 				/>
-				<Text style={styles.title}>MESSAGE</Text>
+				{!isEthereum && prehash && prefix ? (
+					<PayloadDetailsCard
+						style={{ marginBottom: 20 }}
+						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
+						payload={prehash}
+						prefix={prefix}
+					/>
+				) : null}
+				{isHash ? (
+					<Text style={styles.title}>HASH</Text>
+				) : (
+					<Text style={styles.title}>MESSAGE</Text>
+				)}
 				<Text style={styles.message}>
 					{isHash
 						? message

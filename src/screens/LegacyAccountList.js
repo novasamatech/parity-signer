@@ -27,6 +27,7 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
+import testIDs from '../../e2e/testIDs';
 
 export default class LegacyAccountList extends React.PureComponent {
 	render() {
@@ -84,7 +85,7 @@ class AccountListView extends React.PureComponent {
 		const { navigate } = navigation;
 
 		return (
-			<View style={styles.body}>
+			<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
 				<Background />
 				{hasNoAccount && this.showOnboardingMessage()}
 				<FlatList

@@ -34,6 +34,11 @@ import { alertPathDerivationError } from '../util/alertUtils';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
+	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
+	if (!__DEV__) {
+		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+	}
 
 	return (
 		<ScrollView style={styles.body}>
@@ -41,12 +46,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
 			</Text>
 			{Object.entries(NETWORK_LIST)
-				.filter(
-					([networkKey]) =>
-						(__DEV__ && networkKey !== UnknownNetworkKeys.UNKNOWN) ||
-						(networkKey !== SubstrateNetworkKeys.SUBSTRATE_DEV &&
-							networkKey !== UnknownNetworkKeys.UNKNOWN)
-				)
+				.filter(([networkKey]) => !excludedNetworks.includes(networkKey))
 				.map(([networkKey, networkParams]) => (
 					<AccountCard
 						address={''}

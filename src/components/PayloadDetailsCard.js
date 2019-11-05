@@ -16,7 +16,6 @@
 
 // @flow
 
-import extrinsicsFromMeta from '@polkadot/api-metadata/extrinsics/fromMetadata';
 import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
@@ -31,6 +30,7 @@ import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import kusamaMetadata from '../util/static-kusama';
 import substrateDevMetadata from '../util/static-substrate';
+import { shortString } from '../util/strings';
 
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
@@ -48,9 +48,11 @@ export default class PayloadDetailsCard extends React.PureComponent {
 	constructor(props) {
 		super(props);
 
+		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
 		const isKusama =
 			this.props.prefix ===
-			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
+				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix ||
+			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA_DEV].prefix;
 		const isSubstrateDev =
 			this.props.prefix ===
 			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
@@ -65,6 +67,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			});
 		} else if (__DEV__ && isSubstrateDev) {
 			metadata = new Metadata(substrateDevMetadata);
+
 			formatBalance.setDefaults({
 				decimals:
 					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
@@ -82,8 +85,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			Keys: 'SessionKeysPolkadot'
 		});
 
-		const extrinsics = extrinsicsFromMeta(metadata);
-		GenericCall.injectMethods(extrinsics);
+		GenericCall.injectMetadata(metadata);
 	}
 
 	render() {
@@ -154,6 +156,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 				let methodArgs = {};
 
+				// todo: clean this up
 				function formatArgs(callInstance, callMethodArgs, depth) {
 					const { args, meta, methodName, sectionName } = callInstance;
 					let paramArgKvArray = [];
@@ -181,6 +184,18 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 							);
 						} else if (args[i] instanceof Call) {
 							argument = formatArgs(args[i], callMethodArgs, depth++); // go deeper into the nested calls
+						} else if (
+							args[i].toRawType() === 'Vec<AccountId>' ||
+							args[i].toRawType() === 'Vec<Address>'
+						) {
+							// FIXME: lord forgive me for i have sinned. this is all a mess but rushing to get this out the door.
+							for (let p = 0; p < args[i].length; p++) {
+								args[i][p] = encodeAddress(
+									decodeAddress(args[i][p].toString()),
+									prefix
+								);
+							}
+							argument = args[i];
 						} else {
 							argument = args[i].toString();
 						}
@@ -279,7 +294,13 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 							paramArgs.map(([param, arg]) => (
 								<View key={param} style={styles.callDetails}>
 									<Text style={styles.subLabel}>{param}: </Text>
-									<Text style={styles.secondaryText}>{arg}</Text>
+									<Text style={styles.secondaryText}>
+										{arg && arg.length > 50
+											? shortString(arg)
+											: arg instanceof Array
+											? arg.join(', ')
+											: arg}
+									</Text>
 								</View>
 							))
 						) : (
