@@ -50,7 +50,7 @@ class SecurityHeader extends React.Component {
 				}}
 			>
 				<IdentitiesSwitch />
-				{!isConnected && (
+				{isConnected && (
 					<ButtonIcon
 						onPress={() => this.props.navigation.navigate('Security')}
 						iconName="security"
@@ -58,7 +58,7 @@ class SecurityHeader extends React.Component {
 					/>
 				)}
 				<ButtonIcon
-					onPress={() => this.props.navigation.navigate('IdentityBackup')}
+					onPress={() => this.props.navigation.navigate('')}
 					iconType="ionicon"
 					iconName="md-more"
 				/>
