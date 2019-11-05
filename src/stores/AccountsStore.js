@@ -346,7 +346,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			await this.setState({
 				currentIdentity: updatedIdentity
 			});
-			await this.updateCurrentToIdentities();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('derive new Path error', e);
 			return false;
@@ -354,7 +354,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return true;
 	}
 
-	async updateCurrentToIdentities() {
+	async updateIdentitiesWithCurrentIdentity() {
 		const newIdentities = deepCopyIdentities(this.state.identities);
 		const identityIndex = newIdentities.findIndex(
 			identity =>
@@ -370,7 +370,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.name = name;
 		try {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
-			await this.updateCurrentToIdentities();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('update identity name error', e);
 		}
@@ -386,7 +386,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.meta.set(path, updatedPathMeta);
 		try {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
-			await this.updateCurrentToIdentities();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('update path name error', e);
 		}
@@ -422,7 +422,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			await this.setState({
 				currentIdentity: updatedCurrentIdentity
 			});
-			await this.updateCurrentToIdentities();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('derive new Path error', e);
 			return false;

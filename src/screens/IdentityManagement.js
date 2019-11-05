@@ -1,7 +1,8 @@
 import React from 'react';
-import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import { ScrollView, Text } from 'react-native';
+
+import { withAccountStore } from '../util/HOC';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 

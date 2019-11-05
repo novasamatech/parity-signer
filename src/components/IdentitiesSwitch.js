@@ -23,13 +23,19 @@ import { Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
 import Button from './Button';
-import { navigateToPathsList } from '../util/navigationHelpers';
-import { defaultNetworkKey, getIdentityName } from '../util/identitiesUtils';
+import { getIdentityName } from '../util/identitiesUtils';
 
 function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
+	//TODO to be removed before merge
 	console.log('identities are', accounts.state.identities);
 	const { currentIdentity, identities } = accounts.state;
+
+	const onIdentitySelected = async identity => {
+		setVisible(false);
+		await accounts.selectIdentity(identity);
+		navigation.navigate('AccountNetworkChooser');
+	};
 
 	const renderCurrentIdentityCard = () => {
 		if (!currentIdentity) return;
@@ -39,11 +45,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 			<>
 				<ButtonIcon
 					title={currentIdentityTitle}
-					onPress={async () => {
-						setVisible(false);
-						await accounts.selectIdentity(currentIdentity);
-						navigation.navigate('AccountNetworkChooser');
-					}}
+					onPress={() => onIdentitySelected(currentIdentity)}
 					iconName="md-finger-print"
 					iconType="ionicon"
 					iconSize={40}
@@ -119,11 +121,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 									<Button
 										title={title}
 										key={identity.encryptedSeed}
-										onPress={async () => {
-											await accounts.selectIdentity(identity);
-											setVisible(false);
-											navigateToPathsList(navigation, defaultNetworkKey);
-										}}
+										onPress={() => onIdentitySelected(identity)}
 									/>
 								);
 							})}

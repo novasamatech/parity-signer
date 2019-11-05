@@ -17,6 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { withNavigation } from 'react-navigation';
+
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import { emptyIdentity } from '../util/identitiesUtils';
@@ -36,10 +37,9 @@ function IdentityNew({ accounts, navigation }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
 
 	useEffect(() => {
-		accounts.updateNewIdentity(emptyIdentity());
-		return function() {
-			accounts.updateNewIdentity(emptyIdentity());
-		};
+		const clearNewIdentity = () => accounts.updateNewIdentity(emptyIdentity());
+		clearNewIdentity();
+		return clearNewIdentity;
 	}, [accounts]);
 
 	const updateName = name => {
