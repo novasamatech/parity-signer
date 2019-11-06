@@ -45,8 +45,8 @@ export default class Scanner extends React.PureComponent {
 		this.setState({ enableScan: false });
 		Alert.alert(title, message, [
 			{
-				onPress: () => {
-					scannerStore.cleanup();
+				onPress: async () => {
+					await scannerStore.cleanup();
 					this.setState({ enableScan: true });
 				},
 				text: 'Try again'
@@ -61,10 +61,11 @@ export default class Scanner extends React.PureComponent {
 					return (
 						<QrScannerView
 							completedFramesCount={scannerStore.getCompletedFramesCount()}
-							totalFramesCount={scannerStore.getTotalFramesCount()}
 							isMultipart={scannerStore.getTotalFramesCount() > 1}
+							missedFrames={scannerStore.getMissedFrames()}
 							navigation={this.props.navigation}
 							scannerStore={scannerStore}
+							totalFramesCount={scannerStore.getTotalFramesCount()}
 							onBarCodeRead={async txRequestData => {
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
@@ -91,7 +92,9 @@ export default class Scanner extends React.PureComponent {
 											accountsStore,
 											isNetworkSpec
 										);
-									} else if (scannerStore.getErrorMsg()) {
+									}
+
+									if (scannerStore.getErrorMsg()) {
 										throw new Error(scannerStore.getErrorMsg());
 									}
 
@@ -105,6 +108,7 @@ export default class Scanner extends React.PureComponent {
 											this.props.navigation.navigate('MessageDetails');
 										}
 									}
+									('');
 								} catch (e) {
 									return this.showErrorMessage(
 										scannerStore,
@@ -173,10 +177,13 @@ export class QrScannerView extends React.Component {
 	render() {
 		const { onBarCodeRead, scannerStore, navigation } = this.props;
 		const isScanningNetworkSpec = navigation.getParam('isScanningNetworkSpec');
+    const missedFrames = this.props.scannerStore.getMissedFrames();
+		const missedFramesMessage = missedFrames && missedFrames.join(', ');
 
 		if (scannerStore.isBusy()) {
 			return <View style={styles.inactive} />;
 		}
+    
 		return (
 			<RNCamera
 				captureAudio={false}
@@ -212,6 +219,15 @@ export class QrScannerView extends React.Component {
 					) : (
 						this.renderScanningTransactionMessage()
 					)}
+					{missedFrames && missedFrames.length >= 1 ? (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								You missed the following frames: {missedFramesMessage}
+							</Text>
+						</View>
+					) : (
+						undefined
+					)}
 				</View>
 			</RNCamera>
 		);
@@ -235,7 +251,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 		flex: 1,
-		justifyContent: 'center'
+		justifyContent: 'center',
+		paddingHorizontal: 15
 	},
 	descSecondary: {
 		color: colors.bg_text,

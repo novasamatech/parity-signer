@@ -98,7 +98,8 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -107,11 +108,11 @@ android {
 
     defaultConfig {
         applicationId "io.parity.signer"
-        minSdkVersion 16
+        minSdkVersion 18
         missingDimensionStrategy 'react-native-camera', 'general'
         targetSdkVersion 28
-        versionCode 308
-        versionName "3.0.8"
+        versionCode 3011
+        versionName "3.0.11"
         ndk {
             abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         }
@@ -119,6 +120,8 @@ android {
             pickFirst 'lib/x86_64/libjsc.so'
             pickFirst 'lib/arm64-v8a/libjsc.so'
         }
+        testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     signingConfigs {
         release {
@@ -146,6 +149,8 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // Detox-specific additions to pro-guard, uncomment following line if pro-guard is enabled.
+            // proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
     // applicationVariants are e.g. debug, release
@@ -178,6 +183,16 @@ dependencies {
         implementation 'org.webkit:android-jsc-intl:+'
     } else {
         implementation 'org.webkit:android-jsc:+'
+    }
+    androidTestImplementation('com.wix:detox:+') { transitive = true }
+    androidTestImplementation 'junit:junit:4.12'
+}
+
+configurations.all {
+    resolutionStrategy {
+        //  the line below is required for Detox since version 14.5.0;
+        //  it should removed as soon as the project compiles without it
+        force 'androidx.annotation:annotation:1.0.0'
     }
 }
 

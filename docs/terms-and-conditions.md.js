@@ -177,4 +177,4 @@ All disputes or claims arising out of, relating to, or in connection with the Te
 If you are a business entity, then the individual accepting on behalf of the entity (for the avoidance of doubt, for business entities, in these Terms, "you" means the entity) represents and warrants that he or she has the authority to act on your behalf, that you represent that you are duly authorized to do business in the country or countries where you operate, and that your employees, officers, representatives, and other agents accessing Parity Technologies' Products are duly authorized to access  Parity Signer and to legally bind you to these Terms.
 
 Subject to these Terms and subject to the Software Licence Terms, Parity Technologies grants you a non-exclusive, non-transferable licence to use  Parity Signer solely on machines intended for use by your employees, officers, representatives, and agents in connection with your business entity, and provided that their use of  Parity Signer will be subject to these Terms (including the Software Licence Terms).
-`
+`;
