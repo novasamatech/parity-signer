@@ -84,7 +84,7 @@ export default class Scanner extends React.PureComponent {
 									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
 										const isNetworkSpec = this.props.navigation.getParam(
-											'isScanningNetworkSpec'
+											'isScanningMetadata'
 										);
 
 										await scannerStore.setParsedData(
@@ -195,7 +195,7 @@ export class QrScannerView extends React.Component {
 
 	render() {
 		const { onBarCodeRead, scannerStore, navigation } = this.props;
-		const isScanningNetworkSpec = navigation.getParam('isScanningNetworkSpec');
+		const isScanningMetadata = navigation.getParam('isScanningMetadata');
 
 		const missedFrames = this.props.scannerStore.getMissedFrames();
 		const missedFramesMessage = missedFrames && missedFrames.join(', ');
@@ -245,7 +245,7 @@ export class QrScannerView extends React.Component {
 						</View>
 						{this.props.isMultipart
 							? this.renderScanningMultipartMessage()
-							: isScanningNetworkSpec
+							: isScanningMetadata
 							? this.renderScanningNetworkSpecMessage()
 							: this.renderScanningTransactionMessage()}
 						{missedFrames && missedFrames.length >= 1 ? (

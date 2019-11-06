@@ -128,8 +128,12 @@ export default class ScannerStore extends Container<ScannerState> {
 	 * @param strippedData: the rawBytes from react-native-camera, stripped of the ec11 padding to fill the frame size. See: decoders.js
 	 * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
 	 */
-
-	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
+	async setParsedData(
+		strippedData,
+		accountsStore,
+		multipartComplete = false,
+		isMetadata
+	) {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
@@ -141,7 +145,7 @@ export default class ScannerStore extends Container<ScannerState> {
 				parsedData.frameCount,
 				parsedData.partData,
 				accountsStore,
-				isNetworkSpec
+				isMetadata
 			);
 			return;
 		}
@@ -185,7 +189,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setPrehashPayload(parsedData.preHash);
 	}
 
-	async setPartData(frame, frameCount, partData, accountsStore) {
+	async setPartData(frame, frameCount, partData, accountsStore, isMetadata) {
 		const {
 			latestFrame,
 			missedFrames,
@@ -208,7 +212,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		// Network spec is expected to be a JSON.
-		if (!isNetworkSpec) {
+		if (!isMetadata) {
 			if (
 				partDataAsBytes[0] === new Uint8Array([0x00]) ||
 				partDataAsBytes[0] === new Uint8Array([0x7b])
@@ -250,7 +254,7 @@ export default class ScannerStore extends Container<ScannerState> {
 				concatMultipartData,
 				accountsStore,
 				true,
-				isNetworkSpec
+				isMetadata
 			);
 		} else if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet

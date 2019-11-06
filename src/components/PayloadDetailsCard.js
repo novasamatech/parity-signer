@@ -214,8 +214,13 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 					'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.',
 					[
 						{
-							style: 'default',
+							style: 'destructive',
 							text: 'Okay'
+						},
+						{
+							style: 'default',
+							text: 'Offline Import Metadata',
+							onPress: () => this.props.navigation.navigate('QrScanner', { isScanningMetadata: true })
 						}
 					]
 				);
