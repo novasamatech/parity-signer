@@ -174,15 +174,35 @@ export class QrScannerView extends React.Component {
 		);
 	}
 
+	renderScanningMultipartMessage() {
+		return (
+			<View style={styles.bottom}>
+				<Text style={styles.descTitle}>
+					Scanning Multipart Data, Please Hold Still...
+				</Text>
+				<Text style={styles.descSecondary}>
+					{this.props.completedFramesCount} / {this.props.totalFramesCount}{' '}
+					Completed.
+				</Text>
+				<Button
+					onPress={() => this.props.scannerStore.clearMultipartProgress()}
+					style={styles.descSecondary}
+					title="Start Over"
+				/>
+			</View>
+		);
+	}
+
 	render() {
 		const { onBarCodeRead, scannerStore, navigation } = this.props;
 		const isScanningNetworkSpec = navigation.getParam('isScanningNetworkSpec');
 
-		if (scannerStore.isBusy()) {
 		const missedFrames = this.props.scannerStore.getMissedFrames();
 		const missedFramesMessage = missedFrames && missedFrames.join(', ');
+
+		if (scannerStore.isBusy()) {
 			return <View style={styles.inactive} />;
-		}
+		} else {
 		return (
 			<RNCamera
 				captureAudio={false}
@@ -223,19 +243,24 @@ export class QrScannerView extends React.Component {
 								To Sign a New Transaction
 							</Text>
 						</View>
-					)}
-					{missedFrames && missedFrames.length >= 1 ? (
-						<View style={styles.bottom}>
-							<Text style={styles.descTitle}>
-								You missed the following frames: {missedFramesMessage}
-							</Text>
-						</View>
-					) : (
-						undefined
-					)}
-				</View>
-			</RNCamera>
-		);
+						{this.props.isMultipart
+							? this.renderScanningMultipartMessage()
+							: isScanningNetworkSpec
+							? this.renderScanningNetworkSpecMessage()
+							: this.renderScanningTransactionMessage()}
+						{missedFrames && missedFrames.length >= 1 ? (
+							<View style={styles.bottom}>
+								<Text style={styles.descTitle}>
+									You missed the following frames: {missedFramesMessage}
+								</Text>
+							</View>
+						) : (
+							undefined
+						)}
+					</View>
+				</RNCamera>
+			);
+		}
 	}
 }
 

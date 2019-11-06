@@ -67,6 +67,7 @@ class NetworkListView extends React.PureComponent {
 				{networkSpecs ? (
 					networkSpecs.map(networkSpec => (
 						<Card
+							key={networkSpec.genesisHash}
 							title={networkSpec.title}
 							secondaryText={networkSpec.genesisHash}
 							onPress={onSelect}
@@ -80,16 +81,16 @@ class NetworkListView extends React.PureComponent {
 						<Text style={styles.descSecondary}>
 							Press the button below to add a new network spec.
 						</Text>
-						<Button
-							title="Add new network"
-							onPress={() =>
-								this.props.navigation.navigate('QrScanner', {
-									isScanningNetworkSpec: true
-								})
-							}
-						/>
 					</View>
 				)}
+				<Button
+					title="Add new network"
+					onPress={() =>
+						this.props.navigation.navigate('QrScanner', {
+							isScanningNetworkSpec: true
+						})
+					}
+				/>
 			</ScrollView>
 		);
 	}
