@@ -135,11 +135,14 @@ export async function saveToCAndPPConfirmation() {
 }
 
 /*
- * Populate the local storage with the default network specs so it can be updated, deleted.
+ * Called once during onboarding. Populate the local storage with the default network specs with key being network_${genesisHash}.
  */
 export async function saveDefaultNetworks() {
-	Object.entries(defaultNetworkSpecs()).forEach(async ([key, value], index) => {
-		await AsyncStorage.setItem(key, value);
+	Object.entries(defaultNetworkSpecs()).forEach(async ([key, value]) => {
+		await AsyncStorage.setItem(
+			`network_${key}`,
+			JSON.stringify(value, null, 0)
+		);
 	});
 }
 
@@ -147,8 +150,18 @@ export async function saveDefaultNetworks() {
  * @dev map: networkKey => metadata blob
  */
 export async function saveDefaultMetadata() {
-	await AsyncStorage.setItem(SubstrateNetworkKeys.KUSAMA, kusamaMeta);
-	await AsyncStorage.setItem(SubstrateNetworkKeys.SUBSTRATE_DEV, substrateMeta);
+	await AsyncStorage.setItem(
+		SubstrateNetworkKeys.KUSAMA,
+		JSON.stringify(kusamaMeta)
+	);
+	await AsyncStorage.setItem(
+		SubstrateNetworkKeys.KUSAMA_DEV,
+		JSON.stringify(kusamaMeta)
+	);
+	await AsyncStorage.setItem(
+		SubstrateNetworkKeys.SUBSTRATE_DEV,
+		JSON.stringify(substrateMeta)
+	);
 }
 
 /*
@@ -169,26 +182,41 @@ export async function addNetworkSpec(networkKey, networkSpec) {
 		);
 	}
 
-	await AsyncStorage.setItem(networkKey, networkSpec);
+	await AsyncStorage.setItem(networkKey, JSON.stringify(networkSpec, null, 0));
 }
 
 /*
  * @dev get all the network keys
  */
-export async function getAllNetworkKeys() {
-	return await AsyncStorage.multiGet('network_keys');
-}
-
-/*
- * @dev fetch all networks specs
- */
-export async function getAlNetworkSpecs() {
-	await AsyncStorage.multiGet();
+export async function getAllNetworkSpecs() {
+	const allKeys = await AsyncStorage.getAllKeys();
+	let result = [];
+	// network keys are prefixed with network_
+	await asyncForEach(allKeys, async key => {
+		if (key.slice(0, 8) === 'network_') {
+			const spec = await getNetworkSpecByKey(key);
+			console.log('spec here -> ', spec);
+			console.log('json spec here -> ', JSON.parse(spec));
+			result.push(JSON.parse(spec));
+		}
+	});
+	console.log('all the network specs -< ', result);
+	return result;
 }
 
 /*
  * @dev get a specific network spec by networkKey (genesisHash)
  */
 export async function getNetworkSpecByKey(networkKey) {
-	await AsyncStorage.getItem(networkKey);
+	return await AsyncStorage.getItem(networkKey);
+}
+
+export async function clearAsyncStorage() {
+	await AsyncStorage.clear();
+}
+
+async function asyncForEach(array, callback) {
+	for (let i = 0; i < array.length; i++) {
+		await callback(array[i], i, array);
+	}
 }

@@ -19,9 +19,9 @@
 import { Container } from 'unstated';
 
 import {
-	loadNetworkSpecs,
-	saveNetworkSpec,
-	getNetworkSpecByKey
+	getNetworkSpecByKey,
+	getAllNetworkSpecs,
+	addNetworkSpec
 } from '../util/db';
 
 import { empty } from '../util/networkSpecs';
@@ -39,14 +39,14 @@ export type NetworkSpec = {
 };
 
 type State = {
-	networkSpecs: Map<string, NetworkSpec>,
+	networkSpecs: Array<NetworkSpec>,
 	newNetworkSpec: NetworkSpec,
 	selectedKey: string
 };
 
 export default class NetworksStore extends Container<State> {
 	state = {
-		networkSpecs: new Map(),
+		networkSpecs: [],
 		newNetworkSpec: empty(),
 		selectedKey: ''
 	};
@@ -54,6 +54,12 @@ export default class NetworksStore extends Container<State> {
 	constructor(props) {
 		super(props);
 		this.refreshList();
+	}
+
+	async refreshList() {
+		const networkSpecs = await getAllNetworkSpecs();
+
+		this.setState({ networkSpecs });
 	}
 
 	select(networkKey) {
@@ -76,7 +82,7 @@ export default class NetworksStore extends Container<State> {
 		if (network.networkKey) {
 			const networkSpec = await getNetworkSpecByKey(network.networkKey);
 
-			await saveNetworkSpec(network.networkKey, networkSpec);
+			await addNetworkSpec(network.networkKey, networkSpec);
 
 			this.setState({
 				networks: this.state.networks.set(network.networkKey, network),
@@ -88,12 +94,6 @@ export default class NetworksStore extends Container<State> {
 	// updateNetworkSpec(networkKey, updatedNetworkSpec) {
 
 	// }
-
-	async refreshList() {
-		loadNetworkSpecs().then(networkSpecs => {
-			this.setState({ networkSpecs });
-		});
-	}
 
 	// async deleteNetwork(networkKey) {
 	// 	const { networkSpecs } = this.state;

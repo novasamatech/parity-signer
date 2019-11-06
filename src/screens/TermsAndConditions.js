@@ -25,7 +25,11 @@ import fonts from '../fonts';
 import Button from '../components/Button';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
-import { saveDefaultNetworks, saveToCAndPPConfirmation } from '../util/db';
+import {
+	saveDefaultNetworks,
+	saveToCAndPPConfirmation,
+	saveDefaultMetadata
+} from '../util/db';
 import testIDs from '../../e2e/testIDs';
 
 export default class TermsAndConditions extends React.PureComponent {
@@ -106,6 +110,7 @@ export default class TermsAndConditions extends React.PureComponent {
 						);
 						await saveToCAndPPConfirmation();
 						await saveDefaultNetworks(); // save the default networks to AsyncStorage;
+						await saveDefaultMetadata(); // sav the default metadata for their network;
 						navigation.dispatch(firstScreenActions);
 					}}
 				/>

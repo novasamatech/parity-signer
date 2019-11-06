@@ -55,6 +55,8 @@ class NetworkListView extends React.PureComponent {
 	render() {
 		const { networkSpecs, onSelect } = this.props;
 
+		console.log('network specs -< ', networkSpecs);
+
 		return (
 			<ScrollView
 				contentContainerStyle={styles.bodyContent}
@@ -63,13 +65,13 @@ class NetworkListView extends React.PureComponent {
 				<Background />
 				<Text style={styles.titleTop}>Supported Networks</Text>
 				{networkSpecs ? (
-					networkSpecs.forEach((networkSpec, networkKey) => {
+					networkSpecs.map(networkSpec => (
 						<Card
-							title={networkSpec.chainName}
-							secondaryText={networkKey}
+							title={networkSpec.title}
+							secondaryText={networkSpec.genesisHash}
 							onPress={onSelect}
-						/>;
-					})
+						/>
+					))
 				) : (
 					<View style={styles.bodyContent2}>
 						<Text style={styles.descTitle}>

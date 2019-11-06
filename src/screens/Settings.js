@@ -20,6 +20,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import colors from '../colors';
+import { clearAsyncStorage } from '../util/db';
 import fonts from '../fonts';
 import Card from '../components/Card';
 
@@ -52,6 +53,11 @@ export default class Settings extends React.PureComponent {
 					<Card
 						onPress={() => navigate('About')}
 						title="About"
+						style={{ padding: 10 }}
+					/>
+					<Card
+						onPress={() => clearAsyncStorage()}
+						title="Clear Storage"
 						style={{ padding: 10 }}
 					/>
 				</View>
