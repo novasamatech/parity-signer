@@ -128,7 +128,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		strippedData,
 		accountsStore,
 		multipartComplete = false,
-		isNetworkSpec
+		isMetadata
 	) {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
@@ -141,7 +141,7 @@ export default class ScannerStore extends Container<ScannerState> {
 				parsedData.frameCount,
 				parsedData.partData,
 				accountsStore,
-				isNetworkSpec
+				isMetadata
 			);
 			return;
 		}
@@ -185,7 +185,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setPrehashPayload(parsedData.preHash);
 	}
 
-	async setPartData(frame, frameCount, partData, accountsStore, isNetworkSpec) {
+	async setPartData(frame, frameCount, partData, accountsStore, isMetadata) {
 		const {
 			latestFrame,
 			missedFrames,
@@ -208,7 +208,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		// Network spec is expected to be a JSON.
-		if (!isNetworkSpec) {
+		if (!isMetadata) {
 			if (
 				partDataAsBytes[0] === new Uint8Array([0x00]) ||
 				partDataAsBytes[0] === new Uint8Array([0x7b])
@@ -250,7 +250,7 @@ export default class ScannerStore extends Container<ScannerState> {
 				concatMultipartData,
 				accountsStore,
 				true,
-				isNetworkSpec
+				isMetadata
 			);
 		} else if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet

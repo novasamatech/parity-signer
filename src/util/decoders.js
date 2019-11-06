@@ -96,7 +96,7 @@ export function rawDataToU8A(rawData) {
 	return bytes;
 }
 
-export async function constructDataFromBytes(bytes, multipartComplete = false) {
+export async function constructDataFromBytes(bytes, multipartComplete = false, isMetadata = false) {
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
 	const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
