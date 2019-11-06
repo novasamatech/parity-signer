@@ -218,9 +218,12 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 							text: 'Okay'
 						},
 						{
+							onPress: () =>
+								this.props.navigation.navigate('QrScanner', {
+									isScanningMetadata: true
+								}),
 							style: 'default',
-							text: 'Offline Import Metadata',
-							onPress: () => this.props.navigation.navigate('QrScanner', { isScanningMetadata: true })
+							text: 'Offline Import Metadata'
 						}
 					]
 				);

@@ -246,12 +246,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
 			// handle the binary blob as a single UOS payload
-			this.setParsedData(
-				concatMultipartData,
-				accountsStore,
-				true,
-				isMetadata
-			);
+			this.setParsedData(concatMultipartData, accountsStore, true, isMetadata);
 		} else if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData;
