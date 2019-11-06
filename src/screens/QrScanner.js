@@ -174,17 +174,35 @@ export class QrScannerView extends React.Component {
 		);
 	}
 
+	renderScanningMultipartMessage() {
+		return (
+			<View style={styles.bottom}>
+				<Text style={styles.descTitle}>
+					Scanning Multipart Data, Please Hold Still...
+				</Text>
+				<Text style={styles.descSecondary}>
+					{this.props.completedFramesCount} / {this.props.totalFramesCount}{' '}
+					Completed.
+				</Text>
+				<Button
+					onPress={() => this.props.scannerStore.clearMultipartProgress()}
+					style={styles.descSecondary}
+					title="Start Over"
+				/>
+			</View>
+		);
+	}
+
 	render() {
 		const { onBarCodeRead, scannerStore, navigation } = this.props;
 		const isScanningNetworkSpec = navigation.getParam('isScanningNetworkSpec');
 
-		if (scannerStore.isBusy()) {
-			const missedFrames = this.props.scannerStore.getMissedFrames();
-			const missedFramesMessage = missedFrames && missedFrames.join(', ');
+		const missedFrames = this.props.scannerStore.getMissedFrames();
+		const missedFramesMessage = missedFrames && missedFrames.join(', ');
 
-			if (this.props.scannerStore.isBusy()) {
-				return <View style={styles.inactive} />;
-			}
+		if (scannerStore.isBusy()) {
+			return <View style={styles.inactive} />;
+		} else {
 			return (
 				<RNCamera
 					captureAudio={false}
@@ -200,28 +218,11 @@ export class QrScannerView extends React.Component {
 							<View style={styles.middleCenter} />
 							<View style={styles.middleRight} />
 						</View>
-						{this.props.isMultipart ? (
-							<View style={styles.bottom}>
-								<Text style={styles.descTitle}>
-									Scanning Multipart Data, Please Hold Still...
-								</Text>
-								<Text style={styles.descSecondary}>
-									{this.props.completedFramesCount} /{' '}
-									{this.props.totalFramesCount} Completed.
-								</Text>
-								<Button
-									onPress={() =>
-										this.props.scannerStore.clearMultipartProgress()
-									}
-									style={styles.descSecondary}
-									title="Start Over"
-								/>
-							</View>
-						) : isScanningNetworkSpec ? (
-							this.renderScanningNetworkSpecMessage()
-						) : (
-							this.renderScanningTransactionMessage()
-						)}
+						{this.props.isMultipart
+							? this.renderScanningMultipartMessage()
+							: isScanningNetworkSpec
+							? this.renderScanningNetworkSpecMessage()
+							: this.renderScanningTransactionMessage()}
 						{missedFrames && missedFrames.length >= 1 ? (
 							<View style={styles.bottom}>
 								<Text style={styles.descTitle}>
