@@ -138,6 +138,20 @@ function IdentitiesSwitch({ navigation, accounts }) {
 							style={{ paddingLeft: 8 * 4 }}
 						/>
 						<Separator />
+						{accounts.getAccounts().size > 0 && (
+							<ButtonIcon
+								title="Legacy Accounts"
+								onPress={() => {
+									setVisible(false);
+									navigation.navigate('LegacyAccountList');
+								}}
+								iconName="ios-cog"
+								iconType="ionicon"
+								iconSize={24}
+								textStyle={fontStyles.t_big}
+								style={{ paddingLeft: 8 * 4 }}
+							/>
+						)}
 						<ButtonIcon
 							title="Settings"
 							onPress={() => {

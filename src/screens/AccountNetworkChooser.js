@@ -17,7 +17,7 @@
 'use strict';
 
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
@@ -43,10 +43,36 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 	}
+	const { identities, currentIdentity, loaded } = accounts.state;
+	const hasNoAccount =
+		accounts.getAccounts().size === 0 && identities.length === 0;
+
+	const showOnboardingMessage = () => {
+		const createLink = (text, isRecover) => (
+			<Text
+				style={styles.link}
+				onPress={() => navigation.navigate('IdentityNew', { isRecover })}
+			>
+				{text}
+			</Text>
+		);
+
+		return (
+			<ScrollView style={styles.body}>
+				<View style={styles.onboardingWrapper}>
+					<Text style={styles.onboardingText}>
+						No Identity yet?{'\n'}
+						{createLink('Create', false)} or {createLink('Recover', true)} an
+						account to get started.
+					</Text>
+				</View>
+			</ScrollView>
+		);
+	};
 
 	const getNetworkKeys = ([networkKey]) => {
 		const availableNetworks = getAvailableNetworkKeys(
-			accounts.state.currentIdentity
+			currentIdentity || identities[0]
 		);
 		if (excludedNetworks.includes(networkKey)) return false;
 		if (isNew) return true;
@@ -80,6 +106,10 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			);
 		}
 	};
+
+	if (!loaded) return <ScrollView style={styles.body} />;
+
+	if (hasNoAccount) return showOnboardingMessage();
 
 	return (
 		<ScrollView style={styles.body}>
@@ -140,6 +170,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		flexDirection: 'row',
 		justifyContent: 'center'
+	},
+	onboardingText: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.regular,
+		fontSize: 20
+	},
+	onboardingWrapper: {
+		alignItems: 'flex-end',
+		flex: 1,
+		flexDirection: 'row'
 	},
 	title: {
 		color: colors.bg_text_sec,
