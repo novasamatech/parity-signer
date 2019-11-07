@@ -66,7 +66,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					style={styles.i_arrowStyle}
 				/>
 				<ButtonIcon
-					title="Backup Identity"
+					title="Show Recovery Phrase"
 					onPress={() => {
 						setVisible(false);
 						navigation.navigate('IdentityBackup', { isNew: false });
