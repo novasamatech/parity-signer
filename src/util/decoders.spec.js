@@ -36,7 +36,7 @@ import {
 	decodeToString,
 	isJsonString
 } from './decoders';
-import { isAscii } from './strings';
+import { base64ToHex, isAscii } from './strings';
 import kusamaData from './static-kusama';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
@@ -47,7 +47,7 @@ const CMD_SIGN_MSG = new Uint8Array([3]);
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
 
-const metadata = new Metadata(kusamaData);
+const metadata = new Metadata(base64ToHex(kusamaData));
 GenericCall.injectMetadata(metadata);
 
 const RN_TX_REQUEST_RAW_DATA =

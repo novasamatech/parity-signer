@@ -23,6 +23,7 @@ import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 
 import kusamaData from './static-kusama';
+import { base64ToHex } from './strings';
 import { fromWei } from './units';
 
 describe('units', () => {
@@ -48,7 +49,7 @@ describe('units', () => {
 		let method_3;
 
 		beforeAll(() => {
-			const metadata = new Metadata(kusamaData);
+			const metadata = new Metadata(base64ToHex(kusamaData));
 
 			GenericCall.injectMetadata(metadata);
 

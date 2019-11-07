@@ -30,7 +30,7 @@ import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import kusamaMetadata from '../util/static-kusama';
 import substrateDevMetadata from '../util/static-substrate';
-import { shortString } from '../util/strings';
+import { base64ToHex, shortString } from '../util/strings';
 
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
@@ -59,14 +59,14 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
 		let metadata;
 		if (isKusama) {
-			metadata = new Metadata(kusamaMetadata);
+			metadata = new Metadata(base64ToHex(kusamaMetadata));
 
 			formatBalance.setDefaults({
 				decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
 				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
 			});
 		} else if (__DEV__ && isSubstrateDev) {
-			metadata = new Metadata(substrateDevMetadata);
+			metadata = new Metadata(base64ToHex(substrateDevMetadata));
 
 			formatBalance.setDefaults({
 				decimals:
