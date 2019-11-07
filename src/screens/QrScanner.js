@@ -83,14 +83,14 @@ export default class Scanner extends React.PureComponent {
 										await scannerStore.setUnsigned(txRequestData.data);
 									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
-										const isNetworkSpec = this.props.navigation.getParam(
+										const isScanningMetadata = this.props.navigation.getParam(
 											'isScanningMetadata'
 										);
 
 										await scannerStore.setParsedData(
 											strippedData,
 											accountsStore,
-											isNetworkSpec
+											isScanningMetadata
 										);
 									}
 

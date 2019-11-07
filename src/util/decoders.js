@@ -99,7 +99,7 @@ export function rawDataToU8A(rawData) {
 export async function constructDataFromBytes(
 	bytes,
 	multipartComplete = false,
-	isMetadata = false
+	isScanningMetadata = false
 ) {
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
@@ -214,7 +214,13 @@ export async function constructDataFromBytes(
 							); // default to Kusama
 							break;
 						case '03': // Cold Signer should attempt to decode message to utf8
-							data.action = 'signData';
+							if (isScanningMetadata) {
+								data.action = 'updateMetadata';
+								debugger;
+							} else {
+								data.action = 'signData';
+							}
+
 							if (isOversized) {
 								data.data.data = await blake2b(u8aToHex(rawPayload, -1, false));
 								data.isHash = isOversized;

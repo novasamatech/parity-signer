@@ -156,7 +156,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 				let methodArgs = {};
 
-				// todo: clean this up
+				// FIXME: probably could use @polkadot/react-params and override some styles
 				function formatArgs(callInstance, methodArgs, depth) {
 					const { args, meta, methodName, sectionName } = callInstance;
 					let paramArgKvArray = [];
@@ -188,7 +188,6 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 							args[i].toRawType() === 'Vec<AccountId>' ||
 							args[i].toRawType() === 'Vec<Address>'
 						) {
-							// FIXME: lord forgive me for i have sinned. this is all a mess but rushing to get this out the door.
 							for (let p = 0; p < args[i].length; p++) {
 								args[i][p] = encodeAddress(
 									decodeAddress(args[i][p].toString()),

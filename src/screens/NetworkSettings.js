@@ -55,8 +55,6 @@ class NetworkListView extends React.PureComponent {
 	render() {
 		const { networkSpecs, onSelect } = this.props;
 
-		console.log('network specs -< ', networkSpecs);
-
 		return (
 			<ScrollView
 				contentContainerStyle={styles.bodyContent}
