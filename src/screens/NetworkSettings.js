@@ -25,6 +25,7 @@ import colors from '../colors';
 import Background from '../components/Background';
 import Card from '../components/Card';
 import fonts from '../fonts';
+// import MetadataDetails from '../screens/MetadataDetails';
 import NetworksStore from '../stores/NetworksStore';
 
 export default class NetworkSettings extends React.PureComponent {
@@ -36,9 +37,11 @@ export default class NetworkSettings extends React.PureComponent {
 						<NetworkListView
 							{...this.props}
 							networkSpecs={networksStore.getNetworkSpecs()}
-							onSelect={() =>
-								this.props.navigation.navigate('NetworkSpecDetailsView')
-							}
+							onSelect={networkKey => {
+								this.props.navigation.navigate('MetadataDetails', {
+									networkKey: networkKey
+								});
+							}}
 						/>
 					);
 				}}
@@ -68,7 +71,7 @@ class NetworkListView extends React.PureComponent {
 							key={networkSpec.genesisHash}
 							title={networkSpec.title}
 							secondaryText={networkSpec.genesisHash}
-							onPress={onSelect}
+							onPress={() => onSelect(networkSpec.genesisHash)}
 						/>
 					))
 				) : (

@@ -15,15 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
-
+import { Metadata } from '@polkadot/types';
 import { Container } from 'unstated';
 
 import { getMetadataByKey, saveNewMetadata } from '../util/db';
-import { Metadata } from '@polkadot/types';
 
 type State = {
-	new: Metadata,
-	selected: Metadata
+	new: typeof Metadata,
+	selected: typeof Metadata
 };
 
 const DEFAULT_STATE = Object.freeze({
@@ -31,7 +30,7 @@ const DEFAULT_STATE = Object.freeze({
 	selected: null
 });
 
-export class MetadataStore extends Container<State> {
+export default class MetadataStore extends Container<State> {
 	state = DEFAULT_STATE;
 
 	async saveNew(blob, networkKey) {
@@ -45,9 +44,10 @@ export class MetadataStore extends Container<State> {
 
 	async getMetadata(networkKey) {
 		try {
-			await getMetadataByKey(networkKey);
-		} catch (e) {
+			const blob = await getMetadataByKey(networkKey);
 			debugger;
+			return blob;
+		} catch (e) {
 			throw new Error(e);
 		}
 	}

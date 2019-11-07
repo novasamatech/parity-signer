@@ -33,7 +33,7 @@ import {
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
 
-import { isAscii } from '../util/strings';
+import { isAscii, checkIfPayloadIsMetadata } from '../util/strings';
 import {
 	brainWalletSign,
 	decryptData,
@@ -149,7 +149,8 @@ export default class ScannerStore extends Container<ScannerState> {
 			return;
 		} else {
 			// check if it is metadata
-			// let isMetadata = checkIfPayloadIsMetadata(concatMultipartData);
+			let isMetadata = checkIfPayloadIsMetadata(parsedData);
+			console.log('is metadat -=> ', isMetadata);
 			debugger;
 		}
 

@@ -53,6 +53,7 @@ import AccountRecover from './screens/AccountRecover';
 import AccountSettings from './screens/AccountSettings';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import Loading from './screens/Loading';
+import MetadataDetails from './screens/MetadataDetails';
 import MessageDetails from './screens/MessageDetails';
 import NetworkSettings from './screens/NetworkSettings';
 import PrivacyPolicy from './screens/PrivacyPolicy';
@@ -215,6 +216,9 @@ const Screens = createStackNavigator(
 					},
 					MessageDetails: {
 						screen: MessageDetails
+					},
+					MetadataDetails: {
+						screen: MetadataDetails
 					},
 					NetworkSettings: {
 						screen: NetworkSettings
