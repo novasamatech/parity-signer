@@ -60,10 +60,16 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
-				<Button
-					title="Add Network Account"
-					onPress={() => setShouldShowMoreNetworks(true)}
-				/>
+				<>
+					<Button
+						title="Add Network Account"
+						onPress={() => setShouldShowMoreNetworks(true)}
+					/>
+					<Button
+						title="Scan"
+						onPress={() => navigation.navigate('QrScanner')}
+					/>
+				</>
 			);
 		} else {
 			return (
