@@ -101,7 +101,3 @@ function parseAccounts(value, key, map) {
 		meta: new Map()
 	};
 }
-
-const migrateAccount = V3AccountStore => {
-	V3AccountStore.accounts.forEach();
-};

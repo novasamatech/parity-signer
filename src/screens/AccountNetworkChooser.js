@@ -16,11 +16,13 @@
 
 'use strict';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { withNavigation } from 'react-navigation';
+
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
+import Button from '../components/Button';
 import fonts from '../fonts';
 import {
 	NETWORK_LIST,
@@ -31,14 +33,47 @@ import {
 import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
+import { getAvailableNetworkKeys } from '../util/identitiesUtils';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
+	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 	if (!__DEV__) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 	}
+
+	const getNetworkKeys = ([networkKey]) => {
+		const availableNetworks = getAvailableNetworkKeys(
+			accounts.state.currentIdentity
+		);
+		if (excludedNetworks.includes(networkKey)) return false;
+		if (isNew) return true;
+		if (shouldShowMoreNetworks) {
+			return !availableNetworks.includes(networkKey);
+		}
+		return availableNetworks.includes(networkKey);
+	};
+
+	const renderShowMoreButton = () => {
+		if (isNew) return;
+		if (!shouldShowMoreNetworks) {
+			return (
+				<Button
+					title="Add Network Account"
+					onPress={() => setShouldShowMoreNetworks(true)}
+				/>
+			);
+		} else {
+			return (
+				<Button
+					title="Show Existed Network Account"
+					onPress={() => setShouldShowMoreNetworks(false)}
+				/>
+			);
+		}
+	};
 
 	return (
 		<ScrollView style={styles.body}>
@@ -46,7 +81,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
 			</Text>
 			{Object.entries(NETWORK_LIST)
-				.filter(([networkKey]) => !excludedNetworks.includes(networkKey))
+				.filter(getNetworkKeys)
 				.map(([networkKey, networkParams]) => (
 					<AccountCard
 						address={''}
@@ -81,6 +116,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						title={networkParams.title}
 					/>
 				))}
+			{renderShowMoreButton()}
 		</ScrollView>
 	);
 }

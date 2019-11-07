@@ -43,7 +43,7 @@ import {
 	deepCopyIdentities,
 	deepCopyIdentity,
 	emptyIdentity,
-	getNetworkKeyByPath
+	getNetworkKeyBySubstratePath
 } from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
@@ -262,7 +262,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (!targetPath || !targetIdentity) return false;
 
 		const metaData = targetIdentity.meta.get(targetPath);
-		const networkKey = getNetworkKeyByPath(targetPath);
+		const networkKey = getNetworkKeyBySubstratePath(targetPath);
 		return {
 			...metaData,
 			encryptedSeed: targetIdentity.encryptedSeed,

@@ -7,7 +7,7 @@ import PopupMenu from '../components/PopupMenu';
 import colors from '../colors';
 import fonts from '../fonts';
 import QrView from '../components/QrView';
-import { getNetworkKeyByPath } from '../util/identitiesUtils';
+import { getNetworkKeyBySubstratePath } from '../util/identitiesUtils';
 import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
@@ -58,7 +58,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 function PathDetails({ accounts, navigation }) {
 	const path = navigation.getParam('path', '');
-	const networkKey = getNetworkKeyByPath(path);
+	const networkKey = getNetworkKeyBySubstratePath(path);
 	return (
 		<PathDetailsView
 			accounts={accounts}

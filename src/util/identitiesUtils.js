@@ -76,12 +76,28 @@ export const deepCopyIdentity = identity =>
 export const getPathsWithNetwork = (paths, networkKey) =>
 	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
 
-export const getNetworkKeyByPath = path => {
+export const getNetworkKeyBySubstratePath = path => {
 	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
 		networkParams => networkParams.pathId === path.split('//')[1]
 	);
 	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
 	return UnknownNetworkKeys.UNKNOWN;
+};
+
+export const getAvailableNetworkKeys = identity => {
+	const addressesList = Array.from(identity.addresses.values());
+	const networkKeysSet = addressesList.reduce((networksSet, path) => {
+		let networkKey;
+		if (isSubstratePath(path)) {
+			networkKey = getNetworkKeyBySubstratePath(path);
+			console.log('networkKey is', networkKey);
+		} else {
+			console.log('path is', path);
+			networkKey = path;
+		}
+		return { ...networksSet, [networkKey]: true };
+	}, {});
+	return Object.keys(networkKeysSet);
 };
 
 export const validatePath = path =>
