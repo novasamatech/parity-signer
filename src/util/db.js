@@ -138,6 +138,10 @@ export async function saveDefaultMetadata() {
 	);
 }
 
+export async function getMetadataByKey(networkKey) {
+	return await AsyncStorage.getItem(networkKey);
+}
+
 /*
  * ========================================
  *	NETWORK SPECS

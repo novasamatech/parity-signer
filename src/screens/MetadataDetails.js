@@ -16,7 +16,6 @@
 
 'use strict';
 
-// import PropTypes from 'prop-types';
 import React from 'react';
 // import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ScrollView } from 'react-native';
@@ -28,10 +27,11 @@ import Background from '../components/Background';
 // import fonts from '../fonts';
 import MetadataStore from '../stores/MetadataStore';
 import { styles } from 'react-native-markdown-renderer';
-import { SubstrateNetworkKeys } from '../constants';
 
 export default class MetadataDetails extends React.PureComponent {
 	render() {
+		const networkKey = this.props.navigation.getParam('networkKey');
+
 		return (
 			<Subscribe to={[MetadataStore]}>
 				{metadataStore => {
@@ -39,7 +39,7 @@ export default class MetadataDetails extends React.PureComponent {
 						<MetadataDetailsView
 							{...this.props}
 							metadataStore={metadataStore}
-							// networkKey={}
+							networkKey={networkKey}
 						/>
 					);
 				}}
@@ -54,12 +54,11 @@ class MetadataDetailsView extends React.PureComponent {
 	}
 
 	render() {
-		const { metadataStore } = this.props;
+		const { metadataStore, networkKey } = this.props;
 
-		console.log(
-			'meta new -> ',
-			metadataStore.getMetadata(SubstrateNetworkKeys.KUSAMA)
-		);
+		console.log('network key -> ', networkKey);
+
+		console.log('meta new -> ', metadataStore.getMetadata(networkKey));
 
 		return (
 			<ScrollView

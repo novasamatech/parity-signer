@@ -53,6 +53,7 @@ import AccountSettings from './screens/AccountSettings';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
+import MetadataDetails from './screens/MetadataDetails';
 import IdentityBackup from './screens/IdentityBackup';
 import IdentityNew from './screens/IdentityNew';
 import MessageDetails from './screens/MessageDetails';
@@ -228,6 +229,9 @@ const Screens = createStackNavigator(
 					},
 					MessageDetails: {
 						screen: MessageDetails
+					},
+					MetadataDetails: {
+						screen: MetadataDetails
 					},
 					NetworkSettings: {
 						screen: NetworkSettings
