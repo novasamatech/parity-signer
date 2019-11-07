@@ -26,6 +26,27 @@ import kusamaMeta from './static-kusama';
 import substrateMeta from './static-substrate';
 import { SubstrateNetworkKeys } from '../constants';
 
+/*
+ * ========================================
+ *	ACCOUNTS
+ * ========================================
+ */
+
+export async function loadAccountTxHashes(account) {
+	const result = await AsyncStorage.getItem(accountTxsKey(account));
+
+	return result ? JSON.parse(result) : [];
+}
+
+export async function loadAccountTxs(account) {
+	const hashes = await loadAccountTxHashes(account);
+
+	return (await AsyncStorage.multiGet(hashes.map(txKey))).map(v => [
+		v[0],
+		JSON.parse(v[1])
+	]);
+}
+
 export async function loadAccounts(version = 3) {
 	if (!SecureStorage) {
 		return Promise.resolve([]);
@@ -58,10 +79,6 @@ function accountTxsKey({ address, networkKey }) {
 	return 'account_txs_' + accountId({ address, networkKey });
 }
 
-function txKey(hash) {
-	return 'tx_' + hash;
-}
-
 export const deleteAccount = async accountKey =>
 	SecureStorage.deleteItem(accountKey, accountsStore);
 
@@ -72,48 +89,11 @@ export const saveAccount = (accountKey, account) =>
 		accountsStore
 	);
 
-export async function saveTx(tx) {
-	if (!tx.sender) {
-		throw new Error('Tx should contain sender to save');
-	}
-
-	if (!tx.recipient) {
-		throw new Error('Tx should contain recipient to save');
-	}
-
-	await [
-		storagePushValue(accountTxsKey(tx.sender), tx.hash),
-		storagePushValue(accountTxsKey(tx.recipient), tx.hash),
-		AsyncStorage.setItem(txKey(tx.hash), JSON.stringify(tx))
-	];
-}
-
-export async function loadAccountTxHashes(account) {
-	const result = await AsyncStorage.getItem(accountTxsKey(account));
-
-	return result ? JSON.parse(result) : [];
-}
-
-export async function loadAccountTxs(account) {
-	const hashes = await loadAccountTxHashes(account);
-
-	return (await AsyncStorage.multiGet(hashes.map(txKey))).map(v => [
-		v[0],
-		JSON.parse(v[1])
-	]);
-}
-
-async function storagePushValue(key, value) {
-	let currentVal = await AsyncStorage.getItem(key);
-
-	if (currentVal === null) {
-		return AsyncStorage.setItem(key, JSON.stringify([value]));
-	} else {
-		currentVal = JSON.parse(currentVal);
-		const newVal = new Set([...currentVal, value]);
-		return AsyncStorage.setItem(key, JSON.stringify(Array.from(newVal)));
-	}
-}
+/*
+ * ========================================
+ *	TERMS AND CONDITIONS
+ * ========================================
+ */
 
 export async function loadToCAndPPConfirmation() {
 	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v3');
@@ -126,16 +106,10 @@ export async function saveToCAndPPConfirmation() {
 }
 
 /*
- * Called once during onboarding. Populate the local storage with the default network specs with key being network_${genesisHash}.
+ * ========================================
+ *	METADATA
+ * ========================================
  */
-export async function saveDefaultNetworks() {
-	Object.entries(defaultNetworkSpecs()).forEach(async ([key, value]) => {
-		await AsyncStorage.setItem(
-			`network_${key}`,
-			JSON.stringify(value, null, 0)
-		);
-	});
-}
 
 /*
  * @dev map: networkKey => metadata blob
@@ -154,6 +128,12 @@ export async function saveDefaultMetadata() {
 		JSON.stringify(substrateMeta)
 	);
 }
+
+/*
+ * ========================================
+ *	NETWORK SPECS
+ * ========================================
+ */
 
 /*
  * @dev add or update a networkSpec at index of networkKey
@@ -186,12 +166,11 @@ export async function getAllNetworkSpecs() {
 	await asyncForEach(allKeys, async key => {
 		if (key.slice(0, 8) === 'network_') {
 			const spec = await getNetworkSpecByKey(key);
-			console.log('spec here -> ', spec);
-			console.log('json spec here -> ', JSON.parse(spec));
+
 			result.push(JSON.parse(spec));
 		}
 	});
-	console.log('all the network specs -< ', result);
+
 	return result;
 }
 
@@ -202,12 +181,62 @@ export async function getNetworkSpecByKey(networkKey) {
 	return await AsyncStorage.getItem(networkKey);
 }
 
-export async function clearAsyncStorage() {
-	await AsyncStorage.clear();
+/*
+ * Called once during onboarding. Populate the local storage with the default network specs with key being network_${genesisHash}.
+ */
+export async function saveDefaultNetworks() {
+	Object.entries(defaultNetworkSpecs()).forEach(async ([key, value]) => {
+		await AsyncStorage.setItem(
+			`network_${key}`,
+			JSON.stringify(value, null, 0)
+		);
+	});
+}
+
+/*
+ * ========================================
+ *	UTILS
+ * ========================================
+ */
+
+function txKey(hash) {
+	return 'tx_' + hash;
 }
 
 async function asyncForEach(array, callback) {
 	for (let i = 0; i < array.length; i++) {
 		await callback(array[i], i, array);
+	}
+}
+
+export async function clearAsyncStorage() {
+	await AsyncStorage.clear();
+}
+
+export async function saveTx(tx) {
+	if (!tx.sender) {
+		throw new Error('Tx should contain sender to save');
+	}
+
+	if (!tx.recipient) {
+		throw new Error('Tx should contain recipient to save');
+	}
+
+	await [
+		storagePushValue(accountTxsKey(tx.sender), tx.hash),
+		storagePushValue(accountTxsKey(tx.recipient), tx.hash),
+		AsyncStorage.setItem(txKey(tx.hash), JSON.stringify(tx))
+	];
+}
+
+async function storagePushValue(key, value) {
+	let currentVal = await AsyncStorage.getItem(key);
+
+	if (currentVal === null) {
+		return AsyncStorage.setItem(key, JSON.stringify([value]));
+	} else {
+		currentVal = JSON.parse(currentVal);
+		const newVal = new Set([...currentVal, value]);
+		return AsyncStorage.setItem(key, JSON.stringify(Array.from(newVal)));
 	}
 }

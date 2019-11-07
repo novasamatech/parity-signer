@@ -13,7 +13,7 @@
     "build-rust-ios": "cd rust/signer && make ios",
     "build-rust-android": "cd rust/signer && make android",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force && rm -rf ./android/app/build && rm -rf ./ios/build && yarn clean-rust",
-    "clean-rust" : "cd rust/signer && cargo clean && cd ../..",
+    "clean-rust": "cd rust/signer && cargo clean && cd ../..",
     "commit": "commit-wizard",
     "ios": "yarn run build-rust-ios && react-native run-ios",
     "lint": "npx eslint . --ext .js,.jsx --ignore-path .gitignore",
@@ -44,6 +44,7 @@
     "@react-native-community/netinfo": "^4.1.5",
     "@tradle/react-native-http": "^2.0.1",
     "bignumber.js": "^9.0.0",
+    "buffer": "^5.4.3",
     "hoist-non-react-statics": "^3.3.0",
     "node-libs-react-native": "^1.0.3",
     "prop-types": "^15.6.1",
@@ -109,8 +110,7 @@
       },
       "android.emu.debug": {
         "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
-        "build":
-        "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+        "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
         "device": {
           "avdName": "Nexus_5_API_28"

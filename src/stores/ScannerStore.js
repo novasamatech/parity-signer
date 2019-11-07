@@ -68,6 +68,7 @@ type ScannerState = {
 	isHash: boolean,
 	isOversized: boolean,
 	latestFrame: number,
+	isScanningMetadata: boolean,
 	message: string,
 	missedFrames: Array<number>,
 	multipartData: MultipartData,
@@ -91,6 +92,7 @@ const DEFAULT_STATE = Object.freeze({
 	dataToSign: '',
 	isHash: false,
 	isOversized: false,
+	isScanningMetadata: false,
 	latestFrame: null,
 	message: null,
 	missedFrames: [],
@@ -128,11 +130,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		strippedData,
 		accountsStore,
 		multipartComplete = false,
-		isMetadata
+		isScanningMetadata
 	) {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
-			multipartComplete
+			multipartComplete,
+			isScanningMetadata
 		);
 
 		if (!multipartComplete && parsedData.isMultipart) {
@@ -141,9 +144,13 @@ export default class ScannerStore extends Container<ScannerState> {
 				parsedData.frameCount,
 				parsedData.partData,
 				accountsStore,
-				isMetadata
+				isScanningMetadata
 			);
 			return;
+		} else {
+			// check if it is metadata
+			// let isMetadata = checkIfPayloadIsMetadata(concatMultipartData);
+			debugger;
 		}
 
 		if (accountsStore.getByAddress(parsedData.data.account)) {
@@ -174,10 +181,19 @@ export default class ScannerStore extends Container<ScannerState> {
 				}
 			}
 
-			// if the account was not found, unsignedData was never set, alert the user appropriately.
-			this.setErrorMsg(
-				`No private key found for ${parsedData.data.account} in your signer key storage.`
-			);
+			if (isScanningMetadata) {
+				this.setState({
+					isScanningMetadata: true,
+					metadata: parsedData,
+					unsignedData: null
+				});
+				debugger;
+			} else {
+				// if the account was not found, unsignedData was never set, alert the user appropriately. Ignore if scanning in metadata blob.
+				this.setErrorMsg(
+					`No private key found for ${parsedData.data.account} in your signer key storage.`
+				);
+			}
 		}
 
 		// set payload before it got hashed.
@@ -185,7 +201,13 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setPrehashPayload(parsedData.preHash);
 	}
 
-	async setPartData(frame, frameCount, partData, accountsStore, isMetadata) {
+	async setPartData(
+		frame,
+		frameCount,
+		partData,
+		accountsStore,
+		isScanningMetadata
+	) {
 		const {
 			latestFrame,
 			missedFrames,
@@ -201,6 +223,12 @@ export default class ScannerStore extends Container<ScannerState> {
 			});
 		}
 
+		if (!isScanningMetadata) {
+			this.setState({
+				isScanningMetadata
+			});
+		}
+
 		const partDataAsBytes = new Uint8Array(partData.length / 2);
 
 		for (let i = 0; i < partDataAsBytes.length; i++) {
@@ -208,7 +236,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		// Network spec is expected to be a JSON.
-		if (!isMetadata) {
+		if (!isScanningMetadata) {
 			if (
 				partDataAsBytes[0] === new Uint8Array([0x00]) ||
 				partDataAsBytes[0] === new Uint8Array([0x7b])
@@ -246,7 +274,12 @@ export default class ScannerStore extends Container<ScannerState> {
 			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
 			// handle the binary blob as a single UOS payload
-			this.setParsedData(concatMultipartData, accountsStore, true, isMetadata);
+			this.setParsedData(
+				concatMultipartData,
+				accountsStore,
+				true,
+				isScanningMetadata
+			);
 		} else if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData;
@@ -297,6 +330,11 @@ export default class ScannerStore extends Container<ScannerState> {
 				return await this.setTXRequest(this.state.unsignedData, accountsStore);
 			case 'signData':
 				return await this.setDataToSign(this.state.unsignedData, accountsStore);
+			case 'updateMetadata':
+				return await this.setMetadataToUpdate(
+					this.state.metadata,
+					accountsStore
+				);
 			default:
 				throw new Error(
 					'Scanned QR should contain either transaction or a message to sign'

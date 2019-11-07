@@ -20,6 +20,9 @@ import '../shim';
 
 import '@polkadot/types/injector';
 
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
+
 import React, { Component } from 'react';
 import { StatusBar, YellowBox } from 'react-native';
 import {

@@ -16,14 +16,41 @@
 
 // @flow
 
-// import { Container } from 'unstated';
+import { Container } from 'unstated';
 
-// import { getMetadataByKey, saveNewMetadata } from '../util/db';
+import { getMetadataByKey, saveNewMetadata } from '../util/db';
+import { Metadata } from '@polkadot/types';
 
-// export class MetadataStore extends React.Component {
-// 	async setNew() {}
+type State = {
+	new: Metadata,
+	selected: Metadata
+};
 
-// 	async getMetadata(networkKey) {}
+const DEFAULT_STATE = Object.freeze({
+	new: null,
+	selected: null
+});
 
-// 	async updateMedata(networkKey) {}
-// }
+export class MetadataStore extends Container<State> {
+	state = DEFAULT_STATE;
+
+	async saveNew(blob, networkKey) {
+		try {
+			await saveNewMetadata(blob, networkKey);
+		} catch (e) {
+			debugger;
+			throw new Error(e);
+		}
+	}
+
+	async getMetadata(networkKey) {
+		try {
+			await getMetadataByKey(networkKey);
+		} catch (e) {
+			debugger;
+			throw new Error(e);
+		}
+	}
+
+	// async updateMedata(networkKey) {}
+}
