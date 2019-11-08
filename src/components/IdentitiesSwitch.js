@@ -220,44 +220,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 							style={{ paddingLeft: 8 * 4 }}
 						/>
 						<Separator />
-						<ButtonIcon
-							title="Settings"
-							onPress={() => {
-								setVisible(false);
-								// go to Settings;
-							}}
-							iconName="ios-cog"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_big}
-							style={{ paddingLeft: 8 * 4 }}
-						/>
-						<ButtonIcon
-							title="Terms and Conditions"
-							onPress={() => {
-								setVisible(false);
-								navigation.navigate('TermsAndConditions');
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
-						<ButtonIcon
-							title="Privacy Policy"
-							onPress={() => {
-								setVisible(false);
-								navigation.navigate('PrivacyPolicy');
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
+						{renderSettings()}
 					</View>
 				</View>
 			</Modal>
