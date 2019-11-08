@@ -34,6 +34,7 @@ import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
 import { getAvailableNetworkKeys } from '../util/identitiesUtils';
+import testIDs from '../../e2e/testIDs';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
@@ -47,24 +48,34 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	const hasNoAccount =
 		accounts.getAccounts().size === 0 && identities.length === 0;
 
-	const showOnboardingMessage = () => {
-		const createLink = (text, isRecover) => (
-			<Text
-				style={styles.link}
-				onPress={() => navigation.navigate('IdentityNew', { isRecover })}
-			>
-				{text}
-			</Text>
-		);
+	const TextButton = ({ text, isRecover }) => (
+		<Text
+			style={styles.link}
+			testID={
+				isRecover
+					? testIDs.AccountNetworkChooser.recoverButton
+					: testIDs.AccountNetworkChooser.createButton
+			}
+			onPress={() => navigation.navigate('IdentityNew', { isRecover })}
+		>
+			{text}
+		</Text>
+	);
 
+	const showOnboardingMessage = () => {
 		return (
-			<ScrollView style={styles.body}>
+			<ScrollView
+				testID={testIDs.AccountNetworkChooser.noAccountScreen}
+				style={styles.body}
+			>
 				<View style={styles.onboardingWrapper}>
-					<Text style={styles.onboardingText}>
-						No Identity yet?{'\n'}
-						{createLink('Create', false)} or {createLink('Recover', true)} an
-						account to get started.
-					</Text>
+					<View style={styles.onboardingText}>
+						<Text>No Identity yet?{'\n'}</Text>
+						<TextButton text="Create" isRecover={false} />
+						<Text>No Identity yet?{'\n'}</Text>
+						<TextButton text="Recover" isRecover={true} />
+						<Text>an account to get started.</Text>
+					</View>
 				</View>
 			</ScrollView>
 		);
@@ -88,6 +99,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			return (
 				<>
 					<Button
+						testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
 						title="Add Network Account"
 						onPress={() => setShouldShowMoreNetworks(true)}
 					/>
@@ -100,6 +112,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		} else {
 			return (
 				<Button
+					testID={testIDs.AccountNetworkChooser.showExistedButton}
 					title="Show Existed Network Account"
 					onPress={() => setShouldShowMoreNetworks(false)}
 				/>
@@ -112,15 +125,20 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	if (hasNoAccount) return showOnboardingMessage();
 
 	return (
-		<ScrollView style={styles.body}>
+		<ScrollView
+			style={styles.body}
+			testID={testIDs.AccountNetworkChooser.chooserScreen}
+		>
 			<Text style={styles.title}>
 				{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
 			</Text>
 			{Object.entries(NETWORK_LIST)
 				.filter(getNetworkKeys)
-				.map(([networkKey, networkParams]) => (
+				.map(([networkKey, networkParams], index) => (
 					<AccountCard
 						address={''}
+						key={networkKey}
+						testID={testIDs.AccountNetworkChooser.networkButton + index}
 						networkKey={networkKey}
 						onPress={async () => {
 							if (isNew) {

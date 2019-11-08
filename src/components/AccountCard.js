@@ -34,6 +34,7 @@ export default class AccountCard extends React.PureComponent {
 		onPress: PropTypes.func,
 		seedType: PropTypes.string,
 		style: ViewPropTypes.style,
+		testID: PropTypes.string,
 		title: PropTypes.string
 	};
 
@@ -43,7 +44,14 @@ export default class AccountCard extends React.PureComponent {
 	};
 
 	render() {
-		const { address, networkKey, onPress, seedType, style } = this.props;
+		const {
+			address,
+			networkKey,
+			onPress,
+			seedType,
+			style,
+			testID
+		} = this.props;
 		let { title } = this.props;
 		title = title.length ? title : AccountCard.defaultProps.title;
 		const seedTypeDisplay = seedType || '';
@@ -53,6 +61,7 @@ export default class AccountCard extends React.PureComponent {
 		return (
 			<TouchableItem
 				accessibilityComponentType="button"
+				testID={testID}
 				disabled={false}
 				onPress={onPress}
 			>

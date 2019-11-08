@@ -7,15 +7,16 @@ import { getPathName, isSubstratePath } from '../util/identitiesUtils';
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
 	onPress: PropTypes.func,
-	path: PropTypes.string.isRequired
+	path: PropTypes.string.isRequired,
+	testID: PropTypes.string
 };
 
-export default function PathCard({ onPress, identity, path }) {
+export default function PathCard({ onPress, identity, path, testID }) {
 	const pathName = getPathName(path, identity);
 	const address = identity.meta.get(path).address;
 
 	return (
-		<View>
+		<View testID={testID}>
 			<Text>{pathName}</Text>
 			{isSubstratePath(path) && <Button onPress={onPress} title={path} />}
 			<Text>{address}</Text>

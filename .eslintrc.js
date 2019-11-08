@@ -2,7 +2,7 @@ module.exports = {
   extends: ["@react-native-community", "plugin:prettier/recommended"],
   overrides: [
     {
-      "files": ["e2e/*.spec.js", "e2e/init.js"],
+      "files": ["e2e/*.spec.js", "e2e/init.js", "e2e/e2eUtils.js"],
       "rules": {
         "no-undef": "off"
       }

@@ -37,6 +37,7 @@ import {
 	unlockSeed
 } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
+import testIDs from '../../e2e/testIDs';
 
 function IdentityBackup({ navigation, accounts }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
@@ -94,11 +95,17 @@ function IdentityBackup({ navigation, accounts }) {
 					}
 				}}
 			>
-				<Text style={fontStyles.t_seed}>{seedPhrase}</Text>
+				<Text
+					style={fontStyles.t_seed}
+					testID={testIDs.IdentityBackup.seedText}
+				>
+					{seedPhrase}
+				</Text>
 			</TouchableItem>
 			{isNew && (
 				<Button
 					title="Next"
+					testID={testIDs.IdentityBackup.nextButton}
 					onPress={async () => {
 						const pin = await setPin(navigation);
 						await accounts.saveNewIdentity(seedPhrase, pin);

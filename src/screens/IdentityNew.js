@@ -31,6 +31,7 @@ import {
 	setPin
 } from '../util/navigationHelpers';
 import { alertIdentityCreationError } from '../util/alertUtils';
+import testIDs from '../../e2e/testIDs';
 
 function IdentityNew({ accounts, navigation }) {
 	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
@@ -50,6 +51,7 @@ function IdentityNew({ accounts, navigation }) {
 	const renderRecoverView = () => (
 		<>
 			<AccountSeed
+				testID={testIDs.IdentityNew.seedInput}
 				valid={validateSeed(seedPhrase, true).valid} //TODO: validation need to be improved.
 				onChangeText={setSeedPhrase}
 				value={seedPhrase}
@@ -65,6 +67,7 @@ function IdentityNew({ accounts, navigation }) {
 				/>
 				<Button
 					title="Recover Identity"
+					testID={testIDs.IdentityNew.recoverButton}
 					onPress={async () => {
 						const pin = await setPin(navigation);
 						try {
@@ -91,6 +94,7 @@ function IdentityNew({ accounts, navigation }) {
 			/>
 			<Button
 				title="Create"
+				testID={testIDs.IdentityNew.createButton}
 				onPress={() => {
 					setSeedPhrase('');
 					navigation.navigate('IdentityBackup', {

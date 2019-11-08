@@ -30,6 +30,7 @@ import PathCard from '../components/PathCard';
 import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { alertLegacyAccountCreationError } from '../util/alertUtils';
 import { PathDetailsView } from './PathDetails';
+import testIDs from '../../e2e/testIDs';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -77,6 +78,8 @@ function PathsList({ accounts, navigation }) {
 		const path = pathsGroup.paths[0];
 		return (
 			<PathCard
+				key={path}
+				testID={testIDs.PathList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
 				onPress={() => navigate('PathDetails', { path })}
@@ -89,6 +92,8 @@ function PathsList({ accounts, navigation }) {
 			<Text>{pathsGroup.title}</Text>
 			{pathsGroup.paths.map(path => (
 				<PathCard
+					key={path}
+					testID={testIDs.PathList.pathCard + path}
 					identity={currentIdentity}
 					path={path}
 					onPress={() => navigate('PathDetails', { path })}

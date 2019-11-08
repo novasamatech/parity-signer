@@ -90,9 +90,7 @@ export const getAvailableNetworkKeys = identity => {
 		let networkKey;
 		if (isSubstratePath(path)) {
 			networkKey = getNetworkKeyBySubstratePath(path);
-			console.log('networkKey is', networkKey);
 		} else {
-			console.log('path is', path);
 			networkKey = path;
 		}
 		return { ...networksSet, [networkKey]: true };

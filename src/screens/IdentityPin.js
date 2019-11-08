@@ -25,6 +25,7 @@ import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import { withAccountStore } from '../util/HOC';
+import testIDs from '../../e2e/testIDs';
 
 export default withAccountStore(withNavigation(IdentityPin));
 
@@ -118,6 +119,7 @@ function IdentityPin({ navigation, accounts }) {
 				<Text style={styles.title}>PIN</Text>
 				<PinInput
 					autoFocus
+					testID={testIDs.IdentityPin.unlockPinInput}
 					returnKeyType="done"
 					onChangeText={pin => onPinInputChange('pin', pin)}
 					value={state.pin}
@@ -126,6 +128,7 @@ function IdentityPin({ navigation, accounts }) {
 					onPress={testPin}
 					color="green"
 					title="Done"
+					testID={testIDs.IdentityPin.unlockPinButton}
 					accessibilityLabel={'Done'}
 				/>
 			</>
@@ -136,6 +139,7 @@ function IdentityPin({ navigation, accounts }) {
 				<Text style={styles.title}>PIN</Text>
 				<PinInput
 					autoFocus
+					testID={testIDs.IdentityPin.setPin}
 					returnKeyType="next"
 					onFocus={() => updateState({ focusConfirmation: false })}
 					onSubmitEditing={() => {
@@ -147,6 +151,7 @@ function IdentityPin({ navigation, accounts }) {
 				<Text style={styles.title}>CONFIRM PIN</Text>
 				<PinInput
 					returnKeyType="done"
+					testID={testIDs.IdentityPin.confirmPin}
 					focus={state.focusConfirmation}
 					onChangeText={confirmation =>
 						onPinInputChange('confirmation', confirmation)
@@ -154,6 +159,7 @@ function IdentityPin({ navigation, accounts }) {
 					value={state.confirmation}
 				/>
 				<Button
+					testID={testIDs.IdentityPin.submitButton}
 					onPress={submit}
 					color="green"
 					title="Done"
