@@ -16,18 +16,28 @@
 
 import {
 	deserializeIdentities,
+	getAvailableNetworkKeys,
 	getPathName,
 	groupPaths,
 	serializeIdentities
 } from '../../src/util/identitiesUtils';
+import {
+	EthereumNetworkKeys,
+	SubstrateNetworkKeys,
+	UnknownNetworkKeys
+} from '../../src/constants';
 
 const address1 = 'address1',
 	address2 = 'address2',
+	addressPolkadot = 'address5',
+	addressEthereum = 'address6',
 	paths = [
-		'//kusama//default',
-		'//kusama//funding/1',
-		'//kusama//funding/2',
-		'//kusama//stacking/1'
+		'//kusama_CC2//default',
+		'//kusama_CC2//funding/1',
+		'//kusama_CC2//funding/2',
+		'//kusama_CC2//stacking/1',
+		'//polkadot//default',
+		'1'
 	],
 	pathMeta1 = {
 		address: address1,
@@ -40,9 +50,31 @@ const address1 = 'address1',
 		createdAt: 1571068850409,
 		name: 'funding account2',
 		updatedAt: 1571078850509
+	},
+	pathMetaPolkadot = {
+		address: addressPolkadot,
+		createdAt: 1573142786972,
+		name: 'PolkadotFirst',
+		updatedAt: 1573142786972
+	},
+	pathMetaEthereum = {
+		address: addressEthereum,
+		createdAt: 1573142786972,
+		name: 'Eth account',
+		updatedAt: 1573142786972
 	};
-const addressMap = new Map([[address1, paths[1]], [address2, paths[2]]]);
-const metaMap = new Map([[paths[1], pathMeta1], [paths[2], pathMeta2]]);
+const addressMap = new Map([
+	[address1, paths[1]],
+	[address2, paths[2]],
+	[addressPolkadot, paths[4]],
+	[addressEthereum, paths[5]]
+]);
+const metaMap = new Map([
+	[paths[1], pathMeta1],
+	[paths[2], pathMeta2],
+	[paths[4], pathMetaPolkadot],
+	[paths[5], pathMetaEthereum]
+]);
 const testIdentities = [
 	{
 		addresses: addressMap,
@@ -68,7 +100,8 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('regroup the paths', () => {
-		const groupResult = groupPaths(paths);
+		const kusamaPaths = paths.slice(0, 4);
+		const groupResult = groupPaths(kusamaPaths);
 		expect(groupResult).toEqual([
 			{
 				paths: [paths[0]],
@@ -92,5 +125,14 @@ describe('IdentitiesUtils', () => {
 		expect(gotIdentity1PathName).toEqual('funding account1');
 		const gotStacking1PathName = getPathName(paths[3], testIdentities[0]);
 		expect(gotStacking1PathName).toEqual('stacking1');
+	});
+
+	it('get the correspond networkKeys', () => {
+		const networkKeys = getAvailableNetworkKeys(testIdentities[0]);
+		expect(networkKeys).toEqual([
+			EthereumNetworkKeys.FRONTIER,
+			SubstrateNetworkKeys.KUSAMA,
+			UnknownNetworkKeys.UNKNOWN
+		]);
 	});
 });

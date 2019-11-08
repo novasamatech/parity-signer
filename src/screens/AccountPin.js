@@ -63,7 +63,7 @@ class AccountPinView extends React.PureComponent {
 			await accounts.save(accounts.getSelectedKey(), account, pin);
 			const resetAction = StackActions.reset({
 				actions: [
-					NavigationActions.navigate({ routeName: 'AccountList' }),
+					NavigationActions.navigate({ routeName: 'LegacyAccountList' }),
 					NavigationActions.navigate({ routeName: 'AccountDetails' })
 				],
 				index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343

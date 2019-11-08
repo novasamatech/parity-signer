@@ -43,7 +43,7 @@ import {
 	deepCopyIdentities,
 	deepCopyIdentity,
 	emptyIdentity,
-	getNetworkKeyByPath
+	getNetworkKeyBySubstratePath
 } from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
@@ -51,6 +51,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		accounts: new Map(),
 		currentIdentity: null,
 		identities: [],
+		loaded: false,
 		newAccount: emptyAccount(),
 		newIdentity: emptyIdentity(),
 		selectedKey: ''
@@ -134,7 +135,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async refreshList() {
 		const accounts = await loadAccounts();
 		const identities = await loadIdentities();
-		this.setState({ accounts, identities });
+		let { currentIdentity } = this.state;
+		if (identities.length > 0) currentIdentity = identities[0];
+		this.setState({ accounts, currentIdentity, identities, loaded: true });
 	}
 
 	async encryptSeedPhraseAndLockAccount(account, pin = null) {
@@ -262,7 +265,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (!targetPath || !targetIdentity) return false;
 
 		const metaData = targetIdentity.meta.get(targetPath);
-		const networkKey = getNetworkKeyByPath(targetPath);
+		const networkKey = getNetworkKeyBySubstratePath(targetPath);
 		return {
 			...metaData,
 			encryptedSeed: targetIdentity.encryptedSeed,

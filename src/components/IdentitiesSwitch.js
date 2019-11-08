@@ -18,7 +18,6 @@ import React, { useState } from 'react';
 import { FlatList, Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import Button from './Button';
 import ButtonIcon from './ButtonIcon';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
@@ -68,7 +67,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					style={styles.i_arrowStyle}
 				/>
 				<ButtonIcon
-					title="Backup Identity"
+					title="Show Recovery Phrase"
 					onPress={() => {
 						setVisible(false);
 						navigation.navigate('IdentityBackup', { isNew: false });
@@ -88,6 +87,20 @@ function IdentitiesSwitch({ navigation, accounts }) {
 	const renderSettings = () => {
 		return (
 			<>
+				{accounts.getAccounts().size > 0 && (
+					<ButtonIcon
+						title="Legacy Accounts"
+						onPress={() => {
+							setVisible(false);
+							navigation.navigate('LegacyAccountList');
+						}}
+						iconName="ios-cog"
+						iconType="ionicon"
+						iconSize={24}
+						textStyle={fontStyles.t_big}
+						style={{ paddingLeft: 8 * 4 }}
+					/>
+				)}
 				<ButtonIcon
 					title="Settings"
 					onPress={() => {
