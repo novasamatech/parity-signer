@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -37,7 +37,7 @@ export default class LegacyAccountList extends React.PureComponent {
 					return (
 						<AccountListView
 							{...this.props}
-							accounts={accounts.getLegacySubstrateAccounts()}
+							accounts={accounts.getAccounts()}
 							onAccountSelected={key => {
 								accounts.select(key);
 								this.props.navigation.navigate('AccountDetails');
@@ -60,40 +60,19 @@ class AccountListView extends React.PureComponent {
 		super(props);
 	}
 
-	showOnboardingMessage = () => {
-		const { navigate } = this.props.navigation;
-		const createLink = (text, navigation) => (
-			<Text style={styles.link} onPress={() => navigate(navigation)}>
-				{text}
-			</Text>
-		);
-
-		return (
-			<View style={styles.onboardingWrapper}>
-				<Text style={styles.onboardingText}>
-					No account yet?{'\n'}
-					{createLink('Create', 'AccountNew')} or{' '}
-					{createLink('recover', 'AccountRecover')} an account to get started.
-				</Text>
-			</View>
-		);
-	};
-
 	render() {
 		const { accounts, navigation, onAccountSelected } = this.props;
-		const hasNoAccount = accounts.length < 1;
 		const { navigate } = navigation;
 
 		return (
 			<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
 				<Background />
-				{hasNoAccount && this.showOnboardingMessage()}
 				<FlatList
 					ref={list => {
 						this.list = list;
 					}}
 					style={styles.content}
-					data={accounts}
+					data={Array.from(accounts.entries())}
 					keyExtractor={([key]) => key}
 					renderItem={({ item: [accountKey, account] }) => {
 						return (
@@ -110,15 +89,13 @@ class AccountListView extends React.PureComponent {
 					}}
 					enableEmptySections
 				/>
-				{!hasNoAccount && (
-					<View style={styles.bottom}>
-						<Button
-							buttonStyles={{ height: 60 }}
-							title="Scan"
-							onPress={() => navigate('QrScanner')}
-						/>
-					</View>
-				)}
+				<View style={styles.bottom}>
+					<Button
+						buttonStyles={{ height: 60 }}
+						title="Scan"
+						onPress={() => navigate('QrScanner')}
+					/>
+				</View>
 			</View>
 		);
 	}
@@ -147,16 +124,6 @@ const styles = StyleSheet.create({
 	menuView: {
 		alignItems: 'flex-end',
 		flex: 1
-	},
-	onboardingText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.regular,
-		fontSize: 20
-	},
-	onboardingWrapper: {
-		alignItems: 'flex-end',
-		flex: 1,
-		flexDirection: 'row'
 	},
 	title: {
 		color: colors.bg_text_sec,
