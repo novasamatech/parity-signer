@@ -33,8 +33,7 @@ import {
 import { alertIdentityCreationError } from '../util/alertUtils';
 
 function IdentityNew({ accounts, navigation }) {
-	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
-	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
+	const [isRecover, setIsRecover] = useState(false);
 	const [seedPhrase, setSeedPhrase] = useState('');
 
 	useEffect(() => {

@@ -44,7 +44,7 @@ export const navigateToNewIdentityNetwork = navigation => {
 
 export const navigateToLegacyAccountList = navigation => {
 	const resetAction = StackActions.reset({
-		actions: [NavigationActions.navigate({ routeName: 'LegacyAccountList' })],
+		actions: [NavigationActions.navigate({ routeName: 'AccountList' })],
 		index: 0, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 		key: undefined
 	});

@@ -51,7 +51,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		accounts: new Map(),
 		currentIdentity: null,
 		identities: [],
-		loaded: false,
 		newAccount: emptyAccount(),
 		newIdentity: emptyIdentity(),
 		selectedKey: ''
@@ -135,9 +134,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async refreshList() {
 		const accounts = await loadAccounts();
 		const identities = await loadIdentities();
-		let { currentIdentity } = this.state;
-		if (identities.length > 0) currentIdentity = identities[0];
-		this.setState({ accounts, currentIdentity, identities, loaded: true });
+		this.setState({ accounts, identities });
 	}
 
 	async encryptSeedPhraseAndLockAccount(account, pin = null) {

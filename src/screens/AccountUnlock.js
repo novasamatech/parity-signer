@@ -50,9 +50,7 @@ export class AccountUnlockAndSign extends React.PureComponent {
 						navigate={() => {
 							const resetAction = StackActions.reset({
 								actions: [
-									NavigationActions.navigate({
-										routeName: 'LegacyAccountList'
-									}),
+									NavigationActions.navigate({ routeName: 'AccountList' }),
 									NavigationActions.navigate({ routeName: next })
 								],
 								index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
@@ -70,7 +68,7 @@ export class AccountUnlockAndSign extends React.PureComponent {
 export class AccountUnlock extends React.Component {
 	render() {
 		const { navigation } = this.props;
-		const next = navigation.getParam('next', 'LegacyAccountList');
+		const next = navigation.getParam('next', 'AccountList');
 
 		return (
 			<Subscribe to={[AccountsStore]}>
@@ -90,9 +88,7 @@ export class AccountUnlock extends React.Component {
 							} else {
 								const resetAction = StackActions.reset({
 									actions: [
-										NavigationActions.navigate({
-											routeName: 'LegacyAccountList'
-										}),
+										NavigationActions.navigate({ routeName: 'AccountList' }),
 										NavigationActions.navigate({ routeName: 'AccountDetails' }),
 										NavigationActions.navigate({ routeName: next })
 									],

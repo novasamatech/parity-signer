@@ -173,11 +173,11 @@ const Screens = createStackNavigator(
 		Welcome: {
 			screen: createStackNavigator(
 				{
-					AccountNetworkChooser: {
+					AccountList: {
 						navigationOptions: {
 							headerLeft: <HeaderLeftHome />
 						},
-						screen: AccountNetworkChooser
+						screen: LegacyAccountList
 					},
 					AccountPin: {
 						screen: AccountPin
@@ -194,6 +194,9 @@ const Screens = createStackNavigator(
 					AccountEdit: {
 						screen: AccountEdit
 					},
+					AccountNetworkChooser: {
+						screen: AccountNetworkChooser
+					},
 					AccountNew: {
 						screen: AccountNew
 					},
@@ -205,9 +208,6 @@ const Screens = createStackNavigator(
 					},
 					LegacyAccountBackup: {
 						screen: LegacyAccountBackup
-					},
-					LegacyAccountList: {
-						screen: LegacyAccountList
 					},
 					IdentityBackup: {
 						screen: IdentityBackup
