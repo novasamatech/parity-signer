@@ -13,8 +13,11 @@ const {
 	IdentityNew,
 	IdentityBackup,
 	IdentityPin,
+	PathDerivation,
 	PathList
 } = testIDs;
+
+const pinCode = '123456';
 
 describe('Load test', async () => {
 	beforeAll(async () => {
@@ -33,7 +36,6 @@ describe('Load test', async () => {
 	});
 
 	it('create a new identity with default substrate account', async () => {
-		const pinCode = '123456';
 		const substrateNetworkButtonIndex =
 			AccountNetworkChooser.networkButton + '5'; //Need change if network list changes
 
@@ -54,5 +56,16 @@ describe('Load test', async () => {
 		await testInput(IdentityPin.unlockPinInput, pinCode);
 		await testTap(IdentityPin.unlockPinButton);
 		await testExist(PathList.pathCard + '//kusama_CC2//default');
+	});
+
+	it('derive a new key', async () => {
+		const path = '//funding/0';
+		await testTap(PathList.deriveButton);
+		await testInput(PathDerivation.nameInput, 'first one');
+		await testInput(PathDerivation.pathInput, path);
+		await testTap(PathDerivation.deriveButton);
+		await testInput(IdentityPin.unlockPinInput, pinCode);
+		await testTap(IdentityPin.unlockPinButton);
+		await testExist(PathList.pathCard + `//kusama_CC2${path}`);
 	});
 });

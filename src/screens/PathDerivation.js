@@ -25,6 +25,7 @@ import { unlockSeed } from '../util/navigationHelpers';
 import AccountCard from '../components/AccountCard';
 import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
 import { alertPathDerivationError } from '../util/alertUtils';
+import testIDs from '../../e2e/testIDs';
 
 function PathDerivation({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -44,12 +45,17 @@ function PathDerivation({ accounts, navigation }) {
 			{!isPathValid && <Text>Invalid Path</Text>}
 			<Text>Display Name</Text>
 			<TextInput
+				testID={testIDs.PathDerivation.nameInput}
 				value={keyPairsName}
 				onChangeText={keyParisName => setKeyPairsName(keyParisName.trim())}
 			/>
 			<Text>Path</Text>
 			<Text>{existedNetworkPath}</Text>
-			<TextInput value={derivationPath} onChangeText={setDerivationPath} />
+			<TextInput
+				testID={testIDs.PathDerivation.pathInput}
+				value={derivationPath}
+				onChangeText={setDerivationPath}
+			/>
 			{networkKey !== '' && (
 				<AccountCard
 					address={''}
@@ -60,6 +66,7 @@ function PathDerivation({ accounts, navigation }) {
 
 			<Button
 				title="Derive Address"
+				testID={testIDs.PathDerivation.deriveButton}
 				onPress={async () => {
 					if (!validateDerivedPath(derivationPath)) {
 						return setIsPathValid(false);

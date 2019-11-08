@@ -27,7 +27,13 @@ const testIDs = {
 		unlockPinButton: 'identity_unlock_pin_button',
 		unlockPinInput: 'identity_unlock_pin_input'
 	},
+	PathDerivation: {
+		deriveButton: 'path_derivation_derive_button',
+		nameInput: 'path_derivation_name_input',
+		pathInput: 'path_derivation_path_input'
+	},
 	PathList: {
+		deriveButton: 'path_list_derive_button',
 		pathCard: 'path_list_path_card'
 	},
 	TacScreen: {

@@ -110,6 +110,7 @@ function PathsList({ accounts, navigation }) {
 					: renderGroupPaths(pathsGroup)
 			)}
 			<Button
+				testID={testIDs.PathList.deriveButton}
 				title="Create New Derivation"
 				onPress={() => navigation.navigate('PathDerivation', { networkKey })}
 			/>
