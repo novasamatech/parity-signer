@@ -15,10 +15,12 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // @flow
+
 import { Metadata } from '@polkadot/types';
 import { Container } from 'unstated';
 
 import { getMetadataByKey, saveNewMetadata } from '../util/db';
+import { base64ToHex } from '../util/strings';
 
 type State = {
 	new: typeof Metadata,
@@ -42,11 +44,13 @@ export default class MetadataStore extends Container<State> {
 		}
 	}
 
-	async getMetadata(networkKey) {
+	async getMetaByKey(networkKey) {
 		try {
 			const blob = await getMetadataByKey(networkKey);
-			debugger;
-			return blob;
+
+			const result = new Metadata(base64ToHex(blob));
+
+			return result;
 		} catch (e) {
 			throw new Error(e);
 		}
