@@ -22,9 +22,9 @@ import { GenericCall, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 
-import { base64ToHex } from './strings';
-import { fromWei } from '../../src/util/units';
 import kusamaData from '../../src/util/static-kusama';
+import { base64ToHex } from '../../src/util/strings';
+import { fromWei } from '../../src/util/units';
 
 describe('units', () => {
 	describe('ethereum', () => {
