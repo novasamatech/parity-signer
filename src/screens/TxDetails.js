@@ -93,7 +93,7 @@ export class TxDetailsView extends React.PureComponent {
 
 	render() {
 		const {
-			// dataToSign,
+			dataToSign,
 			gas,
 			gasPrice,
 			prehash,
@@ -143,24 +143,10 @@ export class TxDetailsView extends React.PureComponent {
 						<PayloadDetailsCard
 							style={{ marginBottom: 20 }}
 							description="You are about to confirm sending the following extrinsic"
-							payload={dataToSign}
+							payload={prehash || dataToSign}
 							prefix={prefix}
 						/>
-						<Text style={styles.title}>RECIPIENT</Text>
-						<AccountCard
-							title={recipient.name}
-							address={recipient.address}
-							networkKey={recipient.networkKey || ''}
-						/>
-					</React.Fragment>
-				) : (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						description="You are about to confirm sending the following extrinsic"
-						payload={prehash}
-						prefix={prefix}
 					)}
-
 					<Button
 						buttonStyles={{ height: 60 }}
 						title="Sign Transaction"

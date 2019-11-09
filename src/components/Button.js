@@ -46,7 +46,14 @@ export default class Button extends React.PureComponent<{
 	};
 
 	render() {
-		const { buttonStyles, disabled, onPress, testiD, textStyles, title } = this.props;
+		const {
+			buttonStyles,
+			disabled,
+			onPress,
+			testID,
+			textStyles,
+			title
+		} = this.props;
 
 		const finalTextStyles = [styles.text, textStyles];
 		const finalButtonStyles = [styles.button, buttonStyles];

@@ -188,9 +188,6 @@ const Screens = createStackNavigator(
 					AccountPin: {
 						screen: AccountPin
 					},
-					AccountUnlock: {
-						screen: AccountUnlock
-					},
 					About: {
 						screen: About
 					},
