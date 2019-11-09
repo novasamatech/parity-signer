@@ -17,9 +17,12 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  NSArray<NSString *> *arguments = [[NSProcessInfo processInfo] arguments];
+  NSDictionary *initialProps = [NSDictionary dictionaryWithObject: arguments forKey: @"launchArgs"];
+  
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"NativeSigner"
-                                            initialProperties:nil];
+                                            initialProperties:initialProps];
 
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
 
