@@ -24,11 +24,6 @@ import fonts from '../fonts';
 import Markdown from '../components/Markdown';
 
 export default class PrivacyPolicy extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Privacy policy'
-	};
-
 	render() {
 		return (
 			<View style={styles.body}>

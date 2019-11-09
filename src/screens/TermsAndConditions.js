@@ -33,11 +33,6 @@ import {
 import testIDs from '../../e2e/testIDs';
 
 export default class TermsAndConditions extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Terms and conditions'
-	};
-
 	state = {
 		ppAgreement: false,
 		tocAgreement: false

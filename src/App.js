@@ -55,9 +55,15 @@ import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
 import MetadataDetails from './screens/MetadataDetails';
 import IdentityBackup from './screens/IdentityBackup';
+import IdentityManagement from './screens/IdentityManagement';
 import IdentityNew from './screens/IdentityNew';
+import IdentityPin from './screens/IdentityPin';
 import MessageDetails from './screens/MessageDetails';
 import NetworkSettings from './screens/NetworkSettings';
+import PathDerivation from './screens/PathDerivation';
+import PathDetails from './screens/PathDetails';
+import PathsList from './screens/PathsList';
+import PathManagement from './screens/PathManagement';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
@@ -66,8 +72,6 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
-import IdentityPin from './screens/IdentityPin';
-import PathsList from './screens/PathsList';
 
 export default class App extends Component {
 	constructor() {
@@ -176,14 +180,11 @@ const Screens = createStackNavigator(
 		Welcome: {
 			screen: createStackNavigator(
 				{
-					AccountList: {
+					AccountNetworkChooser: {
 						navigationOptions: {
 							headerLeft: <HeaderLeftHome />
 						},
-						screen: LegacyAccountList
-					},
-					IdentityPin: {
-						screen: IdentityPin
+						screen: AccountNetworkChooser
 					},
 					AccountPin: {
 						screen: AccountPin
@@ -196,9 +197,6 @@ const Screens = createStackNavigator(
 					},
 					AccountEdit: {
 						screen: AccountEdit
-					},
-					AccountNetworkChooser: {
-						screen: AccountNetworkChooser
 					},
 					AccountNew: {
 						screen: AccountNew
@@ -218,11 +216,20 @@ const Screens = createStackNavigator(
 					LegacyAccountBackup: {
 						screen: LegacyAccountBackup
 					},
-					IdentityNew: {
-						screen: IdentityNew
+					LegacyAccountList: {
+						screen: LegacyAccountList
 					},
 					IdentityBackup: {
 						screen: IdentityBackup
+					},
+					IdentityManagement: {
+						screen: IdentityManagement
+					},
+					IdentityNew: {
+						screen: IdentityNew
+					},
+					IdentityPin: {
+						screen: IdentityPin
 					},
 					MessageDetails: {
 						screen: MessageDetails
@@ -233,8 +240,17 @@ const Screens = createStackNavigator(
 					NetworkSettings: {
 						screen: NetworkSettings
 					},
+					PathDerivation: {
+						screen: PathDerivation
+					},
+					PathDetails: {
+						screen: PathDetails
+					},
 					PathsList: {
 						screen: PathsList
+					},
+					PathManagement: {
+						screen: PathManagement
 					},
 					QrScanner: {
 						screen: QrScanner

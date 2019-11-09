@@ -14,56 +14,132 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import { withNavigation } from 'react-navigation';
+
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
-import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import { emptyIdentity } from '../util/identity';
+import { emptyIdentity } from '../util/identitiesUtils';
+import colors from '../colors';
+import fonts from '../fonts';
+import { withAccountStore } from '../util/HOC';
+import { validateSeed } from '../util/account';
+import AccountSeed from '../components/AccountSeed';
+import {
+	navigateToNewIdentityNetwork,
+	setPin
+} from '../util/navigationHelpers';
+import { alertIdentityCreationError } from '../util/alertUtils';
+import testIDs from '../../e2e/testIDs';
 
-export default class IdentityNew extends React.Component {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'New Identity'
-	};
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <IdentityNewView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
+function IdentityNew({ accounts, navigation }) {
+	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
+	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
+	const [seedPhrase, setSeedPhrase] = useState('');
 
-function IdentityNewView({ accounts, navigation }) {
 	useEffect(() => {
-		accounts.updateNewIdentity(emptyIdentity());
-		return function() {
-			accounts.updateNewIdentity(emptyIdentity());
-		};
+		const clearNewIdentity = () => accounts.updateNewIdentity(emptyIdentity());
+		clearNewIdentity();
+		return clearNewIdentity;
 	}, [accounts]);
 
 	const updateName = name => {
 		accounts.updateNewIdentity({ name });
 	};
 
-	return (
-		<View>
-			<TextInput
-				onChangeText={updateName}
-				value={accounts.getNewIdentity().name}
-				placeholder="Enter a new identity name"
+	const renderRecoverView = () => (
+		<>
+			<AccountSeed
+				testID={testIDs.IdentityNew.seedInput}
+				valid={validateSeed(seedPhrase, true).valid} //TODO: validation need to be improved.
+				onChangeText={setSeedPhrase}
+				value={seedPhrase}
+			/>
+			<View style={styles.btnBox}>
+				<Button
+					title="Create"
+					onPress={() => {
+						setIsRecover(false);
+					}}
+					small={true}
+					onlyText={true}
+				/>
+				<Button
+					title="Recover Identity"
+					testID={testIDs.IdentityNew.recoverButton}
+					onPress={async () => {
+						const pin = await setPin(navigation);
+						try {
+							await accounts.saveNewIdentity(seedPhrase, pin);
+							setSeedPhrase('');
+							navigateToNewIdentityNetwork(navigation);
+						} catch (e) {
+							alertIdentityCreationError();
+						}
+					}}
+					small={true}
+				/>
+			</View>
+		</>
+	);
+
+	const renderCreateView = () => (
+		<View style={styles.btnBox}>
+			<Button
+				title="Recover Identity"
+				onPress={() => setIsRecover(true)}
+				small={true}
+				onlyText={true}
 			/>
 			<Button
-				title="create"
+				title="Create"
+				testID={testIDs.IdentityNew.createButton}
 				onPress={() => {
+					setSeedPhrase('');
 					navigation.navigate('IdentityBackup', {
 						isNew: true
 					});
 				}}
+				small={true}
 			/>
-			<Button title="recover account" onPress={() => {}} />
+		</View>
+	);
+
+	return (
+		<View style={styles.body}>
+			<Text style={styles.titleTop}>NEW IDENTITY</Text>
+			<TextInput
+				onChangeText={updateName}
+				value={accounts.getNewIdentity().name}
+				placeholder="Enter a new identity name"
+				focus={false}
+			/>
+			{isRecover ? renderRecoverView() : renderCreateView()}
 		</View>
 	);
 }
+
+export default withAccountStore(withNavigation(IdentityNew));
+
+const styles = StyleSheet.create({
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		overflow: 'hidden',
+		padding: 16
+	},
+	btnBox: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 80 },
+	title: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 18
+	},
+	titleTop: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.bold,
+		fontSize: 24,
+		paddingBottom: 20,
+		textAlign: 'center'
+	}
+});

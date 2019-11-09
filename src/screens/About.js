@@ -23,11 +23,6 @@ import fonts from '../fonts';
 import packageJson from '../../package.json';
 
 export default class About extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'About'
-	};
-
 	render() {
 		return (
 			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>

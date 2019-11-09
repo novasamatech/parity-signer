@@ -167,7 +167,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			for (let i = 0; i < networks.length; i++) {
 				let key = networks[i];
-				let account = accountsStore.getByAddress(
+				let account = await accountsStore.getAccountByAddress(
 					encodeAddress(
 						decodeAddress(parsedData.data.account),
 						SUBSTRATE_NETWORK_LIST[key].prefix
@@ -291,13 +291,14 @@ export default class ScannerStore extends Container<ScannerState> {
 				!missedFrames.includes(frame)
 			) {
 				// enumerate all the frames between (current)frame and latestFrame
-				const missedFrames = Array.from(new Array(missedFramesRange), (_, i) =>
-					mod(i + latestFrame, totalFrameCount)
+				const updatedMissedFrames = Array.from(
+					new Array(missedFramesRange),
+					(_, i) => mod(i + latestFrame, totalFrameCount)
 				);
 
 				const dedupMissedFrames = new Set([
 					...this.state.missedFrames,
-					...missedFrames
+					updatedMissedFrames
 				]);
 
 				this.setState({
@@ -358,9 +359,9 @@ export default class ScannerStore extends Container<ScannerState> {
 			dataToSign = await ethSign(message);
 		}
 
-		const sender = accountsStore.getByAddress(address);
+		const sender = await accountsStore.getAccountByAddress(address);
 
-		if (!sender || !sender.encryptedSeed) {
+		if (!sender) {
 			throw new Error(
 				`No private key found for ${address} found in your signer key storage.`
 			);
@@ -409,20 +410,20 @@ export default class ScannerStore extends Container<ScannerState> {
 			? tx.ethereumChainId
 			: txRequest.data.data.genesisHash.toHex();
 
-		const sender = accountsStore.getById({
+		const sender = await accountsStore.getById({
 			address: txRequest.data.account,
 			networkKey
 		});
 
 		const networkTitle = NETWORK_LIST[networkKey].title;
 
-		if (!sender || !sender.encryptedSeed) {
+		if (!sender) {
 			throw new Error(
 				`No private key found for account ${txRequest.data.account} found in your signer key storage for the ${networkTitle} chain.`
 			);
 		}
 
-		const recipient = accountsStore.getById({
+		const recipient = await accountsStore.getById({
 			address: isEthereum ? tx.action : txRequest.data.account,
 			networkKey
 		});
@@ -446,10 +447,9 @@ export default class ScannerStore extends Container<ScannerState> {
 		return true;
 	}
 
-	async signData(pin = '1') {
+	async signDataWithSeed(seed) {
 		const { dataToSign, isHash, sender } = this.state;
 
-		const seed = await decryptData(sender.encryptedSeed, pin);
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 
@@ -480,6 +480,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		this.setState({ signedData });
+	}
+
+	async signData(pin = '1') {
+		const { sender } = this.state;
+		const seed = await decryptData(sender.encryptedSeed, pin);
+		await this.signDataWithSeed(seed);
 	}
 
 	cleanup() {

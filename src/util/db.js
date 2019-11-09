@@ -21,6 +21,7 @@ import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 
 import { accountId } from './account';
+import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 import { defaultNetworkSpecs } from './networkSpecs';
 import kusamaMeta from './static-kusama';
 import substrateMeta from './static-substrate';
@@ -47,6 +48,11 @@ export async function loadAccountTxs(account) {
 	]);
 }
 
+const currentAccountsStore = {
+	keychainService: 'accounts_v3',
+	sharedPreferencesName: 'accounts_v3'
+};
+
 export async function loadAccounts(version = 3) {
 	if (!SecureStorage) {
 		return Promise.resolve([]);
@@ -70,17 +76,36 @@ export async function loadAccounts(version = 3) {
 	});
 }
 
-const accountsStore = {
-	identitiesLabel: 'identities_v4',
-	keychainService: 'accounts_v4',
-	sharedPreferencesName: 'accounts_v4'
+const identitiesStore = {
+	keychainService: 'parity_signer_identities',
+	sharedPreferencesName: 'parity_signer_identities'
 };
+const identityStorageLabel = 'identities_v4';
+
+export async function loadIdentities(version = 3) {
+	function handleError(e) {
+		console.warn('loading identities error', e);
+		return [];
+	}
+	try {
+		// TODO to be deleted before merging, used for clean the keychain.
+		// await SecureStorage.deleteItem(identityStorageLabel, identitiesStore);
+		const identities = await SecureStorage.getItem(
+			identityStorageLabel,
+			identitiesStore
+		);
+		if (!identities) return [];
+		return deserializeIdentities(identities);
+	} catch (e) {
+		handleError(e);
+	}
+}
 
 export const saveIdentities = identities => {
 	SecureStorage.setItem(
-		accountsStore.identitiesLabel,
-		JSON.stringify(identities),
-		accountsStore
+		identityStorageLabel,
+		serializeIdentities(identities),
+		identitiesStore
 	);
 };
 
@@ -89,13 +114,13 @@ function accountTxsKey({ address, networkKey }) {
 }
 
 export const deleteAccount = async accountKey =>
-	SecureStorage.deleteItem(accountKey, accountsStore);
+	SecureStorage.deleteItem(accountKey, currentAccountsStore);
 
 export const saveAccount = (accountKey, account) =>
 	SecureStorage.setItem(
 		accountKey,
 		JSON.stringify(account, null, 0),
-		accountsStore
+		currentAccountsStore
 	);
 
 /*

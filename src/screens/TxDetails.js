@@ -35,13 +35,10 @@ import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
+import { unlockSeed } from '../util/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 
 export default class TxDetails extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Transaction details',
-		title: 'Transaction Details'
-	};
 	render() {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
@@ -61,7 +58,16 @@ export default class TxDetails extends React.PureComponent {
 								prehash={scannerStore.getPrehashPayload()}
 								onNext={async () => {
 									try {
-										this.props.navigation.navigate('AccountUnlockAndSign');
+										if (scannerStore.getSender().isLegacy) {
+											return this.props.navigation.navigate(
+												'AccountUnlockAndSign',
+												{
+													next: 'SignedMessage'
+												}
+											);
+										}
+										const seed = await unlockSeed(this.props.navigation);
+										await scannerStore.signDataWithSeed(seed);
 									} catch (e) {
 										scannerStore.setErrorMsg(e.message);
 									}
@@ -93,7 +99,7 @@ export class TxDetailsView extends React.PureComponent {
 
 	render() {
 		const {
-			dataToSign,
+			// dataToSign,
 			gas,
 			gasPrice,
 			prehash,
@@ -143,10 +149,11 @@ export class TxDetailsView extends React.PureComponent {
 						<PayloadDetailsCard
 							style={{ marginBottom: 20 }}
 							description="You are about to confirm sending the following extrinsic"
-							payload={prehash || dataToSign}
+							payload={prehash}
 							prefix={prefix}
 						/>
 					)}
+
 					<Button
 						buttonStyles={{ height: 60 }}
 						title="Sign Transaction"

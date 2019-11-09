@@ -15,15 +15,170 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import ButtonIcon from './ButtonIcon';
-import Separator from './Separator';
-import fontStyles from '../fontStyles';
-import colors from '../colors';
-import { Modal, View } from 'react-native';
+import { FlatList, Modal, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-function IdentitiesSwitch({ navigation }) {
+import ButtonIcon from './ButtonIcon';
+import colors from '../colors';
+import fontStyles from '../fontStyles';
+import Separator from './Separator';
+import { withAccountStore } from '../util/HOC';
+import { getIdentityName } from '../util/identitiesUtils';
+
+function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
+	//TODO to be removed before merge
+	console.log('identities are', accounts.state.identities);
+	const { currentIdentity, identities } = accounts.state;
+
+	const onIdentitySelected = async identity => {
+		setVisible(false);
+		await accounts.selectIdentity(identity);
+		navigation.navigate('AccountNetworkChooser');
+	};
+
+	const renderCurrentIdentityCard = () => {
+		if (!currentIdentity) return;
+
+		const currentIdentityTitle = getIdentityName(currentIdentity, identities);
+
+		return (
+			<>
+				<ButtonIcon
+					title={currentIdentityTitle}
+					onPress={() => onIdentitySelected(currentIdentity)}
+					iconName="md-finger-print"
+					iconType="ionicon"
+					iconSize={40}
+					style={{ paddingLeft: 8 * 2 }}
+					textStyle={fontStyles.h1}
+				/>
+				<ButtonIcon
+					title="Manage Identity"
+					onPress={() => {
+						setVisible(false);
+						navigation.navigate('IdentityManagement');
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+				<ButtonIcon
+					title="Show Recovery Phrase"
+					onPress={() => {
+						setVisible(false);
+						navigation.navigate('IdentityBackup', { isNew: false });
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+				<Separator />
+			</>
+		);
+	};
+
+	const renderSettings = () => {
+		return (
+			<>
+				{accounts.getAccounts().size > 0 && (
+					<ButtonIcon
+						title="Legacy Accounts"
+						onPress={() => {
+							setVisible(false);
+							navigation.navigate('LegacyAccountList');
+						}}
+						iconName="ios-cog"
+						iconType="ionicon"
+						iconSize={24}
+						textStyle={fontStyles.t_big}
+						style={{ paddingLeft: 8 * 4 }}
+					/>
+				)}
+				<ButtonIcon
+					title="Settings"
+					onPress={() => {
+						setVisible(false);
+						// go to Settings;
+					}}
+					iconName="ios-cog"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_big}
+					style={{ paddingLeft: 8 * 4 }}
+				/>
+				<ButtonIcon
+					title="Terms and Conditions"
+					onPress={() => {
+						setVisible(false);
+						navigation.navigate('TermsAndConditions');
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+				<ButtonIcon
+					title="Privacy Policy"
+					onPress={() => {
+						setVisible(false);
+						navigation.navigate('PrivacyPolicy');
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+			</>
+		);
+	};
+
+	const renderNonSelectedIdentity = ({ item, index }) => {
+		const identity = item;
+		const title = identity.name || `identity_${index.toString()}`;
+		return (
+			<ButtonIcon
+				title={title}
+				onPress={() => onIdentitySelected(identity)}
+				iconName="md-finger-print"
+				iconType="ionicon"
+				iconSize={40}
+				style={{ paddingLeft: 8 * 2 }}
+				textStyle={fontStyles.h1}
+			/>
+		);
+	};
+
+	const renderIdentities = () => {
+		// if no identity or the only one we have is the selected one
+
+		if (!identities.length || (identities.length === 1 && currentIdentity))
+			return;
+
+		const identitiesToShow = currentIdentity
+			? identities.filter(
+					identity => identity.encryptedSeed !== currentIdentity.encryptedSeed
+			  )
+			: identities;
+
+		return (
+			<FlatList
+				data={identitiesToShow}
+				renderItem={renderNonSelectedIdentity}
+				keyExtractor={item => item.encryptedSeed}
+			/>
+		);
+	};
 
 	return (
 		<View>
@@ -32,7 +187,12 @@ function IdentitiesSwitch({ navigation }) {
 				iconName="md-finger-print"
 				iconType="ionicon"
 			/>
-			<Modal animationType="fade" visible={visible} transparent={true}>
+			<Modal
+				animationType="fade"
+				visible={visible}
+				transparent={true}
+				onRequestClose={() => setVisible(false)}
+			>
 				<View style={styles.container}>
 					<View style={styles.headerStyle}>
 						<ButtonIcon
@@ -45,96 +205,22 @@ function IdentitiesSwitch({ navigation }) {
 						/>
 					</View>
 					<View style={styles.card}>
-						<ButtonIcon
-							title="Current Identity Title"
-							onPress={() => {
-								setVisible(false);
-								//go to current Identity
-							}}
-							iconName="md-finger-print"
-							iconType="ionicon"
-							iconSize={40}
-							style={{ paddingLeft: 8 * 2 }}
-							textStyle={fontStyles.h1}
-						/>
-						<ButtonIcon
-							title="Manage Identity"
-							onPress={() => {
-								setVisible(false);
-								//go to current IdentityManage
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
-						<ButtonIcon
-							title="Backup Identity"
-							onPress={() => {
-								setVisible(false);
-								//go to current IdentityBackup
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
-						<Separator />
+						{renderCurrentIdentityCard()}
+						{renderIdentities()}
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {
 								setVisible(false);
 								navigation.navigate('IdentityNew');
 							}}
-							iconName="md-finger-print"
+							iconName="ios-add"
 							iconType="ionicon"
 							iconSize={24}
 							textStyle={fontStyles.t_big}
 							style={{ paddingLeft: 8 * 4 }}
 						/>
 						<Separator />
-						<ButtonIcon
-							title="Settings"
-							onPress={() => {
-								setVisible(false);
-								// go to Settings;
-							}}
-							iconName="md-settings"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_big}
-							style={{ paddingLeft: 8 * 4 }}
-						/>
-						<ButtonIcon
-							title="Terms and Conditions"
-							onPress={() => {
-								setVisible(false);
-								navigation.navigate('TermsAndConditions');
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
-						<ButtonIcon
-							title="Privacy Policy"
-							onPress={() => {
-								setVisible(false);
-								navigation.navigate('PrivacyPolicy');
-							}}
-							iconBgStyle={styles.i_arrowBg}
-							iconName="ios-arrow-round-forward"
-							iconType="ionicon"
-							iconSize={24}
-							textStyle={fontStyles.t_regular}
-							style={styles.i_arrowStyle}
-						/>
+						{renderSettings()}
 					</View>
 				</View>
 			</Modal>
@@ -146,6 +232,7 @@ const styles = {
 	card: {
 		backgroundColor: colors.bg,
 		borderRadius: 5,
+		flex: 1,
 		marginTop: 16,
 		paddingBottom: 8,
 		paddingTop: 8
@@ -173,4 +260,4 @@ const styles = {
 	}
 };
 
-export default withNavigation(IdentitiesSwitch);
+export default withAccountStore(withNavigation(IdentitiesSwitch));

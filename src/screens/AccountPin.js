@@ -54,35 +54,22 @@ class AccountPinView extends React.PureComponent {
 
 	async submit() {
 		const { accounts, navigation } = this.props;
-		const accountCreation = navigation.getParam('isNew');
 		const { pin } = this.state;
-		const account = accountCreation
-			? accounts.getNew()
-			: accounts.getSelected();
+		const account = accounts.getSelected();
 		if (
 			this.state.pin.length >= 6 &&
 			this.state.pin === this.state.confirmation
 		) {
-			if (accountCreation) {
-				await accounts.submitNew(pin);
-				const resetAction = StackActions.reset({
-					actions: [NavigationActions.navigate({ routeName: 'AccountList' })],
-					index: 0, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-					key: undefined
-				});
-				this.props.navigation.dispatch(resetAction);
-			} else {
-				await accounts.save(accounts.getSelectedKey(), account, pin);
-				const resetAction = StackActions.reset({
-					actions: [
-						NavigationActions.navigate({ routeName: 'AccountList' }),
-						NavigationActions.navigate({ routeName: 'AccountDetails' })
-					],
-					index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-					key: undefined
-				});
-				this.props.navigation.dispatch(resetAction);
-			}
+			await accounts.save(accounts.getSelectedKey(), account, pin);
+			const resetAction = StackActions.reset({
+				actions: [
+					NavigationActions.navigate({ routeName: 'LegacyAccountList' }),
+					NavigationActions.navigate({ routeName: 'AccountDetails' })
+				],
+				index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+				key: undefined
+			});
+			navigation.dispatch(resetAction);
 		} else {
 			if (this.state.pin.length < 6) {
 				this.setState({ pinTooShort: true });

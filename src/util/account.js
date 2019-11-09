@@ -45,6 +45,8 @@ export function accountId({ address, networkKey }) {
 	}
 }
 
+export const extractAddressFromAccountId = id => id.split(':')[1] || '';
+
 export function emptyAccount(
 	address = '',
 	networkKey = SubstrateNetworkKeys.KUSAMA

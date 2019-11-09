@@ -29,11 +29,6 @@ import {
 } from '../util/db';
 
 export default class Loading extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Add Account'
-	};
-
 	async componentDidMount() {
 		const tocPP = await loadToCAndPPConfirmation();
 		const firstScreen = 'Welcome';
@@ -62,7 +57,7 @@ export default class Loading extends React.PureComponent {
 			tocActions = firstScreenActions;
 		}
 
-		await loadAccounts();
+		// await loadAccounts();
 		this.props.navigation.dispatch(tocActions);
 	}
 

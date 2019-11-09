@@ -15,8 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
+
 import { words } from '../util/native';
 import {
 	Alert,
@@ -31,47 +30,35 @@ import colors from '../colors';
 import fonts from '../fonts';
 import fontStyles from '../fontStyles';
 import Button from '../components/Button';
-import { NavigationActions, StackActions } from 'react-navigation';
-import { setPin } from '../util/navigationHelpers';
+import { withNavigation } from 'react-navigation';
+import {
+	navigateToNewIdentityNetwork,
+	setPin,
+	unlockSeed
+} from '../util/navigationHelpers';
+import { withAccountStore } from '../util/HOC';
+import testIDs from '../../e2e/testIDs';
 
-export default class IdentityBackup extends React.PureComponent {
-	static navigationOptions = {
-		title: 'Identity Backup'
-	};
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <IdentityBackupView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
-
-function IdentityBackupView({ navigation, accounts }) {
+function IdentityBackup({ navigation, accounts }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const isNew = navigation.getParam('isNew', false);
+
 	useEffect(() => {
 		const setSeedPhraseAsync = async () => {
-			const newSeedPhrase = await words();
-			setSeedPhrase(newSeedPhrase);
+			if (isNew) {
+				setSeedPhrase(await words());
+			} else {
+				const backupSeedPhrase = await unlockSeed(navigation);
+				navigation.pop();
+				setSeedPhrase(backupSeedPhrase);
+			}
 		};
 
 		setSeedPhraseAsync();
 		return () => {
 			setSeedPhrase('');
 		};
-	}, []);
-
-	const resetStackToNetwork = () => {
-		const resetAction = StackActions.reset({
-			actions: [
-				NavigationActions.navigate({ routeName: 'PathsList' }),
-				NavigationActions.navigate({ routeName: 'AccountNetworkChooser' })
-			],
-			index: 1,
-			key: undefined
-		});
-		navigation.dispatch(resetAction);
-	};
+	}, [isNew, navigation]);
 
 	return (
 		<ScrollView style={styles.body}>
@@ -108,19 +95,30 @@ function IdentityBackupView({ navigation, accounts }) {
 					}
 				}}
 			>
-				<Text style={fontStyles.t_seed}>{seedPhrase}</Text>
+				<Text
+					style={fontStyles.t_seed}
+					testID={testIDs.IdentityBackup.seedText}
+				>
+					{seedPhrase}
+				</Text>
 			</TouchableItem>
-			<Button
-				title="Next"
-				onPress={async () => {
-					const pin = await setPin(navigation);
-					await accounts.saveNewIdentity(pin);
-					resetStackToNetwork();
-				}}
-			/>
+			{isNew && (
+				<Button
+					title="Next"
+					testID={testIDs.IdentityBackup.nextButton}
+					onPress={async () => {
+						const pin = await setPin(navigation);
+						await accounts.saveNewIdentity(seedPhrase, pin);
+						setSeedPhrase('');
+						navigateToNewIdentityNetwork(navigation);
+					}}
+				/>
+			)}
 		</ScrollView>
 	);
 }
+
+export default withAccountStore(withNavigation(IdentityBackup));
 
 const styles = StyleSheet.create({
 	body: {

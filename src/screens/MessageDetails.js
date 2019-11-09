@@ -35,12 +35,9 @@ import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/strings';
+import { unlockSeed } from '../util/navigationHelpers';
 
 export default class MessageDetails extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Transaction details',
-		title: 'Transaction Details'
-	};
 	render() {
 		return (
 			<Subscribe to={[ScannerStore]}>
@@ -62,9 +59,16 @@ export default class MessageDetails extends React.PureComponent {
 								isHash={scannerStore.getIsHash()}
 								onNext={async () => {
 									try {
-										this.props.navigation.navigate('AccountUnlockAndSign', {
-											next: 'SignedMessage'
-										});
+										if (scannerStore.getSender().isLegacy) {
+											return this.props.navigation.navigate(
+												'AccountUnlockAndSign',
+												{
+													next: 'SignedMessage'
+												}
+											);
+										}
+										const seed = await unlockSeed(this.props.navigation);
+										await scannerStore.signDataWithSeed(seed);
 									} catch (e) {
 										scannerStore.setErrorMsg(e.message);
 									}

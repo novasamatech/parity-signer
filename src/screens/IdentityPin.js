@@ -17,33 +17,27 @@
 
 import React, { Component, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { Subscribe } from 'unstated';
+import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import fonts from '../fonts';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
-import AccountsStore from '../stores/AccountsStore';
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import { withAccountStore } from '../util/HOC';
+import testIDs from '../../e2e/testIDs';
 
-export default class IdentityPin extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <IdentityPinView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
+export default withAccountStore(withNavigation(IdentityPin));
 
-function IdentityPinView({ navigation, accounts }) {
-	const [state, setState] = useState({
+function IdentityPin({ navigation, accounts }) {
+	const initialState = {
 		confirmation: '',
 		focusConfirmation: false,
 		pin: '',
 		pinMismatch: false,
 		pinTooShort: false
-	});
+	};
+	const [state, setState] = useState(initialState);
 	const updateState = delta => setState({ ...state, ...delta });
 
 	const submit = async () => {
@@ -52,12 +46,13 @@ function IdentityPinView({ navigation, accounts }) {
 		if (pin.length >= 6 && pin === confirmation) {
 			if (isIdentityCreation) {
 				const resolve = navigation.getParam('resolve');
+				setState(initialState);
 				resolve(pin);
 			} else {
 				// await accounts.save(accounts.getSelectedKey(), account, pin);
 				// const resetAction = StackActions.reset({
 				// 	actions: [
-				// 		NavigationActions.navigate({ routeName: 'AccountList' }),
+				// 		NavigationActions.navigate({ routeName: 'LegacyAccountList' }),
 				// 		NavigationActions.navigate({ routeName: 'AccountDetails' })
 				// 	],
 				// 	index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
@@ -69,6 +64,23 @@ function IdentityPinView({ navigation, accounts }) {
 			if (pin.length < 6) {
 				updateState({ pinTooShort: true });
 			} else if (pin !== confirmation) updateState({ pinMismatch: true });
+		}
+	};
+
+	const testPin = async () => {
+		const { pin } = state;
+		if (pin.length >= 6) {
+			try {
+				const seed = await accounts.unlockIdentitySeed(pin);
+				const resolve = navigation.getParam('resolve');
+				setState(initialState);
+				resolve(seed);
+			} catch (e) {
+				updateState({ pin: '', pinMismatch: true });
+				//TODO record error times;
+			}
+		} else {
+			updateState({ pinTooShort: true });
 		}
 	};
 
@@ -99,38 +111,67 @@ function IdentityPinView({ navigation, accounts }) {
 		}
 	};
 
-	const title = 'ACCOUNT PIN';
+	const renderPinInput = () =>
+		navigation.getParam('isUnlock', false) ? (
+			<>
+				<Text style={styles.titleTop}>UNLOCK IDENTITY</Text>
+				{showHintOrError()}
+				<Text style={styles.title}>PIN</Text>
+				<PinInput
+					autoFocus
+					testID={testIDs.IdentityPin.unlockPinInput}
+					returnKeyType="done"
+					onChangeText={pin => onPinInputChange('pin', pin)}
+					value={state.pin}
+				/>
+				<Button
+					onPress={testPin}
+					color="green"
+					title="Done"
+					testID={testIDs.IdentityPin.unlockPinButton}
+					accessibilityLabel={'Done'}
+				/>
+			</>
+		) : (
+			<>
+				<Text style={styles.titleTop}>SET IDENTITY PIN</Text>
+				{showHintOrError()}
+				<Text style={styles.title}>PIN</Text>
+				<PinInput
+					autoFocus
+					testID={testIDs.IdentityPin.setPin}
+					returnKeyType="next"
+					onFocus={() => updateState({ focusConfirmation: false })}
+					onSubmitEditing={() => {
+						updateState({ focusConfirmation: true });
+					}}
+					onChangeText={pin => onPinInputChange('pin', pin)}
+					value={state.pin}
+				/>
+				<Text style={styles.title}>CONFIRM PIN</Text>
+				<PinInput
+					returnKeyType="done"
+					testID={testIDs.IdentityPin.confirmPin}
+					focus={state.focusConfirmation}
+					onChangeText={confirmation =>
+						onPinInputChange('confirmation', confirmation)
+					}
+					value={state.confirmation}
+				/>
+				<Button
+					testID={testIDs.IdentityPin.submitButton}
+					onPress={submit}
+					color="green"
+					title="Done"
+					accessibilityLabel={'Done'}
+				/>
+			</>
+		);
+
 	return (
 		<KeyboardScrollView style={styles.body} extraHeight={120}>
 			<Background />
-			<Text style={styles.titleTop}>{title}</Text>
-			{showHintOrError()}
-			<Text style={styles.title}>PIN</Text>
-			<PinInput
-				autoFocus
-				returnKeyType="next"
-				onFocus={() => updateState({ focusConfirmation: false })}
-				onSubmitEditing={() => {
-					updateState({ focusConfirmation: true });
-				}}
-				onChangeText={pin => onPinInputChange('pin', pin)}
-				value={state.pin}
-			/>
-			<Text style={styles.title}>CONFIRM PIN</Text>
-			<PinInput
-				returnKeyType="done"
-				focus={state.focusConfirmation}
-				onChangeText={confirmation =>
-					onPinInputChange('confirmation', confirmation)
-				}
-				value={state.confirmation}
-			/>
-			<Button
-				onPress={submit}
-				color="green"
-				title="Done"
-				accessibilityLabel={'Done'}
-			/>
+			{renderPinInput()}
 		</KeyboardScrollView>
 	);
 }
