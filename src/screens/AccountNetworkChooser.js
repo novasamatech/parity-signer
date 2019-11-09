@@ -69,13 +69,11 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				style={styles.body}
 			>
 				<View style={styles.onboardingWrapper}>
-					<View style={styles.onboardingText}>
-						<Text>No Identity yet?{'\n'}</Text>
-						<TextButton text="Create" isRecover={false} />
-						<Text>No Identity yet?{'\n'}</Text>
-						<TextButton text="Recover" isRecover={true} />
-						<Text>an account to get started.</Text>
-					</View>
+					<Text style={styles.onboardingText}>No Identity yet?{'\n'}</Text>
+					<TextButton text="Create" isRecover={false} />
+					<Text style={styles.onboardingText}> Or {'\n'}</Text>
+					<TextButton text="Recover" isRecover={true} />
+					<Text style={styles.onboardingText}>an account to get started.</Text>
 				</View>
 			</ScrollView>
 		);
@@ -181,8 +179,7 @@ const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
+		flexDirection: 'column'
 	},
 	header: {
 		alignItems: 'center',
@@ -195,9 +192,8 @@ const styles = StyleSheet.create({
 		fontSize: 20
 	},
 	onboardingWrapper: {
-		alignItems: 'flex-end',
-		flex: 1,
-		flexDirection: 'row'
+		alignItems: 'center',
+		flex: 1
 	},
 	title: {
 		color: colors.bg_text_sec,
