@@ -216,12 +216,11 @@ export async function constructDataFromBytes(
 						case '03': // Cold Signer should attempt to decode message to utf8
 							if (isScanningMetadata) {
 								data.action = 'updateMetadata';
-								debugger;
 							} else {
 								data.action = 'signData';
 							}
 
-							if (isOversized) {
+							if (isOversized && !isScanningMetadata) {
 								data.data.data = await blake2b(u8aToHex(rawPayload, -1, false));
 								data.isHash = isOversized;
 								data.oversized = isOversized;

@@ -17,28 +17,25 @@
 'use strict';
 
 import React from 'react';
-// import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 
-// import colors from '../colors';
 import Background from '../components/Background';
-// import Card from '../components/Card';
-// import fonts from '../fonts';
 import MetadataStore from '../stores/MetadataStore';
-import { styles } from 'react-native-markdown-renderer';
+import NetworksStore from '../stores/NetworksStore';
 
 export default class MetadataDetails extends React.PureComponent {
 	render() {
 		const networkKey = this.props.navigation.getParam('networkKey');
 
 		return (
-			<Subscribe to={[MetadataStore]}>
-				{metadataStore => {
+			<Subscribe to={[MetadataStore, NetworksStore]}>
+				{(metadataStore, networksStore) => {
 					return (
 						<MetadataDetailsView
 							{...this.props}
-							metadataStore={metadataStore}
+							metadataBlob={metadataStore.getMetaByKey(networkKey)}
+							networkSpec={networksStore.getSelected()}
 							networkKey={networkKey}
 						/>
 					);
@@ -48,25 +45,22 @@ export default class MetadataDetails extends React.PureComponent {
 	}
 }
 
-class MetadataDetailsView extends React.PureComponent {
-	constructor(props) {
-		super(props);
-	}
+function MetadataDetailsView(props) {
+	const { networkSpec } = props;
 
-	render() {
-		const { metadataStore, networkKey } = this.props;
+	console.log(networkSpec);
+	debugger;
 
-		console.log('network key -> ', networkKey);
-
-		console.log('meta new -> ', metadataStore.getMetadata(networkKey));
-
-		return (
-			<ScrollView
-				contentContainerStyle={styles.bodyContent}
-				style={styles.body}
-			>
-				<Background />
-			</ScrollView>
-		);
-	}
+	return (
+		<ScrollView contentContainerStyle={styles.bodyContent} style={styles.body}>
+			<Background />
+			<Text>Viewing metadata for: {networkSpec.title}</Text>
+		</ScrollView>
+	);
 }
+
+const styles = StyleSheet.create({
+	bodyContent: {
+		paddingBottom: 40
+	}
+});

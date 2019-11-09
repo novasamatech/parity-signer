@@ -29,6 +29,14 @@ import fonts from '../fonts';
 import NetworksStore from '../stores/NetworksStore';
 
 export default class NetworkSettings extends React.PureComponent {
+	handleSelect = async (networkKey, networksStore) => {
+		await networksStore.select(networkKey);
+
+		this.props.navigation.navigate('MetadataDetails', {
+			networkKey: networkKey
+		});
+	};
+
 	render() {
 		return (
 			<Subscribe to={[NetworksStore]}>
@@ -37,11 +45,9 @@ export default class NetworkSettings extends React.PureComponent {
 						<NetworkListView
 							{...this.props}
 							networkSpecs={networksStore.getNetworkSpecs()}
-							onSelect={networkKey => {
-								this.props.navigation.navigate('MetadataDetails', {
-									networkKey: networkKey
-								});
-							}}
+							onSelect={networkKey =>
+								this.handleSelect(networkKey, networksStore)
+							}
 						/>
 					);
 				}}

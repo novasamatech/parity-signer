@@ -55,6 +55,10 @@ export default class Scanner extends React.PureComponent {
 	}
 
 	render() {
+		const isScanningMetadata = this.props.navigation.getParam(
+			'isScanningMetadata'
+		);
+
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
 				{(scannerStore, accountsStore) => {
@@ -83,13 +87,14 @@ export default class Scanner extends React.PureComponent {
 										await scannerStore.setUnsigned(txRequestData.data);
 									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
-										const isScanningMetadata = this.props.navigation.getParam(
-											'isScanningMetadata'
+										console.log(
+											'QrScanner isScanningMetadata -> ',
+											isScanningMetadata
 										);
-
 										await scannerStore.setParsedData(
 											strippedData,
 											accountsStore,
+											false,
 											isScanningMetadata
 										);
 									}
@@ -107,8 +112,12 @@ export default class Scanner extends React.PureComponent {
 											scannerStore.clearMultipartProgress();
 											this.props.navigation.navigate('MessageDetails');
 										}
+									} else if (scannerStore.getMetadata()) {
+										debugger;
+										await scannerStore.setData(accountsStore);
+										scannerStore.clearMultipartProgress();
+										this.props.navigation.navigate('MetadataDetails');
 									}
-									('');
 								} catch (e) {
 									return this.showErrorMessage(
 										scannerStore,

@@ -28,6 +28,7 @@ import { Alert, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import fonts from '../fonts';
 import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import { getAllNetworkSpecs, getMetadataByKey } from '../util/db';
 import kusamaMetadata from '../util/static-kusama';
 import substrateDevMetadata from '../util/static-substrate';
 import { base64ToHex, shortString } from '../util/strings';
@@ -47,33 +48,12 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
+	}
 
-		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
-		const isKusama =
-			this.props.prefix ===
-				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix ||
-			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA_DEV].prefix;
-		const isSubstrateDev =
-			this.props.prefix ===
-			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
+	async componentDidMount() {
+		const { prefix } = this.props;
 
-		let metadata;
-		if (isKusama) {
-			metadata = new Metadata(base64ToHex(kusamaMetadata));
-
-			formatBalance.setDefaults({
-				decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
-				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
-			});
-		} else if (__DEV__ && isSubstrateDev) {
-			metadata = new Metadata(base64ToHex(substrateDevMetadata));
-
-			formatBalance.setDefaults({
-				decimals:
-					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
-				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].unit
-			});
-		}
+		const { metadata } = await this.matchPrefixToNetworkSpecs(prefix);
 
 		if (!metadata) {
 			this.setState({
@@ -86,6 +66,62 @@ export default class PayloadDetailsCard extends React.PureComponent {
 		});
 
 		GenericCall.injectMetadata(metadata);
+	}
+
+	async matchPrefixToNetworkSpecs(prefix) {
+		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
+		const isKusama =
+			prefix === SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix ||
+			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA_DEV].prefix;
+		const isSubstrateDev =
+			prefix ===
+			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
+
+		let metadata;
+
+		try {
+			if (isKusama) {
+				metadata = new Metadata(base64ToHex(kusamaMetadata));
+
+				formatBalance.setDefaults({
+					decimals:
+						SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
+					unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
+				});
+			} else if (__DEV__ && isSubstrateDev) {
+				metadata = new Metadata(base64ToHex(substrateDevMetadata));
+
+				formatBalance.setDefaults({
+					decimals:
+						SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
+					unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].unit
+				});
+			} else {
+				const allSavedSpecs = await getAllNetworkSpecs();
+
+				allSavedSpecs.forEach(async spec => {
+					if (spec.prefix === prefix) {
+						const metadataBlob = await getMetadataByKey(spec.genesisHash);
+
+						metadata = new Metadata(base64ToHex(metadataBlob));
+
+						formatBalance.setDefaults({
+							decimals: spec.decimals,
+							unit: spec.unit
+						});
+
+						return { metadata };
+					}
+				});
+			}
+
+			return { metadata };
+		} catch (e) {
+			console.error(e);
+			this.setState({
+				fallback: true
+			});
+		}
 	}
 
 	render() {
@@ -222,7 +258,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 									isScanningMetadata: true
 								}),
 							style: 'default',
-							text: 'Offline Import Metadata'
+							text: 'Import Metadata'
 						}
 					]
 				);

@@ -151,11 +151,11 @@ export async function addNetworkSpec(networkKey, networkSpec) {
 		throw new Error('Network spec must include prefix to be valid.');
 	}
 
-	if (!networkSpec.identiconFn) {
-		throw new Error(
-			'Network spec must include a valid identicon generation function.'
-		);
-	}
+	// if (!networkSpec.identiconFn) {
+	// 	throw new Error(
+	// 		'Network spec must include a valid identicon generation function.'
+	// 	);
+	// }
 
 	await AsyncStorage.setItem(networkKey, JSON.stringify(networkSpec, null, 0));
 }
@@ -182,7 +182,9 @@ export async function getAllNetworkSpecs() {
  * @dev get a specific network spec by networkKey (genesisHash)
  */
 export async function getNetworkSpecByKey(networkKey) {
-	return await AsyncStorage.getItem(networkKey);
+	const spec = await AsyncStorage.getItem(networkKey);
+
+	return spec;
 }
 
 /*

@@ -23,32 +23,25 @@ import {
 	getAllNetworkSpecs,
 	addNetworkSpec
 } from '../util/db';
-
 import { empty } from '../util/networkSpecs';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
 // we will need the generate function to be standardized to take an ss58 check address and isSixPoint boolean flag and returns a Circle https://github.com/polkadot-js/ui/blob/ff351a0f3160552f38e393b87fdf6e85051270de/packages/ui-shared/src/polkadotIcon.ts#L12.
 
-export type NetworkSpec = {
-	chainName?: string,
-	derivationPath?: string,
-	identiconFn: () => void,
-	networkKey: string, // genesisHash
-	prefix: number
-};
+type NetworkSpec = {};
 
 type State = {
 	networkSpecs: Array<NetworkSpec>,
 	newNetworkSpec: NetworkSpec,
-	selectedKey: string
+	selectedKey: NetworkSpec
 };
 
 export default class NetworksStore extends Container<State> {
 	state = {
 		networkSpecs: [],
 		newNetworkSpec: empty(),
-		selectedKey: ''
+		selectedSpec: {}
 	};
 
 	constructor(props) {
@@ -62,18 +55,20 @@ export default class NetworksStore extends Container<State> {
 		this.setState({ networkSpecs });
 	}
 
-	select(networkKey) {
-		this.setState({ selectedKey: networkKey });
+	async addNewNetwork(newNetworkSpec) {
+		try {
+			await addNetworkSpec(newNetworkSpec.genesisHash, newNetworkSpec);
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
-	addNewNetwork(newNetworkSpec) {
-		this.setState({
-			newNetwork: { ...this.state.newNetwork, ...newNetworkSpec }
-		});
-	}
+	async select(networkKey) {
+		const selectedSpec = await getNetworkSpecByKey(`network_${networkKey}`);
 
-	getNew() {
-		return this.state.newNetworkSpec;
+		debugger;
+
+		this.setState({ selectedSpec: JSON.parse(selectedSpec) });
 	}
 
 	async submitNew() {
@@ -91,9 +86,7 @@ export default class NetworksStore extends Container<State> {
 		}
 	}
 
-	// updateNetworkSpec(networkKey, updatedNetworkSpec) {
-
-	// }
+	updateNetworkSpec(networkKey, updatedNetworkSpec) {}
 
 	// async deleteNetwork(networkKey) {
 	// 	const { networkSpecs } = this.state;
@@ -103,8 +96,12 @@ export default class NetworksStore extends Container<State> {
 	// 	await deleteDbNetwork(networkKey);
 	// }
 
+	getNew() {
+		return this.state.newNetworkSpec;
+	}
+
 	getSelected() {
-		return this.state.networkSpecs.get(this.state.selectedKey);
+		return this.state.selectedSpec;
 	}
 
 	getNetworkByKey() {

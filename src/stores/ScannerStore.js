@@ -33,7 +33,7 @@ import {
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
 
-import { isAscii, checkIfPayloadIsMetadata } from '../util/strings';
+import { base64ToHex, isAscii } from '../util/strings';
 import {
 	brainWalletSign,
 	decryptData,
@@ -147,14 +147,12 @@ export default class ScannerStore extends Container<ScannerState> {
 				isScanningMetadata
 			);
 			return;
-		} else {
-			// check if it is metadata
-			let isMetadata = checkIfPayloadIsMetadata(parsedData);
-			console.log('is metadat -=> ', isMetadata);
-			debugger;
 		}
 
-		if (accountsStore.getByAddress(parsedData.data.account)) {
+		if (isScanningMetadata && multipartComplete && parsedData.isMultipart) {
+			this.setState({ metadata: parsedData.data.data });
+			debugger;
+		} else if (accountsStore.getByAddress(parsedData.data.account)) {
 			this.setState({
 				unsignedData: parsedData
 			});
@@ -185,8 +183,8 @@ export default class ScannerStore extends Container<ScannerState> {
 			if (isScanningMetadata) {
 				this.setState({
 					isScanningMetadata: true,
-					metadata: parsedData,
-					unsignedData: null
+					metadata: base64ToHex(parsedData.data),
+					unsignedData: parsedData
 				});
 				debugger;
 			} else {
@@ -221,12 +219,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		if (!totalFrameCount) {
 			this.setState({
 				totalFrameCount: frameCount
-			});
-		}
-
-		if (!isScanningMetadata) {
-			this.setState({
-				isScanningMetadata
 			});
 		}
 
@@ -332,6 +324,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			case 'signData':
 				return await this.setDataToSign(this.state.unsignedData, accountsStore);
 			case 'updateMetadata':
+				debugger;
 				return await this.setMetadataToUpdate(
 					this.state.metadata,
 					accountsStore
@@ -379,6 +372,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 
 		return true;
+	}
+
+	async setMetadataToUpdate(metadata, accountsStore) {
+		this.setBusy();
+
+		debugger;
 	}
 
 	async setTXRequest(txRequest, accountsStore) {
@@ -610,6 +609,10 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getErrorMsg() {
 		return this.state.scanErrorMsg;
+	}
+
+	getMetadata() {
+		return this.state.metadata;
 	}
 
 	getMissedFrames() {
