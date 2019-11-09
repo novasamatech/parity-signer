@@ -226,11 +226,23 @@ export! {
 
         Some(signature.to_hex())
     }
+
+    @Java_io_parity_signer_EthkeyBridge_schnorrkelVerify
+    fn schnorrkel_verify(suri: &str, msg: &str, signature: &str) -> Option<bool> {
+        let keypair = sr25519::KeyPair::from_suri(suri)?;
+        let message: Vec<u8> = msg.from_hex().ok()?;
+        let signature: Vec<u8> = signature.from_hex().ok()?;
+        keypair.verify_signature(&message, &signature)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    static SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon";
+
+    static DERIVED_SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
 
      #[test]
     fn test_blake() {
@@ -257,21 +269,29 @@ mod tests {
 
     #[test]
     fn test_substrate_brainwallet_address() {
-        let suri = "grant jaguar wish bench exact find voice habit tank pony state salmon";
         // Secret seed: 0xb139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224
         // Public key (hex): 0x944eeb240615f4a94f673f240a256584ba178e22dd7b67503a753968e2f95761
         let expected = "5FRAPSnpgmnXAnmPVv68fT6o7ntTvaZmkTED8jDttnXs9k4n";
-        let generated = substrate_brainwallet_address(suri, 42).unwrap();
+        let generated = substrate_brainwallet_address(SURI, 42).unwrap();
 
         assert_eq!(expected, generated);
     }
 
     #[test]
     fn test_substrate_brainwallet_address_suri() {
-        let suri = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
         let expected = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
-        let generated = substrate_brainwallet_address(suri, 42).unwrap();
+        let generated = substrate_brainwallet_address(DERIVED_SURI, 42).unwrap();
 
         assert_eq!(expected, generated);
+    }
+
+    #[test]
+    fn test_substrate_sign() {
+        let msg: String = b"Build The Future".to_hex();
+        let signature = substrate_brainwallet_sign(SURI, &msg).unwrap();
+
+        let is_valid = schnorrkel_verify(SURI, &msg, &signature).unwrap();
+
+        assert!(is_valid);
     }
 }
