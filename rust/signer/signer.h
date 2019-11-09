@@ -76,3 +76,5 @@ struct rust_string* qrcode_hex(unsigned* error, const struct rust_string_ptr* da
 struct rust_string* substrate_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed, const unsigned prefix);
 
 struct rust_string* substrate_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* data);
+
+struct rust_string* schnorrkel_verify(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* msg, const struct rust_string_ptr* signature);

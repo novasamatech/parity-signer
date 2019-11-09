@@ -155,6 +155,15 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void schnorrkelVerify(String seed, String message, String signature, Promise promise) {
+        try {
+            promise.resolve(schnorrkelVerify(seed, message, signature));
+        } catch (Exception e) {
+            promise.reject("invalid signature", "invalid signature");
+        }
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletBIP39Address(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
@@ -170,4 +179,5 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native String ethkeyQrCodeHex(String data);
     private static native String substrateBrainwalletAddress(String seed, int prefix);
     private static native String substrateBrainwalletSign(String seed, String message);
+    private static native boolean schnorrkelVerify(String seed, String message, String signature);
 }

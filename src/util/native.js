@@ -135,3 +135,8 @@ export function substrateAddress(seed, prefix) {
 export function substrateSign(seed, message) {
 	return EthkeyBridge.substrateSign(seed, message);
 }
+
+// Verify a sr25519 signature is valid
+export function schnorrkelVerify(seed, message, signature) {
+	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
+}
