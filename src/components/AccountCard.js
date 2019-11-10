@@ -47,6 +47,7 @@ export default class AccountCard extends React.PureComponent {
 		const {
 			address,
 			networkKey,
+			networkColor,
 			onPress,
 			seedType,
 			style,
@@ -81,7 +82,7 @@ export default class AccountCard extends React.PureComponent {
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
-						{address !== '' && (
+						{!network && (
 							<View>
 								<Text
 									style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
@@ -93,7 +94,7 @@ export default class AccountCard extends React.PureComponent {
 						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 							{title}
 						</Text>
-						{address !== '' && (
+						{!network && (
 							<Address address={address} protocol={network.protocol} />
 						)}
 					</View>
@@ -101,7 +102,7 @@ export default class AccountCard extends React.PureComponent {
 						style={[
 							styles.footer,
 							{
-								backgroundColor: network.color
+								backgroundColor: networkColor || network.color
 							}
 						]}
 					/>
