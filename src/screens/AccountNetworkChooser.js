@@ -45,8 +45,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 	}
 	const { identities, currentIdentity, loaded } = accounts.state;
-	const hasNoAccount =
-		accounts.getAccounts().size === 0 && identities.length === 0;
+	const hasLegacyAccount = accounts.getAccounts().size !== 0;
 
 	const TextButton = ({ text, isRecover }) => (
 		<Text
@@ -74,6 +73,12 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					<Text style={styles.onboardingText}> Or {'\n'}</Text>
 					<TextButton text="Recover" isRecover={true} />
 					<Text style={styles.onboardingText}>an account to get started.</Text>
+					{hasLegacyAccount && (
+						<Button
+							title="Show Legacy Account"
+							onPress={() => navigation.navigate('LegacyAccountList')}
+						/>
+					)}
 				</View>
 			</ScrollView>
 		);
@@ -120,7 +125,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 
 	if (!loaded) return <ScrollView style={styles.body} />;
 
-	if (hasNoAccount) return showOnboardingMessage();
+	if (identities.length === 0) return showOnboardingMessage();
 
 	return (
 		<ScrollView
