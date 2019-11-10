@@ -39,7 +39,7 @@ function untagAddress(address) {
 	};
 }
 
-function asString(x) {
+function toHex(x) {
 	return x
 		.split('')
 		.map(c => c.charCodeAt(0).toString(16))
@@ -50,7 +50,7 @@ function asString(x) {
 export async function brainWalletAddress(seed) {
 	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
 	const { bip39, address } = untagAddress(taggedAddress);
-	const hash = await keccak(asString(address));
+	const hash = await keccak(toHex(address));
 
 	return {
 		address: checksummedAddress(address, hash),
@@ -63,7 +63,7 @@ export function brainWalletBIP39Address(seed) {
 		.then(async taggedAddress => {
 			const { bip39, address } = untagAddress(taggedAddress);
 
-			const hash = await keccak(asString(address));
+			const hash = await keccak(toHex(address));
 
 			return {
 				address: checksummedAddress(address, hash),
@@ -117,8 +117,8 @@ export function qrCodeHex(data) {
 	return EthkeyBridge.qrCodeHex(data);
 }
 
-export function blake2s(data) {
-	return EthkeyBridge.blake2s(asString(data));
+export function blake2b(data) {
+	return EthkeyBridge.blake2b(data);
 }
 
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
@@ -136,10 +136,15 @@ export function substrateSign(seed, message) {
 	return EthkeyBridge.substrateSign(seed, message);
 }
 
+// Verify a sr25519 signature is valid
+export function schnorrkelVerify(seed, message, signature) {
+	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
+}
+
 /* secure native */
 
-export function securePut(app, key, seed) {
-	return EthkeyBridge.securePut(app, key, seed);
+export function securePut(app, key, value) {
+	return EthkeyBridge.securePut(app, key, value);
 }
 
 export function secureGet(app, key) {

@@ -26,7 +26,7 @@ use rlp::decode_list;
 use rustc_hex::{ToHex, FromHex};
 use tiny_keccak::Keccak;
 use tiny_keccak::keccak256 as keccak;
-use blake2_rfc::blake2s::blake2s;
+use blake2_rfc::blake2b::blake2b;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
 
@@ -155,7 +155,7 @@ export! {
     fn blake(data: &str) -> Option<String> {
         let data: Vec<u8> = data.from_hex().ok()?;
 
-        Some(blake2s(32, &[], &data).as_bytes().to_hex())
+        Some(blake2b(32, &[], &data).as_bytes().to_hex())
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyBlockiesIcon
@@ -231,6 +231,14 @@ export! {
 
         Some(signature.to_hex())
     }
+
+    @Java_io_parity_signer_EthkeyBridge_schnorrkelVerify
+    fn schnorrkel_verify(suri: &str, msg: &str, signature: &str) -> Option<bool> {
+        let keypair = sr25519::KeyPair::from_suri(suri)?;
+        let message: Vec<u8> = msg.from_hex().ok()?;
+        let signature: Vec<u8> = signature.from_hex().ok()?;
+        keypair.verify_signature(&message, &signature)
+    }
 }
 
 secure_native::export_put! {
@@ -288,6 +296,22 @@ secure_native::define_cresult_destructor!(destroy_cresult_void, ());
 mod tests {
     use super::*;
 
+    static SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon";
+
+    static DERIVED_SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
+
+     #[test]
+    fn test_blake() {
+        let data = "454545454545454545454545454545454545454545454545454545454545454501\
+                    000000000000002481853da20b9f4322f34650fea5f240dcbfb266d02db94bfa01\
+                    53c31f4a29dbdbf025dd4a69a6f4ee6e1577b251b655097e298b692cb34c18d318\
+                    2cac3de0dc00000000";
+        let expected = "1025e5db74fdaf4d2818822dccf0e1604ae9ccc62f26cecfde23448ff0248abf";
+        let result = blake(data);
+
+        assert_eq!(Some(expected.to_string()), result);
+    }
+
     #[test]
     fn test_rlp_item() {
         let rlp = "f85f800182520894095e7baea6a6c7c4c2dfeb977efac326af552d870a801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804";
@@ -301,21 +325,29 @@ mod tests {
 
     #[test]
     fn test_substrate_brainwallet_address() {
-        let suri = "grant jaguar wish bench exact find voice habit tank pony state salmon";
         // Secret seed: 0xb139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224
         // Public key (hex): 0x944eeb240615f4a94f673f240a256584ba178e22dd7b67503a753968e2f95761
         let expected = "5FRAPSnpgmnXAnmPVv68fT6o7ntTvaZmkTED8jDttnXs9k4n";
-        let generated = substrate_brainwallet_address(suri, 42).unwrap();
+        let generated = substrate_brainwallet_address(SURI, 42).unwrap();
 
         assert_eq!(expected, generated);
     }
 
     #[test]
     fn test_substrate_brainwallet_address_suri() {
-        let suri = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
         let expected = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
-        let generated = substrate_brainwallet_address(suri, 42).unwrap();
+        let generated = substrate_brainwallet_address(DERIVED_SURI, 42).unwrap();
 
         assert_eq!(expected, generated);
+    }
+
+    #[test]
+    fn test_substrate_sign() {
+        let msg: String = b"Build The Future".to_hex();
+        let signature = substrate_brainwallet_sign(SURI, &msg).unwrap();
+
+        let is_valid = schnorrkel_verify(SURI, &msg, &signature).unwrap();
+
+        assert!(is_valid);
     }
 }

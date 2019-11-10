@@ -25,7 +25,7 @@ import {
 } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 
-import { blake2s } from './native';
+import { blake2b } from './native';
 import {
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
@@ -175,9 +175,15 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;
+							'';
 							data.data.data = isOversized
-								? await blake2s(u8aToHex(rawPayload))
+								? await blake2b(
+										u8aToHex(extrinsicPayload.toU8a(true), -1, false)
+								  )
 								: extrinsicPayload;
+
+							// while we are signing a hash, we still have the ability to know what the signing payload is, so we should get that information into the store.
+							data.preHash = extrinsicPayload;
 
 							network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
 
@@ -205,9 +211,8 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							break;
 						case '03': // Cold Signer should attempt to decode message to utf8
 							data.action = 'signData';
-
 							if (isOversized) {
-								data.data.data = await blake2s(u8aToHex(rawPayload));
+								data.data.data = await blake2b(u8aToHex(rawPayload, -1, false));
 								data.isHash = isOversized;
 								data.oversized = isOversized;
 							} else {

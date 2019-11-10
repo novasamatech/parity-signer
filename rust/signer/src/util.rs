@@ -17,7 +17,7 @@
 use libc::size_t;
 
 #[cfg(feature = "jni")]
-use jni::{JNIEnv, objects::JString, sys::{jstring, jint, jboolean}};
+use jni::{JNIEnv, objects::JString, sys::{jboolean, jstring, jint}};
 #[cfg(not(feature = "jni"))]
 use std::cell::Cell;
 
@@ -103,22 +103,22 @@ impl Argument<'static> for bool {
 }
 
 #[cfg(not(feature = "jni"))]
-impl Return<'static> for bool {
-    type Ext = u8;
-    type Env = Cell<u32>;
-
-    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
-        val as u8
-    }
-}
-
-#[cfg(not(feature = "jni"))]
 impl<'a> Argument<'static> for &'a str {
     type Ext = *const StringPtr;
     type Env = Cell<u32>;
 
     fn convert(_: &Self::Env, val: Self::Ext) -> Self {
         unsafe { &*val }.as_str()
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl Return<'static> for bool {
+    type Ext = u8;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
+        val as u8
     }
 }
 
@@ -213,16 +213,6 @@ impl<'jni> Argument<'jni> for bool {
 }
 
 #[cfg(feature = "jni")]
-impl<'jni> Return<'jni> for bool {
-    type Ext = jboolean;
-    type Env = JNIEnv<'jni>;
-
-    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
-        val as jboolean
-    }
-}
-
-#[cfg(feature = "jni")]
 impl<'a, 'jni> Argument<'jni> for &'a str {
     type Ext = JString<'jni>;
     type Env = JNIEnv<'jni>;
@@ -257,6 +247,16 @@ impl<'jni> Return<'jni> for String {
 
     fn convert(env: &Self::Env, val: Self) -> Self::Ext {
         env.new_string(val).expect("Could not create java string").into_inner()
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Return<'jni> for bool {
+    type Ext = jboolean;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
+        val as jboolean
     }
 }
 

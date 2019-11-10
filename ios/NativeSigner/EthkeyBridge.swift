@@ -68,7 +68,7 @@ class EthkeyBridge: NSObject {
     }
   }
 
-  @objc func blake2s(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func blake2b(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
     var data_ptr = data.asPtr()
     let hash_rust_str = blake(&error, &data_ptr)
@@ -198,6 +198,19 @@ class EthkeyBridge: NSObject {
     rust_string_ptr_destroy(signature_rust_str_ptr)
     rust_string_destroy(signature_rust_str)
     resolve(signature)
+  }
+
+  @objc func schnorrkelVerify(_ seed: String, message: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var seed_ptr = seed.asPtr()
+    var message_ptr = message.asPtr()
+    var signature_ptr = signature.asPtr()
+    let is_valid = schnorrkel_verify(&error, &seed_ptr, &message_ptr, &signature_ptr)
+    if error == 0 {
+      resolve(is_valid)
+    } else {
+      reject("Failed to verify signature.", nil, nil)
+    }
   }
   
 /* secure native */
