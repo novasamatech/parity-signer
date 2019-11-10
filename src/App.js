@@ -21,7 +21,7 @@ import '../shim';
 import '@polkadot/types/injector';
 
 import React, { Component } from 'react';
-import { StatusBar, YellowBox } from 'react-native';
+import { Platform, StatusBar, YellowBox } from 'react-native';
 import {
 	createAppContainer,
 	createStackNavigator,
@@ -58,9 +58,23 @@ import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 
+const getLaunchArgs = props => {
+	if (Platform.OS === 'ios') {
+		if (props.launchArgs && props.launchArgs.includes('-detoxServer')) {
+			global.inTest = true;
+		}
+	} else {
+		if (props.launchArgs && props.launchArgs.hasOwnProperty('detoxServer')) {
+			global.inTest = true;
+		}
+	}
+	global.inTest = false;
+};
+
 export default class App extends Component {
-	constructor() {
+	constructor(props) {
 		super();
+		getLaunchArgs(props);
 		if (__DEV__) {
 			YellowBox.ignoreWarnings([
 				'Warning: componentWillReceiveProps',
