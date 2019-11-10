@@ -21,6 +21,7 @@
     "postinstall": "npx jetify && chmod +x ./scripts/fix-rn-camera-path.sh && ./scripts/fix-rn-camera-path.sh ./node_modules/react-native-camera/ios/RNCamera.xcodeproj/project.pbxproj",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
     "test": "jest",
+    "test-rust": "cd ./rust/signer && cargo test && cd ../..",
     "build-e2e:android": "detox build -c android.emu.debug",
     "test-e2e:android": "detox test -c android.emu.debug",
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",

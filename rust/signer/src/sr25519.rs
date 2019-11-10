@@ -1,7 +1,7 @@
 use codec::{Encode, Decode};
 use lazy_static::lazy_static;
 use regex::Regex;
-use schnorrkel::{ExpansionMode, SecretKey};
+use schnorrkel::{ExpansionMode, SecretKey, Signature};
 use schnorrkel::derive::{ChainCode, Derivation};
 use substrate_bip39::mini_secret_from_entropy;
 use bip39::{Mnemonic, Language};
@@ -64,6 +64,14 @@ impl KeyPair {
     pub fn sign(&self, message: &[u8]) -> [u8; 64] {
         let context = schnorrkel::signing_context(SIGNING_CTX);
         self.0.sign(context.bytes(message)).to_bytes()
+    }
+
+    pub fn verify_signature(&self, message: &[u8], signature: &[u8]) -> Option<bool> {
+        let context = schnorrkel::signing_context(SIGNING_CTX);
+
+        let signature = Signature::from_bytes(signature).ok()?;
+
+        Some(self.0.verify(context.bytes(&message), &signature).is_ok())
     }
 }
 
