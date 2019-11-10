@@ -16,83 +16,110 @@
 
 // @flow
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import {
 	Platform,
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	View,
-	ViewPropTypes,
 	Text
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import colors from '../colors';
 
-export default class ButtonIcon extends React.PureComponent<{
-	onPress: () => any
-}> {
-	static propTypes = {
-		iconBgStyle: ViewPropTypes.style,
-		iconName: PropTypes.string.isRequired,
-		iconSize: PropTypes.number,
-		iconType: PropTypes.string,
-		onPress: PropTypes.func.isRequired,
-		style: ViewPropTypes.style,
-		textStyle: Text.propTypes.style,
-		title: PropTypes.string
+const ButtonIcon = props => {
+	const {
+		dropdown = false,
+		renderDropdownElement,
+		iconName,
+		iconType,
+		onPress,
+		iconBgStyle,
+		iconSize,
+		textStyle,
+		title,
+		style
+	} = props;
+
+	const styles = {
+		dropdownView: {
+			marginRight: 8,
+			marginVertical: 8
+		},
+		generalView: {
+			display: 'flex',
+			flexDirection: 'row'
+		},
+		iconTitleView: {
+			alignItems: 'center',
+			display: 'flex',
+			flexDirection: 'row',
+			marginHorizontal: 8,
+			marginLeft: 8
+		},
+		iconTitleViewContainer: {
+			flex: dropdown && title ? 1 : 0
+		},
+		iconView: {
+			backgroundColor: colors.card_bg,
+			borderRadius: iconSize || 24,
+			height: iconSize || 24,
+			justifyContent: 'center',
+			width: iconSize || 24
+		},
+		title: {
+			marginLeft: 8
+		}
 	};
 
-	render() {
-		const {
-			iconName,
-			iconType,
-			onPress,
-			iconBgStyle,
-			iconSize,
-			textStyle,
-			title,
-			style
-		} = this.props;
-		const Touchable =
-			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
-		return (
-			<Touchable accessibilityComponentType="button" onPress={onPress}>
-				<View
-					style={[
-						{
-							alignItems: 'center',
-							flexDirection: 'row',
-							marginLeft: 8,
-							marginVertical: 8
-						},
-						style
-					]}
-				>
-					<View
-						style={[
-							{
-								alignItems: 'center',
-								backgroundColor: colors.card_bg,
-								borderRadius: iconSize || 24,
-								height: iconSize || 24,
-								justifyContent: 'center',
-								width: iconSize || 24
-							},
-							iconBgStyle
-						]}
-					>
-						<Icon
-							color={colors.bg_text}
-							size={iconSize - 4 || 20}
-							name={iconName}
-							type={iconType}
-						/>
-					</View>
+	const Touchable =
+		Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
-					{title && <Text style={[{ marginLeft: 8 }, textStyle]}>{title}</Text>}
+	const [isDropdownOpen, setIsDropsdownOpen] = useState(false);
+
+	return (
+		<>
+			<View style={[styles.generalView, style]}>
+				<View style={styles.iconTitleViewContainer}>
+					<Touchable accessibilityComponentType="button" onPress={onPress}>
+						<View style={styles.iconTitleView}>
+							<TouchableOpacity
+								style={[styles.iconView, iconBgStyle]}
+								onPress={onPress}
+							>
+								<Icon
+									color={colors.bg_text}
+									size={iconSize - 4 || 20}
+									name={iconName}
+									type={iconType}
+								/>
+							</TouchableOpacity>
+							{!!title && (
+								<Text style={[styles.title, textStyle]}>{title}</Text>
+							)}
+						</View>
+					</Touchable>
 				</View>
-			</Touchable>
-		);
-	}
-}
+				{dropdown && (
+					<View>
+						<Touchable onPress={() => setIsDropsdownOpen(!isDropdownOpen)}>
+							<View style={styles.dropdownView}>
+								<Icon
+									color={colors.bg_text}
+									size={iconSize - 4 || 20}
+									name={
+										isDropdownOpen ? 'md-arrow-dropup' : 'md-arrow-dropdown'
+									}
+									type="ionicon"
+								/>
+							</View>
+						</Touchable>
+					</View>
+				)}
+			</View>
+			{isDropdownOpen && renderDropdownElement()}
+		</>
+	);
+};
+
+export default ButtonIcon;

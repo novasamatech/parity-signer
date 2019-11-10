@@ -100,17 +100,19 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
-				<>
-					<Button
-						testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
-						title="Add Network Account"
-						onPress={() => setShouldShowMoreNetworks(true)}
-					/>
+				<View
+					style={{
+						alignItems: 'center',
+						bottom: 40,
+						position: 'absolute',
+						width: '100%'
+					}}
+				>
 					<Button
 						title="Scan"
 						onPress={() => navigation.navigate('QrScanner')}
 					/>
-				</>
+				</View>
 			);
 		} else {
 			return (
@@ -128,53 +130,60 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	if (identities.length === 0) return showOnboardingMessage();
 
 	return (
-		<ScrollView
+		<View
 			style={styles.body}
 			testID={testIDs.AccountNetworkChooser.chooserScreen}
 		>
-			<Text style={styles.title}>
-				{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
-			</Text>
-			{Object.entries(NETWORK_LIST)
-				.filter(getNetworkKeys)
-				.map(([networkKey, networkParams], index) => (
-					<AccountCard
-						address={''}
-						key={networkKey}
-						testID={testIDs.AccountNetworkChooser.networkButton + index}
-						networkKey={networkKey}
-						onPress={async () => {
-							if (isNew) {
-								const { prefix, pathId, protocol } = networkParams;
-								const seed = await unlockSeed(navigation);
-								let derivationSucceed;
-								if (protocol === NetworkProtocols.SUBSTRATE) {
-									derivationSucceed = await accounts.deriveNewPath(
-										`//${pathId}//default`,
-										seed,
-										prefix,
-										networkKey
-									);
+			{isNew && <Text style={styles.title}>CREATE YOUR FIRST KEYPAIR</Text>}
+			<ScrollView>
+				{Object.entries(NETWORK_LIST)
+					.filter(getNetworkKeys)
+					.map(([networkKey, networkParams], index) => (
+						<AccountCard
+							address={''}
+							key={networkKey}
+							testID={testIDs.AccountNetworkChooser.networkButton + index}
+							networkKey={networkKey}
+							onPress={async () => {
+								if (isNew) {
+									const { prefix, pathId, protocol } = networkParams;
+									const seed = await unlockSeed(navigation);
+									let derivationSucceed;
+									if (protocol === NetworkProtocols.SUBSTRATE) {
+										derivationSucceed = await accounts.deriveNewPath(
+											`//${pathId}//default`,
+											seed,
+											prefix,
+											networkKey
+										);
+									} else {
+										derivationSucceed = await accounts.deriveEthereumAccount(
+											seed,
+											networkKey
+										);
+									}
+									if (derivationSucceed) {
+										navigateToPathsList(navigation, networkKey);
+									} else {
+										alertPathDerivationError();
+									}
 								} else {
-									derivationSucceed = await accounts.deriveEthereumAccount(
-										seed,
-										networkKey
-									);
+									navigation.navigate('PathsList', { networkKey });
 								}
-								if (derivationSucceed) {
-									navigateToPathsList(navigation, networkKey);
-								} else {
-									alertPathDerivationError();
-								}
-							} else {
-								navigation.navigate('PathsList', { networkKey });
-							}
-						}}
-						title={networkParams.title}
-					/>
-				))}
+							}}
+							title={networkParams.title}
+						/>
+					))}
+				<AccountCard
+					address={'new'}
+					onPress={() => setShouldShowMoreNetworks(true)}
+					title="Add Network Account"
+					networkColor={colors.bg}
+					style={{ marginBottom: 120 }}
+				/>
+			</ScrollView>
 			{renderShowMoreButton()}
-		</ScrollView>
+		</View>
 	);
 }
 
