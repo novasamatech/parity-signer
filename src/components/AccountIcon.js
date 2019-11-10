@@ -89,6 +89,6 @@ export default function AccountIcon(props) {
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <Icon color={colors.bg} name={'error'} size={style.width || 40} />;
+		return <Icon color={colors.bg_text} name={'error'} size={44} />;
 	}
 }
