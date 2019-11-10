@@ -33,7 +33,10 @@ import {
 import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
-import { getAvailableNetworkKeys } from '../util/identitiesUtils';
+import {
+	getAvailableNetworkKeys,
+	getPathsWithNetwork
+} from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 
 function AccountNetworkChooser({ navigation, accounts }) {
@@ -165,6 +168,18 @@ function AccountNetworkChooser({ navigation, accounts }) {
 										alertPathDerivationError();
 									}
 								} else {
+									if (
+										NETWORK_LIST[networkKey].protocol ===
+										NetworkProtocols.SUBSTRATE
+									) {
+										const paths = Array.from(currentIdentity.meta.keys());
+										const listedPaths = getPathsWithNetwork(paths, networkKey);
+										if (listedPaths.length === 0) {
+											return navigation.navigate('PathDerivation', {
+												networkKey
+											});
+										}
+									}
 									navigation.navigate('PathsList', { networkKey });
 								}
 							}}

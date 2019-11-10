@@ -21,7 +21,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import { validateDerivedPath } from '../util/identitiesUtils';
-import { unlockSeed } from '../util/navigationHelpers';
+import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import AccountCard from '../components/AccountCard';
 import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
 import { alertPathDerivationError } from '../util/alertUtils';
@@ -47,7 +47,7 @@ function PathDerivation({ accounts, navigation }) {
 			<TextInput
 				testID={testIDs.PathDerivation.nameInput}
 				value={keyPairsName}
-				onChangeText={keyParisName => setKeyPairsName(keyParisName.trim())}
+				onChangeText={keyParisName => setKeyPairsName(keyParisName)}
 			/>
 			<Text>Path</Text>
 			<Text>{existedNetworkPath}</Text>
@@ -79,7 +79,7 @@ function PathDerivation({ accounts, navigation }) {
 						networkKey
 					);
 					if (derivationSucceed) {
-						navigation.navigate('PathsList', { networkKey });
+						navigateToPathsList(navigation, networkKey);
 					} else {
 						setIsPathValid(false);
 						alertPathDerivationError();
