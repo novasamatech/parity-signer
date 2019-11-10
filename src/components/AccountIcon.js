@@ -71,6 +71,12 @@ export default function AccountIcon(props) {
 				<Icon name="add" color={colors.bg_text} size={32} />
 			</View>
 		);
+	} else if (address === 'existed') {
+		return (
+			<View style={{ height: 40, width: 40 }}>
+				<Icon name="arrow-back" color={colors.bg_text} size={32} />
+			</View>
+		);
 	}
 	if (protocol === NetworkProtocols.SUBSTRATE) {
 		return <Identicon value={address} size={style.width || 40} />;

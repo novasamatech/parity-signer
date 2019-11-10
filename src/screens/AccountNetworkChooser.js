@@ -100,26 +100,23 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
-				<View
-					style={{
-						alignItems: 'center',
-						bottom: 40,
-						position: 'absolute',
-						width: '100%'
-					}}
-				>
-					<Button
-						title="Scan"
-						onPress={() => navigation.navigate('QrScanner')}
-					/>
-				</View>
+				<AccountCard
+					address={'new'}
+					onPress={() => setShouldShowMoreNetworks(true)}
+					title="Add Network Account"
+					networkColor={colors.bg}
+					style={{ marginBottom: 120 }}
+				/>
 			);
 		} else {
 			return (
-				<Button
+				<AccountCard
+					address={'existed'}
+					onPress={() => setShouldShowMoreNetworks(false)}
 					testID={testIDs.AccountNetworkChooser.showExistedButton}
 					title="Show Existed Network Account"
-					onPress={() => setShouldShowMoreNetworks(false)}
+					networkColor={colors.bg}
+					style={{ marginBottom: 120 }}
 				/>
 			);
 		}
@@ -174,15 +171,18 @@ function AccountNetworkChooser({ navigation, accounts }) {
 							title={networkParams.title}
 						/>
 					))}
-				<AccountCard
-					address={'new'}
-					onPress={() => setShouldShowMoreNetworks(true)}
-					title="Add Network Account"
-					networkColor={colors.bg}
-					style={{ marginBottom: 120 }}
-				/>
 			</ScrollView>
 			{renderShowMoreButton()}
+			<View
+				style={{
+					alignItems: 'center',
+					bottom: 40,
+					position: 'absolute',
+					width: '100%'
+				}}
+			>
+				<Button title="Scan" onPress={() => navigation.navigate('QrScanner')} />
+			</View>
 		</View>
 	);
 }
