@@ -57,6 +57,7 @@ const substrateNetworkBase = {
 		color: '#4C4646',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
+		pathId: 'kusama_dev',
 		prefix: 2,
 		title: 'Kusama Development',
 		unit: 'KSM'
