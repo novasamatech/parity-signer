@@ -73,7 +73,7 @@ export const deepCopyIdentities = identities =>
 export const deepCopyIdentity = identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
-export const getPathsWithNetwork = (paths, networkKey) =>
+export const getPathsWithSubstrateNetwork = (paths, networkKey) =>
 	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
 
 export const getNetworkKeyBySubstratePath = path => {

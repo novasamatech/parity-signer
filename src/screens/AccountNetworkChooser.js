@@ -35,7 +35,7 @@ import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
 import {
 	getAvailableNetworkKeys,
-	getPathsWithNetwork
+	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 
@@ -99,6 +99,35 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		return availableNetworks.includes(networkKey);
 	};
 
+	const onDerivationFinished = (derivationSucceed, networkKey) => {
+		if (derivationSucceed) {
+			navigateToPathsList(navigation, networkKey);
+		} else {
+			alertPathDerivationError();
+		}
+	};
+
+	const deriveSubstrateDefault = async (networkKey, networkParams) => {
+		const { prefix, pathId } = networkParams;
+		const seed = await unlockSeed(navigation);
+		const derivationSucceed = await accounts.deriveNewPath(
+			`//${pathId}//default`,
+			seed,
+			prefix,
+			networkKey
+		);
+		onDerivationFinished(derivationSucceed, networkKey);
+	};
+
+	const deriveEthereumAccount = async networkKey => {
+		const seed = await unlockSeed(navigation);
+		const derivationSucceed = await accounts.deriveEthereumAccount(
+			seed,
+			networkKey
+		);
+		onDerivationFinished(derivationSucceed, networkKey);
+	};
+
 	const renderShowMoreButton = () => {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
@@ -146,39 +175,24 @@ function AccountNetworkChooser({ navigation, accounts }) {
 							networkKey={networkKey}
 							onPress={async () => {
 								if (isNew) {
-									const { prefix, pathId, protocol } = networkParams;
-									const seed = await unlockSeed(navigation);
-									let derivationSucceed;
-									if (protocol === NetworkProtocols.SUBSTRATE) {
-										derivationSucceed = await accounts.deriveNewPath(
-											`//${pathId}//default`,
-											seed,
-											prefix,
-											networkKey
-										);
+									if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+										await deriveSubstrateDefault(networkKey, networkParams);
 									} else {
-										derivationSucceed = await accounts.deriveEthereumAccount(
-											seed,
-											networkKey
-										);
-									}
-									if (derivationSucceed) {
-										navigateToPathsList(navigation, networkKey);
-									} else {
-										alertPathDerivationError();
+										await deriveEthereumAccount(networkKey);
 									}
 								} else {
-									if (
-										NETWORK_LIST[networkKey].protocol ===
-										NetworkProtocols.SUBSTRATE
-									) {
-										const paths = Array.from(currentIdentity.meta.keys());
-										const listedPaths = getPathsWithNetwork(paths, networkKey);
-										if (listedPaths.length === 0) {
+									const paths = Array.from(currentIdentity.meta.keys());
+									const listedPaths = getPathsWithSubstrateNetwork(
+										paths,
+										networkKey
+									);
+									if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+										if (listedPaths.length === 0)
 											return navigation.navigate('PathDerivation', {
 												networkKey
 											});
-										}
+									} else if (!paths.includes(networkKey)) {
+										return await deriveEthereumAccount(networkKey);
 									}
 									navigation.navigate('PathsList', { networkKey });
 								}
