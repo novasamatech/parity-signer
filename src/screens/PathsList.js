@@ -82,6 +82,7 @@ function PathsList({ accounts, navigation }) {
 			>
 				<Separator
 					shadow={true}
+					shadowStyle={{ height: 16, marginTop: -16 }}
 					style={{
 						backgroundColor: 'transparent',
 						height: 0,
@@ -129,7 +130,7 @@ function PathsList({ accounts, navigation }) {
 	);
 
 	return (
-		<ScrollView>
+		<ScrollView style={{ backgroundColor: colors.bg, flex: 1 }}>
 			{pathsGroups.map(pathsGroup =>
 				pathsGroup.paths.length === 1
 					? renderSinglePath(pathsGroup)

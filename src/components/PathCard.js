@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, Text, View } from 'react-native';
-import Button from './Button';
 import {
 	getNetworkKeyBySubstratePath,
-	getPathName,
-	isSubstratePath
+	getPathName
 } from '../util/identitiesUtils';
 import { NETWORK_LIST } from '../constants';
 import Separator from '../components/Separator';
@@ -13,6 +11,7 @@ import AccountIcon from './AccountIcon';
 import Address from './Address';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
+import TouchableItem from './TouchableItem';
 
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
@@ -28,7 +27,7 @@ export default function PathCard({ onPress, identity, path, testID }) {
 	const networkKey = getNetworkKeyBySubstratePath(path);
 	const network = NETWORK_LIST[networkKey];
 
-	return (
+	const nonSubstrateCard = (
 		<View testID={testID}>
 			<Separator
 				shadow={true}
@@ -54,7 +53,6 @@ export default function PathCard({ onPress, identity, path, testID }) {
 					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 						{pathName}
 					</Text>
-					{isSubstratePath(path) && <Button onPress={onPress} title={path} />}
 					<Address address={address} protocol={network.protocol} />
 				</View>
 				<View
@@ -68,6 +66,43 @@ export default function PathCard({ onPress, identity, path, testID }) {
 			</View>
 		</View>
 	);
+	const substrateDerivationCard = (
+		<TouchableItem
+			accessibilityComponentType="button"
+			testID={testID}
+			disabled={false}
+			onPress={onPress}
+		>
+			<View testID={testID}>
+				<Separator
+					shadow={false}
+					style={{
+						backgroundColor: 'transparent',
+						height: 2,
+						marginVertical: 0
+					}}
+				/>
+				<View style={[styles.content, styles.contentDer]}>
+					<AccountIcon
+						address={address}
+						protocol={network.protocol}
+						network={network}
+						style={styles.icon}
+					/>
+					<View style={styles.desc}>
+						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+							{pathName}
+						</Text>
+						<Text style={fontStyles.t_codeS}>{path}</Text>
+					</View>
+				</View>
+			</View>
+		</TouchableItem>
+	);
+
+	return network.protocol === 'substrate'
+		? substrateDerivationCard
+		: nonSubstrateCard;
 }
 
 const styles = StyleSheet.create({
@@ -76,6 +111,10 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flexDirection: 'row',
 		paddingLeft: 16
+	},
+	contentDer: {
+		backgroundColor: colors.card_bgSolid,
+		paddingVertical: 8
 	},
 	desc: {
 		flex: 1,
