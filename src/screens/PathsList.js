@@ -73,11 +73,12 @@ function PathsList({ accounts, navigation }) {
 	};
 
 	const renderGroupPaths = pathsGroup => (
-		<>
+		<View style={{ marginBottom: 16 }}>
 			<View
 				style={{
 					backgroundColor: colors.bg,
-					height: 64
+					height: 64,
+					marginTop: 16
 				}}
 			>
 				<Separator
@@ -122,15 +123,17 @@ function PathsList({ accounts, navigation }) {
 				</View>
 			</View>
 			{pathsGroup.paths.map(path => (
-				<PathCard
-					key={path}
-					testID={testIDs.PathList.pathCard + path}
-					identity={currentIdentity}
-					path={path}
-					onPress={() => navigate('PathDetails', { path })}
-				/>
+				<View style={{ marginBottom: -14 }}>
+					<PathCard
+						key={path}
+						testID={testIDs.PathList.pathCard + path}
+						identity={currentIdentity}
+						path={path}
+						onPress={() => navigate('PathDetails', { path })}
+					/>
+				</View>
 			))}
-		</>
+		</View>
 	);
 
 	return (

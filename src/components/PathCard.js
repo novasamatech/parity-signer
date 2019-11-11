@@ -74,14 +74,6 @@ export default function PathCard({ onPress, identity, path, testID }) {
 			onPress={onPress}
 		>
 			<View testID={testID}>
-				<Separator
-					shadow={false}
-					style={{
-						backgroundColor: 'transparent',
-						height: 2,
-						marginVertical: 0
-					}}
-				/>
 				<View style={[styles.content, styles.contentDer]}>
 					<AccountIcon
 						address={address}
@@ -114,6 +106,7 @@ const styles = StyleSheet.create({
 	},
 	contentDer: {
 		backgroundColor: colors.card_bgSolid,
+		marginTop: 16,
 		paddingVertical: 8
 	},
 	desc: {
