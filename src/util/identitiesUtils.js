@@ -84,6 +84,12 @@ export const getNetworkKeyBySubstratePath = path => {
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
+export const getAddressWithPath = (path, identity) => {
+	const pathMeta = identity.meta.get(path);
+	if (pathMeta && pathMeta.address) return pathMeta.address;
+	return '';
+};
+
 export const getAvailableNetworkKeys = identity => {
 	const addressesList = Array.from(identity.addresses.values());
 	const networkKeysSet = addressesList.reduce((networksSet, path) => {

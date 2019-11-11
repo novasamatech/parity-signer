@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, Text, View } from 'react-native';
 import {
+	getAddressWithPath,
 	getIdFromSubstrateAddress,
 	getNetworkKeyBySubstratePath,
 	getPathName
@@ -23,7 +24,7 @@ PathCard.propTypes = {
 
 export default function PathCard({ onPress, identity, path, testID }) {
 	const pathName = getPathName(path, identity);
-	const address = identity.meta.get(path).address;
+	const address = getAddressWithPath(path, identity);
 
 	const networkKey = getNetworkKeyBySubstratePath(path);
 	const network = NETWORK_LIST[networkKey];

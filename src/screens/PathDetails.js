@@ -7,21 +7,28 @@ import PopupMenu from '../components/PopupMenu';
 import colors from '../colors';
 import fonts from '../fonts';
 import QrView from '../components/QrView';
-import { getNetworkKeyBySubstratePath } from '../util/identitiesUtils';
+import {
+	getAddressWithPath,
+	getNetworkKeyBySubstratePath
+} from '../util/identitiesUtils';
 import { UnknownNetworkKeys } from '../constants';
-import { alertDeleteAccount } from '../util/alertUtils';
+import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
 import Button from '../components/Button';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
-	const { address } = currentIdentity.meta.get(path) || {};
+	const address = getAddressWithPath(path, currentIdentity);
 
 	const onOptionSelect = value => {
 		if (value === 'PathDelete') {
 			alertDeleteAccount('this key pairs', async () => {
 				const deleteSucceed = await accounts.deletePath(path);
-				if (deleteSucceed) navigateToPathsList(navigation, networkKey);
+				if (deleteSucceed) {
+					navigateToPathsList(navigation, networkKey);
+				} else {
+					alertPathDeletionError();
+				}
 			});
 		} else {
 			navigation.navigate('PathManagement', { path });
@@ -48,7 +55,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				</View>
 			</View>
 			<PathCard identity={currentIdentity} path={path} />
-			{networkKey !== UnknownNetworkKeys.UNKNOWN && address && (
+			{networkKey !== UnknownNetworkKeys.UNKNOWN && address !== '' && (
 				<QrView data={address} />
 			)}
 			<Button title="Scan" onPress={() => navigation.navigate('QrScanner')} />

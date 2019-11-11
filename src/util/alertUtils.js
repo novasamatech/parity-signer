@@ -16,6 +16,14 @@ export const alertPathDerivationError = () =>
 		}
 	]);
 
+export const alertPathDeletionError = () =>
+	Alert.alert('Error', "Can't delete Key pairs.", [
+		{
+			style: 'Cancel',
+			text: 'Try again'
+		}
+	]);
+
 export const alertDeleteAccount = (accountName, onDelete) => {
 	Alert.alert(
 		'Delete',
