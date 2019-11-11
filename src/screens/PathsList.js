@@ -101,7 +101,11 @@ function PathsList({ accounts, navigation }) {
 				>
 					<View>
 						<Text style={fontStyles.t_prefix}>{pathsGroup.title}</Text>
-						<Text style={fontStyles.t_codeS}>networkPath+pathsGroup.path</Text>
+						<Text style={fontStyles.t_codeS}>
+							{NETWORK_LIST[networkKey].pathId}
+							{'//'}
+							{pathsGroup.subPath}
+						</Text>
 					</View>
 
 					<ButtonIcon
