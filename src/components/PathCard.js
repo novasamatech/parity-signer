@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, Text, View } from 'react-native';
 import {
+	getIdFromSubstrateAddress,
 	getNetworkKeyBySubstratePath,
 	getPathName
 } from '../util/identitiesUtils';
@@ -84,7 +85,7 @@ export default function PathCard({ onPress, identity, path, testID }) {
 				/>
 				<View style={[styles.content, styles.contentDer]}>
 					<AccountIcon
-						address={address}
+						address={getIdFromSubstrateAddress(address)}
 						protocol={network.protocol}
 						network={network}
 						style={styles.icon}

@@ -98,6 +98,8 @@ export const getAvailableNetworkKeys = identity => {
 	return Object.keys(networkKeysSet);
 };
 
+export const getIdFromSubstrateAddress = address => address.split(':')[1] || '';
+
 export const validatePath = path =>
 	/^\/\/([\w-_])+(\/\/?([\w-_])+)+$/.test(path);
 
