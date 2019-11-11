@@ -33,6 +33,11 @@ import PathCard from '../components/PathCard';
 import { PathDetailsView } from './PathDetails';
 import testIDs from '../../e2e/testIDs';
 
+import Separator from '../components/Separator';
+import fontStyles from '../fontStyles';
+import colors from '../colors';
+import ButtonIcon from '../components/ButtonIcon';
+
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
 		'networkKey',
@@ -68,8 +73,49 @@ function PathsList({ accounts, navigation }) {
 	};
 
 	const renderGroupPaths = pathsGroup => (
-		<View>
-			<Text>{pathsGroup.title}</Text>
+		<>
+			<View
+				style={{
+					backgroundColor: colors.bg,
+					height: 64
+				}}
+			>
+				<Separator
+					shadow={true}
+					style={{
+						backgroundColor: 'transparent',
+						height: 0,
+						marginVertical: 0
+					}}
+				/>
+				<View
+					style={{
+						alignItems: 'center',
+						flexDirection: 'row',
+						justifyContent: 'space-between',
+						marginBottom: 20,
+						marginTop: 16,
+						paddingHorizontal: 16
+					}}
+				>
+					<View>
+						<Text style={fontStyles.t_prefix}>{pathsGroup.title}</Text>
+						<Text style={fontStyles.t_codeS}>networkPath+pathsGroup.path</Text>
+					</View>
+
+					<ButtonIcon
+						onPress={() => this.props.navigation.navigate('')}
+						iconName="md-add"
+						iconType="ionicon"
+						style={{ opacity: 0.3 }}
+						// onPress should lead to prefilled PathDerivation form
+						// eslint-disable-next-line react/jsx-no-duplicate-props
+						onPress={() =>
+							navigation.navigate('PathDerivation', { networkKey })
+						}
+					/>
+				</View>
+			</View>
 			{pathsGroup.paths.map(path => (
 				<PathCard
 					key={path}
@@ -79,7 +125,7 @@ function PathsList({ accounts, navigation }) {
 					onPress={() => navigate('PathDetails', { path })}
 				/>
 			))}
-		</View>
+		</>
 	);
 
 	return (
