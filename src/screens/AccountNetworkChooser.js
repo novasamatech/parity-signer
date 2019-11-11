@@ -38,6 +38,7 @@ import {
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
+import ButtonMainAction from '../components/ButtonMainAction';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
@@ -137,7 +138,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					onPress={() => setShouldShowMoreNetworks(true)}
 					title="Add Network Account"
 					networkColor={colors.bg}
-					style={{ marginBottom: 120 }}
+					style={{ marginBottom: 92 }}
 				/>
 			);
 		} else {
@@ -202,16 +203,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					))}
 			</ScrollView>
 			{renderShowMoreButton()}
-			<View
-				style={{
-					alignItems: 'center',
-					bottom: 40,
-					position: 'absolute',
-					width: '100%'
-				}}
-			>
-				<Button title="Scan" onPress={() => navigation.navigate('QrScanner')} />
-			</View>
+			<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
 		</View>
 	);
 }

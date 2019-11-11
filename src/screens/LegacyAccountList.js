@@ -24,10 +24,10 @@ import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
-import Button from '../components/Button';
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import testIDs from '../../e2e/testIDs';
+import ButtonMainAction from '../components/ButtonMainAction';
 
 export default class LegacyAccountList extends React.PureComponent {
 	render() {
@@ -62,8 +62,6 @@ class AccountListView extends React.PureComponent {
 
 	render() {
 		const { accounts, navigation, onAccountSelected } = this.props;
-		const { navigate } = navigation;
-
 		return (
 			<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
 				<Background />
@@ -89,13 +87,7 @@ class AccountListView extends React.PureComponent {
 					}}
 					enableEmptySections
 				/>
-				<View style={styles.bottom}>
-					<Button
-						buttonStyles={{ height: 60 }}
-						title="Scan"
-						onPress={() => navigate('QrScanner')}
-					/>
-				</View>
+				<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
 			</View>
 		);
 	}
