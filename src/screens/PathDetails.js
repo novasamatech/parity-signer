@@ -9,7 +9,8 @@ import fonts from '../fonts';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
-	getNetworkKeyBySubstratePath
+	getNetworkKeyBySubstratePath,
+	isSubstratePath
 } from '../util/identitiesUtils';
 import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
@@ -24,7 +25,9 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			alertDeleteAccount('this key pairs', async () => {
 				const deleteSucceed = await accounts.deletePath(path);
 				if (deleteSucceed) {
-					navigateToPathsList(navigation, networkKey);
+					isSubstratePath(path)
+						? navigateToPathsList(navigation, networkKey)
+						: navigation.navigate('AccountNetworkChooser');
 				} else {
 					alertPathDeletionError();
 				}
