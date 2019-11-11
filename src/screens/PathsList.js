@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
 	NETWORK_LIST,
@@ -28,7 +28,7 @@ import {
 	getPathsWithSubstrateNetwork,
 	groupPaths
 } from '../util/identitiesUtils';
-import Button from '../components/Button';
+import ButtonNewDerivation from '../components/ButtonNewDerivation';
 import PathCard from '../components/PathCard';
 import { PathDetailsView } from './PathDetails';
 import testIDs from '../../e2e/testIDs';
@@ -37,6 +37,7 @@ import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
 import ButtonIcon from '../components/ButtonIcon';
+import ButtonMainAction from '../components/ButtonMainAction';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -137,20 +138,30 @@ function PathsList({ accounts, navigation }) {
 	);
 
 	return (
-		<ScrollView style={{ backgroundColor: colors.bg, flex: 1 }}>
-			{pathsGroups.map(pathsGroup =>
-				pathsGroup.paths.length === 1
-					? renderSinglePath(pathsGroup)
-					: renderGroupPaths(pathsGroup)
-			)}
-			<Button
-				testID={testIDs.PathList.deriveButton}
-				title="Create New Derivation"
-				onPress={() => navigation.navigate('PathDerivation', { networkKey })}
-			/>
-			<Button title="Scan" onPress={() => navigate('QrScanner')} />
-		</ScrollView>
+		<View style={styles.body}>
+			<ScrollView>
+				{pathsGroups.map(pathsGroup =>
+					pathsGroup.paths.length === 1
+						? renderSinglePath(pathsGroup)
+						: renderGroupPaths(pathsGroup)
+				)}
+				<ButtonNewDerivation
+					testID={testIDs.PathList.deriveButton}
+					title="Create New Derivation"
+					onPress={() => navigation.navigate('PathDerivation', { networkKey })}
+				/>
+			</ScrollView>
+			<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
+		</View>
 	);
 }
 
 export default withAccountStore(withNavigation(PathsList));
+
+const styles = StyleSheet.create({
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column'
+	}
+});
