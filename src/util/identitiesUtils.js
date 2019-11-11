@@ -138,7 +138,7 @@ export const groupPaths = paths => {
 		if (existedItem) {
 			existedItem.paths.push(path);
 		} else {
-			groupedPath.push({ paths: [path], title: hardSubPath });
+			groupedPath.push({ paths: [path], subPath: subPath, title: hardSubPath });
 		}
 		return groupedPath;
 	}, []);

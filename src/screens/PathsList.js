@@ -73,11 +73,12 @@ function PathsList({ accounts, navigation }) {
 	};
 
 	const renderGroupPaths = pathsGroup => (
-		<>
+		<View style={{ marginBottom: 16 }}>
 			<View
 				style={{
 					backgroundColor: colors.bg,
-					height: 64
+					height: 64,
+					marginTop: 16
 				}}
 			>
 				<Separator
@@ -101,7 +102,11 @@ function PathsList({ accounts, navigation }) {
 				>
 					<View>
 						<Text style={fontStyles.t_prefix}>{pathsGroup.title}</Text>
-						<Text style={fontStyles.t_codeS}>networkPath+pathsGroup.path</Text>
+						<Text style={fontStyles.t_codeS}>
+							{NETWORK_LIST[networkKey].pathId}
+							{'//'}
+							{pathsGroup.subPath}
+						</Text>
 					</View>
 
 					<ButtonIcon
@@ -118,15 +123,17 @@ function PathsList({ accounts, navigation }) {
 				</View>
 			</View>
 			{pathsGroup.paths.map(path => (
-				<PathCard
-					key={path}
-					testID={testIDs.PathList.pathCard + path}
-					identity={currentIdentity}
-					path={path}
-					onPress={() => navigate('PathDetails', { path })}
-				/>
+				<View style={{ marginBottom: -14 }}>
+					<PathCard
+						key={path}
+						testID={testIDs.PathList.pathCard + path}
+						identity={currentIdentity}
+						path={path}
+						onPress={() => navigate('PathDetails', { path })}
+					/>
+				</View>
 			))}
-		</>
+		</View>
 	);
 
 	return (
