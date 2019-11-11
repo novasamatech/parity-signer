@@ -26,7 +26,6 @@ public class MainActivity extends ReactActivity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
                                        WindowManager.LayoutParams.FLAG_SECURE);
         }
-
     }
 
     @Override
@@ -35,6 +34,14 @@ public class MainActivity extends ReactActivity {
             @Override
             protected ReactRootView createRootView() {
             return new RNGestureHandlerEnabledRootView(MainActivity.this);
+            }
+
+            @Override
+            protected Bundle getLaunchOptions() {
+                Bundle bundle = new Bundle();
+                Bundle argumentsBundle = MainActivity.this.getIntent().getBundleExtra("launchArgs");
+                bundle.putBundle("launchArgs", argumentsBundle);
+                return bundle;
             }
         };
     }
