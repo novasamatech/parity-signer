@@ -37,6 +37,41 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		navigation.navigate('AccountNetworkChooser');
 	};
 
+	const renderIdentityOptions = identity => {
+		return (
+			<>
+				<ButtonIcon
+					title="Manage Identity"
+					onPress={async () => {
+						setVisible(false);
+						await accounts.selectIdentity(identity);
+						navigation.navigate('IdentityManagement');
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+				<ButtonIcon
+					title="Show Recovery Phrase"
+					onPress={async () => {
+						setVisible(false);
+						await accounts.selectIdentity(identity);
+						navigation.navigate('IdentityBackup', { isNew: false });
+					}}
+					iconBgStyle={styles.i_arrowBg}
+					iconName="ios-arrow-round-forward"
+					iconType="ionicon"
+					iconSize={24}
+					textStyle={fontStyles.t_regular}
+					style={styles.i_arrowStyle}
+				/>
+			</>
+		);
+	};
+
 	const renderCurrentIdentityCard = () => {
 		if (!currentIdentity) return;
 
@@ -53,32 +88,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					style={{ paddingLeft: 8 * 2 }}
 					textStyle={fontStyles.h1}
 				/>
-				<ButtonIcon
-					title="Manage Identity"
-					onPress={() => {
-						setVisible(false);
-						navigation.navigate('IdentityManagement');
-					}}
-					iconBgStyle={styles.i_arrowBg}
-					iconName="ios-arrow-round-forward"
-					iconType="ionicon"
-					iconSize={24}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
-				/>
-				<ButtonIcon
-					title="Show Recovery Phrase"
-					onPress={() => {
-						setVisible(false);
-						navigation.navigate('IdentityBackup', { isNew: false });
-					}}
-					iconBgStyle={styles.i_arrowBg}
-					iconName="ios-arrow-round-forward"
-					iconType="ionicon"
-					iconSize={24}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
-				/>
+				{renderIdentityOptions(currentIdentity)}
 				<Separator />
 			</>
 		);
@@ -146,8 +156,11 @@ function IdentitiesSwitch({ navigation, accounts }) {
 	const renderNonSelectedIdentity = ({ item, index }) => {
 		const identity = item;
 		const title = identity.name || `identity_${index.toString()}`;
+
 		return (
 			<ButtonIcon
+				dropdown={true}
+				renderDropdownElement={() => renderIdentityOptions(identity)}
 				title={title}
 				onPress={() => onIdentitySelected(identity)}
 				iconName="md-finger-print"

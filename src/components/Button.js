@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		marginHorizontal: 8,
 		marginVertical: 8,
-		paddingHorizontal: 56
+		paddingHorizontal: 64
 	},
 	buttonDisabled: {
 		backgroundColor: colors.card_bgSolid,

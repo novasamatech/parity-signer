@@ -29,8 +29,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	};
 
 	return (
-		<ScrollView>
-			<PathCard identity={currentIdentity} path={path} />
+		<ScrollView style={styles.body}>
 			<View style={styles.header}>
 				<Text style={styles.title}>PUBLIC ADDRESS</Text>
 				<View style={styles.menuView}>
@@ -48,6 +47,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					/>
 				</View>
 			</View>
+			<PathCard identity={currentIdentity} path={path} />
 			{networkKey !== UnknownNetworkKeys.UNKNOWN && address && (
 				<QrView data={address} />
 			)}
@@ -70,6 +70,11 @@ function PathDetails({ accounts, navigation }) {
 }
 
 const styles = StyleSheet.create({
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column'
+	},
 	header: {
 		alignItems: 'center',
 		flexDirection: 'row',

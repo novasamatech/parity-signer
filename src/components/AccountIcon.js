@@ -65,6 +65,19 @@ export default function AccountIcon(props) {
 			</View>
 		);
 	}
+	if (address === 'new') {
+		return (
+			<View style={{ height: 40, width: 40 }}>
+				<Icon name="add" color={colors.bg_text} size={32} />
+			</View>
+		);
+	} else if (address === 'existed') {
+		return (
+			<View style={{ height: 40, width: 40 }}>
+				<Icon name="arrow-back" color={colors.bg_text} size={32} />
+			</View>
+		);
+	}
 	if (protocol === NetworkProtocols.SUBSTRATE) {
 		return <Identicon value={address} size={style.width || 40} />;
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
@@ -76,6 +89,6 @@ export default function AccountIcon(props) {
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <Icon color={colors.bg} name={'error'} size={style.width || 40} />;
+		return <Icon color={colors.bg_text} name={'error'} size={44} />;
 	}
 }

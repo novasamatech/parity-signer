@@ -19,7 +19,7 @@
 'use strict';
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
@@ -129,56 +129,52 @@ export default class Scanner extends React.PureComponent {
 	}
 }
 
-export class QrScannerView extends React.Component {
-	constructor(props) {
-		super(props);
-		this.setBusySubscription = null;
-		this.setReadySubscription = null;
-	}
+QrScannerView.propTypes = {
+	onBarCodeRead: PropTypes.func.isRequired
+};
 
-	static propTypes = {
-		onBarCodeRead: PropTypes.func.isRequired
-	};
+export function QrScannerView(props) {
+	const { onBarCodeRead, scannerStore, navigation } = this.props;
+	const isScanningMetadata = navigation.getParam('isScanningMetadata');
 
-	componentDidMount() {
-		this.setBusySubscription = this.props.navigation.addListener(
+	const missedFrames = this.props.scannerStore.getMissedFrames();
+	const missedFramesMessage = missedFrames && missedFrames.join(', ');
+
+	useEffect(() => {
+		const setBusySubscription = props.navigation.addListener(
 			'willFocus',
 			() => {
-				this.props.scannerStore.setReady();
+				props.scannerStore.setReady();
 			}
 		);
-		this.setReadySubscription = this.props.navigation.addListener(
-			'didBlur',
-			() => {
-				this.props.scannerStore.setBusy();
-			}
-		);
-	}
+		const setReadySubscription = props.navigation.addListener('didBlur', () => {
+			props.scannerStore.setBusy();
+		});
+		return () => {
+			setBusySubscription.remove();
+			setReadySubscription.remove();
+		};
+	}, [props.navigation, props.scannerStore]);
 
-	componentWillUnmount() {
-		this.setBusySubscription.remove();
-		this.setReadySubscription.remove();
-	}
-
-	renderScanningNetworkSpecMessage() {
+	const renderScanningNetworkSpecMessage = () => {
 		return (
 			<View style={styles.bottom}>
 				<Text style={styles.descTitle}>Scan QR Code</Text>
 				<Text style={styles.descSecondary}>To Add a New Network Spec</Text>
 			</View>
 		);
-	}
+	};
 
-	renderScanningTransactionMessage() {
+	const renderScanningTransactionMessage = () => {
 		return (
 			<View style={styles.bottom}>
 				<Text style={styles.descTitle}>Scan QR Code</Text>
 				<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
 			</View>
 		);
-	}
+	};
 
-	renderScanningMultipartMessage() {
+	const renderScanningMultipartMessage = () => {
 		return (
 			<View style={styles.bottom}>
 				<Text style={styles.descTitle}>
@@ -195,77 +191,67 @@ export class QrScannerView extends React.Component {
 				/>
 			</View>
 		);
-	}
+	};
 
-	render() {
-		const { onBarCodeRead, scannerStore, navigation } = this.props;
-		const isScanningMetadata = navigation.getParam('isScanningMetadata');
-
-		const missedFrames = this.props.scannerStore.getMissedFrames();
-		const missedFramesMessage = missedFrames && missedFrames.join(', ');
-
-		if (scannerStore.isBusy()) {
-			return <View style={styles.inactive} />;
-		} else {
-			return (
-				<RNCamera
-					captureAudio={false}
-					onBarCodeRead={onBarCodeRead}
-					style={styles.view}
-				>
-					<View style={styles.body}>
-						<View style={styles.top}>
-							<Text style={styles.titleTop}>SCANNER</Text>
-						</View>
-						<View style={styles.middle}>
-							<View style={styles.middleLeft} />
-							<View style={styles.middleCenter} />
-							<View style={styles.middleRight} />
-						</View>
-						{isScanningMetadata
-							? this.renderScanningNetworkSpecMessage()
-							: this.renderScanningTransactionMessage()}
-						{this.props.isMultipart ? (
-							<View style={styles.bottom}>
-								<Text style={styles.descTitle}>
-									Scanning Multipart Data, Please Hold Still...
-								</Text>
-								<Text style={styles.descSecondary}>
-									{this.props.completedFramesCount} /{' '}
-									{this.props.totalFramesCount} Completed.
-								</Text>
-								<Button
-									onPress={() =>
-										this.props.scannerStore.clearMultipartProgress()
-									}
-									style={styles.descSecondary}
-									title="Start Over"
-								/>
-							</View>
-						) : (
-							<View style={styles.bottom}>
-								<Text style={styles.descTitle}>Scan QR Code</Text>
-								<Text style={styles.descSecondary}>
-									To Sign a New Transaction
-								</Text>
-								{this.props.isMultipart
-									? this.renderScanningMultipartMessage()
-									: isScanningMetadata
-									? this.renderScanningNetworkSpecMessage()
-									: this.renderScanningTransactionMessage()}
-								{missedFrames && missedFrames.length >= 1 && (
-									<View style={styles.bottom}>
-										<Text style={styles.descTitle}>
-											You missed the following frames: {missedFramesMessage}
-										</Text>
-									</View>
-								)}
-							</View>
-						)}
+	if (scannerStore.isBusy()) {
+		return <View style={styles.inactive} />;
+	} else {
+		return (
+			<RNCamera
+				captureAudio={false}
+				onBarCodeRead={onBarCodeRead}
+				style={styles.view}
+			>
+				<View style={styles.body}>
+					<View style={styles.top}>
+						<Text style={styles.titleTop}>SCANNER</Text>
 					</View>
-				</RNCamera>
-			);
-		}
+					<View style={styles.middle}>
+						<View style={styles.middleLeft} />
+						<View style={styles.middleCenter} />
+						<View style={styles.middleRight} />
+					</View>
+					{isScanningMetadata
+						? renderScanningNetworkSpecMessage()
+						: renderScanningTransactionMessage()}
+					{this.props.isMultipart ? (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								Scanning Multipart Data, Please Hold Still...
+							</Text>
+							<Text style={styles.descSecondary}>
+								{this.props.completedFramesCount} /{' '}
+								{this.props.totalFramesCount} Completed.
+							</Text>
+							<Button
+								onPress={() => this.props.scannerStore.clearMultipartProgress()}
+								style={styles.descSecondary}
+								title="Start Over"
+							/>
+						</View>
+					) : (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>Scan QR Code</Text>
+							<Text style={styles.descSecondary}>
+								To Sign a New Transaction
+							</Text>
+							{this.props.isMultipart
+								? renderScanningMultipartMessage()
+								: isScanningMetadata
+								? renderScanningNetworkSpecMessage()
+								: renderScanningTransactionMessage()}
+							{missedFrames && missedFrames.length >= 1 && (
+								<View style={styles.bottom}>
+									<Text style={styles.descTitle}>
+										You missed the following frames: {missedFramesMessage}
+									</Text>
+								</View>
+							)}
+						</View>
+					)}
+				</View>
+			</RNCamera>
+		);
 	}
 }
 

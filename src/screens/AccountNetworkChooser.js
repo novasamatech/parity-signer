@@ -33,7 +33,10 @@ import {
 import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
-import { getAvailableNetworkKeys } from '../util/identitiesUtils';
+import {
+	getAvailableNetworkKeys,
+	getPathsWithSubstrateNetwork
+} from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 
 function AccountNetworkChooser({ navigation, accounts }) {
@@ -45,8 +48,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 	}
 	const { identities, currentIdentity, loaded } = accounts.state;
-	const hasNoAccount =
-		accounts.getAccounts().size === 0 && identities.length === 0;
+	const hasLegacyAccount = accounts.getAccounts().size !== 0;
 
 	const TextButton = ({ text, isRecover }) => (
 		<Text
@@ -69,13 +71,17 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				style={styles.body}
 			>
 				<View style={styles.onboardingWrapper}>
-					<View style={styles.onboardingText}>
-						<Text>No Identity yet?{'\n'}</Text>
-						<TextButton text="Create" isRecover={false} />
-						<Text>No Identity yet?{'\n'}</Text>
-						<TextButton text="Recover" isRecover={true} />
-						<Text>an account to get started.</Text>
-					</View>
+					<Text style={styles.onboardingText}>No Identity yet?{'\n'}</Text>
+					<TextButton text="Create" isRecover={false} />
+					<Text style={styles.onboardingText}> Or {'\n'}</Text>
+					<TextButton text="Recover" isRecover={true} />
+					<Text style={styles.onboardingText}>an account to get started.</Text>
+					{hasLegacyAccount && (
+						<Button
+							title="Show Legacy Account"
+							onPress={() => navigation.navigate('LegacyAccountList')}
+						/>
+					)}
 				</View>
 			</ScrollView>
 		);
@@ -93,28 +99,56 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		return availableNetworks.includes(networkKey);
 	};
 
+	const onDerivationFinished = (derivationSucceed, networkKey) => {
+		if (derivationSucceed) {
+			navigateToPathsList(navigation, networkKey);
+		} else {
+			alertPathDerivationError();
+		}
+	};
+
+	const deriveSubstrateDefault = async (networkKey, networkParams) => {
+		const { prefix, pathId } = networkParams;
+		const seed = await unlockSeed(navigation);
+		const derivationSucceed = await accounts.deriveNewPath(
+			`//${pathId}//default`,
+			seed,
+			prefix,
+			networkKey
+		);
+		onDerivationFinished(derivationSucceed, networkKey);
+	};
+
+	const deriveEthereumAccount = async networkKey => {
+		const seed = await unlockSeed(navigation);
+		const derivationSucceed = await accounts.deriveEthereumAccount(
+			seed,
+			networkKey
+		);
+		onDerivationFinished(derivationSucceed, networkKey);
+	};
+
 	const renderShowMoreButton = () => {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
-				<>
-					<Button
-						testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
-						title="Add Network Account"
-						onPress={() => setShouldShowMoreNetworks(true)}
-					/>
-					<Button
-						title="Scan"
-						onPress={() => navigation.navigate('QrScanner')}
-					/>
-				</>
+				<AccountCard
+					address={'new'}
+					onPress={() => setShouldShowMoreNetworks(true)}
+					title="Add Network Account"
+					networkColor={colors.bg}
+					style={{ marginBottom: 120 }}
+				/>
 			);
 		} else {
 			return (
-				<Button
+				<AccountCard
+					address={'existed'}
+					onPress={() => setShouldShowMoreNetworks(false)}
 					testID={testIDs.AccountNetworkChooser.showExistedButton}
 					title="Show Existed Network Account"
-					onPress={() => setShouldShowMoreNetworks(false)}
+					networkColor={colors.bg}
+					style={{ marginBottom: 120 }}
 				/>
 			);
 		}
@@ -122,56 +156,63 @@ function AccountNetworkChooser({ navigation, accounts }) {
 
 	if (!loaded) return <ScrollView style={styles.body} />;
 
-	if (hasNoAccount) return showOnboardingMessage();
+	if (identities.length === 0) return showOnboardingMessage();
 
 	return (
-		<ScrollView
+		<View
 			style={styles.body}
 			testID={testIDs.AccountNetworkChooser.chooserScreen}
 		>
-			<Text style={styles.title}>
-				{isNew ? 'CREATE YOUR FIRST KEYPAIR' : 'CHOOSE NETWORK'}{' '}
-			</Text>
-			{Object.entries(NETWORK_LIST)
-				.filter(getNetworkKeys)
-				.map(([networkKey, networkParams], index) => (
-					<AccountCard
-						address={''}
-						key={networkKey}
-						testID={testIDs.AccountNetworkChooser.networkButton + index}
-						networkKey={networkKey}
-						onPress={async () => {
-							if (isNew) {
-								const { prefix, pathId, protocol } = networkParams;
-								const seed = await unlockSeed(navigation);
-								let derivationSucceed;
-								if (protocol === NetworkProtocols.SUBSTRATE) {
-									derivationSucceed = await accounts.deriveNewPath(
-										`//${pathId}//default`,
-										seed,
-										prefix,
+			{isNew && <Text style={styles.title}>CREATE YOUR FIRST KEYPAIR</Text>}
+			<ScrollView>
+				{Object.entries(NETWORK_LIST)
+					.filter(getNetworkKeys)
+					.map(([networkKey, networkParams], index) => (
+						<AccountCard
+							address={''}
+							key={networkKey}
+							testID={testIDs.AccountNetworkChooser.networkButton + index}
+							networkKey={networkKey}
+							onPress={async () => {
+								if (isNew) {
+									if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+										await deriveSubstrateDefault(networkKey, networkParams);
+									} else {
+										await deriveEthereumAccount(networkKey);
+									}
+								} else {
+									const paths = Array.from(currentIdentity.meta.keys());
+									const listedPaths = getPathsWithSubstrateNetwork(
+										paths,
 										networkKey
 									);
-								} else {
-									derivationSucceed = await accounts.deriveEthereumAccount(
-										seed,
-										networkKey
-									);
+									if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+										if (listedPaths.length === 0)
+											return navigation.navigate('PathDerivation', {
+												networkKey
+											});
+									} else if (!paths.includes(networkKey)) {
+										return await deriveEthereumAccount(networkKey);
+									}
+									navigation.navigate('PathsList', { networkKey });
 								}
-								if (derivationSucceed) {
-									navigateToPathsList(navigation, networkKey);
-								} else {
-									alertPathDerivationError();
-								}
-							} else {
-								navigation.navigate('PathsList', { networkKey });
-							}
-						}}
-						title={networkParams.title}
-					/>
-				))}
+							}}
+							title={networkParams.title}
+						/>
+					))}
+			</ScrollView>
 			{renderShowMoreButton()}
-		</ScrollView>
+			<View
+				style={{
+					alignItems: 'center',
+					bottom: 40,
+					position: 'absolute',
+					width: '100%'
+				}}
+			>
+				<Button title="Scan" onPress={() => navigation.navigate('QrScanner')} />
+			</View>
+		</View>
 	);
 }
 
@@ -181,8 +222,7 @@ const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
+		flexDirection: 'column'
 	},
 	header: {
 		alignItems: 'center',
@@ -195,9 +235,8 @@ const styles = StyleSheet.create({
 		fontSize: 20
 	},
 	onboardingWrapper: {
-		alignItems: 'flex-end',
-		flex: 1,
-		flexDirection: 'row'
+		alignItems: 'center',
+		flex: 1
 	},
 	title: {
 		color: colors.bg_text_sec,
