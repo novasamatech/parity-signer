@@ -55,7 +55,10 @@ export default function PathCard({ onPress, identity, path, testID }) {
 					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 						{pathName}
 					</Text>
-					<Address address={address} protocol={network.protocol} />
+					<Address
+						address={address.split(':')[1]}
+						protocol={network.protocol}
+					/>
 				</View>
 				<View
 					style={[
