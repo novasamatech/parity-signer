@@ -112,9 +112,8 @@ function PathsList({ accounts, navigation }) {
 
 					<ButtonIcon
 						onPress={() => this.props.navigation.navigate('')}
-						iconName="md-add"
-						iconType="ionicon"
-						style={{ opacity: 0.3 }}
+						iconName="plus"
+						style={{ opacity: 0.5 }}
 						// onPress should lead to prefilled PathDerivation form
 						// eslint-disable-next-line react/jsx-no-duplicate-props
 						onPress={() =>

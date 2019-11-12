@@ -142,14 +142,12 @@ class AccountDetailsView extends React.Component {
 					networkKey={account.networkKey}
 					title={account.name}
 				/>
-				<View style={styles.bodyContent}>
-					<View style={styles.qr}>
-						{protocol !== NetworkProtocols.UNKNOWN ? (
-							<QrView data={selectedKey} />
-						) : (
-							this.renderWarningUnknownAccount()
-						)}
-					</View>
+				<View>
+					{protocol !== NetworkProtocols.UNKNOWN ? (
+						<QrView data={selectedKey} />
+					) : (
+						this.renderWarningUnknownAccount()
+					)}
 				</View>
 			</ScrollView>
 		);
@@ -164,9 +162,6 @@ const styles = StyleSheet.create({
 		paddingBottom: 40,
 		paddingTop: 8
 	},
-	bodyContent: {
-		padding: 16
-	},
 	deleteText: {
 		color: colors.bg_alert
 	},
@@ -178,10 +173,6 @@ const styles = StyleSheet.create({
 	menuView: {
 		alignItems: 'flex-end',
 		flex: 1
-	},
-	qr: {
-		backgroundColor: colors.card_bg,
-		marginTop: 20
 	},
 	title: {
 		color: colors.bg_text_sec,

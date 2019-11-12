@@ -49,7 +49,6 @@ class SecurityHeader extends React.Component {
 					paddingRight: 14
 				}}
 			>
-				<IdentitiesSwitch />
 				{isConnected && (
 					<ButtonIcon
 						onPress={() => this.props.navigation.navigate('Security')}
@@ -57,11 +56,7 @@ class SecurityHeader extends React.Component {
 						iconColor={colors.bg_alert}
 					/>
 				)}
-				<ButtonIcon
-					onPress={() => this.props.navigation.navigate('')}
-					iconType="ionicon"
-					iconName="md-more"
-				/>
+				<IdentitiesSwitch />
 			</View>
 		);
 	}

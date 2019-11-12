@@ -48,9 +48,9 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						navigation.navigate('IdentityManagement');
 					}}
 					iconBgStyle={styles.i_arrowBg}
-					iconName="ios-arrow-round-forward"
-					iconType="ionicon"
-					iconSize={24}
+					iconType="antdesign"
+					iconName="arrowright"
+					iconSize={18}
 					textStyle={fontStyles.t_regular}
 					style={styles.i_arrowStyle}
 				/>
@@ -62,9 +62,9 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						navigation.navigate('IdentityBackup', { isNew: false });
 					}}
 					iconBgStyle={styles.i_arrowBg}
-					iconName="ios-arrow-round-forward"
-					iconType="ionicon"
-					iconSize={24}
+					iconType="antdesign"
+					iconName="arrowright"
+					iconSize={18}
 					textStyle={fontStyles.t_regular}
 					style={styles.i_arrowStyle}
 				/>
@@ -82,8 +82,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				<ButtonIcon
 					title={currentIdentityTitle}
 					onPress={() => onIdentitySelected(currentIdentity)}
-					iconName="md-finger-print"
-					iconType="ionicon"
+					iconType="antdesign"
+					iconName="user"
 					iconSize={40}
 					style={{ paddingLeft: 8 * 2 }}
 					textStyle={fontStyles.h1}
@@ -103,8 +103,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						setVisible(false);
 						// go to Settings;
 					}}
-					iconName="ios-cog"
-					iconType="ionicon"
+					iconType="antdesign"
+					iconName="setting"
 					iconSize={24}
 					textStyle={fontStyles.t_big}
 					style={{ paddingLeft: 8 * 4 }}
@@ -116,9 +116,9 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						navigation.navigate('TermsAndConditions');
 					}}
 					iconBgStyle={styles.i_arrowBg}
-					iconName="ios-arrow-round-forward"
-					iconType="ionicon"
-					iconSize={24}
+					iconType="antdesign"
+					iconName="arrowright"
+					iconSize={18}
 					textStyle={fontStyles.t_regular}
 					style={styles.i_arrowStyle}
 				/>
@@ -129,9 +129,9 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						navigation.navigate('PrivacyPolicy');
 					}}
 					iconBgStyle={styles.i_arrowBg}
-					iconName="ios-arrow-round-forward"
-					iconType="ionicon"
-					iconSize={24}
+					iconType="antdesign"
+					iconName="arrowright"
+					iconSize={18}
 					textStyle={fontStyles.t_regular}
 					style={styles.i_arrowStyle}
 				/>
@@ -149,8 +149,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				renderDropdownElement={() => renderIdentityOptions(identity)}
 				title={title}
 				onPress={() => onIdentitySelected(identity)}
-				iconName="md-finger-print"
-				iconType="ionicon"
+				iconType="antdesign"
+				iconName="user"
 				iconSize={24}
 				style={{ paddingLeft: 8 * 4 }}
 				textStyle={fontStyles.h1}
@@ -184,8 +184,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		<View>
 			<ButtonIcon
 				onPress={() => setVisible(!visible)}
-				iconName="md-finger-print"
-				iconType="ionicon"
+				iconName="user"
+				iconType="antdesign"
 			/>
 			<Modal
 				animationType="fade"
@@ -199,8 +199,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 							onPress={() => {
 								setVisible(false);
 							}}
-							iconName="md-close"
-							iconType="ionicon"
+							iconName="close"
+							iconType="antdesign"
 							iconBgStyle={{ backgroundColor: colors.card_bgSolid }}
 						/>
 					</View>
@@ -214,8 +214,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 									setVisible(false);
 									navigation.navigate('LegacyAccountList');
 								}}
-								iconName="md-finger-print"
-								iconType="ionicon"
+								iconName="solution1"
+								iconType="antdesign"
 								iconSize={24}
 								textStyle={fontStyles.t_big}
 								style={{ paddingLeft: 8 * 4 }}
@@ -228,8 +228,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								setVisible(false);
 								navigation.navigate('IdentityNew');
 							}}
-							iconName="ios-add"
-							iconType="ionicon"
+							iconName="plus"
+							iconType="antdesign"
 							iconSize={24}
 							textStyle={fontStyles.t_big}
 							style={{ paddingLeft: 8 * 4 }}
@@ -247,7 +247,7 @@ const styles = {
 	card: {
 		backgroundColor: colors.bg,
 		borderRadius: 5,
-		marginTop: 16,
+		marginTop: 8,
 		paddingBottom: 16,
 		paddingTop: 8
 	},
@@ -260,15 +260,15 @@ const styles = {
 	headerStyle: {
 		alignItems: 'flex-end',
 		height: 60,
-		justifyContent: 'center',
-		paddingRight: 62
+		justifyContent: 'center'
 	},
 	i_arrowBg: {
 		backgroundColor: 'rgba(0,0,0,0)',
 		width: 12
 	},
 	i_arrowStyle: {
-		marginVertical: 0,
+		marginBottom: 6,
+		marginTop: 0,
 		opacity: 0.7,
 		paddingLeft: 8 * 8
 	}

@@ -25,6 +25,7 @@ import {
 	Text
 } from 'react-native';
 import { Icon } from 'react-native-elements';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 import colors from '../colors';
 
 const ButtonIcon = props => {
@@ -33,6 +34,7 @@ const ButtonIcon = props => {
 		renderDropdownElement,
 		iconName,
 		iconType,
+		iconColor,
 		onPress,
 		iconBgStyle,
 		iconSize,
@@ -41,9 +43,12 @@ const ButtonIcon = props => {
 		style
 	} = props;
 
+	const size = iconSize || 28;
+
 	const styles = {
 		dropdownView: {
 			marginRight: 8,
+			marginTop: size / -12,
 			marginVertical: 8
 		},
 		generalView: {
@@ -55,18 +60,18 @@ const ButtonIcon = props => {
 			alignItems: 'center',
 			display: 'flex',
 			flexDirection: 'row',
-			marginHorizontal: 8,
 			marginLeft: 8
 		},
 		iconTitleViewContainer: {
 			flex: dropdown && title ? 1 : 0
 		},
 		iconView: {
+			alignItems: 'center',
 			backgroundColor: colors.card_bg,
-			borderRadius: iconSize || 24,
-			height: iconSize || 24,
+			borderRadius: size,
+			height: size,
 			justifyContent: 'center',
-			width: iconSize || 24
+			width: size
 		},
 		title: {
 			marginLeft: 8
@@ -76,6 +81,25 @@ const ButtonIcon = props => {
 	const Touchable =
 		Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
+	const renderIcon = () => {
+		if (iconType === 'antdesign') {
+			return (
+				<AntIcon
+					color={iconColor || colors.bg_text}
+					size={size - 6}
+					name={iconName}
+				/>
+			);
+		}
+		return (
+			<Icon
+				color={iconColor || colors.bg_text}
+				size={size - 6}
+				name={iconName}
+				type={iconType}
+			/>
+		);
+	};
 	const [isDropdownOpen, setIsDropsdownOpen] = useState(false);
 
 	return (
@@ -88,12 +112,7 @@ const ButtonIcon = props => {
 								style={[styles.iconView, iconBgStyle]}
 								onPress={onPress}
 							>
-								<Icon
-									color={colors.bg_text}
-									size={iconSize - 4 || 20}
-									name={iconName}
-									type={iconType}
-								/>
+								{renderIcon()}
 							</TouchableOpacity>
 							{!!title && (
 								<Text style={[styles.title, textStyle]}>{title}</Text>
@@ -107,7 +126,7 @@ const ButtonIcon = props => {
 							<View style={styles.dropdownView}>
 								<Icon
 									color={colors.bg_text}
-									size={iconSize - 4 || 20}
+									size={size - 4}
 									name={
 										isDropdownOpen ? 'md-arrow-dropup' : 'md-arrow-dropdown'
 									}

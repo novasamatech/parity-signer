@@ -46,7 +46,7 @@ export default function QrView(props) {
 	}, [props]);
 
 	const { width: deviceWidth } = Dimensions.get('window');
-	let size = props.size || deviceWidth - 80;
+	let size = props.size || deviceWidth - 64;
 	let flexBasis = props.height || deviceWidth - 32;
 
 	return (
