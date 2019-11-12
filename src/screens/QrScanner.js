@@ -29,6 +29,7 @@ import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { isAddressString, isJsonString, rawDataToU8A } from '../util/decoders';
+import ScreenHeading from '../components/ScreenHeading';
 
 export default class Scanner extends React.PureComponent {
 	constructor(props) {
@@ -151,7 +152,7 @@ export function QrScannerView(props) {
 		>
 			<View style={styles.body}>
 				<View style={styles.top}>
-					<Text style={styles.titleTop}>SCANNER</Text>
+					<ScreenHeading title="Scanner" />
 				</View>
 				<View style={styles.middle}>
 					<View style={styles.middleLeft} />
@@ -250,12 +251,6 @@ const styles = StyleSheet.create({
 	progress: {
 		alignItems: 'center',
 		justifyContent: 'center'
-	},
-	titleTop: {
-		color: colors.bg_text,
-		fontFamily: fonts.bold,
-		fontSize: 26,
-		textAlign: 'center'
 	},
 	top: {
 		alignItems: 'center',

@@ -29,6 +29,7 @@ import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { alertDeleteAccount } from '../util/alertUtils';
 import { navigateToLegacyAccountList } from '../util/navigationHelpers';
+import fontStyles from '../fontStyles';
 
 export default class AccountDetails extends React.Component {
 	render() {
@@ -115,7 +116,7 @@ class AccountDetailsView extends React.Component {
 			<ScrollView contentContainerStyle={styles.body}>
 				<View style={styles.bodyContent}>
 					<View style={styles.header}>
-						<Text style={styles.title}>ACCOUNT</Text>
+						<Text style={fontStyles.h2}>Public Address</Text>
 						<View style={styles.menuView}>
 							<PopupMenu
 								onSelect={this.onOptionSelect}
@@ -166,9 +167,10 @@ const styles = StyleSheet.create({
 		color: colors.bg_alert
 	},
 	header: {
-		alignItems: 'center',
 		flexDirection: 'row',
-		justifyContent: 'center'
+		paddingBottom: 24,
+		paddingLeft: 72,
+		paddingRight: 19
 	},
 	menuView: {
 		alignItems: 'flex-end',

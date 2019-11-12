@@ -15,6 +15,7 @@ import {
 import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
+import fontStyles from '../fontStyles';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
@@ -40,7 +41,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	return (
 		<ScrollView style={styles.body}>
 			<View style={styles.header}>
-				<Text style={styles.title}>PUBLIC ADDRESS</Text>
+				<Text style={fontStyles.h2}>Public Address</Text>
 				<View style={styles.menuView}>
 					<PopupMenu
 						onSelect={onOptionSelect}
@@ -84,9 +85,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'column'
 	},
 	header: {
-		alignItems: 'center',
 		flexDirection: 'row',
-		justifyContent: 'center'
+		paddingBottom: 24,
+		paddingLeft: 72,
+		paddingRight: 19
 	},
 	menuView: {
 		alignItems: 'flex-end',

@@ -38,6 +38,7 @@ import fontStyles from '../fontStyles';
 import colors from '../colors';
 import ButtonIcon from '../components/ButtonIcon';
 import ButtonMainAction from '../components/ButtonMainAction';
+import ScreenHeading from '../components/ScreenHeading';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -113,8 +114,9 @@ function PathsList({ accounts, navigation }) {
 					<ButtonIcon
 						onPress={() => this.props.navigation.navigate('')}
 						iconName="plus"
+						iconType="antdesign"
 						style={{ opacity: 0.5 }}
-						// onPress should lead to prefilled PathDerivation form
+						// TODO: onPress should lead to prefilled PathDerivation form
 						// eslint-disable-next-line react/jsx-no-duplicate-props
 						onPress={() =>
 							navigation.navigate('PathDerivation', { networkKey })
@@ -138,6 +140,11 @@ function PathsList({ accounts, navigation }) {
 
 	return (
 		<View style={styles.body}>
+			<ScreenHeading
+				title={NETWORK_LIST[networkKey].title}
+				subtitle={NETWORK_LIST[networkKey].pathId}
+				big={true}
+			/>
 			<ScrollView>
 				{pathsGroups.map(pathsGroup =>
 					pathsGroup.paths.length === 1

@@ -38,6 +38,7 @@ import {
 } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
+import ScreenHeading from '../components/ScreenHeading';
 
 function IdentityBackup({ navigation, accounts }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
@@ -62,9 +63,8 @@ function IdentityBackup({ navigation, accounts }) {
 
 	return (
 		<ScrollView style={styles.body}>
-			<Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
+			<ScreenHeading title={'Recovery Phrase'} />
 			<View>
-				<Text style={styles.titleTop}>RECOVERY PHRASE</Text>
 				<Text style={styles.hintText}>
 					Write these words down on paper. Keep the backup paper safe. These
 					words allow anyone to recover this account and access its funds.
@@ -139,12 +139,5 @@ const styles = StyleSheet.create({
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
 	}
 });

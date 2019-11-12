@@ -96,7 +96,7 @@ export default class App extends Component {
 		return (
 			<UnstatedProvider>
 				<MenuProvider backHandler={true}>
-					<StatusBar barStyle="light-content" />
+					<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
 					<Background />
 					<ScreensContainer />
 				</MenuProvider>
@@ -113,8 +113,7 @@ const globalStackNavigationOptions = {
 	headerRight: <SecurityHeader />,
 	headerStyle: {
 		backgroundColor: colors.bg,
-		borderBottomColor: colors.bg_text_sec,
-		borderBottomWidth: 0.5,
+		elevation: 0,
 		height: 60,
 		paddingBottom: 0,
 		paddingTop: 0
