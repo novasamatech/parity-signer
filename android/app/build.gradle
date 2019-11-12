@@ -169,11 +169,11 @@ android {
 }
 
 dependencies {
+    implementation project(':@react-native-community_netinfo')
     implementation project(':react-native-camera')
     implementation project(':react-native-secure-storage')
     implementation project(':react-native-gesture-handler')
     implementation project(':react-native-svg')
-    implementation project(':@react-native-community_netinfo')
     implementation project(':react-native-randombytes')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.0.0'

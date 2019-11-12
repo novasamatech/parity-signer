@@ -22,6 +22,7 @@
 //
 
 #import <React/RCTBridgeModule.h>
+#import "stdint.h"
 
 @interface RCT_EXTERN_MODULE(EthkeyBridge, NSObject)
 
@@ -54,7 +55,7 @@ RCT_EXTERN_METHOD(blake2b:(NSString*)data resolve:(RCTPromiseResolveBlock)resolv
 RCT_EXTERN_METHOD(schnorrkelVerify: (NSString*)seed message:(NSString*)message signature:(NSString*)signature resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 
 /* secure native */
-RCT_EXTERN_METHOD(securePut:(NSString*)app key:(NSString*)key seed:(NSString*)seed resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(securePut:(NSString*)app key:(NSString*)key seed:(NSString*)seed withBiometry:(int)withBiometry resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(secureGet:(NSString*)app key:(NSString*)key resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(secureContains:(NSString*)app key:(NSString*)key resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(secureDelete:(NSString*)app key:(NSString*)key resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)

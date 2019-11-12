@@ -215,9 +215,9 @@ class EthkeyBridge: NSObject {
   
 /* secure native */
 
-  @objc func securePut(_ app: String, key: String, seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func securePut(_ app: String, key: String, seed: String, withBiometry: CInt, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
-    let res = sn_put(&error, app, key, seed)
+    let res = sn_put(&error, app, key, seed, withBiometry)
     let error_msg = String(cString: res!.pointee.error_msg!)
     destroy_cresult_void(res)
     if error == 0 {

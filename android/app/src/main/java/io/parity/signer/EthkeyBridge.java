@@ -186,9 +186,9 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     /* secure native */
 
     @ReactMethod
-    public void securePut(String app, String key, String seed, Promise promise) {
+    public void securePut(String app, String key, String seed, boolean withBiometry, Promise promise) {
         try {
-            promise.resolve(snPut(this.getCurrentActivity(), app, key, seed));
+            promise.resolve(snPut(this.getCurrentActivity(), app, key, seed, withBiometry));
         } catch (Exception e) {
             String[] sp = e.getMessage().split(": ");
             String s = sp[sp.length - 1].trim().replace("\"", "");
@@ -251,7 +251,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         }
     }
 
-    private static native boolean snPut(Activity activity, String app, String key, String seed);
+    private static native boolean snPut(Activity activity, String app, String key, String seed, boolean withBiometry);
     private static native String snGet(Activity activity, String app, String key);
     private static native boolean snContains(Activity activity, String app, String key);
     private static native boolean snDelete(Activity activity, String app, String key);

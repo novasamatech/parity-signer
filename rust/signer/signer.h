@@ -97,7 +97,7 @@ struct CResultVoid {
 };
 void destroy_cresult_void(struct CResultVoid* x);
 
-struct CResultVoid* sn_put(unsigned* error, const char* app, const char* key, const char* value);
+struct CResultVoid* sn_put(unsigned* error, const char* app, const char* key, const char* value, int with_biometry);
 struct CResultString* sn_get(unsigned* error, const char* app, const char* key);
 struct CResultBool* sn_contains(unsigned* error, const char* app, const char* key);
 struct CResultVoid* sn_delete(unsigned* error, const char* app, const char* key);

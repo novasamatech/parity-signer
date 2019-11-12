@@ -26,7 +26,7 @@ tiny-hderive = "0.1"
 tiny-keccak = "1.4"
 pixelate = "0.1"
 qrcodegen = "1.4"
-secure-native = { git = "https://github.com/sjeohp/secure-native", rev = "4f27bc0" }
+secure-native = { git = "https://github.com/sjeohp/secure-native", rev = "5b776da" }
 
 [lib]
 name = "signer"
