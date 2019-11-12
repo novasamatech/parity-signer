@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import Button from '../components/Button';
@@ -32,6 +32,7 @@ import {
 } from '../util/navigationHelpers';
 import { alertIdentityCreationError } from '../util/alertUtils';
 import testIDs from '../../e2e/testIDs';
+import ScreenHeading from '../components/ScreenHeading';
 
 function IdentityNew({ accounts, navigation }) {
 	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
@@ -108,7 +109,7 @@ function IdentityNew({ accounts, navigation }) {
 
 	return (
 		<View style={styles.body}>
-			<Text style={styles.titleTop}>NEW IDENTITY</Text>
+			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
 				value={accounts.getNewIdentity().name}
@@ -127,19 +128,12 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flex: 1,
 		overflow: 'hidden',
-		padding: 16
+		paddingHorizontal: 16
 	},
 	btnBox: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 80 },
 	title: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.bold,
 		fontSize: 18
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
 	}
 });

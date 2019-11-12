@@ -153,7 +153,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				iconName="user"
 				iconSize={24}
 				style={{ paddingLeft: 8 * 4 }}
-				textStyle={fontStyles.h1}
+				textStyle={fontStyles.h2}
 			/>
 		);
 	};
@@ -175,7 +175,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				data={identitiesToShow}
 				renderItem={renderNonSelectedIdentity}
 				keyExtractor={item => item.encryptedSeed}
-				style={{ flexGrow: 0 }}
+				style={{ flexGrow: 0, maxHeight: 250 }}
 			/>
 		);
 	};
@@ -186,6 +186,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				onPress={() => setVisible(!visible)}
 				iconName="user"
 				iconType="antdesign"
+				iconBgStyle={{ backgroundColor: 'transparent' }}
 			/>
 			<Modal
 				animationType="fade"

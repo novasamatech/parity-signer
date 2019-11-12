@@ -26,6 +26,7 @@ import TextInput from '../components/TextInput';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
+import ScreenHeading from '../components/ScreenHeading';
 
 export default withAccountStore(withNavigation(IdentityPin));
 
@@ -114,7 +115,7 @@ function IdentityPin({ navigation, accounts }) {
 	const renderPinInput = () =>
 		navigation.getParam('isUnlock', false) ? (
 			<>
-				<Text style={styles.titleTop}>UNLOCK IDENTITY</Text>
+				<ScreenHeading title={'Unlock Identity'} />
 				{showHintOrError()}
 				<Text style={styles.title}>PIN</Text>
 				<PinInput
@@ -134,7 +135,7 @@ function IdentityPin({ navigation, accounts }) {
 			</>
 		) : (
 			<>
-				<Text style={styles.titleTop}>SET IDENTITY PIN</Text>
+				<ScreenHeading title={'Set Identity PIN'} />
 				{showHintOrError()}
 				<Text style={styles.title}>PIN</Text>
 				<PinInput
@@ -226,12 +227,5 @@ const styles = StyleSheet.create({
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 10
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
 	}
 });

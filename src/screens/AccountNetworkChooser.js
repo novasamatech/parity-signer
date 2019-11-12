@@ -39,6 +39,7 @@ import {
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 import ButtonMainAction from '../components/ButtonMainAction';
+import ScreenHeading from '../components/ScreenHeading';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
@@ -147,9 +148,9 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					address={'existed'}
 					onPress={() => setShouldShowMoreNetworks(false)}
 					testID={testIDs.AccountNetworkChooser.showExistedButton}
-					title="Show Existed Network Account"
+					title="Show Existing Network Account"
 					networkColor={colors.bg}
-					style={{ marginBottom: 120 }}
+					style={{ marginBottom: 92 }}
 				/>
 			);
 		}
@@ -164,7 +165,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			style={styles.body}
 			testID={testIDs.AccountNetworkChooser.chooserScreen}
 		>
-			{isNew && <Text style={styles.title}>CREATE YOUR FIRST KEYPAIR</Text>}
+			{isNew && <ScreenHeading title={'Create your first Keypair'} />}
 			<ScrollView>
 				{Object.entries(NETWORK_LIST)
 					.filter(getNetworkKeys)

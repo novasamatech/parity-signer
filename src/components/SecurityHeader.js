@@ -46,7 +46,7 @@ class SecurityHeader extends React.Component {
 				style={{
 					alignItems: 'center',
 					flexDirection: 'row',
-					paddingRight: 14
+					paddingRight: 16
 				}}
 			>
 				{isConnected && (
@@ -54,6 +54,7 @@ class SecurityHeader extends React.Component {
 						onPress={() => this.props.navigation.navigate('Security')}
 						iconName="security"
 						iconColor={colors.bg_alert}
+						iconBgStyle={{ backgroundColor: 'transparent' }}
 					/>
 				)}
 				<IdentitiesSwitch />

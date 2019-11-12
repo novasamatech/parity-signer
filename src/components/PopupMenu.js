@@ -32,7 +32,7 @@ export default class PopupMenu extends React.PureComponent {
 	render() {
 		const { onSelect, menuTriggerIconName, menuItems } = this.props;
 		const menuTriggerIcon = (
-			<Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />
+			<Icon name={menuTriggerIconName} size={24} color={colors.bg_text} />
 		);
 
 		return (
