@@ -24,22 +24,31 @@ import fonts from '../fonts';
 
 export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
+		big: PropTypes.bool,
 		small: PropTypes.bool,
+		subtitle: PropTypes.string,
 		title: PropTypes.string
 	};
 	render() {
-		const { title, small } = this.props;
+		const { big, title, small, subtitle } = this.props;
 		const finalViewStyles = [styles.body];
-		const finalTextStyles = [fontStyles.h1];
+		const finalTextStyles = [fontStyles.h1, styles.t_center];
 
-		if (small) {
-			finalViewStyles.push(styles.bodyS);
-			finalTextStyles.push([fontStyles.h2, styles.titleS]);
+		if (big) {
+			finalViewStyles.push(styles.bodyL);
+			finalTextStyles.push(styles.t_left);
+		} else if (small) {
+			finalViewStyles.push(styles.bodyL);
+			finalTextStyles.push([fontStyles.h2, styles.t_left, styles.t_normal]);
 		}
 
 		return (
 			<View style={finalViewStyles}>
 				<Text style={finalTextStyles}>{title}</Text>
+				<Text style={[finalTextStyles, fontStyles.t_codeS]}>
+					{'//'}
+					{subtitle}
+				</Text>
 			</View>
 		);
 	}
@@ -47,18 +56,20 @@ export default class ScreenHeading extends React.PureComponent {
 
 const styles = {
 	body: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'center',
-		paddingBottom: 24,
+		marginBottom: 16,
 		paddingHorizontal: 16
 	},
-	bodyS: {
-		justifyContent: 'flex-start',
+	bodyL: {
 		paddingLeft: 72,
 		paddingRight: 16
 	},
-	titleS: {
+	t_center: {
+		textAlign: 'center'
+	},
+	t_left: {
+		textAlign: 'left'
+	},
+	t_normal: {
 		fontFamily: fonts.roboto
 	}
 };
