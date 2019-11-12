@@ -48,7 +48,8 @@ const ButtonIcon = props => {
 		},
 		generalView: {
 			display: 'flex',
-			flexDirection: 'row'
+			flexDirection: 'row',
+			marginVertical: 8
 		},
 		iconTitleView: {
 			alignItems: 'center',

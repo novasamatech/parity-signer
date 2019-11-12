@@ -97,20 +97,6 @@ function IdentitiesSwitch({ navigation, accounts }) {
 	const renderSettings = () => {
 		return (
 			<>
-				{accounts.getAccounts().size > 0 && (
-					<ButtonIcon
-						title="Legacy Accounts"
-						onPress={() => {
-							setVisible(false);
-							navigation.navigate('LegacyAccountList');
-						}}
-						iconName="ios-cog"
-						iconType="ionicon"
-						iconSize={24}
-						textStyle={fontStyles.t_big}
-						style={{ paddingLeft: 8 * 4 }}
-					/>
-				)}
 				<ButtonIcon
 					title="Settings"
 					onPress={() => {
@@ -159,14 +145,14 @@ function IdentitiesSwitch({ navigation, accounts }) {
 
 		return (
 			<ButtonIcon
-				dropdown={true}
+				dropdown={false}
 				renderDropdownElement={() => renderIdentityOptions(identity)}
 				title={title}
 				onPress={() => onIdentitySelected(identity)}
 				iconName="md-finger-print"
 				iconType="ionicon"
-				iconSize={40}
-				style={{ paddingLeft: 8 * 2 }}
+				iconSize={24}
+				style={{ paddingLeft: 8 * 4 }}
 				textStyle={fontStyles.h1}
 			/>
 		);
@@ -189,6 +175,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				data={identitiesToShow}
 				renderItem={renderNonSelectedIdentity}
 				keyExtractor={item => item.encryptedSeed}
+				style={{ flexGrow: 0 }}
 			/>
 		);
 	};
@@ -220,6 +207,21 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					<View style={styles.card}>
 						{renderCurrentIdentityCard()}
 						{renderIdentities()}
+						{accounts.getAccounts().size > 0 && (
+							<ButtonIcon
+								title="Legacy Accounts"
+								onPress={() => {
+									setVisible(false);
+									navigation.navigate('LegacyAccountList');
+								}}
+								iconName="md-finger-print"
+								iconType="ionicon"
+								iconSize={24}
+								textStyle={fontStyles.t_big}
+								style={{ paddingLeft: 8 * 4 }}
+							/>
+						)}
+						<Separator />
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {
@@ -245,9 +247,8 @@ const styles = {
 	card: {
 		backgroundColor: colors.bg,
 		borderRadius: 5,
-		flex: 1,
 		marginTop: 16,
-		paddingBottom: 8,
+		paddingBottom: 16,
 		paddingTop: 8
 	},
 	container: {
@@ -267,7 +268,7 @@ const styles = {
 		width: 12
 	},
 	i_arrowStyle: {
-		marginTop: 0,
+		marginVertical: 0,
 		opacity: 0.7,
 		paddingLeft: 8 * 8
 	}
