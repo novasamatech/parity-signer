@@ -323,7 +323,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		if (!sender) {
 			throw new Error(
-				`No private key found for ${address} found in your signer key storage.`
+				`No private key found for ${address} in your signer key storage.`
 			);
 		}
 

@@ -35,7 +35,7 @@ import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
-import { unlockSeed } from '../util/navigationHelpers';
+import { navigateToSignedMessage, unlockSeed } from '../util/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 
 export default class TxDetails extends React.PureComponent {
@@ -68,6 +68,7 @@ export default class TxDetails extends React.PureComponent {
 										}
 										const seed = await unlockSeed(this.props.navigation);
 										await scannerStore.signDataWithSeed(seed);
+										return navigateToSignedMessage(this.props.navigation);
 									} catch (e) {
 										scannerStore.setErrorMsg(e.message);
 									}

@@ -35,7 +35,7 @@ import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import ScannerStore from '../stores/ScannerStore';
 import { hexToAscii, isAscii } from '../util/strings';
-import { unlockSeed } from '../util/navigationHelpers';
+import { navigateToSignedMessage, unlockSeed } from '../util/navigationHelpers';
 
 export default class MessageDetails extends React.PureComponent {
 	render() {
@@ -69,6 +69,7 @@ export default class MessageDetails extends React.PureComponent {
 										}
 										const seed = await unlockSeed(this.props.navigation);
 										await scannerStore.signDataWithSeed(seed);
+										return navigateToSignedMessage(this.props.navigation);
 									} catch (e) {
 										scannerStore.setErrorMsg(e.message);
 									}

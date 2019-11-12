@@ -45,7 +45,14 @@ export function accountId({ address, networkKey }) {
 	}
 }
 
-export const extractAddressFromAccountId = id => id.split(':')[1] || '';
+export const extractAddressFromAccountId = id => {
+	const withoutNetwork = id.split(':')[1];
+	const address = withoutNetwork.split('@')[0];
+	if (address.indexOf('0x') !== -1) {
+		return address.slice(2);
+	}
+	return address;
+};
 
 export function emptyAccount(
 	address = '',
