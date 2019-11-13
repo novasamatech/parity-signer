@@ -33,7 +33,7 @@ export default class ButtonMainAction extends React.PureComponent {
 		const finalViewStyles = [styles.body];
 		const finalButtonStyles = [styles.button];
 
-		if (!bottom) {
+		if (bottom === false) {
 			finalViewStyles.push(styles.p_relative);
 			finalButtonStyles.push(styles.p_relative);
 		}
@@ -55,7 +55,7 @@ export default class ButtonMainAction extends React.PureComponent {
 const styles = {
 	body: {
 		alignItems: 'center',
-		marginBottom: 40,
+		bottom: 32,
 		position: 'absolute',
 		width: '100%'
 	},
@@ -64,7 +64,7 @@ const styles = {
 	},
 	p_relative: {
 		bottom: 0,
-		marginTop: 64,
+		marginTop: 32,
 		position: 'relative'
 	}
 };
