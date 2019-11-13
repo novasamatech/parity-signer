@@ -10,7 +10,7 @@ export default class HeaderLeftHome extends React.PureComponent {
 				style={{
 					alignItems: 'center',
 					flexDirection: 'row',
-					marginTop: -2,
+					marginTop: -10,
 					paddingLeft: 12
 				}}
 				accessibilityComponentType="button"

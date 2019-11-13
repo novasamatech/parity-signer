@@ -24,7 +24,6 @@ import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
-import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import testIDs from '../../e2e/testIDs';
 import ButtonMainAction from '../components/ButtonMainAction';
@@ -87,7 +86,10 @@ class AccountListView extends React.PureComponent {
 					}}
 					enableEmptySections
 				/>
-				<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
+				<ButtonMainAction
+					title={'Scan'}
+					onPress={() => navigation.navigate('QrScanner')}
+				/>
 			</View>
 		);
 	}
@@ -99,31 +101,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column'
 	},
-	bottom: {
-		marginTop: 20
-	},
 	content: {
 		flex: 1
-	},
-	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'center'
-	},
-	link: {
-		textDecorationLine: 'underline'
-	},
-	menuView: {
-		alignItems: 'flex-end',
-		flex: 1
-	},
-	title: {
-		color: colors.bg_text_sec,
-		flexDirection: 'column',
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		justifyContent: 'center',
-		marginTop: 16,
-		paddingLeft: 72
 	}
 });

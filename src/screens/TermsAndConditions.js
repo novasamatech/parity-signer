@@ -22,7 +22,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
 import fonts from '../fonts';
-import Button from '../components/Button';
+import ButtonMainAction from '../components/ButtonMainAction';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
 import { saveToCAndPPConfirmation } from '../util/db';
@@ -90,11 +90,12 @@ export default class TermsAndConditions extends React.PureComponent {
 					</Text>
 				</TouchableItem>
 
-				<Button
-					buttonStyles={{ height: 60, marginTop: 10 }}
+				<ButtonMainAction
 					testID={testIDs.TacScreen.nextButton}
 					title="Next"
 					disabled={!ppAgreement || !tocAgreement}
+					style={{ marginTop: 16 }}
+					bottom={false}
 					onPress={async () => {
 						const firstScreenActions = navigation.getParam(
 							'firstScreenActions'

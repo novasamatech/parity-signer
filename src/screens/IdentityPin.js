@@ -19,14 +19,14 @@ import React, { Component, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import colors from '../colors';
-import fonts from '../fonts';
 import Background from '../components/Background';
-import Button from '../components/Button';
+import ButtonMainAction from '../components/ButtonMainAction';
 import TextInput from '../components/TextInput';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
+import fontStyles from '../fontStyles';
 
 export default withAccountStore(withNavigation(IdentityPin));
 
@@ -87,19 +87,11 @@ function IdentityPin({ navigation, accounts }) {
 
 	const showHintOrError = () => {
 		if (state.pinTooShort) {
-			return (
-				<Text style={styles.errorText}>
-					Your pin must be at least 6 digits long!
-				</Text>
-			);
+			return ' Your pin must be at least 6 digits long!';
 		} else if (state.pinMismatch) {
-			return <Text style={styles.errorText}>Pin codes don't match!</Text>;
+			return " Pin codes don't match!";
 		}
-		return (
-			<Text style={styles.hintText}>
-				Choose a PIN code with 6 or more digits
-			</Text>
-		);
+		return ' Choose a PIN code with 6 or more digits';
 	};
 
 	const onPinInputChange = (stateName, pinInput) => {
@@ -115,9 +107,8 @@ function IdentityPin({ navigation, accounts }) {
 	const renderPinInput = () =>
 		navigation.getParam('isUnlock', false) ? (
 			<>
-				<ScreenHeading title={'Unlock Identity'} />
-				{showHintOrError()}
-				<Text style={styles.title}>PIN</Text>
+				<ScreenHeading title={'Unlock Identity'} subtitle={showHintOrError()} />
+				<Text style={fontStyles.t_regular}>PIN</Text>
 				<PinInput
 					autoFocus
 					testID={testIDs.IdentityPin.unlockPinInput}
@@ -125,19 +116,21 @@ function IdentityPin({ navigation, accounts }) {
 					onChangeText={pin => onPinInputChange('pin', pin)}
 					value={state.pin}
 				/>
-				<Button
+				<ButtonMainAction
+					title={'Done'}
+					bottom={false}
 					onPress={testPin}
-					color="green"
-					title="Done"
 					testID={testIDs.IdentityPin.unlockPinButton}
-					accessibilityLabel={'Done'}
 				/>
 			</>
 		) : (
 			<>
-				<ScreenHeading title={'Set Identity PIN'} />
-				{showHintOrError()}
-				<Text style={styles.title}>PIN</Text>
+				<ScreenHeading
+					title={'Set Identity PIN'}
+					subtitle={showHintOrError()}
+				/>
+
+				<Text style={fontStyles.t_regular}>PIN</Text>
 				<PinInput
 					autoFocus
 					testID={testIDs.IdentityPin.setPin}
@@ -149,7 +142,7 @@ function IdentityPin({ navigation, accounts }) {
 					onChangeText={pin => onPinInputChange('pin', pin)}
 					value={state.pin}
 				/>
-				<Text style={styles.title}>CONFIRM PIN</Text>
+				<Text style={fontStyles.t_regular}>Confirm PIN</Text>
 				<PinInput
 					returnKeyType="done"
 					testID={testIDs.IdentityPin.confirmPin}
@@ -159,12 +152,11 @@ function IdentityPin({ navigation, accounts }) {
 					}
 					value={state.confirmation}
 				/>
-				<Button
-					testID={testIDs.IdentityPin.submitButton}
+				<ButtonMainAction
+					title={'Done'}
+					bottom={false}
 					onPress={submit}
-					color="green"
-					title="Done"
-					accessibilityLabel={'Done'}
+					testID={testIDs.IdentityPin.submitButton}
 				/>
 			</>
 		);
@@ -191,7 +183,7 @@ class PinInput extends Component {
 				numberOfLines={1}
 				returnKeyType="next"
 				secureTextEntry
-				style={styles.pinInput}
+				style={[fontStyles.t_seed, styles.pinInput]}
 				{...this.props}
 			/>
 		);
@@ -205,27 +197,13 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 		padding: 20
 	},
-	errorText: {
-		color: colors.bg_alert,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	hintText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
 	pinInput: {
-		marginBottom: 20
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 10
+		borderBottomColor: colors.bg_button,
+		borderColor: colors.bg_button,
+		marginBottom: 20,
+		marginTop: 4,
+		minHeight: 48,
+		paddingLeft: 10,
+		paddingRight: 10
 	}
 });

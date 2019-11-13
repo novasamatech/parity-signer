@@ -19,7 +19,7 @@ import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
 import { StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
-import Button from '../components/Button';
+import ButtonMainAction from '../components/ButtonMainAction';
 import { validateDerivedPath } from '../util/identitiesUtils';
 import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
 import AccountCard from '../components/AccountCard';
@@ -63,8 +63,8 @@ function PathDerivation({ accounts, navigation }) {
 					title={NETWORK_LIST[networkKey].title}
 				/>
 			)}
-
-			<Button
+			<ButtonMainAction
+				bottom={false}
 				title="Derive Address"
 				testID={testIDs.PathDerivation.deriveButton}
 				onPress={async () => {

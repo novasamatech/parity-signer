@@ -59,11 +59,12 @@ export default {
 		fontSize: 12
 	},
 	t_seed: {
-		borderColor: colors.card_bg_text_sec,
+		borderColor: colors.card_bg,
 		borderWidth: 1,
 		color: colors.bg_button,
 		fontFamily: fonts.light,
 		fontSize: 20,
+		letterSpacing: 0.1,
 		lineHeight: 24,
 		minHeight: 160,
 		paddingHorizontal: 16,

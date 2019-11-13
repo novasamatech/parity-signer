@@ -206,9 +206,13 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					))}
 				{renderShowMoreButton()}
 			</ScrollView>
-			{!shouldShowMoreNetworks && (
-				<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
-			)}
+			{!shouldShowMoreNetworks ||
+				(isNew && (
+					<ButtonMainAction
+						title={'Scan'}
+						onPress={() => navigation.navigate('QrScanner')}
+					/>
+				))}
 		</View>
 	);
 }
@@ -221,11 +225,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column'
 	},
-	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'center'
-	},
 	onboardingText: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.regular,
@@ -234,14 +233,5 @@ const styles = StyleSheet.create({
 	onboardingWrapper: {
 		alignItems: 'center',
 		flex: 1
-	},
-	title: {
-		color: colors.bg_text_sec,
-		flexDirection: 'column',
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		justifyContent: 'center',
-		marginTop: 16,
-		paddingLeft: 72
 	}
 });

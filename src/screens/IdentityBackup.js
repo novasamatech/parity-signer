@@ -27,9 +27,8 @@ import {
 } from 'react-native';
 import TouchableItem from '../components/TouchableItem';
 import colors from '../colors';
-import fonts from '../fonts';
 import fontStyles from '../fontStyles';
-import Button from '../components/Button';
+import ButtonMainAction from '../components/ButtonMainAction';
 import { withNavigation } from 'react-navigation';
 import {
 	navigateToNewIdentityNetwork,
@@ -63,13 +62,13 @@ function IdentityBackup({ navigation, accounts }) {
 
 	return (
 		<ScrollView style={styles.body}>
-			<ScreenHeading title={'Recovery Phrase'} />
-			<View>
-				<Text style={styles.hintText}>
-					Write these words down on paper. Keep the backup paper safe. These
-					words allow anyone to recover this account and access its funds.
-				</Text>
-			</View>
+			<ScreenHeading
+				title={'Recovery Phrase'}
+				subtitle={
+					' Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
+				}
+			/>
+			<View />
 			<TouchableItem
 				onPress={() => {
 					// only allow the copy of the recovery phrase in dev environment
@@ -103,9 +102,10 @@ function IdentityBackup({ navigation, accounts }) {
 				</Text>
 			</TouchableItem>
 			{isNew && (
-				<Button
-					title="Next"
+				<ButtonMainAction
+					title={'Next'}
 					testID={testIDs.IdentityBackup.nextButton}
+					bottom={false}
 					onPress={async () => {
 						const pin = await setPin(navigation);
 						await accounts.saveNewIdentity(seedPhrase, pin);
@@ -126,18 +126,5 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column',
 		padding: 16
-	},
-	hintText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
 	}
 });

@@ -23,25 +23,48 @@ import { View } from 'react-native';
 
 export default class ButtonMainAction extends React.PureComponent {
 	static propTypes = {
-		onPress: PropTypes.func
+		bottom: PropTypes.bool,
+		disabled: PropTypes.bool,
+		onPress: PropTypes.func,
+		title: PropTypes.string
 	};
 	render() {
-		const { onPress } = this.props;
+		const { onPress, title, testID, bottom, disabled, style } = this.props;
+		const finalViewStyles = [styles.body];
+		const finalButtonStyles = [styles.button];
+
+		if (!bottom) {
+			finalViewStyles.push(styles.p_relative);
+			finalButtonStyles.push(styles.p_relative);
+		}
+
 		return (
-			<View
-				style={{
-					alignItems: 'center',
-					bottom: 32,
-					position: 'absolute',
-					width: '100%'
-				}}
-			>
+			<View style={[finalViewStyles, style]}>
 				<Button
-					title="Scan"
+					testID={testID}
+					title={title}
 					onPress={onPress}
-					style={{ position: 'absolute' }}
+					style={finalButtonStyles}
+					disabled={disabled}
 				/>
 			</View>
 		);
 	}
 }
+
+const styles = {
+	body: {
+		alignItems: 'center',
+		bottom: 32,
+		position: 'absolute',
+		width: '100%'
+	},
+	button: {
+		position: 'absolute'
+	},
+	p_relative: {
+		bottom: 0,
+		marginTop: 64,
+		position: 'relative'
+	}
+};
