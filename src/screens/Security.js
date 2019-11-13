@@ -15,34 +15,27 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ScrollView, StyleSheet } from 'react-native';
 import colors from '../colors';
-import fonts from '../fonts';
+import ScreenHeading from '../components/ScreenHeading';
 
 export default class Security extends React.PureComponent {
 	render() {
 		return (
-			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-				<View
-					style={[
-						styles.card,
-						{ backgroundColor: colors.bg_alert, marginBottom: 20 }
-					]}
-				>
-					<Icon
-						style={[styles.cardText, { fontSize: 30, marginRight: 10 }]}
-						name="security"
-					/>
-					<Text style={styles.cardText}>NOT SECURE</Text>
-				</View>
-				<Text style={styles.text}>
+			<ScrollView style={styles.body}>
+				<ScreenHeading
+					title="NOT SECURE"
+					iconName="shield-off"
+					iconType="feather"
+					subtitle="
 					A device is considered not secure if it has access to the internet or
 					has any kind of connectivity enabled. Parity Signer is meant to be
 					used on a device that will be kept offline at any time. Enabling any
 					connectivity such as wifi, cellular network, bluetooth, NFC, usb is a
-					threat to the safety of the private keys stored on the device.
-				</Text>
+					threat to the safety of the private keys stored on the device."
+					error={true}
+					subtitleL={true}
+				/>
 			</ScrollView>
 		);
 	}
@@ -54,29 +47,5 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column',
 		overflow: 'hidden'
-	},
-	card: {
-		alignItems: 'center',
-		backgroundColor: colors.card_bg,
-		flex: 1,
-		flexDirection: 'row',
-		padding: 20
-	},
-	cardText: {
-		color: colors.card_bg,
-		fontFamily: fonts.bold,
-		fontSize: 22
-	},
-	text: {
-		color: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 14,
-		marginBottom: 20
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
 	}
 });

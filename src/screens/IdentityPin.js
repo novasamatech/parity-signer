@@ -107,7 +107,11 @@ function IdentityPin({ navigation, accounts }) {
 	const renderPinInput = () =>
 		navigation.getParam('isUnlock', false) ? (
 			<>
-				<ScreenHeading title={'Unlock Identity'} subtitle={showHintOrError()} />
+				<ScreenHeading
+					title={'Unlock Identity'}
+					error={state.pinMismatch || state.pinTooShort}
+					subtitle={showHintOrError()}
+				/>
 				<Text style={fontStyles.t_regular}>PIN</Text>
 				<PinInput
 					autoFocus
@@ -128,6 +132,7 @@ function IdentityPin({ navigation, accounts }) {
 				<ScreenHeading
 					title={'Set Identity PIN'}
 					subtitle={showHintOrError()}
+					error={state.pinMismatch || state.pinTooShort}
 				/>
 
 				<Text style={fontStyles.t_regular}>PIN</Text>
