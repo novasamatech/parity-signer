@@ -3,6 +3,7 @@ import {
 	testExist,
 	testInput,
 	testNotVisible,
+	testScrollAndTap,
 	testTap,
 	testVisible
 } from './e2eUtils';
@@ -14,7 +15,7 @@ const {
 	IdentityBackup,
 	IdentityPin,
 	PathDerivation,
-	PathList
+	PathsList
 } = testIDs;
 
 const pinCode = '123456';
@@ -48,24 +49,28 @@ describe('Load test', async () => {
 		await testInput(IdentityPin.confirmPin, pinCode);
 		await testTap(IdentityPin.submitButton);
 		await testVisible(AccountNetworkChooser.chooserScreen);
-		await waitFor(element(by.id(substrateNetworkButtonIndex)))
-			.toBeVisible()
-			.whileElement(by.id(testIDs.AccountNetworkChooser.chooserScreen))
-			.scroll(100, 'down');
-		await testTap(substrateNetworkButtonIndex);
+		await testScrollAndTap(
+			substrateNetworkButtonIndex,
+			testIDs.AccountNetworkChooser.chooserScreen
+		);
 		await testInput(IdentityPin.unlockPinInput, pinCode);
 		await testTap(IdentityPin.unlockPinButton);
-		await testExist(PathList.pathCard + '//kusama_CC2//default');
+		await testExist(PathsList.pathCard + '//kusama_CC2//default');
+		await testTap(PathsList.scanButton);
 	});
 
 	it('derive a new key', async () => {
 		const path = '//funding/0';
-		await testTap(PathList.deriveButton);
+		await testTap(PathsList.deriveButton);
 		await testInput(PathDerivation.nameInput, 'first one');
 		await testInput(PathDerivation.pathInput, path);
 		await testTap(PathDerivation.deriveButton);
 		await testInput(IdentityPin.unlockPinInput, pinCode);
 		await testTap(IdentityPin.unlockPinButton);
-		await testExist(PathList.pathCard + `//kusama_CC2${path}`);
+		await testExist(PathsList.pathCard + `//kusama_CC2${path}`);
+	});
+
+	it('delete a existed key', async () => {
+		await element(by.label('Back')).tap();
 	});
 });

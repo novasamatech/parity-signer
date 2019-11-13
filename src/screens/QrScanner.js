@@ -30,6 +30,7 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { isAddressString, isJsonString, rawDataToU8A } from '../util/decoders';
 import ScreenHeading from '../components/ScreenHeading';
+import { createDataSignRequest, signingTestIdentityPath } from '../../e2e/mock';
 
 export default class Scanner extends React.PureComponent {
 	constructor(props) {
@@ -60,9 +61,11 @@ export default class Scanner extends React.PureComponent {
 							isMultipart={scannerStore.getTotalFramesCount() > 1}
 							missedFrames={scannerStore.getMissedFrames()}
 							navigation={this.props.navigation}
+							accountStore={accountsStore}
 							scannerStore={scannerStore}
 							totalFramesCount={scannerStore.getTotalFramesCount()}
 							onBarCodeRead={async txRequestData => {
+								console.log('txRequest data is', txRequestData);
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
 								}
@@ -121,27 +124,40 @@ QrScannerView.propTypes = {
 	onBarCodeRead: PropTypes.func.isRequired
 };
 
-export function QrScannerView(props) {
+export function QrScannerView({
+	navigation,
+	scannerStore,
+	accountStore,
+	...props
+}) {
 	useEffect(() => {
-		const setBusySubscription = props.navigation.addListener(
-			'willFocus',
-			() => {
-				props.scannerStore.setReady();
-			}
+		const defaultAccountAddress = accountStore.state.currentIdentity.meta.get(
+			signingTestIdentityPath
 		);
-		const setReadySubscription = props.navigation.addListener('didBlur', () => {
-			props.scannerStore.setBusy();
+		if (global.inTest) {
+			props.onBarCodeRead(createDataSignRequest(defaultAccountAddress));
+		}
+		const setBusySubscription = navigation.addListener('willFocus', () => {
+			scannerStore.setReady();
+		});
+		const setReadySubscription = navigation.addListener('didBlur', () => {
+			scannerStore.setBusy();
 		});
 		return () => {
 			setBusySubscription.remove();
 			setReadySubscription.remove();
 		};
-	}, [props.navigation, props.scannerStore]);
+	}, [
+		accountStore.state.currentIdentity.meta,
+		navigation,
+		props,
+		scannerStore
+	]);
 
-	const missedFrames = props.scannerStore.getMissedFrames();
+	const missedFrames = scannerStore.getMissedFrames();
 	const missedFramesMessage = missedFrames && missedFrames.join(', ');
 
-	if (props.scannerStore.isBusy()) {
+	if (scannerStore.isBusy()) {
 		return <View style={styles.inactive} />;
 	}
 	return (
@@ -168,7 +184,7 @@ export function QrScannerView(props) {
 							{props.completedFramesCount} / {props.totalFramesCount} Completed.
 						</Text>
 						<Button
-							onPress={() => props.scannerStore.clearMultipartProgress()}
+							onPress={() => scannerStore.clearMultipartProgress()}
 							style={styles.descSecondary}
 							title="Start Over"
 						/>
