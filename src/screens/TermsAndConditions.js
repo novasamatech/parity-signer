@@ -94,7 +94,7 @@ export default class TermsAndConditions extends React.PureComponent {
 					testID={testIDs.TacScreen.nextButton}
 					title="Next"
 					disabled={!ppAgreement || !tocAgreement}
-					style={{ marginTop: 16 }}
+					style={{ marginBottom: 0, marginTop: 16 }}
 					bottom={false}
 					onPress={async () => {
 						const firstScreenActions = navigation.getParam(

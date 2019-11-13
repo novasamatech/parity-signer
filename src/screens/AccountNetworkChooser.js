@@ -158,6 +158,17 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		}
 	};
 
+	const renderScanButton = () => {
+		if (isNew) return;
+		else if (shouldShowMoreNetworks) return;
+		return (
+			<ButtonMainAction
+				title={'Scan'}
+				onPress={() => navigation.navigate('QrScanner')}
+			/>
+		);
+	};
+
 	if (!loaded) return <ScrollView style={styles.body} />;
 
 	if (identities.length === 0) return showOnboardingMessage();
@@ -206,13 +217,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					))}
 				{renderShowMoreButton()}
 			</ScrollView>
-			{!shouldShowMoreNetworks ||
-				(isNew && (
-					<ButtonMainAction
-						title={'Scan'}
-						onPress={() => navigation.navigate('QrScanner')}
-					/>
-				))}
+			{renderScanButton()}
 		</View>
 	);
 }
