@@ -202,7 +202,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 							}}
 							iconName="close"
 							iconType="antdesign"
-							iconBgStyle={{ backgroundColor: colors.card_bgSolid }}
+							iconBgStyle={{ backgroundColor: 'black' }}
 						/>
 					</View>
 					<View style={styles.card}>
@@ -248,7 +248,6 @@ const styles = {
 	card: {
 		backgroundColor: colors.bg,
 		borderRadius: 5,
-		marginTop: 8,
 		paddingBottom: 16,
 		paddingTop: 8
 	},

@@ -52,9 +52,10 @@ class SecurityHeader extends React.Component {
 				{isConnected && (
 					<ButtonIcon
 						onPress={() => this.props.navigation.navigate('Security')}
-						iconName="security"
+						iconName="shield-off"
+						iconType="feather"
 						iconColor={colors.bg_alert}
-						iconBgStyle={{ backgroundColor: 'transparent' }}
+						iconBgStyle={{ backgroundColor: 'transparent', marginTop: -3 }}
 					/>
 				)}
 				<IdentitiesSwitch />

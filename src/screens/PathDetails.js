@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingBottom: 24,
 		paddingLeft: 72,
-		paddingRight: 19
+		paddingRight: 18
 	},
 	menuView: {
 		alignItems: 'flex-end',

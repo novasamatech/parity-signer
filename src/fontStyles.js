@@ -39,7 +39,7 @@ export default {
 	},
 	t_codeS: {
 		color: colors.bg_text_sec,
-		fontFamily: fonts.RobotoMono,
+		fontFamily: fonts.robotoMono,
 		fontSize: 11
 	},
 	t_important: {

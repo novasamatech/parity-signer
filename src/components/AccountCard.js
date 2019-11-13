@@ -127,8 +127,7 @@ const styles = StyleSheet.create({
 	},
 	footer: {
 		alignSelf: 'stretch',
-		backgroundColor: '#977CF6',
-		height: 100,
+		height: 88,
 		marginLeft: 8,
 		width: 8
 	},
