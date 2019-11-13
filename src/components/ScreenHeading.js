@@ -21,16 +21,18 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import fontStyles from '../fontStyles';
 import fonts from '../fonts';
+import ButtonIcon from './ButtonIcon';
 
 export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
 		big: PropTypes.bool,
+		onPress: PropTypes.func,
 		small: PropTypes.bool,
 		subtitle: PropTypes.string,
 		title: PropTypes.string
 	};
 	render() {
-		const { big, title, small, subtitle } = this.props;
+		const { big, title, small, subtitle, onPress } = this.props;
 		const finalViewStyles = [styles.body];
 		const finalTextStyles = [fontStyles.h1, styles.t_center];
 
@@ -42,13 +44,34 @@ export default class ScreenHeading extends React.PureComponent {
 			finalTextStyles.push([fontStyles.h2, styles.t_left, styles.t_normal]);
 		}
 
-		return (
-			<View style={finalViewStyles}>
-				<Text style={finalTextStyles}>{title}</Text>
+		const renderSubtitle = () => {
+			if (!subtitle) return;
+			return (
 				<Text style={[finalTextStyles, fontStyles.t_codeS]}>
 					{'//'}
 					{subtitle}
 				</Text>
+			);
+		};
+
+		const renderBack = () => {
+			if (!onPress) return;
+			return (
+				<ButtonIcon
+					iconName="arrowleft"
+					iconType="antdesign"
+					onPress={onPress}
+					style={styles.icon}
+					iconBgStyle={{ backgroundColor: 'transparent' }}
+				/>
+			);
+		};
+
+		return (
+			<View style={finalViewStyles}>
+				<Text style={finalTextStyles}>{title}</Text>
+				{renderSubtitle()}
+				{renderBack()}
 			</View>
 		);
 	}
@@ -62,6 +85,11 @@ const styles = {
 	bodyL: {
 		paddingLeft: 72,
 		paddingRight: 16
+	},
+	icon: {
+		marginLeft: 5,
+		marginTop: 0,
+		position: 'absolute'
 	},
 	t_center: {
 		textAlign: 'center'

@@ -142,15 +142,17 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					style={{ marginBottom: 92 }}
 				/>
 			);
-		} else {
+		}
+	};
+
+	const renderScreenHeading = () => {
+		if (isNew) {
+			return <ScreenHeading title={'Create your first Keypair'} />;
+		} else if (shouldShowMoreNetworks) {
 			return (
-				<AccountCard
-					address={'existed'}
+				<ScreenHeading
+					title={'Choose Network'}
 					onPress={() => setShouldShowMoreNetworks(false)}
-					testID={testIDs.AccountNetworkChooser.showExistedButton}
-					title="Show Existing Network Account"
-					networkColor={colors.bg}
-					style={{ marginBottom: 92 }}
 				/>
 			);
 		}
@@ -165,7 +167,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			style={styles.body}
 			testID={testIDs.AccountNetworkChooser.chooserScreen}
 		>
-			{isNew && <ScreenHeading title={'Create your first Keypair'} />}
+			{renderScreenHeading()}
 			<ScrollView>
 				{Object.entries(NETWORK_LIST)
 					.filter(getNetworkKeys)
@@ -202,9 +204,11 @@ function AccountNetworkChooser({ navigation, accounts }) {
 							title={networkParams.title}
 						/>
 					))}
+				{renderShowMoreButton()}
 			</ScrollView>
-			{renderShowMoreButton()}
-			<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
+			{!shouldShowMoreNetworks && (
+				<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
+			)}
 		</View>
 	);
 }

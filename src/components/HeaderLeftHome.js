@@ -7,7 +7,12 @@ export default class HeaderLeftHome extends React.PureComponent {
 	render() {
 		return (
 			<View
-				style={{ alignItems: 'center', flexDirection: 'row', paddingLeft: 16 }}
+				style={{
+					alignItems: 'center',
+					flexDirection: 'row',
+					marginTop: -2,
+					paddingLeft: 12
+				}}
 				accessibilityComponentType="button"
 				accessibilityTraits="button"
 				testID="header-back"
@@ -15,10 +20,10 @@ export default class HeaderLeftHome extends React.PureComponent {
 				onPress={() => this.props.onPress && this.props.onPress()}
 			>
 				<Image source={require('../../icon.png')} style={styles.logo} />
-				<Text style={[styles.headerTextLeft, styles.t_bold, { fontSize: 13 }]}>
+				<Text style={[styles.headerTextLeft, styles.t_bold, { fontSize: 14 }]}>
 					parity
 				</Text>
-				<Text style={[styles.headerTextLeft, { fontSize: 13 }]}>signer</Text>
+				<Text style={[styles.headerTextLeft, { fontSize: 14 }]}>signer</Text>
 			</View>
 		);
 	}
@@ -30,12 +35,12 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontFamily: fonts.light,
 		fontSize: 16,
-		marginRight: 3,
+		marginRight: 2,
 		marginTop: 15
 	},
 	logo: {
-		height: 21,
-		width: 21
+		height: 24,
+		width: 24
 	},
 	t_bold: {
 		fontFamily: fonts.semiBold
