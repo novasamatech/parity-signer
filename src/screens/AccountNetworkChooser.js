@@ -142,18 +142,31 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					style={{ marginBottom: 92 }}
 				/>
 			);
-		} else {
+		}
+	};
+
+	const renderScreenHeading = () => {
+		if (isNew) {
+			return <ScreenHeading title={'Create your first Keypair'} />;
+		} else if (shouldShowMoreNetworks) {
 			return (
-				<AccountCard
-					address={'existed'}
+				<ScreenHeading
+					title={'Choose Network'}
 					onPress={() => setShouldShowMoreNetworks(false)}
-					testID={testIDs.AccountNetworkChooser.showExistedButton}
-					title="Show Existing Network Account"
-					networkColor={colors.bg}
-					style={{ marginBottom: 92 }}
 				/>
 			);
 		}
+	};
+
+	const renderScanButton = () => {
+		if (isNew) return;
+		else if (shouldShowMoreNetworks) return;
+		return (
+			<ButtonMainAction
+				title={'Scan'}
+				onPress={() => navigation.navigate('QrScanner')}
+			/>
+		);
 	};
 
 	if (!loaded) return <ScrollView style={styles.body} />;
@@ -165,7 +178,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			style={styles.body}
 			testID={testIDs.AccountNetworkChooser.chooserScreen}
 		>
-			{isNew && <ScreenHeading title={'Create your first Keypair'} />}
+			{renderScreenHeading()}
 			<ScrollView>
 				{Object.entries(NETWORK_LIST)
 					.filter(getNetworkKeys)
@@ -202,9 +215,9 @@ function AccountNetworkChooser({ navigation, accounts }) {
 							title={networkParams.title}
 						/>
 					))}
+				{renderShowMoreButton()}
 			</ScrollView>
-			{renderShowMoreButton()}
-			<ButtonMainAction onPress={() => navigation.navigate('QrScanner')} />
+			{renderScanButton()}
 		</View>
 	);
 }
@@ -217,11 +230,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column'
 	},
-	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'center'
-	},
 	onboardingText: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.regular,
@@ -230,14 +238,5 @@ const styles = StyleSheet.create({
 	onboardingWrapper: {
 		alignItems: 'center',
 		flex: 1
-	},
-	title: {
-		color: colors.bg_text_sec,
-		flexDirection: 'column',
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		justifyContent: 'center',
-		marginTop: 16,
-		paddingLeft: 72
 	}
 });

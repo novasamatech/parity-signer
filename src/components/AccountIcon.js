@@ -56,7 +56,7 @@ export default function AccountIcon(props) {
 				<Image
 					source={network.logo}
 					style={{
-						backgroundColor: colors.card_bg,
+						backgroundColor: colors.bg_text_sec,
 						borderRadius: 40,
 						height: 40,
 						width: 40

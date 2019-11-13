@@ -54,7 +54,7 @@ const substrateNetworkBase = {
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {
-		color: '#4C4646',
+		color: '#A60037',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		pathId: 'kusama_dev',
@@ -63,7 +63,7 @@ const substrateNetworkBase = {
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#ff8c00',
+		color: '#000000',
 		decimals: 15,
 		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
 		pathId: 'substrate_dev',
@@ -83,13 +83,13 @@ const substrateNetworkBase = {
 
 const ethereumNetworkBase = {
 	[EthereumNetworkKeys.FRONTIER]: {
-		color: '#977CF6',
+		color: '#64A2F4',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
 		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.CLASSIC]: {
-		color: '#8C7166',
+		color: '#319C7C',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
 		logo: require('../res/img/logos/eth-classic.png'),
 		secondaryColor: colors.card_bgSolid,
@@ -110,7 +110,7 @@ const ethereumNetworkBase = {
 };
 
 const ethereumDefaultValues = {
-	color: '#F2E265',
+	color: '#2968C7',
 	logo: require('../res/img/logos/eth.png'),
 	protocol: NetworkProtocols.ETHEREUM,
 	secondaryColor: colors.card_text
