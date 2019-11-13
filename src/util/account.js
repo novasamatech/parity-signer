@@ -74,7 +74,7 @@ export function emptyAccount(
 }
 
 export function validateSeed(seed, validBip39Seed) {
-	if (seed.length === 0) {
+	if (!seed || seed.length === 0) {
 		return {
 			accountRecoveryAllowed: false,
 			reason: 'A seed phrase is required.',

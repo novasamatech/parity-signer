@@ -28,6 +28,19 @@ export const navigateToPathsList = (navigation, networkKey) => {
 	navigation.dispatch(resetAction);
 };
 
+export const navigateToLandingPage = navigation => {
+	const resetAction = StackActions.reset({
+		actions: [
+			NavigationActions.navigate({
+				routeName: 'AccountNetworkChooser'
+			})
+		],
+		index: 0,
+		key: undefined
+	});
+	navigation.dispatch(resetAction);
+};
+
 export const navigateToNewIdentityNetwork = navigation => {
 	const resetAction = StackActions.reset({
 		actions: [

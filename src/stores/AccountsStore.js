@@ -80,18 +80,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const account = this.state.newAccount;
 		if (!account.seed) return;
 
-		const { protocol } = NETWORK_LIST[account.networkKey];
-
-		if (protocol === NetworkProtocols.SUBSTRATE) {
-			// TODO unlock save into identities;
-			// const lockedAccount = this.encryptSeedPhraseAndLockAccount(account, pin);
-		} else {
-			await this.save(accountId(account), account, pin);
-		}
-		// only save a new account if the seed isn't empty
+		const accountKey = accountId(account);
+		await this.save(accountKey, account, pin);
 
 		this.setState({
-			accounts: this.state.accounts.set(accountId(account), account),
+			accounts: this.state.accounts.set(accountKey, account),
 			newAccount: emptyAccount()
 		});
 	}

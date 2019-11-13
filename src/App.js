@@ -65,6 +65,7 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
+import LegacyNetworkChooser from './screens/LegacyNetworkChooser';
 
 const getLaunchArgs = props => {
 	if (Platform.OS === 'ios') {
@@ -221,6 +222,9 @@ const Screens = createStackNavigator(
 					},
 					LegacyAccountList: {
 						screen: LegacyAccountList
+					},
+					LegacyNetworkChooser: {
+						screen: LegacyNetworkChooser
 					},
 					IdentityBackup: {
 						screen: IdentityBackup

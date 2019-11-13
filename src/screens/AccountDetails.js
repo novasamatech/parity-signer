@@ -28,7 +28,10 @@ import TxStore from '../stores/TxStore';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { alertDeleteAccount } from '../util/alertUtils';
-import { navigateToLegacyAccountList } from '../util/navigationHelpers';
+import {
+	navigateToLandingPage,
+	navigateToLegacyAccountList
+} from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
 
 export default class AccountDetails extends React.Component {
@@ -54,7 +57,7 @@ class AccountDetailsView extends React.Component {
 	}
 
 	onDelete = () => {
-		const accounts = this.props.accounts;
+		const { accounts, navigation } = this.props;
 		const selected = accounts.getSelected();
 		const selectedKey = accounts.getSelectedKey();
 
@@ -62,7 +65,10 @@ class AccountDetailsView extends React.Component {
 			selected.name || selected.address || 'this account',
 			async () => {
 				await accounts.deleteAccount(selectedKey);
-				navigateToLegacyAccountList(this.props.navigation);
+				if (accounts.getAccounts().size === 0) {
+					return navigateToLandingPage(navigation);
+				}
+				navigateToLegacyAccountList(navigation);
 			}
 		);
 	};

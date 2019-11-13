@@ -87,7 +87,7 @@ function AccountNew({ accounts, navigation }) {
 				address={''}
 				title={selectedNetwork.title}
 				networkKey={selectedAccount.networkKey}
-				onPress={() => navigation.navigate('AccountNetworkChooser')}
+				onPress={() => navigation.navigate('LegacyNetworkChooser')}
 			/>
 			<View style={styles.body}>
 				<Text style={styles.title}>ICON & ADDRESS</Text>
