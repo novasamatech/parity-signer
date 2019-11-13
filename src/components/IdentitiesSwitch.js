@@ -89,7 +89,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					textStyle={fontStyles.h1}
 				/>
 				{renderIdentityOptions(currentIdentity)}
-				<Separator />
+				<Separator style={{ marginBottom: 0 }} />
 			</>
 		);
 	};
@@ -171,12 +171,21 @@ function IdentitiesSwitch({ navigation, accounts }) {
 			: identities;
 
 		return (
-			<FlatList
-				data={identitiesToShow}
-				renderItem={renderNonSelectedIdentity}
-				keyExtractor={item => item.encryptedSeed}
-				style={{ flexGrow: 0, maxHeight: 250 }}
-			/>
+			<>
+				<FlatList
+					data={identitiesToShow}
+					renderItem={renderNonSelectedIdentity}
+					keyExtractor={item => item.encryptedSeed}
+					style={{ flexGrow: 0, maxHeight: 210 }}
+				/>
+				{identities.length > 4 && (
+					<Separator
+						shadow={true}
+						style={{ height: 0, marginTop: 0 }}
+						shadowStyle={{ opacity: 0.9 }}
+					/>
+				)}
+			</>
 		);
 	};
 
@@ -209,20 +218,23 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						{renderCurrentIdentityCard()}
 						{renderIdentities()}
 						{accounts.getAccounts().size > 0 && (
-							<ButtonIcon
-								title="Legacy Accounts"
-								onPress={() => {
-									setVisible(false);
-									navigation.navigate('LegacyAccountList');
-								}}
-								iconName="solution1"
-								iconType="antdesign"
-								iconSize={24}
-								textStyle={fontStyles.t_big}
-								style={{ paddingLeft: 8 * 4 }}
-							/>
+							<>
+								<ButtonIcon
+									title="Legacy Accounts"
+									onPress={() => {
+										setVisible(false);
+										navigation.navigate('LegacyAccountList');
+									}}
+									iconName="solution1"
+									iconType="antdesign"
+									iconSize={24}
+									textStyle={fontStyles.t_big}
+									style={{ paddingLeft: 8 * 4 }}
+								/>
+								<Separator />
+							</>
 						)}
-						<Separator />
+
 						<ButtonIcon
 							title="Add new Identity"
 							onPress={() => {
