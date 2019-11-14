@@ -45,11 +45,15 @@ function PathDerivation({ accounts, navigation }) {
 
 	return (
 		<KeyboardScrollView style={styles.container}>
-			<ScreenHeading title="Derive Account" subtitle={existedNetworkPath} />
+			<ScreenHeading
+				title="Derive Account"
+				subtitle={existedNetworkPath}
+				subtitleIcon={true}
+			/>
 			{!isPathValid && <Text>Invalid Path</Text>}
 			<TextInput
 				label="Path"
-				fixedPrefix={existedNetworkPath}
+				placeholder="//hard/soft"
 				autoFocus
 				value={derivationPath}
 				testID={testIDs.PathDerivation.pathInput}

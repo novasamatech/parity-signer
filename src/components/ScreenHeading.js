@@ -19,6 +19,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { View, Text } from 'react-native';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 import fontStyles from '../fontStyles';
 import fonts from '../fonts';
 import ButtonIcon from './ButtonIcon';
@@ -40,6 +41,7 @@ export default class ScreenHeading extends React.PureComponent {
 			small,
 			subtitle,
 			subtitleL,
+			subtitleIcon,
 			error,
 			onPress,
 			iconName,
@@ -48,10 +50,12 @@ export default class ScreenHeading extends React.PureComponent {
 		const finalViewStyles = [styles.body];
 		const finalTextStyles = [fontStyles.h1, styles.t_center];
 		const finalSubtitleStyle = [fontStyles.t_codeS];
+		const finalSubtitleIconStyle = [styles.subtitleIcon];
 
 		if (big) {
 			finalViewStyles.push(styles.bodyL);
 			finalTextStyles.push(styles.t_left);
+			finalSubtitleIconStyle.push({ justifyContent: 'flex-start' });
 		} else if (small) {
 			finalViewStyles.push(styles.bodyL);
 			finalTextStyles.push([fontStyles.h2, styles.t_left, styles.t_normal]);
@@ -67,8 +71,15 @@ export default class ScreenHeading extends React.PureComponent {
 		const renderSubtitle = () => {
 			if (!subtitle) return;
 			return (
-				<Text style={[finalTextStyles, finalSubtitleStyle]}>{subtitle}</Text>
+				<View style={finalSubtitleIconStyle}>
+					{renderSubtitleIcon()}
+					<Text style={[finalTextStyles, finalSubtitleStyle]}>{subtitle}</Text>
+				</View>
 			);
+		};
+		const renderSubtitleIcon = () => {
+			if (!subtitleIcon) return;
+			return <AntIcon name="user" size={10} color={colors.bg_text_sec} />;
 		};
 
 		const renderBack = () => {
@@ -116,6 +127,11 @@ const styles = {
 		marginLeft: 5,
 		marginTop: 0,
 		position: 'absolute'
+	},
+	subtitleIcon: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'center'
 	},
 	t_center: {
 		textAlign: 'center'

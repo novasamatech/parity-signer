@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, Text, View } from 'react-native';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 import {
 	getAddressWithPath,
 	getIdFromSubstrateAddress,
@@ -89,7 +90,10 @@ export default function PathCard({ onPress, identity, path, testID }) {
 					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 						{pathName}
 					</Text>
-					<Text style={fontStyles.t_codeS}>{path}</Text>
+					<View style={{ alignItems: 'center', flexDirection: 'row' }}>
+						<AntIcon name="user" size={10} color={colors.bg_text_sec} />
+						<Text style={fontStyles.t_codeS}>{path}</Text>
+					</View>
 				</View>
 			</View>
 		</TouchableItem>
