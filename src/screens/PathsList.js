@@ -105,8 +105,7 @@ function PathsList({ accounts, navigation }) {
 					<View>
 						<Text style={fontStyles.t_prefix}>{pathsGroup.title}</Text>
 						<Text style={fontStyles.t_codeS}>
-							{NETWORK_LIST[networkKey].pathId}
-							{'//'}
+							{NETWORK_LIST[networkKey].pathId + '//'}
 							{pathsGroup.subPath}
 						</Text>
 					</View>
@@ -138,7 +137,7 @@ function PathsList({ accounts, navigation }) {
 		<View style={styles.body}>
 			<ScreenHeading
 				title={NETWORK_LIST[networkKey].title}
-				subtitle={NETWORK_LIST[networkKey].pathId}
+				subtitle={'//' + NETWORK_LIST[networkKey].pathId}
 				big={true}
 			/>
 			<ScrollView>

@@ -1,11 +1,11 @@
 import React from 'react';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import PathCard from '../components/PathCard';
 import PopupMenu from '../components/PopupMenu';
+import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
-import fonts from '../fonts';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
@@ -15,7 +15,6 @@ import {
 import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
-import fontStyles from '../fontStyles';
 import testIDs from '../../e2e/testIDs';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
@@ -41,24 +40,22 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 	return (
 		<ScrollView style={styles.body}>
-			<View style={styles.header}>
-				<Text style={fontStyles.h2}>Public Address</Text>
-				<View style={styles.menuView}>
-					<PopupMenu
-						testID={testIDs.PathDetail.popupMenuButton}
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
-						menuItems={[
-							{ text: 'Edit', value: 'PathManagement' },
-							{
-								testID: testIDs.PathDetail.deleteButton,
-								text: 'Delete',
-								textStyle: styles.deleteText,
-								value: 'PathDelete'
-							}
-						]}
-					/>
-				</View>
+			<ScreenHeading small={true} title="Public Address" />
+			<View style={styles.menuView}>
+				<PopupMenu
+					testID={testIDs.PathDetail.popupMenuButton}
+					onSelect={onOptionSelect}
+					menuTriggerIconName={'more-vert'}
+					menuItems={[
+						{ text: 'Edit', value: 'PathManagement' },
+						{
+							testID: testIDs.PathDetail.deleteButton,
+							text: 'Delete',
+							textStyle: styles.deleteText,
+							value: 'PathDelete'
+						}
+					]}
+				/>
 			</View>
 			<PathCard identity={currentIdentity} path={path} />
 			{networkKey !== UnknownNetworkKeys.UNKNOWN && address !== '' && (
@@ -87,26 +84,15 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column'
 	},
-	header: {
-		flexDirection: 'row',
-		paddingBottom: 24,
-		paddingLeft: 72,
-		paddingRight: 18
+	deleteText: {
+		color: colors.bg_alert
 	},
 	menuView: {
 		alignItems: 'flex-end',
-		flex: 1
-	},
-	qr: {
-		backgroundColor: colors.card_bg,
-		marginTop: 20
-	},
-	title: {
-		color: colors.bg_text_sec,
-		flexDirection: 'column',
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		justifyContent: 'center'
+		flex: 1,
+		position: 'absolute',
+		right: 16,
+		top: 5
 	}
 });
 

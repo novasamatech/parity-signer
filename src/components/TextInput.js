@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
 		paddingTop: 8
 	},
 	inputFixed: {
-		color: colors.card_bg_text_sec,
+		color: '#888',
 		flex: 0,
 		paddingTop: 11.5
 	},

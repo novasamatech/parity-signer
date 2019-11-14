@@ -37,6 +37,11 @@ export default {
 		fontFamily: fonts.roboto,
 		fontSize: 16
 	},
+	t_code: {
+		color: colors.bg_text_sec,
+		fontFamily: fonts.robotoMono,
+		fontSize: 18
+	},
 	t_codeS: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.robotoMono,

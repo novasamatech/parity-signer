@@ -22,7 +22,6 @@ import Button from './Button';
 
 import { StyleSheet } from 'react-native';
 import colors from '../colors';
-import fonts from '../fonts';
 import fontStyles from '../fontStyles';
 
 export default class ButtonNewDerivation extends React.PureComponent {
@@ -35,9 +34,8 @@ export default class ButtonNewDerivation extends React.PureComponent {
 			<Button
 				title={title}
 				onPress={onPress}
-				style={{ position: 'absolute' }}
 				testID={testID}
-				textStyles={[fontStyles.h2, styles.text]}
+				textStyles={[fontStyles.t_code, styles.text]}
 				buttonStyles={styles.button}
 			/>
 		);
@@ -49,19 +47,15 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: 'transparent',
 		borderColor: colors.card_bgSolid,
-		borderRadius: 0,
-		borderStyle: 'dashed',
+		borderRadius: 3,
 		borderWidth: 1,
 		elevation: 0,
 		height: 56,
-		justifyContent: 'center',
 		marginBottom: 120,
-		marginHorizontal: 8,
-		marginTop: 16,
-		paddingHorizontal: 64
+		marginTop: 16
 	},
 	text: {
-		fontFamily: fonts.roboto,
+		letterSpacing: -0.4,
 		opacity: 0.4
 	}
 });
