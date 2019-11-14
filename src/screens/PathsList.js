@@ -66,7 +66,7 @@ function PathsList({ accounts, navigation }) {
 		return (
 			<PathCard
 				key={path}
-				testID={testIDs.PathList.pathCard + path}
+				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
 				onPress={() => navigate('PathDetails', { path })}
@@ -128,7 +128,7 @@ function PathsList({ accounts, navigation }) {
 				<View style={{ marginBottom: -14 }}>
 					<PathCard
 						key={path}
-						testID={testIDs.PathList.pathCard + path}
+						testID={testIDs.PathsList.pathCard + path}
 						identity={currentIdentity}
 						path={path}
 						onPress={() => navigate('PathDetails', { path })}
@@ -151,7 +151,7 @@ function PathsList({ accounts, navigation }) {
 						: renderGroupPaths(pathsGroup)
 				)}
 				<ButtonNewDerivation
-					testID={testIDs.PathList.deriveButton}
+					testID={testIDs.PathsList.deriveButton}
 					title="Create New Derivation"
 					onPress={() => navigation.navigate('PathDerivation', { networkKey })}
 				/>

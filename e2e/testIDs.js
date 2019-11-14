@@ -22,6 +22,7 @@ const testIDs = {
 	},
 	IdentityPin: {
 		confirmPin: 'identity_pin_confirm',
+		scrollScreen: 'identity_pin_scroll',
 		setPin: 'identity_pin_set',
 		submitButton: 'identity_submit_button',
 		unlockPinButton: 'identity_unlock_pin_button',
@@ -32,9 +33,10 @@ const testIDs = {
 		nameInput: 'path_derivation_name_input',
 		pathInput: 'path_derivation_path_input'
 	},
-	PathList: {
+	PathsList: {
 		deriveButton: 'path_list_derive_button',
-		pathCard: 'path_list_path_card'
+		pathCard: 'path_list_path_card',
+		scanButton: 'path_list_scan_button'
 	},
 	TacScreen: {
 		agreePrivacyButton: 'tac_privacy',
