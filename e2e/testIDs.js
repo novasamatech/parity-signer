@@ -11,9 +11,16 @@ const testIDs = {
 		recoverButton: 'anc_recover_button',
 		showExistedButton: 'anc_show_existed'
 	},
+	IdentitiesSwitch: {
+		manageIdentityButton: 'identities_switch_manager_button',
+		toggleButton: 'identities_switch_toggle_button'
+	},
 	IdentityBackup: {
 		nextButton: 'identity_backup_next',
 		seedText: 'identity_backup_seed'
+	},
+	IdentityManagement: {
+		deleteButton: 'identity_management_delete_button'
 	},
 	IdentityNew: {
 		createButton: 'identity_new_create_button',

@@ -1,3 +1,6 @@
+import testIDs from './testIDs';
+const { IdentityPin } = testIDs;
+
 export const testTap = async buttonId => await element(by.id(buttonId)).tap();
 
 export const testVisible = async componentId =>
@@ -28,4 +31,9 @@ export const testScrollAndTap = async (buttonId, screenId) => {
 		.whileElement(by.id(screenId))
 		.scroll(100, 'down');
 	await testTap(buttonId);
+};
+
+export const testUnlockPin = async pinCode => {
+	await testInput(IdentityPin.unlockPinInput, pinCode);
+	await testTap(IdentityPin.unlockPinButton);
 };

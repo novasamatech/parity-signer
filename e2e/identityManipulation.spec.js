@@ -6,12 +6,15 @@ import {
 	testNotVisible,
 	testScrollAndTap,
 	testTap,
+	testUnlockPin,
 	testVisible
 } from './e2eUtils';
 
 const {
 	TacScreen,
 	AccountNetworkChooser,
+	IdentitiesSwitch,
+	IdentityManagement,
 	IdentityNew,
 	IdentityBackup,
 	IdentityPin,
@@ -55,8 +58,7 @@ describe('Load test', async () => {
 			substrateNetworkButtonIndex,
 			testIDs.AccountNetworkChooser.chooserScreen
 		);
-		await testInput(IdentityPin.unlockPinInput, pinCode);
-		await testTap(IdentityPin.unlockPinButton);
+		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + '//kusama_CC2//default');
 	});
 
@@ -67,8 +69,7 @@ describe('Load test', async () => {
 		await testInput(PathDerivation.nameInput, 'first one');
 		await testInput(PathDerivation.pathInput, fundingPath);
 		await testTap(PathDerivation.deriveButton);
-		await testInput(IdentityPin.unlockPinInput, pinCode);
-		await testTap(IdentityPin.unlockPinButton);
+		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
 	});
 
@@ -78,5 +79,14 @@ describe('Load test', async () => {
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testNotExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
+	});
+
+	it('delete identity', async () => {
+		await testTap(IdentitiesSwitch.toggleButton);
+		await testTap(IdentitiesSwitch.manageIdentityButton);
+		await testTap(IdentityManagement.deleteButton);
+		await element(by.text('Delete')).tap();
+		await testUnlockPin(pinCode);
+		await testVisible(AccountNetworkChooser.noAccountScreen);
 	});
 });

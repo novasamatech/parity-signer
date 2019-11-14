@@ -24,6 +24,7 @@ import fontStyles from '../fontStyles';
 import Separator from './Separator';
 import { withAccountStore } from '../util/HOC';
 import { getIdentityName } from '../util/identitiesUtils';
+import testIDs from '../../e2e/testIDs';
 
 function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(false);
@@ -51,6 +52,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					iconType="antdesign"
 					iconName="arrowright"
 					iconSize={18}
+					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
 					textStyle={fontStyles.t_regular}
 					style={styles.i_arrowStyle}
 				/>
@@ -196,6 +198,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				iconName="user"
 				iconType="antdesign"
 				iconBgStyle={{ backgroundColor: 'transparent' }}
+				testID={testIDs.IdentitiesSwitch.toggleButton}
 			/>
 			<Modal
 				animationType="fade"

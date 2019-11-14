@@ -38,6 +38,7 @@ const ButtonIcon = props => {
 		onPress,
 		iconBgStyle,
 		iconSize,
+		testID,
 		textStyle,
 		title,
 		style
@@ -104,7 +105,7 @@ const ButtonIcon = props => {
 
 	return (
 		<>
-			<View style={[styles.generalView, style]}>
+			<View style={[styles.generalView, style]} testID={testID}>
 				<View style={styles.iconTitleViewContainer}>
 					<Touchable accessibilityComponentType="button" onPress={onPress}>
 						<View style={styles.iconTitleView}>

@@ -24,11 +24,40 @@ export const alertPathDeletionError = () =>
 		}
 	]);
 
+export const alertIdentityDeletionError = () =>
+	Alert.alert('Error', "Can't delete Identity.", [
+		{
+			style: 'Cancel',
+			text: 'Try again'
+		}
+	]);
+
 export const alertDeleteAccount = (accountName, onDelete) => {
 	Alert.alert(
 		'Delete Key Pairs',
 		`Do you really want to delete ${accountName}?
 This account can only be recovered with its associated recovery phrase.`,
+		[
+			{
+				onPress: () => {
+					onDelete();
+				},
+				style: 'destructive',
+				text: 'Delete'
+			},
+			{
+				style: 'cancel',
+				text: 'Cancel'
+			}
+		]
+	);
+};
+
+export const alertDeleteIdentity = onDelete => {
+	Alert.alert(
+		'Delete Identity',
+		`Do you really want to delete this Identity and all the related key pairs?
+This identity can only be recovered with its associated recovery phrase.`,
 		[
 			{
 				onPress: () => {
