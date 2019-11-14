@@ -30,7 +30,8 @@ export default class TextInput extends React.PureComponent {
 		focus: false
 	};
 	static propTypes = {
-		fixedPrefix: PropTypes.string
+		fixedPrefix: PropTypes.string,
+		style: PropTypes.object
 	};
 
 	// Methods:
@@ -44,30 +45,47 @@ export default class TextInput extends React.PureComponent {
 	}
 
 	render() {
-		const { fixedPrefix } = this.props;
+		const { fixedPrefix, style, label, error } = this.props;
+		const finalInputStyles = [styles.input];
+		if (error) {
+			finalInputStyles.push(styles.input_error);
+		}
+		const renderLabel = () => {
+			if (!label) return;
+			return (
+				<Text style={[fontStyles.t_regular, { marginBottom: 3 }]}>{label}</Text>
+			);
+		};
 		return (
-			<View style={{ flexDirection: 'row' }}>
-				{fixedPrefix && (
-					<Text style={[fontStyles.h2, styles.input, styles.inputFixed]}>
-						{fixedPrefix}
-					</Text>
-				)}
-				<TextInputOrigin
-					ref={input => {
-						this.input = input;
-					}}
-					keyboardAppearance="dark"
-					underlineColorAndroid="transparent"
-					{...this.props}
-					style={[fontStyles.h2, styles.input, this.props.style]}
-					placeholderTextColor={colors.card_bg_text_sec}
-				/>
+			<View style={styles.body}>
+				{renderLabel()}
+				<View style={styles.viewStyle}>
+					{fixedPrefix && (
+						<Text style={[fontStyles.h2, finalInputStyles, styles.inputFixed]}>
+							{fixedPrefix}
+						</Text>
+					)}
+					<TextInputOrigin
+						ref={input => {
+							this.input = input;
+						}}
+						keyboardAppearance="dark"
+						underlineColorAndroid="transparent"
+						{...this.props}
+						style={[fontStyles.h2, finalInputStyles, style]}
+						placeholderTextColor={colors.card_bg_text_sec}
+					/>
+				</View>
 			</View>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
+	body: {
+		marginVertical: 8,
+		paddingHorizontal: 16
+	},
 	input: {
 		borderBottomColor: colors.card_bg_text_sec,
 		borderBottomWidth: 1,
@@ -80,5 +98,11 @@ const styles = StyleSheet.create({
 		color: colors.card_bg_text_sec,
 		flex: 0,
 		paddingTop: 11.5
+	},
+	input_error: {
+		borderBottomColor: colors.bg_alert
+	},
+	viewStyle: {
+		flexDirection: 'row'
 	}
 });

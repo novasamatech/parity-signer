@@ -127,8 +127,7 @@ const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		overflow: 'hidden',
-		paddingHorizontal: 16
+		overflow: 'hidden'
 	},
 	btnBox: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 80 },
 	title: {

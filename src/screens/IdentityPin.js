@@ -16,7 +16,7 @@
 'use strict';
 
 import React, { Component, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import Background from '../components/Background';
@@ -112,8 +112,8 @@ function IdentityPin({ navigation, accounts }) {
 					error={state.pinMismatch || state.pinTooShort}
 					subtitle={showHintOrError()}
 				/>
-				<Text style={fontStyles.t_regular}>PIN</Text>
 				<PinInput
+					label="PIN"
 					autoFocus
 					testID={testIDs.IdentityPin.unlockPinInput}
 					returnKeyType="done"
@@ -135,8 +135,8 @@ function IdentityPin({ navigation, accounts }) {
 					error={state.pinMismatch || state.pinTooShort}
 				/>
 
-				<Text style={fontStyles.t_regular}>PIN</Text>
 				<PinInput
+					label="PIN"
 					autoFocus
 					testID={testIDs.IdentityPin.setPin}
 					returnKeyType="next"
@@ -147,8 +147,8 @@ function IdentityPin({ navigation, accounts }) {
 					onChangeText={pin => onPinInputChange('pin', pin)}
 					value={state.pin}
 				/>
-				<Text style={fontStyles.t_regular}>Confirm PIN</Text>
 				<PinInput
+					label="Confirm PIN"
 					returnKeyType="done"
 					testID={testIDs.IdentityPin.confirmPin}
 					focus={state.focusConfirmation}
@@ -203,14 +203,11 @@ const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		overflow: 'hidden',
-		padding: 20
+		overflow: 'hidden'
 	},
 	pinInput: {
 		borderBottomColor: colors.bg_button,
 		borderColor: colors.bg_button,
-		marginBottom: 20,
-		marginTop: 4,
 		minHeight: 48,
 		paddingLeft: 10,
 		paddingRight: 10
