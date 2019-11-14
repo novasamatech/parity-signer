@@ -113,7 +113,7 @@ function IdentityNew({ accounts, navigation }) {
 			<TextInput
 				onChangeText={updateName}
 				value={accounts.getNewIdentity().name}
-				placeholder="Enter a new identity name"
+				placeholder="Identity Name"
 				focus={false}
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		overflow: 'hidden'
 	},
-	btnBox: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 80 },
+	btnBox: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 32 },
 	title: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.bold,

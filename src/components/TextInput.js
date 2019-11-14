@@ -31,7 +31,7 @@ export default class TextInput extends React.PureComponent {
 	};
 	static propTypes = {
 		fixedPrefix: PropTypes.string,
-		style: PropTypes.object
+		style: PropTypes.style
 	};
 
 	// Methods:
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		borderBottomColor: colors.card_bg_text_sec,
-		borderBottomWidth: 1,
+		borderBottomWidth: 0.8,
 		flex: 1,
 		height: 40,
 		padding: 0,

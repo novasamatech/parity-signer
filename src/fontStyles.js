@@ -60,13 +60,13 @@ export default {
 	},
 	t_seed: {
 		borderColor: colors.card_bg,
-		borderWidth: 1,
+		borderWidth: 0.8,
 		color: colors.bg_button,
 		fontFamily: fonts.light,
 		fontSize: 20,
 		letterSpacing: 0.1,
-		lineHeight: 24,
-		minHeight: 160,
+		lineHeight: 26,
+		minHeight: 140,
 		paddingHorizontal: 16,
 		paddingVertical: 10
 	}

@@ -239,7 +239,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						)}
 
 						<ButtonIcon
-							title="Add New Identity"
+							title="Add Identity"
 							onPress={() => {
 								setVisible(false);
 								navigation.navigate('IdentityNew');

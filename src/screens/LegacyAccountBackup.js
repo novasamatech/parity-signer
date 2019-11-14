@@ -34,6 +34,7 @@ import fontStyles from '../fontStyles';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
+import ScreenHeading from '../components/ScreenHeading';
 import TouchableItem from '../components/TouchableItem';
 import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
 import AccountsStore from '../stores/AccountsStore';
@@ -90,16 +91,14 @@ function LegacyAccountBackupView(props) {
 	return (
 		<ScrollView style={styles.body}>
 			<Background />
-			<Text style={styles.titleTop}>BACKUP ACCOUNT</Text>
+			<ScreenHeading
+				title="Recovery Phrase"
+				subtitle="Write these words down on paper. Keep the backup paper safe. These
+				words allow anyone to recover this account and access its funds."
+			/>
+
 			<AccountCard address={address} networkKey={networkKey} title={name} />
 			<View style={styles.bodyContent}>
-				<View>
-					<Text style={styles.titleTop}>RECOVERY PHRASE</Text>
-					<Text style={styles.hintText}>
-						Write these words down on paper. Keep the backup paper safe. These
-						words allow anyone to recover this account and access its funds.
-					</Text>
-				</View>
 				<TouchableItem
 					onPress={() => {
 						// only allow the copy of the recovery phrase in dev environment
@@ -177,13 +176,6 @@ const styles = StyleSheet.create({
 	bodyContent: {
 		padding: 16
 	},
-	bottom: {
-		flexBasis: 50,
-		paddingBottom: 15
-	},
-	deleteButton: {
-		backgroundColor: colors.bg_alert
-	},
 	derivationText: {
 		backgroundColor: colors.card_bg,
 		fontFamily: fonts.regular,
@@ -193,13 +185,6 @@ const styles = StyleSheet.create({
 		minHeight: 30,
 		padding: 10
 	},
-	hintText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
 	nextStep: {
 		marginTop: 20
 	},
@@ -208,15 +193,5 @@ const styles = StyleSheet.create({
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	top: {
-		flex: 1
 	}
 });
