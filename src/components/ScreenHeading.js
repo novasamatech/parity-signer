@@ -67,10 +67,7 @@ export default class ScreenHeading extends React.PureComponent {
 		const renderSubtitle = () => {
 			if (!subtitle) return;
 			return (
-				<Text style={[finalTextStyles, finalSubtitleStyle]}>
-					{'//'}
-					{subtitle}
-				</Text>
+				<Text style={[finalTextStyles, finalSubtitleStyle]}>{subtitle}</Text>
 			);
 		};
 

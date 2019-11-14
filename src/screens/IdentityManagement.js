@@ -1,18 +1,21 @@
 import React from 'react';
 import { withNavigation } from 'react-navigation';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, StyleSheet } from 'react-native';
 
 import { withAccountStore } from '../util/HOC';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
+import ScreenHeading from '../components/ScreenHeading';
+import colors from '../colors';
 
 function IdentityManagement({ accounts, navigation }) {
 	const { currentIdentity } = accounts.state;
 
 	return (
-		<ScrollView>
-			<Text>Display Name</Text>
+		<ScrollView style={styles.body}>
+			<ScreenHeading title="Manage Identity" />
 			<TextInput
+				label="Display Name"
 				onChangeText={name => accounts.updateIdentityName(name)}
 				value={currentIdentity.name}
 				placeholder="Enter a new identity name"
@@ -30,3 +33,11 @@ function IdentityManagement({ accounts, navigation }) {
 }
 
 export default withAccountStore(withNavigation(IdentityManagement));
+
+const styles = StyleSheet.create({
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		flexDirection: 'column'
+	}
+});

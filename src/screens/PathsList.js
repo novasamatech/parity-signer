@@ -137,7 +137,6 @@ function PathsList({ accounts, navigation }) {
 			))}
 		</View>
 	);
-
 	return (
 		<View style={styles.body}>
 			<ScreenHeading

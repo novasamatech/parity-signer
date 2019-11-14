@@ -22,10 +22,12 @@ import TextInput from '../components/TextInput';
 import ButtonMainAction from '../components/ButtonMainAction';
 import { validateDerivedPath } from '../util/identitiesUtils';
 import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
-import AccountCard from '../components/AccountCard';
 import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
 import { alertPathDerivationError } from '../util/alertUtils';
 import testIDs from '../../e2e/testIDs';
+import Separator from '../components/Separator';
+import ScreenHeading from '../components/ScreenHeading';
+import colors from '../colors';
 
 function PathDerivation({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -41,29 +43,29 @@ function PathDerivation({ accounts, navigation }) {
 
 	return (
 		<View style={styles.container}>
-			<Text>Derivation</Text>
+			<ScreenHeading title="Derive Account" subtitle={existedNetworkPath} />
 			{!isPathValid && <Text>Invalid Path</Text>}
-			<Text>Display Name</Text>
 			<TextInput
+				label="Path"
+				fixedPrefix={existedNetworkPath}
+				autoFocus
+				value={derivationPath}
+				testID={testIDs.PathDerivation.pathInput}
+				onChangeText={setDerivationPath}
+			/>
+			<TextInput
+				label="Display Name"
 				testID={testIDs.PathDerivation.nameInput}
 				value={keyPairsName}
 				onChangeText={keyParisName => setKeyPairsName(keyParisName)}
 			/>
-			<Text>Path</Text>
-			<Text>{existedNetworkPath}</Text>
-			<TextInput
-				testID={testIDs.PathDerivation.pathInput}
-				value={derivationPath}
-				onChangeText={setDerivationPath}
-			/>
-			{networkKey !== '' && (
-				<AccountCard
-					address={''}
-					networkKey={networkKey}
-					title={NETWORK_LIST[networkKey].title}
-				/>
-			)}
+			<Separator style={{ height: 0 }} />
+			{/* TODO: Identity bind */}
+			{/* {networkKey !== '' && (
+				// <PathCard identity="{currentIdentity}" path={derivationPath} />
+			)} */}
 			<ButtonMainAction
+				disabled={!validateDerivedPath(derivationPath)}
 				bottom={false}
 				title="Derive Address"
 				testID={testIDs.PathDerivation.deriveButton}
@@ -92,7 +94,7 @@ function PathDerivation({ accounts, navigation }) {
 
 const styles = StyleSheet.create({
 	container: {
-		backgroundColor: 'rgba(0,0,0,0.8)',
+		backgroundColor: colors.bg,
 		flex: 1
 	}
 });

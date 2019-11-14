@@ -17,10 +17,9 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
@@ -42,27 +41,24 @@ export default class AccountEdit extends React.PureComponent {
 
 					return (
 						<ScrollView style={styles.body}>
-							<Text style={styles.titleTop}>EDIT ACCOUNT</Text>
 							<AccountCard
 								title={selected.name}
 								address={selected.address}
 								networkKey={selected.networkKey}
 							/>
-							<View style={styles.bodyContent}>
-								<Text style={styles.title}>ACCOUNT NAME</Text>
-								<TextInput
-									style={{ marginBottom: 40 }}
-									onChangeText={async name => {
-										accounts.updateSelectedAccount({ name });
-										await accounts.save(
-											accounts.getSelectedKey(),
-											accounts.getSelected()
-										);
-									}}
-									value={selected.name}
-									placeholder="New name"
-								/>
-							</View>
+							<TextInput
+								label="Account Name"
+								style={{ marginBottom: 40 }}
+								onChangeText={async name => {
+									accounts.updateSelectedAccount({ name });
+									await accounts.save(
+										accounts.getSelectedKey(),
+										accounts.getSelected()
+									);
+								}}
+								value={selected.name}
+								placeholder="New name"
+							/>
 						</ScrollView>
 					);
 				}}
@@ -76,40 +72,6 @@ const styles = StyleSheet.create({
 		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		paddingBottom: 40,
-		paddingTop: 24
-	},
-	bodyContent: {
-		padding: 16
-	},
-	bottom: {
-		flexBasis: 50,
-		paddingBottom: 15
-	},
-	deleteButton: {
-		backgroundColor: 'red'
-	},
-	hintText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingTop: 20,
-		textAlign: 'center'
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	top: {
-		flex: 1
+		paddingBottom: 40
 	}
 });
