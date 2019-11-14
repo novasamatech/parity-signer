@@ -89,6 +89,10 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		);
 	};
 
+	const sortNetworkKeys = a => {
+		return a.protocol === NetworkProtocols.SUBSTRATE;
+	};
+
 	const getNetworkKeys = ([networkKey]) => {
 		const availableNetworks = getAvailableNetworkKeys(
 			currentIdentity || identities[0]
@@ -182,6 +186,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			<ScrollView>
 				{Object.entries(NETWORK_LIST)
 					.filter(getNetworkKeys)
+					.sort(sortNetworkKeys)
 					.map(([networkKey, networkParams], index) => (
 						<AccountCard
 							address={''}

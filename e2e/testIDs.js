@@ -33,6 +33,10 @@ const testIDs = {
 		nameInput: 'path_derivation_name_input',
 		pathInput: 'path_derivation_path_input'
 	},
+	PathDetail: {
+		deleteButton: 'path_detail_delete_button',
+		popupMenuButton: 'path_detail_popup_menu_button'
+	},
 	PathsList: {
 		deriveButton: 'path_list_derive_button',
 		pathCard: 'path_list_path_card',

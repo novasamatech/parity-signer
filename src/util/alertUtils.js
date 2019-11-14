@@ -26,7 +26,7 @@ export const alertPathDeletionError = () =>
 
 export const alertDeleteAccount = (accountName, onDelete) => {
 	Alert.alert(
-		'Delete',
+		'Delete Key Pairs',
 		`Do you really want to delete ${accountName}?
 This account can only be recovered with its associated recovery phrase.`,
 		[

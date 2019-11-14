@@ -112,7 +112,6 @@ function PathsList({ accounts, navigation }) {
 					</View>
 
 					<ButtonIcon
-						onPress={() => this.props.navigation.navigate('')}
 						iconName="plus"
 						iconType="antdesign"
 						style={{ opacity: 0.5 }}

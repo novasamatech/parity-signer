@@ -30,12 +30,13 @@ export default class ButtonNewDerivation extends React.PureComponent {
 		onPress: PropTypes.func
 	};
 	render() {
-		const { onPress, title } = this.props;
+		const { onPress, title, testID } = this.props;
 		return (
 			<Button
 				title={title}
 				onPress={onPress}
 				style={{ position: 'absolute' }}
+				testID={testID}
 				textStyles={[fontStyles.h2, styles.text]}
 				buttonStyles={styles.button}
 			/>

@@ -2,6 +2,7 @@ import testIDs from './testIDs';
 import {
 	testExist,
 	testInput,
+	testNotExist,
 	testNotVisible,
 	testScrollAndTap,
 	testTap,
@@ -15,6 +16,7 @@ const {
 	IdentityBackup,
 	IdentityPin,
 	PathDerivation,
+	PathDetail,
 	PathsList
 } = testIDs;
 
@@ -38,7 +40,7 @@ describe('Load test', async () => {
 
 	it('create a new identity with default substrate account', async () => {
 		const substrateNetworkButtonIndex =
-			AccountNetworkChooser.networkButton + '5'; //Need change if network list changes
+			AccountNetworkChooser.networkButton + '2'; //Need change if network list changes
 
 		await testTap(AccountNetworkChooser.createButton);
 		await testNotVisible(IdentityNew.seedInput);
@@ -56,21 +58,25 @@ describe('Load test', async () => {
 		await testInput(IdentityPin.unlockPinInput, pinCode);
 		await testTap(IdentityPin.unlockPinButton);
 		await testExist(PathsList.pathCard + '//kusama_CC2//default');
-		await testTap(PathsList.scanButton);
 	});
 
+	const fundingPath = '//funding/0';
+
 	it('derive a new key', async () => {
-		const path = '//funding/0';
 		await testTap(PathsList.deriveButton);
 		await testInput(PathDerivation.nameInput, 'first one');
-		await testInput(PathDerivation.pathInput, path);
+		await testInput(PathDerivation.pathInput, fundingPath);
 		await testTap(PathDerivation.deriveButton);
 		await testInput(IdentityPin.unlockPinInput, pinCode);
 		await testTap(IdentityPin.unlockPinButton);
-		await testExist(PathsList.pathCard + `//kusama_CC2${path}`);
+		await testExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
 	});
 
-	it('delete a existed key', async () => {
-		await element(by.label('Back')).tap();
+	it('delete a path', async () => {
+		await testTap(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
+		await testTap(PathDetail.popupMenuButton);
+		await testTap(PathDetail.deleteButton);
+		await element(by.text('Delete')).tap();
+		await testNotExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
 	});
 });

@@ -16,6 +16,7 @@ import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
 import { navigateToPathsList } from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
+import testIDs from '../../e2e/testIDs';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
@@ -44,11 +45,13 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				<Text style={fontStyles.h2}>Public Address</Text>
 				<View style={styles.menuView}>
 					<PopupMenu
+						testID={testIDs.PathDetail.popupMenuButton}
 						onSelect={onOptionSelect}
 						menuTriggerIconName={'more-vert'}
 						menuItems={[
 							{ text: 'Edit', value: 'PathManagement' },
 							{
+								testID: testIDs.PathDetail.deleteButton,
 								text: 'Delete',
 								textStyle: styles.deleteText,
 								value: 'PathDelete'

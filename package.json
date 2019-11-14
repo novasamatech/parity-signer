@@ -22,11 +22,11 @@
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
     "test": "jest",
     "test-rust": "cd ./rust/signer && cargo test && cd ../..",
-    "build-e2e:android": "detox build -c android.emu.debug",
-    "test-e2e:android": "detox test -c android.emu.debug",
+    "build-e2e:android": "detox build -c android.emu.debug -l info",
+    "test-e2e:android": "detox test -c android.emu.debug -l info --noStackTrace",
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
-    "build-e2e:ios": "detox build -c ios.sim.debug",
-    "test-e2e:ios": "detox test -c ios.sim.debug",
+    "build-e2e:ios": "detox build -c ios.sim.debug -l info",
+    "test-e2e:ios": "detox test -c ios.sim.debug -l info --noStackTrace",
     "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios"
   },
   "husky": {

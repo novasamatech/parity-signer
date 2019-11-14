@@ -74,24 +74,22 @@ export default function PathCard({ onPress, identity, path, testID }) {
 	const substrateDerivationCard = (
 		<TouchableItem
 			accessibilityComponentType="button"
-			testID={testID}
 			disabled={false}
 			onPress={onPress}
+			testID={testID}
 		>
-			<View testID={testID}>
-				<View style={[styles.content, styles.contentDer]}>
-					<AccountIcon
-						address={getIdFromSubstrateAddress(address)}
-						protocol={network.protocol}
-						network={network}
-						style={styles.icon}
-					/>
-					<View style={styles.desc}>
-						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
-							{pathName}
-						</Text>
-						<Text style={fontStyles.t_codeS}>{path}</Text>
-					</View>
+			<View style={[styles.content, styles.contentDer]}>
+				<AccountIcon
+					address={getIdFromSubstrateAddress(address)}
+					protocol={network.protocol}
+					network={network}
+					style={styles.icon}
+				/>
+				<View style={styles.desc}>
+					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+						{pathName}
+					</Text>
+					<Text style={fontStyles.t_codeS}>{path}</Text>
 				</View>
 			</View>
 		</TouchableItem>
