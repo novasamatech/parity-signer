@@ -115,8 +115,6 @@ function PathsList({ accounts, navigation }) {
 						iconName="plus"
 						iconType="antdesign"
 						style={{ opacity: 0.5 }}
-						// TODO: onPress should lead to prefilled PathDerivation form
-						// eslint-disable-next-line react/jsx-no-duplicate-props
 						onPress={() =>
 							navigation.navigate('PathDerivation', { networkKey })
 						}

@@ -33,6 +33,7 @@ import {
 import { alertIdentityCreationError } from '../util/alertUtils';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
+import KeyboardScrollView from '../components/KeyboardScrollView';
 
 function IdentityNew({ accounts, navigation }) {
 	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
@@ -108,16 +109,17 @@ function IdentityNew({ accounts, navigation }) {
 	);
 
 	return (
-		<View style={styles.body}>
+		<KeyboardScrollView style={styles.body}>
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
+				testID={testIDs.IdentityNew.nameInput}
 				value={accounts.getNewIdentity().name}
 				placeholder="Identity Name"
 				focus={false}
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
-		</View>
+		</KeyboardScrollView>
 	);
 }
 

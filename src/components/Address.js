@@ -27,7 +27,6 @@ import { NetworkProtocols } from '../constants';
 export default function Address(props) {
 	const { address, protocol = NetworkProtocols.SUBSTRATE, style = {} } = props;
 	const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
-	let result = address;
 
 	return (
 		<Text
@@ -36,7 +35,7 @@ export default function Address(props) {
 			ellipsizeMode="middle"
 		>
 			{prefix}
-			{result}
+			{address}
 		</Text>
 	);
 }

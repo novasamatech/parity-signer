@@ -69,6 +69,20 @@ export const navigateToSignedMessage = navigation => {
 	navigation.dispatch(resetAction);
 };
 
+export const navigateToSignedTx = navigation => {
+	const resetAction = StackActions.reset({
+		actions: [
+			NavigationActions.navigate({
+				params: { isNew: true },
+				routeName: 'SignedTx'
+			})
+		],
+		index: 0,
+		key: undefined
+	});
+	navigation.dispatch(resetAction);
+};
+
 export const navigateToLegacyAccountList = navigation => {
 	const resetAction = StackActions.reset({
 		actions: [NavigationActions.navigate({ routeName: 'LegacyAccountList' })],

@@ -24,6 +24,7 @@ const testIDs = {
 	},
 	IdentityNew: {
 		createButton: 'identity_new_create_button',
+		nameInput: 'identity_new_name_input',
 		recoverButton: 'identity_new_recover_button',
 		seedInput: 'identity_new_seed_input'
 	},

@@ -30,7 +30,7 @@ export const SubstrateNetworkKeys = Object.freeze({
 	KUSAMA_DEV:
 		'0xd0861d14ebd971da92298f729e46706216377356b0a196978d054972620f298d',
 	SUBSTRATE_DEV:
-		'0xa9b086bbadc5cedd43e0f8a686de18f0bc010cd88d4b46d2f75ae5a540bf460d' // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
+		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc' // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 });
 
 const unknownNetworkBase = {
