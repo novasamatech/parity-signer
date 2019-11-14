@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import TextInput from '../components/TextInput';
 import ButtonMainAction from '../components/ButtonMainAction';
 import { validateDerivedPath } from '../util/identitiesUtils';
@@ -28,6 +28,8 @@ import testIDs from '../../e2e/testIDs';
 import Separator from '../components/Separator';
 import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
+import PathCard from '../components/PathCard';
+import KeyboardScrollView from '../components/KeyboardScrollView';
 
 function PathDerivation({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -42,7 +44,7 @@ function PathDerivation({ accounts, navigation }) {
 	const completePath = `${existedNetworkPath}${derivationPath}`;
 
 	return (
-		<View style={styles.container}>
+		<KeyboardScrollView style={styles.container}>
 			<ScreenHeading title="Derive Account" subtitle={existedNetworkPath} />
 			{!isPathValid && <Text>Invalid Path</Text>}
 			<TextInput
@@ -60,10 +62,7 @@ function PathDerivation({ accounts, navigation }) {
 				onChangeText={keyParisName => setKeyPairsName(keyParisName)}
 			/>
 			<Separator style={{ height: 0 }} />
-			{/* TODO: Identity bind */}
-			{/* {networkKey !== '' && (
-				// <PathCard identity="{currentIdentity}" path={derivationPath} />
-			)} */}
+			<PathCard identity={accounts.state.currentIdentity} path={completePath} />
 			<ButtonMainAction
 				disabled={!validateDerivedPath(derivationPath)}
 				bottom={false}
@@ -88,7 +87,7 @@ function PathDerivation({ accounts, navigation }) {
 					}
 				}}
 			/>
-		</View>
+		</KeyboardScrollView>
 	);
 }
 
