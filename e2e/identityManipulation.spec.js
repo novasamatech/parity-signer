@@ -24,6 +24,24 @@ const {
 } = testIDs;
 
 const pinCode = '123456';
+const mockIdentityName = 'mockIdentity';
+const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '2'; //Need change if network list changes
+const fundingPath = '//funding/0';
+const mockSeedPhrase =
+	'split cradle example drum veteran swear cruel pizza guilt surface mansion film grant benefit educate marble cargo ignore bind include advance grunt exile grow';
+
+const testSetUpDefaultPath = async () => {
+	await testInput(IdentityPin.setPin, pinCode);
+	await testInput(IdentityPin.confirmPin, pinCode);
+	await testTap(IdentityPin.submitButton);
+	await testVisible(AccountNetworkChooser.chooserScreen);
+	await testScrollAndTap(
+		substrateNetworkButtonIndex,
+		testIDs.AccountNetworkChooser.chooserScreen
+	);
+	await testUnlockPin(pinCode);
+	await testExist(PathsList.pathCard + '//kusama_CC2//default');
+};
 
 describe('Load test', async () => {
 	beforeAll(async () => {
@@ -41,28 +59,23 @@ describe('Load test', async () => {
 		await testVisible(AccountNetworkChooser.noAccountScreen);
 	});
 
-	it('create a new identity with default substrate account', async () => {
-		const substrateNetworkButtonIndex =
-			AccountNetworkChooser.networkButton + '2'; //Need change if network list changes
+	it('recover a identity with seed phrase', async () => {
+		await testTap(AccountNetworkChooser.recoverButton);
+		await testVisible(IdentityNew.seedInput);
+		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
+		await testInput(IdentityNew.nameInput, mockIdentityName);
+		await testTap(IdentityNew.recoverButton);
+		await testSetUpDefaultPath();
+	});
 
+	it('create a new identity with default substrate account', async () => {
 		await testTap(AccountNetworkChooser.createButton);
 		await testNotVisible(IdentityNew.seedInput);
 		await testTap(IdentityNew.createButton);
 		await testVisible(IdentityBackup.seedText);
 		await testTap(IdentityBackup.nextButton);
-		await testInput(IdentityPin.setPin, pinCode);
-		await testInput(IdentityPin.confirmPin, pinCode);
-		await testTap(IdentityPin.submitButton);
-		await testVisible(AccountNetworkChooser.chooserScreen);
-		await testScrollAndTap(
-			substrateNetworkButtonIndex,
-			testIDs.AccountNetworkChooser.chooserScreen
-		);
-		await testUnlockPin(pinCode);
-		await testExist(PathsList.pathCard + '//kusama_CC2//default');
+		await testSetUpDefaultPath();
 	});
-
-	const fundingPath = '//funding/0';
 
 	it('derive a new key', async () => {
 		await testTap(PathsList.deriveButton);

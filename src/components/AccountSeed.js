@@ -132,7 +132,7 @@ export default class AccountSeed extends Component {
 		return (
 			<View>
 				<TextInput
-					style={[styles.input, invalidStyles]}
+					style={{ ...styles.input, ...invalidStyles }}
 					multiline
 					autoCorrect={false}
 					autoCompleteType="off"
