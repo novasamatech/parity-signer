@@ -63,7 +63,7 @@ export default class TxDetails extends React.PureComponent {
 											return this.props.navigation.navigate(
 												'AccountUnlockAndSign',
 												{
-													next: 'SignedMessage'
+													next: 'SignedTx'
 												}
 											);
 										}
