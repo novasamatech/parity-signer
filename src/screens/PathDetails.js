@@ -39,7 +39,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	};
 
 	return (
-		<ScrollView style={styles.body}>
+		<View style={styles.body}>
 			<ScreenHeading small={true} title="Public Address" />
 			<View style={styles.menuView}>
 				<PopupMenu
@@ -57,11 +57,13 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					]}
 				/>
 			</View>
-			<PathCard identity={currentIdentity} path={path} />
-			{networkKey !== UnknownNetworkKeys.UNKNOWN && address !== '' && (
-				<QrView data={address} />
-			)}
-		</ScrollView>
+			<ScrollView>
+				<PathCard identity={currentIdentity} path={path} />
+				{networkKey !== UnknownNetworkKeys.UNKNOWN && address !== '' && (
+					<QrView data={address} />
+				)}
+			</ScrollView>
+		</View>
 	);
 }
 

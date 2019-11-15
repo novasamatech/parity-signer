@@ -40,6 +40,7 @@ import {
 import testIDs from '../../e2e/testIDs';
 import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
+import Separator from '../components/Separator';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
@@ -138,14 +139,16 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
-				<AccountCard
-					address={'new'}
-					isNetworkCard={true}
-					onPress={() => setShouldShowMoreNetworks(true)}
-					title="Add Network Account"
-					networkColor={colors.bg}
-					style={{ marginBottom: 92 }}
-				/>
+				<>
+					<AccountCard
+						address={'new'}
+						isNetworkCard={true}
+						onPress={() => setShouldShowMoreNetworks(true)}
+						title="Add Network Account"
+						networkColor={colors.bg}
+					/>
+					<Separator style={{ backgroundColor: 'transparent', height: 120 }} />
+				</>
 			);
 		}
 	};

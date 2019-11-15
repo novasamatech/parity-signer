@@ -93,13 +93,15 @@ export default function PathCard({ onPress, identity, path, testID }) {
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
 							<Text style={fontStyles.t_codeS}>{path}</Text>
 						</View>
-						<Text
-							style={fontStyles.t_codeS}
-							ellipsizeMode="middle"
-							numberOfLines={1}
-						>
-							{extractAddress}
-						</Text>
+						{extractAddress !== '' && (
+							<Text
+								style={fontStyles.t_codeS}
+								ellipsizeMode="middle"
+								numberOfLines={1}
+							>
+								{extractAddress}
+							</Text>
+						)}
 					</View>
 				</View>
 			</TouchableItem>

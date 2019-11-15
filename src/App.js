@@ -34,7 +34,6 @@ import { MenuProvider } from 'react-native-popup-menu';
 import '../shim';
 import Background from './components/Background';
 import colors from './colors';
-import fonts from './fonts';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import '../ReactotronConfig';
@@ -108,18 +107,19 @@ export default class App extends Component {
 
 const globalStackNavigationOptions = {
 	headerBackTitleStyle: {
-		fontFamily: fonts.semiBold,
-		fontSize: 20
+		color: colors.bg_text_sec
 	},
 	headerRight: <SecurityHeader />,
 	headerStyle: {
 		backgroundColor: colors.bg,
+		borderBottomColor: colors.bg,
+		borderBottomWidth: 0,
 		elevation: 0,
 		height: 60,
 		paddingBottom: 0,
 		paddingTop: 0
 	},
-	headerTintColor: colors.card_bg,
+	headerTintColor: colors.bg_text_sec,
 	headerTitleStyle: {
 		display: 'none'
 	}
@@ -135,7 +135,7 @@ const SecurityHeaderBackButton = withNavigation(
 					{...this.props}
 					titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
 					title="Back"
-					tintColor={colors.card_bg}
+					tintColor={colors.bg_text}
 					onPress={() => navigation.goBack(null)}
 				/>
 			);

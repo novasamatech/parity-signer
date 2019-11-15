@@ -15,8 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { FlatList, Modal, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { FlatList, Modal, View, TouchableWithoutFeedback } from 'react-native';
+import { withNavigation, ScrollView } from 'react-navigation';
 
 import ButtonIcon from './ButtonIcon';
 import colors from '../colors';
@@ -174,16 +174,18 @@ function IdentitiesSwitch({ navigation, accounts }) {
 
 		return (
 			<>
-				<FlatList
-					data={identitiesToShow}
-					renderItem={renderNonSelectedIdentity}
-					keyExtractor={item => item.encryptedSeed}
-					style={{ flexGrow: 0, maxHeight: 210 }}
-				/>
-				{identities.length > 4 && (
+				<ScrollView style={{ maxHeight: 180 }}>
+					<FlatList
+						data={identitiesToShow}
+						renderItem={renderNonSelectedIdentity}
+						keyExtractor={item => item.encryptedSeed}
+						style={{ paddingVertical: identities.length > 5 ? 8 : 0 }}
+					/>
+				</ScrollView>
+				{identities.length > 5 && (
 					<Separator
 						shadow={true}
-						style={{ height: 0, marginTop: 0 }}
+						style={{ backgroundColor: 'transparent', marginTop: 0 }}
 						shadowStyle={{ opacity: 0.9 }}
 					/>
 				)}
@@ -200,73 +202,74 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				iconBgStyle={{ backgroundColor: 'transparent' }}
 				testID={testIDs.IdentitiesSwitch.toggleButton}
 			/>
+
 			<Modal
 				animationType="fade"
 				visible={visible}
 				transparent={true}
 				onRequestClose={() => setVisible(false)}
 			>
-				<View style={styles.container}>
-					<View style={styles.headerStyle}>
-						<ButtonIcon
-							onPress={() => {
-								setVisible(false);
-							}}
-							iconName="close"
-							iconType="antdesign"
-							iconBgStyle={{ backgroundColor: 'black' }}
-						/>
-					</View>
-					<View style={styles.card}>
-						{renderCurrentIdentityCard()}
-						{renderIdentities()}
-						{accounts.getAccounts().size > 0 && (
-							<>
-								<ButtonIcon
-									title="Legacy Accounts"
-									onPress={() => {
-										setVisible(false);
-										navigation.navigate('LegacyAccountList');
-									}}
-									iconName="solution1"
-									iconType="antdesign"
-									iconSize={24}
-									textStyle={fontStyles.t_big}
-									style={{ paddingLeft: 8 * 4 }}
-								/>
-								<Separator />
-							</>
-						)}
+				<TouchableWithoutFeedback
+					style={{ flex: 1 }}
+					onPressIn={() => setVisible(false)}
+				>
+					<View
+						style={styles.container}
+						onPress={() => {
+							setVisible(false);
+						}}
+					>
+						<View style={styles.card}>
+							{renderCurrentIdentityCard()}
+							{renderIdentities()}
+							{accounts.getAccounts().size > 0 && (
+								<>
+									<ButtonIcon
+										title="Legacy Accounts"
+										onPress={() => {
+											setVisible(false);
+											navigation.navigate('LegacyAccountList');
+										}}
+										iconName="solution1"
+										iconType="antdesign"
+										iconSize={24}
+										textStyle={fontStyles.t_big}
+										style={{ paddingLeft: 8 * 4 }}
+									/>
+									<Separator />
+								</>
+							)}
 
-						<ButtonIcon
-							title="Add Identity"
-							onPress={() => {
-								setVisible(false);
-								navigation.navigate('IdentityNew');
-							}}
-							iconName="plus"
-							iconType="antdesign"
-							iconSize={24}
-							textStyle={fontStyles.t_big}
-							style={{ paddingLeft: 8 * 4 }}
-						/>
-						<Separator />
-						<ButtonIcon
-							title="Add legacy account"
-							onPress={() => {
-								setVisible(false);
-								navigation.navigate('AccountNew');
-							}}
-							iconName="plus"
-							iconType="antdesign"
-							iconSize={24}
-							textStyle={fontStyles.t_big}
-							style={{ paddingLeft: 8 * 4 }}
-						/>
-						<Separator />
-						{renderSettings()}
+							<ButtonIcon
+								title="Add Identity"
+								onPress={() => {
+									setVisible(false);
+									navigation.navigate('IdentityNew');
+								}}
+								iconName="plus"
+								iconType="antdesign"
+								iconSize={24}
+								textStyle={fontStyles.t_big}
+								style={{ paddingLeft: 8 * 4 }}
+							/>
+							<Separator />
+							<ButtonIcon
+								title="Add legacy account"
+								onPress={() => {
+									setVisible(false);
+									navigation.navigate('AccountNew');
+								}}
+								iconName="plus"
+								iconType="antdesign"
+								iconSize={24}
+								textStyle={fontStyles.t_big}
+								style={{ paddingLeft: 8 * 4 }}
+							/>
+							<Separator />
+							{renderSettings()}
+						</View>
 					</View>
-				</View>
+				</TouchableWithoutFeedback>
 			</Modal>
 		</View>
 	);
@@ -282,23 +285,20 @@ const styles = {
 	container: {
 		backgroundColor: 'rgba(0,0,0,0.8)',
 		flex: 1,
+		justifyContent: 'center',
+		marginTop: -24,
 		paddingLeft: 16,
 		paddingRight: 16
-	},
-	headerStyle: {
-		alignItems: 'flex-end',
-		height: 60,
-		justifyContent: 'center'
 	},
 	i_arrowBg: {
 		backgroundColor: 'rgba(0,0,0,0)',
 		width: 12
 	},
 	i_arrowStyle: {
-		marginBottom: 6,
-		marginTop: 0,
 		opacity: 0.7,
-		paddingLeft: 8 * 8
+		paddingBottom: 6,
+		paddingLeft: 8 * 8,
+		paddingTop: 0
 	}
 };
 

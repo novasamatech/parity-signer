@@ -85,7 +85,6 @@ function PathsList({ accounts, navigation }) {
 			>
 				<Separator
 					shadow={true}
-					shadowStyle={{ height: 16, marginTop: -16 }}
 					style={{
 						backgroundColor: 'transparent',
 						height: 0,
