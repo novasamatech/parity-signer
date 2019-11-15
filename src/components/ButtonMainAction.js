@@ -26,6 +26,7 @@ export default class ButtonMainAction extends React.PureComponent {
 		bottom: PropTypes.bool,
 		disabled: PropTypes.bool,
 		onPress: PropTypes.func,
+		testID: PropTypes.string,
 		title: PropTypes.string
 	};
 	render() {

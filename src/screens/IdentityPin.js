@@ -192,7 +192,7 @@ class PinInput extends Component {
 				numberOfLines={1}
 				returnKeyType="next"
 				secureTextEntry
-				style={[fontStyles.t_seed, styles.pinInput]}
+				style={{ ...fontStyles.t_seed, ...styles.pinInput }}
 				{...this.props}
 			/>
 		);

@@ -9,7 +9,7 @@ import colors from '../colors';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
-	getNetworkKeyBySubstratePath,
+	getNetworkKeyByPath,
 	isSubstratePath
 } from '../util/identitiesUtils';
 import { UnknownNetworkKeys } from '../constants';
@@ -67,7 +67,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 function PathDetails({ accounts, navigation }) {
 	const path = navigation.getParam('path', '');
-	const networkKey = getNetworkKeyBySubstratePath(path);
+	const networkKey = getNetworkKeyByPath(path);
 	return (
 		<PathDetailsView
 			accounts={accounts}

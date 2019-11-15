@@ -43,7 +43,7 @@ import {
 	deepCopyIdentities,
 	deepCopyIdentity,
 	emptyIdentity,
-	getNetworkKeyBySubstratePath
+	getNetworkKeyByPath
 } from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
@@ -232,11 +232,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async getById({ address, networkKey }) {
 		const generateAccountId = accountId({ address, networkKey });
 		const legacyAccount = this.state.accounts.get(generateAccountId);
-		if (legacyAccount) return;
-		return (
-			this.getAccountFromIdentity(generateAccountId) ||
-			emptyAccount(address, networkKey)
-		);
+		if (legacyAccount) return legacyAccount;
+		const derivedAccount = await this.getAccountFromIdentity(generateAccountId);
+		if (derivedAccount) return derivedAccount;
+		return emptyAccount(address, networkKey);
 	}
 
 	async getAccountFromIdentity(address) {
@@ -258,7 +257,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (!targetPath || !targetIdentity) return false;
 
 		const metaData = targetIdentity.meta.get(targetPath);
-		const networkKey = getNetworkKeyBySubstratePath(targetPath);
+		const networkKey = getNetworkKeyByPath(targetPath);
 		return {
 			...metaData,
 			encryptedSeed: targetIdentity.encryptedSeed,

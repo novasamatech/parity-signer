@@ -26,7 +26,7 @@ import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
 import colors from '../colors';
-import { getIdFromSubstrateAddress } from '../util/identitiesUtils';
+import { getIdFromAddress } from '../util/identitiesUtils';
 
 export default class AccountCard extends React.PureComponent {
 	static propTypes = {
@@ -47,6 +47,7 @@ export default class AccountCard extends React.PureComponent {
 	render() {
 		const {
 			address,
+			isNetworkCard,
 			networkKey,
 			networkColor,
 			onPress,
@@ -59,7 +60,8 @@ export default class AccountCard extends React.PureComponent {
 		const seedTypeDisplay = seedType || '';
 		const network =
 			NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
-		const extractAddress = getIdFromSubstrateAddress(address);
+
+		const extractAddress = getIdFromAddress(address, network.protocol);
 
 		return (
 			<TouchableItem
@@ -84,7 +86,7 @@ export default class AccountCard extends React.PureComponent {
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
-						{!network && (
+						{!isNetworkCard && (
 							<View>
 								<Text
 									style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
@@ -96,7 +98,7 @@ export default class AccountCard extends React.PureComponent {
 						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 							{title}
 						</Text>
-						{network && address !== '' && (
+						{address !== '' && (
 							<Address address={extractAddress} protocol={network.protocol} />
 						)}
 					</View>
