@@ -35,6 +35,7 @@ import {
 import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import testIDs from '../../e2e/testIDs';
 
 export default class SignedTx extends React.PureComponent {
 	render() {
@@ -72,7 +73,7 @@ export class SignedTxView extends React.PureComponent {
 			<ScrollView style={styles.body}>
 				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
 				<View style={styles.bodyContent}>
-					<View style={styles.qr}>
+					<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
 						<QrView data={data} />
 					</View>
 

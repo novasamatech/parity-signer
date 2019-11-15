@@ -18,6 +18,7 @@
 
 import {
 	NETWORK_LIST,
+	NetworkProtocols,
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys
 } from '../constants';
@@ -76,11 +77,15 @@ export const deepCopyIdentity = identity =>
 export const getPathsWithSubstrateNetwork = (paths, networkKey) =>
 	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
 
-export const getNetworkKeyBySubstratePath = path => {
+export const getNetworkKeyByPath = path => {
+	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
+		return path;
+	}
 	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
 		networkParams => networkParams.pathId === path.split('//')[1]
 	);
 	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
+
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
@@ -95,7 +100,7 @@ export const getAvailableNetworkKeys = identity => {
 	const networkKeysSet = addressesList.reduce((networksSet, path) => {
 		let networkKey;
 		if (isSubstratePath(path)) {
-			networkKey = getNetworkKeyBySubstratePath(path);
+			networkKey = getNetworkKeyByPath(path);
 		} else {
 			networkKey = path;
 		}
@@ -104,8 +109,16 @@ export const getAvailableNetworkKeys = identity => {
 	return Object.keys(networkKeysSet);
 };
 
-export const getIdFromSubstrateAddress = address =>
-	address.split(':')[1] || address;
+export const getIdFromAddress = (address, protocol) => {
+	if (!address) return '';
+	if (protocol === NetworkProtocols.SUBSTRATE) {
+		return address.split(':')[1] || address;
+	} else {
+		const withoutPrefix = address.split(':')[1] || address;
+		const withOut0x = withoutPrefix.split('0x')[1] || address;
+		return withOut0x.split('@')[0];
+	}
+};
 
 export const validatePath = path =>
 	/^\/\/([\w-_])+(\/\/?([\w-_])+)+$/.test(path);

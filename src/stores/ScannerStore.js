@@ -48,7 +48,7 @@ import {
 	asciiToHex,
 	encodeNumber
 } from '../util/decoders';
-import { Account } from './AccountsStore';
+import { Account } from './types';
 
 type TXRequest = Object;
 

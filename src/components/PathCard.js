@@ -4,8 +4,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import {
 	getAddressWithPath,
-	getIdFromSubstrateAddress,
-	getNetworkKeyBySubstratePath,
+	getIdFromAddress,
+	getNetworkKeyByPath,
 	getPathName
 } from '../util/identitiesUtils';
 import { NETWORK_LIST } from '../constants';
@@ -27,8 +27,9 @@ export default function PathCard({ onPress, identity, path, testID }) {
 	const pathName = getPathName(path, identity);
 	const address = getAddressWithPath(path, identity);
 
-	const networkKey = getNetworkKeyBySubstratePath(path);
+	const networkKey = getNetworkKeyByPath(path);
 	const network = NETWORK_LIST[networkKey];
+	const extractAddress = getIdFromAddress(address, network.protocol);
 
 	const nonSubstrateCard = (
 		<View testID={testID}>
@@ -42,7 +43,7 @@ export default function PathCard({ onPress, identity, path, testID }) {
 			/>
 			<View style={styles.content}>
 				<AccountIcon
-					address={address}
+					address={extractAddress}
 					protocol={network.protocol}
 					network={network}
 					style={styles.icon}
@@ -56,10 +57,7 @@ export default function PathCard({ onPress, identity, path, testID }) {
 					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 						{pathName}
 					</Text>
-					<Address
-						address={address.split(':')[1]}
-						protocol={network.protocol}
-					/>
+					<Address address={extractAddress} protocol={network.protocol} />
 				</View>
 				<View
 					style={[
@@ -82,7 +80,7 @@ export default function PathCard({ onPress, identity, path, testID }) {
 			>
 				<View style={[styles.content, styles.contentDer]}>
 					<AccountIcon
-						address={getIdFromSubstrateAddress(address)}
+						address={extractAddress}
 						protocol={network.protocol}
 						network={network}
 						style={styles.icon}
@@ -95,6 +93,13 @@ export default function PathCard({ onPress, identity, path, testID }) {
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
 							<Text style={fontStyles.t_codeS}>{path}</Text>
 						</View>
+						<Text
+							style={fontStyles.t_codeS}
+							ellipsizeMode="middle"
+							numberOfLines={1}
+						>
+							{extractAddress}
+						</Text>
 					</View>
 				</View>
 			</TouchableItem>

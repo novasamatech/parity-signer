@@ -140,6 +140,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			return (
 				<AccountCard
 					address={'new'}
+					isNetworkCard={true}
 					onPress={() => setShouldShowMoreNetworks(true)}
 					title="Add Network Account"
 					networkColor={colors.bg}
@@ -167,6 +168,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		else if (shouldShowMoreNetworks) return;
 		return (
 			<ButtonMainAction
+				testID={testIDs.AccountNetworkChooser.scanButton}
 				title={'Scan'}
 				onPress={() => navigation.navigate('QrScanner')}
 			/>
@@ -189,6 +191,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					.sort(sortNetworkKeys)
 					.map(([networkKey, networkParams], index) => (
 						<AccountCard
+							isNetworkCard={true}
 							address={''}
 							key={networkKey}
 							testID={testIDs.AccountNetworkChooser.networkButton + index}

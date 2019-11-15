@@ -31,7 +31,7 @@ export default class TextInput extends React.PureComponent {
 	};
 	static propTypes = {
 		fixedPrefix: PropTypes.string,
-		style: PropTypes.style
+		style: PropTypes.object
 	};
 
 	// Methods:
