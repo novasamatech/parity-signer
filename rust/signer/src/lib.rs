@@ -294,4 +294,14 @@ mod tests {
 
         assert!(is_valid);
     }
+
+    #[test]
+    fn test_substrate_sign1() {
+        let msg = "47900000100005301023c36776005aec2f32a34c109dc791a82edef980eec3be80da938ac9bcc68217220170000010c11111165030000fa030000e3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636dbb5aefb451e26bd64faf476301f980437d87c0d88dec1a8c7a3eb3cc82e9bbb0ec";
+        let signature = "0148106cfb9426aca99aacbde17f8175937692399ba6ec8c4d9341316baf82560abb18ddac642333c4fd9e2c3c42231651333ff0f7d36f7c09135f8063add8fc80";
+        let seed = "split cradle example drum veteran swear cruel pizza guilt surface mansion film grant benefit educate marble cargo ignore bind include advance grunt exile grow";
+        let is_valid = schnorrkel_verify(&seed, &msg, &signature).unwrap();
+
+        assert!(is_valid);
+    }
 }
