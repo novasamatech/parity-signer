@@ -59,11 +59,15 @@ export const navigateToSignedMessage = navigation => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
+				isNew: false,
+				routeName: 'AccountNetworkChooser'
+			}),
+			NavigationActions.navigate({
 				params: { isNew: true },
 				routeName: 'SignedMessage'
 			})
 		],
-		index: 0,
+		index: 1,
 		key: undefined
 	});
 	navigation.dispatch(resetAction);
@@ -73,11 +77,15 @@ export const navigateToSignedTx = navigation => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
+				isNew: false,
+				routeName: 'AccountNetworkChooser'
+			}),
+			NavigationActions.navigate({
 				params: { isNew: true },
 				routeName: 'SignedTx'
 			})
 		],
-		index: 0,
+		index: 1,
 		key: undefined
 	});
 	navigation.dispatch(resetAction);

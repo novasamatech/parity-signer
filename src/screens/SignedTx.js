@@ -72,13 +72,11 @@ export class SignedTxView extends React.PureComponent {
 		return (
 			<ScrollView style={styles.body}>
 				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
-				<View style={styles.bodyContent}>
-					<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
-						<QrView data={data} />
-					</View>
-
-					<Text style={styles.title}>TRANSACTION DETAILS</Text>
+				<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+					<QrView data={data} />
 				</View>
+
+				<Text style={styles.title}>TRANSACTION DETAILS</Text>
 				{NETWORK_LIST[sender.networkKey].protocol ===
 				NetworkProtocols.ETHEREUM ? (
 					<React.Fragment>
@@ -118,11 +116,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 40,
 		paddingTop: 24
 	},
-	bodyContent: {
-		padding: 16
-	},
 	qr: {
-		backgroundColor: colors.card_bg,
 		marginBottom: 20
 	},
 	title: {

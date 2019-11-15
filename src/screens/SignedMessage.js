@@ -91,7 +91,6 @@ const styles = StyleSheet.create({
 		padding: 10
 	},
 	qr: {
-		backgroundColor: colors.card_bg,
 		marginBottom: 20
 	},
 	title: {
