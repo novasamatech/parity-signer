@@ -294,14 +294,4 @@ mod tests {
 
         assert!(is_valid);
     }
-
-    #[test]
-    fn test_substrate_sign1() {
-        let seed = "split cradle example drum veteran swear cruel pizza guilt surface mansion film grant benefit educate marble cargo ignore bind include advance grunt exile grow";
-        let msg: String =  b"47900000100005301023c36776005aec2f32a34c109dc791a82edef980eec3be80da938ac9bcc68217220170000010c11111165030000fa030000e3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636dbb5aefb451e26bd64faf476301f980437d87c0d88dec1a8c7a3eb3cc82e9bbb0ec".to_hex();
-        let signature = substrate_brainwallet_sign(seed, &msg).unwrap();
-        let is_valid = schnorrkel_verify(&seed, &msg, &signature).unwrap();
-
-        assert!(is_valid);
-    }
 }
