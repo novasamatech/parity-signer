@@ -56,6 +56,7 @@ function PathsList({ accounts, navigation }) {
 		);
 	}
 	const { currentIdentity } = accounts.state;
+	if (!currentIdentity) return null;
 	const paths = Array.from(currentIdentity.meta.keys());
 	const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
 	const pathsGroups = groupPaths(listedPaths);

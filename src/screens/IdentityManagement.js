@@ -16,6 +16,7 @@ import PopupMenu from '../components/PopupMenu';
 
 function IdentityManagement({ accounts, navigation }) {
 	const { currentIdentity } = accounts.state;
+	if (!currentIdentity) return null;
 
 	const onOptionSelect = value => {
 		if (value === 'PathDelete') {

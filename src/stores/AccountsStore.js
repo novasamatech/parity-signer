@@ -434,7 +434,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 					identity.encryptedSeed === this.state.currentIdentity.encryptedSeed
 			);
 			newIdentities.splice(identityIndex, 1);
-			this.setState({ identities: newIdentities });
+			this.setState({
+				currentIdentity: null,
+				identities: newIdentities
+			});
 			await saveIdentities(newIdentities);
 			return true;
 		} catch (e) {
