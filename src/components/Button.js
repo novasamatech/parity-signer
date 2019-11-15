@@ -56,7 +56,8 @@ export default class Button extends React.PureComponent<{
 			textStyles,
 			onlyText,
 			buttonStyles,
-			testID
+			testID,
+			style
 		} = this.props;
 
 		const finalTextStyles = [textStyles];
@@ -84,7 +85,7 @@ export default class Button extends React.PureComponent<{
 				onPress={onPress}
 				testID={testID}
 			>
-				<View style={finalButtonStyles}>
+				<View style={[finalButtonStyles, style]}>
 					<Text style={[fontStyles.h1, finalTextStyles]} disabled={disabled}>
 						{title}
 					</Text>
