@@ -23,7 +23,6 @@ import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Button from '../components/Button';
-import fonts from '../fonts';
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
@@ -41,6 +40,7 @@ import testIDs from '../../e2e/testIDs';
 import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
 import Separator from '../components/Separator';
+import fontStyles from '../fontStyles';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
@@ -55,7 +55,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 
 	const TextButton = ({ text, isRecover }) => (
 		<Text
-			style={styles.link}
+			style={[fontStyles.quote, { textDecorationLine: 'underline' }]}
 			testID={
 				isRecover
 					? testIDs.AccountNetworkChooser.recoverButton
@@ -72,17 +72,25 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			<ScrollView
 				testID={testIDs.AccountNetworkChooser.noAccountScreen}
 				style={styles.body}
+				contentContainerStyle={{
+					flex: 1,
+					justifyContent: 'center',
+					padding: 16,
+					paddingBottom: 100
+				}}
 			>
 				<View style={styles.onboardingWrapper}>
-					<Text style={styles.onboardingText}>No Identity yet?{'\n'}</Text>
 					<TextButton text="Create" isRecover={false} />
-					<Text style={styles.onboardingText}> Or {'\n'}</Text>
-					<TextButton text="Recover" isRecover={true} />
-					<Text style={styles.onboardingText}>an account to get started.</Text>
+					<Text style={fontStyles.quote}> or </Text>
+					<TextButton text="recover" isRecover={true} />
+					<Text style={fontStyles.quote}>your identity to get started.</Text>
 					{hasLegacyAccount && (
 						<Button
-							title="Show Legacy Account"
+							title="Show Legacy Accounts"
 							onPress={() => navigation.navigate('LegacyAccountList')}
+							small={true}
+							onlyText={true}
+							style={{ marginLeft: -48 }}
 						/>
 					)}
 				</View>
@@ -241,13 +249,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column'
 	},
-	onboardingText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.regular,
-		fontSize: 20
-	},
 	onboardingWrapper: {
 		alignItems: 'center',
-		flex: 1
+		flexDirection: 'row',
+		flexWrap: 'wrap'
 	}
 });
