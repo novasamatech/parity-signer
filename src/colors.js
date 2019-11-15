@@ -24,5 +24,6 @@ export default {
 	card_bg: 'rgba(255, 255, 255, 0.15)',
 	card_bgSolid: '#323232',
 	card_bg_text_sec: '#999',
-	card_text: '#1A1A1A'
+	card_text: '#1A1A1A',
+	label_text: '#48A5C2'
 };

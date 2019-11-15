@@ -52,6 +52,18 @@ export default {
 		fontFamily: fonts.robotoBold,
 		fontSize: 13
 	},
+	t_label: {
+		backgroundColor: colors.label_text,
+		color: colors.card_text,
+		fontFamily: fonts.robotoMedium,
+		fontSize: 13
+	},
+	t_label_code: {
+		backgroundColor: colors.label_text,
+		color: colors.card_text,
+		fontFamily: fonts.robotoMono,
+		fontSize: 11
+	},
 	t_prefix: {
 		color: colors.bg_text,
 		fontFamily: fonts.roboto,

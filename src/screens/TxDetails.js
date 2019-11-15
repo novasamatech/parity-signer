@@ -128,41 +128,39 @@ export class TxDetailsView extends React.PureComponent {
 					address={sender.address}
 					networkKey={sender.networkKey}
 				/>
-				<View style={styles.bodyContent}>
-					<Text style={styles.title}>TRANSACTION DETAILS</Text>
+				<Text style={styles.title}>TRANSACTION DETAILS</Text>
 
-					{isEthereum ? (
-						<React.Fragment>
-							<TxDetailsCard
-								style={{ marginBottom: 20 }}
-								description="You are about to send the following amount"
-								value={value}
-								gas={gas}
-								gasPrice={gasPrice}
-							/>
-							<Text style={styles.title}>RECIPIENT</Text>
-							<AccountCard
-								title={recipient.name}
-								address={recipient.address}
-								networkKey={recipient.networkKey || ''}
-							/>
-						</React.Fragment>
-					) : (
-						<PayloadDetailsCard
+				{isEthereum ? (
+					<React.Fragment>
+						<TxDetailsCard
 							style={{ marginBottom: 20 }}
-							description="You are about to confirm sending the following extrinsic"
-							payload={prehash}
-							prefix={prefix}
+							description="You are about to send the following amount"
+							value={value}
+							gas={gas}
+							gasPrice={gasPrice}
 						/>
-					)}
-
-					<Button
-						buttonStyles={{ height: 60 }}
-						testID={testIDs.TxDetails.signButton}
-						title="Sign Transaction"
-						onPress={() => onNext()}
+						<Text style={styles.title}>RECIPIENT</Text>
+						<AccountCard
+							title={recipient.name}
+							address={recipient.address}
+							networkKey={recipient.networkKey || ''}
+						/>
+					</React.Fragment>
+				) : (
+					<PayloadDetailsCard
+						style={{ marginBottom: 20 }}
+						description="You are about to confirm sending the following extrinsic"
+						payload={prehash}
+						prefix={prefix}
 					/>
-				</View>
+				)}
+
+				<Button
+					buttonStyles={{ height: 60 }}
+					testID={testIDs.TxDetails.signButton}
+					title="Sign Transaction"
+					onPress={() => onNext()}
+				/>
 			</ScrollView>
 		);
 	}
@@ -185,9 +183,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingBottom: 40,
 		paddingTop: 24
-	},
-	bodyContent: {
-		padding: 16
 	},
 	changePinText: {
 		color: 'green',

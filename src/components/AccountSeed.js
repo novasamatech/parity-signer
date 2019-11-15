@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		height: 40,
 		marginHorizontal: 16,
-		marginTop: -8
+		marginTop: -8,
+		overflow: 'hidden'
 	}
 });

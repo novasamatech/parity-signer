@@ -25,12 +25,12 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
-import fonts from '../fonts';
 import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import kusamaMetadata from '../util/static-kusama';
 import substrateDevMetadata from '../util/static-substrate';
 import { shortString } from '../util/strings';
+import fontStyles from '../fontStyles';
 
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
@@ -286,7 +286,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 				return (
 					<View key={index} style={styles.callDetails}>
-						<Text>
+						<Text style={styles.subLabel}>
 							Call <Text style={styles.titleText}>{sectionMethod}</Text> with
 							the following arguments:
 						</Text>
@@ -322,6 +322,10 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		);
 	};
 
+	const renderGenesisHash = () => (
+		<Text style={styles.genesisHashText}>{value}</Text>
+	);
+
 	return (
 		<View style={[{ alignItems: 'baseline', justifyContent: 'flex-start' }]}>
 			<View
@@ -334,6 +338,8 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 					renderEraDetails()
 				) : label === 'Tip' ? (
 					renderTipDetails()
+				) : label === 'Genesis Hash' ? (
+					renderGenesisHash()
 				) : (
 					<Text style={styles.secondaryText}>
 						{useFallback ? value.toString() : value}
@@ -346,9 +352,8 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.card_bg,
 		flexDirection: 'column',
-		padding: 20,
+		padding: 10,
 		paddingTop: 10
 	},
 	callDetails: {
@@ -365,35 +370,36 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-around'
 	},
+	genesisHashText: {
+		...fontStyles.t_label_code,
+		paddingLeft: 5,
+		textAlign: 'left'
+	},
 	icon: {
 		height: 47,
 		width: 47
 	},
 	label: {
-		backgroundColor: colors.bg,
-		color: colors.card_bg,
-		fontFamily: fonts.bold,
-		fontSize: 20,
+		...fontStyles.t_label,
+		backgroundColor: colors.label_text,
+		paddingLeft: 5,
 		textAlign: 'left'
 	},
 	secondaryText: {
-		color: colors.card_text,
-		fontFamily: fonts.semiBold,
-		fontSize: 14,
+		...fontStyles.t_codeS,
+		color: colors.label_text,
 		paddingLeft: 8,
 		textAlign: 'left'
 	},
 	subLabel: {
-		backgroundColor: null,
-		color: colors.card_text,
-		fontFamily: fonts.bold,
-		fontSize: 14,
+		...fontStyles.t_codeS,
+		color: colors.label_text,
 		paddingLeft: 5,
 		textAlign: 'left'
 	},
 	titleText: {
-		color: colors.card_text,
-		fontFamily: fonts.bold,
+		...fontStyles.t_codeS,
+		color: colors.label_text,
 		fontSize: 14,
 		textAlign: 'center'
 	}
