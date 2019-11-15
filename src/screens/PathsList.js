@@ -75,12 +75,12 @@ function PathsList({ accounts, navigation }) {
 	};
 
 	const renderGroupPaths = pathsGroup => (
-		<View style={{ marginBottom: 16 }}>
+		<View style={{ marginTop: 24 }}>
 			<View
 				style={{
 					backgroundColor: colors.bg,
 					height: 64,
-					marginTop: 16
+					marginBottom: 14
 				}}
 			>
 				<Separator
@@ -97,7 +97,6 @@ function PathsList({ accounts, navigation }) {
 						alignItems: 'center',
 						flexDirection: 'row',
 						justifyContent: 'space-between',
-						marginBottom: 20,
 						marginTop: 16,
 						paddingHorizontal: 16
 					}}
@@ -121,7 +120,7 @@ function PathsList({ accounts, navigation }) {
 				</View>
 			</View>
 			{pathsGroup.paths.map(path => (
-				<View style={{ marginBottom: -14 }}>
+				<View style={{ marginBottom: -8 }}>
 					<PathCard
 						key={path}
 						testID={testIDs.PathsList.pathCard + path}

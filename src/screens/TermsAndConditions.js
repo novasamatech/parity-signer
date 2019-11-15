@@ -21,7 +21,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
-import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import ButtonMainAction from '../components/ButtonMainAction';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
@@ -39,7 +39,7 @@ export default class TermsAndConditions extends React.PureComponent {
 		const { tocAgreement, ppAgreement } = this.state;
 		return (
 			<View style={styles.body} testID={testIDs.TacScreen.tacView}>
-				<ScrollView contentContainerStyle={{}}>
+				<ScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 					<Markdown>{toc}</Markdown>
 				</ScrollView>
 
@@ -47,7 +47,9 @@ export default class TermsAndConditions extends React.PureComponent {
 					testID={testIDs.TacScreen.agreeTacButton}
 					style={{
 						alignItems: 'center',
-						flexDirection: 'row'
+						flexDirection: 'row',
+						paddingHorizontal: 16,
+						paddingVertical: 10
 					}}
 					onPress={() => {
 						this.setState({ tocAgreement: !tocAgreement });
@@ -55,17 +57,19 @@ export default class TermsAndConditions extends React.PureComponent {
 				>
 					<Icon
 						name={tocAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
-						style={[styles.text, { fontSize: 30 }]}
+						style={styles.icon}
 					/>
 
-					<Text style={[styles.text, { fontSize: 16 }]}>
+					<Text style={fontStyles.t_big}>
 						{'  I agree to the terms and conditions'}
 					</Text>
 				</TouchableItem>
 				<TouchableItem
 					style={{
 						alignItems: 'center',
-						flexDirection: 'row'
+						flexDirection: 'row',
+						paddingHorizontal: 16,
+						paddingVertical: 10
 					}}
 					onPress={() => {
 						this.setState({ ppAgreement: !ppAgreement });
@@ -74,10 +78,10 @@ export default class TermsAndConditions extends React.PureComponent {
 					<Icon
 						testID={testIDs.TacScreen.agreePrivacyButton}
 						name={ppAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
-						style={[styles.text, { fontSize: 30 }]}
+						style={styles.icon}
 					/>
 
-					<Text style={[styles.text, { fontSize: 16 }]}>
+					<Text style={fontStyles.t_big}>
 						<Text>{'  I agree to the '}</Text>
 						<Text
 							style={{ textDecorationLine: 'underline' }}
@@ -94,7 +98,7 @@ export default class TermsAndConditions extends React.PureComponent {
 					testID={testIDs.TacScreen.nextButton}
 					title="Next"
 					disabled={!ppAgreement || !tocAgreement}
-					style={{ marginBottom: 0, marginTop: 16 }}
+					style={{ marginBottom: 32, marginTop: 8 }}
 					bottom={false}
 					onPress={async () => {
 						const firstScreenActions = navigation.getParam(
@@ -114,33 +118,10 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flex: 1,
 		flexDirection: 'column',
-		overflow: 'hidden',
-		padding: 20
+		overflow: 'hidden'
 	},
-	bottom: {
-		flexBasis: 50,
-		paddingBottom: 15
-	},
-	text: {
-		color: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 14,
-		marginTop: 10
-	},
-	title: {
+	icon: {
 		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	top: {
-		flex: 1
+		fontSize: 30
 	}
 });

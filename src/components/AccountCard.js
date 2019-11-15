@@ -117,7 +117,7 @@ export default class AccountCard extends React.PureComponent {
 const styles = StyleSheet.create({
 	content: {
 		alignItems: 'center',
-		backgroundColor: colors.bg,
+		//backgroundColor: colors.bg,
 		flexDirection: 'row',
 		paddingLeft: 16
 	},

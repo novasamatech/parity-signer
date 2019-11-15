@@ -27,8 +27,7 @@ export default class Security extends React.PureComponent {
 					title="NOT SECURE"
 					iconName="shield-off"
 					iconType="feather"
-					subtitle="
-					A device is considered not secure if it has access to the internet or
+					subtitle="A device is considered not secure if it has access to the internet or
 					has any kind of connectivity enabled. Parity Signer is meant to be
 					used on a device that will be kept offline at any time. Enabling any
 					connectivity such as wifi, cellular network, bluetooth, NFC, usb is a

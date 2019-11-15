@@ -73,30 +73,32 @@ export default function PathCard({ onPress, identity, path, testID }) {
 		</View>
 	);
 	const substrateDerivationCard = (
-		<TouchableItem
-			accessibilityComponentType="button"
-			disabled={false}
-			onPress={onPress}
-			testID={testID}
-		>
-			<View style={[styles.content, styles.contentDer]}>
-				<AccountIcon
-					address={getIdFromSubstrateAddress(address)}
-					protocol={network.protocol}
-					network={network}
-					style={styles.icon}
-				/>
-				<View style={styles.desc}>
-					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
-						{pathName}
-					</Text>
-					<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-						<AntIcon name="user" size={10} color={colors.bg_text_sec} />
-						<Text style={fontStyles.t_codeS}>{path}</Text>
+		<View style={styles.body}>
+			<TouchableItem
+				accessibilityComponentType="button"
+				disabled={false}
+				onPress={onPress}
+				testID={testID}
+			>
+				<View style={[styles.content, styles.contentDer]}>
+					<AccountIcon
+						address={getIdFromSubstrateAddress(address)}
+						protocol={network.protocol}
+						network={network}
+						style={styles.icon}
+					/>
+					<View style={styles.desc}>
+						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+							{pathName}
+						</Text>
+						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
+							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
+							<Text style={fontStyles.t_codeS}>{path}</Text>
+						</View>
 					</View>
 				</View>
-			</View>
-		</TouchableItem>
+			</TouchableItem>
+		</View>
 	);
 
 	return network.protocol === 'substrate'
@@ -105,15 +107,17 @@ export default function PathCard({ onPress, identity, path, testID }) {
 }
 
 const styles = StyleSheet.create({
+	body: {
+		flexDirection: 'column',
+		marginBottom: 10
+	},
 	content: {
 		alignItems: 'center',
-		backgroundColor: colors.bg,
 		flexDirection: 'row',
 		paddingLeft: 16
 	},
 	contentDer: {
-		backgroundColor: colors.card_bgSolid,
-		marginTop: 16,
+		backgroundColor: colors.card_bg,
 		paddingVertical: 8
 	},
 	desc: {

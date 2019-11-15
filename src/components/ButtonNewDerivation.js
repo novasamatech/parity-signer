@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		elevation: 0,
 		height: 56,
-		marginBottom: 120,
-		marginTop: 16
+		marginBottom: 125,
+		marginTop: 24
 	},
 	text: {
 		letterSpacing: -0.4,

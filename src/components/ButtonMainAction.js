@@ -60,6 +60,7 @@ const styles = {
 		width: '100%'
 	},
 	button: {
+		elevation: 2,
 		position: 'absolute'
 	},
 	p_relative: {
