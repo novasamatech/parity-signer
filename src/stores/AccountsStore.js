@@ -232,9 +232,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async getById({ address, networkKey }) {
 		const generateAccountId = accountId({ address, networkKey });
 		const legacyAccount = this.state.accounts.get(generateAccountId);
-		if (legacyAccount) return legacyAccount;
+		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
 		const derivedAccount = await this.getAccountFromIdentity(generateAccountId);
-		if (derivedAccount) return derivedAccount;
+		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
 		return emptyAccount(address, networkKey);
 	}
 
@@ -263,7 +263,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			encryptedSeed: targetIdentity.encryptedSeed,
 			isBip39: true,
 			isLegacy: false,
-			networkKey
+			networkKey,
+			path: targetPath
 		};
 	}
 

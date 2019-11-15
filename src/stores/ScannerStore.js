@@ -49,6 +49,7 @@ import {
 	encodeNumber
 } from '../util/decoders';
 import { Account } from './types';
+import { constructSURI } from '../util/suri';
 
 type TXRequest = Object;
 
@@ -264,7 +265,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 				const dedupMissedFrames = new Set([
 					...this.state.missedFrames,
-					updatedMissedFrames
+					...updatedMissedFrames
 				]);
 
 				this.setState({
@@ -401,7 +402,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		return true;
 	}
 
-	async signDataWithSeed(seed) {
+	async signDataWithSuri(suri) {
 		const { dataToSign, isHash, sender } = this.state;
 
 		const isEthereum =
@@ -410,7 +411,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		let signedData;
 
 		if (isEthereum) {
-			signedData = await brainWalletSign(seed, dataToSign);
+			signedData = await brainWalletSign(suri, dataToSign);
 		} else {
 			let signable;
 
@@ -423,23 +424,29 @@ export default class ScannerStore extends Container<ScannerState> {
 			} else if (isAscii(dataToSign)) {
 				signable = hexStripPrefix(asciiToHex(dataToSign));
 			}
-
-			let signed = await substrateSign(seed, signable);
+			let signed = await substrateSign(suri, signable);
 			signed = '0x' + signed;
-
 			// TODO: tweak the first byte if and when sig type is not sr25519
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
-
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
 
 		this.setState({ signedData });
 	}
 
-	async signData(pin = '1') {
+	async signDataWithSeed(seed) {
+		const suri = constructSURI({
+			derivePath: this.state.sender.path,
+			password: '',
+			phrase: seed
+		});
+		await this.signDataWithSuri(suri);
+	}
+
+	async signDataLegacy(pin = '1') {
 		const { sender } = this.state;
-		const seed = await decryptData(sender.encryptedSeed, pin);
-		await this.signDataWithSeed(seed);
+		const suri = await decryptData(sender.encryptedSeed, pin);
+		await this.signDataWithSuri(suri);
 	}
 
 	cleanup() {
