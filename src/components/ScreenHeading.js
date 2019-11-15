@@ -89,7 +89,7 @@ export default class ScreenHeading extends React.PureComponent {
 					iconName="arrowleft"
 					iconType="antdesign"
 					onPress={onPress}
-					style={styles.icon}
+					style={[styles.icon, { left: 0, top: -8 }]}
 					iconBgStyle={{ backgroundColor: 'transparent' }}
 				/>
 			);
@@ -125,7 +125,6 @@ const styles = {
 	},
 	icon: {
 		marginLeft: 5,
-		marginTop: 0,
 		position: 'absolute'
 	},
 	subtitleIcon: {

@@ -55,7 +55,7 @@ const ButtonIcon = props => {
 		generalView: {
 			display: 'flex',
 			flexDirection: 'row',
-			marginVertical: 8
+			paddingVertical: 8
 		},
 		iconTitleView: {
 			alignItems: 'center',
@@ -105,39 +105,36 @@ const ButtonIcon = props => {
 
 	return (
 		<>
-			<View style={[styles.generalView, style]} testID={testID}>
+			<TouchableOpacity
+				accessibilityComponentType="button"
+				onPress={onPress}
+				activeOpacity={0.5}
+				style={[styles.generalView, style]}
+				testID={testID}
+			>
 				<View style={styles.iconTitleViewContainer}>
-					<Touchable accessibilityComponentType="button" onPress={onPress}>
-						<View style={styles.iconTitleView}>
-							<TouchableOpacity
-								style={[styles.iconView, iconBgStyle]}
-								onPress={onPress}
-							>
-								{renderIcon()}
-							</TouchableOpacity>
-							{!!title && (
-								<Text style={[styles.title, textStyle]}>{title}</Text>
-							)}
+					<View style={styles.iconTitleView}>
+						<View style={[styles.iconView, iconBgStyle]}>{renderIcon()}</View>
+						{!!title && <Text style={[styles.title, textStyle]}>{title}</Text>}
+					</View>
+				</View>
+			</TouchableOpacity>
+
+			{dropdown && (
+				<View>
+					<Touchable onPress={() => setIsDropsdownOpen(!isDropdownOpen)}>
+						<View style={styles.dropdownView}>
+							<Icon
+								color={colors.bg_text}
+								size={size - 4}
+								name={isDropdownOpen ? 'md-arrow-dropup' : 'md-arrow-dropdown'}
+								type="ionicon"
+							/>
 						</View>
 					</Touchable>
 				</View>
-				{dropdown && (
-					<View>
-						<Touchable onPress={() => setIsDropsdownOpen(!isDropdownOpen)}>
-							<View style={styles.dropdownView}>
-								<Icon
-									color={colors.bg_text}
-									size={size - 4}
-									name={
-										isDropdownOpen ? 'md-arrow-dropup' : 'md-arrow-dropdown'
-									}
-									type="ionicon"
-								/>
-							</View>
-						</Touchable>
-					</View>
-				)}
-			</View>
+			)}
+
 			{isDropdownOpen && renderDropdownElement()}
 		</>
 	);

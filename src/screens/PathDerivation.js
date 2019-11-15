@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
 import ButtonMainAction from '../components/ButtonMainAction';
 import { validateDerivedPath } from '../util/identitiesUtils';
@@ -44,54 +44,60 @@ function PathDerivation({ accounts, navigation }) {
 	const completePath = `${existedNetworkPath}${derivationPath}`;
 
 	return (
-		<KeyboardScrollView style={styles.container}>
+		<View style={styles.container}>
 			<ScreenHeading
 				title="Derive Account"
 				subtitle={existedNetworkPath}
 				subtitleIcon={true}
 			/>
-			{!isPathValid && <Text>Invalid Path</Text>}
-			<TextInput
-				label="Path"
-				placeholder="//hard/soft"
-				autoFocus
-				value={derivationPath}
-				testID={testIDs.PathDerivation.pathInput}
-				onChangeText={setDerivationPath}
-			/>
-			<TextInput
-				label="Display Name"
-				testID={testIDs.PathDerivation.nameInput}
-				value={keyPairsName}
-				onChangeText={keyParisName => setKeyPairsName(keyParisName)}
-			/>
-			<Separator style={{ height: 0 }} />
-			<PathCard identity={accounts.state.currentIdentity} path={completePath} />
-			<ButtonMainAction
-				disabled={!validateDerivedPath(derivationPath)}
-				bottom={false}
-				title="Derive Address"
-				testID={testIDs.PathDerivation.deriveButton}
-				onPress={async () => {
-					if (!validateDerivedPath(derivationPath)) {
-						return setIsPathValid(false);
-					}
-					const seed = await unlockSeed(navigation);
-					const derivationSucceed = await accounts.deriveNewPath(
-						completePath,
-						seed,
-						NETWORK_LIST[networkKey].prefix,
-						networkKey
-					);
-					if (derivationSucceed) {
-						navigateToPathsList(navigation, networkKey);
-					} else {
-						setIsPathValid(false);
-						alertPathDerivationError();
-					}
-				}}
-			/>
-		</KeyboardScrollView>
+			<KeyboardScrollView>
+				{!isPathValid && <Text>Invalid Path</Text>}
+				<TextInput
+					label="Path"
+					placeholder="//hard/soft"
+					autoFocus
+					value={derivationPath}
+					testID={testIDs.PathDerivation.pathInput}
+					onChangeText={setDerivationPath}
+				/>
+				<TextInput
+					label="Display Name"
+					testID={testIDs.PathDerivation.nameInput}
+					value={keyPairsName}
+					onChangeText={keyParisName => setKeyPairsName(keyParisName)}
+				/>
+				<Separator style={{ height: 0 }} />
+				<PathCard
+					identity={accounts.state.currentIdentity}
+					path={completePath}
+				/>
+				<ButtonMainAction
+					disabled={!validateDerivedPath(derivationPath)}
+					bottom={false}
+					style={{ marginTop: 8 }}
+					title="Derive Address"
+					testID={testIDs.PathDerivation.deriveButton}
+					onPress={async () => {
+						if (!validateDerivedPath(derivationPath)) {
+							return setIsPathValid(false);
+						}
+						const seed = await unlockSeed(navigation);
+						const derivationSucceed = await accounts.deriveNewPath(
+							completePath,
+							seed,
+							NETWORK_LIST[networkKey].prefix,
+							networkKey
+						);
+						if (derivationSucceed) {
+							navigateToPathsList(navigation, networkKey);
+						} else {
+							setIsPathValid(false);
+							alertPathDerivationError();
+						}
+					}}
+				/>
+			</KeyboardScrollView>
+		</View>
 	);
 }
 
