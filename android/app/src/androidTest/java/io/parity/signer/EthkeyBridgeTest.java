@@ -75,10 +75,10 @@ public class EthkeyBridgeTest {
     ReactApplicationContext reactApplicationContext = new ReactApplicationContext(ApplicationProvider.getApplicationContext());
     EthkeyBridge ethkey = new EthkeyBridge(reactApplicationContext);
 
-    @Test
-    public void testFailsWithoutBiometricAuth() {
-        this.ethkey.secureContains(TEST_APP, TEST_KEY, new TestPromise(false, false));
-        this.ethkey.securePut(TEST_APP, TEST_KEY, TEST_PIN, false, new TestPromise(null, false));
-        this.ethkey.secureContains(TEST_APP, TEST_KEY, new TestPromise(true, false));
-    }
+//    @Test
+//    public void testFailsWithoutBiometricAuth() {
+//        this.ethkey.secureContains(TEST_APP, TEST_KEY, new TestPromise(false, false));
+//        this.ethkey.securePut(TEST_APP, TEST_KEY, TEST_PIN, false, new TestPromise(null, false));
+//        this.ethkey.secureContains(TEST_APP, TEST_KEY, new TestPromise(true, false));
+//    }
 }

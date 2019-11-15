@@ -99,7 +99,7 @@
         "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone SE"
+          "type": "iPhone 8"
         }
       },
       "ios.sim.release": {
@@ -107,7 +107,7 @@
         "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=NO | xcpretty -t && exit ${PIPESTATUS[0]}",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone SE"
+          "type": "iPhone 8"
         }
       },
       "android.emu.debug": {
