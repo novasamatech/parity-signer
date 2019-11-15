@@ -19,7 +19,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
 
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
@@ -33,80 +32,62 @@ import {
 	TX_DETAILS_MSG
 } from '../constants';
 import fonts from '../fonts';
-import AccountsStore from '../stores/AccountsStore';
-import ScannerStore from '../stores/ScannerStore';
 import testIDs from '../../e2e/testIDs';
+import { withScannerStore } from '../util/HOC';
 
-export default class SignedTx extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scanner, accounts) => {
-					return (
-						<SignedTxView
-							{...scanner.getTx()}
-							data={scanner.getSignedTxData()}
-							recipient={scanner.getRecipient()}
-							sender={scanner.getSender()}
-						/>
-					);
-				}}
-			</Subscribe>
-		);
-	}
-}
+SignedTx.propTypes = {
+	data: PropTypes.string.isRequired,
+	gas: PropTypes.string,
+	gasPrice: PropTypes.string,
+	recipient: PropTypes.object,
+	sender: PropTypes.object,
+	value: PropTypes.string
+};
+export function SignedTx({ scanner }) {
+	const { gas, gasPrice, value } = scanner.getTx();
+	const data = scanner.getSignedTxData();
+	const recipient = scanner.getRecipient();
+	const sender = scanner.getSender();
 
-export class SignedTxView extends React.PureComponent {
-	static propTypes = {
-		data: PropTypes.string.isRequired,
-		gas: PropTypes.string,
-		gasPrice: PropTypes.string,
-		recipient: PropTypes.object,
-		sender: PropTypes.object,
-		value: PropTypes.string
-	};
+	return (
+		<ScrollView style={styles.body}>
+			<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
+			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+				<QrView data={data} />
+			</View>
 
-	render() {
-		const { data, gas, gasPrice, recipient, sender, value } = this.props;
-
-		return (
-			<ScrollView style={styles.body}>
-				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
-				<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
-					<QrView data={data} />
-				</View>
-
-				<Text style={styles.title}>TRANSACTION DETAILS</Text>
-				{NETWORK_LIST[sender.networkKey].protocol ===
-				NetworkProtocols.ETHEREUM ? (
-					<React.Fragment>
-						<TxDetailsCard
-							style={{ marginBottom: 20 }}
-							description={TX_DETAILS_MSG}
-							value={value}
-							gas={gas}
-							gasPrice={gasPrice}
-						/>
-						<Text style={styles.title}>RECIPIENT</Text>
-						<AccountCard
-							address={recipient.address}
-							networkKey={recipient.networkKey || ''}
-							title={recipient.name}
-						/>
-					</React.Fragment>
-				) : (
-					<PayloadDetailsCard
+			<Text style={styles.title}>TRANSACTION DETAILS</Text>
+			{NETWORK_LIST[sender.networkKey].protocol ===
+			NetworkProtocols.ETHEREUM ? (
+				<React.Fragment>
+					<TxDetailsCard
 						style={{ marginBottom: 20 }}
 						description={TX_DETAILS_MSG}
-						protocol={SUBSTRATE_NETWORK_LIST[sender.networkKey].protocol}
-						prefix={SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix}
-						signature={data}
+						value={value}
+						gas={gas}
+						gasPrice={gasPrice}
 					/>
-				)}
-			</ScrollView>
-		);
-	}
+					<Text style={styles.title}>RECIPIENT</Text>
+					<AccountCard
+						address={recipient.address}
+						networkKey={recipient.networkKey || ''}
+						title={recipient.name}
+					/>
+				</React.Fragment>
+			) : (
+				<PayloadDetailsCard
+					style={{ marginBottom: 20 }}
+					description={TX_DETAILS_MSG}
+					protocol={SUBSTRATE_NETWORK_LIST[sender.networkKey].protocol}
+					prefix={SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix}
+					signature={data}
+				/>
+			)}
+		</ScrollView>
+	);
 }
+
+export default withScannerStore(SignedTx);
 
 const styles = StyleSheet.create({
 	body: {
