@@ -37,6 +37,7 @@ import ScannerStore from '../stores/ScannerStore';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import { navigateToSignedTx, unlockSeed } from '../util/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
+import testIDs from '../../e2e/testIDs';
 
 export default class TxDetails extends React.PureComponent {
 	render() {
@@ -116,7 +117,7 @@ export class TxDetailsView extends React.PureComponent {
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
 
 		return (
-			<ScrollView style={styles.body}>
+			<ScrollView style={styles.body} testID={testIDs.TxDetails.scrollScreen}>
 				<Background />
 				<Text style={styles.topTitle}>SIGN TRANSACTION</Text>
 				<View style={styles.bodyContent}>
@@ -157,6 +158,7 @@ export class TxDetailsView extends React.PureComponent {
 
 					<Button
 						buttonStyles={{ height: 60 }}
+						testID={testIDs.TxDetails.signButton}
 						title="Sign Transaction"
 						onPress={() => onNext()}
 					/>

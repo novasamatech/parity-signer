@@ -9,6 +9,7 @@ const testIDs = {
 		networkButton: 'anc_network_button',
 		noAccountScreen: 'anc_no_account_screen',
 		recoverButton: 'anc_recover_button',
+		scanButton: 'anc_scan_button',
 		showExistedButton: 'anc_show_existed'
 	},
 	IdentitiesSwitch: {
@@ -50,11 +51,19 @@ const testIDs = {
 		pathCard: 'path_list_path_card',
 		scanButton: 'path_list_scan_button'
 	},
+	SignedMessage: {},
+	SignedTx: {
+		qrView: 'signed_tx_qr_view'
+	},
 	TacScreen: {
 		agreePrivacyButton: 'tac_privacy',
 		agreeTacButton: 'tac_agree',
 		nextButton: 'tac_next',
 		tacView: 'tac_view'
+	},
+	TxDetails: {
+		scrollScreen: 'tx_details_scroll',
+		signButton: 'tx_details_sign_button'
 	}
 };
 

@@ -20,12 +20,14 @@ const {
 	IdentityPin,
 	PathDerivation,
 	PathDetail,
-	PathsList
+	PathsList,
+	SignedTx,
+	TxDetails
 } = testIDs;
 
 const pinCode = '123456';
 const mockIdentityName = 'mockIdentity';
-const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '2'; //Need change if network list changes
+const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '0'; //Need change if network list changes
 const fundingPath = '//funding/0';
 const mockSeedPhrase =
 	'split cradle example drum veteran swear cruel pizza guilt surface mansion film grant benefit educate marble cargo ignore bind include advance grunt exile grow';
@@ -40,15 +42,15 @@ const testSetUpDefaultPath = async () => {
 		testIDs.AccountNetworkChooser.chooserScreen
 	);
 	await testUnlockPin(pinCode);
-	await testExist(PathsList.pathCard + '//kusama_CC2//default');
+	await testExist(PathsList.pathCard + '//substrate_dev//default');
 };
 
 describe('Load test', async () => {
 	beforeAll(async () => {
 		if (device.getPlatform() === 'ios') {
 			await device.clearKeychain();
-			await device.launchApp();
 		}
+		await device.launchApp({ permissions: { camera: 'YES' } });
 	});
 
 	it('should have account list screen', async () => {
@@ -84,6 +86,13 @@ describe('Load test', async () => {
 		await testTap(PathDerivation.deriveButton);
 		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
+	});
+
+	it('should sign the transaction', async () => {
+		await testTap(AccountNetworkChooser.scanButton);
+		await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
+		await testUnlockPin(pinCode);
+		await testVisible(SignedTx.qrView);
 	});
 
 	it('delete a path', async () => {

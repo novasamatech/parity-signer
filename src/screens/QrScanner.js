@@ -30,7 +30,7 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { isAddressString, isJsonString, rawDataToU8A } from '../util/decoders';
 import ScreenHeading from '../components/ScreenHeading';
-import { createDataSignRequest, signingTestIdentityPath } from '../../e2e/mock';
+import { createMockSignRequest } from '../../e2e/mock';
 
 export default class Scanner extends React.PureComponent {
 	constructor(props) {
@@ -131,11 +131,9 @@ export function QrScannerView({
 	...props
 }) {
 	useEffect(() => {
-		const defaultAccountAddress = accountStore.state.currentIdentity.meta.get(
-			signingTestIdentityPath
-		);
 		if (global.inTest) {
-			props.onBarCodeRead(createDataSignRequest(defaultAccountAddress));
+			props.onBarCodeRead(createMockSignRequest());
+			return () => {};
 		}
 		const setBusySubscription = navigation.addListener('willFocus', () => {
 			scannerStore.setReady();
