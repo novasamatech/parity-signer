@@ -96,7 +96,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			<View style={[styles.body, style]}>
 				<Text style={styles.titleText}>{description}</Text>
 				{!!payload && (
-					<View style={{ padding: 5, paddingVertical: 2 }}>
+					<View style={{ paddingVertical: 2 }}>
 						<ExtrinsicPart
 							label="Block Hash"
 							prefix={prefix}
@@ -130,9 +130,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 					</View>
 				)}
 				{!!signature && (
-					<View
-						style={{ alignItems: 'baseline', padding: 5, paddingVertical: 2 }}
-					>
+					<View style={{ alignItems: 'baseline', paddingVertical: 2 }}>
 						<Text style={styles.label}>Signature</Text>
 						<Text style={styles.secondaryText}>{signature}</Text>
 					</View>
@@ -328,9 +326,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 	return (
 		<View style={[{ alignItems: 'baseline', justifyContent: 'flex-start' }]}>
-			<View
-				style={{ margin: 5, padding: 5, paddingVertical: 2, width: '100%' }}
-			>
+			<View style={{ marginVertical: 5, paddingVertical: 2, width: '100%' }}>
 				<Text style={styles.label}>{label}</Text>
 				{label === 'Method' && !useFallback ? (
 					renderMethodDetails()
@@ -353,7 +349,6 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 const styles = StyleSheet.create({
 	body: {
 		flexDirection: 'column',
-		padding: 10,
 		paddingTop: 10
 	},
 	callDetails: {

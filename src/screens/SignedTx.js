@@ -16,8 +16,7 @@
 
 'use strict';
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import colors from '../colors';
@@ -28,88 +27,90 @@ import QrView from '../components/QrView';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST,
-	TX_DETAILS_MSG
+	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import fonts from '../fonts';
 import testIDs from '../../e2e/testIDs';
 import { withScannerStore } from '../util/HOC';
+import fontStyles from '../fontStyles';
 
-SignedTx.propTypes = {
-	data: PropTypes.string.isRequired,
-	gas: PropTypes.string,
-	gasPrice: PropTypes.string,
-	recipient: PropTypes.object,
-	sender: PropTypes.object,
-	value: PropTypes.string
-};
 export function SignedTx({ scanner }) {
 	const { gas, gasPrice, value } = scanner.getTx();
 	const data = scanner.getSignedTxData();
 	const recipient = scanner.getRecipient();
 	const sender = scanner.getSender();
 
+	useEffect(
+		() =>
+			function() {
+				scanner.cleanup();
+			},
+		[scanner]
+	);
+
 	return (
-		<ScrollView style={styles.body}>
-			<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
+		<ScrollView
+			contentContainerStyle={{ paddingBottom: 40 }}
+			style={styles.body}
+		>
+			<Text style={styles.topTitle}>Scan Signature</Text>
 			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
 				<QrView data={data} />
 			</View>
 
-			<Text style={styles.title}>TRANSACTION DETAILS</Text>
-			{NETWORK_LIST[sender.networkKey].protocol ===
-			NetworkProtocols.ETHEREUM ? (
-				<React.Fragment>
-					<TxDetailsCard
+			<Text style={styles.title}>Transaction Details</Text>
+			<View style={{ marginBottom: 20, marginHorizontal: 20 }}>
+				{NETWORK_LIST[sender.networkKey].protocol ===
+				NetworkProtocols.ETHEREUM ? (
+					<React.Fragment>
+						<TxDetailsCard
+							style={{ marginBottom: 20 }}
+							description={TX_DETAILS_MSG}
+							value={value}
+							gas={gas}
+							gasPrice={gasPrice}
+						/>
+						<Text style={styles.title}>Recipient</Text>
+						<AccountCard
+							address={recipient.address}
+							networkKey={recipient.networkKey || ''}
+							title={recipient.name}
+						/>
+					</React.Fragment>
+				) : (
+					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
 						description={TX_DETAILS_MSG}
-						value={value}
-						gas={gas}
-						gasPrice={gasPrice}
+						protocol={SUBSTRATE_NETWORK_LIST[sender.networkKey].protocol}
+						prefix={SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix}
+						signature={data}
 					/>
-					<Text style={styles.title}>RECIPIENT</Text>
-					<AccountCard
-						address={recipient.address}
-						networkKey={recipient.networkKey || ''}
-						title={recipient.name}
-					/>
-				</React.Fragment>
-			) : (
-				<PayloadDetailsCard
-					style={{ marginBottom: 20 }}
-					description={TX_DETAILS_MSG}
-					protocol={SUBSTRATE_NETWORK_LIST[sender.networkKey].protocol}
-					prefix={SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix}
-					signature={data}
-				/>
-			)}
+				)}
+			</View>
 		</ScrollView>
 	);
 }
 
 export default withScannerStore(SignedTx);
 
+const TX_DETAILS_MSG = 'After signing and publishing you will have sent';
+
 const styles = StyleSheet.create({
 	body: {
 		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		paddingBottom: 40,
 		paddingTop: 24
 	},
 	qr: {
 		marginBottom: 20
 	},
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
+		...fontStyles.h2,
+		marginHorizontal: 20,
 		paddingBottom: 20
 	},
 	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
+		...fontStyles.h1,
 		paddingBottom: 20,
 		textAlign: 'center'
 	}

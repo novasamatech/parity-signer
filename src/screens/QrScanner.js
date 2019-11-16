@@ -144,13 +144,10 @@ export function QrScannerView({
 		return () => {
 			setBusySubscription.remove();
 			setReadySubscription.remove();
+			scannerStore.setReady();
 		};
-	}, [
-		accountStore.state.currentIdentity.meta,
-		navigation,
-		props,
-		scannerStore
-	]);
+		/*eslint-disable-next-line react-hooks/exhaustive-deps*/
+	}, []);
 
 	const missedFrames = scannerStore.getMissedFrames();
 	const missedFramesMessage = missedFrames && missedFrames.join(', ');

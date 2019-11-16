@@ -16,8 +16,7 @@
 
 'use strict';
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
@@ -25,18 +24,21 @@ import QrView from '../components/QrView';
 import { hexToAscii, isAscii } from '../util/strings';
 import { withScannerStore } from '../util/HOC';
 
-SignedMessage.propTypes = {
-	data: PropTypes.string.isRequired, // post sign
-	isHash: PropTypes.bool,
-	message: PropTypes.string // pre sign
-};
 export function SignedMessage({ scanner }) {
 	const data = scanner.getSignedTxData();
 	const isHash = scanner.getIsHash();
 	const message = scanner.getMessage();
 
+	useEffect(
+		() =>
+			function() {
+				scanner.cleanup();
+			},
+		[scanner]
+	);
+
 	return (
-		<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
+		<ScrollView style={styles.body}>
 			<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
 			<View style={styles.qr}>
 				<QrView data={data} />
@@ -69,6 +71,7 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		lineHeight: 26,
 		marginBottom: 20,
+		marginHorizontal: 20,
 		minHeight: 120,
 		padding: 10
 	},
@@ -79,6 +82,7 @@ const styles = StyleSheet.create({
 		color: colors.bg_text_sec,
 		fontFamily: fonts.bold,
 		fontSize: 18,
+		marginHorizontal: 20,
 		paddingBottom: 20
 	},
 	topTitle: {

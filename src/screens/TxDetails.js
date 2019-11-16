@@ -27,7 +27,6 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -38,6 +37,7 @@ import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import { navigateToSignedTx, unlockSeed } from '../util/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import testIDs from '../../e2e/testIDs';
+import fontStyles from '../fontStyles';
 
 export default class TxDetails extends React.PureComponent {
 	render() {
@@ -117,21 +117,25 @@ export class TxDetailsView extends React.PureComponent {
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
 
 		return (
-			<ScrollView style={styles.body} testID={testIDs.TxDetails.scrollScreen}>
+			<ScrollView
+				style={styles.body}
+				contentContainerStyle={{ paddingBottom: 40 }}
+				testID={testIDs.TxDetails.scrollScreen}
+			>
 				<Background />
-				<Text style={styles.topTitle}>SIGN TRANSACTION</Text>
+				<Text style={styles.topTitle}>Sign Transaction</Text>
 				<View style={styles.bodyContent}>
-					<Text style={styles.title}>FROM ACCOUNT</Text>
+					<Text style={styles.title}>From Account</Text>
 				</View>
 				<AccountCard
 					title={sender.name}
 					address={sender.address}
 					networkKey={sender.networkKey}
 				/>
-				<Text style={styles.title}>TRANSACTION DETAILS</Text>
+				<Text style={styles.title}>Transaction Details</Text>
 
 				{isEthereum ? (
-					<React.Fragment>
+					<View style={{ backgroundColor: colors.card_bg }}>
 						<TxDetailsCard
 							style={{ marginBottom: 20 }}
 							description="You are about to send the following amount"
@@ -139,13 +143,13 @@ export class TxDetailsView extends React.PureComponent {
 							gas={gas}
 							gasPrice={gasPrice}
 						/>
-						<Text style={styles.title}>RECIPIENT</Text>
+						<Text style={styles.title}>Recipient</Text>
 						<AccountCard
 							title={recipient.name}
 							address={recipient.address}
 							networkKey={recipient.networkKey || ''}
 						/>
-					</React.Fragment>
+					</View>
 				) : (
 					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
@@ -181,7 +185,7 @@ const styles = StyleSheet.create({
 		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		paddingBottom: 40,
+		paddingHorizontal: 20,
 		paddingTop: 24
 	},
 	changePinText: {
@@ -192,15 +196,11 @@ const styles = StyleSheet.create({
 		textAlign: 'right'
 	},
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
+		...fontStyles.h2,
 		paddingBottom: 20
 	},
 	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
+		...fontStyles.h1,
 		paddingBottom: 20,
 		textAlign: 'center'
 	},
