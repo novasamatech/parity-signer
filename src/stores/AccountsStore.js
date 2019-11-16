@@ -37,7 +37,7 @@ import {
 	encryptData,
 	substrateAddress
 } from '../util/native';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import type { AccountsStoreState } from './types';
 import {
 	deepCopyIdentities,
@@ -62,8 +62,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		this.refreshList();
 	}
 
-	select(accountKey) {
-		this.setState({ selectedKey: accountKey });
+	async select(accountKey) {
+		await this.setState({ selectedKey: accountKey });
 	}
 
 	updateNew(accountUpdate) {
@@ -110,19 +110,19 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	updateAccount(accountKey, updatedAccount) {
+	async updateAccount(accountKey, updatedAccount) {
 		const accounts = this.state.accounts;
 		const account = accounts.get(accountKey);
 
 		if (account && updatedAccount) {
-			this.setState({
+			await this.setState({
 				accounts: accounts.set(accountKey, { ...account, ...updatedAccount })
 			});
 		}
 	}
 
-	updateSelectedAccount(updatedAccount) {
-		this.updateAccount(this.state.selectedKey, updatedAccount);
+	async updateSelectedAccount(updatedAccount) {
+		await this.updateAccount(this.state.selectedKey, updatedAccount);
 	}
 
 	async refreshList() {
@@ -131,24 +131,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
 		this.setState({ accounts, currentIdentity, identities, loaded: true });
-	}
-
-	async encryptSeedPhraseAndLockAccount(account, pin = null) {
-		try {
-			// for account creation
-			if (pin && account.seedPhrase) {
-				account.encryptedSeedPhrase = await encryptData(
-					account.seedPhrase,
-					pin
-				);
-			}
-			const encryptedAccount = this.deleteSensitiveData(account);
-
-			encryptedAccount.updatedAt = new Date().getTime();
-			return encryptedAccount;
-		} catch (e) {
-			console.error(e);
-		}
 	}
 
 	async save(accountKey, account, pin = null) {
@@ -291,17 +273,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	getAccounts() {
 		return this.state.accounts;
-	}
-
-	getLegacySubstrateAccounts() {
-		const result = [];
-		const accounts = this.state.accounts[Symbol.iterator]();
-		for (let [key, value] of accounts) {
-			if (key.split(':')[0] === NetworkProtocols.SUBSTRATE) {
-				result.push([key, value]);
-			}
-		}
-		return result;
 	}
 
 	async unlockIdentitySeed(pin) {

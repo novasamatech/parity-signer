@@ -409,7 +409,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 
 		let signedData;
-
 		if (isEthereum) {
 			signedData = await brainWalletSign(suri, dataToSign);
 		} else {
@@ -430,7 +429,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
-
 		this.setState({ signedData });
 	}
 

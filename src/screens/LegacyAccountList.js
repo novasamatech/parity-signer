@@ -37,8 +37,8 @@ export default class LegacyAccountList extends React.PureComponent {
 						<AccountListView
 							{...this.props}
 							accounts={accounts.getAccounts()}
-							onAccountSelected={key => {
-								accounts.select(key);
+							onAccountSelected={async key => {
+								await accounts.select(key);
 								this.props.navigation.navigate('AccountDetails');
 							}}
 						/>
@@ -51,7 +51,7 @@ export default class LegacyAccountList extends React.PureComponent {
 
 class AccountListView extends React.PureComponent {
 	static propTypes = {
-		accounts: PropTypes.array.isRequired,
+		accounts: PropTypes.object.isRequired,
 		onAccountSelected: PropTypes.func.isRequired
 	};
 

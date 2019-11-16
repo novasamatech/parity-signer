@@ -50,7 +50,7 @@ export default class AccountEdit extends React.PureComponent {
 								label="Account Name"
 								style={{ marginBottom: 40 }}
 								onChangeText={async name => {
-									accounts.updateSelectedAccount({ name });
+									await accounts.updateSelectedAccount({ name });
 									await accounts.save(
 										accounts.getSelectedKey(),
 										accounts.getSelected()
