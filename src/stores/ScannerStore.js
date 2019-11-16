@@ -434,13 +434,17 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setState({ signedData });
 	}
 
-	async signDataWithSeed(seed) {
-		const suri = constructSURI({
-			derivePath: this.state.sender.path,
-			password: '',
-			phrase: seed
-		});
-		await this.signDataWithSuri(suri);
+	async signDataWithSeed(seed, protocol) {
+		if (protocol === NetworkProtocols.SUBSTRATE) {
+			const suri = constructSURI({
+				derivePath: this.state.sender.path,
+				password: '',
+				phrase: seed
+			});
+			await this.signDataWithSuri(suri);
+		} else {
+			await this.signDataWithSuri(seed);
+		}
 	}
 
 	async signDataLegacy(pin = '1') {
@@ -451,11 +455,9 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	cleanup() {
 		return new Promise(resolve => {
-			const prehash = this.state.prehash;
 			this.setState(
 				{
-					...DEFAULT_STATE,
-					prehash
+					...DEFAULT_STATE
 				},
 				resolve
 			);

@@ -44,13 +44,14 @@ export default class MessageDetails extends React.PureComponent {
 				{scannerStore => {
 					const dataToSign = scannerStore.getDataToSign();
 					const message = scannerStore.getMessage();
+					const sender = scannerStore.getSender();
 
 					if (dataToSign) {
 						return (
 							<MessageDetailsView
 								{...this.props}
 								scannerStore={scannerStore}
-								sender={scannerStore.getSender()}
+								sender={sender}
 								message={isU8a(message) ? u8aToHex(message) : message}
 								dataToSign={
 									isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign
@@ -59,7 +60,7 @@ export default class MessageDetails extends React.PureComponent {
 								isHash={scannerStore.getIsHash()}
 								onNext={async () => {
 									try {
-										if (scannerStore.getSender().isLegacy) {
+										if (sender.isLegacy) {
 											return this.props.navigation.navigate(
 												'AccountUnlockAndSign',
 												{
@@ -68,7 +69,10 @@ export default class MessageDetails extends React.PureComponent {
 											);
 										}
 										const seed = await unlockSeed(this.props.navigation);
-										await scannerStore.signDataWithSeed(seed);
+										await scannerStore.signDataWithSeed(
+											seed,
+											NETWORK_LIST[sender.networkKey].protocol
+										);
 										return navigateToSignedMessage(this.props.navigation);
 									} catch (e) {
 										scannerStore.setErrorMsg(e.message);

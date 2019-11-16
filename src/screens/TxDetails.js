@@ -45,7 +45,7 @@ export default class TxDetails extends React.PureComponent {
 			<Subscribe to={[ScannerStore, AccountsStore]}>
 				{scannerStore => {
 					const txRequest = scannerStore.getTXRequest();
-
+					const sender = scannerStore.getSender();
 					if (txRequest) {
 						const tx = scannerStore.getTx();
 
@@ -53,13 +53,13 @@ export default class TxDetails extends React.PureComponent {
 							<TxDetailsView
 								{...{ ...this.props, ...tx }}
 								scannerStore={scannerStore}
-								sender={scannerStore.getSender()}
+								sender={sender}
 								recipient={scannerStore.getRecipient()}
 								// dataToSign={scannerStore.getDataToSign()}
 								prehash={scannerStore.getPrehashPayload()}
 								onNext={async () => {
 									try {
-										if (scannerStore.getSender().isLegacy) {
+										if (sender.isLegacy) {
 											return this.props.navigation.navigate(
 												'AccountUnlockAndSign',
 												{
@@ -68,7 +68,10 @@ export default class TxDetails extends React.PureComponent {
 											);
 										}
 										const seed = await unlockSeed(this.props.navigation);
-										await scannerStore.signDataWithSeed(seed);
+										await scannerStore.signDataWithSeed(
+											seed,
+											NETWORK_LIST[sender.networkKey].protocol
+										);
 										return navigateToSignedTx(this.props.navigation);
 									} catch (e) {
 										scannerStore.setErrorMsg(e.message);
