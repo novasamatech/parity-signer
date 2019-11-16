@@ -67,11 +67,11 @@ const ButtonIcon = props => {
 			flex: dropdown && title ? 1 : 0
 		},
 		iconView: {
-			alignItems: 'center',
 			backgroundColor: colors.card_bg,
 			borderRadius: size,
 			height: size,
-			justifyContent: 'center',
+			paddingLeft: 3,
+			paddingTop: size / 8,
 			width: size
 		},
 		title: {
