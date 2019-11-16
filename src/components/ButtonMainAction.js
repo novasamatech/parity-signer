@@ -55,12 +55,13 @@ export default class ButtonMainAction extends React.PureComponent {
 
 const styles = {
 	body: {
-		alignItems: 'center',
-		bottom: 40,
+		bottom: 0,
+		height: 120,
 		position: 'absolute',
 		width: '100%'
 	},
 	button: {
+		alignSelf: 'center',
 		elevation: 2,
 		position: 'absolute'
 	},
