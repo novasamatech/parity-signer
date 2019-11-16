@@ -19,10 +19,10 @@
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
-import fonts from '../fonts';
 import QrView from '../components/QrView';
-import { hexToAscii, isAscii } from '../util/strings';
 import { withScannerStore } from '../util/HOC';
+import fontStyles from '../fontStyles';
+import MessageDetailsCard from '../components/MessageDetailsCard';
 
 export function SignedMessage({ scanner }) {
 	const data = scanner.getSignedTxData();
@@ -39,19 +39,13 @@ export function SignedMessage({ scanner }) {
 
 	return (
 		<ScrollView style={styles.body}>
-			<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
+			<Text style={styles.topTitle}>Scan Message</Text>
 			<View style={styles.qr}>
 				<QrView data={data} />
 			</View>
-			<Text style={styles.title}>{!isHash && 'MESSAGE'}</Text>
-			{isHash ? (
-				<Text style={styles.title}>HASH</Text>
-			) : (
-				<Text style={styles.title}>MESSAGE</Text>
-			)}
-			<Text style={styles.message}>
-				{isHash ? message : isAscii(message) ? hexToAscii(message) : data}
-			</Text>
+			<View style={styles.messageContainer}>
+				<MessageDetailsCard isHash={isHash} message={message} data={data} />
+			</View>
 		</ScrollView>
 	);
 }
@@ -65,30 +59,14 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		overflow: 'hidden'
 	},
-	message: {
-		backgroundColor: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 20,
-		lineHeight: 26,
-		marginBottom: 20,
-		marginHorizontal: 20,
-		minHeight: 120,
-		padding: 10
+	messageContainer: {
+		marginHorizontal: 20
 	},
 	qr: {
 		marginBottom: 20
 	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		marginHorizontal: 20,
-		paddingBottom: 20
-	},
 	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
+		...fontStyles.h1,
 		paddingBottom: 20,
 		textAlign: 'center'
 	}

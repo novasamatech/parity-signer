@@ -151,5 +151,3 @@ export const NETWORK_LIST = Object.freeze(
 		UNKNOWN_NETWORK
 	)
 );
-
-export const TX_DETAILS_MSG = 'After signing and publishing you will have sent';

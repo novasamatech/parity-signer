@@ -67,14 +67,14 @@ function Amount({ style, value, gas, gasPrice }) {
 					<Text
 						style={{ fontSize: 20, fontWeight: '800', textAlign: 'center' }}
 					>
-						<Text style={{ color: colors.card_bg }}>{value}</Text>
+						<Text style={{ color: colors.bg_text }}>{value}</Text>
 						<Text style={{ color: colors.bg_text_sec }}> ETH</Text>
 					</Text>
 				</View>
 				<View style={{ backgroundColor: colors.bg_text_sec, padding: 5 }}>
 					<Text
 						style={{
-							color: colors.card_bg,
+							color: colors.bg_text,
 							fontSize: 12,
 							fontWeight: '800',
 							textAlign: 'center'

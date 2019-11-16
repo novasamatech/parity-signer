@@ -28,14 +28,14 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/strings';
 import { navigateToSignedMessage, unlockSeed } from '../util/navigationHelpers';
+import fontStyles from '../fontStyles';
+import MessageDetailsCard from '../components/MessageDetailsCard';
 
 export default class MessageDetails extends React.PureComponent {
 	render() {
@@ -109,8 +109,8 @@ export class MessageDetailsView extends React.PureComponent {
 				style={styles.body}
 			>
 				<Background />
-				<Text style={styles.topTitle}>SIGN MESSAGE</Text>
-				<Text style={styles.title}>FROM ACCOUNT</Text>
+				<Text style={styles.topTitle}>Sign Message</Text>
+				<Text style={styles.title}>From Account</Text>
 				<AccountCard
 					title={sender.name}
 					address={sender.address}
@@ -124,18 +124,11 @@ export class MessageDetailsView extends React.PureComponent {
 						prefix={prefix}
 					/>
 				) : null}
-				{isHash ? (
-					<Text style={styles.title}>HASH</Text>
-				) : (
-					<Text style={styles.title}>MESSAGE</Text>
-				)}
-				<Text style={styles.message}>
-					{isHash
-						? message
-						: isAscii(message)
-						? hexToAscii(message)
-						: dataToSign}
-				</Text>
+				<MessageDetailsCard
+					isHash={isHash}
+					message={message}
+					data={dataToSign}
+				/>
 				<Button
 					buttonStyles={{ height: 60 }}
 					title="Sign Message"
@@ -191,25 +184,13 @@ const styles = StyleSheet.create({
 	deleteText: {
 		textAlign: 'right'
 	},
-	message: {
-		backgroundColor: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 20,
-		lineHeight: 26,
-		marginBottom: 20,
-		minHeight: 120,
-		padding: 10
-	},
+
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
+		...fontStyles.h2,
 		paddingBottom: 20
 	},
 	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
+		...fontStyles.h1,
 		paddingBottom: 20,
 		textAlign: 'center'
 	},

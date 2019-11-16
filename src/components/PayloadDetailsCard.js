@@ -320,10 +320,6 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		);
 	};
 
-	const renderGenesisHash = () => (
-		<Text style={styles.genesisHashText}>{value}</Text>
-	);
-
 	return (
 		<View style={[{ alignItems: 'baseline', justifyContent: 'flex-start' }]}>
 			<View style={{ marginVertical: 5, paddingVertical: 2, width: '100%' }}>
@@ -334,8 +330,6 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 					renderEraDetails()
 				) : label === 'Tip' ? (
 					renderTipDetails()
-				) : label === 'Genesis Hash' ? (
-					renderGenesisHash()
 				) : (
 					<Text style={styles.secondaryText}>
 						{useFallback ? value.toString() : value}
@@ -365,11 +359,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-around'
 	},
-	genesisHashText: {
-		...fontStyles.t_label_code,
-		paddingLeft: 5,
-		textAlign: 'left'
-	},
 	icon: {
 		height: 47,
 		width: 47
@@ -389,13 +378,12 @@ const styles = StyleSheet.create({
 	subLabel: {
 		...fontStyles.t_codeS,
 		color: colors.label_text,
-		paddingLeft: 5,
+		paddingLeft: 3,
 		textAlign: 'left'
 	},
 	titleText: {
 		...fontStyles.t_codeS,
 		color: colors.label_text,
-		fontSize: 14,
 		textAlign: 'center'
 	}
 });

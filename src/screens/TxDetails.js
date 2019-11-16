@@ -135,7 +135,7 @@ export class TxDetailsView extends React.PureComponent {
 				<Text style={styles.title}>Transaction Details</Text>
 
 				{isEthereum ? (
-					<View style={{ backgroundColor: colors.card_bg }}>
+					<View>
 						<TxDetailsCard
 							style={{ marginBottom: 20 }}
 							description="You are about to send the following amount"
