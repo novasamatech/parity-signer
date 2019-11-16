@@ -28,10 +28,11 @@ export const navigateToPathsList = (navigation, networkKey) => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToLandingPage = navigation => {
+export const navigateToLandingPage = (navigation, isSwitchOpen) => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
+				params: { isSwitchOpen },
 				routeName: 'AccountNetworkChooser'
 			})
 		],

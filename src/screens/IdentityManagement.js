@@ -24,7 +24,7 @@ function IdentityManagement({ accounts, navigation }) {
 				await unlockSeed(navigation);
 				const deleteSucceed = await accounts.deleteCurrentIdentity();
 				if (deleteSucceed) {
-					navigateToLandingPage(navigation);
+					navigateToLandingPage(navigation, true);
 				} else {
 					alertIdentityDeletionError();
 				}

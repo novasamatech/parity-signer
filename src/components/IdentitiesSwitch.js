@@ -27,7 +27,8 @@ import { getIdentityName } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 
 function IdentitiesSwitch({ navigation, accounts }) {
-	const [visible, setVisible] = useState(false);
+	const defaultVisible = navigation.getParam('isSwitchOpen', false);
+	const [visible, setVisible] = useState(defaultVisible);
 	//TODO to be removed before merge
 	console.log('identities are', accounts.state.identities);
 	const { currentIdentity, identities } = accounts.state;
