@@ -71,7 +71,7 @@ function LegacyAccountBackupView(props) {
 
 			AppState.removeEventListener('change', handleAppStateChange);
 		};
-	}, [props]);
+	}, []);
 
 	const { accounts, navigation } = props;
 	const { navigate } = navigation;

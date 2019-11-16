@@ -27,6 +27,7 @@ module.exports = {
     "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "single",  { "avoidEscape": true }],
     "no-unused-vars": ["error", { "args": "none" }],
+    "react-hooks/exhaustive-deps": "off",
     "react-native/no-inline-styles": "off",
     "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}]
   }

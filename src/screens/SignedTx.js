@@ -44,7 +44,7 @@ export function SignedTx({ scanner }) {
 			function() {
 				scanner.cleanup();
 			},
-		[scanner]
+		[]
 	);
 
 	return (

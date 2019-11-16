@@ -34,7 +34,7 @@ export function SignedMessage({ scanner }) {
 			function() {
 				scanner.cleanup();
 			},
-		[scanner]
+		[]
 	);
 
 	return (

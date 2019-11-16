@@ -103,7 +103,6 @@ export default class Scanner extends React.PureComponent {
 											this.props.navigation.navigate('MessageDetails');
 										}
 									}
-									('');
 								} catch (e) {
 									return this.showErrorMessage(
 										scannerStore,
@@ -146,7 +145,6 @@ export function QrScannerView({
 			setReadySubscription.remove();
 			scannerStore.setReady();
 		};
-		/*eslint-disable-next-line react-hooks/exhaustive-deps*/
 	}, []);
 
 	const missedFrames = scannerStore.getMissedFrames();

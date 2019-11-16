@@ -40,7 +40,7 @@ export default function AccountIcon(props) {
 		if (protocol === NetworkProtocols.ETHEREUM) {
 			loadEthereumIcon(address);
 		}
-	}, [protocol, address]);
+	}, []);
 
 	const loadEthereumIcon = function(ethereumAddress) {
 		blockiesIcon('0x' + ethereumAddress)

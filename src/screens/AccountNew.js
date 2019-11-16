@@ -50,9 +50,8 @@ function AccountNew({ accounts, navigation }) {
 
 	useEffect(() => {
 		accounts.updateNew(emptyAccount());
-	}, [accounts]);
+	}, []);
 
-	/* eslint-disable react-hooks/exhaustive-deps*/
 	useEffect(() => {
 		const selectedAccount = accounts.getNew();
 		const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
