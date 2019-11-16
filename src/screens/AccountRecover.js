@@ -19,13 +19,7 @@
 'use strict';
 
 import React from 'react';
-import {
-	Alert,
-	findNodeHandle,
-	SafeAreaView,
-	StyleSheet,
-	Text
-} from 'react-native';
+import { findNodeHandle, SafeAreaView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -44,6 +38,10 @@ import { emptyAccount, validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress } from '../util/native';
 import { constructSURI } from '../util/suri';
+import {
+	alertErrorWithMessage,
+	alertInvalidSeedRecovery
+} from '../util/alertUtils';
 
 export default class AccountRecover extends React.Component {
 	render() {
@@ -267,28 +265,12 @@ class AccountRecoverView extends React.Component {
 
 							if (!validation.valid) {
 								if (validation.accountRecoveryAllowed) {
-									return Alert.alert('Warning', `${validation.reason}`, [
-										{
-											onPress: () => {
-												navigation.navigate('AccountPin', {
-													isNew: true
-												});
-											},
-											style: 'default',
-											text: 'I understand the risks'
-										},
-										{
-											style: 'cancel',
-											text: 'Back'
-										}
-									]);
+									return alertInvalidSeedRecovery(
+										`${validation.reason}`,
+										navigation
+									);
 								} else {
-									return Alert.alert('Error', `${validation.reason}`, [
-										{
-											style: 'cancel',
-											text: 'Back'
-										}
-									]);
+									return alertErrorWithMessage(`${validation.reason}`, 'Back');
 								}
 							}
 

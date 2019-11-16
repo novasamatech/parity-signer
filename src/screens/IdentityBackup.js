@@ -17,14 +17,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { words } from '../util/native';
-import {
-	Alert,
-	Clipboard,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import TouchableItem from '../components/TouchableItem';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
@@ -38,10 +31,17 @@ import {
 import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
+import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
 
 function IdentityBackup({ navigation, accounts }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const isNew = navigation.getParam('isNew', false);
+	const onBackupDone = async () => {
+		const pin = await setPin(navigation);
+		await accounts.saveNewIdentity(seedPhrase, pin);
+		setSeedPhrase('');
+		navigateToNewIdentityNetwork(navigation);
+	};
 
 	useEffect(() => {
 		const setSeedPhraseAsync = async () => {
@@ -73,24 +73,7 @@ function IdentityBackup({ navigation, accounts }) {
 				onPress={() => {
 					// only allow the copy of the recovery phrase in dev environment
 					if (__DEV__) {
-						Alert.alert(
-							'Write this recovery phrase on paper',
-							`It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
-                `,
-							[
-								{
-									onPress: () => {
-										Clipboard.setString(seedPhrase);
-									},
-									style: 'default',
-									text: 'Copy anyway'
-								},
-								{
-									style: 'cancel',
-									text: 'Cancel'
-								}
-							]
-						);
+						alertCopyBackupPhrase(seedPhrase);
 					}
 				}}
 			>
@@ -106,12 +89,7 @@ function IdentityBackup({ navigation, accounts }) {
 					title={'Next'}
 					testID={testIDs.IdentityBackup.nextButton}
 					bottom={false}
-					onPress={async () => {
-						const pin = await setPin(navigation);
-						await accounts.saveNewIdentity(seedPhrase, pin);
-						setSeedPhrase('');
-						navigateToNewIdentityNetwork(navigation);
-					}}
+					onPress={() => alertBackupDone(onBackupDone)}
 				/>
 			)}
 		</ScrollView>

@@ -17,15 +17,7 @@
 'use strict';
 
 import React, { useEffect } from 'react';
-import {
-	Alert,
-	AppState,
-	Clipboard,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View
-} from 'react-native';
+import { AppState, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -39,6 +31,7 @@ import TouchableItem from '../components/TouchableItem';
 import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
 import AccountsStore from '../stores/AccountsStore';
 import { NetworkProtocols, NETWORK_LIST } from '../constants';
+import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
 
 export default class LegacyAccountBackup extends React.PureComponent {
 	render() {
@@ -103,28 +96,11 @@ function LegacyAccountBackupView(props) {
 					onPress={() => {
 						// only allow the copy of the recovery phrase in dev environment
 						if (__DEV__) {
-							Alert.alert(
-								'Write this recovery phrase on paper',
-								`It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.
-                `,
-								[
-									{
-										onPress: () => {
-											if (protocol === NetworkProtocols.SUBSTRATE) {
-												Clipboard.setString(`${seedPhrase}${derivationPath}`);
-											} else {
-												Clipboard.setString(seed);
-											}
-										},
-										style: 'default',
-										text: 'Copy anyway'
-									},
-									{
-										style: 'cancel',
-										text: 'Cancel'
-									}
-								]
-							);
+							if (protocol === NetworkProtocols.SUBSTRATE) {
+								alertCopyBackupPhrase(`${seedPhrase}${derivationPath}`);
+							} else {
+								alertCopyBackupPhrase(seed);
+							}
 						}
 					}}
 				>
@@ -141,22 +117,9 @@ function LegacyAccountBackupView(props) {
 						buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
 						title="Backup Done"
 						onPress={() => {
-							Alert.alert(
-								'Important',
-								"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",
-								[
-									{
-										onPress: () => {
-											navigate('AccountPin', { isNew });
-										},
-										text: 'Proceed'
-									},
-									{
-										style: 'cancel',
-										text: 'Cancel'
-									}
-								]
-							);
+							alertBackupDone(() => {
+								navigate('AccountPin', { isNew });
+							});
 						}}
 					/>
 				)}

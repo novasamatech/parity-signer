@@ -1,55 +1,45 @@
-import { Alert } from 'react-native';
+import { Alert, Clipboard } from 'react-native';
+
+export const alertErrorWithMessage = (message, buttonText) =>
+	Alert.alert('Error', message, [
+		{
+			style: 'Cancel',
+			text: buttonText
+		}
+	]);
 
 export const alertIdentityCreationError = () =>
-	Alert.alert('Error', "Can't create Identity from the seed", [
-		{
-			style: 'Cancel',
-			text: 'Try again'
-		}
-	]);
+	alertErrorWithMessage("Can't create Identity from the seed", 'Try again');
 
 export const alertPathDerivationError = () =>
-	Alert.alert('Error', "Can't Derive Key pairs from the seed", [
-		{
-			style: 'Cancel',
-			text: 'Try again'
-		}
-	]);
+	alertErrorWithMessage("Can't Derive Key pairs from the seed", 'Try again');
 
 export const alertPathDeletionError = () =>
-	Alert.alert('Error', "Can't delete Key pairs.", [
-		{
-			style: 'Cancel',
-			text: 'Try again'
-		}
-	]);
+	alertErrorWithMessage("Can't delete Key pairs.", 'Try again');
 
 export const alertIdentityDeletionError = () =>
-	Alert.alert('Error', "Can't delete Identity.", [
-		{
-			style: 'Cancel',
-			text: 'Try again'
-		}
-	]);
+	alertErrorWithMessage("Can't delete Identity.", 'Try again');
+
+const buildAlertDeleteButtons = onDelete => [
+	{
+		onPress: () => {
+			onDelete();
+		},
+		style: 'destructive',
+		text: 'Delete'
+	},
+	{
+		style: 'cancel',
+		text: 'Cancel'
+	}
+];
 
 export const alertDeleteAccount = (accountName, onDelete) => {
 	Alert.alert(
 		'Delete Key Pairs',
 		`Do you really want to delete ${accountName}?
 This account can only be recovered with its associated recovery phrase.`,
-		[
-			{
-				onPress: () => {
-					onDelete();
-				},
-				style: 'destructive',
-				text: 'Delete'
-			},
-			{
-				style: 'cancel',
-				text: 'Cancel'
-			}
-		]
+		buildAlertDeleteButtons(onDelete)
 	);
 };
 
@@ -58,13 +48,21 @@ export const alertDeleteIdentity = onDelete => {
 		'Delete Identity',
 		`Do you really want to delete this Identity and all the related key pairs?
 This identity can only be recovered with its associated recovery phrase.`,
+		buildAlertDeleteButtons(onDelete)
+	);
+};
+
+export const alertCopyBackupPhrase = seedPhrase =>
+	Alert.alert(
+		'Write this recovery phrase on paper',
+		'It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.',
 		[
 			{
 				onPress: () => {
-					onDelete();
+					Clipboard.setString(seedPhrase);
 				},
-				style: 'destructive',
-				text: 'Delete'
+				style: 'default',
+				text: 'Copy anyway'
 			},
 			{
 				style: 'cancel',
@@ -72,4 +70,57 @@ This identity can only be recovered with its associated recovery phrase.`,
 			}
 		]
 	);
-};
+
+const alertRisks = (message, onPress) =>
+	Alert.alert('Warning', message, [
+		{
+			onPress,
+			style: 'default',
+			text: 'I understand the risks'
+		},
+		{
+			style: 'cancel',
+			text: 'Back'
+		}
+	]);
+
+export const alertInvalidSeedRecovery = (message, navigation) =>
+	alertRisks(message, () => {
+		navigation.navigate('AccountPin', {
+			isNew: true
+		});
+	});
+
+export const alertMultipart = onNext =>
+	alertRisks(
+		'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
+		onNext
+	);
+
+export const alertDecodeError = () =>
+	Alert.alert(
+		'Could not decode method with available metadata.',
+		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.',
+		[
+			{
+				style: 'default',
+				text: 'Okay'
+			}
+		]
+	);
+
+export const alertBackupDone = onPress =>
+	Alert.alert(
+		'Important',
+		"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",
+		[
+			{
+				onPress,
+				text: 'Proceed'
+			},
+			{
+				style: 'cancel',
+				text: 'Cancel'
+			}
+		]
+	);

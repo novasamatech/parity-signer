@@ -23,7 +23,7 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
 import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
@@ -31,6 +31,7 @@ import kusamaMetadata from '../util/static-kusama';
 import substrateDevMetadata from '../util/static-substrate';
 import { shortString } from '../util/strings';
 import fontStyles from '../fontStyles';
+import { alertDecodeError } from '../util/alertUtils';
 
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
@@ -207,16 +208,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 				formatArgs(call, methodArgs, 0);
 				setFormattedCallArgs(methodArgs);
 			} catch (e) {
-				Alert.alert(
-					'Could not decode method with available metadata.',
-					'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.',
-					[
-						{
-							style: 'default',
-							text: 'Okay'
-						}
-					]
-				);
+				alertDecodeError();
 				setUseFallBack(true);
 			}
 		}

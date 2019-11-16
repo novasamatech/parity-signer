@@ -20,7 +20,7 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import {
@@ -36,6 +36,7 @@ import ScannerStore from '../stores/ScannerStore';
 import { navigateToSignedMessage, unlockSeed } from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
 import MessageDetailsCard from '../components/MessageDetailsCard';
+import { alertMultipart } from '../util/alertUtils';
 
 export default class MessageDetails extends React.PureComponent {
 	render() {
@@ -137,22 +138,7 @@ export class MessageDetailsView extends React.PureComponent {
 					buttonStyles={{ height: 60 }}
 					title="Sign Message"
 					onPress={() => {
-						isHash
-							? Alert.alert(
-									'Warning',
-									'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
-									[
-										{
-											onPress: () => onNext(),
-											text: 'I take the risk'
-										},
-										{
-											style: 'cancel',
-											text: 'Cancel'
-										}
-									]
-							  )
-							: onNext();
+						isHash ? alertMultipart(onNext) : onNext();
 					}}
 				/>
 			</ScrollView>
