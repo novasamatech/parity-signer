@@ -22,7 +22,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
-import ButtonMainAction from '../components/ButtonMainAction';
+import Button from '../components/Button';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
 import { saveToCAndPPConfirmation } from '../util/db';
@@ -37,15 +37,19 @@ export default class TermsAndConditions extends React.PureComponent {
 	render() {
 		const { navigation } = this.props;
 		const { tocAgreement, ppAgreement } = this.state;
-		const firstScreenActions = navigation.getParam('firstScreenActions', null);
+		const disableButtons = navigation.getParam('disableButtons', false);
+
 		return (
 			<View style={styles.body} testID={testIDs.TacScreen.tacView}>
-				<ScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
+				<ScrollView
+					style={styles.scrollView}
+					contentContainerStyle={{ paddingHorizontal: 16 }}
+				>
 					<Markdown>{toc}</Markdown>
 				</ScrollView>
 
-				{firstScreenActions && (
-					<>
+				{!disableButtons && (
+					<View>
 						<TouchableItem
 							testID={testIDs.TacScreen.agreeTacButton}
 							style={{
@@ -73,8 +77,7 @@ export default class TermsAndConditions extends React.PureComponent {
 							style={{
 								alignItems: 'center',
 								flexDirection: 'row',
-								paddingHorizontal: 16,
-								paddingVertical: 10
+								paddingHorizontal: 16
 							}}
 							onPress={() => {
 								this.setState({ ppAgreement: !ppAgreement });
@@ -101,18 +104,16 @@ export default class TermsAndConditions extends React.PureComponent {
 							</Text>
 						</TouchableItem>
 
-						<ButtonMainAction
+						<Button
 							testID={testIDs.TacScreen.nextButton}
 							title="Next"
 							disabled={!ppAgreement || !tocAgreement}
-							style={{ marginBottom: 32, marginTop: 8 }}
-							bottom={false}
 							onPress={async () => {
 								await saveToCAndPPConfirmation();
-								navigation.dispatch(firstScreenActions);
+								navigation.navigate('Welcome');
 							}}
 						/>
-					</>
+					</View>
 				)}
 			</View>
 		);
@@ -129,5 +130,8 @@ const styles = StyleSheet.create({
 	icon: {
 		color: colors.bg_text_sec,
 		fontSize: 30
+	},
+	scrollView: {
+		flex: 1
 	}
 });

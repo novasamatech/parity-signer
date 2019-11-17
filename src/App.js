@@ -25,6 +25,7 @@ import { Platform, StatusBar, View, YellowBox } from 'react-native';
 import {
 	createAppContainer,
 	createStackNavigator,
+	createSwitchNavigator,
 	HeaderBackButton,
 	withNavigation
 } from 'react-navigation';
@@ -65,15 +66,16 @@ import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 import LegacyNetworkChooser from './screens/LegacyNetworkChooser';
+import testIDs from '../e2e/testIDs';
 
 const getLaunchArgs = props => {
 	if (Platform.OS === 'ios') {
 		if (props.launchArgs && props.launchArgs.includes('-detoxServer')) {
-			global.inTest = true;
+			return (global.inTest = true);
 		}
 	} else {
 		if (props.launchArgs && props.launchArgs.hasOwnProperty('detoxServer')) {
-			global.inTest = true;
+			return (global.inTest = true);
 		}
 	}
 	global.inTest = false;
@@ -105,8 +107,7 @@ export default class App extends Component {
 	}
 }
 
-const globalStackNavigationOptions = ({ navigation, screenProps }) => {
-	console.log('navigation', navigation, 'screenProps', screenProps);
+const globalStackNavigationOptions = ({ navigation }) => {
 	const isFirstScreen = navigation.dangerouslyGetParent().state.index === 0;
 	return {
 		headerBackTitleStyle: {
@@ -135,18 +136,19 @@ const HeaderLeftWithBack = withNavigation(
 		render() {
 			const { navigation } = this.props;
 			return (
-				<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-					<HeaderBackButton
-						{...this.props}
-						accessibilityComponentType="button"
-						accessibilityTraits="button"
-						delayPressIn={0}
-						testID="header-back"
-						titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
-						title="Back"
-						tintColor={colors.bg_text}
-						onPress={() => navigation.goBack()}
-					/>
+				<View style={{ flexDirection: 'row' }}>
+					<View testID={testIDs.Header.headerBackButton}>
+						<HeaderBackButton
+							{...this.props}
+							accessibilityComponentType="button"
+							accessibilityTraits="button"
+							delayPressIn={0}
+							titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
+							title="Back"
+							tintColor={colors.bg_text}
+							onPress={() => navigation.goBack()}
+						/>
+					</View>
 					<HeaderLeftHome style={{ marginLeft: -10, paddingLeft: 0 }} />
 				</View>
 			);
@@ -155,11 +157,29 @@ const HeaderLeftWithBack = withNavigation(
 );
 
 /* eslint-disable sort-keys */
-const Screens = createStackNavigator(
+const tocAndPrivacyPolicyScreens = {
+	TermsAndConditions: {
+		navigationOptions: {
+			headerRight: null
+		},
+		screen: TermsAndConditions
+	},
+	PrivacyPolicy: {
+		navigationOptions: {
+			headerRight: null
+		},
+		screen: PrivacyPolicy
+	}
+};
+
+const Screens = createSwitchNavigator(
 	{
 		Loading: {
 			screen: Loading
 		},
+		TocAndPrivacyPolicy: createStackNavigator(tocAndPrivacyPolicyScreens, {
+			defaultNavigationOptions: globalStackNavigationOptions
+		}),
 		Welcome: {
 			screen: createStackNavigator(
 				{
@@ -238,24 +258,13 @@ const Screens = createStackNavigator(
 					TxDetails: {
 						screen: TxDetails
 					},
-					TermsAndConditions: {
-						screen: TermsAndConditions,
-						navigationOptions: {
-							headerRight: null
-						}
-					},
-					PrivacyPolicy: {
-						screen: PrivacyPolicy,
-						navigationOptions: {
-							headerRight: null
-						}
-					},
 					Security: {
 						navigationOptions: {
 							headerRight: null
 						},
 						screen: Security
-					}
+					},
+					...tocAndPrivacyPolicyScreens
 				},
 				{
 					defaultNavigationOptions: globalStackNavigationOptions
