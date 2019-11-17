@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';

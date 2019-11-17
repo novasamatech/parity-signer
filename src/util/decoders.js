@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import {
 	hexStripPrefix,

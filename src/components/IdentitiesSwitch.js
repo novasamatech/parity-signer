@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+'use strict';
+
 import React, { useState } from 'react';
 import { FlatList, Modal, View, TouchableWithoutFeedback } from 'react-native';
 import { withNavigation, ScrollView } from 'react-navigation';

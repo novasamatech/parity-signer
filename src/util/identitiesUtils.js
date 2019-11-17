@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-// import { NetworkProtocols } from '../constants';
+'use strict';
 
 import {
 	NETWORK_LIST,

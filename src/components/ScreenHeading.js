@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { View, Text } from 'react-native';

@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 import {
 	NetworkProtocols,
 	NETWORK_LIST,

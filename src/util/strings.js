@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 /*
  * @dev Check if input is in Ascii table.
  */
