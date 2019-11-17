@@ -65,7 +65,6 @@ export default class Scanner extends React.PureComponent {
 							scannerStore={scannerStore}
 							totalFramesCount={scannerStore.getTotalFramesCount()}
 							onBarCodeRead={async txRequestData => {
-								console.log('txRequest data is', txRequestData);
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
 								}
