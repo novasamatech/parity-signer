@@ -25,6 +25,25 @@ import {
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
 
+const regex = {
+	allPath: /(?<=\/)\w+(?=(\/?))/g,
+	firstPath: /(?<=\/)\w+(?=(\/)?)/,
+	networkPath: /(?<=\/\/)\w+(?=(\/)?)/,
+	validateDerivedPath: /^(\/\/?([\w-_])+)+$/
+};
+
+const extractPathId = path => {
+	const matchNetworkPath = path.match(regex.networkPath);
+	if (!matchNetworkPath) return null;
+	return matchNetworkPath[0];
+};
+
+const extractSubPathName = path => {
+	const pathFragments = path.match(regex.allPath);
+	if (!pathFragments || pathFragments.length <= 1) return '';
+	return pathFragments.slice(1).join('');
+};
+
 export const isSubstratePath = path => path.split('//')[1] !== undefined;
 
 export function emptyIdentity() {
@@ -75,20 +94,7 @@ export const deepCopyIdentity = identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
 export const getPathsWithSubstrateNetwork = (paths, networkKey) =>
-	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
-
-const extractPathId = path => {
-	const matchNetworkPath = path.match(/(?<=\/\/)\w+(?=(\/)?)/);
-	if (!matchNetworkPath) return null;
-	return matchNetworkPath[0];
-};
-
-const extractSubPathName = path => {
-	const matchRegex = /(?<=\/)\w+(?=(\/?))/g;
-	const pathFragments = path.match(matchRegex);
-	if (!pathFragments || pathFragments.length <= 1) return '';
-	return pathFragments.slice(1).join('');
-};
+	paths.filter(path => extractPathId(path) === NETWORK_LIST[networkKey].pathId);
 
 export const getNetworkKeyByPath = path => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
@@ -140,7 +146,7 @@ export const validatePath = path =>
 	/^\/\/([\w-_])+(\/\/?([\w-_])+)+$/.test(path);
 
 export const validateDerivedPath = derivedPath =>
-	/^(\/\/?([\w-_])+)+$/.test(derivedPath);
+	regex.validateDerivedPath.test(derivedPath);
 
 export const getIdentityName = (identity, identities) => {
 	if (identity.name) return identity.name;
@@ -169,7 +175,7 @@ export const groupPaths = paths => {
 		const pathId = extractPathId(path) || '';
 		const subPath = path.slice(pathId.length + 2);
 
-		const groupName = subPath.match(/(?<=\/)\w+(?=(\/)?)/)[0];
+		const groupName = subPath.match(regex.firstPath)[0];
 
 		const existedItem = groupedPath.find(p => p.title === groupName);
 		if (existedItem) {
