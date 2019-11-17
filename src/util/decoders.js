@@ -175,7 +175,6 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;
-							'';
 							data.data.data = isOversized
 								? await blake2b(
 										u8aToHex(extrinsicPayload.toU8a(true), -1, false)
