@@ -98,9 +98,8 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		);
 	};
 
-	const sortNetworkKeys = a => {
-		return a.protocol === NetworkProtocols.SUBSTRATE;
-	};
+	const sortNetworkKeys = ([, networkParams]) =>
+		networkParams.protocol !== NetworkProtocols.SUBSTRATE ? 1 : -1;
 
 	const getNetworkKeys = ([networkKey]) => {
 		const availableNetworks = getAvailableNetworkKeys(
@@ -190,6 +189,10 @@ function AccountNetworkChooser({ navigation, accounts }) {
 
 	if (identities.length === 0) return showOnboardingMessage();
 
+	const NetworkList = Object.entries(NETWORK_LIST).filter(getNetworkKeys);
+	NetworkList.sort(sortNetworkKeys);
+	console.log('network list is', NetworkList);
+
 	return (
 		<View
 			style={styles.body}
@@ -197,43 +200,40 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		>
 			{renderScreenHeading()}
 			<ScrollView>
-				{Object.entries(NETWORK_LIST)
-					.filter(getNetworkKeys)
-					.sort(sortNetworkKeys)
-					.map(([networkKey, networkParams], index) => (
-						<AccountCard
-							isNetworkCard={true}
-							address={''}
-							key={networkKey}
-							testID={testIDs.AccountNetworkChooser.networkButton + index}
-							networkKey={networkKey}
-							onPress={async () => {
-								if (isNew) {
-									if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
-										await deriveSubstrateDefault(networkKey, networkParams);
-									} else {
-										await deriveEthereumAccount(networkKey);
-									}
+				{NetworkList.map(([networkKey, networkParams], index) => (
+					<AccountCard
+						isNetworkCard={true}
+						address={''}
+						key={networkKey}
+						testID={testIDs.AccountNetworkChooser.networkButton + index}
+						networkKey={networkKey}
+						onPress={async () => {
+							if (isNew) {
+								if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+									await deriveSubstrateDefault(networkKey, networkParams);
 								} else {
-									const paths = Array.from(currentIdentity.meta.keys());
-									const listedPaths = getPathsWithSubstrateNetwork(
-										paths,
-										networkKey
-									);
-									if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
-										if (listedPaths.length === 0)
-											return navigation.navigate('PathDerivation', {
-												networkKey
-											});
-									} else if (!paths.includes(networkKey)) {
-										return await deriveEthereumAccount(networkKey);
-									}
-									navigation.navigate('PathsList', { networkKey });
+									await deriveEthereumAccount(networkKey);
 								}
-							}}
-							title={networkParams.title}
-						/>
-					))}
+							} else {
+								const paths = Array.from(currentIdentity.meta.keys());
+								const listedPaths = getPathsWithSubstrateNetwork(
+									paths,
+									networkKey
+								);
+								if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+									if (listedPaths.length === 0)
+										return navigation.navigate('PathDerivation', {
+											networkKey
+										});
+								} else if (!paths.includes(networkKey)) {
+									return await deriveEthereumAccount(networkKey);
+								}
+								navigation.navigate('PathsList', { networkKey });
+							}
+						}}
+						title={networkParams.title}
+					/>
+				))}
 				{renderShowMoreButton()}
 			</ScrollView>
 			{renderScanButton()}

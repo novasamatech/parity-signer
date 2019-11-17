@@ -120,7 +120,7 @@ function PathsList({ accounts, navigation }) {
 				</View>
 			</View>
 			{pathsGroup.paths.map(path => (
-				<View style={{ marginBottom: -8 }}>
+				<View key={path} style={{ marginBottom: -8 }}>
 					<PathCard
 						key={path}
 						testID={testIDs.PathsList.pathCard + path}
