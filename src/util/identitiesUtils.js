@@ -26,22 +26,25 @@ import {
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
 
 const regex = {
-	allPath: /(?<=\/)\w+(?=(\/?))/g,
-	firstPath: /(?<=\/)\w+(?=(\/)?)/,
-	networkPath: /(?<=\/\/)\w+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?([\w-_])+)+$/
+	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
+	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
+	networkPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
+	validateDerivedPath: /^(\/\/?[\w-.]+)+$/
 };
+
+//walk around to fix the regular expression support for positive look behind;
+const removeSlash = str => str.replace(/\//g, '');
 
 const extractPathId = path => {
 	const matchNetworkPath = path.match(regex.networkPath);
 	if (!matchNetworkPath) return null;
-	return matchNetworkPath[0];
+	return removeSlash(matchNetworkPath[0]);
 };
 
 const extractSubPathName = path => {
 	const pathFragments = path.match(regex.allPath);
 	if (!pathFragments || pathFragments.length <= 1) return '';
-	return pathFragments.slice(1).join('');
+	return removeSlash(pathFragments.slice(1).join(''));
 };
 
 export const isSubstratePath = path => path.split('//')[1] !== undefined;
@@ -175,7 +178,7 @@ export const groupPaths = paths => {
 		const pathId = extractPathId(path) || '';
 		const subPath = path.slice(pathId.length + 2);
 
-		const groupName = subPath.match(regex.firstPath)[0];
+		const groupName = removeSlash(subPath.match(regex.firstPath)[0]);
 
 		const existedItem = groupedPath.find(p => p.title === groupName);
 		if (existedItem) {
