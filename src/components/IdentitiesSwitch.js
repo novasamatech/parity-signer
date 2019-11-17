@@ -101,13 +101,14 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		return (
 			<>
 				<ButtonIcon
-					title="Settings"
+					title="About"
 					onPress={() => {
 						setVisible(false);
+						navigation.navigate('About');
 						// go to Settings;
 					}}
 					iconType="antdesign"
-					iconName="setting"
+					iconName="info"
 					iconSize={24}
 					textStyle={fontStyles.t_big}
 					style={{ paddingLeft: 8 * 4 }}
