@@ -242,19 +242,21 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								</>
 							)}
 
-							<ButtonIcon
-								title="Add Identity"
-								testID={testIDs.IdentitiesSwitch.addIdentityButton}
-								onPress={() => {
-									setVisible(false);
-									navigation.navigate('IdentityNew');
-								}}
-								iconName="plus"
-								iconType="antdesign"
-								iconSize={24}
-								textStyle={fontStyles.t_big}
-								style={{ paddingLeft: 8 * 4 }}
-							/>
+							{__DEV__ && (
+								<ButtonIcon
+									title="Add Identity"
+									testID={testIDs.IdentitiesSwitch.addIdentityButton}
+									onPress={() => {
+										setVisible(false);
+										navigation.navigate('IdentityNew');
+									}}
+									iconName="plus"
+									iconType="antdesign"
+									iconSize={24}
+									textStyle={fontStyles.t_big}
+									style={{ paddingLeft: 8 * 4 }}
+								/>
+							)}
 							<Separator />
 							<ButtonIcon
 								title="Add legacy account"

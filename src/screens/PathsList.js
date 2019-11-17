@@ -38,7 +38,6 @@ import testIDs from '../../e2e/testIDs';
 import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
-import ButtonIcon from '../components/ButtonIcon';
 import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
 
@@ -111,14 +110,14 @@ function PathsList({ accounts, navigation }) {
 						</Text>
 					</View>
 
-					<ButtonIcon
-						iconName="plus"
-						iconType="antdesign"
-						style={{ opacity: 0.5 }}
-						onPress={() =>
-							navigation.navigate('PathDerivation', { networkKey })
-						}
-					/>
+					{/*<ButtonIcon*/}
+					{/*	iconName="plus"*/}
+					{/*	iconType="antdesign"*/}
+					{/*	style={{ opacity: 0.5 }}*/}
+					{/*	onPress={() =>*/}
+					{/*		navigation.navigate('PathDerivation', { networkKey })*/}
+					{/*	}*/}
+					{/*/>*/}
 				</View>
 			</View>
 			{pathsGroup.paths.map(path => (

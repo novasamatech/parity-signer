@@ -22,17 +22,17 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
 export const withAccountStore = WrappedComponent => {
-	return () => (
+	return props => (
 		<Subscribe to={[AccountsStore]}>
-			{accounts => <WrappedComponent {...this.props} accounts={accounts} />}
+			{accounts => <WrappedComponent {...props} accounts={accounts} />}
 		</Subscribe>
 	);
 };
 
 export const withScannerStore = WrappedComponent => {
-	return () => (
+	return props => (
 		<Subscribe to={[ScannerStore]}>
-			{scanner => <WrappedComponent {...this.props} scanner={scanner} />}
+			{scanner => <WrappedComponent {...props} scanner={scanner} />}
 		</Subscribe>
 	);
 };
