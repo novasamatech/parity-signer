@@ -136,20 +136,20 @@ const HeaderLeftWithBack = withNavigation(
 		render() {
 			const { navigation } = this.props;
 			return (
-				<View style={{ flexDirection: 'row' }}>
-					<View testID={testIDs.Header.headerBackButton}>
-						<HeaderBackButton
-							{...this.props}
-							accessibilityComponentType="button"
-							accessibilityTraits="button"
-							delayPressIn={0}
-							titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
-							title="Back"
-							tintColor={colors.bg_text}
-							onPress={() => navigation.goBack()}
-						/>
-					</View>
-					<HeaderLeftHome style={{ marginLeft: -10, paddingLeft: 0 }} />
+				<View
+					style={{ flexDirection: 'row' }}
+					testID={testIDs.Header.headerBackButton}
+				>
+					<HeaderBackButton
+						{...this.props}
+						accessibilityComponentType="button"
+						accessibilityTraits="button"
+						delayPressIn={0}
+						titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
+						title="Back"
+						tintColor={colors.bg_text}
+						onPress={() => navigation.goBack()}
+					/>
 				</View>
 			);
 		}
