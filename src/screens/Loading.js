@@ -48,7 +48,7 @@ export default class Loading extends React.PureComponent {
 						params: {
 							firstScreenActions
 						},
-						routeName: 'TocAndPrivacyPolicy'
+						routeName: 'TermsAndConditions'
 					})
 				],
 				index: 0

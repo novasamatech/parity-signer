@@ -21,7 +21,7 @@ import '../shim';
 import '@polkadot/types/injector';
 
 import React, { Component } from 'react';
-import { Platform, StatusBar, YellowBox } from 'react-native';
+import { Platform, StatusBar, View, YellowBox } from 'react-native';
 import {
 	createAppContainer,
 	createStackNavigator,
@@ -105,39 +105,50 @@ export default class App extends Component {
 	}
 }
 
-const globalStackNavigationOptions = {
-	headerBackTitleStyle: {
-		color: colors.bg_text_sec
-	},
-	headerRight: <SecurityHeader />,
-	headerStyle: {
-		backgroundColor: colors.bg,
-		borderBottomColor: colors.bg,
-		borderBottomWidth: 0,
-		elevation: 0,
-		height: 60,
-		paddingBottom: 0,
-		paddingTop: 0
-	},
-	headerTintColor: colors.bg_text_sec,
-	headerTitleStyle: {
-		display: 'none'
-	}
+const globalStackNavigationOptions = ({ navigation, screenProps }) => {
+	console.log('navigation', navigation, 'screenProps', screenProps);
+	const isFirstScreen = navigation.dangerouslyGetParent().state.index === 0;
+	return {
+		headerBackTitleStyle: {
+			color: colors.bg_text_sec
+		},
+		headerLeft: isFirstScreen ? <HeaderLeftHome /> : <HeaderLeftWithBack />,
+		headerRight: <SecurityHeader />,
+		headerStyle: {
+			backgroundColor: colors.bg,
+			borderBottomColor: colors.bg,
+			borderBottomWidth: 0,
+			elevation: 0,
+			height: 60,
+			paddingBottom: 0,
+			paddingTop: 0
+		},
+		headerTintColor: colors.bg_text_sec,
+		headerTitleStyle: {
+			display: 'none'
+		}
+	};
 };
 
-// A workaround for https://github.com/react-navigation/react-navigation/issues/88
-const SecurityHeaderBackButton = withNavigation(
+const HeaderLeftWithBack = withNavigation(
 	class _HeaderBackButton extends Component {
 		render() {
 			const { navigation } = this.props;
 			return (
-				<HeaderBackButton
-					{...this.props}
-					titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
-					title="Back"
-					tintColor={colors.bg_text}
-					onPress={() => navigation.goBack(null)}
-				/>
+				<View style={{ alignItems: 'center', flexDirection: 'row' }}>
+					<HeaderBackButton
+						{...this.props}
+						accessibilityComponentType="button"
+						accessibilityTraits="button"
+						delayPressIn={0}
+						testID="header-back"
+						titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
+						title="Back"
+						tintColor={colors.bg_text}
+						onPress={() => navigation.goBack()}
+					/>
+					<HeaderLeftHome style={{ marginLeft: -10, paddingLeft: 0 }} />
+				</View>
 			);
 		}
 	}
@@ -149,48 +160,10 @@ const Screens = createStackNavigator(
 		Loading: {
 			screen: Loading
 		},
-		Security: {
-			screen: createStackNavigator(
-				{
-					Security: {
-						navigationOptions: {
-							headerLeft: <SecurityHeaderBackButton />,
-							headerRight: null
-						},
-						screen: Security
-					}
-				},
-				{
-					defaultNavigationOptions: globalStackNavigationOptions,
-					headerMode: 'screen'
-				}
-			)
-		},
-		TocAndPrivacyPolicy: {
-			screen: createStackNavigator(
-				{
-					TermsAndConditions: {
-						navigationOptions: {
-							headerLeft: <HeaderLeftHome />
-						},
-						screen: TermsAndConditions
-					},
-					PrivacyPolicy: {
-						screen: PrivacyPolicy
-					}
-				},
-				{
-					defaultNavigationOptions: globalStackNavigationOptions
-				}
-			)
-		},
 		Welcome: {
 			screen: createStackNavigator(
 				{
 					AccountNetworkChooser: {
-						navigationOptions: {
-							headerLeft: <HeaderLeftHome />
-						},
 						screen: AccountNetworkChooser
 					},
 					AccountPin: {
@@ -264,6 +237,24 @@ const Screens = createStackNavigator(
 					},
 					TxDetails: {
 						screen: TxDetails
+					},
+					TermsAndConditions: {
+						screen: TermsAndConditions,
+						navigationOptions: {
+							headerRight: null
+						}
+					},
+					PrivacyPolicy: {
+						screen: PrivacyPolicy,
+						navigationOptions: {
+							headerRight: null
+						}
+					},
+					Security: {
+						navigationOptions: {
+							headerRight: null
+						},
+						screen: Security
 					}
 				},
 				{
