@@ -77,12 +77,28 @@ export const deepCopyIdentity = identity =>
 export const getPathsWithSubstrateNetwork = (paths, networkKey) =>
 	paths.filter(path => path.split('//')[1] === NETWORK_LIST[networkKey].pathId);
 
+const extractPathId = path => {
+	const matchNetworkPath = path.match(/(?<=\/\/)\w+(?=(\/)?)/);
+	if (!matchNetworkPath) return null;
+	return matchNetworkPath[0];
+};
+
+const extractSubPathName = path => {
+	const matchRegex = /(?<=\/)\w+(?=(\/?))/g;
+	const pathFragments = path.match(matchRegex);
+	if (!pathFragments || pathFragments.length <= 1) return '';
+	return pathFragments.slice(1).join('');
+};
+
 export const getNetworkKeyByPath = path => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
 		return path;
 	}
+	const pathId = extractPathId(path);
+	if (!pathId) return UnknownNetworkKeys.UNKNOWN;
+
 	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
-		networkParams => networkParams.pathId === path.split('//')[1]
+		networkParams => networkParams.pathId === pathId
 	);
 	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
 
@@ -145,20 +161,21 @@ export const getPathName = (path, lookUpIdentity) => {
 	if (!isSubstratePath(path)) {
 		return 'New Account';
 	}
-	const networkName = path.split('//')[1];
-	const restPath = path.slice(4 + networkName.length).split('///')[0];
-	return restPath.replace(/\//g, '');
+	return extractSubPathName(path);
 };
 
 export const groupPaths = paths => {
 	const unSortedPaths = paths.reduce((groupedPath, path) => {
-		const subPath = path.split('//')[2] || '';
-		const hardSubPath = subPath.split('/')[0] || '';
-		const existedItem = groupedPath.find(p => p.title === hardSubPath);
+		const pathId = extractPathId(path) || '';
+		const subPath = path.slice(pathId.length + 2);
+
+		const groupName = subPath.match(/(?<=\/)\w+(?=(\/)?)/)[0];
+
+		const existedItem = groupedPath.find(p => p.title === groupName);
 		if (existedItem) {
 			existedItem.paths.push(path);
 		} else {
-			groupedPath.push({ paths: [path], subPath: subPath, title: hardSubPath });
+			groupedPath.push({ paths: [path], title: groupName });
 		}
 		return groupedPath;
 	}, []);

@@ -27,53 +27,81 @@ import {
 	UnknownNetworkKeys
 } from '../../src/constants';
 
-const address1 = 'address1',
-	address2 = 'address2',
+const addressFunding1 = 'address1',
+	addressFunding2 = 'address2',
+	addressSoft = 'address3',
 	addressPolkadot = 'address5',
+	addressStacking = 'address4',
 	addressEthereum = 'address6',
+	addressDefault = 'addressDefault',
 	paths = [
 		'//kusama_CC2//default',
 		'//kusama_CC2//funding/1',
+		'//kusama_CC2/softKey1',
 		'//kusama_CC2//funding/2',
 		'//kusama_CC2//stacking/1',
 		'//polkadot//default',
 		'1'
 	],
-	pathMeta1 = {
-		address: address1,
+	metaDefault = {
+		address: addressDefault,
+		createdAt: 1571068850409,
+		name: '',
+		updatedAt: 1571078850509
+	},
+	metaFunding1 = {
+		address: addressFunding1,
 		createdAt: 1571068850409,
 		name: 'funding account1',
 		updatedAt: 1571078850509
 	},
-	pathMeta2 = {
-		address: address2,
+	metaFunding2 = {
+		address: addressFunding2,
 		createdAt: 1571068850409,
-		name: 'funding account2',
+		name: '',
 		updatedAt: 1571078850509
 	},
-	pathMetaPolkadot = {
+	metaStacking = {
+		address: addressStacking,
+		createdAt: 1571068850409,
+		name: '',
+		updatedAt: 1571078850509
+	},
+	metaPolkadot = {
 		address: addressPolkadot,
 		createdAt: 1573142786972,
 		name: 'PolkadotFirst',
 		updatedAt: 1573142786972
 	},
-	pathMetaEthereum = {
+	metaEthereum = {
 		address: addressEthereum,
 		createdAt: 1573142786972,
 		name: 'Eth account',
 		updatedAt: 1573142786972
+	},
+	metaSoftKey = {
+		address: addressSoft,
+		createdAt: 1573142786972,
+		name: '',
+		updatedAt: 1573142786972
 	};
 const addressMap = new Map([
-	[address1, paths[1]],
-	[address2, paths[2]],
-	[addressPolkadot, paths[4]],
-	[addressEthereum, paths[5]]
+	[addressDefault, paths[0]],
+	[addressFunding1, paths[1]],
+	[addressSoft, paths[2]],
+	[addressFunding2, paths[3]],
+	[addressStacking, paths[4]],
+	[addressPolkadot, paths[5]],
+	[addressEthereum, paths[6]]
 ]);
 const metaMap = new Map([
-	[paths[1], pathMeta1],
-	[paths[2], pathMeta2],
-	[paths[4], pathMetaPolkadot],
-	[paths[5], pathMetaEthereum]
+	[paths[0], metaDefault],
+	[paths[1], metaFunding1],
+	[paths[2], metaSoftKey],
+	[paths[3], metaStacking],
+	[paths[4], metaFunding2],
+	[paths[5], metaPolkadot],
+	[paths[6], metaEthereum]
 ]);
 const testIdentities = [
 	{
@@ -100,34 +128,42 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('regroup the paths', () => {
-		const kusamaPaths = paths.slice(0, 4);
+		const kusamaPaths = paths.slice(0, 5);
 		const groupResult = groupPaths(kusamaPaths);
 		expect(groupResult).toEqual([
 			{
 				paths: [paths[0]],
-				subPath: 'default',
 				title: 'default'
 			},
 			{
-				paths: [paths[3]],
-				subPath: 'stacking/1',
+				paths: [paths[2]],
+				title: 'softKey1'
+			},
+			{
+				paths: [paths[4]],
 				title: 'stacking'
 			},
 			{
-				paths: [paths[1], paths[2]],
-				subPath: 'funding/1',
+				paths: [paths[1], paths[3]],
 				title: 'funding'
 			}
 		]);
 	});
 
 	it('get the path name', () => {
-		const gotDefaultPathName = getPathName(paths[0], testIdentities[0]);
-		expect(gotDefaultPathName).toEqual('default');
-		const gotIdentity1PathName = getPathName(paths[1], testIdentities[0]);
-		expect(gotIdentity1PathName).toEqual('funding account1');
-		const gotStacking1PathName = getPathName(paths[3], testIdentities[0]);
-		expect(gotStacking1PathName).toEqual('stacking1');
+		const expectNames = [
+			'default',
+			'funding account1',
+			'softKey1',
+			'funding2',
+			'stacking1',
+			'PolkadotFirst',
+			'Eth account'
+		];
+		paths.forEach((path, index) => {
+			const name = getPathName(path, testIdentities[0]);
+			expect(name).toEqual(expectNames[index]);
+		});
 	});
 
 	it('get the correspond networkKeys', () => {

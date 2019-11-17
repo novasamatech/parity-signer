@@ -69,6 +69,7 @@ function PathDerivation({ accounts, navigation }) {
 				<Separator style={{ height: 0 }} />
 				<PathCard
 					identity={accounts.state.currentIdentity}
+					name={keyPairsName}
 					path={completePath}
 				/>
 				<ButtonMainAction

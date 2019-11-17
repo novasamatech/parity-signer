@@ -18,13 +18,15 @@ import TouchableItem from './TouchableItem';
 
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
+	name: PropTypes.string,
 	onPress: PropTypes.func,
 	path: PropTypes.string.isRequired,
 	testID: PropTypes.string
 };
 
-export default function PathCard({ onPress, identity, path, testID }) {
-	const pathName = getPathName(path, identity);
+export default function PathCard({ onPress, identity, path, name, testID }) {
+	const isNotEmptyName = name && name !== '';
+	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const address = getAddressWithPath(path, identity);
 
 	const networkKey = getNetworkKeyByPath(path);

@@ -105,7 +105,7 @@ function PathsList({ accounts, navigation }) {
 						<Text style={fontStyles.t_prefix}>{pathsGroup.title}</Text>
 						<Text style={fontStyles.t_codeS}>
 							{NETWORK_LIST[networkKey].pathId + '//'}
-							{pathsGroup.subPath}
+							{pathsGroup.title}
 						</Text>
 					</View>
 
