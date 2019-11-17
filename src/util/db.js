@@ -18,7 +18,7 @@
 
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
-import { accountId } from './account';
+import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 const currentAccountsStore = {
@@ -83,7 +83,7 @@ export const saveIdentities = identities => {
 };
 
 function accountTxsKey({ address, networkKey }) {
-	return 'account_txs_' + accountId({ address, networkKey });
+	return 'account_txs_' + generateAccountId({ address, networkKey });
 }
 
 function txKey(hash) {

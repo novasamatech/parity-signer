@@ -21,8 +21,8 @@ import PropTypes from 'prop-types';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import {
-	getAddressWithPath,
-	getIdFromAddress,
+	getAccountIdWithPath,
+	getAddressFromAccountId,
 	getNetworkKeyByPath,
 	getPathName
 } from '../util/identitiesUtils';
@@ -45,11 +45,11 @@ PathCard.propTypes = {
 export default function PathCard({ onPress, identity, path, name, testID }) {
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
-	const address = getAddressWithPath(path, identity);
+	const accountId = getAccountIdWithPath(path, identity);
 
 	const networkKey = getNetworkKeyByPath(path);
 	const network = NETWORK_LIST[networkKey];
-	const extractAddress = getIdFromAddress(address, network.protocol);
+	const extractAddress = getAddressFromAccountId(accountId, network.protocol);
 
 	const nonSubstrateCard = (
 		<View testID={testID}>

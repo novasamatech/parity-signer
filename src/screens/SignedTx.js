@@ -71,7 +71,9 @@ export function SignedTx({ scanner }) {
 						/>
 						<Text style={styles.title}>Recipient</Text>
 						<AccountCard
-							address={recipient.address}
+							accountId={
+								recipient.isLegacy ? recipient.address : recipient.accountId
+							}
 							networkKey={recipient.networkKey || ''}
 							title={recipient.name}
 						/>

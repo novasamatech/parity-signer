@@ -132,7 +132,7 @@ export class TxDetailsView extends React.PureComponent {
 				</View>
 				<AccountCard
 					title={sender.name}
-					address={sender.address}
+					accountId={sender.isLegacy ? sender.address : sender.accountId}
 					networkKey={sender.networkKey}
 				/>
 				<Text style={styles.title}>Transaction Details</Text>
@@ -149,7 +149,9 @@ export class TxDetailsView extends React.PureComponent {
 						<Text style={styles.title}>Recipient</Text>
 						<AccountCard
 							title={recipient.name}
-							address={recipient.address}
+							accountId={
+								recipient.isLegacy ? recipient.address : recipient.accountId
+							}
 							networkKey={recipient.networkKey || ''}
 						/>
 					</View>

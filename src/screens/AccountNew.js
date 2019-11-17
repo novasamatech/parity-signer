@@ -83,7 +83,7 @@ function AccountNew({ accounts, navigation }) {
 				<Text style={styles.title}>NETWORK</Text>
 			</View>
 			<AccountCard
-				address={''}
+				accountId={''}
 				title={selectedNetwork.title}
 				networkKey={selectedAccount.networkKey}
 				onPress={() => navigation.navigate('LegacyNetworkChooser')}

@@ -19,9 +19,9 @@
 import { Container } from 'unstated';
 
 import {
-	accountId,
 	emptyAccount,
-	extractAddressFromAccountId
+	extractAddressFromAccountId,
+	generateAccountId
 } from '../util/account';
 import {
 	loadAccounts,
@@ -80,7 +80,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const account = this.state.newAccount;
 		if (!account.seed) return;
 
-		const accountKey = accountId(account);
+		const accountKey = generateAccountId(account);
 		await this.save(accountKey, account, pin);
 
 		this.setState({
@@ -94,19 +94,19 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const ethereumAddress = await brainWalletAddress(seed);
 		if (ethereumAddress === '') return false;
 		const { ethereumChainId } = networkParams;
-		const accountAddress = accountId({
+		const accountId = generateAccountId({
 			address: ethereumAddress.address,
 			networkKey
 		});
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		if (updatedCurrentIdentity.meta.has(ethereumChainId)) return false;
 		updatedCurrentIdentity.meta.set(ethereumChainId, {
-			address: accountAddress,
+			accountId,
 			createdAt: new Date().getTime(),
 			name: '',
 			updatedAt: new Date().getTime()
 		});
-		updatedCurrentIdentity.addresses.set(accountAddress, ethereumChainId);
+		updatedCurrentIdentity.accountIds.set(accountId, ethereumChainId);
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
@@ -212,26 +212,26 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async getById({ address, networkKey }) {
-		const generateAccountId = accountId({ address, networkKey });
-		const legacyAccount = this.state.accounts.get(generateAccountId);
+		const accountId = generateAccountId({ address, networkKey });
+		const legacyAccount = this.state.accounts.get(accountId);
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
-		const derivedAccount = await this.getAccountFromIdentity(generateAccountId);
+		const derivedAccount = await this.getAccountFromIdentity(accountId);
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
 		return emptyAccount(address, networkKey);
 	}
 
-	async getAccountFromIdentity(address) {
-		const isAccountId = address.split(':').length > 1;
+	async getAccountFromIdentity(accountIdOrAddress) {
+		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		const mapFunction = isAccountId ? i => i : extractAddressFromAccountId;
 		let targetPath = null;
 		let targetIdentity = null;
 		for (const identity of this.state.identities) {
-			const addressIndex = Array.from(identity.addresses.keys())
+			const accountIdIndex = Array.from(identity.accountIds.keys())
 				.map(mapFunction)
-				.indexOf(address);
-			if (addressIndex !== -1) {
+				.indexOf(accountIdOrAddress);
+			if (accountIdIndex !== -1) {
 				await this.setState({ currentIdentity: identity });
-				targetPath = Array.from(identity.addresses.values())[addressIndex];
+				targetPath = Array.from(identity.accountIds.values())[accountIdIndex];
 				targetIdentity = identity;
 				break;
 			}
@@ -369,22 +369,22 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const address = await substrateAddress(suri, prefix);
 		if (address === '') return false;
 		if (updatedCurrentIdentity.meta.has(newPath)) return false;
-		const accountAddress = accountId({ address, networkKey });
+		const accountId = generateAccountId({ address, networkKey });
 		updatedCurrentIdentity.meta.set(newPath, {
-			address: accountAddress,
+			accountId,
 			createdAt: new Date().getTime(),
 			name: '',
 			updatedAt: new Date().getTime()
 		});
-		updatedCurrentIdentity.addresses.set(accountAddress, newPath);
+		updatedCurrentIdentity.accountIds.set(accountId, newPath);
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
 	async deletePath(path) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const { address } = updatedCurrentIdentity.meta.get(path);
+		const { accountId } = updatedCurrentIdentity.meta.get(path);
 		updatedCurrentIdentity.meta.delete(path);
-		updatedCurrentIdentity.addresses.delete(address);
+		updatedCurrentIdentity.accountIds.delete(accountId);
 		try {
 			await this.setState({
 				currentIdentity: updatedCurrentIdentity

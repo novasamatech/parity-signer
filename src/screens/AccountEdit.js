@@ -43,7 +43,7 @@ export default class AccountEdit extends React.PureComponent {
 						<ScrollView style={styles.body}>
 							<AccountCard
 								title={selected.name}
-								address={selected.address}
+								accountId={selected.address}
 								networkKey={selected.networkKey}
 							/>
 							<TextInput

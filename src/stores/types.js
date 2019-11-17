@@ -41,7 +41,7 @@ export type Identity = {
 	encryptedSeedPhrase: string,
 	derivationPassword: string,
 	meta: Map<string, AccountMeta>,
-	addresses: Map<string, string>,
+	accountIds: Map<string, string>,
 	name: string
 };
 

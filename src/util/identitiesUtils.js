@@ -51,7 +51,7 @@ export const isSubstratePath = path => path.split('//')[1] !== undefined;
 
 export function emptyIdentity() {
 	return {
-		addresses: new Map(),
+		accountIds: new Map(),
 		derivationPassword: '',
 		encryptedSeedPhrase: '',
 		meta: new Map(),
@@ -114,15 +114,15 @@ export const getNetworkKeyByPath = path => {
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
-export const getAddressWithPath = (path, identity) => {
+export const getAccountIdWithPath = (path, identity) => {
 	const pathMeta = identity.meta.get(path);
-	if (pathMeta && pathMeta.address) return pathMeta.address;
+	if (pathMeta && pathMeta.accountId) return pathMeta.accountId;
 	return '';
 };
 
 export const getAvailableNetworkKeys = identity => {
-	const addressesList = Array.from(identity.addresses.values());
-	const networkKeysSet = addressesList.reduce((networksSet, path) => {
+	const accountIdsList = Array.from(identity.accountIds.values());
+	const networkKeysSet = accountIdsList.reduce((networksSet, path) => {
 		let networkKey;
 		if (isSubstratePath(path)) {
 			networkKey = getNetworkKeyByPath(path);
@@ -134,13 +134,13 @@ export const getAvailableNetworkKeys = identity => {
 	return Object.keys(networkKeysSet);
 };
 
-export const getIdFromAddress = (address, protocol) => {
-	if (!address) return '';
+export const getAddressFromAccountId = (accountId, protocol) => {
+	if (!accountId) return '';
 	if (protocol === NetworkProtocols.SUBSTRATE) {
-		return address.split(':')[1] || address;
+		return accountId.split(':')[1] || accountId;
 	} else {
-		const withoutPrefix = address.split(':')[1] || address;
-		const withOut0x = withoutPrefix.split('0x')[1] || address;
+		const withoutPrefix = accountId.split(':')[1] || accountId;
+		const withOut0x = withoutPrefix.split('0x')[1] || accountId;
 		return withOut0x.split('@')[0];
 	}
 };

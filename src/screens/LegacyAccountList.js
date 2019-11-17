@@ -74,7 +74,7 @@ class AccountListView extends React.PureComponent {
 					renderItem={({ item: [accountKey, account] }) => {
 						return (
 							<AccountCard
-								address={account.address}
+								accountId={account.address}
 								networkKey={account.networkKey}
 								onPress={() => {
 									onAccountSelected(accountKey);

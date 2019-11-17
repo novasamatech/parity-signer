@@ -148,7 +148,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			return (
 				<>
 					<AccountCard
-						address={'new'}
+						accountId={'new'}
 						isNetworkCard={true}
 						onPress={() => setShouldShowMoreNetworks(true)}
 						title="Add Network Account"
@@ -202,7 +202,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				{NetworkList.map(([networkKey, networkParams], index) => (
 					<AccountCard
 						isNetworkCard={true}
-						address={''}
+						accountId={''}
 						key={networkKey}
 						testID={testIDs.AccountNetworkChooser.networkButton + index}
 						networkKey={networkKey}

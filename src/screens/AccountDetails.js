@@ -145,7 +145,7 @@ class AccountDetailsView extends React.Component {
 					</View>
 				</View>
 				<AccountCard
-					address={account.address}
+					accountId={account.address}
 					networkKey={account.networkKey}
 					title={account.name}
 				/>

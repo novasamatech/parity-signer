@@ -20,7 +20,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import colors from '../colors';
-import { accountId } from '../util/account';
+import { generateAccountId } from '../util/account';
 import {
 	loadAccounts,
 	loadToCAndPPConfirmation,
@@ -60,7 +60,7 @@ export default class Loading extends React.PureComponent {
 
 		accounts.forEach(account => {
 			try {
-				saveAccount(accountId(account), account);
+				saveAccount(generateAccountId(account), account);
 			} catch (e) {
 				console.error(e);
 			}

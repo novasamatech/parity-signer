@@ -24,7 +24,7 @@ import {
 	SubstrateNetworkKeys
 } from '../constants';
 
-export function accountId({ address, networkKey }) {
+export function generateAccountId({ address, networkKey }) {
 	if (
 		typeof address !== 'string' ||
 		address.length === 0 ||

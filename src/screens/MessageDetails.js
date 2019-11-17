@@ -118,7 +118,7 @@ export class MessageDetailsView extends React.PureComponent {
 				<Text style={styles.title}>From Account</Text>
 				<AccountCard
 					title={sender.name}
-					address={sender.address}
+					accountId={sender.isLegacy ? sender.address : sender.accountId}
 					networkKey={sender.networkKey}
 				/>
 				{!isEthereum && prehash && prefix ? (

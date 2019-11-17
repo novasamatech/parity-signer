@@ -26,7 +26,7 @@ import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import {
-	getAddressWithPath,
+	getAccountIdWithPath,
 	getNetworkKeyByPath,
 	isSubstratePath
 } from '../util/identitiesUtils';
@@ -37,7 +37,7 @@ import testIDs from '../../e2e/testIDs';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
-	const address = getAddressWithPath(path, currentIdentity);
+	const address = getAccountIdWithPath(path, currentIdentity);
 
 	const onOptionSelect = value => {
 		if (value === 'PathDelete') {
