@@ -18,7 +18,6 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NavigationActions, StackActions } from 'react-navigation';
 
 import colors from '../colors';
 import { accountId } from '../util/account';
@@ -31,34 +30,13 @@ import {
 export default class Loading extends React.PureComponent {
 	async componentDidMount() {
 		const tocPP = await loadToCAndPPConfirmation();
-		const firstScreen = 'Welcome';
-		const firstScreenActions = StackActions.reset({
-			actions: [NavigationActions.navigate({ routeName: firstScreen })],
-			index: 0,
-			key: null
-		});
-		let tocActions;
-
+		const { navigate } = this.props.navigation;
 		if (!tocPP) {
 			this.migrateAccounts();
-
-			tocActions = StackActions.reset({
-				actions: [
-					NavigationActions.navigate({
-						params: {
-							firstScreenActions
-						},
-						routeName: 'TermsAndConditions'
-					})
-				],
-				index: 0
-			});
+			navigate('TocAndPrivacyPolicy');
 		} else {
-			tocActions = firstScreenActions;
+			navigate('Welcome');
 		}
-
-		// await loadAccounts();
-		this.props.navigation.dispatch(tocActions);
 	}
 
 	async migrateAccounts() {

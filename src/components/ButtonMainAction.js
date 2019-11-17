@@ -40,9 +40,8 @@ export default class ButtonMainAction extends React.PureComponent {
 		}
 
 		return (
-			<View style={[finalViewStyles, style]}>
+			<View style={[finalViewStyles, style]} testID={testID}>
 				<Button
-					testID={testID}
 					title={title}
 					onPress={onPress}
 					style={finalButtonStyles}

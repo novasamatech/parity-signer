@@ -116,7 +116,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					title="Terms and Conditions"
 					onPress={() => {
 						setVisible(false);
-						navigation.navigate('TermsAndConditions');
+						navigation.navigate('TermsAndConditions', { disableButtons: true });
 					}}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
@@ -215,6 +215,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					onPressIn={() => setVisible(false)}
 				>
 					<View
+						testID={testIDs.IdentitiesSwitch.modal}
 						style={styles.container}
 						onPress={() => {
 							setVisible(false);
@@ -243,6 +244,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 
 							<ButtonIcon
 								title="Add Identity"
+								testID={testIDs.IdentitiesSwitch.addIdentityButton}
 								onPress={() => {
 									setVisible(false);
 									navigation.navigate('IdentityNew');

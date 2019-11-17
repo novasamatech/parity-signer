@@ -1,5 +1,6 @@
 import testIDs from './testIDs';
 import {
+	tapBack,
 	testExist,
 	testInput,
 	testNotExist,
@@ -27,7 +28,7 @@ const {
 
 const pinCode = '123456';
 const mockIdentityName = 'mockIdentity';
-const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '0'; //Need change if network list changes
+const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '2'; //Need change if network list changes
 const fundingPath = '//funding/0';
 const mockSeedPhrase =
 	'split cradle example drum veteran swear cruel pizza guilt surface mansion film grant benefit educate marble cargo ignore bind include advance grunt exile grow';
@@ -42,7 +43,7 @@ const testSetUpDefaultPath = async () => {
 		testIDs.AccountNetworkChooser.chooserScreen
 	);
 	await testUnlockPin(pinCode);
-	await testExist(PathsList.pathCard + '//substrate_dev//default');
+	await testExist(PathsList.pathCard + '//kusama_CC2//default');
 };
 
 describe('Load test', async () => {
@@ -71,11 +72,14 @@ describe('Load test', async () => {
 	});
 
 	it('create a new identity with default substrate account', async () => {
-		await testTap(AccountNetworkChooser.createButton);
+		await tapBack();
+		await testTap(IdentitiesSwitch.toggleButton);
+		await testTap(IdentitiesSwitch.addIdentityButton);
 		await testNotVisible(IdentityNew.seedInput);
 		await testTap(IdentityNew.createButton);
 		await testVisible(IdentityBackup.seedText);
 		await testTap(IdentityBackup.nextButton);
+		await element(by.text('Proceed')).tap();
 		await testSetUpDefaultPath();
 	});
 
@@ -88,14 +92,9 @@ describe('Load test', async () => {
 		await testExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
 	});
 
-	it('should sign the transaction', async () => {
-		await testTap(AccountNetworkChooser.scanButton);
-		await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
-		await testUnlockPin(pinCode);
-		await testVisible(SignedTx.qrView);
-	});
-
 	it('delete a path', async () => {
+		await tapBack();
+		await testTap(AccountNetworkChooser.networkButton + '0');
 		await testTap(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
@@ -103,14 +102,23 @@ describe('Load test', async () => {
 		await testNotExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
 	});
 
+	it('should sign the transaction', async () => {
+		await tapBack();
+		await testTap(AccountNetworkChooser.scanButton);
+		await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
+		await testUnlockPin(pinCode);
+		await testVisible(SignedTx.qrView);
+	});
+
 	it('delete identity', async () => {
 		await element(by.id(IdentitiesSwitch.toggleButton))
 			.atIndex(0)
 			.tap();
 		await testTap(IdentitiesSwitch.manageIdentityButton);
+		await testTap(IdentityManagement.popupMenuButton);
 		await testTap(IdentityManagement.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testUnlockPin(pinCode);
-		await testVisible(AccountNetworkChooser.noAccountScreen);
+		await testVisible(IdentitiesSwitch.modal);
 	});
 });

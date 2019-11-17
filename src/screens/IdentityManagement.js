@@ -39,6 +39,7 @@ function IdentityManagement({ accounts, navigation }) {
 			<ScreenHeading title="Manage Identity" />
 			<View style={styles.menuView}>
 				<PopupMenu
+					testID={testIDs.IdentityManagement.popupMenuButton}
 					onSelect={onOptionSelect}
 					menuTriggerIconName={'more-vert'}
 					menuItems={[

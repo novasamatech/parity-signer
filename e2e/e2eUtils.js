@@ -15,6 +15,11 @@ export const testNotExist = async componentId =>
 export const testNotVisible = async componentId =>
 	await expect(element(by.id(componentId))).toBeNotVisible();
 
+export const tapBack = async () =>
+	await element(by.id(testIDs.Header.headerBackButton))
+		.atIndex(0)
+		.tap();
+
 // export const timeout = m => new Promise(r => setTimeout(r, m));
 
 export const testInput = async (inputId, inputText) => {

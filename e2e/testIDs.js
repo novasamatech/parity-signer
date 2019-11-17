@@ -12,8 +12,13 @@ const testIDs = {
 		scanButton: 'anc_scan_button',
 		showExistedButton: 'anc_show_existed'
 	},
+	Header: {
+		headerBackButton: 'header_back_button'
+	},
 	IdentitiesSwitch: {
+		addIdentityButton: 'identities_switch_add_identity',
 		manageIdentityButton: 'identities_switch_manager_button',
+		modal: 'identity_switch_modal',
 		toggleButton: 'identities_switch_toggle_button'
 	},
 	IdentityBackup: {
@@ -21,7 +26,8 @@ const testIDs = {
 		seedText: 'identity_backup_seed'
 	},
 	IdentityManagement: {
-		deleteButton: 'identity_management_delete_button'
+		deleteButton: 'identity_management_delete_button',
+		popupMenuButton: 'identity_management_popup_menu'
 	},
 	IdentityNew: {
 		createButton: 'identity_new_create_button',

@@ -191,7 +191,6 @@ function AccountNetworkChooser({ navigation, accounts }) {
 
 	const NetworkList = Object.entries(NETWORK_LIST).filter(getNetworkKeys);
 	NetworkList.sort(sortNetworkKeys);
-	console.log('network list is', NetworkList);
 
 	return (
 		<View

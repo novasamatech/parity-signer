@@ -76,7 +76,7 @@ function PathsList({ accounts, navigation }) {
 	};
 
 	const renderGroupPaths = pathsGroup => (
-		<View style={{ marginTop: 24 }}>
+		<View key={`group${pathsGroup.title}`} style={{ marginTop: 24 }}>
 			<View
 				style={{
 					backgroundColor: colors.bg,
