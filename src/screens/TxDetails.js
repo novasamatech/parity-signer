@@ -27,7 +27,6 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
@@ -39,12 +38,13 @@ import { navigateToSignedTx, unlockSeed } from '../util/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import testIDs from '../../e2e/testIDs';
 import fontStyles from '../fontStyles';
+import CompatibleCard from '../components/CompatibleCard';
 
 export default class TxDetails extends React.PureComponent {
 	render() {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{scannerStore => {
+				{(scannerStore, accountsStore) => {
 					const txRequest = scannerStore.getTXRequest();
 					const sender = scannerStore.getSender();
 					if (txRequest) {
@@ -53,6 +53,7 @@ export default class TxDetails extends React.PureComponent {
 						return (
 							<TxDetailsView
 								{...{ ...this.props, ...tx }}
+								accountsStore={accountsStore}
 								scannerStore={scannerStore}
 								sender={sender}
 								recipient={scannerStore.getRecipient()}
@@ -106,10 +107,10 @@ export class TxDetailsView extends React.PureComponent {
 	render() {
 		const {
 			// dataToSign,
+			accountsStore,
 			gas,
 			gasPrice,
 			prehash,
-			recipient,
 			sender,
 			value,
 			onNext
@@ -135,12 +136,10 @@ export class TxDetailsView extends React.PureComponent {
 						small={true}
 					/>
 					<Background />
-					<AccountCard
+					<CompatibleCard
+						account={sender}
+						accountsStore={accountsStore}
 						titlePrefix={'from: '}
-						title={sender.name}
-						accountId={sender.isLegacy ? sender.address : sender.accountId}
-						networkKey={sender.networkKey}
-						style={{ marginBottom: 24 }}
 					/>
 					<View style={styles.bodyContent}>
 						{isEthereum ? (
@@ -153,12 +152,10 @@ export class TxDetailsView extends React.PureComponent {
 									gasPrice={gasPrice}
 								/>
 								<Text style={styles.title}>Recipient</Text>
-								<AccountCard
-									title={recipient.name}
-									accountId={
-										recipient.isLegacy ? recipient.address : recipient.accountId
-									}
-									networkKey={recipient.networkKey || ''}
+								<CompatibleCard
+									account={sender}
+									accountsStore={accountsStore}
+								/>
 								/>
 							</View>
 						) : (

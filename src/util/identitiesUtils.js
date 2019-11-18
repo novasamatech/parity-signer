@@ -32,7 +32,7 @@ const extractPathId = path => {
 	return removeSlash(matchNetworkPath[0]);
 };
 
-const extractSubPathName = path => {
+export const extractSubPathName = path => {
 	const pathFragments = path.match(pathsRegex.allPath);
 	if (!pathFragments || pathFragments.length <= 1) return '';
 	return removeSlash(pathFragments.slice(1).join(''));
@@ -156,7 +156,7 @@ export const getPathName = (path, lookUpIdentity) => {
 		return lookUpIdentity.meta.get(path).name;
 	}
 	if (!isSubstratePath(path)) {
-		return 'New Account';
+		return 'No name';
 	}
 	return extractSubPathName(path);
 };
@@ -178,22 +178,3 @@ export const groupPaths = paths => {
 	}, []);
 	return unSortedPaths.sort((a, b) => a.paths.length - b.paths.length);
 };
-
-// export function omit(object, omitKeys) {
-// 	const result = Object.assign({}, object);
-// 	for (const omitKey of omitKeys) {
-// 		delete result[omitKey];
-// 	}
-// 	return result;
-// }
-
-// export function checkIdentityExistence(encryptedSeed, accountStore) {
-// 	return accountStore.identities.find(
-// 		identity => identity.encryptedSeed === encryptedSeed
-// 	);
-// }
-//
-// export function findIdentityIndexByAccountId(accountId, accountsStore) {
-// 	const [, address, genesisHash] = accountId.split(':');
-// 	accountsStore.identities.findIndex();
-// }

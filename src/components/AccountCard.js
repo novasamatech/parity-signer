@@ -44,7 +44,7 @@ export default class AccountCard extends React.PureComponent {
 
 	static defaultProps = {
 		onPress: () => {},
-		title: 'no name'
+		title: 'No name'
 	};
 
 	render() {

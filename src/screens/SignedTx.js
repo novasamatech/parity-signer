@@ -20,7 +20,6 @@ import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import colors from '../colors';
-import AccountCard from '../components/AccountCard';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
@@ -30,10 +29,11 @@ import {
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
 import testIDs from '../../e2e/testIDs';
-import { withScannerStore } from '../util/HOC';
+import { withAccountAndScannerStore } from '../util/HOC';
 import fontStyles from '../fontStyles';
+import CompatibleCard from '../components/CompatibleCard';
 
-export function SignedTx({ scanner }) {
+export function SignedTx({ scanner, accounts }) {
 	const { gas, gasPrice, value } = scanner.getTx();
 	const data = scanner.getSignedTxData();
 	const recipient = scanner.getRecipient();
@@ -70,13 +70,7 @@ export function SignedTx({ scanner }) {
 							gasPrice={gasPrice}
 						/>
 						<Text style={styles.title}>Recipient</Text>
-						<AccountCard
-							accountId={
-								recipient.isLegacy ? recipient.address : recipient.accountId
-							}
-							networkKey={recipient.networkKey || ''}
-							title={recipient.name}
-						/>
+						<CompatibleCard account={recipient} accountsStore={accounts} />
 					</React.Fragment>
 				) : (
 					<PayloadDetailsCard
@@ -92,7 +86,7 @@ export function SignedTx({ scanner }) {
 	);
 }
 
-export default withScannerStore(SignedTx);
+export default withAccountAndScannerStore(SignedTx);
 
 const TX_DETAILS_MSG = 'After signing and publishing you will have sent';
 

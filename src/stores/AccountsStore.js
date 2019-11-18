@@ -282,6 +282,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return phrase;
 	}
 
+	getIdentityByAccountId(accountId) {
+		return this.state.identities.find(identity =>
+			identity.accountIds.has(accountId)
+		);
+	}
+
 	getNewIdentity() {
 		return this.state.newIdentity;
 	}
