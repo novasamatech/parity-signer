@@ -29,7 +29,7 @@ import { getIdentityName } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 
 function IdentitiesSwitch({ navigation, accounts }) {
-	const defaultVisible = navigation.getParam('isSwitchOpen', true);
+	const defaultVisible = navigation.getParam('isSwitchOpen', false);
 	const [visible, setVisible] = useState(defaultVisible);
 	const { currentIdentity, identities } = accounts.state;
 
