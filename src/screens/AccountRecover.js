@@ -217,7 +217,6 @@ class AccountRecoverView extends React.Component {
 								findNodeHandle(event.target)
 							);
 						}}
-						ref={this._seed}
 						valid={
 							validateSeed(seedPhrase, validBip39Seed).valid ||
 							(isSubstrate && address)

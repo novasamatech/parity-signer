@@ -16,7 +16,6 @@
 
 'use strict';
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
@@ -27,11 +26,6 @@ import Background from '../components/Background';
 import testIDs from '../../e2e/testIDs';
 import ButtonMainAction from '../components/ButtonMainAction';
 import { withAccountStore } from '../util/HOC';
-
-LegacyAccountList.propTypes = {
-	accounts: PropTypes.object.isRequired,
-	onAccountSelected: PropTypes.func.isRequired
-};
 
 function LegacyAccountList({ navigation, accounts }) {
 	const onAccountSelected = async key => {
@@ -44,9 +38,6 @@ function LegacyAccountList({ navigation, accounts }) {
 		<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
 			<Background />
 			<FlatList
-				ref={list => {
-					this.list = list;
-				}}
 				style={styles.content}
 				data={Array.from(accountsMap.entries())}
 				keyExtractor={([key]) => key}
