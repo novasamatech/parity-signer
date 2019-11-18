@@ -38,7 +38,8 @@ export default class AccountCard extends React.PureComponent {
 		seedType: PropTypes.string,
 		style: ViewPropTypes.style,
 		testID: PropTypes.string,
-		title: PropTypes.string
+		title: PropTypes.string,
+		titlePrefix: PropTypes.string
 	};
 
 	static defaultProps = {
@@ -55,7 +56,8 @@ export default class AccountCard extends React.PureComponent {
 			onPress,
 			seedType,
 			style,
-			testID
+			testID,
+			titlePrefix
 		} = this.props;
 		let { title } = this.props;
 		title = title.length ? title : AccountCard.defaultProps.title;
@@ -97,9 +99,20 @@ export default class AccountCard extends React.PureComponent {
 								</Text>
 							</View>
 						)}
-						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
-							{title}
-						</Text>
+						<View style={{ flexDirection: 'row', marginTop: -2 }}>
+							<Text
+								numberOfLines={1}
+								style={[
+									fontStyles.t_codeS,
+									{ color: colors.bg_button, marginTop: 7 }
+								]}
+							>
+								{titlePrefix}
+							</Text>
+							<Text numberOfLines={1} style={fontStyles.h2}>
+								{title}
+							</Text>
+						</View>
 						{accountId !== '' && (
 							<Address address={extractAddress} protocol={network.protocol} />
 						)}
@@ -121,7 +134,6 @@ export default class AccountCard extends React.PureComponent {
 const styles = StyleSheet.create({
 	content: {
 		alignItems: 'center',
-		//backgroundColor: colors.bg,
 		flexDirection: 'row',
 		paddingLeft: 16
 	},

@@ -27,5 +27,6 @@ export default {
 	card_bgSolid: '#323232',
 	card_bg_text_sec: '#999',
 	card_text: '#1A1A1A',
-	label_text: '#48A5C2'
+	label_text: '#48A5C2',
+	label_text_sec: '#A8CDD9'
 };

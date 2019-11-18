@@ -29,7 +29,8 @@ import {
 } from '../constants';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
-import Button from '../components/Button';
+import ButtonMainAction from '../components/ButtonMainAction';
+import ScreenHeading from '../components/ScreenHeading';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
@@ -120,100 +121,76 @@ export class TxDetailsView extends React.PureComponent {
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
 
 		return (
-			<ScrollView
-				style={styles.body}
-				contentContainerStyle={{ paddingBottom: 40 }}
-				testID={testIDs.TxDetails.scrollScreen}
-			>
-				<Background />
-				<Text style={styles.topTitle}>Sign Transaction</Text>
-				<View style={styles.bodyContent}>
-					<Text style={styles.title}>From Account</Text>
-				</View>
-				<AccountCard
-					title={sender.name}
-					accountId={sender.isLegacy ? sender.address : sender.accountId}
-					networkKey={sender.networkKey}
+			<View style={styles.body}>
+				<ScreenHeading
+					title="Sign Transaction"
+					subtitle="step 1/2 – verify and  sign"
 				/>
-				<Text style={styles.title}>Transaction Details</Text>
-
-				{isEthereum ? (
-					<View>
-						<TxDetailsCard
-							style={{ marginBottom: 20 }}
-							description="You are about to send the following amount"
-							value={value}
-							gas={gas}
-							gasPrice={gasPrice}
-						/>
-						<Text style={styles.title}>Recipient</Text>
-						<AccountCard
-							title={recipient.name}
-							accountId={
-								recipient.isLegacy ? recipient.address : recipient.accountId
-							}
-							networkKey={recipient.networkKey || ''}
-						/>
-					</View>
-				) : (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						description="You are about to confirm sending the following extrinsic"
-						payload={prehash}
-						prefix={prefix}
+				<ScrollView
+					contentContainerStyle={{ paddingBottom: 120 }}
+					testID={testIDs.TxDetails.scrollScreen}
+				>
+					<ScreenHeading
+						title="You are about to confirm sending the following extrinsic:"
+						small={true}
 					/>
-				)}
-
-				<Button
-					buttonStyles={{ height: 60 }}
+					<Background />
+					<AccountCard
+						titlePrefix={'from: '}
+						title={sender.name}
+						accountId={sender.isLegacy ? sender.address : sender.accountId}
+						networkKey={sender.networkKey}
+						style={{ marginBottom: 24 }}
+					/>
+					<View style={styles.bodyContent}>
+						{isEthereum ? (
+							<View>
+								<TxDetailsCard
+									style={{ marginBottom: 20 }}
+									description="You are about to send the following amount"
+									value={value}
+									gas={gas}
+									gasPrice={gasPrice}
+								/>
+								<Text style={styles.title}>Recipient</Text>
+								<AccountCard
+									title={recipient.name}
+									accountId={
+										recipient.isLegacy ? recipient.address : recipient.accountId
+									}
+									networkKey={recipient.networkKey || ''}
+								/>
+							</View>
+						) : (
+							<PayloadDetailsCard
+								style={{ marginBottom: 20 }}
+								payload={prehash}
+								prefix={prefix}
+							/>
+						)}
+					</View>
+				</ScrollView>
+				<ButtonMainAction
 					testID={testIDs.TxDetails.signButton}
 					title="Sign Transaction"
 					onPress={() => onNext()}
 				/>
-			</ScrollView>
+			</View>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
-	actionButtonContainer: {
-		flex: 1
-	},
-	actionsContainer: {
-		flex: 1,
-		flexDirection: 'row'
-	},
-	address: {
-		flex: 1
-	},
 	body: {
 		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
-		flex: 1,
-		paddingHorizontal: 20,
-		paddingTop: 24
-	},
-	changePinText: {
-		color: 'green',
-		textAlign: 'left'
-	},
-	deleteText: {
-		textAlign: 'right'
-	},
-	title: {
-		...fontStyles.h2,
-		paddingBottom: 20
-	},
-	topTitle: {
-		...fontStyles.h1,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	transactionDetails: {
-		backgroundColor: colors.card_bg,
 		flex: 1
 	},
-	wrapper: {
-		borderRadius: 5
+	bodyContent: {
+		paddingHorizontal: 16
+	},
+	title: {
+		...fontStyles.t_regular,
+		paddingBottom: 8
 	}
 });

@@ -97,7 +97,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
 		return (
 			<View style={[styles.body, style]}>
-				<Text style={styles.titleText}>{description}</Text>
+				{!!description && <Text style={styles.titleText}>{description}</Text>}
 				{!!payload && (
 					<View style={{ paddingVertical: 2 }}>
 						<ExtrinsicPart
@@ -230,13 +230,9 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 	const renderEraDetails = () => {
 		if (period && phase) {
 			return (
-				<View style={{ display: 'flex', flexDirection: 'column', padding: 5 }}>
-					<View style={styles.era}>
-						<Text style={{ ...styles.subLabel, flex: 1 }}>phase: </Text>
-						<Text style={{ ...styles.secondaryText, flex: 1 }}>{phase}</Text>
-						<Text style={{ ...styles.subLabel, flex: 1 }}>period: </Text>
-						<Text style={{ ...styles.secondaryText, flex: 1 }}>{period}</Text>
-					</View>
+				<View style={styles.era}>
+					<Text style={{ ...styles.subLabel, flex: 1 }}>phase: {phase} </Text>
+					<Text style={{ ...styles.subLabel, flex: 1 }}>period: {period}</Text>
 				</View>
 			);
 		} else {
@@ -245,8 +241,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
-						flexWrap: 'wrap',
-						padding: 5
+						flexWrap: 'wrap'
 					}}
 				>
 					<Text style={{ ...styles.subLabel, flex: 1 }}>Immortal Era</Text>
@@ -285,13 +280,15 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 						{paramArgs ? (
 							paramArgs.map(([param, arg]) => (
 								<View key={param} style={styles.callDetails}>
-									<Text style={styles.subLabel}>{param}: </Text>
-									<Text style={styles.secondaryText}>
+									<Text style={styles.titleText}>
+										{' { '}
+										{param}:{' '}
 										{arg && arg.length > 50
 											? shortString(arg)
 											: arg instanceof Array
 											? arg.join(', ')
-											: arg}
+											: arg}{' '}
+										{'}'}
 									</Text>
 								</View>
 							))
@@ -316,7 +313,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 	return (
 		<View style={[{ alignItems: 'baseline', justifyContent: 'flex-start' }]}>
-			<View style={{ marginVertical: 5, paddingVertical: 2, width: '100%' }}>
+			<View style={{ marginBottom: 12, width: '100%' }}>
 				<Text style={styles.label}>{label}</Text>
 				{label === 'Method' && !useFallback ? (
 					renderMethodDetails()
@@ -335,49 +332,33 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 }
 
 const styles = StyleSheet.create({
-	body: {
-		flexDirection: 'column',
-		paddingTop: 10
-	},
 	callDetails: {
-		alignItems: 'flex-start',
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'flex-start',
-		paddingLeft: 5,
-		width: '100%'
+		marginBottom: 4
 	},
 	era: {
-		alignItems: 'flex-end',
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-around'
-	},
-	icon: {
-		height: 47,
-		width: 47
+		flexDirection: 'row'
 	},
 	label: {
 		...fontStyles.t_label,
 		backgroundColor: colors.label_text,
-		paddingLeft: 5,
+		marginBottom: 10,
+		paddingLeft: 8,
 		textAlign: 'left'
 	},
 	secondaryText: {
 		...fontStyles.t_codeS,
 		color: colors.label_text,
-		paddingLeft: 8,
+		paddingHorizontal: 8,
 		textAlign: 'left'
 	},
 	subLabel: {
 		...fontStyles.t_codeS,
 		color: colors.label_text,
-		paddingLeft: 3,
+		paddingLeft: 8,
 		textAlign: 'left'
 	},
 	titleText: {
 		...fontStyles.t_codeS,
-		color: colors.label_text,
-		textAlign: 'center'
+		color: colors.label_text_sec
 	}
 });
