@@ -39,10 +39,18 @@ PathCard.propTypes = {
 	name: PropTypes.string,
 	onPress: PropTypes.func,
 	path: PropTypes.string.isRequired,
-	testID: PropTypes.string
+	testID: PropTypes.string,
+	titlePrefix: PropTypes.string
 };
 
-export default function PathCard({ onPress, identity, path, name, testID }) {
+export default function PathCard({
+	onPress,
+	identity,
+	path,
+	name,
+	testID,
+	titlePrefix
+}) {
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const accountId = getAccountIdWithPath(path, identity);
@@ -74,9 +82,22 @@ export default function PathCard({ onPress, identity, path, name, testID }) {
 							{network.title}
 						</Text>
 					</View>
-					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
-						{pathName}
-					</Text>
+					<View style={{ flexDirection: 'row' }}>
+						{!!titlePrefix && (
+							<Text
+								numberOfLines={1}
+								style={[
+									fontStyles.t_codeS,
+									{ color: colors.bg_button, marginTop: 5 }
+								]}
+							>
+								{titlePrefix}
+							</Text>
+						)}
+						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+							{pathName}
+						</Text>
+					</View>
 					<Address address={extractAddress} protocol={network.protocol} />
 				</View>
 				<View
@@ -106,9 +127,25 @@ export default function PathCard({ onPress, identity, path, name, testID }) {
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
-						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
-							{pathName}
-						</Text>
+						<View style={{ flexDirection: 'row' }}>
+							{!!titlePrefix && (
+								<Text
+									numberOfLines={1}
+									style={[
+										fontStyles.t_codeS,
+										{ color: colors.bg_button, marginTop: 5 }
+									]}
+								>
+									{titlePrefix}
+								</Text>
+							)}
+							<Text
+								numberOfLines={1}
+								style={[fontStyles.h2, { marginTop: -2 }]}
+							>
+								{pathName}
+							</Text>
+						</View>
 						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
 							<Text style={fontStyles.t_codeS}>{path}</Text>

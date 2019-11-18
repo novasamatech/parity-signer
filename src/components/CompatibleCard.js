@@ -21,11 +21,12 @@ import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 import React from 'react';
 
-const CompatibleCard = ({ account, accountsStore }) =>
+const CompatibleCard = ({ account, accountsStore, titlePrefix }) =>
 	account.isLegacy === false ? (
 		<PathCard
 			identity={accountsStore.getIdentityByAccountId(account.accountId)}
 			path={account.path}
+			titlePrefix={titlePrefix}
 		/>
 	) : (
 		<AccountCard
@@ -37,7 +38,8 @@ const CompatibleCard = ({ account, accountsStore }) =>
 
 CompatibleCard.propTypes = {
 	account: PropTypes.object.isRequired,
-	accountsStore: PropTypes.object.isRequired
+	accountsStore: PropTypes.object.isRequired,
+	titlePrefix: PropTypes.string
 };
 
 export default CompatibleCard;

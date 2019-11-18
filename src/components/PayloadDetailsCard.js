@@ -332,6 +332,9 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 }
 
 const styles = StyleSheet.create({
+	body: {
+		marginTop: 8
+	},
 	callDetails: {
 		marginBottom: 4
 	},
