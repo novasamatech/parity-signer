@@ -48,14 +48,14 @@ export default class Loading extends React.PureComponent {
 		const oldAccounts_v2 = await loadAccounts(2);
 		const oldAccounts = [...oldAccounts_v1, ...oldAccounts_v2];
 		const accounts = oldAccounts.map(([_, value]) => {
-			let result = {};
 			if (value.chainId) {
 				// The networkKey for Ethereum accounts is the chain id
-				result = { ...value, networkKey: value.chainId, recovered: true };
+				const result = { ...value, networkKey: value.chainId, recovered: true };
 				delete result.chainId;
 				delete result.networkType;
+				return result;
 			}
-			return result;
+			return value;
 		});
 
 		accounts.forEach(account => {
