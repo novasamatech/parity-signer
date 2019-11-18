@@ -16,27 +16,28 @@
 
 'use strict';
 
+import PropTypes from 'prop-types';
+import AccountCard from './AccountCard';
+import PathCard from './PathCard';
 import React from 'react';
-import { Subscribe } from 'unstated';
-import AccountsStore from '../stores/AccountsStore';
-import ScannerStore from '../stores/ScannerStore';
 
-export const withAccountStore = WrappedComponent => props => (
-	<Subscribe to={[AccountsStore]}>
-		{accounts => <WrappedComponent {...props} accounts={accounts} />}
-	</Subscribe>
-);
+const CompatibleCard = ({ account, accountsStore }) =>
+	account.isLegacy === false ? (
+		<PathCard
+			identity={accountsStore.getIdentityByAccountId(account.accountId)}
+			path={account.path}
+		/>
+	) : (
+		<AccountCard
+			title={account.name}
+			accountId={account.address}
+			networkKey={account.networkKey || ''}
+		/>
+	);
 
-export const withScannerStore = WrappedComponent => props => (
-	<Subscribe to={[ScannerStore]}>
-		{scanner => <WrappedComponent {...props} scanner={scanner} />}
-	</Subscribe>
-);
+CompatibleCard.propTypes = {
+	account: PropTypes.object.isRequired,
+	accountsStore: PropTypes.object.isRequired
+};
 
-export const withAccountAndScannerStore = WrappedComponent => props => (
-	<Subscribe to={[ScannerStore, AccountsStore]}>
-		{(scanner, accounts) => (
-			<WrappedComponent {...props} scanner={scanner} accounts={accounts} />
-		)}
-	</Subscribe>
-);
+export default CompatibleCard;

@@ -28,21 +28,22 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import ScannerStore from '../stores/ScannerStore';
+import AccountsStore from '../stores/AccountsStore';
 import { navigateToSignedMessage, unlockSeed } from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
 import MessageDetailsCard from '../components/MessageDetailsCard';
 import { alertMultipart } from '../util/alertUtils';
+import CompatibleCard from '../components/CompatibleCard';
 
 export default class MessageDetails extends React.PureComponent {
 	render() {
 		return (
-			<Subscribe to={[ScannerStore]}>
-				{scannerStore => {
+			<Subscribe to={[ScannerStore, AccountsStore]}>
+				{(scannerStore, accountsStore) => {
 					const dataToSign = scannerStore.getDataToSign();
 					const message = scannerStore.getMessage();
 					const sender = scannerStore.getSender();
@@ -52,6 +53,7 @@ export default class MessageDetails extends React.PureComponent {
 							<MessageDetailsView
 								{...this.props}
 								scannerStore={scannerStore}
+								accountsStore={accountsStore}
 								sender={sender}
 								message={isU8a(message) ? u8aToHex(message) : message}
 								dataToSign={
@@ -101,7 +103,15 @@ export class MessageDetailsView extends React.PureComponent {
 	};
 
 	render() {
-		const { dataToSign, isHash, message, onNext, prehash, sender } = this.props;
+		const {
+			accountsStore,
+			dataToSign,
+			isHash,
+			message,
+			onNext,
+			prehash,
+			sender
+		} = this.props;
 
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
@@ -116,11 +126,7 @@ export class MessageDetailsView extends React.PureComponent {
 				<Background />
 				<Text style={styles.topTitle}>Sign Message</Text>
 				<Text style={styles.title}>From Account</Text>
-				<AccountCard
-					title={sender.name}
-					accountId={sender.isLegacy ? sender.address : sender.accountId}
-					networkKey={sender.networkKey}
-				/>
+				<CompatibleCard account={sender} accountsStore={accountsStore} />
 				{!isEthereum && prehash && prefix ? (
 					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
