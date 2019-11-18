@@ -298,7 +298,7 @@ const styles = {
 	},
 	i_arrowBg: {
 		backgroundColor: 'rgba(0,0,0,0)',
-		width: 12
+		marginRight: -3
 	},
 	i_arrowStyle: {
 		opacity: 0.7,
