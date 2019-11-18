@@ -18,7 +18,7 @@
 
 import React, { useEffect } from 'react';
 import { AppState, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
+import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
 import fonts from '../fonts';
@@ -29,23 +29,11 @@ import Button from '../components/Button';
 import ScreenHeading from '../components/ScreenHeading';
 import TouchableItem from '../components/TouchableItem';
 import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
-import AccountsStore from '../stores/AccountsStore';
+import { withAccountStore } from '../util/HOC';
 import { NetworkProtocols, NETWORK_LIST } from '../constants';
 import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
 
-export default class LegacyAccountBackup extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => (
-					<LegacyAccountBackupView {...this.props} accounts={accounts} />
-				)}
-			</Subscribe>
-		);
-	}
-}
-
-function LegacyAccountBackupView(props) {
+function LegacyAccountBackup(props) {
 	useEffect(() => {
 		const handleAppStateChange = nextAppState => {
 			if (nextAppState === 'inactive') {
@@ -54,7 +42,7 @@ function LegacyAccountBackupView(props) {
 		};
 
 		AppState.addEventListener('change', handleAppStateChange);
-		return function() {
+		return () => {
 			const { accounts } = props;
 			const selectedKey = accounts.getSelectedKey();
 
@@ -79,7 +67,8 @@ function LegacyAccountBackupView(props) {
 		seedPhrase
 	} = isNew ? accounts.getNew() : accounts.getSelected();
 	const protocol =
-		(NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol) || '';
+		(NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol) ||
+		NetworkProtocols.UNKNOWN;
 
 	return (
 		<ScrollView style={styles.body}>
@@ -127,6 +116,8 @@ function LegacyAccountBackupView(props) {
 		</ScrollView>
 	);
 }
+
+export default withAccountStore(withNavigation(LegacyAccountBackup));
 
 const styles = StyleSheet.create({
 	body: {

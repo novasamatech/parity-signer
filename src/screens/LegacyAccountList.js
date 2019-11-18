@@ -19,81 +19,59 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Subscribe } from 'unstated';
+import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
-import AccountsStore from '../stores/AccountsStore';
 import testIDs from '../../e2e/testIDs';
 import ButtonMainAction from '../components/ButtonMainAction';
+import { withAccountStore } from '../util/HOC';
 
-export default class LegacyAccountList extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => {
+LegacyAccountList.propTypes = {
+	accounts: PropTypes.object.isRequired,
+	onAccountSelected: PropTypes.func.isRequired
+};
+
+function LegacyAccountList({ navigation, accounts }) {
+	const onAccountSelected = async key => {
+		await accounts.select(key);
+		navigation.navigate('AccountDetails');
+	};
+	const accountsMap = accounts.getAccounts();
+
+	return (
+		<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
+			<Background />
+			<FlatList
+				ref={list => {
+					this.list = list;
+				}}
+				style={styles.content}
+				data={Array.from(accountsMap.entries())}
+				keyExtractor={([key]) => key}
+				renderItem={({ item: [accountKey, account] }) => {
 					return (
-						<AccountListView
-							{...this.props}
-							accounts={accounts.getAccounts()}
-							onAccountSelected={async key => {
-								await accounts.select(key);
-								this.props.navigation.navigate('AccountDetails');
-							}}
+						<AccountCard
+							accountId={account.address}
+							networkKey={account.networkKey}
+							onPress={() => onAccountSelected(accountKey)}
+							style={{ paddingBottom: null }}
+							title={account.name}
 						/>
 					);
 				}}
-			</Subscribe>
-		);
-	}
+				enableEmptySections
+			/>
+			<ButtonMainAction
+				title={'Scan'}
+				onPress={() => navigation.navigate('QrScanner')}
+			/>
+		</View>
+	);
 }
 
-class AccountListView extends React.PureComponent {
-	static propTypes = {
-		accounts: PropTypes.object.isRequired,
-		onAccountSelected: PropTypes.func.isRequired
-	};
-
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		const { accounts, navigation, onAccountSelected } = this.props;
-		return (
-			<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
-				<Background />
-				<FlatList
-					ref={list => {
-						this.list = list;
-					}}
-					style={styles.content}
-					data={Array.from(accounts.entries())}
-					keyExtractor={([key]) => key}
-					renderItem={({ item: [accountKey, account] }) => {
-						return (
-							<AccountCard
-								accountId={account.address}
-								networkKey={account.networkKey}
-								onPress={() => {
-									onAccountSelected(accountKey);
-								}}
-								style={{ paddingBottom: null }}
-								title={account.name}
-							/>
-						);
-					}}
-					enableEmptySections
-				/>
-				<ButtonMainAction
-					title={'Scan'}
-					onPress={() => navigation.navigate('QrScanner')}
-				/>
-			</View>
-		);
-	}
-}
+export default withAccountStore(withNavigation(LegacyAccountList));
 
 const styles = StyleSheet.create({
 	body: {

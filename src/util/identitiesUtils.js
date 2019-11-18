@@ -19,30 +19,21 @@
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
-	SubstrateNetworkKeys,
 	UnknownNetworkKeys
 } from '../constants';
-
-export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
-
-const regex = {
-	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
-	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)+$/
-};
+import { pathsRegex } from './regex';
 
 //walk around to fix the regular expression support for positive look behind;
 const removeSlash = str => str.replace(/\//g, '');
 
 const extractPathId = path => {
-	const matchNetworkPath = path.match(regex.networkPath);
+	const matchNetworkPath = path.match(pathsRegex.networkPath);
 	if (!matchNetworkPath) return null;
 	return removeSlash(matchNetworkPath[0]);
 };
 
 const extractSubPathName = path => {
-	const pathFragments = path.match(regex.allPath);
+	const pathFragments = path.match(pathsRegex.allPath);
 	if (!pathFragments || pathFragments.length <= 1) return '';
 	return removeSlash(pathFragments.slice(1).join(''));
 };
@@ -145,11 +136,8 @@ export const getAddressFromAccountId = (accountId, protocol) => {
 	}
 };
 
-export const validatePath = path =>
-	/^\/\/([\w-_])+(\/\/?([\w-_])+)+$/.test(path);
-
 export const validateDerivedPath = derivedPath =>
-	regex.validateDerivedPath.test(derivedPath);
+	pathsRegex.validateDerivedPath.test(derivedPath);
 
 export const getIdentityName = (identity, identities) => {
 	if (identity.name) return identity.name;
@@ -178,7 +166,7 @@ export const groupPaths = paths => {
 		const pathId = extractPathId(path) || '';
 		const subPath = path.slice(pathId.length + 2);
 
-		const groupName = removeSlash(subPath.match(regex.firstPath)[0]);
+		const groupName = removeSlash(subPath.match(pathsRegex.firstPath)[0]);
 
 		const existedItem = groupedPath.find(p => p.title === groupName);
 		if (existedItem) {

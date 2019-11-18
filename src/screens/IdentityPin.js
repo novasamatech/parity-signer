@@ -27,6 +27,7 @@ import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
+import { onlyNumberRegex } from '../util/regex';
 
 export default withAccountStore(withNavigation(IdentityPin));
 
@@ -40,6 +41,7 @@ function IdentityPin({ navigation, accounts }) {
 	};
 	const [state, setState] = useState(initialState);
 	const updateState = delta => setState({ ...state, ...delta });
+	const isUnlock = navigation.getParam('isUnlock', false);
 
 	const submit = async () => {
 		const isIdentityCreation = navigation.getParam('isNew');
@@ -49,17 +51,6 @@ function IdentityPin({ navigation, accounts }) {
 				const resolve = navigation.getParam('resolve');
 				setState(initialState);
 				resolve(pin);
-			} else {
-				// await accounts.save(accounts.getSelectedKey(), account, pin);
-				// const resetAction = StackActions.reset({
-				// 	actions: [
-				// 		NavigationActions.navigate({ routeName: 'LegacyAccountList' }),
-				// 		NavigationActions.navigate({ routeName: 'AccountDetails' })
-				// 	],
-				// 	index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-				// 	key: undefined
-				// });
-				// navigation.dispatch(resetAction);
 			}
 		} else {
 			if (pin.length < 6) {
@@ -89,13 +80,13 @@ function IdentityPin({ navigation, accounts }) {
 		if (state.pinTooShort) {
 			return ' Your pin must be at least 6 digits long!';
 		} else if (state.pinMismatch) {
-			return " Pin codes don't match!";
+			return isUnlock ? ' Pin code is wrong!' : " Pin codes don't match!";
 		}
 		return ' Choose a PIN code with 6 or more digits';
 	};
 
 	const onPinInputChange = (stateName, pinInput) => {
-		if (/^\d+$|^$/.test(pinInput)) {
+		if (onlyNumberRegex.test(pinInput)) {
 			updateState({
 				pinMismatch: false,
 				pinTooShort: false,
@@ -105,7 +96,7 @@ function IdentityPin({ navigation, accounts }) {
 	};
 
 	const renderPinInput = () =>
-		navigation.getParam('isUnlock', false) ? (
+		isUnlock ? (
 			<>
 				<ScreenHeading
 					title={'Unlock Identity'}

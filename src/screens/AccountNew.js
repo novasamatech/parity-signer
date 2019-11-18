@@ -164,10 +164,9 @@ function AccountNew({ accounts, navigation }) {
 							!isDerivationPathValid
 						}
 						onPress={() => {
-							validateSeed(seed, validBip39Seed).valid &&
-								navigation.navigate('LegacyAccountBackup', {
-									isNew: true
-								});
+							navigation.navigate('LegacyAccountBackup', {
+								isNew: true
+							});
 						}}
 					/>
 				</View>

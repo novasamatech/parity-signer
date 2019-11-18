@@ -76,7 +76,7 @@ function IdentityManagement({ accounts, navigation }) {
 				onChangeText={name => accounts.updateIdentityName(name)}
 				value={currentIdentity.name}
 				placeholder="Enter a new identity name"
-				focus={true}
+				focus
 			/>
 		</ScrollView>
 	);
