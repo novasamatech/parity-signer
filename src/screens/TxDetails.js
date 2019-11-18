@@ -112,6 +112,7 @@ export class TxDetailsView extends React.PureComponent {
 			gasPrice,
 			prehash,
 			sender,
+			recipient,
 			value,
 			onNext
 		} = this.props;
@@ -153,9 +154,8 @@ export class TxDetailsView extends React.PureComponent {
 								/>
 								<Text style={styles.title}>Recipient</Text>
 								<CompatibleCard
-									account={sender}
+									account={recipient}
 									accountsStore={accountsStore}
-								/>
 								/>
 							</View>
 						) : (

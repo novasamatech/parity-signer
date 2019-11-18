@@ -29,6 +29,7 @@ import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
 import colors from '../colors';
 import { getAddressFromAccountId } from '../util/identitiesUtils';
+import { AccountPrefixedTitle } from './AccountPrefixedTitle';
 
 export default class AccountCard extends React.PureComponent {
 	static propTypes = {
@@ -65,7 +66,7 @@ export default class AccountCard extends React.PureComponent {
 		const network =
 			NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
 
-		const extractAddress = getAddressFromAccountId(accountId, network.protocol);
+		const extractAddress = getAddressFromAccountId(accountId);
 
 		return (
 			<TouchableItem
@@ -99,20 +100,7 @@ export default class AccountCard extends React.PureComponent {
 								</Text>
 							</View>
 						)}
-						<View style={{ flexDirection: 'row', marginTop: -2 }}>
-							<Text
-								numberOfLines={1}
-								style={[
-									fontStyles.t_codeS,
-									{ color: colors.bg_button, marginTop: 7 }
-								]}
-							>
-								{titlePrefix}
-							</Text>
-							<Text numberOfLines={1} style={fontStyles.h2}>
-								{title}
-							</Text>
-						</View>
+						<AccountPrefixedTitle title={title} titlePrefix={titlePrefix} />
 						{accountId !== '' && (
 							<Address address={extractAddress} protocol={network.protocol} />
 						)}

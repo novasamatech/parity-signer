@@ -33,6 +33,7 @@ import Address from './Address';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
+import { AccountPrefixedTitle } from './AccountPrefixedTitle';
 
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
@@ -82,22 +83,7 @@ export default function PathCard({
 							{network.title}
 						</Text>
 					</View>
-					<View style={{ flexDirection: 'row' }}>
-						{!!titlePrefix && (
-							<Text
-								numberOfLines={1}
-								style={[
-									fontStyles.t_codeS,
-									{ color: colors.bg_button, marginTop: 5 }
-								]}
-							>
-								{titlePrefix}
-							</Text>
-						)}
-						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
-							{pathName}
-						</Text>
-					</View>
+					<AccountPrefixedTitle title={pathName} titlePrefix={titlePrefix} />
 					<Address address={extractAddress} protocol={network.protocol} />
 				</View>
 				<View
@@ -127,25 +113,7 @@ export default function PathCard({
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
-						<View style={{ flexDirection: 'row' }}>
-							{!!titlePrefix && (
-								<Text
-									numberOfLines={1}
-									style={[
-										fontStyles.t_codeS,
-										{ color: colors.bg_button, marginTop: 5 }
-									]}
-								>
-									{titlePrefix}
-								</Text>
-							)}
-							<Text
-								numberOfLines={1}
-								style={[fontStyles.h2, { marginTop: -2 }]}
-							>
-								{pathName}
-							</Text>
-						</View>
+						<AccountPrefixedTitle title={pathName} titlePrefix={titlePrefix} />
 						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
 							<Text style={fontStyles.t_codeS}>{path}</Text>
