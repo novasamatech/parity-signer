@@ -29,7 +29,7 @@ import { getIdentityName } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 
 function IdentitiesSwitch({ navigation, accounts }) {
-	const defaultVisible = navigation.getParam('isSwitchOpen', false);
+	const defaultVisible = navigation.getParam('isSwitchOpen', true);
 	const [visible, setVisible] = useState(defaultVisible);
 	const { currentIdentity, identities } = accounts.state;
 
@@ -298,7 +298,7 @@ const styles = {
 	},
 	i_arrowBg: {
 		backgroundColor: 'rgba(0,0,0,0)',
-		width: 12
+		marginRight: -3
 	},
 	i_arrowStyle: {
 		opacity: 0.7,
