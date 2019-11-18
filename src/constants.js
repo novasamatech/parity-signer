@@ -81,8 +81,8 @@ const substrateNetworkBase = {
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#000000',
-		decimals: 15,
+		color: '#ff8c00',
+		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
 		pathId: 'substrate_dev',
 		prefix: 42,
