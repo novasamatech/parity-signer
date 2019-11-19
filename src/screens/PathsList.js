@@ -28,7 +28,8 @@ import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import {
 	getPathsWithSubstrateNetwork,
-	groupPaths
+	groupPaths,
+	removeSlash
 } from '../util/identitiesUtils';
 import ButtonNewDerivation from '../components/ButtonNewDerivation';
 import PathCard from '../components/PathCard';
@@ -103,9 +104,11 @@ function PathsList({ accounts, navigation }) {
 					}}
 				>
 					<View>
-						<Text style={fontStyles.t_prefix}>{pathsGroup.title}</Text>
+						<Text style={fontStyles.t_prefix}>
+							{removeSlash(pathsGroup.title)}
+						</Text>
 						<Text style={fontStyles.t_codeS}>
-							{NETWORK_LIST[networkKey].pathId + '//'}
+							{NETWORK_LIST[networkKey].pathId}
 							{pathsGroup.title}
 						</Text>
 					</View>

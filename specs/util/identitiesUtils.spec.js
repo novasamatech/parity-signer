@@ -135,19 +135,19 @@ describe('IdentitiesUtils', () => {
 		expect(groupResult).toEqual([
 			{
 				paths: [paths[0]],
-				title: 'default'
+				title: '//default'
 			},
 			{
 				paths: [paths[2]],
-				title: 'softKey1'
+				title: '/softKey1'
 			},
 			{
 				paths: [paths[4]],
-				title: 'stacking'
+				title: '//stacking'
 			},
 			{
 				paths: [paths[1], paths[3]],
-				title: 'funding'
+				title: '//funding'
 			}
 		]);
 	});

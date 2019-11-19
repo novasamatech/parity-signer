@@ -24,7 +24,7 @@ import {
 import { pathsRegex } from './regex';
 
 //walk around to fix the regular expression support for positive look behind;
-const removeSlash = str => str.replace(/\//g, '');
+export const removeSlash = str => str.replace(/\//g, '');
 
 const extractPathId = path => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);
@@ -166,7 +166,7 @@ export const groupPaths = paths => {
 		const pathId = extractPathId(path) || '';
 		const subPath = path.slice(pathId.length + 2);
 
-		const groupName = removeSlash(subPath.match(pathsRegex.firstPath)[0]);
+		const groupName = subPath.match(pathsRegex.firstPath)[0];
 
 		const existedItem = groupedPath.find(p => p.title === groupName);
 		if (existedItem) {
