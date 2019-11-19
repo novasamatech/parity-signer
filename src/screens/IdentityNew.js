@@ -46,7 +46,7 @@ function IdentityNew({ accounts, navigation }) {
 		const clearNewIdentity = () => accounts.updateNewIdentity(emptyIdentity());
 		clearNewIdentity();
 		return clearNewIdentity;
-	}, []);
+	}, [accounts]);
 
 	const updateName = name => {
 		accounts.updateNewIdentity({ name });

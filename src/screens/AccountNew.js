@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import colors from '../colors';
@@ -33,9 +33,6 @@ import { constructSURI } from '../util/suri';
 import AccountCard from '../components/AccountCard';
 import { withAccountStore } from '../util/HOC';
 
-/**
- * @return {null}
- */
 function AccountNew({ accounts, navigation }) {
 	const initialState = {
 		derivationPassword: '',
@@ -45,23 +42,21 @@ function AccountNew({ accounts, navigation }) {
 		selectedNetwork: undefined
 	};
 
-	const [state, setState] = useState(initialState);
-	const updateState = delta => setState({ ...state, ...delta });
+	const reducer = (state, delta) => ({ ...state, ...delta });
+	const [state, updateState] = useReducer(reducer, initialState);
 
 	useEffect(() => {
 		accounts.updateNew(emptyAccount());
-	}, []);
+	}, [accounts, accounts.updateNew]);
 
 	useEffect(() => {
-		const selectedAccount = accounts.getNew();
+		const selectedAccount = accounts.state.newAccount;
 		const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 		updateState({
-			derivationPassword: state.derivationPassword,
-			derivationPath: state.derivationPath,
 			selectedAccount,
 			selectedNetwork
 		});
-	}, [accounts.getNew()]);
+	}, [accounts.state.newAccount]);
 
 	const {
 		derivationPassword,

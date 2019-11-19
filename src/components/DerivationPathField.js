@@ -36,10 +36,7 @@ export default function DerivationPathField(props) {
 
 	return (
 		<>
-			<TouchableOpacity
-				onPress={toggleShowAdvancedField}
-				//style={{ diplay: 'flex' }}
-			>
+			<TouchableOpacity onPress={toggleShowAdvancedField}>
 				<View style={{ justifyContent: 'center' }}>
 					<Text style={[styles.title, ownStyles.advancedText]}>
 						ADVANCED

@@ -21,6 +21,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import Separator from '../components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
@@ -33,7 +35,8 @@ import { AccountPrefixedTitle } from './AccountPrefixedTitle';
 
 export default class AccountCard extends React.PureComponent {
 	static propTypes = {
-		accountId: PropTypes.string.isRequired,
+		accountId: PropTypes.string,
+		isAdd: PropTypes.bool,
 		networkKey: PropTypes.string,
 		onPress: PropTypes.func,
 		seedType: PropTypes.string,
@@ -51,6 +54,7 @@ export default class AccountCard extends React.PureComponent {
 	render() {
 		const {
 			accountId,
+			isAdd,
 			isNetworkCard,
 			networkKey,
 			networkColor,
@@ -84,25 +88,34 @@ export default class AccountCard extends React.PureComponent {
 					}}
 				/>
 				<View style={[styles.content, style]}>
-					<AccountIcon
-						address={extractAddress}
-						protocol={network.protocol}
-						network={network}
-						style={styles.icon}
-					/>
+					{isAdd ? (
+						<View style={{ height: 40, width: 40 }}>
+							<Icon name="add" color={colors.bg_text} size={32} />
+						</View>
+					) : (
+						<AccountIcon
+							address={extractAddress}
+							protocol={network.protocol}
+							network={network}
+							style={styles.icon}
+						/>
+					)}
 					<View style={styles.desc}>
 						{!isNetworkCard && (
 							<View>
 								<Text
 									style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
 								>
-									{network.title} {seedTypeDisplay}{' '}
+									{`${network.title}${seedTypeDisplay} `}
 								</Text>
 							</View>
 						)}
 						<AccountPrefixedTitle title={title} titlePrefix={titlePrefix} />
 						{accountId !== '' && (
-							<Address address={extractAddress} protocol={network.protocol} />
+							<Address
+								address={isAdd ? 'new' : extractAddress}
+								protocol={network.protocol}
+							/>
 						)}
 					</View>
 					<View

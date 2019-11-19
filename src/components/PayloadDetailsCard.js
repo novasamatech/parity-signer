@@ -225,7 +225,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		if (label === 'Tip' && !fallback) {
 			setTip(formatBalance(value));
 		}
-	}, []);
+	}, [fallback, label, prefix, value]);
 
 	const renderEraDetails = () => {
 		if (period && phase) {

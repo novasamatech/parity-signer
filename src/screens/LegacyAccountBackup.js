@@ -33,17 +33,16 @@ import { withAccountStore } from '../util/HOC';
 import { NetworkProtocols, NETWORK_LIST } from '../constants';
 import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
 
-function LegacyAccountBackup(props) {
+function LegacyAccountBackup({ navigation, accounts }) {
 	useEffect(() => {
 		const handleAppStateChange = nextAppState => {
 			if (nextAppState === 'inactive') {
-				props.navigation.goBack();
+				navigation.goBack();
 			}
 		};
 
 		AppState.addEventListener('change', handleAppStateChange);
 		return () => {
-			const { accounts } = props;
 			const selectedKey = accounts.getSelectedKey();
 
 			if (selectedKey) {
@@ -52,9 +51,8 @@ function LegacyAccountBackup(props) {
 
 			AppState.removeEventListener('change', handleAppStateChange);
 		};
-	}, []);
+	}, [navigation, accounts]);
 
-	const { accounts, navigation } = props;
 	const { navigate } = navigation;
 	const isNew = navigation.getParam('isNew');
 	const {

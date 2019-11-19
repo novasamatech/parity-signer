@@ -149,7 +149,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			return (
 				<>
 					<AccountCard
-						accountId={'new'}
+						isAdd={true}
 						isNetworkCard={true}
 						onPress={() => setShouldShowMoreNetworks(true)}
 						title="Add Network Account"
@@ -186,6 +186,28 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		);
 	};
 
+	const onNetworkChosen = async (networkKey, networkParams) => {
+		if (isNew) {
+			if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+				await deriveSubstrateDefault(networkKey, networkParams);
+			} else {
+				await deriveEthereumAccount(networkKey);
+			}
+		} else {
+			const paths = Array.from(currentIdentity.meta.keys());
+			const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
+			if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
+				if (listedPaths.length === 0)
+					return navigation.navigate('PathDerivation', {
+						networkKey
+					});
+			} else if (!paths.includes(networkKey)) {
+				return await deriveEthereumAccount(networkKey);
+			}
+			navigation.navigate('PathsList', { networkKey });
+		}
+	};
+
 	if (!loaded) return <ScrollView style={styles.body} />;
 
 	if (identities.length === 0) return showOnboardingMessage();
@@ -207,30 +229,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						key={networkKey}
 						testID={testIDs.AccountNetworkChooser.networkButton + index}
 						networkKey={networkKey}
-						onPress={async () => {
-							if (isNew) {
-								if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
-									await deriveSubstrateDefault(networkKey, networkParams);
-								} else {
-									await deriveEthereumAccount(networkKey);
-								}
-							} else {
-								const paths = Array.from(currentIdentity.meta.keys());
-								const listedPaths = getPathsWithSubstrateNetwork(
-									paths,
-									networkKey
-								);
-								if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
-									if (listedPaths.length === 0)
-										return navigation.navigate('PathDerivation', {
-											networkKey
-										});
-								} else if (!paths.includes(networkKey)) {
-									return await deriveEthereumAccount(networkKey);
-								}
-								navigation.navigate('PathsList', { networkKey });
-							}
-						}}
+						onPress={() => onNetworkChosen(networkKey, networkParams)}
 						title={networkParams.title}
 					/>
 				))}

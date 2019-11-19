@@ -33,7 +33,7 @@ const accountIdFunding1 = 'address1',
 	accountIdFunding2 = 'address2',
 	accountIdSoft = 'address3',
 	accountIdPolkadot = 'address5',
-	accountIdStacking = 'address4',
+	accountIdStaking = 'address4',
 	accountIdEthereum = 'address6',
 	accountIdDefault = 'addressDefault',
 	paths = [
@@ -41,7 +41,7 @@ const accountIdFunding1 = 'address1',
 		'//kusama_CC2//funding/1',
 		'//kusama_CC2/softKey1',
 		'//kusama_CC2//funding/2',
-		'//kusama_CC2//stacking/1',
+		'//kusama_CC2//staking/1',
 		'//polkadot//default',
 		'1'
 	],
@@ -63,8 +63,8 @@ const accountIdFunding1 = 'address1',
 		name: '',
 		updatedAt: 1571078850509
 	},
-	metaStacking = {
-		accountId: accountIdStacking,
+	metaStaking = {
+		accountId: accountIdStaking,
 		createdAt: 1571068850409,
 		name: '',
 		updatedAt: 1571078850509
@@ -92,7 +92,7 @@ const accountIdsMap = new Map([
 	[accountIdFunding1, paths[1]],
 	[accountIdSoft, paths[2]],
 	[accountIdFunding2, paths[3]],
-	[accountIdStacking, paths[4]],
+	[accountIdStaking, paths[4]],
 	[accountIdPolkadot, paths[5]],
 	[accountIdEthereum, paths[6]]
 ]);
@@ -100,7 +100,7 @@ const metaMap = new Map([
 	[paths[0], metaDefault],
 	[paths[1], metaFunding1],
 	[paths[2], metaSoftKey],
-	[paths[3], metaStacking],
+	[paths[3], metaStaking],
 	[paths[4], metaFunding2],
 	[paths[5], metaPolkadot],
 	[paths[6], metaEthereum]
@@ -143,7 +143,7 @@ describe('IdentitiesUtils', () => {
 			},
 			{
 				paths: [paths[4]],
-				title: '//stacking'
+				title: '//staking'
 			},
 			{
 				paths: [paths[1], paths[3]],
@@ -158,7 +158,7 @@ describe('IdentitiesUtils', () => {
 			'funding account1',
 			'softKey1',
 			'funding2',
-			'stacking1',
+			'staking1',
 			'PolkadotFirst',
 			'Eth account'
 		];

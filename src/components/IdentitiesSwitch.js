@@ -33,10 +33,18 @@ function IdentitiesSwitch({ navigation, accounts }) {
 	const [visible, setVisible] = useState(defaultVisible);
 	const { currentIdentity, identities } = accounts.state;
 
-	const onIdentitySelected = async identity => {
+	const closeModalAndNavigate = (screenName, params) => {
 		setVisible(false);
+		navigation.navigate(screenName, params);
+	};
+
+	const onIdentitySelectedAndNavigate = async (
+		identity,
+		screenName,
+		params
+	) => {
 		await accounts.selectIdentity(identity);
-		navigation.navigate('AccountNetworkChooser');
+		closeModalAndNavigate(screenName, params);
 	};
 
 	const renderIdentityOptions = identity => {
@@ -44,11 +52,9 @@ function IdentitiesSwitch({ navigation, accounts }) {
 			<>
 				<ButtonIcon
 					title="Manage Identity"
-					onPress={async () => {
-						setVisible(false);
-						await accounts.selectIdentity(identity);
-						navigation.navigate('IdentityManagement');
-					}}
+					onPress={() =>
+						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
+					}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
 					iconName="arrowright"
@@ -59,11 +65,11 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				/>
 				<ButtonIcon
 					title="Show Recovery Phrase"
-					onPress={async () => {
-						setVisible(false);
-						await accounts.selectIdentity(identity);
-						navigation.navigate('IdentityBackup', { isNew: false });
-					}}
+					onPress={() =>
+						onIdentitySelectedAndNavigate(identity, 'IdentityBackup', {
+							isNew: false
+						})
+					}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
 					iconName="arrowright"
@@ -84,7 +90,12 @@ function IdentitiesSwitch({ navigation, accounts }) {
 			<>
 				<ButtonIcon
 					title={currentIdentityTitle}
-					onPress={() => onIdentitySelected(currentIdentity)}
+					onPress={() =>
+						onIdentitySelectedAndNavigate(
+							currentIdentity,
+							'AccountNetworkChooser'
+						)
+					}
 					iconType="antdesign"
 					iconName="user"
 					iconSize={40}
@@ -102,23 +113,20 @@ function IdentitiesSwitch({ navigation, accounts }) {
 			<>
 				<ButtonIcon
 					title="About"
-					onPress={() => {
-						setVisible(false);
-						navigation.navigate('About');
-						// go to Settings;
-					}}
+					onPress={() => closeModalAndNavigate('About')}
 					iconType="antdesign"
 					iconName="info"
 					iconSize={24}
 					textStyle={fontStyles.t_big}
-					style={{ paddingLeft: 32 }}
+					style={styles.indentedButton}
 				/>
 				<ButtonIcon
 					title="Terms and Conditions"
-					onPress={() => {
-						setVisible(false);
-						navigation.navigate('TermsAndConditions', { disableButtons: true });
-					}}
+					onPress={() =>
+						closeModalAndNavigate('TermsAndConditions', {
+							disableButtons: true
+						})
+					}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
 					iconName="arrowright"
@@ -128,10 +136,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				/>
 				<ButtonIcon
 					title="Privacy Policy"
-					onPress={() => {
-						setVisible(false);
-						navigation.navigate('PrivacyPolicy');
-					}}
+					onPress={() => closeModalAndNavigate('PrivacyPolicy')}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
 					iconName="arrowright"
@@ -152,11 +157,13 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				dropdown={false}
 				renderDropdownElement={() => renderIdentityOptions(identity)}
 				title={title}
-				onPress={() => onIdentitySelected(identity)}
+				onPress={() =>
+					onIdentitySelectedAndNavigate(identity, 'AccountNetworkChooser')
+				}
 				iconType="antdesign"
 				iconName="user"
 				iconSize={24}
-				style={{ paddingLeft: 32 }}
+				style={styles.indentedButton}
 				textStyle={fontStyles.h2}
 			/>
 		);
@@ -218,9 +225,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					<View
 						testID={testIDs.IdentitiesSwitch.modal}
 						style={styles.container}
-						onPress={() => {
-							setVisible(false);
-						}}
+						onPress={() => setVisible(false)}
 					>
 						<View style={styles.card}>
 							{renderCurrentIdentityCard()}
@@ -229,15 +234,12 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								<>
 									<ButtonIcon
 										title="Legacy Accounts"
-										onPress={() => {
-											setVisible(false);
-											navigation.navigate('LegacyAccountList');
-										}}
+										onPress={() => closeModalAndNavigate('LegacyAccountList')}
 										iconName="solution1"
 										iconType="antdesign"
 										iconSize={24}
 										textStyle={fontStyles.t_big}
-										style={{ paddingLeft: 32 }}
+										style={styles.indentedButton}
 									/>
 									<Separator />
 								</>
@@ -247,29 +249,23 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								<ButtonIcon
 									title="Add Identity"
 									testID={testIDs.IdentitiesSwitch.addIdentityButton}
-									onPress={() => {
-										setVisible(false);
-										navigation.navigate('IdentityNew');
-									}}
+									onPress={() => closeModalAndNavigate('IdentityNew')}
 									iconName="plus"
 									iconType="antdesign"
 									iconSize={24}
 									textStyle={fontStyles.t_big}
-									style={{ paddingLeft: 32 }}
+									style={styles.indentedButton}
 								/>
 							)}
 							<Separator />
 							<ButtonIcon
 								title="Add legacy account"
-								onPress={() => {
-									setVisible(false);
-									navigation.navigate('AccountNew');
-								}}
+								onPress={() => closeModalAndNavigate('AccountNew')}
 								iconName="plus"
 								iconType="antdesign"
 								iconSize={24}
 								textStyle={fontStyles.t_big}
-								style={{ paddingLeft: 32 }}
+								style={styles.indentedButton}
 							/>
 							<Separator />
 							{renderSettings()}
@@ -305,6 +301,9 @@ const styles = {
 		paddingBottom: 6,
 		paddingLeft: 64,
 		paddingTop: 0
+	},
+	indentedButton: {
+		paddingLeft: 32
 	}
 };
 

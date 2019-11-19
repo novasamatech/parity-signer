@@ -30,6 +30,11 @@ export default class AccountEdit extends React.PureComponent {
 	}
 
 	render() {
+		const onNameInput = async (accounts, name) => {
+			await accounts.updateSelectedAccount({ name });
+			await accounts.save(accounts.getSelectedKey(), accounts.getSelected());
+		};
+
 		return (
 			<Subscribe to={[AccountsStore]}>
 				{accounts => {
@@ -49,13 +54,7 @@ export default class AccountEdit extends React.PureComponent {
 							<TextInput
 								label="Account Name"
 								style={{ marginBottom: 40 }}
-								onChangeText={async name => {
-									await accounts.updateSelectedAccount({ name });
-									await accounts.save(
-										accounts.getSelectedKey(),
-										accounts.getSelected()
-									);
-								}}
+								onChangeText={name => onNameInput(accounts, name)}
 								value={selected.name}
 								placeholder="New name"
 							/>

@@ -37,18 +37,18 @@ export default function AccountIcon(props) {
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 
 	useEffect(() => {
+		const loadEthereumIcon = function(ethereumAddress) {
+			blockiesIcon('0x' + ethereumAddress)
+				.then(uri => {
+					setEthereumIconUri(uri);
+				})
+				.catch(console.error);
+		};
+
 		if (protocol === NetworkProtocols.ETHEREUM) {
 			loadEthereumIcon(address);
 		}
-	}, []);
-
-	const loadEthereumIcon = function(ethereumAddress) {
-		blockiesIcon('0x' + ethereumAddress)
-			.then(uri => {
-				setEthereumIconUri(uri);
-			})
-			.catch(console.error);
-	};
+	}, [address, protocol]);
 
 	if (address === '') {
 		return (
@@ -62,19 +62,6 @@ export default function AccountIcon(props) {
 						width: 40
 					}}
 				/>
-			</View>
-		);
-	}
-	if (address === 'new') {
-		return (
-			<View style={{ height: 40, width: 40 }}>
-				<Icon name="add" color={colors.bg_text} size={32} />
-			</View>
-		);
-	} else if (address === 'existed') {
-		return (
-			<View style={{ height: 40, width: 40 }}>
-				<Icon name="arrow-back" color={colors.bg_text} size={32} />
 			</View>
 		);
 	}

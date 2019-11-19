@@ -60,7 +60,7 @@ function IdentityBackup({ navigation, accounts }) {
 		return () => {
 			setSeedPhrase('');
 		};
-	}, []);
+	}, [isNew, navigation]);
 
 	return (
 		<ScrollView style={styles.body}>

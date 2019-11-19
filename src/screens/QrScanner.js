@@ -128,11 +128,11 @@ export function QrScannerView({
 	accountStore,
 	...props
 }) {
+	if (global.inTest) {
+		props.onBarCodeRead(createMockSignRequest());
+	}
+
 	useEffect(() => {
-		if (global.inTest) {
-			props.onBarCodeRead(createMockSignRequest());
-			return () => {};
-		}
 		const setBusySubscription = navigation.addListener('willFocus', () => {
 			scannerStore.setReady();
 		});
@@ -144,7 +144,7 @@ export function QrScannerView({
 			setReadySubscription.remove();
 			scannerStore.setReady();
 		};
-	}, []);
+	}, [navigation, scannerStore]);
 
 	const missedFrames = scannerStore.getMissedFrames();
 	const missedFramesMessage = missedFrames && missedFrames.join(', ');

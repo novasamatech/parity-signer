@@ -43,7 +43,7 @@ export default function QrView(props) {
 		}
 
 		displayQrCode(props.data);
-	}, []);
+	}, [props.data]);
 
 	const { width: deviceWidth } = Dimensions.get('window');
 	let size = props.size || deviceWidth - 64;

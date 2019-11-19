@@ -15,7 +15,7 @@
 
 'use strict';
 
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import colors from '../colors';
@@ -169,25 +169,23 @@ function IdentityPin({ navigation, accounts }) {
 	);
 }
 
-class PinInput extends Component {
-	render() {
-		return (
-			<TextInput
-				keyboardAppearance="dark"
-				clearTextOnFocus
-				editable
-				fontSize={24}
-				keyboardType="numeric"
-				multiline={false}
-				autoCorrect={false}
-				numberOfLines={1}
-				returnKeyType="next"
-				secureTextEntry
-				style={{ ...fontStyles.t_seed, ...styles.pinInput }}
-				{...this.props}
-			/>
-		);
-	}
+function PinInput(props) {
+	return (
+		<TextInput
+			keyboardAppearance="dark"
+			clearTextOnFocus
+			editable
+			fontSize={24}
+			keyboardType="numeric"
+			multiline={false}
+			autoCorrect={false}
+			numberOfLines={1}
+			returnKeyType="next"
+			secureTextEntry
+			style={{ ...fontStyles.t_seed, ...styles.pinInput }}
+			{...props}
+		/>
+	);
 }
 
 const styles = StyleSheet.create({
