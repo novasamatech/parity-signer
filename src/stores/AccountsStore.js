@@ -365,7 +365,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seed, prefix, networkKey) {
+	async deriveNewPath(newPath, seed, prefix, networkKey, name) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const suri = constructSURI({
 			derivePath: newPath,
@@ -379,7 +379,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.meta.set(newPath, {
 			accountId,
 			createdAt: new Date().getTime(),
-			name: '',
+			name,
 			updatedAt: new Date().getTime()
 		});
 		updatedCurrentIdentity.accountIds.set(accountId, newPath);

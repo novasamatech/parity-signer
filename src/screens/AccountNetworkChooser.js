@@ -128,7 +128,8 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			`//${pathId}//default`,
 			seed,
 			prefix,
-			networkKey
+			networkKey,
+			'Default'
 		);
 		onDerivationFinished(derivationSucceed, networkKey);
 	};

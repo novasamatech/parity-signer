@@ -89,7 +89,8 @@ function PathDerivation({ accounts, navigation }) {
 							completePath,
 							seed,
 							NETWORK_LIST[networkKey].prefix,
-							networkKey
+							networkKey,
+							keyPairsName
 						);
 						if (derivationSucceed) {
 							navigateToPathsList(navigation, networkKey);
