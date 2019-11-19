@@ -39,6 +39,7 @@ function LegacyAccountList({ navigation, accounts }) {
 			<Background />
 			<FlatList
 				style={styles.content}
+				contentContainerStyle={{ paddingBottom: 120 }}
 				data={Array.from(accountsMap.entries())}
 				keyExtractor={([key]) => key}
 				renderItem={({ item: [accountKey, account] }) => {

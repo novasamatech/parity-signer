@@ -181,10 +181,11 @@ const styles = StyleSheet.create({
 	body: {
 		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
-		flex: 1
+		flex: 1,
+		paddingHorizontal: 16
 	},
 	bodyContent: {
-		paddingHorizontal: 16
+		marginTop: 16
 	},
 	title: {
 		...fontStyles.t_regular,
