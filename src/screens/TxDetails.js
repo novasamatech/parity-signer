@@ -132,10 +132,9 @@ export class TxDetailsView extends React.PureComponent {
 					contentContainerStyle={{ paddingBottom: 120 }}
 					testID={testIDs.TxDetails.scrollScreen}
 				>
-					<ScreenHeading
-						title="You are about to confirm sending the following extrinsic:"
-						small={true}
-					/>
+					<Text style={[fontStyles.t_big, styles.bodyContent]}>
+						You are about to confirm sending the following extrinsic:
+					</Text>
 					<Background />
 					<CompatibleCard
 						account={sender}
@@ -181,11 +180,11 @@ const styles = StyleSheet.create({
 	body: {
 		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
-		flex: 1,
-		paddingHorizontal: 16
+		flex: 1
 	},
 	bodyContent: {
-		marginTop: 16
+		marginVertical: 16,
+		paddingHorizontal: 16
 	},
 	title: {
 		...fontStyles.t_regular,
