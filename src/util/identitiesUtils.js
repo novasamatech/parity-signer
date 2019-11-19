@@ -171,6 +171,7 @@ export const groupPaths = paths => {
 		const existedItem = groupedPath.find(p => p.title === groupName);
 		if (existedItem) {
 			existedItem.paths.push(path);
+			existedItem.paths.sort();
 		} else {
 			groupedPath.push({ paths: [path], title: groupName });
 		}

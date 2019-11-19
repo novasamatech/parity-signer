@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -47,7 +47,19 @@ function PathsList({ accounts, navigation }) {
 		'networkKey',
 		UnknownNetworkKeys.UNKNOWN
 	);
-	if (NETWORK_LIST[networkKey].protocol !== NetworkProtocols.SUBSTRATE) {
+
+	const { currentIdentity } = accounts.state;
+	const isSubstratePaths =
+		NETWORK_LIST[networkKey].protocol === NetworkProtocols.SUBSTRATE;
+	const pathsGroups = useMemo(() => {
+		if (!currentIdentity || !isSubstratePaths) return null;
+		const paths = Array.from(currentIdentity.meta.keys());
+		const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
+		return groupPaths(listedPaths);
+	}, [currentIdentity]);
+
+	if (!currentIdentity) return null;
+	if (!isSubstratePaths) {
 		return (
 			<PathDetailsView
 				networkKey={networkKey}
@@ -57,11 +69,7 @@ function PathsList({ accounts, navigation }) {
 			/>
 		);
 	}
-	const { currentIdentity } = accounts.state;
-	if (!currentIdentity) return null;
-	const paths = Array.from(currentIdentity.meta.keys());
-	const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
-	const pathsGroups = groupPaths(listedPaths);
+
 	const { navigate } = navigation;
 
 	const renderSinglePath = pathsGroup => {
