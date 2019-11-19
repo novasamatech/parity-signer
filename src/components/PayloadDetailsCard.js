@@ -37,7 +37,7 @@ import { alertDecodeError } from '../util/alertUtils';
 
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
-		description: PropTypes.string.isRequired,
+		description: PropTypes.string,
 		payload: PropTypes.object,
 		prefix: PropTypes.number.isRequired,
 		signature: PropTypes.string,
@@ -101,14 +101,14 @@ export default class PayloadDetailsCard extends React.PureComponent {
 				{!!payload && (
 					<View style={{ paddingVertical: 2 }}>
 						<ExtrinsicPart
-							label="Block Hash"
-							prefix={prefix}
-							value={payload.blockHash.toString()}
-						/>
-						<ExtrinsicPart
 							label="Method"
 							prefix={prefix}
 							value={fallback ? payload.method.toString() : payload.method}
+						/>
+						<ExtrinsicPart
+							label="Block Hash"
+							prefix={prefix}
+							value={payload.blockHash.toString()}
 						/>
 						<ExtrinsicPart
 							label="Era"
