@@ -88,7 +88,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					iconType="antdesign"
 					iconName="user"
 					iconSize={40}
-					style={{ paddingLeft: 8 * 2 }}
+					style={{ paddingLeft: 16 }}
 					textStyle={fontStyles.h1}
 				/>
 				{renderIdentityOptions(currentIdentity)}
@@ -111,7 +111,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					iconName="info"
 					iconSize={24}
 					textStyle={fontStyles.t_big}
-					style={{ paddingLeft: 8 * 4 }}
+					style={{ paddingLeft: 32 }}
 				/>
 				<ButtonIcon
 					title="Terms and Conditions"
@@ -156,7 +156,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				iconType="antdesign"
 				iconName="user"
 				iconSize={24}
-				style={{ paddingLeft: 8 * 4 }}
+				style={{ paddingLeft: 32 }}
 				textStyle={fontStyles.h2}
 			/>
 		);
@@ -237,7 +237,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 										iconType="antdesign"
 										iconSize={24}
 										textStyle={fontStyles.t_big}
-										style={{ paddingLeft: 8 * 4 }}
+										style={{ paddingLeft: 32 }}
 									/>
 									<Separator />
 								</>
@@ -255,7 +255,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 									iconType="antdesign"
 									iconSize={24}
 									textStyle={fontStyles.t_big}
-									style={{ paddingLeft: 8 * 4 }}
+									style={{ paddingLeft: 32 }}
 								/>
 							)}
 							<Separator />
@@ -269,7 +269,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								iconType="antdesign"
 								iconSize={24}
 								textStyle={fontStyles.t_big}
-								style={{ paddingLeft: 8 * 4 }}
+								style={{ paddingLeft: 32 }}
 							/>
 							<Separator />
 							{renderSettings()}
@@ -303,7 +303,7 @@ const styles = {
 	i_arrowStyle: {
 		opacity: 0.7,
 		paddingBottom: 6,
-		paddingLeft: 8 * 8,
+		paddingLeft: 64,
 		paddingTop: 0
 	}
 };
