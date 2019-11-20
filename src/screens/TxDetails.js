@@ -130,7 +130,7 @@ export class TxDetailsView extends React.PureComponent {
 			<View style={styles.body}>
 				<ScreenHeading
 					title="Sign Transaction"
-					subtitle="step 1/2 – verify and  sign"
+					subtitle="step 1/2 – verify and sign"
 				/>
 				<ScrollView
 					contentContainerStyle={{ paddingBottom: 120 }}
@@ -142,12 +142,14 @@ export class TxDetailsView extends React.PureComponent {
 						}`}
 					</Text>
 					<Background />
-					<CompatibleCard
-						account={sender}
-						accountsStore={accountsStore}
-						titlePrefix={'from: '}
-					/>
 					<View style={styles.bodyContent}>
+						<View style={styles.marginBottom}>
+							<CompatibleCard
+								account={sender}
+								accountsStore={accountsStore}
+								titlePrefix={'from: '}
+							/>
+						</View>
 						{isEthereum ? (
 							<View>
 								<TxDetailsCard
@@ -190,7 +192,10 @@ const styles = StyleSheet.create({
 	},
 	bodyContent: {
 		marginVertical: 16,
-		paddingHorizontal: 16
+		paddingHorizontal: 20
+	},
+	marginBottom: {
+		marginBottom: 16
 	},
 	title: {
 		...fontStyles.t_regular,
