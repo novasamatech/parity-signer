@@ -245,11 +245,22 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								</>
 							)}
 
+							<ButtonIcon
+								title="Add Identity"
+								testID={testIDs.IdentitiesSwitch.addIdentityButton}
+								onPress={() => closeModalAndNavigate('IdentityNew')}
+								iconName="plus"
+								iconType="antdesign"
+								iconSize={24}
+								textStyle={fontStyles.t_big}
+								style={styles.indentedButton}
+							/>
+
+							<Separator />
 							{__DEV__ && (
 								<ButtonIcon
-									title="Add Identity"
-									testID={testIDs.IdentitiesSwitch.addIdentityButton}
-									onPress={() => closeModalAndNavigate('IdentityNew')}
+									title="Add legacy account"
+									onPress={() => closeModalAndNavigate('AccountNew')}
 									iconName="plus"
 									iconType="antdesign"
 									iconSize={24}
@@ -258,16 +269,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								/>
 							)}
 							<Separator />
-							<ButtonIcon
-								title="Add legacy account"
-								onPress={() => closeModalAndNavigate('AccountNew')}
-								iconName="plus"
-								iconType="antdesign"
-								iconSize={24}
-								textStyle={fontStyles.t_big}
-								style={styles.indentedButton}
-							/>
-							<Separator />
+
 							{renderSettings()}
 						</View>
 					</View>

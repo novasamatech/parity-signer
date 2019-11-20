@@ -38,14 +38,9 @@ export const tapBack = async () =>
 		.atIndex(0)
 		.tap();
 
-// export const timeout = m => new Promise(r => setTimeout(r, m));
-
 export const testInput = async (inputId, inputText) => {
 	await element(by.id(inputId)).typeText(inputText);
 	await element(by.id(inputId)).tapReturnKey();
-	// if (device.getPlatform() !== 'ios') {
-	// 	await device.pressBack();
-	// }
 };
 
 export const testScrollAndTap = async (buttonId, screenId) => {

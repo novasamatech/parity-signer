@@ -137,7 +137,9 @@ export class TxDetailsView extends React.PureComponent {
 					testID={testIDs.TxDetails.scrollScreen}
 				>
 					<Text style={[fontStyles.t_big, styles.bodyContent]}>
-						You are about to confirm sending the following extrinsic:
+						{`You are about to confirm sending the following ${
+							isEthereum ? 'transaction' : 'extrinsic'
+						}`}
 					</Text>
 					<Background />
 					<CompatibleCard

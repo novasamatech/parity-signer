@@ -39,7 +39,7 @@ export function SignedMessage({ scanner }) {
 
 	return (
 		<ScrollView style={styles.body}>
-			<Text style={styles.topTitle}>Scan Message</Text>
+			<Text style={styles.topTitle}>Signed Message</Text>
 			<View style={styles.qr}>
 				<QrView data={data} />
 			</View>
@@ -60,7 +60,8 @@ const styles = StyleSheet.create({
 		overflow: 'hidden'
 	},
 	messageContainer: {
-		marginHorizontal: 20
+		marginHorizontal: 20,
+		marginTop: 16
 	},
 	qr: {
 		marginBottom: 20
