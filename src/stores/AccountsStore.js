@@ -201,19 +201,20 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async checkPinForSelected(pin) {
-		const account = this.getSelected();
-
-		if (account && account.encryptedSeed) {
-			return await decryptData(account.encryptedSeed, pin);
-		} else {
-			return false;
+	getAccountWithoutCaseSensitive(accountId) {
+		let findLegacyAccount = null;
+		for (const [key, value] of this.state.accounts) {
+			if (key.toLowerCase() === accountId.toLowerCase()) {
+				findLegacyAccount = value;
+				break;
+			}
 		}
+		return findLegacyAccount;
 	}
 
 	async getById({ address, networkKey }) {
 		const accountId = generateAccountId({ address, networkKey });
-		const legacyAccount = this.state.accounts.get(accountId);
+		const legacyAccount = this.getAccountWithoutCaseSensitive(accountId);
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
 		const derivedAccount = await this.getAccountFromIdentity(accountId);
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
@@ -222,21 +223,29 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async getAccountFromIdentity(accountIdOrAddress) {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
-		const mapFunction = isAccountId ? i => i : extractAddressFromAccountId;
 		let targetPath = null;
 		let targetIdentity = null;
 		for (const identity of this.state.identities) {
-			const accountIdIndex = Array.from(identity.accountIds.keys())
-				.map(mapFunction)
-				.indexOf(accountIdOrAddress);
-			if (accountIdIndex !== -1) {
-				await this.setState({ currentIdentity: identity });
-				targetPath = Array.from(identity.accountIds.values())[accountIdIndex];
-				targetIdentity = identity;
-				break;
+			const searchList = Array.from(identity.accountIds.entries());
+			for (const [accountId, path] of searchList) {
+				const searchAccountIdOrAddress = isAccountId
+					? accountId
+					: extractAddressFromAccountId(accountId);
+				const found =
+					accountId.indexOf('ethereum:') === 0
+						? searchAccountIdOrAddress.toLowerCase() ===
+						  accountIdOrAddress.toLowerCase()
+						: searchAccountIdOrAddress === accountIdOrAddress;
+				if (found) {
+					targetPath = path;
+					targetIdentity = identity;
+					break;
+				}
 			}
 		}
+
 		if (!targetPath || !targetIdentity) return false;
+		await this.setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
 		const networkKey = getNetworkKeyByPath(targetPath);

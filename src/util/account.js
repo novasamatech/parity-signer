@@ -43,7 +43,7 @@ export function generateAccountId({ address, networkKey }) {
 	if (protocol === NetworkProtocols.SUBSTRATE) {
 		return `${protocol}:${address}:${genesisHash}`;
 	} else {
-		return `${protocol}:0x${address.toLowerCase()}@${ethereumChainId}`;
+		return `${protocol}:0x${address}@${ethereumChainId}`;
 	}
 }
 

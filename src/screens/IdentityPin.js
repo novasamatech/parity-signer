@@ -64,10 +64,8 @@ function IdentityPin({ navigation, accounts }) {
 		const { pin } = state;
 		if (pin.length >= 6) {
 			try {
-				const identity = navigation.getParam(
-					'identity',
-					accounts.state.currentIdentity
-				);
+				const identity =
+					navigation.getParam('identity') || accounts.state.currentIdentity;
 				const resolve = navigation.getParam('resolve');
 				const seed = await unlockIdentitySeed(pin, identity);
 				setState(initialState);
