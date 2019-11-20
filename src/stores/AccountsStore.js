@@ -275,13 +275,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return this.state.accounts;
 	}
 
-	async unlockIdentitySeed(pin) {
-		const { encryptedSeed } = this.state.currentIdentity;
-		const seed = await decryptData(encryptedSeed, pin);
-		const { phrase } = parseSURI(seed);
-		return phrase;
-	}
-
 	getIdentityByAccountId(accountId) {
 		return this.state.identities.find(identity =>
 			identity.accountIds.has(accountId)

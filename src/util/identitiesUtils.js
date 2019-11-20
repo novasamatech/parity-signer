@@ -22,6 +22,8 @@ import {
 	UnknownNetworkKeys
 } from '../constants';
 import { pathsRegex } from './regex';
+import { decryptData } from './native';
+import { parseSURI } from './suri';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = str => str.replace(/\//g, '');
@@ -105,10 +107,20 @@ export const getNetworkKeyByPath = path => {
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
+export const getIdentityFromSender = (sender, identities) =>
+	identities.find(i => i.encryptedSeed === sender.encryptedSeed);
+
 export const getAccountIdWithPath = (path, identity) => {
 	const pathMeta = identity.meta.get(path);
 	if (pathMeta && pathMeta.accountId) return pathMeta.accountId;
 	return '';
+};
+
+export const unlockIdentitySeed = async (pin, identity) => {
+	const { encryptedSeed } = identity;
+	const seed = await decryptData(encryptedSeed, pin);
+	const { phrase } = parseSURI(seed);
+	return phrase;
 };
 
 export const getAvailableNetworkKeys = identity => {

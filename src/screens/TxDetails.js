@@ -39,9 +39,32 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import testIDs from '../../e2e/testIDs';
 import fontStyles from '../fontStyles';
 import CompatibleCard from '../components/CompatibleCard';
+import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class TxDetails extends React.PureComponent {
 	render() {
+		const onSignTx = async (scannerStore, accountsStore, sender) => {
+			try {
+				if (sender.isLegacy) {
+					return this.props.navigation.navigate('AccountUnlockAndSign', {
+						next: 'SignedTx'
+					});
+				}
+				const senderIdentity = getIdentityFromSender(
+					sender,
+					accountsStore.state.identities
+				);
+				const seed = await unlockSeed(this.props.navigation, senderIdentity);
+				await scannerStore.signDataWithSeed(
+					seed,
+					NETWORK_LIST[sender.networkKey].protocol
+				);
+				return navigateToSignedTx(this.props.navigation);
+			} catch (e) {
+				scannerStore.setErrorMsg(e.message);
+			}
+		};
+
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
 				{(scannerStore, accountsStore) => {
@@ -59,26 +82,7 @@ export default class TxDetails extends React.PureComponent {
 								recipient={scannerStore.getRecipient()}
 								// dataToSign={scannerStore.getDataToSign()}
 								prehash={scannerStore.getPrehashPayload()}
-								onNext={async () => {
-									try {
-										if (sender.isLegacy) {
-											return this.props.navigation.navigate(
-												'AccountUnlockAndSign',
-												{
-													next: 'SignedTx'
-												}
-											);
-										}
-										const seed = await unlockSeed(this.props.navigation);
-										await scannerStore.signDataWithSeed(
-											seed,
-											NETWORK_LIST[sender.networkKey].protocol
-										);
-										return navigateToSignedTx(this.props.navigation);
-									} catch (e) {
-										scannerStore.setErrorMsg(e.message);
-									}
-								}}
+								onNext={() => onSignTx(scannerStore, accountsStore, sender)}
 							/>
 						);
 					} else {

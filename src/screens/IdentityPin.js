@@ -28,6 +28,7 @@ import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { onlyNumberRegex } from '../util/regex';
+import { unlockIdentitySeed } from '../util/identitiesUtils';
 
 export default withAccountStore(withNavigation(IdentityPin));
 
@@ -63,8 +64,12 @@ function IdentityPin({ navigation, accounts }) {
 		const { pin } = state;
 		if (pin.length >= 6) {
 			try {
-				const seed = await accounts.unlockIdentitySeed(pin);
+				const identity = navigation.getParam(
+					'identity',
+					accounts.state.currentIdentity
+				);
 				const resolve = navigation.getParam('resolve');
+				const seed = await unlockIdentitySeed(pin, identity);
 				setState(initialState);
 				resolve(seed);
 			} catch (e) {

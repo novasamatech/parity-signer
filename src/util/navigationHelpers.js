@@ -23,9 +23,9 @@ export const setPin = async navigation =>
 		navigation.navigate('IdentityPin', { isNew: true, resolve });
 	});
 
-export const unlockSeed = async navigation =>
+export const unlockSeed = async (navigation, identity) =>
 	new Promise(resolve => {
-		navigation.navigate('IdentityPin', { isUnlock: true, resolve });
+		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
 	});
 
 export const navigateToPathsList = (navigation, networkKey) => {
