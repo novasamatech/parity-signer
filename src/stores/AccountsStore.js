@@ -372,7 +372,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			password: '',
 			phrase: seed
 		});
-		const address = await substrateAddress(suri, prefix);
+		let address = '';
+		try {
+			address = await substrateAddress(suri, prefix);
+		} catch (e) {
+			return false;
+		}
 		if (address === '') return false;
 		if (updatedCurrentIdentity.meta.has(newPath)) return false;
 		const accountId = generateAccountId({ address, networkKey });
