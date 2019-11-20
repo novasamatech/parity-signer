@@ -68,7 +68,7 @@ export class AccountUnlockAndSign extends React.PureComponent {
 	}
 }
 
-export class AccountUnlock extends React.Component {
+export class AccountUnlock extends React.PureComponent {
 	render() {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'LegacyAccountList');

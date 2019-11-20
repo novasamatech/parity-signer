@@ -52,6 +52,24 @@ function IdentityNew({ accounts, navigation }) {
 		accounts.updateNewIdentity({ name });
 	};
 
+	const onRecoverIdentity = async () => {
+		const pin = await setPin(navigation);
+		try {
+			await accounts.saveNewIdentity(seedPhrase, pin);
+			setSeedPhrase('');
+			navigateToNewIdentityNetwork(navigation);
+		} catch (e) {
+			alertIdentityCreationError();
+		}
+	};
+
+	const onCreateNewIdentity = () => {
+		setSeedPhrase('');
+		navigation.navigate('IdentityBackup', {
+			isNew: true
+		});
+	};
+
 	const renderRecoverView = () => (
 		<>
 			<AccountSeed
@@ -72,16 +90,7 @@ function IdentityNew({ accounts, navigation }) {
 				<Button
 					title="Recover Identity"
 					testID={testIDs.IdentityNew.recoverButton}
-					onPress={async () => {
-						const pin = await setPin(navigation);
-						try {
-							await accounts.saveNewIdentity(seedPhrase, pin);
-							setSeedPhrase('');
-							navigateToNewIdentityNetwork(navigation);
-						} catch (e) {
-							alertIdentityCreationError();
-						}
-					}}
+					onPress={onRecoverIdentity}
 					small={true}
 				/>
 			</View>
@@ -99,12 +108,7 @@ function IdentityNew({ accounts, navigation }) {
 			<Button
 				title="Create"
 				testID={testIDs.IdentityNew.createButton}
-				onPress={() => {
-					setSeedPhrase('');
-					navigation.navigate('IdentityBackup', {
-						isNew: true
-					});
-				}}
+				onPress={onCreateNewIdentity}
 				small={true}
 			/>
 		</View>

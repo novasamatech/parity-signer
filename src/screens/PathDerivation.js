@@ -45,6 +45,26 @@ function PathDerivation({ accounts, navigation }) {
 	const existedNetworkPath = `//${NETWORK_LIST[networkKey].pathId}`;
 	const completePath = `${existedNetworkPath}${derivationPath}`;
 
+	const onPathDerivation = async () => {
+		if (!validateDerivedPath(derivationPath)) {
+			return setIsPathValid(false);
+		}
+		const seed = await unlockSeed(navigation);
+		const derivationSucceed = await accounts.deriveNewPath(
+			completePath,
+			seed,
+			NETWORK_LIST[networkKey].prefix,
+			networkKey,
+			keyPairsName
+		);
+		if (derivationSucceed) {
+			navigateToPathsList(navigation, networkKey);
+		} else {
+			setIsPathValid(false);
+			alertPathDerivationError();
+		}
+	};
+
 	return (
 		<View style={styles.container}>
 			<ScreenHeading
@@ -80,25 +100,7 @@ function PathDerivation({ accounts, navigation }) {
 					style={{ marginTop: 8 }}
 					title="Derive Address"
 					testID={testIDs.PathDerivation.deriveButton}
-					onPress={async () => {
-						if (!validateDerivedPath(derivationPath)) {
-							return setIsPathValid(false);
-						}
-						const seed = await unlockSeed(navigation);
-						const derivationSucceed = await accounts.deriveNewPath(
-							completePath,
-							seed,
-							NETWORK_LIST[networkKey].prefix,
-							networkKey,
-							keyPairsName
-						);
-						if (derivationSucceed) {
-							navigateToPathsList(navigation, networkKey);
-						} else {
-							setIsPathValid(false);
-							alertPathDerivationError();
-						}
-					}}
+					onPress={() => onPathDerivation()}
 				/>
 			</KeyboardScrollView>
 		</View>

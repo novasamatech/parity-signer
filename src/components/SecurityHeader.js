@@ -17,7 +17,7 @@
 'use strict';
 
 import NetInfo from '@react-native-community/netinfo';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
@@ -25,45 +25,37 @@ import colors from '../colors';
 import IdentitiesSwitch from '../components/IdentitiesSwitch';
 import ButtonIcon from './ButtonIcon';
 
-class SecurityHeader extends React.Component {
-	state = {
-		isConnected: false
-	};
+function SecurityHeader({ navigation }) {
+	const [isConnected, setIsConnected] = useState(false);
 
-	componentDidMount() {
-		this.unsubscribe = NetInfo.addEventListener(state => {
-			this.setState({ isConnected: state.isConnected });
-		});
-	}
+	useEffect(() => {
+		const subscribe = () =>
+			NetInfo.addEventListener(state => {
+				setIsConnected(state.isConnected);
+			});
+		return subscribe();
+	}, []);
 
-	componentWillUnmount() {
-		this.unsubscribe();
-	}
-
-	render() {
-		const { isConnected } = this.state;
-
-		return (
-			<View
-				style={{
-					alignItems: 'center',
-					flexDirection: 'row',
-					paddingRight: 16
-				}}
-			>
-				{isConnected && (
-					<ButtonIcon
-						onPress={() => this.props.navigation.navigate('Security')}
-						iconName="shield-off"
-						iconType="feather"
-						iconColor={colors.bg_alert}
-						iconBgStyle={{ backgroundColor: 'transparent', marginTop: -3 }}
-					/>
-				)}
-				<IdentitiesSwitch />
-			</View>
-		);
-	}
+	return (
+		<View
+			style={{
+				alignItems: 'center',
+				flexDirection: 'row',
+				paddingRight: 16
+			}}
+		>
+			{isConnected && (
+				<ButtonIcon
+					onPress={() => navigation.navigate('Security')}
+					iconName="shield-off"
+					iconType="feather"
+					iconColor={colors.bg_alert}
+					iconBgStyle={{ backgroundColor: 'transparent', marginTop: -3 }}
+				/>
+			)}
+			<IdentitiesSwitch />
+		</View>
+	);
 }
 
 export default withNavigation(SecurityHeader);

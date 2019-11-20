@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
@@ -148,7 +148,7 @@ class AccountPinView extends React.PureComponent {
 	}
 }
 
-class PinInput extends Component {
+class PinInput extends PureComponent {
 	render() {
 		return (
 			<TextInput

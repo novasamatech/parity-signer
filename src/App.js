@@ -20,7 +20,7 @@ import '../shim';
 
 import '@polkadot/types/injector';
 
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { Platform, StatusBar, View, YellowBox } from 'react-native';
 import {
 	createAppContainer,
@@ -132,7 +132,7 @@ const globalStackNavigationOptions = ({ navigation }) => {
 };
 
 const HeaderLeftWithBack = withNavigation(
-	class _HeaderBackButton extends Component {
+	class _HeaderBackButton extends PureComponent {
 		render() {
 			const { navigation } = this.props;
 			return (

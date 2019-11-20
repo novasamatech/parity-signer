@@ -36,7 +36,7 @@ import {
 
 const ANDROID_VERSION_LOLLIPOP = 21;
 
-export default class TouchableItem extends React.Component {
+export default class TouchableItem extends React.PureComponent {
 	static defaultProps = {
 		borderless: false,
 		pressColor: 'rgba(0, 0, 0, .32)'

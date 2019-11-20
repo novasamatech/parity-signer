@@ -39,6 +39,11 @@ export default class TermsAndConditions extends React.PureComponent {
 		const { tocAgreement, ppAgreement } = this.state;
 		const disableButtons = navigation.getParam('disableButtons', false);
 
+		const onConfirm = async () => {
+			await saveToCAndPPConfirmation();
+			navigation.navigate('Welcome');
+		};
+
 		return (
 			<View style={styles.body} testID={testIDs.TacScreen.tacView}>
 				<ScrollView
@@ -108,10 +113,7 @@ export default class TermsAndConditions extends React.PureComponent {
 							testID={testIDs.TacScreen.nextButton}
 							title="Next"
 							disabled={!ppAgreement || !tocAgreement}
-							onPress={async () => {
-								await saveToCAndPPConfirmation();
-								navigation.navigate('Welcome');
-							}}
+							onPress={onConfirm}
 						/>
 					</View>
 				)}

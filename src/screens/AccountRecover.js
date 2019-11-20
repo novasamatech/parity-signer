@@ -43,7 +43,7 @@ import {
 	alertInvalidSeedRecovery
 } from '../util/alertUtils';
 
-export default class AccountRecover extends React.Component {
+export default class AccountRecover extends React.PureComponent {
 	render() {
 		return (
 			<Subscribe to={[AccountsStore]}>
@@ -53,7 +53,7 @@ export default class AccountRecover extends React.Component {
 	}
 }
 
-class AccountRecoverView extends React.Component {
+class AccountRecoverView extends React.PureComponent {
 	constructor(...args) {
 		super(...args);
 
@@ -166,12 +166,26 @@ class AccountRecoverView extends React.Component {
 		}
 	}
 
-	toggleAdvancedField = () => {
-		this.setState({ showAdvancedField: !this.state.showAdvancedField });
+	onAccountRecover = () => {
+		const { navigation } = this.props;
+		const { seedPhrase, validBip39Seed } = this.state.selectedAccount;
+		const validation = validateSeed(seedPhrase, validBip39Seed);
+
+		if (!validation.valid) {
+			if (validation.accountRecoveryAllowed) {
+				return alertInvalidSeedRecovery(`${validation.reason}`, navigation);
+			} else {
+				return alertErrorWithMessage(`${validation.reason}`, 'Back');
+			}
+		}
+
+		navigation.navigate('AccountPin', {
+			isNew: true
+		});
 	};
 
 	render() {
-		const { accounts, navigation } = this.props;
+		const { accounts } = this.props;
 		const {
 			derivationPassword,
 			derivationPath,
@@ -259,24 +273,7 @@ class AccountRecoverView extends React.Component {
 						buttonStyles={{ marginBottom: 40 }}
 						disabled={isSubstrate && (!address || !isDerivationPathValid)}
 						title="Next Step"
-						onPress={() => {
-							const validation = validateSeed(seedPhrase, validBip39Seed);
-
-							if (!validation.valid) {
-								if (validation.accountRecoveryAllowed) {
-									return alertInvalidSeedRecovery(
-										`${validation.reason}`,
-										navigation
-									);
-								} else {
-									return alertErrorWithMessage(`${validation.reason}`, 'Back');
-								}
-							}
-
-							navigation.navigate('AccountPin', {
-								isNew: true
-							});
-						}}
+						onPress={() => this.onAccountRecover()}
 					/>
 				</KeyboardScrollView>
 			</SafeAreaView>

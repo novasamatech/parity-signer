@@ -20,7 +20,7 @@ import React from 'react';
 import { Keyboard, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-class KeyboardScrollView extends React.Component {
+class KeyboardScrollView extends React.PureComponent {
 	render() {
 		const defaultProps = { enableAutomaticScroll: true };
 		return Platform.select({

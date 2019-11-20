@@ -34,7 +34,7 @@ import {
 } from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
 
-export default class AccountDetails extends React.Component {
+export default class AccountDetails extends React.PureComponent {
 	render() {
 		return (
 			<Subscribe to={[AccountsStore, TxStore]}>
@@ -51,7 +51,7 @@ export default class AccountDetails extends React.Component {
 	}
 }
 
-class AccountDetailsView extends React.Component {
+class AccountDetailsView extends React.PureComponent {
 	constructor(props) {
 		super(props);
 	}
