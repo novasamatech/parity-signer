@@ -9,23 +9,24 @@ variables:
   CARGOFLAGS: ""
 cache:
   untracked: true
-#android-test:
-#  stage: test
-#  image: parity/parity-android
-#  only:
-#    - beta
-#    - tags
-#    - stable
-#    - triggers
-#    - master
-#  script:
-#    - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-#    - apt-get install -y nodejs
-#    - npm install -g yarn
-#    - npm install
-#    - npm run test
-#  tags:
-#    - linux-docker
+
+
+
+android-test:
+  stage: test
+  image: parity/parity-android
+  only:
+    - master
+    - /^[0-9]+$/
+  script:
+    - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    - apt-get install -y nodejs
+    - npm install -g yarn
+    - npm install
+    - npm run test
+  tags:
+    - linux-docker
+
 android-build:
   stage: build
   image: parity/android-sdk
