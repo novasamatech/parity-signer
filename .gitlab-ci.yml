@@ -19,7 +19,7 @@ android-test:
     - master
     - /^[0-9]+$/
   script:
-    - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    - curl -sL https://deb.nodesource.com/setup_8.x | bash -
     - apt-get install -y nodejs
     - npm install -g yarn
     - npm install
