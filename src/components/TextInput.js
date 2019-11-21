@@ -46,21 +46,24 @@ export default class TextInput extends React.PureComponent {
 		focus && this.focus();
 	}
 
+	renderLabel() {
+		const { label } = this.props;
+		if (!label) return;
+		return (
+			<Text style={[fontStyles.t_regular, { marginBottom: 3 }]}>{label}</Text>
+		);
+	}
+
 	render() {
-		const { fixedPrefix, style, label, error } = this.props;
+		const { fixedPrefix, style, error } = this.props;
 		const finalInputStyles = [styles.input];
 		if (error) {
 			finalInputStyles.push(styles.input_error);
 		}
-		const renderLabel = () => {
-			if (!label) return;
-			return (
-				<Text style={[fontStyles.t_regular, { marginBottom: 3 }]}>{label}</Text>
-			);
-		};
+
 		return (
 			<View style={styles.body}>
-				{renderLabel()}
+				{this.renderLabel()}
 				<View style={styles.viewStyle}>
 					{fixedPrefix && (
 						<Text style={[fontStyles.h2, finalInputStyles, styles.inputFixed]}>

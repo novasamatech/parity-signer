@@ -24,17 +24,17 @@ import AccountCard from '../components/AccountCard';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 
+const onNameInput = async (accounts, name) => {
+	await accounts.updateSelectedAccount({ name });
+	await accounts.save(accounts.getSelectedKey(), accounts.getSelected());
+};
+
 export default class AccountEdit extends React.PureComponent {
 	constructor(props) {
 		super(props);
 	}
 
 	render() {
-		const onNameInput = async (accounts, name) => {
-			await accounts.updateSelectedAccount({ name });
-			await accounts.save(accounts.getSelectedKey(), accounts.getSelected());
-		};
-
 		return (
 			<Subscribe to={[AccountsStore]}>
 				{accounts => {

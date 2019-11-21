@@ -41,29 +41,29 @@ import CompatibleCard from '../components/CompatibleCard';
 import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent {
-	render() {
-		const onSignMessage = async (scannerStore, accountsStore, sender) => {
-			try {
-				if (sender.isLegacy) {
-					return this.props.navigation.navigate('AccountUnlockAndSign', {
-						next: 'SignedMessage'
-					});
-				}
-				const senderIdentity = getIdentityFromSender(
-					sender,
-					accountsStore.state.identities
-				);
-				const seed = await unlockSeed(this.props.navigation, senderIdentity);
-				await scannerStore.signDataWithSeed(
-					seed,
-					NETWORK_LIST[sender.networkKey].protocol
-				);
-				return navigateToSignedMessage(this.props.navigation);
-			} catch (e) {
-				scannerStore.setErrorMsg(e.message);
+	async onSignMessage(scannerStore, accountsStore, sender) {
+		try {
+			if (sender.isLegacy) {
+				return this.props.navigation.navigate('AccountUnlockAndSign', {
+					next: 'SignedMessage'
+				});
 			}
-		};
+			const senderIdentity = getIdentityFromSender(
+				sender,
+				accountsStore.state.identities
+			);
+			const seed = await unlockSeed(this.props.navigation, senderIdentity);
+			await scannerStore.signDataWithSeed(
+				seed,
+				NETWORK_LIST[sender.networkKey].protocol
+			);
+			return navigateToSignedMessage(this.props.navigation);
+		} catch (e) {
+			scannerStore.setErrorMsg(e.message);
+		}
+	}
 
+	render() {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
 				{(scannerStore, accountsStore) => {
@@ -85,7 +85,7 @@ export default class MessageDetails extends React.PureComponent {
 								prehash={scannerStore.getPrehashPayload()}
 								isHash={scannerStore.getIsHash()}
 								onNext={() =>
-									onSignMessage(scannerStore, accountsStore, sender)
+									this.onSignMessage(scannerStore, accountsStore, sender)
 								}
 							/>
 						);
