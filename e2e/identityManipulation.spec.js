@@ -117,6 +117,7 @@ describe('Load test', async () => {
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
+		await testUnlockPin(pinCode);
 		await testNotExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
 	});
 
