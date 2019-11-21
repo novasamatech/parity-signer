@@ -258,17 +258,19 @@ function IdentitiesSwitch({ navigation, accounts }) {
 
 							<Separator />
 							{__DEV__ && (
-								<ButtonIcon
-									title="Add legacy account"
-									onPress={() => closeModalAndNavigate('AccountNew')}
-									iconName="plus"
-									iconType="antdesign"
-									iconSize={24}
-									textStyle={fontStyles.t_big}
-									style={styles.indentedButton}
-								/>
+								<View>
+									<ButtonIcon
+										title="Add legacy account"
+										onPress={() => closeModalAndNavigate('AccountNew')}
+										iconName="plus"
+										iconType="antdesign"
+										iconSize={24}
+										textStyle={fontStyles.t_big}
+										style={styles.indentedButton}
+									/>
+									<Separator />
+								</View>
 							)}
-							<Separator />
 
 							{renderSettings()}
 						</View>
