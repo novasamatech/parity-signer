@@ -14,7 +14,7 @@ cache:
 
 android-test:
   stage: test
-  image: parity/parity-android
+  image: parity/parity-sdk
   only:
     - master
     - /^[0-9]+$/
