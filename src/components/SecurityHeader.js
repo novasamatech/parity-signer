@@ -28,13 +28,13 @@ import ButtonIcon from './ButtonIcon';
 function SecurityHeader({ navigation }) {
 	const [isConnected, setIsConnected] = useState(false);
 
-	useEffect(() => {
-		const subscribe = () =>
+	useEffect(
+		() =>
 			NetInfo.addEventListener(state => {
 				setIsConnected(state.isConnected);
-			});
-		return subscribe();
-	}, []);
+			}),
+		[]
+	);
 
 	return (
 		<View

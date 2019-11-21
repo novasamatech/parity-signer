@@ -20,6 +20,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
+import iconLogo from '../../res/img/icon.png';
 
 export default class HeaderLeftHome extends React.PureComponent {
 	render() {
@@ -35,7 +36,7 @@ export default class HeaderLeftHome extends React.PureComponent {
 					this.props.style
 				]}
 			>
-				<Image source={require('../../icon.png')} style={styles.logo} />
+				<Image source={iconLogo} style={styles.logo} />
 				<Text style={[styles.headerTextLeft, styles.t_bold]}>parity</Text>
 				<Text style={styles.headerTextLeft}>signer</Text>
 			</View>

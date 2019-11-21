@@ -20,6 +20,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { View, ViewPropTypes, Image } from 'react-native';
 
+import shadowImage from '../../res/img/card_shadow.png';
+
 export default class Separator extends React.PureComponent {
 	static propTypes = {
 		shadow: PropTypes.bool,
@@ -44,7 +46,7 @@ export default class Separator extends React.PureComponent {
 			>
 				{shadow && (
 					<Image
-						source={require('../../res/img/card_shadow.png')}
+						source={shadowImage}
 						style={[
 							{
 								height: 32,

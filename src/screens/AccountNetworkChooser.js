@@ -212,8 +212,8 @@ function AccountNetworkChooser({ navigation, accounts }) {
 
 	if (identities.length === 0) return showOnboardingMessage();
 
-	const NetworkList = Object.entries(NETWORK_LIST).filter(getNetworkKeys);
-	NetworkList.sort(sortNetworkKeys);
+	const networkList = Object.entries(NETWORK_LIST).filter(getNetworkKeys);
+	networkList.sort(sortNetworkKeys);
 
 	return (
 		<View
@@ -222,7 +222,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		>
 			{renderScreenHeading()}
 			<ScrollView>
-				{NetworkList.map(([networkKey, networkParams], index) => (
+				{networkList.map(([networkKey, networkParams], index) => (
 					<AccountCard
 						isNetworkCard={true}
 						accountId={''}
