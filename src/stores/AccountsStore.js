@@ -294,6 +294,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return this.state.newIdentity;
 	}
 
+	async resetCurrentIdentity() {
+		await this.setState({ currentIdentity: null });
+	}
+
 	async saveNewIdentity(seedPhrase, pin) {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
