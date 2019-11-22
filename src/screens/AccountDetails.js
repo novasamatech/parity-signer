@@ -17,10 +17,8 @@
 'use strict';
 
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { NavigationActions, StackActions } from 'react-navigation';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
-
 import colors from '../colors';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
@@ -29,12 +27,14 @@ import AccountsStore from '../stores/AccountsStore';
 import TxStore from '../stores/TxStore';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { alertDeleteAccount } from '../util/alertUtils';
+import {
+	navigateToLandingPage,
+	navigateToLegacyAccountList
+} from '../util/navigationHelpers';
+import fontStyles from '../fontStyles';
 
-export default class AccountDetails extends React.Component {
-	static navigationOptions = {
-		title: 'Account Details'
-	};
-
+export default class AccountDetails extends React.PureComponent {
 	render() {
 		return (
 			<Subscribe to={[AccountsStore, TxStore]}>
@@ -51,43 +51,25 @@ export default class AccountDetails extends React.Component {
 	}
 }
 
-class AccountDetailsView extends React.Component {
+class AccountDetailsView extends React.PureComponent {
 	constructor(props) {
 		super(props);
 	}
 
 	onDelete = () => {
-		const accounts = this.props.accounts;
+		const { accounts, navigation } = this.props;
 		const selected = accounts.getSelected();
 		const selectedKey = accounts.getSelectedKey();
 
-		Alert.alert(
-			'Delete Account',
-			`Do you really want to delete ${selected.name ||
-				selected.address ||
-				'this account'}?
-This account can only be recovered with its associated recovery phrase.`,
-			[
-				{
-					onPress: () => {
-						accounts.deleteAccount(selectedKey);
-						const resetAction = StackActions.reset({
-							actions: [
-								NavigationActions.navigate({ routeName: 'AccountList' })
-							],
-							index: 0, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-							key: undefined
-						});
-						this.props.navigation.dispatch(resetAction);
-					},
-					style: 'destructive',
-					text: 'Delete'
-				},
-				{
-					style: 'cancel',
-					text: 'Cancel'
+		alertDeleteAccount(
+			selected.name || selected.address || 'this account',
+			async () => {
+				await accounts.deleteAccount(selectedKey);
+				if (accounts.getAccounts().size === 0) {
+					return navigateToLandingPage(navigation);
 				}
-			]
+				navigateToLegacyAccountList(navigation);
+			}
 		);
 	};
 
@@ -137,35 +119,37 @@ This account can only be recovered with its associated recovery phrase.`,
 			NetworkProtocols.UNKNOWN;
 
 		return (
-			<ScrollView
-				contentContainerStyle={styles.bodyContent}
-				style={styles.body}
-			>
-				<View style={styles.header}>
-					<Text style={styles.title}>ACCOUNT</Text>
-					<View style={styles.menuView}>
-						<PopupMenu
-							onSelect={this.onOptionSelect}
-							menuTriggerIconName={'more-vert'}
-							menuItems={[
-								{ text: 'Edit', value: 'AccountEdit' },
-								{ text: 'Change Pin', value: 'AccountPin' },
-								{ text: 'View Recovery Phrase', value: 'AccountBackup' },
-								{
-									text: 'Delete',
-									textStyle: styles.deleteText,
-									value: 'AccountDelete'
-								}
-							]}
-						/>
+			<ScrollView contentContainerStyle={styles.body}>
+				<View style={styles.bodyContent}>
+					<View style={styles.header}>
+						<Text style={fontStyles.h2}>Public Address</Text>
+						<View style={styles.menuView}>
+							<PopupMenu
+								onSelect={this.onOptionSelect}
+								menuTriggerIconName={'more-vert'}
+								menuItems={[
+									{ text: 'Edit', value: 'AccountEdit' },
+									{ text: 'Change Pin', value: 'AccountPin' },
+									{
+										text: 'View Recovery Phrase',
+										value: 'LegacyAccountBackup'
+									},
+									{
+										text: 'Delete',
+										textStyle: styles.deleteText,
+										value: 'AccountDelete'
+									}
+								]}
+							/>
+						</View>
 					</View>
 				</View>
 				<AccountCard
-					address={account.address}
+					accountId={account.address}
 					networkKey={account.networkKey}
 					title={account.name}
 				/>
-				<View style={styles.qr}>
+				<View>
 					{protocol !== NetworkProtocols.UNKNOWN ? (
 						<QrView data={selectedKey} />
 					) : (
@@ -179,30 +163,24 @@ This account can only be recovered with its associated recovery phrase.`,
 
 const styles = StyleSheet.create({
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		padding: 20
-	},
-	bodyContent: {
-		paddingBottom: 40
+		paddingBottom: 40,
+		paddingTop: 8
 	},
 	deleteText: {
 		color: colors.bg_alert
 	},
 	header: {
-		alignItems: 'center',
 		flexDirection: 'row',
-		justifyContent: 'center',
-		paddingBottom: 20
+		paddingBottom: 24,
+		paddingLeft: 72,
+		paddingRight: 19
 	},
 	menuView: {
 		alignItems: 'flex-end',
 		flex: 1
-	},
-	qr: {
-		backgroundColor: colors.card_bg,
-		marginTop: 20
 	},
 	title: {
 		color: colors.bg_text_sec,

@@ -18,12 +18,13 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import Background from '../components/Background';
+import ScreenHeading from '../components/ScreenHeading';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
@@ -41,7 +42,7 @@ export class AccountUnlockAndSign extends React.PureComponent {
 						accounts={accounts}
 						checkPin={async pin => {
 							try {
-								await scannerStore.signData(pin);
+								await scannerStore.signDataLegacy(pin);
 								return true;
 							} catch (e) {
 								return false;
@@ -50,7 +51,9 @@ export class AccountUnlockAndSign extends React.PureComponent {
 						navigate={() => {
 							const resetAction = StackActions.reset({
 								actions: [
-									NavigationActions.navigate({ routeName: 'AccountList' }),
+									NavigationActions.navigate({
+										routeName: 'LegacyAccountList'
+									}),
 									NavigationActions.navigate({ routeName: next })
 								],
 								index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
@@ -65,10 +68,10 @@ export class AccountUnlockAndSign extends React.PureComponent {
 	}
 }
 
-export class AccountUnlock extends React.Component {
+export class AccountUnlock extends React.PureComponent {
 	render() {
 		const { navigation } = this.props;
-		const next = navigation.getParam('next', 'AccountList');
+		const next = navigation.getParam('next', 'LegacyAccountList');
 
 		return (
 			<Subscribe to={[AccountsStore]}>
@@ -88,7 +91,9 @@ export class AccountUnlock extends React.Component {
 							} else {
 								const resetAction = StackActions.reset({
 									actions: [
-										NavigationActions.navigate({ routeName: 'AccountList' }),
+										NavigationActions.navigate({
+											routeName: 'LegacyAccountList'
+										}),
 										NavigationActions.navigate({ routeName: 'AccountDetails' }),
 										NavigationActions.navigate({ routeName: next })
 									],
@@ -126,10 +131,13 @@ class AccountUnlockView extends React.PureComponent {
 		return (
 			<View style={styles.body}>
 				<Background />
-				<Text style={styles.titleTop}>UNLOCK ACCOUNT</Text>
-				<Text style={styles.errorText}>{this.showErrorMessage()}</Text>
-				<Text style={styles.title}>PIN</Text>
+				<ScreenHeading
+					title={'Unlock Account'}
+					subtitle={this.showErrorMessage()}
+					error={{ hasWrongPin: true }}
+				/>
 				<PinInput
+					label="PIN"
 					onChangeText={async pin => {
 						this.setState({ pin: pin });
 						if (pin.length < 4) {
@@ -162,7 +170,7 @@ function PinInput(props) {
 			numberOfLines={1}
 			returnKeyType="next"
 			secureTextEntry
-			style={styles.pinInput}
+			style={[fontStyles.t_seed, styles.pinInput]}
 			{...props}
 		/>
 	);
@@ -172,30 +180,13 @@ const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		overflow: 'hidden',
-		padding: 20
-	},
-	errorText: {
-		color: colors.bg_alert,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingBottom: 20,
-		textAlign: 'center'
+		overflow: 'hidden'
 	},
 	pinInput: {
-		marginBottom: 20
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 10
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
+		borderBottomColor: colors.bg_button,
+		borderColor: colors.bg_button,
+		minHeight: 48,
+		paddingLeft: 10,
+		paddingRight: 10
 	}
 });

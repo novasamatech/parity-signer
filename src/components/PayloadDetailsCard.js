@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
@@ -23,18 +25,19 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 
-import fonts from '../fonts';
 import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import kusamaMetadata from '../util/static-kusama';
 import substrateDevMetadata from '../util/static-substrate';
 import { shortString } from '../util/strings';
+import fontStyles from '../fontStyles';
+import { alertDecodeError } from '../util/alertUtils';
 
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
-		description: PropTypes.string.isRequired,
+		description: PropTypes.string,
 		payload: PropTypes.object,
 		prefix: PropTypes.number.isRequired,
 		signature: PropTypes.string,
@@ -94,18 +97,18 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
 		return (
 			<View style={[styles.body, style]}>
-				<Text style={styles.titleText}>{description}</Text>
+				{!!description && <Text style={styles.titleText}>{description}</Text>}
 				{!!payload && (
-					<View style={{ padding: 5, paddingVertical: 2 }}>
-						<ExtrinsicPart
-							label="Block Hash"
-							prefix={prefix}
-							value={payload.blockHash.toString()}
-						/>
+					<View style={styles.extrinsicContainer}>
 						<ExtrinsicPart
 							label="Method"
 							prefix={prefix}
 							value={fallback ? payload.method.toString() : payload.method}
+						/>
+						<ExtrinsicPart
+							label="Block Hash"
+							prefix={prefix}
+							value={payload.blockHash.toString()}
 						/>
 						<ExtrinsicPart
 							label="Era"
@@ -130,9 +133,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 					</View>
 				)}
 				{!!signature && (
-					<View
-						style={{ alignItems: 'baseline', padding: 5, paddingVertical: 2 }}
-					>
+					<View style={styles.extrinsicContainer}>
 						<Text style={styles.label}>Signature</Text>
 						<Text style={styles.secondaryText}>{signature}</Text>
 					</View>
@@ -157,12 +158,12 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 				let methodArgs = {};
 
 				// todo: clean this up
-				function formatArgs(callInstance, methodArgs, depth) {
+				function formatArgs(callInstance, callMethodArgs, depth) {
 					const { args, meta, methodName, sectionName } = callInstance;
 					let paramArgKvArray = [];
 					if (!meta.args.length) {
 						const sectionMethod = `${sectionName}.${methodName}`;
-						methodArgs[sectionMethod] = null;
+						callMethodArgs[sectionMethod] = null;
 						return;
 					}
 
@@ -183,7 +184,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 								prefix
 							);
 						} else if (args[i] instanceof Call) {
-							argument = formatArgs(args[i], methodArgs, depth++); // go deeper into the nested calls
+							argument = formatArgs(args[i], callMethodArgs, depth++); // go deeper into the nested calls
 						} else if (
 							args[i].toRawType() === 'Vec<AccountId>' ||
 							args[i].toRawType() === 'Vec<Address>'
@@ -202,23 +203,14 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 						const param = meta.args[i].name.toString();
 						const sectionMethod = `${sectionName}.${methodName}`;
 						paramArgKvArray.push([param, argument]);
-						methodArgs[sectionMethod] = paramArgKvArray;
+						callMethodArgs[sectionMethod] = paramArgKvArray;
 					}
 				}
 
 				formatArgs(call, methodArgs, 0);
 				setFormattedCallArgs(methodArgs);
 			} catch (e) {
-				Alert.alert(
-					'Could not decode method with available metadata.',
-					'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.',
-					[
-						{
-							style: 'default',
-							text: 'Okay'
-						}
-					]
-				);
+				alertDecodeError();
 				setUseFallBack(true);
 			}
 		}
@@ -238,13 +230,9 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 	const renderEraDetails = () => {
 		if (period && phase) {
 			return (
-				<View style={{ display: 'flex', flexDirection: 'column', padding: 5 }}>
-					<View style={styles.era}>
-						<Text style={{ ...styles.subLabel, flex: 1 }}>phase: </Text>
-						<Text style={{ ...styles.secondaryText, flex: 1 }}>{phase}</Text>
-						<Text style={{ ...styles.subLabel, flex: 1 }}>period: </Text>
-						<Text style={{ ...styles.secondaryText, flex: 1 }}>{period}</Text>
-					</View>
+				<View style={styles.era}>
+					<Text style={{ ...styles.subLabel, flex: 1 }}>phase: {phase} </Text>
+					<Text style={{ ...styles.subLabel, flex: 1 }}>period: {period}</Text>
 				</View>
 			);
 		} else {
@@ -253,8 +241,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 					style={{
 						display: 'flex',
 						flexDirection: 'row',
-						flexWrap: 'wrap',
-						padding: 5
+						flexWrap: 'wrap'
 					}}
 				>
 					<Text style={{ ...styles.subLabel, flex: 1 }}>Immortal Era</Text>
@@ -286,20 +273,22 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 				return (
 					<View key={index} style={styles.callDetails}>
-						<Text>
+						<Text style={styles.subLabel}>
 							Call <Text style={styles.titleText}>{sectionMethod}</Text> with
 							the following arguments:
 						</Text>
 						{paramArgs ? (
 							paramArgs.map(([param, arg]) => (
 								<View key={param} style={styles.callDetails}>
-									<Text style={styles.subLabel}>{param}: </Text>
-									<Text style={styles.secondaryText}>
+									<Text style={styles.titleText}>
+										{' { '}
+										{param}:{' '}
 										{arg && arg.length > 50
 											? shortString(arg)
 											: arg instanceof Array
 											? arg.join(', ')
-											: arg}
+											: arg}{' '}
+										{'}'}
 									</Text>
 								</View>
 							))
@@ -324,9 +313,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 	return (
 		<View style={[{ alignItems: 'baseline', justifyContent: 'flex-start' }]}>
-			<View
-				style={{ margin: 5, padding: 5, paddingVertical: 2, width: '100%' }}
-			>
+			<View style={{ marginBottom: 12, width: '100%' }}>
 				<Text style={styles.label}>{label}</Text>
 				{label === 'Method' && !useFallback ? (
 					renderMethodDetails()
@@ -346,55 +333,38 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.card_bg,
-		flexDirection: 'column',
-		padding: 20,
-		paddingTop: 10
+		marginTop: 8
 	},
 	callDetails: {
-		alignItems: 'flex-start',
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'flex-start',
-		paddingLeft: 5,
-		width: '100%'
+		marginBottom: 4
 	},
 	era: {
-		alignItems: 'flex-end',
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-around'
+		flexDirection: 'row'
 	},
-	icon: {
-		height: 47,
-		width: 47
+	extrinsicContainer: {
+		paddingTop: 16
 	},
 	label: {
-		backgroundColor: colors.bg,
-		color: colors.card_bg,
-		fontFamily: fonts.bold,
-		fontSize: 20,
-		textAlign: 'left'
-	},
-	secondaryText: {
-		color: colors.card_text,
-		fontFamily: fonts.semiBold,
-		fontSize: 14,
+		...fontStyles.t_label,
+		backgroundColor: colors.label_text,
+		marginBottom: 10,
 		paddingLeft: 8,
 		textAlign: 'left'
 	},
+	secondaryText: {
+		...fontStyles.t_codeS,
+		color: colors.label_text,
+		paddingHorizontal: 8,
+		textAlign: 'left'
+	},
 	subLabel: {
-		backgroundColor: null,
-		color: colors.card_text,
-		fontFamily: fonts.bold,
-		fontSize: 14,
-		paddingLeft: 5,
+		...fontStyles.t_codeS,
+		color: colors.label_text,
+		paddingLeft: 8,
 		textAlign: 'left'
 	},
 	titleText: {
-		color: colors.card_text,
-		fontFamily: fonts.bold,
-		fontSize: 14,
-		textAlign: 'center'
+		...fontStyles.t_codeS,
+		color: colors.label_text_sec
 	}
 });

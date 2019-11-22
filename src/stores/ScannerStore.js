@@ -48,7 +48,8 @@ import {
 	asciiToHex,
 	encodeNumber
 } from '../util/decoders';
-import { Account } from './AccountsStore';
+import { Account } from './types';
+import { constructSURI } from '../util/suri';
 
 type TXRequest = Object;
 
@@ -145,7 +146,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			return;
 		}
 
-		if (accountsStore.getByAddress(parsedData.data.account)) {
+		if (await accountsStore.getAccountByAddress(parsedData.data.account)) {
 			this.setState({
 				unsignedData: parsedData
 			});
@@ -156,7 +157,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			for (let i = 0; i < networks.length; i++) {
 				let key = networks[i];
-				let account = accountsStore.getByAddress(
+				let account = await accountsStore.getAccountByAddress(
 					encodeAddress(
 						decodeAddress(parsedData.data.account),
 						SUBSTRATE_NETWORK_LIST[key].prefix
@@ -257,13 +258,14 @@ export default class ScannerStore extends Container<ScannerState> {
 				!missedFrames.includes(frame)
 			) {
 				// enumerate all the frames between (current)frame and latestFrame
-				const missedFrames = Array.from(new Array(missedFramesRange), (_, i) =>
-					mod(i + latestFrame, totalFrameCount)
+				const updatedMissedFrames = Array.from(
+					new Array(missedFramesRange),
+					(_, i) => mod(i + latestFrame, totalFrameCount)
 				);
 
 				const dedupMissedFrames = new Set([
 					...this.state.missedFrames,
-					...missedFrames
+					...updatedMissedFrames
 				]);
 
 				this.setState({
@@ -318,11 +320,11 @@ export default class ScannerStore extends Container<ScannerState> {
 			dataToSign = await ethSign(message);
 		}
 
-		const sender = accountsStore.getByAddress(address);
+		const sender = await accountsStore.getAccountByAddress(address);
 
-		if (!sender || !sender.encryptedSeed) {
+		if (!sender) {
 			throw new Error(
-				`No private key found for ${address} found in your signer key storage.`
+				`No private key found for ${address} in your signer key storage.`
 			);
 		}
 
@@ -363,20 +365,20 @@ export default class ScannerStore extends Container<ScannerState> {
 			? tx.ethereumChainId
 			: txRequest.data.data.genesisHash.toHex();
 
-		const sender = accountsStore.getById({
+		const sender = await accountsStore.getById({
 			address: txRequest.data.account,
 			networkKey
 		});
 
 		const networkTitle = NETWORK_LIST[networkKey].title;
 
-		if (!sender || !sender.encryptedSeed) {
+		if (!sender) {
 			throw new Error(
 				`No private key found for account ${txRequest.data.account} found in your signer key storage for the ${networkTitle} chain.`
 			);
 		}
 
-		const recipient = accountsStore.getById({
+		const recipient = await accountsStore.getById({
 			address: isEthereum ? tx.action : txRequest.data.account,
 			networkKey
 		});
@@ -400,17 +402,15 @@ export default class ScannerStore extends Container<ScannerState> {
 		return true;
 	}
 
-	async signData(pin = '1') {
+	async signDataWithSuri(suri) {
 		const { dataToSign, isHash, sender } = this.state;
 
-		const seed = await decryptData(sender.encryptedSeed, pin);
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 
 		let signedData;
-
 		if (isEthereum) {
-			signedData = await brainWalletSign(seed, dataToSign);
+			signedData = await brainWalletSign(suri, dataToSign);
 		} else {
 			let signable;
 
@@ -423,26 +423,39 @@ export default class ScannerStore extends Container<ScannerState> {
 			} else if (isAscii(dataToSign)) {
 				signable = hexStripPrefix(asciiToHex(dataToSign));
 			}
-
-			let signed = await substrateSign(seed, signable);
+			let signed = await substrateSign(suri, signable);
 			signed = '0x' + signed;
-
 			// TODO: tweak the first byte if and when sig type is not sr25519
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
-
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
-
 		this.setState({ signedData });
+	}
+
+	async signDataWithSeed(seed, protocol) {
+		if (protocol === NetworkProtocols.SUBSTRATE) {
+			const suri = constructSURI({
+				derivePath: this.state.sender.path,
+				password: '',
+				phrase: seed
+			});
+			await this.signDataWithSuri(suri);
+		} else {
+			await this.signDataWithSuri(seed);
+		}
+	}
+
+	async signDataLegacy(pin = '1') {
+		const { sender } = this.state;
+		const suri = await decryptData(sender.encryptedSeed, pin);
+		await this.signDataWithSuri(suri);
 	}
 
 	cleanup() {
 		return new Promise(resolve => {
-			const prehash = this.state.prehash;
 			this.setState(
 				{
-					...DEFAULT_STATE,
-					prehash
+					...DEFAULT_STATE
 				},
 				resolve
 			);

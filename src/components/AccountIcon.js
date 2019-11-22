@@ -19,7 +19,7 @@
 import Identicon from '@polkadot/reactnative-identicon';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import colors from '../colors';
@@ -29,37 +29,53 @@ import { blockiesIcon } from '../util/native';
 export default function AccountIcon(props) {
 	AccountIcon.propTypes = {
 		address: PropTypes.string.isRequired,
+		network: PropTypes.object,
 		protocol: PropTypes.string.isRequired
 	};
 
-	const { address, protocol, style } = props;
+	const { address, protocol, style, network } = props;
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 
 	useEffect(() => {
+		const loadEthereumIcon = function(ethereumAddress) {
+			blockiesIcon('0x' + ethereumAddress)
+				.then(uri => {
+					setEthereumIconUri(uri);
+				})
+				.catch(console.error);
+		};
+
 		if (protocol === NetworkProtocols.ETHEREUM) {
 			loadEthereumIcon(address);
 		}
-	}, [protocol, address]);
+	}, [address, protocol]);
 
-	const loadEthereumIcon = function(ethereumAddress) {
-		blockiesIcon('0x' + ethereumAddress)
-			.then(uri => {
-				setEthereumIconUri(uri);
-			})
-			.catch(console.error);
-	};
-
+	if (address === '') {
+		return (
+			<View>
+				<Image
+					source={network.logo}
+					style={{
+						backgroundColor: colors.bg_text_sec,
+						borderRadius: 40,
+						height: 40,
+						width: 40
+					}}
+				/>
+			</View>
+		);
+	}
 	if (protocol === NetworkProtocols.SUBSTRATE) {
-		return <Identicon value={address} size={style.width || 50} />;
+		return <Identicon value={address} size={style.width || 40} />;
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
 			<Image
 				source={{ uri: ethereumIconUri }}
-				style={style || { height: 47, width: 47 }}
+				style={style || { height: 40, width: 40 }}
 			/>
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <Icon color={colors.bg} name={'error'} size={style.width || 50} />;
+		return <Icon color={colors.bg_text} name={'error'} size={44} />;
 	}
 }

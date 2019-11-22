@@ -22,10 +22,12 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { parseDerivationPath } from '../util/suri';
 import TextInput from './TextInput';
+import colors from '../colors';
+import fontStyles from '../fontStyles';
 
 export default function DerivationPathField(props) {
 	const { onChange, styles } = props;
-	const [showAdvancedField, setShowAdvancedField] = useState(false);
+	const [showAdvancedField, setShowAdvancedField] = useState(true);
 	const [isValidPath, setIsValidPath] = useState(true);
 
 	const toggleShowAdvancedField = () => {
@@ -34,10 +36,7 @@ export default function DerivationPathField(props) {
 
 	return (
 		<>
-			<TouchableOpacity
-				onPress={toggleShowAdvancedField}
-				style={{ diplay: 'flex' }}
-			>
+			<TouchableOpacity onPress={toggleShowAdvancedField}>
 				<View style={{ justifyContent: 'center' }}>
 					<Text style={[styles.title, ownStyles.advancedText]}>
 						ADVANCED
@@ -71,7 +70,12 @@ export default function DerivationPathField(props) {
 						}
 					}}
 					placeholder="optional derivation path"
-					style={isValidPath ? ownStyles.validInput : ownStyles.invalidInput}
+					style={[
+						fontStyles.h2,
+						ownStyles.input,
+						ownStyles.test,
+						isValidPath ? {} : ownStyles.invalidInput
+					]}
 				/>
 			)}
 		</>
@@ -84,9 +88,6 @@ const ownStyles = StyleSheet.create({
 		paddingTop: 20
 	},
 	invalidInput: {
-		backgroundColor: '#fee3e3'
-	},
-	validInput: {
-		backgroundColor: '#e4fee4'
+		borderBottomColor: colors.bg_alert
 	}
 });

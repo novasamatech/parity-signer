@@ -20,7 +20,7 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import {
@@ -28,47 +28,65 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import fonts from '../fonts';
-import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/strings';
+import AccountsStore from '../stores/AccountsStore';
+import { navigateToSignedMessage, unlockSeed } from '../util/navigationHelpers';
+import fontStyles from '../fontStyles';
+import MessageDetailsCard from '../components/MessageDetailsCard';
+import { alertMultipart } from '../util/alertUtils';
+import CompatibleCard from '../components/CompatibleCard';
+import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Transaction details',
-		title: 'Transaction Details'
-	};
+	async onSignMessage(scannerStore, accountsStore, sender) {
+		try {
+			if (sender.isLegacy) {
+				return this.props.navigation.navigate('AccountUnlockAndSign', {
+					next: 'SignedMessage'
+				});
+			}
+			const senderIdentity = getIdentityFromSender(
+				sender,
+				accountsStore.state.identities
+			);
+			const seed = await unlockSeed(this.props.navigation, senderIdentity);
+			await scannerStore.signDataWithSeed(
+				seed,
+				NETWORK_LIST[sender.networkKey].protocol
+			);
+			return navigateToSignedMessage(this.props.navigation);
+		} catch (e) {
+			scannerStore.setErrorMsg(e.message);
+		}
+	}
+
 	render() {
 		return (
-			<Subscribe to={[ScannerStore]}>
-				{scannerStore => {
+			<Subscribe to={[ScannerStore, AccountsStore]}>
+				{(scannerStore, accountsStore) => {
 					const dataToSign = scannerStore.getDataToSign();
 					const message = scannerStore.getMessage();
+					const sender = scannerStore.getSender();
 
 					if (dataToSign) {
 						return (
 							<MessageDetailsView
 								{...this.props}
 								scannerStore={scannerStore}
-								sender={scannerStore.getSender()}
+								accountsStore={accountsStore}
+								sender={sender}
 								message={isU8a(message) ? u8aToHex(message) : message}
 								dataToSign={
 									isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign
 								}
 								prehash={scannerStore.getPrehashPayload()}
 								isHash={scannerStore.getIsHash()}
-								onNext={async () => {
-									try {
-										this.props.navigation.navigate('AccountUnlockAndSign', {
-											next: 'SignedMessage'
-										});
-									} catch (e) {
-										scannerStore.setErrorMsg(e.message);
-									}
-								}}
+								onNext={() =>
+									this.onSignMessage(scannerStore, accountsStore, sender)
+								}
 							/>
 						);
 					} else {
@@ -91,7 +109,15 @@ export class MessageDetailsView extends React.PureComponent {
 	};
 
 	render() {
-		const { dataToSign, isHash, message, onNext, prehash, sender } = this.props;
+		const {
+			accountsStore,
+			dataToSign,
+			isHash,
+			message,
+			onNext,
+			prehash,
+			sender
+		} = this.props;
 
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
@@ -104,53 +130,26 @@ export class MessageDetailsView extends React.PureComponent {
 				style={styles.body}
 			>
 				<Background />
-				<Text style={styles.topTitle}>SIGN MESSAGE</Text>
-				<Text style={styles.title}>FROM ACCOUNT</Text>
-				<AccountCard
-					title={sender.name}
-					address={sender.address}
-					networkKey={sender.networkKey}
-				/>
+				<Text style={styles.topTitle}>Sign Message</Text>
+				<Text style={styles.title}>From Account</Text>
+				<CompatibleCard account={sender} accountsStore={accountsStore} />
 				{!isEthereum && prehash && prefix ? (
 					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
 						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
 						payload={prehash}
 						prefix={prefix}
 					/>
 				) : null}
-				{isHash ? (
-					<Text style={styles.title}>HASH</Text>
-				) : (
-					<Text style={styles.title}>MESSAGE</Text>
-				)}
-				<Text style={styles.message}>
-					{isHash
-						? message
-						: isAscii(message)
-						? hexToAscii(message)
-						: dataToSign}
-				</Text>
+				<MessageDetailsCard
+					isHash={isHash}
+					message={message}
+					data={dataToSign}
+				/>
 				<Button
 					buttonStyles={{ height: 60 }}
 					title="Sign Message"
 					onPress={() => {
-						isHash
-							? Alert.alert(
-									'Warning',
-									'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
-									[
-										{
-											onPress: () => onNext(),
-											text: 'I take the risk'
-										},
-										{
-											style: 'cancel',
-											text: 'Cancel'
-										}
-									]
-							  )
-							: onNext();
+						isHash ? alertMultipart(onNext) : onNext();
 					}}
 				/>
 			</ScrollView>
@@ -186,25 +185,13 @@ const styles = StyleSheet.create({
 	deleteText: {
 		textAlign: 'right'
 	},
-	message: {
-		backgroundColor: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 20,
-		lineHeight: 26,
-		marginBottom: 20,
-		minHeight: 120,
-		padding: 10
-	},
+
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
+		...fontStyles.h2,
 		paddingBottom: 20
 	},
 	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
+		...fontStyles.h1,
 		paddingBottom: 20,
 		textAlign: 'center'
 	},

@@ -20,6 +20,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import PARITY_WORDS from '../../res/parity_wordlist.json';
 import BIP39_WORDS from '../../res/bip39_wordlist.json';
 import TextInput from './TextInput';
@@ -132,7 +133,8 @@ export default class AccountSeed extends Component {
 		return (
 			<View>
 				<TextInput
-					style={[styles.input, invalidStyles]}
+					autoFocus
+					style={[fontStyles.t_seed, styles.input, invalidStyles]}
 					multiline
 					autoCorrect={false}
 					autoCompleteType="off"
@@ -152,29 +154,29 @@ const styles = StyleSheet.create({
 		flexDirection: 'column'
 	},
 	input: {
-		backgroundColor: '#e4fee4',
-		fontSize: 20,
-		height: 160,
-		lineHeight: 26
+		borderBottomColor: colors.card_bg
 	},
 	invalidInput: {
-		backgroundColor: '#fee3e3'
+		borderBottomColor: colors.bg_alert,
+		borderColor: colors.bg_alert
 	},
 	suggestion: {
-		padding: 10,
-		paddingVertical: 9
+		padding: 14,
+		paddingVertical: 4
 	},
 	suggestionText: {
-		color: colors.card_bg_text,
+		color: colors.bg_button,
 		fontFamily: fonts.regular
 	},
 	suggestions: {
 		alignItems: 'center',
 		backgroundColor: colors.card_bg,
-		borderColor: colors.card_bg_text_sec,
-		borderTopWidth: 0.3,
+		borderColor: colors.card_bg,
+		borderWidth: 0.5,
 		flexDirection: 'row',
-		height: 35,
-		paddingHorizontal: 5
+		height: 40,
+		marginHorizontal: 16,
+		marginTop: -8,
+		overflow: 'hidden'
 	}
 });

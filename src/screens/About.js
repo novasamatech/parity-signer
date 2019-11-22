@@ -23,11 +23,6 @@ import fonts from '../fonts';
 import packageJson from '../../package.json';
 
 export default class About extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'About'
-	};
-
 	render() {
 		return (
 			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
@@ -104,7 +99,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 15
 	},
 	text: {
-		color: colors.card_bg,
+		color: colors.bg_text_sec,
 		fontFamily: fonts.regular,
 		fontSize: 14,
 		marginBottom: 20
@@ -114,13 +109,6 @@ const styles = StyleSheet.create({
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
 	},
 	top: {
 		flex: 1

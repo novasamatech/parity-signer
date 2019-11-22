@@ -43,17 +43,24 @@ export default function QrView(props) {
 		}
 
 		displayQrCode(props.data);
-	}, [props]);
+	}, [props.data]);
 
 	const { width: deviceWidth } = Dimensions.get('window');
-	let size = props.size || deviceWidth - 80;
-	let flexBasis = props.height || deviceWidth - 40;
+	let size = props.size || deviceWidth - 64;
+	let flexBasis = props.height || deviceWidth - 32;
 
 	return (
 		<View
 			style={[
 				styles.rectangleContainer,
-				{ flexBasis, height: flexBasis },
+				{
+					backgroundColor: 'white',
+					flexBasis,
+					height: flexBasis,
+					marginHorizontal: 16,
+					marginVertical: 32,
+					width: deviceWidth - 32
+				},
 				props.style
 			]}
 		>

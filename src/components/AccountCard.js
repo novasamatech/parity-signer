@@ -16,89 +16,116 @@
 
 // @flow
 
+'use strict';
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import Separator from '../components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
-import colors from '../colors';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
+import colors from '../colors';
+import { getAddressFromAccountId } from '../util/identitiesUtils';
+import { AccountPrefixedTitle } from './AccountPrefixedTitle';
 
 export default class AccountCard extends React.PureComponent {
 	static propTypes = {
-		address: PropTypes.string.isRequired,
+		accountId: PropTypes.string,
+		isAdd: PropTypes.bool,
 		networkKey: PropTypes.string,
 		onPress: PropTypes.func,
 		seedType: PropTypes.string,
 		style: ViewPropTypes.style,
-		title: PropTypes.string
+		testID: PropTypes.string,
+		title: PropTypes.string,
+		titlePrefix: PropTypes.string
 	};
 
 	static defaultProps = {
 		onPress: () => {},
-		title: 'no name'
+		title: 'No name'
 	};
 
 	render() {
-		const { address, networkKey, onPress, seedType, style } = this.props;
+		const {
+			accountId,
+			isAdd,
+			isNetworkCard,
+			networkKey,
+			networkColor,
+			onPress,
+			seedType,
+			style,
+			testID,
+			titlePrefix
+		} = this.props;
 		let { title } = this.props;
 		title = title.length ? title : AccountCard.defaultProps.title;
 		const seedTypeDisplay = seedType || '';
 		const network =
 			NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
 
+		const extractAddress = getAddressFromAccountId(accountId);
+
 		return (
 			<TouchableItem
 				accessibilityComponentType="button"
+				testID={testID}
 				disabled={false}
 				onPress={onPress}
 			>
-				<View style={[styles.body, style]}>
-					<View style={styles.content}>
+				<Separator
+					shadow={true}
+					style={{
+						backgroundColor: 'transparent',
+						height: 0,
+						marginVertical: 0
+					}}
+				/>
+				<View style={[styles.content, style]}>
+					{isAdd ? (
+						<View style={{ height: 40, width: 40 }}>
+							<Icon name="add" color={colors.bg_text} size={32} />
+						</View>
+					) : (
 						<AccountIcon
-							address={address}
+							address={extractAddress}
 							protocol={network.protocol}
+							network={network}
 							style={styles.icon}
 						/>
-						<View style={styles.desc}>
-							<Text numberOfLines={1} style={styles.titleText}>
-								{title}
-							</Text>
-							<Address address={address} protocol={network.protocol} />
-						</View>
+					)}
+					<View style={styles.desc}>
+						{!isNetworkCard && (
+							<View>
+								<Text
+									style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
+								>
+									{`${network.title}${seedTypeDisplay} `}
+								</Text>
+							</View>
+						)}
+						<AccountPrefixedTitle title={title} titlePrefix={titlePrefix} />
+						{accountId !== '' && (
+							<Address
+								address={isAdd ? 'new' : extractAddress}
+								protocol={network.protocol}
+							/>
+						)}
 					</View>
 					<View
 						style={[
 							styles.footer,
 							{
-								backgroundColor: network.color
+								backgroundColor: networkColor || network.color
 							}
 						]}
-					>
-						<Text
-							style={[
-								styles.footerSeedType,
-								{
-									color: network.secondaryColor
-								}
-							]}
-						>
-							{seedTypeDisplay}
-						</Text>
-						<Text
-							style={[
-								styles.footerNetwork,
-								{
-									color: network.secondaryColor
-								}
-							]}
-						>
-							{network.title}
-						</Text>
-					</View>
+					/>
 				</View>
 			</TouchableItem>
 		);
@@ -106,45 +133,25 @@ export default class AccountCard extends React.PureComponent {
 }
 
 const styles = StyleSheet.create({
-	body: {
-		paddingBottom: 20
-	},
 	content: {
-		backgroundColor: colors.card_bg,
+		alignItems: 'center',
 		flexDirection: 'row',
-		padding: 10
+		paddingLeft: 16
 	},
 	desc: {
 		flex: 1,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-		paddingLeft: 10
+		paddingLeft: 16
 	},
 	footer: {
-		backgroundColor: '#977CF6',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		padding: 5
-	},
-	footerNetwork: {
-		color: colors.card_bg,
-		fontFamily: fonts.semiBold
-	},
-	footerSeedType: {
-		color: colors.card_bg,
-		fontFamily: fonts.regular
+		alignSelf: 'stretch',
+		height: 88,
+		marginLeft: 8,
+		width: 8
 	},
 	icon: {
-		height: 47,
-		width: 47
-	},
-	secondaryText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.semiBold,
-		fontSize: 14
-	},
-	titleText: {
-		fontFamily: fonts.semiBold,
-		fontSize: 20
+		height: 40,
+		width: 40
 	}
 });

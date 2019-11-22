@@ -17,19 +17,19 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 
-export default class AccountEdit extends React.PureComponent {
-	static navigationOptions = {
-		title: 'Edit Account'
-	};
+const onNameInput = async (accounts, name) => {
+	await accounts.updateSelectedAccount({ name });
+	await accounts.save(accounts.getSelectedKey(), accounts.getSelected());
+};
 
+export default class AccountEdit extends React.PureComponent {
 	constructor(props) {
 		super(props);
 	}
@@ -45,26 +45,16 @@ export default class AccountEdit extends React.PureComponent {
 					}
 
 					return (
-						<ScrollView
-							style={styles.body}
-							contentContainerStyle={styles.bodyContainer}
-						>
-							<Text style={styles.titleTop}>EDIT ACCOUNT</Text>
+						<ScrollView style={styles.body}>
 							<AccountCard
 								title={selected.name}
-								address={selected.address}
+								accountId={selected.address}
 								networkKey={selected.networkKey}
 							/>
-							<Text style={styles.title}>ACCOUNT NAME</Text>
 							<TextInput
+								label="Account Name"
 								style={{ marginBottom: 40 }}
-								onChangeText={async name => {
-									accounts.updateSelectedAccount({ name });
-									await accounts.save(
-										accounts.getSelectedKey(),
-										accounts.getSelected()
-									);
-								}}
+								onChangeText={name => onNameInput(accounts, name)}
 								value={selected.name}
 								placeholder="New name"
 							/>
@@ -78,43 +68,9 @@ export default class AccountEdit extends React.PureComponent {
 
 const styles = StyleSheet.create({
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
-	},
-	bodyContainer: {
-		flex: 1,
-		padding: 20
-	},
-	bottom: {
-		flexBasis: 50,
-		paddingBottom: 15
-	},
-	deleteButton: {
-		backgroundColor: 'red'
-	},
-	hintText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingTop: 20,
-		textAlign: 'center'
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	top: {
-		flex: 1
+		paddingBottom: 40
 	}
 });

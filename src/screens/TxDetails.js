@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -27,45 +27,64 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import fonts from '../fonts';
-import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
-import Button from '../components/Button';
+import ButtonMainAction from '../components/ButtonMainAction';
+import ScreenHeading from '../components/ScreenHeading';
 import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
+import { navigateToSignedTx, unlockSeed } from '../util/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
+import testIDs from '../../e2e/testIDs';
+import fontStyles from '../fontStyles';
+import CompatibleCard from '../components/CompatibleCard';
+import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class TxDetails extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Transaction details',
-		title: 'Transaction Details'
-	};
+	async onSignTx(scannerStore, accountsStore, sender) {
+		try {
+			if (sender.isLegacy) {
+				return this.props.navigation.navigate('AccountUnlockAndSign', {
+					next: 'SignedTx'
+				});
+			}
+			const senderIdentity = getIdentityFromSender(
+				sender,
+				accountsStore.state.identities
+			);
+			const seed = await unlockSeed(this.props.navigation, senderIdentity);
+			await scannerStore.signDataWithSeed(
+				seed,
+				NETWORK_LIST[sender.networkKey].protocol
+			);
+			return navigateToSignedTx(this.props.navigation);
+		} catch (e) {
+			scannerStore.setErrorMsg(e.message);
+		}
+	}
+
 	render() {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{scannerStore => {
+				{(scannerStore, accountsStore) => {
 					const txRequest = scannerStore.getTXRequest();
-
+					const sender = scannerStore.getSender();
 					if (txRequest) {
 						const tx = scannerStore.getTx();
 
 						return (
 							<TxDetailsView
 								{...{ ...this.props, ...tx }}
+								accountsStore={accountsStore}
 								scannerStore={scannerStore}
-								sender={scannerStore.getSender()}
+								sender={sender}
 								recipient={scannerStore.getRecipient()}
 								// dataToSign={scannerStore.getDataToSign()}
 								prehash={scannerStore.getPrehashPayload()}
-								onNext={async () => {
-									try {
-										this.props.navigation.navigate('AccountUnlockAndSign');
-									} catch (e) {
-										scannerStore.setErrorMsg(e.message);
-									}
-								}}
+								onNext={() =>
+									this.onSignTx(scannerStore, accountsStore, sender)
+								}
 							/>
 						);
 					} else {
@@ -94,11 +113,12 @@ export class TxDetailsView extends React.PureComponent {
 	render() {
 		const {
 			// dataToSign,
+			accountsStore,
 			gas,
 			gasPrice,
 			prehash,
-			recipient,
 			sender,
+			recipient,
 			value,
 			onNext
 		} = this.props;
@@ -109,101 +129,76 @@ export class TxDetailsView extends React.PureComponent {
 			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
 
 		return (
-			<ScrollView
-				contentContainerStyle={styles.bodyContent}
-				style={styles.body}
-			>
-				<Background />
-				<Text style={styles.topTitle}>SIGN TRANSACTION</Text>
-				<Text style={styles.title}>FROM ACCOUNT</Text>
-				<AccountCard
-					title={sender.name}
-					address={sender.address}
-					networkKey={sender.networkKey}
+			<View style={styles.body}>
+				<ScreenHeading
+					title="Sign Transaction"
+					subtitle="step 1/2 – verify and sign"
 				/>
-				<Text style={styles.title}>TRANSACTION DETAILS</Text>
-
-				{isEthereum ? (
-					<React.Fragment>
-						<TxDetailsCard
-							style={{ marginBottom: 20 }}
-							description="You are about to send the following amount"
-							value={value}
-							gas={gas}
-							gasPrice={gasPrice}
+				<ScrollView
+					contentContainerStyle={{ paddingBottom: 120 }}
+					testID={testIDs.TxDetails.scrollScreen}
+				>
+					<Text style={[fontStyles.t_big, styles.bodyContent]}>
+						{`You are about to confirm sending the following ${
+							isEthereum ? 'transaction' : 'extrinsic'
+						}`}
+					</Text>
+					<Background />
+					<View style={styles.bodyContent}>
+						<CompatibleCard
+							account={sender}
+							accountsStore={accountsStore}
+							titlePrefix={'from: '}
 						/>
-						<Text style={styles.title}>RECIPIENT</Text>
-						<AccountCard
-							title={recipient.name}
-							address={recipient.address}
-							networkKey={recipient.networkKey || ''}
-						/>
-					</React.Fragment>
-				) : (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						description="You are about to confirm sending the following extrinsic"
-						payload={prehash}
-						prefix={prefix}
-					/>
-				)}
-
-				<Button
-					buttonStyles={{ height: 60 }}
+						{isEthereum ? (
+							<View style={{ marginTop: 16 }}>
+								<TxDetailsCard
+									style={{ marginBottom: 20 }}
+									description="You are about to send the following amount"
+									value={value}
+									gas={gas}
+									gasPrice={gasPrice}
+								/>
+								<Text style={styles.title}>Recipient</Text>
+								<CompatibleCard
+									account={recipient}
+									accountsStore={accountsStore}
+								/>
+							</View>
+						) : (
+							<PayloadDetailsCard
+								style={{ marginBottom: 20 }}
+								payload={prehash}
+								prefix={prefix}
+							/>
+						)}
+					</View>
+				</ScrollView>
+				<ButtonMainAction
+					testID={testIDs.TxDetails.signButton}
 					title="Sign Transaction"
 					onPress={() => onNext()}
 				/>
-			</ScrollView>
+			</View>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
-	actionButtonContainer: {
-		flex: 1
-	},
-	actionsContainer: {
-		flex: 1,
-		flexDirection: 'row'
-	},
-	address: {
-		flex: 1
-	},
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden',
-		padding: 20
+		flex: 1
 	},
 	bodyContent: {
-		paddingBottom: 40
+		marginVertical: 16,
+		paddingHorizontal: 20
 	},
-	changePinText: {
-		color: 'green',
-		textAlign: 'left'
-	},
-	deleteText: {
-		textAlign: 'right'
+	marginBottom: {
+		marginBottom: 16
 	},
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
-	},
-	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	transactionDetails: {
-		backgroundColor: colors.card_bg,
-		flex: 1
-	},
-	wrapper: {
-		borderRadius: 5
+		...fontStyles.t_regular,
+		paddingBottom: 8
 	}
 });

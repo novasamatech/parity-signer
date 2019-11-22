@@ -16,63 +16,42 @@
 
 'use strict';
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
+import React, { useEffect } from 'react';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import colors from '../colors';
-import fonts from '../fonts';
 import QrView from '../components/QrView';
-import ScannerStore from '../stores/ScannerStore';
-import { hexToAscii, isAscii } from '../util/strings';
+import { withScannerStore } from '../util/HOC';
+import fontStyles from '../fontStyles';
+import MessageDetailsCard from '../components/MessageDetailsCard';
 
-export default class SignedMessage extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[ScannerStore]}>
-				{scannerStore => {
-					return (
-						<SignedMessageView
-							data={scannerStore.getSignedTxData()}
-							isHash={scannerStore.getIsHash()}
-							message={scannerStore.getMessage()}
-						/>
-					);
-				}}
-			</Subscribe>
-		);
-	}
+export function SignedMessage({ scanner }) {
+	const data = scanner.getSignedTxData();
+	const isHash = scanner.getIsHash();
+	const message = scanner.getMessage();
+
+	useEffect(
+		() =>
+			function() {
+				scanner.cleanup();
+			},
+		[scanner]
+	);
+
+	return (
+		<ScrollView style={styles.body}>
+			<Text style={styles.topTitle}>Signed Message</Text>
+			<QrView data={data} />
+			<MessageDetailsCard
+				isHash={isHash}
+				message={message}
+				data={data}
+				style={styles.messageDetail}
+			/>
+		</ScrollView>
+	);
 }
 
-export class SignedMessageView extends React.PureComponent {
-	static propTypes = {
-		data: PropTypes.string.isRequired, // post sign
-		isHash: PropTypes.bool,
-		message: PropTypes.string // pre sign
-	};
-
-	render() {
-		const { data, isHash, message } = this.props;
-
-		return (
-			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
-				<View style={styles.qr}>
-					<QrView data={data} />
-				</View>
-				<Text style={styles.title}>{!isHash && 'MESSAGE'}</Text>
-				{isHash ? (
-					<Text style={styles.title}>HASH</Text>
-				) : (
-					<Text style={styles.title}>MESSAGE</Text>
-				)}
-				<Text style={styles.message}>
-					{isHash ? message : isAscii(message) ? hexToAscii(message) : data}
-				</Text>
-			</ScrollView>
-		);
-	}
-}
+export default withScannerStore(SignedMessage);
 
 const styles = StyleSheet.create({
 	body: {
@@ -81,30 +60,11 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		overflow: 'hidden'
 	},
-	message: {
-		backgroundColor: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 20,
-		lineHeight: 26,
-		marginBottom: 20,
-		minHeight: 120,
-		padding: 10
-	},
-	qr: {
-		backgroundColor: colors.card_bg,
-		marginBottom: 20
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
+	messageDetail: {
+		paddingHorizontal: 20
 	},
 	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
+		...fontStyles.h1,
 		textAlign: 'center'
 	}
 });

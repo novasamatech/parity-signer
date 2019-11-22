@@ -30,9 +30,14 @@ import fonts from '../fonts';
 
 export default class PopupMenu extends React.PureComponent {
 	render() {
-		const { onSelect, menuTriggerIconName, menuItems } = this.props;
+		const { onSelect, menuTriggerIconName, menuItems, testID } = this.props;
 		const menuTriggerIcon = (
-			<Icon name={menuTriggerIconName} size={35} color={colors.bg_text_sec} />
+			<Icon
+				name={menuTriggerIconName}
+				size={25}
+				color={colors.bg_text}
+				testID={testID}
+			/>
 		);
 
 		return (
@@ -41,7 +46,10 @@ export default class PopupMenu extends React.PureComponent {
 				<MenuOptions customStyles={menuOptionsStyles}>
 					{menuItems.map((menuItem, index) => (
 						<MenuOption key={index} value={menuItem.value}>
-							<Text style={[menuOptionsStyles.optionText, menuItem.textStyle]}>
+							<Text
+								style={[menuOptionsStyles.optionText, menuItem.textStyle]}
+								testID={menuItem.testID}
+							>
 								{menuItem.text}
 							</Text>
 						</MenuOption>

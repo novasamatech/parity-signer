@@ -16,191 +16,168 @@
 
 'use strict';
 
-import React from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
-
+import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import DerivationPathField from '../components/DerivationPathField';
 import KeyboardScrollView from '../components/KeyboardScrollView';
-import NetworkButton from '../components/NetworkButton';
 import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
-import AccountsStore from '../stores/AccountsStore';
-import { empty, validateSeed } from '../util/account';
+import { emptyAccount, validateSeed } from '../util/account';
 import { constructSURI } from '../util/suri';
+import AccountCard from '../components/AccountCard';
+import { withAccountStore } from '../util/HOC';
 
-export default class AccountNew extends React.Component {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'New Account'
-	};
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <AccountNewView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
-}
-
-class AccountNewView extends React.Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			derivationPassword: '',
-			derivationPath: '',
-			isDerivationPathValid: true,
-			selectedAccount: undefined,
-			selectedNetwork: undefined
-		};
-	}
-
-	componentWillUnmount = function() {
-		// called when the user goes back, or finishes the whole process
-		this.props.accounts.updateNew(empty());
+function AccountNew({ accounts, navigation }) {
+	const initialState = {
+		derivationPassword: '',
+		derivationPath: '',
+		isDerivationPathValid: true,
+		selectedAccount: undefined,
+		selectedNetwork: undefined
 	};
 
-	static getDerivedStateFromProps(nextProps, prevState) {
-		const selectedAccount = nextProps.accounts.getNew();
+	const reducer = (state, delta) => ({ ...state, ...delta });
+	const [state, updateState] = useReducer(reducer, initialState);
+
+	useEffect(() => {
+		accounts.updateNew(emptyAccount());
+	}, [accounts, accounts.updateNew]);
+
+	useEffect(() => {
+		const selectedAccount = accounts.state.newAccount;
 		const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
-
-		return {
-			derivationPassword: prevState.derivationPassword,
-			derivationPath: prevState.derivationPath,
+		updateState({
 			selectedAccount,
 			selectedNetwork
-		};
-	}
+		});
+	}, [accounts.state.newAccount]);
 
-	render() {
-		const { accounts, navigation } = this.props;
-		const {
-			derivationPassword,
-			derivationPath,
-			isDerivationPathValid,
-			selectedAccount,
-			selectedNetwork
-		} = this.state;
-		const { address, name, seed, validBip39Seed } = selectedAccount;
-		const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
+	const {
+		derivationPassword,
+		derivationPath,
+		isDerivationPathValid,
+		selectedAccount,
+		selectedNetwork
+	} = state;
+	if (!selectedAccount) return null;
 
-		if (!selectedAccount) {
-			return null;
-		}
+	const { address, name, seed, validBip39Seed } = selectedAccount;
+	const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
 
-		return (
+	return (
+		<KeyboardScrollView>
 			<View style={styles.body}>
-				<KeyboardScrollView style={{ padding: 20 }}>
-					<Background />
-					<View style={styles.top}>
-						<Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-						<Text style={styles.title}>NETWORK</Text>
-						<NetworkButton network={selectedNetwork} />
-						<Text style={styles.title}>ICON & ADDRESS</Text>
-						<AccountIconChooser
-							derivationPassword={derivationPassword}
-							derivationPath={derivationPath}
-							onSelect={({ newAddress, isBip39, newSeed }) => {
-								if (newAddress && isBip39 && newSeed) {
-									if (isSubstrate) {
-										try {
-											const suri = constructSURI({
-												derivePath: derivationPath,
-												password: derivationPassword,
-												phrase: newSeed
-											});
-
-											accounts.updateNew({
-												address: newAddress,
-												derivationPassword,
-												derivationPath,
-												seed: suri,
-												seedPhrase: newSeed,
-												validBip39Seed: isBip39
-											});
-										} catch (e) {
-											console.error(e);
-										}
-									} else {
-										// Ethereum account
-										accounts.updateNew({
-											address: newAddress,
-											seed: newSeed,
-											validBip39Seed: isBip39
-										});
-									}
-								} else {
-									accounts.updateNew({
-										address: '',
-										seed: '',
-										validBip39Seed: false
+				<Background />
+				<Text style={styles.titleTop}>CREATE ACCOUNT</Text>
+				<Text style={styles.title}>NETWORK</Text>
+			</View>
+			<AccountCard
+				accountId={''}
+				title={selectedNetwork.title}
+				networkKey={selectedAccount.networkKey}
+				onPress={() => navigation.navigate('LegacyNetworkChooser')}
+			/>
+			<View style={styles.body}>
+				<Text style={styles.title}>ICON & ADDRESS</Text>
+				<AccountIconChooser
+					derivationPassword={derivationPassword}
+					derivationPath={derivationPath}
+					onSelect={({ newAddress, isBip39, newSeed }) => {
+						if (newAddress && isBip39 && newSeed) {
+							if (isSubstrate) {
+								try {
+									const suri = constructSURI({
+										derivePath: derivationPath,
+										password: derivationPassword,
+										phrase: newSeed
 									});
-								}
-							}}
-							network={selectedNetwork}
-							value={address && address}
-						/>
-						<Text style={styles.title}>NAME</Text>
-						<TextInput
-							onChangeText={name => accounts.updateNew({ name })}
-							value={name}
-							placeholder="Enter a new account name"
-						/>
-						{isSubstrate && (
-							<DerivationPathField
-								onChange={({
-									derivationPassword,
-									derivationPath,
-									isDerivationPathValid
-								}) => {
-									this.setState({
+
+									accounts.updateNew({
+										address: newAddress,
 										derivationPassword,
 										derivationPath,
-										isDerivationPathValid
+										seed: suri,
+										seedPhrase: newSeed,
+										validBip39Seed: isBip39
 									});
-								}}
-								styles={styles}
-							/>
-						)}
-					</View>
-					<View style={styles.bottom}>
-						<Text style={styles.hintText}>
-							Next, you will be asked to backup your account, get a pen and some
-							paper.
-						</Text>
-						<Button
-							buttonStyles={styles.nextStep}
-							title="Next Step"
-							disabled={
-								!validateSeed(seed, validBip39Seed).valid ||
-								!isDerivationPathValid
+								} catch (e) {
+									console.error(e);
+								}
+							} else {
+								// Ethereum account
+								accounts.updateNew({
+									address: newAddress,
+									seed: newSeed,
+									validBip39Seed: isBip39
+								});
 							}
-							onPress={() => {
-								validateSeed(seed, validBip39Seed).valid &&
-									navigation.navigate('AccountBackup', {
-										isNew: true,
-										isWelcome: navigation.getParam('isWelcome')
-									});
-							}}
-						/>
-					</View>
-				</KeyboardScrollView>
+						} else {
+							accounts.updateNew({
+								address: '',
+								seed: '',
+								validBip39Seed: false
+							});
+						}
+					}}
+					network={selectedNetwork}
+					value={address && address}
+				/>
+				<Text style={styles.title}>NAME</Text>
+				<TextInput
+					onChangeText={input => accounts.updateNew({ name: input })}
+					value={name}
+					placeholder="Enter a new account name"
+				/>
+				{isSubstrate && (
+					<DerivationPathField
+						onChange={newDerivationPath => {
+							updateState({
+								derivationPassword: newDerivationPath.derivationPassword,
+								derivationPath: newDerivationPath.derivationPath,
+								isDerivationPathValid: newDerivationPath.isDerivationPathValid
+							});
+						}}
+						styles={styles}
+					/>
+				)}
+				<View style={styles.bottom}>
+					<Text style={styles.hintText}>
+						Next, you will be asked to backup your account, get a pen and some
+						paper.
+					</Text>
+					<Button
+						buttonStyles={styles.nextStep}
+						title="Next Step"
+						disabled={
+							!validateSeed(seed, validBip39Seed).valid ||
+							!isDerivationPathValid
+						}
+						onPress={() => {
+							navigation.navigate('LegacyAccountBackup', {
+								isNew: true
+							});
+						}}
+					/>
+				</View>
 			</View>
-		);
-	}
+		</KeyboardScrollView>
+	);
 }
+
+export default withAccountStore(withNavigation(AccountNew));
 
 const styles = StyleSheet.create({
 	body: {
 		backgroundColor: colors.bg,
 		flex: 1,
-		overflow: 'hidden'
+		overflow: 'hidden',
+		padding: 16
 	},
 	bodyContainer: {
 		flex: 1,
@@ -224,8 +201,7 @@ const styles = StyleSheet.create({
 	title: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
+		fontSize: 18
 	},
 	titleTop: {
 		color: colors.bg_text_sec,
@@ -233,8 +209,5 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 		paddingBottom: 20,
 		textAlign: 'center'
-	},
-	top: {
-		flex: 1
 	}
 });

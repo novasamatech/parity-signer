@@ -21,7 +21,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
-import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import Button from '../components/Button';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
@@ -29,11 +29,6 @@ import { saveToCAndPPConfirmation } from '../util/db';
 import testIDs from '../../e2e/testIDs';
 
 export default class TermsAndConditions extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Terms and conditions'
-	};
-
 	state = {
 		ppAgreement: false,
 		tocAgreement: false
@@ -42,72 +37,86 @@ export default class TermsAndConditions extends React.PureComponent {
 	render() {
 		const { navigation } = this.props;
 		const { tocAgreement, ppAgreement } = this.state;
+		const disableButtons = navigation.getParam('disableButtons', false);
+
+		const onConfirm = async () => {
+			await saveToCAndPPConfirmation();
+			navigation.navigate('Welcome');
+		};
+
 		return (
 			<View style={styles.body} testID={testIDs.TacScreen.tacView}>
-				<ScrollView contentContainerStyle={{}}>
+				<ScrollView
+					style={styles.scrollView}
+					contentContainerStyle={{ paddingHorizontal: 16 }}
+				>
 					<Markdown>{toc}</Markdown>
 				</ScrollView>
 
-				<TouchableItem
-					testID={testIDs.TacScreen.agreeTacButton}
-					style={{
-						alignItems: 'center',
-						flexDirection: 'row'
-					}}
-					onPress={() => {
-						this.setState({ tocAgreement: !tocAgreement });
-					}}
-				>
-					<Icon
-						name={tocAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
-						style={[styles.text, { fontSize: 30 }]}
-					/>
-
-					<Text style={[styles.text, { fontSize: 16 }]}>
-						{'  I agree to the terms and conditions'}
-					</Text>
-				</TouchableItem>
-				<TouchableItem
-					style={{
-						alignItems: 'center',
-						flexDirection: 'row'
-					}}
-					onPress={() => {
-						this.setState({ ppAgreement: !ppAgreement });
-					}}
-				>
-					<Icon
-						testID={testIDs.TacScreen.agreePrivacyButton}
-						name={ppAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
-						style={[styles.text, { fontSize: 30 }]}
-					/>
-
-					<Text style={[styles.text, { fontSize: 16 }]}>
-						<Text>{'  I agree to the '}</Text>
-						<Text
-							style={{ textDecorationLine: 'underline' }}
+				{!disableButtons && (
+					<View>
+						<TouchableItem
+							testID={testIDs.TacScreen.agreeTacButton}
+							style={{
+								alignItems: 'center',
+								flexDirection: 'row',
+								paddingHorizontal: 16,
+								paddingVertical: 10
+							}}
 							onPress={() => {
-								navigation.navigate('PrivacyPolicy');
+								this.setState({ tocAgreement: !tocAgreement });
 							}}
 						>
-							privacy policy
-						</Text>
-					</Text>
-				</TouchableItem>
+							<Icon
+								name={
+									tocAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'
+								}
+								style={styles.icon}
+							/>
 
-				<Button
-					buttonStyles={{ height: 60, marginTop: 10 }}
-					testID={testIDs.TacScreen.nextButton}
-					title="Next"
-					disabled={!ppAgreement || !tocAgreement}
-					onPress={async () => {
-						const firstScreenActions = navigation.getParam(
-							'firstScreenActions'
-						);
-						await saveToCAndPPConfirmation();
-						navigation.dispatch(firstScreenActions);
-					}}
-				/>
+							<Text style={fontStyles.t_big}>
+								{'  I agree to the terms and conditions'}
+							</Text>
+						</TouchableItem>
+						<TouchableItem
+							style={{
+								alignItems: 'center',
+								flexDirection: 'row',
+								paddingHorizontal: 16
+							}}
+							onPress={() => {
+								this.setState({ ppAgreement: !ppAgreement });
+							}}
+						>
+							<Icon
+								testID={testIDs.TacScreen.agreePrivacyButton}
+								name={
+									ppAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'
+								}
+								style={styles.icon}
+							/>
+
+							<Text style={fontStyles.t_big}>
+								<Text>{'  I agree to the '}</Text>
+								<Text
+									style={{ textDecorationLine: 'underline' }}
+									onPress={() => {
+										navigation.navigate('PrivacyPolicy');
+									}}
+								>
+									privacy policy
+								</Text>
+							</Text>
+						</TouchableItem>
+
+						<Button
+							testID={testIDs.TacScreen.nextButton}
+							title="Next"
+							disabled={!ppAgreement || !tocAgreement}
+							onPress={onConfirm}
+						/>
+					</View>
+				)}
 			</View>
 		);
 	}
@@ -118,33 +127,13 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flex: 1,
 		flexDirection: 'column',
-		overflow: 'hidden',
-		padding: 20
+		overflow: 'hidden'
 	},
-	bottom: {
-		flexBasis: 50,
-		paddingBottom: 15
-	},
-	text: {
-		color: colors.card_bg,
-		fontFamily: fonts.regular,
-		fontSize: 14,
-		marginTop: 10
-	},
-	title: {
+	icon: {
 		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
+		fontSize: 30
 	},
-	titleTop: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	top: {
+	scrollView: {
 		flex: 1
 	}
 });

@@ -1,3 +1,19 @@
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// This file is part of Parity.
+
+// Parity is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Parity is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Parity.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * TouchableItem renders a touchable that looks native on both iOS and Android.
  *
@@ -7,6 +23,9 @@
  * On iOS you can pass the props of TouchableOpacity, on Android pass the props
  * of TouchableNativeFeedback.
  */
+
+'use strict';
+
 import React from 'react';
 import {
 	Platform,
@@ -17,7 +36,7 @@ import {
 
 const ANDROID_VERSION_LOLLIPOP = 21;
 
-export default class TouchableItem extends React.Component {
+export default class TouchableItem extends React.PureComponent {
 	static defaultProps = {
 		borderless: false,
 		pressColor: 'rgba(0, 0, 0, .32)'
