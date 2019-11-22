@@ -111,7 +111,7 @@ class AccountBackupView extends React.PureComponent {
 				</View>
 				<TouchableItem
 					onPress={() => {
-						// only allows the copy of the recovery phrase in dev environment
+						// only allow the copy of the recovery phrase in dev environment
 						if (__DEV__) {
 							Alert.alert(
 								'Write this recovery phrase on paper',
