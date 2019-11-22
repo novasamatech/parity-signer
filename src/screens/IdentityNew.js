@@ -137,7 +137,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		overflow: 'hidden'
 	},
-	btnBox: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 32 },
+	btnBox: {
+		alignContent: 'center',
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'space-around',
+		marginTop: 32
+	},
 	title: {
 		color: colors.bg_text_sec,
 		fontFamily: fonts.bold,

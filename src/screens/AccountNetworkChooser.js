@@ -90,7 +90,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 							onPress={() => navigation.navigate('LegacyAccountList')}
 							small={true}
 							onlyText={true}
-							style={{ marginLeft: -48 }}
+							style={{ marginLeft: 0 }}
 						/>
 					)}
 				</View>
