@@ -89,7 +89,7 @@ export const alertCopyBackupPhrase = seedPhrase =>
 		]
 	);
 
-const alertRisks = (message, onPress) =>
+export const alertRisks = (message, onPress) =>
 	Alert.alert('Warning', message, [
 		{
 			onPress,
@@ -101,13 +101,6 @@ const alertRisks = (message, onPress) =>
 			text: 'Back'
 		}
 	]);
-
-export const alertInvalidSeedRecovery = (message, navigation) =>
-	alertRisks(message, () => {
-		navigation.navigate('AccountPin', {
-			isNew: true
-		});
-	});
 
 export const alertMultipart = onNext =>
 	alertRisks(

@@ -32,14 +32,21 @@ import {
 	navigateToNewIdentityNetwork,
 	setPin
 } from '../util/navigationHelpers';
-import { alertIdentityCreationError } from '../util/alertUtils';
+import {
+	alertErrorWithMessage,
+	alertIdentityCreationError,
+	alertRisks
+} from '../util/alertUtils';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import { brainWalletAddress } from '../util/native';
+import { debounce } from '../util/debounce';
 
 function IdentityNew({ accounts, navigation }) {
 	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
+	const [isSeedValid, setIsSeedValid] = useState(false);
 	const [seedPhrase, setSeedPhrase] = useState('');
 
 	useEffect(() => {
@@ -50,6 +57,18 @@ function IdentityNew({ accounts, navigation }) {
 
 	const updateName = name => {
 		accounts.updateNewIdentity({ name });
+	};
+
+	const onSeedTextInput = inputSeedPhrase => {
+		setSeedPhrase(inputSeedPhrase);
+		const addressGeneration = () =>
+			brainWalletAddress(inputSeedPhrase)
+				.then(({ bip39 }) => {
+					setIsSeedValid(validateSeed(inputSeedPhrase, bip39));
+				})
+				.catch(() => setIsSeedValid(inputSeedPhrase, false));
+		const debouncedAddressGeneration = debounce(addressGeneration, 200);
+		debouncedAddressGeneration();
 	};
 
 	const onRecoverIdentity = async () => {
@@ -63,6 +82,17 @@ function IdentityNew({ accounts, navigation }) {
 		}
 	};
 
+	const onRecoverConfirm = () => {
+		if (!isSeedValid.valid) {
+			if (isSeedValid.accountRecoveryAllowed) {
+				return alertRisks(`${isSeedValid.reason}`, onRecoverIdentity);
+			} else {
+				return alertErrorWithMessage(`${isSeedValid.reason}`, 'Back');
+			}
+		}
+		return onRecoverIdentity();
+	};
+
 	const onCreateNewIdentity = () => {
 		setSeedPhrase('');
 		navigation.navigate('IdentityBackup', {
@@ -74,8 +104,8 @@ function IdentityNew({ accounts, navigation }) {
 		<>
 			<AccountSeed
 				testID={testIDs.IdentityNew.seedInput}
-				valid={validateSeed(seedPhrase, true).valid} //TODO: validation need to be improved.
-				onChangeText={setSeedPhrase}
+				valid={isSeedValid.valid}
+				onChangeText={onSeedTextInput}
 				value={seedPhrase}
 			/>
 			<View style={styles.btnBox}>
@@ -90,7 +120,7 @@ function IdentityNew({ accounts, navigation }) {
 				<Button
 					title="Recover Identity"
 					testID={testIDs.IdentityNew.recoverButton}
-					onPress={onRecoverIdentity}
+					onPress={onRecoverConfirm}
 					small={true}
 				/>
 			</View>

@@ -76,7 +76,7 @@ export function emptyAccount(
 }
 
 export function validateSeed(seed, validBip39Seed) {
-	if (!seed || seed.length === 0) {
+	if (!seed || seed.trim().length === 0) {
 		return {
 			accountRecoveryAllowed: false,
 			reason: 'A seed phrase is required.',
@@ -100,7 +100,7 @@ export function validateSeed(seed, validBip39Seed) {
 		return {
 			accountRecoveryAllowed: true,
 			reason:
-				'This recovery phrase will be treated as a legacy Parity brain wallet.',
+				'This recovery phrase is not a valid BIP39 seed, will be treated as a legacy Parity brain wallet.',
 			valid: false
 		};
 	}
