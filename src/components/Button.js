@@ -115,7 +115,8 @@ const styles = StyleSheet.create({
 	},
 	buttonOnlyText: {
 		backgroundColor: colors.bg,
-		elevation: 0
+		elevation: 0,
+		paddingHorizontal: 0
 	},
 	buttonSmall: {
 		height: 48,
