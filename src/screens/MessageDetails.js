@@ -135,7 +135,7 @@ export class MessageDetailsView extends React.PureComponent {
 				<CompatibleCard account={sender} accountsStore={accountsStore} />
 				{!isEthereum && prehash && prefix ? (
 					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
+						style={{ marginVertical: 20 }}
 						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
 						payload={prehash}
 						prefix={prefix}

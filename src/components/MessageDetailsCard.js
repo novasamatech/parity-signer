@@ -17,15 +17,15 @@
 'use strict';
 
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import fontStyles from '../fontStyles';
 import { hexToAscii, isAscii } from '../util/strings';
 import colors from '../colors';
 
-export default function MessageDetailsCard({ isHash, message, data }) {
+export default function MessageDetailsCard({ isHash, message, data, style }) {
 	return (
-		<>
+		<View style={[styles.messageContainer, style]}>
 			<Text style={fontStyles.t_label}>{isHash ? 'Hash' : 'Message'}</Text>
 			{isHash ? (
 				<Text style={styles.hashText}>{message}</Text>
@@ -34,7 +34,7 @@ export default function MessageDetailsCard({ isHash, message, data }) {
 					{isAscii(message) ? hexToAscii(message) : data}
 				</Text>
 			)}
-		</>
+		</View>
 	);
 }
 
@@ -45,6 +45,9 @@ const styles = StyleSheet.create({
 		color: colors.bg,
 		marginBottom: 20,
 		paddingHorizontal: 8
+	},
+	messageContainer: {
+		marginTop: 16
 	},
 	messageText: {
 		...fontStyles.t_code,

@@ -99,7 +99,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 			<View style={[styles.body, style]}>
 				{!!description && <Text style={styles.titleText}>{description}</Text>}
 				{!!payload && (
-					<View style={{ paddingVertical: 2 }}>
+					<View style={styles.extrinsicContainer}>
 						<ExtrinsicPart
 							label="Method"
 							prefix={prefix}
@@ -133,7 +133,7 @@ export default class PayloadDetailsCard extends React.PureComponent {
 					</View>
 				)}
 				{!!signature && (
-					<View style={{ alignItems: 'baseline', paddingVertical: 2 }}>
+					<View style={styles.extrinsicContainer}>
 						<Text style={styles.label}>Signature</Text>
 						<Text style={styles.secondaryText}>{signature}</Text>
 					</View>
@@ -340,6 +340,9 @@ const styles = StyleSheet.create({
 	},
 	era: {
 		flexDirection: 'row'
+	},
+	extrinsicContainer: {
+		paddingVertical: 16
 	},
 	label: {
 		...fontStyles.t_label,

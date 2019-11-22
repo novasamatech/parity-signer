@@ -145,15 +145,13 @@ export class TxDetailsView extends React.PureComponent {
 					</Text>
 					<Background />
 					<View style={styles.bodyContent}>
-						<View style={styles.marginBottom}>
-							<CompatibleCard
-								account={sender}
-								accountsStore={accountsStore}
-								titlePrefix={'from: '}
-							/>
-						</View>
+						<CompatibleCard
+							account={sender}
+							accountsStore={accountsStore}
+							titlePrefix={'from: '}
+						/>
 						{isEthereum ? (
-							<View>
+							<View style={{ marginTop: 16 }}>
 								<TxDetailsCard
 									style={{ marginBottom: 20 }}
 									description="You are about to send the following amount"

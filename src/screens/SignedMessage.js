@@ -17,7 +17,7 @@
 'use strict';
 
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import { withScannerStore } from '../util/HOC';
@@ -40,12 +40,13 @@ export function SignedMessage({ scanner }) {
 	return (
 		<ScrollView style={styles.body}>
 			<Text style={styles.topTitle}>Signed Message</Text>
-			<View style={styles.qr}>
-				<QrView data={data} />
-			</View>
-			<View style={styles.messageContainer}>
-				<MessageDetailsCard isHash={isHash} message={message} data={data} />
-			</View>
+			<QrView data={data} />
+			<MessageDetailsCard
+				isHash={isHash}
+				message={message}
+				data={data}
+				style={styles.messageDetail}
+			/>
 		</ScrollView>
 	);
 }
@@ -59,16 +60,11 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		overflow: 'hidden'
 	},
-	messageContainer: {
-		marginHorizontal: 20,
-		marginTop: 16
-	},
-	qr: {
-		marginBottom: 20
+	messageDetail: {
+		paddingHorizontal: 20
 	},
 	topTitle: {
 		...fontStyles.h1,
-		paddingBottom: 20,
 		textAlign: 'center'
 	}
 });
