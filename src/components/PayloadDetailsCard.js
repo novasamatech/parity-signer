@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row'
 	},
 	extrinsicContainer: {
-		paddingVertical: 16
+		paddingTop: 16
 	},
 	label: {
 		...fontStyles.t_label,
