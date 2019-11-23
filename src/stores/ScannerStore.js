@@ -50,6 +50,7 @@ import {
 } from '../util/decoders';
 import { Account } from './types';
 import { constructSURI } from '../util/suri';
+import { emptyAccount } from '../util/account';
 
 type TXRequest = Object;
 
@@ -378,10 +379,13 @@ export default class ScannerStore extends Container<ScannerState> {
 			);
 		}
 
-		const recipient = await accountsStore.getById({
-			address: isEthereum ? tx.action : txRequest.data.account,
-			networkKey
-		});
+		const recipientAddress = isEthereum ? tx.action : txRequest.data.account;
+
+		let recipient =
+			(await accountsStore.getById({
+				address: recipientAddress,
+				networkKey
+			})) || emptyAccount(emptyAccount(recipientAddress, networkKey));
 
 		// For Eth, always sign the keccak hash.
 		// For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).

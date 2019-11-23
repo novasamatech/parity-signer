@@ -52,6 +52,8 @@ export default class MessageDetails extends React.PureComponent {
 				sender,
 				accountsStore.state.identities
 			);
+			if (!senderIdentity)
+				return scannerStore.setErrorMsg('Sender identity not found');
 			const seed = await unlockSeed(this.props.navigation, senderIdentity);
 			await scannerStore.signDataWithSeed(
 				seed,
