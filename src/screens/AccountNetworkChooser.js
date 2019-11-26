@@ -206,7 +206,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		}
 	};
 
-	if (!loaded) return <ScrollView style={styles.body} />;
+	if (!loaded || !currentIdentity) return <ScrollView style={styles.body} />;
 
 	if (identities.length === 0) return showOnboardingMessage();
 

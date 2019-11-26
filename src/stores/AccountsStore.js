@@ -423,7 +423,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			);
 			newIdentities.splice(identityIndex, 1);
 			this.setState({
-				currentIdentity: newIdentities.length > 1 ? newIdentities[0] : null,
+				currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
 				identities: newIdentities
 			});
 			await saveIdentities(newIdentities);
