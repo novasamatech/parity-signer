@@ -296,13 +296,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async saveNewIdentity(seedPhrase, pin) {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
-		//TODO integrate password
-		const seed = constructSURI({
-			derivePath: '',
-			password: '',
-			phrase: seedPhrase
-		});
-		updatedIdentity.encryptedSeed = await encryptData(seed, pin);
+		//TODO encrypt seedPhrase with password in the future version,
+		// current encryption with only seedPhrase is compatible.
+		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
 			currentIdentity: updatedIdentity,
