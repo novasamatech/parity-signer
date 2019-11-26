@@ -32,7 +32,10 @@ import {
 } from '../util/identitiesUtils';
 import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
-import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
+import {
+	navigateToPathsList,
+	unlockSeedPhrase
+} from '../util/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
@@ -42,7 +45,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const onOptionSelect = value => {
 		if (value === 'PathDelete') {
 			alertDeleteAccount('this key pairs', async () => {
-				await unlockSeed(navigation);
+				await unlockSeedPhrase(navigation);
 				const deleteSucceed = await accounts.deletePath(path);
 				if (deleteSucceed) {
 					isSubstratePath(path)
