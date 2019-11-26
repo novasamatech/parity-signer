@@ -46,7 +46,7 @@ export function emptyIdentity() {
 	return {
 		accountIds: new Map(),
 		derivationPassword: '',
-		encryptedSeedPhrase: '',
+		encryptedSeed: '',
 		meta: new Map(),
 		name: ''
 	};
