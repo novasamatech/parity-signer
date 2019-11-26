@@ -153,9 +153,9 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		);
 	};
 
-	const renderNonSelectedIdentity = ({ item, index }) => {
+	const renderNonSelectedIdentity = ({ item }) => {
 		const identity = item;
-		const title = identity.name || `identity_${index.toString()}`;
+		const title = getIdentityName(identity, identities);
 
 		return (
 			<ButtonIcon
