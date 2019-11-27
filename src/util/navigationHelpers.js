@@ -23,7 +23,7 @@ export const setPin = async navigation =>
 		navigation.navigate('IdentityPin', { isNew: true, resolve });
 	});
 
-export const unlockSeed = async (navigation, identity) =>
+export const unlockSeedPhrase = async (navigation, identity) =>
 	new Promise(resolve => {
 		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
 	});

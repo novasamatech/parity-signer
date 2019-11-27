@@ -34,7 +34,10 @@ import TxDetailsCard from '../components/TxDetailsCard';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
-import { navigateToSignedTx, unlockSeed } from '../util/navigationHelpers';
+import {
+	navigateToSignedTx,
+	unlockSeedPhrase
+} from '../util/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import testIDs from '../../e2e/testIDs';
 import fontStyles from '../fontStyles';
@@ -53,9 +56,12 @@ export default class TxDetails extends React.PureComponent {
 				sender,
 				accountsStore.state.identities
 			);
-			const seed = await unlockSeed(this.props.navigation, senderIdentity);
-			await scannerStore.signDataWithSeed(
-				seed,
+			const seedPhrase = await unlockSeedPhrase(
+				this.props.navigation,
+				senderIdentity
+			);
+			await scannerStore.signDataWithSeedPhrase(
+				seedPhrase,
 				NETWORK_LIST[sender.networkKey].protocol
 			);
 			return navigateToSignedTx(this.props.navigation);
