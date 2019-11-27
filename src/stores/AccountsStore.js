@@ -218,7 +218,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
 		const derivedAccount = await this.getAccountFromIdentity(accountId);
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
-		return emptyAccount(address, networkKey);
+		return null;
 	}
 
 	async getAccountFromIdentity(accountIdOrAddress) {
