@@ -294,6 +294,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return this.state.newIdentity;
 	}
 
+	async resetCurrentIdentity() {
+		await this.setState({ currentIdentity: null });
+	}
+
 	async saveNewIdentity(seedPhrase, pin) {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		//TODO encrypt seedPhrase with password in the future version,
@@ -421,7 +425,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			);
 			newIdentities.splice(identityIndex, 1);
 			this.setState({
-				currentIdentity: null,
+				currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
 				identities: newIdentities
 			});
 			await saveIdentities(newIdentities);

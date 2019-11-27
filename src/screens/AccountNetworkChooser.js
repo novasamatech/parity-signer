@@ -105,9 +105,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		networkParams.protocol !== NetworkProtocols.SUBSTRATE ? 1 : -1;
 
 	const getNetworkKeys = ([networkKey]) => {
-		const availableNetworks = getAvailableNetworkKeys(
-			currentIdentity || identities[0]
-		);
+		const availableNetworks = getAvailableNetworkKeys(currentIdentity);
 		if (excludedNetworks.includes(networkKey)) return false;
 		if (isNew) return true;
 		if (shouldShowMoreNetworks) {
@@ -211,7 +209,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		}
 	};
 
-	if (!loaded) return <ScrollView style={styles.body} />;
+	if (!loaded || !currentIdentity) return <ScrollView style={styles.body} />;
 
 	if (identities.length === 0) return showOnboardingMessage();
 

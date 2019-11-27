@@ -47,6 +47,11 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		closeModalAndNavigate(screenName, params);
 	};
 
+	const onLegacyListClicked = async () => {
+		await accounts.resetCurrentIdentity();
+		closeModalAndNavigate('LegacyAccountList');
+	};
+
 	const renderIdentityOptions = identity => {
 		return (
 			<>
@@ -148,9 +153,9 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		);
 	};
 
-	const renderNonSelectedIdentity = ({ item, index }) => {
+	const renderNonSelectedIdentity = ({ item }) => {
 		const identity = item;
-		const title = identity.name || `identity_${index.toString()}`;
+		const title = getIdentityName(identity, identities);
 
 		return (
 			<ButtonIcon
@@ -234,7 +239,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 								<>
 									<ButtonIcon
 										title="Legacy Accounts"
-										onPress={() => closeModalAndNavigate('LegacyAccountList')}
+										onPress={onLegacyListClicked}
 										iconName="solution1"
 										iconType="antdesign"
 										iconSize={24}
