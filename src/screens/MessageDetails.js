@@ -33,7 +33,10 @@ import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import ScannerStore from '../stores/ScannerStore';
 import AccountsStore from '../stores/AccountsStore';
-import { navigateToSignedMessage, unlockSeed } from '../util/navigationHelpers';
+import {
+	navigateToSignedMessage,
+	unlockSeedPhrase
+} from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
 import MessageDetailsCard from '../components/MessageDetailsCard';
 import { alertMultipart } from '../util/alertUtils';
@@ -58,9 +61,12 @@ export default class MessageDetails extends React.PureComponent {
 					sender,
 					accountsStore.state.identities
 				);
-				const seed = await unlockSeed(this.props.navigation, senderIdentity);
-				await scannerStore.signDataWithSeed(
-					seed,
+				const seedPhrase = await unlockSeedPhrase(
+					this.props.navigation,
+					senderIdentity
+				);
+				await scannerStore.signDataWithSeedPhrase(
+					seedPhrase,
 					NETWORK_LIST[sender.networkKey].protocol
 				);
 				return navigateToSignedMessage(this.props.navigation);

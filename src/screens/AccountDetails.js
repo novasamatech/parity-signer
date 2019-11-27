@@ -138,9 +138,8 @@ class AccountDetailsView extends React.PureComponent {
 	};
 
 	render() {
-		const { accounts } = this.props;
-		const account = accounts.getSelected();
-		const selectedKey = accounts.getSelectedKey();
+		const account = this.props.accounts.getSelected();
+		const selectedKey = this.props.accounts.getSelectedKey();
 
 		if (!account) {
 			return null;

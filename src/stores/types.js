@@ -40,7 +40,8 @@ type AccountMeta = {
 };
 
 export type Identity = {
-	encryptedSeedPhrase: string,
+	// encrypted seed include seedPhrase and password
+	encryptedSeed: string,
 	derivationPassword: string,
 	meta: Map<string, AccountMeta>,
 	accountIds: Map<string, string>,

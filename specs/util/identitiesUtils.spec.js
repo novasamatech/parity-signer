@@ -109,14 +109,14 @@ const testIdentities = [
 	{
 		accountIds: accountIdsMap,
 		derivationPassword: '',
-		encryptedSeedPhrase: 'yyyy',
+		encryptedSeed: 'yyyy',
 		meta: metaMap,
 		name: 'identity1'
 	},
 	{
 		accountIds: accountIdsMap,
 		derivationPassword: '',
-		encryptedSeedPhrase: 'xxxx',
+		encryptedSeed: 'xxxx',
 		meta: metaMap,
 		name: 'identity2'
 	}
