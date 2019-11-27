@@ -18,15 +18,16 @@ mod eth;
 mod sr25519;
 mod util;
 
-use util::StringPtr;
 use eth::{KeyPair, PhraseKind};
+use util::StringPtr;
 
-use ethsign::{Protected, keyfile::Crypto};
-use rlp::decode_list;
-use rustc_hex::{ToHex, FromHex};
-use tiny_keccak::Keccak;
-use tiny_keccak::keccak256 as keccak;
 use blake2_rfc::blake2b::blake2b;
+use ethsign::{keyfile::Crypto, Protected};
+use regex::Regex;
+use rlp::decode_list;
+use rustc_hex::{FromHex, ToHex};
+use tiny_keccak::keccak256 as keccak;
+use tiny_keccak::Keccak;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
 
@@ -44,23 +45,26 @@ fn base64png(png: &[u8]) -> String {
 
 // string ffi
 #[no_mangle]
-pub unsafe extern fn rust_string_ptr(s: *mut String) -> *mut StringPtr {
+pub unsafe extern "C" fn rust_string_ptr(s: *mut String) -> *mut StringPtr {
     Box::into_raw(Box::new(StringPtr::from(&**s)))
 }
 
 #[no_mangle]
-pub unsafe extern fn rust_string_destroy(s: *mut String) {
+pub unsafe extern "C" fn rust_string_destroy(s: *mut String) {
     let _ = Box::from_raw(s);
 }
 
 #[no_mangle]
-pub unsafe extern fn rust_string_ptr_destroy(s: *mut StringPtr) {
+pub unsafe extern "C" fn rust_string_ptr_destroy(s: *mut StringPtr) {
     let _ = Box::from_raw(s);
 }
 
 // TODO: REMOVE, use ethkey_brainwallet_sign!
 #[no_mangle]
-pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut StringPtr) -> *mut String {
+pub unsafe extern "C" fn ethkey_keypair_sign(
+    keypair: *mut KeyPair,
+    message: *mut StringPtr,
+) -> *mut String {
     let keypair = &*keypair;
     let message: Vec<u8> = (*message).as_str().from_hex().unwrap();
     let signature = keypair.sign(&message).unwrap().to_hex();
@@ -68,12 +72,12 @@ pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut St
 }
 
 fn qrcode_bytes(data: &[u8]) -> Option<String> {
+    use pixelate::{Color, Image, BLACK};
     use qrcodegen::{QrCode, QrCodeEcc};
-    use pixelate::{Image, Color, BLACK};
 
     let qr = QrCode::encode_binary(data, QrCodeEcc::Medium).ok()?;
 
-    let palette = &[Color::Rgba(255,255,255,0), BLACK];
+    let palette = &[Color::Rgba(255, 255, 255, 0), BLACK];
     let mut pixels = Vec::with_capacity((qr.size() * qr.size()) as usize);
 
     for y in 0..qr.size() {
@@ -89,13 +93,64 @@ fn qrcode_bytes(data: &[u8]) -> Option<String> {
         pixels: &pixels,
         width: qr.size() as usize,
         scale: 16,
-    }.render(&mut result).ok()?;
+    }
+    .render(&mut result)
+    .ok()?;
 
     Some(base64png(&result))
 }
 
 fn construct_suri(seed: &str, path: &str, password: &str) -> String {
     format!("{}{}///{}", seed, path, password)
+}
+
+#[derive(Debug, PartialEq)]
+struct SURI {
+    phrase: String,
+    path: String,
+    password: String,
+}
+
+fn parse_suri(suri: &str) -> Result<SURI, String> {
+    fn parse_derivation_path(input: &str) -> Result<(String, String), String> {
+        let re = Regex::new(r"^((?:\/\/?[^/]+)*)(?:\/\/\/(.*))?$").expect("invalid regex");
+        let matches = re
+            .captures_iter(input)
+            .map(|cap| cap.get(0).map_or("", |m| m.as_str()).to_string())
+            .collect::<Vec<String>>();
+        if matches.len() > 0 && matches[0].len() > 0 {
+            let derivation_path = matches[0].clone();
+            let password = if matches.len() > 1 {
+                matches[1].clone()
+            } else {
+                "".to_string()
+            };
+            Ok((derivation_path, password))
+        } else {
+            Err("invalid derivation path input".to_string())
+        }
+    }
+
+    let re = Regex::new(r"^(\w+(?: \w+)*)?(.*)$").expect("invalid regex");
+    let matches = re
+        .captures_iter(suri)
+        .map(|cap| cap.get(0).map_or("", |m| m.as_str()).to_string())
+        .collect::<Vec<String>>();
+    if matches.len() > 0 && matches[0].len() > 0 {
+        let phrase = matches[0].clone();
+        let (path, password) = if matches.len() > 1 {
+            parse_derivation_path(&matches[1])?
+        } else {
+            ("".to_string(), "".to_string())
+        };
+        Ok(SURI {
+            phrase: phrase,
+            path: path,
+            password: password,
+        })
+    } else {
+        Err("invalid suri input".to_string())
+    }
 }
 
 fn decrypt(data: &str, password: &str) -> Result<String, String> {
@@ -251,17 +306,21 @@ secure_native::export_put! {
 secure_native::export_get! {
     @Java_io_parity_signer_EthkeyBridge_snEthkeyBrainwalletSign
     fn sn_ethkey_brainwallet_sign(pin: Result<String, String>, message: String, encrypted: String) -> Result<String, String> {
-        let seed = decrypt(&encrypted, &pin?);
-        let (_, keypair) = KeyPair::from_auto_phrase(&seed?);
+        let seed = decrypt(&encrypted, &pin?)?;
+        let phrase = parse_suri(&seed)?.phrase;
+        let (_, keypair) = KeyPair::from_auto_phrase(&phrase);
         let message: Vec<u8> = message.from_hex().map_err(|e| format!("{}", e))?;
         let signature = keypair.sign(&message).map_err(|e| format!("{}", e))?;
         Ok(signature.to_hex())
     }
 
     @Java_io_parity_signer_EthkeyBridge_snSubstrateBrainwalletSign
-    fn sn_substrate_brainwallet_sign(pin: Result<String, String>, path: String, password: String, message: String, encrypted: String) -> Result<String, String> {
-        let seed = decrypt(&encrypted, &pin?);
-        let suri = construct_suri(&seed?, &path, &password);
+    fn sn_substrate_brainwallet_sign(pin: Result<String, String>, path: String, password: String, message: String, encrypted: String, legacy: bool) -> Result<String, String> {
+        let seed = decrypt(&encrypted, &pin?)?;
+        let suri = if legacy { seed } else {
+            let phrase = parse_suri(&seed)?.phrase;
+            construct_suri(&phrase, &path, &password)
+        };
         let keypair = sr25519::KeyPair::from_suri(&suri).ok_or(format!("KeyPair from suri"))?;
         let message: Vec<u8> = message.from_hex().map_err(|e| format!("{}", e))?;
         let signature = keypair.sign(&message);
@@ -298,9 +357,22 @@ mod tests {
 
     static SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon";
 
-    static DERIVED_SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
+    static DERIVED_SURI: &str =
+        "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
 
-     #[test]
+    #[test]
+    fn test_parse_suri_legacy() {
+        assert_eq!(
+            dbg!(parse_suri("hello")).unwrap(),
+            SURI {
+                phrase: "hello".to_string(),
+                path: "".to_string(),
+                password: "".to_string(),
+            }
+        );
+    }
+
+    #[test]
     fn test_blake() {
         let data = "454545454545454545454545454545454545454545454545454545454545454501\
                     000000000000002481853da20b9f4322f34650fea5f240dcbfb266d02db94bfa01\
@@ -318,7 +390,10 @@ mod tests {
         assert_eq!(rlp_item(rlp, 0), Some("".into()));
         assert_eq!(rlp_item(rlp, 1), Some("01".into()));
         assert_eq!(rlp_item(rlp, 2), Some("5208".into()));
-        assert_eq!(rlp_item(rlp, 3), Some("095e7baea6a6c7c4c2dfeb977efac326af552d87".into()));
+        assert_eq!(
+            rlp_item(rlp, 3),
+            Some("095e7baea6a6c7c4c2dfeb977efac326af552d87".into())
+        );
         assert_eq!(rlp_item(rlp, 4), Some("0a".into()));
         assert_eq!(rlp_item(rlp, 5), Some("".into()));
     }

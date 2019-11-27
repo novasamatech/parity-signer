@@ -1,3 +1,21 @@
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// This file is part of Parity.
+
+// Parity is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Parity is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Parity.  If not, see <http://www.gnu.org/licenses/>.
+
+'use strict';
+
 import colors from './colors';
 
 export const NetworkProtocols = Object.freeze({
@@ -21,6 +39,7 @@ export const EthereumNetworkKeys = Object.freeze({
 	KOVAN: '42',
 	CLASSIC: '61'
 });
+
 /* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
@@ -29,39 +48,43 @@ export const SubstrateNetworkKeys = Object.freeze({
 	KUSAMA_DEV:
 		'0xd0861d14ebd971da92298f729e46706216377356b0a196978d054972620f298d',
 	SUBSTRATE_DEV:
-		'0xa9b086bbadc5cedd43e0f8a686de18f0bc010cd88d4b46d2f75ae5a540bf460d' // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
+		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc' // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 });
 
 const unknownNetworkBase = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.bg_alert,
 		protocol: NetworkProtocols.UNKNOWN,
-		secondaryColor: colors.card_bg,
+		secondaryColor: colors.card_bgSolid,
 		title: 'Unknown network'
 	}
 };
 
 const substrateNetworkBase = {
 	[SubstrateNetworkKeys.KUSAMA]: {
-		color: '#4C4646',
+		color: '#e6007a',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
+		logo: require('../res/img/logos/kusama.png'),
+		pathId: 'kusama_CC2',
 		prefix: 2,
 		title: 'Kusama CC2',
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {
-		color: '#4C4646',
+		color: '#A60037',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
+		pathId: 'kusama_dev',
 		prefix: 2,
 		title: 'Kusama Development',
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
 		color: '#ff8c00',
-		decimals: 15,
+		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
+		pathId: 'substrate_dev',
 		prefix: 42,
 		title: 'Substrate Development',
 		unit: 'UNIT'
@@ -78,15 +101,16 @@ const substrateNetworkBase = {
 
 const ethereumNetworkBase = {
 	[EthereumNetworkKeys.FRONTIER]: {
-		color: '#977CF6',
+		color: '#64A2F4',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
-		secondaryColor: colors.card_bg,
+		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.CLASSIC]: {
-		color: '#8C7166',
+		color: '#319C7C',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
-		secondaryColor: colors.card_bg,
+		logo: require('../res/img/logos/eth-classic.png'),
+		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum Classic'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
@@ -104,15 +128,17 @@ const ethereumNetworkBase = {
 };
 
 const ethereumDefaultValues = {
-	color: '#F2E265',
+	color: '#2968C7',
+	logo: require('../res/img/logos/eth.png'),
 	protocol: NetworkProtocols.ETHEREUM,
 	secondaryColor: colors.card_text
 };
 
 const substrateDefaultValues = {
 	color: '#4C4646',
+	logo: require('../res/img/logos/substrate-dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
-	secondaryColor: colors.card_bg
+	secondaryColor: colors.card_bgSolid
 };
 
 function setDefault(networkBase, defaultProps) {
@@ -144,5 +170,4 @@ export const NETWORK_LIST = Object.freeze(
 	)
 );
 
-export const TX_DETAILS_MSG = 'After signing and publishing you will have sent';
 export const APP_ID = 'signer';

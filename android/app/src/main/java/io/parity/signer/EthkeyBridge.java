@@ -241,9 +241,9 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void secureSubstrateSign(String app, String key, String message, String encrypted, Promise promise) {
+    public void secureSubstrateSign(String app, String key, String message, String encrypted, boolean legacy, Promise promise) {
         try {
-            promise.resolve(snSubstrateBrainwalletSign(this.getCurrentActivity(), app, key, message, encrypted));
+            promise.resolve(snSubstrateBrainwalletSign(this.getCurrentActivity(), app, key, message, encrypted, legacy));
         } catch (Exception e) {
             String[] sp = e.getMessage().split(": ");
             String s = sp[sp.length - 1].trim().replace("\"", "");
@@ -256,5 +256,5 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native boolean snContains(Activity activity, String app, String key);
     private static native boolean snDelete(Activity activity, String app, String key);
     private static native String snEthkeyBrainwalletSign(Activity activity, String app, String key, String message, String encrypted);
-    private static native String snSubstrateBrainwalletSign(Activity activity, String app, String key, String message, String encrypted);
+    private static native String snSubstrateBrainwalletSign(Activity activity, String app, String key, String message, boolean legacy, String encrypted);
 }

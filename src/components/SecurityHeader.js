@@ -14,64 +14,48 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+'use strict';
+
 import NetInfo from '@react-native-community/netinfo';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
-import fonts from '../fonts';
-import TouchableItem from './TouchableItem';
+import IdentitiesSwitch from '../components/IdentitiesSwitch';
+import ButtonIcon from './ButtonIcon';
 
-class SecurityHeader extends React.Component {
-	state = {
-		isConnected: false
-	};
+function SecurityHeader({ navigation }) {
+	const [isConnected, setIsConnected] = useState(false);
 
-	componentDidMount() {
-		this.unsubscribe = NetInfo.addEventListener(state => {
-			this.setState({ isConnected: state.isConnected });
-		});
-	}
+	useEffect(
+		() =>
+			NetInfo.addEventListener(state => {
+				setIsConnected(state.isConnected);
+			}),
+		[]
+	);
 
-	componentWillUnmount() {
-		this.unsubscribe();
-	}
-
-	render() {
-		const { isConnected } = this.state;
-
-		if (!isConnected) {
-			return null;
-		}
-
-		return (
-			<TouchableItem onPress={() => this.props.navigation.navigate('Security')}>
-				<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-					<Icon style={styles.headerSecureIcon} name="security" />
-					<Text style={styles.headerTextRight}>Not Secure</Text>
-				</View>
-			</TouchableItem>
-		);
-	}
+	return (
+		<View
+			style={{
+				alignItems: 'center',
+				flexDirection: 'row',
+				paddingRight: 16
+			}}
+		>
+			{isConnected && (
+				<ButtonIcon
+					onPress={() => navigation.navigate('Security')}
+					iconName="shield-off"
+					iconType="feather"
+					iconColor={colors.bg_alert}
+					iconBgStyle={{ backgroundColor: 'transparent', marginTop: -3 }}
+				/>
+			)}
+			<IdentitiesSwitch />
+		</View>
+	);
 }
-
-const styles = StyleSheet.create({
-	headerSecureIcon: {
-		color: colors.bg_alert,
-		fontFamily: fonts.bold,
-		fontSize: 20,
-		marginLeft: 0,
-		paddingRight: 5
-	},
-	headerTextRight: {
-		color: colors.bg_alert,
-		fontFamily: fonts.bold,
-		fontSize: 17,
-		marginLeft: 0,
-		paddingRight: 14
-	}
-});
 
 export default withNavigation(SecurityHeader);

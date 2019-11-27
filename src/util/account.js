@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 import {
 	NetworkProtocols,
 	NETWORK_LIST,
@@ -23,7 +25,7 @@ import {
 } from '../constants';
 import { v4 } from 'react-native-uuid';
 
-export function accountId({ address, networkKey }) {
+export function generateAccountId({ address, networkKey }) {
 	if (
 		typeof address !== 'string' ||
 		address.length === 0 ||
@@ -42,11 +44,23 @@ export function accountId({ address, networkKey }) {
 	if (protocol === NetworkProtocols.SUBSTRATE) {
 		return `${protocol}:${address}:${genesisHash}`;
 	} else {
-		return `${protocol}:0x${address.toLowerCase()}@${ethereumChainId}`;
+		return `${protocol}:0x${address}@${ethereumChainId}`;
 	}
 }
 
-export function empty(address = '', networkKey = SubstrateNetworkKeys.KUSAMA) {
+export const extractAddressFromAccountId = id => {
+	const withoutNetwork = id.split(':')[1];
+	const address = withoutNetwork.split('@')[0];
+	if (address.indexOf('0x') !== -1) {
+		return address.slice(2);
+	}
+	return address;
+};
+
+export function emptyAccount(
+	address = '',
+	networkKey = SubstrateNetworkKeys.KUSAMA
+) {
 	return {
 		address: address,
 		biometricEnabled: false,
@@ -65,7 +79,7 @@ export function empty(address = '', networkKey = SubstrateNetworkKeys.KUSAMA) {
 }
 
 export function validateSeed(seed, validBip39Seed) {
-	if (seed.length === 0) {
+	if (!seed || seed.length === 0) {
 		return {
 			accountRecoveryAllowed: false,
 			reason: 'A seed phrase is required.',

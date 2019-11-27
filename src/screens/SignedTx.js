@@ -16,65 +16,49 @@
 
 'use strict';
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import AccountCard from '../components/AccountCard';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST,
-	TX_DETAILS_MSG
+	SUBSTRATE_NETWORK_LIST
 } from '../constants';
-import fonts from '../fonts';
-import AccountsStore from '../stores/AccountsStore';
-import ScannerStore from '../stores/ScannerStore';
+import testIDs from '../../e2e/testIDs';
+import { withAccountAndScannerStore } from '../util/HOC';
+import fontStyles from '../fontStyles';
+import CompatibleCard from '../components/CompatibleCard';
 
-export default class SignedTx extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scanner, accounts) => {
-					return (
-						<SignedTxView
-							{...scanner.getTx()}
-							data={scanner.getSignedTxData()}
-							recipient={scanner.getRecipient()}
-							sender={scanner.getSender()}
-						/>
-					);
-				}}
-			</Subscribe>
-		);
-	}
-}
+export function SignedTx({ scanner, accounts }) {
+	const { gas, gasPrice, value } = scanner.getTx();
+	const data = scanner.getSignedTxData();
+	const recipient = scanner.getRecipient();
+	const sender = scanner.getSender();
 
-export class SignedTxView extends React.PureComponent {
-	static propTypes = {
-		data: PropTypes.string.isRequired,
-		gas: PropTypes.string,
-		gasPrice: PropTypes.string,
-		recipient: PropTypes.object,
-		sender: PropTypes.object,
-		value: PropTypes.string
-	};
+	useEffect(
+		() =>
+			function() {
+				scanner.cleanup();
+			},
+		[scanner]
+	);
 
-	render() {
-		const { data, gas, gasPrice, recipient, sender, value } = this.props;
+	return (
+		<ScrollView
+			contentContainerStyle={{ paddingBottom: 40 }}
+			style={styles.body}
+		>
+			<Text style={styles.topTitle}>Scan Signature</Text>
+			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+				<QrView data={data} />
+			</View>
 
-		return (
-			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
-				<Text style={styles.topTitle}>SCAN SIGNATURE</Text>
-				<View style={styles.qr}>
-					<QrView data={data} />
-				</View>
-				<Text style={styles.title}>TRANSACTION DETAILS</Text>
+			<Text style={styles.title}>Transaction Details</Text>
+			<View style={{ marginBottom: 20, marginHorizontal: 20 }}>
 				{NETWORK_LIST[sender.networkKey].protocol ===
 				NetworkProtocols.ETHEREUM ? (
 					<React.Fragment>
@@ -85,12 +69,8 @@ export class SignedTxView extends React.PureComponent {
 							gas={gas}
 							gasPrice={gasPrice}
 						/>
-						<Text style={styles.title}>RECIPIENT</Text>
-						<AccountCard
-							address={recipient.address}
-							networkKey={recipient.networkKey || ''}
-							title={recipient.name}
-						/>
+						<Text style={styles.title}>Recipient</Text>
+						<CompatibleCard account={recipient} accountsStore={accounts} />
 					</React.Fragment>
 				) : (
 					<PayloadDetailsCard
@@ -101,32 +81,32 @@ export class SignedTxView extends React.PureComponent {
 						signature={data}
 					/>
 				)}
-			</ScrollView>
-		);
-	}
+			</View>
+		</ScrollView>
+	);
 }
+
+export default withAccountAndScannerStore(SignedTx);
+
+const TX_DETAILS_MSG = 'After signing and publishing you will have sent';
 
 const styles = StyleSheet.create({
 	body: {
+		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
+		paddingTop: 24
 	},
 	qr: {
-		backgroundColor: colors.card_bg,
 		marginBottom: 20
 	},
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
+		...fontStyles.h2,
+		marginHorizontal: 20,
 		paddingBottom: 20
 	},
 	topTitle: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 24,
+		...fontStyles.h1,
 		paddingBottom: 20,
 		textAlign: 'center'
 	}

@@ -20,11 +20,12 @@ import '../shim';
 
 import '@polkadot/types/injector';
 
-import React, { Component } from 'react';
-import { Platform, StatusBar, YellowBox } from 'react-native';
+import React, { Component, PureComponent } from 'react';
+import { Platform, StatusBar, View, YellowBox } from 'react-native';
 import {
 	createAppContainer,
 	createStackNavigator,
+	createSwitchNavigator,
 	HeaderBackButton,
 	withNavigation
 } from 'react-navigation';
@@ -34,22 +35,29 @@ import { MenuProvider } from 'react-native-popup-menu';
 import '../shim';
 import Background from './components/Background';
 import colors from './colors';
-import fonts from './fonts';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import '../ReactotronConfig';
 import About from './screens/About';
-import AccountBackup from './screens/AccountBackup';
+import LegacyAccountBackup from './screens/LegacyAccountBackup';
 import AccountDetails from './screens/AccountDetails';
 import AccountEdit from './screens/AccountEdit';
-import AccountList from './screens/AccountList';
 import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
 import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
+import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
+import IdentityBackup from './screens/IdentityBackup';
+import IdentityManagement from './screens/IdentityManagement';
+import IdentityNew from './screens/IdentityNew';
+import IdentityPin from './screens/IdentityPin';
 import MessageDetails from './screens/MessageDetails';
+import PathDerivation from './screens/PathDerivation';
+import PathDetails from './screens/PathDetails';
+import PathsList from './screens/PathsList';
+import PathManagement from './screens/PathManagement';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
@@ -57,15 +65,17 @@ import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
+import LegacyNetworkChooser from './screens/LegacyNetworkChooser';
+import testIDs from '../e2e/testIDs';
 
 const getLaunchArgs = props => {
 	if (Platform.OS === 'ios') {
 		if (props.launchArgs && props.launchArgs.includes('-detoxServer')) {
-			global.inTest = true;
+			return (global.inTest = true);
 		}
 	} else {
 		if (props.launchArgs && props.launchArgs.hasOwnProperty('detoxServer')) {
-			global.inTest = true;
+			return (global.inTest = true);
 		}
 	}
 	global.inTest = false;
@@ -88,7 +98,7 @@ export default class App extends Component {
 		return (
 			<UnstatedProvider>
 				<MenuProvider backHandler={true}>
-					<StatusBar barStyle="light-content" />
+					<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
 					<Background />
 					<ScreensContainer />
 				</MenuProvider>
@@ -97,102 +107,93 @@ export default class App extends Component {
 	}
 }
 
-const globalStackNavigationOptions = {
-	headerBackTitleStyle: {
-		fontFamily: fonts.semiBold,
-		fontSize: 20
-	},
-	headerRight: <SecurityHeader />,
-	headerStyle: {
-		backgroundColor: colors.bg,
-		borderBottomColor: colors.bg_text_sec,
-		borderBottomWidth: 0.5,
-		height: 60,
-		paddingBottom: 0,
-		paddingTop: 0
-	},
-	headerTintColor: colors.card_bg,
-	headerTitleStyle: {
-		display: 'none'
-	}
+const globalStackNavigationOptions = ({ navigation }) => {
+	const isFirstScreen = navigation.dangerouslyGetParent().state.index === 0;
+	return {
+		headerBackTitleStyle: {
+			color: colors.bg_text_sec
+		},
+		headerLeft: isFirstScreen ? <HeaderLeftHome /> : <HeaderLeftWithBack />,
+		headerRight: <SecurityHeader />,
+		headerStyle: {
+			backgroundColor: colors.bg,
+			borderBottomColor: colors.bg,
+			borderBottomWidth: 0,
+			elevation: 0,
+			height: 60,
+			paddingBottom: 0,
+			paddingTop: 0
+		},
+		headerTintColor: colors.bg_text_sec,
+		headerTitleStyle: {
+			display: 'none'
+		}
+	};
 };
 
-// A workaround for https://github.com/react-navigation/react-navigation/issues/88
-const SecurityHeaderBackButton = withNavigation(
-	class _HeaderBackButton extends Component {
+const HeaderLeftWithBack = withNavigation(
+	class _HeaderBackButton extends PureComponent {
 		render() {
 			const { navigation } = this.props;
 			return (
-				<HeaderBackButton
-					{...this.props}
-					titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
-					title="Back"
-					tintColor={colors.card_bg}
-					onPress={() => navigation.goBack(null)}
-				/>
+				<View
+					style={{ flexDirection: 'row' }}
+					testID={testIDs.Header.headerBackButton}
+				>
+					<HeaderBackButton
+						{...this.props}
+						accessibilityComponentType="button"
+						accessibilityTraits="button"
+						delayPressIn={0}
+						titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
+						title="Back"
+						tintColor={colors.bg_text}
+						onPress={() => navigation.goBack()}
+					/>
+				</View>
 			);
 		}
 	}
 );
 
 /* eslint-disable sort-keys */
-const Screens = createStackNavigator(
+const tocAndPrivacyPolicyScreens = {
+	TermsAndConditions: {
+		navigationOptions: {
+			headerRight: null
+		},
+		screen: TermsAndConditions
+	},
+	PrivacyPolicy: {
+		navigationOptions: {
+			headerRight: null
+		},
+		screen: PrivacyPolicy
+	}
+};
+
+const Screens = createSwitchNavigator(
 	{
 		Loading: {
 			screen: Loading
 		},
-		Security: {
-			screen: createStackNavigator(
-				{
-					Security: {
-						navigationOptions: {
-							headerLeft: <SecurityHeaderBackButton />,
-							headerRight: null
-						},
-						screen: Security
-					}
-				},
-				{
-					defaultNavigationOptions: globalStackNavigationOptions,
-					headerMode: 'screen'
-				}
-			)
-		},
-		TocAndPrivacyPolicy: {
-			screen: createStackNavigator(
-				{
-					TermsAndConditions: {
-						navigationOptions: {
-							headerLeft: <HeaderLeftHome />
-						},
-						screen: TermsAndConditions
-					},
-					PrivacyPolicy: {
-						screen: PrivacyPolicy
-					}
-				},
-				{
-					defaultNavigationOptions: globalStackNavigationOptions,
-					initialRouteParams: {
-						isWelcome: true
-					}
-				}
-			)
-		},
+		TocAndPrivacyPolicy: createStackNavigator(tocAndPrivacyPolicyScreens, {
+			defaultNavigationOptions: globalStackNavigationOptions
+		}),
 		Welcome: {
 			screen: createStackNavigator(
 				{
-					AccountList: {
-						navigationOptions: {
-							headerLeft: <HeaderLeftHome />
-						},
-						screen: AccountList
+					AccountNetworkChooser: {
+						screen: AccountNetworkChooser
+					},
+					AccountPin: {
+						screen: AccountPin
+					},
+					AccountUnlock: {
+						screen: AccountUnlock
 					},
 					About: {
 						screen: About
-					},
-					AccountBackup: {
-						screen: AccountBackup
 					},
 					AccountDetails: {
 						screen: AccountDetails
@@ -200,26 +201,50 @@ const Screens = createStackNavigator(
 					AccountEdit: {
 						screen: AccountEdit
 					},
-					AccountNetworkChooser: {
-						screen: AccountNetworkChooser
-					},
 					AccountNew: {
 						screen: AccountNew
-					},
-					AccountPin: {
-						screen: AccountPin
 					},
 					AccountRecover: {
 						screen: AccountRecover
 					},
-					AccountUnlock: {
-						screen: AccountUnlock
-					},
 					AccountUnlockAndSign: {
 						screen: AccountUnlockAndSign
 					},
+					LegacyAccountBackup: {
+						screen: LegacyAccountBackup
+					},
+					LegacyAccountList: {
+						screen: LegacyAccountList
+					},
+					LegacyNetworkChooser: {
+						screen: LegacyNetworkChooser
+					},
+					IdentityBackup: {
+						screen: IdentityBackup
+					},
+					IdentityManagement: {
+						screen: IdentityManagement
+					},
+					IdentityNew: {
+						screen: IdentityNew
+					},
+					IdentityPin: {
+						screen: IdentityPin
+					},
 					MessageDetails: {
 						screen: MessageDetails
+					},
+					PathDerivation: {
+						screen: PathDerivation
+					},
+					PathDetails: {
+						screen: PathDetails
+					},
+					PathsList: {
+						screen: PathsList
+					},
+					PathManagement: {
+						screen: PathManagement
 					},
 					QrScanner: {
 						screen: QrScanner
@@ -232,13 +257,17 @@ const Screens = createStackNavigator(
 					},
 					TxDetails: {
 						screen: TxDetails
-					}
+					},
+					Security: {
+						navigationOptions: {
+							headerRight: null
+						},
+						screen: Security
+					},
+					...tocAndPrivacyPolicyScreens
 				},
 				{
-					defaultNavigationOptions: globalStackNavigationOptions,
-					initialRouteParams: {
-						isWelcome: true
-					}
+					defaultNavigationOptions: globalStackNavigationOptions
 				}
 			)
 		}

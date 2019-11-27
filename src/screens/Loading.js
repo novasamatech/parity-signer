@@ -18,10 +18,9 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NavigationActions, StackActions } from 'react-navigation';
 
 import colors from '../colors';
-import { accountId } from '../util/account';
+import { generateAccountId } from '../util/account';
 import {
 	loadAccounts,
 	loadToCAndPPConfirmation,
@@ -29,41 +28,15 @@ import {
 } from '../util/db';
 
 export default class Loading extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Add Account'
-	};
-
 	async componentDidMount() {
 		const tocPP = await loadToCAndPPConfirmation();
-		const firstScreen = 'Welcome';
-		const firstScreenActions = StackActions.reset({
-			actions: [NavigationActions.navigate({ routeName: firstScreen })],
-			index: 0,
-			key: null
-		});
-		let tocActions;
-
+		const { navigate } = this.props.navigation;
 		if (!tocPP) {
 			this.migrateAccounts();
-
-			tocActions = StackActions.reset({
-				actions: [
-					NavigationActions.navigate({
-						params: {
-							firstScreenActions
-						},
-						routeName: 'TocAndPrivacyPolicy'
-					})
-				],
-				index: 0
-			});
+			navigate('TocAndPrivacyPolicy');
 		} else {
-			tocActions = firstScreenActions;
+			navigate('Welcome');
 		}
-
-		await loadAccounts();
-		this.props.navigation.dispatch(tocActions);
 	}
 
 	async migrateAccounts() {
@@ -87,7 +60,7 @@ export default class Loading extends React.PureComponent {
 
 		accounts.forEach(account => {
 			try {
-				saveAccount(accountId(account), account);
+				saveAccount(generateAccountId(account), account);
 			} catch (e) {
 				console.error(e);
 			}

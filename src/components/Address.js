@@ -16,26 +16,28 @@
 
 // @flow
 
+'use strict';
+
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 
 import colors from '../colors';
 import fonts from '../fonts';
+import fontStyles from '../fontStyles';
 import { NetworkProtocols } from '../constants';
 
 export default function Address(props) {
 	const { address, protocol = NetworkProtocols.SUBSTRATE, style = {} } = props;
 	const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
-	let result = address;
 
 	return (
 		<Text
 			numberOfLines={1}
-			style={[styles.secondaryText, style]}
+			style={[styles.secondaryText, style, fontStyles.t_codeS]}
 			ellipsizeMode="middle"
 		>
 			{prefix}
-			{result}
+			{address}
 		</Text>
 	);
 }

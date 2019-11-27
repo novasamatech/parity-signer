@@ -27,7 +27,10 @@ import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 
-import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from '../../src/constants';
 import {
 	constructDataFromBytes,
 	rawDataToU8A,
@@ -35,9 +38,9 @@ import {
 	hexToAscii,
 	decodeToString,
 	isJsonString
-} from './decoders';
-import { isAscii } from './strings';
-import kusamaData from './static-kusama';
+} from '../../src/util/decoders';
+import { isAscii } from '../../src/util/strings';
+import kusamaData from '../../src/util/static-kusama';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
@@ -97,6 +100,7 @@ const SIGN_TX_TEST = u8aConcat(
 	new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, { version: 4 }).toU8a()
 );
 
+/* eslint-disable-next-line jest/no-disabled-tests */
 describe.skip('sanity check', () => {
 	it('sanity check address is kusama', () => {
 		expect(checkAddress(KUSAMA_ADDRESS, 2)).toEqual([true, null]);

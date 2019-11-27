@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
@@ -27,6 +27,7 @@ import Button from '../components/Button';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import { navigateToLegacyAccountList } from '../util/navigationHelpers';
 
 export default class AccountPin extends React.PureComponent {
 	render() {
@@ -54,40 +55,31 @@ class AccountPinView extends React.PureComponent {
 
 	async submit() {
 		const { accounts, navigation } = this.props;
+		const { pin, confirmation } = this.state;
 		const accountCreation = navigation.getParam('isNew');
-		const { pin } = this.state;
 		const account = accountCreation
 			? accounts.getNew()
 			: accounts.getSelected();
-		if (
-			this.state.pin.length >= 6 &&
-			this.state.pin === this.state.confirmation
-		) {
+		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
 				await accounts.submitNew(pin);
-				const resetAction = StackActions.reset({
-					actions: [NavigationActions.navigate({ routeName: 'AccountList' })],
-					index: 0, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-					key: undefined
-				});
-				this.props.navigation.dispatch(resetAction);
+				return navigateToLegacyAccountList(navigation);
 			} else {
 				await accounts.save(accounts.getSelectedKey(), account, pin);
 				const resetAction = StackActions.reset({
 					actions: [
-						NavigationActions.navigate({ routeName: 'AccountList' }),
+						NavigationActions.navigate({ routeName: 'LegacyAccountList' }),
 						NavigationActions.navigate({ routeName: 'AccountDetails' })
 					],
 					index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
 					key: undefined
 				});
-				this.props.navigation.dispatch(resetAction);
+				navigation.dispatch(resetAction);
 			}
 		} else {
-			if (this.state.pin.length < 6) {
+			if (pin.length < 6) {
 				this.setState({ pinTooShort: true });
-			} else if (this.state.pin !== this.state.confirmation)
-				this.setState({ pinMismatch: true });
+			} else if (pin !== confirmation) this.setState({ pinMismatch: true });
 		}
 	}
 
@@ -156,7 +148,7 @@ class AccountPinView extends React.PureComponent {
 	}
 }
 
-class PinInput extends Component {
+class PinInput extends PureComponent {
 	render() {
 		return (
 			<TextInput

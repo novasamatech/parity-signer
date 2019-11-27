@@ -19,7 +19,7 @@
 'use strict';
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
@@ -29,13 +29,10 @@ import fonts from '../fonts';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 import { isAddressString, isJsonString, rawDataToU8A } from '../util/decoders';
+import ScreenHeading from '../components/ScreenHeading';
+import { createMockSignRequest } from '../../e2e/mock';
 
 export default class Scanner extends React.PureComponent {
-	static navigationOptions = {
-		headerBackTitle: 'Scanner',
-		title: 'Transaction Details'
-	};
-
 	constructor(props) {
 		super(props);
 		this.state = { enableScan: true };
@@ -64,6 +61,7 @@ export default class Scanner extends React.PureComponent {
 							isMultipart={scannerStore.getTotalFramesCount() > 1}
 							missedFrames={scannerStore.getMissedFrames()}
 							navigation={this.props.navigation}
+							accountStore={accountsStore}
 							scannerStore={scannerStore}
 							totalFramesCount={scannerStore.getTotalFramesCount()}
 							onBarCodeRead={async txRequestData => {
@@ -104,7 +102,6 @@ export default class Scanner extends React.PureComponent {
 											this.props.navigation.navigate('MessageDetails');
 										}
 									}
-									('');
 								} catch (e) {
 									return this.showErrorMessage(
 										scannerStore,
@@ -121,95 +118,85 @@ export default class Scanner extends React.PureComponent {
 	}
 }
 
-export class QrScannerView extends React.Component {
-	constructor(props) {
-		super(props);
-		this.setBusySubscription = null;
-		this.setReadySubscription = null;
+QrScannerView.propTypes = {
+	onBarCodeRead: PropTypes.func.isRequired
+};
+
+export function QrScannerView({
+	navigation,
+	scannerStore,
+	accountStore,
+	...props
+}) {
+	if (global.inTest) {
+		props.onBarCodeRead(createMockSignRequest());
 	}
 
-	static propTypes = {
-		onBarCodeRead: PropTypes.func.isRequired
-	};
+	useEffect(() => {
+		const setBusySubscription = navigation.addListener('willFocus', () => {
+			scannerStore.setReady();
+		});
+		const setReadySubscription = navigation.addListener('didBlur', () => {
+			scannerStore.setBusy();
+		});
+		return () => {
+			setBusySubscription.remove();
+			setReadySubscription.remove();
+			scannerStore.setReady();
+		};
+	}, [navigation, scannerStore]);
 
-	componentDidMount() {
-		this.setBusySubscription = this.props.navigation.addListener(
-			'willFocus',
-			() => {
-				this.props.scannerStore.setReady();
-			}
-		);
-		this.setReadySubscription = this.props.navigation.addListener(
-			'didBlur',
-			() => {
-				this.props.scannerStore.setBusy();
-			}
-		);
+	const missedFrames = scannerStore.getMissedFrames();
+	const missedFramesMessage = missedFrames && missedFrames.join(', ');
+
+	if (scannerStore.isBusy()) {
+		return <View style={styles.inactive} />;
 	}
-
-	componentWillUnmount() {
-		this.setBusySubscription.remove();
-		this.setReadySubscription.remove();
-	}
-
-	render() {
-		const missedFrames = this.props.scannerStore.getMissedFrames();
-		const missedFramesMessage = missedFrames && missedFrames.join(', ');
-
-		if (this.props.scannerStore.isBusy()) {
-			return <View style={styles.inactive} />;
-		}
-		return (
-			<RNCamera
-				captureAudio={false}
-				onBarCodeRead={this.props.onBarCodeRead}
-				style={styles.view}
-			>
-				<View style={styles.body}>
-					<View style={styles.top}>
-						<Text style={styles.titleTop}>SCANNER</Text>
-					</View>
-					<View style={styles.middle}>
-						<View style={styles.middleLeft} />
-						<View style={styles.middleCenter} />
-						<View style={styles.middleRight} />
-					</View>
-					{this.props.isMultipart ? (
-						<View style={styles.bottom}>
-							<Text style={styles.descTitle}>
-								Scanning Multipart Data, Please Hold Still...
-							</Text>
-							<Text style={styles.descSecondary}>
-								{this.props.completedFramesCount} /{' '}
-								{this.props.totalFramesCount} Completed.
-							</Text>
-							<Button
-								onPress={() => this.props.scannerStore.clearMultipartProgress()}
-								style={styles.descSecondary}
-								title="Start Over"
-							/>
-						</View>
-					) : (
-						<View style={styles.bottom}>
-							<Text style={styles.descTitle}>Scan QR Code</Text>
-							<Text style={styles.descSecondary}>
-								To Sign a New Transaction
-							</Text>
-						</View>
-					)}
-					{missedFrames && missedFrames.length >= 1 ? (
-						<View style={styles.bottom}>
-							<Text style={styles.descTitle}>
-								You missed the following frames: {missedFramesMessage}
-							</Text>
-						</View>
-					) : (
-						undefined
-					)}
+	return (
+		<RNCamera
+			captureAudio={false}
+			onBarCodeRead={props.onBarCodeRead}
+			style={styles.view}
+		>
+			<View style={styles.body}>
+				<View style={styles.top}>
+					<ScreenHeading title="Scanner" />
 				</View>
-			</RNCamera>
-		);
-	}
+				<View style={styles.middle}>
+					<View style={styles.middleLeft} />
+					<View style={styles.middleCenter} />
+					<View style={styles.middleRight} />
+				</View>
+				{props.isMultipart ? (
+					<View style={styles.bottom}>
+						<Text style={styles.descTitle}>
+							Scanning Multipart Data, Please Hold Still...
+						</Text>
+						<Text style={styles.descSecondary}>
+							{props.completedFramesCount} / {props.totalFramesCount} Completed.
+						</Text>
+						<Button
+							onPress={() => scannerStore.clearMultipartProgress()}
+							style={styles.descSecondary}
+							title="Start Over"
+						/>
+					</View>
+				) : (
+					<View style={styles.bottom}>
+						<Text style={styles.descTitle}>Scan QR Code</Text>
+						<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
+					</View>
+				)}
+				{missedFrames && missedFrames.length >= 1 && (
+					<View style={styles.bottom}>
+						<Text style={styles.descTitle}>
+							You missed the following frames: {missedFramesMessage}
+						</Text>
+					</View>
+				)}
+			</View>
+		</RNCamera>
+	);
 }
 
 const text = {
@@ -272,12 +259,6 @@ const styles = StyleSheet.create({
 	progress: {
 		alignItems: 'center',
 		justifyContent: 'center'
-	},
-	titleTop: {
-		color: colors.bg_text,
-		fontFamily: fonts.bold,
-		fontSize: 26,
-		textAlign: 'center'
 	},
 	top: {
 		alignItems: 'center',

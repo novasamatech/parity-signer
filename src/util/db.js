@@ -18,7 +18,13 @@
 
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
-import { accountId } from './account';
+import { generateAccountId } from './account';
+import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
+
+const currentAccountsStore = {
+	keychainService: 'accounts_v3',
+	sharedPreferencesName: 'accounts_v3'
+};
 
 export async function loadAccounts(version = 3) {
 	if (!SecureStorage) {
@@ -43,13 +49,41 @@ export async function loadAccounts(version = 3) {
 	});
 }
 
-const accountsStore = {
-	keychainService: 'accounts_v3',
-	sharedPreferencesName: 'accounts_v3'
+const identitiesStore = {
+	keychainService: 'parity_signer_identities',
+	sharedPreferencesName: 'parity_signer_identities'
+};
+const identityStorageLabel = 'identities_v4';
+
+export async function loadIdentities(version = 3) {
+	function handleError(e) {
+		console.warn('loading identities error', e);
+		return [];
+	}
+	try {
+		// TODO to be deleted before merging, used for clean the keychain.
+		// await SecureStorage.deleteItem(identityStorageLabel, identitiesStore);
+		const identities = await SecureStorage.getItem(
+			identityStorageLabel,
+			identitiesStore
+		);
+		if (!identities) return [];
+		return deserializeIdentities(identities);
+	} catch (e) {
+		handleError(e);
+	}
+}
+
+export const saveIdentities = identities => {
+	SecureStorage.setItem(
+		identityStorageLabel,
+		serializeIdentities(identities),
+		identitiesStore
+	);
 };
 
 function accountTxsKey({ address, networkKey }) {
-	return 'account_txs_' + accountId({ address, networkKey });
+	return 'account_txs_' + generateAccountId({ address, networkKey });
 }
 
 function txKey(hash) {
@@ -57,13 +91,13 @@ function txKey(hash) {
 }
 
 export const deleteAccount = async accountKey =>
-	SecureStorage.deleteItem(accountKey, accountsStore);
+	SecureStorage.deleteItem(accountKey, currentAccountsStore);
 
 export const saveAccount = (accountKey, account) =>
 	SecureStorage.setItem(
 		accountKey,
 		JSON.stringify(account, null, 0),
-		accountsStore
+		currentAccountsStore
 	);
 
 export async function saveTx(tx) {

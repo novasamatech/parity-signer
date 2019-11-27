@@ -102,4 +102,4 @@ struct CResultString* sn_get(unsigned* error, const char* app, const char* key);
 struct CResultBool* sn_contains(unsigned* error, const char* app, const char* key);
 struct CResultVoid* sn_delete(unsigned* error, const char* app, const char* key);
 struct CResultString* sn_ethkey_brainwallet_sign(unsigned* error, const char* app, const char* key, const char* message, const char* encrypted);
-struct CResultString* sn_substrate_brainwallet_sign(unsigned* error, const char* app, const char* key, const char* message, const char* encrypted);
+struct CResultString* sn_substrate_brainwallet_sign(unsigned* error, const char* app, const char* key, const char* message, const char* encrypted, int legacy);

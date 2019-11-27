@@ -14,8 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+'use strict';
+
 export default {
 	bold: 'ManifoldCF-Bold',
+	light: 'ManifoldCF-Light',
 	regular: 'Manifold CF',
+	roboto: 'Roboto-regular',
+	robotoBold: 'Roboto-Bold',
+	robotoLight: 'Roboto-Light',
+	robotoMedium: 'Roboto-Medium',
+	robotoMono: 'RobotoMono-Regular',
 	semiBold: 'ManifoldCF-DemiBold'
 };

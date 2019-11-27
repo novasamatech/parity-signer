@@ -16,6 +16,8 @@
 
 // @flow
 
+'use strict';
+
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { default as MarkdownRender } from 'react-native-markdown-renderer';
@@ -28,7 +30,7 @@ export default class Markdown extends React.PureComponent {
 			<MarkdownRender
 				style={StyleSheet.create({
 					listOrderedItemIcon: {
-						color: colors.card_bg,
+						color: colors.bg_text,
 						marginRight: 3,
 						marginTop: 19
 					},
@@ -39,7 +41,7 @@ export default class Markdown extends React.PureComponent {
 						marginTop: 19
 					},
 					text: {
-						color: colors.card_bg,
+						color: colors.bg_text_sec,
 						fontFamily: fonts.regular,
 						fontSize: 14,
 						marginTop: 10

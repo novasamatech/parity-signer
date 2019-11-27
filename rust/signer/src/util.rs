@@ -17,7 +17,11 @@
 use libc::size_t;
 
 #[cfg(feature = "jni")]
-use jni::{JNIEnv, objects::JString, sys::{jboolean, jstring, jint}};
+use jni::{
+    objects::JString,
+    sys::{jboolean, jint, jstring},
+    JNIEnv,
+};
 #[cfg(not(feature = "jni"))]
 use std::cell::Cell;
 
@@ -38,21 +42,21 @@ impl<'a> From<&'a str> for StringPtr {
 }
 
 impl StringPtr {
-	pub fn as_str(&self) -> &str {
-		use std::{slice, str};
+    pub fn as_str(&self) -> &str {
+        use std::{slice, str};
 
-		unsafe {
-			let slice = slice::from_raw_parts(self.ptr, self.len);
-			str::from_utf8_unchecked(slice)
-		}
-	}
+        unsafe {
+            let slice = slice::from_raw_parts(self.ptr, self.len);
+            str::from_utf8_unchecked(slice)
+        }
+    }
 }
 
 impl std::ops::Deref for StringPtr {
     type Target = str;
 
     fn deref(&self) -> &str {
-    	self.as_str()
+        self.as_str()
     }
 }
 
@@ -246,7 +250,9 @@ impl<'jni> Return<'jni> for String {
     type Env = JNIEnv<'jni>;
 
     fn convert(env: &Self::Env, val: Self) -> Self::Ext {
-        env.new_string(val).expect("Could not create java string").into_inner()
+        env.new_string(val)
+            .expect("Could not create java string")
+            .into_inner()
     }
 }
 
@@ -278,15 +284,21 @@ impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni> for O
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 let ret = Return::convert(env, Inner::default());
 
-                let class = env.find_class("java/lang/Exception").expect("Must have the Exception class; qed");
-                let exception: JThrowable<'jni> = env.new_object(class, "()V", &[]).expect("Must be able to instantiate the Exception; qed").into();
+                let class = env
+                    .find_class("java/lang/Exception")
+                    .expect("Must have the Exception class; qed");
+                let exception: JThrowable<'jni> = env
+                    .new_object(class, "()V", &[])
+                    .expect("Must be able to instantiate the Exception; qed")
+                    .into();
 
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // !!!!                                                        !!!!
                 // !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THIS POINT !!!!
                 // !!!!                                                        !!!!
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                env.throw(exception).expect("Must be able to throw the Exception; qed");
+                env.throw(exception)
+                    .expect("Must be able to throw the Exception; qed");
 
                 ret
             }
@@ -295,7 +307,9 @@ impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni> for O
 }
 
 #[cfg(feature = "jni")]
-impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni> for Result<Inner, String> {
+impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni>
+    for Result<Inner, String>
+{
     type Ext = Inner::Ext;
     type Env = Inner::Env;
 
@@ -313,15 +327,21 @@ impl<'jni, Inner: Return<'jni, Env = JNIEnv<'jni>> + Default> Return<'jni> for R
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 let ret = Return::convert(env, Inner::default());
 
-                let class = env.find_class("java/lang/Exception").expect("Must have the Exception class; qed");
-                let exception: JThrowable<'jni> = env.new_object(class, "()V", &[]).expect("Must be able to instantiate the Exception; qed").into();
+                let class = env
+                    .find_class("java/lang/Exception")
+                    .expect("Must have the Exception class; qed");
+                let exception: JThrowable<'jni> = env
+                    .new_object(class, "()V", &[])
+                    .expect("Must be able to instantiate the Exception; qed")
+                    .into();
 
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 // !!!!                                                        !!!!
                 // !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THIS POINT !!!!
                 // !!!!                                                        !!!!
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                env.throw(exception).expect("Must be able to throw the Exception; qed");
+                env.throw(exception)
+                    .expect("Must be able to throw the Exception; qed");
 
                 ret
             }
