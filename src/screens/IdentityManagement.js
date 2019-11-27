@@ -22,7 +22,10 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { withAccountStore } from '../util/HOC';
 import TextInput from '../components/TextInput';
-import { navigateToLandingPage, unlockSeed } from '../util/navigationHelpers';
+import {
+	navigateToLandingPage,
+	unlockSeedPhrase
+} from '../util/navigationHelpers';
 import {
 	alertDeleteIdentity,
 	alertIdentityDeletionError
@@ -39,7 +42,7 @@ function IdentityManagement({ accounts, navigation }) {
 	const onOptionSelect = value => {
 		if (value === 'PathDelete') {
 			alertDeleteIdentity(async () => {
-				await unlockSeed(navigation);
+				await unlockSeedPhrase(navigation);
 				const deleteSucceed = await accounts.deleteCurrentIdentity();
 				if (deleteSucceed) {
 					navigateToLandingPage(navigation, true);

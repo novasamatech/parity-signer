@@ -29,7 +29,10 @@ import {
 	SubstrateNetworkKeys,
 	NetworkProtocols
 } from '../constants';
-import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
+import {
+	navigateToPathsList,
+	unlockSeedPhrase
+} from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
 import {
@@ -123,10 +126,10 @@ function AccountNetworkChooser({ navigation, accounts }) {
 
 	const deriveSubstrateDefault = async (networkKey, networkParams) => {
 		const { prefix, pathId } = networkParams;
-		const seed = await unlockSeed(navigation);
+		const seedPhrase = await unlockSeedPhrase(navigation);
 		const derivationSucceed = await accounts.deriveNewPath(
 			`//${pathId}//default`,
-			seed,
+			seedPhrase,
 			prefix,
 			networkKey,
 			'Default'
@@ -135,9 +138,9 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	};
 
 	const deriveEthereumAccount = async networkKey => {
-		const seed = await unlockSeed(navigation);
+		const seedPhrase = await unlockSeedPhrase(navigation);
 		const derivationSucceed = await accounts.deriveEthereumAccount(
-			seed,
+			seedPhrase,
 			networkKey
 		);
 		onDerivationFinished(derivationSucceed, networkKey);

@@ -89,9 +89,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		});
 	}
 
-	async deriveEthereumAccount(seed, networkKey) {
+	async deriveEthereumAccount(seedPhrase, networkKey) {
 		const networkParams = NETWORK_LIST[networkKey];
-		const ethereumAddress = await brainWalletAddress(seed);
+		const ethereumAddress = await brainWalletAddress(seedPhrase);
 		if (ethereumAddress === '') return false;
 		const { ethereumChainId } = networkParams;
 		const accountId = generateAccountId({
@@ -296,6 +296,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async saveNewIdentity(seedPhrase, pin) {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
+		//TODO encrypt seedPhrase with password in the future version,
+		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
@@ -367,12 +369,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seed, prefix, networkKey, name) {
+	async deriveNewPath(newPath, seedPhrase, prefix, networkKey, name) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const suri = constructSURI({
 			derivePath: newPath,
 			password: '',
-			phrase: seed
+			phrase: seedPhrase
 		});
 		let address = '';
 		try {
