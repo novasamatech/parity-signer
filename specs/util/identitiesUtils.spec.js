@@ -29,13 +29,13 @@ import {
 	UnknownNetworkKeys
 } from '../../src/constants';
 
-const accountIdFunding1 = 'address1',
-	accountIdFunding2 = 'address2',
-	accountIdSoft = 'address3',
-	accountIdPolkadot = 'address5',
-	accountIdStaking = 'address4',
-	accountIdEthereum = 'address6',
-	accountIdDefault = 'addressDefault',
+const addressFunding1 = 'address1',
+	addressFunding2 = 'address2',
+	addressSoft = 'address3',
+	addressPolkadot = 'address5',
+	addressStaking = 'address4',
+	addressEthereum = 'address6',
+	addressDefault = 'addressDefault',
 	paths = [
 		'//kusama_CC2//default',
 		'//kusama_CC2//funding/1',
@@ -46,55 +46,55 @@ const accountIdFunding1 = 'address1',
 		'1'
 	],
 	metaDefault = {
-		accountId: accountIdDefault,
+		address: addressDefault,
 		createdAt: 1571068850409,
 		name: '',
 		updatedAt: 1571078850509
 	},
 	metaFunding1 = {
-		accountId: accountIdFunding1,
+		address: addressFunding1,
 		createdAt: 1571068850409,
 		name: 'funding account1',
 		updatedAt: 1571078850509
 	},
 	metaFunding2 = {
-		accountId: accountIdFunding2,
+		address: addressFunding2,
 		createdAt: 1571068850409,
 		name: '',
 		updatedAt: 1571078850509
 	},
 	metaStaking = {
-		accountId: accountIdStaking,
+		address: addressStaking,
 		createdAt: 1571068850409,
 		name: '',
 		updatedAt: 1571078850509
 	},
 	metaPolkadot = {
-		accountId: accountIdPolkadot,
+		address: addressPolkadot,
 		createdAt: 1573142786972,
 		name: 'PolkadotFirst',
 		updatedAt: 1573142786972
 	},
 	metaEthereum = {
-		accountId: accountIdEthereum,
+		address: addressEthereum,
 		createdAt: 1573142786972,
 		name: 'Eth account',
 		updatedAt: 1573142786972
 	},
 	metaSoftKey = {
-		accountId: accountIdSoft,
+		address: addressSoft,
 		createdAt: 1573142786972,
 		name: '',
 		updatedAt: 1573142786972
 	};
-const accountIdsMap = new Map([
-	[accountIdDefault, paths[0]],
-	[accountIdFunding1, paths[1]],
-	[accountIdSoft, paths[2]],
-	[accountIdFunding2, paths[3]],
-	[accountIdStaking, paths[4]],
-	[accountIdPolkadot, paths[5]],
-	[accountIdEthereum, paths[6]]
+const addressesMap = new Map([
+	[addressDefault, paths[0]],
+	[addressFunding1, paths[1]],
+	[addressSoft, paths[2]],
+	[addressFunding2, paths[3]],
+	[addressStaking, paths[4]],
+	[addressPolkadot, paths[5]],
+	[addressEthereum, paths[6]]
 ]);
 const metaMap = new Map([
 	[paths[0], metaDefault],
@@ -107,14 +107,14 @@ const metaMap = new Map([
 ]);
 const testIdentities = [
 	{
-		accountIds: accountIdsMap,
+		addresses: addressesMap,
 		derivationPassword: '',
 		encryptedSeed: 'yyyy',
 		meta: metaMap,
 		name: 'identity1'
 	},
 	{
-		accountIds: accountIdsMap,
+		addresses: addressesMap,
 		derivationPassword: '',
 		encryptedSeed: 'xxxx',
 		meta: metaMap,
