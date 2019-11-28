@@ -66,9 +66,9 @@ const substrateNetworkBase = {
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('../res/img/logos/kusama.png'),
-		pathId: 'kusama_CC2',
+		pathId: 'kusama',
 		prefix: 2,
-		title: 'Kusama CC2',
+		title: 'Kusama',
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {
