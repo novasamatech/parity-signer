@@ -23,7 +23,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
 import ButtonMainAction from '../components/ButtonMainAction';
 import { validateDerivedPath } from '../util/identitiesUtils';
-import { navigateToPathsList, unlockSeed } from '../util/navigationHelpers';
+import {
+	navigateToPathsList,
+	unlockSeedPhrase
+} from '../util/navigationHelpers';
 import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
 import { alertPathDerivationError } from '../util/alertUtils';
 import testIDs from '../../e2e/testIDs';
@@ -49,10 +52,10 @@ function PathDerivation({ accounts, navigation }) {
 		if (!validateDerivedPath(derivationPath)) {
 			return setIsPathValid(false);
 		}
-		const seed = await unlockSeed(navigation);
+		const seedPhrase = await unlockSeedPhrase(navigation);
 		const derivationSucceed = await accounts.deriveNewPath(
 			completePath,
-			seed,
+			seedPhrase,
 			NETWORK_LIST[networkKey].prefix,
 			networkKey,
 			keyPairsName

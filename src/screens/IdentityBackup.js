@@ -28,7 +28,7 @@ import { withNavigation } from 'react-navigation';
 import {
 	navigateToNewIdentityNetwork,
 	setPin,
-	unlockSeed
+	unlockSeedPhrase
 } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
@@ -50,7 +50,7 @@ function IdentityBackup({ navigation, accounts }) {
 			if (isNew) {
 				setSeedPhrase(await words());
 			} else {
-				const backupSeedPhrase = await unlockSeed(navigation);
+				const backupSeedPhrase = await unlockSeedPhrase(navigation);
 				navigation.pop();
 				setSeedPhrase(backupSeedPhrase);
 			}

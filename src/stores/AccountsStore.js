@@ -89,9 +89,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		});
 	}
 
-	async deriveEthereumAccount(seed, networkKey) {
+	async deriveEthereumAccount(seedPhrase, networkKey) {
 		const networkParams = NETWORK_LIST[networkKey];
-		const ethereumAddress = await brainWalletAddress(seed);
+		const ethereumAddress = await brainWalletAddress(seedPhrase);
 		if (ethereumAddress === '') return false;
 		const { ethereumChainId } = networkParams;
 		const accountId = generateAccountId({
@@ -218,7 +218,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
 		const derivedAccount = await this.getAccountFromIdentity(accountId);
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
-		return emptyAccount(address, networkKey);
+		return null;
 	}
 
 	async getAccountFromIdentity(accountIdOrAddress) {
@@ -294,8 +294,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return this.state.newIdentity;
 	}
 
+	async resetCurrentIdentity() {
+		await this.setState({ currentIdentity: null });
+	}
+
 	async saveNewIdentity(seedPhrase, pin) {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
+		//TODO encrypt seedPhrase with password in the future version,
+		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
@@ -367,12 +373,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seed, prefix, networkKey, name) {
+	async deriveNewPath(newPath, seedPhrase, prefix, networkKey, name) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const suri = constructSURI({
 			derivePath: newPath,
 			password: '',
-			phrase: seed
+			phrase: seedPhrase
 		});
 		let address = '';
 		try {
@@ -419,7 +425,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			);
 			newIdentities.splice(identityIndex, 1);
 			this.setState({
-				currentIdentity: null,
+				currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
 				identities: newIdentities
 			});
 			await saveIdentities(newIdentities);
