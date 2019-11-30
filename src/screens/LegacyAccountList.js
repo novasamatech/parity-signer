@@ -45,7 +45,7 @@ function LegacyAccountList({ navigation, accounts }) {
 				renderItem={({ item: [accountKey, account] }) => {
 					return (
 						<AccountCard
-							accountId={account.address}
+							address={account.address}
 							networkKey={account.networkKey}
 							onPress={() => onAccountSelected(accountKey)}
 							style={{ paddingBottom: null }}

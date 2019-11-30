@@ -77,7 +77,7 @@ function LegacyAccountBackup({ navigation, accounts }) {
 				words allow anyone to recover this account and access its funds."
 			/>
 
-			<AccountCard accountId={address} networkKey={networkKey} title={name} />
+			<AccountCard adress={address} networkKey={networkKey} title={name} />
 			<View style={styles.bodyContent}>
 				<TouchableItem
 					onPress={() => {

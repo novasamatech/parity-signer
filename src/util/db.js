@@ -19,7 +19,11 @@
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
-import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
+import {
+	deserializeIdentities,
+	isEthereumAccountId,
+	serializeIdentities
+} from './identitiesUtils';
 
 const currentAccountsStore = {
 	keychainService: 'accounts_v3',
@@ -68,7 +72,26 @@ export async function loadIdentities(version = 3) {
 			identitiesStore
 		);
 		if (!identities) return [];
-		return deserializeIdentities(identities);
+		// TODO migrate identities on test devices, remove them in v4.1
+		const identitiesObject = deserializeIdentities(identities);
+		const migrationIdentityFunction = identity => {
+			if (identity.hasOwnProperty('addresses')) {
+				return identity;
+			}
+			const addressMap = new Map();
+			identity.accountIds.forEach((path, accountId) => {
+				if (isEthereumAccountId(accountId)) {
+					addressMap.set(accountId, path);
+				} else {
+					addressMap.set(accountId.split(':')[1], path);
+				}
+			});
+			identity.addresses = addressMap;
+			delete identity.accountIds;
+			return identity;
+		};
+
+		return identitiesObject.map(migrationIdentityFunction);
 	} catch (e) {
 		handleError(e);
 	}

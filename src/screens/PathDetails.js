@@ -26,7 +26,7 @@ import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import {
-	getAccountIdWithPath,
+	getAddressWithPath,
 	getNetworkKeyByPath,
 	isSubstratePath
 } from '../util/identitiesUtils';
@@ -37,10 +37,15 @@ import {
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
+import { generateAccountId } from '../util/account';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
-	const address = getAccountIdWithPath(path, currentIdentity);
+	const address = getAddressWithPath(path, currentIdentity);
+	const accountId = generateAccountId({
+		address,
+		networkKey: getNetworkKeyByPath(path)
+	});
 
 	const onOptionSelect = value => {
 		if (value === 'PathDelete') {
@@ -82,7 +87,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			<ScrollView>
 				<PathCard identity={currentIdentity} path={path} />
 				{networkKey !== UnknownNetworkKeys.UNKNOWN && address !== '' && (
-					<QrView data={address} />
+					<QrView data={accountId} />
 				)}
 			</ScrollView>
 		</View>

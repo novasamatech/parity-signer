@@ -69,6 +69,8 @@ export default class Scanner extends React.PureComponent {
 									return;
 								}
 
+								console.log('txReqeustData is:', txRequestData);
+
 								try {
 									if (isAddressString(txRequestData.data)) {
 										return this.showErrorMessage(

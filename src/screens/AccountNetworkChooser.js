@@ -209,9 +209,9 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		}
 	};
 
-	if (!loaded || !currentIdentity) return <ScrollView style={styles.body} />;
-
+	if (!loaded) return <ScrollView style={styles.body} />;
 	if (identities.length === 0) return showOnboardingMessage();
+	if (!currentIdentity) return <ScrollView style={styles.body} />;
 
 	const networkList = Object.entries(NETWORK_LIST).filter(getNetworkKeys);
 	networkList.sort(sortNetworkKeys);
@@ -226,7 +226,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				{networkList.map(([networkKey, networkParams], index) => (
 					<AccountCard
 						isNetworkCard={true}
-						accountId={''}
+						address={''}
 						key={networkKey}
 						testID={testIDs.AccountNetworkChooser.networkButton + index}
 						networkKey={networkKey}

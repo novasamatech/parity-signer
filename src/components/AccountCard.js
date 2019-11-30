@@ -30,12 +30,11 @@ import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
 import colors from '../colors';
-import { getAddressFromAccountId } from '../util/identitiesUtils';
 import { AccountPrefixedTitle } from './AccountPrefixedTitle';
 
 export default class AccountCard extends React.PureComponent {
 	static propTypes = {
-		accountId: PropTypes.string,
+		address: PropTypes.string,
 		isAdd: PropTypes.bool,
 		networkKey: PropTypes.string,
 		onPress: PropTypes.func,
@@ -53,7 +52,7 @@ export default class AccountCard extends React.PureComponent {
 
 	render() {
 		const {
-			accountId,
+			address,
 			isAdd,
 			isNetworkCard,
 			networkKey,
@@ -69,8 +68,6 @@ export default class AccountCard extends React.PureComponent {
 		const seedTypeDisplay = seedType || '';
 		const network =
 			NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
-
-		const extractAddress = getAddressFromAccountId(accountId);
 
 		return (
 			<TouchableItem
@@ -94,7 +91,7 @@ export default class AccountCard extends React.PureComponent {
 						</View>
 					) : (
 						<AccountIcon
-							address={extractAddress}
+							address={address}
 							protocol={network.protocol}
 							network={network}
 							style={styles.icon}
@@ -111,9 +108,9 @@ export default class AccountCard extends React.PureComponent {
 							</View>
 						)}
 						<AccountPrefixedTitle title={title} titlePrefix={titlePrefix} />
-						{accountId !== '' && (
+						{address !== '' && (
 							<Address
-								address={isAdd ? 'new' : extractAddress}
+								address={isAdd ? 'new' : address}
 								protocol={network.protocol}
 							/>
 						)}
