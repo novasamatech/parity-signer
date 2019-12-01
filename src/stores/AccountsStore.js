@@ -126,7 +126,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async refreshList() {
 		const accounts = await loadAccounts();
 		const identities = await loadIdentities();
-		console.log('accounts', accounts, 'and identities', identities);
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
 		this.setState({ accounts, currentIdentity, identities, loaded: true });
@@ -224,6 +223,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetPath = null;
 		let targetIdentity = null;
+		let targetAccountId = null;
 		for (const identity of this.state.identities) {
 			const searchList = Array.from(identity.addresses.entries());
 			for (const [addressKey, path] of searchList) {
@@ -239,6 +239,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 				if (found) {
 					targetPath = path;
 					targetIdentity = identity;
+					targetAccountId = accountId;
 					break;
 				}
 			}
@@ -251,6 +252,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const networkKey = getNetworkKeyByPath(targetPath);
 		return {
 			...metaData,
+			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
 			isBip39: true,
 			isLegacy: false,

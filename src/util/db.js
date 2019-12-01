@@ -21,6 +21,7 @@ import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
 import {
 	deserializeIdentities,
+	extractAddressFromAccountId,
 	isEthereumAccountId,
 	serializeIdentities
 } from './identitiesUtils';
@@ -75,19 +76,32 @@ export async function loadIdentities(version = 3) {
 		// TODO migrate identities on test devices, remove them in v4.1
 		const identitiesObject = deserializeIdentities(identities);
 		const migrationIdentityFunction = identity => {
+			const getAddressKey = accountId =>
+				isEthereumAccountId(accountId)
+					? accountId
+					: extractAddressFromAccountId(accountId);
 			if (identity.hasOwnProperty('addresses')) {
 				return identity;
 			}
 			const addressMap = new Map();
 			identity.accountIds.forEach((path, accountId) => {
-				if (isEthereumAccountId(accountId)) {
-					addressMap.set(accountId, path);
-				} else {
-					addressMap.set(accountId.split(':')[1], path);
-				}
+				addressMap.set(getAddressKey(accountId), path);
 			});
 			identity.addresses = addressMap;
 			delete identity.accountIds;
+
+			const metaMap = new Map();
+			identity.meta.forEach((metaData, path) => {
+				if (metaData.hasOwnProperty('accountId')) {
+					const { accountId } = metaData;
+					metaData.address = getAddressKey(accountId);
+					delete metaData.accountId;
+					return metaMap.set(path, metaData);
+				}
+				metaMap.set(path, metaData);
+			});
+			identity.meta = metaMap;
+
 			return identity;
 		};
 

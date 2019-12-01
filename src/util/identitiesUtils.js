@@ -41,6 +41,15 @@ export const isSubstratePath = path => path.split('//')[1] !== undefined;
 
 export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
 
+export const extractAddressFromAccountId = id => {
+	const withoutNetwork = id.split(':')[1];
+	const address = withoutNetwork.split('@')[0];
+	if (address.indexOf('0x') !== -1) {
+		return address.slice(2);
+	}
+	return address;
+};
+
 export const getAddressKeyByPath = (address, path) =>
 	isSubstratePath(path)
 		? address
@@ -116,7 +125,11 @@ export const getIdentityFromSender = (sender, identities) =>
 
 export const getAddressWithPath = (path, identity) => {
 	const pathMeta = identity.meta.get(path);
-	return pathMeta ? pathMeta.address : '';
+	if (!pathMeta) return '';
+	const { address } = pathMeta;
+	return isEthereumAccountId(address)
+		? extractAddressFromAccountId(address)
+		: address;
 };
 
 export const unlockIdentitySeed = async (pin, identity) => {
