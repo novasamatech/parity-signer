@@ -229,10 +229,15 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			const searchList = Array.from(identity.addresses.entries());
 			for (const [addressKey, path] of searchList) {
 				const networkKey = getNetworkKeyByPath(path);
-				const accountId = isEthereumAccountId(addressKey)
-					? addressKey
-					: generateAccountId({ address: addressKey, networkKey });
-				const searchAccountIdOrAddress = isAccountId ? accountId : addressKey;
+				let accountId, address;
+				if (isEthereumAccountId(addressKey)) {
+					accountId = addressKey;
+					address = extractAddressFromAccountId(addressKey);
+				} else {
+					accountId = generateAccountId({ address: addressKey, networkKey });
+					address = addressKey;
+				}
+				const searchAccountIdOrAddress = isAccountId ? accountId : address;
 				const found = isEthereumAccountId(accountId)
 					? searchAccountIdOrAddress.toLowerCase() ===
 					  accountIdOrAddress.toLowerCase()

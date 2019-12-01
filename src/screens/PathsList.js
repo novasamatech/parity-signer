@@ -146,11 +146,16 @@ function PathsList({ accounts, navigation }) {
 			))}
 		</View>
 	);
+
+	const subtitle =
+		networkKey === UnknownNetworkKeys.UNKNOWN
+			? ''
+			: `//${NETWORK_LIST[networkKey].pathId}`;
 	return (
 		<View style={styles.body}>
 			<ScreenHeading
 				title={NETWORK_LIST[networkKey].title}
-				subtitle={'//' + NETWORK_LIST[networkKey].pathId}
+				subtitle={subtitle}
 				big={true}
 				subtitleIcon={true}
 			/>
