@@ -38,6 +38,7 @@ import {
 } from '../util/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from '../util/account';
+import UnknownAccountWarning from '../components/UnknownAccountWarning';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
@@ -87,7 +88,9 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			</View>
 			<ScrollView>
 				<PathCard identity={currentIdentity} path={path} />
-				{networkKey !== UnknownNetworkKeys.UNKNOWN && address !== '' && (
+				{networkKey === UnknownNetworkKeys.UNKNOWN ? (
+					<UnknownAccountWarning />
+				) : (
 					<QrView data={accountId} />
 				)}
 			</ScrollView>

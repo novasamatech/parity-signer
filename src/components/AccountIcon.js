@@ -19,8 +19,9 @@
 import Identicon from '@polkadot/reactnative-identicon';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Image, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Image, StyleSheet, View } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import colors from '../colors';
 import { NetworkProtocols } from '../constants';
@@ -53,15 +54,13 @@ export default function AccountIcon(props) {
 	if (address === '') {
 		return (
 			<View>
-				<Image
-					source={network.logo}
-					style={{
-						backgroundColor: colors.bg_text_sec,
-						borderRadius: 40,
-						height: 40,
-						width: 40
-					}}
-				/>
+				{network.logo ? (
+					<Image source={network.logo} style={styles.logo} />
+				) : (
+					<View style={styles.logo}>
+						<FontAwesome name="question" color={colors.bg} size={28} />
+					</View>
+				)}
 			</View>
 		);
 	}
@@ -76,6 +75,17 @@ export default function AccountIcon(props) {
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <Icon color={colors.bg_text} name={'error'} size={44} />;
+		return <MaterialIcons color={colors.bg_text} name={'error'} size={44} />;
 	}
 }
+
+const styles = StyleSheet.create({
+	logo: {
+		alignItems: 'center',
+		backgroundColor: colors.bg_text_sec,
+		borderRadius: 40,
+		height: 40,
+		justifyContent: 'center',
+		width: 40
+	}
+});

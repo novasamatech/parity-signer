@@ -25,14 +25,14 @@ import {
 	getNetworkKeyByPath,
 	getPathName
 } from '../util/identitiesUtils';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import Separator from '../components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
-import { AccountPrefixedTitle } from './AccountPrefixedTitle';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
 
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
@@ -131,7 +131,8 @@ export default function PathCard({
 		</View>
 	);
 
-	return network.protocol === 'substrate'
+	return network.protocol === NetworkProtocols.SUBSTRATE ||
+		NetworkProtocols.UNKNOWN
 		? substrateDerivationCard
 		: nonSubstrateCard;
 }

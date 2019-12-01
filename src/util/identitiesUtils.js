@@ -16,7 +16,11 @@
 
 'use strict';
 
-import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
+import {
+	NETWORK_LIST,
+	SUBSTRATE_NETWORK_LIST,
+	UnknownNetworkKeys
+} from '../constants';
 import { pathsRegex } from './regex';
 import { decryptData } from './native';
 import { parseSURI } from './suri';
@@ -102,8 +106,19 @@ export const deepCopyIdentities = identities =>
 export const deepCopyIdentity = identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
-export const getPathsWithSubstrateNetwork = (paths, networkKey) =>
-	paths.filter(path => extractPathId(path) === NETWORK_LIST[networkKey].pathId);
+export const getPathsWithSubstrateNetwork = (paths, networkKey) => {
+	if (networkKey === UnknownNetworkKeys.UNKNOWN) {
+		const pathIdList = Object.values(SUBSTRATE_NETWORK_LIST).map(
+			networkParams => networkParams.pathId
+		);
+		return paths.filter(
+			path => isSubstratePath(path) && !pathIdList.includes(extractPathId(path))
+		);
+	}
+	return paths.filter(
+		path => extractPathId(path) === NETWORK_LIST[networkKey].pathId
+	);
+};
 
 export const getNetworkKeyByPath = path => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
@@ -139,7 +154,7 @@ export const unlockIdentitySeed = async (pin, identity) => {
 	return phrase;
 };
 
-export const getAvailableNetworkKeys = identity => {
+export const getExistedNetworkKeys = identity => {
 	const pathsList = Array.from(identity.addresses.values());
 	const networkKeysSet = pathsList.reduce((networksSet, path) => {
 		let networkKey;

@@ -33,6 +33,7 @@ import {
 	navigateToLegacyAccountList
 } from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
+import UnknownAccountWarning from '../components/UnknownAccountWarning';
 
 export default class AccountDetails extends React.PureComponent {
 	render() {
@@ -86,23 +87,6 @@ class AccountDetailsView extends React.PureComponent {
 		}
 	};
 
-	renderWarningUnknownAccount = function() {
-		return (
-			<View style={styles.warningView}>
-				<Text style={{ ...styles.title, ...styles.warningTitle }}>Warning</Text>
-				<Text>
-					This account wasn't retrieved successfully. This could be because its
-					network isn't supported, or you upgraded Parity Signer without wiping
-					your device and this account couldn't be migrated.
-					{'\n'}
-					{'\n'}
-					To be able to use this account you need to:{'\n'}- write down its
-					recovery phrase{'\n'}- delete it{'\n'}- recover it{'\n'}
-				</Text>
-			</View>
-		);
-	};
-
 	render() {
 		const { accounts } = this.props;
 		const account = accounts.getSelected();
@@ -153,7 +137,7 @@ class AccountDetailsView extends React.PureComponent {
 					{protocol !== NetworkProtocols.UNKNOWN ? (
 						<QrView data={selectedKey} />
 					) : (
-						this.renderWarningUnknownAccount()
+						<UnknownAccountWarning />
 					)}
 				</View>
 			</ScrollView>
@@ -188,13 +172,5 @@ const styles = StyleSheet.create({
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		justifyContent: 'center'
-	},
-	warningTitle: {
-		color: colors.bg_alert,
-		fontSize: 20,
-		marginBottom: 10
-	},
-	warningView: {
-		padding: 20
 	}
 });

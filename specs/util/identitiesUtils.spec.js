@@ -18,7 +18,7 @@
 
 import {
 	deserializeIdentities,
-	getAvailableNetworkKeys,
+	getExistedNetworkKeys,
 	getPathName,
 	groupPaths,
 	serializeIdentities
@@ -169,7 +169,7 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('get the correspond networkKeys', () => {
-		const networkKeys = getAvailableNetworkKeys(testIdentities[0]);
+		const networkKeys = getExistedNetworkKeys(testIdentities[0]);
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,

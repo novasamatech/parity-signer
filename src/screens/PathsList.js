@@ -49,17 +49,19 @@ function PathsList({ accounts, navigation }) {
 	);
 
 	const { currentIdentity } = accounts.state;
-	const isSubstratePaths =
-		NETWORK_LIST[networkKey].protocol === NetworkProtocols.SUBSTRATE;
+	const isEthereumPath =
+		NETWORK_LIST[networkKey].protocol === NetworkProtocols.ETHEREUM;
+	const isUnknownNetworkPath =
+		NETWORK_LIST[networkKey].protocol === NetworkProtocols.UNKNOWN;
 	const pathsGroups = useMemo(() => {
-		if (!currentIdentity || !isSubstratePaths) return null;
+		if (!currentIdentity || isEthereumPath) return null;
 		const paths = Array.from(currentIdentity.meta.keys());
 		const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
 		return groupPaths(listedPaths);
-	}, [currentIdentity, isSubstratePaths, networkKey]);
+	}, [currentIdentity, isEthereumPath, networkKey]);
 
 	if (!currentIdentity) return null;
-	if (!isSubstratePaths) {
+	if (isEthereumPath) {
 		return (
 			<PathDetailsView
 				networkKey={networkKey}
@@ -158,11 +160,15 @@ function PathsList({ accounts, navigation }) {
 						? renderSinglePath(pathsGroup)
 						: renderGroupPaths(pathsGroup)
 				)}
-				<ButtonNewDerivation
-					testID={testIDs.PathsList.deriveButton}
-					title="Create New Derivation"
-					onPress={() => navigation.navigate('PathDerivation', { networkKey })}
-				/>
+				{!isUnknownNetworkPath && (
+					<ButtonNewDerivation
+						testID={testIDs.PathsList.deriveButton}
+						title="Create New Derivation"
+						onPress={() =>
+							navigation.navigate('PathDerivation', { networkKey })
+						}
+					/>
+				)}
 			</ScrollView>
 			<ButtonMainAction
 				title={'Scan'}
