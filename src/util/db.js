@@ -19,12 +19,7 @@
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
-import {
-	deserializeIdentities,
-	extractAddressFromAccountId,
-	isEthereumAccountId,
-	serializeIdentities
-} from './identitiesUtils';
+import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 const currentAccountsStore = {
 	keychainService: 'accounts_v3',
@@ -58,13 +53,15 @@ const identitiesStore = {
 	keychainService: 'parity_signer_identities',
 	sharedPreferencesName: 'parity_signer_identities'
 };
-const identityStorageLabel = 'identities_v4';
+const currentIdentityStorageLabel = 'identities_v4';
 
-export async function loadIdentities(version = 3) {
+export async function loadIdentities(version = 4) {
 	function handleError(e) {
 		console.warn('loading identities error', e);
 		return [];
 	}
+
+	const identityStorageLabel = `identities_v${version}`;
 	try {
 		// TODO to be deleted before merging, used for clean the keychain.
 		// await SecureStorage.deleteItem(identityStorageLabel, identitiesStore);
@@ -73,41 +70,7 @@ export async function loadIdentities(version = 3) {
 			identitiesStore
 		);
 		if (!identities) return [];
-		const identitiesObject = deserializeIdentities(identities);
-		// TODO migrate identities on test devices, remove them in v4.1
-
-		const migrationIdentityFunction = identity => {
-			const getAddressKey = accountId =>
-				isEthereumAccountId(accountId)
-					? accountId
-					: extractAddressFromAccountId(accountId);
-
-			if (identity.hasOwnProperty('addresses')) {
-				return identity;
-			}
-			const addressMap = new Map();
-			identity.accountIds.forEach((path, accountId) => {
-				addressMap.set(getAddressKey(accountId), path);
-			});
-			identity.addresses = addressMap;
-			delete identity.accountIds;
-
-			const metaMap = new Map();
-			identity.meta.forEach((metaData, path) => {
-				if (metaData.hasOwnProperty('accountId')) {
-					const { accountId } = metaData;
-					metaData.address = getAddressKey(accountId);
-					delete metaData.accountId;
-					return metaMap.set(path, metaData);
-				}
-				metaMap.set(path, metaData);
-			});
-			identity.meta = metaMap;
-
-			return identity;
-		};
-
-		return identitiesObject.map(migrationIdentityFunction);
+		return deserializeIdentities(identities);
 	} catch (e) {
 		handleError(e);
 	}
@@ -115,7 +78,7 @@ export async function loadIdentities(version = 3) {
 
 export const saveIdentities = identities => {
 	SecureStorage.setItem(
-		identityStorageLabel,
+		currentIdentityStorageLabel,
 		serializeIdentities(identities),
 		identitiesStore
 	);
@@ -183,11 +146,11 @@ async function storagePushValue(key, value) {
 }
 
 export async function loadToCAndPPConfirmation() {
-	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v3');
+	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v4');
 
 	return !!result;
 }
 
 export async function saveToCAndPPConfirmation() {
-	await AsyncStorage.setItem('ToCAndPPConfirmation_v3', 'yes');
+	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
 }

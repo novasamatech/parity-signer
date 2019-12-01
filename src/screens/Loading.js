@@ -23,9 +23,15 @@ import colors from '../colors';
 import { generateAccountId } from '../util/account';
 import {
 	loadAccounts,
+	loadIdentities,
 	loadToCAndPPConfirmation,
-	saveAccount
+	saveAccount,
+	saveIdentities
 } from '../util/db';
+import {
+	extractAddressFromAccountId,
+	isEthereumAccountId
+} from '../util/identitiesUtils';
 
 export default class Loading extends React.PureComponent {
 	async componentDidMount() {
@@ -33,10 +39,48 @@ export default class Loading extends React.PureComponent {
 		const { navigate } = this.props.navigation;
 		if (!tocPP) {
 			this.migrateAccounts();
+			this.migrateIdentity();
 			navigate('TocAndPrivacyPolicy');
 		} else {
 			navigate('Welcome');
 		}
+	}
+
+	// TODO migrate identities only on internal test devices, remove them in v4.1
+	async migrateIdentity() {
+		const identities = await loadIdentities(3);
+
+		const migrationIdentityFunction = identity => {
+			const getAddressKey = accountId =>
+				isEthereumAccountId(accountId)
+					? accountId
+					: extractAddressFromAccountId(accountId);
+
+			if (identity.hasOwnProperty('addresses')) {
+				return identity;
+			}
+			const addressMap = new Map();
+			identity.accountIds.forEach((path, accountId) => {
+				addressMap.set(getAddressKey(accountId), path);
+			});
+			identity.addresses = addressMap;
+			delete identity.accountIds;
+
+			const metaMap = new Map();
+			identity.meta.forEach((metaData, path) => {
+				if (metaData.hasOwnProperty('accountId')) {
+					const { accountId } = metaData;
+					metaData.address = getAddressKey(accountId);
+					delete metaData.accountId;
+					return metaMap.set(path, metaData);
+				}
+				metaMap.set(path, metaData);
+			});
+			identity.meta = metaMap;
+
+			return identity;
+		};
+		saveIdentities(identities.map(migrationIdentityFunction));
 	}
 
 	async migrateAccounts() {
