@@ -54,15 +54,23 @@ const NetworkFooter = ({ networkColor, network }) => (
 	/>
 );
 
+NetworkCard.propTypes = {
+	isAdd: PropTypes.bool,
+	networkColor: PropTypes.string,
+	networkKey: PropTypes.string,
+	onPress: PropTypes.func.isRequired,
+	testID: PropTypes.string,
+	title: PropTypes.string.isRequired
+};
+
 export function NetworkCard({
 	isAdd,
-	networkKey,
 	networkColor,
+	networkKey,
 	onPress,
-	title,
-	testID
+	testID,
+	title
 }) {
-	const displayTitle = title.length ? title : '';
 	const network =
 		NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
 
@@ -88,7 +96,7 @@ export function NetworkCard({
 					/>
 				)}
 				<View style={styles.desc}>
-					<AccountPrefixedTitle title={displayTitle} />
+					<AccountPrefixedTitle title={title} />
 				</View>
 				<NetworkFooter network={network} networkColor={networkColor} />
 			</View>

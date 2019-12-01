@@ -20,7 +20,7 @@ import Identicon from '@polkadot/reactnative-identicon';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import colors from '../colors';
@@ -75,7 +75,7 @@ export default function AccountIcon(props) {
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <MaterialIcons color={colors.bg_text} name={'error'} size={44} />;
+		return <MaterialIcon color={colors.bg_text} name={'error'} size={44} />;
 	}
 }
 
