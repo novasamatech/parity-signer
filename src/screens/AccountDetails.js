@@ -18,13 +18,10 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
-import AccountsStore from '../stores/AccountsStore';
-import TxStore from '../stores/TxStore';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { alertDeleteAccount } from '../util/alertUtils';
@@ -34,36 +31,25 @@ import {
 } from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
 import UnknownAccountWarning from '../components/UnknownAccountWarning';
+import { withAccountStore } from '../util/HOC';
 
-export default class AccountDetails extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[AccountsStore, TxStore]}>
-				{(accounts, txStore) => (
-					<AccountDetailsView
-						{...this.props}
-						txStore={txStore}
-						accounts={accounts}
-						selected={accounts.getSelected() && accounts.getSelected().address}
-					/>
-				)}
-			</Subscribe>
-		);
-	}
-}
+export default withAccountStore(AccountDetails);
 
-class AccountDetailsView extends React.PureComponent {
-	constructor(props) {
-		super(props);
-	}
+function AccountDetails({ accounts, navigation }) {
+	const account = accounts.getSelected();
+	const selectedKey = accounts.getSelectedKey();
 
-	onDelete = () => {
-		const { accounts, navigation } = this.props;
-		const selected = accounts.getSelected();
-		const selectedKey = accounts.getSelectedKey();
+	if (!account) return null;
 
+	const protocol =
+		(account.networkKey &&
+			NETWORK_LIST[account.networkKey] &&
+			NETWORK_LIST[account.networkKey].protocol) ||
+		NetworkProtocols.UNKNOWN;
+
+	const onDelete = () => {
 		alertDeleteAccount(
-			selected.name || selected.address || 'this account',
+			account.name || account.address || 'this account',
 			async () => {
 				await accounts.deleteAccount(selectedKey);
 				if (accounts.getAccounts().size === 0) {
@@ -74,75 +60,57 @@ class AccountDetailsView extends React.PureComponent {
 		);
 	};
 
-	onOptionSelect = value => {
-		const navigate = this.props.navigation.navigate;
-
+	const onOptionSelect = value => {
 		if (value !== 'AccountEdit') {
-			navigate('AccountUnlock', {
+			navigation.navigate('AccountUnlock', {
 				next: value,
-				onDelete: this.onDelete
+				onDelete
 			});
 		} else {
-			navigate(value);
+			navigation.navigate(value);
 		}
 	};
 
-	render() {
-		const { accounts } = this.props;
-		const account = accounts.getSelected();
-		const selectedKey = accounts.getSelectedKey();
-
-		if (!account) {
-			return null;
-		}
-
-		const protocol =
-			(account.networkKey &&
-				NETWORK_LIST[account.networkKey] &&
-				NETWORK_LIST[account.networkKey].protocol) ||
-			NetworkProtocols.UNKNOWN;
-
-		return (
-			<ScrollView contentContainerStyle={styles.body}>
-				<View style={styles.bodyContent}>
-					<View style={styles.header}>
-						<Text style={fontStyles.h2}>Public Address</Text>
-						<View style={styles.menuView}>
-							<PopupMenu
-								onSelect={this.onOptionSelect}
-								menuTriggerIconName={'more-vert'}
-								menuItems={[
-									{ text: 'Edit', value: 'AccountEdit' },
-									{ text: 'Change Pin', value: 'AccountPin' },
-									{
-										text: 'View Recovery Phrase',
-										value: 'LegacyAccountBackup'
-									},
-									{
-										text: 'Delete',
-										textStyle: styles.deleteText,
-										value: 'AccountDelete'
-									}
-								]}
-							/>
-						</View>
+	return (
+		<ScrollView contentContainerStyle={styles.body}>
+			<View style={styles.bodyContent}>
+				<View style={styles.header}>
+					<Text style={fontStyles.h2}>Public Address</Text>
+					<View style={styles.menuView}>
+						<PopupMenu
+							onSelect={onOptionSelect}
+							menuTriggerIconName={'more-vert'}
+							menuItems={[
+								{ text: 'Edit', value: 'AccountEdit' },
+								{ text: 'Change Pin', value: 'AccountPin' },
+								{
+									text: 'View Recovery Phrase',
+									value: 'LegacyAccountBackup'
+								},
+								{
+									text: 'Delete',
+									textStyle: styles.deleteText,
+									value: 'AccountDelete'
+								}
+							]}
+						/>
 					</View>
 				</View>
-				<AccountCard
-					address={account.address}
-					networkKey={account.networkKey}
-					title={account.name}
-				/>
-				<View>
-					{protocol !== NetworkProtocols.UNKNOWN ? (
-						<QrView data={selectedKey} />
-					) : (
-						<UnknownAccountWarning />
-					)}
-				</View>
-			</ScrollView>
-		);
-	}
+			</View>
+			<AccountCard
+				address={account.address}
+				networkKey={account.networkKey}
+				title={account.name}
+			/>
+			<View>
+				{protocol !== NetworkProtocols.UNKNOWN ? (
+					<QrView data={selectedKey} />
+				) : (
+					<UnknownAccountWarning />
+				)}
+			</View>
+		</ScrollView>
+	);
 }
 
 const styles = StyleSheet.create({
