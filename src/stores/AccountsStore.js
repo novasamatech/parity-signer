@@ -39,6 +39,7 @@ import {
 	deepCopyIdentities,
 	deepCopyIdentity,
 	emptyIdentity,
+	extractAddressFromAccountId,
 	getAddressKeyByPath,
 	getNetworkKeyByPath,
 	isEthereumAccountId
@@ -290,7 +291,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const networkProtocol = accountId.split(':')[0];
 		const searchAddress =
 			networkProtocol === NetworkProtocols.SUBSTRATE
-				? accountId.slice(':')[1]
+				? extractAddressFromAccountId(accountId)
 				: accountId;
 		return this.state.identities.find(identity =>
 			identity.addresses.has(searchAddress)

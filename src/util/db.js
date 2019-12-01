@@ -73,13 +73,15 @@ export async function loadIdentities(version = 3) {
 			identitiesStore
 		);
 		if (!identities) return [];
-		// TODO migrate identities on test devices, remove them in v4.1
 		const identitiesObject = deserializeIdentities(identities);
+		// TODO migrate identities on test devices, remove them in v4.1
+
 		const migrationIdentityFunction = identity => {
 			const getAddressKey = accountId =>
 				isEthereumAccountId(accountId)
 					? accountId
 					: extractAddressFromAccountId(accountId);
+
 			if (identity.hasOwnProperty('addresses')) {
 				return identity;
 			}

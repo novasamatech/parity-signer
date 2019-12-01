@@ -42,6 +42,7 @@ import { generateAccountId } from '../util/account';
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
 	const address = getAddressWithPath(path, currentIdentity);
+	if (!address) return null;
 	const accountId = generateAccountId({
 		address,
 		networkKey: getNetworkKeyByPath(path)
