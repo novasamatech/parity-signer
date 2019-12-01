@@ -131,8 +131,8 @@ export default function PathCard({
 		</View>
 	);
 
-	return network.protocol === NetworkProtocols.SUBSTRATE ||
-		NetworkProtocols.UNKNOWN
+	return network.protocol ===
+		(NetworkProtocols.SUBSTRATE || NetworkProtocols.UNKNOWN)
 		? substrateDerivationCard
 		: nonSubstrateCard;
 }
