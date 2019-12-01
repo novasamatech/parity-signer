@@ -38,10 +38,7 @@ import { emptyAccount, validateSeed } from '../util/account';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress } from '../util/native';
 import { constructSURI } from '../util/suri';
-import {
-	alertErrorWithMessage,
-	alertInvalidSeedRecovery
-} from '../util/alertUtils';
+import { alertErrorWithMessage, alertRisks } from '../util/alertUtils';
 
 export default class AccountRecover extends React.PureComponent {
 	render() {
@@ -173,7 +170,11 @@ class AccountRecoverView extends React.PureComponent {
 
 		if (!validation.valid) {
 			if (validation.accountRecoveryAllowed) {
-				return alertInvalidSeedRecovery(`${validation.reason}`, navigation);
+				return alertRisks(`${validation.reason}`, () =>
+					navigation.navigate('AccountPin', {
+						isNew: true
+					})
+				);
 			} else {
 				return alertErrorWithMessage(`${validation.reason}`, 'Back');
 			}
