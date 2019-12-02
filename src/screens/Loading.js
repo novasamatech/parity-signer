@@ -70,7 +70,7 @@ export default class Loading extends React.PureComponent {
 			identity.meta.forEach((metaData, path) => {
 				if (metaData.hasOwnProperty('accountId')) {
 					const { accountId } = metaData;
-					metaData.address = getAddressKey(accountId);
+					metaData.address = extractAddressFromAccountId(accountId);
 					delete metaData.accountId;
 					return metaMap.set(path, metaData);
 				}

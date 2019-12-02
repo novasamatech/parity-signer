@@ -127,6 +127,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async refreshList() {
 		const accounts = await loadAccounts();
 		const identities = await loadIdentities();
+		console.log('accounts are', accounts, 'identities', identities);
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
 		this.setState({ accounts, currentIdentity, identities, loaded: true });
@@ -203,7 +204,19 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	getAccountWithoutCaseSensitive(accountId) {
 		let findLegacyAccount = null;
 		for (const [key, value] of this.state.accounts) {
-			if (key.toLowerCase() === accountId.toLowerCase()) {
+			if (isEthereumAccountId(accountId)) {
+				if (key.toLowerCase() === accountId.toLowerCase()) {
+					findLegacyAccount = value;
+					break;
+				}
+			} else if (key === accountId) {
+				findLegacyAccount = value;
+				break;
+			} else if (
+				//backward compatible with hard spoon substrate key pairs
+				extractAddressFromAccountId(key) ===
+				extractAddressFromAccountId(accountId)
+			) {
 				findLegacyAccount = value;
 				break;
 			}

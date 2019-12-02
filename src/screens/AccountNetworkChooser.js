@@ -48,7 +48,10 @@ import { NetworkCard } from '../components/AccountCard';
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
+	const excludedNetworks = [
+		UnknownNetworkKeys.UNKNOWN,
+		SubstrateNetworkKeys.KUSAMA_CC2
+	];
 	if (!__DEV__) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
