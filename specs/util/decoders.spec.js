@@ -47,7 +47,7 @@ const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 
-const KUSAMA_ADDRESS = 'DFmfqkFcLPpvr2o15eE1tUhpydfd3SuahV3RbCfCbEtctB3';
+const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
 
 const metadata = new Metadata(kusamaData);
