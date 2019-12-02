@@ -28,9 +28,9 @@
  *
  * @return {any}            the debounced function
  */
-export function debounce(fn, time) {
-	let timeout;
+let timeout;
 
+export function debounce(fn, time) {
 	return function() {
 		const functionCall = () => fn.apply(this, arguments);
 

@@ -35,7 +35,7 @@
  * @returns {SURIObject}
  */
 export function parseSURI(suri) {
-	const RE_CAPTURE = /^(\w+(?: \w+)*)?(.*)$/;
+	const RE_CAPTURE = /^([\w ]+(?: +\w*)*)?(.*)$/;
 	const matches = suri.match(RE_CAPTURE);
 	let phrase,
 		parsedDerivationPath,
