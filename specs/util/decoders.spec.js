@@ -20,9 +20,9 @@ import '@polkadot/types/injector';
 import {
 	createType,
 	GenericExtrinsicPayload,
-	GenericCall,
-	Metadata
+	GenericCall
 } from '@polkadot/types';
+import MetaData from '@polkadot/metadata';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
@@ -50,7 +50,7 @@ const CMD_SIGN_MSG = new Uint8Array([3]);
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
 
-const metadata = new Metadata(kusamaData);
+const metadata = new MetaData(kusamaData);
 GenericCall.injectMetadata(metadata);
 
 const RN_TX_REQUEST_RAW_DATA =

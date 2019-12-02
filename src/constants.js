@@ -44,7 +44,7 @@ export const EthereumNetworkKeys = Object.freeze({
 
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys = Object.freeze({
-	KUSAMA: '0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636', // https://polkascan.io/pre/kusama-cc2/block/0
+	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc2/block/0
 	KUSAMA_DEV:
 		'0x17fcbdfd61fa90f732628a6fa9c416a011d58a2c7a980472e6a0868c87b60e44',
 	SUBSTRATE_DEV:
@@ -66,9 +66,9 @@ const substrateNetworkBase = {
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('../res/img/logos/kusama.png'),
-		pathId: 'kusama_CC2',
+		pathId: 'kusama',
 		prefix: 2,
-		title: 'Kusama CC2',
+		title: 'Kusama',
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {

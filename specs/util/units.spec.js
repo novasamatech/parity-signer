@@ -18,7 +18,8 @@
 
 import '@polkadot/types/injector';
 
-import { GenericCall, Metadata } from '@polkadot/types';
+import { GenericCall } from '@polkadot/types';
+import Metadata from '@polkadot/metadata';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 

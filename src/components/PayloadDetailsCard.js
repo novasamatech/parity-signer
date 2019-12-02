@@ -18,7 +18,8 @@
 
 'use strict';
 
-import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
+import { GenericCall, getTypeRegistry } from '@polkadot/types';
+import Metadata from '@polkadot/metadata';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
