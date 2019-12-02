@@ -27,6 +27,10 @@ import Separator from './Separator';
 import { withAccountStore } from '../util/HOC';
 import { getIdentityName } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
+import {
+	navigateToLegacyAccountList,
+	resetNavigationTo
+} from '../util/navigationHelpers';
 
 function IdentitiesSwitch({ navigation, accounts }) {
 	const defaultVisible = navigation.getParam('isSwitchOpen', false);
@@ -44,12 +48,14 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		params
 	) => {
 		await accounts.selectIdentity(identity);
-		closeModalAndNavigate(screenName, params);
+		setVisible(false);
+		resetNavigationTo(navigation, screenName, params);
 	};
 
 	const onLegacyListClicked = async () => {
 		await accounts.resetCurrentIdentity();
-		closeModalAndNavigate('LegacyAccountList');
+		setVisible(false);
+		navigateToLegacyAccountList(navigation);
 	};
 
 	const renderIdentityOptions = identity => {

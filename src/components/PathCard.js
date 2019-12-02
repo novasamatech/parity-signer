@@ -21,19 +21,18 @@ import PropTypes from 'prop-types';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import {
-	getAccountIdWithPath,
-	getAddressFromAccountId,
+	getAddressWithPath,
 	getNetworkKeyByPath,
 	getPathName
 } from '../util/identitiesUtils';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import Separator from '../components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
-import { AccountPrefixedTitle } from './AccountPrefixedTitle';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
 
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
@@ -54,11 +53,10 @@ export default function PathCard({
 }) {
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
-	const accountId = getAccountIdWithPath(path, identity);
+	const address = getAddressWithPath(path, identity);
 
 	const networkKey = getNetworkKeyByPath(path);
 	const network = NETWORK_LIST[networkKey];
-	const extractAddress = getAddressFromAccountId(accountId, network.protocol);
 
 	const nonSubstrateCard = (
 		<View testID={testID}>
@@ -72,7 +70,7 @@ export default function PathCard({
 			/>
 			<View style={styles.content}>
 				<AccountIcon
-					address={extractAddress}
+					address={address}
 					protocol={network.protocol}
 					network={network}
 					style={styles.icon}
@@ -84,7 +82,7 @@ export default function PathCard({
 						</Text>
 					</View>
 					<AccountPrefixedTitle title={pathName} titlePrefix={titlePrefix} />
-					<Address address={extractAddress} protocol={network.protocol} />
+					<Address address={address} protocol={network.protocol} />
 				</View>
 				<View
 					style={[
@@ -107,7 +105,7 @@ export default function PathCard({
 			>
 				<View style={[styles.content, styles.contentDer]}>
 					<AccountIcon
-						address={extractAddress}
+						address={address}
 						protocol={network.protocol}
 						network={network}
 						style={styles.icon}
@@ -118,13 +116,13 @@ export default function PathCard({
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
 							<Text style={fontStyles.t_codeS}>{path}</Text>
 						</View>
-						{extractAddress !== '' && (
+						{address !== '' && (
 							<Text
 								style={fontStyles.t_codeS}
 								ellipsizeMode="middle"
 								numberOfLines={1}
 							>
-								{extractAddress}
+								{address}
 							</Text>
 						)}
 					</View>
@@ -133,7 +131,8 @@ export default function PathCard({
 		</View>
 	);
 
-	return network.protocol === 'substrate'
+	return network.protocol === NetworkProtocols.SUBSTRATE ||
+		network.protocol === NetworkProtocols.UNKNOWN
 		? substrateDerivationCard
 		: nonSubstrateCard;
 }

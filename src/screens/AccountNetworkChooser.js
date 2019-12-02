@@ -21,7 +21,6 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
-import AccountCard from '../components/AccountCard';
 import Button from '../components/Button';
 import {
 	NETWORK_LIST,
@@ -36,7 +35,7 @@ import {
 import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
 import {
-	getAvailableNetworkKeys,
+	getExistedNetworkKeys,
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
@@ -44,11 +43,15 @@ import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
 import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
+import { NetworkCard } from '../components/AccountCard';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
+	const excludedNetworks = [
+		UnknownNetworkKeys.UNKNOWN,
+		SubstrateNetworkKeys.KUSAMA_CC2
+	];
 	if (!__DEV__) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
@@ -105,10 +108,11 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		networkParams.protocol !== NetworkProtocols.SUBSTRATE ? 1 : -1;
 
 	const getNetworkKeys = ([networkKey]) => {
-		const availableNetworks = getAvailableNetworkKeys(currentIdentity);
-		if (excludedNetworks.includes(networkKey)) return false;
-		if (isNew) return true;
+		const shouldExclude = excludedNetworks.includes(networkKey);
+		if (isNew && !shouldExclude) return true;
+		const availableNetworks = getExistedNetworkKeys(currentIdentity);
 		if (shouldShowMoreNetworks) {
+			if (shouldExclude) return false;
 			return !availableNetworks.includes(networkKey);
 		}
 		return availableNetworks.includes(networkKey);
@@ -149,9 +153,8 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		if (!shouldShowMoreNetworks) {
 			return (
 				<>
-					<AccountCard
+					<NetworkCard
 						isAdd={true}
-						isNetworkCard={true}
 						onPress={() => setShouldShowMoreNetworks(true)}
 						title="Add Network Account"
 						networkColor={colors.bg}
@@ -202,16 +205,19 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					return navigation.navigate('PathDerivation', {
 						networkKey
 					});
-			} else if (!paths.includes(networkKey)) {
+			} else if (
+				networkParams.protocol === NetworkProtocols.ETHEREUM &&
+				!paths.includes(networkKey)
+			) {
 				return await deriveEthereumAccount(networkKey);
 			}
 			navigation.navigate('PathsList', { networkKey });
 		}
 	};
 
-	if (!loaded || !currentIdentity) return <ScrollView style={styles.body} />;
-
+	if (!loaded) return <ScrollView style={styles.body} />;
 	if (identities.length === 0) return showOnboardingMessage();
+	if (!currentIdentity) return <ScrollView style={styles.body} />;
 
 	const networkList = Object.entries(NETWORK_LIST).filter(getNetworkKeys);
 	networkList.sort(sortNetworkKeys);
@@ -224,9 +230,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			{renderScreenHeading()}
 			<ScrollView>
 				{networkList.map(([networkKey, networkParams], index) => (
-					<AccountCard
-						isNetworkCard={true}
-						accountId={''}
+					<NetworkCard
 						key={networkKey}
 						testID={testIDs.AccountNetworkChooser.networkButton + index}
 						networkKey={networkKey}
