@@ -46,7 +46,7 @@ const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 const registry = new TypeRegistry();
-registry.setMetadata(new MetaData(registry, kusamaData));
+new MetaData(registry, kusamaData);
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';

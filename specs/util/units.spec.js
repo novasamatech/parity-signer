@@ -25,7 +25,7 @@ import kusamaData from '../../src/util/static-kusama';
 import { fromWei } from '../../src/util/units';
 const registry = new TypeRegistry();
 
-registry.setMetadata(new MetaData(registry, kusamaData));
+new MetaData(registry, kusamaData);
 
 describe('units', () => {
 	describe('ethereum', () => {
