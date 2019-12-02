@@ -18,7 +18,7 @@
 
 'use strict';
 
-import { GenericExtrinsicPayload } from '@polkadot/types';
+import { GenericExtrinsicPayload, TypeRegistry } from '@polkadot/types';
 import {
 	hexStripPrefix,
 	hexToU8a,
@@ -52,6 +52,8 @@ import {
   --- SQRC Filler Bytes
   ec11ec11ec11ec // SQRC filler bytes
   */
+
+const registry = new TypeRegistry();
 export function rawDataToU8A(rawData) {
 	if (!rawData) {
 		return null;
@@ -170,10 +172,13 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 					switch (secondByte) {
 						case '00': // sign mortal extrinsic
 						case '02': // sign immortal extrinsic
-							extrinsicPayload = new GenericExtrinsicPayload(rawPayload, {
-								version: 4
-							});
-
+							extrinsicPayload = new GenericExtrinsicPayload(
+								registry,
+								rawPayload,
+								{
+									version: 4
+								}
+							);
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;
