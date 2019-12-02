@@ -18,11 +18,7 @@
 
 import { Container } from 'unstated';
 
-import {
-	emptyAccount,
-	extractAddressFromAccountId,
-	generateAccountId
-} from '../util/account';
+import { emptyAccount, generateAccountId } from '../util/account';
 import {
 	loadAccounts,
 	saveAccount,
@@ -37,13 +33,16 @@ import {
 	encryptData,
 	substrateAddress
 } from '../util/native';
-import { NETWORK_LIST } from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import type { AccountsStoreState } from './types';
 import {
 	deepCopyIdentities,
 	deepCopyIdentity,
 	emptyIdentity,
-	getNetworkKeyByPath
+	extractAddressFromAccountId,
+	getAddressKeyByPath,
+	getNetworkKeyByPath,
+	isEthereumAccountId
 } from '../util/identitiesUtils';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
@@ -101,12 +100,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		if (updatedCurrentIdentity.meta.has(ethereumChainId)) return false;
 		updatedCurrentIdentity.meta.set(ethereumChainId, {
-			accountId,
+			address: ethereumAddress.address,
 			createdAt: new Date().getTime(),
 			name: '',
 			updatedAt: new Date().getTime()
 		});
-		updatedCurrentIdentity.accountIds.set(accountId, ethereumChainId);
+		updatedCurrentIdentity.addresses.set(accountId, ethereumChainId);
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
@@ -204,7 +203,19 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	getAccountWithoutCaseSensitive(accountId) {
 		let findLegacyAccount = null;
 		for (const [key, value] of this.state.accounts) {
-			if (key.toLowerCase() === accountId.toLowerCase()) {
+			if (isEthereumAccountId(accountId)) {
+				if (key.toLowerCase() === accountId.toLowerCase()) {
+					findLegacyAccount = value;
+					break;
+				}
+			} else if (key === accountId) {
+				findLegacyAccount = value;
+				break;
+			} else if (
+				//backward compatible with hard spoon substrate key pairs
+				extractAddressFromAccountId(key) ===
+				extractAddressFromAccountId(accountId)
+			) {
 				findLegacyAccount = value;
 				break;
 			}
@@ -225,20 +236,28 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetPath = null;
 		let targetIdentity = null;
+		let targetAccountId = null;
 		for (const identity of this.state.identities) {
-			const searchList = Array.from(identity.accountIds.entries());
-			for (const [accountId, path] of searchList) {
-				const searchAccountIdOrAddress = isAccountId
-					? accountId
-					: extractAddressFromAccountId(accountId);
-				const found =
-					accountId.indexOf('ethereum:') === 0
-						? searchAccountIdOrAddress.toLowerCase() ===
-						  accountIdOrAddress.toLowerCase()
-						: searchAccountIdOrAddress === accountIdOrAddress;
+			const searchList = Array.from(identity.addresses.entries());
+			for (const [addressKey, path] of searchList) {
+				const networkKey = getNetworkKeyByPath(path);
+				let accountId, address;
+				if (isEthereumAccountId(addressKey)) {
+					accountId = addressKey;
+					address = extractAddressFromAccountId(addressKey);
+				} else {
+					accountId = generateAccountId({ address: addressKey, networkKey });
+					address = addressKey;
+				}
+				const searchAccountIdOrAddress = isAccountId ? accountId : address;
+				const found = isEthereumAccountId(accountId)
+					? searchAccountIdOrAddress.toLowerCase() ===
+					  accountIdOrAddress.toLowerCase()
+					: searchAccountIdOrAddress === accountIdOrAddress;
 				if (found) {
 					targetPath = path;
 					targetIdentity = identity;
+					targetAccountId = accountId;
 					break;
 				}
 			}
@@ -251,6 +270,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const networkKey = getNetworkKeyByPath(targetPath);
 		return {
 			...metaData,
+			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
 			isBip39: true,
 			isLegacy: false,
@@ -285,8 +305,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	getIdentityByAccountId(accountId) {
+		const networkProtocol = accountId.split(':')[0];
+		const searchAddress =
+			networkProtocol === NetworkProtocols.SUBSTRATE
+				? extractAddressFromAccountId(accountId)
+				: accountId;
 		return this.state.identities.find(identity =>
-			identity.accountIds.has(accountId)
+			identity.addresses.has(searchAddress)
 		);
 	}
 
@@ -388,22 +413,22 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 		if (address === '') return false;
 		if (updatedCurrentIdentity.meta.has(newPath)) return false;
-		const accountId = generateAccountId({ address, networkKey });
 		updatedCurrentIdentity.meta.set(newPath, {
-			accountId,
+			address,
 			createdAt: new Date().getTime(),
 			name,
 			updatedAt: new Date().getTime()
 		});
-		updatedCurrentIdentity.accountIds.set(accountId, newPath);
+		updatedCurrentIdentity.addresses.set(address, newPath);
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
 	async deletePath(path) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const { accountId } = updatedCurrentIdentity.meta.get(path);
+		const { address } = updatedCurrentIdentity.meta.get(path);
 		updatedCurrentIdentity.meta.delete(path);
-		updatedCurrentIdentity.accountIds.delete(accountId);
+		updatedCurrentIdentity.addresses.delete(getAddressKeyByPath(address, path));
+
 		try {
 			await this.setState({
 				currentIdentity: updatedCurrentIdentity
