@@ -18,7 +18,8 @@
 
 'use strict';
 
-import { GenericCall, getTypeRegistry, Metadata } from '@polkadot/types';
+import { TypeRegistry } from '@polkadot/types';
+import MetaData from '@polkadot/metadata';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
@@ -35,6 +36,8 @@ import { shortString } from '../util/strings';
 import fontStyles from '../fontStyles';
 import { alertDecodeError } from '../util/alertUtils';
 
+const registry = new TypeRegistry();
+
 export default class PayloadDetailsCard extends React.PureComponent {
 	static propTypes = {
 		description: PropTypes.string,
@@ -44,13 +47,8 @@ export default class PayloadDetailsCard extends React.PureComponent {
 		style: ViewPropTypes.style
 	};
 
-	state = {
-		fallback: false
-	};
-
 	constructor(props) {
 		super(props);
-
 		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
 		const isKusama =
 			this.props.prefix ===
@@ -62,33 +60,23 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
 		let metadata;
 		if (isKusama) {
-			metadata = new Metadata(kusamaMetadata);
-
+			metadata = new MetaData(registry, kusamaMetadata);
+			// registry.setMetadata(metaData);
 			formatBalance.setDefaults({
 				decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
 				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
 			});
 		} else if (__DEV__ && isSubstrateDev) {
-			metadata = new Metadata(substrateDevMetadata);
-
+			metadata = new MetaData(registry, substrateDevMetadata);
 			formatBalance.setDefaults({
 				decimals:
 					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
 				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].unit
 			});
 		}
-
-		if (!metadata) {
-			this.setState({
-				fallback: true
-			});
-		}
-
-		getTypeRegistry().register({
-			Keys: 'SessionKeysPolkadot'
-		});
-
-		GenericCall.injectMetadata(metadata);
+		this.state = {
+			fallback: !metadata
+		};
 	}
 
 	render() {
@@ -153,7 +141,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 	useEffect(() => {
 		if (label === 'Method' && !fallback) {
 			try {
-				const call = new Call(value);
+				const call = new Call(registry, value);
 
 				let methodArgs = {};
 

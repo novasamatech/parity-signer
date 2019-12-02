@@ -15,14 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 'use strict';
-import '@polkadot/types/injector';
 
 import {
 	createType,
 	GenericExtrinsicPayload,
-	GenericCall,
-	Metadata
+	TypeRegistry
 } from '@polkadot/types';
+import MetaData from '@polkadot/metadata';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
@@ -46,12 +45,11 @@ const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
+const registry = new TypeRegistry();
+new MetaData(registry, kusamaData);
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
-
-const metadata = new Metadata(kusamaData);
-GenericCall.injectMetadata(metadata);
 
 const RN_TX_REQUEST_RAW_DATA =
 	'4' + // indicates data is binary encoded
@@ -82,7 +80,7 @@ const SIGNER_PAYLOAD_TEST = {
 	blockHash:
 		'0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
 	blockNumber: '0x231d30',
-	era: createType('ExtrinsicEra', { current: 2301232, period: 200 }),
+	era: createType(registry, 'ExtrinsicEra', { current: 2301232, period: 200 }),
 	genesisHash: SubstrateNetworkKeys.KUSAMA,
 	method:
 		'0x0600ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
@@ -97,7 +95,9 @@ const SIGN_TX_TEST = u8aConcat(
 	CRYPTO_SR25519,
 	CMD_SIGN_MORTAL,
 	decodeAddress(KUSAMA_ADDRESS),
-	new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, { version: 4 }).toU8a()
+	new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, {
+		version: 4
+	}).toU8a()
 );
 
 /* eslint-disable-next-line jest/no-disabled-tests */
@@ -107,10 +107,10 @@ describe.skip('sanity check', () => {
 	});
 
 	it('sanity check payload encodes as expected', () => {
-		const payload = new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, {
+		const payload = new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, {
 			version: 4
 		});
-		const fromBytes = new GenericExtrinsicPayload(payload.toU8a(), {
+		const fromBytes = new GenericExtrinsicPayload(registry, payload.toU8a(), {
 			version: 4
 		});
 
@@ -213,11 +213,15 @@ describe('decoders', () => {
 		});
 
 		it('decodes Payload Method to something human readable with Kusama metadata', () => {
-			const payload = new GenericExtrinsicPayload(SIGNER_PAYLOAD_TEST, {
-				version: 4
-			});
+			const payload = new GenericExtrinsicPayload(
+				registry,
+				SIGNER_PAYLOAD_TEST,
+				{
+					version: 4
+				}
+			);
 
-			const call = new Call(payload.method);
+			const call = new Call(registry, payload.method);
 
 			expect(call).toBeDefined();
 			expect(call.args).toBeDefined();
