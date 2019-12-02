@@ -108,10 +108,11 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		networkParams.protocol !== NetworkProtocols.SUBSTRATE ? 1 : -1;
 
 	const getNetworkKeys = ([networkKey]) => {
+		const shouldExclude = excludedNetworks.includes(networkKey);
+		if (isNew && !shouldExclude) return true;
 		const availableNetworks = getExistedNetworkKeys(currentIdentity);
-		if (isNew) return true;
 		if (shouldShowMoreNetworks) {
-			if (excludedNetworks.includes(networkKey)) return false;
+			if (shouldExclude) return false;
 			return !availableNetworks.includes(networkKey);
 		}
 		return availableNetworks.includes(networkKey);
