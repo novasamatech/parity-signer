@@ -20,7 +20,6 @@ import XCTest
 @testable import NativeSigner
 
 let TEST_APP = "TEST_APP";
-let NOT_TEST_APP = "NOT_TEST_APP";
 let TEST_KEY = "TEST_KEY";
 let NOT_TEST_KEY = "NOT_TEST_KEY";
 let TEST_PIN = "42";
@@ -29,7 +28,7 @@ class SecureNativeTests: XCTestCase {
   let ethkey = EthkeyBridge();
   
   func testFailsWithoutBiometricAuth() {
-    let expectation = XCTestExpectation(description: "Pin corresponds to key");
+    let expectation = XCTestExpectation(description: "Pin corresponds to TEST_APP, key");
     self.ethkey.secureContains(TEST_APP, key: TEST_KEY, resolve: { (result: Any?) -> Void in
       XCTAssert(result as! UInt8 == 0);
       self.ethkey.securePut(TEST_APP, key: TEST_KEY, seed: TEST_PIN, withBiometry: 1, resolve: { (result: Any) in
@@ -44,7 +43,7 @@ class SecureNativeTests: XCTestCase {
   }
   
   func testPinCorrespondsToKey() {
-    let expectation = XCTestExpectation(description: "Pin corresponds to key");
+    let expectation = XCTestExpectation(description: "Pin corresponds to TEST_APP, key");
     self.ethkey.secureContains(TEST_APP, key: TEST_KEY, resolve: { (result: Any?) -> Void in
       XCTAssert(result as! UInt8 == 0);
       self.ethkey.securePut(TEST_APP, key: TEST_KEY, seed: TEST_PIN, withBiometry: 0, resolve: { (result: Any) in
@@ -64,7 +63,7 @@ class SecureNativeTests: XCTestCase {
   }
   
   func testPinDoesNotCorrespondToADifferentKey() {
-    let expectation = XCTestExpectation(description: "Pin does not correspond to a different key");
+    let expectation = XCTestExpectation(description: "Pin does not correspond to a different TEST_APP, key");
     self.ethkey.secureContains(TEST_APP, key: TEST_KEY, resolve: { (result: Any?) -> Void in
       XCTAssert(result as! UInt8 == 0);
       self.ethkey.securePut(TEST_APP, key: NOT_TEST_KEY, seed: TEST_PIN, withBiometry: 0, resolve: { (result: Any) in
@@ -85,7 +84,7 @@ class SecureNativeTests: XCTestCase {
   }
   
   func testFailsToDeleteNonExistentKey() {
-    let expectation = XCTestExpectation(description: "Correct failure deleting non-existent key");
+    let expectation = XCTestExpectation(description: "Correct failure deleting non-existent TEST_APP, key");
     self.ethkey.secureContains(TEST_APP, key: TEST_KEY, resolve: { (result: Any?) -> Void in
       XCTAssert(result as! UInt8 == 0);
       self.ethkey.securePut(TEST_APP, key: TEST_KEY, seed: TEST_PIN, withBiometry: 0, resolve: { (result: Any) in

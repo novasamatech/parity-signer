@@ -43,6 +43,7 @@ function IdentityPin({ navigation, accounts }) {
 	const [state, setState] = useState(initialState);
 	const updateState = delta => setState({ ...state, ...delta });
 	const isUnlock = navigation.getParam('isUnlock', false);
+	const resolvePin = navigation.getParam('resolvePin', false);
 
 	const submit = async () => {
 		const isIdentityCreation = navigation.getParam('isNew');
@@ -69,7 +70,7 @@ function IdentityPin({ navigation, accounts }) {
 				const resolve = navigation.getParam('resolve');
 				const seed = await unlockIdentitySeed(pin, identity);
 				setState(initialState);
-				resolve(seed);
+				resolve(resolvePin ? pin : seed);
 			} catch (e) {
 				updateState({ pin: '', pinMismatch: true });
 				//TODO record error times;

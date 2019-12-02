@@ -142,3 +142,13 @@ export const alertBackupDone = onPress =>
 			}
 		]
 	);
+
+export const alertBiometricError = (e, after) =>
+	Alert.alert('Biometric Error', e.message, [
+		{
+			onDismiss: after,
+			onPress: after,
+			style: 'default',
+			text: 'Ok'
+		}
+	]);

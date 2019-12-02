@@ -169,5 +169,3 @@ export const NETWORK_LIST = Object.freeze(
 		UNKNOWN_NETWORK
 	)
 );
-
-export const APP_ID = 'signer';

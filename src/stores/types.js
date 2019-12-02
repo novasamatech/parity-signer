@@ -40,12 +40,14 @@ type AccountMeta = {
 };
 
 export type Identity = {
+	accountIds: Map<string, string>,
+	biometricEnabled: boolean,
+	derivationPassword: string,
 	// encrypted seed include seedPhrase and password
 	encryptedSeed: string,
-	derivationPassword: string,
 	meta: Map<string, AccountMeta>,
-	accountIds: Map<string, string>,
-	name: string
+	name: string,
+	pinKey: string
 };
 
 export type AccountsStoreState = {

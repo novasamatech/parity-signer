@@ -28,6 +28,16 @@ export const unlockSeedPhrase = async (navigation, identity) =>
 		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
 	});
 
+export const unlockPin = async (navigation, identity) =>
+	new Promise(resolve => {
+		navigation.navigate('IdentityPin', {
+			identity,
+			isUnlock: true,
+			resolve,
+			resolvePin: true
+		});
+	});
+
 export const navigateToPathsList = (navigation, networkKey) => {
 	const resetAction = StackActions.reset({
 		actions: [

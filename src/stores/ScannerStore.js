@@ -30,8 +30,7 @@ import { Container } from 'unstated';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST,
-	APP_ID
+	SUBSTRATE_NETWORK_LIST
 } from '../constants';
 
 import { isAscii } from '../util/strings';
@@ -54,6 +53,7 @@ import {
 import { Account } from './types';
 import { constructSURI } from '../util/suri';
 import { emptyAccount } from '../util/account';
+import { alertBiometricError } from '../util/alertUtils';
 
 type TXRequest = Object;
 
@@ -409,6 +409,18 @@ export default class ScannerStore extends Container<ScannerState> {
 		return true;
 	}
 
+	getSignable(dataToSign, isHash) {
+		if (dataToSign instanceof GenericExtrinsicPayload) {
+			return u8aToHex(dataToSign.toU8a(true), -1, false);
+		} else if (isHash) {
+			return hexStripPrefix(dataToSign);
+		} else if (isU8a(dataToSign)) {
+			return hexStripPrefix(u8aToHex(dataToSign));
+		} else if (isAscii(dataToSign)) {
+			return hexStripPrefix(asciiToHex(dataToSign));
+		}
+	}
+
 	async signDataBiometric(legacy = false) {
 		const { dataToSign, isHash, sender } = this.state;
 
@@ -419,45 +431,34 @@ export default class ScannerStore extends Container<ScannerState> {
 		if (isEthereum) {
 			signable = dataToSign;
 		} else {
-			if (dataToSign instanceof GenericExtrinsicPayload) {
-				signable = u8aToHex(dataToSign.toU8a(true), -1, false);
-			} else if (isHash) {
-				signable = hexStripPrefix(dataToSign);
-			} else if (isU8a(dataToSign)) {
-				signable = hexStripPrefix(u8aToHex(dataToSign));
-			} else if (isAscii(dataToSign)) {
-				signable = hexStripPrefix(asciiToHex(dataToSign));
-			}
+			signable = this.getSignable(dataToSign, isHash);
 		}
 
-		let signedData;
 		try {
+			let signedDataPromise;
 			if (isEthereum) {
-				signedData = await secureEthkeySign(
-					APP_ID,
+				signedDataPromise = secureEthkeySign(
 					sender.pinKey,
 					signable,
 					sender.encryptedSeed
 				);
 			} else {
-				signedData = await secureSubstrateSign(
-					APP_ID,
+				signedDataPromise = secureSubstrateSign(
 					sender.pinKey,
 					signable,
 					sender.encryptedSeed,
 					legacy
-				);
+				).then(signed => {
+					// TODO: tweak the first byte if and when sig type is not sr25519
+					const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a('0x' + signed));
+					return u8aToHex(sig, -1, false); // the false doesn't add 0x
+				});
 			}
-
-			if (!isEthereum) {
-				// TODO: tweak the first byte if and when sig type is not sr25519
-				const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a('0x' + signedData));
-				signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
-			}
-
+			const signedData = await signedDataPromise;
 			this.setState({ signedData });
+			return true;
 		} catch (e) {
-			console.log(e);
+			alertBiometricError(e, () => {});
 			return false;
 		}
 	}
@@ -473,16 +474,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		if (isEthereum) {
 			signedData = await brainWalletSign(seed, dataToSign);
 		} else {
-			let signable;
-			if (dataToSign instanceof GenericExtrinsicPayload) {
-				signable = u8aToHex(dataToSign.toU8a(true), -1, false);
-			} else if (isHash) {
-				signable = hexStripPrefix(dataToSign);
-			} else if (isU8a(dataToSign)) {
-				signable = hexStripPrefix(u8aToHex(dataToSign));
-			} else if (isAscii(dataToSign)) {
-				signable = hexStripPrefix(asciiToHex(dataToSign));
-			}
+			let signable = this.getSignable(dataToSign, isHash);
 			let signed = await substrateSign(seed, signable);
 			signed = '0x' + signed;
 			// TODO: tweak the first byte if and when sig type is not sr25519

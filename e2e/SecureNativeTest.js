@@ -23,13 +23,12 @@ import {
 	secureGet,
 	securePut
 	//	secureSubstrateSign
-} from '../../src/util/native';
+} from '../src/util/native';
 import testIDs from '../testIDs';
 import Button from '../../src/components/Button';
 
 //const testSeed = ('0xf49cd2aa6bda43467abc6aa0a4f37c5b1378146855f80f491e5dd6d053fa4279');
 //const testPublicAddress = '0x5Cc5dc62be3c95C771C142C2e30358B398265de21111';
-const testApp = 'test_signer';
 const testKey = 'test_key';
 const testPin = '424242';
 
@@ -42,11 +41,12 @@ export default function SecureNativeTest() {
 			: setTestResult(false);
 
 	const runTest = async () => {
-		await securePut(testApp, testKey, testPin, 0);
-		generateTestResult(true, await secureContains(testApp, testKey));
-		generateTestResult(testPin, await secureGet(testApp, testKey));
-		await secureDelete(testApp, testKey);
-		generateTestResult(false, await secureContains(testApp, testKey));
+		await securePut(testKey, testPin, 0);
+		const a = await secureContains(testKey);
+		const b = await secureGet(testKey);
+		await secureDelete(testKey);
+		const c = await secureContains(testKey);
+		generateTestResult(true, a && b === testPin && !c);
 	};
 
 	const startTest = async () => {
@@ -59,13 +59,13 @@ export default function SecureNativeTest() {
 	};
 
 	return (
-		<View testID={testIDs.NativeTestScreen.nativeTestView}>
+		<View testID={testIDs.SecureNativeTest.nativeTestView}>
 			<Button
 				title="Start Test"
 				onPress={startTest}
-				testID={testIDs.NativeTestScreen.startButton}
+				testID={testIDs.SecureNativeTest.startButton}
 			/>
-			{testSucceed && <View testID={testIDs.NativeTestScreen.succeedView} />}
+			{testSucceed && <View testID={testIDs.SecureNativeTest.succeedView} />}
 		</View>
 	);
 }

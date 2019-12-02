@@ -41,7 +41,7 @@ import {
 	secureDelete,
 	substrateAddress
 } from '../util/native';
-import { APP_ID, NETWORK_LIST } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import type { AccountsStoreState } from './types';
 import {
 	deepCopyIdentities,
@@ -167,8 +167,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		accounts.delete(accountKey);
 		this.setState({ accounts, selectedKey: '' });
 		await deleteDbAccount(accountKey);
-		if (await secureContains(APP_ID, account.pinKey)) {
-			await secureDelete(APP_ID, account.pinKey);
+		if (await secureContains(account.pinKey)) {
+			await secureDelete(account.pinKey);
 		}
 	}
 
@@ -181,14 +181,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 
 		try {
-			const keyExists = await secureContains(APP_ID, account.pinKey);
+			const keyExists = await secureContains(account.pinKey);
 			if (!keyExists) {
 				throw {
 					message:
 						'Invalid state: biometry is enabled but no corresponding key found in storage.'
 				};
 			} else {
-				const pin = await secureGet(APP_ID, account.pinKey);
+				const pin = await secureGet(account.pinKey);
 				account.seed = await decryptData(account.encryptedSeed, pin);
 
 				const { phrase, derivePath, password } = parseSURI(account.seed);
@@ -335,7 +335,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async enableBiometric(accountKey, pin) {
 		const account = this.state.accounts.get(accountKey);
-		return securePut(APP_ID, account.pinKey, pin).then(() => {
+		return securePut(account.pinKey, pin).then(() => {
 			this.updateAccount(accountKey, { biometricEnabled: true });
 			return this.save(accountKey);
 		});
@@ -343,8 +343,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async disableBiometric(accountKey) {
 		const account = this.state.accounts.get(accountKey);
-		return secureDelete(APP_ID, account.pinKey)
-			.catch(e => console.log(e))
+		return secureDelete(account.pinKey)
+			.catch(e => {})
 			.finally(() => {
 				// incase delete failed, overwrite the pinKey and forget the encrypted pin
 				this.updateAccount(accountKey, {
@@ -356,12 +356,56 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async updateBiometric(accountKey, account, pin) {
-		return secureDelete(APP_ID, account.pinKey)
+		return secureDelete(account.pinKey)
 			.catch(e => {
-				console.log(e);
 				account.pinKey = v4();
 			})
-			.finally(() => securePut(APP_ID, account.pinKey, pin));
+			.finally(() => securePut(account.pinKey, pin));
+	}
+
+	async identityEnableBiometric(pin) {
+		return securePut(this.state.currentIdentity.pinKey, pin).then(async () => {
+			const updatedCurrentIdentity = deepCopyIdentity(
+				this.state.currentIdentity
+			);
+			updatedCurrentIdentity.biometricEnabled = true;
+			try {
+				await this.setState({ currentIdentity: updatedCurrentIdentity });
+				await this._updateIdentitiesWithCurrentIdentity();
+			} catch (e) {
+				console.warn('identity enable biometric error', e);
+			}
+		});
+	}
+
+	async identityDisableBiometric() {
+		const identity = deepCopyIdentity(this.state.currentIdentity);
+		return secureDelete(identity.pinKey).finally(async () => {
+			identity.biometricEnabled = false;
+			identity.pinKey = v4();
+			try {
+				await this.setState({ currentIdentity: identity });
+				await this._updateIdentitiesWithCurrentIdentity();
+			} catch (e) {
+				console.warn('identity enable biometric error', e);
+			}
+		});
+	}
+
+	async identityUpdateBiometric(pin) {
+		const identity = deepCopyIdentity(this.state.currentIdentity);
+		return secureDelete(identity.pinKey)
+			.catch(e => {
+				identity.pinKey = v4();
+			})
+			.finally(async () => {
+				try {
+					await this.setState({ currentIdentity: identity });
+					await this._updateIdentitiesWithCurrentIdentity();
+				} catch (e) {
+					console.warn('identity enable biometric error', e);
+				}
+			});
 	}
 
 	getIdentityByAccountId(accountId) {

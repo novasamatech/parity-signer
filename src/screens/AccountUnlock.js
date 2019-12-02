@@ -69,10 +69,53 @@ export class AccountUnlockAndSign extends React.PureComponent {
 }
 
 export class AccountUnlock extends React.PureComponent {
-	render() {
+	onToggleBiometric = async (pin, accounts) => {
+		this.props.navigation.goBack();
+		if (accounts.getSelected().biometricEnabled) {
+			await accounts.disableBiometric(accounts.getSelectedKey());
+		} else {
+			await accounts
+				.enableBiometric(accounts.getSelectedKey(), pin)
+				.catch(error => {
+					// error here is likely no fingerprints/biometrics enrolled, so should be displayed to the user
+					Alert.alert('Biometric Error', error.message, [
+						{
+							style: 'default',
+							text: 'Ok'
+						}
+					]);
+				});
+		}
+	};
+
+	onNavigate = async (pin, accounts) => {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'LegacyAccountList');
 
+		if (next === 'AccountBiometric') {
+			this.onToggleBiometric(pin, accounts);
+		} else if (next === 'AccountDelete') {
+			navigation.goBack();
+			navigation.state.params.onDelete();
+		} else {
+			const resetAction = StackActions.reset({
+				actions: [
+					NavigationActions.navigate({
+						routeName: 'LegacyAccountList'
+					}),
+					NavigationActions.navigate({ routeName: 'AccountDetails' }),
+					NavigationActions.navigate({
+						routeName: next
+					})
+				],
+				index: 2,
+				key: undefined // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
+			});
+			this.props.navigation.dispatch(resetAction);
+		}
+	};
+
+	render() {
 		return (
 			<Subscribe to={[AccountsStore]}>
 				{accounts => (
@@ -85,44 +128,7 @@ export class AccountUnlock extends React.PureComponent {
 							);
 						}}
 						navigate={async pin => {
-							if (next === 'AccountBiometric') {
-								navigation.goBack();
-								if (accounts.getSelected().biometricEnabled) {
-									await accounts.disableBiometric(accounts.getSelectedKey());
-								} else {
-									await accounts
-										.enableBiometric(accounts.getSelectedKey(), pin)
-										.catch(error => {
-											// error here is likely no fingerprints/biometrics enrolled, so should be displayed to the user
-											console.log(error);
-											Alert.alert('Biometric Error', error.message, [
-												{
-													style: 'default',
-													text: 'Ok'
-												}
-											]);
-										});
-								}
-							} else if (next === 'AccountDelete') {
-								navigation.goBack();
-								navigation.state.params.onDelete();
-							} else {
-								const resetAction = StackActions.reset({
-									actions: [
-										NavigationActions.navigate({
-											routeName: 'LegacyAccountList'
-										}),
-										NavigationActions.navigate({ routeName: 'AccountDetails' }),
-										NavigationActions.navigate({
-											params: next === 'AccountBiometric' ? { pin: pin } : {},
-											routeName: next
-										})
-									],
-									index: 2,
-									key: undefined // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-								});
-								this.props.navigation.dispatch(resetAction);
-							}
+							this.onNavigate(pin, accounts);
 						}}
 					/>
 				)}

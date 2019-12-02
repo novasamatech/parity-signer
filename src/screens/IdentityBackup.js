@@ -30,12 +30,14 @@ import {
 	setPin,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
+import { unlockIdentitySeedWithBiometric } from '../util/identitiesUtils';
 import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
 import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
 
 function IdentityBackup({ navigation, accounts }) {
+	const { currentIdentity } = accounts.state;
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const isNew = navigation.getParam('isNew', false);
 	const onBackupDone = async () => {
@@ -50,8 +52,19 @@ function IdentityBackup({ navigation, accounts }) {
 			if (isNew) {
 				setSeedPhrase(await words());
 			} else {
-				const backupSeedPhrase = await unlockSeedPhrase(navigation);
-				navigation.pop();
+				let backupSeedPhrase;
+				if (currentIdentity.biometricEnabled) {
+					try {
+						backupSeedPhrase = await unlockIdentitySeedWithBiometric(
+							currentIdentity
+						);
+					} catch (e) {
+						backupSeedPhrase = await unlockSeedPhrase(navigation);
+					}
+				} else {
+					backupSeedPhrase = await unlockSeedPhrase(navigation);
+				}
+				//				navigation.pop();
 				setSeedPhrase(backupSeedPhrase);
 			}
 		};
@@ -60,7 +73,7 @@ function IdentityBackup({ navigation, accounts }) {
 		return () => {
 			setSeedPhrase('');
 		};
-	}, [isNew, navigation]);
+	}, [accounts, currentIdentity, isNew, navigation]);
 
 	return (
 		<ScrollView style={styles.body}>

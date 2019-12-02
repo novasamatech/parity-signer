@@ -16,8 +16,11 @@
 
 'use strict';
 
-import { EthkeyBridge } from 'NativeModules';
+import { NativeModules } from 'react-native';
+const { EthkeyBridge } = NativeModules;
 import { checksummedAddress } from './checksum';
+
+const APP_ID = 'signer';
 
 /**
  * Turn an address string tagged with either 'legacy:' or 'bip39:' prefix
@@ -143,33 +146,27 @@ export function schnorrkelVerify(seed, message, signature) {
 
 /* secure native */
 
-export function securePut(app, key, value, withBiometry = 1) {
-	return EthkeyBridge.securePut(app, key, value, withBiometry);
+export function securePut(key, value, withBiometry = 1) {
+	return EthkeyBridge.securePut(APP_ID, key, value, withBiometry);
 }
 
-export function secureGet(app, key) {
-	return EthkeyBridge.secureGet(app, key);
+export function secureGet(key) {
+	return EthkeyBridge.secureGet(APP_ID, key);
 }
 
-export function secureContains(app, key) {
-	return EthkeyBridge.secureContains(app, key);
+export function secureContains(key) {
+	return EthkeyBridge.secureContains(APP_ID, key);
 }
 
-export function secureDelete(app, key) {
-	return EthkeyBridge.secureDelete(app, key);
+export function secureDelete(key) {
+	return EthkeyBridge.secureDelete(APP_ID, key);
 }
 
-export function secureEthkeySign(app, key, message, encrypted) {
-	return EthkeyBridge.secureEthkeySign(app, key, message, encrypted);
+export function secureEthkeySign(key, message, encrypted) {
+	return EthkeyBridge.secureEthkeySign(APP_ID, key, message, encrypted);
 }
 
 // Message is hex-encoded byte array.
-export function secureSubstrateSign(
-	app,
-	key,
-	message,
-	encrypted,
-	legacy = false
-) {
-	return EthkeyBridge.secureSubstrateSign(app, key, message, encrypted, legacy);
+export function secureSubstrateSign(key, message, encrypted, legacy = false) {
+	return EthkeyBridge.secureSubstrateSign(key, message, encrypted, legacy);
 }

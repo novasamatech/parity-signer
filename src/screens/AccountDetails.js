@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
@@ -27,7 +27,7 @@ import AccountsStore from '../stores/AccountsStore';
 import TxStore from '../stores/TxStore';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import { alertDeleteAccount } from '../util/alertUtils';
+import { alertBiometricError, alertDeleteAccount } from '../util/alertUtils';
 import {
 	navigateToLandingPage,
 	navigateToLegacyAccountList
@@ -56,67 +56,62 @@ class AccountDetailsView extends React.PureComponent {
 		super(props);
 	}
 
-	onDelete = () => {
+	onDelete = async () => {
 		const { accounts, navigation } = this.props;
-		const selected = accounts.getSelected();
 		const selectedKey = accounts.getSelectedKey();
 
-		alertDeleteAccount(
-			selected.name || selected.address || 'this account',
-			async () => {
-				await accounts.deleteAccount(selectedKey);
-				if (accounts.getAccounts().size === 0) {
-					return navigateToLandingPage(navigation);
-				}
-				navigateToLegacyAccountList(navigation);
+		await accounts.deleteAccount(selectedKey);
+		if (accounts.getAccounts().size === 0) {
+			return navigateToLandingPage(navigation);
+		}
+		navigateToLegacyAccountList(navigation);
+	};
+
+	noBiometric = async value => {
+		const { navigation } = this.props;
+		navigation.navigate('AccountUnlock', {
+			next: value,
+			onDelete: this.onDelete
+		});
+	};
+
+	withBiometric = async value => {
+		const { accounts, navigation } = this.props;
+		const selected = accounts.getSelected();
+		try {
+			const selectedKey = accounts.getSelectedKey();
+			if (value === 'AccountDelete') {
+				alertDeleteAccount(
+					selected.name || selected.address || 'this account',
+					async () => {
+						await accounts.unlockAccountWithBiometric(selectedKey);
+						await this.onDelete();
+					}
+				);
+			} else if (value === 'AccountBiometric') {
+				await accounts.unlockAccountWithBiometric(selectedKey);
+				await accounts.disableBiometric(selectedKey);
+			} else {
+				await accounts.unlockAccountWithBiometric(selectedKey);
+				navigation.navigate(value);
 			}
-		);
+		} catch (e) {
+			alertBiometricError(e, async () => {
+				await this.noBiometric(value);
+			});
+		}
 	};
 
 	onOptionSelect = async value => {
-		const navigate = this.props.navigation.navigate;
-		const accounts = this.props.accounts;
-
+		const { accounts, navigation } = this.props;
 		if (value !== 'AccountEdit') {
 			if (accounts.getSelected().biometricEnabled) {
-				try {
-					await accounts.unlockAccountWithBiometric(accounts.getSelectedKey());
-					if (value === 'AccountDelete') {
-						this.onDelete();
-					} else if (value === 'AccountBiometric') {
-						await accounts.disableBiometric(accounts.getSelectedKey());
-					} else {
-						navigate(value);
-					}
-				} catch (e) {
-					console.log(e);
-					Alert.alert('Biometric Error', e.message, [
-						{
-							onDismiss: () => {
-								navigate('AccountUnlock', {
-									next: value,
-									onDelete: this.onDelete
-								});
-							},
-							onPress: () => {
-								navigate('AccountUnlock', {
-									next: value,
-									onDelete: this.onDelete
-								});
-							},
-							style: 'default',
-							text: 'Ok'
-						}
-					]);
-				}
+				await this.withBiometric(value);
 			} else {
-				navigate('AccountUnlock', {
-					next: value,
-					onDelete: this.onDelete
-				});
+				await this.noBiometric(value);
 			}
 		} else {
-			navigate(value);
+			navigation.navigate('AccountEdit');
 		}
 	};
 

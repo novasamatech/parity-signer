@@ -24,12 +24,15 @@ import { withAccountStore } from '../util/HOC';
 import TextInput from '../components/TextInput';
 import {
 	navigateToLandingPage,
+	unlockPin,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
 import {
+	alertBiometricError,
 	alertDeleteIdentity,
 	alertIdentityDeletionError
 } from '../util/alertUtils';
+import { unlockIdentitySeedWithBiometric } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
@@ -39,17 +42,44 @@ function IdentityManagement({ accounts, navigation }) {
 	const { currentIdentity } = accounts.state;
 	if (!currentIdentity) return null;
 
-	const onOptionSelect = value => {
+	const onDelete = async () => {
+		const deleteSucceed = await accounts.deleteCurrentIdentity();
+		if (deleteSucceed) {
+			navigateToLandingPage(navigation, true);
+		} else {
+			alertIdentityDeletionError();
+		}
+	};
+
+	const toggleBiometric = async () => {
+		if (currentIdentity.biometricEnabled) {
+			await unlockIdentitySeedWithBiometric(currentIdentity);
+			await accounts.identityDisableBiometric();
+		} else {
+			const pin = await unlockPin(navigation);
+			navigation.pop();
+			await accounts.identityEnableBiometric(pin).catch(error => {
+				// error here is likely no fingerprints/biometrics enrolled, so should be displayed to the user
+				alertBiometricError(error);
+			});
+		}
+	};
+
+	const onOptionSelect = async value => {
 		if (value === 'PathDelete') {
 			alertDeleteIdentity(async () => {
-				await unlockSeedPhrase(navigation);
-				const deleteSucceed = await accounts.deleteCurrentIdentity();
-				if (deleteSucceed) {
-					navigateToLandingPage(navigation, true);
+				if (currentIdentity.biometricEnabled) {
+					await unlockIdentitySeedWithBiometric(currentIdentity)
+						.then(onDelete)
+						.catch(() => {
+							unlockSeedPhrase(navigation).then(onDelete);
+						});
 				} else {
-					alertIdentityDeletionError();
+					await unlockSeedPhrase(navigation).then(onDelete);
 				}
 			});
+		} else if (value === 'IdentityBiometric') {
+			await toggleBiometric();
 		} else {
 			navigation.navigate('IdentityBackup', { isNew: false });
 		}
@@ -65,6 +95,12 @@ function IdentityManagement({ accounts, navigation }) {
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
 						{ text: 'Backup', value: 'IdentityBackup' },
+						{
+							text: currentIdentity.biometricEnabled
+								? 'Disable Biometric'
+								: 'Enable Biometric',
+							value: 'IdentityBiometric'
+						},
 						{
 							testID: testIDs.IdentityManagement.deleteButton,
 							text: 'Delete',

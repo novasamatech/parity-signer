@@ -45,8 +45,12 @@ import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent {
 	async onSignMessage(scannerStore, accountsStore, sender) {
+		const senderIdentity = getIdentityFromSender(
+			sender,
+			accountsStore.state.identities
+		);
 		if (
-			sender.biometricEnabled &&
+			senderIdentity.biometricEnabled &&
 			(await scannerStore.signDataBiometric(sender.isLegacy))
 		) {
 			return navigateToSignedMessage(this.props.navigation);
@@ -57,10 +61,6 @@ export default class MessageDetails extends React.PureComponent {
 						next: 'SignedMessage'
 					});
 				}
-				const senderIdentity = getIdentityFromSender(
-					sender,
-					accountsStore.state.identities
-				);
 				const seedPhrase = await unlockSeedPhrase(
 					this.props.navigation,
 					senderIdentity
@@ -97,7 +97,7 @@ export default class MessageDetails extends React.PureComponent {
 								}
 								prehash={scannerStore.getPrehashPayload()}
 								isHash={scannerStore.getIsHash()}
-								onNext={async () => {
+								onNext={() => {
 									this.onSignMessage(scannerStore, accountsStore, sender);
 								}}
 							/>

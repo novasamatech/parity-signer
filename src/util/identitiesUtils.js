@@ -22,7 +22,7 @@ import {
 	UnknownNetworkKeys
 } from '../constants';
 import { pathsRegex } from './regex';
-import { decryptData } from './native';
+import { decryptData, secureGet } from '../util/native';
 import { parseSURI } from './suri';
 
 //walk around to fix the regular expression support for positive look behind;
@@ -121,6 +121,12 @@ export const unlockIdentitySeed = async (pin, identity) => {
 	const seed = await decryptData(encryptedSeed, pin);
 	const { phrase } = parseSURI(seed);
 	return phrase;
+};
+
+export const unlockIdentitySeedWithBiometric = async identity => {
+	return secureGet(identity.pinKey).then(async pin => {
+		return unlockIdentitySeed(pin, identity);
+	});
 };
 
 export const getAvailableNetworkKeys = identity => {

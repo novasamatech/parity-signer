@@ -131,7 +131,7 @@ fn parse_suri(suri: &str) -> Result<SURI, String> {
         }
     }
 
-    let re = Regex::new(r"^(\w+(?: \w+)*)?(.*)$").expect("invalid regex");
+    let re = Regex::new(r"^([\w ]+(?: +\w*)*)?(.*)$").expect("invalid regex");
     let matches = re
         .captures_iter(suri)
         .map(|cap| cap.get(0).map_or("", |m| m.as_str()).to_string())
