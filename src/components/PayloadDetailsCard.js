@@ -47,10 +47,6 @@ export default class PayloadDetailsCard extends React.PureComponent {
 		style: ViewPropTypes.style
 	};
 
-	state = {
-		fallback: false
-	};
-
 	constructor(props) {
 		super(props);
 		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
@@ -64,25 +60,23 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
 		let metadata;
 		if (isKusama) {
-			new MetaData(registry, kusamaMetadata);
+			metadata = new MetaData(registry, kusamaMetadata);
+			// registry.setMetadata(metaData);
 			formatBalance.setDefaults({
 				decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
 				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
 			});
 		} else if (__DEV__ && isSubstrateDev) {
-			new MetaData(registry, substrateDevMetadata);
+			metadata = new MetaData(registry, substrateDevMetadata);
 			formatBalance.setDefaults({
 				decimals:
 					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
 				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].unit
 			});
 		}
-
-		if (!metadata) {
-			this.setState({
-				fallback: true
-			});
-		}
+		this.state = {
+			fallback: !metadata
+		};
 	}
 
 	render() {
