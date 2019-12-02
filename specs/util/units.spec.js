@@ -16,14 +16,16 @@
 
 'use strict';
 
-import '@polkadot/types/injector';
-
-import { GenericCall, Metadata } from '@polkadot/types';
+import { TypeRegistry } from '@polkadot/types';
+import MetaData from '@polkadot/metadata';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 
 import kusamaData from '../../src/util/static-kusama';
 import { fromWei } from '../../src/util/units';
+const registry = new TypeRegistry();
+
+new MetaData(registry, kusamaData);
 
 describe('units', () => {
 	describe('ethereum', () => {
@@ -48,22 +50,21 @@ describe('units', () => {
 		let method_3;
 
 		beforeAll(() => {
-			const metadata = new Metadata(kusamaData);
-
-			GenericCall.injectMetadata(metadata);
-
 			formatBalance.setDefaults({
 				decimals: 12,
 				unit: 'KSM'
 			});
 
 			method_1 = new Call(
+				registry,
 				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f'
 			);
 			method_2 = new Call(
+				registry,
 				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110ae2d45a1d'
 			);
 			method_3 = new Call(
+				registry,
 				'0x0400ffd9d249ea49e9ae53fc0df3df40d3b070c88e387c265841fe2f3362970d864fdf1f0000606b82534ae05e4508'
 			);
 		});
