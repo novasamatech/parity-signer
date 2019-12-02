@@ -187,7 +187,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							data.preHash = extrinsicPayload;
 
 							network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
-
+							debugger;
 							if (!network) {
 								throw new Error(
 									`Signer does not currently support a chain with genesis hash: ${extrinsicPayload.genesisHash.toHex()}`

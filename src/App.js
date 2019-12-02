@@ -18,8 +18,6 @@
 
 import '../shim';
 
-import '@polkadot/types/injector';
-
 import React, { Component, PureComponent } from 'react';
 import { Platform, StatusBar, View, YellowBox } from 'react-native';
 import {
