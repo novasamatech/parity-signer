@@ -48,7 +48,7 @@ export default class Loading extends React.PureComponent {
 
 	// TODO migrate identities only on internal test devices, remove them in v4.1
 	async migrateIdentity() {
-		const identities = await loadIdentities(3);
+		const identities = await loadIdentities(4);
 
 		const migrationIdentityFunction = identity => {
 			const getAddressKey = accountId =>
