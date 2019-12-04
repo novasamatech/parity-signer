@@ -47,10 +47,7 @@ function AccountDetails({ accounts, navigation }) {
 			NETWORK_LIST[account.networkKey].protocol) ||
 		NetworkProtocols.UNKNOWN;
 
-	onDelete = async () => {
-		const { accounts, navigation } = this.props;
-		const selectedKey = accounts.getSelectedKey();
-
+	const onDelete = async () => {
 		await accounts.deleteAccount(selectedKey);
 		if (accounts.getAccounts().size === 0) {
 			return navigateToLandingPage(navigation);
@@ -58,36 +55,33 @@ function AccountDetails({ accounts, navigation }) {
 		navigateToLegacyAccountList(navigation);
 	};
 
-	noBiometric = async value => {
-		const { navigation } = this.props;
-                if (value === 'AccountDelete') {
-                        alertDeleteAccount(
-                                selected.name || selected.address || 'this account',
-                                async () => {
-                                        navigation.navigate('AccountUnlock', {
-                                                next: value,
-                                                onDelete: this.onDelete
-                                        });
-                                });
-                } else {
-                        navigation.navigate('AccountUnlock', {
-                                next: value,
-                                onDelete: this.onDelete
-                        });
-                }
+	const noBiometric = async value => {
+		if (value === 'AccountDelete') {
+			alertDeleteAccount(
+				account.name || account.address || 'this account',
+				async () => {
+					navigation.navigate('AccountUnlock', {
+						next: value,
+						onDelete: onDelete
+					});
+				}
+			);
+		} else {
+			navigation.navigate('AccountUnlock', {
+				next: value,
+				onDelete: onDelete
+			});
+		}
 	};
 
-	withBiometric = async value => {
-		const { accounts, navigation } = this.props;
-		const selected = accounts.getSelected();
+	const withBiometric = async value => {
 		try {
-			const selectedKey = accounts.getSelectedKey();
 			if (value === 'AccountDelete') {
 				alertDeleteAccount(
-					selected.name || selected.address || 'this account',
+					account.name || account.address || 'this account',
 					async () => {
 						await accounts.unlockAccountWithBiometric(selectedKey);
-						await this.onDelete();
+						await onDelete();
 					}
 				);
 			} else if (value === 'AccountBiometric') {
@@ -99,74 +93,69 @@ function AccountDetails({ accounts, navigation }) {
 			}
 		} catch (e) {
 			alertBiometricError(e, async () => {
-				await this.noBiometric(value);
+				await noBiometric(value);
 			});
 		}
 	};
 
-	onOptionSelect = async value => {
-		const { accounts, navigation } = this.props;
+	const onOptionSelect = async value => {
 		if (value !== 'AccountEdit') {
 			if (accounts.getSelected().biometricEnabled) {
-				await this.withBiometric(value);
+				await withBiometric(value);
 			} else {
-				await this.noBiometric(value);
+				await noBiometric(value);
 			}
 		} else {
 			navigation.navigate('AccountEdit');
 		}
 	};
 
-        return (
-                <Subscribe to={[AccountsStore]}>
-                        {accounts => (
-                                <ScrollView contentContainerStyle={styles.body}>
-                                        <View style={styles.bodyContent}>
-                                                <View style={styles.header}>
-                                                        <Text style={fontStyles.h2}>Public Address</Text>
-                                                        <View style={styles.menuView}>
-                                                                <PopupMenu
-                                                                        onSelect={this.onOptionSelect}
-                                                                        menuTriggerIconName={'more-vert'}
-                                                                        menuItems={[
-                                                                                { text: 'Edit', value: 'AccountEdit' },
-                                                                                { text: 'Change Pin', value: 'AccountPin' },
-                                                                                {
-                                                                                        text: accounts.getSelected().biometricEnabled
-                                                                                                ? 'Disable Biometric'
-                                                                                                : 'Enable Biometric',
-                                                                                        value: 'AccountBiometric'
-                                                                                },
-                                                                                {
-                                                                                        text: 'View Recovery Phrase',
-                                                                                        value: 'LegacyAccountBackup'
-                                                                                },
-                                                                                {
-                                                                                        text: 'Delete',
-                                                                                        textStyle: styles.deleteText,
-                                                                                        value: 'AccountDelete'
-                                                                                }
-                                                                        ]}
-                                                                />
-                                                        </View>
-                                                </View>
-                                        </View>
-                                        <AccountCard
-                                                accountId={account.address}
-                                                networkKey={account.networkKey}
-                                                title={account.name}
-                                        />
-                                        <View>
-                                                {protocol !== NetworkProtocols.UNKNOWN ? (
-                                                        <QrView data={selectedKey} />
-                                                ) : (
-                                                        <UnkownAccountWarning />	
-                                                )}
-                                        </View>
-                                </ScrollView>
-                        )}
-                </Subscribe>
-        );
+	return (
+		<ScrollView contentContainerStyle={styles.body}>
+			<View style={styles.bodyContent}>
+				<View style={styles.header}>
+					<Text style={fontStyles.h2}>Public Address</Text>
+					<View style={styles.menuView}>
+						<PopupMenu
+							onSelect={onOptionSelect}
+							menuTriggerIconName={'more-vert'}
+							menuItems={[
+								{ text: 'Edit', value: 'AccountEdit' },
+								{ text: 'Change Pin', value: 'AccountPin' },
+								{
+									text: accounts.getSelected().biometricEnabled
+										? 'Disable Biometric'
+										: 'Enable Biometric',
+									value: 'AccountBiometric'
+								},
+								{
+									text: 'View Recovery Phrase',
+									value: 'LegacyAccountBackup'
+								},
+								{
+									text: 'Delete',
+									textStyle: styles.deleteText,
+									value: 'AccountDelete'
+								}
+							]}
+						/>
+					</View>
+				</View>
+			</View>
+			<AccountCard
+				accountId={account.address}
+				networkKey={account.networkKey}
+				title={account.name}
+			/>
+			<View>
+				{protocol !== NetworkProtocols.UNKNOWN ? (
+					<QrView data={selectedKey} />
+				) : (
+					<UnknownAccountWarning />
+				)}
+			</View>
+		</ScrollView>
+	);
 }
 
 const styles = StyleSheet.create({

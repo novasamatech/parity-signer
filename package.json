@@ -28,7 +28,8 @@
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
     "build-e2e:ios": "detox build -c ios.sim.debug -l info",
     "test-e2e:ios": "detox test -c ios.sim.debug -l info --noStackTrace",
-    "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios"
+    "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios",
+    "unit-test:ios": "xcodebuild test -project ios/NativeSigner.xcodeproj -scheme NativeSigner -destination 'platform=iOS Simulator,name=iPhone 8'"
   },
   "husky": {
     "hooks": {
