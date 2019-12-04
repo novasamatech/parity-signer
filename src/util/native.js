@@ -16,8 +16,7 @@
 
 'use strict';
 
-import { NativeModules } from 'react-native';
-const { EthkeyBridge } = NativeModules;
+import { EthkeyBridge } from 'NativeModules';
 import { checksummedAddress } from './checksum';
 
 const APP_ID = 'signer';
