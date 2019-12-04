@@ -265,7 +265,7 @@ class AccountRecoverView extends React.PureComponent {
 					)}
 					<AccountCard
 						style={{ marginTop: 20 }}
-						accountId={address || ''}
+						address={address || ''}
 						networkKey={networkKey || ''}
 						title={name}
 						seedType={validBip39Seed ? 'bip39' : 'brain wallet'}

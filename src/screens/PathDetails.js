@@ -26,7 +26,7 @@ import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import {
-	getAccountIdWithPath,
+	getAddressWithPath,
 	getNetworkKeyByPath,
 	isSubstratePath,
 	unlockIdentitySeedWithBiometric
@@ -39,10 +39,17 @@ import {
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
+import { generateAccountId } from '../util/account';
+import UnknownAccountWarning from '../components/UnknownAccountWarning';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
-	const address = getAccountIdWithPath(path, currentIdentity);
+	const address = getAddressWithPath(path, currentIdentity);
+	if (!address) return null;
+	const accountId = generateAccountId({
+		address,
+		networkKey: getNetworkKeyByPath(path)
+	});
 
 	async function onDelete() {
 		const deleteSucceed = await accounts.deletePath(path);
@@ -152,8 +159,10 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			</View>
 			<ScrollView>
 				<PathCard identity={currentIdentity} path={path} />
-				{networkKey !== UnknownNetworkKeys.UNKNOWN && address !== '' && (
-					<QrView data={address} />
+				{networkKey === UnknownNetworkKeys.UNKNOWN ? (
+					<UnknownAccountWarning />
+				) : (
+					<QrView data={accountId} />
 				)}
 			</ScrollView>
 		</View>

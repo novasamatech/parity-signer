@@ -325,7 +325,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		const sender = await accountsStore.getAccountByAddress(address);
-
 		if (!sender) {
 			throw new Error(
 				`No private key found for ${address} in your signer key storage.`

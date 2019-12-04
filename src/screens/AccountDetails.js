@@ -18,13 +18,10 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
 import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
-import AccountsStore from '../stores/AccountsStore';
-import TxStore from '../stores/TxStore';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import { alertBiometricError, alertDeleteAccount } from '../util/alertUtils';
@@ -33,28 +30,22 @@ import {
 	navigateToLegacyAccountList
 } from '../util/navigationHelpers';
 import fontStyles from '../fontStyles';
+import UnknownAccountWarning from '../components/UnknownAccountWarning';
+import { withAccountStore } from '../util/HOC';
 
-export default class AccountDetails extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[AccountsStore, TxStore]}>
-				{(accounts, txStore) => (
-					<AccountDetailsView
-						{...this.props}
-						txStore={txStore}
-						accounts={accounts}
-						selected={accounts.getSelected() && accounts.getSelected().address}
-					/>
-				)}
-			</Subscribe>
-		);
-	}
-}
+export default withAccountStore(AccountDetails);
 
-class AccountDetailsView extends React.PureComponent {
-	constructor(props) {
-		super(props);
-	}
+function AccountDetails({ accounts, navigation }) {
+	const account = accounts.getSelected();
+	const selectedKey = accounts.getSelectedKey();
+
+	if (!account) return null;
+
+	const protocol =
+		(account.networkKey &&
+			NETWORK_LIST[account.networkKey] &&
+			NETWORK_LIST[account.networkKey].protocol) ||
+		NetworkProtocols.UNKNOWN;
 
 	onDelete = async () => {
 		const { accounts, navigation } = this.props;
@@ -69,10 +60,21 @@ class AccountDetailsView extends React.PureComponent {
 
 	noBiometric = async value => {
 		const { navigation } = this.props;
-		navigation.navigate('AccountUnlock', {
-			next: value,
-			onDelete: this.onDelete
-		});
+                if (value === 'AccountDelete') {
+                        alertDeleteAccount(
+                                selected.name || selected.address || 'this account',
+                                async () => {
+                                        navigation.navigate('AccountUnlock', {
+                                                next: value,
+                                                onDelete: this.onDelete
+                                        });
+                                });
+                } else {
+                        navigation.navigate('AccountUnlock', {
+                                next: value,
+                                onDelete: this.onDelete
+                        });
+                }
 	};
 
 	withBiometric = async value => {
@@ -115,88 +117,56 @@ class AccountDetailsView extends React.PureComponent {
 		}
 	};
 
-	renderWarningUnknownAccount = function() {
-		return (
-			<View style={styles.warningView}>
-				<Text style={{ ...styles.title, ...styles.warningTitle }}>Warning</Text>
-				<Text>
-					This account wasn't retrieved successfully. This could be because its
-					network isn't supported, or you upgraded Parity Signer without wiping
-					your device and this account couldn't be migrated.
-					{'\n'}
-					{'\n'}
-					To be able to use this account you need to:{'\n'}- write down its
-					recovery phrase{'\n'}- delete it{'\n'}- recover it{'\n'}
-				</Text>
-			</View>
-		);
-	};
-
-	render() {
-		const account = this.props.accounts.getSelected();
-		const selectedKey = this.props.accounts.getSelectedKey();
-
-		if (!account) {
-			return null;
-		}
-
-		const protocol =
-			(account.networkKey &&
-				NETWORK_LIST[account.networkKey] &&
-				NETWORK_LIST[account.networkKey].protocol) ||
-			NetworkProtocols.UNKNOWN;
-
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => (
-					<ScrollView contentContainerStyle={styles.body}>
-						<View style={styles.bodyContent}>
-							<View style={styles.header}>
-								<Text style={fontStyles.h2}>Public Address</Text>
-								<View style={styles.menuView}>
-									<PopupMenu
-										onSelect={this.onOptionSelect}
-										menuTriggerIconName={'more-vert'}
-										menuItems={[
-											{ text: 'Edit', value: 'AccountEdit' },
-											{ text: 'Change Pin', value: 'AccountPin' },
-											{
-												text: accounts.getSelected().biometricEnabled
-													? 'Disable Biometric'
-													: 'Enable Biometric',
-												value: 'AccountBiometric'
-											},
-											{
-												text: 'View Recovery Phrase',
-												value: 'LegacyAccountBackup'
-											},
-											{
-												text: 'Delete',
-												textStyle: styles.deleteText,
-												value: 'AccountDelete'
-											}
-										]}
-									/>
-								</View>
-							</View>
-						</View>
-						<AccountCard
-							accountId={account.address}
-							networkKey={account.networkKey}
-							title={account.name}
-						/>
-						<View>
-							{protocol !== NetworkProtocols.UNKNOWN ? (
-								<QrView data={selectedKey} />
-							) : (
-								this.renderWarningUnknownAccount()
-							)}
-						</View>
-					</ScrollView>
-				)}
-			</Subscribe>
-		);
-	}
+        return (
+                <Subscribe to={[AccountsStore]}>
+                        {accounts => (
+                                <ScrollView contentContainerStyle={styles.body}>
+                                        <View style={styles.bodyContent}>
+                                                <View style={styles.header}>
+                                                        <Text style={fontStyles.h2}>Public Address</Text>
+                                                        <View style={styles.menuView}>
+                                                                <PopupMenu
+                                                                        onSelect={this.onOptionSelect}
+                                                                        menuTriggerIconName={'more-vert'}
+                                                                        menuItems={[
+                                                                                { text: 'Edit', value: 'AccountEdit' },
+                                                                                { text: 'Change Pin', value: 'AccountPin' },
+                                                                                {
+                                                                                        text: accounts.getSelected().biometricEnabled
+                                                                                                ? 'Disable Biometric'
+                                                                                                : 'Enable Biometric',
+                                                                                        value: 'AccountBiometric'
+                                                                                },
+                                                                                {
+                                                                                        text: 'View Recovery Phrase',
+                                                                                        value: 'LegacyAccountBackup'
+                                                                                },
+                                                                                {
+                                                                                        text: 'Delete',
+                                                                                        textStyle: styles.deleteText,
+                                                                                        value: 'AccountDelete'
+                                                                                }
+                                                                        ]}
+                                                                />
+                                                        </View>
+                                                </View>
+                                        </View>
+                                        <AccountCard
+                                                accountId={account.address}
+                                                networkKey={account.networkKey}
+                                                title={account.name}
+                                        />
+                                        <View>
+                                                {protocol !== NetworkProtocols.UNKNOWN ? (
+                                                        <QrView data={selectedKey} />
+                                                ) : (
+                                                        <UnkownAccountWarning />	
+                                                )}
+                                        </View>
+                                </ScrollView>
+                        )}
+                </Subscribe>
+        );
 }
 
 const styles = StyleSheet.create({
@@ -226,13 +196,5 @@ const styles = StyleSheet.create({
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		justifyContent: 'center'
-	},
-	warningTitle: {
-		color: colors.bg_alert,
-		fontSize: 20,
-		marginBottom: 10
-	},
-	warningView: {
-		padding: 20
 	}
 });

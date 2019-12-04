@@ -31,7 +31,7 @@ const CompatibleCard = ({ account, accountsStore, titlePrefix }) =>
 	) : (
 		<AccountCard
 			title={account.name}
-			accountId={account.address}
+			address={account.address}
 			networkKey={account.networkKey || ''}
 		/>
 	);

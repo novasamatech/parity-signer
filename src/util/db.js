@@ -53,13 +53,15 @@ const identitiesStore = {
 	keychainService: 'parity_signer_identities',
 	sharedPreferencesName: 'parity_signer_identities'
 };
-const identityStorageLabel = 'identities_v4';
+const currentIdentityStorageLabel = 'identities_v4';
 
-export async function loadIdentities(version = 3) {
+export async function loadIdentities(version = 4) {
 	function handleError(e) {
 		console.warn('loading identities error', e);
 		return [];
 	}
+
+	const identityStorageLabel = `identities_v${version}`;
 	try {
 		// TODO to be deleted before merging, used for clean the keychain.
 		// await SecureStorage.deleteItem(identityStorageLabel, identitiesStore);
@@ -76,7 +78,7 @@ export async function loadIdentities(version = 3) {
 
 export const saveIdentities = identities => {
 	SecureStorage.setItem(
-		identityStorageLabel,
+		currentIdentityStorageLabel,
 		serializeIdentities(identities),
 		identitiesStore
 	);
@@ -144,11 +146,11 @@ async function storagePushValue(key, value) {
 }
 
 export async function loadToCAndPPConfirmation() {
-	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v3');
+	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v4');
 
 	return !!result;
 }
 
 export async function saveToCAndPPConfirmation() {
-	await AsyncStorage.setItem('ToCAndPPConfirmation_v3', 'yes');
+	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
 }

@@ -28,7 +28,7 @@ AccountPrefixedTitle.propTypes = {
 	titlePrefix: PropTypes.string
 };
 
-export function AccountPrefixedTitle({ titlePrefix, title }) {
+export default function AccountPrefixedTitle({ titlePrefix, title }) {
 	return (
 		<View style={{ flexDirection: 'row' }}>
 			{titlePrefix && (

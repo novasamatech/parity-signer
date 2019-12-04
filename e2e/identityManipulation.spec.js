@@ -61,7 +61,7 @@ const testSetUpDefaultPath = async () => {
 		testIDs.AccountNetworkChooser.chooserScreen
 	);
 	await testUnlockPin(pinCode);
-	await testExist(PathsList.pathCard + '//kusama_CC2//default');
+	await testExist(PathsList.pathCard + '//kusama//default');
 };
 
 describe('Load test', async () => {
@@ -107,18 +107,18 @@ describe('Load test', async () => {
 		await testInput(PathDerivation.pathInput, fundingPath);
 		await testTap(PathDerivation.deriveButton);
 		await testUnlockPin(pinCode);
-		await testExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
+		await testExist(PathsList.pathCard + `//kusama${fundingPath}`);
 	});
 
 	it('delete a path', async () => {
 		await tapBack();
 		await testTap(AccountNetworkChooser.networkButton + '0');
-		await testTap(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
+		await testTap(PathsList.pathCard + `//kusama${fundingPath}`);
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testUnlockPin(pinCode);
-		await testNotExist(PathsList.pathCard + `//kusama_CC2${fundingPath}`);
+		await testNotExist(PathsList.pathCard + `//kusama${fundingPath}`);
 	});
 
 	it('should sign the transaction', async () => {

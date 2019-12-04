@@ -30,106 +30,145 @@ import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
 import colors from '../colors';
-import { getAddressFromAccountId } from '../util/identitiesUtils';
-import { AccountPrefixedTitle } from './AccountPrefixedTitle';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
 
-export default class AccountCard extends React.PureComponent {
-	static propTypes = {
-		accountId: PropTypes.string,
-		isAdd: PropTypes.bool,
-		networkKey: PropTypes.string,
-		onPress: PropTypes.func,
-		seedType: PropTypes.string,
-		style: ViewPropTypes.style,
-		testID: PropTypes.string,
-		title: PropTypes.string,
-		titlePrefix: PropTypes.string
-	};
+const CardSeparator = () => (
+	<Separator
+		shadow={true}
+		style={{
+			backgroundColor: 'transparent',
+			height: 0,
+			marginVertical: 0
+		}}
+	/>
+);
 
-	static defaultProps = {
-		onPress: () => {},
-		title: 'No name'
-	};
+const NetworkFooter = ({ networkColor, network }) => (
+	<View
+		style={[
+			styles.footer,
+			{
+				backgroundColor: networkColor || network.color
+			}
+		]}
+	/>
+);
 
-	render() {
-		const {
-			accountId,
-			isAdd,
-			isNetworkCard,
-			networkKey,
-			networkColor,
-			onPress,
-			seedType,
-			style,
-			testID,
-			titlePrefix
-		} = this.props;
-		let { title } = this.props;
-		title = title.length ? title : AccountCard.defaultProps.title;
-		const seedTypeDisplay = seedType || '';
-		const network =
-			NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
+NetworkCard.propTypes = {
+	isAdd: PropTypes.bool,
+	networkColor: PropTypes.string,
+	networkKey: PropTypes.string,
+	onPress: PropTypes.func.isRequired,
+	testID: PropTypes.string,
+	title: PropTypes.string.isRequired
+};
 
-		const extractAddress = getAddressFromAccountId(accountId);
+export function NetworkCard({
+	isAdd,
+	networkColor,
+	networkKey,
+	onPress,
+	testID,
+	title
+}) {
+	const network =
+		NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
 
-		return (
-			<TouchableItem
-				accessibilityComponentType="button"
-				testID={testID}
-				disabled={false}
-				onPress={onPress}
-			>
-				<Separator
-					shadow={true}
-					style={{
-						backgroundColor: 'transparent',
-						height: 0,
-						marginVertical: 0
-					}}
-				/>
-				<View style={[styles.content, style]}>
-					{isAdd ? (
-						<View style={{ height: 40, width: 40 }}>
-							<Icon name="add" color={colors.bg_text} size={32} />
-						</View>
-					) : (
-						<AccountIcon
-							address={extractAddress}
-							protocol={network.protocol}
-							network={network}
-							style={styles.icon}
-						/>
-					)}
-					<View style={styles.desc}>
-						{!isNetworkCard && (
-							<View>
-								<Text
-									style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}
-								>
-									{`${network.title}${seedTypeDisplay} `}
-								</Text>
-							</View>
-						)}
-						<AccountPrefixedTitle title={title} titlePrefix={titlePrefix} />
-						{accountId !== '' && (
-							<Address
-								address={isAdd ? 'new' : extractAddress}
-								protocol={network.protocol}
-							/>
-						)}
+	return (
+		<TouchableItem
+			accessibilityComponentType="button"
+			testID={testID}
+			disabled={false}
+			onPress={onPress}
+		>
+			<CardSeparator />
+			<View style={styles.content}>
+				{isAdd ? (
+					<View style={{ height: 40, width: 40 }}>
+						<Icon name="add" color={colors.bg_text} size={32} />
 					</View>
-					<View
-						style={[
-							styles.footer,
-							{
-								backgroundColor: networkColor || network.color
-							}
-						]}
+				) : (
+					<AccountIcon
+						address={''}
+						protocol={network.protocol}
+						network={network}
+						style={styles.icon}
 					/>
+				)}
+				<View style={styles.desc}>
+					<AccountPrefixedTitle title={title} />
 				</View>
-			</TouchableItem>
-		);
-	}
+				<NetworkFooter network={network} networkColor={networkColor} />
+			</View>
+		</TouchableItem>
+	);
+}
+
+AccountCard.propTypes = {
+	address: PropTypes.string,
+	networkKey: PropTypes.string,
+	onPress: PropTypes.func,
+	seedType: PropTypes.string,
+	style: ViewPropTypes.style,
+	testID: PropTypes.string,
+	title: PropTypes.string,
+	titlePrefix: PropTypes.string
+};
+
+AccountCard.defaultProps = {
+	onPress: () => {},
+	title: 'No name'
+};
+
+export default function AccountCard({
+	address,
+	networkKey,
+	networkColor,
+	onPress,
+	seedType,
+	style,
+	testID,
+	title,
+	titlePrefix
+}) {
+	const displayTitle = title.length ? title : AccountCard.defaultProps.title;
+	const seedTypeDisplay = seedType || '';
+	const network =
+		NETWORK_LIST[networkKey] || NETWORK_LIST[NetworkProtocols.UNKNOWN];
+
+	return (
+		<TouchableItem
+			accessibilityComponentType="button"
+			testID={testID}
+			disabled={false}
+			onPress={onPress}
+		>
+			<CardSeparator />
+			<View style={[styles.content, style]}>
+				<AccountIcon
+					address={address}
+					protocol={network.protocol}
+					network={network}
+					style={styles.icon}
+				/>
+				<View style={styles.desc}>
+					<View>
+						<Text style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}>
+							{`${network.title}${seedTypeDisplay} `}
+						</Text>
+					</View>
+					<AccountPrefixedTitle
+						title={displayTitle}
+						titlePrefix={titlePrefix}
+					/>
+					{address !== '' && (
+						<Address address={address} protocol={network.protocol} />
+					)}
+				</View>
+				<NetworkFooter network={network} networkColor={networkColor} />
+			</View>
+		</TouchableItem>
+	);
 }
 
 const styles = StyleSheet.create({

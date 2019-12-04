@@ -18,12 +18,13 @@
 
 import {
 	NETWORK_LIST,
-	NetworkProtocols,
+	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
 } from '../constants';
 import { pathsRegex } from './regex';
 import { decryptData, secureGet } from '../util/native';
 import { parseSURI } from './suri';
+import { generateAccountId } from './account';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = str => str.replace(/\//g, '');
@@ -42,9 +43,25 @@ export const extractSubPathName = path => {
 
 export const isSubstratePath = path => path.split('//')[1] !== undefined;
 
+export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
+
+export const extractAddressFromAccountId = id => {
+	const withoutNetwork = id.split(':')[1];
+	const address = withoutNetwork.split('@')[0];
+	if (address.indexOf('0x') !== -1) {
+		return address.slice(2);
+	}
+	return address;
+};
+
+export const getAddressKeyByPath = (address, path) =>
+	isSubstratePath(path)
+		? address
+		: generateAccountId({ address, networkKey: getNetworkKeyByPath(path) });
+
 export function emptyIdentity() {
 	return {
-		accountIds: new Map(),
+		addresses: new Map(),
 		derivationPassword: '',
 		encryptedSeed: '',
 		meta: new Map(),
@@ -89,8 +106,19 @@ export const deepCopyIdentities = identities =>
 export const deepCopyIdentity = identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
-export const getPathsWithSubstrateNetwork = (paths, networkKey) =>
-	paths.filter(path => extractPathId(path) === NETWORK_LIST[networkKey].pathId);
+export const getPathsWithSubstrateNetwork = (paths, networkKey) => {
+	if (networkKey === UnknownNetworkKeys.UNKNOWN) {
+		const pathIdList = Object.values(SUBSTRATE_NETWORK_LIST).map(
+			networkParams => networkParams.pathId
+		);
+		return paths.filter(
+			path => isSubstratePath(path) && !pathIdList.includes(extractPathId(path))
+		);
+	}
+	return paths.filter(
+		path => extractPathId(path) === NETWORK_LIST[networkKey].pathId
+	);
+};
 
 export const getNetworkKeyByPath = path => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
@@ -110,10 +138,13 @@ export const getNetworkKeyByPath = path => {
 export const getIdentityFromSender = (sender, identities) =>
 	identities.find(i => i.encryptedSeed === sender.encryptedSeed);
 
-export const getAccountIdWithPath = (path, identity) => {
+export const getAddressWithPath = (path, identity) => {
 	const pathMeta = identity.meta.get(path);
-	if (pathMeta && pathMeta.accountId) return pathMeta.accountId;
-	return '';
+	if (!pathMeta) return '';
+	const { address } = pathMeta;
+	return isEthereumAccountId(address)
+		? extractAddressFromAccountId(address)
+		: address;
 };
 
 export const unlockIdentitySeed = async (pin, identity) => {
@@ -129,9 +160,9 @@ export const unlockIdentitySeedWithBiometric = async identity => {
 	});
 };
 
-export const getAvailableNetworkKeys = identity => {
-	const accountIdsList = Array.from(identity.accountIds.values());
-	const networkKeysSet = accountIdsList.reduce((networksSet, path) => {
+export const getExistedNetworkKeys = identity => {
+	const pathsList = Array.from(identity.addresses.values());
+	const networkKeysSet = pathsList.reduce((networksSet, path) => {
 		let networkKey;
 		if (isSubstratePath(path)) {
 			networkKey = getNetworkKeyByPath(path);
@@ -141,17 +172,6 @@ export const getAvailableNetworkKeys = identity => {
 		return { ...networksSet, [networkKey]: true };
 	}, {});
 	return Object.keys(networkKeysSet);
-};
-
-export const getAddressFromAccountId = (accountId, protocol) => {
-	if (!accountId) return '';
-	if (protocol === NetworkProtocols.SUBSTRATE) {
-		return accountId.split(':')[1] || accountId;
-	} else {
-		const withoutPrefix = accountId.split(':')[1] || accountId;
-		const withOut0x = withoutPrefix.split('0x')[1] || accountId;
-		return withOut0x.split('@')[0];
-	}
 };
 
 export const validateDerivedPath = derivedPath =>
