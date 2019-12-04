@@ -256,5 +256,5 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native boolean snContains(Activity activity, String app, String key);
     private static native boolean snDelete(Activity activity, String app, String key);
     private static native String snEthkeyBrainwalletSign(Activity activity, String app, String key, String message, String encrypted);
-    private static native String snSubstrateBrainwalletSign(Activity activity, String app, String key, String message, boolean legacy, String encrypted);
+    private static native String snSubstrateBrainwalletSign(Activity activity, String app, String key, String message, String encrypted, boolean legacy);
 }
