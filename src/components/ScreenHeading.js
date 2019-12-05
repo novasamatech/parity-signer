@@ -33,21 +33,22 @@ import TouchableItem from './TouchableItem';
 
 const composeStyle = StyleSheet.compose;
 
-const extendComponentStyle = (styleKey, extendStyle) => {
-	componentStyles[styleKey] = StyleSheet.compose(
-		componentStyles[styleKey],
-		extendStyle
-	);
-};
-
-const renderSubtitle = (subtitle, subtitleIcon, styles) => {
+const renderSubtitle = (subtitle, subtitleIcon, isAlignLeft, isError) => {
 	if (!subtitle) return;
+	let subtitleBodyStyle = [baseStyles.subtitleBody],
+		subtitleTextStyle = [fontStyles.t_codeS];
+	if (isAlignLeft) {
+		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
+		subtitleTextStyle.push({ textAlign: 'left' });
+	}
+	if (isError) {
+		subtitleTextStyle.push(baseStyles.t_error);
+	}
+
 	return (
-		<View style={styles.finalSubtitleIconStyle}>
+		<View style={subtitleBodyStyle}>
 			{renderSubtitleIcon(subtitleIcon)}
-			<Text style={[styles.finalTextStyles, styles.finalSubtitleStyle]}>
-				{subtitle}
-			</Text>
+			<Text style={subtitleTextStyle}>{subtitle}</Text>
 		</View>
 	);
 };
@@ -104,10 +105,6 @@ export function PathListHeading({
 	networkKey,
 	onPress
 }) {
-	extendComponentStyle('finalTextStyles', baseStyles.t_left);
-	extendComponentStyle('finalSubtitleIconStyle', {
-		justifyContent: 'flex-start'
-	});
 	return (
 		<TouchableItem style={baseStyles.bodyWithIcon} onPress={onPress}>
 			<AccountIcon
@@ -116,8 +113,8 @@ export function PathListHeading({
 				style={baseStyles.networkIcon}
 			/>
 			<View>
-				<Text style={componentStyles.finalTextStyles}>{title}</Text>
-				{renderSubtitle(subtitle, subtitleIcon, componentStyles)}
+				<Text style={[baseStyles.text, baseStyles.t_left]}>{title}</Text>
+				{renderSubtitle(subtitle, subtitleIcon, true)}
 			</View>
 		</TouchableItem>
 	);
@@ -125,9 +122,7 @@ export function PathListHeading({
 
 export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
-		big: PropTypes.bool,
 		onPress: PropTypes.func,
-		small: PropTypes.bool,
 		subtitle: PropTypes.string,
 		title: PropTypes.string
 	};
@@ -143,17 +138,10 @@ export default class ScreenHeading extends React.PureComponent {
 			iconType
 		} = this.props;
 
-		if (error) {
-			extendComponentStyle('finalSubtitleStyle', baseStyles.t_error);
-		}
-		if (subtitleL) {
-			extendComponentStyle('finalSubtitleStyle', { textAlign: 'left' });
-		}
-
 		return (
 			<View style={baseStyles.body}>
-				<Text style={componentStyles.finalTextStyles}>{title}</Text>
-				{renderSubtitle(subtitle, subtitleIcon, componentStyles)}
+				<Text style={baseStyles.text}>{title}</Text>
+				{renderSubtitle(subtitle, subtitleIcon, subtitleL, error)}
 				{renderBack(onPress)}
 				{renderIcon(iconName, iconType)}
 			</View>
@@ -178,7 +166,7 @@ const baseStyles = StyleSheet.create({
 	networkIcon: {
 		paddingHorizontal: 16
 	},
-	subtitleIcon: {
+	subtitleBody: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		justifyContent: 'center'
@@ -194,14 +182,9 @@ const baseStyles = StyleSheet.create({
 	},
 	t_normal: {
 		fontFamily: fonts.roboto
+	},
+	text: {
+		...fontStyles.h1,
+		textAlign: 'center'
 	}
 });
-
-const componentStyles = {
-	finalSubtitleIconStyle: baseStyles.subtitleIcon,
-	finalSubtitleStyle: fontStyles.t_codeS,
-	finalTextStyles: StyleSheet.compose(
-		fontStyles.h1,
-		baseStyles.t_center
-	)
-};
