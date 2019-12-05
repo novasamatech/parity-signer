@@ -46,6 +46,28 @@ export const navigateToPathsList = (navigation, networkKey) => {
 	navigation.dispatch(resetAction);
 };
 
+export const navigateToPathDetails = (navigation, networkKey, path) => {
+	const resetAction = StackActions.reset({
+		actions: [
+			NavigationActions.navigate({
+				isNew: false,
+				routeName: 'AccountNetworkChooser'
+			}),
+			NavigationActions.navigate({
+				params: { networkKey },
+				routeName: 'PathsList'
+			}),
+			NavigationActions.navigate({
+				params: { path },
+				routeName: 'PathDetails'
+			})
+		],
+		index: 2,
+		key: undefined
+	});
+	navigation.dispatch(resetAction);
+};
+
 export const navigateToLandingPage = (navigation, isSwitchOpen) => {
 	const resetAction = StackActions.reset({
 		actions: [

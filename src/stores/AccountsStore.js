@@ -127,6 +127,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async refreshList() {
 		const accounts = await loadAccounts();
 		const identities = await loadIdentities();
+		console.log('identities: ', identities);
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
 		this.setState({ accounts, currentIdentity, identities, loaded: true });
@@ -398,7 +399,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seedPhrase, prefix, networkKey, name) {
+	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
+		const prefix = NETWORK_LIST[networkKey].prefix;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const suri = constructSURI({
 			derivePath: newPath,

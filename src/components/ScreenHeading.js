@@ -29,6 +29,7 @@ import { Icon } from 'react-native-elements';
 import colors from '../colors';
 import AccountIcon from './AccountIcon';
 import { NETWORK_LIST } from '../constants';
+import TouchableItem from './TouchableItem';
 
 const composeStyle = StyleSheet.compose;
 
@@ -96,13 +97,19 @@ export function PathCardHeading({ title, networkKey }) {
 	);
 }
 
-export function PathListHeading({ title, subtitle, subtitleIcon, networkKey }) {
+export function PathListHeading({
+	title,
+	subtitle,
+	subtitleIcon,
+	networkKey,
+	onPress
+}) {
 	extendComponentStyle('finalTextStyles', baseStyles.t_left);
 	extendComponentStyle('finalSubtitleIconStyle', {
 		justifyContent: 'flex-start'
 	});
 	return (
-		<View style={baseStyles.bodyWithIcon}>
+		<TouchableItem style={baseStyles.bodyWithIcon} onPress={onPress}>
 			<AccountIcon
 				address={''}
 				network={NETWORK_LIST[networkKey]}
@@ -112,7 +119,7 @@ export function PathListHeading({ title, subtitle, subtitleIcon, networkKey }) {
 				<Text style={componentStyles.finalTextStyles}>{title}</Text>
 				{renderSubtitle(subtitle, subtitleIcon, componentStyles)}
 			</View>
-		</View>
+		</TouchableItem>
 	);
 }
 

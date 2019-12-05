@@ -147,6 +147,15 @@ export const getAddressWithPath = (path, identity) => {
 		: address;
 };
 
+export const getRootPathMeta = (identity, networkKey) => {
+	const rootPathId = `//${NETWORK_LIST[networkKey].pathId}`;
+	if (identity.meta.has(rootPathId)) {
+		return identity.meta.get(rootPathId);
+	} else {
+		return null;
+	}
+};
+
 export const unlockIdentitySeed = async (pin, identity) => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
@@ -196,6 +205,8 @@ export const getPathName = (path, lookUpIdentity) => {
 export const groupPaths = paths => {
 	const unSortedPaths = paths.reduce((groupedPath, path) => {
 		const pathId = extractPathId(path) || '';
+		if (removeSlash(path) === pathId) return groupedPath;
+
 		const subPath = path.slice(pathId.length + 2);
 
 		const groupName = subPath.match(pathsRegex.firstPath)[0];
