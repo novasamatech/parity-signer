@@ -171,9 +171,12 @@ const baseStyles = StyleSheet.create({
 	}
 });
 
-const componentStyles = StyleSheet.create({
-	finalSubtitleIconStyle: [baseStyles.subtitleIcon],
-	finalSubtitleStyle: [fontStyles.t_codeS],
-	finalTextStyles: [fontStyles.h1, baseStyles.t_center],
-	finalViewStyles: [baseStyles.body]
-});
+const componentStyles = {
+	finalSubtitleIconStyle: baseStyles.subtitleIcon,
+	finalSubtitleStyle: fontStyles.t_codeS,
+	finalTextStyles: StyleSheet.compose(
+		fontStyles.h1,
+		baseStyles.t_center
+	),
+	finalViewStyles: baseStyles.body
+};
