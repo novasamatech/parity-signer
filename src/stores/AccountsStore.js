@@ -127,7 +127,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async refreshList() {
 		const accounts = await loadAccounts();
 		const identities = await loadIdentities();
-		console.log('identities: ', identities);
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
 		this.setState({ accounts, currentIdentity, identities, loaded: true });

@@ -151,7 +151,7 @@ export default class ScreenHeading extends React.PureComponent {
 		}
 
 		return (
-			<View style={[baseStyles.body, baseStyles.bodyL]}>
+			<View style={baseStyles.body}>
 				<Text style={componentStyles.finalTextStyles}>{title}</Text>
 				{renderSubtitle(subtitle, subtitleIcon, componentStyles)}
 				{renderBack(onPress)}
@@ -165,10 +165,6 @@ const baseStyles = StyleSheet.create({
 	body: {
 		marginBottom: 16,
 		paddingHorizontal: 16
-	},
-	bodyL: {
-		paddingLeft: 72,
-		paddingRight: 16
 	},
 	bodyWithIcon: {
 		alignItems: 'center',
