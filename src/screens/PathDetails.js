@@ -69,7 +69,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 	return (
 		<View style={styles.body}>
-			<PathCardHeading title="Public Address" />
+			<PathCardHeading title="Public Address" networkKey={networkKey} />
 			<View style={styles.menuView}>
 				<PopupMenu
 					testID={testIDs.PathDetail.popupMenuButton}

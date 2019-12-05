@@ -78,7 +78,6 @@ function AccountDetails({ accounts, navigation }) {
 				<View style={styles.header}>
 					<AccountIcon
 						address={''}
-						protocol={protocol}
 						network={NETWORK_LIST[account.networkKey]}
 						style={styles.icon}
 					/>

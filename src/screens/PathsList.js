@@ -157,6 +157,7 @@ function PathsList({ accounts, navigation }) {
 				title={NETWORK_LIST[networkKey].title}
 				subtitle={subtitle}
 				subtitleIcon={true}
+				networkKey={networkKey}
 			/>
 			<ScrollView>
 				{pathsGroups.map(pathsGroup =>

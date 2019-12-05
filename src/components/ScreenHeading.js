@@ -27,6 +27,8 @@ import fonts from '../fonts';
 import ButtonIcon from './ButtonIcon';
 import { Icon } from 'react-native-elements';
 import colors from '../colors';
+import AccountIcon from './AccountIcon';
+import { NETWORK_LIST } from '../constants';
 
 const composeStyle = StyleSheet.compose;
 
@@ -74,28 +76,42 @@ const renderIcon = (iconName, iconType) => {
 	);
 };
 
-export function PathCardHeading({ title }) {
+export function PathCardHeading({ title, networkKey }) {
 	const titleStyle = composeStyle(
 		fontStyles.h2,
 		baseStyles.t_left,
 		baseStyles.t_normal
 	);
 	return (
-		<View style={componentStyles.finalViewStyles}>
-			<Text style={titleStyle}>{title}</Text>
+		<View style={baseStyles.bodyWithIcon}>
+			<AccountIcon
+				address={''}
+				network={NETWORK_LIST[networkKey]}
+				style={baseStyles.networkIcon}
+			/>
+			<View>
+				<Text style={titleStyle}>{title}</Text>
+			</View>
 		</View>
 	);
 }
 
-export function PathListHeading({ title, subtitle, subtitleIcon }) {
+export function PathListHeading({ title, subtitle, subtitleIcon, networkKey }) {
 	extendComponentStyle('finalTextStyles', baseStyles.t_left);
 	extendComponentStyle('finalSubtitleIconStyle', {
 		justifyContent: 'flex-start'
 	});
 	return (
-		<View style={componentStyles.finalViewStyles}>
-			<Text style={componentStyles.finalTextStyles}>{title}</Text>
-			{renderSubtitle(subtitle, subtitleIcon, componentStyles)}
+		<View style={baseStyles.bodyWithIcon}>
+			<AccountIcon
+				address={''}
+				network={NETWORK_LIST[networkKey]}
+				style={baseStyles.networkIcon}
+			/>
+			<View>
+				<Text style={componentStyles.finalTextStyles}>{title}</Text>
+				{renderSubtitle(subtitle, subtitleIcon, componentStyles)}
+			</View>
 		</View>
 	);
 }
@@ -127,9 +143,8 @@ export default class ScreenHeading extends React.PureComponent {
 			extendComponentStyle('finalSubtitleStyle', { textAlign: 'left' });
 		}
 
-		extendComponentStyle('finalViewStyles', baseStyles.bodyL);
 		return (
-			<View style={componentStyles.finalViewStyles}>
+			<View style={[baseStyles.body, baseStyles.bodyL]}>
 				<Text style={componentStyles.finalTextStyles}>{title}</Text>
 				{renderSubtitle(subtitle, subtitleIcon, componentStyles)}
 				{renderBack(onPress)}
@@ -148,9 +163,17 @@ const baseStyles = StyleSheet.create({
 		paddingLeft: 72,
 		paddingRight: 16
 	},
+	bodyWithIcon: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		marginBottom: 16
+	},
 	icon: {
 		marginLeft: 5,
 		position: 'absolute'
+	},
+	networkIcon: {
+		paddingHorizontal: 16
 	},
 	subtitleIcon: {
 		alignItems: 'center',
@@ -177,6 +200,5 @@ const componentStyles = {
 	finalTextStyles: StyleSheet.compose(
 		fontStyles.h1,
 		baseStyles.t_center
-	),
-	finalViewStyles: baseStyles.body
+	)
 };
