@@ -20,7 +20,7 @@ export const pathsRegex = {
 	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
 	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
 	networkPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)+$/
+	validateDerivedPath: /^(\/\/?[\w-.]+)?$/
 };
 
 export const onlyNumberRegex = /^\d+$|^$/;
