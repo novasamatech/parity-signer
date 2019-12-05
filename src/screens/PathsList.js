@@ -40,7 +40,7 @@ import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
 import ButtonMainAction from '../components/ButtonMainAction';
-import ScreenHeading from '../components/ScreenHeading';
+import { PathListHeading } from '../components/ScreenHeading';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -153,10 +153,9 @@ function PathsList({ accounts, navigation }) {
 			: `//${NETWORK_LIST[networkKey].pathId}`;
 	return (
 		<View style={styles.body}>
-			<ScreenHeading
+			<PathListHeading
 				title={NETWORK_LIST[networkKey].title}
 				subtitle={subtitle}
-				big={true}
 				subtitleIcon={true}
 			/>
 			<ScrollView>

@@ -22,7 +22,7 @@ import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import PathCard from '../components/PathCard';
 import PopupMenu from '../components/PopupMenu';
-import ScreenHeading from '../components/ScreenHeading';
+import { PathCardHeading } from '../components/ScreenHeading';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import {
@@ -69,7 +69,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 	return (
 		<View style={styles.body}>
-			<ScreenHeading small={true} title="Public Address" />
+			<PathCardHeading title="Public Address" />
 			<View style={styles.menuView}>
 				<PopupMenu
 					testID={testIDs.PathDetail.popupMenuButton}
