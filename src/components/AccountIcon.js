@@ -53,7 +53,7 @@ export default function AccountIcon(props) {
 
 	if (address === '') {
 		return (
-			<View>
+			<View style={style}>
 				{network.logo ? (
 					<Image source={network.logo} style={styles.logo} />
 				) : (
