@@ -224,7 +224,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 			/>
 
 			<Modal
-				animationType="fade"
+				animationType="none"
 				visible={visible}
 				transparent={true}
 				onRequestClose={() => setVisible(false)}
