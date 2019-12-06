@@ -89,7 +89,10 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			<ScrollView>
 				<PathCard identity={currentIdentity} path={path} />
 				{networkKey === UnknownNetworkKeys.UNKNOWN ? (
-					<UnknownAccountWarning />
+					<>
+						<QrView data={address} />
+						<UnknownAccountWarning />
+					</>
 				) : (
 					<QrView data={accountId} />
 				)}

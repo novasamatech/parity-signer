@@ -56,6 +56,8 @@ export const SubstrateNetworkKeys = Object.freeze({
 const unknownNetworkBase = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.bg_alert,
+		pathId: '',
+		prefix: 2,
 		protocol: NetworkProtocols.UNKNOWN,
 		secondaryColor: colors.card_bgSolid,
 		title: 'Unknown network'

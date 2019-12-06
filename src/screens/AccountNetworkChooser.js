@@ -148,7 +148,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		onDerivationFinished(derivationSucceed, networkKey);
 	};
 
-	const renderShowMoreButton = () => {
+	const renderAddButton = () => {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
@@ -157,6 +157,18 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						isAdd={true}
 						onPress={() => setShouldShowMoreNetworks(true)}
 						title="Add Network Account"
+						networkColor={colors.bg}
+					/>
+					<Separator style={{ backgroundColor: 'transparent', height: 120 }} />
+				</>
+			);
+		} else {
+			return (
+				<>
+					<NetworkCard
+						isAdd={true}
+						onPress={() => navigation.navigate('PathDerivation')}
+						title="Create Custom Path"
 						networkColor={colors.bg}
 					/>
 					<Separator style={{ backgroundColor: 'transparent', height: 120 }} />
@@ -238,7 +250,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						title={networkParams.title}
 					/>
 				))}
-				{renderShowMoreButton()}
+				{renderAddButton()}
 			</ScrollView>
 			{renderScanButton()}
 		</View>
