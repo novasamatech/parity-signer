@@ -33,7 +33,11 @@ import {
 	encryptData,
 	substrateAddress
 } from '../util/native';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import {
+	NETWORK_LIST,
+	NetworkProtocols,
+	UnknownNetworkKeys
+} from '../constants';
 import type { AccountsStoreState } from './types';
 import {
 	deepCopyIdentities,
@@ -227,7 +231,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const accountId = generateAccountId({ address, networkKey });
 		const legacyAccount = this.getAccountWithoutCaseSensitive(accountId);
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
-		const derivedAccount = await this.getAccountFromIdentity(accountId);
+		let derivedAccount;
+		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
+			derivedAccount = await this.getAccountFromIdentity(accountId);
+		} else {
+			derivedAccount = await this.getAccountFromIdentity(address);
+		}
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
 		return null;
 	}
