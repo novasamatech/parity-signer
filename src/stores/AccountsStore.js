@@ -407,7 +407,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seedPhrase, prefix, networkKey, name) {
+	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
+		const prefix = NETWORK_LIST[networkKey].prefix;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const suri = constructSURI({
 			derivePath: newPath,

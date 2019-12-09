@@ -59,7 +59,6 @@ function PathDerivation({ accounts, navigation }) {
 		const derivationSucceed = await accounts.deriveNewPath(
 			completePath,
 			seedPhrase,
-			NETWORK_LIST[networkKey].prefix,
 			networkKey,
 			keyPairsName
 		);

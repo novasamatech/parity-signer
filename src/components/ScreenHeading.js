@@ -20,27 +20,115 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import fontStyles from '../fontStyles';
 import fonts from '../fonts';
 import ButtonIcon from './ButtonIcon';
 import { Icon } from 'react-native-elements';
 import colors from '../colors';
+import AccountIcon from './AccountIcon';
+import { NETWORK_LIST } from '../constants';
+import TouchableItem from './TouchableItem';
+
+const composeStyle = StyleSheet.compose;
+
+const renderSubtitle = (subtitle, subtitleIcon, isAlignLeft, isError) => {
+	if (!subtitle) return;
+	let subtitleBodyStyle = [baseStyles.subtitleBody],
+		subtitleTextStyle = [fontStyles.t_codeS];
+	if (isAlignLeft) {
+		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
+		subtitleTextStyle.push({ textAlign: 'left' });
+	}
+	if (isError) {
+		subtitleTextStyle.push(baseStyles.t_error);
+	}
+
+	return (
+		<View style={subtitleBodyStyle}>
+			{renderSubtitleIcon(subtitleIcon)}
+			<Text style={subtitleTextStyle}>{subtitle}</Text>
+		</View>
+	);
+};
+const renderSubtitleIcon = subtitleIcon => {
+	if (!subtitleIcon) return;
+	return <AntIcon name="user" size={10} color={colors.bg_text_sec} />;
+};
+
+const renderBack = onPress => {
+	if (!onPress) return;
+	return (
+		<ButtonIcon
+			iconName="arrowleft"
+			iconType="antdesign"
+			onPress={onPress}
+			style={[baseStyles.icon, { left: 0, top: -8 }]}
+			iconBgStyle={{ backgroundColor: 'transparent' }}
+		/>
+	);
+};
+const renderIcon = (iconName, iconType) => {
+	if (!iconName) return;
+	return (
+		<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
+			<Icon name={iconName} type={iconType} color={colors.bg_text} />
+		</View>
+	);
+};
+
+export function PathCardHeading({ title, networkKey }) {
+	const titleStyle = composeStyle(
+		fontStyles.h2,
+		baseStyles.t_left,
+		baseStyles.t_normal
+	);
+	return (
+		<View style={baseStyles.bodyWithIcon}>
+			<AccountIcon
+				address={''}
+				network={NETWORK_LIST[networkKey]}
+				style={baseStyles.networkIcon}
+			/>
+			<View>
+				<Text style={titleStyle}>{title}</Text>
+			</View>
+		</View>
+	);
+}
+
+export function PathListHeading({
+	title,
+	subtitle,
+	subtitleIcon,
+	networkKey,
+	onPress
+}) {
+	return (
+		<TouchableItem style={baseStyles.bodyWithIcon} onPress={onPress}>
+			<AccountIcon
+				address={''}
+				network={NETWORK_LIST[networkKey]}
+				style={baseStyles.networkIcon}
+			/>
+			<View>
+				<Text style={[baseStyles.text, baseStyles.t_left]}>{title}</Text>
+				{renderSubtitle(subtitle, subtitleIcon, true)}
+			</View>
+		</TouchableItem>
+	);
+}
 
 export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
-		big: PropTypes.bool,
 		onPress: PropTypes.func,
-		small: PropTypes.bool,
 		subtitle: PropTypes.string,
 		title: PropTypes.string
 	};
 	render() {
 		const {
-			big,
 			title,
-			small,
 			subtitle,
 			subtitleL,
 			subtitleIcon,
@@ -49,87 +137,36 @@ export default class ScreenHeading extends React.PureComponent {
 			iconName,
 			iconType
 		} = this.props;
-		const finalViewStyles = [styles.body];
-		const finalTextStyles = [fontStyles.h1, styles.t_center];
-		const finalSubtitleStyle = [fontStyles.t_codeS];
-		const finalSubtitleIconStyle = [styles.subtitleIcon];
-
-		if (big) {
-			finalViewStyles.push(styles.bodyL);
-			finalTextStyles.push(styles.t_left);
-			finalSubtitleIconStyle.push({ justifyContent: 'flex-start' });
-		} else if (small) {
-			finalViewStyles.push(styles.bodyL);
-			finalTextStyles.push([fontStyles.h2, styles.t_left, styles.t_normal]);
-		}
-
-		if (error) {
-			finalSubtitleStyle.push(styles.t_error);
-		}
-		if (subtitleL) {
-			finalSubtitleStyle.push({ textAlign: 'left' });
-		}
-
-		const renderSubtitle = () => {
-			if (!subtitle) return;
-			return (
-				<View style={finalSubtitleIconStyle}>
-					{renderSubtitleIcon()}
-					<Text style={[finalTextStyles, finalSubtitleStyle]}>{subtitle}</Text>
-				</View>
-			);
-		};
-		const renderSubtitleIcon = () => {
-			if (!subtitleIcon) return;
-			return <AntIcon name="user" size={10} color={colors.bg_text_sec} />;
-		};
-
-		const renderBack = () => {
-			if (!onPress) return;
-			return (
-				<ButtonIcon
-					iconName="arrowleft"
-					iconType="antdesign"
-					onPress={onPress}
-					style={[styles.icon, { left: 0, top: -8 }]}
-					iconBgStyle={{ backgroundColor: 'transparent' }}
-				/>
-			);
-		};
-		const renderIcon = () => {
-			if (!iconName) return;
-			return (
-				<View style={[styles.icon, { paddingLeft: 16 }]}>
-					<Icon name={iconName} type={iconType} color={colors.bg_text} />
-				</View>
-			);
-		};
 
 		return (
-			<View style={finalViewStyles}>
-				<Text style={finalTextStyles}>{title}</Text>
-				{renderSubtitle()}
-				{renderBack()}
-				{renderIcon()}
+			<View style={baseStyles.body}>
+				<Text style={baseStyles.text}>{title}</Text>
+				{renderSubtitle(subtitle, subtitleIcon, subtitleL, error)}
+				{renderBack(onPress)}
+				{renderIcon(iconName, iconType)}
 			</View>
 		);
 	}
 }
 
-const styles = {
+const baseStyles = StyleSheet.create({
 	body: {
 		marginBottom: 16,
 		paddingHorizontal: 16
 	},
-	bodyL: {
-		paddingLeft: 72,
-		paddingRight: 16
+	bodyWithIcon: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		marginBottom: 16
 	},
 	icon: {
 		marginLeft: 5,
 		position: 'absolute'
 	},
-	subtitleIcon: {
+	networkIcon: {
+		paddingHorizontal: 16
+	},
+	subtitleBody: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		justifyContent: 'center'
@@ -145,5 +182,9 @@ const styles = {
 	},
 	t_normal: {
 		fontFamily: fonts.roboto
+	},
+	text: {
+		...fontStyles.h1,
+		textAlign: 'center'
 	}
-};
+});

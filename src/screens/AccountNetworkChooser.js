@@ -127,12 +127,11 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	};
 
 	const deriveSubstrateDefault = async (networkKey, networkParams) => {
-		const { prefix, pathId } = networkParams;
+		const { pathId } = networkParams;
 		const seedPhrase = await unlockSeedPhrase(navigation);
 		const derivationSucceed = await accounts.deriveNewPath(
 			`//${pathId}//default`,
 			seedPhrase,
-			prefix,
 			networkKey,
 			'Default'
 		);
