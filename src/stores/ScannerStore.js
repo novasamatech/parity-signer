@@ -384,7 +384,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			(await accountsStore.getById({
 				address: recipientAddress,
 				networkKey
-			})) || emptyAccount(emptyAccount(recipientAddress, networkKey));
+			})) || emptyAccount(recipientAddress, networkKey);
 
 		// For Eth, always sign the keccak hash.
 		// For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
