@@ -33,7 +33,7 @@ import { withAccountAndScannerStore } from '../util/HOC';
 import fontStyles from '../fontStyles';
 import CompatibleCard from '../components/CompatibleCard';
 
-export function SignedTx({ scanner, accounts }) {
+function SignedTx({ scanner, accounts }) {
 	const { gas, gasPrice, value } = scanner.getTx();
 	const data = scanner.getSignedTxData();
 	const recipient = scanner.getRecipient();
