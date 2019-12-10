@@ -19,9 +19,9 @@
 import {
 	createType,
 	GenericExtrinsicPayload,
+	Metadata,
 	TypeRegistry
 } from '@polkadot/types';
-import MetaData from '@polkadot/metadata';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
@@ -46,7 +46,7 @@ const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 const registry = new TypeRegistry();
-new MetaData(registry, kusamaData);
+registry.setMetadata(new Metadata(registry, kusamaData));
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';

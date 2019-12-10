@@ -16,16 +16,14 @@
 
 'use strict';
 
-import { TypeRegistry } from '@polkadot/types';
-import MetaData from '@polkadot/metadata';
+import { Metadata, TypeRegistry } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 
 import kusamaData from '../../src/util/static-kusama';
 import { fromWei } from '../../src/util/units';
 const registry = new TypeRegistry();
-
-new MetaData(registry, kusamaData);
+registry.setMetadata(new Metadata(registry, kusamaData));
 
 describe('units', () => {
 	describe('ethereum', () => {
