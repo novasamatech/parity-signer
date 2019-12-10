@@ -36,7 +36,8 @@ const addressFunding1 = 'address1',
 	addressStaking = 'address4',
 	addressEthereum = 'address6',
 	addressDefault = 'addressDefault',
-	addressKusamaRoot = 'addressRoot',
+	addressKusamaRoot = 'addressKusamaRoot',
+	addressRoot = 'addressRoot',
 	paths = [
 		'//kusama//default',
 		'//kusama//funding/1',
@@ -45,7 +46,8 @@ const addressFunding1 = 'address1',
 		'//kusama//staking/1',
 		'//polkadot//default',
 		'1',
-		'//kusama'
+		'//kusama',
+		''
 	],
 	metaDefault = {
 		address: addressDefault,
@@ -89,6 +91,12 @@ const addressFunding1 = 'address1',
 		name: '',
 		updatedAt: 1573142786972
 	},
+	metaRoot = {
+		address: addressRoot,
+		createdAt: 1573142786972,
+		name: '',
+		updatedAt: 1573142786972
+	},
 	metaSoftKey = {
 		address: addressSoft,
 		createdAt: 1573142786972,
@@ -103,7 +111,8 @@ const addressesMap = new Map([
 	[addressStaking, paths[4]],
 	[addressPolkadot, paths[5]],
 	[addressEthereum, paths[6]],
-	[addressKusamaRoot, paths[7]]
+	[addressKusamaRoot, paths[7]],
+	[addressRoot, paths[8]]
 ]);
 const metaMap = new Map([
 	[paths[0], metaDefault],
@@ -113,7 +122,8 @@ const metaMap = new Map([
 	[paths[4], metaFunding2],
 	[paths[5], metaPolkadot],
 	[paths[6], metaEthereum],
-	[paths[7], metaKusamaRoot]
+	[paths[7], metaKusamaRoot],
+	[paths[8], metaRoot]
 ]);
 const testIdentities = [
 	{
@@ -139,9 +149,10 @@ describe('IdentitiesUtils', () => {
 		expect(originItem).toEqual(testIdentities);
 	});
 
-	it('regroup the paths', () => {
+	it('regroup the kusama paths', () => {
 		const kusamaPaths = paths.slice();
 		kusamaPaths.splice(5, 2);
+		kusamaPaths.splice(6, 1);
 		const groupResult = groupPaths(kusamaPaths);
 		expect(groupResult).toEqual([
 			{
@@ -163,6 +174,21 @@ describe('IdentitiesUtils', () => {
 		]);
 	});
 
+	it('regroup the unknown paths', () => {
+		const unKnownPaths = ['//polkadot//default', ''];
+		const groupResult = groupPaths(unKnownPaths);
+		expect(groupResult).toEqual([
+			{
+				paths: ['//polkadot//default'],
+				title: '//default'
+			},
+			{
+				paths: [''],
+				title: 'Root'
+			}
+		]);
+	});
+
 	it('get the path name', () => {
 		const expectNames = [
 			'default',
@@ -172,6 +198,7 @@ describe('IdentitiesUtils', () => {
 			'staking1',
 			'PolkadotFirst',
 			'Eth account',
+			'',
 			''
 		];
 		paths.forEach((path, index) => {

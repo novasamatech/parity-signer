@@ -90,7 +90,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				<PathCard identity={currentIdentity} path={path} />
 				{networkKey === UnknownNetworkKeys.UNKNOWN ? (
 					<>
-						<QrView data={address} />
+						<QrView data={generateAccountId({ address, networkKey })} />
 						<UnknownAccountWarning />
 					</>
 				) : (

@@ -133,6 +133,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const identities = await loadIdentities();
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
+		console.log('identities', identities);
 		this.setState({ accounts, currentIdentity, identities, loaded: true });
 	}
 
@@ -233,15 +234,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
 		let derivedAccount;
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
-			derivedAccount = await this.getAccountFromIdentity(accountId);
-		} else {
-			derivedAccount = await this.getAccountFromIdentity(address);
+			derivedAccount = this.getAccountFromIdentity(accountId);
+		}
+		if (!derivedAccount) {
+			derivedAccount = this.getAccountFromIdentity(address);
 		}
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
 		return null;
 	}
 
-	async getAccountFromIdentity(accountIdOrAddress) {
+	getAccountFromIdentity(accountIdOrAddress) {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetPath = null;
 		let targetIdentity = null;
@@ -272,8 +274,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			}
 		}
 
-		if (!targetPath || !targetIdentity) return false;
-		await this.setState({ currentIdentity: targetIdentity });
+		if (targetPath === null || targetIdentity === null) return false;
+		this.setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
 		const networkKey = getNetworkKeyByPath(targetPath);
@@ -288,7 +290,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		};
 	}
 
-	async getAccountByAddress(address) {
+	getAccountByAddress(address) {
 		if (!address) {
 			return false;
 		}
@@ -298,7 +300,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 				return { ...v, isLegacy: true };
 			}
 		}
-		return await this.getAccountFromIdentity(address);
+		return this.getAccountFromIdentity(address);
 	}
 
 	getSelected() {

@@ -22,11 +22,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST
-} from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import Background from '../components/Background';
 import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
@@ -131,8 +127,7 @@ export class TxDetailsView extends React.PureComponent {
 
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
-		const prefix =
-			!isEthereum && SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix;
+		const prefix = !isEthereum && NETWORK_LIST[sender.networkKey].prefix;
 
 		return (
 			<View style={styles.body}>

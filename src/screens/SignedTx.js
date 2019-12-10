@@ -23,11 +23,7 @@ import colors from '../colors';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST
-} from '../constants';
+import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import testIDs from '../../e2e/testIDs';
 import { withAccountAndScannerStore } from '../util/HOC';
 import fontStyles from '../fontStyles';
@@ -76,8 +72,8 @@ export function SignedTx({ scanner, accounts }) {
 					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
 						description={TX_DETAILS_MSG}
-						protocol={SUBSTRATE_NETWORK_LIST[sender.networkKey].protocol}
-						prefix={SUBSTRATE_NETWORK_LIST[sender.networkKey].prefix}
+						protocol={NETWORK_LIST[sender.networkKey].protocol}
+						prefix={NETWORK_LIST[sender.networkKey].prefix}
 						signature={data}
 					/>
 				)}

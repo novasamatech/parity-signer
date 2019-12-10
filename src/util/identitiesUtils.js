@@ -41,7 +41,8 @@ export const extractSubPathName = path => {
 	return removeSlash(pathFragments.slice(1).join(''));
 };
 
-export const isSubstratePath = path => path.split('//')[1] !== undefined;
+export const isSubstratePath = path =>
+	path.split('//')[1] !== undefined || path === '';
 
 export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
 
@@ -204,6 +205,10 @@ export const getPathName = (path, lookUpIdentity) => {
 
 export const groupPaths = paths => {
 	const unSortedPaths = paths.reduce((groupedPath, path) => {
+		if (path === '') {
+			groupedPath.push({ paths: [path], title: 'Root' });
+			return groupedPath;
+		}
 		const pathId = extractPathId(path) || '';
 		if (removeSlash(path) === pathId) return groupedPath;
 
