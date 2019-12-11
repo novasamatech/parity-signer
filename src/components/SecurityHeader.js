@@ -18,12 +18,13 @@
 
 import NetInfo from '@react-native-community/netinfo';
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import colors from '../colors';
 import IdentitiesSwitch from '../components/IdentitiesSwitch';
 import ButtonIcon from './ButtonIcon';
+import testIDs from '../../e2e/testIDs';
 
 function SecurityHeader({ navigation }) {
 	const [isConnected, setIsConnected] = useState(false);
@@ -37,25 +38,36 @@ function SecurityHeader({ navigation }) {
 	);
 
 	return (
-		<View
-			style={{
-				alignItems: 'center',
-				flexDirection: 'row',
-				paddingRight: 16
-			}}
-		>
+		<View style={styles.body}>
 			{isConnected && (
 				<ButtonIcon
 					onPress={() => navigation.navigate('Security')}
 					iconName="shield-off"
 					iconType="feather"
 					iconColor={colors.bg_alert}
-					iconBgStyle={{ backgroundColor: 'transparent', marginTop: -3 }}
+					iconBgStyle={styles.securityIconBgStyle}
 				/>
 			)}
+			<ButtonIcon
+				onPress={() => navigation.navigate('QrScanner')}
+				iconName="qrcode-scan"
+				iconType="material-community"
+				iconBgStyle={styles.scannerIconBgStyle}
+				testID={testIDs.SecurityHeader.scanButton}
+			/>
 			<IdentitiesSwitch />
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	body: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		paddingRight: 16
+	},
+	scannerIconBgStyle: { backgroundColor: 'transparent' },
+	securityIconBgStyle: { backgroundColor: 'transparent', marginTop: -3 }
+});
 
 export default withNavigation(SecurityHeader);
