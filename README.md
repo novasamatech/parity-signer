@@ -127,7 +127,7 @@ If debugging is needed:
 2. Run `yarn test:debug`
 3. Open a new tab in Chrome and go to `chrome://inspect`
 4. Click the `inspect` button of target under `Remote Target`
-5. Back to the terminal and choose one of the node watch commands for running tests again.
+5. Back to the terminal, choose one of the node watch commands to run the tests again.
 
 #### Integration Test
 
