@@ -30,6 +30,7 @@ import {
 } from '../constants';
 import {
 	navigateToPathsList,
+	navigateToSubstrateRoot,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
 import { withAccountStore } from '../util/HOC';
@@ -118,24 +119,31 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		return availableNetworks.includes(networkKey);
 	};
 
-	const onDerivationFinished = (derivationSucceed, networkKey) => {
+	const onDerivationFinished = (
+		derivationSucceed,
+		networkKey,
+		isSubstrateRoot
+	) => {
 		if (derivationSucceed) {
+			if (isSubstrateRoot) {
+				return navigateToSubstrateRoot(navigation, networkKey);
+			}
 			navigateToPathsList(navigation, networkKey);
 		} else {
 			alertPathDerivationError();
 		}
 	};
 
-	const deriveSubstrateDefault = async (networkKey, networkParams) => {
+	const deriveSubstrateRoot = async (networkKey, networkParams) => {
 		const { pathId } = networkParams;
 		const seedPhrase = await unlockSeedPhrase(navigation);
 		const derivationSucceed = await accounts.deriveNewPath(
-			`//${pathId}//default`,
+			`//${pathId}`,
 			seedPhrase,
 			networkKey,
-			'Default'
+			'Root'
 		);
-		onDerivationFinished(derivationSucceed, networkKey);
+		onDerivationFinished(derivationSucceed, networkKey, true);
 	};
 
 	const deriveEthereumAccount = async networkKey => {
@@ -144,7 +152,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			seedPhrase,
 			networkKey
 		);
-		onDerivationFinished(derivationSucceed, networkKey);
+		onDerivationFinished(derivationSucceed, networkKey, false);
 	};
 
 	const renderAddButton = () => {
@@ -204,7 +212,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	const onNetworkChosen = async (networkKey, networkParams) => {
 		if (isNew) {
 			if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
-				await deriveSubstrateDefault(networkKey, networkParams);
+				await deriveSubstrateRoot(networkKey, networkParams);
 			} else {
 				await deriveEthereumAccount(networkKey);
 			}
@@ -213,9 +221,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
 			if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
 				if (listedPaths.length === 0)
-					return navigation.navigate('PathDerivation', {
-						networkKey
-					});
+					return await deriveSubstrateRoot(networkKey, networkParams);
 			} else if (
 				networkParams.protocol === NetworkProtocols.ETHEREUM &&
 				!paths.includes(networkKey)
