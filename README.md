@@ -117,6 +117,18 @@ Corresponding data:
 }
 ```
 
+#### Unit Test
+
+Run `yarn test` for all the units test.
+
+If debugging is needed:
+
+1. Insert a line of `debugger;` into the code base where might be failed.
+2. Run `yarn test:debug`
+3. Open a new tab in Chrome with address `chrome://inspect`
+4. Click the `inspect` button of target under `Remote Target`
+5. Back to the terminal and choose one of the node watch commands for running tests again.
+
 #### Integration Test
 
 Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
