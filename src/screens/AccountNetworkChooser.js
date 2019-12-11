@@ -242,12 +242,9 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	networkList.sort(sortNetworkKeys);
 
 	return (
-		<View
-			style={styles.body}
-			testID={testIDs.AccountNetworkChooser.chooserScreen}
-		>
+		<View style={styles.body}>
 			{renderScreenHeading()}
-			<ScrollView>
+			<ScrollView testID={testIDs.AccountNetworkChooser.chooserScreen}>
 				{networkList.map(([networkKey, networkParams], index) => (
 					<NetworkCard
 						key={networkKey}

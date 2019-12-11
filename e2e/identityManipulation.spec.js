@@ -124,8 +124,8 @@ describe('Load test', async () => {
 		await tapBack();
 		await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
 		await testScrollAndTap(
-			substrateNetworkButtonIndex,
-			testIDs.AccountNetworkChooser.addCustomNetworkButton
+			testIDs.AccountNetworkChooser.addCustomNetworkButton,
+			testIDs.AccountNetworkChooser.chooserScreen
 		);
 		await testInput(PathDerivation.nameInput, 'custom network');
 		await testInput(PathDerivation.pathInput, customPath);

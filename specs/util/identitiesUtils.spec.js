@@ -38,6 +38,7 @@ const addressFunding1 = 'address1',
 	addressDefault = 'addressDefault',
 	addressKusamaRoot = 'addressKusamaRoot',
 	addressRoot = 'addressRoot',
+	addressCustom = 'addressCustom',
 	paths = [
 		'//kusama//default',
 		'//kusama//funding/1',
@@ -47,8 +48,23 @@ const addressFunding1 = 'address1',
 		'//polkadot//default',
 		'1',
 		'//kusama',
-		''
+		'',
+		'//custom'
 	],
+	kusamaPaths = [
+		'//kusama//default',
+		'//kusama//funding/1',
+		'//kusama/softKey1',
+		'//kusama//funding/2',
+		'//kusama//staking/1',
+		'//kusama'
+	],
+	metaCustom = {
+		address: addressCustom,
+		createdAt: 1571068850409,
+		name: 'custom Path',
+		updatedAt: 1571068850409
+	},
 	metaDefault = {
 		address: addressDefault,
 		createdAt: 1571068850409,
@@ -112,7 +128,8 @@ const addressesMap = new Map([
 	[addressPolkadot, paths[5]],
 	[addressEthereum, paths[6]],
 	[addressKusamaRoot, paths[7]],
-	[addressRoot, paths[8]]
+	[addressRoot, paths[8]],
+	[addressCustom, paths[9]]
 ]);
 const metaMap = new Map([
 	[paths[0], metaDefault],
@@ -123,7 +140,8 @@ const metaMap = new Map([
 	[paths[5], metaPolkadot],
 	[paths[6], metaEthereum],
 	[paths[7], metaKusamaRoot],
-	[paths[8], metaRoot]
+	[paths[8], metaRoot],
+	[paths[9], metaCustom]
 ]);
 const testIdentities = [
 	{
@@ -150,9 +168,6 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('regroup the kusama paths', () => {
-		const kusamaPaths = paths.slice();
-		kusamaPaths.splice(5, 2);
-		kusamaPaths.splice(6, 1);
 		const groupResult = groupPaths(kusamaPaths);
 		expect(groupResult).toEqual([
 			{
@@ -175,7 +190,7 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('regroup the unknown paths', () => {
-		const unKnownPaths = ['//polkadot//default', ''];
+		const unKnownPaths = ['//polkadot//default', '', '//custom'];
 		const groupResult = groupPaths(unKnownPaths);
 		expect(groupResult).toEqual([
 			{
@@ -185,6 +200,10 @@ describe('IdentitiesUtils', () => {
 			{
 				paths: [''],
 				title: 'Root'
+			},
+			{
+				paths: ['//custom'],
+				title: 'custom'
 			}
 		]);
 	});
@@ -199,7 +218,8 @@ describe('IdentitiesUtils', () => {
 			'PolkadotFirst',
 			'Eth account',
 			'',
-			''
+			'',
+			'custom Path'
 		];
 		paths.forEach((path, index) => {
 			const name = getPathName(path, testIdentities[0]);

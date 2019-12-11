@@ -210,7 +210,16 @@ export const groupPaths = paths => {
 			return groupedPath;
 		}
 		const pathId = extractPathId(path) || '';
-		if (removeSlash(path) === pathId) return groupedPath;
+		const isRootPath = removeSlash(path) === pathId;
+		if (isRootPath) {
+			const isUnknownRootPath = Object.values(NETWORK_LIST).every(
+				v => v.pathId !== pathId
+			);
+			if (isUnknownRootPath) {
+				groupedPath.push({ paths: [path], title: pathId });
+			}
+			return groupedPath;
+		}
 
 		const subPath = path.slice(pathId.length + 2);
 
