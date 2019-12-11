@@ -18,8 +18,7 @@
 
 'use strict';
 
-import { TypeRegistry } from '@polkadot/types';
-import MetaData from '@polkadot/metadata';
+import { TypeRegistry, Metadata } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
@@ -60,14 +59,15 @@ export default class PayloadDetailsCard extends React.PureComponent {
 
 		let metadata;
 		if (isKusama) {
-			metadata = new MetaData(registry, kusamaMetadata);
-			// registry.setMetadata(metaData);
+			metadata = new Metadata(registry, kusamaMetadata);
+			registry.setMetadata(metadata);
 			formatBalance.setDefaults({
 				decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
 				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
 			});
 		} else if (__DEV__ && isSubstrateDev) {
-			metadata = new MetaData(registry, substrateDevMetadata);
+			metadata = new Metadata(registry, substrateDevMetadata);
+			registry.setMetadata(metadata);
 			formatBalance.setDefaults({
 				decimals:
 					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,

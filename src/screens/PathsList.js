@@ -39,7 +39,6 @@ import testIDs from '../../e2e/testIDs';
 import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
-import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
 
 function PathsList({ accounts, navigation }) {
@@ -175,10 +174,6 @@ function PathsList({ accounts, navigation }) {
 					/>
 				)}
 			</ScrollView>
-			<ButtonMainAction
-				title={'Scan'}
-				onPress={() => navigation.navigate('QrScanner')}
-			/>
 		</View>
 	);
 }

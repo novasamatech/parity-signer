@@ -24,7 +24,7 @@ import { withScannerStore } from '../util/HOC';
 import fontStyles from '../fontStyles';
 import MessageDetailsCard from '../components/MessageDetailsCard';
 
-export function SignedMessage({ scanner }) {
+function SignedMessage({ scanner }) {
 	const data = scanner.getSignedTxData();
 	const isHash = scanner.getIsHash();
 	const message = scanner.getMessage();
