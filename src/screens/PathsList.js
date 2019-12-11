@@ -185,10 +185,11 @@ function PathsList({ accounts, navigation }) {
 			? ''
 			: `//${networkParams.pathId}`;
 	return (
-		<View style={styles.body}>
+		<View style={styles.body} testID={testIDs.PathsList.screen}>
 			<PathListHeading
 				onPress={onClickRootPath}
 				title={networkParams.title}
+				testID={testIDs.PathsList.rootButton}
 				subtitle={subtitle}
 				subtitleIcon={true}
 				networkKey={networkKey}

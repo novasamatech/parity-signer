@@ -102,11 +102,16 @@ export function PathListHeading({
 	title,
 	subtitle,
 	subtitleIcon,
+	testID,
 	networkKey,
 	onPress
 }) {
 	return (
-		<TouchableItem style={baseStyles.bodyWithIcon} onPress={onPress}>
+		<TouchableItem
+			style={baseStyles.bodyWithIcon}
+			onPress={onPress}
+			testID={testID}
+		>
 			<AccountIcon
 				address={''}
 				network={NETWORK_LIST[networkKey]}

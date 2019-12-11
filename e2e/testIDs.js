@@ -22,7 +22,7 @@ const testIDs = {
 	},
 	AccountNetworkChooser: {
 		addNewNetworkButton: 'anc_add_button',
-		chooserScreen: 'anc_chooser_scree',
+		chooserScreen: 'anc_chooser_screen',
 		createButton: 'anc_create_button',
 		networkButton: 'anc_network_button',
 		noAccountScreen: 'anc_no_account_screen',
@@ -68,12 +68,15 @@ const testIDs = {
 	},
 	PathDetail: {
 		deleteButton: 'path_detail_delete_button',
-		popupMenuButton: 'path_detail_popup_menu_button'
+		popupMenuButton: 'path_detail_popup_menu_button',
+		screen: 'path_detail_screen'
 	},
 	PathsList: {
 		deriveButton: 'path_list_derive_button',
 		pathCard: 'path_list_path_card',
-		scanButton: 'path_list_scan_button'
+		rootButton: 'path_list_root_button',
+		scanButton: 'path_list_scan_button',
+		screen: 'path_list_screen'
 	},
 	SignedMessage: {},
 	SignedTx: {

@@ -122,12 +122,7 @@ QrScannerView.propTypes = {
 	onBarCodeRead: PropTypes.func.isRequired
 };
 
-export function QrScannerView({
-	navigation,
-	scannerStore,
-	accountStore,
-	...props
-}) {
+function QrScannerView({ navigation, scannerStore, accountStore, ...props }) {
 	if (global.inTest) {
 		props.onBarCodeRead(createMockSignRequest());
 	}
