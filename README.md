@@ -123,7 +123,7 @@ Run `yarn test` for all the units test.
 
 If debugging is needed:
 
-1. Insert a line of `debugger;` into the code base where might be failed.
+1. Insert `debugger;` in the code where you think it fails.
 2. Run `yarn test:debug`
 3. Open a new tab in Chrome with address `chrome://inspect`
 4. Click the `inspect` button of target under `Remote Target`
