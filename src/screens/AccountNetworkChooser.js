@@ -157,14 +157,14 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
-				<View style={styles.bottomButton}>
+				<>
 					<NetworkCard
 						isAdd={true}
 						onPress={() => setShouldShowMoreNetworks(true)}
 						title="Add Network Account"
 						networkColor={colors.bg}
 					/>
-				</View>
+				</>
 			);
 		}
 	};
@@ -228,8 +228,8 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						title={networkParams.title}
 					/>
 				))}
+				{renderShowMoreButton()}
 			</ScrollView>
-			{renderShowMoreButton()}
 		</View>
 	);
 }
@@ -241,12 +241,6 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flex: 1,
 		flexDirection: 'column'
-	},
-	bottomButton: {
-		bottom: 0,
-		left: 0,
-		position: 'absolute',
-		right: 0
 	},
 	onboardingWrapper: {
 		alignItems: 'center',
