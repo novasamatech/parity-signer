@@ -27,12 +27,14 @@ import {
 	HeaderBackButton,
 	withNavigation
 } from 'react-navigation';
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
 import '../shim';
 import Background from './components/Background';
 import colors from './colors';
+import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import '../ReactotronConfig';
@@ -179,93 +181,154 @@ const Screens = createSwitchNavigator(
 			defaultNavigationOptions: globalStackNavigationOptions
 		}),
 		Welcome: {
-			screen: createStackNavigator(
+			screen: createMaterialBottomTabNavigator(
 				{
-					AccountNetworkChooser: {
-						screen: AccountNetworkChooser
-					},
-					AccountPin: {
-						screen: AccountPin
-					},
-					AccountUnlock: {
-						screen: AccountUnlock
-					},
-					About: {
-						screen: About
-					},
-					AccountDetails: {
-						screen: AccountDetails
-					},
-					AccountEdit: {
-						screen: AccountEdit
-					},
-					AccountNew: {
-						screen: AccountNew
-					},
-					AccountRecover: {
-						screen: AccountRecover
-					},
-					AccountUnlockAndSign: {
-						screen: AccountUnlockAndSign
-					},
-					LegacyAccountBackup: {
-						screen: LegacyAccountBackup
-					},
-					LegacyAccountList: {
-						screen: LegacyAccountList
-					},
-					LegacyNetworkChooser: {
-						screen: LegacyNetworkChooser
-					},
-					IdentityBackup: {
-						screen: IdentityBackup
-					},
-					IdentityManagement: {
-						screen: IdentityManagement
-					},
-					IdentityNew: {
-						screen: IdentityNew
-					},
-					IdentityPin: {
-						screen: IdentityPin
-					},
-					MessageDetails: {
-						screen: MessageDetails
-					},
-					PathDerivation: {
-						screen: PathDerivation
-					},
-					PathDetails: {
-						screen: PathDetails
-					},
-					PathsList: {
-						screen: PathsList
-					},
-					PathManagement: {
-						screen: PathManagement
-					},
-					QrScanner: {
-						screen: QrScanner
-					},
-					SignedMessage: {
-						screen: SignedMessage
-					},
-					SignedTx: {
-						screen: SignedTx
-					},
-					TxDetails: {
-						screen: TxDetails
-					},
-					Security: {
+					Accounts: {
+						screen: createStackNavigator(
+							{
+								AccountNetworkChooser: {
+									screen: AccountNetworkChooser
+								},
+								AccountPin: {
+									screen: AccountPin
+								},
+								AccountUnlock: {
+									screen: AccountUnlock
+								},
+								AccountDetails: {
+									screen: AccountDetails
+								},
+								AccountEdit: {
+									screen: AccountEdit
+								},
+								AccountNew: {
+									screen: AccountNew
+								},
+								AccountRecover: {
+									screen: AccountRecover
+								},
+								AccountUnlockAndSign: {
+									screen: AccountUnlockAndSign
+								},
+								LegacyAccountBackup: {
+									screen: LegacyAccountBackup
+								},
+								LegacyAccountList: {
+									screen: LegacyAccountList
+								},
+								LegacyNetworkChooser: {
+									screen: LegacyNetworkChooser
+								},
+								IdentityBackup: {
+									screen: IdentityBackup
+								},
+								IdentityManagement: {
+									screen: IdentityManagement
+								},
+								IdentityNew: {
+									screen: IdentityNew
+								},
+								IdentityPin: {
+									screen: IdentityPin
+								},
+								MessageDetails: {
+									screen: MessageDetails
+								},
+								PathDerivation: {
+									screen: PathDerivation
+								},
+								PathDetails: {
+									screen: PathDetails
+								},
+								PathsList: {
+									screen: PathsList
+								},
+								PathManagement: {
+									screen: PathManagement
+								}
+							},
+							{
+								defaultNavigationOptions: globalStackNavigationOptions
+							}
+						),
 						navigationOptions: {
-							headerRight: null
-						},
-						screen: Security
+							tabBarLabel: 'Accounts',
+							tabBarIcon: ({ tintColor }) => (
+								<Icon
+									style={[{ color: tintColor }]}
+									size={25}
+									name={'ios-key'}
+								/>
+							)
+						}
 					},
-					...tocAndPrivacyPolicyScreens
+					Profile: {
+						screen: createStackNavigator(
+							{
+								QrScanner: {
+									screen: QrScanner
+								},
+								SignedMessage: {
+									screen: SignedMessage
+								},
+								SignedTx: {
+									screen: SignedTx
+								},
+								TxDetails: {
+									screen: TxDetails
+								}
+							},
+							{
+								defaultNavigationOptions: globalStackNavigationOptions
+							}
+						),
+						navigationOptions: {
+							tabBarLabel: 'Scanner',
+							tabBarIcon: ({ tintColor }) => (
+								<Icon
+									style={[{ color: tintColor }]}
+									size={25}
+									name={'ios-qr-scanner'}
+								/>
+							)
+						}
+					},
+					Settings: {
+						screen: createStackNavigator(
+							{
+								About: {
+									screen: About
+								},
+								Security: {
+									navigationOptions: {
+										headerRight: null
+									},
+									screen: Security
+								},
+								...tocAndPrivacyPolicyScreens
+							},
+							{
+								defaultNavigationOptions: globalStackNavigationOptions
+							}
+						),
+						navigationOptions: {
+							tabBarLabel: 'Settings',
+							tabBarIcon: ({ tintColor }) => (
+								<Icon
+									style={[{ color: tintColor }]}
+									size={25}
+									name={'ios-settings'}
+								/>
+							)
+						}
+					}
 				},
 				{
-					defaultNavigationOptions: globalStackNavigationOptions
+					activeColor: colors.bg_button,
+					barStyle: { backgroundColor: '#000000' },
+					inactiveColor: colors.card_bg_text_sec,
+					initialRouteName: 'Accounts',
+					shifting: true
 				}
 			)
 		}
