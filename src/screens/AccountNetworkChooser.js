@@ -40,9 +40,7 @@ import {
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
-import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
-import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
 
@@ -159,15 +157,14 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
-				<>
+				<View style={styles.bottomButton}>
 					<NetworkCard
 						isAdd={true}
 						onPress={() => setShouldShowMoreNetworks(true)}
 						title="Add Network Account"
 						networkColor={colors.bg}
 					/>
-					<Separator style={{ backgroundColor: 'transparent', height: 120 }} />
-				</>
+				</View>
 			);
 		}
 	};
@@ -183,18 +180,6 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				/>
 			);
 		}
-	};
-
-	const renderScanButton = () => {
-		if (isNew) return;
-		else if (shouldShowMoreNetworks) return;
-		return (
-			<ButtonMainAction
-				testID={testIDs.AccountNetworkChooser.scanButton}
-				title={'Scan'}
-				onPress={() => navigation.navigate('QrScanner')}
-			/>
-		);
 	};
 
 	const onNetworkChosen = async (networkKey, networkParams) => {
@@ -243,9 +228,8 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						title={networkParams.title}
 					/>
 				))}
-				{renderShowMoreButton()}
 			</ScrollView>
-			{renderScanButton()}
+			{renderShowMoreButton()}
 		</View>
 	);
 }
@@ -257,6 +241,12 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg,
 		flex: 1,
 		flexDirection: 'column'
+	},
+	bottomButton: {
+		bottom: 0,
+		left: 0,
+		position: 'absolute',
+		right: 0
 	},
 	onboardingWrapper: {
 		alignItems: 'center',
