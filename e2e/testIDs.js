@@ -21,7 +21,8 @@ const testIDs = {
 		accountList: 'accountList'
 	},
 	AccountNetworkChooser: {
-		addNewNetworkButton: 'anc_add_button',
+		addCustomNetworkButton: 'anc_add_custom_button',
+		addNewNetworkButton: 'anc_add_new_button',
 		chooserScreen: 'anc_chooser_screen',
 		createButton: 'anc_create_button',
 		networkButton: 'anc_network_button',

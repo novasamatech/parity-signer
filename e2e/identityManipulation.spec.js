@@ -47,7 +47,8 @@ const {
 const pinCode = '123456';
 const mockIdentityName = 'mockIdentity';
 const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '2'; //Need change if network list changes
-const defaultPath = '//default';
+const defaultPath = '//default',
+	customPath = '//sunny_day/1';
 const mockSeedPhrase =
 	'split cradle example drum veteran swear cruel pizza guilt surface mansion film grant benefit educate marble cargo ignore bind include advance grunt exile grow';
 
@@ -117,6 +118,20 @@ describe('Load test', async () => {
 		await testTap(PathsList.rootButton);
 		await expect(element(by.text('Root'))).toExist();
 		await tapBack();
+	});
+
+	it('is able to create custom path', async () => {
+		await tapBack();
+		await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
+		await testScrollAndTap(
+			substrateNetworkButtonIndex,
+			testIDs.AccountNetworkChooser.addCustomNetworkButton
+		);
+		await testInput(PathDerivation.nameInput, 'custom network');
+		await testInput(PathDerivation.pathInput, customPath);
+		await testTap(PathDerivation.deriveButton);
+		await testUnlockPin(pinCode);
+		await testExist(PathsList.pathCard + customPath);
 	});
 
 	it('should sign the transaction', async () => {
