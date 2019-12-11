@@ -39,7 +39,6 @@ import {
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
-import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
 import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
@@ -178,18 +177,6 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		}
 	};
 
-	const renderScanButton = () => {
-		if (isNew) return;
-		else if (shouldShowMoreNetworks) return;
-		return (
-			<ButtonMainAction
-				testID={testIDs.AccountNetworkChooser.scanButton}
-				title={'Scan'}
-				onPress={() => navigation.navigate('QrScanner')}
-			/>
-		);
-	};
-
 	const onNetworkChosen = async (networkKey, networkParams) => {
 		if (isNew) {
 			if (networkParams.protocol === NetworkProtocols.SUBSTRATE) {
@@ -240,7 +227,6 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				))}
 				{renderShowMoreButton()}
 			</ScrollView>
-			{renderScanButton()}
 		</View>
 	);
 }
