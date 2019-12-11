@@ -53,27 +53,26 @@ export default class TxDetails extends React.PureComponent {
 		if (
 			senderIdentity.biometricEnabled &&
 			(await scannerStore.signDataBiometric(sender.isLegacy))
-		) {
+		)
 			return navigateToSignedTx(this.props.navigation);
-		} else {
-			try {
-				if (sender.isLegacy) {
-					return this.props.navigation.navigate('AccountUnlockAndSign', {
-						next: 'SignedTx'
-					});
-				}
-				const seedPhrase = await unlockSeedPhrase(
-					this.props.navigation,
-					senderIdentity
-				);
-				await scannerStore.signDataWithSeedPhrase(
-					seedPhrase,
-					NETWORK_LIST[sender.networkKey].protocol
-				);
-				return navigateToSignedTx(this.props.navigation);
-			} catch (e) {
-				scannerStore.setErrorMsg(e.message);
+
+		try {
+			if (sender.isLegacy) {
+				return this.props.navigation.navigate('AccountUnlockAndSign', {
+					next: 'SignedTx'
+				});
 			}
+			const seedPhrase = await unlockSeedPhrase(
+				this.props.navigation,
+				senderIdentity
+			);
+			await scannerStore.signDataWithSeedPhrase(
+				seedPhrase,
+				NETWORK_LIST[sender.networkKey].protocol
+			);
+			return navigateToSignedTx(this.props.navigation);
+		} catch (e) {
+			scannerStore.setErrorMsg(e.message);
 		}
 	}
 

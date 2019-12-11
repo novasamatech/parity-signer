@@ -155,9 +155,13 @@ export const unlockIdentitySeed = async (pin, identity) => {
 };
 
 export const unlockIdentitySeedWithBiometric = async identity => {
-	return secureGet(identity.pinKey).then(async pin => {
-		return unlockIdentitySeed(pin, identity);
-	});
+	try {
+		return secureGet(identity.pinKey).then(async pin => {
+			return unlockIdentitySeed(pin, identity);
+		});
+	} catch (err) {
+		return false;
+	}
 };
 
 export const getExistedNetworkKeys = identity => {

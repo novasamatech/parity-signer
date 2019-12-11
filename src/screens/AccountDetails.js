@@ -62,14 +62,13 @@ function AccountDetails({ accounts, navigation }) {
 				async () => {
 					navigation.navigate('AccountUnlock', {
 						next: value,
-						onDelete: onDelete
+						onDelete
 					});
 				}
 			);
 		} else {
 			navigation.navigate('AccountUnlock', {
-				next: value,
-				onDelete: onDelete
+				next: value
 			});
 		}
 	};
@@ -99,14 +98,12 @@ function AccountDetails({ accounts, navigation }) {
 	};
 
 	const onOptionSelect = async value => {
-		if (value !== 'AccountEdit') {
-			if (accounts.getSelected().biometricEnabled) {
-				await withBiometric(value);
-			} else {
-				await noBiometric(value);
-			}
+		if (value === 'AccountEdit') return navigation.navigate('AccountEdit');
+
+		if (accounts.getSelected().biometricEnabled) {
+			await withBiometric(value);
 		} else {
-			navigation.navigate('AccountEdit');
+			await noBiometric(value);
 		}
 	};
 
@@ -143,7 +140,7 @@ function AccountDetails({ accounts, navigation }) {
 				</View>
 			</View>
 			<AccountCard
-				accountId={account.address}
+				address={account.address}
 				networkKey={account.networkKey}
 				title={account.name}
 			/>

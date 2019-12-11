@@ -47,6 +47,8 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		screenName,
 		params
 	) => {
+		if (identity === currentIdentity)
+			return closeModalAndNavigate(screenName, params);
 		await accounts.selectIdentity(identity);
 		setVisible(false);
 		resetNavigationTo(navigation, screenName, params);

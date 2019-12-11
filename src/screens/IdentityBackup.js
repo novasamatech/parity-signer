@@ -48,24 +48,23 @@ function IdentityBackup({ navigation, accounts }) {
 	};
 
 	useEffect(() => {
+		const onUnlockSuccess = backupSeedPhrase => {
+			navigation.pop();
+			setSeedPhrase(backupSeedPhrase);
+		};
 		const setSeedPhraseAsync = async () => {
 			if (isNew) {
 				setSeedPhrase(await words());
 			} else {
 				let backupSeedPhrase;
 				if (currentIdentity.biometricEnabled) {
-					try {
-						backupSeedPhrase = await unlockIdentitySeedWithBiometric(
-							currentIdentity
-						);
-					} catch (e) {
-						backupSeedPhrase = await unlockSeedPhrase(navigation);
-					}
-				} else {
-					backupSeedPhrase = await unlockSeedPhrase(navigation);
+					backupSeedPhrase = await unlockIdentitySeedWithBiometric(
+						currentIdentity
+					);
+					if (backupSeedPhrase) return onUnlockSuccess(backupSeedPhrase);
 				}
-				//				navigation.pop();
-				setSeedPhrase(backupSeedPhrase);
+				backupSeedPhrase = await unlockSeedPhrase(navigation);
+				onUnlockSuccess(backupSeedPhrase);
 			}
 		};
 
@@ -73,7 +72,7 @@ function IdentityBackup({ navigation, accounts }) {
 		return () => {
 			setSeedPhrase('');
 		};
-	}, [accounts, currentIdentity, isNew, navigation]);
+	}, [currentIdentity, isNew, navigation]);
 
 	return (
 		<ScrollView style={styles.body}>

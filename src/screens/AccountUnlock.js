@@ -70,7 +70,6 @@ export class AccountUnlockAndSign extends React.PureComponent {
 
 export class AccountUnlock extends React.PureComponent {
 	onToggleBiometric = async (pin, accounts) => {
-		this.props.navigation.goBack();
 		if (accounts.getSelected().biometricEnabled) {
 			await accounts.disableBiometric(accounts.getSelectedKey());
 		} else {
@@ -86,17 +85,19 @@ export class AccountUnlock extends React.PureComponent {
 					]);
 				});
 		}
+		this.props.navigation.goBack();
 	};
 
 	onNavigate = async (pin, accounts) => {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'LegacyAccountList');
+		const onDelete = navigation.getParam('onDelete');
 
 		if (next === 'AccountBiometric') {
 			this.onToggleBiometric(pin, accounts);
 		} else if (next === 'AccountDelete') {
 			navigation.goBack();
-			navigation.state.params.onDelete();
+			onDelete();
 		} else {
 			const resetAction = StackActions.reset({
 				actions: [

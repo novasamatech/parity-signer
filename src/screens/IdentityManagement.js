@@ -68,14 +68,14 @@ function IdentityManagement({ accounts, navigation }) {
 	const onOptionSelect = async value => {
 		if (value === 'PathDelete') {
 			alertDeleteIdentity(async () => {
-				if (currentIdentity.biometricEnabled) {
-					await unlockIdentitySeedWithBiometric(currentIdentity)
-						.then(onDelete)
-						.catch(() => {
-							unlockSeedPhrase(navigation).then(onDelete);
-						});
+				if (
+					currentIdentity.biometricEnabled &&
+					(await unlockIdentitySeedWithBiometric(currentIdentity))
+				) {
+					await onDelete();
 				} else {
-					await unlockSeedPhrase(navigation).then(onDelete);
+					await unlockSeedPhrase(navigation);
+					await onDelete();
 				}
 			});
 		} else if (value === 'IdentityBiometric') {
