@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["@react-native-community", "plugin:prettier/recommended"],
+  extends: ["@react-native-community", "plugin:prettier/recommended", "plugin:import/errors", "plugin:import/warnings"],
   overrides: [
     {
       "files": ["e2e/*.spec.js", "e2e/init.js", "e2e/e2eUtils.js"],
