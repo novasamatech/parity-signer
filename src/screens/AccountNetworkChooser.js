@@ -177,7 +177,6 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						title="Create Custom Path"
 						networkColor={colors.bg}
 					/>
-					<Separator style={{ backgroundColor: 'transparent', height: 120 }} />
 				</>
 			);
 		}
