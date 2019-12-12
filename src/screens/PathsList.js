@@ -28,6 +28,7 @@ import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import {
 	getPathsWithSubstrateNetwork,
+	getRootPathMeta,
 	groupPaths,
 	removeSlash
 } from '../util/identitiesUtils';
@@ -39,19 +40,27 @@ import testIDs from '../../e2e/testIDs';
 import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
-import ScreenHeading from '../components/ScreenHeading';
+import { PathListHeading } from '../components/ScreenHeading';
+import {
+	alertDeriveRootPath,
+	alertPathDerivationError
+} from '../util/alertUtils';
+import {
+	navigateToPathDetails,
+	unlockSeedPhrase
+} from '../util/navigationHelpers';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
 		'networkKey',
 		UnknownNetworkKeys.UNKNOWN
 	);
+	const networkParams = NETWORK_LIST[networkKey];
 
 	const { currentIdentity } = accounts.state;
-	const isEthereumPath =
-		NETWORK_LIST[networkKey].protocol === NetworkProtocols.ETHEREUM;
+	const isEthereumPath = networkParams.protocol === NetworkProtocols.ETHEREUM;
 	const isUnknownNetworkPath =
-		NETWORK_LIST[networkKey].protocol === NetworkProtocols.UNKNOWN;
+		networkParams.protocol === NetworkProtocols.UNKNOWN;
 	const pathsGroups = useMemo(() => {
 		if (!currentIdentity || isEthereumPath) return null;
 		const paths = Array.from(currentIdentity.meta.keys());
@@ -72,6 +81,30 @@ function PathsList({ accounts, navigation }) {
 	}
 
 	const { navigate } = navigation;
+
+	const onClickRootPath = () => {
+		if (isUnknownNetworkPath) return;
+		const rootPath = `//${networkParams.pathId}`;
+		const rootPathMeta = getRootPathMeta(currentIdentity, networkKey);
+		if (rootPathMeta) {
+			navigate('PathDetails', { path: rootPath });
+		} else {
+			alertDeriveRootPath(async () => {
+				const seedPhrase = await unlockSeedPhrase(navigation);
+				const derivationSucceed = await accounts.deriveNewPath(
+					rootPath,
+					seedPhrase,
+					networkKey,
+					`${networkParams.title} Root`
+				);
+				if (derivationSucceed) {
+					navigateToPathDetails(navigation, networkKey, rootPath);
+				} else {
+					alertPathDerivationError();
+				}
+			});
+		}
+	};
 
 	const renderSinglePath = pathsGroup => {
 		const path = pathsGroup.paths[0];
@@ -117,7 +150,7 @@ function PathsList({ accounts, navigation }) {
 							{removeSlash(pathsGroup.title)}
 						</Text>
 						<Text style={fontStyles.t_codeS}>
-							{NETWORK_LIST[networkKey].pathId}
+							{networkParams.pathId}
 							{pathsGroup.title}
 						</Text>
 					</View>
@@ -149,14 +182,15 @@ function PathsList({ accounts, navigation }) {
 	const subtitle =
 		networkKey === UnknownNetworkKeys.UNKNOWN
 			? ''
-			: `//${NETWORK_LIST[networkKey].pathId}`;
+			: `//${networkParams.pathId}`;
 	return (
 		<View style={styles.body}>
-			<ScreenHeading
-				title={NETWORK_LIST[networkKey].title}
+			<PathListHeading
+				onPress={onClickRootPath}
+				title={networkParams.title}
 				subtitle={subtitle}
-				big={true}
 				subtitleIcon={true}
+				networkKey={networkKey}
 			/>
 			<ScrollView>
 				{pathsGroups.map(pathsGroup =>
