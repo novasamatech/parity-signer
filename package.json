@@ -58,6 +58,7 @@
     "react-native-gesture-handler": "^1.5.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-markdown-renderer": "^3.2.8",
+    "react-native-navbar-color": "^1.0.3",
     "react-native-paper": "^3.3.0",
     "react-native-popup-menu": "^0.15.6",
     "react-native-randombytes": "^3.5.3",

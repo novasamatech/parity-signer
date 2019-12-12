@@ -1,4 +1,6 @@
 rootProject.name = 'Parity Signer'
+include ':react-native-navbar-color'
+project(':react-native-navbar-color').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-navbar-color/android')
 include ':react-native-secure-storage'
 project(':react-native-secure-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-secure-storage/android')
 include ':react-native-gesture-handler'

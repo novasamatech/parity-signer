@@ -27,6 +27,7 @@ import {
 	HeaderBackButton,
 	withNavigation
 } from 'react-navigation';
+import NavigationBar from 'react-native-navbar-color';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
@@ -92,6 +93,9 @@ export default class App extends Component {
 				'Warning: componentWillUpdate'
 			]);
 		}
+	}
+	componentDidMount() {
+		NavigationBar.setColor('black');
 	}
 
 	render() {
