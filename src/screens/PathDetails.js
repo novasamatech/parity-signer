@@ -19,7 +19,7 @@
 import React from 'react';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import PathCard from '../components/PathCard';
 import PopupMenu from '../components/PopupMenu';
 import ScreenHeading from '../components/ScreenHeading';
@@ -35,7 +35,6 @@ import { UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
 import {
 	navigateToPathsList,
-	unlockPin,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
@@ -62,76 +61,30 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 		}
 	}
 
-	async function noBiometric(value) {
-		try {
-			if (value === 'PathDelete') {
-				alertDeleteAccount('this key pairs', async () => {
-					await unlockSeedPhrase(navigation);
-					await onDelete();
-				});
-			} else if (false) {
-				const pin = await unlockPin(navigation);
-				navigation.pop();
-				if (currentIdentity.biometricEnabled) {
-					// we can reach here if if biometric is enabled but failed for some reason, eg. if fingerprints were invalidated
-					await accounts.identityDisableBiometric().catch(() => {
-						// errors already handled
-					});
-				} else {
-					await accounts.identityEnableBiometric(pin).catch(error => {
-						// error here is likely no fingerprints/biometrics enrolled, so should be displayed to the user
-						Alert.alert('Biometric Error', error.message, [
-							{
-								style: 'default',
-								text: 'Ok'
-							}
-						]);
-					});
-				}
-			} else {
-				// impossible!
-			}
-		} catch (e) {}
+	function deleteWithoutBiometric(value) {
+		alertDeleteAccount('this key pairs', async () => {
+			try {
+				await unlockSeedPhrase(navigation).then(onDelete);
+			} catch (e) {}
+		});
 	}
 
-	async function withBiometric(value) {
-		try {
-			if (value === 'PathDelete') {
-				alertDeleteAccount('this key pairs', async () => {
-					await unlockIdentitySeedWithBiometric(currentIdentity)
-						.then(onDelete)
-						.catch(() => {
-							unlockSeedPhrase(navigation).then(onDelete);
-						});
-				});
-			} else if (false) {
-				await unlockIdentitySeedWithBiometric(currentIdentity);
-				await accounts.identityDisableBiometric();
-			} else {
-				// impossible!
+	function deleteWithBiometric() {
+		alertDeleteAccount('this key pairs', async () => {
+			try {
+				await unlockIdentitySeedWithBiometric(currentIdentity).then(onDelete);
+			} catch (e) {
+				await unlockSeedPhrase(navigation).then(onDelete);
 			}
-		} catch (e) {
-			Alert.alert('Biometric Error', e.message, [
-				{
-					onDismiss: async () => {
-						await noBiometric(value);
-					},
-					onPress: async () => {
-						await noBiometric(value);
-					},
-					style: 'default',
-					text: 'Ok'
-				}
-			]);
-		}
+		});
 	}
 
 	const onOptionSelect = async value => {
 		if (value !== 'PathManagement') {
 			if (currentIdentity.biometricEnabled) {
-				await withBiometric(value);
+				deleteWithBiometric(value);
 			} else {
-				await noBiometric(value);
+				deleteWithoutBiometric(value);
 			}
 		} else {
 			navigation.navigate('PathManagement', { path });

@@ -24,7 +24,6 @@ import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import Background from '../components/Background';
 import testIDs from '../../e2e/testIDs';
-import ButtonMainAction from '../components/ButtonMainAction';
 import { withAccountStore } from '../util/HOC';
 
 function LegacyAccountList({ navigation, accounts }) {
@@ -54,10 +53,6 @@ function LegacyAccountList({ navigation, accounts }) {
 					);
 				}}
 				enableEmptySections
-			/>
-			<ButtonMainAction
-				title={'Scan'}
-				onPress={() => navigation.navigate('QrScanner')}
 			/>
 		</View>
 	);

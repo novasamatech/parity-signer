@@ -30,7 +30,6 @@ import {
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
-import '../shim';
 import Background from './components/Background';
 import colors from './colors';
 import HeaderLeftHome from './components/HeaderLeftHome';
