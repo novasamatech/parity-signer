@@ -88,12 +88,7 @@ export function NetworkCard({
 						<Icon name="add" color={colors.bg_text} size={32} />
 					</View>
 				) : (
-					<AccountIcon
-						address={''}
-						protocol={network.protocol}
-						network={network}
-						style={styles.icon}
-					/>
+					<AccountIcon address={''} network={network} style={styles.icon} />
 				)}
 				<View style={styles.desc}>
 					<AccountPrefixedTitle title={title} />
@@ -145,12 +140,7 @@ export default function AccountCard({
 		>
 			<CardSeparator />
 			<View style={[styles.content, style]}>
-				<AccountIcon
-					address={address}
-					protocol={network.protocol}
-					network={network}
-					style={styles.icon}
-				/>
+				<AccountIcon address={address} network={network} style={styles.icon} />
 				<View style={styles.desc}>
 					<View>
 						<Text style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}>

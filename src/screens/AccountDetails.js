@@ -32,6 +32,7 @@ import {
 import fontStyles from '../fontStyles';
 import UnknownAccountWarning from '../components/UnknownAccountWarning';
 import { withAccountStore } from '../util/HOC';
+import AccountIcon from '../components/AccountIcon';
 
 export default withAccountStore(AccountDetails);
 
@@ -111,6 +112,11 @@ function AccountDetails({ accounts, navigation }) {
 		<ScrollView contentContainerStyle={styles.body}>
 			<View style={styles.bodyContent}>
 				<View style={styles.header}>
+					<AccountIcon
+						address={''}
+						network={NETWORK_LIST[account.networkKey]}
+						style={styles.icon}
+					/>
 					<Text style={fontStyles.h2}>Public Address</Text>
 					<View style={styles.menuView}>
 						<PopupMenu
@@ -167,10 +173,13 @@ const styles = StyleSheet.create({
 		color: colors.bg_alert
 	},
 	header: {
+		alignItems: 'center',
 		flexDirection: 'row',
 		paddingBottom: 24,
-		paddingLeft: 72,
 		paddingRight: 19
+	},
+	icon: {
+		paddingHorizontal: 16
 	},
 	menuView: {
 		alignItems: 'flex-end',

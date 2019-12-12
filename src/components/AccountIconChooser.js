@@ -116,11 +116,7 @@ export default class AccountIconChooser extends React.PureComponent {
 	};
 
 	renderIcon = ({ item, index }) => {
-		const {
-			onSelect,
-			network: { protocol },
-			value
-		} = this.props;
+		const { onSelect, network, value } = this.props;
 		const { address, bip39, seed } = item;
 		const isSelected = address.toLowerCase() === value.toLowerCase();
 
@@ -137,11 +133,7 @@ export default class AccountIconChooser extends React.PureComponent {
 					onSelect({ isBip39: bip39, newAddress: address, newSeed: seed })
 				}
 			>
-				<AccountIcon
-					address={address}
-					protocol={protocol}
-					style={styles.icon}
-				/>
+				<AccountIcon address={address} network={network} style={styles.icon} />
 			</TouchableOpacity>
 		);
 	};

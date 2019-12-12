@@ -69,12 +69,7 @@ export default function PathCard({
 				}}
 			/>
 			<View style={styles.content}>
-				<AccountIcon
-					address={address}
-					protocol={network.protocol}
-					network={network}
-					style={styles.icon}
-				/>
+				<AccountIcon address={address} network={network} style={styles.icon} />
 				<View style={styles.desc}>
 					<View>
 						<Text style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}>
@@ -106,7 +101,6 @@ export default function PathCard({
 				<View style={[styles.content, styles.contentDer]}>
 					<AccountIcon
 						address={address}
-						protocol={network.protocol}
 						network={network}
 						style={styles.icon}
 					/>

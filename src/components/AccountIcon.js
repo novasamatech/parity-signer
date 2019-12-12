@@ -30,12 +30,13 @@ import { blockiesIcon } from '../util/native';
 export default function AccountIcon(props) {
 	AccountIcon.propTypes = {
 		address: PropTypes.string.isRequired,
-		network: PropTypes.object,
-		protocol: PropTypes.string.isRequired
+		network: PropTypes.object.isRequired,
+		style: PropTypes.object
 	};
 
-	const { address, protocol, style, network } = props;
+	const { address, style, network } = props;
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
+	const protocol = network.protocol;
 
 	useEffect(() => {
 		const loadEthereumIcon = function(ethereumAddress) {
@@ -53,7 +54,7 @@ export default function AccountIcon(props) {
 
 	if (address === '') {
 		return (
-			<View>
+			<View style={style}>
 				{network.logo ? (
 					<Image source={network.logo} style={styles.logo} />
 				) : (
