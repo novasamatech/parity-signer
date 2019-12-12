@@ -61,24 +61,6 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 		}
 	}
 
-	// function deleteWithoutBiometric(value) {
-	// 	alertDeleteAccount('this key pairs', async () => {
-	// 		try {
-	// 			await unlockSeedPhrase(navigation).then(onDelete);
-	// 		} catch (e) {}
-	// 	});
-	// }
-	//
-	// function deleteWithBiometric() {
-	// 	alertDeleteAccount('this key pairs', async () => {
-	// 		try {
-	// 			await unlockIdentitySeedWithBiometric(currentIdentity).then(onDelete);
-	// 		} catch (e) {
-	// 			await unlockSeedPhrase(navigation).then(onDelete);
-	// 		}
-	// 	});
-	// }
-
 	const onOptionSelect = async value => {
 		if (value === 'PathDelete') {
 			alertDeleteAccount('this key pairs', async () => {
