@@ -27,7 +27,6 @@ const testIDs = {
 		networkButton: 'anc_network_button',
 		noAccountScreen: 'anc_no_account_screen',
 		recoverButton: 'anc_recover_button',
-		scanButton: 'anc_scan_button',
 		showExistedButton: 'anc_show_existed'
 	},
 	Header: {
@@ -77,8 +76,10 @@ const testIDs = {
 	},
 	PathsList: {
 		deriveButton: 'path_list_derive_button',
-		pathCard: 'path_list_path_card',
-		scanButton: 'path_list_scan_button'
+		pathCard: 'path_list_path_card'
+	},
+	SecurityHeader: {
+		scanButton: 'security_header_scan_button'
 	},
 	SignedMessage: {},
 	SignedTx: {
