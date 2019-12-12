@@ -39,6 +39,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderLeftHome from './components/HeaderLeftHome';
 import SecurityHeader from './components/SecurityHeader';
 import '../ReactotronConfig';
+import NavBottomLable from './components/NavBottomLabel';
 import About from './screens/About';
 import LegacyAccountBackup from './screens/LegacyAccountBackup';
 import AccountDetails from './screens/AccountDetails';
@@ -256,7 +257,7 @@ const Screens = createSwitchNavigator(
 							}
 						),
 						navigationOptions: {
-							tabBarLabel: 'Accounts',
+							tabBarLabel: <NavBottomLable title="Accounts" />,
 							tabBarIcon: ({ tintColor }) => (
 								<Icon
 									style={[{ color: tintColor }]}
@@ -287,7 +288,7 @@ const Screens = createSwitchNavigator(
 							}
 						),
 						navigationOptions: {
-							tabBarLabel: 'Scanner',
+							tabBarLabel: <NavBottomLable title="Scanner" />,
 							tabBarIcon: ({ tintColor }) => (
 								<Icon
 									style={[{ color: tintColor }]}
@@ -316,7 +317,7 @@ const Screens = createSwitchNavigator(
 							}
 						),
 						navigationOptions: {
-							tabBarLabel: 'Settings',
+							tabBarLabel: <NavBottomLable title="Settings" />,
 							tabBarIcon: ({ tintColor }) => (
 								<Icon
 									style={[{ color: tintColor }]}
