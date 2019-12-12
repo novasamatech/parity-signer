@@ -28,7 +28,6 @@ const testIDs = {
 		networkButton: 'anc_network_button',
 		noAccountScreen: 'anc_no_account_screen',
 		recoverButton: 'anc_recover_button',
-		scanButton: 'anc_scan_button',
 		showExistedButton: 'anc_show_existed'
 	},
 	Header: {
@@ -78,6 +77,9 @@ const testIDs = {
 		rootButton: 'path_list_root_button',
 		scanButton: 'path_list_scan_button',
 		screen: 'path_list_screen'
+	},
+	SecurityHeader: {
+		scanButton: 'security_header_scan_button'
 	},
 	SignedMessage: {},
 	SignedTx: {

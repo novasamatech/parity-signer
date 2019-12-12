@@ -40,6 +40,7 @@ const {
 	PathDerivation,
 	PathDetail,
 	PathsList,
+	SecurityHeader,
 	SignedTx,
 	TxDetails
 } = testIDs;
@@ -136,7 +137,7 @@ describe('Load test', async () => {
 
 	it('should sign the transaction', async () => {
 		await tapBack();
-		await testTap(AccountNetworkChooser.scanButton);
+		await testTap(SecurityHeader.scanButton);
 		await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
 		await testUnlockPin(pinCode);
 		await testVisible(SignedTx.qrView);
