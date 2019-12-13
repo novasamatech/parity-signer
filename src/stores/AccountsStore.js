@@ -322,6 +322,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			accountId: targetAccountId,
 			biometricEnabled: targetIdentity.biometricEnabled,
 			encryptedSeed: targetIdentity.encryptedSeed,
+			identity: targetIdentity,
 			isBip39: true,
 			isLegacy: false,
 			networkKey,

@@ -42,7 +42,6 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import testIDs from '../../e2e/testIDs';
 import fontStyles from '../fontStyles';
 import CompatibleCard from '../components/CompatibleCard';
-import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class TxDetails extends React.PureComponent {
 	async onSignTx(scannerStore, accountsStore, sender) {
@@ -58,13 +57,9 @@ export default class TxDetails extends React.PureComponent {
 					next: 'SignedTx'
 				});
 			}
-			const senderIdentity = getIdentityFromSender(
-				sender,
-				accountsStore.state.identities
-			);
 			const seedPhrase = await unlockSeedPhrase(
 				this.props.navigation,
-				senderIdentity
+				sender.identity
 			);
 			await scannerStore.signDataWithSeedPhrase(
 				seedPhrase,

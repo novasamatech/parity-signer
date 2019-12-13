@@ -41,7 +41,6 @@ import fontStyles from '../fontStyles';
 import MessageDetailsCard from '../components/MessageDetailsCard';
 import { alertMultipart } from '../util/alertUtils';
 import CompatibleCard from '../components/CompatibleCard';
-import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent {
 	async onSignMessage(scannerStore, accountsStore, sender) {
@@ -59,11 +58,7 @@ export default class MessageDetails extends React.PureComponent {
 					next: 'SignedMessage'
 				});
 			}
-			const senderIdentity = getIdentityFromSender(
-				sender,
-				accountsStore.state.identities
-			);
-			const seedPhrase = await unlockSeedPhrase(navigation, senderIdentity);
+			const seedPhrase = await unlockSeedPhrase(navigation, sender.identity);
 			await scannerStore.signDataWithSeedPhrase(
 				seedPhrase,
 				NETWORK_LIST[sender.networkKey].protocol

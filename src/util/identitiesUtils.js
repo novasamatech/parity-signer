@@ -135,9 +135,6 @@ export const getNetworkKeyByPath = path => {
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
-export const getIdentityFromSender = (sender, identities) =>
-	identities.find(i => i.encryptedSeed === sender.encryptedSeed);
-
 export const getAddressWithPath = (path, identity) => {
 	const pathMeta = identity.meta.get(path);
 	if (!pathMeta) return '';
