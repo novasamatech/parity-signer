@@ -130,12 +130,12 @@ export const navigateToNewIdentityNetwork = navigation => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToSignedMessage = navigation => {
+export const navigateToSignedMessage = (navigation, isLegacy) => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
 				isNew: false,
-				routeName: 'AccountNetworkChooser'
+				routeName: isLegacy ? 'LegacyAccountList' : 'AccountNetworkChooser'
 			}),
 			NavigationActions.navigate({
 				params: { isNew: true },
@@ -148,12 +148,12 @@ export const navigateToSignedMessage = navigation => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToSignedTx = navigation => {
+export const navigateToSignedTx = (navigation, isLegacy) => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
 				isNew: false,
-				routeName: 'AccountNetworkChooser'
+				routeName: isLegacy ? 'LegacyAccountList' : 'AccountNetworkChooser'
 			}),
 			NavigationActions.navigate({
 				params: { isNew: true },

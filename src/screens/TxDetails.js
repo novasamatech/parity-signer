@@ -45,27 +45,25 @@ import CompatibleCard from '../components/CompatibleCard';
 
 export default class TxDetails extends React.PureComponent {
 	async onSignTx(scannerStore, accountsStore, sender) {
+		const { navigation } = this.props;
 		if (
 			sender.biometricEnabled &&
 			(await scannerStore.signDataBiometric(sender.isLegacy))
 		)
-			return navigateToSignedTx(this.props.navigation);
+			return navigateToSignedTx(navigation, sender.isLegacy);
 
 		try {
 			if (sender.isLegacy) {
-				return this.props.navigation.navigate('AccountUnlockAndSign', {
+				return navigation.navigate('AccountUnlockAndSign', {
 					next: 'SignedTx'
 				});
 			}
-			const seedPhrase = await unlockSeedPhrase(
-				this.props.navigation,
-				sender.identity
-			);
+			const seedPhrase = await unlockSeedPhrase(navigation, sender.identity);
 			await scannerStore.signDataWithSeedPhrase(
 				seedPhrase,
 				NETWORK_LIST[sender.networkKey].protocol
 			);
-			return navigateToSignedTx(this.props.navigation);
+			return navigateToSignedTx(navigation, false);
 		} catch (e) {
 			scannerStore.setErrorMsg(e.message);
 		}

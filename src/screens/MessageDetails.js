@@ -49,7 +49,7 @@ export default class MessageDetails extends React.PureComponent {
 			sender.biometricEnabled &&
 			(await scannerStore.signDataBiometric(sender.isLegacy))
 		) {
-			return navigateToSignedMessage(navigation);
+			return navigateToSignedMessage(navigation, sender.isLegacy);
 		}
 
 		try {
@@ -63,7 +63,7 @@ export default class MessageDetails extends React.PureComponent {
 				seedPhrase,
 				NETWORK_LIST[sender.networkKey].protocol
 			);
-			return navigateToSignedMessage(navigation);
+			return navigateToSignedMessage(navigation, false);
 		} catch (e) {
 			scannerStore.setErrorMsg(e.message);
 		}
