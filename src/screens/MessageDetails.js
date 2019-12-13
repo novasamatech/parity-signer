@@ -45,34 +45,32 @@ import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent {
 	async onSignMessage(scannerStore, accountsStore, sender) {
-		const senderIdentity = getIdentityFromSender(
-			sender,
-			accountsStore.state.identities
-		);
+		const { navigation } = this.props;
 		if (
-			senderIdentity.biometricEnabled &&
+			sender.biometricEnabled &&
 			(await scannerStore.signDataBiometric(sender.isLegacy))
 		) {
-			return navigateToSignedMessage(this.props.navigation);
-		} else {
-			try {
-				if (sender.isLegacy) {
-					return this.props.navigation.navigate('AccountUnlockAndSign', {
-						next: 'SignedMessage'
-					});
-				}
-				const seedPhrase = await unlockSeedPhrase(
-					this.props.navigation,
-					senderIdentity
-				);
-				await scannerStore.signDataWithSeedPhrase(
-					seedPhrase,
-					NETWORK_LIST[sender.networkKey].protocol
-				);
-				return navigateToSignedMessage(this.props.navigation);
-			} catch (e) {
-				scannerStore.setErrorMsg(e.message);
+			return navigateToSignedMessage(navigation);
+		}
+
+		try {
+			if (sender.isLegacy) {
+				return navigation.navigate('AccountUnlockAndSign', {
+					next: 'SignedMessage'
+				});
 			}
+			const senderIdentity = getIdentityFromSender(
+				sender,
+				accountsStore.state.identities
+			);
+			const seedPhrase = await unlockSeedPhrase(navigation, senderIdentity);
+			await scannerStore.signDataWithSeedPhrase(
+				seedPhrase,
+				NETWORK_LIST[sender.networkKey].protocol
+			);
+			return navigateToSignedMessage(navigation);
+		} catch (e) {
+			scannerStore.setErrorMsg(e.message);
 		}
 	}
 

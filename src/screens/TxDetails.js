@@ -46,12 +46,8 @@ import { getIdentityFromSender } from '../util/identitiesUtils';
 
 export default class TxDetails extends React.PureComponent {
 	async onSignTx(scannerStore, accountsStore, sender) {
-		const senderIdentity = getIdentityFromSender(
-			sender,
-			accountsStore.state.identities
-		);
 		if (
-			senderIdentity.biometricEnabled &&
+			sender.biometricEnabled &&
 			(await scannerStore.signDataBiometric(sender.isLegacy))
 		)
 			return navigateToSignedTx(this.props.navigation);
@@ -62,6 +58,10 @@ export default class TxDetails extends React.PureComponent {
 					next: 'SignedTx'
 				});
 			}
+			const senderIdentity = getIdentityFromSender(
+				sender,
+				accountsStore.state.identities
+			);
 			const seedPhrase = await unlockSeedPhrase(
 				this.props.navigation,
 				senderIdentity

@@ -320,6 +320,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return {
 			...metaData,
 			accountId: targetAccountId,
+			biometricEnabled: targetIdentity.biometricEnabled,
 			encryptedSeed: targetIdentity.encryptedSeed,
 			isBip39: true,
 			isLegacy: false,
