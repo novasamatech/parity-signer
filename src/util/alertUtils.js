@@ -146,6 +146,23 @@ export const alertBackupDone = onPress =>
 		]
 	);
 
+export const alertBiometricDone = isCurrentlyEnabled =>
+	new Promise(resolve =>
+		Alert.alert(
+			'Biometric',
+			`Biometric authentication success ${
+				isCurrentlyEnabled ? 'enabled' : 'disabled'
+			}`,
+			[
+				{
+					onPress: () => resolve(),
+					style: 'default',
+					text: 'Okay'
+				}
+			]
+		)
+	);
+
 export const alertBiometricError = (e, after) =>
 	Alert.alert('Biometric Error', e.message, [
 		{

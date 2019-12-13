@@ -28,6 +28,7 @@ import {
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
 import {
+	alertBiometricDone,
 	alertBiometricError,
 	alertDeleteIdentity,
 	alertIdentityDeletionError
@@ -52,16 +53,24 @@ function IdentityManagement({ accounts, navigation }) {
 	};
 
 	const toggleBiometric = async () => {
-		if (currentIdentity.biometricEnabled) {
-			await unlockIdentitySeedWithBiometric(currentIdentity);
-			await accounts.identityDisableBiometric();
-		} else {
-			const pin = await unlockPin(navigation);
-			navigation.pop();
-			await accounts.identityEnableBiometric(pin).catch(error => {
-				// error here is likely no fingerprints/biometrics enrolled, so should be displayed to the user
-				alertBiometricError(error);
-			});
+		try {
+			if (currentIdentity.biometricEnabled) {
+				const biometricUnlockSucceed = await unlockIdentitySeedWithBiometric(
+					currentIdentity
+				);
+				if (!biometricUnlockSucceed) {
+					await unlockPin(navigation);
+					navigation.pop();
+				}
+				await accounts.identityDisableBiometric();
+			} else {
+				const pin = await unlockPin(navigation);
+				await accounts.identityEnableBiometric(pin);
+				navigation.pop();
+			}
+			await alertBiometricDone(!currentIdentity.biometricEnabled);
+		} catch (error) {
+			alertBiometricError(error);
 		}
 	};
 

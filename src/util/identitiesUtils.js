@@ -162,9 +162,8 @@ export const unlockIdentitySeed = async (pin, identity) => {
 
 export const unlockIdentitySeedWithBiometric = async identity => {
 	try {
-		return secureGet(identity.pinKey).then(async pin => {
-			return unlockIdentitySeed(pin, identity);
-		});
+		const pin = await secureGet(identity.pinKey);
+		return await unlockIdentitySeed(pin, identity);
 	} catch (err) {
 		return false;
 	}

@@ -171,6 +171,17 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
+	async _unlockEncryptedSeed(accountKey, account, pin) {
+		account.seed = await decryptData(account.encryptedSeed, pin);
+		const { phrase, derivePath, password } = parseSURI(account.seed);
+		account.seedPhrase = phrase || '';
+		account.derivationPath = derivePath || '';
+		account.derivationPassword = password || '';
+		this.setState({
+			accounts: this.state.accounts.set(accountKey, account)
+		});
+	}
+
 	async unlockAccountWithBiometric(accountKey) {
 		const { accounts } = this.state;
 		const account = accounts.get(accountKey);
@@ -188,15 +199,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 				};
 			} else {
 				const pin = await secureGet(account.pinKey);
-				account.seed = await decryptData(account.encryptedSeed, pin);
-
-				const { phrase, derivePath, password } = parseSURI(account.seed);
-				account.seedPhrase = phrase || '';
-				account.derivationPath = derivePath || '';
-				account.derivationPassword = password || '';
-				this.setState({
-					accounts: this.state.accounts.set(accountKey, account)
-				});
+				await this._unlockEncryptedSeed(accountKey, account, pin);
 			}
 		} catch (e) {
 			throw e;
@@ -213,15 +216,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 
 		try {
-			account.seed = await decryptData(account.encryptedSeed, pin);
-			const { phrase, derivePath, password } = parseSURI(account.seed);
-
-			account.seedPhrase = phrase || '';
-			account.derivationPath = derivePath || '';
-			account.derivationPassword = password || '';
-			this.setState({
-				accounts: this.state.accounts.set(accountKey, account)
-			});
+			await this._unlockEncryptedSeed(accountKey, account, pin);
 		} catch (e) {
 			return false;
 		}
@@ -357,77 +352,44 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async enableBiometric(accountKey, pin) {
 		const account = this.state.accounts.get(accountKey);
-		return securePut(account.pinKey, pin).then(() => {
-			this.updateAccount(accountKey, { biometricEnabled: true });
-			return this.save(accountKey);
-		});
+		await securePut(account.pinKey, pin);
+		await this.updateAccount(accountKey, { biometricEnabled: true });
+		return this.save(accountKey);
 	}
 
 	async disableBiometric(accountKey) {
 		const account = this.state.accounts.get(accountKey);
-		return secureDelete(account.pinKey)
-			.catch(e => {})
-			.finally(() => {
-				// incase delete failed, overwrite the pinKey and forget the encrypted pin
-				this.updateAccount(accountKey, {
-					biometricEnabled: false,
-					pinKey: v4()
-				});
-				return this.save(accountKey);
-			});
+		await secureDelete(account.pinKey);
+		await this.updateAccount(accountKey, {
+			biometricEnabled: false,
+			pinKey: v4()
+		});
+		return this.save(accountKey);
 	}
 
 	async updateBiometric(accountKey, account, pin) {
 		return secureDelete(account.pinKey)
-			.catch(e => {
+			.catch(() => {
 				account.pinKey = v4();
 			})
 			.finally(() => securePut(account.pinKey, pin));
 	}
 
 	async identityEnableBiometric(pin) {
-		return securePut(this.state.currentIdentity.pinKey, pin).then(async () => {
-			const updatedCurrentIdentity = deepCopyIdentity(
-				this.state.currentIdentity
-			);
-			updatedCurrentIdentity.biometricEnabled = true;
-			try {
-				await this.setState({ currentIdentity: updatedCurrentIdentity });
-				await this._updateIdentitiesWithCurrentIdentity();
-			} catch (e) {
-				console.warn('identity enable biometric error', e);
-			}
-		});
+		await securePut(this.state.currentIdentity.pinKey, pin);
+		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
+		updatedCurrentIdentity.biometricEnabled = true;
+		await this.setState({ currentIdentity: updatedCurrentIdentity });
+		await this._updateIdentitiesWithCurrentIdentity();
 	}
 
 	async identityDisableBiometric() {
 		const identity = deepCopyIdentity(this.state.currentIdentity);
-		return secureDelete(identity.pinKey).finally(async () => {
-			identity.biometricEnabled = false;
-			identity.pinKey = v4();
-			try {
-				await this.setState({ currentIdentity: identity });
-				await this._updateIdentitiesWithCurrentIdentity();
-			} catch (e) {
-				console.warn('identity enable biometric error', e);
-			}
-		});
-	}
-
-	async identityUpdateBiometric(pin) {
-		const identity = deepCopyIdentity(this.state.currentIdentity);
-		return secureDelete(identity.pinKey)
-			.catch(e => {
-				identity.pinKey = v4();
-			})
-			.finally(async () => {
-				try {
-					await this.setState({ currentIdentity: identity });
-					await this._updateIdentitiesWithCurrentIdentity();
-				} catch (e) {
-					console.warn('identity enable biometric error', e);
-				}
-			});
+		await secureDelete(identity.pinKey);
+		identity.biometricEnabled = false;
+		identity.pinKey = v4();
+		await this.setState({ currentIdentity: identity });
+		await this._updateIdentitiesWithCurrentIdentity();
 	}
 
 	getIdentityByAccountId(accountId) {

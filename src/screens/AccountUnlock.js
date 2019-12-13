@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
@@ -28,6 +28,7 @@ import ScreenHeading from '../components/ScreenHeading';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
+import { alertBiometricDone, alertBiometricError } from '../util/alertUtils';
 
 export class AccountUnlockAndSign extends React.PureComponent {
 	render() {
@@ -70,20 +71,16 @@ export class AccountUnlockAndSign extends React.PureComponent {
 
 export class AccountUnlock extends React.PureComponent {
 	onToggleBiometric = async (pin, accounts) => {
-		if (accounts.getSelected().biometricEnabled) {
-			await accounts.disableBiometric(accounts.getSelectedKey());
-		} else {
-			await accounts
-				.enableBiometric(accounts.getSelectedKey(), pin)
-				.catch(error => {
-					// error here is likely no fingerprints/biometrics enrolled, so should be displayed to the user
-					Alert.alert('Biometric Error', error.message, [
-						{
-							style: 'default',
-							text: 'Ok'
-						}
-					]);
-				});
+		try {
+			const isPreviousEnabled = accounts.getSelected().biometricEnabled;
+			if (isPreviousEnabled) {
+				await accounts.disableBiometric(accounts.getSelectedKey());
+			} else {
+				await accounts.enableBiometric(accounts.getSelectedKey(), pin);
+			}
+			await alertBiometricDone(!isPreviousEnabled);
+		} catch (error) {
+			alertBiometricError(error, () => this.props.navigation.goBack());
 		}
 		this.props.navigation.goBack();
 	};

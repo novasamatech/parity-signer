@@ -24,7 +24,11 @@ import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import { alertBiometricError, alertDeleteAccount } from '../util/alertUtils';
+import {
+	alertBiometricDone,
+	alertBiometricError,
+	alertDeleteAccount
+} from '../util/alertUtils';
 import {
 	navigateToLandingPage,
 	navigateToLegacyAccountList
@@ -87,8 +91,10 @@ function AccountDetails({ accounts, navigation }) {
 			} else if (value === 'AccountBiometric') {
 				await accounts.unlockAccountWithBiometric(selectedKey);
 				await accounts.disableBiometric(selectedKey);
+				await alertBiometricDone(false);
 			} else {
 				await accounts.unlockAccountWithBiometric(selectedKey);
+				await alertBiometricDone(true);
 				navigation.navigate(value);
 			}
 		} catch (e) {
