@@ -113,7 +113,7 @@ struct SURI {
 
 fn parse_suri(suri: &str) -> Result<SURI, String> {
     fn parse_derivation_path(input: &str) -> Result<(String, String), String> {
-        let re = Regex::new(r"^((?:\/\/?[^/]+)*)(?:\/\/\/(.*))?$").expect("invalid regex");
+        let re = Regex::new(r"^([\w ]+(?: +\w*)*)?(.*)$").expect("invalid regex");
         let matches = re
             .captures_iter(input)
             .map(|cap| cap.get(0).map_or("", |m| m.as_str()).to_string())
