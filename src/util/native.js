@@ -168,5 +168,11 @@ export function secureEthkeySign(key, message, encrypted) {
 
 // Message is hex-encoded byte array.
 export function secureSubstrateSign(key, message, encrypted, legacy = false) {
-	return EthkeyBridge.secureSubstrateSign(key, message, encrypted, legacy);
+	return EthkeyBridge.secureSubstrateSign(
+		APP_ID,
+		key,
+		message,
+		encrypted,
+		legacy
+	);
 }
