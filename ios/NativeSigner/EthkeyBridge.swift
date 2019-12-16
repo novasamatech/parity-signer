@@ -227,7 +227,7 @@ class EthkeyBridge: NSObject {
       reject("Failed to verify signature.", nil, nil)
     }
   }
-  
+
 /* secure native */
 
   @objc func securePut(_ app: String, key: String, seed: String, withBiometry: CInt, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
@@ -241,7 +241,7 @@ class EthkeyBridge: NSObject {
       reject("put", error_msg, nil)
     }
   }
-  
+
   @objc func secureGet(_ app: String, key: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
     let res = sn_get(&error, app, key)
@@ -293,9 +293,9 @@ class EthkeyBridge: NSObject {
     }
   }
 
-  @objc func secureSubstrateSign(_ app: String, key: String, message: String, encrypted: String, legacy: CInt, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func secureSubstrateSign(_ app: String, key: String, path: String, password: String, message: String, encrypted: String, legacy: Bool, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
-    let res = sn_substrate_brainwallet_sign(&error, app, key, message, encrypted, legacy)
+    let res = sn_substrate_brainwallet_sign(&error, app, key, path, password, message, encrypted, legacy)
     let value = String(cString: res!.pointee.value!)
     let error_msg = String(cString: res!.pointee.error_msg!)
     destroy_cresult_string(res)

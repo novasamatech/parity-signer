@@ -241,9 +241,9 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void secureSubstrateSign(String app, String key, String message, String encrypted, boolean legacy, Promise promise) {
+    public void secureSubstrateSign(String app, String key, String path, String password, String message, String encrypted, Boolean legacy, Promise promise) {
         try {
-            promise.resolve(snSubstrateBrainwalletSign(this.getCurrentActivity(), app, key, message, encrypted, legacy));
+            promise.resolve(snSubstrateBrainwalletSign(this.getCurrentActivity(), app, key, path, password, message, encrypted, legacy));
         } catch (Exception e) {
             String[] sp = e.getMessage().split(": ");
             String s = sp[sp.length - 1].trim().replace("\"", "");

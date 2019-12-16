@@ -314,9 +314,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const networkKey = getNetworkKeyByPath(targetPath);
 		return {
 			...metaData,
+			...targetIdentity,
 			accountId: targetAccountId,
-			biometricEnabled: targetIdentity.biometricEnabled,
-			encryptedSeed: targetIdentity.encryptedSeed,
 			identity: targetIdentity,
 			isBip39: true,
 			isLegacy: false,

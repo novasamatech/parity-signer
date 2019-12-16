@@ -444,6 +444,8 @@ export default class ScannerStore extends Container<ScannerState> {
 			} else {
 				signedDataPromise = secureSubstrateSign(
 					sender.pinKey,
+					sender.path ? sender.path : '',
+					sender.password ? sender.password : '',
 					signable,
 					sender.encryptedSeed,
 					legacy
