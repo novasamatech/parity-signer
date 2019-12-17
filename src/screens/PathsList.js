@@ -190,7 +190,7 @@ function PathsList({ accounts, navigation }) {
 				title={networkParams.title}
 				testID={testIDs.PathsList.rootButton}
 				subtitle={subtitle}
-				subtitleIcon={true}
+				hasSubtitleIcon={true}
 				networkKey={networkKey}
 			/>
 			<ScrollView>

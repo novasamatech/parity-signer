@@ -75,7 +75,7 @@ function PathDerivation({ accounts, navigation }) {
 			<ScreenHeading
 				title="Derive Account"
 				subtitle={currentNetworkPath}
-				subtitleIcon={true}
+				hasSubtitleIcon={true}
 			/>
 			<KeyboardScrollView>
 				{!isPathValid && <Text>Invalid Path</Text>}

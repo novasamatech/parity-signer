@@ -37,10 +37,11 @@ import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
 import {
 	getExistedNetworkKeys,
+	getIdentityName,
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading from '../components/ScreenHeading';
+import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
 
@@ -190,6 +191,22 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				<ScreenHeading
 					title={'Choose Network'}
 					onPress={() => setShouldShowMoreNetworks(false)}
+				/>
+			);
+		} else {
+			const identityName = getIdentityName(currentIdentity, identities);
+			const rootAccount = currentIdentity.meta.get('');
+			const rootAddress = rootAccount ? ' ' + rootAccount.address : '';
+			const onRootKeyPress = () => {
+				if (rootAccount !== '')
+					navigation.navigate('PathDetails', { path: '' });
+			};
+			return (
+				<IdentityHeading
+					title={identityName}
+					subtitle={rootAddress}
+					onPress={onRootKeyPress}
+					hasSubtitleIcon={true}
 				/>
 			);
 		}

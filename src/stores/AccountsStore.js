@@ -333,11 +333,37 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await this.setState({ currentIdentity: null });
 	}
 
+	async _addPathToIdentity(newPath, seedPhrase, updatedIdentity, name, prefix) {
+		const suri = constructSURI({
+			derivePath: newPath,
+			password: '',
+			phrase: seedPhrase
+		});
+		let address = '';
+		try {
+			address = await substrateAddress(suri, prefix);
+		} catch (e) {
+			return false;
+		}
+		if (address === '') return false;
+		if (updatedIdentity.meta.has(newPath)) return false;
+		updatedIdentity.meta.set(newPath, {
+			address,
+			createdAt: new Date().getTime(),
+			name,
+			updatedAt: new Date().getTime()
+		});
+		updatedIdentity.addresses.set(address, newPath);
+		return true;
+	}
+
 	async saveNewIdentity(seedPhrase, pin) {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		//TODO encrypt seedPhrase with password in the future version,
 		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
+		//TODO now hard coded to polkadot canary prefix which is 2, future enable user to change that.
+		await this._addPathToIdentity('', seedPhrase, updatedIdentity, 'Root', 2);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
 			currentIdentity: updatedIdentity,
@@ -411,26 +437,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
 		const prefix = NETWORK_LIST[networkKey].prefix;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const suri = constructSURI({
-			derivePath: newPath,
-			password: '',
-			phrase: seedPhrase
-		});
-		let address = '';
-		try {
-			address = await substrateAddress(suri, prefix);
-		} catch (e) {
-			return false;
-		}
-		if (address === '') return false;
-		if (updatedCurrentIdentity.meta.has(newPath)) return false;
-		updatedCurrentIdentity.meta.set(newPath, {
-			address,
-			createdAt: new Date().getTime(),
+		const deriveSucceed = await this._addPathToIdentity(
+			newPath,
+			seedPhrase,
+			updatedCurrentIdentity,
 			name,
-			updatedAt: new Date().getTime()
-		});
-		updatedCurrentIdentity.addresses.set(address, newPath);
+			prefix
+		);
+		if (!deriveSucceed) return false;
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
