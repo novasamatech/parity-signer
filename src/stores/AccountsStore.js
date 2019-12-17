@@ -351,44 +351,62 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async enableBiometric(accountKey, pin) {
 		const account = this.state.accounts.get(accountKey);
-		await securePut(account.pinKey, pin);
-		await this.updateAccount(accountKey, { biometricEnabled: true });
+		const pinKey = account.pinKey || v4();
+		await securePut(pinKey, pin);
+		await this.updateAccount(accountKey, { biometricEnabled: true, pinKey: pinKey });
 		return this.save(accountKey);
 	}
 
 	async disableBiometric(accountKey) {
 		const account = this.state.accounts.get(accountKey);
-		await secureDelete(account.pinKey);
-		await this.updateAccount(accountKey, {
-			biometricEnabled: false,
-			pinKey: v4()
-		});
-		return this.save(accountKey);
+		return secureDelete(account.pinKey)
+			.catch(e => {})
+			.finally(() => {
+				// incase delete failed, overwrite the pinKey and forget the encrypted pin
+				this.updateAccount(accountKey, {
+					biometricEnabled: false,
+					pinKey: v4()
+				});
+				return this.save(accountKey);
+			});
 	}
 
 	async updateBiometric(accountKey, account, pin) {
 		return secureDelete(account.pinKey)
-			.catch(() => {
-				account.pinKey = v4();
-			})
-			.finally(() => securePut(account.pinKey, pin));
+			.finally(() => {
+					// incase delete failed, overwrite the pinKey and forget the encrypted pin
+					const pinKey = v4();
+					this.updateAccount(accountKey, {
+							pinKey: pinKey
+					});
+					await securePut(pinKey, pin);
+					return this.save(accountKey);
+			});
 	}
 
 	async identityEnableBiometric(pin) {
-		await securePut(this.state.currentIdentity.pinKey, pin);
+		const pinKey = this.state.currentIdentity.pinKey || v4();
+		await securePut(pinKey, pin);
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		updatedCurrentIdentity.biometricEnabled = true;
+		updatedCurrentIdentity.pinKey = pinKey;
 		await this.setState({ currentIdentity: updatedCurrentIdentity });
 		await this._updateIdentitiesWithCurrentIdentity();
 	}
 
 	async identityDisableBiometric() {
 		const identity = deepCopyIdentity(this.state.currentIdentity);
-		await secureDelete(identity.pinKey);
-		identity.biometricEnabled = false;
-		identity.pinKey = v4();
-		await this.setState({ currentIdentity: identity });
-		await this._updateIdentitiesWithCurrentIdentity();
+		return secureDelete(identity.pinKey)
+			.finally(async () => {
+				// incase delete failed, overwrite the pinKey and forget the encrypted pin
+				try {
+					identity.pinKey = v4();
+					await this.setState({ currentIdentity: identity });
+					await this._updateIdentitiesWithCurrentIdentity();
+				} catch (e) {
+					console.warn('identity enable biometric error', e);
+				}
+			});
 	}
 
 	getIdentityByAccountId(accountId) {
