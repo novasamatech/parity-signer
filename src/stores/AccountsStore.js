@@ -353,7 +353,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const account = this.state.accounts.get(accountKey);
 		const pinKey = account.pinKey || v4();
 		await securePut(pinKey, pin);
-		await this.updateAccount(accountKey, { biometricEnabled: true, pinKey: pinKey });
+		await this.updateAccount(accountKey, {
+			biometricEnabled: true,
+			pinKey: pinKey
+		});
 		return this.save(accountKey);
 	}
 
@@ -372,16 +375,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async updateBiometric(accountKey, account, pin) {
-		return secureDelete(account.pinKey)
-			.finally(() => {
-					// incase delete failed, overwrite the pinKey and forget the encrypted pin
-					const pinKey = v4();
-					this.updateAccount(accountKey, {
-							pinKey: pinKey
-					});
-					await securePut(pinKey, pin);
-					return this.save(accountKey);
+		return secureDelete(account.pinKey).finally(() => {
+			// incase delete failed, overwrite the pinKey and forget the encrypted pin
+			const pinKey = v4();
+			this.updateAccount(accountKey, {
+				pinKey: pinKey
 			});
+			return securePut(pinKey, pin).then(() => {
+				this.save(accountKey);
+			});
+		});
 	}
 
 	async identityEnableBiometric(pin) {
@@ -396,17 +399,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async identityDisableBiometric() {
 		const identity = deepCopyIdentity(this.state.currentIdentity);
-		return secureDelete(identity.pinKey)
-			.finally(async () => {
-				// incase delete failed, overwrite the pinKey and forget the encrypted pin
-				try {
-					identity.pinKey = v4();
-					await this.setState({ currentIdentity: identity });
-					await this._updateIdentitiesWithCurrentIdentity();
-				} catch (e) {
-					console.warn('identity enable biometric error', e);
-				}
-			});
+		return secureDelete(identity.pinKey).finally(async () => {
+			// incase delete failed, overwrite the pinKey and forget the encrypted pin
+			try {
+				identity.pinKey = v4();
+				await this.setState({ currentIdentity: identity });
+				await this._updateIdentitiesWithCurrentIdentity();
+			} catch (e) {
+				console.warn('identity enable biometric error', e);
+			}
+		});
 	}
 
 	getIdentityByAccountId(accountId) {
