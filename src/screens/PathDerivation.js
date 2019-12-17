@@ -22,7 +22,10 @@ import { withAccountStore } from '../util/HOC';
 import { StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
 import ButtonMainAction from '../components/ButtonMainAction';
-import { validateDerivedPath } from '../util/identitiesUtils';
+import {
+	getNetworkKeyByPath,
+	validateDerivedPath
+} from '../util/identitiesUtils';
 import {
 	navigateToPathsList,
 	unlockSeedPhrase
@@ -37,14 +40,14 @@ import PathCard from '../components/PathCard';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 
 function PathDerivation({ accounts, navigation }) {
-	const networkKey = navigation.getParam(
-		'networkKey',
-		UnknownNetworkKeys.UNKNOWN
-	);
-
 	const [derivationPath, setDerivationPath] = useState('');
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
+	const networkKey = navigation.getParam(
+		'networkKey',
+		getNetworkKeyByPath(derivationPath)
+	);
+
 	const currentNetworkPath =
 		networkKey !== UnknownNetworkKeys.UNKNOWN
 			? `//${NETWORK_LIST[networkKey].pathId}`
