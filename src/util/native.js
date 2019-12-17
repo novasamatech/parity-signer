@@ -146,7 +146,7 @@ export function schnorrkelVerify(seed, message, signature) {
 
 /* secure native */
 
-export function securePut(key, value, withBiometry = 1) {
+export function securePut(key, value, withBiometry = true) {
 	return EthkeyBridge.securePut(APP_ID, key, value, withBiometry);
 }
 

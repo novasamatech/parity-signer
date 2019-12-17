@@ -25,6 +25,7 @@ import { pathsRegex } from './regex';
 import { decryptData, secureGet } from '../util/native';
 import { parseSURI } from './suri';
 import { generateAccountId } from './account';
+import { v4 } from 'react-native-uuid';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = str => str.replace(/\//g, '');
@@ -65,7 +66,8 @@ export function emptyIdentity() {
 		derivationPassword: '',
 		encryptedSeed: '',
 		meta: new Map(),
-		name: ''
+		name: '',
+		pinKey: v4()
 	};
 }
 
