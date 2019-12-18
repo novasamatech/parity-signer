@@ -206,7 +206,6 @@ export const getPathName = (path, lookUpIdentity) => {
 export const groupPaths = paths => {
 	const unSortedPaths = paths.reduce((groupedPath, path) => {
 		if (path === '') {
-			groupedPath.push({ paths: [path], title: 'Root' });
 			return groupedPath;
 		}
 		const pathId = extractPathId(path) || '';
