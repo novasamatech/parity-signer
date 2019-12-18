@@ -30,11 +30,12 @@ import colors from '../colors';
 import AccountIcon from './AccountIcon';
 import { NETWORK_LIST } from '../constants';
 import TouchableItem from './TouchableItem';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const composeStyle = StyleSheet.compose;
 
 const renderSubtitle = (subtitle, hasSubtitleIcon, isAlignLeft, isError) => {
-	if (!subtitle) return;
+	if (!subtitle || subtitle === '') return;
 	let subtitleBodyStyle = [baseStyles.subtitleBody],
 		subtitleTextStyle = [fontStyles.t_codeS];
 	if (isAlignLeft) {
@@ -130,14 +131,22 @@ export function PathListHeading({
 export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
 	return (
 		<TouchableItem style={baseStyles.bodyWithIdentity} onPress={onPress}>
-			<View>
-				<Text
-					style={[baseStyles.text, baseStyles.t_left]}
-					numberOfLines={1}
-					ellipsizeMode="middle"
-				>
-					{title}
-				</Text>
+			<View style={baseStyles.touchable}>
+				<View style={baseStyles.identityName}>
+					<Text
+						style={[baseStyles.text, baseStyles.t_left]}
+						numberOfLines={1}
+						ellipsizeMode="middle"
+					>
+						{title}
+					</Text>
+					<FontAwesome
+						style={baseStyles.linkIcon}
+						name="external-link"
+						color={colors.bg_button}
+						size={18}
+					/>
+				</View>
 				{renderSubtitle(subtitle, hasSubtitleIcon, true)}
 			</View>
 		</TouchableItem>
@@ -184,13 +193,20 @@ const baseStyles = StyleSheet.create({
 		marginBottom: 16
 	},
 	bodyWithIdentity: {
-		height: 44,
+		height: 42,
 		paddingLeft: 72,
 		paddingRight: 32
 	},
 	icon: {
 		marginLeft: 5,
 		position: 'absolute'
+	},
+	identityName: {
+		flexDirection: 'row'
+	},
+	linkIcon: {
+		marginLeft: 10,
+		paddingTop: 4
 	},
 	networkIcon: {
 		paddingHorizontal: 16
@@ -215,5 +231,10 @@ const baseStyles = StyleSheet.create({
 	text: {
 		...fontStyles.h1,
 		textAlign: 'center'
+	},
+	touchable: {
+		flex: 1,
+		flexDirection: 'column',
+		justifyContent: 'center'
 	}
 });

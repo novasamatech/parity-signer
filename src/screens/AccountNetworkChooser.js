@@ -26,10 +26,12 @@ import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
-	NetworkProtocols
+	NetworkProtocols,
+	defaultNetworkKey
 } from '../constants';
 import {
 	navigateToPathsList,
+	navigateToRoot,
 	navigateToSubstrateRoot,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
@@ -196,10 +198,24 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		} else {
 			const identityName = getIdentityName(currentIdentity, identities);
 			const rootAccount = currentIdentity.meta.get('');
-			const rootAddress = rootAccount ? ' ' + rootAccount.address : '';
-			const onRootKeyPress = () => {
-				if (rootAccount !== '')
+			const rootAddress = rootAccount ? rootAccount.address : '';
+			const onRootKeyPress = async () => {
+				if (rootAccount == null) {
+					const seedPhrase = await unlockSeedPhrase(navigation);
+					const derivationSucceed = await accounts.deriveNewPath(
+						'',
+						seedPhrase,
+						defaultNetworkKey,
+						''
+					);
+					if (!derivationSucceed) {
+						return alertPathDerivationError();
+					} else {
+						navigateToRoot(navigation);
+					}
+				} else {
 					navigation.navigate('PathDetails', { path: '' });
+				}
 			};
 			return (
 				<IdentityHeading

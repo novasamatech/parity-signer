@@ -183,3 +183,5 @@ export const NETWORK_LIST = Object.freeze(
 		UNKNOWN_NETWORK
 	)
 );
+
+export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;

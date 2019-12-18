@@ -165,5 +165,23 @@ export const resetNavigationTo = (navigation, screenName, params) => {
 	navigation.dispatch(resetAction);
 };
 
+export const navigateToRoot = navigation => {
+	const resetAction = StackActions.reset({
+		actions: [
+			NavigationActions.navigate({
+				isNew: false,
+				routeName: 'AccountNetworkChooser'
+			}),
+			NavigationActions.navigate({
+				params: { path: '' },
+				routeName: 'PathDetails'
+			})
+		],
+		index: 1,
+		key: undefined
+	});
+	navigation.dispatch(resetAction);
+};
+
 export const navigateToLegacyAccountList = navigation =>
 	resetNavigationTo(navigation, 'LegacyAccountList');
