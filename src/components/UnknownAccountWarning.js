@@ -30,7 +30,7 @@ export default function UnknownAccountWarning({ isPath }) {
 					The account is now using Polkadot Canary Address Format.
 					{'\n'}
 					In the future user may specify different address formats like Polkadot
-					Live, which will lead to different address.
+					Live, which will lead to a different address.
 				</Text>
 			) : (
 				<Text style={styles.warningText}>
