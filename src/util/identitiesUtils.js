@@ -167,6 +167,7 @@ export const unlockIdentitySeed = async (pin, identity) => {
 export const getExistedNetworkKeys = identity => {
 	const pathsList = Array.from(identity.addresses.values());
 	const networkKeysSet = pathsList.reduce((networksSet, path) => {
+		if (path === '') return networksSet;
 		let networkKey;
 		if (isSubstratePath(path)) {
 			networkKey = getNetworkKeyByPath(path);
