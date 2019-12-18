@@ -52,6 +52,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	});
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	//TODO enable user to select networkKey.
+	const isRootPath = path === '';
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onOptionSelect = value => {
@@ -60,7 +61,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				await unlockSeedPhrase(navigation);
 				const deleteSucceed = await accounts.deletePath(path);
 				if (deleteSucceed) {
-					isSubstratePath(path) || path === ''
+					isSubstratePath(path) && !isRootPath
 						? navigateToPathsList(navigation, networkKey)
 						: navigation.navigate('AccountNetworkChooser');
 				} else {
