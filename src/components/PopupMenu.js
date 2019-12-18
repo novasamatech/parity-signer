@@ -44,16 +44,21 @@ export default class PopupMenu extends React.PureComponent {
 			<Menu onSelect={onSelect}>
 				<MenuTrigger children={menuTriggerIcon} />
 				<MenuOptions customStyles={menuOptionsStyles}>
-					{menuItems.map((menuItem, index) => (
-						<MenuOption key={index} value={menuItem.value}>
-							<Text
-								style={[menuOptionsStyles.optionText, menuItem.textStyle]}
-								testID={menuItem.testID}
-							>
-								{menuItem.text}
-							</Text>
-						</MenuOption>
-					))}
+					{menuItems.map((menuItem, index) => {
+						if (menuItem.hide === true) {
+							return null;
+						}
+						return (
+							<MenuOption key={index} value={menuItem.value}>
+								<Text
+									style={[menuOptionsStyles.optionText, menuItem.textStyle]}
+									testID={menuItem.testID}
+								>
+									{menuItem.text}
+								</Text>
+							</MenuOption>
+						);
+					})}
 				</MenuOptions>
 			</Menu>
 		);

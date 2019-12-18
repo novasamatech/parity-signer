@@ -27,10 +27,11 @@ import colors from '../colors';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
+	getIdentityName,
 	getNetworkKeyByPath,
 	isSubstratePath
 } from '../util/identitiesUtils';
-import { UnknownNetworkKeys } from '../constants';
+import { defaultNetworkKey, UnknownNetworkKeys } from '../constants';
 import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
 import {
 	navigateToPathsList,
@@ -39,6 +40,7 @@ import {
 import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from '../util/account';
 import UnknownAccountWarning from '../components/UnknownAccountWarning';
+import AccountCard from '../components/AccountCard';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
@@ -48,6 +50,10 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 		address,
 		networkKey: getNetworkKeyByPath(path)
 	});
+	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
+	//TODO enable user to select networkKey.
+	const isRootPath = path === '';
+	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onOptionSelect = value => {
 		if (value === 'PathDelete') {
@@ -55,7 +61,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				await unlockSeedPhrase(navigation);
 				const deleteSucceed = await accounts.deletePath(path);
 				if (deleteSucceed) {
-					isSubstratePath(path)
+					isSubstratePath(path) && !isRootPath
 						? navigateToPathsList(navigation, networkKey)
 						: navigation.navigate('AccountNetworkChooser');
 				} else {
@@ -69,14 +75,17 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 	return (
 		<View style={styles.body} testID={testIDs.PathDetail.screen}>
-			<PathCardHeading title="Public Address" networkKey={networkKey} />
+			<PathCardHeading
+				title="Public Address"
+				networkKey={formattedNetworkKey}
+			/>
 			<View style={styles.menuView}>
 				<PopupMenu
 					testID={testIDs.PathDetail.popupMenuButton}
 					onSelect={onOptionSelect}
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
-						{ text: 'Edit', value: 'PathManagement' },
+						{ hide: isUnknownNetwork, text: 'Edit', value: 'PathManagement' },
 						{
 							testID: testIDs.PathDetail.deleteButton,
 							text: 'Delete',
@@ -87,14 +96,28 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				/>
 			</View>
 			<ScrollView>
-				<PathCard identity={currentIdentity} path={path} />
-				{networkKey === UnknownNetworkKeys.UNKNOWN ? (
+				{isUnknownNetwork ? (
 					<>
+						<AccountCard
+							title={getIdentityName(
+								currentIdentity,
+								accounts.state.identities
+							)}
+							address={address}
+							networkKey={formattedNetworkKey}
+						/>
 						<QrView data={generateAccountId({ address, networkKey })} />
 						<UnknownAccountWarning />
 					</>
 				) : (
-					<QrView data={accountId} />
+					<>
+						<PathCard
+							identity={currentIdentity}
+							path={path}
+							formattedNetworkKey={formattedNetworkKey}
+						/>
+						<QrView data={accountId} />
+					</>
 				)}
 			</ScrollView>
 		</View>

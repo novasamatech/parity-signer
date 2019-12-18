@@ -198,10 +198,6 @@ describe('IdentitiesUtils', () => {
 				title: '//default'
 			},
 			{
-				paths: [''],
-				title: 'Root'
-			},
-			{
 				paths: ['//custom'],
 				title: 'custom'
 			}
