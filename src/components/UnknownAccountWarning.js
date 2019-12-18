@@ -21,19 +21,31 @@ import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
 
-export default function UnknownAccountWarning() {
+export default function UnknownAccountWarning({ isPath }) {
 	return (
 		<View style={styles.warningView}>
 			<Text style={styles.warningTitle}>Warning</Text>
-			<Text style={styles.warningText}>
-				This account wasn't retrieved successfully. This could be because its
-				network isn't supported, or you upgraded Parity Signer without wiping
-				your device and this account couldn't be migrated.
-				{'\n'}
-				{'\n'}
-				To be able to use this account you need to:{'\n'}- write down its
-				recovery phrase{'\n'}- delete it{'\n'}- recover/derive it{'\n'}
-			</Text>
+			{isPath ? (
+				<Text style={styles.warningText}>
+					The account is now using Polkadot Canary Address Format.
+					{'\n'}
+					In the future user may specify different address formats like Polkadot
+					Live, which will lead to different address.
+				</Text>
+			) : (
+				<Text style={styles.warningText}>
+					This account wasn't retrieved successfully. This could be because its
+					network isn't supported, or you upgraded Parity Signer without wiping
+					your device and this account couldn't be migrated.
+					{'\n'}
+					{'\n'}
+					To be able to use this account you need to:
+					{'\n'}- write down its recovery phrase
+					{'\n'}- delete it
+					{'\n'}- recover/derive it
+					{'\n'}
+				</Text>
+			)}
 		</View>
 	);
 }

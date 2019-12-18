@@ -107,7 +107,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 							networkKey={formattedNetworkKey}
 						/>
 						<QrView data={generateAccountId({ address, networkKey })} />
-						<UnknownAccountWarning />
+						<UnknownAccountWarning isPath />
 					</>
 				) : (
 					<>
