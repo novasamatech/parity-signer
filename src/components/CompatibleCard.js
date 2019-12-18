@@ -20,19 +20,27 @@ import PropTypes from 'prop-types';
 import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 import React from 'react';
+import { getIdentityName } from '../util/identitiesUtils';
+import { defaultNetworkKey } from '../constants';
 
 const CompatibleCard = ({ account, accountsStore, titlePrefix }) =>
-	account.isLegacy === false ? (
-		<PathCard
-			identity={accountsStore.getIdentityByAccountId(account.accountId)}
-			path={account.path}
-			titlePrefix={titlePrefix}
-		/>
-	) : (
+	account.isLegacy === true ? (
 		<AccountCard
 			title={account.name}
 			address={account.address}
 			networkKey={account.networkKey || ''}
+		/>
+	) : account.path === '' ? (
+		<AccountCard
+			title={getIdentityName(account, accountsStore.state.identities)}
+			address={account.address}
+			networkKey={defaultNetworkKey}
+		/>
+	) : (
+		<PathCard
+			identity={accountsStore.getIdentityByAccountId(account.accountId)}
+			path={account.path}
+			titlePrefix={titlePrefix}
 		/>
 	);
 
