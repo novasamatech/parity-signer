@@ -437,7 +437,10 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async signDataWithSeedPhrase(seedPhrase, protocol) {
-		if (protocol === NetworkProtocols.SUBSTRATE) {
+		if (
+			protocol === NetworkProtocols.SUBSTRATE ||
+			protocol === NetworkProtocols.UNKNOWN
+		) {
 			const suri = constructSURI({
 				derivePath: this.state.sender.path,
 				password: '',

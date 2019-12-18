@@ -235,9 +235,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = this.getAccountFromIdentity(accountId);
 		}
-		if (!derivedAccount) {
-			derivedAccount = this.getAccountFromIdentity(address);
-		}
+		derivedAccount = derivedAccount || this.getAccountFromIdentity(address);
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
 		return null;
 	}

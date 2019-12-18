@@ -29,6 +29,7 @@ import {
 	getAddressWithPath,
 	getIdentityName,
 	getNetworkKeyByPath,
+	getPathName,
 	isSubstratePath
 } from '../util/identitiesUtils';
 import { defaultNetworkKey, UnknownNetworkKeys } from '../constants';
@@ -99,10 +100,11 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				{isUnknownNetwork ? (
 					<>
 						<AccountCard
-							title={getIdentityName(
-								currentIdentity,
-								accounts.state.identities
-							)}
+							title={
+								isRootPath
+									? getIdentityName(currentIdentity, accounts.state.identities)
+									: getPathName(path, currentIdentity)
+							}
 							address={address}
 							networkKey={formattedNetworkKey}
 						/>
@@ -111,11 +113,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					</>
 				) : (
 					<>
-						<PathCard
-							identity={currentIdentity}
-							path={path}
-							formattedNetworkKey={formattedNetworkKey}
-						/>
+						<PathCard identity={currentIdentity} path={path} />
 						<QrView data={accountId} />
 					</>
 				)}
