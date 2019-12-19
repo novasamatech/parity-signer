@@ -27,10 +27,10 @@ export default function UnknownAccountWarning({ isPath }) {
 			<Text style={styles.warningTitle}>Warning</Text>
 			{isPath ? (
 				<Text style={styles.warningText}>
-					The account is now using Polkadot Canary Address Format.
+					This account is not bond to a specific network.
 					{'\n'}
-					In the future user may be able specify different address formats like
-					Polkadot Live, which may lead to a different address.
+					The address currently displayed is using Kusama format, however, the
+					address for this account may be different on another network.
 				</Text>
 			) : (
 				<Text style={styles.warningText}>
