@@ -1,180 +1,198 @@
 export default `
-# TERMS & CONDITIONS - Parity Signer
+**PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**
 
-## LEGAL WARNING SHORT VERSION
-### Disclaimer of Liability and Warranties
-- The user expressly acknowledges and agrees that Parity Technologies Limited makes the Parity Signer application available to the user at the user's sole risk.
-- The user represents that the user has an adequate understanding of the risks, usage and intricacies of public and private key cryptography, cryptographic tokens, mobile wallet technology, blockchain-based open source software, the various platforms that Signer supports, including the Ethereum platform and any platforms built on Substrate including Kusama and Polkadot, and the blockchain tokens native to the various platforms supported by Signer, including Ether (ETH), Kusamas (KSM) and DOTs.
-- The user acknowledges and agrees that, to the fullest extent permitted by any applicable law, the disclaimers of liability contained herein apply to any and all damages or injury whatsoever caused by or related to risks of, use of, or inability to use, the Parity Signer application under any cause or action whatsoever of any kind in any jurisdiction, including, without limitation, actions for breach of warranty, breach of contract or tort (including negligence) and that Parity Technologies Limited shall not be liable for any indirect, incidental, special, exemplary or consequential damages, including for loss of profits, goodwill or data.
-- Some jurisdictions do not allow the exclusion of certain warranties or the limitation or exclusion of liability for certain types of damages. Therefore, some of the above limitations in this section may not apply to a user. In particular, nothing in these terms shall affect the statutory rights of any user or limit or exclude liability for death or physical injury arising from the negligence or wilful misconduct of Parity Technologies Limited or for fraud or fraudulent misrepresentation.
-- All rights reserved by Parity Technologies Limited. Licensed to the public under the GNU General Public License Version 3: https://opensource.org/licenses/GPL-3.0
+**Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at Ignition Law, Moray House, 23-31 Great Titchfield Street, London WC1W 7PA ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
 
-## LEGAL WARNING LONG VERSION
-The following Terms and Conditions ("Terms") govern the use of Parity Technologies Limited's open source software application Parity Signer and any published updates to that open source software application ("Parity Signer"). Prior to any use of Parity Signer or any of Parity Technologies Limited's products ("Parity Technologies' Products"), you ("User" or "you") confirm on your own behalf and on behalf of anyone who uses Parity Signer on your behalf that you (and they) understand, expressly agree to and will comply with all of the Terms. All capitalized words and expressions in these Terms will have the effect and meaning given to them in the Terms. The group of developers and other personnel that is now, or will be, employed by, or contracted with, or affiliated with, Parity Technologies Limited ("Parity Technologies" or "we") is termed the "Parity Technologies Team".
+In this document, when we refer to "**we**", "**us**" or "**our**", we mean Parity; and when we refer to "**you**" or "**your**" we mean you, the person downloading, accessing and/or using the App.
 
-### Acknowledgement of Risks
-The User acknowledges the following serious risks to any users of Parity Signer and expressly agrees not to hold liable Parity Technologies or the Parity Technologies Team should any of these risks occur:
+1.  **Understanding these terms**
 
-### Risk of Security Weaknesses in the Parity Core Infrastructure Software
-Parity Signer uses open-source libraries and components developed by third parties. While Parity Technologies Limited generally aims to use only widely adopted open-source technology and develop it in line with industry standards, such open-source technology may contain bugs and errors and may not function correctly in all circumstances. As a result, there is a risk that Parity Technologies or the Parity Technologies Team may have introduced unintentional weaknesses or bugs into the core infrastructural elements of Parity Signer causing the loss of private keys stored in one or more user accounts in the application and sums of valued blockchain tokens such as ETH, KSMs or DOTs.
+  1.1  This end user licence agreement together with appendix 1 to it and our instructions referred to in it (this "**EULA**") describes how you may download the App and access and/or use the App. By downloading, accessing and/or using the App, this EULA will apply to you and you agree to the terms of this EULA. You should therefore read the terms carefully before downloading, accessing and/or using the App. If any written instruction we have given you is inconsistent with the terms set out in this document, you should comply with our instructions and in doing so you will not be in breach of the inconsistent term of this document.
 
-### Risk of Weaknesses or Exploitable Breakthroughs in the Field of Cryptography
-Cryptography is an art, not a science, and the state of the art can advance over time. Advances in code cracking, or technical advances such as the development of quantum computers, could present risks to cryptocurrencies and Parity Signer, which could result in the theft or loss of private keys stored in one or more user accounts in the Parity Signer application, ETH, KSMs, DOTs or sums of other valued tokens. To the extent possible, Parity Technologies intends to update the software underlying Parity Signer to account for any advances in cryptography and to incorporate additional security measures, but it cannot predict the future of cryptography or guarantee that any security updates will be made, timely or successful.
+  1.2  When certain words and phrases are used in this EULA, they have specific meanings (these are known as "**defined terms**"). You can identify these defined terms because they start with capital letters (even if they are not at the start of a sentence). Where a defined term is used, it has the meaning given to it in the section of this EULA where it was defined (you can find these meanings by looking at the sentence where the defined term is included in brackets and speech marks).
 
-### Risk of Mining Attacks
-Some of the blockchains for which Parity Signer creates accounts are susceptible to mining attacks, including but not limited to double-spend attacks, majority mining power attacks, "selfish-mining" attacks, and race condition attacks. Any successful attacks present a risk to the ecosystems of those blockchains, for example in respect of the Ethereum ecosystem a successful attack would present risks to the expected proper execution and sequencing of ETH transactions, and the expected proper execution and sequencing of contract computations. Despite the efforts of Parity Technologies and the Parity Technologies Team, known or novel mining attacks may be successful.
+  1.3  In order to access and/or use the App it must be downloaded on to a smartphone or other mobile device running either the iOS or Android operating systems (the device you use, "**Device**"). In order to download the App, you will need Internet access.
 
-### Risk of Rapid Adoption and Insufficiency of Computational Application Processing Power on the Ethereum Network
-If Ethereum is rapidly adopted, the demand for transaction processing and distributed application computations could rise dramatically and at a pace that exceeds the rate with which ETH miners can bring online additional mining power. Under such a scenario, the entire Ethereum ecosystem could become destabilized, due to the increased cost of running distributed applications. In turn, this could dampen interest in the Ethereum ecosystem and ETH. Insufficiency of computational resources and an associated rise in the price of ETH could result in businesses being unable to acquire scarce computational resources to run their distributed applications. This would represent revenue losses to businesses or worst case, cause businesses to cease operations because such operations have become uneconomical due to distortions in the crypto-economy.
+  1.4  Please note that:
 
+    1.4.1  to download the App, you must also review and agree to the additional app terms set out in appendix 1 to this EULA and any other terms and conditions imposed by the app store from which you have downloaded the App; and
 
-### Use of Parity Signer by you
-You agree to use Parity Signer only for purposes that are permitted by:
-1)  these Terms (including the Software Licence Terms, as defined below);and
-2)  any applicable law or regulation in the relevant jurisdictions (including any laws regarding the export of data or software to and from the United Kingdom or other relevant countries).
+    1.4.2  we will not collect any personal information from or in relation to you, including from your downloading, accessing and/or use of the App. If you contact us, we only use your personal information in accordance with our privacy policy (available at [*www.parity.io/privacy*](www.parity.io/privacy)).
 
-You agree that you will not engage in any activity that:
-1. interferes with or disrupts Parity Signer's or Parity Technologies' Products' functioning (or the networks for which Parity Signer creates accounts); or
-2. is calculated or likely to do so.
+2.  **The App**
 
-Unless you have been specifically permitted to do so in a separate agreement with Parity Technologies, you agree that you will not reproduce, duplicate, copy, sell, trade or resell Parity Signer or Parity Technologies' Products for any purpose other than in accordance with the terms of the software licence terms available here: [https://opensource.org/licenses/GPL-3.0](https://opensource.org/licenses/GPL-3.0).
+  2.1  Subject to the terms of this EULA, the App is made available to you free of charge. The App does not connect to any computer system (other than the Device on which you install it) and does not gather or transmit to us or any other person any data in relation to you or your use of the App.
 
-You agree that you are solely responsible for the way you use, store, and backup your information and data relating to your use of Parity Signer or Parity Technologies Products, this includes but is not limited to any private cryptographic keys generated by Parity Signer or stored within a Parity Signer user account.
+  2.2  You are responsible for making all arrangements necessary for you to have access to and use of the App. You should not allow any other person to access and/or use the App on your Device. .
 
-You agree that you are solely responsible for ensuring the security and integrity of the devices on which you use Parity Signer.
+  2.3  The App and the content on it are provided for general information purposes only. They are not intended to amount to advice on which you should rely.
 
-You agree that you are solely responsible for maintaining the confidentiality of your account names, password, recovery phrase and PIN code and ensuring the security of your personal and private access to your user accounts within Parity Signer and any wallet technology you use in conjunction with Parity Signer, as well as managing the restrictions on access to the devices on which you will use Parity Signer and any other equipment.
+  2.4  You may only access and/or use the App for your own domestic, private and non-commercial use.
 
-When you use Parity Signer or Parity Technologies' Products, you may (as a result of, or in connection with your use of these products) use a service or download a piece of software, or smart contract, or purchase goods, which are provided by another person or company (“Third Party Services”), including but not limited to the use of cryptographic wallet technology such as software wallets. You agree and understand that Parity Technologies does not operate or control any such Third Party Services and that your use of them is at your sole risk and without warranties of any kind by Parity Technologies expressed, implied or otherwise. You further agree that under no circumstances is Parity Technologies liable for any damages arising from any transactions or interactions between you and the provider of any such Third Party Service or for any information that they provide you.
+  2.5  Subject to clause 2.6, the App (once downloaded on to a Device in accordance with this EULA) is designed to enable you to:
 
-To the extent permitted by applicable law, you agree to be responsible for all activities that have been conducted from your user account or as a result of your use of Parity Signer with your password, PIN code or recovery phrase. You must take all necessary steps to ensure that your password, PIN code and recovery phrase remain confidential and secured.
+    2.5.1  generate private keys using a recovery phrase ("**Private Key(s**)") and a corresponding public key and store them on such Device;
 
-You agree that you are solely responsible for (and that Parity Technologies has no responsibility to you or to any third party for) any breach of your obligations under these Terms and for the consequences (including any loss or damage which Parity Technologies may suffer) of any such breach.
+    2.5.2  verify and sign transactions on Blockchains (as defined below) using the relevant Private Key ("**Digital Signature**"); and
 
-### Privacy and your personal information
+    2.5.3  when used in conjunction with certain Third Party Services (which are defined in clause 4.3), can be used to broadcast transactions on the relevant Blockchains,
 
-For more information on how we use your data (if any) please refer to  Parity Technologies' privacy policies: [https://paritytech.io/privacy/](https://paritytech.io/privacy/). These policies explain how Parity Technologies treats your personal information (if any is gathered), and protects your privacy, when you use Parity Technologies' Products.
+(the "**App** **Functionality**").
 
-### Content in Parity Signer
-You understand that all information and data (such as smart contracts, data files, written text, computer software, music, audio files or other sounds, photographs, videos or other images) which you may have access to as part of, through or as a result of your use of, Parity Signer or Parity Technologies' Products are the sole responsibility of the person from which such content originated. All such information is referred to below as "Content".
+  2.6  The App Functionality the App, can only be used on the Ethereum public blockchain protocol, blockchain protocols built on our "Substrate" technology, including Kusama and Polkadot, and other blockchain protocols as are indicated within the App itself ("**Blockchain(s)**"). You are responsible for your choice of and interaction with the relevant Blockchain.
 
-You should be aware that Content presented to you as a result of  Parity Signer or through Parity Technologies' Products within Parity Signer, may be protected by intellectual property rights which are owned by third parties who may provide that Content to Parity Technologies (or by other persons or companies on their behalf). You may not modify, rent, lease, loan, sell, distribute or create derivative works based on this Content (either in whole or in part) unless you have been specifically told that you may do so by Parity Technologies or by the owners of that Content, in a separate agreement.
+  2.7  The App is not itself part of any blockchain. For this reason, we will have no liability to you in relation to any activity on any blockchain or the performance or availability of any blockchain. In addition, we do not guarantee that a Digital Signature will result in the related transaction being recorded on the relevant Blockchain. You are responsible for ensuring that any transactions you broadcast, or Digital Signatures you create, conform to the applicable rules of the relevant Blockchain.
 
-Parity Technologies reserves the right (but shall have no obligation) to pre-screen, review, flag, filter, modify, refuse or remove any or all Content presented.
+  2.8  You should only download, access and/or use the App if you are familiar with interacting with the Blockchains. We recommend you learn about and understand the basics of the Blockchains in connection with which you intend to use the App before downloading, accessing and/or using the App.
 
-You understand that as a result of using Parity Signer or by using Parity Technologies' Products you may be exposed to Content that you may find offensive, indecent or objectionable and that, in this additional respect, you use  Parity Signer or Parity Technologies' Products at your own risk.
+  2.9  The purpose of the App is to provide the App Functionality on a Device which is not connected to any form network or the internet. The App should only ever be used on an offline Device. Once you have downloaded, installed and set up the App on the Device, it is very important that you follow the instructions we provide on our website (available [*here*](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial)) to ensure the Device is not connected to any network or the internet.
 
-You agree that you are solely responsible for (and that Parity Technologies has no responsibility to you or to any third party for) any Content that you create, transmit or display as a result of using Parity Signer or while using Parity Technologies' Products and for the consequences of your actions (including any loss or damage which Parity Technologies may suffer) by doing so.
+	2.10  You are responsible for the use and security of any Device on which you have installed the App. We will have no liability to you for any losses or damages you incur in respect of (i) access and/or use of the App (including the creation of any Digital Signature or loss of Private Keys) as a result of unauthorised persons gaining access to your Device; or (ii) your Device being compromised or corrupted.
 
-### Proprietary rights
-You acknowledge and agree that Parity Technologies owns all legal rights, title and interest in and to  Parity Signer and Parity Technologies' Products, including any intellectual property rights which subsist in  Parity Signer and Parity Technologies' Products (whether those rights happen to be registered or not, and wherever in the world those rights may exist).
 
-Unless you have agreed otherwise in writing with Parity Technologies, nothing in the Terms gives you a right to use any of Parity Technologies' trade names, trade marks, service marks, logos, domain names, and other distinctive brand features.
+3.  **Your account and password**
 
-If you have been given an explicit right to use any of these brand features in a separate written agreement with Parity Technologies, then you agree that your use of such features shall be in compliance with that agreement, any applicable provisions of these Terms, and Parity Technologies' brand feature use guidelines as updated from time to time. These guidelines can be provided to you if you contact admin@parity.io.
+  3.1  You will need to register an account on the App in order to make full use of the App ("**Account**"). If you register an Account, you will be asked to provide certain information (such as your email address) and to create a pin code and a seed recovery phrase, as part of our security procedures. The information relating to your Account is never transmitted to us. You must treat such pin code and recovery phrase as confidential and you must not disclose it to any third party. Your recovery phrase is used to generate your Private Key, so if you lose your recovery phase, you will not be able to regenerate your Private Key to recover your Account. This may mean you are unable to access any digital currency, token and cryptocurrency associated with such Private Keys and/or create any Digital Signatures. You should ensure that you have taken appropriate steps to securely back-up any of your data stored on your Device (including the recovery phrase and Private Keys) so that such data is accessible in these circumstances.
 
-You retain copyright and any other rights you already hold in Content which you submit, post or display on through or as a result of use of,  Parity Signer. By posting Content, you grant to Parity Technologies a perpetual, royalty-free, non-exclusive, and irrevocable right and licence to use such Content in connection with its provision of  Parity Signer and Parity Technologies' Products. Parity Technologies acknowledges and agrees that, except as expressly provided in these Terms or the Software Licence Terms, it obtains no right, title or interest from you (or your licensors) in or to any Content that you submit, post, transmit or display on, through, or as a result of use of  Parity Signer, including any intellectual property rights which subsist in that Content (whether those rights happen to be registered or not, and wherever in the world those rights may exist). Unless you have agreed otherwise in writing with Parity Technologies, you agree that you are responsible for protecting and enforcing those rights and that Parity Technologies has no obligation to do so on your behalf.
+  3.2  You are responsible for any unauthorised access and/or use of your App or Account login details.
 
-You agree that you shall not remove, obscure, or alter any proprietary rights notices (including copyright and trade-mark notices) which may be affixed to or contained within Parity Signer or Parity Technologies' Products.
+4.  **Acceptable use**
 
-Unless you have been expressly authorized to do so in writing by Parity Technologies, you agree that in using Parity Signer, you will not use any trademark, service mark, trade name, logo of any company or organization in a way that is likely or intended to cause confusion about the owner or authorized user of such marks, names or logos.
+*General*
 
-### License Restrictions from Parity Technologies
-You may not (and you may not permit anyone else to) copy, modify, create a derivative work of, reverse engineer, decompile or otherwise attempt to extract the source code of  Parity Signer, Parity Technologies' Products or any part thereof, unless this is expressly permitted by our Software Licence Terms or required by law, or unless you have been specifically told that you may do so by Parity Technologies, in writing.
+  4.1  We provide software code in the App on an "open source" basis in accordance with the terms of the GPL 3.0 licence, which can be found here: [*https://opensource.org/licenses/GPL-3.0*](https://opensource.org/licenses/GPL-3.0), ("GPL 3.0") and make the source code of the App available here [*https://github.com/paritytech/parity-signer*](https://protect-eu.mimecast.com/s/G9QrCW6Agclr60pTxhQkw). You are free to use, modify and distribute the software code in the App in accordance with the terms of GPL 3.0. In the case of any conflict between the terms of GPL 3.0 and the terms of this EULA in relation to your use of the software code in the App, the terms of GPL 3.0 shall prevail.
 
-Unless Parity Technologies has given you specific written permission to do so, you may not assign (or grant a sub-licence of) your rights to use Parity Technologies' Products, grant a security interest in or over your rights to use Parity Technologies' Products, or otherwise transfer any part of your rights to use Parity Technologies' Products.
+  4.2  When accessing and/or using the App, you agree:
 
-### Software updates
-Any software updates   to Parity Signer published by Parity Technologies are designed to improve, enhance and further develop Parity Signer and may take the form of bug fixes, enhanced functions, new software modules and completely new versions. As Parity Signer is designed to operate on a device which remains offline, you agree that it is your responsibility and choice to update Parity Signer and check and download updates of Parity Signer published by Parity Technologies.
+      4.2.1  not to access and/or use the App in any unlawful manner, for any unlawful purpose or in any manner inconsistent with this EULA;
 
-### Ending your relationship with Parity Technologies
-The Terms will continue to apply until terminated by either you or Parity Technologies as set out below. You may at any time, terminate your legal agreement with Parity Technologies. Parity Technologies may at any time, terminate its legal agreement with you if:
-1. you have breached any provision of these Terms (or have acted in manner which indicates that you do not intend to, or are unable to comply with the provisions of these terms); or
-1. Parity Technologies is required to do so by law (for example, where the provision of  Parity Signer or any of Parity Technologies' Products to you is, or becomes, unlawful); or
-1. any partner with whom Parity Technologies offered products or services to you has terminated its relationship with Parity Technologies or ceased to offer products or services to you; or
-1. Parity Technologies is transitioning to no longer providing products or services to users in the country in which you are resident or from which you use the service; or
-1. the provision of products or services to you by Parity Technologies is, in Parity Technologies' opinion, no longer commercially viable.
+      4.2.2  not to infringe our intellectual property rights or those of any third party in relation to your use of the App (to the extent that such access and/or use is not licensed under this EULA); and
 
-When these Terms come to an end for any reason:
-1. you must immediately cease use of  Parity Signer and Parity Technologies' Products;
-1. you must delete or remove  Parity Signer or Parity Technologies' Products from all devices and operating systems in your possession or under your control; and
-1. all of the rights granted to you in these Terms shall cease.
+      4.2.3  to comply with all technology control or export laws and regulations that apply to the technology used or supported by the App.
 
-Except as set out above, termination of these Terms shall not affect any rights, remedies, obligations and liabilities that have accrued to you or Parity Technologies up to the date of termination, including the right to claim damages in respect of any breach of these Terms which existed at or before the date of termination, and the courts of England and Wales shall continue to have jurisdiction in respect of such rights, obligations and liabilities indefinitely.
+*Use with other software and hardware*
 
-### Acknowledgement and acceptance of all risks, exclusion of warranties
-The User expressly acknowledges and agrees that the User is using Parity Signer and Parity Technologies' Products at the User's sole risk. The User represents that the User has an adequate understanding of the risks, usage and intricacies of private key cryptography, cryptographic tokens, mobile wallet technology and blockchain-based open source software.
+  4.3  When you make use of the App, you may use the App Functionality to enter into transactions on the relevant Blockchain (for example, transferring crypto currency, entering into a smart contract, or purchasing goods) (“**Transactions**”). You may also use the App in conjunction with other services or software (including cryptographic wallet technology such as software wallets) which are provided by a person or company other than Parity (“**Third Party Services**”). You agree and understand that you are responsible for any Transaction which you enter into and we do not operate or control any such Third Party Services. We have no responsibility for any Transactions you enter into and your use of Third Party Services is at your sole risk and we provide no warranty or guarantee of any in respect of Third Party Services. You further agree that under no circumstances will we be liable to you for any losses or damages arising from any Transactions or any interactions between you and the provider of any such Third Party Services or for any information that such Third Party Services provider provides you or you to them.
 
-You expressly understand and agree that  Parity Signer and Parity Technologies' Products are provided "as is" and "as available."
+*Bugs and Viruses*
 
-Parity Technologies, its subsidiaries and affiliates, and its licensors do not represent or warrant to you that:
-1. your use of  Parity Signer or Parity Technologies' Products will meet your requirements,
-1. your use of  Parity Signer or Parity Technologies' Products will be uninterrupted, timely, secure or free from error,
-1. any information obtained by you as a result of your use of  Parity Signer or Parity Technologies' Products will be accurate or reliable, or
-1. defects in the operation or functionality of any software provided to you as part of Parity Technologies' Products will be corrected.
+  4.4  We do not guarantee that the App will be totally secure or free from bugs or viruses.
 
-Any material downloaded or otherwise obtained through the use of or as a result of the use of  Parity Signer or Parity Technologies' Products is done at your own discretion and risk and you will be solely responsible for any damage to  the device on which you use Parity Signer or any loss of data or economic loss that results from the download of any such material.
+  4.5  You must not misuse the App by knowingly introducing viruses, trojans, worms, logic bombs or other material which is malicious or technologically harmful. By breaching this provision, you would commit criminal offences.
 
-No advice or information, whether oral or written, obtained by you from Parity Technologies or through or from Parity Technologies' Products shall create any warranty not expressly stated in the Terms.
+<!-- -->
 
-To the fullest extent permitted by applicable law, Parity Technologies expressly disclaims all implied warranties and conditions of any kind including, but not limited to, implied statutory warranties and conditions of merchantability, fitness for a particular purpose and non-infringement.
+5.  **Intellectual property**
 
-Exclusion and limitation of liability
-The User acknowledges and agrees that, to the fullest extent permitted by any applicable law, the disclaimers and exclusion of liability contained herein apply to any and all damages or injury whatsoever caused by or related to risks of, use of, or inability to use, Parity Signer under any cause of action whatsoever of any kind in any jurisdiction, including, without limitation, actions for breach of warranty, breach of contract or tort (including negligence).
+  5.1  As we refer to above, we grant to you a licence to use the software code in the App on the terms of GPL 3.0. This right does not apply to the Parity name and mark, the Parity Signer product names, and any texts, designs, graphics, photographs and images contained in the App, which you are not entitled to use (other than through the use of the App on your Device in accordance with this EULA) or modify in any circumstances . We reserve all other rights.
 
-Some jurisdictions do not allow the exclusion of certain warranties or the limitation or exclusion of liability for certain types of damages. Therefore, some of the above limitations in this section may not apply to you. In particular, nothing in these terms shall affect the statutory rights of any User or limit or exclude liability for death or physical injury arising from the negligence or wilful misconduct of Parity Technologies or for fraud or fraudulent misrepresentation.
+  5.2  We are the owner or licensee of all intellectual property rights in the App and its content, the Parity name and mark and Parity Signer product names and images. Those works are protected by intellectual property laws and treaties around the world. All such rights are reserved.
 
-Subject to any liability which may not be excluded, you expressly understand and agree that Parity Technologies, its subsidiaries and affiliates, and its licensors shall not be liable to you for:
-1. any direct, indirect, incidental, special consequential or exemplary damages which may be incurred by you, however caused and under any theory of liability. This shall include, but not be limited to, any loss of profit (whether incurred directly or indirectly), any loss of goodwill or business reputation, any loss of data suffered, cost of procurement of substitute goods or services, or other intangible loss; or
-1. any loss or damage which may be incurred by you, including but not limited to loss or damage as a result of:
+  5.3  You are not granted any right to use, and may not use, any of our intellectual property rights other than as set out in this EULA. You must not use the App (or any part of it or its content) for commercial purposes.
 
-    a. any changes which Parity Technologies may make to Parity Technologies' Products, or for any permanent or temporary cessation in the provision of Parity Technologies' Products (or any features within Parity Technologies' Products);
+  5.4  Any communications or materials you send to us by electronic mail or other means will be treated as non-proprietary and non-confidential. We are free to publish, display, post, distribute and otherwise use any ideas, suggestions, concepts, designs, know-how and other information contained in such communications or material for any purpose, including, but not limited to, developing, manufacturing, advertising and marketing us and our products.
 
-    b. the deletion of, corruption of, or failure to store, any content and other communications data maintained or transmitted by or through your use of Parity Technologies' Products;
+6.  **Our liability**
 
-    c. your failure to ensure the security or integrity of any device on which you install or use Parity Signer;
+  6.1  Nothing in this EULA excludes or limits our liability for:
 
-    d. your failure to provide Parity Technologies with accurate account information (if this is required); and
+      6.1.1  death or personal injury caused by our negligence;
 
-    e. your failure to keep your password or account details secure and confidential.
+      6.1.2  fraud or fraudulent misrepresentation; and
 
-The limitations on Parity Technologies' liability to you shall apply whether or not Parity Technologies has been advised of or should have been aware of the possibility of any such losses arising.
+      6.1.3  any matter in respect of which it would be unlawful for us to exclude or restrict our liability.
 
-### Copyright and trade mark policies
-It is Parity Technologies' policy to respond to notices of alleged copyright infringement that comply with applicable international intellectual property law (including, in the United States, the Digital Millennium Copyright Act) where Parity Technologies is put on notice and it is under Parity Technologies' control. In such cases Parity Technologies shall be entitled to terminate the accounts of repeat infringers.
+  6.2  The App is built on open source software and made available in accordance with this agreement as an open source community project. Accordingly, we make the App (and both the source code and object code in it) available on an "as is" basis. This means that we cannot guarantee or warrant to you that the App is free from errors or defects.
 
+  6.3  It is possible that as a result of an error or defect the version of the App stored on your Device may become corrupt and unusable so that it may not be possible to retrieve the data stored on it (including any Private Keys). You should ensure that you have taken appropriate steps to securely back-up any of your data (including any Private Keys) stored on your Device so that it is not lost in these circumstances. Save if we cause damage to your Device or other digital content and such damage would not have occurred if we had exercised reasonable care and skill, as the App is free for you to access and/or use and we receive no data in relation to you from your use of it, we will not be liable to you in any way if the App stops working properly or at all, including where any data stored in the App is lost or corrupted.
 
-### Other content
-Parity Technologies' services provided may include hyperlinks to other web sites, smart contracts or content or resources. Parity Technologies may have no control over any web sites or resources which are provided by companies or persons other than Parity Technologies.
-You acknowledge and agree that Parity Technologies is not responsible for the availability of any such external sites or resources, and does not endorse any advertising, products or other materials on or available from such web sites or resources.
+  6.4  Nothing in this EULA affects your statutory rights. Advice about your statutory rights is available from your local Citizens' Advice Bureau or Trading Standards Office.
 
-You acknowledge and agree that Parity Technologies is not liable for any loss or damage which may be incurred by you as a result of the availability of those external sites or resources, or as a result of any reliance placed by you on the completeness, accuracy or existence of any advertising, products or other materials on, or available from, such web sites or resources.
+  6.5  We only supply the App for domestic and private use. You agree not to use the App, or any content on the App, for any commercial or business purposes and we have no liability to you for any loss of profit, loss of business, business interruption, or loss of business opportunity.
 
-### Changes to the Terms
-Parity Technologies may make changes to these Terms from time to time. When these changes are made, Parity Technologies will make a new copy of these Terms available e to you from within, or through,  Parity Signer or the affected Parity Technologies' Product.
+  6.6  The App may contain inaccuracies or typographical errors. We make no representations about the reliability, availability, timeliness or accuracy of the content included on the App.
 
-You understand and agree that if you use  Parity Signer or Parity Technologies' Products after the date on which the Terms have changed, Parity Technologies will treat your use as acceptance of the updated terms.
+  6.7  We assume no responsibility for the content of any websites or services which you use the App to authenticate transactions on. We will not be liable for any loss or damage that may arise from your use of them.
 
-### General legal terms
-Sometimes when you use  Parity Signer or Parity Technologies' Products, you may (as a result of, or in connection with your use of these products) use a service or download a piece of software, or smart contract, or purchase goods, which are provided by another person or company. Your use of these other services, software, smart contract or goods may be subject to separate terms between you and the company or person concerned. If so, these Terms do not affect your legal relationship with these other companies or individuals.
+  6.8  Save as set out in clause 6.1 above, our maximum liability to you under this EULA is £100.
 
-These Terms (including the Software Licence Terms) constitute the whole legal agreement between you and Parity Technologies and govern your use of  Parity Signer and Parity Technologies' Products (but excluding any products or services which Parity Technologies may provide to you under a separate written agreement), and completely replace any prior agreements between you and Parity Technologies in relation to  Parity Signer and Parity Technologies' Products.
+7.  **Suspension and termination**
 
-You agree that Parity Technologies may provide you with notices, including those regarding changes to the Terms, by postings on  Parity Signer or the affected Parity Technologies' Product.
+  7.1  Either you or we may terminate this EULA at any time for any reason.
 
-You agree that if Parity Technologies does not exercise or enforce any legal right or remedy which is contained in these Terms (or which Parity Technologies has the benefit of under any applicable law), this will not be taken to be a formal waiver of Parity Technologies' rights and that those rights or remedies will still be available to Parity Technologies.
+  7.2  If you breach any of the terms of this EULA, we may immediately do any or all of the following (without limitation):
 
-If any court of law, having the jurisdiction to decide on this matter, rules that any provision of these Terms is invalid, then that provision will be removed from the Terms without affecting the rest of the Terms. The remaining provisions of the Terms will continue to be valid and enforceable.
+      7.2.1  issue a warning to you;
 
-You acknowledge and agree that each member of the group of companies of which Parity Technologies is the parent shall be third party beneficiaries to these Terms and that such other companies shall be entitled to directly enforce, and rely upon, any provision of the Terms which confers a benefit on (or rights in favour of) them. Other than this, no other person or company shall be third party beneficiaries to these Terms.
+      7.2.2  temporarily or permanently withdraw your right to use the App;
 
-These Terms, and your relationship with Parity Technologies under these Terms, shall be governed by the laws of England and Wales, United Kingdom. You and Parity Technologies agree to submit to the exclusive jurisdiction of the courts located within England, United Kingdom to resolve any legal matter arising from these Terms (subject to the Dispute Resolution clause below). Notwithstanding this, you agree that Parity Technologies shall still be allowed to apply for injunctive remedies (or an equivalent type of urgent legal relief) in any jurisdiction.
+      7.2.3  issue legal proceedings against you for reimbursement of all costs resulting from the breach (including, but not limited to, reasonable administrative and legal costs);
 
-### Dispute Resolution
-All disputes or claims arising out of, relating to, or in connection with the Terms, the breach thereof, or use of  Parity Signer shall be finally settled under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators appointed in accordance with said Rules. All claims between the parties relating to these Terms that are capable of being resolved by arbitration, whether sounding in contract, tort, or otherwise, shall be submitted to ICC arbitration. Prior to commencing arbitration, the parties have a duty to negotiate in good faith and attempt to resolve their dispute in a manner other than by submission to ICC arbitration. The arbitration panel shall consist of one arbitrator only, unless the ICC Court of Arbitration determines that the dispute is such as to warrant three arbitrators. If the Court determines that one arbitrator is sufficient, then such arbitrator shall be a UK resident. If the Court determines that three arbitrators are necessary, then each party shall have 30 days to nominate an arbitrator of its choice - in the case of the Claimant, measured from receipt of notification of the ICC Court's decision to have three arbitrators; in the case of Respondent, measured from receipt of notification of Claimant's nomination. All nominations must be UK residents. If a party fails to nominate an arbitrator, the Court will do so. The Court shall also appoint the chairman. All arbitrators shall be and remain "independent" of the parties involved in the arbitration. The place of arbitration shall be England, United Kingdom. The language of the arbitration shall be English. In deciding the merits of the dispute, the tribunal shall apply the laws of England and Wales and any discovery shall be limited and shall not involve any depositions or any other examinations outside of a formal hearing. The tribunal shall not assume the powers of amiable compositeur or decide the case ex aequo et bono. In the final award, the tribunal shall fix the costs of the arbitration and decide which of the parties shall bear such costs in what proportion. Every award shall be binding on the parties. The parties undertake to carry out the award without delay and waive their right to any form of recourse against the award in so far as such waiver can validly be made. Notwithstanding the foregoing, either party shall be entitled at any time to apply to the courts of England, United Kingdom for injunctive relief, or where a claim is incapable of being resolved by arbitration.
+      7.2.4  take further legal action against you; and/or
 
-### Additional Terms for Enterprise Use
-If you are a business entity, then the individual accepting on behalf of the entity (for the avoidance of doubt, for business entities, in these Terms, "you" means the entity) represents and warrants that he or she has the authority to act on your behalf, that you represent that you are duly authorized to do business in the country or countries where you operate, and that your employees, officers, representatives, and other agents accessing Parity Technologies' Products are duly authorized to access  Parity Signer and to legally bind you to these Terms.
+      7.2.5  disclose such information to law enforcement authorities as we reasonably feel is necessary to do so.
 
-Subject to these Terms and subject to the Software Licence Terms, Parity Technologies grants you a non-exclusive, non-transferable licence to use  Parity Signer solely on machines intended for use by your employees, officers, representatives, and agents in connection with your business entity, and provided that their use of  Parity Signer will be subject to these Terms (including the Software Licence Terms).
+  7.3  If we withdraw your right to use the App, then:
+
+      7.3.1  all rights granted to you under this EULA shall cease;
+
+      7.3.2  you must immediately cease all activities authorised by this EULA, including your use of any services provided through the App; and
+
+      7.3.3  you must immediately delete or remove the App from your Device, and immediately destroy all copies of the App then in your possession, custody or control and if we request you to, certify to us that you have done so.
+
+8.  **Changes to this EULA**
+
+  8.1  We may make changes to the terms of this EULA from time to time (if, for example, there is a change in the law that means we need to change this EULA). Please check this EULA (at the address indicated in clause 1.1) regularly to ensure that you understand the up-to-date terms that apply at the time that you access and use the App. If we update the terms of this EULA, the updated terms will apply 10 days after the update is posted (at the address indicated in clause 1.1) to each of your uses of the App from that point on.
+
+  8.2  From time to time updates to the App may be issued through the relevant app store. As the App is designed to operate on a Device which remains offline, you agree that it is your responsibility to check whether we have published any updates to the App. You should carry out this check on a device on which the App has not been installed and follow our instructions (available at [*https://wiki.parity.io/Parity-Signer-Mobile-App*](https://wiki.parity.io/Parity-Signer-Mobile-App)) as to how to update the App.
+
+  8.3  You will be assumed to have obtained permission from the owners of any Devices that are controlled, but not owned, by you to download a copy of the App onto the Devices. You and they may be charged by your and their service providers for Internet access on the Devices. You accept responsibility in accordance with the terms of this EULA for the use of the App in relation to any Device, whether or not it is owned by you.
+
+9.  **Other important information**
+
+  9.1  Each of the clauses of this EULA operates separately. If any court or relevant authority decides that any of them are unlawful or unenforceable, the remaining clauses will remain in full force and effect.
+
+  9.2  If we fail to insist that you perform any of your obligations under this EULA, or if we do not enforce our rights against you, or if we delay in doing so, that will not mean that we have waived our rights against you and will not mean that you do not have to comply with those obligations. If we do waive a default by you, we will only do so in writing, and that will not mean that we will automatically waive any later default by you.
+
+  9.3  If you wish to have more information on online dispute resolution, please follow this link to the website of the European Commission: [*http://ec.europa.eu/consumers/odr/*](http://ec.europa.eu/consumers/odr/). This link is provided as required by Regulation (EU) No 524/2013 of the European Parliament and of the Council, for information purposes only. We are not obliged to participate in online dispute resolution.
+
+10.  **Governing law and jurisdiction**
+
+  10.1  This EULA is governed by English law. This means that your download, access to, and use of, the App, and any dispute or claim arising out of or in connection therewith will be governed by English law.
+
+  10.2  You can bring proceedings in respect of this EULA in the English courts. However, as a consumer, if you live in another European Union member state you can bring legal proceedings in respect of this EULA in either the English courts or the courts of that Member State.
+
+  10.3  As a consumer, if you are resident in the European Union and we direct this App to the member state in which you are resident, you will benefit from any mandatory provisions of the law of the country in which you are resident. Nothing in this EULA, including clause 10.1, affects your rights as a consumer to rely on such mandatory provisions of local law.
+
+11.  **Contacting us**
+
+Should you have any reasons for a complaint, we will endeavour to resolve the issue and avoid any re-occurrence in the future. You can always contact us by using the following details:
+Address: Parity Technologies Limited, Ignition Law, Moray House, 23-31 Great Titchfield Street, London WC1W 7PA
+Email address: admin@parity.io and legal@parity.io
+
+Thank you.
+
+**Terms last updated 10 December 2019**
+
+**APPENDIX 1**
+
+**Additional App Terms**
+
+The following terms and conditions shall apply to your access and/or use of the App in addition to those set out in this EULA.
+
+For the purpose of this appendix 1, "**Appstore Provider**" means the provider of the app store through which you have downloaded the App (for example, Apple is the Appstore Provider if you have downloaded the App from the Apple App Store, Google is the Appstore Provider if you have downloaded the App from Google Play, etc).
+
+1.  You acknowledge and agree that this EULA has been concluded between you and Parity, and not with the Appstore Provider. You acknowledge and agree that the Appstore Provider is not responsible for the App and its content.
+
+2.  You acknowledge and agree that the Appstore Provider has no obligation to provide any maintenance or support in respect of the App. Should you have any problems in using the App, please contact the us at admin@parity.io.
+
+3.  In the event that the App does not conform with any product warranty provided for by this EULA, the Appstore Provider may provide you with a refund of the price that you paid to purchase the App (if any). The Appstore Provider shall, to the maximum extent permitted by law, have no obligation to you whatsoever with respect to the App.
+
+4.  You acknowledge and agree that the Appstore Provider shall not be responsible for addressing any claims that you might have relating to the App, including (without limitation): product liability claims; any claim that the App fails to conform to any applicable legal or regulatory requirement; and claims arising under consumer protection or similar legislation.
+
+5.  In the event that a third party claims that the App infringes its intellectual property rights, Parity (and not the Appstore Provider) shall be solely responsible for the investigation, defence, settlement and discharge of such claim.
+
+6.  You warrant and represent that: (i) you are not located in a country that is subject to a U.S. Government embargo, or that has been designated by the U.S. Government as a "terrorist supporting" country; and (ii) you are not listed on any U.S. Government list of prohibited or restricted parties.
+
+If the Appstore Provider is Apple, you acknowledge and agree that Apple and its subsidiaries are third party beneficiaries to this EULA. Upon your acceptance of this EULA, Apple will have the right to enforce the EULA against you as a third party beneficiary.
 `;
