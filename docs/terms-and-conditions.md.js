@@ -23,7 +23,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   2.1  Subject to the terms of this EULA, the App is made available to you free of charge. The App does not connect to any computer system (other than the Device on which you install it) and does not gather or transmit to us or any other person any data in relation to you or your use of the App.
 
-  2.2  You are responsible for making all arrangements necessary for you to have access to and use of the App. You should not allow any other person to access and/or use the App on your Device. .
+  2.2  You are responsible for making all arrangements necessary for you to have access to and use of the App. You should not allow any other person to access and/or use the App on your Device.
 
   2.3  The App and the content on it are provided for general information purposes only. They are not intended to amount to advice on which you should rely.
 
@@ -184,7 +184,7 @@ For the purpose of this appendix 1, "**Appstore Provider**" means the provider o
 
 1.  You acknowledge and agree that this EULA has been concluded between you and Parity, and not with the Appstore Provider. You acknowledge and agree that the Appstore Provider is not responsible for the App and its content.
 
-2.  You acknowledge and agree that the Appstore Provider has no obligation to provide any maintenance or support in respect of the App. Should you have any problems in using the App, please contact the us at admin@parity.io.
+2.  You acknowledge and agree that the Appstore Provider has no obligation to provide any maintenance or support in respect of the App. Should you have any problems in using the App, please contact us at admin@parity.io.
 
 3.  In the event that the App does not conform with any product warranty provided for by this EULA, the Appstore Provider may provide you with a refund of the price that you paid to purchase the App (if any). The Appstore Provider shall, to the maximum extent permitted by law, have no obligation to you whatsoever with respect to the App.
 
