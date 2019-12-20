@@ -25,7 +25,12 @@ import {
 	getNetworkKeyByPath,
 	getPathName
 } from '../util/identitiesUtils';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import {
+	defaultNetworkKey,
+	NETWORK_LIST,
+	NetworkProtocols,
+	UnknownNetworkKeys
+} from '../constants';
 import Separator from '../components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
@@ -54,9 +59,13 @@ export default function PathCard({
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const address = getAddressWithPath(path, identity);
+	const isUnknownAddress = address === '';
 
 	const networkKey = getNetworkKeyByPath(path);
-	const network = NETWORK_LIST[networkKey];
+	const network =
+		networkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress
+			? NETWORK_LIST[defaultNetworkKey]
+			: NETWORK_LIST[networkKey];
 
 	const nonSubstrateCard = (
 		<View testID={testID}>

@@ -24,7 +24,7 @@ import { getIdentityName } from '../util/identitiesUtils';
 import { defaultNetworkKey } from '../constants';
 
 const CompatibleCard = ({ account, accountsStore, titlePrefix }) =>
-	account.isLegacy === true ? (
+	account.isLegacy === true || account.isLegacy === undefined ? (
 		<AccountCard
 			title={account.name}
 			address={account.address}
