@@ -163,7 +163,7 @@ function IdentityPin({ navigation, accounts }) {
 	return (
 		<KeyboardScrollView
 			style={styles.body}
-			extraHeight={120}
+			extraHeight={200}
 			testID={testIDs.IdentityPin.scrollScreen}
 		>
 			<Background />

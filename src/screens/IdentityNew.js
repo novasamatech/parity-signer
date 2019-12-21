@@ -17,7 +17,7 @@
 'use strict';
 
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
 import Button from '../components/Button';
@@ -145,7 +145,10 @@ function IdentityNew({ accounts, navigation }) {
 	);
 
 	return (
-		<KeyboardScrollView style={styles.body}>
+		<KeyboardScrollView
+			style={styles.body}
+			extraHeight={Platform.OS === 'ios' ? 210 : 120}
+		>
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
