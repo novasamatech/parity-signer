@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		letterSpacing: -0.4,
-		opacity: 0.4
+		opacity: 0.4,
+		textAlign: 'center'
 	}
 });

@@ -133,12 +133,13 @@ export default class AccountSeed extends Component {
 		return (
 			<View>
 				<TextInput
-					autoFocus
 					style={[fontStyles.t_seed, styles.input, invalidStyles]}
 					multiline
 					autoCorrect={false}
 					autoCompleteType="off"
 					autoCapitalize="none"
+					returnKeyType="done"
+					blurOnSubmit={true}
 					textAlignVertical="top"
 					onSelectionChange={this.handleCursorPosition}
 					{...this.props}

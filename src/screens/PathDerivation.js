@@ -19,7 +19,7 @@
 import React, { useState } from 'react';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
 import ButtonMainAction from '../components/ButtonMainAction';
 import {
@@ -80,17 +80,20 @@ function PathDerivation({ accounts, navigation }) {
 				subtitle={currentNetworkPath}
 				hasSubtitleIcon={true}
 			/>
-			<KeyboardScrollView>
+			<KeyboardScrollView extraHeight={Platform.OS === 'ios' ? 250 : 180}>
 				{!isPathValid && <Text>Invalid Path</Text>}
 				<TextInput
+					autoCorrect={false}
+					autoCompleteType="off"
 					label="Path"
 					placeholder="//hard/soft"
-					autoFocus
 					value={derivationPath}
 					testID={testIDs.PathDerivation.pathInput}
 					onChangeText={setDerivationPath}
 				/>
 				<TextInput
+					autoCorrect={false}
+					autoCompleteType="off"
 					label="Display Name"
 					testID={testIDs.PathDerivation.nameInput}
 					value={keyPairsName}
