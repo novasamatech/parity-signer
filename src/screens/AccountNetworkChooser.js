@@ -26,10 +26,12 @@ import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
-	NetworkProtocols
+	NetworkProtocols,
+	defaultNetworkKey
 } from '../constants';
 import {
 	navigateToPathsList,
+	navigateToRootPath,
 	navigateToSubstrateRoot,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
@@ -37,10 +39,11 @@ import { withAccountStore } from '../util/HOC';
 import { alertPathDerivationError } from '../util/alertUtils';
 import {
 	getExistedNetworkKeys,
+	getIdentityName,
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading from '../components/ScreenHeading';
+import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
 
@@ -153,7 +156,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		onDerivationFinished(derivationSucceed, networkKey, false);
 	};
 
-	const renderShowMoreButton = () => {
+	const renderAddButton = () => {
 		if (isNew) return;
 		if (!shouldShowMoreNetworks) {
 			return (
@@ -161,7 +164,20 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					<NetworkCard
 						isAdd={true}
 						onPress={() => setShouldShowMoreNetworks(true)}
+						testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
 						title="Add Network Account"
+						networkColor={colors.bg}
+					/>
+				</>
+			);
+		} else {
+			return (
+				<>
+					<NetworkCard
+						isAdd={true}
+						onPress={() => navigation.navigate('PathDerivation')}
+						testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}
+						title="Create Custom Path"
 						networkColor={colors.bg}
 					/>
 				</>
@@ -177,6 +193,36 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				<ScreenHeading
 					title={'Choose Network'}
 					onPress={() => setShouldShowMoreNetworks(false)}
+				/>
+			);
+		} else {
+			const identityName = getIdentityName(currentIdentity, identities);
+			const rootAccount = currentIdentity.meta.get('');
+			const rootAddress = rootAccount ? rootAccount.address : '';
+			const onRootKeyPress = async () => {
+				if (rootAccount == null) {
+					const seedPhrase = await unlockSeedPhrase(navigation);
+					const derivationSucceed = await accounts.deriveNewPath(
+						'',
+						seedPhrase,
+						defaultNetworkKey,
+						''
+					);
+					if (!derivationSucceed) {
+						return alertPathDerivationError();
+					} else {
+						navigateToRootPath(navigation);
+					}
+				} else {
+					navigation.navigate('PathDetails', { path: '' });
+				}
+			};
+			return (
+				<IdentityHeading
+					title={identityName}
+					subtitle={rootAddress}
+					onPress={onRootKeyPress}
+					hasSubtitleIcon={true}
 				/>
 			);
 		}
@@ -213,12 +259,9 @@ function AccountNetworkChooser({ navigation, accounts }) {
 	networkList.sort(sortNetworkKeys);
 
 	return (
-		<View
-			style={styles.body}
-			testID={testIDs.AccountNetworkChooser.chooserScreen}
-		>
+		<View style={styles.body}>
 			{renderScreenHeading()}
-			<ScrollView>
+			<ScrollView testID={testIDs.AccountNetworkChooser.chooserScreen}>
 				{networkList.map(([networkKey, networkParams], index) => (
 					<NetworkCard
 						key={networkKey}
@@ -228,7 +271,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 						title={networkParams.title}
 					/>
 				))}
-				{renderShowMoreButton()}
+				{renderAddButton()}
 			</ScrollView>
 		</View>
 	);

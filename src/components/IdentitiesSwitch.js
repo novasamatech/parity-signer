@@ -29,7 +29,8 @@ import { getIdentityName } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 import {
 	navigateToLegacyAccountList,
-	resetNavigationTo
+	resetNavigationTo,
+	resetNavigationWithNetworkChooser
 } from '../util/navigationHelpers';
 
 function IdentitiesSwitch({ navigation, accounts }) {
@@ -49,7 +50,11 @@ function IdentitiesSwitch({ navigation, accounts }) {
 	) => {
 		await accounts.selectIdentity(identity);
 		setVisible(false);
-		resetNavigationTo(navigation, screenName, params);
+		if (screenName === 'AccountNetworkChooser') {
+			resetNavigationTo(navigation, screenName, params);
+		} else {
+			resetNavigationWithNetworkChooser(navigation, screenName, params);
+		}
 	};
 
 	const onLegacyListClicked = async () => {

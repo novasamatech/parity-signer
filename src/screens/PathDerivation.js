@@ -22,7 +22,10 @@ import { withAccountStore } from '../util/HOC';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
 import ButtonMainAction from '../components/ButtonMainAction';
-import { validateDerivedPath } from '../util/identitiesUtils';
+import {
+	getNetworkKeyByPath,
+	validateDerivedPath
+} from '../util/identitiesUtils';
 import {
 	navigateToPathsList,
 	unlockSeedPhrase
@@ -37,16 +40,19 @@ import PathCard from '../components/PathCard';
 import KeyboardScrollView from '../components/KeyboardScrollView';
 
 function PathDerivation({ accounts, navigation }) {
-	const networkKey = navigation.getParam(
-		'networkKey',
-		UnknownNetworkKeys.UNKNOWN
-	);
-
 	const [derivationPath, setDerivationPath] = useState('');
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
-	const existedNetworkPath = `//${NETWORK_LIST[networkKey].pathId}`;
-	const completePath = `${existedNetworkPath}${derivationPath}`;
+	const networkKey = navigation.getParam(
+		'networkKey',
+		getNetworkKeyByPath(derivationPath)
+	);
+
+	const currentNetworkPath =
+		networkKey !== UnknownNetworkKeys.UNKNOWN
+			? `//${NETWORK_LIST[networkKey].pathId}`
+			: '';
+	const completePath = `${currentNetworkPath}${derivationPath}`;
 
 	const onPathDerivation = async () => {
 		if (!validateDerivedPath(derivationPath)) {
@@ -71,8 +77,8 @@ function PathDerivation({ accounts, navigation }) {
 		<View style={styles.container}>
 			<ScreenHeading
 				title="Derive Account"
-				subtitle={existedNetworkPath}
-				subtitleIcon={true}
+				subtitle={currentNetworkPath}
+				hasSubtitleIcon={true}
 			/>
 			<KeyboardScrollView extraHeight={Platform.OS === 'ios' ? 250 : 180}>
 				{!isPathValid && <Text>Invalid Path</Text>}

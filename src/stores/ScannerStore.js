@@ -147,7 +147,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			return;
 		}
 
-		if (await accountsStore.getAccountByAddress(parsedData.data.account)) {
+		if (accountsStore.getAccountByAddress(parsedData.data.account)) {
 			this.setState({
 				unsignedData: parsedData
 			});
@@ -158,7 +158,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			for (let i = 0; i < networks.length; i++) {
 				let key = networks[i];
-				let account = await accountsStore.getAccountByAddress(
+				let account = accountsStore.getAccountByAddress(
 					encodeAddress(
 						decodeAddress(parsedData.data.account),
 						SUBSTRATE_NETWORK_LIST[key].prefix
@@ -321,7 +321,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			dataToSign = await ethSign(message);
 		}
 
-		const sender = await accountsStore.getAccountByAddress(address);
+		const sender = accountsStore.getAccountByAddress(address);
 		if (!sender) {
 			throw new Error(
 				`No private key found for ${address} in your signer key storage.`
@@ -437,7 +437,10 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async signDataWithSeedPhrase(seedPhrase, protocol) {
-		if (protocol === NetworkProtocols.SUBSTRATE) {
+		if (
+			protocol === NetworkProtocols.SUBSTRATE ||
+			protocol === NetworkProtocols.UNKNOWN
+		) {
 			const suri = constructSURI({
 				derivePath: this.state.sender.path,
 				password: '',

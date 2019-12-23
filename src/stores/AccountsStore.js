@@ -33,7 +33,11 @@ import {
 	encryptData,
 	substrateAddress
 } from '../util/native';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import {
+	NETWORK_LIST,
+	NetworkProtocols,
+	UnknownNetworkKeys
+} from '../constants';
 import type { AccountsStoreState } from './types';
 import {
 	deepCopyIdentities,
@@ -227,12 +231,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const accountId = generateAccountId({ address, networkKey });
 		const legacyAccount = this.getAccountWithoutCaseSensitive(accountId);
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
-		const derivedAccount = await this.getAccountFromIdentity(accountId);
+		let derivedAccount;
+		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
+			derivedAccount = this.getAccountFromIdentity(accountId);
+		}
+		derivedAccount = derivedAccount || this.getAccountFromIdentity(address);
 		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
 		return null;
 	}
 
-	async getAccountFromIdentity(accountIdOrAddress) {
+	getAccountFromIdentity(accountIdOrAddress) {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetPath = null;
 		let targetIdentity = null;
@@ -263,8 +271,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			}
 		}
 
-		if (!targetPath || !targetIdentity) return false;
-		await this.setState({ currentIdentity: targetIdentity });
+		if (targetPath === null || targetIdentity === null) return false;
+		this.setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
 		const networkKey = getNetworkKeyByPath(targetPath);
@@ -279,7 +287,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		};
 	}
 
-	async getAccountByAddress(address) {
+	getAccountByAddress(address) {
 		if (!address) {
 			return false;
 		}
@@ -289,7 +297,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 				return { ...v, isLegacy: true };
 			}
 		}
-		return await this.getAccountFromIdentity(address);
+		return this.getAccountFromIdentity(address);
 	}
 
 	getSelected() {
@@ -323,11 +331,37 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await this.setState({ currentIdentity: null });
 	}
 
+	async _addPathToIdentity(newPath, seedPhrase, updatedIdentity, name, prefix) {
+		const suri = constructSURI({
+			derivePath: newPath,
+			password: '',
+			phrase: seedPhrase
+		});
+		let address = '';
+		try {
+			address = await substrateAddress(suri, prefix);
+		} catch (e) {
+			return false;
+		}
+		if (address === '') return false;
+		if (updatedIdentity.meta.has(newPath)) return false;
+		updatedIdentity.meta.set(newPath, {
+			address,
+			createdAt: new Date().getTime(),
+			name,
+			updatedAt: new Date().getTime()
+		});
+		updatedIdentity.addresses.set(address, newPath);
+		return true;
+	}
+
 	async saveNewIdentity(seedPhrase, pin) {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		//TODO encrypt seedPhrase with password in the future version,
 		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
+		//TODO now hard coded to polkadot canary prefix which is 2, future enable user to change that.
+		await this._addPathToIdentity('', seedPhrase, updatedIdentity, 'Root', 2);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
 			currentIdentity: updatedIdentity,
@@ -401,26 +435,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
 		const prefix = NETWORK_LIST[networkKey].prefix;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const suri = constructSURI({
-			derivePath: newPath,
-			password: '',
-			phrase: seedPhrase
-		});
-		let address = '';
-		try {
-			address = await substrateAddress(suri, prefix);
-		} catch (e) {
-			return false;
-		}
-		if (address === '') return false;
-		if (updatedCurrentIdentity.meta.has(newPath)) return false;
-		updatedCurrentIdentity.meta.set(newPath, {
-			address,
-			createdAt: new Date().getTime(),
+		const deriveSucceed = await this._addPathToIdentity(
+			newPath,
+			seedPhrase,
+			updatedCurrentIdentity,
 			name,
-			updatedAt: new Date().getTime()
-		});
-		updatedCurrentIdentity.addresses.set(address, newPath);
+			prefix
+		);
+		if (!deriveSucceed) return false;
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 

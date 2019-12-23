@@ -42,6 +42,8 @@ export function generateAccountId({ address, networkKey }) {
 
 	if (protocol === NetworkProtocols.SUBSTRATE) {
 		return `${protocol}:${address}:${genesisHash}`;
+	} else if (protocol === NetworkProtocols.UNKNOWN) {
+		return `substrate:${address}`;
 	} else {
 		return `${protocol}:0x${address}@${ethereumChainId}`;
 	}

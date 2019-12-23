@@ -41,7 +41,8 @@ export const extractSubPathName = path => {
 	return removeSlash(pathFragments.slice(1).join(''));
 };
 
-export const isSubstratePath = path => path.split('//')[1] !== undefined;
+export const isSubstratePath = path =>
+	path.split('//')[1] !== undefined || path === '';
 
 export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
 
@@ -166,6 +167,7 @@ export const unlockIdentitySeed = async (pin, identity) => {
 export const getExistedNetworkKeys = identity => {
 	const pathsList = Array.from(identity.addresses.values());
 	const networkKeysSet = pathsList.reduce((networksSet, path) => {
+		if (path === '') return networksSet;
 		let networkKey;
 		if (isSubstratePath(path)) {
 			networkKey = getNetworkKeyByPath(path);
@@ -204,8 +206,20 @@ export const getPathName = (path, lookUpIdentity) => {
 
 export const groupPaths = paths => {
 	const unSortedPaths = paths.reduce((groupedPath, path) => {
+		if (path === '') {
+			return groupedPath;
+		}
 		const pathId = extractPathId(path) || '';
-		if (removeSlash(path) === pathId) return groupedPath;
+		const isRootPath = removeSlash(path) === pathId;
+		if (isRootPath) {
+			const isUnknownRootPath = Object.values(NETWORK_LIST).every(
+				v => v.pathId !== pathId
+			);
+			if (isUnknownRootPath) {
+				groupedPath.push({ paths: [path], title: pathId });
+			}
+			return groupedPath;
+		}
 
 		const subPath = path.slice(pathId.length + 2);
 

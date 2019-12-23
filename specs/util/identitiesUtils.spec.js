@@ -36,7 +36,9 @@ const addressFunding1 = 'address1',
 	addressStaking = 'address4',
 	addressEthereum = 'address6',
 	addressDefault = 'addressDefault',
-	addressKusamaRoot = 'addressRoot',
+	addressKusamaRoot = 'addressKusamaRoot',
+	addressRoot = 'addressRoot',
+	addressCustom = 'addressCustom',
 	paths = [
 		'//kusama//default',
 		'//kusama//funding/1',
@@ -45,8 +47,24 @@ const addressFunding1 = 'address1',
 		'//kusama//staking/1',
 		'//polkadot//default',
 		'1',
+		'//kusama',
+		'',
+		'//custom'
+	],
+	kusamaPaths = [
+		'//kusama//default',
+		'//kusama//funding/1',
+		'//kusama/softKey1',
+		'//kusama//funding/2',
+		'//kusama//staking/1',
 		'//kusama'
 	],
+	metaCustom = {
+		address: addressCustom,
+		createdAt: 1571068850409,
+		name: 'custom Path',
+		updatedAt: 1571068850409
+	},
 	metaDefault = {
 		address: addressDefault,
 		createdAt: 1571068850409,
@@ -89,6 +107,12 @@ const addressFunding1 = 'address1',
 		name: '',
 		updatedAt: 1573142786972
 	},
+	metaRoot = {
+		address: addressRoot,
+		createdAt: 1573142786972,
+		name: '',
+		updatedAt: 1573142786972
+	},
 	metaSoftKey = {
 		address: addressSoft,
 		createdAt: 1573142786972,
@@ -103,7 +127,9 @@ const addressesMap = new Map([
 	[addressStaking, paths[4]],
 	[addressPolkadot, paths[5]],
 	[addressEthereum, paths[6]],
-	[addressKusamaRoot, paths[7]]
+	[addressKusamaRoot, paths[7]],
+	[addressRoot, paths[8]],
+	[addressCustom, paths[9]]
 ]);
 const metaMap = new Map([
 	[paths[0], metaDefault],
@@ -113,7 +139,9 @@ const metaMap = new Map([
 	[paths[4], metaFunding2],
 	[paths[5], metaPolkadot],
 	[paths[6], metaEthereum],
-	[paths[7], metaKusamaRoot]
+	[paths[7], metaKusamaRoot],
+	[paths[8], metaRoot],
+	[paths[9], metaCustom]
 ]);
 const testIdentities = [
 	{
@@ -139,9 +167,7 @@ describe('IdentitiesUtils', () => {
 		expect(originItem).toEqual(testIdentities);
 	});
 
-	it('regroup the paths', () => {
-		const kusamaPaths = paths.slice();
-		kusamaPaths.splice(5, 2);
+	it('regroup the kusama paths', () => {
 		const groupResult = groupPaths(kusamaPaths);
 		expect(groupResult).toEqual([
 			{
@@ -163,6 +189,21 @@ describe('IdentitiesUtils', () => {
 		]);
 	});
 
+	it('regroup the unknown paths', () => {
+		const unKnownPaths = ['//polkadot//default', '', '//custom'];
+		const groupResult = groupPaths(unKnownPaths);
+		expect(groupResult).toEqual([
+			{
+				paths: ['//polkadot//default'],
+				title: '//default'
+			},
+			{
+				paths: ['//custom'],
+				title: 'custom'
+			}
+		]);
+	});
+
 	it('get the path name', () => {
 		const expectNames = [
 			'default',
@@ -172,7 +213,9 @@ describe('IdentitiesUtils', () => {
 			'staking1',
 			'PolkadotFirst',
 			'Eth account',
-			''
+			'',
+			'',
+			'custom Path'
 		];
 		paths.forEach((path, index) => {
 			const name = getPathName(path, testIdentities[0]);

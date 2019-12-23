@@ -30,11 +30,12 @@ import colors from '../colors';
 import AccountIcon from './AccountIcon';
 import { NETWORK_LIST } from '../constants';
 import TouchableItem from './TouchableItem';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const composeStyle = StyleSheet.compose;
 
-const renderSubtitle = (subtitle, subtitleIcon, isAlignLeft, isError) => {
-	if (!subtitle) return;
+const renderSubtitle = (subtitle, hasSubtitleIcon, isAlignLeft, isError) => {
+	if (!subtitle || subtitle === '') return;
 	let subtitleBodyStyle = [baseStyles.subtitleBody],
 		subtitleTextStyle = [fontStyles.t_codeS];
 	if (isAlignLeft) {
@@ -47,13 +48,15 @@ const renderSubtitle = (subtitle, subtitleIcon, isAlignLeft, isError) => {
 
 	return (
 		<View style={subtitleBodyStyle}>
-			{renderSubtitleIcon(subtitleIcon)}
-			<Text style={subtitleTextStyle}>{subtitle}</Text>
+			{renderSubtitleIcon(hasSubtitleIcon)}
+			<Text style={subtitleTextStyle} numberOfLines={1} ellipsizeMode="middle">
+				{subtitle}
+			</Text>
 		</View>
 	);
 };
-const renderSubtitleIcon = subtitleIcon => {
-	if (!subtitleIcon) return;
+const renderSubtitleIcon = hasSubtitleIcon => {
+	if (!hasSubtitleIcon) return;
 	return <AntIcon name="user" size={10} color={colors.bg_text_sec} />;
 };
 
@@ -101,12 +104,17 @@ export function PathCardHeading({ title, networkKey }) {
 export function PathListHeading({
 	title,
 	subtitle,
-	subtitleIcon,
+	hasSubtitleIcon,
+	testID,
 	networkKey,
 	onPress
 }) {
 	return (
-		<TouchableItem style={baseStyles.bodyWithIcon} onPress={onPress}>
+		<TouchableItem
+			style={baseStyles.bodyWithIcon}
+			onPress={onPress}
+			testID={testID}
+		>
 			<AccountIcon
 				address={''}
 				network={NETWORK_LIST[networkKey]}
@@ -114,7 +122,32 @@ export function PathListHeading({
 			/>
 			<View>
 				<Text style={[baseStyles.text, baseStyles.t_left]}>{title}</Text>
-				{renderSubtitle(subtitle, subtitleIcon, true)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, true)}
+			</View>
+		</TouchableItem>
+	);
+}
+
+export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
+	return (
+		<TouchableItem style={baseStyles.bodyWithIdentity} onPress={onPress}>
+			<View style={baseStyles.touchable}>
+				<View style={baseStyles.identityName}>
+					<Text
+						style={[baseStyles.text, baseStyles.t_left]}
+						numberOfLines={1}
+						ellipsizeMode="middle"
+					>
+						{title}
+					</Text>
+					<FontAwesome
+						style={baseStyles.linkIcon}
+						name="external-link"
+						color={colors.bg_button}
+						size={18}
+					/>
+				</View>
+				{renderSubtitle(subtitle, hasSubtitleIcon, true)}
 			</View>
 		</TouchableItem>
 	);
@@ -131,7 +164,7 @@ export default class ScreenHeading extends React.PureComponent {
 			title,
 			subtitle,
 			subtitleL,
-			subtitleIcon,
+			hasSubtitleIcon,
 			error,
 			onPress,
 			iconName,
@@ -141,7 +174,7 @@ export default class ScreenHeading extends React.PureComponent {
 		return (
 			<View style={baseStyles.body}>
 				<Text style={baseStyles.text}>{title}</Text>
-				{renderSubtitle(subtitle, subtitleIcon, subtitleL, error)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error)}
 				{renderBack(onPress)}
 				{renderIcon(iconName, iconType)}
 			</View>
@@ -159,9 +192,21 @@ const baseStyles = StyleSheet.create({
 		flexDirection: 'row',
 		marginBottom: 16
 	},
+	bodyWithIdentity: {
+		height: 42,
+		paddingLeft: 72,
+		paddingRight: 32
+	},
 	icon: {
 		marginLeft: 5,
 		position: 'absolute'
+	},
+	identityName: {
+		flexDirection: 'row'
+	},
+	linkIcon: {
+		marginLeft: 10,
+		paddingTop: 4
 	},
 	networkIcon: {
 		paddingHorizontal: 16
@@ -186,5 +231,10 @@ const baseStyles = StyleSheet.create({
 	text: {
 		...fontStyles.h1,
 		textAlign: 'center'
+	},
+	touchable: {
+		flex: 1,
+		flexDirection: 'column',
+		justifyContent: 'center'
 	}
 });
