@@ -29,24 +29,6 @@ export const unlockSeedPhrase = async (navigation, identity) =>
 		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
 	});
 
-export const navigateToPathsList = (navigation, networkKey) => {
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				isNew: false,
-				routeName: 'AccountNetworkChooser'
-			}),
-			NavigationActions.navigate({
-				params: { networkKey },
-				routeName: 'PathsList'
-			})
-		],
-		index: 1,
-		key: undefined
-	});
-	navigation.dispatch(resetAction);
-};
-
 export const navigateToSubstrateRoot = (navigation, networkKey) => {
 	const pathId = NETWORK_LIST[networkKey].pathId;
 	const resetAction = StackActions.reset({
@@ -120,42 +102,6 @@ export const navigateToNewIdentityNetwork = navigation => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToSignedMessage = navigation => {
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				isNew: false,
-				routeName: 'AccountNetworkChooser'
-			}),
-			NavigationActions.navigate({
-				params: { isNew: true },
-				routeName: 'SignedMessage'
-			})
-		],
-		index: 1,
-		key: undefined
-	});
-	navigation.dispatch(resetAction);
-};
-
-export const navigateToSignedTx = navigation => {
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				isNew: false,
-				routeName: 'AccountNetworkChooser'
-			}),
-			NavigationActions.navigate({
-				params: { isNew: true },
-				routeName: 'SignedTx'
-			})
-		],
-		index: 1,
-		key: undefined
-	});
-	navigation.dispatch(resetAction);
-};
-
 export const resetNavigationTo = (navigation, screenName, params) => {
 	const resetAction = StackActions.reset({
 		actions: [NavigationActions.navigate({ params, routeName: screenName })],
@@ -165,16 +111,21 @@ export const resetNavigationTo = (navigation, screenName, params) => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToRoot = navigation => {
+export const resetNavigationWithNetworkChooser = (
+	navigation,
+	screenName,
+	params = {},
+	isNew = false
+) => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
-				isNew: false,
+				isNew: isNew,
 				routeName: 'AccountNetworkChooser'
 			}),
 			NavigationActions.navigate({
-				params: { path: '' },
-				routeName: 'PathDetails'
+				params: params,
+				routeName: screenName
 			})
 		],
 		index: 1,
@@ -182,6 +133,23 @@ export const navigateToRoot = navigation => {
 	});
 	navigation.dispatch(resetAction);
 };
+
+export const navigateToSignedMessage = navigation =>
+	resetNavigationWithNetworkChooser(navigation, 'SignedMessage', {
+		isNew: true
+	});
+
+export const navigateToSignedTx = navigation =>
+	resetNavigationWithNetworkChooser(navigation, 'SignedTx', { isNew: true });
+
+export const navigateToRootPath = navigation =>
+	resetNavigationWithNetworkChooser(navigation, 'PathDetails', { path: '' });
+
+export const navigateToPathsList = (navigation, networkKey) =>
+	resetNavigationWithNetworkChooser(navigation, 'PathsList', { networkKey });
+
+export const navigateToQrScanner = navigation =>
+	resetNavigationWithNetworkChooser(navigation, 'QrScanner');
 
 export const navigateToLegacyAccountList = navigation =>
 	resetNavigationTo(navigation, 'LegacyAccountList');

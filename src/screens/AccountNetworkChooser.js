@@ -31,7 +31,7 @@ import {
 } from '../constants';
 import {
 	navigateToPathsList,
-	navigateToRoot,
+	navigateToRootPath,
 	navigateToSubstrateRoot,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
@@ -211,7 +211,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 					if (!derivationSucceed) {
 						return alertPathDerivationError();
 					} else {
-						navigateToRoot(navigation);
+						navigateToRootPath(navigation);
 					}
 				} else {
 					navigation.navigate('PathDetails', { path: '' });

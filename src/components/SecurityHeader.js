@@ -25,6 +25,7 @@ import colors from '../colors';
 import IdentitiesSwitch from '../components/IdentitiesSwitch';
 import ButtonIcon from './ButtonIcon';
 import testIDs from '../../e2e/testIDs';
+import { navigateToQrScanner } from '../util/navigationHelpers';
 
 function SecurityHeader({ navigation }) {
 	const [isConnected, setIsConnected] = useState(false);
@@ -49,7 +50,7 @@ function SecurityHeader({ navigation }) {
 				/>
 			)}
 			<ButtonIcon
-				onPress={() => navigation.navigate('QrScanner')}
+				onPress={() => navigateToQrScanner(navigation)}
 				iconName="qrcode-scan"
 				iconType="material-community"
 				iconBgStyle={styles.scannerIconBgStyle}
