@@ -214,11 +214,11 @@ const baseStyles = StyleSheet.create({
 		position: 'absolute'
 	},
 	identityName: {
+		alignItems: 'center',
 		flexDirection: 'row'
 	},
 	linkIcon: {
-		marginLeft: 10,
-		paddingTop: 4
+		marginLeft: 10
 	},
 	networkIcon: {
 		paddingHorizontal: 16
