@@ -34,7 +34,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const composeStyle = StyleSheet.compose;
 
-const renderSubtitle = (subtitle, hasSubtitleIcon, isAlignLeft, isError) => {
+const renderSubtitle = (
+	subtitle,
+	hasSubtitleIcon,
+	isAlignLeft,
+	isError,
+	multiline
+) => {
 	if (!subtitle || subtitle === '') return;
 	let subtitleBodyStyle = [baseStyles.subtitleBody],
 		subtitleTextStyle = [fontStyles.t_codeS];
@@ -49,7 +55,11 @@ const renderSubtitle = (subtitle, hasSubtitleIcon, isAlignLeft, isError) => {
 	return (
 		<View style={subtitleBodyStyle}>
 			{renderSubtitleIcon(hasSubtitleIcon)}
-			<Text style={subtitleTextStyle} numberOfLines={1} ellipsizeMode="middle">
+			<Text
+				style={subtitleTextStyle}
+				numberOfLines={multiline ? undefined : 1}
+				ellipsizeMode="middle"
+			>
 				{subtitle}
 			</Text>
 		</View>
@@ -155,6 +165,7 @@ export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
 
 export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
+		multiline: PropTypes.bool,
 		onPress: PropTypes.func,
 		subtitle: PropTypes.string,
 		title: PropTypes.string
@@ -168,13 +179,14 @@ export default class ScreenHeading extends React.PureComponent {
 			error,
 			onPress,
 			iconName,
-			iconType
+			iconType,
+			multiline
 		} = this.props;
 
 		return (
 			<View style={baseStyles.body}>
 				<Text style={baseStyles.text}>{title}</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, multiline)}
 				{renderBack(onPress)}
 				{renderIcon(iconName, iconType)}
 			</View>
