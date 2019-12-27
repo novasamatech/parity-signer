@@ -30,7 +30,7 @@ import {
 	navigateToPathsList,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
-import { NETWORK_LIST, UnknownNetworkKeys } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import { alertPathDerivationError } from '../util/alertUtils';
 import testIDs from '../../e2e/testIDs';
 import Separator from '../components/Separator';
@@ -43,22 +43,20 @@ function PathDerivation({ accounts, navigation }) {
 	const [derivationPath, setDerivationPath] = useState('');
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
-	const networkKey = navigation.getParam(
-		'networkKey',
-		getNetworkKeyByPath(derivationPath)
-	);
-
-	const currentNetworkPath =
-		networkKey !== UnknownNetworkKeys.UNKNOWN
-			? `//${NETWORK_LIST[networkKey].pathId}`
-			: '';
-	const completePath = `${currentNetworkPath}${derivationPath}`;
+	const inheritNetworkKey = navigation.getParam('networkKey');
+	const isCustomPath = inheritNetworkKey === undefined;
+	const networkKey = inheritNetworkKey || getNetworkKeyByPath(derivationPath);
+	const currentNetworkPath = `//${NETWORK_LIST[networkKey].pathId}`;
+	const completePath = isCustomPath
+		? derivationPath
+		: `${currentNetworkPath}${derivationPath}`;
 
 	const onPathDerivation = async () => {
 		if (!validateDerivedPath(derivationPath)) {
 			return setIsPathValid(false);
 		}
 		const seedPhrase = await unlockSeedPhrase(navigation);
+		console.log('complete path is', completePath, 'networkKey:', networkKey);
 		const derivationSucceed = await accounts.deriveNewPath(
 			completePath,
 			seedPhrase,
