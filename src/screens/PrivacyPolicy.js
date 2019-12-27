@@ -17,18 +17,19 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import privacyPolicy from '../../docs/privacy-policy.md';
 import colors from '../colors';
 import Markdown from '../components/Markdown';
+import CustomScrollview from '../components/CustomScrollView';
 
 export default class PrivacyPolicy extends React.PureComponent {
 	render() {
 		return (
 			<View style={styles.body}>
-				<ScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
+				<CustomScrollview contentContainerStyle={{ paddingHorizontal: 16 }}>
 					<Markdown>{privacyPolicy}</Markdown>
-				</ScrollView>
+				</CustomScrollview>
 			</View>
 		);
 	}

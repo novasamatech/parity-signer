@@ -17,14 +17,18 @@
 'use strict';
 
 import React from 'react';
-import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
+import CustomScrollview from '../components/CustomScrollView';
 
 export default class About extends React.PureComponent {
 	render() {
 		return (
-			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
+			<CustomScrollview
+				containerStyle={styles.body}
+				contentContainerStyle={{ padding: 20 }}
+			>
 				<Text style={styles.title}>PARITY SIGNER</Text>
 				<View>
 					<Text style={styles.text}>
@@ -81,7 +85,7 @@ export default class About extends React.PureComponent {
 						.
 					</Text>
 				</View>
-			</ScrollView>
+			</CustomScrollview>
 		);
 	}
 }
