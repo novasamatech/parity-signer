@@ -56,7 +56,6 @@ function PathDerivation({ accounts, navigation }) {
 			return setIsPathValid(false);
 		}
 		const seedPhrase = await unlockSeedPhrase(navigation);
-		console.log('complete path is', completePath, 'networkKey:', networkKey);
 		const derivationSucceed = await accounts.deriveNewPath(
 			completePath,
 			seedPhrase,
