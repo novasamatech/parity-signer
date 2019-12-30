@@ -132,7 +132,7 @@ export function PathListHeading({
 			/>
 			<View>
 				<Text style={[baseStyles.text, baseStyles.t_left]}>{title}</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
 			</View>
 		</TouchableItem>
 	);
@@ -157,7 +157,7 @@ export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
 						size={18}
 					/>
 				</View>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
 			</View>
 		</TouchableItem>
 	);
@@ -165,7 +165,6 @@ export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
 
 export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
-		multiline: PropTypes.bool,
 		onPress: PropTypes.func,
 		subtitle: PropTypes.string,
 		title: PropTypes.string
@@ -179,14 +178,13 @@ export default class ScreenHeading extends React.PureComponent {
 			error,
 			onPress,
 			iconName,
-			iconType,
-			multiline
+			iconType
 		} = this.props;
 
 		return (
 			<View style={baseStyles.body}>
 				<Text style={baseStyles.text}>{title}</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, multiline)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, true)}
 				{renderBack(onPress)}
 				{renderIcon(iconName, iconType)}
 			</View>

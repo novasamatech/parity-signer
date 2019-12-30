@@ -26,7 +26,6 @@ export default class Security extends React.PureComponent {
 		return (
 			<ScrollView style={styles.body}>
 				<ScreenHeading
-					multiline
 					title="NOT SECURE"
 					iconName="shield-off"
 					iconType="feather"
