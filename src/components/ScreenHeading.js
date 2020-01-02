@@ -34,7 +34,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const composeStyle = StyleSheet.compose;
 
-const renderSubtitle = (subtitle, hasSubtitleIcon, isAlignLeft, isError) => {
+const renderSubtitle = (
+	subtitle,
+	hasSubtitleIcon,
+	isAlignLeft,
+	isError,
+	multiline
+) => {
 	if (!subtitle || subtitle === '') return;
 	let subtitleBodyStyle = [baseStyles.subtitleBody],
 		subtitleTextStyle = [fontStyles.t_codeS];
@@ -49,7 +55,11 @@ const renderSubtitle = (subtitle, hasSubtitleIcon, isAlignLeft, isError) => {
 	return (
 		<View style={subtitleBodyStyle}>
 			{renderSubtitleIcon(hasSubtitleIcon)}
-			<Text style={subtitleTextStyle} numberOfLines={1} ellipsizeMode="middle">
+			<Text
+				style={subtitleTextStyle}
+				numberOfLines={multiline ? undefined : 1}
+				ellipsizeMode="middle"
+			>
 				{subtitle}
 			</Text>
 		</View>
@@ -122,7 +132,7 @@ export function PathListHeading({
 			/>
 			<View>
 				<Text style={[baseStyles.text, baseStyles.t_left]}>{title}</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
 			</View>
 		</TouchableItem>
 	);
@@ -147,7 +157,7 @@ export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
 						size={18}
 					/>
 				</View>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
 			</View>
 		</TouchableItem>
 	);
@@ -174,7 +184,7 @@ export default class ScreenHeading extends React.PureComponent {
 		return (
 			<View style={baseStyles.body}>
 				<Text style={baseStyles.text}>{title}</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error)}
+				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, true)}
 				{renderBack(onPress)}
 				{renderIcon(iconName, iconType)}
 			</View>
@@ -202,11 +212,11 @@ const baseStyles = StyleSheet.create({
 		position: 'absolute'
 	},
 	identityName: {
+		alignItems: 'center',
 		flexDirection: 'row'
 	},
 	linkIcon: {
-		marginLeft: 10,
-		paddingTop: 4
+		marginLeft: 10
 	},
 	networkIcon: {
 		paddingHorizontal: 16

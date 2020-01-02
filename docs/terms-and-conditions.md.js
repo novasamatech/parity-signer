@@ -5,7 +5,7 @@ export default `
 
 In this document, when we refer to "**we**", "**us**" or "**our**", we mean Parity; and when we refer to "**you**" or "**your**" we mean you, the person downloading, accessing and/or using the App.
 
-1.  **Understanding these terms**
+**1.  Understanding these terms**
 
   1.1  This end user licence agreement together with appendix 1 to it and our instructions referred to in it (this "**EULA**") describes how you may download the App and access and/or use the App. By downloading, accessing and/or using the App, this EULA will apply to you and you agree to the terms of this EULA. You should therefore read the terms carefully before downloading, accessing and/or using the App. If any written instruction we have given you is inconsistent with the terms set out in this document, you should comply with our instructions and in doing so you will not be in breach of the inconsistent term of this document.
 
@@ -15,11 +15,11 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   1.4  Please note that:
 
-    1.4.1  to download the App, you must also review and agree to the additional app terms set out in appendix 1 to this EULA and any other terms and conditions imposed by the app store from which you have downloaded the App; and
+  1.4.1  to download the App, you must also review and agree to the additional app terms set out in appendix 1 to this EULA and any other terms and conditions imposed by the app store from which you have downloaded the App; and
 
-    1.4.2  we will not collect any personal information from or in relation to you, including from your downloading, accessing and/or use of the App. If you contact us, we only use your personal information in accordance with our privacy policy (available at [*www.parity.io/privacy*](www.parity.io/privacy)).
+  1.4.2  we will not collect any personal information from or in relation to you, including from your downloading, accessing and/or use of the App. If you contact us, we only use your personal information in accordance with our privacy policy (available at [*www.parity.io/privacy*](www.parity.io/privacy)).
 
-2.  **The App**
+**2.  The App**
 
   2.1  Subject to the terms of this EULA, the App is made available to you free of charge. The App does not connect to any computer system (other than the Device on which you install it) and does not gather or transmit to us or any other person any data in relation to you or your use of the App.
 
@@ -31,11 +31,11 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   2.5  Subject to clause 2.6, the App (once downloaded on to a Device in accordance with this EULA) is designed to enable you to:
 
-    2.5.1  generate private keys using a recovery phrase ("**Private Key(s**)") and a corresponding public key and store them on such Device;
+  2.5.1  generate private keys using a recovery phrase ("**Private Key(s**)") and a corresponding public key and store them on such Device;
 
-    2.5.2  verify and sign transactions on Blockchains (as defined below) using the relevant Private Key ("**Digital Signature**"); and
+  2.5.2  verify and sign transactions on Blockchains (as defined below) using the relevant Private Key ("**Digital Signature**"); and
 
-    2.5.3  when used in conjunction with certain Third Party Services (which are defined in clause 4.3), can be used to broadcast transactions on the relevant Blockchains,
+  2.5.3  when used in conjunction with certain Third Party Services (which are defined in clause 4.3), can be used to broadcast transactions on the relevant Blockchains,
 
 (the "**App** **Functionality**").
 
@@ -47,16 +47,15 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   2.9  The purpose of the App is to provide the App Functionality on a Device which is not connected to any form network or the internet. The App should only ever be used on an offline Device. Once you have downloaded, installed and set up the App on the Device, it is very important that you follow the instructions we provide on our website (available [*here*](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial)) to ensure the Device is not connected to any network or the internet.
 
-	2.10  You are responsible for the use and security of any Device on which you have installed the App. We will have no liability to you for any losses or damages you incur in respect of (i) access and/or use of the App (including the creation of any Digital Signature or loss of Private Keys) as a result of unauthorised persons gaining access to your Device; or (ii) your Device being compromised or corrupted.
+  2.10  You are responsible for the use and security of any Device on which you have installed the App. We will have no liability to you for any losses or damages you incur in respect of (i) access and/or use of the App (including the creation of any Digital Signature or loss of Private Keys) as a result of unauthorised persons gaining access to your Device; or (ii) your Device being compromised or corrupted.
 
-
-3.  **Your account and password**
+**3.  Your account and password**
 
   3.1  You will need to register an account on the App in order to make full use of the App ("**Account**"). If you register an Account, you will be asked to provide certain information (such as your email address) and to create a pin code and a seed recovery phrase, as part of our security procedures. The information relating to your Account is never transmitted to us. You must treat such pin code and recovery phrase as confidential and you must not disclose it to any third party. Your recovery phrase is used to generate your Private Key, so if you lose your recovery phase, you will not be able to regenerate your Private Key to recover your Account. This may mean you are unable to access any digital currency, token and cryptocurrency associated with such Private Keys and/or create any Digital Signatures. You should ensure that you have taken appropriate steps to securely back-up any of your data stored on your Device (including the recovery phrase and Private Keys) so that such data is accessible in these circumstances.
 
   3.2  You are responsible for any unauthorised access and/or use of your App or Account login details.
 
-4.  **Acceptable use**
+**4.  Acceptable use**
 
 *General*
 
@@ -64,11 +63,11 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   4.2  When accessing and/or using the App, you agree:
 
-      4.2.1  not to access and/or use the App in any unlawful manner, for any unlawful purpose or in any manner inconsistent with this EULA;
+  4.2.1  not to access and/or use the App in any unlawful manner, for any unlawful purpose or in any manner inconsistent with this EULA;
 
-      4.2.2  not to infringe our intellectual property rights or those of any third party in relation to your use of the App (to the extent that such access and/or use is not licensed under this EULA); and
+  4.2.2  not to infringe our intellectual property rights or those of any third party in relation to your use of the App (to the extent that such access and/or use is not licensed under this EULA); and
 
-      4.2.3  to comply with all technology control or export laws and regulations that apply to the technology used or supported by the App.
+  4.2.3  to comply with all technology control or export laws and regulations that apply to the technology used or supported by the App.
 
 *Use with other software and hardware*
 
@@ -80,9 +79,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   4.5  You must not misuse the App by knowingly introducing viruses, trojans, worms, logic bombs or other material which is malicious or technologically harmful. By breaching this provision, you would commit criminal offences.
 
-<!-- -->
-
-5.  **Intellectual property**
+**5.  Intellectual property**
 
   5.1  As we refer to above, we grant to you a licence to use the software code in the App on the terms of GPL 3.0. This right does not apply to the Parity name and mark, the Parity Signer product names, and any texts, designs, graphics, photographs and images contained in the App, which you are not entitled to use (other than through the use of the App on your Device in accordance with this EULA) or modify in any circumstances . We reserve all other rights.
 
@@ -92,15 +89,15 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   5.4  Any communications or materials you send to us by electronic mail or other means will be treated as non-proprietary and non-confidential. We are free to publish, display, post, distribute and otherwise use any ideas, suggestions, concepts, designs, know-how and other information contained in such communications or material for any purpose, including, but not limited to, developing, manufacturing, advertising and marketing us and our products.
 
-6.  **Our liability**
+**6.  Our liability**
 
   6.1  Nothing in this EULA excludes or limits our liability for:
 
-      6.1.1  death or personal injury caused by our negligence;
+  6.1.1  death or personal injury caused by our negligence;
 
-      6.1.2  fraud or fraudulent misrepresentation; and
+  6.1.2  fraud or fraudulent misrepresentation; and
 
-      6.1.3  any matter in respect of which it would be unlawful for us to exclude or restrict our liability.
+  6.1.3  any matter in respect of which it would be unlawful for us to exclude or restrict our liability.
 
   6.2  The App is built on open source software and made available in accordance with this agreement as an open source community project. Accordingly, we make the App (and both the source code and object code in it) available on an "as is" basis. This means that we cannot guarantee or warrant to you that the App is free from errors or defects.
 
@@ -116,31 +113,31 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   6.8  Save as set out in clause 6.1 above, our maximum liability to you under this EULA is £100.
 
-7.  **Suspension and termination**
+**7.  Suspension and termination**
 
   7.1  Either you or we may terminate this EULA at any time for any reason.
 
   7.2  If you breach any of the terms of this EULA, we may immediately do any or all of the following (without limitation):
 
-      7.2.1  issue a warning to you;
+  7.2.1  issue a warning to you;
 
-      7.2.2  temporarily or permanently withdraw your right to use the App;
+  7.2.2  temporarily or permanently withdraw your right to use the App;
 
-      7.2.3  issue legal proceedings against you for reimbursement of all costs resulting from the breach (including, but not limited to, reasonable administrative and legal costs);
+  7.2.3  issue legal proceedings against you for reimbursement of all costs resulting from the breach (including, but not limited to, reasonable administrative and legal costs);
 
-      7.2.4  take further legal action against you; and/or
+  7.2.4  take further legal action against you; and/or
 
-      7.2.5  disclose such information to law enforcement authorities as we reasonably feel is necessary to do so.
+  7.2.5  disclose such information to law enforcement authorities as we reasonably feel is necessary to do so.
 
   7.3  If we withdraw your right to use the App, then:
 
-      7.3.1  all rights granted to you under this EULA shall cease;
+  7.3.1  all rights granted to you under this EULA shall cease;
 
-      7.3.2  you must immediately cease all activities authorised by this EULA, including your use of any services provided through the App; and
+  7.3.2  you must immediately cease all activities authorised by this EULA, including your use of any services provided through the App; and
 
-      7.3.3  you must immediately delete or remove the App from your Device, and immediately destroy all copies of the App then in your possession, custody or control and if we request you to, certify to us that you have done so.
+  7.3.3  you must immediately delete or remove the App from your Device, and immediately destroy all copies of the App then in your possession, custody or control and if we request you to, certify to us that you have done so.
 
-8.  **Changes to this EULA**
+**8.  Changes to this EULA**
 
   8.1  We may make changes to the terms of this EULA from time to time (if, for example, there is a change in the law that means we need to change this EULA). Please check this EULA (at the address indicated in clause 1.1) regularly to ensure that you understand the up-to-date terms that apply at the time that you access and use the App. If we update the terms of this EULA, the updated terms will apply 10 days after the update is posted (at the address indicated in clause 1.1) to each of your uses of the App from that point on.
 
@@ -148,7 +145,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   8.3  You will be assumed to have obtained permission from the owners of any Devices that are controlled, but not owned, by you to download a copy of the App onto the Devices. You and they may be charged by your and their service providers for Internet access on the Devices. You accept responsibility in accordance with the terms of this EULA for the use of the App in relation to any Device, whether or not it is owned by you.
 
-9.  **Other important information**
+**9.  Other important information**
 
   9.1  Each of the clauses of this EULA operates separately. If any court or relevant authority decides that any of them are unlawful or unenforceable, the remaining clauses will remain in full force and effect.
 
@@ -156,7 +153,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   9.3  If you wish to have more information on online dispute resolution, please follow this link to the website of the European Commission: [*http://ec.europa.eu/consumers/odr/*](http://ec.europa.eu/consumers/odr/). This link is provided as required by Regulation (EU) No 524/2013 of the European Parliament and of the Council, for information purposes only. We are not obliged to participate in online dispute resolution.
 
-10.  **Governing law and jurisdiction**
+**10.  Governing law and jurisdiction**
 
   10.1  This EULA is governed by English law. This means that your download, access to, and use of, the App, and any dispute or claim arising out of or in connection therewith will be governed by English law.
 
@@ -164,7 +161,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   10.3  As a consumer, if you are resident in the European Union and we direct this App to the member state in which you are resident, you will benefit from any mandatory provisions of the law of the country in which you are resident. Nothing in this EULA, including clause 10.1, affects your rights as a consumer to rely on such mandatory provisions of local law.
 
-11.  **Contacting us**
+**11.  Contacting us**
 
 Should you have any reasons for a complaint, we will endeavour to resolve the issue and avoid any re-occurrence in the future. You can always contact us by using the following details:
 Address: Parity Technologies Limited, Ignition Law, Moray House, 23-31 Great Titchfield Street, London WC1W 7PA
