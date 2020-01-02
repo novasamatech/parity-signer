@@ -25,7 +25,8 @@ Our Sites uses cookies to distinguish you from other users of our Sites. This he
 ## For what purposes do we use your data and what is the legal basis for this use?
 
 We may use information held about you in the following ways and relying on the following legal bases:
-- As required by Parity to conduct our business and pursue our legitimate interests, in particular:
+
+  As required by Parity to conduct our business and pursue our legitimate interests, in particular:
   - to notify you about changes to our service;
   - to ensure that content from our Sites are presented in the most effective manner for you and for your computer;
   - to administer our Sites and for internal operations, including troubleshooting and statistical purposes;
@@ -36,15 +37,16 @@ We may use information held about you in the following ways and relying on the f
   - to assess your eligibility for the particular role you applied for;
   - to assess your eligibility for any role that we might have available;
   - to schedule, arrange and administer events and meetups in which you have expressed an interest (including creating an attendance record for the event and sending anonymised data to the venue including attendees, dietary requirements and accessibility requirements);
-
   - to document the copyright and other rights granted with contributions made under our CLA;
   - to use data in connection with legal claims, compliance, regulatory and investigative purposes as necessary (including disclosure of such information in connection with legal process or litigation); and
   - Information we receive from other sources: We will combine this information with information you give to us and information we collect about you. We will use this information and the combined information for the purposes set out above (depending on the types of information we receive).
-- Where you give us consent:
+
+  Where you give us consent:
   - we or our carefully selected partners will send you direct marketing in relation to our relevant products and services, or other products and services provided by us, our affiliates and carefully selected partners. However, we will only provide you with marketing related information after you have, where legally required to do so, opted in to receive those communications and having provided the opportunity for you to opt out at any time.
   - we place cookies and use similar technologies in accordance with our Cookies Policy and the information provided to you when those technologies are used
   - on other occasions where we ask you for consent. We will use the data for the purpose which we explain at that time.
-- For purposes which are required by law:
+
+  For purposes which are required by law:
   - In response to requests by government or law enforcement authorities conducting an investigation.
 
 ## Relying on our legitimate interests
