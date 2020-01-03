@@ -30,6 +30,7 @@ import {
 	getIdentityName,
 	getNetworkKeyByPath,
 	getPathName,
+	getPathsWithSubstrateNetwork,
 	isSubstratePath
 } from '../util/identitiesUtils';
 import { defaultNetworkKey, UnknownNetworkKeys } from '../constants';
@@ -61,8 +62,11 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			alertDeleteAccount('this key pairs', async () => {
 				await unlockSeedPhrase(navigation);
 				const deleteSucceed = await accounts.deletePath(path);
+				const paths = Array.from(accounts.state.currentIdentity.meta.keys());
+				const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
+				const hasOtherPaths = listedPaths.length > 0;
 				if (deleteSucceed) {
-					isSubstratePath(path) && !isRootPath
+					isSubstratePath(path) && !isRootPath && hasOtherPaths
 						? navigateToPathsList(navigation, networkKey)
 						: navigation.navigate('AccountNetworkChooser');
 				} else {
