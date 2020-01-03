@@ -17,7 +17,7 @@
 'use strict';
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
@@ -27,6 +27,7 @@ import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
 import { saveToCAndPPConfirmation } from '../util/db';
 import testIDs from '../../e2e/testIDs';
+import CustomScrollview from '../components/CustomScrollView';
 
 export default class TermsAndConditions extends React.PureComponent {
 	state = {
@@ -46,12 +47,12 @@ export default class TermsAndConditions extends React.PureComponent {
 
 		return (
 			<View style={styles.body} testID={testIDs.TacScreen.tacView}>
-				<ScrollView
-					style={styles.scrollView}
+				<CustomScrollview
+					containerStyle={styles.scrollView}
 					contentContainerStyle={{ paddingHorizontal: 16 }}
 				>
 					<Markdown>{toc}</Markdown>
-				</ScrollView>
+				</CustomScrollview>
 
 				{!disableButtons && (
 					<View>
