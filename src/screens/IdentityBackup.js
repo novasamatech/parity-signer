@@ -50,8 +50,8 @@ function IdentityBackup({ navigation, accounts }) {
 	const renderTextButton = buttonWordsNumber => {
 		const textStyles =
 			wordsNumber === buttonWordsNumber
-				? fontStyles.t_codeS
-				: { ...fontStyles.t_codeS, color: colors.label_text };
+				? { ...fontStyles.t_codeS, color: colors.label_text }
+				: fontStyles.t_codeS;
 		return (
 			<Button
 				buttonStyles={styles.mnemonicSelectionButton}
