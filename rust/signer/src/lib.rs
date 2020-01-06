@@ -59,15 +59,6 @@ pub unsafe extern fn rust_string_ptr_destroy(s: *mut StringPtr) {
     let _ = Box::from_raw(s);
 }
 
-// TODO: REMOVE, use ethkey_brainwallet_sign!
-#[no_mangle]
-pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut StringPtr) -> *mut String {
-    let keypair = &*keypair;
-    let message: Vec<u8> = (*message).as_str().from_hex().unwrap();
-    let signature = keypair.sign(&message).unwrap().to_hex();
-    Box::into_raw(Box::new(signature))
-}
-
 fn qrcode_bytes(data: &[u8]) -> Option<String> {
     use qrcodegen::{QrCode, QrCodeEcc};
     use pixelate::{Image, Color, BLACK};

@@ -109,9 +109,10 @@ class EthkeyBridge: NSObject {
     }
   }
 
-  @objc func randomPhrase(_ resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func randomPhrase(_ wordsNumber:NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
-    let words_rust_str = random_phrase(&error)
+    let words_number: Int32 = Int32(wordsNumber)
+    let words_rust_str = random_phrase(&error, words_number)
     let words_rust_str_ptr = rust_string_ptr(words_rust_str)
     let words = String.fromStringPtr(ptr: words_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(words_rust_str_ptr)
