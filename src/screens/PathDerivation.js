@@ -45,9 +45,9 @@ function PathDerivation({ accounts, navigation }) {
 	const [isPathValid, setIsPathValid] = useState(true);
 	const pathNameInput = useRef(null);
 	const parentPath = navigation.getParam('parentPath');
-	const networkKey = getNetworkKeyByPath(parentPath);
-	const currentNetworkPath = `//${NETWORK_LIST[networkKey].pathId}`;
 	const completePath = `${parentPath}${derivationPath}`;
+	const networkKey = getNetworkKeyByPath(completePath);
+	const currentNetworkPath = `//${NETWORK_LIST[networkKey].pathId}`;
 
 	const onPathDerivation = async () => {
 		if (!validateDerivedPath(derivationPath)) {
