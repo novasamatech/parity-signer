@@ -58,23 +58,29 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onOptionSelect = value => {
-		if (value === 'PathDelete') {
-			alertDeleteAccount('this key pairs', async () => {
-				await unlockSeedPhrase(navigation);
-				const deleteSucceed = await accounts.deletePath(path);
-				const paths = Array.from(accounts.state.currentIdentity.meta.keys());
-				const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
-				const hasOtherPaths = listedPaths.length > 0;
-				if (deleteSucceed) {
-					isSubstratePath(path) && !isRootPath && hasOtherPaths
-						? navigateToPathsList(navigation, networkKey)
-						: navigation.navigate('AccountNetworkChooser');
-				} else {
-					alertPathDeletionError();
-				}
-			});
-		} else {
-			navigation.navigate('PathManagement', { path });
+		switch (value) {
+			case 'PathDelete':
+				alertDeleteAccount('this key pairs', async () => {
+					await unlockSeedPhrase(navigation);
+					const deleteSucceed = await accounts.deletePath(path);
+					const paths = Array.from(accounts.state.currentIdentity.meta.keys());
+					const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
+					const hasOtherPaths = listedPaths.length > 0;
+					if (deleteSucceed) {
+						isSubstratePath(path) && !isRootPath && hasOtherPaths
+							? navigateToPathsList(navigation, networkKey)
+							: navigation.navigate('AccountNetworkChooser');
+					} else {
+						alertPathDeletionError();
+					}
+				});
+				break;
+			case 'PathDerivation':
+				navigation.navigate('PathDerivation', { parentPath: path });
+				break;
+			case 'PathManagement':
+				navigation.navigate('PathManagement', { path });
+				break;
 		}
 	};
 
@@ -91,6 +97,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
 						{ hide: isUnknownNetwork, text: 'Edit', value: 'PathManagement' },
+						{ text: 'Derive Account', value: 'PathDerivation' },
 						{
 							testID: testIDs.PathDetail.deleteButton,
 							text: 'Delete',
