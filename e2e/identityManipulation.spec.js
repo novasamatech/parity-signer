@@ -87,17 +87,16 @@ describe('Load test', async () => {
 	it('recover a identity with seed phrase', async () => {
 		await testTap(AccountNetworkChooser.recoverButton);
 		await testVisible(IdentityNew.seedInput);
-		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
 		await testInput(IdentityNew.nameInput, mockIdentityName);
-		await testTap(IdentityNew.recoverButton);
+		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
+		await element(by.id(IdentityNew.seedInput)).tapReturnKey();
 		await testSetUpDefaultPath();
 	});
 
 	it('derive a new key', async () => {
 		await testTap(PathsList.deriveButton);
-		await testInput(PathDerivation.nameInput, 'first one');
 		await testInput(PathDerivation.pathInput, defaultPath);
-		await testTap(PathDerivation.deriveButton);
+		await testInput(PathDerivation.nameInput, 'first one');
 		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}`);
 	});
@@ -128,9 +127,8 @@ describe('Load test', async () => {
 			testIDs.AccountNetworkChooser.addCustomNetworkButton,
 			testIDs.AccountNetworkChooser.chooserScreen
 		);
-		await testInput(PathDerivation.nameInput, 'custom network');
 		await testInput(PathDerivation.pathInput, customPath);
-		await testTap(PathDerivation.deriveButton);
+		await testInput(PathDerivation.nameInput, 'custom network');
 		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + customPath);
 	});
