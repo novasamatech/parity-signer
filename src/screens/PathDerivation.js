@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
 import { Platform, StyleSheet, Text, View } from 'react-native';
@@ -43,6 +43,7 @@ function PathDerivation({ accounts, navigation }) {
 	const [derivationPath, setDerivationPath] = useState('');
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
+	const pathNameInput = useRef(null);
 	const inheritNetworkKey = navigation.getParam('networkKey');
 	const isCustomPath = inheritNetworkKey === undefined;
 	const networkKey = inheritNetworkKey || getNetworkKeyByPath(derivationPath);
@@ -80,21 +81,26 @@ function PathDerivation({ accounts, navigation }) {
 			<KeyboardScrollView extraHeight={Platform.OS === 'ios' ? 250 : 180}>
 				{!isPathValid && <Text>Invalid Path</Text>}
 				<TextInput
-					autoCorrect={false}
 					autoCompleteType="off"
+					autoCorrect={false}
 					label="Path"
-					placeholder="//hard/soft"
-					value={derivationPath}
-					testID={testIDs.PathDerivation.pathInput}
 					onChangeText={setDerivationPath}
+					onSubmitEditing={() => pathNameInput.current.focus()}
+					placeholder="//hard/soft"
+					returnKeyType="next"
+					testID={testIDs.PathDerivation.pathInput}
+					value={derivationPath}
 				/>
 				<TextInput
-					autoCorrect={false}
 					autoCompleteType="off"
+					autoCorrect={false}
 					label="Display Name"
+					onChangeText={keyParisName => setKeyPairsName(keyParisName)}
+					onSubmitEditing={onPathDerivation}
+					ref={pathNameInput}
+					returnKeyType="done"
 					testID={testIDs.PathDerivation.nameInput}
 					value={keyPairsName}
-					onChangeText={keyParisName => setKeyPairsName(keyParisName)}
 				/>
 				<Separator style={{ height: 0 }} />
 				<PathCard
@@ -108,7 +114,7 @@ function PathDerivation({ accounts, navigation }) {
 					style={{ marginTop: 8 }}
 					title="Derive Address"
 					testID={testIDs.PathDerivation.deriveButton}
-					onPress={() => onPathDerivation()}
+					onPress={onPathDerivation}
 				/>
 			</KeyboardScrollView>
 		</View>

@@ -114,6 +114,7 @@ function IdentityPin({ navigation, accounts }) {
 					testID={testIDs.IdentityPin.unlockPinInput}
 					returnKeyType="done"
 					onChangeText={pin => onPinInputChange('pin', pin)}
+					onSubmitEditing={testPin}
 					value={state.pin}
 				/>
 				<ButtonMainAction
@@ -152,6 +153,7 @@ function IdentityPin({ navigation, accounts }) {
 						onPinInputChange('confirmation', confirmation)
 					}
 					value={state.confirmation}
+					onSubmitEditing={submit}
 				/>
 				<ButtonMainAction
 					title={t.doneButton.pinCreation}

@@ -104,8 +104,10 @@ function IdentityNew({ accounts, navigation }) {
 		<>
 			<AccountSeed
 				testID={testIDs.IdentityNew.seedInput}
-				valid={isSeedValid.valid}
 				onChangeText={onSeedTextInput}
+				onSubmitEditing={onRecoverConfirm}
+				returnKeyType="done"
+				valid={isSeedValid.valid}
 				value={seedPhrase}
 			/>
 			<View style={styles.btnBox}>
