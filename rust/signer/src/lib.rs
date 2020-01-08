@@ -170,7 +170,7 @@ export! {
     fn random_phrase(words_number:u32) -> String {
         let mnemonic_type = match MnemonicType::for_word_count(words_number as usize) {
             Ok(t) => t,
-            Err(_e) => MnemonicType::Words12,
+            Err(_e) => MnemonicType::Words24,
         };
         let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
 
