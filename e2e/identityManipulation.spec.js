@@ -21,6 +21,7 @@ import {
 	tapBack,
 	testExist,
 	testInput,
+	testInputWithDone,
 	testNotExist,
 	testNotVisible,
 	testScrollAndTap,
@@ -55,8 +56,7 @@ const mockSeedPhrase =
 
 const testSetUpDefaultPath = async () => {
 	await testInput(IdentityPin.setPin, pinCode);
-	await testInput(IdentityPin.confirmPin, pinCode);
-	await testTap(IdentityPin.submitButton);
+	await testInputWithDone(IdentityPin.confirmPin, pinCode);
 	await testVisible(AccountNetworkChooser.chooserScreen);
 	await testScrollAndTap(
 		substrateNetworkButtonIndex,

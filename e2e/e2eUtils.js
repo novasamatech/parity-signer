@@ -43,6 +43,17 @@ export const testInput = async (inputId, inputText) => {
 	await element(by.id(inputId)).tapReturnKey();
 };
 
+export const testInputWithDone = async (inputId, inputText) => {
+	await element(by.id(inputId)).typeText(inputText);
+	if (device.getPlatform() === 'ios') {
+		await element(by.label('Done'))
+			.atIndex(0)
+			.tap();
+	} else {
+		await element(by.id(inputId)).tapReturnKey();
+	}
+};
+
 export const testScrollAndTap = async (buttonId, screenId) => {
 	await waitFor(element(by.id(buttonId)))
 		.toBeVisible()
@@ -52,6 +63,5 @@ export const testScrollAndTap = async (buttonId, screenId) => {
 };
 
 export const testUnlockPin = async pinCode => {
-	await testInput(IdentityPin.unlockPinInput, pinCode);
-	await testTap(IdentityPin.unlockPinButton);
+	await testInputWithDone(IdentityPin.unlockPinInput, pinCode);
 };
