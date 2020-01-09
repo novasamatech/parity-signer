@@ -105,8 +105,7 @@ const styles = StyleSheet.create({
 		elevation: 4,
 		height: 56,
 		justifyContent: 'center',
-		marginHorizontal: 8,
-		marginVertical: 8,
+		margin: 8,
 		paddingHorizontal: 64
 	},
 	buttonDisabled: {

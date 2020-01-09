@@ -97,8 +97,8 @@ export function blockiesIcon(seed) {
 	return EthkeyBridge.blockiesIcon(seed.toLowerCase());
 }
 
-export function words() {
-	return EthkeyBridge.randomPhrase();
+export function words(wordsNumber) {
+	return EthkeyBridge.randomPhrase(wordsNumber);
 }
 
 export function encryptData(data, password) {
