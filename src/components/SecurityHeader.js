@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 import NetInfo from '@react-native-community/netinfo';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';

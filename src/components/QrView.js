@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 import { isHex } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';

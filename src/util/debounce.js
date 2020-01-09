@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 /**
  * Creates and returns a new debounced version of the passed function that will
  * postpone its execution until after wait milliseconds have elapsed since

@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';

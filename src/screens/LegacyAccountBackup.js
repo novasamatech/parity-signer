@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 import React, { useEffect } from 'react';
 import { AppState, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';

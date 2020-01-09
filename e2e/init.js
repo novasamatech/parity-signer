@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 const detox = require('detox');
 const config = require('../package.json').detox;
 const adapter = require('detox/runners/jest/adapter');

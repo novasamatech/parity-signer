@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';

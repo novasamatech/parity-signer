@@ -14,10 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-// @flow
-
-'use strict';
-
 import TouchableItem from './TouchableItem';
 import { Text } from 'react-native';
 import React from 'react';
