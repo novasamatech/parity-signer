@@ -143,12 +143,12 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 			try {
 				const call = new Call(registry, value);
 
-				let methodArgs = {};
+				const methodArgs = {};
 
 				// todo: clean this up
 				function formatArgs(callInstance, callMethodArgs, depth) {
 					const { args, meta, methodName, sectionName } = callInstance;
-					let paramArgKvArray = [];
+					const paramArgKvArray = [];
 					if (!meta.args.length) {
 						const sectionMethod = `${sectionName}.${methodName}`;
 						callMethodArgs[sectionMethod] = null;
@@ -248,7 +248,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 			// HACK: if there's a sudo method just put it to the front. Better way would be to order by depth but currently this is only relevant for a single extrinsic, so seems like overkill.
 			for (let i = 1; i < formattedArgs.length; i++) {
 				if (formattedArgs[i][0].includes('sudo')) {
-					let tmp = formattedArgs[i];
+					const tmp = formattedArgs[i];
 					formattedArgs.splice(i, 1);
 					formattedArgs.unshift(tmp);
 					break;

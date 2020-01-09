@@ -72,7 +72,7 @@ export function emptyIdentity() {
 
 export const serializeIdentity = identity =>
 	Object.entries(identity).reduce((newIdentity, entry) => {
-		let [key, value] = entry;
+		const [key, value] = entry;
 		if (value instanceof Map) {
 			newIdentity[key] = Array.from(value.entries());
 		} else {
@@ -83,7 +83,7 @@ export const serializeIdentity = identity =>
 
 export const deserializeIdentity = identityJSON =>
 	Object.entries(identityJSON).reduce((newIdentity, entry) => {
-		let [key, value] = entry;
+		const [key, value] = entry;
 		if (value instanceof Array) {
 			newIdentity[key] = new Map(value);
 		} else {

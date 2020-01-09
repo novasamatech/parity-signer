@@ -79,7 +79,7 @@ export function validateSeed(seed, validBip39Seed) {
 
 	const words = seed.split(' ');
 
-	for (let word of words) {
+	for (const word of words) {
 		if (word === '') {
 			return {
 				accountRecoveryAllowed: true,

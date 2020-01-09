@@ -40,7 +40,7 @@ export async function loadAccounts(version = 3) {
 
 	return SecureStorage.getAllItems(accountsStore).then(accounts => {
 		const accountMap = new Map();
-		for (let [key, value] of Object.entries(accounts)) {
+		for (const [key, value] of Object.entries(accounts)) {
 			const account = JSON.parse(value);
 			accountMap.set(key, { ...account });
 		}

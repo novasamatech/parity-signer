@@ -34,14 +34,14 @@ class Transaction {
 
 async function asyncTransaction(rlp, resolve, reject) {
 	try {
-		let nonce = await rlpItem(rlp, 0);
-		let gasPrice = await rlpItem(rlp, 1);
-		let gas = await rlpItem(rlp, 2);
-		let action = await rlpItem(rlp, 3);
-		let value = await rlpItem(rlp, 4);
-		let data = await rlpItem(rlp, 5);
-		let ethereumChainId = await rlpItem(rlp, 6);
-		let tx = new Transaction(
+		const nonce = await rlpItem(rlp, 0);
+		const gasPrice = await rlpItem(rlp, 1);
+		const gas = await rlpItem(rlp, 2);
+		const action = await rlpItem(rlp, 3);
+		const value = await rlpItem(rlp, 4);
+		const data = await rlpItem(rlp, 5);
+		const ethereumChainId = await rlpItem(rlp, 6);
+		const tx = new Transaction(
 			nonce,
 			gasPrice,
 			gas,

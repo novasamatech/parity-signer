@@ -62,7 +62,7 @@ export default class AccountIconChooser extends React.PureComponent {
 					.join(' ')
 					.split(' ')
 					.map(async () => {
-						let result = {
+						const result = {
 							address: '',
 							bip39: false,
 							seed: ''

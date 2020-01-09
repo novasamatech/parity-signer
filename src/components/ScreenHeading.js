@@ -42,7 +42,7 @@ const renderSubtitle = (
 	multiline
 ) => {
 	if (!subtitle || subtitle === '') return;
-	let subtitleBodyStyle = [baseStyles.subtitleBody],
+	const subtitleBodyStyle = [baseStyles.subtitleBody],
 		subtitleTextStyle = [fontStyles.t_codeS];
 	if (isAlignLeft) {
 		subtitleBodyStyle.push({ justifyContent: 'flex-start' });

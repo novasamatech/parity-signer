@@ -52,7 +52,7 @@ import { Account } from './types';
 import { constructSURI } from '../util/suri';
 import { emptyAccount } from '../util/account';
 
-type TXRequest = Object;
+type TXRequest = Record<string, any>;
 
 type SignedTX = {
 	recipient: Account,
@@ -81,10 +81,10 @@ type ScannerState = {
 	signedData: string,
 	signedTxList: [SignedTX],
 	totalFrameCount: number,
-	tx: Object,
+	tx: Record<string, any>;
 	txRequest: TXRequest | null,
 	type: 'transaction' | 'message',
-	unsignedData: Object
+	unsignedData: Record<string, any>;
 };
 
 const DEFAULT_STATE = Object.freeze({
@@ -154,11 +154,11 @@ export default class ScannerStore extends Container<ScannerState> {
 		} else {
 			// If the address is not found on device in its current encoding,
 			// try decoding the public key and encoding it to all the other known network prefixes.
-			let networks = Object.keys(SUBSTRATE_NETWORK_LIST);
+			const networks = Object.keys(SUBSTRATE_NETWORK_LIST);
 
 			for (let i = 0; i < networks.length; i++) {
-				let key = networks[i];
-				let account = accountsStore.getAccountByAddress(
+				const key = networks[i];
+				const account = accountsStore.getAccountByAddress(
 					encodeAddress(
 						decodeAddress(parsedData.data.account),
 						SUBSTRATE_NETWORK_LIST[key].prefix
@@ -380,7 +380,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		const recipientAddress = isEthereum ? tx.action : txRequest.data.account;
 
-		let recipient =
+		const recipient =
 			(await accountsStore.getById({
 				address: recipientAddress,
 				networkKey

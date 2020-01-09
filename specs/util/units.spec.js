@@ -28,8 +28,8 @@ registry.setMetadata(new Metadata(registry, kusamaData));
 describe('units', () => {
 	describe('ethereum', () => {
 		it('should properly convert units from wei', () => {
-			let wei = '5208';
-			let ether = fromWei(wei);
+			const wei = '5208';
+			const ether = fromWei(wei);
 			expect(ether).toEqual('0.000000000000021');
 		});
 
@@ -70,7 +70,7 @@ describe('units', () => {
 		it('should format KSM', () => {
 			const { args, meta } = method_1;
 
-			let result = {};
+			const result = {};
 			for (let i = 0; i < meta.args.length; i++) {
 				let value;
 				if (
@@ -93,7 +93,7 @@ describe('units', () => {
 		it('should format decimals for less than one KSM', () => {
 			const { args, meta } = method_2;
 
-			let result = {};
+			const result = {};
 			for (let i = 0; i < meta.args.length; i++) {
 				let value;
 				if (
@@ -116,7 +116,7 @@ describe('units', () => {
 		it('should format absurdly large KSM', () => {
 			const { args, meta } = method_3;
 
-			let result = {};
+			const result = {};
 			for (let i = 0; i < meta.args.length; i++) {
 				let value;
 				if (

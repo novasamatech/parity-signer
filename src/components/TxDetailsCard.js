@@ -31,7 +31,7 @@ export default class TxDetailsCard extends React.PureComponent<{
 	description: string,
 	gas: string,
 	gasPrice: string,
-	style: Object
+	style: Record<string, any>;
 }> {
 	static propTypes = {
 		description: PropTypes.string.isRequired,

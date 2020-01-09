@@ -19,7 +19,7 @@
 import BigNumber from 'bignumber.js';
 
 /* eslint-disable sort-keys */
-let unitMap = {
+const unitMap = {
 	noether: '0',
 	wei: '1',
 	kwei: '1000',
@@ -51,7 +51,7 @@ let unitMap = {
 
 function getValueOfUnit(unit) {
 	unit = unit ? unit.toLowerCase() : 'ether';
-	var unitValue = unitMap[unit] || 0;
+	const unitValue = unitMap[unit] || 0;
 	return new BigNumber(unitValue, 10);
 }
 

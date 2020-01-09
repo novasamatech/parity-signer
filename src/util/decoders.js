@@ -123,7 +123,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 	const secondByte = uosAfterFrames.substr(4, 2);
 
 	let action;
-	let data = {};
+	const data = {};
 	data.data = {}; // for consistency with legacy data format.
 
 	try {
@@ -136,7 +136,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 						: firstByte === '01'
 						? 'signTransaction'
 						: null;
-				let address = uosAfterFrames.substr(4, 44);
+				const address = uosAfterFrames.substr(4, 44);
 
 				data.action = action;
 				data.data.account = address;
@@ -256,7 +256,7 @@ export function decodeToString(message) {
 }
 
 export function asciiToHex(message) {
-	let result = [];
+	const result = [];
 	for (let i = 0; i < message.length; i++) {
 		const hex = Number(message.charCodeAt(i)).toString(16);
 		result.push(hex);

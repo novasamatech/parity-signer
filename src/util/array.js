@@ -52,7 +52,7 @@ export function binarySearch(array, item, compare = defaultCompare) {
 	let max = array.length - 1;
 
 	while (min <= max) {
-		let guess = (min + max) >> 1; // fast integer division by 2
+		const guess = (min + max) >> 1; // fast integer division by 2
 
 		const result = compare(item, array[guess]);
 
@@ -77,8 +77,8 @@ export function zip(left, right) {
 	const out = new Array(left.length + right.length);
 
 	while (lindex < left.length && rindex < right.length) {
-		let lword = left[lindex];
-		let rword = right[rindex];
+		const lword = left[lindex];
+		const rword = right[rindex];
 
 		if (lword < rword) {
 			out[oindex] = lword;

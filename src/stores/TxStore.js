@@ -19,7 +19,7 @@ import { Container } from 'unstated';
 import { loadAccountTxs, saveTx } from '../util/db';
 
 type State = {
-	signedTxs: Map<string, Object>
+	signedTxs: Map<string, Record<string, any>>
 };
 
 export default class TxStore extends Container<State> {
