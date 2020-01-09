@@ -1,5 +1,12 @@
 module.exports = {
-  extends: ["@react-native-community", "plugin:prettier/recommended", "plugin:import/errors", "plugin:import/warnings"],
+  extends: [
+    "@react-native-community",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+   ],
   overrides: [
     {
       "files": ["e2e/*.spec.js", "e2e/init.js", "e2e/e2eUtils.js"],
@@ -8,6 +15,7 @@ module.exports = {
       }
     }
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     "ecmaVersion": 6,
     "sourceType": "module",
@@ -15,6 +23,9 @@ module.exports = {
       "jsx": true
     },
   },
+  plugins: [
+    '@typescript-eslint',
+  ],
   settings: {
     react: {
       "pragma": "React",  // Pragma to use, default to "React"

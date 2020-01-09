@@ -75,11 +75,15 @@
     "@babel/plugin-transform-runtime": "^7.5.0",
     "@babel/runtime": "^7.5.4",
     "@react-native-community/eslint-config": "^0.0.5",
+    "@types/react": "^16.9.17",
+    "@types/react-native": "^0.60.30",
+    "@typescript-eslint/eslint-plugin": "^2.15.0",
+    "@typescript-eslint/parser": "^2.15.0",
     "babel-eslint": "10.0.3",
     "babel-jest": "^24.9.0",
     "babel-plugin-rewrite-require": "^1.14.5",
     "detox": "^14.7.0",
-    "eslint": "^6.3.0",
+    "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-prettier": "^3.1.0",
@@ -88,8 +92,10 @@
     "jetifier": "^1.6.4",
     "metro-react-native-babel-preset": "^0.56.0",
     "prettier": "1.18.2",
+    "react-native-typescript-transformer": "^1.2.13",
     "react-test-renderer": "16.9.0",
-    "reactotron-react-native": "^3.6.5"
+    "reactotron-react-native": "^3.6.5",
+    "typescript": "^3.7.4"
   },
   "resolutions": {
     "@react-native-community/eslint-config/babel-eslint": "10.0.3"
