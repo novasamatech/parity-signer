@@ -34,9 +34,11 @@ import { withAccountStore } from '../util/HOC';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading from '../components/ScreenHeading';
 import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
+import Button from '../components/Button';
 
 function IdentityBackup({ navigation, accounts }) {
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const [wordsNumber, setWordsNumber] = useState(24);
 	const isNew = navigation.getParam('isNew', false);
 	const onBackupDone = async () => {
 		const pin = await setPin(navigation);
@@ -45,10 +47,24 @@ function IdentityBackup({ navigation, accounts }) {
 		navigateToNewIdentityNetwork(navigation);
 	};
 
+	const renderTextButton = buttonWordsNumber => {
+		const textStyles =
+			wordsNumber === buttonWordsNumber
+				? { ...fontStyles.t_codeS, color: colors.label_text }
+				: fontStyles.t_codeS;
+		return (
+			<Button
+				buttonStyles={styles.mnemonicSelectionButton}
+				textStyles={textStyles}
+				title={`${buttonWordsNumber} words`}
+				onPress={() => setWordsNumber(buttonWordsNumber)}
+			/>
+		);
+	};
 	useEffect(() => {
 		const setSeedPhraseAsync = async () => {
 			if (isNew) {
-				setSeedPhrase(await words());
+				setSeedPhrase(await words(wordsNumber));
 			} else {
 				const backupSeedPhrase = await unlockSeedPhrase(navigation);
 				navigation.pop();
@@ -60,7 +76,7 @@ function IdentityBackup({ navigation, accounts }) {
 		return () => {
 			setSeedPhrase('');
 		};
-	}, [isNew, navigation]);
+	}, [isNew, navigation, wordsNumber]);
 
 	return (
 		<ScrollView style={styles.body}>
@@ -71,6 +87,12 @@ function IdentityBackup({ navigation, accounts }) {
 				}
 			/>
 			<View />
+			{isNew && (
+				<View style={styles.mnemonicSelectionRow}>
+					{renderTextButton(12)}
+					{renderTextButton(24)}
+				</View>
+			)}
 			<TouchableItem
 				onPress={() => {
 					// only allow the copy of the recovery phrase in dev environment
@@ -106,5 +128,17 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column',
 		padding: 16
+	},
+	mnemonicSelectionButton: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		height: 30,
+		paddingHorizontal: 5,
+		paddingVertical: 5
+	},
+	mnemonicSelectionRow: {
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-around'
 	}
 });

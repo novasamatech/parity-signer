@@ -60,7 +60,7 @@ struct rust_string* eth_sign(unsigned* error, const struct rust_string_ptr* data
 
 struct rust_string* blockies_icon(unsigned* error, const struct rust_string_ptr* blockies_seed);
 
-struct rust_string* random_phrase(unsigned* error);
+struct rust_string* random_phrase(unsigned* error, int words_number);
 
 struct rust_string* encrypt_data(unsigned* error, const struct rust_string_ptr* data, const struct rust_string_ptr* password);
 

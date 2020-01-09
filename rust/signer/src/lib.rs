@@ -14,19 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+use bip39::{Language, Mnemonic, MnemonicType};
+use blake2_rfc::blake2b::blake2b;
+use ethsign::{keyfile::Crypto, Protected};
+use rlp::decode_list;
+use rustc_hex::{FromHex, ToHex};
+use tiny_keccak::Keccak;
+use tiny_keccak::keccak256 as keccak;
+
+use eth::{KeyPair, PhraseKind};
+use util::StringPtr;
+
 mod eth;
 mod sr25519;
 mod util;
-
-use util::StringPtr;
-use eth::{KeyPair, PhraseKind};
-
-use ethsign::{Protected, keyfile::Crypto};
-use rlp::decode_list;
-use rustc_hex::{ToHex, FromHex};
-use tiny_keccak::Keccak;
-use tiny_keccak::keccak256 as keccak;
-use blake2_rfc::blake2b::blake2b;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
 
@@ -56,15 +57,6 @@ pub unsafe extern fn rust_string_destroy(s: *mut String) {
 #[no_mangle]
 pub unsafe extern fn rust_string_ptr_destroy(s: *mut StringPtr) {
     let _ = Box::from_raw(s);
-}
-
-// TODO: REMOVE, use ethkey_brainwallet_sign!
-#[no_mangle]
-pub unsafe extern fn ethkey_keypair_sign(keypair: *mut KeyPair, message: *mut StringPtr) -> *mut String {
-    let keypair = &*keypair;
-    let message: Vec<u8> = (*message).as_str().from_hex().unwrap();
-    let signature = keypair.sign(&message).unwrap().to_hex();
-    Box::into_raw(Box::new(signature))
 }
 
 fn qrcode_bytes(data: &[u8]) -> Option<String> {
@@ -175,9 +167,12 @@ export! {
     }
 
     @Java_io_parity_signer_EthkeyBridge_ethkeyRandomPhrase
-    fn random_phrase() -> String {
-        use bip39::{Mnemonic, MnemonicType, Language};
-        let mnemonic = Mnemonic::new(MnemonicType::Words24, Language::English);
+    fn random_phrase(words_number:u32) -> String {
+        let mnemonic_type = match MnemonicType::for_word_count(words_number as usize) {
+            Ok(t) => t,
+            Err(_e) => MnemonicType::Words24,
+        };
+        let mnemonic = Mnemonic::new(mnemonic_type, Language::English);
 
         mnemonic.into_phrase()
     }
@@ -244,7 +239,17 @@ mod tests {
 
     static DERIVED_SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
 
-     #[test]
+    #[test]
+    fn test_random_phrase() {
+        let result_12 = random_phrase(12);
+        assert_eq!(12, result_12.split_whitespace().count());
+        let result_24 = random_phrase(24);
+        assert_eq!(24, result_24.split_whitespace().count());
+        let result_17 = random_phrase(17);
+        assert_eq!(12, result_17.split_whitespace().count());
+    }
+
+    #[test]
     fn test_blake() {
         let data = "454545454545454545454545454545454545454545454545454545454545454501\
                     000000000000002481853da20b9f4322f34650fea5f240dcbfb266d02db94bfa01\
