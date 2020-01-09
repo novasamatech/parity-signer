@@ -81,11 +81,13 @@ function IdentityPin({ navigation, accounts }) {
 
 	const showHintOrError = () => {
 		if (state.pinTooShort) {
-			return ' Your pin must be at least 6 digits long!';
+			return t.pinTooShortHint;
 		} else if (state.pinMismatch) {
-			return isUnlock ? ' Pin code is wrong!' : " Pin codes don't match!";
+			return isUnlock
+				? t.pinMisMatchHint.pinUnlock
+				: t.pinMisMatchHint.pinCreation;
 		}
-		return ' Choose a PIN code with 6 or more digits';
+		return isUnlock ? t.subtitle.pinUnlock : t.subtitle.pinCreation;
 	};
 
 	const onPinInputChange = (stateName, pinInput) => {
@@ -102,20 +104,21 @@ function IdentityPin({ navigation, accounts }) {
 		isUnlock ? (
 			<>
 				<ScreenHeading
-					title={'Unlock Identity'}
+					title={t.title.pinUnlock}
 					error={state.pinMismatch || state.pinTooShort}
 					subtitle={showHintOrError()}
 				/>
 				<PinInput
-					label="PIN"
+					label={t.pinLabel}
 					autoFocus
 					testID={testIDs.IdentityPin.unlockPinInput}
 					returnKeyType="done"
 					onChangeText={pin => onPinInputChange('pin', pin)}
+					onSubmitEditing={testPin}
 					value={state.pin}
 				/>
 				<ButtonMainAction
-					title={'Done'}
+					title={t.doneButton.pinUnlock}
 					bottom={false}
 					onPress={testPin}
 					testID={testIDs.IdentityPin.unlockPinButton}
@@ -124,13 +127,13 @@ function IdentityPin({ navigation, accounts }) {
 		) : (
 			<>
 				<ScreenHeading
-					title={'Set Identity PIN'}
+					title={t.title.pinCreation}
 					subtitle={showHintOrError()}
 					error={state.pinMismatch || state.pinTooShort}
 				/>
 
 				<PinInput
-					label="PIN"
+					label={t.pinLabel}
 					autoFocus
 					testID={testIDs.IdentityPin.setPin}
 					returnKeyType="next"
@@ -142,7 +145,7 @@ function IdentityPin({ navigation, accounts }) {
 					value={state.pin}
 				/>
 				<PinInput
-					label="Confirm PIN"
+					label={t.pinConfirmLabel}
 					returnKeyType="done"
 					testID={testIDs.IdentityPin.confirmPin}
 					focus={state.focusConfirmation}
@@ -150,9 +153,10 @@ function IdentityPin({ navigation, accounts }) {
 						onPinInputChange('confirmation', confirmation)
 					}
 					value={state.confirmation}
+					onSubmitEditing={submit}
 				/>
 				<ButtonMainAction
-					title={'Done'}
+					title={t.doneButton.pinCreation}
 					bottom={false}
 					onPress={submit}
 					testID={testIDs.IdentityPin.submitButton}
@@ -190,6 +194,28 @@ function PinInput(props) {
 		/>
 	);
 }
+
+const t = {
+	doneButton: {
+		pinCreation: 'DONE',
+		pinUnlock: 'UNLOCK'
+	},
+	pinConfirmLabel: 'Confirm PIN',
+	pinLabel: 'PIN',
+	pinMisMatchHint: {
+		pinCreation: "Pin codes don't match!",
+		pinUnlock: 'Pin code is wrong!'
+	},
+	pinTooShortHint: 'Your pin must be at least 6 digits long!',
+	subtitle: {
+		pinCreation: 'Choose a PIN code with 6 or more digits',
+		pinUnlock: 'Unlock the identity to use the seed'
+	},
+	title: {
+		pinCreation: 'Set Identity PIN',
+		pinUnlock: 'Unlock Identity'
+	}
+};
 
 const styles = StyleSheet.create({
 	body: {
