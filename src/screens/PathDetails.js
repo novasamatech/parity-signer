@@ -60,7 +60,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const onOptionSelect = value => {
 		switch (value) {
 			case 'PathDelete':
-				alertDeleteAccount('this key pairs', async () => {
+				alertDeleteAccount('this account', async () => {
 					await unlockSeedPhrase(navigation);
 					const deleteSucceed = await accounts.deletePath(path);
 					const paths = Array.from(accounts.state.currentIdentity.meta.keys());

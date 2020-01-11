@@ -30,7 +30,6 @@ import {
 	navigateToPathsList,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
-import { NETWORK_LIST } from '../constants';
 import { alertPathDerivationError } from '../util/alertUtils';
 import testIDs from '../../e2e/testIDs';
 import Separator from '../components/Separator';
@@ -47,7 +46,6 @@ function PathDerivation({ accounts, navigation }) {
 	const parentPath = navigation.getParam('parentPath');
 	const completePath = `${parentPath}${derivationPath}`;
 	const networkKey = getNetworkKeyByPath(completePath);
-	const currentNetworkPath = `//${NETWORK_LIST[networkKey].pathId}`;
 
 	const onPathDerivation = async () => {
 		if (!validateDerivedPath(derivationPath)) {
@@ -72,7 +70,7 @@ function PathDerivation({ accounts, navigation }) {
 		<View style={styles.container}>
 			<ScreenHeading
 				title="Derive Account"
-				subtitle={currentNetworkPath}
+				subtitle={parentPath}
 				hasSubtitleIcon={true}
 			/>
 			<KeyboardScrollView extraHeight={Platform.OS === 'ios' ? 250 : 180}>
@@ -109,7 +107,7 @@ function PathDerivation({ accounts, navigation }) {
 					disabled={!validateDerivedPath(derivationPath)}
 					bottom={false}
 					style={{ marginTop: 8 }}
-					title="Derive Address"
+					title="Next"
 					testID={testIDs.PathDerivation.deriveButton}
 					onPress={onPathDerivation}
 				/>
