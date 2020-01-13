@@ -107,6 +107,12 @@ const raw = [
 		expectName: '1',
 		name: '',
 		path: '/kusama/1'
+	},
+	{
+		address: 'softAddress2',
+		expectName: '1',
+		name: '',
+		path: '/polkadot/1'
 	}
 ];
 const expectNames = raw.map(v => v.expectName);
@@ -179,25 +185,26 @@ describe('IdentitiesUtils', () => {
 			'',
 			'//custom',
 			'/kusama',
-			'/kusama/1'
+			'/kusama/1',
+			'/polkadot/1'
 		];
 		const groupResult = groupPaths(unKnownPaths);
 		expect(groupResult).toEqual([
 			{
 				paths: ['//polkadot//default'],
-				title: '//default'
+				title: '//polkadot'
 			},
 			{
 				paths: ['//custom'],
-				title: 'custom'
+				title: '//custom'
 			},
 			{
-				paths: ['/kusama'],
-				title: 'kusama'
+				paths: ['/polkadot/1'],
+				title: '/polkadot'
 			},
 			{
-				paths: ['/kusama/1'],
-				title: '/1'
+				paths: ['/kusama', '/kusama/1'],
+				title: '/kusama'
 			}
 		]);
 	});

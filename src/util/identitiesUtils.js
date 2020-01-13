@@ -206,33 +206,38 @@ export const getPathName = (path, lookUpIdentity) => {
 };
 
 export const groupPaths = paths => {
+	const insertPathIntoGroup = (matchingPath, fullPath, pathGroup) => {
+		const groupName = matchingPath.match(pathsRegex.firstPath)[0];
+
+		const existedItem = pathGroup.find(p => p.title === groupName);
+		if (existedItem) {
+			existedItem.paths.push(fullPath);
+			existedItem.paths.sort();
+		} else {
+			pathGroup.push({ paths: [fullPath], title: groupName });
+		}
+	};
+
 	const unSortedPaths = paths.reduce((groupedPath, path) => {
 		if (path === '') {
 			return groupedPath;
 		}
 		const rootPath = path.match(pathsRegex.firstPath)[0];
-		const isRootPath = path === rootPath;
-		if (isRootPath) {
-			const isUnknownRootPath = Object.values(NETWORK_LIST).every(
-				v => `//${v.pathId}` !== rootPath
-			);
-			if (isUnknownRootPath) {
-				groupedPath.push({ paths: [path], title: removeSlash(rootPath) });
-			}
+
+		const isUnknownRootPath = Object.values(NETWORK_LIST).every(
+			v => `//${v.pathId}` !== rootPath
+		);
+		if (isUnknownRootPath) {
+			insertPathIntoGroup(path, path, groupedPath);
 			return groupedPath;
 		}
 
+		const isRootPath = path === rootPath;
+		if (isRootPath) return groupedPath;
+
 		const subPath = path.slice(rootPath.length);
+		insertPathIntoGroup(subPath, path, groupedPath);
 
-		const groupName = subPath.match(pathsRegex.firstPath)[0];
-
-		const existedItem = groupedPath.find(p => p.title === groupName);
-		if (existedItem) {
-			existedItem.paths.push(path);
-			existedItem.paths.sort();
-		} else {
-			groupedPath.push({ paths: [path], title: groupName });
-		}
 		return groupedPath;
 	}, []);
 	return unSortedPaths.sort((a, b) => a.paths.length - b.paths.length);
