@@ -19,7 +19,7 @@
 export const pathsRegex = {
 	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
 	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
+	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
 	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
 };
 

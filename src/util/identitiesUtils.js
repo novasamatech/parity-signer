@@ -37,12 +37,13 @@ const extractPathId = path => {
 
 export const extractSubPathName = path => {
 	const pathFragments = path.match(pathsRegex.allPath);
-	if (!pathFragments || pathFragments.length <= 1) return '';
+	if (!pathFragments || pathFragments.length === 0) return '';
+	if (pathFragments.length === 1) return removeSlash(pathFragments[0]);
 	return removeSlash(pathFragments.slice(1).join(''));
 };
 
 export const isSubstratePath = path =>
-	path.split('//')[1] !== undefined || path === '';
+	path.match(pathsRegex.allPath) != null || path === '';
 
 export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
 
@@ -209,19 +210,19 @@ export const groupPaths = paths => {
 		if (path === '') {
 			return groupedPath;
 		}
-		const pathId = extractPathId(path) || '';
-		const isRootPath = removeSlash(path) === pathId;
+		const rootPath = path.match(pathsRegex.firstPath)[0];
+		const isRootPath = path === rootPath;
 		if (isRootPath) {
 			const isUnknownRootPath = Object.values(NETWORK_LIST).every(
-				v => v.pathId !== pathId
+				v => `//${v.pathId}` !== rootPath
 			);
 			if (isUnknownRootPath) {
-				groupedPath.push({ paths: [path], title: pathId });
+				groupedPath.push({ paths: [path], title: removeSlash(rootPath) });
 			}
 			return groupedPath;
 		}
 
-		const subPath = path.slice(pathId.length + 2);
+		const subPath = path.slice(rootPath.length);
 
 		const groupName = subPath.match(pathsRegex.firstPath)[0];
 
