@@ -25,7 +25,7 @@ import fontStyles from '../fontStyles';
 import Button from '../components/Button';
 import Markdown from '../components/Markdown';
 import TouchableItem from '../components/TouchableItem';
-import { saveToCAndPPConfirmation } from '../util/db';
+import { saveDefaultNetworks, saveToCAndPPConfirmation } from '../util/db';
 import testIDs from '../../e2e/testIDs';
 import CustomScrollview from '../components/CustomScrollView';
 
@@ -41,8 +41,12 @@ export default class TermsAndConditions extends React.PureComponent {
 		const disableButtons = navigation.getParam('disableButtons', false);
 
 		const onConfirm = async () => {
+			const firstScreenActions = navigation.getParam('firstScreenActions');
 			await saveToCAndPPConfirmation();
-			navigation.navigate('Welcome');
+			await saveDefaultNetworks(); // save the default networks to AsyncStorage;
+			navigation.dispatch(firstScreenActions);
+			await saveToCAndPPConfirmation();
+			// navigation.navigate('Welcome');
 		};
 
 		return (
@@ -111,6 +115,7 @@ export default class TermsAndConditions extends React.PureComponent {
 						</TouchableItem>
 
 						<Button
+							buttonStyles={{ height: 60, marginTop: 10 }}
 							testID={testIDs.TacScreen.nextButton}
 							title="Next"
 							disabled={!ppAgreement || !tocAgreement}

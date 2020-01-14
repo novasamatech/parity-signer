@@ -18,6 +18,37 @@
 
 'use strict';
 
+import { Metadata } from '@polkadot/types';
+import { u8aToHex } from '@polkadot/util';
+
+import atob from 'atob';
+
+// bytes of base64 hex, convert it to hex then pass it in to Metadata constructor
+export function checkIfPayloadIsMetadata(payloadU8a) {
+	try {
+		const hex = u8aToHex(payloadU8a);
+		const meta = new Metadata(hex);
+		if (meta) {
+			return true;
+		}
+	} catch (e) {
+		return false;
+	}
+}
+
+export function base64ToHex(base64) {
+	const raw = atob(base64);
+	let result = '';
+
+	for (let i = 0; i < raw.length; i++) {
+		const hexByte = raw.charCodeAt(i).toString(16);
+
+		result += hexByte.length === 2 ? hexByte : '0' + hexByte;
+	}
+
+	return '0x' + result.toUpperCase();
+}
+
 /*
  * @dev Check if input is in Ascii table.
  */

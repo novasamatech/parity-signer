@@ -131,7 +131,12 @@ export default class ScannerStore extends Container<ScannerState> {
 	 * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
 	 */
 
-	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
+	async setParsedData(
+		strippedData,
+		accountsStore,
+		multipartComplete = false,
+		isNetworkSpec = false
+	) {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
@@ -142,7 +147,8 @@ export default class ScannerStore extends Container<ScannerState> {
 				parsedData.currentFrame,
 				parsedData.frameCount,
 				parsedData.partData,
-				accountsStore
+				accountsStore,
+				isNetworkSpec
 			);
 			return;
 		}
@@ -186,7 +192,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setPrehashPayload(parsedData.preHash);
 	}
 
-	async setPartData(frame, frameCount, partData, accountsStore) {
+	async setPartData(frame, frameCount, partData, accountsStore, isNetworkSpec) {
 		const {
 			latestFrame,
 			missedFrames,
@@ -208,12 +214,15 @@ export default class ScannerStore extends Container<ScannerState> {
 			partDataAsBytes[i] = parseInt(partData.substr(i * 2, 2), 16);
 		}
 
-		if (
-			partDataAsBytes[0] === new Uint8Array([0x00]) ||
-			partDataAsBytes[0] === new Uint8Array([0x7b])
-		) {
-			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
-			throw new Error('Error decoding invalid part data.');
+		// Network spec is expected to be a JSON.
+		if (!isNetworkSpec) {
+			if (
+				partDataAsBytes[0] === new Uint8Array([0x00]) ||
+				partDataAsBytes[0] === new Uint8Array([0x7b])
+			) {
+				// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
+				throw new Error('Error decoding invalid part data.');
+			}
 		}
 
 		const completedFramesCount = Object.keys(multipartData).length;
@@ -244,7 +253,12 @@ export default class ScannerStore extends Container<ScannerState> {
 			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
 			// handle the binary blob as a single UOS payload
-			this.setParsedData(concatMultipartData, accountsStore, true);
+			this.setParsedData(
+				concatMultipartData,
+				accountsStore,
+				true,
+				isNetworkSpec
+			);
 		} else if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData;

@@ -43,6 +43,7 @@ import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
 import AccountRecover from './screens/AccountRecover';
+import AccountSettings from './screens/AccountSettings';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
@@ -55,9 +56,11 @@ import PathDerivation from './screens/PathDerivation';
 import PathDetails from './screens/PathDetails';
 import PathsList from './screens/PathsList';
 import PathManagement from './screens/PathManagement';
+import NetworkSettings from './screens/NetworkSettings';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
+import Settings from './screens/Settings';
 import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
@@ -186,9 +189,6 @@ const Screens = createSwitchNavigator(
 					AccountPin: {
 						screen: AccountPin
 					},
-					AccountUnlock: {
-						screen: AccountUnlock
-					},
 					About: {
 						screen: About
 					},
@@ -203,6 +203,12 @@ const Screens = createSwitchNavigator(
 					},
 					AccountRecover: {
 						screen: AccountRecover
+					},
+					AccountSettings: {
+						screen: AccountSettings
+					},
+					AccountUnlock: {
+						screen: AccountUnlock
 					},
 					AccountUnlockAndSign: {
 						screen: AccountUnlockAndSign
@@ -231,6 +237,9 @@ const Screens = createSwitchNavigator(
 					MessageDetails: {
 						screen: MessageDetails
 					},
+					NetworkSettings: {
+						screen: NetworkSettings
+					},
 					PathDerivation: {
 						screen: PathDerivation
 					},
@@ -245,6 +254,9 @@ const Screens = createSwitchNavigator(
 					},
 					QrScanner: {
 						screen: QrScanner
+					},
+					Settings: {
+						screen: Settings
 					},
 					SignedMessage: {
 						screen: SignedMessage

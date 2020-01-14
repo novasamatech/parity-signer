@@ -81,10 +81,14 @@ export default class Scanner extends React.PureComponent {
 										await scannerStore.setUnsigned(txRequestData.data);
 									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
+										const isNetworkSpec = this.props.navigation.getParam(
+											'isScanningNetworkSpec'
+										);
 
 										await scannerStore.setParsedData(
 											strippedData,
-											accountsStore
+											accountsStore,
+											isNetworkSpec
 										);
 									}
 
@@ -127,6 +131,8 @@ function QrScannerView({ navigation, scannerStore, accountStore, ...props }) {
 		props.onBarCodeRead(createMockSignRequest());
 	}
 
+	const isNetworkSpec = navigation.getParam('isScanningNetworkSpec');
+
 	useEffect(() => {
 		const setBusySubscription = navigation.addListener('willFocus', () => {
 			scannerStore.setReady();
@@ -143,6 +149,24 @@ function QrScannerView({ navigation, scannerStore, accountStore, ...props }) {
 
 	const missedFrames = scannerStore.getMissedFrames();
 	const missedFramesMessage = missedFrames && missedFrames.join(', ');
+
+	const renderScanningNetworkSpecMessage = () => {
+		return (
+			<View style={styles.bottom}>
+				<Text style={styles.descTitle}>Scan QR Code</Text>
+				<Text style={styles.descSecondary}>To Add a New Network Spec</Text>
+			</View>
+		);
+	};
+
+	const renderScanningTransactionMessage = () => {
+		return (
+			<View style={styles.bottom}>
+				<Text style={styles.descTitle}>Scan QR Code</Text>
+				<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
+			</View>
+		);
+	};
 
 	if (scannerStore.isBusy()) {
 		return <View style={styles.inactive} />;
@@ -182,6 +206,9 @@ function QrScannerView({ navigation, scannerStore, accountStore, ...props }) {
 						<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
 					</View>
 				)}
+				{isNetworkSpec
+					? renderScanningNetworkSpecMessage()
+					: renderScanningTransactionMessage()}
 				{missedFrames && missedFrames.length >= 1 && (
 					<View style={styles.bottom}>
 						<Text style={styles.descTitle}>
