@@ -206,12 +206,11 @@ export const getPathName = (path, lookUpIdentity) => {
 };
 
 /**
- * This function grouped paths list into a list with different groups, for a better display.
- * The group will based :
- * on their second subpath if it is a known network, for example, '//staking' of '//kusama//staking/0'
- * on their first subpath if it is an unknown network, for example, '/random' of '/random//derivation/1'
- * examples please refer to the path group test suit in identitiesUtils.spec.js
- */
+ * This function decides how to group the list of derivation paths in the display based on the following rules.
+ * If the network is unknown: group by the first subpath, e.g. '/random' of '/random//derivation/1'
+ * If the network is known: group by the second subpath, e.g. '//staking' of '//kusama//staking/0'
+ * Please refer to identitiesUtils.spec.js for more examples.
+ **/
 export const groupPaths = paths => {
 	const insertPathIntoGroup = (matchingPath, fullPath, pathGroup) => {
 		const groupName = matchingPath.match(pathsRegex.firstPath)[0];
