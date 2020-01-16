@@ -43,7 +43,7 @@ export const extractSubPathName = path => {
 };
 
 export const isSubstratePath = path =>
-	path.match(pathsRegex.allPath) != null || path === '';
+	path.match(pathsRegex.allPath) !== null || path === '';
 
 export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
 
@@ -205,6 +205,13 @@ export const getPathName = (path, lookUpIdentity) => {
 	return extractSubPathName(path);
 };
 
+/**
+ * This function grouped paths list into a list with different groups, for a better display.
+ * The group will based :
+ * on their second subpath if it is a known network, for example, '//staking' of '//kusama//staking/0'
+ * on their first subpath if it is an unknown network, for example, '/random' of '/random//derivation/1'
+ * examples please refer to the path group test suit in identitiesUtils.spec.js
+ */
 export const groupPaths = paths => {
 	const insertPathIntoGroup = (matchingPath, fullPath, pathGroup) => {
 		const groupName = matchingPath.match(pathsRegex.firstPath)[0];
@@ -218,7 +225,7 @@ export const groupPaths = paths => {
 		}
 	};
 
-	const unSortedPaths = paths.reduce((groupedPath, path) => {
+	const groupedPaths = paths.reduce((groupedPath, path) => {
 		if (path === '') {
 			return groupedPath;
 		}
@@ -240,5 +247,5 @@ export const groupPaths = paths => {
 
 		return groupedPath;
 	}, []);
-	return unSortedPaths.sort((a, b) => a.paths.length - b.paths.length);
+	return groupedPaths.sort((a, b) => a.paths.length - b.paths.length);
 };
