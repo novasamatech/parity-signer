@@ -95,7 +95,7 @@ function PathsList({ accounts, navigation }) {
 					rootPath,
 					seedPhrase,
 					networkKey,
-					`${networkParams.title} Root`
+					''
 				);
 				if (derivationSucceed) {
 					navigateToPathDetails(navigation, networkKey, rootPath);

@@ -37,12 +37,13 @@ const extractPathId = path => {
 
 export const extractSubPathName = path => {
 	const pathFragments = path.match(pathsRegex.allPath);
-	if (!pathFragments || pathFragments.length <= 1) return '';
+	if (!pathFragments || pathFragments.length === 0) return '';
+	if (pathFragments.length === 1) return removeSlash(pathFragments[0]);
 	return removeSlash(pathFragments.slice(1).join(''));
 };
 
 export const isSubstratePath = path =>
-	path.split('//')[1] !== undefined || path === '';
+	path.match(pathsRegex.allPath) !== null || path === '';
 
 export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
 
@@ -204,35 +205,46 @@ export const getPathName = (path, lookUpIdentity) => {
 	return extractSubPathName(path);
 };
 
+/**
+ * This function decides how to group the list of derivation paths in the display based on the following rules.
+ * If the network is unknown: group by the first subpath, e.g. '/random' of '/random//derivation/1'
+ * If the network is known: group by the second subpath, e.g. '//staking' of '//kusama//staking/0'
+ * Please refer to identitiesUtils.spec.js for more examples.
+ **/
 export const groupPaths = paths => {
-	const unSortedPaths = paths.reduce((groupedPath, path) => {
+	const insertPathIntoGroup = (matchingPath, fullPath, pathGroup) => {
+		const groupName = matchingPath.match(pathsRegex.firstPath)[0];
+
+		const existedItem = pathGroup.find(p => p.title === groupName);
+		if (existedItem) {
+			existedItem.paths.push(fullPath);
+			existedItem.paths.sort();
+		} else {
+			pathGroup.push({ paths: [fullPath], title: groupName });
+		}
+	};
+
+	const groupedPaths = paths.reduce((groupedPath, path) => {
 		if (path === '') {
 			return groupedPath;
 		}
-		const pathId = extractPathId(path) || '';
-		const isRootPath = removeSlash(path) === pathId;
-		if (isRootPath) {
-			const isUnknownRootPath = Object.values(NETWORK_LIST).every(
-				v => v.pathId !== pathId
-			);
-			if (isUnknownRootPath) {
-				groupedPath.push({ paths: [path], title: pathId });
-			}
+		const rootPath = path.match(pathsRegex.firstPath)[0];
+
+		const isUnknownRootPath = Object.values(NETWORK_LIST).every(
+			v => `//${v.pathId}` !== rootPath
+		);
+		if (isUnknownRootPath) {
+			insertPathIntoGroup(path, path, groupedPath);
 			return groupedPath;
 		}
 
-		const subPath = path.slice(pathId.length + 2);
+		const isRootPath = path === rootPath;
+		if (isRootPath) return groupedPath;
 
-		const groupName = subPath.match(pathsRegex.firstPath)[0];
+		const subPath = path.slice(rootPath.length);
+		insertPathIntoGroup(subPath, path, groupedPath);
 
-		const existedItem = groupedPath.find(p => p.title === groupName);
-		if (existedItem) {
-			existedItem.paths.push(path);
-			existedItem.paths.sort();
-		} else {
-			groupedPath.push({ paths: [path], title: groupName });
-		}
 		return groupedPath;
 	}, []);
-	return unSortedPaths.sort((a, b) => a.paths.length - b.paths.length);
+	return groupedPaths.sort((a, b) => a.paths.length - b.paths.length);
 };

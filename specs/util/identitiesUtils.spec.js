@@ -30,120 +30,110 @@ import {
 	UnknownNetworkKeys
 } from '../../src/constants';
 
-const addressFunding1 = 'address1',
-	addressFunding2 = 'address2',
-	addressSoft = 'address3',
-	addressPolkadot = 'address5',
-	addressStaking = 'address4',
-	addressEthereum = 'address6',
-	addressDefault = 'addressDefault',
-	addressKusamaRoot = 'addressKusamaRoot',
-	addressRoot = 'addressRoot',
-	addressCustom = 'addressCustom',
-	paths = [
-		'//kusama//default',
-		'//kusama//funding/1',
-		'//kusama/softKey1',
-		'//kusama//funding/2',
-		'//kusama//staking/1',
-		'//polkadot//default',
-		'1',
-		'//kusama',
-		'',
-		'//custom'
-	],
-	kusamaPaths = [
-		'//kusama//default',
-		'//kusama//funding/1',
-		'//kusama/softKey1',
-		'//kusama//funding/2',
-		'//kusama//staking/1',
-		'//kusama'
-	],
-	metaCustom = {
-		address: addressCustom,
-		createdAt: 1571068850409,
-		name: 'custom Path',
-		updatedAt: 1571068850409
-	},
-	metaDefault = {
-		address: addressDefault,
-		createdAt: 1571068850409,
+const raw = [
+	{
+		address: 'addressDefault',
+		expectName: 'default',
+		isKusamaPath: true,
 		name: '',
-		updatedAt: 1571078850509
+		path: '//kusama//default'
 	},
-	metaFunding1 = {
-		address: addressFunding1,
-		createdAt: 1571068850409,
+	{
+		address: 'address1',
+		expectName: 'funding account1',
+		isKusamaPath: true,
 		name: 'funding account1',
-		updatedAt: 1571078850509
+		path: '//kusama//funding/1'
 	},
-	metaFunding2 = {
-		address: addressFunding2,
-		createdAt: 1571068850409,
+	{
+		address: 'address3',
+		expectName: 'softKey1',
+		isKusamaPath: true,
 		name: '',
-		updatedAt: 1571078850509
+		path: '//kusama/softKey1'
 	},
-	metaStaking = {
-		address: addressStaking,
-		createdAt: 1571068850409,
+	{
+		address: 'address2',
+		expectName: 'funding2',
+		isKusamaPath: true,
 		name: '',
-		updatedAt: 1571078850509
+		path: '//kusama//funding/2'
 	},
-	metaPolkadot = {
-		address: addressPolkadot,
-		createdAt: 1573142786972,
-		name: 'PolkadotFirst',
-		updatedAt: 1573142786972
-	},
-	metaEthereum = {
-		address: addressEthereum,
-		createdAt: 1573142786972,
-		name: 'Eth account',
-		updatedAt: 1573142786972
-	},
-	metaKusamaRoot = {
-		address: addressKusamaRoot,
-		createdAt: 1573142786972,
+	{
+		address: 'address4',
+		expectName: 'staking1',
+		isKusamaPath: true,
 		name: '',
-		updatedAt: 1573142786972
+		path: '//kusama//staking/1'
 	},
-	metaRoot = {
-		address: addressRoot,
-		createdAt: 1573142786972,
+	{
+		address: 'address5',
+		expectName: 'default',
 		name: '',
-		updatedAt: 1573142786972
+		path: '//polkadot//default'
 	},
-	metaSoftKey = {
-		address: addressSoft,
-		createdAt: 1573142786972,
+	{
+		address: 'address6',
+		expectName: 'No name',
 		name: '',
+		path: '1'
+	},
+	{
+		address: 'addressKusamaRoot',
+		expectName: 'kusama',
+		isKusamaPath: true,
+		name: '',
+		path: '//kusama'
+	},
+	{
+		address: 'addressRoot',
+		expectName: '',
+		name: '',
+		path: ''
+	},
+	{
+		address: 'addressCustom',
+		expectName: 'CustomName',
+		name: 'CustomName',
+		path: '//custom'
+	},
+	{
+		address: 'addressKusamaSoft',
+		expectName: 'kusama',
+		name: '',
+		path: '/kusama'
+	},
+	{
+		address: 'softAddress',
+		expectName: '1',
+		name: '',
+		path: '/kusama/1'
+	},
+	{
+		address: 'softAddress2',
+		expectName: '1',
+		name: '',
+		path: '/polkadot/1'
+	}
+];
+const expectNames = raw.map(v => v.expectName);
+const paths = raw.map(v => v.path);
+const kusamaPaths = raw.filter(v => v.isKusamaPath).map(v => v.path);
+const metaMap = raw.reduce((acc, v) => {
+	const meta = {
+		address: v.address,
+		createdAt: 1573142786972,
+		name: v.name,
 		updatedAt: 1573142786972
 	};
-const addressesMap = new Map([
-	[addressDefault, paths[0]],
-	[addressFunding1, paths[1]],
-	[addressSoft, paths[2]],
-	[addressFunding2, paths[3]],
-	[addressStaking, paths[4]],
-	[addressPolkadot, paths[5]],
-	[addressEthereum, paths[6]],
-	[addressKusamaRoot, paths[7]],
-	[addressRoot, paths[8]],
-	[addressCustom, paths[9]]
-]);
-const metaMap = new Map([
-	[paths[0], metaDefault],
-	[paths[1], metaFunding1],
-	[paths[2], metaSoftKey],
-	[paths[3], metaStaking],
-	[paths[4], metaFunding2],
-	[paths[5], metaPolkadot],
-	[paths[6], metaEthereum],
-	[paths[7], metaKusamaRoot],
-	[paths[8], metaRoot],
-	[paths[9], metaCustom]
-]);
+	acc.set(v.path, meta);
+	return acc;
+}, new Map());
+const addressesMap = raw.reduce((acc, v) => {
+	acc.set(v.address, v.path);
+	return acc;
+}, new Map());
+
 const testIdentities = [
 	{
 		addresses: addressesMap,
@@ -191,33 +181,36 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('regroup the unknown paths', () => {
-		const unKnownPaths = ['//polkadot//default', '', '//custom'];
+		const unKnownPaths = [
+			'//polkadot//default',
+			'',
+			'//custom',
+			'/kusama',
+			'/kusama/1',
+			'/polkadot/1'
+		];
 		const groupResult = groupPaths(unKnownPaths);
 		expect(groupResult).toEqual([
 			{
 				paths: ['//polkadot//default'],
-				title: '//default'
+				title: '//polkadot'
 			},
 			{
 				paths: ['//custom'],
-				title: 'custom'
+				title: '//custom'
+			},
+			{
+				paths: ['/polkadot/1'],
+				title: '/polkadot'
+			},
+			{
+				paths: ['/kusama', '/kusama/1'],
+				title: '/kusama'
 			}
 		]);
 	});
 
 	it('get the path name', () => {
-		const expectNames = [
-			'default',
-			'funding account1',
-			'softKey1',
-			'funding2',
-			'staking1',
-			'PolkadotFirst',
-			'Eth account',
-			'',
-			'',
-			'custom Path'
-		];
 		paths.forEach((path, index) => {
 			const name = getPathName(path, testIdentities[0]);
 			expect(name).toEqual(expectNames[index]);
