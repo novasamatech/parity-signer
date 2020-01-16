@@ -175,7 +175,9 @@ function AccountNetworkChooser({ navigation, accounts }) {
 				<>
 					<NetworkCard
 						isAdd={true}
-						onPress={() => navigation.navigate('PathDerivation')}
+						onPress={() =>
+							navigation.navigate('PathDerivation', { parentPath: '' })
+						}
 						testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}
 						title="Create Custom Path"
 						networkColor={colors.bg}

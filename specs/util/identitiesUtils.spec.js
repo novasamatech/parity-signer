@@ -19,6 +19,7 @@
 import {
 	deserializeIdentities,
 	getExistedNetworkKeys,
+	getNetworkKeyByPath,
 	getPathName,
 	groupPaths,
 	serializeIdentities
@@ -223,5 +224,19 @@ describe('IdentitiesUtils', () => {
 			SubstrateNetworkKeys.KUSAMA,
 			UnknownNetworkKeys.UNKNOWN
 		]);
+	});
+
+	it('get networkKey correctly by path', () => {
+		expect(getNetworkKeyByPath('')).toEqual(UnknownNetworkKeys.UNKNOWN);
+		expect(getNetworkKeyByPath('//kusama')).toEqual(
+			SubstrateNetworkKeys.KUSAMA
+		);
+		expect(getNetworkKeyByPath('//kusama//derived//anything')).toEqual(
+			SubstrateNetworkKeys.KUSAMA
+		);
+		expect(getNetworkKeyByPath('1')).toEqual(EthereumNetworkKeys.FRONTIER);
+		expect(getNetworkKeyByPath('//anything/could/be')).toEqual(
+			UnknownNetworkKeys.UNKNOWN
+		);
 	});
 });
