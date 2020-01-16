@@ -81,10 +81,10 @@ function PathsList({ accounts, navigation }) {
 	}
 
 	const { navigate } = navigation;
+	const rootPath = `//${networkParams.pathId}`;
 
 	const onClickRootPath = () => {
 		if (isUnknownNetworkPath) return;
-		const rootPath = `//${networkParams.pathId}`;
 		const rootPathMeta = getRootPathMeta(currentIdentity, networkKey);
 		if (rootPathMeta) {
 			navigate('PathDetails', { path: rootPath });
@@ -154,15 +154,6 @@ function PathsList({ accounts, navigation }) {
 							{pathsGroup.title}
 						</Text>
 					</View>
-
-					{/*<ButtonIcon*/}
-					{/*	iconName="plus"*/}
-					{/*	iconType="antdesign"*/}
-					{/*	style={{ opacity: 0.5 }}*/}
-					{/*	onPress={() =>*/}
-					{/*		navigation.navigate('PathDerivation', { networkKey })*/}
-					{/*	}*/}
-					{/*/>*/}
 				</View>
 			</View>
 			{pathsGroup.paths.map(path => (
@@ -204,7 +195,7 @@ function PathsList({ accounts, navigation }) {
 						testID={testIDs.PathsList.deriveButton}
 						title="Create New Derivation"
 						onPress={() =>
-							navigation.navigate('PathDerivation', { networkKey })
+							navigation.navigate('PathDerivation', { parentPath: rootPath })
 						}
 					/>
 				)}
