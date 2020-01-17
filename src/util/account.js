@@ -78,7 +78,7 @@ export function validateSeed(seed, validBip39Seed) {
 		};
 	}
 
-	const words = validBip39Seed ? seed.trimEnd().split('') : seed.split(' ');
+	const words = validBip39Seed ? seed.trimEnd().split(' ') : seed.split(' ');
 
 	for (let word of words) {
 		if (word === '') {
