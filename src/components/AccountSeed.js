@@ -112,7 +112,7 @@ export default class AccountSeed extends Component {
 						<TouchableItem
 							key={i}
 							onPress={e => {
-								let phrase = left.concat(suggestion, right).join(' ');
+								let phrase = left.concat(suggestion, right).join(' ').trimEnd();
 								const is24words = phrase.split(' ').length === 24;
 								if (!is24words) phrase += ' ';
 								this.props.onChangeText(phrase);
