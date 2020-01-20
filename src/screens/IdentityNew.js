@@ -62,7 +62,7 @@ function IdentityNew({ accounts, navigation }) {
 	const onSeedTextInput = inputSeedPhrase => {
 		setSeedPhrase(inputSeedPhrase);
 		const addressGeneration = () =>
-			brainWalletAddress(inputSeedPhrase)
+			brainWalletAddress(inputSeedPhrase.trimEnd())
 				.then(({ bip39 }) => {
 					setIsSeedValid(validateSeed(inputSeedPhrase, bip39));
 				})
@@ -74,7 +74,11 @@ function IdentityNew({ accounts, navigation }) {
 	const onRecoverIdentity = async () => {
 		const pin = await setPin(navigation);
 		try {
-			await accounts.saveNewIdentity(seedPhrase, pin);
+			if (isSeedValid.bip39) {
+				await accounts.saveNewIdentity(seedPhrase.trimEnd(), pin);
+			} else {
+				await accounts.saveNewIdentity(seedPhrase, pin);
+			}
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
