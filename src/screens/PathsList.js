@@ -156,15 +156,15 @@ function PathsList({ accounts, navigation }) {
 						? renderSinglePath(pathsGroup)
 						: renderGroupPaths(pathsGroup)
 				)}
-				{!isUnknownNetworkPath && (
-					<ButtonNewDerivation
-						testID={testIDs.PathsList.deriveButton}
-						title="Create New Derivation"
-						onPress={() =>
-							navigation.navigate('PathDerivation', { parentPath: rootPath })
-						}
-					/>
-				)}
+				<ButtonNewDerivation
+					testID={testIDs.PathsList.deriveButton}
+					title="Create New Derivation"
+					onPress={() =>
+						navigation.navigate('PathDerivation', {
+							parentPath: isUnknownNetworkPath ? '' : rootPath
+						})
+					}
+				/>
 			</ScrollView>
 		</View>
 	);
