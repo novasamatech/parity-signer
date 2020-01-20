@@ -140,7 +140,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			`//${pathId}`,
 			seedPhrase,
 			networkKey,
-			'Root'
+			`${networkParams.title} root`
 		);
 		onDerivationFinished(derivationSucceed, networkKey, true);
 	};
