@@ -138,28 +138,26 @@ export function PathListHeading({
 	);
 }
 
-export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
+export function IdentityHeading({ title, subtitle, hasSubtitleIcon }) {
 	return (
-		<TouchableItem style={baseStyles.bodyWithIdentity} onPress={onPress}>
-			<View style={baseStyles.touchable}>
-				<View style={baseStyles.identityName}>
-					<Text
-						style={[baseStyles.text, baseStyles.t_left]}
-						numberOfLines={1}
-						ellipsizeMode="middle"
-					>
-						{title}
-					</Text>
-					<FontAwesome
-						style={baseStyles.linkIcon}
-						name="external-link"
-						color={colors.bg_button}
-						size={18}
-					/>
-				</View>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+		<View style={baseStyles.bodyWithIdentity}>
+			<View style={baseStyles.identityName}>
+				<Text
+					style={[baseStyles.text, baseStyles.t_left]}
+					numberOfLines={1}
+					ellipsizeMode="middle"
+				>
+					{title}
+				</Text>
+				<FontAwesome
+					style={baseStyles.linkIcon}
+					name="external-link"
+					color={colors.bg_button}
+					size={18}
+				/>
 			</View>
-		</TouchableItem>
+			{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+		</View>
 	);
 }
 
@@ -167,7 +165,7 @@ export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
 		onPress: PropTypes.func,
 		subtitle: PropTypes.string,
-		title: PropTypes.string
+		title: PropTypes.string.isRequired
 	};
 	render() {
 		const {
@@ -203,7 +201,10 @@ const baseStyles = StyleSheet.create({
 		marginBottom: 16
 	},
 	bodyWithIdentity: {
+		flex: 1,
+		flexDirection: 'column',
 		height: 42,
+		justifyContent: 'center',
 		paddingLeft: 72,
 		paddingRight: 32
 	},
@@ -241,10 +242,5 @@ const baseStyles = StyleSheet.create({
 	text: {
 		...fontStyles.h1,
 		textAlign: 'center'
-	},
-	touchable: {
-		flex: 1,
-		flexDirection: 'column',
-		justifyContent: 'center'
 	}
 });

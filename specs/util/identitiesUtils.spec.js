@@ -87,7 +87,7 @@ const raw = [
 	},
 	{
 		address: 'addressRoot',
-		expectName: '',
+		expectName: 'Root Account',
 		name: '',
 		path: ''
 	},
@@ -191,6 +191,10 @@ describe('IdentitiesUtils', () => {
 		];
 		const groupResult = groupPaths(unKnownPaths);
 		expect(groupResult).toEqual([
+			{
+				paths: [''],
+				title: 'Root Account'
+			},
 			{
 				paths: ['//polkadot//default'],
 				title: '//polkadot'

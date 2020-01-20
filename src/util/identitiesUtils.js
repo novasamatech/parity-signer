@@ -168,7 +168,6 @@ export const unlockIdentitySeed = async (pin, identity) => {
 export const getExistedNetworkKeys = identity => {
 	const pathsList = Array.from(identity.addresses.values());
 	const networkKeysSet = pathsList.reduce((networksSet, path) => {
-		if (path === '') return networksSet;
 		let networkKey;
 		if (isSubstratePath(path)) {
 			networkKey = getNetworkKeyByPath(path);
@@ -199,9 +198,8 @@ export const getPathName = (path, lookUpIdentity) => {
 	) {
 		return lookUpIdentity.meta.get(path).name;
 	}
-	if (!isSubstratePath(path)) {
-		return 'No name';
-	}
+	if (!isSubstratePath(path)) return 'No name';
+	if (path === '') return 'Root Account';
 	return extractSubPathName(path);
 };
 
@@ -226,8 +224,10 @@ export const groupPaths = paths => {
 
 	const groupedPaths = paths.reduce((groupedPath, path) => {
 		if (path === '') {
+			groupedPath.push({ paths: [''], title: 'Root Account' });
 			return groupedPath;
 		}
+
 		const rootPath = path.match(pathsRegex.firstPath)[0];
 
 		const isUnknownRootPath = Object.values(NETWORK_LIST).every(
@@ -246,5 +246,8 @@ export const groupPaths = paths => {
 
 		return groupedPath;
 	}, []);
-	return groupedPaths.sort((a, b) => a.paths.length - b.paths.length);
+	return groupedPaths.sort((a, b) => {
+		if (a.paths[0] === '') return -1;
+		return a.paths.length - b.paths.length;
+	});
 };

@@ -26,12 +26,10 @@ import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
-	NetworkProtocols,
-	defaultNetworkKey
+	NetworkProtocols
 } from '../constants';
 import {
 	navigateToPathsList,
-	navigateToRootPath,
 	navigateToSubstrateRoot,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
@@ -43,7 +41,7 @@ import {
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
+import ScreenHeading from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
 
@@ -199,34 +197,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			);
 		} else {
 			const identityName = getIdentityName(currentIdentity, identities);
-			const rootAccount = currentIdentity.meta.get('');
-			const rootAddress = rootAccount ? rootAccount.address : '';
-			const onRootKeyPress = async () => {
-				if (rootAccount == null) {
-					const seedPhrase = await unlockSeedPhrase(navigation);
-					const derivationSucceed = await accounts.deriveNewPath(
-						'',
-						seedPhrase,
-						defaultNetworkKey,
-						''
-					);
-					if (!derivationSucceed) {
-						return alertPathDerivationError();
-					} else {
-						navigateToRootPath(navigation);
-					}
-				} else {
-					navigation.navigate('PathDetails', { path: '' });
-				}
-			};
-			return (
-				<IdentityHeading
-					title={identityName}
-					subtitle={rootAddress}
-					onPress={onRootKeyPress}
-					hasSubtitleIcon={true}
-				/>
-			);
+			return <ScreenHeading title={identityName} />;
 		}
 	};
 
