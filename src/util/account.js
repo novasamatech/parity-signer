@@ -72,17 +72,19 @@ export function validateSeed(seed, validBip39Seed) {
 	if (!seed || seed.length === 0) {
 		return {
 			accountRecoveryAllowed: false,
+			bip39: false,
 			reason: 'A seed phrase is required.',
 			valid: false
 		};
 	}
 
-	const words = seed.split(' ');
+	const words = validBip39Seed ? seed.trimEnd().split(' ') : seed.split(' ');
 
 	for (let word of words) {
 		if (word === '') {
 			return {
 				accountRecoveryAllowed: true,
+				bip39: false,
 				reason: 'Extra whitespace found.',
 				valid: false
 			};
@@ -92,6 +94,7 @@ export function validateSeed(seed, validBip39Seed) {
 	if (!validBip39Seed) {
 		return {
 			accountRecoveryAllowed: true,
+			bip39: false,
 			reason:
 				'This recovery phrase is not a valid BIP39 seed, will be treated as a legacy Parity brain wallet.',
 			valid: false
@@ -99,6 +102,7 @@ export function validateSeed(seed, validBip39Seed) {
 	}
 
 	return {
+		bip39: true,
 		reason: null,
 		valid: true
 	};
