@@ -41,7 +41,7 @@ import {
 	getPathsWithSubstrateNetwork
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading from '../components/ScreenHeading';
+import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
 
@@ -190,14 +190,14 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			return <ScreenHeading title={'Create your first Keypair'} />;
 		} else if (shouldShowMoreNetworks) {
 			return (
-				<ScreenHeading
+				<IdentityHeading
 					title={'Choose Network'}
-					onPress={() => setShouldShowMoreNetworks(false)}
+					onPressBack={() => setShouldShowMoreNetworks(false)}
 				/>
 			);
 		} else {
 			const identityName = getIdentityName(currentIdentity, identities);
-			return <ScreenHeading title={identityName} />;
+			return <IdentityHeading title={identityName} />;
 		}
 	};
 
