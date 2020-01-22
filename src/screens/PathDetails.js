@@ -41,7 +41,6 @@ import {
 } from '../util/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from '../util/account';
-import UnknownAccountWarning from '../components/UnknownAccountWarning';
 import AccountCard from '../components/AccountCard';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
@@ -120,7 +119,6 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 							networkKey={formattedNetworkKey}
 						/>
 						<QrView data={generateAccountId({ address, networkKey })} />
-						<UnknownAccountWarning isPath />
 					</>
 				) : (
 					<>

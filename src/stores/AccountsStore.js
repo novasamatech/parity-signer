@@ -331,7 +331,15 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await this.setState({ currentIdentity: null });
 	}
 
-	async _addPathToIdentity(newPath, seedPhrase, updatedIdentity, name, prefix) {
+	async _addPathToIdentity(
+		newPath,
+		seedPhrase,
+		updatedIdentity,
+		name,
+		networkKey,
+		isUnknownNetwork
+	) {
+		const prefix = NETWORK_LIST[networkKey].prefix;
 		const suri = constructSURI({
 			derivePath: newPath,
 			password: '',
@@ -345,12 +353,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 		if (address === '') return false;
 		if (updatedIdentity.meta.has(newPath)) return false;
-		updatedIdentity.meta.set(newPath, {
+		const pathMeta = {
 			address,
 			createdAt: new Date().getTime(),
 			name,
 			updatedAt: new Date().getTime()
-		});
+		};
+		if (isUnknownNetwork) pathMeta.networkKey = networkKey;
+		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
 		return true;
 	}
@@ -361,7 +371,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
 		//TODO now hard coded to polkadot canary prefix which is 2, future enable user to change that.
-		await this._addPathToIdentity('', seedPhrase, updatedIdentity, 'Root', 2);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
 			currentIdentity: updatedIdentity,
@@ -432,15 +441,15 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
-		const prefix = NETWORK_LIST[networkKey].prefix;
+	async deriveNewPath(newPath, seedPhrase, networkKey, name, isUnknownNetwork) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const deriveSucceed = await this._addPathToIdentity(
 			newPath,
 			seedPhrase,
 			updatedCurrentIdentity,
 			name,
-			prefix
+			networkKey,
+			isUnknownNetwork
 		);
 		if (!deriveSucceed) return false;
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);

@@ -37,6 +37,12 @@ import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
 import PathCard from '../components/PathCard';
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import {
+	defaultNetworkKey,
+	NETWORK_LIST,
+	UnknownNetworkKeys
+} from '../constants';
+import NetworkSelector from '../components/NetworkSelector';
 
 function PathDerivation({ accounts, navigation }) {
 	const [derivationPath, setDerivationPath] = useState('');
@@ -46,6 +52,7 @@ function PathDerivation({ accounts, navigation }) {
 	const parentPath = navigation.getParam('parentPath');
 	const completePath = `${parentPath}${derivationPath}`;
 	const networkKey = getNetworkKeyByPath(completePath);
+	const isCustomNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 
 	const onPathDerivation = async () => {
 		if (!validateDerivedPath(derivationPath)) {
@@ -56,7 +63,8 @@ function PathDerivation({ accounts, navigation }) {
 			completePath,
 			seedPhrase,
 			networkKey,
-			keyPairsName
+			keyPairsName,
+			isCustomNetwork
 		);
 		if (derivationSucceed) {
 			navigateToPathsList(navigation, networkKey);
@@ -103,6 +111,7 @@ function PathDerivation({ accounts, navigation }) {
 					name={keyPairsName}
 					path={completePath}
 				/>
+				{isCustomNetwork && <NetworkSelector />}
 				<ButtonMainAction
 					disabled={!validateDerivedPath(derivationPath)}
 					bottom={false}
