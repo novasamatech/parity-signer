@@ -89,10 +89,6 @@ const styles = StyleSheet.create({
 		marginVertical: 8,
 		paddingHorizontal: 16
 	},
-	label: {
-		marginBottom: 3,
-		...fontStyles.t_regular
-	},
 	input: {
 		borderBottomColor: colors.card_bg_text_sec,
 		borderBottomWidth: 0.8,
@@ -108,6 +104,10 @@ const styles = StyleSheet.create({
 	},
 	input_error: {
 		borderBottomColor: colors.bg_alert
+	},
+	label: {
+		marginBottom: 3,
+		...fontStyles.t_regular
 	},
 	viewStyle: {
 		flexDirection: 'row'

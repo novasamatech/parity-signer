@@ -336,8 +336,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		seedPhrase,
 		updatedIdentity,
 		name,
-		networkKey,
-		isUnknownNetwork
+		networkKey
 	) {
 		const prefix = NETWORK_LIST[networkKey].prefix;
 		const suri = constructSURI({
@@ -357,9 +356,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			address,
 			createdAt: new Date().getTime(),
 			name,
+			networkKey,
 			updatedAt: new Date().getTime()
 		};
-		if (isUnknownNetwork) pathMeta.networkKey = networkKey;
 		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
 		return true;
@@ -441,15 +440,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seedPhrase, networkKey, name, isUnknownNetwork) {
+	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const deriveSucceed = await this._addPathToIdentity(
 			newPath,
 			seedPhrase,
 			updatedCurrentIdentity,
 			name,
-			networkKey,
-			isUnknownNetwork
+			networkKey
 		);
 		if (!deriveSucceed) return false;
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);

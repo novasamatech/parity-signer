@@ -16,7 +16,7 @@
 
 'use strict';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { withNavigation } from 'react-navigation';
 import { withAccountStore } from '../util/HOC';
 import { Platform, StyleSheet, Text, View } from 'react-native';
@@ -37,22 +37,24 @@ import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
 import PathCard from '../components/PathCard';
 import KeyboardScrollView from '../components/KeyboardScrollView';
-import {
-	defaultNetworkKey,
-	NETWORK_LIST,
-	UnknownNetworkKeys
-} from '../constants';
-import NetworkSelector from '../components/NetworkSelector';
+import { defaultNetworkKey, UnknownNetworkKeys } from '../constants';
+import { NetworkSelector, NetworkOptions } from '../components/NetworkSelector';
 
 function PathDerivation({ accounts, navigation }) {
 	const [derivationPath, setDerivationPath] = useState('');
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [customNetworkKey, setCustomNetworkKey] = useState(defaultNetworkKey);
 	const pathNameInput = useRef(null);
 	const parentPath = navigation.getParam('parentPath');
 	const completePath = `${parentPath}${derivationPath}`;
-	const networkKey = getNetworkKeyByPath(completePath);
-	const isCustomNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
+	const pathIndicatedNetworkKey = useMemo(
+		() => getNetworkKeyByPath(completePath),
+		[completePath]
+	);
+	const isCustomNetwork =
+		pathIndicatedNetworkKey === UnknownNetworkKeys.UNKNOWN;
 
 	const onPathDerivation = async () => {
 		if (!validateDerivedPath(derivationPath)) {
@@ -62,12 +64,11 @@ function PathDerivation({ accounts, navigation }) {
 		const derivationSucceed = await accounts.deriveNewPath(
 			completePath,
 			seedPhrase,
-			networkKey,
-			keyPairsName,
-			isCustomNetwork
+			isCustomNetwork ? customNetworkKey : pathIndicatedNetworkKey,
+			keyPairsName
 		);
 		if (derivationSucceed) {
-			navigateToPathsList(navigation, networkKey);
+			navigateToPathsList(navigation, pathIndicatedNetworkKey);
 		} else {
 			setIsPathValid(false);
 			alertPathDerivationError();
@@ -105,13 +106,17 @@ function PathDerivation({ accounts, navigation }) {
 					testID={testIDs.PathDerivation.nameInput}
 					value={keyPairsName}
 				/>
+				<NetworkSelector
+					networkKey={customNetworkKey}
+					setVisible={setModalVisible}
+				/>
 				<Separator style={{ height: 0 }} />
 				<PathCard
 					identity={accounts.state.currentIdentity}
 					name={keyPairsName}
 					path={completePath}
 				/>
-				{isCustomNetwork && <NetworkSelector />}
+
 				<ButtonMainAction
 					disabled={!validateDerivedPath(derivationPath)}
 					bottom={false}
@@ -121,6 +126,13 @@ function PathDerivation({ accounts, navigation }) {
 					onPress={onPathDerivation}
 				/>
 			</KeyboardScrollView>
+			{isCustomNetwork && (
+				<NetworkOptions
+					setNetworkKey={setCustomNetworkKey}
+					visible={modalVisible}
+					setVisible={setModalVisible}
+				/>
+			)}
 		</View>
 	);
 }

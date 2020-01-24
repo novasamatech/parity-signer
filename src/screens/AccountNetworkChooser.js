@@ -46,7 +46,6 @@ import testIDs from '../../e2e/testIDs';
 import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
-import NetworkSelector from '../components/NetworkSelector';
 
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);

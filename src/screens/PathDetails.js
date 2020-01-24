@@ -52,7 +52,6 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 		networkKey: getNetworkKeyByPath(path)
 	});
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
-	//TODO enable user to select networkKey.
 	const isRootPath = path === '';
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 

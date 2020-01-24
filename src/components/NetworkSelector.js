@@ -18,60 +18,90 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+	Image,
+	Platform,
+	StyleSheet,
+	Text,
+	TouchableNativeFeedback,
+	TouchableOpacity,
+	View
+} from 'react-native';
 import fontStyles from '../fontStyles';
-import fonts from '../fonts';
 import { SUBSTRATE_NETWORK_LIST } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
+import TransparentBackground from './TransparentBackground';
+import fonts from '../fonts';
 
-NetworkSelector.protoTypes = {};
+const ACCOUNT_NETWORK = 'Account Network';
+const Touchable =
+	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
-const onOptionSelect = value => {
-	console.log('value selected', value);
+NetworkSelector.protoTypes = {
+	networkKey: PropTypes.string.isRequired,
+	setVisible: PropTypes.func.isRequired
 };
 
-export function NetworkSelector({ testID }) {
-	const menuOptions = Object.entries(SUBSTRATE_NETWORK_LIST).map(
-		([networkKey, networkParams]) => {
-			return (
-				<View style={styles.optionWrapper} key={networkKey} value={networkKey}>
-					<Text style={styles.optionText}>{networkParams.title}</Text>
-				</View>
-			);
-		}
-	);
+export function NetworkSelector({ networkKey, setVisible }) {
 	return (
 		<View style={styles.body}>
-			<Text style={styles.label}>Account Network</Text>
-			<View style={styles.menu} onSelect={onOptionSelect}>
-				<View styles={styles.triggerWrapper}>
-					<Text style={styles.triggerLabel}>Kusama</Text>
-					<Icon
-						name="more-vert"
-						size={25}
-						color={colors.bg_text}
-						testID={testID}
-					/>
-				</View>
-			</View>
-			<View style={styles.optionsWrapper}>{menuOptions}</View>
+			<Text style={styles.label}>{ACCOUNT_NETWORK}</Text>
+			<Touchable style={styles.triggerWrapper} onPress={() => setVisible(true)}>
+				<Text style={styles.triggerLabel}>
+					{SUBSTRATE_NETWORK_LIST[networkKey].title}
+				</Text>
+				<Icon name="more-vert" size={25} color={colors.bg_text} />
+			</Touchable>
 		</View>
 	);
 }
 
-export function NetworkOptions({}) {
+NetworkOptions.propTypes = {
+	setNetworkKey: PropTypes.func.isRequired,
+	setVisible: PropTypes.func.isRequired,
+	visible: PropTypes.bool.isRequired
+};
+
+export function NetworkOptions({ setNetworkKey, visible, setVisible }) {
+	const onNetworkSelected = networkKey => {
+		setNetworkKey(networkKey);
+		setVisible(false);
+	};
+
 	const menuOptions = Object.entries(SUBSTRATE_NETWORK_LIST).map(
 		([networkKey, networkParams]) => {
 			return (
-				<View style={styles.optionWrapper} key={networkKey} value={networkKey}>
+				<Touchable
+					style={styles.optionWrapper}
+					key={networkKey}
+					value={networkKey}
+					onPress={() => onNetworkSelected(networkKey)}
+				>
+					<Image source={networkParams.logo} style={styles.optionLogo} />
 					<Text style={styles.optionText}>{networkParams.title}</Text>
-				</View>
+				</Touchable>
 			);
 		}
 	);
 
-	return <View style={styles.optionsWrapper}>{menuOptions}</View>;
+	return (
+		<TransparentBackground
+			style={styles.optionsWrapper}
+			visible={visible}
+			setVisible={setVisible}
+			animationType="fade"
+		>
+			<View style={styles.optionsBackground}>
+				<View style={{ ...styles.optionWrapper, borderTopWidth: 0 }}>
+					<Text style={styles.optionHeadingText}>
+						{ACCOUNT_NETWORK.toUpperCase()}
+					</Text>
+				</View>
+				{menuOptions}
+			</View>
+		</TransparentBackground>
+	);
 }
 
 const styles = StyleSheet.create({
@@ -85,35 +115,53 @@ const styles = StyleSheet.create({
 		marginBottom: 3,
 		...fontStyles.t_regular
 	},
-	menu: {
-		flex: 1
-	},
 	menuOption: {
 		width: '100%'
 	},
-	triggerWrapper: {
-		height: 40,
-		paddingTop: 8,
-		backgroundColor: colors.bg,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.bg_text,
+	optionHeadingText: {
+		color: colors.bg_text,
+		fontFamily: fonts.robotoMedium,
+		fontSize: 14,
+		paddingLeft: 16
+	},
+	optionLogo: {
 		alignItems: 'center',
-		flexDirection: 'row'
+		backgroundColor: colors.bg_text_sec,
+		borderRadius: 30,
+		height: 30,
+		justifyContent: 'center',
+		marginHorizontal: 16,
+		width: 30
+	},
+	optionText: {
+		color: colors.bg_text,
+		...fontStyles.h2
+	},
+	optionWrapper: {
+		alignItems: 'center',
+		borderTopColor: 'black',
+		borderTopWidth: 1,
+		flexDirection: 'row',
+		paddingVertical: 8
+	},
+	optionsBackground: {
+		backgroundColor: colors.bg
+	},
+	optionsWrapper: {
+		justifyContent: 'flex-end'
 	},
 	triggerLabel: {
 		flex: 1,
 		...fontStyles.h2
 	},
-	optionsWrapper: {
-		backgroundColor: 'white',
-		position: 'absolute',
-		left: 0,
-		right: 0,
-		bottom: 0
-	},
-	optionText: {
-		fontFamily: fonts.regular,
-		fontSize: 16
-	},
-	optionWrapper: {}
+	triggerWrapper: {
+		alignItems: 'center',
+		backgroundColor: colors.bg,
+		borderBottomColor: colors.card_bg_text_sec,
+		borderBottomWidth: 0.8,
+		flex: 1,
+		flexDirection: 'row',
+		height: 40,
+		paddingTop: 8
+	}
 });
