@@ -45,7 +45,7 @@ import {
 	emptyIdentity,
 	extractAddressFromAccountId,
 	getAddressKeyByPath,
-	getNetworkKeyByPath,
+	getNetworkKey,
 	isEthereumAccountId
 } from '../util/identitiesUtils';
 
@@ -242,13 +242,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	getAccountFromIdentity(accountIdOrAddress) {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
-		let targetPath = null;
-		let targetIdentity = null;
 		let targetAccountId = null;
+		let targetIdentity = null;
+		let targetNetworkKey = null;
+		let targetPath = null;
 		for (const identity of this.state.identities) {
 			const searchList = Array.from(identity.addresses.entries());
 			for (const [addressKey, path] of searchList) {
-				const networkKey = getNetworkKeyByPath(path);
+				const networkKey = getNetworkKey(path, identity);
 				let accountId, address;
 				if (isEthereumAccountId(addressKey)) {
 					accountId = addressKey;
@@ -266,6 +267,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 					targetPath = path;
 					targetIdentity = identity;
 					targetAccountId = accountId;
+					targetNetworkKey = networkKey;
 					break;
 				}
 			}
@@ -275,14 +277,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		this.setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
-		const networkKey = getNetworkKeyByPath(targetPath);
 		return {
 			...metaData,
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
 			isBip39: true,
 			isLegacy: false,
-			networkKey,
+			networkKey: targetNetworkKey,
 			path: targetPath
 		};
 	}

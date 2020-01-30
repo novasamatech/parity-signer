@@ -122,6 +122,14 @@ export const getPathsWithSubstrateNetwork = (paths, networkKey) => {
 	);
 };
 
+export const getNetworkKey = (path, identity) => {
+	if (identity.meta.has(path)) {
+		const networkKey = identity.meta.get(path).networkKey;
+		if (networkKey) return networkKey;
+	}
+	return getNetworkKeyByPath(path);
+};
+
 export const getNetworkKeyByPath = path => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
 		return path;

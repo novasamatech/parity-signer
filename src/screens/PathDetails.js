@@ -28,7 +28,7 @@ import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
 	getIdentityName,
-	getNetworkKeyByPath,
+	getNetworkKey,
 	getPathName,
 	getPathsWithSubstrateNetwork,
 	isSubstratePath
@@ -49,7 +49,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	if (!address) return null;
 	const accountId = generateAccountId({
 		address,
-		networkKey: getNetworkKeyByPath(path)
+		networkKey
 	});
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const isRootPath = path === '';
@@ -132,7 +132,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 function PathDetails({ accounts, navigation }) {
 	const path = navigation.getParam('path', '');
-	const networkKey = getNetworkKeyByPath(path);
+	const networkKey = getNetworkKey(path, accounts.state.currentIdentity);
 	return (
 		<PathDetailsView
 			accounts={accounts}

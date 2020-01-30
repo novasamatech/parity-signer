@@ -106,10 +106,12 @@ function PathDerivation({ accounts, navigation }) {
 					testID={testIDs.PathDerivation.nameInput}
 					value={keyPairsName}
 				/>
-				<NetworkSelector
-					networkKey={customNetworkKey}
-					setVisible={setModalVisible}
-				/>
+				{isCustomNetwork && (
+					<NetworkSelector
+						networkKey={customNetworkKey}
+						setVisible={setModalVisible}
+					/>
+				)}
 				<Separator style={{ height: 0 }} />
 				<PathCard
 					identity={accounts.state.currentIdentity}
