@@ -87,7 +87,7 @@ const raw = [
 	},
 	{
 		address: 'addressRoot',
-		expectName: '',
+		expectName: 'Identity root',
 		name: '',
 		path: ''
 	},
@@ -162,19 +162,23 @@ describe('IdentitiesUtils', () => {
 		const groupResult = groupPaths(kusamaPaths);
 		expect(groupResult).toEqual([
 			{
-				paths: [paths[0]],
+				paths: ['//kusama'],
+				title: 'Kusama root'
+			},
+			{
+				paths: ['//kusama//default'],
 				title: '//default'
 			},
 			{
-				paths: [paths[2]],
+				paths: ['//kusama/softKey1'],
 				title: '/softKey1'
 			},
 			{
-				paths: [paths[4]],
+				paths: ['//kusama//staking/1'],
 				title: '//staking'
 			},
 			{
-				paths: [paths[1], paths[3]],
+				paths: ['//kusama//funding/1', '//kusama//funding/2'],
 				title: '//funding'
 			}
 		]);
@@ -192,8 +196,8 @@ describe('IdentitiesUtils', () => {
 		const groupResult = groupPaths(unKnownPaths);
 		expect(groupResult).toEqual([
 			{
-				paths: ['//polkadot//default'],
-				title: '//polkadot'
+				paths: [''],
+				title: 'Identity root'
 			},
 			{
 				paths: ['//custom'],
@@ -202,6 +206,10 @@ describe('IdentitiesUtils', () => {
 			{
 				paths: ['/polkadot/1'],
 				title: '/polkadot'
+			},
+			{
+				paths: ['//polkadot//default'],
+				title: '//polkadot'
 			},
 			{
 				paths: ['/kusama', '/kusama/1'],

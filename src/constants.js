@@ -60,7 +60,7 @@ const unknownNetworkBase = {
 		prefix: 2,
 		protocol: NetworkProtocols.UNKNOWN,
 		secondaryColor: colors.card_bgSolid,
-		title: 'Unknown network'
+		title: 'Custom network'
 	}
 };
 

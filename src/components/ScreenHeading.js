@@ -29,8 +29,6 @@ import { Icon } from 'react-native-elements';
 import colors from '../colors';
 import AccountIcon from './AccountIcon';
 import { NETWORK_LIST } from '../constants';
-import TouchableItem from './TouchableItem';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const composeStyle = StyleSheet.compose;
 
@@ -77,7 +75,7 @@ const renderBack = onPress => {
 			iconName="arrowleft"
 			iconType="antdesign"
 			onPress={onPress}
-			style={[baseStyles.icon, { left: 0, top: -8 }]}
+			style={[baseStyles.icon, { left: 0 }]}
 			iconBgStyle={{ backgroundColor: 'transparent' }}
 		/>
 	);
@@ -91,11 +89,20 @@ const renderIcon = (iconName, iconType) => {
 	);
 };
 
-export function PathCardHeading({ title, networkKey }) {
+export function LeftScreenHeading({
+	title,
+	subtitle,
+	hasSubtitleIcon,
+	networkKey
+}) {
 	const titleStyle = composeStyle(
 		fontStyles.h2,
 		baseStyles.t_left,
 		baseStyles.t_normal
+	);
+	const titleStyleWithSubtitle = composeStyle(
+		baseStyles.text,
+		baseStyles.t_left
 	);
 	return (
 		<View style={baseStyles.bodyWithIcon}>
@@ -105,61 +112,35 @@ export function PathCardHeading({ title, networkKey }) {
 				style={baseStyles.networkIcon}
 			/>
 			<View>
-				<Text style={titleStyle}>{title}</Text>
+				<Text style={subtitle ? titleStyleWithSubtitle : titleStyle}>
+					{title}
+				</Text>
+				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
 			</View>
 		</View>
 	);
 }
 
-export function PathListHeading({
+export function IdentityHeading({
 	title,
 	subtitle,
 	hasSubtitleIcon,
-	testID,
-	networkKey,
-	onPress
+	onPressBack
 }) {
 	return (
-		<TouchableItem
-			style={baseStyles.bodyWithIcon}
-			onPress={onPress}
-			testID={testID}
-		>
-			<AccountIcon
-				address={''}
-				network={NETWORK_LIST[networkKey]}
-				style={baseStyles.networkIcon}
-			/>
-			<View>
-				<Text style={[baseStyles.text, baseStyles.t_left]}>{title}</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+		<View style={baseStyles.bodyWithIdentity}>
+			<View style={baseStyles.identityName}>
+				<Text
+					style={[baseStyles.text, baseStyles.t_left]}
+					numberOfLines={1}
+					ellipsizeMode="middle"
+				>
+					{title}
+				</Text>
 			</View>
-		</TouchableItem>
-	);
-}
-
-export function IdentityHeading({ onPress, title, subtitle, hasSubtitleIcon }) {
-	return (
-		<TouchableItem style={baseStyles.bodyWithIdentity} onPress={onPress}>
-			<View style={baseStyles.touchable}>
-				<View style={baseStyles.identityName}>
-					<Text
-						style={[baseStyles.text, baseStyles.t_left]}
-						numberOfLines={1}
-						ellipsizeMode="middle"
-					>
-						{title}
-					</Text>
-					<FontAwesome
-						style={baseStyles.linkIcon}
-						name="external-link"
-						color={colors.bg_button}
-						size={18}
-					/>
-				</View>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
-			</View>
-		</TouchableItem>
+			{onPressBack && renderBack(onPressBack)}
+			{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+		</View>
 	);
 }
 
@@ -167,7 +148,7 @@ export default class ScreenHeading extends React.PureComponent {
 	static propTypes = {
 		onPress: PropTypes.func,
 		subtitle: PropTypes.string,
-		title: PropTypes.string
+		title: PropTypes.string.isRequired
 	};
 	render() {
 		const {
@@ -176,7 +157,6 @@ export default class ScreenHeading extends React.PureComponent {
 			subtitleL,
 			hasSubtitleIcon,
 			error,
-			onPress,
 			iconName,
 			iconType
 		} = this.props;
@@ -185,7 +165,6 @@ export default class ScreenHeading extends React.PureComponent {
 			<View style={baseStyles.body}>
 				<Text style={baseStyles.text}>{title}</Text>
 				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, true)}
-				{renderBack(onPress)}
 				{renderIcon(iconName, iconType)}
 			</View>
 		);
@@ -203,7 +182,9 @@ const baseStyles = StyleSheet.create({
 		marginBottom: 16
 	},
 	bodyWithIdentity: {
+		flexDirection: 'column',
 		height: 42,
+		justifyContent: 'center',
 		paddingLeft: 72,
 		paddingRight: 32
 	},
@@ -241,10 +222,5 @@ const baseStyles = StyleSheet.create({
 	text: {
 		...fontStyles.h1,
 		textAlign: 'center'
-	},
-	touchable: {
-		flex: 1,
-		flexDirection: 'column',
-		justifyContent: 'center'
 	}
 });

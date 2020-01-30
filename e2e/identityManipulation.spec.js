@@ -114,12 +114,6 @@ describe('Load test', async () => {
 		await testSetUpDefaultPath();
 	});
 
-	it('starts with a root account', async () => {
-		await testTap(PathsList.rootButton);
-		await expect(element(by.text('Root'))).toExist();
-		await tapBack();
-	});
-
 	it('is able to create custom path', async () => {
 		await tapBack();
 		await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);

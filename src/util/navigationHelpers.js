@@ -142,9 +142,6 @@ export const navigateToSignedMessage = navigation =>
 export const navigateToSignedTx = navigation =>
 	resetNavigationWithNetworkChooser(navigation, 'SignedTx', { isNew: true });
 
-export const navigateToRootPath = navigation =>
-	resetNavigationWithNetworkChooser(navigation, 'PathDetails', { path: '' });
-
 export const navigateToPathsList = (navigation, networkKey) =>
 	resetNavigationWithNetworkChooser(navigation, 'PathsList', { networkKey });
 
