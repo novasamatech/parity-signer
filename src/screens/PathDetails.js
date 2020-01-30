@@ -47,6 +47,7 @@ import AccountCard from '../components/AccountCard';
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
 	const address = getAddressWithPath(path, currentIdentity);
+	const pathName = getPathName(path, currentIdentity);
 	if (!address) return null;
 	const accountId = generateAccountId({
 		address,
@@ -125,7 +126,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				) : (
 					<>
 						<PathCard identity={currentIdentity} path={path} />
-						<QrView data={accountId} />
+						<QrView data={`${accountId}:${pathName}`} />
 					</>
 				)}
 			</ScrollView>
