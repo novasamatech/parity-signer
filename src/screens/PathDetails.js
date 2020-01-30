@@ -48,7 +48,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 	const accountId = generateAccountId({
 		address,
-		formattedNetworkKey
+		networkKey: formattedNetworkKey
 	});
 
 	const onOptionSelect = value => {
