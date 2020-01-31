@@ -20,11 +20,10 @@ import React, { Component, PureComponent } from 'react';
 import { Platform, StatusBar, View, YellowBox } from 'react-native';
 import {
 	createAppContainer,
-	createStackNavigator,
 	createSwitchNavigator,
-	HeaderBackButton,
 	withNavigation
 } from 'react-navigation';
+import { createStackNavigator, HeaderBackButton } from 'react-navigation-stack';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
@@ -62,23 +61,33 @@ import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 import LegacyNetworkChooser from './screens/LegacyNetworkChooser';
 import testIDs from '../e2e/testIDs';
+import { NavigationProps } from './types/props';
 
-const getLaunchArgs = props => {
+const getLaunchArgs = (props: Props): void => {
 	if (Platform.OS === 'ios') {
-		if (props.launchArgs && props.launchArgs.includes('-detoxServer')) {
-			return (global.inTest = true);
+		if (
+			Array.isArray(props.launchArgs) &&
+			props.launchArgs.includes('-detoxServer')
+		) {
+			global.inTest = true;
+			return;
 		}
 	} else {
 		if (props.launchArgs && props.launchArgs.hasOwnProperty('detoxServer')) {
-			return (global.inTest = true);
+			global.inTest = true;
+			return;
 		}
 	}
 	global.inTest = false;
 };
 
-export default class App extends Component {
-	constructor(props) {
-		super();
+interface Props {
+	launchArgs?: Array<string> | object;
+}
+
+export default class App<Props, S> extends Component<Props, S> {
+	constructor(props: Props) {
+		super(props);
 		getLaunchArgs(props);
 		if (__DEV__) {
 			YellowBox.ignoreWarnings([
@@ -89,7 +98,7 @@ export default class App extends Component {
 		}
 	}
 
-	render() {
+	render(): React.ReactNode {
 		return (
 			<UnstatedProvider>
 				<MenuProvider backHandler={true}>
@@ -102,7 +111,9 @@ export default class App extends Component {
 	}
 }
 
-const globalStackNavigationOptions = ({ navigation }) => {
+const globalStackNavigationOptions = ({
+	navigation
+}: NavigationProps): object => {
 	const isFirstScreen = navigation.dangerouslyGetParent().state.index === 0;
 	return {
 		headerBackTitleStyle: {
@@ -127,8 +138,8 @@ const globalStackNavigationOptions = ({ navigation }) => {
 };
 
 const HeaderLeftWithBack = withNavigation(
-	class _HeaderBackButton extends PureComponent {
-		render() {
+	class HeaderBackButtonComponent extends PureComponent<NavigationProps> {
+		render(): React.ReactNode {
 			const { navigation } = this.props;
 			return (
 				<View
@@ -137,13 +148,12 @@ const HeaderLeftWithBack = withNavigation(
 				>
 					<HeaderBackButton
 						{...this.props}
-						accessibilityComponentType="button"
-						accessibilityTraits="button"
-						delayPressIn={0}
-						titleStyle={globalStackNavigationOptions.headerBackTitleStyle}
-						title="Back"
+						labelStyle={
+							globalStackNavigationOptions({ navigation }).headerBackTitleStyle
+						}
+						label="Back"
 						tintColor={colors.bg_text}
-						onPress={() => navigation.goBack()}
+						onPress={(): boolean => navigation.goBack()}
 					/>
 				</View>
 			);
