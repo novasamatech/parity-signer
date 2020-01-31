@@ -1,11 +1,22 @@
+const commonRules = {
+  "no-bitwise": "off",
+  "comma-dangle": ["error", "never"],
+  "object-curly-spacing": ["error", "always"],
+  "quotes": ["error", "single",  { "avoidEscape": true }],
+  "no-unused-vars": ["error", { "args": "none" }],
+  "react-native/no-inline-styles": "off",
+  "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}]
+};
+
 module.exports = {
   extends: [
     "@react-native-community",
     "plugin:prettier/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
+    "plugin:import/typescript"
    ],
-  globals: { inTest: "readonly" },
+  globals: { inTest: "writable" },
   overrides: [
     {
       files: ["e2e/*.spec.js", "e2e/init.js", "e2e/e2eUtils.js"],
@@ -21,6 +32,7 @@ module.exports = {
         "plugin:prettier/recommended",
         "plugin:import/errors",
         "plugin:import/warnings",
+        "plugin:import/typescript",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
       ],
@@ -33,10 +45,7 @@ module.exports = {
       },
       plugins: ["@typescript-eslint"],
       rules: {
-        "indent": ["error", 2, { "SwitchCase": 1 }],
-        "linebreak-style": ["error", "unix"],
-        "quotes": ["error", "single"],
-        "comma-dangle": ["error", "always-multiline"],
+        ...commonRules,
         "@typescript-eslint/no-explicit-any": 0
       }
     }
@@ -54,18 +63,11 @@ module.exports = {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     },
+    "import/ignore": "react-navigation",
     react: {
       "pragma": "React",  // Pragma to use, default to "React"
       "version": "16.9.0", // React version, default to the latest React stable release
     },
   },
-  rules: {
-  	"no-bitwise": "off",
-    "comma-dangle": ["error", "never"],
-    "object-curly-spacing": ["error", "always"],
-    "quotes": ["error", "single",  { "avoidEscape": true }],
-    "no-unused-vars": ["error", { "args": "none" }],
-    "react-native/no-inline-styles": "off",
-    "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}]
-  }
+  rules: commonRules
 };
