@@ -79,10 +79,10 @@ type ScannerState = {
 	signedData: string,
 	signedTxList: [SignedTX],
 	totalFrameCount: number,
-	tx: Record<string, any>;
+	tx: Record<string, any>,
 	txRequest: TXRequest | null,
 	type: 'transaction' | 'message',
-	unsignedData: Record<string, any>;
+	unsignedData: Record<string, any>
 };
 
 const DEFAULT_STATE = Object.freeze({
