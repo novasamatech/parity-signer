@@ -16,11 +16,14 @@
 
 import '../shim';
 
-import React, { Component, PureComponent } from 'react';
+import * as React from 'react';
 import { Platform, StatusBar, View, YellowBox } from 'react-native';
 import {
 	createAppContainer,
 	createSwitchNavigator,
+	NavigationInjectedProps,
+	NavigationScreenConfig,
+	NavigationScreenProp,
 	withNavigation
 } from 'react-navigation';
 import { createStackNavigator, HeaderBackButton } from 'react-navigation-stack';
@@ -61,7 +64,6 @@ import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 import LegacyNetworkChooser from './screens/LegacyNetworkChooser';
 import testIDs from '../e2e/testIDs';
-import { NavigationProps } from './types/props';
 
 const getLaunchArgs = (props: Props): void => {
 	if (Platform.OS === 'ios') {
@@ -85,7 +87,7 @@ interface Props {
 	launchArgs?: Array<string> | object;
 }
 
-export default class App<Props, S> extends Component<Props, S> {
+export default class App<Props> extends React.Component<Props> {
 	constructor(props: Props) {
 		super(props);
 		getLaunchArgs(props);
@@ -113,14 +115,19 @@ export default class App<Props, S> extends Component<Props, S> {
 
 const globalStackNavigationOptions = ({
 	navigation
-}: NavigationProps): object => {
-	const isFirstScreen = navigation.dangerouslyGetParent().state.index === 0;
+}: {
+	navigation: NavigationScreenProp<{ index: number }, {}>;
+}): NavigationScreenConfig<any, any> => {
+	const isFirstScreen = navigation.dangerouslyGetParent()?.state.index === 0;
+
 	return {
 		headerBackTitleStyle: {
 			color: colors.bg_text_sec
 		},
-		headerLeft: isFirstScreen ? <HeaderLeftHome /> : <HeaderLeftWithBack />,
-		headerRight: <SecurityHeader />,
+		headerBackTitleVisible: false,
+		headerLeft: (): React.ReactElement =>
+			isFirstScreen ? <HeaderLeftHome /> : <HeaderLeftWithBack />,
+		headerRight: (): React.ReactElement => <SecurityHeader />,
 		headerStyle: {
 			backgroundColor: colors.bg,
 			borderBottomColor: colors.bg,
@@ -128,17 +135,18 @@ const globalStackNavigationOptions = ({
 			elevation: 0,
 			height: 60,
 			paddingBottom: 0,
-			paddingTop: 0
+			paddingTop: 0,
+			shadowColor: 'transparent'
 		},
 		headerTintColor: colors.bg_text_sec,
-		headerTitleStyle: {
-			display: 'none'
-		}
+		headerTitle: (): React.ReactNode => null
 	};
 };
 
 const HeaderLeftWithBack = withNavigation(
-	class HeaderBackButtonComponent extends PureComponent<NavigationProps> {
+	class HeaderBackButtonComponent extends React.PureComponent<
+		NavigationInjectedProps
+	> {
 		render(): React.ReactNode {
 			const { navigation } = this.props;
 			return (
@@ -151,7 +159,7 @@ const HeaderLeftWithBack = withNavigation(
 						labelStyle={
 							globalStackNavigationOptions({ navigation }).headerBackTitleStyle
 						}
-						label="Back"
+						labelVisible={false}
 						tintColor={colors.bg_text}
 						onPress={(): boolean => navigation.goBack()}
 					/>
@@ -165,13 +173,13 @@ const HeaderLeftWithBack = withNavigation(
 const tocAndPrivacyPolicyScreens = {
 	TermsAndConditions: {
 		navigationOptions: {
-			headerRight: null
+			headerRight: (): React.ReactNode => null
 		},
 		screen: TermsAndConditions
 	},
 	PrivacyPolicy: {
 		navigationOptions: {
-			headerRight: null
+			headerRight: (): React.ReactNode => null
 		},
 		screen: PrivacyPolicy
 	}
@@ -265,7 +273,7 @@ const Screens = createSwitchNavigator(
 					},
 					Security: {
 						navigationOptions: {
-							headerRight: null
+							headerRight: (): React.ReactNode => null
 						},
 						screen: Security
 					},
@@ -278,9 +286,7 @@ const Screens = createSwitchNavigator(
 		}
 	},
 	{
-		defaultNavigationOptions: globalStackNavigationOptions,
-		headerMode: 'none',
-		mode: 'card'
+		defaultNavigationOptions: globalStackNavigationOptions
 	}
 );
 
