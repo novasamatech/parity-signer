@@ -37,6 +37,7 @@ const testIDs = {
 		addIdentityButton: 'identities_switch_add_identity',
 		manageIdentityButton: 'identities_switch_manager_button',
 		modal: 'identity_switch_modal',
+		networkSettingsButton: 'identities_switch_network_settings',
 		toggleButton: 'identities_switch_toggle_button'
 	},
 	IdentityBackup: {

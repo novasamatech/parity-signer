@@ -273,6 +273,19 @@ function IdentitiesSwitch({ navigation, accounts }) {
 							/>
 
 							<Separator />
+
+							<ButtonIcon
+								title="Network Settings"
+								testID={testIDs.IdentitiesSwitch.networkSettingsButton}
+								onPress={() => closeModalAndNavigate('NetworkSettings')}
+								iconName="wifi"
+								iconType="antdesign"
+								iconSize={24}
+								textStyle={fontStyles.t_big}
+								style={styles.indentedButton}
+							/>
+
+							<Separator />
 							{__DEV__ && (
 								<View>
 									<ButtonIcon

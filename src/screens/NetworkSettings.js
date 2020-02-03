@@ -16,7 +16,6 @@
 
 'use strict';
 
-// import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
@@ -27,6 +26,7 @@ import Card from '../components/Card';
 import fonts from '../fonts';
 // import MetadataDetails from '../screens/MetadataDetails';
 import NetworksStore from '../stores/NetworksStore';
+import ScreenHeading from '../components/ScreenHeading';
 
 export default class NetworkSettings extends React.PureComponent {
 	handleSelect = async (networkKey, networksStore) => {
@@ -70,7 +70,7 @@ class NetworkListView extends React.PureComponent {
 				style={styles.body}
 			>
 				<Background />
-				<Text style={styles.titleTop}>Supported Networks</Text>
+				<ScreenHeading title="Supported Networks" />
 				{networkSpecs ? (
 					networkSpecs.map(networkSpec => (
 						<Card
@@ -131,14 +131,6 @@ const styles = StyleSheet.create({
 		color: colors.bg_text,
 		fontFamily: fonts.bold,
 		fontSize: 18,
-		paddingBottom: 10,
-		textAlign: 'center'
-	},
-	titleTop: {
-		color: colors.bg_text,
-		flex: 1,
-		fontFamily: fonts.bold,
-		fontSize: 26,
 		paddingBottom: 10,
 		textAlign: 'center'
 	}
