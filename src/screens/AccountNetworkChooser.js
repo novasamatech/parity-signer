@@ -45,17 +45,18 @@ import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
 
+const excludedNetworks = [
+	UnknownNetworkKeys.UNKNOWN,
+	SubstrateNetworkKeys.KUSAMA_CC2
+];
+if (!__DEV__) {
+	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+}
+
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const excludedNetworks = [
-		UnknownNetworkKeys.UNKNOWN,
-		SubstrateNetworkKeys.KUSAMA_CC2
-	];
-	if (!__DEV__) {
-		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-	}
 	const { identities, currentIdentity, loaded } = accounts.state;
 	const hasLegacyAccount = accounts.getAccounts().size !== 0;
 

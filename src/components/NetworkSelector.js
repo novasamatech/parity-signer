@@ -28,7 +28,7 @@ import {
 	View
 } from 'react-native';
 import fontStyles from '../fontStyles';
-import { SUBSTRATE_NETWORK_LIST } from '../constants';
+import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 import TransparentBackground from './TransparentBackground';
@@ -42,6 +42,12 @@ NetworkSelector.protoTypes = {
 	networkKey: PropTypes.string.isRequired,
 	setVisible: PropTypes.func.isRequired
 };
+
+const excludedNetworks = [SubstrateNetworkKeys.KUSAMA_CC2];
+if (!__DEV__) {
+	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+}
 
 export function NetworkSelector({ networkKey, setVisible }) {
 	return (
@@ -69,8 +75,9 @@ export function NetworkOptions({ setNetworkKey, visible, setVisible }) {
 		setVisible(false);
 	};
 
-	const menuOptions = Object.entries(SUBSTRATE_NETWORK_LIST).map(
-		([networkKey, networkParams]) => {
+	const menuOptions = Object.entries(SUBSTRATE_NETWORK_LIST)
+		.filter(([networkKey]) => !excludedNetworks.includes(networkKey))
+		.map(([networkKey, networkParams]) => {
 			return (
 				<Touchable
 					style={styles.optionWrapper}
@@ -82,8 +89,7 @@ export function NetworkOptions({ setNetworkKey, visible, setVisible }) {
 					<Text style={styles.optionText}>{networkParams.title}</Text>
 				</Touchable>
 			);
-		}
-	);
+		});
 
 	return (
 		<TransparentBackground
