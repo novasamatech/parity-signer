@@ -73,34 +73,32 @@ function AccountDetails({ accounts, navigation }) {
 	};
 
 	return (
-		<ScrollView contentContainerStyle={styles.body}>
-			<View style={styles.bodyContent}>
-				<View style={styles.header}>
-					<AccountIcon
-						address={''}
-						network={NETWORK_LIST[account.networkKey]}
-						style={styles.icon}
+		<ScrollView style={styles.body}>
+			<View style={styles.header}>
+				<AccountIcon
+					address={''}
+					network={NETWORK_LIST[account.networkKey]}
+					style={styles.icon}
+				/>
+				<Text style={fontStyles.h2}>Public Address</Text>
+				<View style={styles.menuView}>
+					<PopupMenu
+						onSelect={onOptionSelect}
+						menuTriggerIconName={'more-vert'}
+						menuItems={[
+							{ text: 'Edit', value: 'AccountEdit' },
+							{ text: 'Change Pin', value: 'AccountPin' },
+							{
+								text: 'View Recovery Phrase',
+								value: 'LegacyAccountBackup'
+							},
+							{
+								text: 'Delete',
+								textStyle: styles.deleteText,
+								value: 'AccountDelete'
+							}
+						]}
 					/>
-					<Text style={fontStyles.h2}>Public Address</Text>
-					<View style={styles.menuView}>
-						<PopupMenu
-							onSelect={onOptionSelect}
-							menuTriggerIconName={'more-vert'}
-							menuItems={[
-								{ text: 'Edit', value: 'AccountEdit' },
-								{ text: 'Change Pin', value: 'AccountPin' },
-								{
-									text: 'View Recovery Phrase',
-									value: 'LegacyAccountBackup'
-								},
-								{
-									text: 'Delete',
-									textStyle: styles.deleteText,
-									value: 'AccountDelete'
-								}
-							]}
-						/>
-					</View>
 				</View>
 			</View>
 			<AccountCard
@@ -124,7 +122,6 @@ const styles = StyleSheet.create({
 		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
 		flex: 1,
-		paddingBottom: 40,
 		paddingTop: 8
 	},
 	deleteText: {
