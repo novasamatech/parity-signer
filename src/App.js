@@ -43,7 +43,6 @@ import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
 import AccountRecover from './screens/AccountRecover';
-import AccountSettings from './screens/AccountSettings';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
@@ -60,7 +59,6 @@ import NetworkSettings from './screens/NetworkSettings';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import QrScanner from './screens/QrScanner';
 import Security from './screens/Security';
-import Settings from './screens/Settings';
 import SignedMessage from './screens/SignedMessage';
 import SignedTx from './screens/SignedTx';
 import TermsAndConditions from './screens/TermsAndConditions';
@@ -204,9 +202,6 @@ const Screens = createSwitchNavigator(
 					AccountRecover: {
 						screen: AccountRecover
 					},
-					AccountSettings: {
-						screen: AccountSettings
-					},
 					AccountUnlock: {
 						screen: AccountUnlock
 					},
@@ -254,9 +249,6 @@ const Screens = createSwitchNavigator(
 					},
 					QrScanner: {
 						screen: QrScanner
-					},
-					Settings: {
-						screen: Settings
 					},
 					SignedMessage: {
 						screen: SignedMessage
