@@ -30,7 +30,7 @@ import {
 import colors from '../colors';
 import fonts from '../fonts';
 
-export default class Card extends React.PureComponent<{
+export default class NetworkCard extends React.PureComponent<{
 	title: string,
 	secondaryText?: ?string,
 	labelText?: ?string,

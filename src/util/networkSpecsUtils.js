@@ -16,7 +16,7 @@
 
 // @flow
 
-import { SUBSTRATE_NETWORK_LIST } from '../constants';
+import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 
 export function empty() {
 	return {
@@ -32,7 +32,18 @@ export function empty() {
 }
 
 export function defaultNetworkSpecs() {
-	return {
-		...SUBSTRATE_NETWORK_LIST
-	};
+	const excludedNetworks = [SubstrateNetworkKeys.KUSAMA_CC2];
+	if (!__DEV__) {
+		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+	}
+	return Object.entries(SUBSTRATE_NETWORK_LIST).reduce(
+		(networkSpecsList, [networkKey, networkParams]) => {
+			console.log('networkKey', networkKey, 'networkParams', networkParams);
+			if (excludedNetworks.includes(networkKey)) return networkSpecsList;
+			networkSpecsList.push(networkParams);
+			return networkSpecsList;
+		},
+		[]
+	);
 }

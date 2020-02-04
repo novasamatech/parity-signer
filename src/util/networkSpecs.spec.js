@@ -18,7 +18,7 @@
 
 'use strict';
 
-import { empty, defaultNetworkSpecs } from './networkSpecs';
+import { empty, defaultNetworkSpecs } from './networkSpecsUtils';
 
 describe('network specs', () => {
 	it('should return a valid empty', () => {
@@ -36,7 +36,7 @@ describe('network specs', () => {
 	it('should return valid defaults', () => {
 		const defaults = defaultNetworkSpecs();
 
-		Object.entries(defaults).forEach(([key, value], index) => {
+		defaults.forEach(value => {
 			expect(value).toBeDefined();
 			expect(value.color).toBeDefined();
 			expect(value.title).toBeDefined();
@@ -44,8 +44,6 @@ describe('network specs', () => {
 			expect(value.prefix).toBeDefined();
 			expect(value.protocol).toBeDefined();
 			expect(value.decimals).toBeDefined();
-
-			expect(key).toBe(value.genesisHash);
 		});
 	});
 });

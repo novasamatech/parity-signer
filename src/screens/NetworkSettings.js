@@ -17,12 +17,12 @@
 'use strict';
 
 import React from 'react';
-import { Button, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button, ScrollView, StyleSheet } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
 import Background from '../components/Background';
-import Card from '../components/Card';
+import NetworkCard from '../components/NetworkCard';
 import fonts from '../fonts';
 // import MetadataDetails from '../screens/MetadataDetails';
 import NetworksStore from '../stores/NetworksStore';
@@ -62,7 +62,7 @@ class NetworkListView extends React.PureComponent {
 	}
 
 	render() {
-		const { networkSpecs, onSelect } = this.props;
+		const { networkSpecs, onSelect, navigation } = this.props;
 
 		return (
 			<ScrollView
@@ -71,30 +71,19 @@ class NetworkListView extends React.PureComponent {
 			>
 				<Background />
 				<ScreenHeading title="Supported Networks" />
-				{networkSpecs ? (
-					networkSpecs.map(networkSpec => (
-						<Card
-							key={networkSpec.genesisHash}
-							title={networkSpec.title}
-							secondaryText={networkSpec.genesisHash}
-							onPress={() => onSelect(networkSpec.genesisHash)}
-						/>
-					))
-				) : (
-					<View style={styles.bodyContent2}>
-						<Text style={styles.descTitle}>
-							It looks like no networks are supported yet...
-						</Text>
-						<Text style={styles.descSecondary}>
-							Press the button below to add a new network spec.
-						</Text>
-					</View>
-				)}
+				{networkSpecs.map(networkSpec => (
+					<NetworkCard
+						key={networkSpec.genesisHash}
+						title={networkSpec.title}
+						secondaryText={networkSpec.genesisHash}
+						onPress={() => onSelect(networkSpec.genesisHash)}
+					/>
+				))}
 				<Button
 					title="Add new network"
 					onPress={() =>
-						this.props.navigation.navigate('QrScanner', {
-							isScanningMetadata: true
+						navigation.navigate('QrScanner', {
+							isScanningNetworkSpec: true
 						})
 					}
 				/>

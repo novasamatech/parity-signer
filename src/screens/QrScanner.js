@@ -200,15 +200,12 @@ function QrScannerView({ navigation, scannerStore, accountStore, ...props }) {
 							title="Start Over"
 						/>
 					</View>
+				) : isNetworkSpec ? (
+					renderScanningNetworkSpecMessage()
 				) : (
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>Scan QR Code</Text>
-						<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
-					</View>
+					renderScanningTransactionMessage()
 				)}
-				{isNetworkSpec
-					? renderScanningNetworkSpecMessage()
-					: renderScanningTransactionMessage()}
+
 				{missedFrames && missedFrames.length >= 1 && (
 					<View style={styles.bottom}>
 						<Text style={styles.descTitle}>

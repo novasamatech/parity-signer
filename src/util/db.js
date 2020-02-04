@@ -21,7 +21,7 @@ import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
-import { defaultNetworkSpecs } from './networkSpecs';
+import { defaultNetworkSpecs } from './networkSpecsUtils';
 import kusamaMeta from './static-kusama';
 import substrateMeta from './static-substrate';
 import { SubstrateNetworkKeys } from '../constants';
@@ -196,7 +196,7 @@ export async function getNetworkSpecs() {
 		console.warn('loading network specifications error', e);
 	}
 
-	if (networkSpecs === null) return [];
+	if (networkSpecs === null) return defaultNetworkSpecs();
 
 	return JSON.parse(networkSpecs);
 }
