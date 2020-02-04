@@ -17,6 +17,7 @@
 'use strict';
 
 import colors from './colors';
+import logos from './logos';
 
 export const NetworkProtocols = Object.freeze({
 	ETHEREUM: 'ethereum',
@@ -69,7 +70,7 @@ const substrateNetworkBase = {
 		color: '#e6007a',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('../res/img/logos/kusama.png'),
+		logo: logos.kusama,
 		pathId: 'kusama',
 		prefix: 2,
 		title: 'Kusama',
@@ -79,7 +80,7 @@ const substrateNetworkBase = {
 		color: '#e6007a',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('../res/img/logos/kusama.png'),
+		logo: logos.kusama,
 		pathId: 'kusama_CC2',
 		prefix: 2,
 		title: 'Kusama',
@@ -123,7 +124,7 @@ const ethereumNetworkBase = {
 	[EthereumNetworkKeys.CLASSIC]: {
 		color: '#319C7C',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
-		logo: require('../res/img/logos/eth-classic.png'),
+		logo: logos.ethClassic,
 		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum Classic'
 	},
@@ -143,14 +144,14 @@ const ethereumNetworkBase = {
 
 const ethereumDefaultValues = {
 	color: '#2968C7',
-	logo: require('../res/img/logos/eth.png'),
+	logo: logos.ethereum,
 	protocol: NetworkProtocols.ETHEREUM,
 	secondaryColor: colors.card_text
 };
 
 const substrateDefaultValues = {
 	color: '#4C4646',
-	logo: require('../res/img/logos/substrate-dev.png'),
+	logo: logos.substrateDev,
 	protocol: NetworkProtocols.SUBSTRATE,
 	secondaryColor: colors.card_bgSolid
 };
