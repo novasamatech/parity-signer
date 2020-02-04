@@ -18,11 +18,7 @@
 
 import { Container } from 'unstated';
 
-import {
-	getNetworkSpecByKey,
-	getAllNetworkSpecs,
-	addNetworkSpec
-} from '../util/db';
+import { getNetworkSpecs, saveNetworkSpecs } from '../util/db';
 import { empty } from '../util/networkSpecs';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
@@ -37,11 +33,13 @@ type State = {
 	selectedKey: NetworkSpec
 };
 
+const deepCopy = networkSpecs => JSON.parse(JSON.stringify(networkSpecs));
+
 export default class NetworksStore extends Container<State> {
 	state = {
 		networkSpecs: [],
 		newNetworkSpec: empty(),
-		selectedSpec: {}
+		selectedSpec: null
 	};
 
 	constructor(props) {
@@ -50,49 +48,90 @@ export default class NetworksStore extends Container<State> {
 	}
 
 	async refreshList() {
-		const networkSpecs = await getAllNetworkSpecs();
-
-		this.setState({ networkSpecs });
+		const networkSpecs = await getNetworkSpecs();
+		await this.setState({ networkSpecs });
 	}
 
 	async addNewNetwork(newNetworkSpec) {
+		//TODO give feedback to UI
+		if (!newNetworkSpec.genesisHash) {
+			throw new Error('Must supply a network key to add new network spec.');
+		}
+
+		if (!newNetworkSpec.prefix) {
+			throw new Error('Network spec must include prefix to be valid.');
+		}
+		const updatedNetworkSpecs = deepCopy(this.state.networkSpecs);
+		updatedNetworkSpecs.push({ [newNetworkSpec.genesisHash]: newNetworkSpec });
 		try {
-			await addNetworkSpec(newNetworkSpec.genesisHash, newNetworkSpec);
+			await saveNetworkSpecs(updatedNetworkSpecs);
 		} catch (e) {
+			//TODO give feedback to UI
 			console.error(e);
 		}
 	}
 
 	async select(networkKey) {
-		const selectedSpec = await getNetworkSpecByKey(`network_${networkKey}`);
-
-		this.setState({ selectedSpec: JSON.parse(selectedSpec) });
+		const selectedSpec = this.state.networkSpecs.find(
+			networkSpec => networkSpec.genesisHash === networkKey
+		);
+		await this.setState({ selectedSpec });
 	}
 
-	async submitNew() {
-		const network = this.state.newNetwork;
+	async submitNewNetworkSpec() {
+		const { networkSpecs, newNetworkSpec } = this.state;
 
-		if (network.networkKey) {
-			const networkSpec = await getNetworkSpecByKey(network.networkKey);
+		//TODO give feedback to UI
+		if (!newNetworkSpec.genesisHash) {
+			throw new Error('Must supply a network key to add new network spec.');
+		}
 
-			await addNetworkSpec(network.networkKey, networkSpec);
+		if (!newNetworkSpec.prefix) {
+			throw new Error('Network spec must include prefix to be valid.');
+		}
+		const updatedNetworkSpecs = deepCopy(networkSpecs);
+		const networkIndex = updatedNetworkSpecs.findIndex(
+			networkSpec => networkSpec.genesisHash === newNetworkSpec.genesisHash
+		);
+		if (networkIndex === -1) {
+			updatedNetworkSpecs.push(newNetworkSpec);
+		} else {
+			updatedNetworkSpecs.splice(networkIndex, 1, newNetworkSpec);
+		}
 
-			this.setState({
-				networks: this.state.networks.set(network.networkKey, network),
-				newNetworkSpec: empty()
-			});
+		await this.setState({
+			networkSpecs: updatedNetworkSpecs,
+			newNetworkSpec: empty()
+		});
+
+		try {
+			await saveNetworkSpecs(updatedNetworkSpecs);
+		} catch (e) {
+			//TODO give feedback to UI
+			console.error(e);
 		}
 	}
 
-	updateNetworkSpec(networkKey, updatedNetworkSpec) {}
+	async deleteNetwork(networkKey) {
+		const { networkSpecs } = this.state;
+		const updatedNetworkSpecs = deepCopy(networkSpecs);
+		const networkIndex = updatedNetworkSpecs.findIndex(
+			networkSpec => networkSpec.genesisHash === networkKey
+		);
+		if (networkIndex === -1) return;
 
-	// async deleteNetwork(networkKey) {
-	// 	const { networkSpecs } = this.state;
-
-	// 	networkSpecs.delete(networkKey);
-	// 	this.setState({ networkSpecs, selectedKey: '' });
-	// 	await deleteDbNetwork(networkKey);
-	// }
+		updatedNetworkSpecs.splice(networkIndex, 1);
+		await this.setState({
+			networkSpecs: updatedNetworkSpecs,
+			selectedSpec: null
+		});
+		try {
+			await saveNetworkSpecs(updatedNetworkSpecs);
+		} catch (e) {
+			//TODO give feedback to UI
+			console.error(e);
+		}
+	}
 
 	getNew() {
 		return this.state.newNetworkSpec;
