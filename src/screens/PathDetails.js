@@ -39,6 +39,7 @@ import {
 } from '../util/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from '../util/account';
+import UnknownAccountWarning from '../components/UnknownAccountWarning';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
@@ -104,6 +105,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			<ScrollView>
 				<PathCard identity={currentIdentity} path={path} />
 				<QrView data={accountId} />
+				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
 		</View>
 	);

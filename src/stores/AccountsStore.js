@@ -339,7 +339,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		name,
 		networkKey
 	) {
-		const prefix = NETWORK_LIST[networkKey].prefix;
+		const { prefix, pathId } = NETWORK_LIST[networkKey];
 		const suri = constructSURI({
 			derivePath: newPath,
 			password: '',
@@ -357,7 +357,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			address,
 			createdAt: new Date().getTime(),
 			name,
-			networkKey,
+			networkPathId: pathId,
 			updatedAt: new Date().getTime()
 		};
 		updatedIdentity.meta.set(newPath, pathMeta);
