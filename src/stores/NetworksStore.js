@@ -52,25 +52,6 @@ export default class NetworksStore extends Container<State> {
 		await this.setState({ networkSpecs });
 	}
 
-	async addNewNetwork(newNetworkSpec) {
-		//TODO give feedback to UI
-		if (!newNetworkSpec.genesisHash) {
-			throw new Error('Must supply a network key to add new network spec.');
-		}
-
-		if (!newNetworkSpec.prefix) {
-			throw new Error('Network spec must include prefix to be valid.');
-		}
-		const updatedNetworkSpecs = deepCopy(this.state.networkSpecs);
-		updatedNetworkSpecs.push({ [newNetworkSpec.genesisHash]: newNetworkSpec });
-		try {
-			await saveNetworkSpecs(updatedNetworkSpecs);
-		} catch (e) {
-			//TODO give feedback to UI
-			console.error(e);
-		}
-	}
-
 	async select(networkKey) {
 		const selectedSpec = this.state.networkSpecs.find(
 			networkSpec => networkSpec.genesisHash === networkKey

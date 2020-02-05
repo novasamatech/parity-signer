@@ -36,14 +36,14 @@ describe('network specs', () => {
 	it('should return valid defaults', () => {
 		const defaults = defaultNetworkSpecs();
 
-		defaults.forEach(value => {
-			expect(value).toBeDefined();
-			expect(value.color).toBeDefined();
-			expect(value.title).toBeDefined();
-			expect(value.genesisHash).toBeDefined();
-			expect(value.prefix).toBeDefined();
-			expect(value.protocol).toBeDefined();
-			expect(value.decimals).toBeDefined();
+		defaults.forEach(networkSpec => {
+			expect(networkSpec).toBeDefined();
+			expect(networkSpec.color).toBeDefined();
+			expect(networkSpec.title).toBeDefined();
+			expect(networkSpec.genesisHash).toBeDefined();
+			expect(networkSpec.prefix).toBeDefined();
+			expect(networkSpec.protocol).toBeDefined();
+			expect(networkSpec.decimals).toBeDefined();
 		});
 	});
 });

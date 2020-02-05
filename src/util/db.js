@@ -195,7 +195,6 @@ export async function getNetworkSpecs() {
 	} catch (e) {
 		console.warn('loading network specifications error', e);
 	}
-
 	if (networkSpecs === null) return defaultNetworkSpecs();
 
 	return JSON.parse(networkSpecs);
@@ -206,7 +205,7 @@ export async function getNetworkSpecs() {
  */
 export async function saveDefaultNetworks() {
 	const networkSpecsString = JSON.stringify(defaultNetworkSpecs());
-	console.log('networkSpecs to be stored is', networkSpecsString);
+	console.log('networkSpecs to be stored is', networkSpecsString); //TODO to be removed
 	// AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecsString);
 }
 

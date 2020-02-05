@@ -39,7 +39,6 @@ export function defaultNetworkSpecs() {
 	}
 	return Object.entries(SUBSTRATE_NETWORK_LIST).reduce(
 		(networkSpecsList, [networkKey, networkParams]) => {
-			console.log('networkKey', networkKey, 'networkParams', networkParams);
 			if (excludedNetworks.includes(networkKey)) return networkSpecsList;
 			networkSpecsList.push(networkParams);
 			return networkSpecsList;

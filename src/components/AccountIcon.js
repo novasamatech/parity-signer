@@ -56,7 +56,7 @@ export default function AccountIcon(props) {
 		return (
 			<View style={style}>
 				{network.logo ? (
-					<Image source={network.logo} style={styles.logo} />
+					<Image source={{ uri: network.logo }} style={styles.logo} />
 				) : (
 					<View style={styles.logo}>
 						<FontAwesome name="question" color={colors.bg} size={28} />
