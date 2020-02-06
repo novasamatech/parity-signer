@@ -22,12 +22,11 @@ import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import PathCard from '../components/PathCard';
 import PopupMenu from '../components/PopupMenu';
-import { PathCardHeading } from '../components/ScreenHeading';
+import { LeftScreenHeading } from '../components/ScreenHeading';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
-	getIdentityName,
 	getNetworkKeyByPath,
 	getPathName,
 	getPathsWithSubstrateNetwork,
@@ -54,7 +53,6 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	});
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	//TODO enable user to select networkKey.
-	const isRootPath = path === '';
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onOptionSelect = value => {
@@ -67,7 +65,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
 					const hasOtherPaths = listedPaths.length > 0;
 					if (deleteSucceed) {
-						isSubstratePath(path) && !isRootPath && hasOtherPaths
+						isSubstratePath(path) && hasOtherPaths
 							? navigateToPathsList(navigation, networkKey)
 							: navigation.navigate('AccountNetworkChooser');
 					} else {
@@ -86,7 +84,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 	return (
 		<View style={styles.body} testID={testIDs.PathDetail.screen}>
-			<PathCardHeading
+			<LeftScreenHeading
 				title="Public Address"
 				networkKey={formattedNetworkKey}
 			/>
@@ -96,7 +94,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					onSelect={onOptionSelect}
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
-						{ hide: isUnknownNetwork, text: 'Edit', value: 'PathManagement' },
+						{ text: 'Edit', value: 'PathManagement' },
 						{ text: 'Derive Account', value: 'PathDerivation' },
 						{
 							testID: testIDs.PathDetail.deleteButton,
@@ -111,11 +109,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				{isUnknownNetwork ? (
 					<>
 						<AccountCard
-							title={
-								isRootPath
-									? getIdentityName(currentIdentity, accounts.state.identities)
-									: getPathName(path, currentIdentity)
-							}
+							title={getPathName(path, currentIdentity)}
 							address={address}
 							networkKey={formattedNetworkKey}
 						/>

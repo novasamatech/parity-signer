@@ -81,13 +81,6 @@ This identity can only be recovered with its associated recovery phrase.`,
 	);
 };
 
-export const alertDeriveRootPath = onDeriveRootPath =>
-	Alert.alert(
-		'Create Root Path',
-		'By confirm you are about to create the root account for this network',
-		buildAlertButtons(onDeriveRootPath, 'Confirm')
-	);
-
 export const alertCopyBackupPhrase = seedPhrase =>
 	Alert.alert(
 		'Write this recovery phrase on paper',
