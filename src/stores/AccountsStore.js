@@ -358,8 +358,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		//TODO encrypt seedPhrase with password in the future version,
 		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
-		//TODO now hard coded to polkadot canary prefix which is 2, future enable user to change that.
-		await this._addPathToIdentity('', seedPhrase, updatedIdentity, 'Root', 2);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
 			currentIdentity: updatedIdentity,

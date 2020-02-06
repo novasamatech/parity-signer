@@ -35,12 +35,13 @@ const extractPathId = path => {
 
 export const extractSubPathName = path => {
 	const pathFragments = path.match(pathsRegex.allPath);
-	if (!pathFragments || pathFragments.length <= 1) return '';
+	if (!pathFragments || pathFragments.length === 0) return '';
+	if (pathFragments.length === 1) return removeSlash(pathFragments[0]);
 	return removeSlash(pathFragments.slice(1).join(''));
 };
 
 export const isSubstratePath = path =>
-	path.split('//')[1] !== undefined || path === '';
+	path.match(pathsRegex.allPath) !== null || path === '';
 
 export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
 
@@ -146,15 +147,6 @@ export const getAddressWithPath = (path, identity) => {
 		: address;
 };
 
-export const getRootPathMeta = (identity, networkKey) => {
-	const rootPathId = `//${NETWORK_LIST[networkKey].pathId}`;
-	if (identity.meta.has(rootPathId)) {
-		return identity.meta.get(rootPathId);
-	} else {
-		return null;
-	}
-};
-
 export const unlockIdentitySeed = async (pin, identity) => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
@@ -165,7 +157,6 @@ export const unlockIdentitySeed = async (pin, identity) => {
 export const getExistedNetworkKeys = identity => {
 	const pathsList = Array.from(identity.addresses.values());
 	const networkKeysSet = pathsList.reduce((networksSet, path) => {
-		if (path === '') return networksSet;
 		let networkKey;
 		if (isSubstratePath(path)) {
 			networkKey = getNetworkKeyByPath(path);
@@ -196,41 +187,61 @@ export const getPathName = (path, lookUpIdentity) => {
 	) {
 		return lookUpIdentity.meta.get(path).name;
 	}
-	if (!isSubstratePath(path)) {
-		return 'No name';
-	}
+	if (!isSubstratePath(path)) return 'No name';
+	if (path === '') return 'Identity root';
 	return extractSubPathName(path);
 };
 
+/**
+ * This function decides how to group the list of derivation paths in the display based on the following rules.
+ * If the network is unknown: group by the first subpath, e.g. '/random' of '/random//derivation/1'
+ * If the network is known: group by the second subpath, e.g. '//staking' of '//kusama//staking/0'
+ * Please refer to identitiesUtils.spec.js for more examples.
+ **/
 export const groupPaths = paths => {
-	const unSortedPaths = paths.reduce((groupedPath, path) => {
-		if (path === '') {
-			return groupedPath;
-		}
-		const pathId = extractPathId(path) || '';
-		const isRootPath = removeSlash(path) === pathId;
-		if (isRootPath) {
-			const isUnknownRootPath = Object.values(NETWORK_LIST).every(
-				v => v.pathId !== pathId
-			);
-			if (isUnknownRootPath) {
-				groupedPath.push({ paths: [path], title: pathId });
-			}
-			return groupedPath;
-		}
+	const insertPathIntoGroup = (matchingPath, fullPath, pathGroup) => {
+		const groupName = matchingPath.match(pathsRegex.firstPath)[0];
 
-		const subPath = path.slice(pathId.length + 2);
-
-		const groupName = subPath.match(pathsRegex.firstPath)[0];
-
-		const existedItem = groupedPath.find(p => p.title === groupName);
+		const existedItem = pathGroup.find(p => p.title === groupName);
 		if (existedItem) {
-			existedItem.paths.push(path);
+			existedItem.paths.push(fullPath);
 			existedItem.paths.sort();
 		} else {
-			groupedPath.push({ paths: [path], title: groupName });
+			pathGroup.push({ paths: [fullPath], title: groupName });
 		}
+	};
+
+	const groupedPaths = paths.reduce((groupedPath, path) => {
+		if (path === '') {
+			groupedPath.push({ paths: [''], title: 'Identity root' });
+			return groupedPath;
+		}
+
+		const rootPath = path.match(pathsRegex.firstPath)[0];
+
+		const networkParams = Object.values(NETWORK_LIST).find(
+			v => `//${v.pathId}` === rootPath
+		);
+		if (networkParams === undefined) {
+			insertPathIntoGroup(path, path, groupedPath);
+			return groupedPath;
+		}
+
+		const isRootPath = path === rootPath;
+		if (isRootPath) {
+			groupedPath.push({ paths: [path], title: `${networkParams.title} root` });
+			return groupedPath;
+		}
+
+		const subPath = path.slice(rootPath.length);
+		insertPathIntoGroup(subPath, path, groupedPath);
+
 		return groupedPath;
 	}, []);
-	return unSortedPaths.sort((a, b) => a.paths.length - b.paths.length);
+	return groupedPaths.sort((a, b) => {
+		if (a.paths.length === 1 && b.paths.length === 1) {
+			return a.paths[0].length - b.paths[0].length;
+		}
+		return a.paths.length - b.paths.length;
+	});
 };

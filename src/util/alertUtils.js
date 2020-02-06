@@ -56,8 +56,16 @@ const buildAlertDeleteButtons = onDelete =>
 export const alertDeleteAccount = (accountName, onDelete) => {
 	Alert.alert(
 		'Delete Key Pairs',
+		`Do you really want to delete ${accountName}?`,
+		buildAlertDeleteButtons(onDelete)
+	);
+};
+
+export const alertDeleteLegacyAccount = (accountName, onDelete) => {
+	Alert.alert(
+		'Delete Key Pairs',
 		`Do you really want to delete ${accountName}?
-This account can only be recovered with its associated recovery phrase.`,
+The account can only be recovered with its associated recovery phrase.`,
 		buildAlertDeleteButtons(onDelete)
 	);
 };
@@ -65,18 +73,11 @@ This account can only be recovered with its associated recovery phrase.`,
 export const alertDeleteIdentity = onDelete => {
 	Alert.alert(
 		'Delete Identity',
-		`Do you really want to delete this Identity and all the related key pairs?
+		`Do you really want to delete this Identity and all the related accounts?
 This identity can only be recovered with its associated recovery phrase.`,
 		buildAlertDeleteButtons(onDelete)
 	);
 };
-
-export const alertDeriveRootPath = onDeriveRootPath =>
-	Alert.alert(
-		'Create Root Path',
-		'By confirm you are about to create the root account for this network',
-		buildAlertButtons(onDeriveRootPath, 'Confirm')
-	);
 
 export const alertCopyBackupPhrase = seedPhrase =>
 	Alert.alert(

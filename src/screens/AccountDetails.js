@@ -22,7 +22,7 @@ import AccountCard from '../components/AccountCard';
 import QrView from '../components/QrView';
 import PopupMenu from '../components/PopupMenu';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import { alertDeleteAccount } from '../util/alertUtils';
+import { alertDeleteLegacyAccount } from '../util/alertUtils';
 import {
 	navigateToLandingPage,
 	navigateToLegacyAccountList
@@ -47,7 +47,7 @@ function AccountDetails({ accounts, navigation }) {
 		NetworkProtocols.UNKNOWN;
 
 	const onDelete = () => {
-		alertDeleteAccount(
+		alertDeleteLegacyAccount(
 			account.name || account.address || 'this account',
 			async () => {
 				await accounts.deleteAccount(selectedKey);

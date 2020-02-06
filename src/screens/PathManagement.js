@@ -34,7 +34,7 @@ function PathManagement({ accounts, navigation }) {
 				label="Display Name"
 				onChangeText={name => accounts.updatePathName(path, name)}
 				value={pathName}
-				placeholder="Enter a new identity name"
+				placeholder="Enter a new account name"
 				focus={true}
 			/>
 		</ScrollView>

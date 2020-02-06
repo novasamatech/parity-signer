@@ -46,7 +46,7 @@ export const SubstrateNetworkKeys = Object.freeze({
 	KUSAMA_CC2:
 		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
 	KUSAMA_DEV:
-		'0x17fcbdfd61fa90f732628a6fa9c416a011d58a2c7a980472e6a0868c87b60e44',
+		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
 	SUBSTRATE_DEV:
 		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc' // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 });
@@ -58,7 +58,7 @@ const unknownNetworkBase = {
 		prefix: 2,
 		protocol: NetworkProtocols.UNKNOWN,
 		secondaryColor: colors.card_bgSolid,
-		title: 'Unknown network'
+		title: 'Custom network'
 	}
 };
 

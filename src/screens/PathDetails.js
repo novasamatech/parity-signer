@@ -20,12 +20,11 @@ import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import PathCard from '../components/PathCard';
 import PopupMenu from '../components/PopupMenu';
-import { PathCardHeading } from '../components/ScreenHeading';
+import { LeftScreenHeading } from '../components/ScreenHeading';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
-	getIdentityName,
 	getNetworkKeyByPath,
 	getPathName,
 	getPathsWithSubstrateNetwork,
@@ -52,33 +51,38 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	});
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	//TODO enable user to select networkKey.
-	const isRootPath = path === '';
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onOptionSelect = value => {
-		if (value === 'PathDelete') {
-			alertDeleteAccount('this key pairs', async () => {
-				await unlockSeedPhrase(navigation);
-				const deleteSucceed = await accounts.deletePath(path);
-				const paths = Array.from(accounts.state.currentIdentity.meta.keys());
-				const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
-				const hasOtherPaths = listedPaths.length > 0;
-				if (deleteSucceed) {
-					isSubstratePath(path) && !isRootPath && hasOtherPaths
-						? navigateToPathsList(navigation, networkKey)
-						: navigation.navigate('AccountNetworkChooser');
-				} else {
-					alertPathDeletionError();
-				}
-			});
-		} else {
-			navigation.navigate('PathManagement', { path });
+		switch (value) {
+			case 'PathDelete':
+				alertDeleteAccount('this account', async () => {
+					await unlockSeedPhrase(navigation);
+					const deleteSucceed = await accounts.deletePath(path);
+					const paths = Array.from(accounts.state.currentIdentity.meta.keys());
+					const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
+					const hasOtherPaths = listedPaths.length > 0;
+					if (deleteSucceed) {
+						isSubstratePath(path) && hasOtherPaths
+							? navigateToPathsList(navigation, networkKey)
+							: navigation.navigate('AccountNetworkChooser');
+					} else {
+						alertPathDeletionError();
+					}
+				});
+				break;
+			case 'PathDerivation':
+				navigation.navigate('PathDerivation', { parentPath: path });
+				break;
+			case 'PathManagement':
+				navigation.navigate('PathManagement', { path });
+				break;
 		}
 	};
 
 	return (
 		<View style={styles.body} testID={testIDs.PathDetail.screen}>
-			<PathCardHeading
+			<LeftScreenHeading
 				title="Public Address"
 				networkKey={formattedNetworkKey}
 			/>
@@ -88,7 +92,8 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					onSelect={onOptionSelect}
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
-						{ hide: isUnknownNetwork, text: 'Edit', value: 'PathManagement' },
+						{ text: 'Edit', value: 'PathManagement' },
+						{ text: 'Derive Account', value: 'PathDerivation' },
 						{
 							testID: testIDs.PathDetail.deleteButton,
 							text: 'Delete',
@@ -102,11 +107,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				{isUnknownNetwork ? (
 					<>
 						<AccountCard
-							title={
-								isRootPath
-									? getIdentityName(currentIdentity, accounts.state.identities)
-									: getPathName(path, currentIdentity)
-							}
+							title={getPathName(path, currentIdentity)}
 							address={address}
 							networkKey={formattedNetworkKey}
 						/>

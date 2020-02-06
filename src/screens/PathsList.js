@@ -26,7 +26,6 @@ import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import {
 	getPathsWithSubstrateNetwork,
-	getRootPathMeta,
 	groupPaths,
 	removeSlash
 } from '../util/identitiesUtils';
@@ -38,15 +37,7 @@ import testIDs from '../../e2e/testIDs';
 import Separator from '../components/Separator';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
-import { PathListHeading } from '../components/ScreenHeading';
-import {
-	alertDeriveRootPath,
-	alertPathDerivationError
-} from '../util/alertUtils';
-import {
-	navigateToPathDetails,
-	unlockSeedPhrase
-} from '../util/navigationHelpers';
+import { LeftScreenHeading } from '../components/ScreenHeading';
 
 function PathsList({ accounts, navigation }) {
 	const networkKey = navigation.getParam(
@@ -79,30 +70,7 @@ function PathsList({ accounts, navigation }) {
 	}
 
 	const { navigate } = navigation;
-
-	const onClickRootPath = () => {
-		if (isUnknownNetworkPath) return;
-		const rootPath = `//${networkParams.pathId}`;
-		const rootPathMeta = getRootPathMeta(currentIdentity, networkKey);
-		if (rootPathMeta) {
-			navigate('PathDetails', { path: rootPath });
-		} else {
-			alertDeriveRootPath(async () => {
-				const seedPhrase = await unlockSeedPhrase(navigation);
-				const derivationSucceed = await accounts.deriveNewPath(
-					rootPath,
-					seedPhrase,
-					networkKey,
-					`${networkParams.title} Root`
-				);
-				if (derivationSucceed) {
-					navigateToPathDetails(navigation, networkKey, rootPath);
-				} else {
-					alertPathDerivationError();
-				}
-			});
-		}
-	};
+	const rootPath = `//${networkParams.pathId}`;
 
 	const renderSinglePath = pathsGroup => {
 		const path = pathsGroup.paths[0];
@@ -152,15 +120,6 @@ function PathsList({ accounts, navigation }) {
 							{pathsGroup.title}
 						</Text>
 					</View>
-
-					{/*<ButtonIcon*/}
-					{/*	iconName="plus"*/}
-					{/*	iconType="antdesign"*/}
-					{/*	style={{ opacity: 0.5 }}*/}
-					{/*	onPress={() =>*/}
-					{/*		navigation.navigate('PathDerivation', { networkKey })*/}
-					{/*	}*/}
-					{/*/>*/}
 				</View>
 			</View>
 			{pathsGroup.paths.map(path => (
@@ -183,10 +142,8 @@ function PathsList({ accounts, navigation }) {
 			: `//${networkParams.pathId}`;
 	return (
 		<View style={styles.body} testID={testIDs.PathsList.screen}>
-			<PathListHeading
-				onPress={onClickRootPath}
+			<LeftScreenHeading
 				title={networkParams.title}
-				testID={testIDs.PathsList.rootButton}
 				subtitle={subtitle}
 				hasSubtitleIcon={true}
 				networkKey={networkKey}
@@ -197,15 +154,15 @@ function PathsList({ accounts, navigation }) {
 						? renderSinglePath(pathsGroup)
 						: renderGroupPaths(pathsGroup)
 				)}
-				{!isUnknownNetworkPath && (
-					<ButtonNewDerivation
-						testID={testIDs.PathsList.deriveButton}
-						title="Create New Derivation"
-						onPress={() =>
-							navigation.navigate('PathDerivation', { networkKey })
-						}
-					/>
-				)}
+				<ButtonNewDerivation
+					testID={testIDs.PathsList.deriveButton}
+					title="Create New Derivation"
+					onPress={() =>
+						navigation.navigate('PathDerivation', {
+							parentPath: isUnknownNetworkPath ? '' : rootPath
+						})
+					}
+				/>
 			</ScrollView>
 		</View>
 	);
