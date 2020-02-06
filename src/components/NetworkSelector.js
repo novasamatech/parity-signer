@@ -53,11 +53,13 @@ export function NetworkSelector({ networkKey, setVisible }) {
 	return (
 		<View style={styles.body}>
 			<Text style={styles.label}>{ACCOUNT_NETWORK}</Text>
-			<Touchable style={styles.triggerWrapper} onPress={() => setVisible(true)}>
-				<Text style={styles.triggerLabel}>
-					{SUBSTRATE_NETWORK_LIST[networkKey].title}
-				</Text>
-				<Icon name="more-vert" size={25} color={colors.bg_text} />
+			<Touchable onPress={() => setVisible(true)}>
+				<View style={styles.triggerWrapper}>
+					<Text style={styles.triggerLabel}>
+						{SUBSTRATE_NETWORK_LIST[networkKey].title}
+					</Text>
+					<Icon name="more-vert" size={25} color={colors.bg_text} />
+				</View>
 			</Touchable>
 		</View>
 	);
@@ -80,13 +82,14 @@ export function NetworkOptions({ setNetworkKey, visible, setVisible }) {
 		.map(([networkKey, networkParams]) => {
 			return (
 				<Touchable
-					style={styles.optionWrapper}
 					key={networkKey}
 					value={networkKey}
 					onPress={() => onNetworkSelected(networkKey)}
 				>
-					<Image source={networkParams.logo} style={styles.optionLogo} />
-					<Text style={styles.optionText}>{networkParams.title}</Text>
+					<View style={styles.optionWrapper}>
+						<Image source={networkParams.logo} style={styles.optionLogo} />
+						<Text style={styles.optionText}>{networkParams.title}</Text>
+					</View>
 				</Touchable>
 			);
 		});

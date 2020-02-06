@@ -155,34 +155,30 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		onDerivationFinished(derivationSucceed, networkKey, false);
 	};
 
+	const renderCustomPathCard = () => (
+		<NetworkCard
+			isAdd={true}
+			onPress={() => navigation.navigate('PathDerivation', { parentPath: '' })}
+			testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}
+			title="Create Custom Path"
+			networkColor={colors.bg}
+		/>
+	);
+
 	const renderAddButton = () => {
-		if (isNew) return;
+		if (isNew) return renderCustomPathCard();
 		if (!shouldShowMoreNetworks) {
 			return (
-				<>
-					<NetworkCard
-						isAdd={true}
-						onPress={() => setShouldShowMoreNetworks(true)}
-						testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
-						title="Add Network Account"
-						networkColor={colors.bg}
-					/>
-				</>
+				<NetworkCard
+					isAdd={true}
+					onPress={() => setShouldShowMoreNetworks(true)}
+					testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
+					title="Add Network Account"
+					networkColor={colors.bg}
+				/>
 			);
 		} else {
-			return (
-				<>
-					<NetworkCard
-						isAdd={true}
-						onPress={() =>
-							navigation.navigate('PathDerivation', { parentPath: '' })
-						}
-						testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}
-						title="Create Custom Path"
-						networkColor={colors.bg}
-					/>
-				</>
-			);
+			return renderCustomPathCard();
 		}
 	};
 
