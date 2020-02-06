@@ -28,6 +28,7 @@ import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
 	getNetworkKey,
+	getPathName,
 	getPathsWithSubstrateNetwork,
 	isSubstratePath
 } from '../util/identitiesUtils';
