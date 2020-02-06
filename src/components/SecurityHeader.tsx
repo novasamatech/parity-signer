@@ -17,7 +17,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { NavigationInjectedProps, withNavigation } from 'react-navigation';
 
 import colors from '../colors';
 import IdentitiesSwitch from '../components/IdentitiesSwitch';
@@ -25,7 +25,9 @@ import ButtonIcon from './ButtonIcon';
 import testIDs from '../../e2e/testIDs';
 import { navigateToQrScanner } from '../util/navigationHelpers';
 
-function SecurityHeader({ navigation }) {
+function SecurityHeader({
+	navigation
+}: NavigationInjectedProps): React.ReactElement<NavigationInjectedProps> {
 	const [isConnected, setIsConnected] = useState(false);
 
 	useEffect(

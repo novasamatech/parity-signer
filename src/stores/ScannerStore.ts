@@ -53,36 +53,36 @@ import { emptyAccount } from '../util/account';
 type TXRequest = Record<string, any>;
 
 type SignedTX = {
-	recipient: Account,
-	sender: Account,
-	txRequest: TXRequest
+	recipient: Account;
+	sender: Account;
+	txRequest: TXRequest;
 };
 
 type MultipartData = {
-	[x: string]: Uint8Array
+	[x: string]: Uint8Array;
 };
 
 type ScannerState = {
-	completedFramesCount: number,
-	dataToSign: string,
-	isHash: boolean,
-	isOversized: boolean,
-	latestFrame: number,
-	message: string,
-	missedFrames: Array<number>,
-	multipartData: MultipartData,
-	multipartComplete: boolean,
-	prehash: GenericExtrinsicPayload,
-	recipient: Account,
-	scanErrorMsg: string,
-	sender: Account,
-	signedData: string,
-	signedTxList: [SignedTX],
-	totalFrameCount: number,
-	tx: Record<string, any>,
-	txRequest: TXRequest | null,
-	type: 'transaction' | 'message',
-	unsignedData: Record<string, any>
+	completedFramesCount: number;
+	dataToSign: string;
+	isHash: boolean;
+	isOversized: boolean;
+	latestFrame: number;
+	message: string;
+	missedFrames: Array<number>;
+	multipartData: MultipartData;
+	multipartComplete: boolean;
+	prehash: GenericExtrinsicPayload;
+	recipient: Account;
+	scanErrorMsg: string;
+	sender: Account;
+	signedData: string;
+	signedTxList: [SignedTX];
+	totalFrameCount: number;
+	tx: Record<string, any>;
+	txRequest: TXRequest | null;
+	type: 'transaction' | 'message';
+	unsignedData: Record<string, any>;
 };
 
 const DEFAULT_STATE = Object.freeze({
@@ -229,9 +229,9 @@ export default class ScannerStore extends Container<ScannerState> {
 			});
 
 			// concatenate all the parts into one binary blob
-			let concatMultipartData = Object.values(multipartData).reduce(
-				(acc, part) => [...acc, ...part]
-			);
+			let concatMultipartData = Object.values(
+				multipartData
+			).reduce((acc, part) => [...acc, ...part]);
 
 			// unshift the frame info
 			const frameInfo = u8aConcat(

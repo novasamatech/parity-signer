@@ -15,19 +15,21 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import TouchableItem from './TouchableItem';
-import { Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import React from 'react';
-import { withNavigation } from 'react-navigation';
+import {NavigationInjectedProps, withNavigation} from 'react-navigation';
 import colors from '../colors';
 import fonts from '../fonts';
 
-class NetworkButton extends React.PureComponent<{
+interface Props extends NavigationInjectedProps{
 	network: {
-		title: number,
-		color: string,
-		secondaryColor: string
-	}
-}> {
+		title: number;
+		color: string;
+		secondaryColor: string;
+	};
+}
+
+class NetworkButton extends React.PureComponent<Props> {
 	render() {
 		const { navigation, network } = this.props;
 
@@ -50,7 +52,7 @@ class NetworkButton extends React.PureComponent<{
 	}
 }
 
-const styles = {
+const styles = StyleSheet.create({
 	card: {
 		backgroundColor: colors.card_bg,
 		padding: 20
@@ -66,6 +68,6 @@ const styles = {
 		justifyContent: 'space-between',
 		padding: 5
 	}
-};
+});
 
 export default withNavigation(NetworkButton);

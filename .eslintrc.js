@@ -48,7 +48,8 @@ module.exports = {
         ...commonRules,
         "@typescript-eslint/no-explicit-any": 0,
         "semi": "off",
-        "@typescript-eslint/semi": ["error"]
+        "@typescript-eslint/semi": ["error"],
+        "@typescript-eslint/no-use-before-define": ["error", { "variables": false }] // enable defining variables after react component;
       }
     }
   ],

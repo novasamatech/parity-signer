@@ -14,38 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {
+	GestureResponderEvent,
 	Platform,
 	StyleSheet,
 	Text,
+	TextStyle,
 	TouchableNativeFeedback,
+	TouchableNativeFeedbackProps,
 	TouchableOpacity,
 	View,
-	ViewPropTypes
+	ViewStyle
 } from 'react-native';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
 
 export default class Button extends React.PureComponent<{
-	title: string,
-	onPress: () => any,
-	textStyles?: ?StyleSheet.Styles,
-	buttonStyles?: ?StyleSheet.Styles,
-	disabled?: ?boolean
+	title: string;
+	onPress: (event: GestureResponderEvent) => void;
+	textStyles?: TextStyle;
+	buttonStyles?: ViewStyle;
+	disabled?: boolean;
+	small?: boolean;
+	onlyText?: boolean;
+	testID?: string;
+	style?: ViewStyle;
 }> {
-	static propTypes = {
-		disabled: PropTypes.bool,
-		onPress: PropTypes.func.isRequired,
-		onlyText: PropTypes.bool,
-		small: PropTypes.bool,
-		style: ViewPropTypes.style,
-		textStyles: Text.propTypes.style,
-		title: PropTypes.string.isRequired
-	};
-
-	render() {
+	render(): React.ReactElement {
 		const {
 			onPress,
 			title,
@@ -74,7 +70,7 @@ export default class Button extends React.PureComponent<{
 			finalButtonStyles.push(styles.buttonDisabled);
 		}
 
-		const Touchable =
+		const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 		return (
 			<Touchable
@@ -84,9 +80,7 @@ export default class Button extends React.PureComponent<{
 				testID={testID}
 			>
 				<View style={[finalButtonStyles, style]}>
-					<Text style={[fontStyles.h1, finalTextStyles]} disabled={disabled}>
-						{title}
-					</Text>
+					<Text style={[fontStyles.h1, finalTextStyles]}>{title}</Text>
 				</View>
 			</Touchable>
 		);

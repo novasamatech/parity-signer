@@ -15,39 +15,39 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 export type Account = {
-	address: string,
-	createdAt: number,
-	derivationPassword: string,
-	derivationPath: string, // doesn't contain the ///password
-	encryptedSeed: string,
-	name: string,
-	networkKey: string,
-	seed: string, //this is the SURI (seedPhrase + /soft//hard///password derivation)
-	seedPhrase: string, //contains only the BIP39 words, no derivation path
-	updatedAt: number,
-	validBip39Seed: boolean
+	address: string;
+	createdAt: number;
+	derivationPassword: string;
+	derivationPath: string; // doesn't contain the ///password
+	encryptedSeed: string;
+	name: string;
+	networkKey: string;
+	seed: string; //this is the SURI (seedPhrase + /soft//hard///password derivation)
+	seedPhrase: string; //contains only the BIP39 words, no derivation path
+	updatedAt: number;
+	validBip39Seed: boolean;
 };
 
 type AccountMeta = {
-	address: string,
-	createdAt: number,
-	name: ?string,
-	updatedAt: number
+	address: string;
+	createdAt: number;
+	name?: string;
+	updatedAt: number;
 };
 
 export type Identity = {
 	// encrypted seed include seedPhrase and password
-	encryptedSeed: string,
-	derivationPassword: string,
-	meta: Map<string, AccountMeta>,
-	addresses: Map<string, string>,
-	name: string
+	encryptedSeed: string;
+	derivationPassword: string;
+	meta: Map<string, AccountMeta>;
+	addresses: Map<string, string>;
+	name: string;
 };
 
 export type AccountsStoreState = {
-	identities: [Identity],
-	accounts: Map<string, Account>,
-	newAccount: Account,
-	newIdentity: ?Identity,
-	selectedKey: string
+	identities: [Identity];
+	accounts: Map<string, Account>;
+	newAccount: Account;
+	newIdentity?: Identity;
+	selectedKey: string;
 };

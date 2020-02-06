@@ -66,7 +66,7 @@ export default {
 	},
 	t_regular: {
 		color: colors.bg_text,
-		fontFamily: fonts.robotoRegular,
+		fontFamily: fonts.roboto,
 		fontSize: 12
 	},
 	t_seed: {
