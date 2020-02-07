@@ -16,20 +16,20 @@
 
 import colors from './colors';
 
-export const NetworkProtocols = Object.freeze({
+export const NetworkProtocols: {[key:string]: NetworkProtocol} = Object.freeze({
 	ETHEREUM: 'ethereum',
 	SUBSTRATE: 'substrate',
 	UNKNOWN: 'unknown'
 });
 
 // accounts for which the network couldn't be found (failed migration, removed network)
-export const UnknownNetworkKeys = Object.freeze({
+export const UnknownNetworkKeys:  {[key:string]: string} = Object.freeze({
 	UNKNOWN: 'unknown'
 });
 
 // ethereumChainId is used as Network key for Ethereum networks
 /* eslint-disable sort-keys */
-export const EthereumNetworkKeys = Object.freeze({
+export const EthereumNetworkKeys:  {[key:string]: string} = Object.freeze({
 	FRONTIER: '1',
 	ROPSTEN: '3',
 	RINKEBY: '4',
@@ -41,7 +41,7 @@ export const EthereumNetworkKeys = Object.freeze({
 /* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
-export const SubstrateNetworkKeys = Object.freeze({
+export const SubstrateNetworkKeys: {[key:string]: string} = Object.freeze({
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
 	KUSAMA_CC2:
 		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
@@ -51,7 +51,7 @@ export const SubstrateNetworkKeys = Object.freeze({
 		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc' // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 });
 
-const unknownNetworkBase = {
+const unknownNetworkBase: {[key: string]: NetworkParams} = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.bg_alert,
 		pathId: '',

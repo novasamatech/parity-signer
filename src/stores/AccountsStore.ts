@@ -58,8 +58,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		selectedKey: ''
 	};
 
-	constructor(props) {
-		super(props);
+	constructor(props:any) {
+		super();
 		this.refreshList();
 	}
 
@@ -126,7 +126,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await this.updateAccount(this.state.selectedKey, updatedAccount);
 	}
 
-	async refreshList() {
+	async refreshList():Promise<void> {
 		const accounts = await loadAccounts();
 		const identities = await loadIdentities();
 		let { currentIdentity } = this.state;
