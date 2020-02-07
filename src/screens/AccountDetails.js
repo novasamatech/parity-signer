@@ -110,7 +110,9 @@ function AccountDetails({ accounts, navigation }) {
 			/>
 			<View>
 				{protocol !== NetworkProtocols.UNKNOWN ? (
-					<QrView data={selectedKey} />
+					<QrView
+						data={account.name ? `${selectedKey}:${account.name}` : selectedKey}
+					/>
 				) : (
 					<UnknownAccountWarning />
 				)}

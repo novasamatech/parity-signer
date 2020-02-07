@@ -28,6 +28,7 @@ import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
 	getNetworkKey,
+	getPathName,
 	getPathsWithSubstrateNetwork,
 	isSubstratePath
 } from '../util/identitiesUtils';
@@ -44,6 +45,7 @@ import UnknownAccountWarning from '../components/UnknownAccountWarning';
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
 	const address = getAddressWithPath(path, currentIdentity);
+	const accountName = getPathName(path, currentIdentity);
 	if (!address) return null;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
@@ -104,7 +106,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 			</View>
 			<ScrollView>
 				<PathCard identity={currentIdentity} path={path} />
-				<QrView data={accountId} />
+				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
 		</View>
