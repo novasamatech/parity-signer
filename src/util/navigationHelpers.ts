@@ -14,25 +14,38 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NavigationActions, StackActions } from 'react-navigation';
+import {
+	NavigationActions,
+	NavigationScreenProp,
+	StackActions
+} from 'react-navigation';
 import { NETWORK_LIST } from '../constants';
+import { Identity } from '../stores/types';
 
-export const setPin = async navigation =>
+export const setPin = async (
+	navigation: NavigationScreenProp<{}>
+): Promise<boolean> =>
 	new Promise(resolve => {
 		navigation.navigate('IdentityPin', { isNew: true, resolve });
 	});
 
-export const unlockSeedPhrase = async (navigation, identity) =>
+export const unlockSeedPhrase = async (
+	navigation: NavigationScreenProp<{}>,
+	identity: Identity
+): Promise<boolean> =>
 	new Promise(resolve => {
 		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
 	});
 
-export const navigateToSubstrateRoot = (navigation, networkKey) => {
+export const navigateToSubstrateRoot = (
+	navigation: NavigationScreenProp<{}>,
+	networkKey: string
+): void => {
 	const pathId = NETWORK_LIST[networkKey].pathId;
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
-				isNew: false,
+				params: { isNew: false },
 				routeName: 'AccountNetworkChooser'
 			}),
 			NavigationActions.navigate({
@@ -50,11 +63,15 @@ export const navigateToSubstrateRoot = (navigation, networkKey) => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToPathDetails = (navigation, networkKey, path) => {
+export const navigateToPathDetails = (
+	navigation: NavigationScreenProp<{}>,
+	networkKey: string,
+	path: string
+): void => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
-				isNew: false,
+				params: { isNew: false },
 				routeName: 'AccountNetworkChooser'
 			}),
 			NavigationActions.navigate({
@@ -72,7 +89,10 @@ export const navigateToPathDetails = (navigation, networkKey, path) => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToLandingPage = (navigation, isSwitchOpen) => {
+export const navigateToLandingPage = (
+	navigation: NavigationScreenProp<{}>,
+	isSwitchOpen: boolean
+): void => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
@@ -86,7 +106,9 @@ export const navigateToLandingPage = (navigation, isSwitchOpen) => {
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToNewIdentityNetwork = navigation => {
+export const navigateToNewIdentityNetwork = (
+	navigation: NavigationScreenProp<{}>
+): void => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
@@ -100,7 +122,11 @@ export const navigateToNewIdentityNetwork = navigation => {
 	navigation.dispatch(resetAction);
 };
 
-export const resetNavigationTo = (navigation, screenName, params) => {
+export const resetNavigationTo = (
+	navigation: NavigationScreenProp<{}>,
+	screenName: string,
+	params?: any
+): void => {
 	const resetAction = StackActions.reset({
 		actions: [NavigationActions.navigate({ params, routeName: screenName })],
 		index: 0,
@@ -110,15 +136,15 @@ export const resetNavigationTo = (navigation, screenName, params) => {
 };
 
 export const resetNavigationWithNetworkChooser = (
-	navigation,
-	screenName,
-	params = {},
+	navigation: NavigationScreenProp<{}>,
+	screenName: string,
+	params: object = {},
 	isNew = false
-) => {
+): void => {
 	const resetAction = StackActions.reset({
 		actions: [
 			NavigationActions.navigate({
-				isNew: isNew,
+				params: { isNew },
 				routeName: 'AccountNetworkChooser'
 			}),
 			NavigationActions.navigate({
@@ -132,19 +158,28 @@ export const resetNavigationWithNetworkChooser = (
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToSignedMessage = navigation =>
+export const navigateToSignedMessage = (
+	navigation: NavigationScreenProp<{}>
+): void =>
 	resetNavigationWithNetworkChooser(navigation, 'SignedMessage', {
 		isNew: true
 	});
 
-export const navigateToSignedTx = navigation =>
+export const navigateToSignedTx = (
+	navigation: NavigationScreenProp<{}>
+): void =>
 	resetNavigationWithNetworkChooser(navigation, 'SignedTx', { isNew: true });
 
-export const navigateToPathsList = (navigation, networkKey) =>
+export const navigateToPathsList = (
+	navigation: NavigationScreenProp<{}>,
+	networkKey: string
+): void =>
 	resetNavigationWithNetworkChooser(navigation, 'PathsList', { networkKey });
 
-export const navigateToQrScanner = navigation =>
-	resetNavigationWithNetworkChooser(navigation, 'QrScanner');
+export const navigateToQrScanner = (
+	navigation: NavigationScreenProp<{}>
+): void => resetNavigationWithNetworkChooser(navigation, 'QrScanner');
 
-export const navigateToLegacyAccountList = navigation =>
-	resetNavigationTo(navigation, 'LegacyAccountList');
+export const navigateToLegacyAccountList = (
+	navigation: NavigationScreenProp<{}>
+): void => resetNavigationTo(navigation, 'LegacyAccountList');

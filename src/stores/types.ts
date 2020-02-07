@@ -19,7 +19,7 @@ export type Account = {
 	createdAt: number;
 	derivationPassword: string;
 	derivationPath: string; // doesn't contain the ///password
-	encryptedSeed: string;
+	encryptedSeed: string | null;
 	name: string;
 	networkKey: string;
 	seed: string; //this is the SURI (seedPhrase + /soft//hard///password derivation)
@@ -45,8 +45,10 @@ export type Identity = {
 };
 
 export type AccountsStoreState = {
-	identities: [Identity];
+	identities: Identity[];
 	accounts: Map<string, Account>;
+	currentIdentity: Identity | null;
+	loaded: boolean;
 	newAccount: Account;
 	newIdentity?: Identity;
 	selectedKey: string;

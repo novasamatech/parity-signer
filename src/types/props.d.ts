@@ -1,10 +1,8 @@
 import { NavigationStackScreenProps } from 'react-navigation-stack';
-import {NavigationInjectedProps} from "react-navigation";
+import { NavigationInjectedProps } from 'react-navigation';
 
 export interface NavigationProps<Params, ScreenProps> {
 	navigation: NavigationStackScreenProps<Params, ScreenProps>;
 }
 
-export interface ScreenProps extends NavigationInjectedProps {
-
-}
+export type ScreenProps = NavigationInjectedProps;

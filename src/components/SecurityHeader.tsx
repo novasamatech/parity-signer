@@ -42,7 +42,7 @@ function SecurityHeader({
 		<View style={styles.body}>
 			{isConnected && (
 				<ButtonIcon
-					onPress={() => navigation.navigate('Security')}
+					onPress={(): boolean => navigation.navigate('Security')}
 					iconName="shield-off"
 					iconType="feather"
 					iconColor={colors.bg_alert}
@@ -50,7 +50,7 @@ function SecurityHeader({
 				/>
 			)}
 			<ButtonIcon
-				onPress={() => navigateToQrScanner(navigation)}
+				onPress={(): void => navigateToQrScanner(navigation)}
 				iconName="qrcode-scan"
 				iconType="material-community"
 				iconBgStyle={styles.scannerIconBgStyle}

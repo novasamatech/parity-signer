@@ -36,7 +36,6 @@ import {
 	NetworkProtocols,
 	UnknownNetworkKeys
 } from '../constants';
-import type { AccountsStoreState } from './types';
 import {
 	deepCopyIdentities,
 	deepCopyIdentity,
@@ -46,9 +45,10 @@ import {
 	getNetworkKeyByPath,
 	isEthereumAccountId
 } from '../util/identitiesUtils';
+import { AccountsStoreState } from './types';
 
 export default class AccountsStore extends Container<AccountsStoreState> {
-	state = {
+	state: AccountsStoreState = {
 		accounts: new Map(),
 		currentIdentity: null,
 		identities: [],
@@ -290,7 +290,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			return false;
 		}
 
-		for (let v of this.state.accounts.values()) {
+		for (const v of this.state.accounts.values()) {
 			if (v.address.toLowerCase() === address.toLowerCase()) {
 				return { ...v, isLegacy: true };
 			}

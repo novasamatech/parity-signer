@@ -14,16 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React from 'react';
-import {StyleSheet, Text, View, ViewPropTypes, ViewStyle} from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
-import {NavigationInjectedProps} from "react-navigation";
 
 const WEI_IN_ETH = 1000000000000000000;
 
-interface Props{
+interface Props {
 	value: string;
 	description: string;
 	gas: string;
@@ -31,8 +29,7 @@ interface Props{
 	style: ViewStyle;
 }
 export default class TxDetailsCard extends React.PureComponent<Props> {
-
-	render() {
+	render(): React.ReactNode {
 		const { value, description, gas, gasPrice, style } = this.props;
 
 		return (
@@ -49,14 +46,19 @@ export default class TxDetailsCard extends React.PureComponent<Props> {
 	}
 }
 
-interface AmountProps{
+interface AmountProps {
 	value: string;
 	gas: string;
 	gasPrice: string;
 	style: ViewStyle;
 }
 
-function Amount({ style, value, gas, gasPrice }: AmountProps): React.ReactElement<AmountProps> {
+function Amount({
+	style,
+	value,
+	gas,
+	gasPrice
+}: AmountProps): React.ReactElement<AmountProps> {
 	const fee = (parseInt(gas, 10) * parseInt(gasPrice, 10)) / WEI_IN_ETH;
 	return (
 		<View style={[{ alignItems: 'center', justifyContent: 'center' }, style]}>

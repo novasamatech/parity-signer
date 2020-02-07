@@ -17,11 +17,11 @@
 import TouchableItem from './TouchableItem';
 import { StyleSheet, Text } from 'react-native';
 import React from 'react';
-import {NavigationInjectedProps, withNavigation} from 'react-navigation';
+import { NavigationInjectedProps, withNavigation } from 'react-navigation';
 import colors from '../colors';
 import fonts from '../fonts';
 
-interface Props extends NavigationInjectedProps{
+interface Props extends NavigationInjectedProps {
 	network: {
 		title: number;
 		color: string;
@@ -30,7 +30,7 @@ interface Props extends NavigationInjectedProps{
 }
 
 class NetworkButton extends React.PureComponent<Props> {
-	render() {
+	render(): React.ReactNode {
 		const { navigation, network } = this.props;
 
 		return (
@@ -42,7 +42,7 @@ class NetworkButton extends React.PureComponent<Props> {
 						marginBottom: 20
 					}
 				]}
-				onPress={() => navigation.navigate('AccountNetworkChooser')}
+				onPress={(): boolean => navigation.navigate('AccountNetworkChooser')}
 			>
 				<Text style={[styles.cardText, { color: network.secondaryColor }]}>
 					{network.title}
