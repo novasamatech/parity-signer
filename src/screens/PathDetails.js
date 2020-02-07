@@ -22,13 +22,12 @@ import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import PathCard from '../components/PathCard';
 import PopupMenu from '../components/PopupMenu';
-import { PathCardHeading } from '../components/ScreenHeading';
+import { LeftScreenHeading } from '../components/ScreenHeading';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
-	getIdentityName,
-	getNetworkKeyByPath,
+	getNetworkKey,
 	getPathName,
 	getPathsWithSubstrateNetwork,
 	isSubstratePath
@@ -42,20 +41,18 @@ import {
 import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from '../util/account';
 import UnknownAccountWarning from '../components/UnknownAccountWarning';
-import AccountCard from '../components/AccountCard';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
 	const address = getAddressWithPath(path, currentIdentity);
+	const accountName = getPathName(path, currentIdentity);
 	if (!address) return null;
+	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
+	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 	const accountId = generateAccountId({
 		address,
-		networkKey: getNetworkKeyByPath(path)
+		networkKey: formattedNetworkKey
 	});
-	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
-	//TODO enable user to select networkKey.
-	const isRootPath = path === '';
-	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onOptionSelect = value => {
 		switch (value) {
@@ -67,7 +64,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
 					const hasOtherPaths = listedPaths.length > 0;
 					if (deleteSucceed) {
-						isSubstratePath(path) && !isRootPath && hasOtherPaths
+						isSubstratePath(path) && hasOtherPaths
 							? navigateToPathsList(navigation, networkKey)
 							: navigation.navigate('AccountNetworkChooser');
 					} else {
@@ -86,7 +83,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 	return (
 		<View style={styles.body} testID={testIDs.PathDetail.screen}>
-			<PathCardHeading
+			<LeftScreenHeading
 				title="Public Address"
 				networkKey={formattedNetworkKey}
 			/>
@@ -96,7 +93,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					onSelect={onOptionSelect}
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
-						{ hide: isUnknownNetwork, text: 'Edit', value: 'PathManagement' },
+						{ text: 'Edit', value: 'PathManagement' },
 						{ text: 'Derive Account', value: 'PathDerivation' },
 						{
 							testID: testIDs.PathDetail.deleteButton,
@@ -108,26 +105,9 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				/>
 			</View>
 			<ScrollView>
-				{isUnknownNetwork ? (
-					<>
-						<AccountCard
-							title={
-								isRootPath
-									? getIdentityName(currentIdentity, accounts.state.identities)
-									: getPathName(path, currentIdentity)
-							}
-							address={address}
-							networkKey={formattedNetworkKey}
-						/>
-						<QrView data={generateAccountId({ address, networkKey })} />
-						<UnknownAccountWarning isPath />
-					</>
-				) : (
-					<>
-						<PathCard identity={currentIdentity} path={path} />
-						<QrView data={accountId} />
-					</>
-				)}
+				<PathCard identity={currentIdentity} path={path} />
+				<QrView data={`${accountId}:${accountName}`} />
+				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
 		</View>
 	);
@@ -135,7 +115,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 function PathDetails({ accounts, navigation }) {
 	const path = navigation.getParam('path', '');
-	const networkKey = getNetworkKeyByPath(path);
+	const networkKey = getNetworkKey(path, accounts.state.currentIdentity);
 	return (
 		<PathDetailsView
 			accounts={accounts}

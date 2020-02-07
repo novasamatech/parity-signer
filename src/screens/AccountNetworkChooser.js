@@ -26,12 +26,10 @@ import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
-	NetworkProtocols,
-	defaultNetworkKey
+	NetworkProtocols
 } from '../constants';
 import {
 	navigateToPathsList,
-	navigateToRootPath,
 	navigateToSubstrateRoot,
 	unlockSeedPhrase
 } from '../util/navigationHelpers';
@@ -47,17 +45,18 @@ import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
 
+const excludedNetworks = [
+	UnknownNetworkKeys.UNKNOWN,
+	SubstrateNetworkKeys.KUSAMA_CC2
+];
+if (!__DEV__) {
+	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+}
+
 function AccountNetworkChooser({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew', false);
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const excludedNetworks = [
-		UnknownNetworkKeys.UNKNOWN,
-		SubstrateNetworkKeys.KUSAMA_CC2
-	];
-	if (!__DEV__) {
-		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-	}
 	const { identities, currentIdentity, loaded } = accounts.state;
 	const hasLegacyAccount = accounts.getAccounts().size !== 0;
 
@@ -142,7 +141,7 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			`//${pathId}`,
 			seedPhrase,
 			networkKey,
-			'Root'
+			`${networkParams.title} root`
 		);
 		onDerivationFinished(derivationSucceed, networkKey, true);
 	};
@@ -156,34 +155,30 @@ function AccountNetworkChooser({ navigation, accounts }) {
 		onDerivationFinished(derivationSucceed, networkKey, false);
 	};
 
+	const renderCustomPathCard = () => (
+		<NetworkCard
+			isAdd={true}
+			onPress={() => navigation.navigate('PathDerivation', { parentPath: '' })}
+			testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}
+			title="Create Custom Path"
+			networkColor={colors.bg}
+		/>
+	);
+
 	const renderAddButton = () => {
-		if (isNew) return;
+		if (isNew) return renderCustomPathCard();
 		if (!shouldShowMoreNetworks) {
 			return (
-				<>
-					<NetworkCard
-						isAdd={true}
-						onPress={() => setShouldShowMoreNetworks(true)}
-						testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
-						title="Add Network Account"
-						networkColor={colors.bg}
-					/>
-				</>
+				<NetworkCard
+					isAdd={true}
+					onPress={() => setShouldShowMoreNetworks(true)}
+					testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
+					title="Add Network Account"
+					networkColor={colors.bg}
+				/>
 			);
 		} else {
-			return (
-				<>
-					<NetworkCard
-						isAdd={true}
-						onPress={() =>
-							navigation.navigate('PathDerivation', { parentPath: '' })
-						}
-						testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}
-						title="Create Custom Path"
-						networkColor={colors.bg}
-					/>
-				</>
-			);
+			return renderCustomPathCard();
 		}
 	};
 
@@ -192,41 +187,14 @@ function AccountNetworkChooser({ navigation, accounts }) {
 			return <ScreenHeading title={'Create your first Keypair'} />;
 		} else if (shouldShowMoreNetworks) {
 			return (
-				<ScreenHeading
+				<IdentityHeading
 					title={'Choose Network'}
-					onPress={() => setShouldShowMoreNetworks(false)}
+					onPressBack={() => setShouldShowMoreNetworks(false)}
 				/>
 			);
 		} else {
 			const identityName = getIdentityName(currentIdentity, identities);
-			const rootAccount = currentIdentity.meta.get('');
-			const rootAddress = rootAccount ? rootAccount.address : '';
-			const onRootKeyPress = async () => {
-				if (rootAccount == null) {
-					const seedPhrase = await unlockSeedPhrase(navigation);
-					const derivationSucceed = await accounts.deriveNewPath(
-						'',
-						seedPhrase,
-						defaultNetworkKey,
-						''
-					);
-					if (!derivationSucceed) {
-						return alertPathDerivationError();
-					} else {
-						navigateToRootPath(navigation);
-					}
-				} else {
-					navigation.navigate('PathDetails', { path: '' });
-				}
-			};
-			return (
-				<IdentityHeading
-					title={identityName}
-					subtitle={rootAddress}
-					onPress={onRootKeyPress}
-					hasSubtitleIcon={true}
-				/>
-			);
+			return <IdentityHeading title={identityName} />;
 		}
 	};
 

@@ -29,8 +29,17 @@ export default function UnknownAccountWarning({ isPath }) {
 				<Text style={styles.warningText}>
 					This account is not bond to a specific network.
 					{'\n'}
-					The address currently displayed is using Kusama format, however, the
-					address for this account may be different on another network.
+					{'\n'}
+					This could be because the network specifications are updated or the
+					account is generated in a previous version. The address currently
+					displayed is using Kusama format.
+					{'\n'}
+					{'\n'}
+					To bind the desired network with this account you need to:
+					{'\n'}- remember account path
+					{'\n'}- delete the account
+					{'\n'}- tap "Add Network Account -> Create Custom Path"
+					{'\n'}- derive an account with the same path as before
 				</Text>
 			) : (
 				<Text style={styles.warningText}>

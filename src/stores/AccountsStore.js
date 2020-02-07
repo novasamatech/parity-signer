@@ -45,7 +45,7 @@ import {
 	emptyIdentity,
 	extractAddressFromAccountId,
 	getAddressKeyByPath,
-	getNetworkKeyByPath,
+	getNetworkKey,
 	isEthereumAccountId
 } from '../util/identitiesUtils';
 
@@ -242,13 +242,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	getAccountFromIdentity(accountIdOrAddress) {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
-		let targetPath = null;
-		let targetIdentity = null;
 		let targetAccountId = null;
+		let targetIdentity = null;
+		let targetNetworkKey = null;
+		let targetPath = null;
 		for (const identity of this.state.identities) {
 			const searchList = Array.from(identity.addresses.entries());
 			for (const [addressKey, path] of searchList) {
-				const networkKey = getNetworkKeyByPath(path);
+				const networkKey = getNetworkKey(path, identity);
 				let accountId, address;
 				if (isEthereumAccountId(addressKey)) {
 					accountId = addressKey;
@@ -266,6 +267,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 					targetPath = path;
 					targetIdentity = identity;
 					targetAccountId = accountId;
+					targetNetworkKey = networkKey;
 					break;
 				}
 			}
@@ -275,14 +277,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		this.setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
-		const networkKey = getNetworkKeyByPath(targetPath);
 		return {
 			...metaData,
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
 			isBip39: true,
 			isLegacy: false,
-			networkKey,
+			networkKey: targetNetworkKey,
 			path: targetPath
 		};
 	}
@@ -331,7 +332,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await this.setState({ currentIdentity: null });
 	}
 
-	async _addPathToIdentity(newPath, seedPhrase, updatedIdentity, name, prefix) {
+	async _addPathToIdentity(
+		newPath,
+		seedPhrase,
+		updatedIdentity,
+		name,
+		networkKey
+	) {
+		const { prefix, pathId } = NETWORK_LIST[networkKey];
 		const suri = constructSURI({
 			derivePath: newPath,
 			password: '',
@@ -345,12 +353,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 		if (address === '') return false;
 		if (updatedIdentity.meta.has(newPath)) return false;
-		updatedIdentity.meta.set(newPath, {
+		const pathMeta = {
 			address,
 			createdAt: new Date().getTime(),
 			name,
+			networkPathId: pathId,
 			updatedAt: new Date().getTime()
-		});
+		};
+		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
 		return true;
 	}
@@ -360,8 +370,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		//TODO encrypt seedPhrase with password in the future version,
 		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
-		//TODO now hard coded to polkadot canary prefix which is 2, future enable user to change that.
-		await this._addPathToIdentity('', seedPhrase, updatedIdentity, 'Root', 2);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		this.setState({
 			currentIdentity: updatedIdentity,
@@ -433,14 +441,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
-		const prefix = NETWORK_LIST[networkKey].prefix;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const deriveSucceed = await this._addPathToIdentity(
 			newPath,
 			seedPhrase,
 			updatedCurrentIdentity,
 			name,
-			prefix
+			networkKey
 		);
 		if (!deriveSucceed) return false;
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
