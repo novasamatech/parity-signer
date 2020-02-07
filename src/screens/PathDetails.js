@@ -25,7 +25,7 @@ import colors from '../colors';
 import QrView from '../components/QrView';
 import {
 	getAddressWithPath,
-	getNetworkKeyByPath,
+	getNetworkKey,
 	getPathName,
 	getPathsWithSubstrateNetwork,
 	isSubstratePath
@@ -39,19 +39,18 @@ import {
 import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from '../util/account';
 import UnknownAccountWarning from '../components/UnknownAccountWarning';
-import AccountCard from '../components/AccountCard';
 
 export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	const { currentIdentity } = accounts.state;
 	const address = getAddressWithPath(path, currentIdentity);
+	const accountName = getPathName(path, currentIdentity);
 	if (!address) return null;
+	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
+	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 	const accountId = generateAccountId({
 		address,
-		networkKey: getNetworkKeyByPath(path)
+		networkKey: formattedNetworkKey
 	});
-	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
-	//TODO enable user to select networkKey.
-	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onOptionSelect = value => {
 		switch (value) {
@@ -104,22 +103,9 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				/>
 			</View>
 			<ScrollView>
-				{isUnknownNetwork ? (
-					<>
-						<AccountCard
-							title={getPathName(path, currentIdentity)}
-							address={address}
-							networkKey={formattedNetworkKey}
-						/>
-						<QrView data={generateAccountId({ address, networkKey })} />
-						<UnknownAccountWarning isPath />
-					</>
-				) : (
-					<>
-						<PathCard identity={currentIdentity} path={path} />
-						<QrView data={accountId} />
-					</>
-				)}
+				<PathCard identity={currentIdentity} path={path} />
+				<QrView data={`${accountId}:${accountName}`} />
+				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
 		</View>
 	);
@@ -127,7 +113,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 
 function PathDetails({ accounts, navigation }) {
 	const path = navigation.getParam('path', '');
-	const networkKey = getNetworkKeyByPath(path);
+	const networkKey = getNetworkKey(path, accounts.state.currentIdentity);
 	return (
 		<PathDetailsView
 			accounts={accounts}

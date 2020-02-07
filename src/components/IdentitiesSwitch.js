@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { FlatList, Modal, View, TouchableWithoutFeedback } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { withNavigation, ScrollView } from 'react-navigation';
 
 import ButtonIcon from './ButtonIcon';
@@ -30,6 +30,7 @@ import {
 	resetNavigationTo,
 	resetNavigationWithNetworkChooser
 } from '../util/navigationHelpers';
+import TransparentBackground from './TransparentBackground';
 
 function IdentitiesSwitch({ navigation, accounts }) {
 	const defaultVisible = navigation.getParam('isSwitchOpen', false);
@@ -226,71 +227,61 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				testID={testIDs.IdentitiesSwitch.toggleButton}
 			/>
 
-			<Modal
-				animationType="none"
+			<TransparentBackground
+				testID={testIDs.IdentitiesSwitch.modal}
 				visible={visible}
-				transparent={true}
-				onRequestClose={() => setVisible(false)}
+				setVisible={setVisible}
+				style={styles.container}
+				animationType="none"
 			>
-				<TouchableWithoutFeedback
-					style={{ flex: 1 }}
-					onPressIn={() => setVisible(false)}
-				>
-					<View
-						testID={testIDs.IdentitiesSwitch.modal}
-						style={styles.container}
-						onPress={() => setVisible(false)}
-					>
-						<View style={styles.card}>
-							{renderCurrentIdentityCard()}
-							{renderIdentities()}
-							{accounts.getAccounts().size > 0 && (
-								<>
-									<ButtonIcon
-										title="Legacy Accounts"
-										onPress={onLegacyListClicked}
-										iconName="solution1"
-										iconType="antdesign"
-										iconSize={24}
-										textStyle={fontStyles.t_big}
-										style={styles.indentedButton}
-									/>
-									<Separator />
-								</>
-							)}
-
+				<View style={styles.card}>
+					{renderCurrentIdentityCard()}
+					{renderIdentities()}
+					{accounts.getAccounts().size > 0 && (
+						<>
 							<ButtonIcon
-								title="Add Identity"
-								testID={testIDs.IdentitiesSwitch.addIdentityButton}
-								onPress={() => closeModalAndNavigate('IdentityNew')}
+								title="Legacy Accounts"
+								onPress={onLegacyListClicked}
+								iconName="solution1"
+								iconType="antdesign"
+								iconSize={24}
+								textStyle={fontStyles.t_big}
+								style={styles.indentedButton}
+							/>
+							<Separator />
+						</>
+					)}
+
+					<ButtonIcon
+						title="Add Identity"
+						testID={testIDs.IdentitiesSwitch.addIdentityButton}
+						onPress={() => closeModalAndNavigate('IdentityNew')}
+						iconName="plus"
+						iconType="antdesign"
+						iconSize={24}
+						textStyle={fontStyles.t_big}
+						style={styles.indentedButton}
+					/>
+
+					<Separator />
+					{__DEV__ && (
+						<View>
+							<ButtonIcon
+								title="Add legacy account"
+								onPress={() => closeModalAndNavigate('AccountNew')}
 								iconName="plus"
 								iconType="antdesign"
 								iconSize={24}
 								textStyle={fontStyles.t_big}
 								style={styles.indentedButton}
 							/>
-
 							<Separator />
-							{__DEV__ && (
-								<View>
-									<ButtonIcon
-										title="Add legacy account"
-										onPress={() => closeModalAndNavigate('AccountNew')}
-										iconName="plus"
-										iconType="antdesign"
-										iconSize={24}
-										textStyle={fontStyles.t_big}
-										style={styles.indentedButton}
-									/>
-									<Separator />
-								</View>
-							)}
-
-							{renderSettings()}
 						</View>
-					</View>
-				</TouchableWithoutFeedback>
-			</Modal>
+					)}
+
+					{renderSettings()}
+				</View>
+			</TransparentBackground>
 		</View>
 	);
 }
@@ -303,8 +294,6 @@ const styles = {
 		paddingTop: 8
 	},
 	container: {
-		backgroundColor: 'rgba(0,0,0,0.8)',
-		flex: 1,
 		justifyContent: 'center',
 		marginTop: -24,
 		paddingLeft: 16,

@@ -47,9 +47,7 @@ export default class TextInput extends React.PureComponent {
 	renderLabel() {
 		const { label } = this.props;
 		if (!label) return;
-		return (
-			<Text style={[fontStyles.t_regular, { marginBottom: 3 }]}>{label}</Text>
-		);
+		return <Text style={styles.label}>{label}</Text>;
 	}
 
 	render() {
@@ -104,6 +102,10 @@ const styles = StyleSheet.create({
 	},
 	input_error: {
 		borderBottomColor: colors.bg_alert
+	},
+	label: {
+		marginBottom: 3,
+		...fontStyles.t_regular
 	},
 	viewStyle: {
 		flexDirection: 'row'

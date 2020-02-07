@@ -120,6 +120,22 @@ export const getPathsWithSubstrateNetwork = (paths, networkKey) => {
 	);
 };
 
+const getNetworkKeyByPathId = pathId => {
+	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
+		networkParams => networkParams.pathId === pathId
+	);
+	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
+	return UnknownNetworkKeys.UNKNOWN;
+};
+
+export const getNetworkKey = (path, identity) => {
+	if (identity.meta.has(path)) {
+		const networkPathId = identity.meta.get(path).networkPathId;
+		if (networkPathId) return getNetworkKeyByPathId(networkPathId);
+	}
+	return getNetworkKeyByPath(path);
+};
+
 export const getNetworkKeyByPath = path => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
 		return path;
@@ -127,12 +143,7 @@ export const getNetworkKeyByPath = path => {
 	const pathId = extractPathId(path);
 	if (!pathId) return UnknownNetworkKeys.UNKNOWN;
 
-	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
-		networkParams => networkParams.pathId === pathId
-	);
-	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
-
-	return UnknownNetworkKeys.UNKNOWN;
+	return getNetworkKeyByPathId(pathId);
 };
 
 export const getIdentityFromSender = (sender, identities) =>
