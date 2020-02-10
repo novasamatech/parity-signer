@@ -63,7 +63,7 @@ export default class AccountIconChooser extends React.PureComponent {
 							bip39: false,
 							seed: ''
 						};
-						result.seed = await words();
+						result.seed = await words(24);
 
 						if (protocol === NetworkProtocols.ETHEREUM) {
 							Object.assign(result, await brainWalletAddress(result.seed));
