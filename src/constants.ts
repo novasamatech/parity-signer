@@ -15,21 +15,32 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import colors from './colors';
+import {
+	EthereumNetworkBasicParams,
+	EthereumNetworkParams,
+	NetworkParams,
+	NetworkProtocol,
+	SubstrateNetworkBasicParams,
+	SubstrateNetworkParams,
+	UnknownNetworkParams
+} from './constant';
 
-export const NetworkProtocols: {[key:string]: NetworkProtocol} = Object.freeze({
+export const NetworkProtocols: {
+	[key: string]: NetworkProtocol;
+} = Object.freeze({
 	ETHEREUM: 'ethereum',
 	SUBSTRATE: 'substrate',
 	UNKNOWN: 'unknown'
 });
 
 // accounts for which the network couldn't be found (failed migration, removed network)
-export const UnknownNetworkKeys:  {[key:string]: string} = Object.freeze({
+export const UnknownNetworkKeys: { [key: string]: string } = Object.freeze({
 	UNKNOWN: 'unknown'
 });
 
 // ethereumChainId is used as Network key for Ethereum networks
 /* eslint-disable sort-keys */
-export const EthereumNetworkKeys:  {[key:string]: string} = Object.freeze({
+export const EthereumNetworkKeys: { [key: string]: string } = Object.freeze({
 	FRONTIER: '1',
 	ROPSTEN: '3',
 	RINKEBY: '4',
@@ -41,7 +52,7 @@ export const EthereumNetworkKeys:  {[key:string]: string} = Object.freeze({
 /* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
-export const SubstrateNetworkKeys: {[key:string]: string} = Object.freeze({
+export const SubstrateNetworkKeys: { [key: string]: string } = Object.freeze({
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
 	KUSAMA_CC2:
 		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
@@ -51,7 +62,7 @@ export const SubstrateNetworkKeys: {[key:string]: string} = Object.freeze({
 		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc' // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 });
 
-const unknownNetworkBase: {[key: string]: NetworkParams} = {
+const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.bg_alert,
 		pathId: '',
@@ -62,7 +73,7 @@ const unknownNetworkBase: {[key: string]: NetworkParams} = {
 	}
 };
 
-const substrateNetworkBase = {
+const substrateNetworkBase: { [key: string]: SubstrateNetworkBasicParams } = {
 	[SubstrateNetworkKeys.KUSAMA]: {
 		color: '#e6007a',
 		decimals: 12,
@@ -111,7 +122,7 @@ const substrateNetworkBase = {
 	// }
 };
 
-const ethereumNetworkBase = {
+const ethereumNetworkBase: { [key: string]: EthereumNetworkBasicParams } = {
 	[EthereumNetworkKeys.FRONTIER]: {
 		color: '#64A2F4',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
@@ -153,7 +164,10 @@ const substrateDefaultValues = {
 	secondaryColor: colors.card_bgSolid
 };
 
-function setDefault(networkBase, defaultProps) {
+function setDefault(
+	networkBase: any,
+	defaultProps: object
+): { [key: string]: any } {
 	return Object.keys(networkBase).reduce((acc, networkKey) => {
 		return {
 			...acc,
@@ -165,15 +179,17 @@ function setDefault(networkBase, defaultProps) {
 	}, {});
 }
 
-export const ETHEREUM_NETWORK_LIST = Object.freeze(
-	setDefault(ethereumNetworkBase, ethereumDefaultValues)
-);
-export const SUBSTRATE_NETWORK_LIST = Object.freeze(
-	setDefault(substrateNetworkBase, substrateDefaultValues)
-);
-export const UNKNOWN_NETWORK = Object.freeze(unknownNetworkBase);
+export const ETHEREUM_NETWORK_LIST: {
+	[key: string]: EthereumNetworkParams;
+} = Object.freeze(setDefault(ethereumNetworkBase, ethereumDefaultValues));
+export const SUBSTRATE_NETWORK_LIST: {
+	[key: string]: SubstrateNetworkParams;
+} = Object.freeze(setDefault(substrateNetworkBase, substrateDefaultValues));
+export const UNKNOWN_NETWORK: {
+	[key: string]: UnknownNetworkParams;
+} = Object.freeze(unknownNetworkBase);
 
-export const NETWORK_LIST = Object.freeze(
+export const NETWORK_LIST: { [key: string]: NetworkParams } = Object.freeze(
 	Object.assign(
 		{},
 		SUBSTRATE_NETWORK_LIST,
