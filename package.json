@@ -103,7 +103,8 @@
     "typescript": "^3.7.5"
   },
   "resolutions": {
-    "@react-native-community/eslint-config/babel-eslint": "10.0.3"
+    "@react-native-community/eslint-config/babel-eslint": "10.0.3",
+    "kind-of": ">=6.0.3"
   },
   "detox": {
     "configurations": {
