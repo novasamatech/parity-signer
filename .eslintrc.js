@@ -47,9 +47,11 @@ module.exports = {
       rules: {
         ...commonRules,
         "@typescript-eslint/no-explicit-any": 0,
-        "semi": "off",
         "@typescript-eslint/semi": ["error"],
-        "@typescript-eslint/no-use-before-define": ["error", { "variables": false }] // enable defining variables after react component;
+        "@typescript-eslint/no-use-before-define": ["error", { "variables": false }], // enable defining variables after react component;
+        "@typescript-eslint/no-non-null-assertion": 0,
+        "no-void": "off",
+        "semi": "off"
       }
     }
   ],
@@ -64,7 +66,10 @@ module.exports = {
     "import/resolver": {
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
-      }
+      },
+      "typescript": {
+        "alwaysTryTypes": true // always try to resolve types under `<roo/>@types` directory even it doesn't contain any source code, like `@types/unist`
+      },
     },
     "import/ignore": "react-navigation",
     react: {

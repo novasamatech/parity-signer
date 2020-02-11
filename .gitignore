@@ -1,6 +1,9 @@
 yarn-error.log
 package-lock.json
 
+# typescript output directory
+dist/
+
 # NDK
 NDK/
 rust/.cargo
