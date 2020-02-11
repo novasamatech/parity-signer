@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-export type Account = {
+export type UnlockedAccount = {
 	address: string;
 	createdAt: number;
 	derivationPassword: string;
@@ -28,12 +28,32 @@ export type Account = {
 	validBip39Seed: boolean;
 };
 
-type AccountMeta = {
+export type LockedAccount = Omit<
+	UnlockedAccount,
+	'seedPhrase' | 'seed' | 'derivationPassword' | 'derivationPath'
+>;
+
+export type Account = UnlockedAccount | LockedAccount;
+
+export type AccountMeta = {
 	address: string;
 	createdAt: number;
-	name?: string;
+	name: string;
 	updatedAt: number;
 };
+
+export interface FoundAccount extends AccountMeta {
+	accountId: string;
+	encryptedSeed: string;
+	validBip39Seed: true;
+	isLegacy: false;
+	networkKey: string;
+	path: string;
+}
+
+export interface FoundLegacyAccount extends LockedAccount {
+	isLegacy: true;
+}
 
 export type Identity = {
 	// encrypted seed include seedPhrase and password
@@ -44,12 +64,20 @@ export type Identity = {
 	name: string;
 };
 
+export type SerializedIdentity = {
+	encryptedSeed: string;
+	derivationPassword: string;
+	meta: Array<[string, AccountMeta]>;
+	addresses: Array<[string, string]>;
+	name: string;
+};
+
 export type AccountsStoreState = {
 	identities: Identity[];
 	accounts: Map<string, Account>;
 	currentIdentity: Identity | null;
 	loaded: boolean;
-	newAccount: Account;
-	newIdentity?: Identity;
+	newAccount: UnlockedAccount;
+	newIdentity: Identity;
 	selectedKey: string;
 };

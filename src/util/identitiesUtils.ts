@@ -23,6 +23,7 @@ import { pathsRegex } from './regex';
 import { decryptData } from './native';
 import { parseSURI } from './suri';
 import { generateAccountId } from './account';
+import { Identity, SerializedIdentity } from 'types/identityTypes';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = str => str.replace(/\//g, '');
@@ -69,7 +70,7 @@ export function emptyIdentity() {
 	};
 }
 
-export const serializeIdentity = identity =>
+export const serializeIdentity = (identity: Identity): SerializedIdentity =>
 	Object.entries(identity).reduce((newIdentity, entry) => {
 		const [key, value] = entry;
 		if (value instanceof Map) {
@@ -80,7 +81,9 @@ export const serializeIdentity = identity =>
 		return newIdentity;
 	}, {});
 
-export const deserializeIdentity = identityJSON =>
+export const deserializeIdentity = (
+	identityJSON: SerializedIdentity
+): Identity =>
 	Object.entries(identityJSON).reduce((newIdentity, entry) => {
 		const [key, value] = entry;
 		if (value instanceof Array) {
@@ -103,7 +106,8 @@ export const deserializeIdentities = identitiesJSON => {
 
 export const deepCopyIdentities = identities =>
 	deserializeIdentities(serializeIdentities(identities));
-export const deepCopyIdentity = identity =>
+
+export const deepCopyIdentity = (identity: Identity): Identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
 export const getPathsWithSubstrateNetwork = (paths, networkKey) => {

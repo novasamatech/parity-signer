@@ -32,8 +32,9 @@ import {
 	substrateAddress
 } from '../util/native';
 import {
-	NETWORK_LIST,
+	ETHEREUM_NETWORK_LIST,
 	NetworkProtocols,
+	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
 } from '../constants';
 import {
@@ -45,7 +46,21 @@ import {
 	getNetworkKey,
 	isEthereumAccountId
 } from '../util/identitiesUtils';
-import { AccountsStoreState } from './types';
+import {
+	AccountsStoreState,
+	Account,
+	LockedAccount,
+	UnlockedAccount,
+	FoundAccount,
+	FoundLegacyAccount,
+	Identity
+} from 'types/identityTypes';
+
+function isUnlockedAccount(
+	account: UnlockedAccount | LockedAccount
+): account is UnlockedAccount {
+	return 'seed' in account || 'seedPhrase' in account;
+}
 
 export default class AccountsStore extends Container<AccountsStoreState> {
 	state: AccountsStoreState = {
@@ -58,26 +73,26 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		selectedKey: ''
 	};
 
-	constructor(props: any) {
+	constructor() {
 		super();
 		this.refreshList();
 	}
 
-	async select(accountKey) {
+	async select(accountKey: string): Promise<void> {
 		await this.setState({ selectedKey: accountKey });
 	}
 
-	updateNew(accountUpdate) {
+	updateNew(accountUpdate: Partial<UnlockedAccount>): void {
 		this.setState({
 			newAccount: { ...this.state.newAccount, ...accountUpdate }
 		});
 	}
 
-	getNew() {
+	getNew(): UnlockedAccount {
 		return this.state.newAccount;
 	}
 
-	async submitNew(pin) {
+	async submitNew(pin: string): Promise<void> {
 		const account = this.state.newAccount;
 		if (!account.seed) return;
 
@@ -90,15 +105,19 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		});
 	}
 
-	async deriveEthereumAccount(seedPhrase, networkKey) {
-		const networkParams = NETWORK_LIST[networkKey];
+	async deriveEthereumAccount(
+		seedPhrase: string,
+		networkKey: string
+	): Promise<boolean> {
+		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
 		const ethereumAddress = await brainWalletAddress(seedPhrase);
-		if (ethereumAddress === '') return false;
+		if (ethereumAddress.address === '') return false;
 		const { ethereumChainId } = networkParams;
 		const accountId = generateAccountId({
 			address: ethereumAddress.address,
 			networkKey
 		});
+		if (this.state.currentIdentity === null) return false;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		if (updatedCurrentIdentity.meta.has(ethereumChainId)) return false;
 		updatedCurrentIdentity.meta.set(ethereumChainId, {
@@ -111,7 +130,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async updateAccount(accountKey, updatedAccount) {
+	async updateAccount(
+		accountKey: string,
+		updatedAccount: Account
+	): Promise<void> {
 		const accounts = this.state.accounts;
 		const account = accounts.get(accountKey);
 
@@ -122,7 +144,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async updateSelectedAccount(updatedAccount) {
+	async updateSelectedAccount(updatedAccount: Account): Promise<void> {
 		await this.updateAccount(this.state.selectedKey, updatedAccount);
 	}
 
@@ -134,7 +156,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		this.setState({ accounts, currentIdentity, identities, loaded: true });
 	}
 
-	async save(accountKey, account, pin = null) {
+	async save(
+		accountKey: string,
+		account: UnlockedAccount,
+		pin: string | null = null
+	): Promise<void> {
 		try {
 			// for account creation
 			if (pin && account.seed) {
@@ -149,7 +175,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deleteAccount(accountKey) {
+	async deleteAccount(accountKey: string): Promise<void> {
 		const { accounts } = this.state;
 
 		accounts.delete(accountKey);
@@ -157,7 +183,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await deleteDbAccount(accountKey);
 	}
 
-	async unlockAccount(accountKey, pin) {
+	async unlockAccount(accountKey: string, pin: string): Promise<boolean> {
 		const { accounts } = this.state;
 		const account = accounts.get(accountKey);
 
@@ -166,14 +192,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 
 		try {
-			account.seed = await decryptData(account.encryptedSeed, pin);
-			const { phrase, derivePath, password } = parseSURI(account.seed);
-
-			account.seedPhrase = phrase || '';
-			account.derivationPath = derivePath || '';
-			account.derivationPassword = password || '';
+			const decryptedSeed = await decryptData(account.encryptedSeed, pin);
+			const { phrase, derivePath, password } = parseSURI(decryptedSeed);
 			this.setState({
-				accounts: this.state.accounts.set(accountKey, account)
+				accounts: this.state.accounts.set(accountKey, {
+					derivationPassword: password || '',
+					derivationPath: derivePath || '',
+					seed: decryptedSeed,
+					seedPhrase: phrase || '',
+					...account
+				})
 			});
 		} catch (e) {
 			return false;
@@ -181,7 +209,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return true;
 	}
 
-	deleteSensitiveData(account) {
+	deleteSensitiveData(account: UnlockedAccount): LockedAccount {
 		delete account.seed;
 		delete account.seedPhrase;
 		delete account.derivationPassword;
@@ -190,11 +218,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return account;
 	}
 
-	lockAccount(accountKey) {
+	lockAccount(accountKey: string): void {
 		const { accounts } = this.state;
 		const account = accounts.get(accountKey);
 
-		if (account) {
+		if (account && isUnlockedAccount(account)) {
 			const lockedAccount = this.deleteSensitiveData(account);
 			this.setState({
 				accounts: this.state.accounts.set(accountKey, lockedAccount)
@@ -202,7 +230,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	getAccountWithoutCaseSensitive(accountId) {
+	getAccountWithoutCaseSensitive(accountId: string): Account | null {
 		let findLegacyAccount = null;
 		for (const [key, value] of this.state.accounts) {
 			if (isEthereumAccountId(accountId)) {
@@ -225,20 +253,30 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return findLegacyAccount;
 	}
 
-	async getById({ address, networkKey }) {
+	getById({
+		address,
+		networkKey
+	}: {
+		address: string;
+		networkKey: string;
+	}): null | (Account & { isLegacy: boolean }) {
 		const accountId = generateAccountId({ address, networkKey });
 		const legacyAccount = this.getAccountWithoutCaseSensitive(accountId);
 		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
 		let derivedAccount;
+		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = this.getAccountFromIdentity(accountId);
+		} else {
+			derivedAccount = this.getAccountFromIdentity(address);
 		}
-		derivedAccount = derivedAccount || this.getAccountFromIdentity(address);
-		if (derivedAccount) return { ...derivedAccount, isLegacy: false };
+
+		if (derivedAccount instanceof Object)
+			return { ...derivedAccount, isLegacy: false };
 		return null;
 	}
 
-	getAccountFromIdentity(accountIdOrAddress) {
+	getAccountFromIdentity(accountIdOrAddress: string): false | FoundAccount {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetAccountId = null;
 		let targetIdentity = null;
@@ -271,22 +309,30 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			}
 		}
 
-		if (targetPath === null || targetIdentity === null) return false;
+		if (
+			targetPath === null ||
+			targetIdentity === null ||
+			targetAccountId === null
+		)
+			return false;
 		this.setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
+		if (metaData === undefined) return false;
 		return {
-			...metaData,
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
-			isBip39: true,
 			isLegacy: false,
 			networkKey: targetNetworkKey,
-			path: targetPath
+			path: targetPath,
+			validBip39Seed: true,
+			...metaData
 		};
 	}
 
-	getAccountByAddress(address) {
+	getAccountByAddress(
+		address: string
+	): false | FoundAccount | FoundLegacyAccount {
 		if (!address) {
 			return false;
 		}
@@ -299,19 +345,19 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return this.getAccountFromIdentity(address);
 	}
 
-	getSelected() {
+	getSelected(): Account | undefined {
 		return this.state.accounts.get(this.state.selectedKey);
 	}
 
-	getSelectedKey() {
+	getSelectedKey(): string {
 		return this.state.selectedKey;
 	}
 
-	getAccounts() {
+	getAccounts(): Map<string, Account> {
 		return this.state.accounts;
 	}
 
-	getIdentityByAccountId(accountId) {
+	getIdentityByAccountId(accountId: string): Identity | undefined {
 		const networkProtocol = accountId.split(':')[0];
 		const searchAddress =
 			networkProtocol === NetworkProtocols.SUBSTRATE
@@ -322,22 +368,22 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		);
 	}
 
-	getNewIdentity() {
+	getNewIdentity(): Identity {
 		return this.state.newIdentity;
 	}
 
-	async resetCurrentIdentity() {
+	async resetCurrentIdentity(): Promise<void> {
 		await this.setState({ currentIdentity: null });
 	}
 
 	async _addPathToIdentity(
-		newPath,
-		seedPhrase,
-		updatedIdentity,
-		name,
-		networkKey
-	) {
-		const { prefix, pathId } = NETWORK_LIST[networkKey];
+		newPath: string,
+		seedPhrase: string,
+		updatedIdentity: Identity,
+		name: string,
+		networkKey: string
+	): Promise<boolean> {
+		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
 		const suri = constructSURI({
 			derivePath: newPath,
 			password: '',
@@ -363,7 +409,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return true;
 	}
 
-	async saveNewIdentity(seedPhrase, pin) {
+	async saveNewIdentity(seedPhrase: string, pin: string): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		//TODO encrypt seedPhrase with password in the future version,
 		// current encryption with only seedPhrase is compatible.
@@ -377,17 +423,17 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await saveIdentities(newIdentities);
 	}
 
-	async selectIdentity(identity) {
+	async selectIdentity(identity: Identity): Promise<void> {
 		await this.setState({ currentIdentity: identity });
 	}
 
-	updateNewIdentity(identityUpdate) {
+	updateNewIdentity(identityUpdate: Partial<Identity>): void {
 		this.setState({
 			newIdentity: { ...this.state.newIdentity, ...identityUpdate }
 		});
 	}
 
-	async updateCurrentIdentity(updatedIdentity) {
+	async updateCurrentIdentity(updatedIdentity: Identity): Promise<boolean> {
 		try {
 			await this.setState({
 				currentIdentity: updatedIdentity
@@ -400,19 +446,21 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return true;
 	}
 
-	async _updateIdentitiesWithCurrentIdentity() {
+	async _updateIdentitiesWithCurrentIdentity(): Promise<void> {
 		const newIdentities = deepCopyIdentities(this.state.identities);
 		const identityIndex = newIdentities.findIndex(
-			identity =>
-				identity.encryptedSeed === this.state.currentIdentity.encryptedSeed
+			(identity: Identity) =>
+				identity.encryptedSeed === this.state.currentIdentity?.encryptedSeed
 		);
 		newIdentities.splice(identityIndex, 1, this.state.currentIdentity);
 		this.setState({ identities: newIdentities });
 		await saveIdentities(newIdentities);
 	}
 
-	async updateIdentityName(name) {
-		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
+	async updateIdentityName(name: string): Promise<void> {
+		const updatedCurrentIdentity = deepCopyIdentity(
+			this.state.currentIdentity!
+		);
 		updatedCurrentIdentity.name = name;
 		try {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
@@ -422,8 +470,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async updatePathName(path, name) {
-		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
+	async updatePathName(path: string, name: string): Promise<void> {
+		const updatedCurrentIdentity = deepCopyIdentity(
+			this.state.currentIdentity!
+		);
 		const updatedPathMeta = Object.assign(
 			{},
 			updatedCurrentIdentity.meta.get(path),
@@ -438,8 +488,15 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async deriveNewPath(newPath, seedPhrase, networkKey, name) {
-		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
+	async deriveNewPath(
+		newPath: string,
+		seedPhrase: string,
+		networkKey: string,
+		name: string
+	): Promise<boolean> {
+		const updatedCurrentIdentity = deepCopyIdentity(
+			this.state.currentIdentity!
+		);
 		const deriveSucceed = await this._addPathToIdentity(
 			newPath,
 			seedPhrase,
@@ -451,9 +508,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async deletePath(path) {
+	async deletePath(path: string): Promise<boolean> {
+		if (this.state.currentIdentity === null) return false;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const { address } = updatedCurrentIdentity.meta.get(path);
+		const { address } = updatedCurrentIdentity.meta.get(path)!;
 		updatedCurrentIdentity.meta.delete(path);
 		updatedCurrentIdentity.addresses.delete(getAddressKeyByPath(address, path));
 
@@ -469,12 +527,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return true;
 	}
 
-	async deleteCurrentIdentity() {
+	async deleteCurrentIdentity(): Promise<boolean> {
 		try {
 			const newIdentities = deepCopyIdentities(this.state.identities);
 			const identityIndex = newIdentities.findIndex(
-				identity =>
-					identity.encryptedSeed === this.state.currentIdentity.encryptedSeed
+				(identity: Identity) =>
+					identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
 			);
 			newIdentities.splice(identityIndex, 1);
 			this.setState({

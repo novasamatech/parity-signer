@@ -46,7 +46,7 @@ import {
 	asciiToHex,
 	encodeNumber
 } from '../util/decoders';
-import { Account } from './types';
+import { Account } from 'types/identityTypes';
 import { constructSURI } from '../util/suri';
 import { emptyAccount } from '../util/account';
 

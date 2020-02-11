@@ -16,14 +16,12 @@
 
 import colors from './colors';
 import {
-	EthereumNetworkBasicParams,
 	EthereumNetworkParams,
 	NetworkParams,
 	NetworkProtocol,
-	SubstrateNetworkBasicParams,
 	SubstrateNetworkParams,
 	UnknownNetworkParams
-} from './constant';
+} from 'types/networkSpecsTypes';
 
 export const NetworkProtocols: {
 	[key: string]: NetworkProtocol;
@@ -73,7 +71,9 @@ const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 	}
 };
 
-const substrateNetworkBase: { [key: string]: SubstrateNetworkBasicParams } = {
+const substrateNetworkBase: {
+	[key: string]: Partial<SubstrateNetworkParams>;
+} = {
 	[SubstrateNetworkKeys.KUSAMA]: {
 		color: '#e6007a',
 		decimals: 12,
@@ -122,7 +122,7 @@ const substrateNetworkBase: { [key: string]: SubstrateNetworkBasicParams } = {
 	// }
 };
 
-const ethereumNetworkBase: { [key: string]: EthereumNetworkBasicParams } = {
+const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 	[EthereumNetworkKeys.FRONTIER]: {
 		color: '#64A2F4',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,

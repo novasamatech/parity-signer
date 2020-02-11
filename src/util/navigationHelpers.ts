@@ -20,7 +20,7 @@ import {
 	StackActions
 } from 'react-navigation';
 import { NETWORK_LIST } from '../constants';
-import { Identity } from '../stores/types';
+import { Identity } from 'types/identityTypes';
 
 export const setPin = async (
 	navigation: NavigationScreenProp<{}>
