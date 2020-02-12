@@ -27,10 +27,18 @@ import ScreenHeading from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { onlyNumberRegex } from '../util/regex';
 import { unlockIdentitySeed } from '../util/identitiesUtils';
+import { NavigationAccountProps } from 'types/props';
+import { Identity } from 'types/identityTypes';
 
-export default withAccountStore(withNavigation(IdentityPin));
-
-function IdentityPin({ navigation, accounts }) {
+function IdentityPin({
+	navigation,
+	accounts
+}: NavigationAccountProps<{
+	isUnlock?: boolean;
+	isNew?: boolean;
+	identity?: Identity;
+	resolve: (returnValue: string) => Promise<string>;
+}>) {
 	const initialState = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -214,6 +222,8 @@ const t = {
 		pinUnlock: 'Unlock Identity'
 	}
 };
+
+export default withAccountStore(withNavigation(IdentityPin));
 
 const styles = StyleSheet.create({
 	body: {

@@ -22,11 +22,14 @@ import {
 	createAppContainer,
 	createSwitchNavigator,
 	NavigationInjectedProps,
-	NavigationScreenConfig,
 	NavigationScreenProp,
 	withNavigation
 } from 'react-navigation';
-import { createStackNavigator, HeaderBackButton } from 'react-navigation-stack';
+import {
+	CardStyleInterpolators,
+	createStackNavigator,
+	HeaderBackButton
+} from 'react-navigation-stack';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
@@ -64,6 +67,7 @@ import TermsAndConditions from './screens/TermsAndConditions';
 import TxDetails from './screens/TxDetails';
 import LegacyNetworkChooser from './screens/LegacyNetworkChooser';
 import testIDs from '../e2e/testIDs';
+import { StackNavigationOptions } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 
 const getLaunchArgs = (props: Props): void => {
 	if (Platform.OS === 'ios') {
@@ -117,10 +121,12 @@ const globalStackNavigationOptions = ({
 	navigation
 }: {
 	navigation: NavigationScreenProp<{ index: number }, {}>;
-}): NavigationScreenConfig<any, any> => {
+}): StackNavigationOptions => {
 	const isFirstScreen = navigation.dangerouslyGetParent()?.state.index === 0;
 
 	return {
+		//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
+		cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 		headerBackTitleStyle: {
 			color: colors.bg_text_sec
 		},
@@ -157,7 +163,7 @@ const HeaderLeftWithBack = withNavigation(
 					<HeaderBackButton
 						{...this.props}
 						labelStyle={
-							globalStackNavigationOptions({ navigation }).headerBackTitleStyle
+							globalStackNavigationOptions({ navigation }).headerBackTitleStyle!
 						}
 						labelVisible={false}
 						tintColor={colors.bg_text}

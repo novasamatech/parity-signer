@@ -19,7 +19,6 @@ import {
 	NavigationScreenProp,
 	StackActions
 } from 'react-navigation';
-import { NETWORK_LIST } from '../constants';
 import { Identity } from 'types/identityTypes';
 
 export const setPin = async (
@@ -31,37 +30,11 @@ export const setPin = async (
 
 export const unlockSeedPhrase = async (
 	navigation: NavigationScreenProp<{}>,
-	identity: Identity
-): Promise<boolean> =>
+	identity?: Identity
+): Promise<string> =>
 	new Promise(resolve => {
 		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
 	});
-
-export const navigateToSubstrateRoot = (
-	navigation: NavigationScreenProp<{}>,
-	networkKey: string
-): void => {
-	const pathId = NETWORK_LIST[networkKey].pathId;
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				params: { isNew: false },
-				routeName: 'AccountNetworkChooser'
-			}),
-			NavigationActions.navigate({
-				params: { networkKey },
-				routeName: 'PathsList'
-			}),
-			NavigationActions.navigate({
-				params: { path: `//${pathId}` },
-				routeName: 'PathDetails'
-			})
-		],
-		index: 2,
-		key: undefined
-	});
-	navigation.dispatch(resetAction);
-};
 
 export const navigateToPathDetails = (
 	navigation: NavigationScreenProp<{}>,

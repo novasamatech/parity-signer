@@ -16,6 +16,7 @@
 
 import {
 	NETWORK_LIST,
+	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
 } from '../constants';
@@ -24,9 +25,26 @@ import { decryptData } from './native';
 import { parseSURI } from './suri';
 import { generateAccountId } from './account';
 import { Identity, SerializedIdentity } from 'types/identityTypes';
+import {
+	EthereumNetworkParams,
+	SubstrateNetworkParams,
+	UnknownNetworkParams
+} from 'types/networkSpecsTypes';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = str => str.replace(/\//g, '');
+
+export function isSubstrateNetworkParams(
+	networkParams:
+		| SubstrateNetworkParams
+		| UnknownNetworkParams
+		| EthereumNetworkParams
+): networkParams is SubstrateNetworkParams {
+	return (
+		(networkParams as SubstrateNetworkParams).protocol ===
+		NetworkProtocols.SUBSTRATE
+	);
+}
 
 const extractPathId = path => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);

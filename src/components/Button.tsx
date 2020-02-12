@@ -16,7 +16,6 @@
 
 import React from 'react';
 import {
-	GestureResponderEvent,
 	Platform,
 	StyleSheet,
 	Text,
@@ -29,10 +28,11 @@ import {
 } from 'react-native';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
+import { ButtonListener } from 'types/props';
 
 export default class Button extends React.PureComponent<{
 	title: string;
-	onPress: (event: GestureResponderEvent) => void;
+	onPress: ButtonListener;
 	textStyles?: TextStyle;
 	buttonStyles?: ViewStyle;
 	disabled?: boolean;

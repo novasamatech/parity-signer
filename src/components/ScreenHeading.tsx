@@ -25,6 +25,7 @@ import { Icon } from 'react-native-elements';
 import colors from '../colors';
 import AccountIcon from './AccountIcon';
 import { NETWORK_LIST } from '../constants';
+import { ButtonListener } from 'types/props';
 
 const composeStyle = StyleSheet.compose;
 
@@ -122,6 +123,11 @@ export function IdentityHeading({
 	subtitle,
 	hasSubtitleIcon,
 	onPressBack
+}: {
+	title: string;
+	subtitle?: string;
+	hasSubtitleIcon?: boolean;
+	onPressBack?: ButtonListener;
 }) {
 	return (
 		<View style={baseStyles.bodyWithIdentity}>

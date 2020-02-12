@@ -27,6 +27,7 @@ import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
+/* Used for unlock and sign tx and messages for legacy accounts */
 export class AccountUnlockAndSign extends React.PureComponent {
 	render() {
 		const { navigation } = this.props;
