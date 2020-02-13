@@ -32,13 +32,17 @@ export const NetworkProtocols: {
 });
 
 // accounts for which the network couldn't be found (failed migration, removed network)
-export const UnknownNetworkKeys: { [key: string]: string } = Object.freeze({
+export const UnknownNetworkKeys: {
+	[key: string]: string;
+} = Object.freeze({
 	UNKNOWN: 'unknown'
 });
 
 // ethereumChainId is used as Network key for Ethereum networks
 /* eslint-disable sort-keys */
-export const EthereumNetworkKeys: { [key: string]: string } = Object.freeze({
+export const EthereumNetworkKeys: {
+	[key: string]: string;
+} = Object.freeze({
 	FRONTIER: '1',
 	ROPSTEN: '3',
 	RINKEBY: '4',
@@ -50,7 +54,9 @@ export const EthereumNetworkKeys: { [key: string]: string } = Object.freeze({
 /* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
-export const SubstrateNetworkKeys: { [key: string]: string } = Object.freeze({
+export const SubstrateNetworkKeys: {
+	[key: string]: string;
+} = Object.freeze({
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
 	KUSAMA_CC2:
 		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',

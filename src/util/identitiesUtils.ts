@@ -24,7 +24,16 @@ import { pathsRegex } from './regex';
 import { decryptData } from './native';
 import { parseSURI } from './suri';
 import { generateAccountId } from './account';
-import { Identity, SerializedIdentity } from 'types/identityTypes';
+import {
+	Account,
+	FoundAccount,
+	Identity,
+	LockedAccount,
+	PathGroup,
+	SerializedIdentity,
+	UnlockedAccount
+} from 'types/identityTypes';
+
 import {
 	EthereumNetworkParams,
 	SubstrateNetworkParams,
@@ -32,7 +41,7 @@ import {
 } from 'types/networkSpecsTypes';
 
 //walk around to fix the regular expression support for positive look behind;
-export const removeSlash = str => str.replace(/\//g, '');
+export const removeSlash = (str: string): string => str.replace(/\//g, '');
 
 export function isSubstrateNetworkParams(
 	networkParams:
@@ -46,25 +55,26 @@ export function isSubstrateNetworkParams(
 	);
 }
 
-const extractPathId = path => {
+const extractPathId = (path: string): string | null => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);
 	if (!matchNetworkPath) return null;
 	return removeSlash(matchNetworkPath[0]);
 };
 
-export const extractSubPathName = path => {
+export const extractSubPathName = (path: string): string => {
 	const pathFragments = path.match(pathsRegex.allPath);
 	if (!pathFragments || pathFragments.length === 0) return '';
 	if (pathFragments.length === 1) return removeSlash(pathFragments[0]);
 	return removeSlash(pathFragments.slice(1).join(''));
 };
 
-export const isSubstratePath = path =>
+export const isSubstratePath = (path: string): boolean =>
 	path.match(pathsRegex.allPath) !== null || path === '';
 
-export const isEthereumAccountId = v => v.indexOf('ethereum:') === 0;
+export const isEthereumAccountId = (v: string): boolean =>
+	v.indexOf('ethereum:') === 0;
 
-export const extractAddressFromAccountId = id => {
+export const extractAddressFromAccountId = (id: string): string => {
 	const withoutNetwork = id.split(':')[1];
 	const address = withoutNetwork.split('@')[0];
 	if (address.indexOf('0x') !== -1) {
@@ -73,12 +83,12 @@ export const extractAddressFromAccountId = id => {
 	return address;
 };
 
-export const getAddressKeyByPath = (address, path) =>
+export const getAddressKeyByPath = (address: string, path: string): string =>
 	isSubstratePath(path)
 		? address
 		: generateAccountId({ address, networkKey: getNetworkKeyByPath(path) });
 
-export function emptyIdentity() {
+export function emptyIdentity(): Identity {
 	return {
 		addresses: new Map(),
 		derivationPassword: '',
@@ -89,7 +99,7 @@ export function emptyIdentity() {
 }
 
 export const serializeIdentity = (identity: Identity): SerializedIdentity =>
-	Object.entries(identity).reduce((newIdentity, entry) => {
+	Object.entries(identity).reduce((newIdentity: any, entry: [string, any]) => {
 		const [key, value] = entry;
 		if (value instanceof Map) {
 			newIdentity[key] = Array.from(value.entries());
@@ -102,63 +112,72 @@ export const serializeIdentity = (identity: Identity): SerializedIdentity =>
 export const deserializeIdentity = (
 	identityJSON: SerializedIdentity
 ): Identity =>
-	Object.entries(identityJSON).reduce((newIdentity, entry) => {
-		const [key, value] = entry;
-		if (value instanceof Array) {
-			newIdentity[key] = new Map(value);
-		} else {
-			newIdentity[key] = value;
-		}
-		return newIdentity;
-	}, {});
+	Object.entries(identityJSON).reduce(
+		(newIdentity: any, entry: [string, any]) => {
+			const [key, value] = entry;
+			if (value instanceof Array) {
+				newIdentity[key] = new Map(value);
+			} else {
+				newIdentity[key] = value;
+			}
+			return newIdentity;
+		},
+		{}
+	);
 
-export const serializeIdentities = identities => {
+export const serializeIdentities = (identities: Identity[]): string => {
 	const identitiesWithObject = identities.map(serializeIdentity);
 	return JSON.stringify(identitiesWithObject);
 };
 
-export const deserializeIdentities = identitiesJSON => {
+export const deserializeIdentities = (identitiesJSON: string): Identity[] => {
 	const identitiesWithObject = JSON.parse(identitiesJSON);
 	return identitiesWithObject.map(deserializeIdentity);
 };
 
-export const deepCopyIdentities = identities =>
+export const deepCopyIdentities = (identities: Identity[]): Identity[] =>
 	deserializeIdentities(serializeIdentities(identities));
 
 export const deepCopyIdentity = (identity: Identity): Identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
-export const getPathsWithSubstrateNetwork = (paths, networkKey) => {
+export const getPathsWithSubstrateNetwork = (
+	paths: string[],
+	networkKey: string
+): string[] => {
 	if (networkKey === UnknownNetworkKeys.UNKNOWN) {
 		const pathIdList = Object.values(SUBSTRATE_NETWORK_LIST).map(
 			networkParams => networkParams.pathId
 		);
-		return paths.filter(
-			path => isSubstratePath(path) && !pathIdList.includes(extractPathId(path))
-		);
+		return paths.filter(path => {
+			const pathId = extractPathId(path);
+			if (!pathId) return false;
+			return isSubstratePath(path) && !pathIdList.includes(pathId);
+		});
 	}
 	return paths.filter(
-		path => extractPathId(path) === NETWORK_LIST[networkKey].pathId
+		path => extractPathId(path) === SUBSTRATE_NETWORK_LIST[networkKey].pathId
 	);
 };
 
-const getNetworkKeyByPathId = pathId => {
-	const networkKeyIndex = Object.values(NETWORK_LIST).findIndex(
+const getNetworkKeyByPathId = (pathId: string): string => {
+	const networkKeyIndex = Object.values(SUBSTRATE_NETWORK_LIST).findIndex(
 		networkParams => networkParams.pathId === pathId
 	);
-	if (networkKeyIndex !== -1) return Object.keys(NETWORK_LIST)[networkKeyIndex];
+	if (networkKeyIndex !== -1)
+		return Object.keys(SUBSTRATE_NETWORK_LIST)[networkKeyIndex];
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
-export const getNetworkKey = (path, identity) => {
+export const getNetworkKey = (path: string, identity: Identity): string => {
 	if (identity.meta.has(path)) {
-		const networkPathId = identity.meta.get(path).networkPathId;
+		const networkPathId = identity.meta.get(path)!.networkPathId;
 		if (networkPathId) return getNetworkKeyByPathId(networkPathId);
 	}
 	return getNetworkKeyByPath(path);
 };
 
-export const getNetworkKeyByPath = path => {
+export const getNetworkKeyByPath = (path: string): string => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
 		return path;
 	}
@@ -168,10 +187,39 @@ export const getNetworkKeyByPath = path => {
 	return getNetworkKeyByPathId(pathId);
 };
 
-export const getIdentityFromSender = (sender, identities) =>
+export const parseFoundLegacyAccount = (
+	legacyAccount: Account,
+	accountId: string
+): FoundAccount => {
+	const returnAccount: FoundAccount = {
+		accountId,
+		address: legacyAccount.address,
+		createdAt: legacyAccount.createdAt,
+		isLegacy: true,
+		name: legacyAccount.name,
+		networkKey: legacyAccount.networkKey,
+		updatedAt: legacyAccount.updatedAt,
+		validBip39Seed: legacyAccount.validBip39Seed
+	};
+	if (legacyAccount.hasOwnProperty('encryptedSeed')) {
+		returnAccount.encryptedSeed = (legacyAccount as LockedAccount).encryptedSeed;
+	}
+	if (legacyAccount.hasOwnProperty('derivationPath')) {
+		returnAccount.path = (legacyAccount as UnlockedAccount).derivationPath;
+	}
+	return returnAccount;
+};
+
+export const getIdentityFromSender = (
+	sender: FoundAccount,
+	identities: Identity[]
+): Identity | undefined =>
 	identities.find(i => i.encryptedSeed === sender.encryptedSeed);
 
-export const getAddressWithPath = (path, identity) => {
+export const getAddressWithPath = (
+	path: string,
+	identity: Identity
+): string => {
 	const pathMeta = identity.meta.get(path);
 	if (!pathMeta) return '';
 	const { address } = pathMeta;
@@ -180,14 +228,17 @@ export const getAddressWithPath = (path, identity) => {
 		: address;
 };
 
-export const unlockIdentitySeed = async (pin, identity) => {
+export const unlockIdentitySeed = async (
+	pin: string,
+	identity: Identity
+): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
 	const { phrase } = parseSURI(seed);
 	return phrase;
 };
 
-export const getExistedNetworkKeys = identity => {
+export const getExistedNetworkKeys = (identity: Identity): string[] => {
 	const pathsList = Array.from(identity.addresses.values());
 	const networkKeysSet = pathsList.reduce((networksSet, path) => {
 		let networkKey;
@@ -201,10 +252,13 @@ export const getExistedNetworkKeys = identity => {
 	return Object.keys(networkKeysSet);
 };
 
-export const validateDerivedPath = derivedPath =>
+export const validateDerivedPath = (derivedPath: string): boolean =>
 	pathsRegex.validateDerivedPath.test(derivedPath);
 
-export const getIdentityName = (identity, identities) => {
+export const getIdentityName = (
+	identity: Identity,
+	identities: Identity[]
+): string => {
 	if (identity.name) return identity.name;
 	const identityIndex = identities.findIndex(
 		i => i.encryptedSeed === identity.encryptedSeed
@@ -212,13 +266,13 @@ export const getIdentityName = (identity, identities) => {
 	return `Identity_${identityIndex}`;
 };
 
-export const getPathName = (path, lookUpIdentity) => {
+export const getPathName = (path: string, lookUpIdentity: Identity): string => {
 	if (
 		lookUpIdentity &&
 		lookUpIdentity.meta.has(path) &&
-		lookUpIdentity.meta.get(path).name !== ''
+		lookUpIdentity.meta.get(path)!.name !== ''
 	) {
-		return lookUpIdentity.meta.get(path).name;
+		return lookUpIdentity.meta.get(path)!.name;
 	}
 	if (!isSubstratePath(path)) return 'No name';
 	if (path === '') return 'Identity root';
@@ -231,9 +285,14 @@ export const getPathName = (path, lookUpIdentity) => {
  * If the network is known: group by the second subpath, e.g. '//staking' of '//kusama//staking/0'
  * Please refer to identitiesUtils.spec.js for more examples.
  **/
-export const groupPaths = paths => {
-	const insertPathIntoGroup = (matchingPath, fullPath, pathGroup) => {
-		const groupName = matchingPath.match(pathsRegex.firstPath)[0];
+export const groupPaths = (paths: string[]): PathGroup[] => {
+	const insertPathIntoGroup = (
+		matchingPath: string,
+		fullPath: string,
+		pathGroup: PathGroup[]
+	) => {
+		const matchResult = matchingPath.match(pathsRegex.firstPath);
+		const groupName = matchResult ? matchResult[0] : '-';
 
 		const existedItem = pathGroup.find(p => p.title === groupName);
 		if (existedItem) {
@@ -244,33 +303,40 @@ export const groupPaths = paths => {
 		}
 	};
 
-	const groupedPaths = paths.reduce((groupedPath, path) => {
-		if (path === '') {
-			groupedPath.push({ paths: [''], title: 'Identity root' });
+	const groupedPaths = paths.reduce(
+		(groupedPath: PathGroup[], path: string) => {
+			if (path === '') {
+				groupedPath.push({ paths: [''], title: 'Identity root' });
+				return groupedPath;
+			}
+
+			const rootPath = path.match(pathsRegex.firstPath)?.[0];
+			if (rootPath === undefined) return groupedPath;
+
+			const networkParams = Object.values(SUBSTRATE_NETWORK_LIST).find(
+				v => `//${v.pathId}` === rootPath
+			);
+			if (networkParams === undefined) {
+				insertPathIntoGroup(path, path, groupedPath);
+				return groupedPath;
+			}
+
+			const isRootPath = path === rootPath;
+			if (isRootPath) {
+				groupedPath.push({
+					paths: [path],
+					title: `${networkParams.title} root`
+				});
+				return groupedPath;
+			}
+
+			const subPath = path.slice(rootPath.length);
+			insertPathIntoGroup(subPath, path, groupedPath);
+
 			return groupedPath;
-		}
-
-		const rootPath = path.match(pathsRegex.firstPath)[0];
-
-		const networkParams = Object.values(NETWORK_LIST).find(
-			v => `//${v.pathId}` === rootPath
-		);
-		if (networkParams === undefined) {
-			insertPathIntoGroup(path, path, groupedPath);
-			return groupedPath;
-		}
-
-		const isRootPath = path === rootPath;
-		if (isRootPath) {
-			groupedPath.push({ paths: [path], title: `${networkParams.title} root` });
-			return groupedPath;
-		}
-
-		const subPath = path.slice(rootPath.length);
-		insertPathIntoGroup(subPath, path, groupedPath);
-
-		return groupedPath;
-	}, []);
+		},
+		[]
+	);
 	return groupedPaths.sort((a, b) => {
 		if (a.paths.length === 1 && b.paths.length === 1) {
 			return a.paths[0].length - b.paths[0].length;

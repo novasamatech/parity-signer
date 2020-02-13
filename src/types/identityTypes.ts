@@ -19,7 +19,7 @@ export type UnlockedAccount = {
 	createdAt: number;
 	derivationPassword: string;
 	derivationPath: string; // doesn't contain the ///password
-	encryptedSeed: string | null;
+	encryptedSeed: string | undefined;
 	name: string;
 	networkKey: string;
 	seed: string; //this is the SURI (seedPhrase + /soft//hard///password derivation)
@@ -40,15 +40,16 @@ export type AccountMeta = {
 	createdAt: number;
 	name: string;
 	updatedAt: number;
+	networkPathId?: string;
 };
 
 export interface FoundAccount extends AccountMeta {
 	accountId: string;
-	encryptedSeed: string;
-	validBip39Seed: true;
-	isLegacy: false;
+	encryptedSeed?: string;
+	validBip39Seed: boolean;
+	isLegacy: boolean;
 	networkKey: string;
-	path: string;
+	path?: string;
 }
 
 export interface FoundLegacyAccount extends LockedAccount {
@@ -80,4 +81,9 @@ export type AccountsStoreState = {
 	newAccount: UnlockedAccount;
 	newIdentity: Identity;
 	selectedKey: string;
+};
+
+export type PathGroup = {
+	paths: string[];
+	title: string;
 };

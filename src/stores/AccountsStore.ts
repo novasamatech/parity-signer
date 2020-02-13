@@ -44,7 +44,8 @@ import {
 	extractAddressFromAccountId,
 	getAddressKeyByPath,
 	getNetworkKey,
-	isEthereumAccountId
+	isEthereumAccountId,
+	parseFoundLegacyAccount
 } from '../util/identitiesUtils';
 import {
 	AccountsStoreState,
@@ -262,7 +263,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}): null | (Account & { isLegacy: boolean }) {
 		const accountId = generateAccountId({ address, networkKey });
 		const legacyAccount = this.getAccountWithoutCaseSensitive(accountId);
-		if (legacyAccount) return { ...legacyAccount, isLegacy: true };
+		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
 		let derivedAccount;
 		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
