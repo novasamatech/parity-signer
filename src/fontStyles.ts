@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-/* eslint-disable @typescript-eslint/camelcase */
 import fonts from './fonts';
 import colors from './colors';
 export default {

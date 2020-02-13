@@ -205,11 +205,11 @@ function AccountNetworkChooser({
 			return (
 				<IdentityHeading
 					title={'Choose Network'}
-					onPressBack={() => setShouldShowMoreNetworks(false)}
+					onPressBack={():void  => setShouldShowMoreNetworks(false)}
 				/>
 			);
 		} else {
-			const identityName = getIdentityName(currentIdentity, identities);
+			const identityName = getIdentityName(currentIdentity!, identities);
 			return <IdentityHeading title={identityName} />;
 		}
 	};
@@ -259,7 +259,7 @@ function AccountNetworkChooser({
 						key={networkKey}
 						testID={testIDs.AccountNetworkChooser.networkButton + index}
 						networkKey={networkKey}
-						onPress={() => onNetworkChosen(networkKey, networkParams)}
+						onPress={(): Promise<void> => onNetworkChosen(networkKey, networkParams)}
 						title={networkParams.title}
 					/>
 				))}

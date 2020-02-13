@@ -15,8 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import PropTypes from 'prop-types';
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import React, { ReactElement, ReactNode } from 'react';
+import { View, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import fontStyles from '../fontStyles';
 import fonts from '../fonts';
@@ -30,15 +30,15 @@ import { ButtonListener } from 'types/props';
 const composeStyle = StyleSheet.compose;
 
 const renderSubtitle = (
-	subtitle,
-	hasSubtitleIcon,
-	isAlignLeft,
-	isError,
-	multiline
+	subtitle?: string,
+	hasSubtitleIcon?: boolean,
+	isAlignLeft?: boolean,
+	isError?: boolean,
+	multiline?: boolean
 ) => {
 	if (!subtitle || subtitle === '') return;
-	const subtitleBodyStyle = [baseStyles.subtitleBody],
-		subtitleTextStyle = [fontStyles.t_codeS];
+	const subtitleBodyStyle: ViewStyle[] = [baseStyles.subtitleBody],
+		subtitleTextStyle: TextStyle[] = [fontStyles.t_codeS];
 	if (isAlignLeft) {
 		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
 		subtitleTextStyle.push({ textAlign: 'left' });
@@ -60,12 +60,12 @@ const renderSubtitle = (
 		</View>
 	);
 };
-const renderSubtitleIcon = hasSubtitleIcon => {
+const renderSubtitleIcon = (hasSubtitleIcon?: boolean): ReactNode => {
 	if (!hasSubtitleIcon) return;
 	return <AntIcon name="user" size={10} color={colors.bg_text_sec} />;
 };
 
-const renderBack = onPress => {
+const renderBack = (onPress?: ButtonListener): ReactNode => {
 	if (!onPress) return;
 	return (
 		<ButtonIcon
@@ -77,7 +77,7 @@ const renderBack = onPress => {
 		/>
 	);
 };
-const renderIcon = (iconName, iconType) => {
+const renderIcon = (iconName?: string, iconType?: string): ReactNode => {
 	if (!iconName) return;
 	return (
 		<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
@@ -91,13 +91,18 @@ export function LeftScreenHeading({
 	subtitle,
 	hasSubtitleIcon,
 	networkKey
-}) {
-	const titleStyle = composeStyle(
+}: {
+	title: string;
+	subtitle?: string;
+	hasSubtitleIcon?: boolean;
+	networkKey: string;
+}): ReactElement {
+	const titleStyle: TextStyle = composeStyle(
 		fontStyles.h2,
 		baseStyles.t_left,
 		baseStyles.t_normal
 	);
-	const titleStyleWithSubtitle = composeStyle(
+	const titleStyleWithSubtitle: TextStyle = composeStyle(
 		baseStyles.text,
 		baseStyles.t_left
 	);
@@ -128,7 +133,7 @@ export function IdentityHeading({
 	subtitle?: string;
 	hasSubtitleIcon?: boolean;
 	onPressBack?: ButtonListener;
-}) {
+}): ReactElement {
 	return (
 		<View style={baseStyles.bodyWithIdentity}>
 			<View style={baseStyles.identityName}>
@@ -146,13 +151,17 @@ export function IdentityHeading({
 	);
 }
 
-export default class ScreenHeading extends React.PureComponent {
-	static propTypes = {
-		onPress: PropTypes.func,
-		subtitle: PropTypes.string,
-		title: PropTypes.string.isRequired
-	};
-	render() {
+export default class ScreenHeading extends React.PureComponent<{
+	subtitle?: string;
+	subtitleL?: boolean;
+	hasSubtitleIcon?: boolean;
+	title: string;
+	onPress?: ButtonListener;
+	error?: boolean;
+	iconName?: string;
+	iconType?: string;
+}> {
+	render(): ReactElement {
 		const {
 			title,
 			subtitle,
