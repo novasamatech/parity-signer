@@ -15,13 +15,23 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import fontStyles from '../fontStyles';
 import { hexToAscii, isAscii } from '../util/strings';
 import colors from '../colors';
 
-export default function MessageDetailsCard({ isHash, message, data, style }) {
+export default function MessageDetailsCard({
+	isHash,
+	message,
+	data,
+	style
+}: {
+	isHash: boolean;
+	message: string;
+	data: string;
+	style?: ViewStyle;
+}): React.ReactElement {
 	return (
 		<View style={[styles.messageContainer, style]}>
 			<Text style={fontStyles.t_label}>{isHash ? 'Hash' : 'Message'}</Text>

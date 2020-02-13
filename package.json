@@ -50,7 +50,6 @@
     "bignumber.js": "^9.0.0",
     "hoist-non-react-statics": "^3.3.0",
     "node-libs-react-native": "^1.0.3",
-    "prop-types": "^15.6.1",
     "react": "^16.9.0",
     "react-native": "0.60.5",
     "react-native-camera": "^3.4.0",

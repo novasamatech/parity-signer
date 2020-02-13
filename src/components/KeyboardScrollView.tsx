@@ -15,10 +15,15 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Keyboard, Platform } from 'react-native';
+import { Keyboard, Platform, ScrollViewProps } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-class KeyboardScrollView extends React.PureComponent {
+interface Props extends ScrollViewProps {
+	enableAutomaticScroll?: boolean;
+	extraHeight: number;
+}
+
+class KeyboardScrollView extends React.PureComponent<Props> {
 	render() {
 		const defaultProps = { enableAutomaticScroll: true };
 		return Platform.select({
@@ -30,7 +35,9 @@ class KeyboardScrollView extends React.PureComponent {
 					enableOnAndroid
 					{...defaultProps}
 					{...this.props}
-				/>
+				>
+					{this.props.children}
+				</KeyboardAwareScrollView>
 			),
 			ios: (
 				<KeyboardAwareScrollView
@@ -38,7 +45,9 @@ class KeyboardScrollView extends React.PureComponent {
 					keyboardShouldPersistTaps="handled"
 					{...defaultProps}
 					{...this.props}
-				/>
+				>
+					{this.props.children}
+				</KeyboardAwareScrollView>
 			)
 		});
 	}

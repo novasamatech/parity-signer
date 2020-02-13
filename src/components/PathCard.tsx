@@ -36,6 +36,8 @@ import colors from '../colors';
 import fontStyles from '../fontStyles';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
+import { ButtonListener } from 'types/props';
+import { Identity } from 'types/identityTypes';
 
 PathCard.propTypes = {
 	identity: PropTypes.object.isRequired,
@@ -53,6 +55,13 @@ export default function PathCard({
 	name,
 	testID,
 	titlePrefix
+}: {
+	onPress?: ButtonListener;
+	identity: Identity;
+	path: string;
+	name?: string;
+	testID?: string;
+	titlePrefix?: string;
 }) {
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
@@ -83,7 +92,7 @@ export default function PathCard({
 							{network.title}
 						</Text>
 					</View>
-					<AccountPrefixedTitle title={pathName} titlePrefix={titlePrefix} />
+					<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
 					<Address address={address} protocol={network.protocol} />
 				</View>
 				<View
@@ -112,7 +121,7 @@ export default function PathCard({
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
-						<AccountPrefixedTitle title={pathName} titlePrefix={titlePrefix} />
+						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
 						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
 							<Text style={fontStyles.t_codeS}>{path}</Text>

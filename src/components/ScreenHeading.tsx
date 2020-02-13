@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React, { ReactElement, ReactNode } from 'react';
 import { View, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
@@ -26,8 +25,6 @@ import colors from '../colors';
 import AccountIcon from './AccountIcon';
 import { NETWORK_LIST } from '../constants';
 import { ButtonListener } from 'types/props';
-
-const composeStyle = StyleSheet.compose;
 
 const renderSubtitle = (
 	subtitle?: string,
@@ -97,15 +94,15 @@ export function LeftScreenHeading({
 	hasSubtitleIcon?: boolean;
 	networkKey: string;
 }): ReactElement {
-	const titleStyle: TextStyle = composeStyle(
-		fontStyles.h2,
-		baseStyles.t_left,
-		baseStyles.t_normal
-	);
-	const titleStyleWithSubtitle: TextStyle = composeStyle(
-		baseStyles.text,
-		baseStyles.t_left
-	);
+	const titleStyle: TextStyle = {
+		...fontStyles.h2,
+		...baseStyles.t_left,
+		...baseStyles.t_normal
+	};
+	const titleStyleWithSubtitle: TextStyle = {
+		...baseStyles.text,
+		...baseStyles.t_left
+	};
 	return (
 		<View style={baseStyles.bodyWithIcon}>
 			<AccountIcon

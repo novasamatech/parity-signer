@@ -24,6 +24,7 @@ import {
 	StyleSheet,
 	Text,
 	TouchableNativeFeedback,
+	TouchableNativeFeedbackProps,
 	TouchableOpacity,
 	View
 } from 'react-native';
@@ -35,7 +36,7 @@ import TransparentBackground from './TransparentBackground';
 import fonts from '../fonts';
 
 const ACCOUNT_NETWORK = 'Account Network';
-const Touchable =
+const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
 NetworkSelector.protoTypes = {

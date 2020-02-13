@@ -21,11 +21,13 @@ import Button from './Button';
 import { StyleSheet } from 'react-native';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
+import { ButtonListener } from 'types/props';
 
-export default class ButtonNewDerivation extends React.PureComponent {
-	static propTypes = {
-		onPress: PropTypes.func
-	};
+export default class ButtonNewDerivation extends React.PureComponent<{
+	onPress: ButtonListener;
+	title: string;
+	testID?: string;
+}> {
 	render() {
 		const { onPress, title, testID } = this.props;
 		return (
@@ -33,7 +35,7 @@ export default class ButtonNewDerivation extends React.PureComponent {
 				title={title}
 				onPress={onPress}
 				testID={testID}
-				textStyles={[fontStyles.t_code, styles.text]}
+				textStyles={StyleSheet.flatten([fontStyles.t_code, styles.text])}
 				buttonStyles={styles.button}
 			/>
 		);

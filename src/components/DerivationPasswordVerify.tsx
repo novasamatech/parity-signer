@@ -22,7 +22,9 @@ import colors from '../colors';
 import fonts from '../fonts';
 import TextInput from './TextInput';
 
-export default function DerivationPasswordVerify(props) {
+export default function DerivationPasswordVerify(props: {
+	password: string;
+}): React.ReactElement {
 	const { password } = props;
 	const [enteredPassword, setEnteredPassword] = useState('');
 	const [verifyField, setVerifyField] = useState(false);
@@ -34,7 +36,7 @@ export default function DerivationPasswordVerify(props) {
 
 	return (
 		<>
-			<TouchableOpacity onPress={toggleVerifyField} style={{ diplay: 'flex' }}>
+			<TouchableOpacity onPress={toggleVerifyField}>
 				<View style={{ justifyContent: 'center' }}>
 					<Text style={styles.passwordText}>
 						<Icon name={'info'} size={20} color={colors.bg_text_sec} /> This

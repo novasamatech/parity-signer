@@ -18,9 +18,20 @@ import PropTypes from 'prop-types';
 import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 import React from 'react';
+import { FoundAccount } from 'types/identityTypes';
+import AccountsStore from '../stores/AccountsStore';
+import { isLegacyFoundAccount } from '../util/identitiesUtils';
 
-const CompatibleCard = ({ account, accountsStore, titlePrefix }) =>
-	account.isLegacy === true || account.isLegacy === undefined ? (
+const CompatibleCard = ({
+	account,
+	accountsStore,
+	titlePrefix
+}: {
+	account: FoundAccount;
+	accountsStore: AccountsStore;
+	titlePrefix?: string;
+}) =>
+	isLegacyFoundAccount(account) ? (
 		<AccountCard
 			title={account.name}
 			address={account.address}
@@ -28,7 +39,7 @@ const CompatibleCard = ({ account, accountsStore, titlePrefix }) =>
 		/>
 	) : (
 		<PathCard
-			identity={accountsStore.getIdentityByAccountId(account.accountId)}
+			identity={accountsStore.getIdentityByAccountId(account.accountId)!}
 			path={account.path}
 			titlePrefix={titlePrefix}
 		/>

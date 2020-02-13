@@ -205,7 +205,7 @@ function AccountNetworkChooser({
 			return (
 				<IdentityHeading
 					title={'Choose Network'}
-					onPressBack={():void  => setShouldShowMoreNetworks(false)}
+					onPressBack={(): void => setShouldShowMoreNetworks(false)}
 				/>
 			);
 		} else {
@@ -259,7 +259,9 @@ function AccountNetworkChooser({
 						key={networkKey}
 						testID={testIDs.AccountNetworkChooser.networkButton + index}
 						networkKey={networkKey}
-						onPress={(): Promise<void> => onNetworkChosen(networkKey, networkParams)}
+						onPress={(): Promise<void> =>
+							onNetworkChosen(networkKey, networkParams)
+						}
 						title={networkParams.title}
 					/>
 				))}

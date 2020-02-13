@@ -20,23 +20,30 @@ import {
 	StyleSheet,
 	TextInput as TextInputOrigin,
 	View,
-	Text
+	Text,
+	TextStyle,
+	TextInputProps
 } from 'react-native';
 import fontStyles from '../fontStyles';
 import colors from '../colors';
 
-export default class TextInput extends React.PureComponent {
+interface Props extends TextInputProps {
+	fixedPrefix?: string;
+	style?: TextStyle;
+	focus?: boolean;
+	label?: string;
+	error?: boolean;
+}
+
+export default class TextInput extends React.PureComponent<Props, {}> {
 	static defaultProps = {
 		focus: false
 	};
-	static propTypes = {
-		fixedPrefix: PropTypes.string,
-		style: PropTypes.oneOfType([PropTypes.object, PropTypes.array])
-	};
+	private input: TextInputOrigin | null = null;
 
 	// Methods:
-	focus() {
-		this.input.focus();
+	focus(): void {
+		this.input?.focus();
 	}
 
 	componentDidUpdate() {
@@ -52,7 +59,7 @@ export default class TextInput extends React.PureComponent {
 
 	render() {
 		const { fixedPrefix, style, error } = this.props;
-		const finalInputStyles = [styles.input];
+		const finalInputStyles: TextStyle[] = [styles.input];
 		if (error) {
 			finalInputStyles.push(styles.input_error);
 		}
@@ -67,9 +74,7 @@ export default class TextInput extends React.PureComponent {
 						</Text>
 					)}
 					<TextInputOrigin
-						ref={input => {
-							this.input = input;
-						}}
+						ref={(input: TextInputOrigin): any => (this.input = input)}
 						keyboardAppearance="dark"
 						underlineColorAndroid="transparent"
 						{...this.props}

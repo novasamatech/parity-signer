@@ -27,6 +27,7 @@ import { generateAccountId } from './account';
 import {
 	Account,
 	FoundAccount,
+	FoundLegacyAccount,
 	Identity,
 	LockedAccount,
 	PathGroup,
@@ -53,6 +54,12 @@ export function isSubstrateNetworkParams(
 		(networkParams as SubstrateNetworkParams).protocol ===
 		NetworkProtocols.SUBSTRATE
 	);
+}
+
+export function isLegacyFoundAccount(
+	foundAccount: FoundAccount
+): foundAccount is FoundLegacyAccount {
+	return foundAccount.isLegacy;
 }
 
 const extractPathId = (path: string): string | null => {
@@ -190,8 +197,8 @@ export const getNetworkKeyByPath = (path: string): string => {
 export const parseFoundLegacyAccount = (
 	legacyAccount: Account,
 	accountId: string
-): FoundAccount => {
-	const returnAccount: FoundAccount = {
+): FoundLegacyAccount => {
+	const returnAccount: FoundLegacyAccount = {
 		accountId,
 		address: legacyAccount.address,
 		createdAt: legacyAccount.createdAt,

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { ReactElement } from 'react';
 import {
 	FlatList,
 	StyleSheet,
@@ -32,9 +32,31 @@ import fonts from '../fonts';
 import { debounce } from '../util/debounce';
 import { brainWalletAddress, substrateAddress, words } from '../util/native';
 import { constructSURI } from '../util/suri';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
 
-export default class AccountIconChooser extends React.PureComponent {
-	constructor(props) {
+interface IconType {
+	address: string;
+	bip39: boolean;
+	seed: string;
+}
+
+interface Props {
+	derivationPassword: string;
+	derivationPath: string;
+	network: NetworkParams;
+	onSelect: (icon: {
+		isBip39: boolean;
+		newAddress: string;
+		newSeed: string;
+	}) => void;
+	value: string;
+}
+
+export default class AccountIconChooser extends React.PureComponent<
+	Props,
+	{ icons: IconType[] }
+> {
+	constructor(props: any) {
 		super(props);
 
 		this.state = {
@@ -42,11 +64,11 @@ export default class AccountIconChooser extends React.PureComponent {
 		};
 	}
 
-	refreshIcons = async () => {
+	refreshIcons = async (): Promise<void> => {
 		const {
 			derivationPassword,
 			derivationPath,
-			network: { protocol, prefix },
+			network,
 			onSelect
 		} = this.props;
 
@@ -65,7 +87,7 @@ export default class AccountIconChooser extends React.PureComponent {
 						};
 						result.seed = await words(24);
 
-						if (protocol === NetworkProtocols.ETHEREUM) {
+						if (network.protocol === NetworkProtocols.ETHEREUM) {
 							Object.assign(result, await brainWalletAddress(result.seed));
 						} else {
 							// Substrate
@@ -76,7 +98,10 @@ export default class AccountIconChooser extends React.PureComponent {
 									phrase: result.seed
 								});
 
-								result.address = await substrateAddress(suri, prefix);
+								result.address = await substrateAddress(
+									suri,
+									(network as SubstrateNetworkParams).prefix
+								);
 								result.bip39 = true;
 							} catch (e) {
 								// invalid seed or derivation path
@@ -92,7 +117,7 @@ export default class AccountIconChooser extends React.PureComponent {
 		}
 	};
 
-	renderAddress = () => {
+	renderAddress = (): ReactElement => {
 		const {
 			network: { protocol },
 			value
@@ -111,7 +136,13 @@ export default class AccountIconChooser extends React.PureComponent {
 		}
 	};
 
-	renderIcon = ({ item, index }) => {
+	renderIcon = ({
+		item,
+		index
+	}: {
+		item: IconType;
+		index: number;
+	}): ReactElement => {
 		const { onSelect, network, value } = this.props;
 		const { address, bip39, seed } = item;
 		const isSelected = address.toLowerCase() === value.toLowerCase();
@@ -134,13 +165,13 @@ export default class AccountIconChooser extends React.PureComponent {
 		);
 	};
 
-	componentDidMount() {
+	componentDidMount(): void {
 		this.refreshIcons();
 	}
 
 	debouncedRefreshIcons = debounce(this.refreshIcons, 200);
 
-	componentDidUpdate(prevProps) {
+	componentDidUpdate(prevProps: any): void {
 		const { derivationPassword, derivationPath, network } = this.props;
 
 		if (
@@ -165,7 +196,6 @@ export default class AccountIconChooser extends React.PureComponent {
 						horizontal
 						keyExtractor={item => item.seed}
 						renderItem={this.renderIcon}
-						style={styles.icons}
 					/>
 					<TouchableOpacity onPress={this.refreshIcons}>
 						<Icon name={'refresh'} size={35} style={styles.refreshIcon} />

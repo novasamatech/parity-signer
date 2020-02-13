@@ -14,37 +14,55 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import {
 	Platform,
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	View,
-	Text
+	Text,
+	ViewStyle,
+	TextStyle,
+	StyleSheet,
+	TouchableNativeFeedbackProps
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import colors from '../colors';
+import { ButtonListener } from 'types/props';
 
-const ButtonIcon = props => {
-	const {
-		dropdown = false,
-		renderDropdownElement,
-		iconName,
-		iconType,
-		iconColor,
-		onPress,
-		iconBgStyle,
-		iconSize,
-		testID,
-		textStyle,
-		title,
-		style
-	} = props;
+interface Props {
+	dropdown?: boolean;
+	renderDropdownElement?: () => React.ReactNode;
+	iconName: string;
+	iconType: string;
+	iconColor?: string;
+	onPress: ButtonListener;
+	iconBgStyle?: ViewStyle;
+	iconSize?: number;
+	testID?: string;
+	textStyle?: TextStyle;
+	title?: string;
+	style?: ViewStyle;
+}
 
+const ButtonIcon: FunctionComponent<Props> = ({
+	dropdown = false,
+	renderDropdownElement = () => null,
+	iconName,
+	iconType,
+	iconColor,
+	onPress,
+	iconBgStyle,
+	iconSize,
+	testID,
+	textStyle,
+	title,
+	style = {}
+}) => {
 	const size = iconSize || 28;
 
-	const styles = {
+	const styles = StyleSheet.create({
 		dropdownView: {
 			marginRight: 8,
 			marginTop: size / -12,
@@ -75,9 +93,9 @@ const ButtonIcon = props => {
 		title: {
 			marginLeft: 8
 		}
-	};
+	});
 
-	const Touchable =
+	const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 		Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
 	const renderIcon = () => {
@@ -107,7 +125,7 @@ const ButtonIcon = props => {
 				accessibilityComponentType="button"
 				onPress={onPress}
 				activeOpacity={0.5}
-				style={[styles.generalView, style]}
+				style={{ ...styles.generalView, ...style }}
 				testID={testID}
 			>
 				<View style={styles.iconTitleViewContainer}>
@@ -120,7 +138,7 @@ const ButtonIcon = props => {
 
 			{dropdown && (
 				<View>
-					<Touchable onPress={() => setIsDropsdownOpen(!isDropdownOpen)}>
+					<Touchable onPress={(): void => setIsDropsdownOpen(!isDropdownOpen)}>
 						<View style={styles.dropdownView}>
 							<Icon
 								color={colors.bg_text}

@@ -15,29 +15,27 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import Identicon from '@polkadot/reactnative-identicon';
-import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import colors from '../colors';
 import { NetworkProtocols } from '../constants';
 import { blockiesIcon } from '../util/native';
+import { NetworkParams } from 'types/networkSpecsTypes';
 
-export default function AccountIcon(props) {
-	AccountIcon.propTypes = {
-		address: PropTypes.string.isRequired,
-		network: PropTypes.object.isRequired,
-		style: PropTypes.object
-	};
-
+export default function AccountIcon(props: {
+	address: string;
+	network: NetworkParams;
+	style?: ViewStyle | ImageStyle;
+}): ReactElement {
 	const { address, style, network } = props;
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 	const protocol = network.protocol;
 
-	useEffect(() => {
-		const loadEthereumIcon = function(ethereumAddress) {
+	useEffect((): void => {
+		const loadEthereumIcon = function(ethereumAddress: string): void {
 			blockiesIcon('0x' + ethereumAddress)
 				.then(uri => {
 					setEthereumIconUri(uri);
@@ -52,7 +50,7 @@ export default function AccountIcon(props) {
 
 	if (address === '') {
 		return (
-			<View style={style}>
+			<View style={style as ViewStyle}>
 				{network.logo ? (
 					<Image source={network.logo} style={styles.logo} />
 				) : (
@@ -64,12 +62,19 @@ export default function AccountIcon(props) {
 		);
 	}
 	if (protocol === NetworkProtocols.SUBSTRATE) {
-		return <Identicon value={address} size={style.width || 40} />;
+		let iconSize;
+		if (typeof style?.width === 'string') {
+			const parseIconSize = parseInt(style.width, 10);
+			iconSize = isNaN(parseIconSize) ? undefined : parseIconSize;
+		} else {
+			iconSize = style?.width;
+		}
+		return <Identicon value={address} size={iconSize || 40} />;
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
 			<Image
 				source={{ uri: ethereumIconUri }}
-				style={style || { height: 40, width: 40 }}
+				style={(style as ImageStyle) || { height: 40, width: 40 }}
 			/>
 		);
 	} else {

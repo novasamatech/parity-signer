@@ -15,15 +15,31 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+	ViewStyle
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { parseDerivationPath } from '../util/suri';
 import TextInput from './TextInput';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
+import { TextChangeListener } from 'types/props';
 
-export default function DerivationPathField(props) {
+export default function DerivationPathField(props: {
+	onChange: (derivationEvent: {
+		derivationPassword: string;
+		derivationPath: string;
+		isDerivationPathValid: boolean;
+	}) => void;
+	styles: {
+		title: ViewStyle;
+	};
+}) {
 	const { onChange, styles } = props;
 	const [showAdvancedField, setShowAdvancedField] = useState(true);
 	const [isValidPath, setIsValidPath] = useState(true);
@@ -36,7 +52,9 @@ export default function DerivationPathField(props) {
 		<>
 			<TouchableOpacity onPress={toggleShowAdvancedField}>
 				<View style={{ justifyContent: 'center' }}>
-					<Text style={[styles.title, ownStyles.advancedText]}>
+					<Text
+						style={StyleSheet.flatten([styles.title, ownStyles.advancedText])}
+					>
 						ADVANCED
 						<Icon
 							name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
@@ -47,7 +65,7 @@ export default function DerivationPathField(props) {
 			</TouchableOpacity>
 			{showAdvancedField && (
 				<TextInput
-					onChangeText={text => {
+					onChangeText={(text: string): void => {
 						try {
 							const derivationPath = parseDerivationPath(text);
 
@@ -68,12 +86,10 @@ export default function DerivationPathField(props) {
 						}
 					}}
 					placeholder="optional derivation path"
-					style={[
+					style={StyleSheet.flatten([
 						fontStyles.h2,
-						ownStyles.input,
-						ownStyles.test,
 						isValidPath ? {} : ownStyles.invalidInput
-					]}
+					])}
 				/>
 			)}
 		</>

@@ -14,7 +14,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TextInputProps, TextStyle, ViewStyle } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import Background from '../components/Background';
@@ -30,16 +30,28 @@ import { unlockIdentitySeed } from '../util/identitiesUtils';
 import { NavigationAccountProps } from 'types/props';
 import { Identity } from 'types/identityTypes';
 
-function IdentityPin({
-	navigation,
-	accounts
-}: NavigationAccountProps<{
+type NavigationParams = {
 	isUnlock?: boolean;
 	isNew?: boolean;
 	identity?: Identity;
 	resolve: (returnValue: string) => Promise<string>;
-}>) {
-	const initialState = {
+};
+
+interface Props
+	extends NavigationAccountProps<NavigationParams>,
+		TextInputProps {
+	label: string;
+}
+
+type State = {
+	confirmation: string;
+	focusConfirmation: boolean;
+	pin: string;
+	pinMismatch: boolean;
+	pinTooShort: boolean;
+};
+function IdentityPin({ navigation, accounts }: Props) {
+	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
 		pin: '',
@@ -47,10 +59,11 @@ function IdentityPin({
 		pinTooShort: false
 	};
 	const [state, setState] = useState(initialState);
-	const updateState = delta => setState({ ...state, ...delta });
+	const updateState = (delta: Partial<State>): void =>
+		setState({ ...state, ...delta });
 	const isUnlock = navigation.getParam('isUnlock', false);
 
-	const submit = async () => {
+	const submit = async (): Promise<void> => {
 		const isIdentityCreation = navigation.getParam('isNew');
 		const { pin, confirmation } = state;
 		if (pin.length >= 6 && pin === confirmation) {
@@ -66,9 +79,9 @@ function IdentityPin({
 		}
 	};
 
-	const testPin = async () => {
+	const testPin = async (): Promise<void> => {
 		const { pin } = state;
-		if (pin.length >= 6) {
+		if (pin.length >= 6 && accounts.state.currentIdentity) {
 			try {
 				const identity =
 					navigation.getParam('identity') || accounts.state.currentIdentity;
@@ -85,7 +98,7 @@ function IdentityPin({
 		}
 	};
 
-	const showHintOrError = () => {
+	const showHintOrError = (): string => {
 		if (state.pinTooShort) {
 			return t.pinTooShortHint;
 		} else if (state.pinMismatch) {
@@ -96,7 +109,7 @@ function IdentityPin({
 		return isUnlock ? t.subtitle.pinUnlock : t.subtitle.pinCreation;
 	};
 
-	const onPinInputChange = (stateName, pinInput) => {
+	const onPinInputChange = (stateName: string, pinInput: string): void => {
 		if (onlyNumberRegex.test(pinInput)) {
 			updateState({
 				pinMismatch: false,
@@ -106,7 +119,7 @@ function IdentityPin({
 		}
 	};
 
-	const renderPinInput = () =>
+	const renderPinInput = (): React.ReactElement =>
 		isUnlock ? (
 			<>
 				<ScreenHeading
@@ -182,21 +195,30 @@ function IdentityPin({
 	);
 }
 
-function PinInput(props) {
+interface PinInputProps extends TextInputProps {
+	label: string;
+	focus?: boolean;
+}
+
+function PinInput(props: PinInputProps): React.ReactElement {
 	return (
 		<TextInput
 			keyboardAppearance="dark"
 			clearTextOnFocus
 			editable
-			fontSize={24}
 			keyboardType="numeric"
 			multiline={false}
 			autoCorrect={false}
 			numberOfLines={1}
 			returnKeyType="next"
 			secureTextEntry
-			style={{ ...fontStyles.t_seed, ...styles.pinInput }}
 			{...props}
+			style={StyleSheet.flatten([
+				fontStyles.t_seed,
+				styles.pinInput,
+				{ fontSize: 24 },
+				props.style
+			])}
 		/>
 	);
 }

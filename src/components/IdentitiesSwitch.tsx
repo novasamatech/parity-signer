@@ -16,7 +16,7 @@
 
 import React, { useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { withNavigation, ScrollView } from 'react-navigation';
+import { withNavigation, ScrollView, NavigationParams } from 'react-navigation';
 
 import ButtonIcon from './ButtonIcon';
 import colors from '../colors';
@@ -31,22 +31,30 @@ import {
 	resetNavigationWithNetworkChooser
 } from '../util/navigationHelpers';
 import TransparentBackground from './TransparentBackground';
+import { NavigationAccountProps } from 'types/props';
+import { Identity } from 'types/identityTypes';
 
-function IdentitiesSwitch({ navigation, accounts }) {
+function IdentitiesSwitch({
+	navigation,
+	accounts
+}: NavigationAccountProps<{ isSwitchOpen?: boolean }>) {
 	const defaultVisible = navigation.getParam('isSwitchOpen', false);
 	const [visible, setVisible] = useState(defaultVisible);
 	const { currentIdentity, identities } = accounts.state;
 
-	const closeModalAndNavigate = (screenName, params) => {
+	const closeModalAndNavigate = (
+		screenName: string,
+		params?: NavigationParams
+	): void => {
 		setVisible(false);
 		navigation.navigate(screenName, params);
 	};
 
 	const onIdentitySelectedAndNavigate = async (
-		identity,
-		screenName,
-		params
-	) => {
+		identity: Identity,
+		screenName: string,
+		params?: NavigationParams
+	): Promise<void> => {
 		await accounts.selectIdentity(identity);
 		setVisible(false);
 		if (screenName === 'AccountNetworkChooser') {
@@ -56,18 +64,18 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		}
 	};
 
-	const onLegacyListClicked = async () => {
+	const onLegacyListClicked = async (): Promise<void> => {
 		await accounts.resetCurrentIdentity();
 		setVisible(false);
 		navigateToLegacyAccountList(navigation);
 	};
 
-	const renderIdentityOptions = identity => {
+	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
 		return (
 			<>
 				<ButtonIcon
 					title="Manage Identity"
-					onPress={() =>
+					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
 					}
 					iconBgStyle={styles.i_arrowBg}
@@ -80,7 +88,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				/>
 				<ButtonIcon
 					title="Show Recovery Phrase"
-					onPress={() =>
+					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityBackup', {
 							isNew: false
 						})
@@ -96,7 +104,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		);
 	};
 
-	const renderCurrentIdentityCard = () => {
+	const renderCurrentIdentityCard = (): React.ReactNode => {
 		if (!currentIdentity) return;
 
 		const currentIdentityTitle = getIdentityName(currentIdentity, identities);
@@ -128,7 +136,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 			<>
 				<ButtonIcon
 					title="About"
-					onPress={() => closeModalAndNavigate('About')}
+					onPress={(): void => closeModalAndNavigate('About')}
 					iconType="antdesign"
 					iconName="info"
 					iconSize={24}
@@ -137,7 +145,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				/>
 				<ButtonIcon
 					title="Terms and Conditions"
-					onPress={() =>
+					onPress={(): void =>
 						closeModalAndNavigate('TermsAndConditions', {
 							disableButtons: true
 						})
@@ -151,7 +159,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 				/>
 				<ButtonIcon
 					title="Privacy Policy"
-					onPress={() => closeModalAndNavigate('PrivacyPolicy')}
+					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
 					iconName="arrowright"
@@ -163,16 +171,18 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		);
 	};
 
-	const renderNonSelectedIdentity = ({ item }) => {
+	const renderNonSelectedIdentity = ({ item }: { item: Identity }) => {
 		const identity = item;
 		const title = getIdentityName(identity, identities);
 
 		return (
 			<ButtonIcon
 				dropdown={false}
-				renderDropdownElement={() => renderIdentityOptions(identity)}
+				renderDropdownElement={(): React.ReactElement =>
+					renderIdentityOptions(identity)
+				}
 				title={title}
-				onPress={() =>
+				onPress={(): Promise<void> =>
 					onIdentitySelectedAndNavigate(identity, 'AccountNetworkChooser')
 				}
 				iconType="antdesign"
@@ -184,7 +194,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 		);
 	};
 
-	const renderIdentities = () => {
+	const renderIdentities = (): React.ReactNode => {
 		// if no identity or the only one we have is the selected one
 
 		if (!identities.length || (identities.length === 1 && currentIdentity))
@@ -255,7 +265,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 					<ButtonIcon
 						title="Add Identity"
 						testID={testIDs.IdentitiesSwitch.addIdentityButton}
-						onPress={() => closeModalAndNavigate('IdentityNew')}
+						onPress={(): void => closeModalAndNavigate('IdentityNew')}
 						iconName="plus"
 						iconType="antdesign"
 						iconSize={24}
@@ -268,7 +278,7 @@ function IdentitiesSwitch({ navigation, accounts }) {
 						<View>
 							<ButtonIcon
 								title="Add legacy account"
-								onPress={() => closeModalAndNavigate('AccountNew')}
+								onPress={(): void => closeModalAndNavigate('AccountNew')}
 								iconName="plus"
 								iconType="antdesign"
 								iconSize={24}

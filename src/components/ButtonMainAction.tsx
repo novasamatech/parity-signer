@@ -14,23 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import Button from './Button';
-import { View } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+import { ButtonListener } from 'types/props';
 
-export default class ButtonMainAction extends React.PureComponent {
-	static propTypes = {
-		bottom: PropTypes.bool,
-		disabled: PropTypes.bool,
-		onPress: PropTypes.func,
-		testID: PropTypes.string,
-		title: PropTypes.string
-	};
-	render() {
+export default class ButtonMainAction extends React.PureComponent<{
+	bottom?: boolean;
+	disabled?: boolean;
+	onPress: ButtonListener;
+	testID?: string;
+	title: string;
+	style?: ViewStyle;
+}> {
+	render(): ReactElement {
 		const { onPress, title, testID, bottom, disabled, style } = this.props;
-		const finalViewStyles = [styles.body];
-		const finalButtonStyles = [styles.button];
+		const finalViewStyles: ViewStyle[] = [styles.body];
+		const finalButtonStyles: ViewStyle[] = [styles.button];
 
 		if (bottom === false) {
 			finalViewStyles.push(styles.p_relative);
@@ -42,7 +42,7 @@ export default class ButtonMainAction extends React.PureComponent {
 				<Button
 					title={title}
 					onPress={onPress}
-					style={finalButtonStyles}
+					style={StyleSheet.flatten(finalButtonStyles)}
 					disabled={disabled}
 				/>
 			</View>
@@ -50,7 +50,7 @@ export default class ButtonMainAction extends React.PureComponent {
 	}
 }
 
-const styles = {
+const styles = StyleSheet.create({
 	body: {
 		bottom: 0,
 		height: 120,
@@ -67,4 +67,4 @@ const styles = {
 		marginTop: 32,
 		position: 'relative'
 	}
-};
+});

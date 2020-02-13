@@ -20,7 +20,7 @@ import { default as MarkdownRender } from 'react-native-markdown-renderer';
 import colors from '../colors';
 import fonts from '../fonts';
 
-export default class Markdown extends React.PureComponent {
+export default class Markdown extends React.PureComponent<any> {
 	render() {
 		return (
 			<MarkdownRender

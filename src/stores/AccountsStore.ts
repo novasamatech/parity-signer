@@ -54,7 +54,8 @@ import {
 	UnlockedAccount,
 	FoundAccount,
 	FoundLegacyAccount,
-	Identity
+	Identity,
+	FoundIdentityAccount
 } from 'types/identityTypes';
 
 function isUnlockedAccount(
@@ -260,7 +261,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}: {
 		address: string;
 		networkKey: string;
-	}): null | (Account & { isLegacy: boolean }) {
+	}): null | FoundAccount {
 		const accountId = generateAccountId({ address, networkKey });
 		const legacyAccount = this.getAccountWithoutCaseSensitive(accountId);
 		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
@@ -277,7 +278,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return null;
 	}
 
-	getAccountFromIdentity(accountIdOrAddress: string): false | FoundAccount {
+	getAccountFromIdentity(
+		accountIdOrAddress: string
+	): false | FoundIdentityAccount {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetAccountId = null;
 		let targetIdentity = null;
@@ -324,23 +327,21 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
 			isLegacy: false,
-			networkKey: targetNetworkKey,
+			networkKey: targetNetworkKey!,
 			path: targetPath,
 			validBip39Seed: true,
 			...metaData
 		};
 	}
 
-	getAccountByAddress(
-		address: string
-	): false | FoundAccount | FoundLegacyAccount {
+	getAccountByAddress(address: string): false | FoundAccount {
 		if (!address) {
 			return false;
 		}
 
-		for (const v of this.state.accounts.values()) {
+		for (const [k, v] of this.state.accounts.entries()) {
 			if (v.address.toLowerCase() === address.toLowerCase()) {
-				return { ...v, isLegacy: true };
+				return { ...v, isLegacy: true, accountId: k };
 			}
 		}
 		return this.getAccountFromIdentity(address);
@@ -449,9 +450,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async _updateIdentitiesWithCurrentIdentity(): Promise<void> {
 		const newIdentities = deepCopyIdentities(this.state.identities);
+		if (this.state.currentIdentity === null) return;
 		const identityIndex = newIdentities.findIndex(
 			(identity: Identity) =>
-				identity.encryptedSeed === this.state.currentIdentity?.encryptedSeed
+				identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
 		);
 		newIdentities.splice(identityIndex, 1, this.state.currentIdentity);
 		this.setState({ identities: newIdentities });

@@ -14,8 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { Component, ReactElement } from 'react';
+import {
+	NativeSyntheticEvent,
+	StyleSheet,
+	Text,
+	TextInputChangeEventData,
+	TextInputFocusEventData,
+	TextInputSelectionChangeEventData,
+	View
+} from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
 import fontStyles from '../fontStyles';
@@ -24,17 +32,30 @@ import BIP39_WORDS from '../../res/bip39_wordlist.json';
 import TextInput from './TextInput';
 import TouchableItem from './TouchableItem';
 import { binarySearch } from '../util/array';
+import { FocusListener } from 'types/props';
 
 // Combined, de-duplicated, sorted word list (could be a precompute from json as well)
 const ALL_WORDS = Array.from(new Set(PARITY_WORDS.concat(BIP39_WORDS))).sort();
 const SUGGESTIONS_COUNT = 5;
 
-export default class AccountSeed extends Component {
+export default class AccountSeed extends Component<
+	{
+		value: string;
+		onFocus: FocusListener;
+		onChangeText: (text: string) => void;
+		valid: boolean;
+	},
+	{
+		cursorPosition: number;
+	}
+> {
 	state = {
 		cursorPosition: 0
 	};
 
-	handleCursorPosition = event => {
+	handleCursorPosition = (
+		event: NativeSyntheticEvent<TextInputSelectionChangeEventData>
+	) => {
 		const { start, end } = event.nativeEvent.selection;
 
 		if (start !== end) {
@@ -45,13 +66,8 @@ export default class AccountSeed extends Component {
 
 	/**
 	 * Generate a list of suggestions for input
-	 *
-	 * @param {string}   input    to find suggestions for
-	 * @param {string[]} wordList to find suggestions in
-	 *
-	 * @return {string[]} suggestions
 	 */
-	generateSuggestions(input, wordList) {
+	generateSuggestions(input: string, wordList: string[]): string[] {
 		const fromIndex = binarySearch(wordList, input).index; // index to start search from
 
 		let suggestions = wordList.slice(fromIndex, fromIndex + SUGGESTIONS_COUNT);
@@ -67,7 +83,7 @@ export default class AccountSeed extends Component {
 		return suggestions;
 	}
 
-	selectWordList(otherWords) {
+	selectWordList(otherWords: string[]): string[] {
 		for (const word of otherWords) {
 			const isBIP39 = binarySearch(BIP39_WORDS, word).hit;
 			const isParity = binarySearch(PARITY_WORDS, word).hit;
@@ -79,10 +95,10 @@ export default class AccountSeed extends Component {
 			}
 		}
 
-		return ALL_WORDS;
+		return ALL_WORDS as string[];
 	}
 
-	renderSuggestions() {
+	renderSuggestions(): ReactElement {
 		const { value } = this.props;
 		const { cursorPosition } = this.state;
 
@@ -109,7 +125,7 @@ export default class AccountSeed extends Component {
 					return (
 						<TouchableItem
 							key={i}
-							onPress={e => {
+							onPress={(): void => {
 								let phrase = left
 									.concat(suggestion, right)
 									.join(' ')
@@ -129,13 +145,13 @@ export default class AccountSeed extends Component {
 		);
 	}
 
-	render() {
+	render(): ReactElement {
 		const { valid, value } = this.props;
 		const invalidStyles = !valid ? styles.invalidInput : {};
 		return (
 			<View>
 				<TextInput
-					style={[fontStyles.t_seed, styles.input, invalidStyles]}
+					style={{ ...fontStyles.t_seed, ...styles.input, ...invalidStyles }}
 					multiline
 					autoCorrect={false}
 					autoCompleteType="off"

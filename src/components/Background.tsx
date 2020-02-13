@@ -19,10 +19,7 @@ import { StyleSheet, View } from 'react-native';
 import colors from '../colors';
 
 export default class Background extends React.PureComponent {
-	render() {
-		// const lines = new Array(100)
-		//   .fill(0)
-		//   .map((_, i) => <View key={i} style={styles.line} />);
+	render(): React.ReactElement {
 		return (
 			<View style={styles.bg}>
 				{/* <View style={styles.lines}>{lines}</View> */}

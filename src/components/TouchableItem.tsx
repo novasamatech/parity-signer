@@ -24,23 +24,29 @@
  * of TouchableNativeFeedback.
  */
 
-import React from 'react';
+import React, { ReactElement } from 'react';
 import {
 	Platform,
 	TouchableNativeFeedback,
 	TouchableOpacity,
+	TouchableOpacityProps,
 	View
 } from 'react-native';
 
 const ANDROID_VERSION_LOLLIPOP = 21;
 
-export default class TouchableItem extends React.PureComponent {
+interface Props extends TouchableOpacityProps {
+	borderless: boolean;
+	pressColor: string;
+}
+
+export default class TouchableItem extends React.PureComponent<Props> {
 	static defaultProps = {
 		borderless: false,
 		pressColor: 'rgba(0, 0, 0, .32)'
 	};
 
-	render() {
+	render(): ReactElement {
 		/*
 		 * TouchableNativeFeedback.Ripple causes a crash on old Android versions,
 		 * therefore only enable it on Android Lollipop and above.

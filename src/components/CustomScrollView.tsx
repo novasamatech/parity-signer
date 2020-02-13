@@ -15,11 +15,28 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Animated, ScrollView, StyleSheet, View } from 'react-native';
+import {
+	Animated,
+	ScrollView,
+	StyleSheet,
+	View,
+	ViewStyle
+} from 'react-native';
 
 import colors from '../colors';
 
-export default class CustomScrollview extends React.PureComponent {
+export default class CustomScrollview extends React.PureComponent<
+	{
+		containerStyle?: ViewStyle;
+		contentContainerStyle: ViewStyle;
+	},
+	{
+		indicator: Animated.AnimatedValue;
+		visible: boolean;
+		visibleHeight: number;
+		wholeHeight: number;
+	}
+> {
 	state = {
 		indicator: new Animated.Value(0),
 		visible: false,

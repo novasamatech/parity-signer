@@ -43,18 +43,29 @@ export type AccountMeta = {
 	networkPathId?: string;
 };
 
-export interface FoundAccount extends AccountMeta {
+export interface FoundIdentityAccount extends AccountMeta {
 	accountId: string;
+	encryptedSeed: string;
+	validBip39Seed: true;
+	isLegacy: false;
+	networkKey: string;
+	path: string;
+}
+
+export interface FoundLegacyAccount {
+	address: string;
+	accountId: string;
+	createdAt: number;
+	name: string;
+	updatedAt: number;
 	encryptedSeed?: string;
 	validBip39Seed: boolean;
-	isLegacy: boolean;
+	isLegacy: true;
 	networkKey: string;
 	path?: string;
 }
 
-export interface FoundLegacyAccount extends LockedAccount {
-	isLegacy: true;
-}
+export type FoundAccount = FoundIdentityAccount | FoundLegacyAccount;
 
 export type Identity = {
 	// encrypted seed include seedPhrase and password

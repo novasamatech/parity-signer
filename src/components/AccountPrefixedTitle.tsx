@@ -14,19 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Text, View } from 'react-native';
-import PropTypes from 'prop-types';
 
 import fontStyles from '../fontStyles';
 import colors from '../colors';
 
-AccountPrefixedTitle.propTypes = {
-	title: PropTypes.string.isRequired,
-	titlePrefix: PropTypes.string
-};
-
-export default function AccountPrefixedTitle({ titlePrefix, title }) {
+export default function AccountPrefixedTitle({
+	titlePrefix,
+	title
+}: {
+	title: string;
+	titlePrefix?: string;
+}): ReactElement {
 	return (
 		<View style={{ flexDirection: 'row' }}>
 			{titlePrefix && (

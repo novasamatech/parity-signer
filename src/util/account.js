@@ -54,7 +54,7 @@ export function emptyAccount(
 		createdAt: new Date().getTime(),
 		derivationPassword: '',
 		derivationPath: '',
-		encryptedSeed: null,
+		encryptedSeed: undefined,
 		name: '',
 		networkKey: networkKey,
 		seed: '',

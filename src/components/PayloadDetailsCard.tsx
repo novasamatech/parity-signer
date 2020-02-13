@@ -19,9 +19,8 @@ import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import { StyleSheet, Text, View, ViewPropTypes, ViewStyle } from 'react-native';
 
 import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
@@ -30,19 +29,33 @@ import substrateDevMetadata from '../util/static-substrate';
 import { shortString } from '../util/strings';
 import fontStyles from '../fontStyles';
 import { alertDecodeError } from '../util/alertUtils';
+import {
+	AnyNumber,
+	AnyU8a,
+	Codec,
+	ExtrinsicPayloadValue,
+	IExtrinsicEra,
+	IMethod
+} from '@polkadot/types/types';
+import { ExtrinsicEra, MortalEra } from '@polkadot/types/interfaces';
 
 const registry = new TypeRegistry();
 
-export default class PayloadDetailsCard extends React.PureComponent {
-	static propTypes = {
-		description: PropTypes.string,
-		payload: PropTypes.object,
-		prefix: PropTypes.number.isRequired,
-		signature: PropTypes.string,
-		style: ViewPropTypes.style
-	};
+interface Props {
+	description?: string;
+	payload?: ExtrinsicPayloadValue;
+	prefix: number;
+	signature?: string;
+	style?: ViewStyle;
+}
 
-	constructor(props) {
+export default class PayloadDetailsCard extends React.PureComponent<
+	Props,
+	{
+		fallback: boolean;
+	}
+> {
+	constructor(props: Props) {
 		super(props);
 		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
 		const isKusama =
@@ -127,7 +140,20 @@ export default class PayloadDetailsCard extends React.PureComponent {
 	}
 }
 
-function ExtrinsicPart({ label, fallback, prefix, value }) {
+const recodeAddress = (encodedAddress: string, prefix: number): string =>
+	encodeAddress(decodeAddress(encodedAddress), prefix);
+
+function ExtrinsicPart({
+	label,
+	fallback,
+	prefix,
+	value
+}: {
+	label: string;
+	prefix: number;
+	value: AnyU8a | IMethod | IExtrinsicEra;
+	fallback?: string;
+}) {
 	const [period, setPeriod] = useState();
 	const [phase, setPhase] = useState();
 	const [formattedCallArgs, setFormattedCallArgs] = useState();
@@ -142,7 +168,11 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 				const methodArgs = {};
 
 				// todo: clean this up
-				function formatArgs(callInstance, callMethodArgs, depth) {
+				function formatArgs(
+					callInstance: Call,
+					callMethodArgs: any,
+					depth: number
+				) {
 					const { args, meta, methodName, sectionName } = callInstance;
 					const paramArgKvArray = [];
 					if (!meta.args.length) {
@@ -163,24 +193,16 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 							args[i].toRawType() === 'AccountId'
 						) {
 							// encode Address and AccountId to the appropriate prefix
-							argument = encodeAddress(
-								decodeAddress(args[i].toString()),
-								prefix
-							);
+							argument = recodeAddress(args[i].toString(), prefix);
 						} else if (args[i] instanceof Call) {
-							argument = formatArgs(args[i], callMethodArgs, depth++); // go deeper into the nested calls
+							argument = formatArgs(args[i] as Call, callMethodArgs, depth++); // go deeper into the nested calls
 						} else if (
 							args[i].toRawType() === 'Vec<AccountId>' ||
 							args[i].toRawType() === 'Vec<Address>'
 						) {
-							// FIXME: lord forgive me for i have sinned. this is all a mess but rushing to get this out the door.
-							for (let p = 0; p < args[i].length; p++) {
-								args[i][p] = encodeAddress(
-									decodeAddress(args[i][p].toString()),
-									prefix
-								);
-							}
-							argument = args[i];
+							argument = (args[i] as any).map((v: any) =>
+								recodeAddress(v.toString(), prefix)
+							);
 						} else {
 							argument = args[i].toString();
 						}
@@ -200,14 +222,14 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		}
 
 		if (label === 'Era' && !fallback) {
-			if (value.isMortalEra) {
-				setPeriod(value.asMortalEra.period.toString());
-				setPhase(value.asMortalEra.phase.toString());
+			if ((value as ExtrinsicEra).isMortalEra) {
+				setPeriod((value as ExtrinsicEra).asMortalEra.period.toString());
+				setPhase((value as ExtrinsicEra).asMortalEra.phase.toString());
 			}
 		}
 
 		if (label === 'Tip' && !fallback) {
-			setTip(formatBalance(value));
+			setTip(formatBalance(value as any));
 		}
 	}, [fallback, label, prefix, value]);
 
@@ -237,9 +259,13 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 		}
 	};
 
+	type ArgsList = Array<[string, any]>;
+	type MethodCall = [string, ArgsList];
+	type FormattedArgs = Array<MethodCall>;
+
 	const renderMethodDetails = () => {
 		if (formattedCallArgs) {
-			const formattedArgs = Object.entries(formattedCallArgs);
+			const formattedArgs: FormattedArgs = Object.entries(formattedCallArgs);
 
 			// HACK: if there's a sudo method just put it to the front. Better way would be to order by depth but currently this is only relevant for a single extrinsic, so seems like overkill.
 			for (let i = 1; i < formattedArgs.length; i++) {
@@ -253,7 +279,7 @@ function ExtrinsicPart({ label, fallback, prefix, value }) {
 
 			return formattedArgs.map((entry, index) => {
 				const sectionMethod = entry[0];
-				const paramArgs = entry[1];
+				const paramArgs: Array<[any, any]> = entry[1];
 
 				return (
 					<View key={index} style={styles.callDetails}>

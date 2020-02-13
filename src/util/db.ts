@@ -18,6 +18,7 @@ import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
+import { Identity } from 'types/identityTypes';
 
 const currentAccountsStore = {
 	keychainService: 'accounts_v3',
@@ -53,8 +54,8 @@ const identitiesStore = {
 };
 const currentIdentityStorageLabel = 'identities_v4';
 
-export async function loadIdentities(version = 4) {
-	function handleError(e) {
+export async function loadIdentities(version = 4): Promise<Identity[]> {
+	function handleError(e: Error): Identity[] {
 		console.warn('loading identities error', e);
 		return [];
 	}
@@ -70,7 +71,7 @@ export async function loadIdentities(version = 4) {
 		if (!identities) return [];
 		return deserializeIdentities(identities);
 	} catch (e) {
-		handleError(e);
+		return handleError(e);
 	}
 }
 
