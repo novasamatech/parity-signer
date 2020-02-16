@@ -14,16 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NETWORK_LIST, SubstrateNetworkKeys } from '../src/constants';
+import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../src/constants';
+import { TxRequestData } from 'types/scannerTypes';
 
 export const signingTestIdentityPath = `//${
-	NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathID
+	SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathId
 }//default`;
 
 const setRemarkExtrinsicKusama =
 	'47900000100005301021e169bcc4cdb062f1c85f971be770b6aea1bd32ac1bf7877aa54ccd73309014a20180000010c11111145030000fe030000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeaf2df518f7017e0442a1d01b0f175e0fa5d427470014c1c3ab2131e6250072a70ec';
 
-export const createMockSignRequest = () => ({
+export const createMockSignRequest = (): TxRequestData => ({
 	bounds: {
 		height: 1440,
 		origin: [],

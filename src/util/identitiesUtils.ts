@@ -148,7 +148,7 @@ export const deepCopyIdentities = (identities: Identity[]): Identity[] =>
 export const deepCopyIdentity = (identity: Identity): Identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
-export const getPathsWithSubstrateNetwork = (
+export const getPathsWithSubstrateNetworkKey = (
 	paths: string[],
 	networkKey: string
 ): string[] => {

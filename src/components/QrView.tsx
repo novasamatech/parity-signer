@@ -15,21 +15,23 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { isHex } from '@polkadot/util';
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { qrCode, qrCodeHex } from '../util/native';
 
-QrView.propTypes = {
-	data: PropTypes.string.isRequired
-};
+interface Props {
+	data: string;
+	size?: number;
+	height?: number;
+	style?: ViewStyle;
+}
 
-export default function QrView(props) {
-	const [qr, setQr] = useState(null);
+export default function QrView(props: Props): React.ReactElement {
+	const [qr, setQr] = useState('');
 
 	useEffect(() => {
-		async function displayQrCode(data) {
+		async function displayQrCode(data: string): Promise<void> {
 			try {
 				const generatedQr = isHex(data)
 					? await qrCodeHex(data)

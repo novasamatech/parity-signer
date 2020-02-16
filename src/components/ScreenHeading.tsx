@@ -32,7 +32,7 @@ const renderSubtitle = (
 	isAlignLeft?: boolean,
 	isError?: boolean,
 	multiline?: boolean
-) => {
+): ReactNode => {
 	if (!subtitle || subtitle === '') return;
 	const subtitleBodyStyle: ViewStyle[] = [baseStyles.subtitleBody],
 		subtitleTextStyle: TextStyle[] = [fontStyles.t_codeS];
@@ -69,7 +69,7 @@ const renderBack = (onPress?: ButtonListener): ReactNode => {
 			iconName="arrowleft"
 			iconType="antdesign"
 			onPress={onPress}
-			style={[baseStyles.icon, { left: 0 }]}
+			style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
 			iconBgStyle={{ backgroundColor: 'transparent' }}
 		/>
 	);

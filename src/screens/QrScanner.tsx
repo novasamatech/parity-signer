@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
@@ -27,6 +26,7 @@ import ScannerStore from '../stores/ScannerStore';
 import { isAddressString, isJsonString, rawDataToU8A } from '../util/decoders';
 import ScreenHeading from '../components/ScreenHeading';
 import { createMockSignRequest } from '../../e2e/mock';
+import { TxRequestData } from 'types/scannerTypes';
 
 export default class Scanner extends React.PureComponent {
 	constructor(props) {
@@ -60,11 +60,11 @@ export default class Scanner extends React.PureComponent {
 							accountStore={accountsStore}
 							scannerStore={scannerStore}
 							totalFramesCount={scannerStore.getTotalFramesCount()}
-							onBarCodeRead={async txRequestData => {
+							onBarCodeRead={async (txRequestData: TxRequestData) => {
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
 								}
-
+								console.log('txRequestData is', txRequestData);
 								try {
 									if (isAddressString(txRequestData.data)) {
 										return this.showErrorMessage(
@@ -77,10 +77,11 @@ export default class Scanner extends React.PureComponent {
 										await scannerStore.setUnsigned(txRequestData.data);
 									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
-
+										console.log('strippedData is', strippedData);
 										await scannerStore.setParsedData(
 											strippedData,
-											accountsStore
+											accountsStore,
+											false
 										);
 									}
 
@@ -114,11 +115,14 @@ export default class Scanner extends React.PureComponent {
 	}
 }
 
-QrScannerView.propTypes = {
-	onBarCodeRead: PropTypes.func.isRequired
-};
-
-function QrScannerView({ navigation, scannerStore, accountStore, ...props }) {
+function QrScannerView({
+	navigation,
+	scannerStore,
+	accountStore,
+	...props
+}: {
+	onBarCodeRead: (listener: TxRequestData) => void;
+}) {
 	if (global.inTest) {
 		props.onBarCodeRead(createMockSignRequest());
 	}

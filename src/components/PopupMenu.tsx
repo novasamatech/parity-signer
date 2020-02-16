@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextStyle } from 'react-native';
 import {
 	Menu,
 	MenuOptions,
@@ -25,9 +25,25 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 import fonts from '../fonts';
+import { ButtonListener } from 'types/props';
 
-export default class PopupMenu extends React.PureComponent {
-	render() {
+type MenuItem = {
+	text: string;
+	value: string;
+	textStyle?: TextStyle;
+	testID?: string;
+	hide?: boolean;
+};
+
+interface Props {
+	onSelect: ButtonListener;
+	menuTriggerIconName: string;
+	menuItems: Array<MenuItem>;
+	testID?: string;
+}
+
+export default class PopupMenu extends React.PureComponent<Props> {
+	render(): React.ReactElement {
 		const { onSelect, menuTriggerIconName, menuItems, testID } = this.props;
 		const menuTriggerIcon = (
 			<Icon
@@ -42,21 +58,23 @@ export default class PopupMenu extends React.PureComponent {
 			<Menu onSelect={onSelect}>
 				<MenuTrigger children={menuTriggerIcon} />
 				<MenuOptions customStyles={menuOptionsStyles}>
-					{menuItems.map((menuItem, index) => {
-						if (menuItem.hide === true) {
-							return null;
+					{menuItems.map(
+						(menuItem: MenuItem, index: number): React.ReactNode => {
+							if (menuItem.hide === true) {
+								return null;
+							}
+							return (
+								<MenuOption key={index} value={menuItem.value}>
+									<Text
+										style={[menuOptionsStyles.optionText, menuItem.textStyle]}
+										testID={menuItem.testID}
+									>
+										{menuItem.text}
+									</Text>
+								</MenuOption>
+							);
 						}
-						return (
-							<MenuOption key={index} value={menuItem.value}>
-								<Text
-									style={[menuOptionsStyles.optionText, menuItem.textStyle]}
-									testID={menuItem.testID}
-								>
-									{menuItem.text}
-								</Text>
-							</MenuOption>
-						);
-					})}
+					)}
 				</MenuOptions>
 			</Menu>
 		);

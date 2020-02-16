@@ -156,7 +156,7 @@ export default class AccountIconChooser extends React.PureComponent<
 			<TouchableOpacity
 				key={index}
 				style={[styles.iconBorder, isSelected ? styles.selected : {}]}
-				onPress={() =>
+				onPress={(): void =>
 					onSelect({ isBip39: bip39, newAddress: address, newSeed: seed })
 				}
 			>
@@ -183,7 +183,7 @@ export default class AccountIconChooser extends React.PureComponent<
 		}
 	}
 
-	render() {
+	render(): React.ReactElement {
 		const { value } = this.props;
 		const { icons } = this.state;
 
@@ -194,7 +194,7 @@ export default class AccountIconChooser extends React.PureComponent<
 						data={icons}
 						extraData={value}
 						horizontal
-						keyExtractor={item => item.seed}
+						keyExtractor={(item: IconType): string => item.seed}
 						renderItem={this.renderIcon}
 					/>
 					<TouchableOpacity onPress={this.refreshIcons}>

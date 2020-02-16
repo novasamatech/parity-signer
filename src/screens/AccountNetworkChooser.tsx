@@ -40,7 +40,7 @@ import { alertPathDerivationError } from '../util/alertUtils';
 import {
 	getExistedNetworkKeys,
 	getIdentityName,
-	getPathsWithSubstrateNetwork,
+	getPathsWithSubstrateNetworkKey,
 	isSubstrateNetworkParams
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
@@ -128,7 +128,7 @@ function AccountNetworkChooser({
 	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
 		const shouldExclude = excludedNetworks.includes(networkKey);
 		if (isNew && !shouldExclude) return true;
-		const availableNetworks = getExistedNetworkKeys(currentIdentity);
+		const availableNetworks = getExistedNetworkKeys(currentIdentity!);
 		if (shouldShowMoreNetworks) {
 			if (shouldExclude) return false;
 			return !availableNetworks.includes(networkKey);
@@ -226,8 +226,8 @@ function AccountNetworkChooser({
 			}
 		} else {
 			const paths = Array.from(currentIdentity!.meta.keys());
-			const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
 			if (isSubstrateNetworkParams(networkParams)) {
+				const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
 				if (listedPaths.length === 0)
 					return await deriveSubstrateNetworkRootPath(
 						networkKey,

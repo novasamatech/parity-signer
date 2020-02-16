@@ -14,7 +14,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { StyleSheet, TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import { StyleSheet, TextInputProps } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import colors from '../colors';
 import Background from '../components/Background';

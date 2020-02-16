@@ -25,7 +25,7 @@ import {
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import {
-	getPathsWithSubstrateNetwork,
+	getPathsWithSubstrateNetworkKey,
 	groupPaths,
 	removeSlash
 } from '../util/identitiesUtils';
@@ -53,7 +53,7 @@ function PathsList({ accounts, navigation }) {
 	const pathsGroups = useMemo(() => {
 		if (!currentIdentity || isEthereumPath) return null;
 		const paths = Array.from(currentIdentity.meta.keys());
-		const listedPaths = getPathsWithSubstrateNetwork(paths, networkKey);
+		const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
 		return groupPaths(listedPaths);
 	}, [currentIdentity, isEthereumPath, networkKey]);
 

@@ -46,7 +46,7 @@ const NetworkFooter = ({
 }: {
 	networkColor: string;
 	network: NetworkParams;
-}) => (
+}): React.ReactElement => (
 	<View
 		style={[
 			styles.footer,
@@ -103,17 +103,12 @@ export function NetworkCard({
 type AccountCardProps = {
 	address: string;
 	networkKey?: string;
-	onPress: ButtonListener;
+	onPress?: ButtonListener;
 	seedType?: string;
 	style?: ViewStyle;
 	testID?: string;
 	title: string;
 	titlePrefix?: string;
-};
-
-AccountCard.defaultProps = {
-	onPress: () => {},
-	title: 'No name'
 };
 
 export default function AccountCard({
@@ -126,7 +121,8 @@ export default function AccountCard({
 	title,
 	titlePrefix
 }: AccountCardProps): ReactElement {
-	const displayTitle = title.length ? title : AccountCard.defaultProps.title;
+	const defaultTitle = 'No name';
+	const displayTitle = title.length > 0 ? title : defaultTitle;
 	const seedTypeDisplay = seedType || '';
 	const network =
 		networkKey !== undefined

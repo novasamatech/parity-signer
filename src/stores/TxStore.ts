@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 import { Container } from 'unstated';
 import { loadAccountTxs, saveTx } from '../util/db';
+import { TxParticipant } from 'types/tx';
 
 type State = {
 	signedTxs: Map<string, Record<string, any>>;
@@ -25,19 +26,19 @@ export default class TxStore extends Container<State> {
 		signedTxs: new Map()
 	};
 
-	async saveTx(tx) {
+	async saveTx(tx: any): Promise<void> {
 		await saveTx(tx);
 		this.setState({ signedTxs: this.state.signedTxs.set(tx.hash, tx) });
 	}
 
-	async loadTxsForAccount(account) {
+	async loadTxsForAccount(account: TxParticipant): Promise<void> {
 		const txs = await loadAccountTxs(account);
 		this.setState({
 			signedTxs: new Map([...this.state.signedTxs, ...txs])
 		});
 	}
 
-	getTxList({ address }) {
+	getTxList({ address }: { address: string }): string[] {
 		return Array.from(this.state.signedTxs.values()).filter(
 			tx => tx.sender === address || tx.recipient === address
 		);

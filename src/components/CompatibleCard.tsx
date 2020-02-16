@@ -31,7 +31,7 @@ const CompatibleCard = ({
 	accountsStore: AccountsStore;
 	titlePrefix?: string;
 }) =>
-	isLegacyFoundAccount(account) ? (
+	isLegacyFoundAccount(account) || account.isLegacy === undefined ? (
 		<AccountCard
 			title={account.name}
 			address={account.address}

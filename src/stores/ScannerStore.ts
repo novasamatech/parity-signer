@@ -46,9 +46,17 @@ import {
 	asciiToHex,
 	encodeNumber
 } from '../util/decoders';
-import { Account } from 'types/identityTypes';
+import { Account, FoundAccount } from 'types/identityTypes';
 import { constructSURI } from '../util/suri';
 import { emptyAccount } from '../util/account';
+import AccountsStore from './AccountsStore';
+import {
+	CompletedParsedData,
+	isEthereumCompletedParsedData,
+	isMultipartData,
+	SubstrateCompletedParsedData
+} from 'types/scannerTypes';
+import { NetworkProtocol } from 'types/networkSpecsTypes';
 
 type TXRequest = Record<string, any>;
 
@@ -63,26 +71,27 @@ type MultipartData = {
 };
 
 type ScannerState = {
+	busy: boolean;
 	completedFramesCount: number;
-	dataToSign: string;
+	dataToSign: string | GenericExtrinsicPayload;
 	isHash: boolean;
 	isOversized: boolean;
-	latestFrame: number;
-	message: string;
+	latestFrame: number | null;
+	message: string | null;
 	missedFrames: Array<number>;
 	multipartData: MultipartData;
 	multipartComplete: boolean;
-	prehash: GenericExtrinsicPayload;
-	recipient: Account;
+	prehash: GenericExtrinsicPayload | null;
+	recipient: FoundAccount | null;
 	scanErrorMsg: string;
-	sender: Account;
+	sender: FoundAccount | null;
 	signedData: string;
-	signedTxList: [SignedTX];
+	signedTxList: SignedTX[];
 	totalFrameCount: number;
-	tx: Record<string, any>;
+	tx: Record<string, any> | string;
 	txRequest: TXRequest | null;
-	type: 'transaction' | 'message';
-	unsignedData: Record<string, any>;
+	type: 'transaction' | 'message' | null;
+	unsignedData: CompletedParsedData | null;
 };
 
 const DEFAULT_STATE = Object.freeze({
@@ -101,6 +110,7 @@ const DEFAULT_STATE = Object.freeze({
 	scanErrorMsg: '',
 	sender: null,
 	signedData: '',
+	signedTxList: [],
 	totalFrameCount: 0,
 	tx: '',
 	txRequest: null,
@@ -116,9 +126,10 @@ const SIG_TYPE_SR25519 = new Uint8Array([1]);
 // const SIG_TYPE_ECDSA = new Uint8Array([2]);
 
 export default class ScannerStore extends Container<ScannerState> {
-	state = DEFAULT_STATE;
+	state: ScannerState = DEFAULT_STATE;
 
-	async setUnsigned(data) {
+	async setUnsigned(data: string) {
+		console.log('parsed unsignedData is', JSON.parse(data));
 		this.setState({
 			unsignedData: JSON.parse(data)
 		});
@@ -129,13 +140,19 @@ export default class ScannerStore extends Container<ScannerState> {
 	 * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
 	 */
 
-	async setParsedData(strippedData, accountsStore, multipartComplete = false) {
+	async setParsedData(
+		strippedData: Uint8Array,
+		accountsStore: AccountsStore,
+		multipartComplete = false
+	): Promise<void> {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
 		);
 
-		if (!multipartComplete && parsedData.isMultipart) {
+		console.log('parsed data: ', parsedData);
+
+		if (isMultipartData(parsedData)) {
 			this.setPartData(
 				parsedData.currentFrame,
 				parsedData.frameCount,
@@ -181,10 +198,19 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		// set payload before it got hashed.
 		// signature will be generated from the hash, but we still want to display it.
-		this.setPrehashPayload(parsedData.preHash);
+		if (parsedData.hasOwnProperty('preHash')) {
+			this.setPrehashPayload(
+				(parsedData as SubstrateCompletedParsedData).preHash
+			);
+		}
 	}
 
-	async setPartData(frame, frameCount, partData, accountsStore) {
+	async setPartData(
+		frame: number,
+		frameCount: number,
+		partData: string,
+		accountsStore: AccountsStore
+	) {
 		const {
 			latestFrame,
 			missedFrames,
@@ -207,8 +233,8 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		if (
-			partDataAsBytes[0] === new Uint8Array([0x00]) ||
-			partDataAsBytes[0] === new Uint8Array([0x7b])
+			partDataAsBytes[0] === new Uint8Array([0x00])[0] ||
+			partDataAsBytes[0] === new Uint8Array([0x7b])[0]
 		) {
 			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
 			throw new Error('Error decoding invalid part data.');
@@ -229,9 +255,15 @@ export default class ScannerStore extends Container<ScannerState> {
 			});
 
 			// concatenate all the parts into one binary blob
-			let concatMultipartData = Object.values(
-				multipartData
-			).reduce((acc, part) => [...acc, ...part]);
+			let concatMultipartData = Object.values(multipartData).reduce(
+				(acc: Uint8Array, part: Uint8Array): Uint8Array => {
+					const c = new Uint8Array(acc.length + part.length);
+					c.set(acc);
+					c.set(part, acc.length);
+					return c;
+				},
+				new Uint8Array(0)
+			);
 
 			// unshift the frame info
 			const frameInfo = u8aConcat(
@@ -248,7 +280,9 @@ export default class ScannerStore extends Container<ScannerState> {
 			const nextDataState = multipartData;
 			nextDataState[frame] = partDataAsBytes;
 
-			const missedFramesRange = mod(frame - latestFrame, totalFrameCount) - 1;
+			const missedFramesRange: number = latestFrame
+				? mod(frame - latestFrame, totalFrameCount) - 1
+				: 0;
 
 			// we skipped at least one frame that we haven't already scanned before
 			if (
@@ -288,35 +322,52 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
-	async setData(accountsStore) {
-		switch (this.state.unsignedData.action) {
-			case 'signTransaction':
-				return await this.setTXRequest(this.state.unsignedData, accountsStore);
-			case 'signData':
-				return await this.setDataToSign(this.state.unsignedData, accountsStore);
-			default:
-				throw new Error(
-					'Scanned QR should contain either transaction or a message to sign'
-				);
+	async setData(accountsStore: AccountsStore): Promise<void> {
+		const throwError = (): never => {
+			throw new Error(
+				'Scanned QR should contain either transaction or a message to sign'
+			);
+		};
+		if (!isMultipartData(this.state.unsignedData)) {
+			switch (this.state.unsignedData.action) {
+				case 'signTransaction':
+					return await this.setTXRequest(
+						this.state.unsignedData,
+						accountsStore
+					);
+				case 'signData':
+					await this.setDataToSign(this.state.unsignedData, accountsStore);
+					return;
+				default:
+					throwError();
+			}
+		} else {
+			throwError();
 		}
 	}
 
-	async setDataToSign(signRequest, accountsStore) {
+	async setDataToSign(
+		signRequest: CompletedParsedData,
+		accountsStore: AccountsStore
+	): Promise<boolean> {
 		this.setBusy();
 
 		const address = signRequest.data.account;
-		const crypto = signRequest.data.crypto;
+		const crypto = signRequest.data?.crypto;
 		const message = signRequest.data.data;
-		const isHash = signRequest.isHash;
-		const isOversized = signRequest.oversized;
+		const isHash = signRequest?.isHash;
+		const isOversized = signRequest?.oversized;
 
 		let dataToSign = '';
+		const messageString = message?.toString();
+		if (messageString === undefined)
+			throw new Error('No message data to sign.');
 
 		if (crypto === 'sr25519' || crypto === 'ed25519') {
 			// only Substrate payload has crypto field
-			dataToSign = message;
+			dataToSign = message!.toString();
 		} else {
-			dataToSign = await ethSign(message);
+			dataToSign = await ethSign(message!.toString());
 		}
 
 		const sender = accountsStore.getAccountByAddress(address);
@@ -328,40 +379,46 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		this.setState({
 			dataToSign,
-			isHash,
-			isOversized,
-			message,
-			sender,
+			isHash: isHash ?? false,
+			isOversized: isOversized ?? false,
+			message: message!.toString(),
+			sender: sender!,
 			type: 'message'
 		});
 
 		return true;
 	}
 
-	async setTXRequest(txRequest, accountsStore) {
+	async setTXRequest(
+		txRequest: CompletedParsedData,
+		accountsStore: AccountsStore
+	): Promise<boolean> {
 		this.setBusy();
 
-		const isOversized = txRequest.oversized;
+		const isOversized = txRequest?.oversized;
 
-		const protocol = txRequest.data.rlp
-			? NetworkProtocols.ETHEREUM
-			: NetworkProtocols.SUBSTRATE;
-		const isEthereum = protocol === NetworkProtocols.ETHEREUM;
+		const isEthereum = isEthereumCompletedParsedData(txRequest);
 
 		if (
 			isEthereum &&
-			!(txRequest.data && txRequest.data.rlp && txRequest.data.account)
+			!(txRequest.data && txRequest.data!.rlp && txRequest.data.account)
 		) {
 			throw new Error('Scanned QR contains no valid transaction');
 		}
-
-		const tx = isEthereum
-			? await transaction(txRequest.data.rlp)
-			: txRequest.data.data;
-
-		const networkKey = isEthereum
-			? tx.ethereumChainId
-			: txRequest.data.data.genesisHash.toHex();
+		let tx, networkKey, recipientAddress, dataToSign;
+		if (isEthereumCompletedParsedData(txRequest)) {
+			tx = await transaction(txRequest.data.rlp);
+			networkKey = tx.ethereumChainId;
+			recipientAddress = tx.action;
+			// For Eth, always sign the keccak hash.
+			// For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
+			dataToSign = await keccak(txRequest.data.rlp);
+		} else {
+			tx = txRequest.data.data;
+			networkKey = txRequest.data.data?.genesisHash.toHex();
+			recipientAddress = txRequest.data.account;
+			dataToSign = txRequest.data.data;
+		}
 
 		const sender = await accountsStore.getById({
 			address: txRequest.data.account,
@@ -376,24 +433,16 @@ export default class ScannerStore extends Container<ScannerState> {
 			);
 		}
 
-		const recipientAddress = isEthereum ? tx.action : txRequest.data.account;
-
 		const recipient =
 			(await accountsStore.getById({
 				address: recipientAddress,
 				networkKey
 			})) || emptyAccount(recipientAddress, networkKey);
 
-		// For Eth, always sign the keccak hash.
-		// For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
-		const dataToSign = isEthereum
-			? await keccak(txRequest.data.rlp)
-			: txRequest.data.data;
-
 		this.setState({
-			dataToSign,
+			dataToSign: dataToSign as string,
 			isOversized,
-			recipient,
+			recipient: recipient as FoundAccount,
 			sender,
 			tx,
 			txRequest,
@@ -404,15 +453,18 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	//seed is SURI on substrate and is seedPhrase on Ethereum
-	async signData(seed) {
+	async signData(seed: string): Promise<void> {
 		const { dataToSign, isHash, sender } = this.state;
+
+		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
+			throw new Error('Signing Error: sender could not be found.');
 
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
 
 		let signedData;
 		if (isEthereum) {
-			signedData = await brainWalletSign(seed, dataToSign);
+			signedData = await brainWalletSign(seed, dataToSign as string);
 		} else {
 			let signable;
 
@@ -424,6 +476,8 @@ export default class ScannerStore extends Container<ScannerState> {
 				signable = hexStripPrefix(u8aToHex(dataToSign));
 			} else if (isAscii(dataToSign)) {
 				signable = hexStripPrefix(asciiToHex(dataToSign));
+			} else {
+				throw new Error('Signing Error: cannot signing message');
 			}
 			let signed = await substrateSign(seed, signable);
 			signed = '0x' + signed;
@@ -434,13 +488,16 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setState({ signedData });
 	}
 
-	async signDataWithSeedPhrase(seedPhrase, protocol) {
+	async signDataWithSeedPhrase(
+		seedPhrase: string,
+		protocol: NetworkProtocol
+	): Promise<void> {
 		if (
 			protocol === NetworkProtocols.SUBSTRATE ||
 			protocol === NetworkProtocols.UNKNOWN
 		) {
 			const suri = constructSURI({
-				derivePath: this.state.sender.path,
+				derivePath: this.state.sender?.path,
 				password: '',
 				phrase: seedPhrase
 			});
@@ -450,25 +507,22 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 	}
 
-	async signDataLegacy(pin = '1') {
+	async signDataLegacy(pin = '1'): Promise<void> {
 		const { sender } = this.state;
+		if (!sender || !sender.encryptedSeed)
+			throw new Error('Signing Error: sender could not be found.');
 		const seed = await decryptData(sender.encryptedSeed, pin);
 		await this.signData(seed);
 	}
 
-	cleanup() {
-		return new Promise(resolve => {
-			this.setState(
-				{
-					...DEFAULT_STATE
-				},
-				resolve
-			);
-			this.clearMultipartProgress();
+	async cleanup(): Promise<void> {
+		await this.setState({
+			...DEFAULT_STATE
 		});
+		this.clearMultipartProgress();
 	}
 
-	clearMultipartProgress() {
+	clearMultipartProgress(): void {
 		this.setState({
 			completedFramesCount: DEFAULT_STATE.completedFramesCount,
 			latestFrame: DEFAULT_STATE.latestFrame,
@@ -483,14 +537,14 @@ export default class ScannerStore extends Container<ScannerState> {
 	/**
 	 * @dev signing payload type can be either transaction or message
 	 */
-	getType() {
+	getType(): 'transaction' | 'message' | null {
 		return this.state.type;
 	}
 
 	/**
 	 * @dev sets a lock on writes
 	 */
-	setBusy() {
+	setBusy(): void {
 		this.setState({
 			busy: true
 		});
@@ -499,103 +553,103 @@ export default class ScannerStore extends Container<ScannerState> {
 	/**
 	 * @dev allow write operations
 	 */
-	setReady() {
+	setReady(): void {
 		this.setState({
 			busy: false
 		});
 	}
 
-	isBusy() {
+	isBusy(): boolean {
 		return this.state.busy;
 	}
 
-	isMultipartComplete() {
+	isMultipartComplete(): boolean {
 		return this.state.multipartComplete;
 	}
 
 	/**
 	 * @dev is the payload a hash
 	 */
-	getIsHash() {
+	getIsHash(): boolean {
 		return this.state.isHash;
 	}
 
 	/**
 	 * @dev is the payload size greater than 256 (in Substrate chains)
 	 */
-	getIsOversized() {
+	getIsOversized(): boolean {
 		return this.state.isOversized;
 	}
 
 	/**
 	 * @dev returns the number of completed frames so far
 	 */
-	getCompletedFramesCount() {
+	getCompletedFramesCount(): number {
 		return this.state.completedFramesCount;
 	}
 
 	/**
 	 * @dev returns the number of frames to fill in total
 	 */
-	getTotalFramesCount() {
+	getTotalFramesCount(): number {
 		return this.state.totalFrameCount;
 	}
 
-	getSender() {
+	getSender(): FoundAccount | null {
 		return this.state.sender;
 	}
 
-	getRecipient() {
+	getRecipient(): FoundAccount | null {
 		return this.state.recipient;
 	}
 
-	getTXRequest() {
+	getTXRequest(): TXRequest | null {
 		return this.state.txRequest;
 	}
 
-	getMessage() {
+	getMessage(): string | null {
 		return this.state.message;
 	}
 
 	/**
 	 * @dev unsigned data, not yet formatted as signable payload
 	 */
-	getUnsigned() {
+	getUnsigned(): CompletedParsedData | null {
 		return this.state.unsignedData;
 	}
 
-	getTx() {
+	getTx(): Record<string, any> | string {
 		return this.state.tx;
 	}
 
 	/**
 	 * @dev unsigned date, formatted as signable payload
 	 */
-	getDataToSign() {
+	getDataToSign(): string | GenericExtrinsicPayload {
 		return this.state.dataToSign;
 	}
 
-	getSignedTxData() {
+	getSignedTxData(): string {
 		return this.state.signedData;
 	}
 
-	setErrorMsg(scanErrorMsg) {
+	setErrorMsg(scanErrorMsg: string): void {
 		this.setState({ scanErrorMsg });
 	}
 
-	getErrorMsg() {
+	getErrorMsg(): string {
 		return this.state.scanErrorMsg;
 	}
 
-	getMissedFrames() {
+	getMissedFrames(): number[] {
 		return this.state.missedFrames;
 	}
 
-	getPrehashPayload() {
+	getPrehashPayload(): GenericExtrinsicPayload | null {
 		return this.state.prehash;
 	}
 
-	setPrehashPayload(prehash) {
+	setPrehashPayload(prehash: GenericExtrinsicPayload): void {
 		this.setState({
 			prehash
 		});

@@ -20,7 +20,7 @@ import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ViewPropTypes, ViewStyle } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import colors from '../colors';
 import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
@@ -30,14 +30,12 @@ import { shortString } from '../util/strings';
 import fontStyles from '../fontStyles';
 import { alertDecodeError } from '../util/alertUtils';
 import {
-	AnyNumber,
 	AnyU8a,
-	Codec,
 	ExtrinsicPayloadValue,
 	IExtrinsicEra,
 	IMethod
 } from '@polkadot/types/types';
-import { ExtrinsicEra, MortalEra } from '@polkadot/types/interfaces';
+import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 const registry = new TypeRegistry();
 

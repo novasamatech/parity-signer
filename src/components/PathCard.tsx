@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import {
@@ -38,15 +37,6 @@ import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 import { ButtonListener } from 'types/props';
 import { Identity } from 'types/identityTypes';
-
-PathCard.propTypes = {
-	identity: PropTypes.object.isRequired,
-	name: PropTypes.string,
-	onPress: PropTypes.func,
-	path: PropTypes.string.isRequired,
-	testID: PropTypes.string,
-	titlePrefix: PropTypes.string
-};
 
 export default function PathCard({
 	onPress,

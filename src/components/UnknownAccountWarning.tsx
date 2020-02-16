@@ -19,7 +19,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import colors from '../colors';
 import fonts from '../fonts';
 
-export default function UnknownAccountWarning({ isPath }) {
+export default function UnknownAccountWarning({
+	isPath
+}: {
+	isPath?: boolean;
+}): React.ReactElement {
 	return (
 		<View style={styles.warningView}>
 			<Text style={styles.warningTitle}>Warning</Text>

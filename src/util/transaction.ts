@@ -18,7 +18,24 @@ import { rlpItem } from './native';
 import { fromWei } from './units';
 
 class Transaction {
-	constructor(nonce, gasPrice, gas, action, value, data, ethereumChainId) {
+	readonly nonce: string;
+	readonly gasPrice: string;
+	readonly gas: string;
+	readonly action: string;
+	readonly value: string;
+	readonly data: string;
+	readonly ethereumChainId: string;
+	readonly isSafe: boolean;
+
+	constructor(
+		nonce: string,
+		gasPrice: string,
+		gas: string,
+		action: string,
+		value: string,
+		data: string,
+		ethereumChainId: string
+	) {
 		this.nonce = nonce || '0';
 		this.gasPrice = parseInt(gasPrice, 16).toString();
 		this.gas = parseInt(gas, 16).toString();
@@ -30,7 +47,11 @@ class Transaction {
 	}
 }
 
-async function asyncTransaction(rlp, resolve, reject) {
+async function asyncTransaction(
+	rlp: string,
+	resolve: (value?: Transaction) => void,
+	reject: any
+): Promise<void> {
 	try {
 		const nonce = await rlpItem(rlp, 0);
 		const gasPrice = await rlpItem(rlp, 1);
@@ -54,7 +75,7 @@ async function asyncTransaction(rlp, resolve, reject) {
 	}
 }
 
-export default function transaction(rlp) {
+export default function transaction(rlp: string): Promise<Transaction> {
 	return new Promise((resolve, reject) =>
 		asyncTransaction(rlp, resolve, reject)
 	);

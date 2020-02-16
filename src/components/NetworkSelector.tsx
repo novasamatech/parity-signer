@@ -17,7 +17,6 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import {
 	Image,
 	Platform,
@@ -39,18 +38,19 @@ const ACCOUNT_NETWORK = 'Account Network';
 const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
-NetworkSelector.protoTypes = {
-	networkKey: PropTypes.string.isRequired,
-	setVisible: PropTypes.func.isRequired
-};
-
 const excludedNetworks = [SubstrateNetworkKeys.KUSAMA_CC2];
 if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 }
 
-export function NetworkSelector({ networkKey, setVisible }) {
+export function NetworkSelector({
+	networkKey,
+	setVisible
+}: {
+	networkKey: string;
+	setVisible: (shouldVisible: boolean) => void;
+}) {
 	return (
 		<View style={styles.body}>
 			<Text style={styles.label}>{ACCOUNT_NETWORK}</Text>
@@ -66,14 +66,16 @@ export function NetworkSelector({ networkKey, setVisible }) {
 	);
 }
 
-NetworkOptions.propTypes = {
-	setNetworkKey: PropTypes.func.isRequired,
-	setVisible: PropTypes.func.isRequired,
-	visible: PropTypes.bool.isRequired
-};
-
-export function NetworkOptions({ setNetworkKey, visible, setVisible }) {
-	const onNetworkSelected = networkKey => {
+export function NetworkOptions({
+	setNetworkKey,
+	visible,
+	setVisible
+}: {
+	setNetworkKey: (networkKey: string) => void;
+	visible: boolean;
+	setVisible: (shouldVisible: boolean) => void;
+}) {
+	const onNetworkSelected = (networkKey: string) => {
 		setNetworkKey(networkKey);
 		setVisible(false);
 	};
@@ -84,7 +86,6 @@ export function NetworkOptions({ setNetworkKey, visible, setVisible }) {
 			return (
 				<Touchable
 					key={networkKey}
-					value={networkKey}
 					onPress={() => onNetworkSelected(networkKey)}
 				>
 					<View style={styles.optionWrapper}>

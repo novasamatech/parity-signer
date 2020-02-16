@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {
 	StyleSheet,
@@ -46,18 +45,18 @@ export default class TextInput extends React.PureComponent<Props, {}> {
 		this.input?.focus();
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate(): void {
 		const { focus } = this.props;
 		focus && this.focus();
 	}
 
-	renderLabel() {
+	renderLabel(): React.ReactNode {
 		const { label } = this.props;
 		if (!label) return;
 		return <Text style={styles.label}>{label}</Text>;
 	}
 
-	render() {
+	render(): React.ReactElement {
 		const { fixedPrefix, style, error } = this.props;
 		const finalInputStyles: TextStyle[] = [styles.input];
 		if (error) {

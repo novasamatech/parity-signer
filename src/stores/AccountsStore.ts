@@ -53,7 +53,6 @@ import {
 	LockedAccount,
 	UnlockedAccount,
 	FoundAccount,
-	FoundLegacyAccount,
 	Identity,
 	FoundIdentityAccount
 } from 'types/identityTypes';
@@ -341,7 +340,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 		for (const [k, v] of this.state.accounts.entries()) {
 			if (v.address.toLowerCase() === address.toLowerCase()) {
-				return { ...v, isLegacy: true, accountId: k };
+				return { ...v, accountId: k, isLegacy: true };
 			}
 		}
 		return this.getAccountFromIdentity(address);

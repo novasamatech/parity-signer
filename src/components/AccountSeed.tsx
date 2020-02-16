@@ -19,8 +19,6 @@ import {
 	NativeSyntheticEvent,
 	StyleSheet,
 	Text,
-	TextInputChangeEventData,
-	TextInputFocusEventData,
 	TextInputSelectionChangeEventData,
 	View
 } from 'react-native';

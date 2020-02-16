@@ -17,21 +17,22 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import {
 	Modal,
 	StyleSheet,
 	TouchableWithoutFeedback,
-	View
+	View,
+	ViewStyle
 } from 'react-native';
 
-TransparentBackground.propTypes = {
-	animationType: PropTypes.string.isRequired,
-	setVisible: PropTypes.func.isRequired,
-	style: PropTypes.object,
-	testID: PropTypes.string,
-	visible: PropTypes.bool.isRequired
-};
+interface Props {
+	animationType: 'none' | 'slide' | 'fade';
+	setVisible: (isVisible: boolean) => void;
+	style?: ViewStyle;
+	testID?: string;
+	visible: boolean;
+	children: any;
+}
 
 export default function TransparentBackground({
 	children,
@@ -40,22 +41,21 @@ export default function TransparentBackground({
 	testID,
 	style,
 	animationType
-}) {
+}: Props) {
 	return (
 		<Modal
 			animationType={animationType}
 			visible={visible}
 			transparent={true}
-			onRequestClose={() => setVisible(false)}
+			onRequestClose={(): void => setVisible(false)}
 		>
 			<TouchableWithoutFeedback
 				style={{ flex: 1 }}
-				onPressIn={() => setVisible(false)}
+				onPressIn={(): void => setVisible(false)}
 			>
 				<View
 					testID={testID}
-					style={[styles.container, style]}
-					onPress={() => setVisible(false)}
+					style={StyleSheet.flatten([styles.container, style])}
 				>
 					{children}
 				</View>

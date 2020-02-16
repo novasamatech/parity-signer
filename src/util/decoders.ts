@@ -24,11 +24,13 @@ import {
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import { blake2b } from './native';
+import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
 import {
-	NETWORK_LIST,
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from '../constants';
+	EthereumParsedData,
+	ParsedData,
+	SubstrateCompletedParsedData,
+	SubstrateMultiParsedData
+} from 'types/scannerTypes';
 
 /*
   Example Full Raw Data
@@ -96,7 +98,10 @@ export function rawDataToU8A(rawData) {
 	return bytes;
 }
 
-export async function constructDataFromBytes(bytes, multipartComplete = false) {
+export async function constructDataFromBytes(
+	bytes: Uint8Array,
+	multipartComplete = false
+): Promise<ParsedData> {
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
 	const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
@@ -105,7 +110,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 
 	// UOS after frames can be metadata json
 	if (isMultipart && !multipartComplete) {
-		const partData = {
+		const partData: SubstrateMultiParsedData = {
 			currentFrame,
 			frameCount,
 			isMultipart,
@@ -119,13 +124,15 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 	const secondByte = uosAfterFrames.substr(4, 2);
 
 	let action;
-	const data = {};
-	data.data = {}; // for consistency with legacy data format.
 
 	try {
 		// decode payload appropriately via UOS
 		switch (zerothByte) {
-			case '45': // Ethereum UOS payload
+			case '45': {
+				// Ethereum UOS payload
+				const data = {
+					data: {} // for consistency with legacy data format.
+				} as EthereumParsedData;
 				action =
 					firstByte === '00' || firstByte === '01'
 						? 'signData'
@@ -136,7 +143,7 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 
 				data.action = action;
 				data.data.account = address;
-
+				debugger;
 				if (action === 'signData') {
 					data.data.rlp = uosAfterFrames[13];
 				} else if (action === 'signTransaction') {
@@ -144,16 +151,20 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 				} else {
 					throw new Error('Could not determine action type.');
 				}
-				break;
-			case '53': // Substrate UOS payload
+				return data;
+			}
+			case '53': {
+				// Substrate UOS payload
+				const data = {
+					data: {} // for consistency with legacy data format.
+				} as SubstrateCompletedParsedData;
 				try {
-					const crypto =
+					data.data.crypto =
 						firstByte === '00'
 							? 'ed25519'
 							: firstByte === '01'
 							? 'sr25519'
 							: null;
-					data.data.crypto = crypto;
 					const pubKeyHex = uosAfterFrames.substr(6, 64);
 					const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
 					const hexEncodedData = '0x' + uosAfterFrames.slice(70);
@@ -187,7 +198,8 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 							// while we are signing a hash, we still have the ability to know what the signing payload is, so we should get that information into the store.
 							data.preHash = extrinsicPayload;
 
-							network = NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
+							network =
+								SUBSTRATE_NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
 
 							if (!network) {
 								throw new Error(
@@ -231,18 +243,17 @@ export async function constructDataFromBytes(bytes, multipartComplete = false) {
 					}
 				} catch (e) {
 					throw new Error(
-						'Error: something went wrong decoding the Substrate UOS payload: ',
-						uosAfterFrames
+						'Error: something went wrong decoding the Substrate UOS payload: ' +
+							uosAfterFrames
 					);
 				}
-				break;
+				return data;
+			}
 			default:
-				throw new Error('Error: Payload is not formatted correctly: ', bytes);
+				throw new Error('Error: Payload is not formatted correctly: ' + bytes);
 		}
-
-		return data;
 	} catch (e) {
-		throw new Error('we cannot handle the payload: ', bytes);
+		throw new Error('we cannot handle the payload: ' + bytes);
 	}
 }
 

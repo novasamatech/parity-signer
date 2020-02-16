@@ -14,19 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React from 'react';
-import { View, ViewPropTypes, Image } from 'react-native';
+import { View, Image, ViewStyle, StyleSheet, ImageStyle } from 'react-native';
 
 import shadowImage from '../../res/img/card_shadow.png';
 
-export default class Separator extends React.PureComponent {
-	static propTypes = {
-		shadow: PropTypes.bool,
-		shadowStyle: ViewPropTypes.style,
-		style: ViewPropTypes.style
-	};
+interface Props {
+	shadow?: boolean;
+	shadowStyle?: ImageStyle;
+	style?: ViewStyle;
+}
 
+export default class Separator extends React.PureComponent<Props> {
 	render() {
 		const { shadow, shadowStyle, style } = this.props;
 
@@ -45,14 +44,14 @@ export default class Separator extends React.PureComponent {
 				{shadow && (
 					<Image
 						source={shadowImage}
-						style={[
+						style={StyleSheet.flatten([
 							{
 								height: 32,
 								marginTop: -32,
 								width: '100%'
 							},
 							shadowStyle
-						]}
+						])}
 					/>
 				)}
 			</View>

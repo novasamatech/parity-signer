@@ -27,13 +27,43 @@
  * @property {string} password - The optionnal password password without the `///`
  */
 
+import { SURIObject } from 'types/scannerTypes';
+
 /**
  * @description Extract the phrase, path and password from a SURI format for specifying secret keys `<secret>/<soft-key>//<hard-key>///<password>` (the `///password` may be omitted, and `/<soft-key>` and `//<hard-key>` maybe repeated and mixed).
  * @param {string} suri The SURI to be parsed
  * @returns {SURIObject}
  */
 
-export function parseSURI(suri) {
+/**
+ * @description Extract the path and password from a SURI format for specifying secret keys `/<soft-key>//<hard-key>///<password>` (the `///password` may be omitted, and `/<soft-key>` and `//<hard-key>` maybe repeated and mixed).
+ * @param {string} input: suri The SURI to be parsed
+ * @returns {DerivationPathObject}
+ */
+
+export function parseDerivationPath(
+	input: string
+): {
+	derivePath: string;
+	password: string;
+} {
+	const RE_CAPTURE = /^((?:\/\/?[^/]+)*)(?:\/\/\/(.*))?$/;
+	const matches = input.match(RE_CAPTURE);
+	let derivePath, password;
+
+	if (matches) {
+		[, derivePath = '', password = ''] = matches;
+	} else {
+		throw new Error('Invalid derivation path input.');
+	}
+
+	return {
+		derivePath,
+		password
+	};
+}
+
+export function parseSURI(suri: string): SURIObject {
 	const RE_CAPTURE = /^([\w ]+(?: +\w*)*)?(.*)$/;
 	const matches = suri.match(RE_CAPTURE);
 	let phrase,
@@ -64,35 +94,20 @@ export function parseSURI(suri) {
 }
 
 /**
- * @description Extract the path and password from a SURI format for specifying secret keys `/<soft-key>//<hard-key>///<password>` (the `///password` may be omitted, and `/<soft-key>` and `//<hard-key>` maybe repeated and mixed).
- * @param {string} suri The SURI to be parsed
- * @returns {DerivationPathObject}
- */
-
-export function parseDerivationPath(input) {
-	const RE_CAPTURE = /^((?:\/\/?[^/]+)*)(?:\/\/\/(.*))?$/;
-	const matches = input.match(RE_CAPTURE);
-	let derivePath, password;
-
-	if (matches) {
-		[, derivePath = '', password = ''] = matches;
-	} else {
-		throw new Error('Invalid derivation path input.');
-	}
-
-	return {
-		derivePath,
-		password
-	};
-}
-
-/**
  * @description Return a SURI format from a bip39 phrase, a derivePath, e.g `//hard/soft` and a password.
  * @param {SURIObject} SURIObject
  * @returns {string}
  */
 
-export function constructSURI({ derivePath = '', password = '', phrase }) {
+export function constructSURI({
+	derivePath = '',
+	password = '',
+	phrase
+}: {
+	derivePath?: string;
+	password?: string;
+	phrase: string;
+}) {
 	if (!phrase) {
 		throw new Error('Cannot construct an SURI from emtpy phrase.');
 	}

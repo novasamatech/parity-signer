@@ -55,6 +55,7 @@ export function emptyAccount(
 		derivationPassword: '',
 		derivationPath: '',
 		encryptedSeed: undefined,
+		isLegacy: true,
 		name: '',
 		networkKey: networkKey,
 		seed: '',

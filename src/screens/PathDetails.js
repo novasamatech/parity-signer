@@ -28,7 +28,7 @@ import {
 	getNetworkKey,
 	getNetworkKeyByPath,
 	getPathName,
-	getPathsWithSubstrateNetwork,
+	getPathsWithSubstrateNetworkKey,
 	isSubstratePath
 } from '../util/identitiesUtils';
 import { defaultNetworkKey, UnknownNetworkKeys } from '../constants';
@@ -61,7 +61,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 					const deleteSucceed = await accounts.deletePath(path);
 					const paths = Array.from(accounts.state.currentIdentity.meta.keys());
 					const pathIndicatedNetworkKey = getNetworkKeyByPath(path);
-					const listedPaths = getPathsWithSubstrateNetwork(
+					const listedPaths = getPathsWithSubstrateNetworkKey(
 						paths,
 						pathIndicatedNetworkKey
 					);

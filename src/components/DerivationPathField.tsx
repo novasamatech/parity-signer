@@ -28,7 +28,6 @@ import { parseDerivationPath } from '../util/suri';
 import TextInput from './TextInput';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
-import { TextChangeListener } from 'types/props';
 
 export default function DerivationPathField(props: {
 	onChange: (derivationEvent: {

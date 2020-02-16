@@ -19,32 +19,33 @@ import { Subscribe } from 'unstated';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
-interface WithAccountProps {
+interface AccountInjectedProps {
 	accounts: AccountsStore;
 }
 
-interface WithScannerProps {
+interface ScannerInjectedProps {
 	scanner: ScannerStore;
 }
 
-type WithAccountAndScannerProps = WithAccountProps & WithScannerProps;
+type AccountAndScannerInjectedProps = AccountInjectedProps &
+	ScannerInjectedProps;
 
-export function withAccountStore<T extends WithAccountProps = WithAccountProps>(
-	WrappedComponent: React.ComponentType<T>
-) {
-	return (props: T): React.ReactElement => (
+export function withAccountStore<T extends AccountInjectedProps>(
+	WrappedComponent: React.ComponentType<any>
+): React.ComponentType<Omit<T, keyof AccountInjectedProps>> {
+	return props => (
 		<Subscribe to={[AccountsStore]}>
 			{(accounts: AccountsStore): React.ReactElement => (
-				<WrappedComponent {...props} accounts={accounts} />
+				<WrappedComponent accounts={accounts} {...props} />
 			)}
 		</Subscribe>
 	);
 }
 
-export function withScannerStore<T extends WithScannerProps = WithScannerProps>(
-	WrappedComponent: React.ComponentType<T>
-) {
-	return (props: T): React.ReactElement => (
+export function withScannerStore<T extends ScannerInjectedProps>(
+	WrappedComponent: React.ComponentType<any>
+): React.ComponentType<Omit<T, keyof AccountInjectedProps>> {
+	return props => (
 		<Subscribe to={[ScannerStore]}>
 			{scanner => <WrappedComponent {...props} scanner={scanner} />}
 		</Subscribe>
@@ -52,9 +53,11 @@ export function withScannerStore<T extends WithScannerProps = WithScannerProps>(
 }
 
 export function withAccountAndScannerStore<
-	T extends WithAccountAndScannerProps = WithAccountAndScannerProps
->(WrappedComponent: React.ComponentType<T>) {
-	return (props: T): React.ReactElement => (
+	T extends AccountAndScannerInjectedProps
+>(
+	WrappedComponent: React.ComponentType<any>
+): React.ComponentType<Omit<T, keyof AccountAndScannerInjectedProps>> {
+	return props => (
 		<Subscribe to={[ScannerStore, AccountsStore]}>
 			{(scanner, accounts) => (
 				<WrappedComponent {...props} scanner={scanner} accounts={accounts} />
