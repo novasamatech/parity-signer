@@ -1,4 +1,3 @@
-import { NavigationStackScreenProps } from 'react-navigation-stack';
 import {
 	NavigationInjectedProps,
 	NavigationScreenProp
@@ -11,8 +10,8 @@ import {
 } from 'react-native';
 import AccountsStore from '../stores/AccountsStore';
 
-export interface NavigationProps<Params, ScreenProps> {
-	navigation: NavigationStackScreenProps<Params, ScreenProps>;
+export interface NavigationProps<Params> {
+	navigation: NavigationScreenProp<ScreenProps, Params>;
 }
 
 export type ScreenProps = NavigationInjectedProps;

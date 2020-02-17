@@ -17,7 +17,13 @@
 import React, { useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
+
+import { Account, UnlockedAccount } from 'types/identityTypes';
+import { NetworkParams } from 'types/networkSpecsTypes';
+import { NavigationAccountProps } from 'types/props';
+
 import colors from '../colors';
+import AccountCard from '../components/AccountCard';
 import AccountIconChooser from '../components/AccountIconChooser';
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -27,11 +33,19 @@ import TextInput from '../components/TextInput';
 import { NETWORK_LIST, NetworkProtocols } from '../constants';
 import fonts from '../fonts';
 import { emptyAccount, validateSeed } from '../util/account';
-import { constructSURI } from '../util/suri';
-import AccountCard from '../components/AccountCard';
 import { withAccountStore } from '../util/HOC';
+import { constructSURI } from '../util/suri';
 
-function AccountNew({ accounts, navigation }) {
+interface State {
+	derivationPassword: string;
+	derivationPath: string;
+	isDerivationPathValid: boolean;
+	selectedAccount: undefined | Account;
+	selectedNetwork: undefined | NetworkParams;
+	newAccount?: Account;
+}
+
+function AccountNew({ accounts, navigation }: NavigationAccountProps<{}>) {
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -40,14 +54,17 @@ function AccountNew({ accounts, navigation }) {
 		selectedNetwork: undefined
 	};
 
-	const reducer = (state, delta) => ({ ...state, ...delta });
+	const reducer = (state: State, delta: Partial<State>): State => ({
+		...state,
+		...delta
+	});
 	const [state, updateState] = useReducer(reducer, initialState);
 
-	useEffect(() => {
+	useEffect((): void => {
 		accounts.updateNew(emptyAccount());
 	}, [accounts, accounts.updateNew]);
 
-	useEffect(() => {
+	useEffect((): void => {
 		const selectedAccount = accounts.state.newAccount;
 		const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 		updateState({
@@ -65,8 +82,9 @@ function AccountNew({ accounts, navigation }) {
 	} = state;
 	if (!selectedAccount) return null;
 
-	const { address, name, seed, validBip39Seed } = selectedAccount;
-	const isSubstrate = selectedNetwork.protocol === NetworkProtocols.SUBSTRATE;
+	const { address, name, validBip39Seed } = selectedAccount;
+	const seed = (selectedAccount as UnlockedAccount)?.seed;
+	const isSubstrate = selectedNetwork!.protocol === NetworkProtocols.SUBSTRATE;
 
 	return (
 		<KeyboardScrollView>
@@ -77,7 +95,7 @@ function AccountNew({ accounts, navigation }) {
 			</View>
 			<AccountCard
 				address={''}
-				title={selectedNetwork.title}
+				title={selectedNetwork!.title}
 				networkKey={selectedAccount.networkKey}
 				onPress={() => navigation.navigate('LegacyNetworkChooser')}
 			/>
@@ -123,7 +141,7 @@ function AccountNew({ accounts, navigation }) {
 							});
 						}
 					}}
-					network={selectedNetwork}
+					network={selectedNetwork!}
 					value={address && address}
 				/>
 				<Text style={styles.title}>NAME</Text>

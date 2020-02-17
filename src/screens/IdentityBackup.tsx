@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
+import { NavigationAccountProps } from 'types/props';
 
 import { words } from '../util/native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -34,7 +35,10 @@ import ScreenHeading from '../components/ScreenHeading';
 import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
 import Button from '../components/Button';
 
-function IdentityBackup({ navigation, accounts }) {
+function IdentityBackup({
+	navigation,
+	accounts
+}: NavigationAccountProps<{ isNew: boolean }>) {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(24);
 	const isNew = navigation.getParam('isNew', false);
@@ -45,7 +49,7 @@ function IdentityBackup({ navigation, accounts }) {
 		navigateToNewIdentityNetwork(navigation);
 	};
 
-	const renderTextButton = buttonWordsNumber => {
+	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
 		const textStyles =
 			wordsNumber === buttonWordsNumber
 				? { ...fontStyles.t_codeS, color: colors.label_text }
@@ -59,8 +63,8 @@ function IdentityBackup({ navigation, accounts }) {
 			/>
 		);
 	};
-	useEffect(() => {
-		const setSeedPhraseAsync = async () => {
+	useEffect((): (() => void) => {
+		const setSeedPhraseAsync = async (): Promise<void> => {
 			if (isNew) {
 				setSeedPhrase(await words(wordsNumber));
 			} else {
@@ -71,7 +75,7 @@ function IdentityBackup({ navigation, accounts }) {
 		};
 
 		setSeedPhraseAsync();
-		return () => {
+		return (): void => {
 			setSeedPhrase('');
 		};
 	}, [isNew, navigation, wordsNumber]);
@@ -92,7 +96,7 @@ function IdentityBackup({ navigation, accounts }) {
 				</View>
 			)}
 			<TouchableItem
-				onPress={() => {
+				onPress={(): void => {
 					// only allow the copy of the recovery phrase in dev environment
 					if (__DEV__) {
 						alertCopyBackupPhrase(seedPhrase);

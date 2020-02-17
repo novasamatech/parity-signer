@@ -14,36 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { PureComponent } from 'react';
+//Deprecated
+
+import React, { useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
-import { Subscribe } from 'unstated';
+import { NavigationAccountProps } from 'types/props';
 import colors from '../colors';
-import fonts from '../fonts';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import TextInput from '../components/TextInput';
-import AccountsStore from '../stores/AccountsStore';
 import KeyboardScrollView from '../components/KeyboardScrollView';
+import TextInput from '../components/TextInput';
+import fonts from '../fonts';
+import { withAccountStore } from '../util/HOC';
 import { navigateToLegacyAccountList } from '../util/navigationHelpers';
 
-export default class AccountPin extends React.PureComponent {
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => <AccountPinView {...this.props} accounts={accounts} />}
-			</Subscribe>
-		);
-	}
+interface State {
+	confirmation: string;
+	focusConfirmation: boolean;
+	pin: string;
+	pinMismatch: boolean;
+	pinTooShort: boolean;
 }
-
-class AccountPinView extends React.PureComponent {
-	constructor(...args) {
-		super(...args);
-		this.submit = this.submit.bind(this);
-	}
-
-	state = {
+function AccountPin({
+	accounts,
+	navigation
+}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
+	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
 		pin: '',
@@ -51,13 +48,18 @@ class AccountPinView extends React.PureComponent {
 		pinTooShort: false
 	};
 
-	async submit() {
-		const { accounts, navigation } = this.props;
-		const { pin, confirmation } = this.state;
-		const accountCreation = navigation.getParam('isNew');
+	const reducer = (state: State, delta: Partial<State>): State => ({
+		...state,
+		...delta
+	});
+	const [state, setState] = useReducer(reducer, initialState);
+
+	const submit = async (): Promise<void> => {
+		const { pin, confirmation } = state;
+		const accountCreation: boolean = navigation.getParam('isNew', false);
 		const account = accountCreation
 			? accounts.getNew()
-			: accounts.getSelected();
+			: accounts.getSelected()!;
 		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
 				await accounts.submitNew(pin);
@@ -76,19 +78,19 @@ class AccountPinView extends React.PureComponent {
 			}
 		} else {
 			if (pin.length < 6) {
-				this.setState({ pinTooShort: true });
-			} else if (pin !== confirmation) this.setState({ pinMismatch: true });
+				setState({ pinTooShort: true });
+			} else if (pin !== confirmation) setState({ pinMismatch: true });
 		}
-	}
+	};
 
-	showHintOrError = () => {
-		if (this.state.pinTooShort) {
+	const showHintOrError = () => {
+		if (state.pinTooShort) {
 			return (
 				<Text style={styles.errorText}>
 					Your pin must be at least 6 digits long!
 				</Text>
 			);
-		} else if (this.state.pinMismatch) {
+		} else if (state.pinMismatch) {
 			return <Text style={styles.errorText}>Pin codes don't match!</Text>;
 		}
 		return (
@@ -98,9 +100,9 @@ class AccountPinView extends React.PureComponent {
 		);
 	};
 
-	onPinInputChange = (stateName, pinInput) => {
+	const onPinInputChange = (stateName: string, pinInput: string): void => {
 		if (/^\d+$|^$/.test(pinInput)) {
-			this.setState({
+			setState({
 				pinMismatch: false,
 				pinTooShort: false,
 				[stateName]: pinInput
@@ -108,64 +110,56 @@ class AccountPinView extends React.PureComponent {
 		}
 	};
 
-	render() {
-		const title = 'ACCOUNT PIN';
-		return (
-			<KeyboardScrollView style={styles.body} extraHeight={120}>
-				<Background />
-				<Text style={styles.titleTop}>{title}</Text>
-				{this.showHintOrError()}
-				<Text style={styles.title}>PIN</Text>
-				<PinInput
-					autoFocus
-					returnKeyType="next"
-					onFocus={() => this.setState({ focusConfirmation: false })}
-					onSubmitEditing={() => {
-						this.setState({ focusConfirmation: true });
-					}}
-					onChangeText={pin => this.onPinInputChange('pin', pin)}
-					value={this.state.pin}
-				/>
-				<Text style={styles.title}>CONFIRM PIN</Text>
-				<PinInput
-					returnKeyType="done"
-					focus={this.state.focusConfirmation}
-					onChangeText={confirmation =>
-						this.onPinInputChange('confirmation', confirmation)
-					}
-					value={this.state.confirmation}
-				/>
-				<Button
-					onPress={this.submit}
-					color="green"
-					title="Done"
-					accessibilityLabel={'Done'}
-				/>
-			</KeyboardScrollView>
-		);
-	}
+	const title = 'ACCOUNT PIN';
+	return (
+		<KeyboardScrollView style={styles.body} extraHeight={120}>
+			<Background />
+			<Text style={styles.titleTop}>{title}</Text>
+			{showHintOrError()}
+			<Text style={styles.title}>PIN</Text>
+			<PinInput
+				autoFocus
+				returnKeyType="next"
+				onFocus={() => setState({ focusConfirmation: false })}
+				onSubmitEditing={() => {
+					setState({ focusConfirmation: true });
+				}}
+				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
+				value={state.pin}
+			/>
+			<Text style={styles.title}>CONFIRM PIN</Text>
+			<PinInput
+				returnKeyType="done"
+				focus={state.focusConfirmation}
+				onChangeText={(confirmation: string): void =>
+					onPinInputChange('confirmation', confirmation)
+				}
+				value={state.confirmation}
+			/>
+			<Button onPress={submit} title="Done" />
+		</KeyboardScrollView>
+	);
 }
 
-class PinInput extends PureComponent {
-	render() {
-		return (
-			<TextInput
-				keyboardAppearance="dark"
-				clearTextOnFocus
-				editable
-				fontSize={24}
-				keyboardType="numeric"
-				multiline={false}
-				autoCorrect={false}
-				numberOfLines={1}
-				returnKeyType="next"
-				secureTextEntry
-				style={styles.pinInput}
-				{...this.props}
-			/>
-		);
-	}
+function PinInput(props: any): React.ReactElement {
+	return (
+		<TextInput
+			keyboardAppearance="dark"
+			clearTextOnFocus
+			editable
+			keyboardType="numeric"
+			multiline={false}
+			autoCorrect={false}
+			numberOfLines={1}
+			returnKeyType="next"
+			secureTextEntry
+			style={StyleSheet.flatten([styles.pinInput, { fontSize: 24 }])}
+			{...props}
+		/>
+	);
 }
+
+export default withAccountStore(AccountPin);
 
 const styles = StyleSheet.create({
 	body: {

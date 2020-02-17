@@ -54,14 +54,9 @@ import {
 	UnlockedAccount,
 	FoundAccount,
 	Identity,
-	FoundIdentityAccount
+	FoundIdentityAccount,
+	isUnlockedAccount
 } from 'types/identityTypes';
-
-function isUnlockedAccount(
-	account: UnlockedAccount | LockedAccount
-): account is UnlockedAccount {
-	return 'seed' in account || 'seedPhrase' in account;
-}
 
 export default class AccountsStore extends Container<AccountsStoreState> {
 	state: AccountsStoreState = {
@@ -133,7 +128,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async updateAccount(
 		accountKey: string,
-		updatedAccount: Account
+		updatedAccount: Partial<LockedAccount>
 	): Promise<void> {
 		const accounts = this.state.accounts;
 		const account = accounts.get(accountKey);
@@ -145,7 +140,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	async updateSelectedAccount(updatedAccount: Account): Promise<void> {
+	async updateSelectedAccount(
+		updatedAccount: Partial<LockedAccount>
+	): Promise<void> {
 		await this.updateAccount(this.state.selectedKey, updatedAccount);
 	}
 
@@ -159,16 +156,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async save(
 		accountKey: string,
-		account: UnlockedAccount,
+		account: Account,
 		pin: string | null = null
 	): Promise<void> {
 		try {
 			// for account creation
-			if (pin && account.seed) {
+			let accountToSave = account;
+			if (pin && isUnlockedAccount(account)) {
 				account.encryptedSeed = await encryptData(account.seed, pin);
+				accountToSave = this.deleteSensitiveData(account);
 			}
-
-			const accountToSave = this.deleteSensitiveData(account);
 
 			await saveAccount(accountKey, accountToSave);
 		} catch (e) {

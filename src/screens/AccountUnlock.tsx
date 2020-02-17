@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
+import { NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
@@ -28,18 +28,22 @@ import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
 /* Used for unlock and sign tx and messages for legacy accounts */
-export class AccountUnlockAndSign extends React.PureComponent {
+export class AccountUnlockAndSign extends React.PureComponent<
+	NavigationProps<{ next: string }>
+> {
 	render() {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'SignedTx');
 
 		return (
 			<Subscribe to={[AccountsStore, ScannerStore]}>
-				{(accounts, scannerStore) => (
+				{(
+					accounts: AccountsStore,
+					scannerStore: ScannerStore
+				): React.ReactElement => (
 					<AccountUnlockView
 						{...this.props}
-						accounts={accounts}
-						checkPin={async pin => {
+						checkPin={async (pin: string): Promise<boolean> => {
 							try {
 								await scannerStore.signDataLegacy(pin);
 								return true;
@@ -67,14 +71,17 @@ export class AccountUnlockAndSign extends React.PureComponent {
 	}
 }
 
-export class AccountUnlock extends React.PureComponent {
+export class AccountUnlock extends React.PureComponent<
+	NavigationProps<{ next: string; onDelete: () => any }>
+> {
 	render() {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'LegacyAccountList');
+		const onDelete = navigation.getParam('onDelete', () => null);
 
 		return (
 			<Subscribe to={[AccountsStore]}>
-				{accounts => (
+				{(accounts: AccountsStore): React.ReactElement => (
 					<AccountUnlockView
 						{...this.props}
 						checkPin={async pin => {
@@ -83,10 +90,10 @@ export class AccountUnlock extends React.PureComponent {
 								pin
 							);
 						}}
-						navigate={() => {
+						navigate={(): void => {
 							if (next === 'AccountDelete') {
 								navigation.goBack();
-								navigation.state.params.onDelete();
+								onDelete();
 							} else {
 								const resetAction = StackActions.reset({
 									actions: [
@@ -109,12 +116,21 @@ export class AccountUnlock extends React.PureComponent {
 	}
 }
 
-class AccountUnlockView extends React.PureComponent {
-	static propTypes = {
-		checkPin: PropTypes.func.isRequired,
-		hasWrongPin: PropTypes.bool
-	};
+interface AccountUnlockViewProps {
+	checkPin: (pin: string) => Promise<boolean>;
+	hasWrongPin?: boolean;
+	navigate: () => void;
+}
 
+interface AccountUnlockViewState {
+	hasWrongPin: boolean;
+	pin: string;
+}
+
+class AccountUnlockView extends React.PureComponent<
+	AccountUnlockViewProps,
+	AccountUnlockViewState
+> {
 	state = {
 		hasWrongPin: false,
 		pin: ''
@@ -126,6 +142,7 @@ class AccountUnlockView extends React.PureComponent {
 
 	render() {
 		const { checkPin, navigate } = this.props;
+		const { hasWrongPin, pin } = this.state;
 
 		return (
 			<View style={styles.body}>
@@ -133,11 +150,11 @@ class AccountUnlockView extends React.PureComponent {
 				<ScreenHeading
 					title={'Unlock Account'}
 					subtitle={this.showErrorMessage()}
-					error={{ hasWrongPin: true }}
+					error={hasWrongPin}
 				/>
 				<PinInput
 					label="PIN"
-					onChangeText={async pin => {
+					onChangeText={async (pin: string): Promise<void> => {
 						this.setState({ pin: pin });
 						if (pin.length < 4) {
 							return;
@@ -148,14 +165,14 @@ class AccountUnlockView extends React.PureComponent {
 							this.setState({ hasWrongPin: true });
 						}
 					}}
-					value={this.state.pin}
+					value={pin}
 				/>
 			</View>
 		);
 	}
 }
 
-function PinInput(props) {
+function PinInput(props: any) {
 	return (
 		<TextInput
 			autoFocus

@@ -20,6 +20,7 @@ export type UnlockedAccount = {
 	derivationPassword: string;
 	derivationPath: string; // doesn't contain the ///password
 	encryptedSeed: string | undefined;
+	isLegacy?: boolean;
 	name: string;
 	networkKey: string;
 	seed: string; //this is the SURI (seedPhrase + /soft//hard///password derivation)
@@ -34,6 +35,12 @@ export type LockedAccount = Omit<
 >;
 
 export type Account = UnlockedAccount | LockedAccount;
+
+export function isUnlockedAccount(
+	account: UnlockedAccount | LockedAccount
+): account is UnlockedAccount {
+	return 'seed' in account || 'seedPhrase' in account;
+}
 
 export type AccountMeta = {
 	address: string;

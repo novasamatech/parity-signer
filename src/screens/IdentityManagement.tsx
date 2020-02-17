@@ -17,6 +17,7 @@
 import React from 'react';
 import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { NavigationAccountProps } from 'types/props';
 
 import { withAccountStore } from '../util/HOC';
 import TextInput from '../components/TextInput';
@@ -33,21 +34,26 @@ import ScreenHeading from '../components/ScreenHeading';
 import colors from '../colors';
 import PopupMenu from '../components/PopupMenu';
 
-function IdentityManagement({ accounts, navigation }) {
+function IdentityManagement({
+	accounts,
+	navigation
+}: NavigationAccountProps<{}>): React.ReactElement {
 	const { currentIdentity } = accounts.state;
-	if (!currentIdentity) return null;
+	if (!currentIdentity) return <View />;
 
-	const onOptionSelect = value => {
+	const onOptionSelect = (value: string): void => {
 		if (value === 'PathDelete') {
-			alertDeleteIdentity(async () => {
-				await unlockSeedPhrase(navigation);
-				const deleteSucceed = await accounts.deleteCurrentIdentity();
-				if (deleteSucceed) {
-					navigateToLandingPage(navigation, true);
-				} else {
-					alertIdentityDeletionError();
+			alertDeleteIdentity(
+				async (): Promise<void> => {
+					await unlockSeedPhrase(navigation);
+					const deleteSucceed = await accounts.deleteCurrentIdentity();
+					if (deleteSucceed) {
+						navigateToLandingPage(navigation, true);
+					} else {
+						alertIdentityDeletionError();
+					}
 				}
-			});
+			);
 		} else {
 			navigation.navigate('IdentityBackup', { isNew: false });
 		}

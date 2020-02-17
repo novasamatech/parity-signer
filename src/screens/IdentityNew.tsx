@@ -17,6 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
+import { NavigationAccountProps } from 'types/props';
 
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
@@ -41,35 +42,39 @@ import KeyboardScrollView from '../components/KeyboardScrollView';
 import { brainWalletAddress } from '../util/native';
 import { debounce } from '../util/debounce';
 
-function IdentityNew({ accounts, navigation }) {
+function IdentityNew({
+	accounts,
+	navigation
+}: NavigationAccountProps<{ isRecover: boolean }>): React.ReactElement {
+	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
-	const [isSeedValid, setIsSeedValid] = useState(false);
+	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
 
-	useEffect(() => {
+	useEffect((): (() => void) => {
 		const clearNewIdentity = () => accounts.updateNewIdentity(emptyIdentity());
 		clearNewIdentity();
 		return clearNewIdentity;
 	}, [accounts]);
 
-	const updateName = name => {
+	const updateName = (name: string): void => {
 		accounts.updateNewIdentity({ name });
 	};
 
-	const onSeedTextInput = inputSeedPhrase => {
+	const onSeedTextInput = (inputSeedPhrase: string): void => {
 		setSeedPhrase(inputSeedPhrase);
-		const addressGeneration = () =>
+		const addressGeneration = (): Promise<void> =>
 			brainWalletAddress(inputSeedPhrase.trimEnd())
 				.then(({ bip39 }) => {
 					setIsSeedValid(validateSeed(inputSeedPhrase, bip39));
 				})
-				.catch(() => setIsSeedValid(inputSeedPhrase, false));
+				.catch(() => setIsSeedValid(defaultSeedValidObject));
 		const debouncedAddressGeneration = debounce(addressGeneration, 200);
 		debouncedAddressGeneration();
 	};
 
-	const onRecoverIdentity = async () => {
+	const onRecoverIdentity = async (): Promise<void> => {
 		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
@@ -84,7 +89,7 @@ function IdentityNew({ accounts, navigation }) {
 		}
 	};
 
-	const onRecoverConfirm = () => {
+	const onRecoverConfirm = (): void | Promise<void> => {
 		if (!isSeedValid.valid) {
 			if (isSeedValid.accountRecoveryAllowed) {
 				return alertRisks(`${isSeedValid.reason}`, onRecoverIdentity);
@@ -95,14 +100,14 @@ function IdentityNew({ accounts, navigation }) {
 		return onRecoverIdentity();
 	};
 
-	const onCreateNewIdentity = () => {
+	const onCreateNewIdentity = (): void => {
 		setSeedPhrase('');
 		navigation.navigate('IdentityBackup', {
 			isNew: true
 		});
 	};
 
-	const renderRecoverView = () => (
+	const renderRecoverView = (): React.ReactElement => (
 		<>
 			<AccountSeed
 				testID={testIDs.IdentityNew.seedInput}

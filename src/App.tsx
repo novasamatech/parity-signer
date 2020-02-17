@@ -45,7 +45,6 @@ import AccountEdit from './screens/AccountEdit';
 import AccountNetworkChooser from './screens/AccountNetworkChooser';
 import AccountNew from './screens/AccountNew';
 import AccountPin from './screens/AccountPin';
-import AccountRecover from './screens/AccountRecover';
 import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
 import LegacyAccountList from './screens/LegacyAccountList';
 import Loading from './screens/Loading';
@@ -222,9 +221,6 @@ const Screens = createSwitchNavigator(
 					},
 					AccountNew: {
 						screen: AccountNew
-					},
-					AccountRecover: {
-						screen: AccountRecover
 					},
 					AccountUnlockAndSign: {
 						screen: AccountUnlockAndSign

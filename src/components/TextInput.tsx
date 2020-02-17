@@ -28,7 +28,6 @@ import colors from '../colors';
 
 interface Props extends TextInputProps {
 	fixedPrefix?: string;
-	style?: TextStyle;
 	focus?: boolean;
 	label?: string;
 	error?: boolean;

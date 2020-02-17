@@ -18,9 +18,9 @@ import React, { useState } from 'react';
 import {
 	StyleSheet,
 	Text,
+	TextStyle,
 	TouchableOpacity,
-	View,
-	ViewStyle
+	View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -36,7 +36,7 @@ export default function DerivationPathField(props: {
 		isDerivationPathValid: boolean;
 	}) => void;
 	styles: {
-		title: ViewStyle;
+		title: TextStyle;
 	};
 }): React.ReactElement {
 	const { onChange, styles } = props;

@@ -19,6 +19,7 @@ import {
 	NativeSyntheticEvent,
 	StyleSheet,
 	Text,
+	TextInputProps,
 	TextInputSelectionChangeEventData,
 	View
 } from 'react-native';
@@ -30,19 +31,19 @@ import BIP39_WORDS from '../../res/bip39_wordlist.json';
 import TextInput from './TextInput';
 import TouchableItem from './TouchableItem';
 import { binarySearch } from '../util/array';
-import { FocusListener } from 'types/props';
 
 // Combined, de-duplicated, sorted word list (could be a precompute from json as well)
 const ALL_WORDS = Array.from(new Set(PARITY_WORDS.concat(BIP39_WORDS))).sort();
 const SUGGESTIONS_COUNT = 5;
 
+interface Props extends TextInputProps {
+	onChangeText: (text: string) => void;
+	valid: boolean;
+	value: string;
+}
+
 export default class AccountSeed extends Component<
-	{
-		value: string;
-		onFocus: FocusListener;
-		onChangeText: (text: string) => void;
-		valid: boolean;
-	},
+	Props,
 	{
 		cursorPosition: number;
 	}
@@ -149,7 +150,11 @@ export default class AccountSeed extends Component<
 		return (
 			<View>
 				<TextInput
-					style={{ ...fontStyles.t_seed, ...styles.input, ...invalidStyles }}
+					style={StyleSheet.flatten([
+						fontStyles.t_seed,
+						styles.input,
+						invalidStyles
+					])}
 					multiline
 					autoCorrect={false}
 					autoCompleteType="off"

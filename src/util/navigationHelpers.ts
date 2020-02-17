@@ -23,7 +23,7 @@ import { Identity } from 'types/identityTypes';
 
 export const setPin = async (
 	navigation: NavigationScreenProp<{}>
-): Promise<boolean> =>
+): Promise<string> =>
 	new Promise(resolve => {
 		navigation.navigate('IdentityPin', { isNew: true, resolve });
 	});
@@ -63,8 +63,8 @@ export const navigateToPathDetails = (
 };
 
 export const navigateToLandingPage = (
-	navigation: NavigationScreenProp<{}>,
-	isSwitchOpen: boolean
+	navigation: NavigationScreenProp<any>,
+	isSwitchOpen = false
 ): void => {
 	const resetAction = StackActions.reset({
 		actions: [

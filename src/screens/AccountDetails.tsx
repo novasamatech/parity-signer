@@ -31,10 +31,9 @@ import fontStyles from '../fontStyles';
 import UnknownAccountWarning from '../components/UnknownAccountWarning';
 import { withAccountStore } from '../util/HOC';
 import AccountIcon from '../components/AccountIcon';
+import { NavigationAccountProps } from 'types/props';
 
-export default withAccountStore(AccountDetails);
-
-function AccountDetails({ accounts, navigation }) {
+function AccountDetails({ accounts, navigation }: NavigationAccountProps<{}>) {
 	const account = accounts.getSelected();
 	const selectedKey = accounts.getSelectedKey();
 
@@ -46,7 +45,7 @@ function AccountDetails({ accounts, navigation }) {
 			NETWORK_LIST[account.networkKey].protocol) ||
 		NetworkProtocols.UNKNOWN;
 
-	const onDelete = () => {
+	const onDelete = (): void => {
 		alertDeleteLegacyAccount(
 			account.name || account.address || 'this account',
 			async () => {
@@ -59,7 +58,7 @@ function AccountDetails({ accounts, navigation }) {
 		);
 	};
 
-	const onOptionSelect = value => {
+	const onOptionSelect = (value: string): void => {
 		if (value !== 'AccountEdit') {
 			navigation.navigate('AccountUnlock', {
 				next: value,
@@ -72,33 +71,31 @@ function AccountDetails({ accounts, navigation }) {
 
 	return (
 		<ScrollView contentContainerStyle={styles.body}>
-			<View style={styles.bodyContent}>
-				<View style={styles.header}>
-					<AccountIcon
-						address={''}
-						network={NETWORK_LIST[account.networkKey]}
-						style={styles.icon}
+			<View style={styles.header}>
+				<AccountIcon
+					address={''}
+					network={NETWORK_LIST[account.networkKey]}
+					style={styles.icon}
+				/>
+				<Text style={fontStyles.h2}>Public Address</Text>
+				<View style={styles.menuView}>
+					<PopupMenu
+						onSelect={onOptionSelect}
+						menuTriggerIconName={'more-vert'}
+						menuItems={[
+							{ text: 'Edit', value: 'AccountEdit' },
+							{ text: 'Change Pin', value: 'AccountPin' },
+							{
+								text: 'View Recovery Phrase',
+								value: 'LegacyAccountBackup'
+							},
+							{
+								text: 'Delete',
+								textStyle: styles.deleteText,
+								value: 'AccountDelete'
+							}
+						]}
 					/>
-					<Text style={fontStyles.h2}>Public Address</Text>
-					<View style={styles.menuView}>
-						<PopupMenu
-							onSelect={onOptionSelect}
-							menuTriggerIconName={'more-vert'}
-							menuItems={[
-								{ text: 'Edit', value: 'AccountEdit' },
-								{ text: 'Change Pin', value: 'AccountPin' },
-								{
-									text: 'View Recovery Phrase',
-									value: 'LegacyAccountBackup'
-								},
-								{
-									text: 'Delete',
-									textStyle: styles.deleteText,
-									value: 'AccountDelete'
-								}
-							]}
-						/>
-					</View>
 				</View>
 			</View>
 			<AccountCard
@@ -118,6 +115,8 @@ function AccountDetails({ accounts, navigation }) {
 		</ScrollView>
 	);
 }
+
+export default withAccountStore(AccountDetails);
 
 const styles = StyleSheet.create({
 	body: {

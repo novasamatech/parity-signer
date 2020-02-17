@@ -14,13 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { UnlockedAccount } from 'types/identityTypes';
+import { EthereumNetworkParams } from 'types/networkSpecsTypes';
+import { ValidSeed } from 'types/utilTypes';
 import {
 	NetworkProtocols,
 	NETWORK_LIST,
 	SubstrateNetworkKeys
 } from '../constants';
+import { isSubstrateNetworkParams } from './identitiesUtils';
 
-export function generateAccountId({ address, networkKey }) {
+export function generateAccountId({
+	address,
+	networkKey
+}: {
+	address: string;
+	networkKey: string;
+}): string {
 	if (
 		typeof address !== 'string' ||
 		address.length === 0 ||
@@ -32,23 +42,24 @@ export function generateAccountId({ address, networkKey }) {
 		);
 	}
 
-	const { ethereumChainId = '', protocol, genesisHash = '' } = NETWORK_LIST[
-		networkKey
-	];
+	const networkParams = NETWORK_LIST[networkKey];
+	const { protocol } = networkParams;
 
-	if (protocol === NetworkProtocols.SUBSTRATE) {
+	if (isSubstrateNetworkParams(networkParams)) {
+		const { genesisHash } = networkParams;
 		return `${protocol}:${address}:${genesisHash}`;
 	} else if (protocol === NetworkProtocols.UNKNOWN) {
 		return `substrate:${address}`;
 	} else {
+		const { ethereumChainId } = networkParams as EthereumNetworkParams;
 		return `${protocol}:0x${address}@${ethereumChainId}`;
 	}
 }
 
 export function emptyAccount(
 	address = '',
-	networkKey = SubstrateNetworkKeys.KUSAMA
-) {
+	networkKey: string = SubstrateNetworkKeys.KUSAMA
+): UnlockedAccount {
 	return {
 		address: address,
 		createdAt: new Date().getTime(),
@@ -65,7 +76,7 @@ export function emptyAccount(
 	};
 }
 
-export function validateSeed(seed, validBip39Seed) {
+export function validateSeed(seed: string, validBip39Seed: boolean): ValidSeed {
 	if (!seed || seed.length === 0) {
 		return {
 			accountRecoveryAllowed: false,

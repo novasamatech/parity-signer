@@ -14,29 +14,35 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Alert, Clipboard } from 'react-native';
+import { Alert, AlertButton, Clipboard } from 'react-native';
 
-export const alertErrorWithMessage = (message, buttonText) =>
+export const alertErrorWithMessage = (
+	message: string,
+	buttonText: string
+): void =>
 	Alert.alert('Error', message, [
 		{
-			style: 'Cancel',
+			style: 'cancel',
 			text: buttonText
 		}
 	]);
 
-export const alertIdentityCreationError = () =>
+export const alertIdentityCreationError = (): void =>
 	alertErrorWithMessage("Can't create Identity from the seed", 'Try again');
 
-export const alertPathDerivationError = () =>
+export const alertPathDerivationError = (): void =>
 	alertErrorWithMessage("Can't Derive Key pairs from the seed", 'Try again');
 
-export const alertPathDeletionError = () =>
+export const alertPathDeletionError = (): void =>
 	alertErrorWithMessage("Can't delete Key pairs.", 'Try again');
 
-export const alertIdentityDeletionError = () =>
+export const alertIdentityDeletionError = (): void =>
 	alertErrorWithMessage("Can't delete Identity.", 'Try again');
 
-const buildAlertButtons = (onConfirm, confirmText) => [
+const buildAlertButtons = (
+	onConfirm: () => any,
+	confirmText: string
+): AlertButton[] => [
 	{
 		onPress: () => {
 			onConfirm();
@@ -50,10 +56,13 @@ const buildAlertButtons = (onConfirm, confirmText) => [
 	}
 ];
 
-const buildAlertDeleteButtons = onDelete =>
+const buildAlertDeleteButtons = (onDelete: () => any): AlertButton[] =>
 	buildAlertButtons(onDelete, 'Delete');
 
-export const alertDeleteAccount = (accountName, onDelete) => {
+export const alertDeleteAccount = (
+	accountName: string,
+	onDelete: () => any
+): void => {
 	Alert.alert(
 		'Delete Key Pairs',
 		`Do you really want to delete ${accountName}?`,
@@ -61,7 +70,10 @@ export const alertDeleteAccount = (accountName, onDelete) => {
 	);
 };
 
-export const alertDeleteLegacyAccount = (accountName, onDelete) => {
+export const alertDeleteLegacyAccount = (
+	accountName: string,
+	onDelete: () => any
+): void => {
 	Alert.alert(
 		'Delete Key Pairs',
 		`Do you really want to delete ${accountName}?
@@ -70,7 +82,7 @@ The account can only be recovered with its associated recovery phrase.`,
 	);
 };
 
-export const alertDeleteIdentity = onDelete => {
+export const alertDeleteIdentity = (onDelete: () => any): void => {
 	Alert.alert(
 		'Delete Identity',
 		`Do you really want to delete this Identity and all the related accounts?
@@ -79,7 +91,7 @@ This identity can only be recovered with its associated recovery phrase.`,
 	);
 };
 
-export const alertCopyBackupPhrase = seedPhrase =>
+export const alertCopyBackupPhrase = (seedPhrase: string): void =>
 	Alert.alert(
 		'Write this recovery phrase on paper',
 		'It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.',
@@ -98,7 +110,7 @@ export const alertCopyBackupPhrase = seedPhrase =>
 		]
 	);
 
-export const alertRisks = (message, onPress) =>
+export const alertRisks = (message: string, onPress: () => any): void =>
 	Alert.alert('Warning', message, [
 		{
 			onPress,
@@ -111,13 +123,13 @@ export const alertRisks = (message, onPress) =>
 		}
 	]);
 
-export const alertMultipart = onNext =>
+export const alertMultipart = (onNext: () => any): void =>
 	alertRisks(
 		'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
 		onNext
 	);
 
-export const alertDecodeError = () =>
+export const alertDecodeError = (): void =>
 	Alert.alert(
 		'Could not decode method with available metadata.',
 		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.',
@@ -129,7 +141,7 @@ export const alertDecodeError = () =>
 		]
 	);
 
-export const alertBackupDone = onPress =>
+export const alertBackupDone = (onPress: () => any): void =>
 	Alert.alert(
 		'Important',
 		"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",

@@ -21,7 +21,7 @@ import fonts from '../fonts';
 import CustomScrollview from '../components/CustomScrollView';
 
 export default class About extends React.PureComponent {
-	render() {
+	render(): React.ReactElement {
 		return (
 			<CustomScrollview
 				containerStyle={styles.body}

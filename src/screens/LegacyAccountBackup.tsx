@@ -15,8 +15,17 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect } from 'react';
-import { AppState, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+	AppState,
+	AppStateStatus,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View
+} from 'react-native';
 import { withNavigation } from 'react-navigation';
+import { UnlockedAccount } from 'types/identityTypes';
+import { NavigationAccountProps } from 'types/props';
 
 import colors from '../colors';
 import fonts from '../fonts';
@@ -31,9 +40,12 @@ import { withAccountStore } from '../util/HOC';
 import { NetworkProtocols, NETWORK_LIST } from '../constants';
 import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
 
-function LegacyAccountBackup({ navigation, accounts }) {
+function LegacyAccountBackup({
+	navigation,
+	accounts
+}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
 	useEffect(() => {
-		const handleAppStateChange = nextAppState => {
+		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
 			if (nextAppState === 'inactive') {
 				navigation.goBack();
 			}
@@ -55,13 +67,13 @@ function LegacyAccountBackup({ navigation, accounts }) {
 	const isNew = navigation.getParam('isNew');
 	const {
 		address,
-		derivationPassword,
-		derivationPath,
+		derivationPassword = null,
+		derivationPath = null,
 		name,
 		networkKey,
-		seed,
-		seedPhrase
-	} = isNew ? accounts.getNew() : accounts.getSelected();
+		seed = null,
+		seedPhrase = null
+	} = isNew ? accounts.getNew() : (accounts.getSelected() as UnlockedAccount);
 	const protocol =
 		(NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol) ||
 		NetworkProtocols.UNKNOWN;
@@ -82,24 +94,29 @@ function LegacyAccountBackup({ navigation, accounts }) {
 						// only allow the copy of the recovery phrase in dev environment
 						if (__DEV__) {
 							if (protocol === NetworkProtocols.SUBSTRATE) {
-								alertCopyBackupPhrase(`${seedPhrase}${derivationPath}`);
+								alertCopyBackupPhrase(
+									`${seedPhrase || ''}${derivationPath || ''}`
+								);
 							} else {
-								alertCopyBackupPhrase(seed);
+								alertCopyBackupPhrase(seed || '');
 							}
 						}
 					}}
 				>
-					<Text style={fontStyles.t_seed}>{seedPhrase || seed}</Text>
+					<Text style={fontStyles.t_seed}>{seedPhrase || seed || ''}</Text>
 				</TouchableItem>
-				{!!derivationPath && (
+				{derivationPath && (
 					<Text style={styles.derivationText}>{derivationPath}</Text>
 				)}
-				{!!derivationPassword && (
+				{derivationPassword && (
 					<DerivationPasswordVerify password={derivationPassword} />
 				)}
 				{isNew && (
 					<Button
-						buttonStyles={[styles.nextStep, { marginBottom: 20 }]}
+						buttonStyles={StyleSheet.flatten([
+							styles.nextStep,
+							{ marginBottom: 20 }
+						])}
 						title="Backup Done"
 						onPress={() => {
 							alertBackupDone(() => {

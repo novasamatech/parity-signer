@@ -16,53 +16,50 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Subscribe } from 'unstated';
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
 import TextInput from '../components/TextInput';
 import AccountsStore from '../stores/AccountsStore';
+import { withAccountStore } from '../util/HOC';
 
-const onNameInput = async (accounts, name) => {
+const onNameInput = async (
+	accounts: AccountsStore,
+	name: string
+): Promise<void> => {
 	await accounts.updateSelectedAccount({ name });
-	await accounts.save(accounts.getSelectedKey(), accounts.getSelected());
+	const selectedAccount = accounts.getSelected()!;
+	await accounts.save(accounts.getSelectedKey(), selectedAccount);
 };
 
-export default class AccountEdit extends React.PureComponent {
-	constructor(props) {
-		super(props);
+function AccountEdit({
+	accounts
+}: {
+	accounts: AccountsStore;
+}): React.ReactElement {
+	const selectedAccount = accounts.getSelected()!;
+	if (!selectedAccount) {
+		return <ScrollView style={styles.body} />;
 	}
 
-	render() {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{accounts => {
-					const selected = accounts.getSelected();
-
-					if (!selected) {
-						return null;
-					}
-
-					return (
-						<ScrollView style={styles.body}>
-							<AccountCard
-								address={selected.address}
-								title={selected.name}
-								networkKey={selected.networkKey}
-							/>
-							<TextInput
-								label="Account Name"
-								style={{ marginBottom: 40 }}
-								onChangeText={name => onNameInput(accounts, name)}
-								value={selected.name}
-								placeholder="New name"
-							/>
-						</ScrollView>
-					);
-				}}
-			</Subscribe>
-		);
-	}
+	return (
+		<ScrollView style={styles.body}>
+			<AccountCard
+				address={selectedAccount.address}
+				title={selectedAccount.name}
+				networkKey={selectedAccount.networkKey}
+			/>
+			<TextInput
+				label="Account Name"
+				style={{ marginBottom: 40 }}
+				onChangeText={name => onNameInput(accounts, name)}
+				value={selectedAccount.name}
+				placeholder="New name"
+			/>
+		</ScrollView>
+	);
 }
+
+export default withAccountStore(AccountEdit);
 
 const styles = StyleSheet.create({
 	body: {

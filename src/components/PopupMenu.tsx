@@ -25,7 +25,6 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../colors';
 import fonts from '../fonts';
-import { ButtonListener } from 'types/props';
 
 type MenuItem = {
 	text: string;
@@ -36,7 +35,7 @@ type MenuItem = {
 };
 
 interface Props {
-	onSelect: ButtonListener;
+	onSelect: (selectedItem: any) => void;
 	menuTriggerIconName: string;
 	menuItems: Array<MenuItem>;
 	testID?: string;

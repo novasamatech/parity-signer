@@ -20,7 +20,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 interface Props extends ScrollViewProps {
 	enableAutomaticScroll?: boolean;
-	extraHeight: number;
+	extraHeight?: number;
 }
 
 class KeyboardScrollView extends React.PureComponent<Props> {
