@@ -110,7 +110,7 @@ export const saveAccount = (accountKey: string, account: Account): void =>
 		currentAccountsStore
 	);
 
-async function storagePushValue(key: string, value: string) {
+async function storagePushValue(key: string, value: string): Promise<void> {
 	let currentVal = await AsyncStorage.getItem(key);
 
 	if (currentVal === null) {

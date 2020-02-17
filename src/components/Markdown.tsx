@@ -21,7 +21,7 @@ import colors from '../colors';
 import fonts from '../fonts';
 
 export default class Markdown extends React.PureComponent<any> {
-	render() {
+	render(): React.ReactElement {
 		return (
 			<MarkdownRender
 				style={StyleSheet.create({

@@ -50,11 +50,11 @@ export function NetworkSelector({
 }: {
 	networkKey: string;
 	setVisible: (shouldVisible: boolean) => void;
-}) {
+}): React.ReactElement {
 	return (
 		<View style={styles.body}>
 			<Text style={styles.label}>{ACCOUNT_NETWORK}</Text>
-			<Touchable onPress={() => setVisible(true)}>
+			<Touchable onPress={(): void => setVisible(true)}>
 				<View style={styles.triggerWrapper}>
 					<Text style={styles.triggerLabel}>
 						{SUBSTRATE_NETWORK_LIST[networkKey].title}
@@ -74,8 +74,8 @@ export function NetworkOptions({
 	setNetworkKey: (networkKey: string) => void;
 	visible: boolean;
 	setVisible: (shouldVisible: boolean) => void;
-}) {
-	const onNetworkSelected = (networkKey: string) => {
+}): React.ReactElement {
+	const onNetworkSelected = (networkKey: string): void => {
 		setNetworkKey(networkKey);
 		setVisible(false);
 	};
@@ -86,7 +86,7 @@ export function NetworkOptions({
 			return (
 				<Touchable
 					key={networkKey}
-					onPress={() => onNetworkSelected(networkKey)}
+					onPress={(): void => onNetworkSelected(networkKey)}
 				>
 					<View style={styles.optionWrapper}>
 						<Image source={networkParams.logo} style={styles.optionLogo} />

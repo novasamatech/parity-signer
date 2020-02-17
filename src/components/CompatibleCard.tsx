@@ -30,7 +30,7 @@ const CompatibleCard = ({
 	account: FoundAccount;
 	accountsStore: AccountsStore;
 	titlePrefix?: string;
-}) =>
+}): React.ReactElement =>
 	isLegacyFoundAccount(account) || account.isLegacy === undefined ? (
 		<AccountCard
 			title={account.name}

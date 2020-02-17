@@ -26,7 +26,7 @@ interface Props {
 }
 
 export default class Separator extends React.PureComponent<Props> {
-	render() {
+	render(): React.ReactElement {
 		const { shadow, shadowStyle, style } = this.props;
 
 		return (

@@ -52,7 +52,7 @@ export default function PathCard({
 	name?: string;
 	testID?: string;
 	titlePrefix?: string;
-}) {
+}): React.ReactElement {
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const address = getAddressWithPath(path, identity);

@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation, ScrollView, NavigationParams } from 'react-navigation';
 
 import ButtonIcon from './ButtonIcon';
@@ -37,7 +37,7 @@ import { Identity } from 'types/identityTypes';
 function IdentitiesSwitch({
 	navigation,
 	accounts
-}: NavigationAccountProps<{ isSwitchOpen?: boolean }>) {
+}: NavigationAccountProps<{ isSwitchOpen?: boolean }>): React.ReactElement {
 	const defaultVisible = navigation.getParam('isSwitchOpen', false);
 	const [visible, setVisible] = useState(defaultVisible);
 	const { currentIdentity, identities } = accounts.state;
@@ -113,7 +113,7 @@ function IdentitiesSwitch({
 			<>
 				<ButtonIcon
 					title={currentIdentityTitle}
-					onPress={() =>
+					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(
 							currentIdentity,
 							'AccountNetworkChooser'
@@ -131,7 +131,7 @@ function IdentitiesSwitch({
 		);
 	};
 
-	const renderSettings = () => {
+	const renderSettings = (): React.ReactElement => {
 		return (
 			<>
 				<ButtonIcon
@@ -171,7 +171,11 @@ function IdentitiesSwitch({
 		);
 	};
 
-	const renderNonSelectedIdentity = ({ item }: { item: Identity }) => {
+	const renderNonSelectedIdentity = ({
+		item
+	}: {
+		item: Identity;
+	}): React.ReactElement => {
 		const identity = item;
 		const title = getIdentityName(identity, identities);
 
@@ -212,7 +216,7 @@ function IdentitiesSwitch({
 					<FlatList
 						data={identitiesToShow}
 						renderItem={renderNonSelectedIdentity}
-						keyExtractor={item => item.encryptedSeed}
+						keyExtractor={(item: Identity): string => item.encryptedSeed}
 						style={{ paddingVertical: identities.length > 5 ? 8 : 0 }}
 					/>
 				</ScrollView>
@@ -230,7 +234,7 @@ function IdentitiesSwitch({
 	return (
 		<View>
 			<ButtonIcon
-				onPress={() => setVisible(!visible)}
+				onPress={(): void => setVisible(!visible)}
 				iconName="user"
 				iconType="antdesign"
 				iconBgStyle={{ backgroundColor: 'transparent' }}
@@ -296,7 +300,7 @@ function IdentitiesSwitch({
 	);
 }
 
-const styles = {
+const styles = StyleSheet.create({
 	card: {
 		backgroundColor: colors.bg,
 		borderRadius: 5,
@@ -322,6 +326,6 @@ const styles = {
 	indentedButton: {
 		paddingLeft: 32
 	}
-};
+});
 
 export default withAccountStore(withNavigation(IdentitiesSwitch));

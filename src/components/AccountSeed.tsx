@@ -53,7 +53,7 @@ export default class AccountSeed extends Component<
 
 	handleCursorPosition = (
 		event: NativeSyntheticEvent<TextInputSelectionChangeEventData>
-	) => {
+	): void => {
 		const { start, end } = event.nativeEvent.selection;
 
 		if (start !== end) {

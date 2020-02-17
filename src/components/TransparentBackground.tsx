@@ -41,7 +41,7 @@ export default function TransparentBackground({
 	testID,
 	style,
 	animationType
-}: Props) {
+}: Props): React.ReactElement {
 	return (
 		<Modal
 			animationType={animationType}

@@ -23,7 +23,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import colors from '../colors';
 import { NetworkProtocols } from '../constants';
 import { blockiesIcon } from '../util/native';
-import { NetworkParams } from 'types/networkSpecsTypes';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
 
 export default function AccountIcon(props: {
 	address: string;
@@ -51,8 +51,11 @@ export default function AccountIcon(props: {
 	if (address === '') {
 		return (
 			<View style={style as ViewStyle}>
-				{network.logo ? (
-					<Image source={network.logo} style={styles.logo} />
+				{(network as SubstrateNetworkParams).logo ? (
+					<Image
+						source={(network as SubstrateNetworkParams).logo}
+						style={styles.logo}
+					/>
 				) : (
 					<View style={styles.logo}>
 						<FontAwesome name="question" color={colors.bg} size={28} />

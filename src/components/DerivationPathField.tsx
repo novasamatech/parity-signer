@@ -38,12 +38,12 @@ export default function DerivationPathField(props: {
 	styles: {
 		title: ViewStyle;
 	};
-}) {
+}): React.ReactElement {
 	const { onChange, styles } = props;
 	const [showAdvancedField, setShowAdvancedField] = useState(true);
 	const [isValidPath, setIsValidPath] = useState(true);
 
-	const toggleShowAdvancedField = () => {
+	const toggleShowAdvancedField = (): void => {
 		setShowAdvancedField(!showAdvancedField);
 	};
 

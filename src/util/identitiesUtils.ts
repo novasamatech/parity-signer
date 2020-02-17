@@ -297,7 +297,7 @@ export const groupPaths = (paths: string[]): PathGroup[] => {
 		matchingPath: string,
 		fullPath: string,
 		pathGroup: PathGroup[]
-	) => {
+	): void => {
 		const matchResult = matchingPath.match(pathsRegex.firstPath);
 		const groupName = matchResult ? matchResult[0] : '-';
 

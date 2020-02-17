@@ -11,4 +11,7 @@ declare global {
             inTest: boolean;
         }
     }
+    // declare webpack modules
+    declare module '*.png'
 }
+

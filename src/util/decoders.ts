@@ -52,7 +52,7 @@ import {
   */
 
 const registry = new TypeRegistry();
-export function rawDataToU8A(rawData) {
+export function rawDataToU8A(rawData: string): Uint8Array | null {
 	if (!rawData) {
 		return null;
 	}
@@ -257,12 +257,12 @@ export async function constructDataFromBytes(
 	}
 }
 
-export function decodeToString(message) {
+export function decodeToString(message: number[]): string {
 	const encodedString = String.fromCharCode.apply(null, message);
 	return decodeURIComponent(escape(encodedString));
 }
 
-export function asciiToHex(message) {
+export function asciiToHex(message: string): string {
 	const result = [];
 	for (let i = 0; i < message.length; i++) {
 		const hex = Number(message.charCodeAt(i)).toString(16);
@@ -271,7 +271,7 @@ export function asciiToHex(message) {
 	return result.join('');
 }
 
-export function hexToAscii(hexBytes) {
+export function hexToAscii(hexBytes: string): string {
 	const hex = hexBytes.toString();
 	let str = '';
 	for (let n = 0; n < hex.length; n += 2) {
@@ -281,7 +281,7 @@ export function hexToAscii(hexBytes) {
 	return str;
 }
 
-export function isJsonString(str) {
+export function isJsonString(str: any): boolean {
 	if (!str) {
 		return false;
 	}
@@ -294,7 +294,7 @@ export function isJsonString(str) {
 	return true;
 }
 
-export function isAddressString(str) {
+export function isAddressString(str: string): boolean {
 	if (!str) {
 		return false;
 	}
@@ -306,6 +306,6 @@ export function isAddressString(str) {
 	);
 }
 
-export function encodeNumber(value) {
+export function encodeNumber(value: number): Uint8Array {
 	return new Uint8Array([value >> 8, value & 0xff]);
 }

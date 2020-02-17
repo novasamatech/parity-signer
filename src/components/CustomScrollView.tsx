@@ -17,6 +17,7 @@
 import React from 'react';
 import {
 	Animated,
+	LayoutChangeEvent,
 	ScrollView,
 	StyleSheet,
 	View,
@@ -44,7 +45,7 @@ export default class CustomScrollview extends React.PureComponent<
 		wholeHeight: 1
 	};
 
-	render() {
+	render(): React.ReactElement {
 		const indicatorSize =
 			this.state.wholeHeight > this.state.visibleHeight
 				? (this.state.visibleHeight * this.state.visibleHeight) /
@@ -60,14 +61,16 @@ export default class CustomScrollview extends React.PureComponent<
 			<View style={this.props.containerStyle}>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
-					onContentSizeChange={(width, height) => {
+					onContentSizeChange={(width: number, height: number): void => {
 						this.setState({ wholeHeight: height });
 					}}
 					onLayout={({
 						nativeEvent: {
 							layout: { height }
 						}
-					}) => this.setState({ visibleHeight: height })}
+					}: LayoutChangeEvent): void =>
+						this.setState({ visibleHeight: height })
+					}
 					scrollEventThrottle={16}
 					onScroll={Animated.event([
 						{ nativeEvent: { contentOffset: { y: this.state.indicator } } }

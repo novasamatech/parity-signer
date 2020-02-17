@@ -52,11 +52,13 @@ import { emptyAccount } from '../util/account';
 import AccountsStore from './AccountsStore';
 import {
 	CompletedParsedData,
+	EthereumParsedData,
 	isEthereumCompletedParsedData,
 	isMultipartData,
 	SubstrateCompletedParsedData
 } from 'types/scannerTypes';
 import { NetworkProtocol } from 'types/networkSpecsTypes';
+import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
 type TXRequest = Record<string, any>;
 
@@ -128,7 +130,7 @@ const SIG_TYPE_SR25519 = new Uint8Array([1]);
 export default class ScannerStore extends Container<ScannerState> {
 	state: ScannerState = DEFAULT_STATE;
 
-	async setUnsigned(data: string) {
+	async setUnsigned(data: string): Promise<void> {
 		console.log('parsed unsignedData is', JSON.parse(data));
 		this.setState({
 			unsignedData: JSON.parse(data)
@@ -210,7 +212,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		frameCount: number,
 		partData: string,
 		accountsStore: AccountsStore
-	) {
+	): Promise<boolean | void | Uint8Array> {
 		const {
 			latestFrame,
 			missedFrames,
@@ -322,21 +324,19 @@ export default class ScannerStore extends Container<ScannerState> {
 		});
 	}
 
-	async setData(accountsStore: AccountsStore): Promise<void> {
+	async setData(accountsStore: AccountsStore): Promise<boolean | void> {
+		const { unsignedData } = this.state;
 		const throwError = (): never => {
 			throw new Error(
 				'Scanned QR should contain either transaction or a message to sign'
 			);
 		};
-		if (!isMultipartData(this.state.unsignedData)) {
-			switch (this.state.unsignedData.action) {
+		if (!isMultipartData(unsignedData) && unsignedData !== null) {
+			switch (unsignedData.action) {
 				case 'signTransaction':
-					return await this.setTXRequest(
-						this.state.unsignedData,
-						accountsStore
-					);
+					return await this.setTXRequest(unsignedData, accountsStore);
 				case 'signData':
-					await this.setDataToSign(this.state.unsignedData, accountsStore);
+					await this.setDataToSign(unsignedData, accountsStore);
 					return;
 				default:
 					throwError();
@@ -353,10 +353,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setBusy();
 
 		const address = signRequest.data.account;
-		const crypto = signRequest.data?.crypto;
 		const message = signRequest.data.data;
-		const isHash = signRequest?.isHash;
-		const isOversized = signRequest?.oversized;
+		const crypto = (signRequest as SubstrateCompletedParsedData).data?.crypto;
+		const isHash =
+			(signRequest as SubstrateCompletedParsedData)?.isHash || false;
+		const isOversized =
+			(signRequest as SubstrateCompletedParsedData)?.oversized || false;
 
 		let dataToSign = '';
 		const messageString = message?.toString();
@@ -379,8 +381,8 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		this.setState({
 			dataToSign,
-			isHash: isHash ?? false,
-			isOversized: isOversized ?? false,
+			isHash: isHash,
+			isOversized: isOversized,
 			message: message!.toString(),
 			sender: sender!,
 			type: 'message'
@@ -395,13 +397,18 @@ export default class ScannerStore extends Container<ScannerState> {
 	): Promise<boolean> {
 		this.setBusy();
 
-		const isOversized = txRequest?.oversized;
+		const isOversized =
+			(txRequest as SubstrateCompletedParsedData)?.oversized || false;
 
 		const isEthereum = isEthereumCompletedParsedData(txRequest);
 
 		if (
 			isEthereum &&
-			!(txRequest.data && txRequest.data!.rlp && txRequest.data.account)
+			!(
+				txRequest.data &&
+				(txRequest as EthereumParsedData).data!.rlp &&
+				txRequest.data.account
+			)
 		) {
 			throw new Error('Scanned QR contains no valid transaction');
 		}
@@ -415,7 +422,8 @@ export default class ScannerStore extends Container<ScannerState> {
 			dataToSign = await keccak(txRequest.data.rlp);
 		} else {
 			tx = txRequest.data.data;
-			networkKey = txRequest.data.data?.genesisHash.toHex();
+			networkKey = (txRequest.data
+				.data as ExtrinsicPayload)?.genesisHash.toHex();
 			recipientAddress = txRequest.data.account;
 			dataToSign = txRequest.data.data;
 		}

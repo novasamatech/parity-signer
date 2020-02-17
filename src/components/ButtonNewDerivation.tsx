@@ -27,7 +27,7 @@ export default class ButtonNewDerivation extends React.PureComponent<{
 	title: string;
 	testID?: string;
 }> {
-	render() {
+	render(): React.ReactElement {
 		const { onPress, title, testID } = this.props;
 		return (
 			<Button

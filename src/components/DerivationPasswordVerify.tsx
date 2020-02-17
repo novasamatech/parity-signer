@@ -30,7 +30,7 @@ export default function DerivationPasswordVerify(props: {
 	const [verifyField, setVerifyField] = useState(false);
 	const isMatching = enteredPassword === password;
 
-	const toggleVerifyField = () => {
+	const toggleVerifyField = (): void => {
 		setVerifyField(!verifyField);
 	};
 

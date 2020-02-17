@@ -48,7 +48,7 @@ interface Props {
 
 const ButtonIcon: FunctionComponent<Props> = ({
 	dropdown = false,
-	renderDropdownElement = () => null,
+	renderDropdownElement = (): null => null,
 	iconName,
 	iconType,
 	iconColor,
@@ -98,7 +98,7 @@ const ButtonIcon: FunctionComponent<Props> = ({
 	const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 		Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
-	const renderIcon = () => {
+	const renderIcon = (): React.ReactElement => {
 		if (iconType === 'antdesign') {
 			return (
 				<AntIcon

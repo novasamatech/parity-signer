@@ -86,7 +86,7 @@ export default class PayloadDetailsCard extends React.PureComponent<
 		};
 	}
 
-	render() {
+	render(): React.ReactElement {
 		const { fallback } = this.state;
 		const { description, payload, prefix, signature, style } = this.props;
 
@@ -151,7 +151,7 @@ function ExtrinsicPart({
 	prefix: number;
 	value: AnyU8a | IMethod | IExtrinsicEra;
 	fallback?: string;
-}) {
+}): React.ReactElement {
 	const [period, setPeriod] = useState();
 	const [phase, setPhase] = useState();
 	const [formattedCallArgs, setFormattedCallArgs] = useState();
@@ -170,7 +170,7 @@ function ExtrinsicPart({
 					callInstance: Call,
 					callMethodArgs: any,
 					depth: number
-				) {
+				): void {
 					const { args, meta, methodName, sectionName } = callInstance;
 					const paramArgKvArray = [];
 					if (!meta.args.length) {
@@ -231,7 +231,7 @@ function ExtrinsicPart({
 		}
 	}, [fallback, label, prefix, value]);
 
-	const renderEraDetails = () => {
+	const renderEraDetails = (): React.ReactElement => {
 		if (period && phase) {
 			return (
 				<View style={styles.era}>
@@ -261,7 +261,7 @@ function ExtrinsicPart({
 	type MethodCall = [string, ArgsList];
 	type FormattedArgs = Array<MethodCall>;
 
-	const renderMethodDetails = () => {
+	const renderMethodDetails = (): React.ReactNode => {
 		if (formattedCallArgs) {
 			const formattedArgs: FormattedArgs = Object.entries(formattedCallArgs);
 
@@ -311,7 +311,7 @@ function ExtrinsicPart({
 		}
 	};
 
-	const renderTipDetails = () => {
+	const renderTipDetails = (): React.ReactElement => {
 		return (
 			<View style={{ display: 'flex', flexDirection: 'column' }}>
 				<Text style={styles.secondaryText}>{tip}</Text>

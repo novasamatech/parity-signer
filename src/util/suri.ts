@@ -107,7 +107,7 @@ export function constructSURI({
 	derivePath?: string;
 	password?: string;
 	phrase: string;
-}) {
+}): string {
 	if (!phrase) {
 		throw new Error('Cannot construct an SURI from emtpy phrase.');
 	}

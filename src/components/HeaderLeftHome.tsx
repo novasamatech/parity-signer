@@ -21,9 +21,9 @@ import fonts from '../fonts';
 import iconLogo from '../../res/img/icon.png';
 
 export default class HeaderLeftHome extends React.PureComponent<{
-	style: ViewStyle;
+	style?: ViewStyle;
 }> {
-	render() {
+	render(): React.ReactElement {
 		return (
 			<View
 				style={[
