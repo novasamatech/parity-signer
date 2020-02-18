@@ -43,7 +43,7 @@ export type CompletedParsedData =
 export type SubstrateCompletedParsedData = {
 	data: {
 		crypto: 'ed25519' | 'sr25519' | null;
-		data: ExtrinsicPayload;
+		data: ExtrinsicPayload | Uint8Array | string;
 		account: string;
 	};
 	action: string; //"signTransaction"

@@ -90,7 +90,7 @@ type ScannerState = {
 	signedData: string;
 	signedTxList: SignedTX[];
 	totalFrameCount: number;
-	tx: Transaction | GenericExtrinsicPayload | null;
+	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
 	txRequest: TXRequest | null;
 	type: 'transaction' | 'message' | null;
 	unsignedData: CompletedParsedData | null;
@@ -626,7 +626,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.unsignedData;
 	}
 
-	getTx(): GenericExtrinsicPayload | Transaction | null {
+	getTx(): GenericExtrinsicPayload | Transaction | string| Uint8Array| null {
 		return this.state.tx;
 	}
 

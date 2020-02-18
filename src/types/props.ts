@@ -1,6 +1,5 @@
 import {
-	NavigationInjectedProps,
-	NavigationScreenProp
+	NavigationRoute,
 } from 'react-navigation';
 import {
 	GestureResponderEvent,
@@ -8,14 +7,13 @@ import {
 	TextInputChangeEventData,
 	TextInputFocusEventData
 } from 'react-native';
+import {StackNavigationProp} from 'react-navigation-stack/src/vendor/types';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 
 export interface NavigationProps<Params> {
-	navigation: NavigationScreenProp<{}, Params>;
+	navigation: StackNavigationProp<NavigationRoute, Params>;
 }
-
-export type ScreenProps = NavigationInjectedProps;
 
 export type ButtonListener = (event: GestureResponderEvent) => void;
 export type TextChangeListener = (

@@ -27,11 +27,11 @@ const setRemarkExtrinsicKusama =
 export const createMockSignRequest = (): TxRequestData => ({
 	bounds: {
 		height: 1440,
-		origin: [],
+		bounds: [{x: '50', y: '50'}, {x:'100',y:'100'}],
 		width: 1920
 	},
 	data: '',
 	rawData: setRemarkExtrinsicKusama,
 	target: 319,
-	type: 'QR_CODE'
+	type: 'qr'
 });
