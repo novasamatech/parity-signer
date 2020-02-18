@@ -16,6 +16,13 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import {
+	Account,
+	AccountMeta,
+	Identity,
+	LockedAccount
+} from 'types/identityTypes';
+import { NavigationProps } from 'types/props';
 
 import colors from '../colors';
 import { generateAccountId } from '../util/account';
@@ -31,8 +38,22 @@ import {
 	isEthereumAccountId
 } from '../util/identitiesUtils';
 
-export default class Loading extends React.PureComponent {
-	async componentDidMount() {
+interface LegacyMeta extends AccountMeta {
+	accountId: string;
+}
+
+interface LegacyIdentity extends Identity {
+	meta: Map<string, LegacyMeta>;
+	accountIds: Map<string, string>;
+}
+
+interface LegacyAccount extends LockedAccount {
+	chainId: string;
+	networkType: string;
+}
+
+export default class Loading extends React.PureComponent<NavigationProps<{}>> {
+	async componentDidMount(): Promise<void> {
 		const tocPP = await loadToCAndPPConfirmation();
 		const { navigate } = this.props.navigation;
 		if (!tocPP) {
@@ -45,11 +66,11 @@ export default class Loading extends React.PureComponent {
 	}
 
 	// TODO migrate identities only on internal test devices, remove them in v4.1
-	async migrateIdentity() {
+	async migrateIdentity(): Promise<void> {
 		const identities = await loadIdentities(4);
 
-		const migrationIdentityFunction = identity => {
-			const getAddressKey = accountId =>
+		const migrationIdentityFunction = (identity: LegacyIdentity): Identity => {
+			const getAddressKey = (accountId: string): string =>
 				isEthereumAccountId(accountId)
 					? accountId
 					: extractAddressFromAccountId(accountId);
@@ -58,30 +79,33 @@ export default class Loading extends React.PureComponent {
 				return identity;
 			}
 			const addressMap = new Map();
-			identity.accountIds.forEach((path, accountId) => {
+			identity.accountIds.forEach((path: string, accountId: string): void => {
 				addressMap.set(getAddressKey(accountId), path);
 			});
 			identity.addresses = addressMap;
 			delete identity.accountIds;
 
 			const metaMap = new Map();
-			identity.meta.forEach((metaData, path) => {
+			identity.meta.forEach((metaData: LegacyMeta, path: string): void => {
 				if (metaData.hasOwnProperty('accountId')) {
 					const { accountId } = metaData;
 					metaData.address = extractAddressFromAccountId(accountId);
 					delete metaData.accountId;
-					return metaMap.set(path, metaData);
+					metaMap.set(path, metaData);
+				} else {
+					metaMap.set(path, metaData);
 				}
-				metaMap.set(path, metaData);
 			});
 			identity.meta = metaMap;
 
 			return identity;
 		};
-		saveIdentities(identities.map(migrationIdentityFunction));
+		saveIdentities(
+			(identities as LegacyIdentity[]).map(migrationIdentityFunction)
+		);
 	}
 
-	async migrateAccounts() {
+	async migrateAccounts(): Promise<void> {
 		const oldAccounts_v1 = await loadAccounts(1);
 		// get a map from old accounts
 		// v2 accounts (up to v2.2.2) are only ethereum accounts
@@ -89,18 +113,20 @@ export default class Loading extends React.PureComponent {
 		// networkKey property is missing since it was introduced in v3.
 		const oldAccounts_v2 = await loadAccounts(2);
 		const oldAccounts = [...oldAccounts_v1, ...oldAccounts_v2];
-		const accounts = oldAccounts.map(([_, value]) => {
-			let result = {};
-			if (value.chainId) {
-				// The networkKey for Ethereum accounts is the chain id
-				result = { ...value, networkKey: value.chainId, recovered: true };
-				delete result.chainId;
-				delete result.networkType;
+		const accounts = oldAccounts.map(
+			([_, value]: [any, LegacyAccount]): Account => {
+				let result = {} as LegacyAccount;
+				if (value.chainId) {
+					// The networkKey for Ethereum accounts is the chain id
+					result = { ...value, networkKey: value.chainId, recovered: true };
+					delete result.chainId;
+					delete result.networkType;
+				}
+				return result;
 			}
-			return result;
-		});
+		);
 
-		accounts.forEach(account => {
+		accounts.forEach((account: Account): void => {
 			try {
 				saveAccount(generateAccountId(account), account);
 			} catch (e) {
@@ -109,7 +135,7 @@ export default class Loading extends React.PureComponent {
 		});
 	}
 
-	render() {
+	render(): React.ReactElement {
 		return <View style={styles.body} />;
 	}
 }

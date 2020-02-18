@@ -50,7 +50,7 @@ type State = {
 	pinMismatch: boolean;
 	pinTooShort: boolean;
 };
-function IdentityPin({ navigation, accounts }: Props) {
+function IdentityPin({ navigation, accounts }: Props): React.ReactElement {
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -132,7 +132,7 @@ function IdentityPin({ navigation, accounts }: Props) {
 					autoFocus
 					testID={testIDs.IdentityPin.unlockPinInput}
 					returnKeyType="done"
-					onChangeText={pin => onPinInputChange('pin', pin)}
+					onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
 					onSubmitEditing={testPin}
 					value={state.pin}
 				/>
@@ -156,11 +156,11 @@ function IdentityPin({ navigation, accounts }: Props) {
 					autoFocus
 					testID={testIDs.IdentityPin.setPin}
 					returnKeyType="next"
-					onFocus={() => updateState({ focusConfirmation: false })}
-					onSubmitEditing={() => {
+					onFocus={(): void => updateState({ focusConfirmation: false })}
+					onSubmitEditing={(): void => {
 						updateState({ focusConfirmation: true });
 					}}
-					onChangeText={pin => onPinInputChange('pin', pin)}
+					onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
 					value={state.pin}
 				/>
 				<PinInput
@@ -168,7 +168,7 @@ function IdentityPin({ navigation, accounts }: Props) {
 					returnKeyType="done"
 					testID={testIDs.IdentityPin.confirmPin}
 					focus={state.focusConfirmation}
-					onChangeText={confirmation =>
+					onChangeText={(confirmation: string): void =>
 						onPinInputChange('confirmation', confirmation)
 					}
 					value={state.confirmation}
@@ -216,7 +216,7 @@ function PinInput(props: PinInputProps): React.ReactElement {
 			style={StyleSheet.flatten([
 				fontStyles.t_seed,
 				styles.pinInput,
-				{ fontSize: 24 },
+				{ fontSize: 22 },
 				props.style
 			])}
 		/>

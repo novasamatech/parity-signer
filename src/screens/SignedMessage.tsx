@@ -16,23 +16,26 @@
 
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
+import { NavigationScannerProps } from 'types/props';
 import colors from '../colors';
 import QrView from '../components/QrView';
 import { withScannerStore } from '../util/HOC';
 import fontStyles from '../fontStyles';
 import MessageDetailsCard from '../components/MessageDetailsCard';
 
-function SignedMessage({ scanner }) {
-	const data = scanner.getSignedTxData();
-	const isHash = scanner.getIsHash();
-	const message = scanner.getMessage();
+function SignedMessage({
+	scannerStore
+}: NavigationScannerProps<{}>): React.ReactElement {
+	const data = scannerStore.getSignedTxData();
+	const isHash = scannerStore.getIsHash();
+	const message = scannerStore.getMessage();
 
 	useEffect(
-		() =>
-			function() {
-				scanner.cleanup();
+		(): (() => void) =>
+			function(): void {
+				scannerStore.cleanup();
 			},
-		[scanner]
+		[scannerStore]
 	);
 
 	return (
@@ -41,7 +44,7 @@ function SignedMessage({ scanner }) {
 			<QrView data={data} />
 			<MessageDetailsCard
 				isHash={isHash}
-				message={message}
+				message={message ?? ''}
 				data={data}
 				style={styles.messageDetail}
 			/>

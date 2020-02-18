@@ -16,6 +16,8 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
+import { NetworkParams } from 'types/networkSpecsTypes';
+import { NavigationAccountProps, NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
 import fonts from '../fonts';
@@ -28,15 +30,18 @@ import {
 import AccountsStore from '../stores/AccountsStore';
 import { emptyAccount } from '../util/account';
 
-export default class LegacyNetworkChooser extends React.PureComponent {
+export default class LegacyNetworkChooser extends React.PureComponent<
+	NavigationProps<{}>,
+	{}
+> {
 	static navigationOptions = {
 		headerBackTitle: 'Back',
 		title: 'Choose a network'
 	};
-	render() {
+	render(): React.ReactElement {
 		return (
 			<Subscribe to={[AccountsStore]}>
-				{accounts => (
+				{(accounts: AccountsStore): React.ReactElement => (
 					<LegacyNetworkChooserView {...this.props} accounts={accounts} />
 				)}
 			</Subscribe>
@@ -44,10 +49,12 @@ export default class LegacyNetworkChooser extends React.PureComponent {
 	}
 }
 
-class LegacyNetworkChooserView extends React.PureComponent {
-	render() {
-		const { navigation } = this.props;
-		const { accounts } = this.props;
+class LegacyNetworkChooserView extends React.PureComponent<
+	NavigationAccountProps<{}>,
+	{}
+> {
+	render(): React.ReactElement {
+		const { navigation, accounts } = this.props;
 		const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 
 		if (!__DEV__) {
@@ -59,34 +66,42 @@ class LegacyNetworkChooserView extends React.PureComponent {
 			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
 				<Text style={styles.title}>CHOOSE NETWORK</Text>
 				{Object.entries(NETWORK_LIST)
-					.filter(([networkKey]) => !excludedNetworks.includes(networkKey))
-					.map(([networkKey, networkParams]) => (
-						<TouchableItem
-							key={networkKey}
-							style={[
-								styles.card,
-								{
-									backgroundColor: networkParams.color,
-									marginTop: 20
-								}
-							]}
-							onPress={() => {
-								accounts.updateNew(emptyAccount('', networkKey));
-								navigation.goBack();
-							}}
-						>
-							<Text
+					.filter(
+						([networkKey]: [string, any]): boolean =>
+							!excludedNetworks.includes(networkKey)
+					)
+					.map(
+						([networkKey, networkParams]: [
+							string,
+							NetworkParams
+						]): React.ReactElement => (
+							<TouchableItem
+								key={networkKey}
 								style={[
-									styles.cardText,
+									styles.card,
 									{
-										color: networkParams.secondaryColor
+										backgroundColor: networkParams.color,
+										marginTop: 20
 									}
 								]}
+								onPress={(): void => {
+									accounts.updateNew(emptyAccount('', networkKey));
+									navigation.goBack();
+								}}
 							>
-								{networkParams.title}
-							</Text>
-						</TouchableItem>
-					))}
+								<Text
+									style={[
+										styles.cardText,
+										{
+											color: networkParams.secondaryColor
+										}
+									]}
+								>
+									{networkParams.title}
+								</Text>
+							</TouchableItem>
+						)
+					)}
 			</ScrollView>
 		);
 	}

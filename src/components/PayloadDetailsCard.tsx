@@ -14,7 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { TypeRegistry, Metadata } from '@polkadot/types';
+import {
+	TypeRegistry,
+	Metadata,
+	GenericExtrinsicPayload
+} from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
@@ -29,19 +33,14 @@ import substrateDevMetadata from '../util/static-substrate';
 import { shortString } from '../util/strings';
 import fontStyles from '../fontStyles';
 import { alertDecodeError } from '../util/alertUtils';
-import {
-	AnyU8a,
-	ExtrinsicPayloadValue,
-	IExtrinsicEra,
-	IMethod
-} from '@polkadot/types/types';
+import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 const registry = new TypeRegistry();
 
 interface Props {
 	description?: string;
-	payload?: ExtrinsicPayloadValue;
+	payload?: GenericExtrinsicPayload;
 	prefix: number;
 	signature?: string;
 	style?: ViewStyle;

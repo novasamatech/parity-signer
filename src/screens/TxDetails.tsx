@@ -14,13 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FoundAccount } from 'types/identityTypes';
+import {
+	isEthereumNetworkParams,
+	SubstrateNetworkParams
+} from 'types/networkSpecsTypes';
+import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import Background from '../components/Background';
 import ButtonMainAction from '../components/ButtonMainAction';
 import ScreenHeading from '../components/ScreenHeading';
@@ -37,14 +42,22 @@ import testIDs from '../../e2e/testIDs';
 import fontStyles from '../fontStyles';
 import CompatibleCard from '../components/CompatibleCard';
 import { getIdentityFromSender } from '../util/identitiesUtils';
+import { Transaction } from '../util/transaction';
 
-export default class TxDetails extends React.PureComponent {
-	async onSignTx(scannerStore, accountsStore, sender) {
+export default class TxDetails extends React.PureComponent<
+	NavigationProps<{}>
+> {
+	async onSignTx(
+		scannerStore: ScannerStore,
+		accountsStore: AccountsStore,
+		sender: FoundAccount
+	): Promise<void> {
 		try {
 			if (sender.isLegacy) {
-				return this.props.navigation.navigate('AccountUnlockAndSign', {
+				this.props.navigation.navigate('AccountUnlockAndSign', {
 					next: 'SignedTx'
 				});
+				return;
 			}
 			const senderIdentity = getIdentityFromSender(
 				sender,
@@ -64,25 +77,27 @@ export default class TxDetails extends React.PureComponent {
 		}
 	}
 
-	render() {
+	render(): React.ReactElement {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scannerStore, accountsStore) => {
+				{(
+					scannerStore: ScannerStore,
+					accountsStore: AccountsStore
+				): React.ReactNode => {
 					const txRequest = scannerStore.getTXRequest();
-					const sender = scannerStore.getSender();
+					const sender = scannerStore.getSender()!;
 					if (txRequest) {
 						const tx = scannerStore.getTx();
-
+						console.log('tx is ', tx);
 						return (
 							<TxDetailsView
-								{...{ ...this.props, ...tx }}
-								accountsStore={accountsStore}
+								{...{ ...this.props, ...(tx as Transaction) }}
+								accounts={accountsStore}
 								scannerStore={scannerStore}
-								sender={sender}
-								recipient={scannerStore.getRecipient()}
-								// dataToSign={scannerStore.getDataToSign()}
-								prehash={scannerStore.getPrehashPayload()}
-								onNext={() =>
+								sender={sender!}
+								recipient={scannerStore.getRecipient()!}
+								prehash={scannerStore.getPrehashPayload()!}
+								onNext={(): Promise<void> =>
 									this.onSignTx(scannerStore, accountsStore, sender)
 								}
 							/>
@@ -96,24 +111,21 @@ export default class TxDetails extends React.PureComponent {
 	}
 }
 
-export class TxDetailsView extends React.PureComponent {
-	static propTypes = {
-		// dataToSign: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
-		// .isRequired,
-		gas: PropTypes.string,
-		gasPrice: PropTypes.string,
-		nonce: PropTypes.string,
-		onNext: PropTypes.func.isRequired,
-		prehash: PropTypes.instanceOf(GenericExtrinsicPayload),
-		recipient: PropTypes.object.isRequired,
-		sender: PropTypes.object.isRequired,
-		value: PropTypes.string
-	};
+interface ViewProps extends NavigationAccountScannerProps<{}> {
+	gas: string;
+	gasPrice: string;
+	nonce: string;
+	onNext: () => void;
+	prehash: GenericExtrinsicPayload;
+	recipient: FoundAccount;
+	sender: FoundAccount;
+	value: string;
+}
 
-	render() {
+export class TxDetailsView extends React.PureComponent<ViewProps> {
+	render(): React.ReactElement {
 		const {
-			// dataToSign,
-			accountsStore,
+			accounts,
 			gas,
 			gasPrice,
 			prehash,
@@ -123,9 +135,10 @@ export class TxDetailsView extends React.PureComponent {
 			onNext
 		} = this.props;
 
-		const isEthereum =
-			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
-		const prefix = !isEthereum && NETWORK_LIST[sender.networkKey].prefix;
+		const senderNetworkParams = NETWORK_LIST[sender.networkKey];
+		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
+		const prefix = (NETWORK_LIST[sender.networkKey] as SubstrateNetworkParams)
+			?.prefix;
 
 		return (
 			<View style={styles.body}>
@@ -146,7 +159,7 @@ export class TxDetailsView extends React.PureComponent {
 					<View style={styles.bodyContent}>
 						<CompatibleCard
 							account={sender}
-							accountsStore={accountsStore}
+							accountsStore={accounts}
 							titlePrefix={'from: '}
 						/>
 						{isEthereum ? (
@@ -159,10 +172,7 @@ export class TxDetailsView extends React.PureComponent {
 									gasPrice={gasPrice}
 								/>
 								<Text style={styles.title}>Recipient</Text>
-								<CompatibleCard
-									account={recipient}
-									accountsStore={accountsStore}
-								/>
+								<CompatibleCard account={recipient} accountsStore={accounts} />
 							</View>
 						) : (
 							<PayloadDetailsCard
@@ -176,7 +186,7 @@ export class TxDetailsView extends React.PureComponent {
 				<ButtonMainAction
 					testID={testIDs.TxDetails.signButton}
 					title="Sign Transaction"
-					onPress={() => onNext()}
+					onPress={(): any => onNext()}
 				/>
 			</View>
 		);

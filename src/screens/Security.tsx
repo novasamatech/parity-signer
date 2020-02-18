@@ -20,7 +20,7 @@ import colors from '../colors';
 import ScreenHeading from '../components/ScreenHeading';
 
 export default class Security extends React.PureComponent {
-	render() {
+	render(): React.ReactElement {
 		return (
 			<ScrollView style={styles.body}>
 				<ScreenHeading

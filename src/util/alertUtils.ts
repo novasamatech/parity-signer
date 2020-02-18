@@ -44,7 +44,7 @@ const buildAlertButtons = (
 	confirmText: string
 ): AlertButton[] => [
 	{
-		onPress: () => {
+		onPress: (): void => {
 			onConfirm();
 		},
 		style: 'destructive',
@@ -97,7 +97,7 @@ export const alertCopyBackupPhrase = (seedPhrase: string): void =>
 		'It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.',
 		[
 			{
-				onPress: () => {
+				onPress: (): void => {
 					Clipboard.setString(seedPhrase);
 				},
 				style: 'default',

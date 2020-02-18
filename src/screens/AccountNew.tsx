@@ -45,7 +45,10 @@ interface State {
 	newAccount?: Account;
 }
 
-function AccountNew({ accounts, navigation }: NavigationAccountProps<{}>) {
+function AccountNew({
+	accounts,
+	navigation
+}: NavigationAccountProps<{}>): React.ReactElement {
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -80,7 +83,7 @@ function AccountNew({ accounts, navigation }: NavigationAccountProps<{}>) {
 		selectedAccount,
 		selectedNetwork
 	} = state;
-	if (!selectedAccount) return null;
+	if (!selectedAccount) return <View />;
 
 	const { address, name, validBip39Seed } = selectedAccount;
 	const seed = (selectedAccount as UnlockedAccount)?.seed;
@@ -97,14 +100,14 @@ function AccountNew({ accounts, navigation }: NavigationAccountProps<{}>) {
 				address={''}
 				title={selectedNetwork!.title}
 				networkKey={selectedAccount.networkKey}
-				onPress={() => navigation.navigate('LegacyNetworkChooser')}
+				onPress={(): boolean => navigation.navigate('LegacyNetworkChooser')}
 			/>
 			<View style={styles.body}>
 				<Text style={styles.title}>ICON & ADDRESS</Text>
 				<AccountIconChooser
 					derivationPassword={derivationPassword}
 					derivationPath={derivationPath}
-					onSelect={({ newAddress, isBip39, newSeed }) => {
+					onSelect={({ newAddress, isBip39, newSeed }): void => {
 						if (newAddress && isBip39 && newSeed) {
 							if (isSubstrate) {
 								try {
@@ -146,13 +149,19 @@ function AccountNew({ accounts, navigation }: NavigationAccountProps<{}>) {
 				/>
 				<Text style={styles.title}>NAME</Text>
 				<TextInput
-					onChangeText={input => accounts.updateNew({ name: input })}
+					onChangeText={(input: string): void =>
+						accounts.updateNew({ name: input })
+					}
 					value={name}
 					placeholder="Enter a new account name"
 				/>
 				{isSubstrate && (
 					<DerivationPathField
-						onChange={newDerivationPath => {
+						onChange={(newDerivationPath: {
+							derivationPassword: string;
+							derivationPath: string;
+							isDerivationPathValid: boolean;
+						}): void => {
 							updateState({
 								derivationPassword: newDerivationPath.derivationPassword,
 								derivationPath: newDerivationPath.derivationPath,
@@ -174,7 +183,7 @@ function AccountNew({ accounts, navigation }: NavigationAccountProps<{}>) {
 							!validateSeed(seed, validBip39Seed).valid ||
 							!isDerivationPathValid
 						}
-						onPress={() => {
+						onPress={(): void => {
 							navigation.navigate('LegacyAccountBackup', {
 								isNew: true
 							});

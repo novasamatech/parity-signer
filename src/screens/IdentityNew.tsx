@@ -53,7 +53,8 @@ function IdentityNew({
 	const [seedPhrase, setSeedPhrase] = useState('');
 
 	useEffect((): (() => void) => {
-		const clearNewIdentity = () => accounts.updateNewIdentity(emptyIdentity());
+		const clearNewIdentity = (): void =>
+			accounts.updateNewIdentity(emptyIdentity());
 		clearNewIdentity();
 		return clearNewIdentity;
 	}, [accounts]);
@@ -120,7 +121,7 @@ function IdentityNew({
 			<View style={styles.btnBox}>
 				<Button
 					title="Create"
-					onPress={() => {
+					onPress={(): void => {
 						setIsRecover(false);
 					}}
 					small={true}
@@ -136,11 +137,11 @@ function IdentityNew({
 		</>
 	);
 
-	const renderCreateView = () => (
+	const renderCreateView = (): React.ReactElement => (
 		<View style={styles.btnBox}>
 			<Button
 				title="Recover Identity"
-				onPress={() => setIsRecover(true)}
+				onPress={(): void => setIsRecover(true)}
 				small={true}
 				onlyText={true}
 			/>

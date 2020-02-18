@@ -17,6 +17,8 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
+import { NavigationAccountProps } from 'types/props';
+import { Account } from 'types/identityTypes';
 
 import colors from '../colors';
 import AccountCard from '../components/AccountCard';
@@ -24,8 +26,11 @@ import Background from '../components/Background';
 import testIDs from '../../e2e/testIDs';
 import { withAccountStore } from '../util/HOC';
 
-function LegacyAccountList({ navigation, accounts }) {
-	const onAccountSelected = async key => {
+function LegacyAccountList({
+	navigation,
+	accounts
+}: NavigationAccountProps<{}>): React.ReactElement {
+	const onAccountSelected = async (key: string): Promise<void> => {
 		await accounts.select(key);
 		navigation.navigate('AccountDetails');
 	};
@@ -38,19 +43,22 @@ function LegacyAccountList({ navigation, accounts }) {
 				style={styles.content}
 				contentContainerStyle={{ paddingBottom: 120 }}
 				data={Array.from(accountsMap.entries())}
-				keyExtractor={([key]) => key}
-				renderItem={({ item: [accountKey, account] }) => {
+				keyExtractor={([key]: [string, any]): string => key}
+				renderItem={({
+					item: [accountKey, account]
+				}: {
+					item: [string, Account];
+				}): React.ReactElement => {
 					return (
 						<AccountCard
 							address={account.address}
 							networkKey={account.networkKey}
-							onPress={() => onAccountSelected(accountKey)}
-							style={{ paddingBottom: null }}
+							onPress={(): Promise<void> => onAccountSelected(accountKey)}
+							style={{ paddingBottom: 0 }}
 							title={account.name}
 						/>
 					);
 				}}
-				enableEmptySections
 			/>
 		</View>
 	);

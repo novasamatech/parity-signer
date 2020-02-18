@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
+import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from '../util/HOC';
 import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -41,11 +42,21 @@ import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from '../util/account';
 import UnknownAccountWarning from '../components/UnknownAccountWarning';
 
-export function PathDetailsView({ accounts, navigation, path, networkKey }) {
+interface Props extends NavigationAccountProps<{}> {
+	path: string;
+	networkKey: string;
+}
+
+export function PathDetailsView({
+	accounts,
+	navigation,
+	path,
+	networkKey
+}: Props): React.ReactElement {
 	const { currentIdentity } = accounts.state;
-	const address = getAddressWithPath(path, currentIdentity);
-	const accountName = getPathName(path, currentIdentity);
-	if (!address) return null;
+	const address = getAddressWithPath(path, currentIdentity!);
+	const accountName = getPathName(path, currentIdentity!);
+	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 	const accountId = generateAccountId({
@@ -53,13 +64,13 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 		networkKey: formattedNetworkKey
 	});
 
-	const onOptionSelect = value => {
+	const onOptionSelect = (value: string): void => {
 		switch (value) {
 			case 'PathDelete':
 				alertDeleteAccount('this account', async () => {
 					await unlockSeedPhrase(navigation);
 					const deleteSucceed = await accounts.deletePath(path);
-					const paths = Array.from(accounts.state.currentIdentity.meta.keys());
+					const paths = Array.from(accounts.state.currentIdentity!.meta.keys());
 					const pathIndicatedNetworkKey = getNetworkKeyByPath(path);
 					const listedPaths = getPathsWithSubstrateNetworkKey(
 						paths,
@@ -108,7 +119,7 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 				/>
 			</View>
 			<ScrollView>
-				<PathCard identity={currentIdentity} path={path} />
+				<PathCard identity={currentIdentity!} path={path} />
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
@@ -116,9 +127,12 @@ export function PathDetailsView({ accounts, navigation, path, networkKey }) {
 	);
 }
 
-function PathDetails({ accounts, navigation }) {
+function PathDetails({
+	accounts,
+	navigation
+}: NavigationAccountProps<{ path?: string }>): React.ReactElement {
 	const path = navigation.getParam('path', '');
-	const networkKey = getNetworkKey(path, accounts.state.currentIdentity);
+	const networkKey = getNetworkKey(path, accounts.state.currentIdentity!);
 	return (
 		<PathDetailsView
 			accounts={accounts}

@@ -17,7 +17,7 @@
 import { rlpItem } from './native';
 import { fromWei } from './units';
 
-class Transaction {
+export class Transaction {
 	readonly nonce: string;
 	readonly gasPrice: string;
 	readonly gas: string;

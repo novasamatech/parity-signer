@@ -52,7 +52,7 @@ function LegacyAccountBackup({
 		};
 
 		AppState.addEventListener('change', handleAppStateChange);
-		return () => {
+		return (): void => {
 			const selectedKey = accounts.getSelectedKey();
 
 			if (selectedKey) {
@@ -90,7 +90,7 @@ function LegacyAccountBackup({
 			<AccountCard address={address} networkKey={networkKey} title={name} />
 			<View style={styles.bodyContent}>
 				<TouchableItem
-					onPress={() => {
+					onPress={(): void => {
 						// only allow the copy of the recovery phrase in dev environment
 						if (__DEV__) {
 							if (protocol === NetworkProtocols.SUBSTRATE) {
@@ -118,7 +118,7 @@ function LegacyAccountBackup({
 							{ marginBottom: 20 }
 						])}
 						title="Backup Done"
-						onPress={() => {
+						onPress={(): void => {
 							alertBackupDone(() => {
 								navigate('AccountPin', { isNew });
 							});

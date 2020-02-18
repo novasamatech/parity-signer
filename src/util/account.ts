@@ -15,14 +15,16 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { UnlockedAccount } from 'types/identityTypes';
-import { EthereumNetworkParams } from 'types/networkSpecsTypes';
+import {
+	EthereumNetworkParams,
+	isSubstrateNetworkParams
+} from 'types/networkSpecsTypes';
 import { ValidSeed } from 'types/utilTypes';
 import {
 	NetworkProtocols,
 	NETWORK_LIST,
 	SubstrateNetworkKeys
 } from '../constants';
-import { isSubstrateNetworkParams } from './identitiesUtils';
 
 export function generateAccountId({
 	address,

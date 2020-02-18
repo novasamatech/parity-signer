@@ -17,6 +17,7 @@
 import React, { useEffect } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+import { NavigationProps, NavigationScannerProps } from 'types/props';
 import { Subscribe } from 'unstated';
 
 import colors from '../colors';
@@ -28,17 +29,28 @@ import ScreenHeading from '../components/ScreenHeading';
 import { createMockSignRequest } from '../../e2e/mock';
 import { TxRequestData } from 'types/scannerTypes';
 
-export default class Scanner extends React.PureComponent {
-	constructor(props) {
+interface State {
+	enableScan: boolean;
+}
+
+export default class Scanner extends React.PureComponent<
+	NavigationProps<{}>,
+	State
+> {
+	constructor(props: NavigationProps<{}>) {
 		super(props);
 		this.state = { enableScan: true };
 	}
 
-	showErrorMessage(scannerStore, title, message) {
+	showErrorMessage(
+		scannerStore: ScannerStore,
+		title: string,
+		message: string
+	): void {
 		this.setState({ enableScan: false });
 		Alert.alert(title, message, [
 			{
-				onPress: async () => {
+				onPress: async (): Promise<void> => {
 					await scannerStore.cleanup();
 					this.setState({ enableScan: true });
 				},
@@ -47,20 +59,24 @@ export default class Scanner extends React.PureComponent {
 		]);
 	}
 
-	render() {
+	render(): React.ReactElement {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scannerStore, accountsStore) => {
+				{(
+					scannerStore: ScannerStore,
+					accountsStore: AccountsStore
+				): React.ReactElement => {
 					return (
 						<QrScannerView
 							completedFramesCount={scannerStore.getCompletedFramesCount()}
 							isMultipart={scannerStore.getTotalFramesCount() > 1}
 							missedFrames={scannerStore.getMissedFrames()}
 							navigation={this.props.navigation}
-							accountStore={accountsStore}
 							scannerStore={scannerStore}
 							totalFramesCount={scannerStore.getTotalFramesCount()}
-							onBarCodeRead={async (txRequestData: TxRequestData) => {
+							onBarCodeRead={async (
+								txRequestData: TxRequestData
+							): Promise<void> => {
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
 								}
@@ -77,6 +93,12 @@ export default class Scanner extends React.PureComponent {
 										await scannerStore.setUnsigned(txRequestData.data);
 									} else if (!scannerStore.isMultipartComplete()) {
 										const strippedData = rawDataToU8A(txRequestData.rawData);
+										if (strippedData === null)
+											return this.showErrorMessage(
+												scannerStore,
+												text.PARSE_ERROR_TITLE,
+												'There is no raw Data from the request'
+											);
 										console.log('strippedData is', strippedData);
 										await scannerStore.setParsedData(
 											strippedData,
@@ -115,26 +137,31 @@ export default class Scanner extends React.PureComponent {
 	}
 }
 
+interface ViewProps extends NavigationScannerProps<{}> {
+	onBarCodeRead: (listener: TxRequestData) => void;
+	completedFramesCount: number;
+	isMultipart: boolean;
+	missedFrames: number[];
+	totalFramesCount: number;
+}
+
 function QrScannerView({
 	navigation,
 	scannerStore,
-	accountStore,
 	...props
-}: {
-	onBarCodeRead: (listener: TxRequestData) => void;
-}) {
+}: ViewProps): React.ReactElement {
 	if (global.inTest) {
 		props.onBarCodeRead(createMockSignRequest());
 	}
 
-	useEffect(() => {
+	useEffect((): (() => void) => {
 		const setBusySubscription = navigation.addListener('willFocus', () => {
 			scannerStore.setReady();
 		});
 		const setReadySubscription = navigation.addListener('didBlur', () => {
 			scannerStore.setBusy();
 		});
-		return () => {
+		return (): void => {
 			setBusySubscription.remove();
 			setReadySubscription.remove();
 			scannerStore.setReady();
@@ -150,7 +177,9 @@ function QrScannerView({
 	return (
 		<RNCamera
 			captureAudio={false}
-			onBarCodeRead={props.onBarCodeRead}
+			onBarCodeRead={(event: any): void =>
+				props.onBarCodeRead(event as TxRequestData)
+			}
 			style={styles.view}
 		>
 			<View style={styles.body}>
@@ -171,8 +200,7 @@ function QrScannerView({
 							{props.completedFramesCount} / {props.totalFramesCount} Completed.
 						</Text>
 						<Button
-							onPress={() => scannerStore.clearMultipartProgress()}
-							style={styles.descSecondary}
+							onPress={(): void => scannerStore.clearMultipartProgress()}
 							title="Start Over"
 						/>
 					</View>

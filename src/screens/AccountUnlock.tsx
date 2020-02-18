@@ -31,7 +31,7 @@ import ScannerStore from '../stores/ScannerStore';
 export class AccountUnlockAndSign extends React.PureComponent<
 	NavigationProps<{ next: string }>
 > {
-	render() {
+	render(): React.ReactElement {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'SignedTx');
 
@@ -51,7 +51,7 @@ export class AccountUnlockAndSign extends React.PureComponent<
 								return false;
 							}
 						}}
-						navigate={() => {
+						navigate={(): void => {
 							const resetAction = StackActions.reset({
 								actions: [
 									NavigationActions.navigate({
@@ -74,7 +74,7 @@ export class AccountUnlockAndSign extends React.PureComponent<
 export class AccountUnlock extends React.PureComponent<
 	NavigationProps<{ next: string; onDelete: () => any }>
 > {
-	render() {
+	render(): React.ReactElement {
 		const { navigation } = this.props;
 		const next = navigation.getParam('next', 'LegacyAccountList');
 		const onDelete = navigation.getParam('onDelete', () => null);
@@ -84,7 +84,7 @@ export class AccountUnlock extends React.PureComponent<
 				{(accounts: AccountsStore): React.ReactElement => (
 					<AccountUnlockView
 						{...this.props}
-						checkPin={async pin => {
+						checkPin={async (pin: string): Promise<boolean> => {
 							return await accounts.unlockAccount(
 								accounts.getSelectedKey(),
 								pin
@@ -136,11 +136,11 @@ class AccountUnlockView extends React.PureComponent<
 		pin: ''
 	};
 
-	showErrorMessage = () => {
+	showErrorMessage = (): string => {
 		return this.state.hasWrongPin ? 'Wrong pin, please try again' : '';
 	};
 
-	render() {
+	render(): React.ReactElement {
 		const { checkPin, navigate } = this.props;
 		const { hasWrongPin, pin } = this.state;
 
@@ -154,14 +154,14 @@ class AccountUnlockView extends React.PureComponent<
 				/>
 				<PinInput
 					label="PIN"
-					onChangeText={async (pin: string): Promise<void> => {
-						this.setState({ pin: pin });
-						if (pin.length < 4) {
+					onChangeText={async (inputPin: string): Promise<void> => {
+						this.setState({ pin: inputPin });
+						if (inputPin.length < 4) {
 							return;
 						}
-						if (await checkPin(pin)) {
+						if (await checkPin(inputPin)) {
 							navigate();
-						} else if (pin.length > 5) {
+						} else if (inputPin.length > 5) {
 							this.setState({ hasWrongPin: true });
 						}
 					}}
@@ -172,7 +172,7 @@ class AccountUnlockView extends React.PureComponent<
 	}
 }
 
-function PinInput(props: any) {
+function PinInput(props: any): React.ReactElement {
 	return (
 		<TextInput
 			autoFocus

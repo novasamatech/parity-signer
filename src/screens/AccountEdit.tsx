@@ -51,7 +51,9 @@ function AccountEdit({
 			<TextInput
 				label="Account Name"
 				style={{ marginBottom: 40 }}
-				onChangeText={name => onNameInput(accounts, name)}
+				onChangeText={(name: string): Promise<any> =>
+					onNameInput(accounts, name)
+				}
 				value={selectedAccount.name}
 				placeholder="New name"
 			/>

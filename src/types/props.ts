@@ -9,9 +9,10 @@ import {
 	TextInputFocusEventData
 } from 'react-native';
 import AccountsStore from '../stores/AccountsStore';
+import ScannerStore from '../stores/ScannerStore';
 
 export interface NavigationProps<Params> {
-	navigation: NavigationScreenProp<ScreenProps, Params>;
+	navigation: NavigationScreenProp<{}, Params>;
 }
 
 export type ScreenProps = NavigationInjectedProps;
@@ -24,7 +25,17 @@ export type FocusListener = (
 	event: NativeSyntheticEvent<TextInputFocusEventData>
 ) => void;
 
-export interface NavigationAccountProps<Params> {
+export interface NavigationAccountProps<Params>
+	extends NavigationProps<Params> {
 	accounts: AccountsStore;
-	navigation: NavigationScreenProp<{}, Params>;
+}
+
+export interface NavigationAccountScannerProps<Params>
+	extends NavigationAccountProps<Params> {
+	scannerStore: ScannerStore;
+}
+
+export interface NavigationScannerProps<Params>
+	extends NavigationProps<Params> {
+	scannerStore: ScannerStore;
 }

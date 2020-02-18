@@ -16,12 +16,18 @@
 
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
-import PropTypes from 'prop-types';
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
+import { FoundAccount } from 'types/identityTypes';
+import {
+	isEthereumNetworkParams,
+	SubstrateNetworkParams,
+	UnknownNetworkParams
+} from 'types/networkSpecsTypes';
+import { NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
 import colors from '../colors';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
@@ -37,13 +43,20 @@ import { alertMultipart } from '../util/alertUtils';
 import CompatibleCard from '../components/CompatibleCard';
 import { getIdentityFromSender } from '../util/identitiesUtils';
 
-export default class MessageDetails extends React.PureComponent {
-	async onSignMessage(scannerStore, accountsStore, sender) {
+export default class MessageDetails extends React.PureComponent<
+	NavigationProps<{}>
+> {
+	async onSignMessage(
+		scannerStore: ScannerStore,
+		accountsStore: AccountsStore,
+		sender: FoundAccount
+	): Promise<void> {
 		try {
 			if (sender.isLegacy) {
-				return this.props.navigation.navigate('AccountUnlockAndSign', {
+				this.props.navigation.navigate('AccountUnlockAndSign', {
 					next: 'SignedMessage'
 				});
+				return;
 			}
 			const senderIdentity = getIdentityFromSender(
 				sender,
@@ -63,14 +76,16 @@ export default class MessageDetails extends React.PureComponent {
 		}
 	}
 
-	render() {
+	render(): React.ReactElement {
 		return (
 			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(scannerStore, accountsStore) => {
-					const dataToSign = scannerStore.getDataToSign();
-					const message = scannerStore.getMessage();
-					const sender = scannerStore.getSender();
-
+				{(
+					scannerStore: ScannerStore,
+					accountsStore: AccountsStore
+				): React.ReactNode => {
+					const dataToSign = scannerStore.getDataToSign()!;
+					const message = scannerStore.getMessage()!;
+					const sender = scannerStore.getSender()!;
 					if (dataToSign) {
 						return (
 							<MessageDetailsView
@@ -80,11 +95,14 @@ export default class MessageDetails extends React.PureComponent {
 								sender={sender}
 								message={isU8a(message) ? u8aToHex(message) : message}
 								dataToSign={
-									isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign
+									//dataToSign could be U8A?
+									isU8a(dataToSign)
+										? u8aToHex(dataToSign)
+										: dataToSign.toString()
 								}
 								prehash={scannerStore.getPrehashPayload()}
 								isHash={scannerStore.getIsHash()}
-								onNext={() =>
+								onNext={(): Promise<void> =>
 									this.onSignMessage(scannerStore, accountsStore, sender)
 								}
 							/>
@@ -98,17 +116,19 @@ export default class MessageDetails extends React.PureComponent {
 	}
 }
 
-export class MessageDetailsView extends React.PureComponent {
-	static propTypes = {
-		dataToSign: PropTypes.string.isRequired,
-		isHash: PropTypes.bool,
-		message: PropTypes.string.isRequired,
-		onNext: PropTypes.func.isRequired,
-		prehash: PropTypes.instanceOf(GenericExtrinsicPayload),
-		sender: PropTypes.object.isRequired
-	};
+interface Props extends NavigationProps<{}> {
+	dataToSign: string;
+	isHash?: boolean;
+	message: string;
+	onNext: () => void;
+	prehash: GenericExtrinsicPayload | null;
+	sender: FoundAccount;
+	scannerStore: ScannerStore;
+	accountsStore: AccountsStore;
+}
 
-	render() {
+export class MessageDetailsView extends React.PureComponent<Props> {
+	render(): React.ReactElement {
 		const {
 			accountsStore,
 			dataToSign,
@@ -119,9 +139,11 @@ export class MessageDetailsView extends React.PureComponent {
 			sender
 		} = this.props;
 
-		const isEthereum =
-			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
-		const prefix = !isEthereum && NETWORK_LIST[sender.networkKey].prefix;
+		const networkParams = NETWORK_LIST[sender.networkKey];
+		const isEthereum = isEthereumNetworkParams(networkParams);
+		const prefix = (networkParams as
+			| SubstrateNetworkParams
+			| UnknownNetworkParams)?.prefix;
 
 		return (
 			<ScrollView
@@ -140,14 +162,14 @@ export class MessageDetailsView extends React.PureComponent {
 					/>
 				) : null}
 				<MessageDetailsCard
-					isHash={isHash}
+					isHash={isHash ?? false}
 					message={message}
 					data={dataToSign}
 				/>
 				<Button
 					buttonStyles={{ height: 60 }}
 					title="Sign Message"
-					onPress={() => {
+					onPress={(): void => {
 						isHash ? alertMultipart(onNext) : onNext();
 					}}
 				/>

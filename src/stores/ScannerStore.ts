@@ -40,7 +40,7 @@ import {
 	substrateSign
 } from '../util/native';
 import { mod } from '../util/numbers';
-import transaction from '../util/transaction';
+import transaction, { Transaction } from '../util/transaction';
 import {
 	constructDataFromBytes,
 	asciiToHex,
@@ -90,7 +90,7 @@ type ScannerState = {
 	signedData: string;
 	signedTxList: SignedTX[];
 	totalFrameCount: number;
-	tx: Record<string, any> | string;
+	tx: Transaction | GenericExtrinsicPayload | null;
 	txRequest: TXRequest | null;
 	type: 'transaction' | 'message' | null;
 	unsignedData: CompletedParsedData | null;
@@ -114,7 +114,7 @@ const DEFAULT_STATE = Object.freeze({
 	signedData: '',
 	signedTxList: [],
 	totalFrameCount: 0,
-	tx: '',
+	tx: null,
 	txRequest: null,
 	type: null,
 	unsignedData: null
@@ -626,7 +626,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.unsignedData;
 	}
 
-	getTx(): Record<string, any> | string {
+	getTx(): GenericExtrinsicPayload | Transaction | null {
 		return this.state.tx;
 	}
 

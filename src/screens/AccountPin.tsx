@@ -83,7 +83,7 @@ function AccountPin({
 		}
 	};
 
-	const showHintOrError = () => {
+	const showHintOrError = (): React.ReactElement => {
 		if (state.pinTooShort) {
 			return (
 				<Text style={styles.errorText}>
@@ -120,8 +120,8 @@ function AccountPin({
 			<PinInput
 				autoFocus
 				returnKeyType="next"
-				onFocus={() => setState({ focusConfirmation: false })}
-				onSubmitEditing={() => {
+				onFocus={(): void => setState({ focusConfirmation: false })}
+				onSubmitEditing={(): void => {
 					setState({ focusConfirmation: true });
 				}}
 				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}

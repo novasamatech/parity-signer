@@ -16,7 +16,9 @@
 
 import fonts from './fonts';
 import colors from './colors';
-export default {
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
 	h1: {
 		color: colors.bg_text,
 		fontFamily: fonts.robotoBold,
@@ -81,4 +83,4 @@ export default {
 		paddingHorizontal: 16,
 		paddingVertical: 10
 	}
-};
+});

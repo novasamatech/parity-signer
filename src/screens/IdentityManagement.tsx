@@ -80,7 +80,9 @@ function IdentityManagement({
 			</View>
 			<TextInput
 				label="Display Name"
-				onChangeText={name => accounts.updateIdentityName(name)}
+				onChangeText={(name: string): Promise<void> =>
+					accounts.updateIdentityName(name)
+				}
 				value={currentIdentity.name}
 				placeholder="Enter a new identity name"
 				focus

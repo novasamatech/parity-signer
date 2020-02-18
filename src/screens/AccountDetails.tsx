@@ -33,11 +33,14 @@ import { withAccountStore } from '../util/HOC';
 import AccountIcon from '../components/AccountIcon';
 import { NavigationAccountProps } from 'types/props';
 
-function AccountDetails({ accounts, navigation }: NavigationAccountProps<{}>) {
+function AccountDetails({
+	accounts,
+	navigation
+}: NavigationAccountProps<{}>): React.ReactElement {
 	const account = accounts.getSelected();
 	const selectedKey = accounts.getSelectedKey();
 
-	if (!account) return null;
+	if (!account) return <View />;
 
 	const protocol =
 		(account.networkKey &&

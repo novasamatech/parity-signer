@@ -23,6 +23,7 @@ export type UnlockedAccount = {
 	isLegacy?: boolean;
 	name: string;
 	networkKey: string;
+	recovered?: boolean;
 	seed: string; //this is the SURI (seedPhrase + /soft//hard///password derivation)
 	seedPhrase: string; //contains only the BIP39 words, no derivation path
 	updatedAt: number;

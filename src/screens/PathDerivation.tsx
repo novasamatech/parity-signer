@@ -16,6 +16,7 @@
 
 import React, { useRef, useState, useMemo } from 'react';
 import { withNavigation } from 'react-navigation';
+import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from '../util/HOC';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import TextInput from '../components/TextInput';
@@ -38,23 +39,26 @@ import KeyboardScrollView from '../components/KeyboardScrollView';
 import { defaultNetworkKey, UnknownNetworkKeys } from '../constants';
 import { NetworkSelector, NetworkOptions } from '../components/NetworkSelector';
 
-function PathDerivation({ accounts, navigation }) {
+function PathDerivation({
+	accounts,
+	navigation
+}: NavigationAccountProps<{ parentPath: string }>): React.ReactElement {
 	const [derivationPath, setDerivationPath] = useState('');
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [customNetworkKey, setCustomNetworkKey] = useState(defaultNetworkKey);
-	const pathNameInput = useRef(null);
+	const pathNameInput = useRef<TextInput>(null);
 	const parentPath = navigation.getParam('parentPath');
 	const completePath = `${parentPath}${derivationPath}`;
 	const pathIndicatedNetworkKey = useMemo(
-		() => getNetworkKeyByPath(completePath),
+		(): string => getNetworkKeyByPath(completePath),
 		[completePath]
 	);
 	const isCustomNetwork =
 		pathIndicatedNetworkKey === UnknownNetworkKeys.UNKNOWN;
 
-	const onPathDerivation = async () => {
+	const onPathDerivation = async (): Promise<void> => {
 		if (!validateDerivedPath(derivationPath)) {
 			return setIsPathValid(false);
 		}
@@ -87,7 +91,7 @@ function PathDerivation({ accounts, navigation }) {
 					autoCorrect={false}
 					label="Path"
 					onChangeText={setDerivationPath}
-					onSubmitEditing={() => pathNameInput.current.focus()}
+					onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
 					placeholder="//hard/soft"
 					returnKeyType="next"
 					testID={testIDs.PathDerivation.pathInput}
@@ -97,7 +101,9 @@ function PathDerivation({ accounts, navigation }) {
 					autoCompleteType="off"
 					autoCorrect={false}
 					label="Display Name"
-					onChangeText={keyParisName => setKeyPairsName(keyParisName)}
+					onChangeText={(keyParisName: string): void =>
+						setKeyPairsName(keyParisName)
+					}
 					onSubmitEditing={onPathDerivation}
 					ref={pathNameInput}
 					returnKeyType="done"
@@ -112,7 +118,7 @@ function PathDerivation({ accounts, navigation }) {
 				)}
 				<Separator style={{ height: 0 }} />
 				<PathCard
-					identity={accounts.state.currentIdentity}
+					identity={accounts.state.currentIdentity!}
 					name={keyPairsName}
 					path={completePath}
 				/>

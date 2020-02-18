@@ -40,14 +40,17 @@ import { alertPathDerivationError } from '../util/alertUtils';
 import {
 	getExistedNetworkKeys,
 	getIdentityName,
-	getPathsWithSubstrateNetworkKey,
-	isSubstrateNetworkParams
+	getPathsWithSubstrateNetworkKey
 } from '../util/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
 import fontStyles from '../fontStyles';
 import { NetworkCard } from '../components/AccountCard';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
+import {
+	NetworkParams,
+	SubstrateNetworkParams,
+	isSubstrateNetworkParams
+} from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 
 const excludedNetworks = [

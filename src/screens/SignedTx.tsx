@@ -16,30 +16,64 @@
 
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import { NavigationAccountScannerProps } from 'types/props';
 
 import colors from '../colors';
 import PayloadDetailsCard from '../components/PayloadDetailsCard';
 import TxDetailsCard from '../components/TxDetailsCard';
 import QrView from '../components/QrView';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
+import { NETWORK_LIST } from '../constants';
 import testIDs from '../../e2e/testIDs';
 import { withAccountAndScannerStore } from '../util/HOC';
 import fontStyles from '../fontStyles';
 import CompatibleCard from '../components/CompatibleCard';
+import { Transaction } from '../util/transaction';
 
-function SignedTx({ scanner, accounts }) {
-	const { gas, gasPrice, value } = scanner.getTx();
-	const data = scanner.getSignedTxData();
-	const recipient = scanner.getRecipient();
-	const sender = scanner.getSender();
+function SignedTx({
+	scannerStore,
+	accounts
+}: NavigationAccountScannerProps<{}>): React.ReactElement {
+	const data = scannerStore.getSignedTxData();
+	const recipient = scannerStore.getRecipient()!;
+	const sender = scannerStore.getSender();
 
 	useEffect(
 		() =>
-			function() {
-				scanner.cleanup();
+			function(): void {
+				scannerStore.cleanup();
 			},
-		[scanner]
+		[scannerStore]
 	);
+
+	const renderTxPayload = (): React.ReactElement => {
+		const networkParams = NETWORK_LIST[sender!.networkKey];
+		if (isEthereumNetworkParams(networkParams)) {
+			const { gas, gasPrice, value } = scannerStore.getTx() as Transaction;
+			return (
+				<React.Fragment>
+					<TxDetailsCard
+						style={{ marginBottom: 20 }}
+						description={TX_DETAILS_MSG}
+						value={value}
+						gas={gas}
+						gasPrice={gasPrice}
+					/>
+					<Text style={styles.title}>Recipient</Text>
+					<CompatibleCard account={recipient} accountsStore={accounts} />
+				</React.Fragment>
+			);
+		} else {
+			return (
+				<PayloadDetailsCard
+					style={{ marginBottom: 20 }}
+					description={TX_DETAILS_MSG}
+					prefix={networkParams.prefix}
+					signature={data}
+				/>
+			);
+		}
+	};
 
 	return (
 		<ScrollView
@@ -53,28 +87,7 @@ function SignedTx({ scanner, accounts }) {
 
 			<Text style={styles.title}>Transaction Details</Text>
 			<View style={{ marginBottom: 20, marginHorizontal: 20 }}>
-				{NETWORK_LIST[sender.networkKey].protocol ===
-				NetworkProtocols.ETHEREUM ? (
-					<React.Fragment>
-						<TxDetailsCard
-							style={{ marginBottom: 20 }}
-							description={TX_DETAILS_MSG}
-							value={value}
-							gas={gas}
-							gasPrice={gasPrice}
-						/>
-						<Text style={styles.title}>Recipient</Text>
-						<CompatibleCard account={recipient} accountsStore={accounts} />
-					</React.Fragment>
-				) : (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						description={TX_DETAILS_MSG}
-						protocol={NETWORK_LIST[sender.networkKey].protocol}
-						prefix={NETWORK_LIST[sender.networkKey].prefix}
-						signature={data}
-					/>
-				)}
+				{renderTxPayload()}
 			</View>
 		</ScrollView>
 	);

@@ -22,7 +22,7 @@ import Markdown from '../components/Markdown';
 import CustomScrollview from '../components/CustomScrollView';
 
 export default class PrivacyPolicy extends React.PureComponent {
-	render() {
+	render(): React.ReactElement {
 		return (
 			<View style={styles.body}>
 				<CustomScrollview contentContainerStyle={{ paddingHorizontal: 16 }}>

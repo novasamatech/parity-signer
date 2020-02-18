@@ -17,6 +17,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { NavigationProps } from 'types/props';
 import toc from '../../docs/terms-and-conditions.md';
 import colors from '../colors';
 import fontStyles from '../fontStyles';
@@ -27,18 +28,26 @@ import { saveToCAndPPConfirmation } from '../util/db';
 import testIDs from '../../e2e/testIDs';
 import CustomScrollview from '../components/CustomScrollView';
 
-export default class TermsAndConditions extends React.PureComponent {
-	state = {
+interface State {
+	tocAgreement: boolean;
+	ppAgreement: boolean;
+}
+
+export default class TermsAndConditions extends React.PureComponent<
+	NavigationProps<{ disableButtons?: boolean }>,
+	State
+> {
+	state: State = {
 		ppAgreement: false,
 		tocAgreement: false
 	};
 
-	render() {
+	render(): React.ReactElement {
 		const { navigation } = this.props;
 		const { tocAgreement, ppAgreement } = this.state;
 		const disableButtons = navigation.getParam('disableButtons', false);
 
-		const onConfirm = async () => {
+		const onConfirm = async (): Promise<void> => {
 			await saveToCAndPPConfirmation();
 			navigation.navigate('Welcome');
 		};
@@ -62,7 +71,7 @@ export default class TermsAndConditions extends React.PureComponent {
 								paddingHorizontal: 16,
 								paddingVertical: 10
 							}}
-							onPress={() => {
+							onPress={(): void => {
 								this.setState({ tocAgreement: !tocAgreement });
 							}}
 						>
@@ -83,7 +92,7 @@ export default class TermsAndConditions extends React.PureComponent {
 								flexDirection: 'row',
 								paddingHorizontal: 16
 							}}
-							onPress={() => {
+							onPress={(): void => {
 								this.setState({ ppAgreement: !ppAgreement });
 							}}
 						>
@@ -99,7 +108,7 @@ export default class TermsAndConditions extends React.PureComponent {
 								<Text>{'  I agree to the '}</Text>
 								<Text
 									style={{ textDecorationLine: 'underline' }}
-									onPress={() => {
+									onPress={(): void => {
 										navigation.navigate('PrivacyPolicy');
 									}}
 								>

@@ -37,7 +37,7 @@ export default class TextInput extends React.PureComponent<Props, {}> {
 	static defaultProps = {
 		focus: false
 	};
-	private input: TextInputOrigin | null = null;
+	input: TextInputOrigin | null = null;
 
 	// Methods:
 	focus(): void {

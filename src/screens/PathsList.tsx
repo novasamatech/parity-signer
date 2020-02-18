@@ -16,6 +16,9 @@
 
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { PathGroup } from 'types/identityTypes';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import { NavigationAccountProps } from 'types/props';
 
 import {
 	NETWORK_LIST,
@@ -39,7 +42,10 @@ import fontStyles from '../fontStyles';
 import colors from '../colors';
 import { LeftScreenHeading } from '../components/ScreenHeading';
 
-function PathsList({ accounts, navigation }) {
+function PathsList({
+	accounts,
+	navigation
+}: NavigationAccountProps<{ networkKey?: string }>): React.ReactElement {
 	const networkKey = navigation.getParam(
 		'networkKey',
 		UnknownNetworkKeys.UNKNOWN
@@ -47,18 +53,18 @@ function PathsList({ accounts, navigation }) {
 	const networkParams = NETWORK_LIST[networkKey];
 
 	const { currentIdentity } = accounts.state;
-	const isEthereumPath = networkParams.protocol === NetworkProtocols.ETHEREUM;
+	const isEthereumPath = isEthereumNetworkParams(networkParams);
 	const isUnknownNetworkPath =
 		networkParams.protocol === NetworkProtocols.UNKNOWN;
-	const pathsGroups = useMemo(() => {
+	const pathsGroups = useMemo((): PathGroup[] | null => {
 		if (!currentIdentity || isEthereumPath) return null;
 		const paths = Array.from(currentIdentity.meta.keys());
 		const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
 		return groupPaths(listedPaths);
 	}, [currentIdentity, isEthereumPath, networkKey]);
 
-	if (!currentIdentity) return null;
-	if (isEthereumPath) {
+	if (!currentIdentity) return <View />;
+	if (isEthereumNetworkParams(networkParams)) {
 		return (
 			<PathDetailsView
 				networkKey={networkKey}
@@ -72,7 +78,7 @@ function PathsList({ accounts, navigation }) {
 	const { navigate } = navigation;
 	const rootPath = `//${networkParams.pathId}`;
 
-	const renderSinglePath = pathsGroup => {
+	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
 		const path = pathsGroup.paths[0];
 		return (
 			<PathCard
@@ -80,12 +86,12 @@ function PathsList({ accounts, navigation }) {
 				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
-				onPress={() => navigate('PathDetails', { path })}
+				onPress={(): boolean => navigate('PathDetails', { path })}
 			/>
 		);
 	};
 
-	const renderGroupPaths = pathsGroup => (
+	const renderGroupPaths = (pathsGroup: PathGroup): React.ReactElement => (
 		<View key={`group${pathsGroup.title}`} style={{ marginTop: 24 }}>
 			<View
 				style={{
@@ -129,7 +135,7 @@ function PathsList({ accounts, navigation }) {
 						testID={testIDs.PathsList.pathCard + path}
 						identity={currentIdentity}
 						path={path}
-						onPress={() => navigate('PathDetails', { path })}
+						onPress={(): boolean => navigate('PathDetails', { path })}
 					/>
 				</View>
 			))}
@@ -149,7 +155,7 @@ function PathsList({ accounts, navigation }) {
 				networkKey={networkKey}
 			/>
 			<ScrollView>
-				{pathsGroups.map(pathsGroup =>
+				{(pathsGroups as PathGroup[]).map(pathsGroup =>
 					pathsGroup.paths.length === 1
 						? renderSinglePath(pathsGroup)
 						: renderGroupPaths(pathsGroup)
@@ -157,7 +163,7 @@ function PathsList({ accounts, navigation }) {
 				<ButtonNewDerivation
 					testID={testIDs.PathsList.deriveButton}
 					title="Create New Derivation"
-					onPress={() =>
+					onPress={(): boolean =>
 						navigation.navigate('PathDerivation', {
 							parentPath: isUnknownNetworkPath ? '' : rootPath
 						})

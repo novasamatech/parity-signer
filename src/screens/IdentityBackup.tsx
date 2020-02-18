@@ -38,11 +38,11 @@ import Button from '../components/Button';
 function IdentityBackup({
 	navigation,
 	accounts
-}: NavigationAccountProps<{ isNew: boolean }>) {
+}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(24);
 	const isNew = navigation.getParam('isNew', false);
-	const onBackupDone = async () => {
+	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
 		await accounts.saveNewIdentity(seedPhrase, pin);
 		setSeedPhrase('');
@@ -59,7 +59,7 @@ function IdentityBackup({
 				buttonStyles={styles.mnemonicSelectionButton}
 				textStyles={textStyles}
 				title={`${buttonWordsNumber} words`}
-				onPress={() => setWordsNumber(buttonWordsNumber)}
+				onPress={(): void => setWordsNumber(buttonWordsNumber)}
 			/>
 		);
 	};
@@ -115,7 +115,7 @@ function IdentityBackup({
 					title={'Next'}
 					testID={testIDs.IdentityBackup.nextButton}
 					bottom={false}
-					onPress={() => alertBackupDone(onBackupDone)}
+					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
 			)}
 		</ScrollView>

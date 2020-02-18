@@ -16,7 +16,6 @@
 
 import {
 	NETWORK_LIST,
-	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
 } from '../constants';
@@ -35,26 +34,8 @@ import {
 	UnlockedAccount
 } from 'types/identityTypes';
 
-import {
-	EthereumNetworkParams,
-	SubstrateNetworkParams,
-	UnknownNetworkParams
-} from 'types/networkSpecsTypes';
-
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = (str: string): string => str.replace(/\//g, '');
-
-export function isSubstrateNetworkParams(
-	networkParams:
-		| SubstrateNetworkParams
-		| UnknownNetworkParams
-		| EthereumNetworkParams
-): networkParams is SubstrateNetworkParams {
-	return (
-		(networkParams as SubstrateNetworkParams).protocol ===
-		NetworkProtocols.SUBSTRATE
-	);
-}
 
 export function isLegacyFoundAccount(
 	foundAccount: FoundAccount

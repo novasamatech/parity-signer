@@ -143,7 +143,6 @@ export async function constructDataFromBytes(
 
 				data.action = action;
 				data.data.account = address;
-				debugger;
 				if (action === 'signData') {
 					data.data.rlp = uosAfterFrames[13];
 				} else if (action === 'signTransaction') {
