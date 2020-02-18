@@ -626,7 +626,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.unsignedData;
 	}
 
-	getTx(): GenericExtrinsicPayload | Transaction | string| Uint8Array| null {
+	getTx(): GenericExtrinsicPayload | Transaction | string | Uint8Array | null {
 		return this.state.tx;
 	}
 

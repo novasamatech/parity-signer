@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-export const pathsRegex = {
-	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
-	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
+export const checksummedAddress = (address: string, hash: string): string => {
+	let result = '';
+	for (let n = 0; n < 40; n++) {
+		result = `${result}${
+			parseInt(hash[n], 16) > 7 ? address[n].toUpperCase() : address[n]
+		}`;
+	}
+	return result;
 };
-
-export const onlyNumberRegex = /^\d+$|^$/;

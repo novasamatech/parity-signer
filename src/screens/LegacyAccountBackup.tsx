@@ -67,12 +67,12 @@ function LegacyAccountBackup({
 	const isNew = navigation.getParam('isNew');
 	const {
 		address,
-		derivationPassword = null,
-		derivationPath = null,
+		derivationPassword = '',
+		derivationPath = '',
 		name,
 		networkKey,
-		seed = null,
-		seedPhrase = null
+		seed = '',
+		seedPhrase = ''
 	} = isNew ? accounts.getNew() : (accounts.getSelected() as UnlockedAccount);
 	const protocol =
 		(NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol) ||
@@ -94,21 +94,21 @@ function LegacyAccountBackup({
 						// only allow the copy of the recovery phrase in dev environment
 						if (__DEV__) {
 							if (protocol === NetworkProtocols.SUBSTRATE) {
-								alertCopyBackupPhrase(
-									`${seedPhrase || ''}${derivationPath || ''}`
-								);
+								alertCopyBackupPhrase(`${seedPhrase}${derivationPath}`);
 							} else {
-								alertCopyBackupPhrase(seed || '');
+								alertCopyBackupPhrase(seedPhrase === '' ? seed : seedPhrase);
 							}
 						}
 					}}
 				>
-					<Text style={fontStyles.t_seed}>{seedPhrase || seed || ''}</Text>
+					<Text style={fontStyles.t_seed}>
+						{seedPhrase === '' ? seed : seedPhrase}
+					</Text>
 				</TouchableItem>
-				{derivationPath && (
-					<Text style={styles.derivationText}>{derivationPath}</Text>
+				{derivationPath !== '' && (
+					<Text style={styles.derivationText}>{derivationPath || ''}</Text>
 				)}
-				{derivationPassword && (
+				{derivationPassword !== '' && (
 					<DerivationPasswordVerify password={derivationPassword} />
 				)}
 				{isNew && (

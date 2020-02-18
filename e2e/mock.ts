@@ -26,8 +26,11 @@ const setRemarkExtrinsicKusama =
 
 export const createMockSignRequest = (): TxRequestData => ({
 	bounds: {
+		bounds: [
+			{ x: '50', y: '50' },
+			{ x: '100', y: '100' }
+		],
 		height: 1440,
-		bounds: [{x: '50', y: '50'}, {x:'100',y:'100'}],
 		width: 1920
 	},
 	data: '',

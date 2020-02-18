@@ -14,25 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Creates and returns a new debounced version of the passed function that will
- * postpone its execution until after wait milliseconds have elapsed since
- * the last time it was invoked.
- *
- * @type  {T}                item    type
- * @param {(any) => any}     function to debounce
- * @param {number}           time in milliseconds
- *
- *
- * @return {any}            the debounced function
- */
-let timeout;
+export const pathsRegex: {
+	[key: string]: RegExp;
+} = {
+	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
+	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
+	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
+	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
+};
 
-export function debounce(fn, time) {
-	return function() {
-		const functionCall = () => fn.apply(this, arguments);
-
-		clearTimeout(timeout);
-		timeout = setTimeout(functionCall, time);
-	};
-}
+export const onlyNumberRegex = /^\d+$|^$/;

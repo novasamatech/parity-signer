@@ -17,7 +17,7 @@
 /**
  * Default comparator, should work for strings and numbers
  */
-function defaultCompare(a, b) {
+function defaultCompare(a: any, b: any): number {
 	if (a > b) {
 		return 1;
 	}
@@ -41,7 +41,11 @@ function defaultCompare(a, b) {
  * @return {{ hit: bool, index: number }} if `hit` is `true` -> index at which the item was found
  *                                        if `hit` is `false` -> index at which the item can be inserted
  */
-export function binarySearch(array, item, compare = defaultCompare) {
+export function binarySearch(
+	array: Array<any>,
+	item: any,
+	compare: (a: any, b: any) => number = defaultCompare
+): { hit: boolean; index: number } {
 	if (array.length === 0) {
 		return { hit: false, index: 0 };
 	}
@@ -66,7 +70,7 @@ export function binarySearch(array, item, compare = defaultCompare) {
 	return { hit: false, index: min };
 }
 
-export function zip(left, right) {
+export function zip(left: any[], right: any[]): any[] {
 	let lindex = 0;
 	let rindex = 0;
 	let oindex = 0;

@@ -1,13 +1,11 @@
-import {
-	NavigationRoute,
-} from 'react-navigation';
+import { NavigationRoute } from 'react-navigation';
 import {
 	GestureResponderEvent,
 	NativeSyntheticEvent,
 	TextInputChangeEventData,
 	TextInputFocusEventData
 } from 'react-native';
-import {StackNavigationProp} from 'react-navigation-stack/src/vendor/types';
+import { StackNavigationProp } from 'react-navigation-stack/src/vendor/types';
 import AccountsStore from '../stores/AccountsStore';
 import ScannerStore from '../stores/ScannerStore';
 

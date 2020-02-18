@@ -17,7 +17,9 @@
 import BigNumber from 'bignumber.js';
 
 /* eslint-disable sort-keys */
-const unitMap = {
+const unitMap: {
+	[key: string]: string;
+} = {
 	noether: '0',
 	wei: '1',
 	kwei: '1000',
@@ -47,13 +49,13 @@ const unitMap = {
 	tether: '1000000000000000000000000000000'
 };
 
-function getValueOfUnit(unit) {
+function getValueOfUnit(unit?: string): BigNumber {
 	unit = unit ? unit.toLowerCase() : 'ether';
 	const unitValue = unitMap[unit] || 0;
 	return new BigNumber(unitValue, 10);
 }
 
-export function fromWei(number, unit) {
+export function fromWei(number: string, unit?: string): string {
 	return new BigNumber(number || 0, 16)
 		.dividedBy(getValueOfUnit(unit))
 		.toString(10);

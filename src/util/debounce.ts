@@ -14,34 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- * @dev Check if input is in Ascii table.
+/**
+ * Creates and returns a new debounced version of the passed function that will
+ * postpone its execution until after wait milliseconds have elapsed since
+ * the last time it was invoked.
+ *
+ * @type  {T}                item    type
+ * @param {(any) => any}     function to debounce
+ * @param {number}           time in milliseconds
+ *
+ *
+ * @return {any}            the debounced function
  */
-export function isAscii(data) {
-	/* eslint-disable-next-line no-control-regex */
-	return /^[\x00-\x7F]*$/.test(data);
-}
+let timeout: any;
 
-/*
- * @dev Take hex encoded binary and make it utf-8 readable
- */
-export function hexToAscii(hexx) {
-	const hex = hexx.toString();
-	let str = '';
-	for (let i = 0; i < hex.length; i += 2) {
-		str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-	}
+export function debounce(fn: any, time: number): () => void {
+	return function debouncedFunction(...args): void {
+		const functionCall = (): any => fn.apply(null, ...args);
 
-	return str;
-}
-
-/*
- * @dev Take a long string and output the first and last 10 chars.
- */
-
-export function shortString(original) {
-	return original
-		.substr(0, 20)
-		.concat('......')
-		.concat(original.substr(original.length - 20));
+		clearTimeout(timeout);
+		timeout = setTimeout(functionCall, time);
+	};
 }
