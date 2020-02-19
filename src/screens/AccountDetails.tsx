@@ -16,12 +16,14 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
+
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
 import PopupMenu from 'components/PopupMenu';
-import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
 import {
 	navigateToLandingPage,

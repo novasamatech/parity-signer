@@ -24,9 +24,11 @@ import {
 	View
 } from 'react-native';
 import { withNavigation } from 'react-navigation';
+
+import { NetworkProtocols, NETWORK_LIST } from '../constants/networkSpecs';
+
 import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationAccountProps } from 'types/props';
-
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
@@ -37,7 +39,6 @@ import ScreenHeading from 'components/ScreenHeading';
 import TouchableItem from 'components/TouchableItem';
 import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
 import { withAccountStore } from 'utils/HOC';
-import { NetworkProtocols, NETWORK_LIST } from '../constants/networkSpecs';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 function LegacyAccountBackup({

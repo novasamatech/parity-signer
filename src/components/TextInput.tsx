@@ -23,6 +23,7 @@ import {
 	TextStyle,
 	TextInputProps
 } from 'react-native';
+
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 

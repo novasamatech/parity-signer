@@ -17,8 +17,10 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import { NavigationAccountProps } from 'types/props';
 
+import testIDs from '../../e2e/testIDs';
+
+import { NavigationAccountProps } from 'types/props';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { emptyIdentity } from 'utils/identitiesUtils';
@@ -33,7 +35,6 @@ import {
 	alertIdentityCreationError,
 	alertRisks
 } from 'utils/alertUtils';
-import testIDs from '../../e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import { brainWalletAddress } from 'utils/native';

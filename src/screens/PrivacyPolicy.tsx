@@ -16,7 +16,9 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+
 import privacyPolicy from '../../docs/privacy-policy.md';
+
 import colors from 'styles/colors';
 import Markdown from 'components/Markdown';
 import CustomScrollview from 'components/CustomScrollView';

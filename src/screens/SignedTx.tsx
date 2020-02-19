@@ -16,15 +16,16 @@
 
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { NETWORK_LIST } from '../constants/networkSpecs';
+import testIDs from '../../e2e/testIDs';
+
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
-
 import colors from 'styles/colors';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
 import TxDetailsCard from 'components/TxDetailsCard';
 import QrView from 'components/QrView';
-import { NETWORK_LIST } from '../constants/networkSpecs';
-import testIDs from '../../e2e/testIDs';
 import { withAccountAndScannerStore } from 'utils/HOC';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';

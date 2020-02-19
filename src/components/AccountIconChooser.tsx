@@ -26,6 +26,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import AccountIcon from './AccountIcon';
 import Address from './Address';
+
 import colors from 'styles/colors';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import fonts from 'styles/fonts';

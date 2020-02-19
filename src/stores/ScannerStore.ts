@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 import { GenericExtrinsicPayload } from '@polkadot/types';
-
 import {
 	hexStripPrefix,
 	hexToU8a,
@@ -24,12 +23,15 @@ import {
 } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
+import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from '../constants/networkSpecs';
+
+import AccountsStore from './AccountsStore';
 
 import { isAscii } from 'utils/strings';
 import {
@@ -49,7 +51,6 @@ import {
 import { Account, FoundAccount } from 'types/identityTypes';
 import { constructSURI } from 'utils/suri';
 import { emptyAccount } from 'utils/account';
-import AccountsStore from './AccountsStore';
 import {
 	CompletedParsedData,
 	EthereumParsedData,
@@ -58,7 +59,6 @@ import {
 	SubstrateCompletedParsedData
 } from 'types/scannerTypes';
 import { NetworkProtocol } from 'types/networkSpecsTypes';
-import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
 type TXRequest = Record<string, any>;
 

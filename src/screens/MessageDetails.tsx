@@ -18,6 +18,10 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
+import { Subscribe } from 'unstated';
+
+import { NETWORK_LIST } from '../constants/networkSpecs';
+
 import { FoundAccount } from 'types/identityTypes';
 import {
 	isEthereumNetworkParams,
@@ -25,9 +29,7 @@ import {
 	UnknownNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationProps } from 'types/props';
-import { Subscribe } from 'unstated';
 import colors from 'styles/colors';
-import { NETWORK_LIST } from '../constants/networkSpecs';
 import Background from 'components/Background';
 import Button from 'components/Button';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';

@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
+
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import TextInput from 'components/TextInput';

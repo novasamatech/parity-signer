@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native';
+
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import iconLogo from 'res/img/icon.png';

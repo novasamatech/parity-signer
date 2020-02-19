@@ -18,19 +18,21 @@ import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation, ScrollView, NavigationParams } from 'react-navigation';
 
+import testIDs from '../../e2e/testIDs';
+
 import ButtonIcon from './ButtonIcon';
+import Separator from './Separator';
+import TransparentBackground from './TransparentBackground';
+
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import Separator from './Separator';
 import { withAccountStore } from 'utils/HOC';
 import { getIdentityName } from 'utils/identitiesUtils';
-import testIDs from '../../e2e/testIDs';
 import {
 	navigateToLegacyAccountList,
 	resetNavigationTo,
 	resetNavigationWithNetworkChooser
 } from 'utils/navigationHelpers';
-import TransparentBackground from './TransparentBackground';
 import { NavigationAccountProps } from 'types/props';
 import { Identity } from 'types/identityTypes';
 

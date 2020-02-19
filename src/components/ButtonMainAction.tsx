@@ -15,8 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement } from 'react';
-import Button from './Button';
 import { StyleSheet, View, ViewStyle } from 'react-native';
+
+import Button from './Button';
+
 import { ButtonListener } from 'types/props';
 
 export default class ButtonMainAction extends React.PureComponent<{

@@ -17,13 +17,14 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
+
+import testIDs from '../../e2e/testIDs';
+
 import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
-
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import Background from 'components/Background';
-import testIDs from '../../e2e/testIDs';
 import { withAccountStore } from 'utils/HOC';
 
 function LegacyAccountList({

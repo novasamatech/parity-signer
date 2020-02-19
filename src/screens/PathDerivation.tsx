@@ -16,9 +16,16 @@
 
 import React, { useRef, useState, useMemo } from 'react';
 import { withNavigation } from 'react-navigation';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+
+import testIDs from '../../e2e/testIDs';
+import {
+	defaultNetworkKey,
+	UnknownNetworkKeys
+} from '../constants/networkSpecs';
+
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
-import { Platform, StyleSheet, Text, View } from 'react-native';
 import TextInput from 'components/TextInput';
 import ButtonMainAction from 'components/ButtonMainAction';
 import {
@@ -27,16 +34,11 @@ import {
 } from 'utils/identitiesUtils';
 import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
-import testIDs from '../../e2e/testIDs';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PathCard from 'components/PathCard';
 import KeyboardScrollView from 'components/KeyboardScrollView';
-import {
-	defaultNetworkKey,
-	UnknownNetworkKeys
-} from '../constants/networkSpecs';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
 
 function PathDerivation({

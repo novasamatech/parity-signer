@@ -17,24 +17,27 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
-import {
-	getAddressWithPath,
-	getNetworkKeyByPath,
-	getPathName
-} from 'utils/identitiesUtils';
+
 import {
 	defaultNetworkKey,
 	NETWORK_LIST,
 	NetworkProtocols,
 	UnknownNetworkKeys
 } from '../constants/networkSpecs';
-import Separator from 'components/Separator';
+
 import AccountIcon from './AccountIcon';
 import Address from './Address';
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
+
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import Separator from 'components/Separator';
+import {
+	getAddressWithPath,
+	getNetworkKeyByPath,
+	getPathName
+} from 'utils/identitiesUtils';
 import { ButtonListener } from 'types/props';
 import { Identity } from 'types/identityTypes';
 

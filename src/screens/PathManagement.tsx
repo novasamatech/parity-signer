@@ -15,10 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
 import { withNavigation } from 'react-navigation';
 import { ScrollView } from 'react-native';
+
+import { NavigationAccountProps } from 'types/props';
+import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import PathCard from 'components/PathCard';
 import colors from 'styles/colors';

@@ -15,9 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 const detox = require('detox');
-const config = require('../package.json').detox;
 const adapter = require('detox/runners/jest/adapter');
 const specReporter = require('detox/runners/jest/specReporter');
+
+const config = require('../package.json').detox;
 
 // Set the default timeout
 jest.setTimeout(120000);

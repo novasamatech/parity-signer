@@ -19,6 +19,7 @@
 import React, { useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
+
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
 import Background from 'components/Background';

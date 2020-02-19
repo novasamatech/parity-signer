@@ -5,7 +5,10 @@ const commonRules = {
   "quotes": ["error", "single",  { "avoidEscape": true }],
   "no-unused-vars": ["error", { "args": "none" }],
   "react-native/no-inline-styles": "off",
-  "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}]
+  "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}],
+  "import/order": ["error", {
+    "newlines-between": "always"
+  }]
 };
 
 module.exports = {

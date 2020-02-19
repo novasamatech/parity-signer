@@ -18,14 +18,15 @@ import React, { ReactElement } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import Separator from 'components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
+import TouchableItem from './TouchableItem';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
+
+import Separator from 'components/Separator';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
-import TouchableItem from './TouchableItem';
 import colors from 'styles/colors';
-import AccountPrefixedTitle from './AccountPrefixedTitle';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { ButtonListener } from 'types/props';
 

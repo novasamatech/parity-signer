@@ -19,10 +19,12 @@ import {
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
 } from '../constants/networkSpecs';
+
 import { pathsRegex } from './regex';
 import { decryptData } from './native';
 import { parseSURI } from './suri';
 import { generateAccountId } from './account';
+
 import {
 	Account,
 	FoundAccount,

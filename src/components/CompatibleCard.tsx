@@ -15,9 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import PropTypes from 'prop-types';
+import React from 'react';
+
 import AccountCard from './AccountCard';
 import PathCard from './PathCard';
-import React from 'react';
+
 import { FoundAccount } from 'types/identityTypes';
 import AccountsStore from 'stores/AccountsStore';
 import { isLegacyFoundAccount } from 'utils/identitiesUtils';

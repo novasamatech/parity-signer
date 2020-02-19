@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
+
 import colors from 'styles/colors';
 import ScreenHeading from 'components/ScreenHeading';
 

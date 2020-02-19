@@ -27,14 +27,17 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
-import fontStyles from 'styles/fontStyles';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
 } from '../constants/networkSpecs';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from 'styles/colors';
+
 import TransparentBackground from './TransparentBackground';
+
+import fontStyles from 'styles/fontStyles';
+import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 
 const ACCOUNT_NETWORK = 'Account Network';

@@ -18,10 +18,11 @@ import React, { useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
+import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
+
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
-
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import AccountIconChooser from 'components/AccountIconChooser';
@@ -30,7 +31,6 @@ import Button from 'components/Button';
 import DerivationPathField from 'components/DerivationPathField';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
-import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
 import fonts from 'styles/fonts';
 import { emptyAccount, validateSeed } from 'utils/account';
 import { withAccountStore } from 'utils/HOC';

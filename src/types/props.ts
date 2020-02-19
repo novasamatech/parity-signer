@@ -6,6 +6,7 @@ import {
 	TextInputFocusEventData
 } from 'react-native';
 import { StackNavigationProp } from 'react-navigation-stack/src/vendor/types';
+
 import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 

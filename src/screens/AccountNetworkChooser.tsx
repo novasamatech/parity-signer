@@ -22,14 +22,16 @@ import React, { FunctionComponent, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import colors from 'styles/colors';
-import Button from 'components/Button';
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
 	NetworkProtocols
 } from '../constants/networkSpecs';
+import testIDs from '../../e2e/testIDs';
+
+import colors from 'styles/colors';
+import Button from 'components/Button';
 import {
 	navigateToPathsList,
 	unlockSeedPhrase,
@@ -42,7 +44,6 @@ import {
 	getIdentityName,
 	getPathsWithSubstrateNetworkKey
 } from 'utils/identitiesUtils';
-import testIDs from '../../e2e/testIDs';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import fontStyles from 'styles/fontStyles';
 import { NetworkCard } from 'components/AccountCard';

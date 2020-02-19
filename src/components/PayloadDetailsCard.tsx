@@ -22,9 +22,10 @@ import {
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
-
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
+import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 import colors from 'styles/colors';
 import {
@@ -36,8 +37,6 @@ import substrateDevMetadata from 'constants/static-substrate';
 import { shortString } from 'utils/strings';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
-import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
-import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 const registry = new TypeRegistry();
 

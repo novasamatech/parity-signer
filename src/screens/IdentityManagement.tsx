@@ -17,8 +17,10 @@
 import React from 'react';
 import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { NavigationAccountProps } from 'types/props';
 
+import testIDs from '../../e2e/testIDs';
+
+import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
@@ -29,7 +31,6 @@ import {
 	alertDeleteIdentity,
 	alertIdentityDeletionError
 } from 'utils/alertUtils';
-import testIDs from '../../e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';

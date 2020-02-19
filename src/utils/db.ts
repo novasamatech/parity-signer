@@ -16,8 +16,10 @@
 
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
+
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
+
 import { Account, Identity } from 'types/identityTypes';
 import { Tx, TxParticipant } from 'types/tx';
 

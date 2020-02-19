@@ -23,13 +23,15 @@ import {
 	TextInputSelectionChangeEventData,
 	View
 } from 'react-native';
+
+import TextInput from './TextInput';
+import TouchableItem from './TouchableItem';
+
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 import PARITY_WORDS from 'res/parity_wordlist.json';
 import BIP39_WORDS from 'res/bip39_wordlist.json';
-import TextInput from './TextInput';
-import TouchableItem from './TouchableItem';
 import { binarySearch } from 'utils/array';
 
 // Combined, de-duplicated, sorted word list (could be a precompute from json as well)

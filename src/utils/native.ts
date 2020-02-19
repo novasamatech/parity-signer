@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { NativeModules } from 'react-native';
+
 import { checksummedAddress } from './checksum';
 
 const { EthkeyBridge } = NativeModules || {};

@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { Subscribe } from 'unstated';
+
 import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 

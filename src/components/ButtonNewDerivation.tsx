@@ -15,9 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
+import { StyleSheet } from 'react-native';
+
 import Button from './Button';
 
-import { StyleSheet } from 'react-native';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';

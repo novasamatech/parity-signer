@@ -17,16 +17,17 @@
 import React, { useEffect } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
-import { NavigationProps, NavigationScannerProps } from 'types/props';
 import { Subscribe } from 'unstated';
 
+import { createMockSignRequest } from '../../e2e/mock';
+
+import { NavigationProps, NavigationScannerProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 import { isAddressString, isJsonString, rawDataToU8A } from 'utils/decoders';
 import ScreenHeading from 'components/ScreenHeading';
-import { createMockSignRequest } from '../../e2e/mock';
 import { TxRequestData } from 'types/scannerTypes';
 
 interface State {

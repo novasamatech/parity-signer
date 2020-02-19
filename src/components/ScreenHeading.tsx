@@ -17,13 +17,16 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { View, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
+import { Icon } from 'react-native-elements';
+
+import { NETWORK_LIST } from '../constants/networkSpecs';
+
+import ButtonIcon from './ButtonIcon';
+import AccountIcon from './AccountIcon';
+
 import fontStyles from 'styles/fontStyles';
 import fonts from 'styles/fonts';
-import ButtonIcon from './ButtonIcon';
-import { Icon } from 'react-native-elements';
 import colors from 'styles/colors';
-import AccountIcon from './AccountIcon';
-import { NETWORK_LIST } from '../constants/networkSpecs';
 import { ButtonListener } from 'types/props';
 
 const renderSubtitle = (

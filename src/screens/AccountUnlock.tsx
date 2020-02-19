@@ -17,8 +17,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
-import { NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
+
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import Background from 'components/Background';

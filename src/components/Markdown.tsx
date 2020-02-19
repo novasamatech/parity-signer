@@ -17,6 +17,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { default as MarkdownRender } from 'react-native-markdown-renderer';
+
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 

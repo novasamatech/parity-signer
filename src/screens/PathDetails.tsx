@@ -15,10 +15,17 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
 import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
+
+import {
+	defaultNetworkKey,
+	UnknownNetworkKeys
+} from '../constants/networkSpecs';
+import testIDs from '../../e2e/testIDs';
+
+import { NavigationAccountProps } from 'types/props';
+import { withAccountStore } from 'utils/HOC';
 import PathCard from 'components/PathCard';
 import PopupMenu from 'components/PopupMenu';
 import { LeftScreenHeading } from 'components/ScreenHeading';
@@ -32,13 +39,8 @@ import {
 	getPathsWithSubstrateNetworkKey,
 	isSubstratePath
 } from 'utils/identitiesUtils';
-import {
-	defaultNetworkKey,
-	UnknownNetworkKeys
-} from '../constants/networkSpecs';
 import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
 import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
-import testIDs from '../../e2e/testIDs';
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
 

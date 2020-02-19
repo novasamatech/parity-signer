@@ -16,6 +16,7 @@
 
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
+
 import { NavigationScannerProps } from 'types/props';
 import colors from 'styles/colors';
 import QrView from 'components/QrView';

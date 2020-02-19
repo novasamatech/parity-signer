@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+
 import {
 	Account,
 	AccountMeta,
@@ -23,7 +24,6 @@ import {
 	LockedAccount
 } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
-
 import colors from 'styles/colors';
 import { generateAccountId } from 'utils/account';
 import {

@@ -16,16 +16,19 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Subscribe } from 'unstated';
+import { GenericExtrinsicPayload } from '@polkadot/types';
+
+import { NETWORK_LIST } from '../constants/networkSpecs';
+import testIDs from '../../e2e/testIDs';
+
 import { FoundAccount } from 'types/identityTypes';
 import {
 	isEthereumNetworkParams,
 	SubstrateNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
-import { Subscribe } from 'unstated';
-
 import colors from 'styles/colors';
-import { NETWORK_LIST } from '../constants/networkSpecs';
 import Background from 'components/Background';
 import ButtonMainAction from 'components/ButtonMainAction';
 import ScreenHeading from 'components/ScreenHeading';
@@ -34,8 +37,6 @@ import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
 import { navigateToSignedTx, unlockSeedPhrase } from 'utils/navigationHelpers';
-import { GenericExtrinsicPayload } from '@polkadot/types';
-import testIDs from '../../e2e/testIDs';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { getIdentityFromSender } from 'utils/identitiesUtils';

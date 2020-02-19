@@ -19,6 +19,7 @@ import {
 	NavigationScreenProp,
 	StackActions
 } from 'react-navigation';
+
 import { Identity } from 'types/identityTypes';
 
 export const setPin = async (

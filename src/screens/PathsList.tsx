@@ -16,17 +16,21 @@
 
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { PathGroup } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountProps } from 'types/props';
+import { withNavigation } from 'react-navigation';
 
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
 	UnknownNetworkKeys
 } from '../constants/networkSpecs';
+import testIDs from '../../e2e/testIDs';
+
+import { PathDetailsView } from './PathDetails';
+
+import { PathGroup } from 'types/identityTypes';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
-import { withNavigation } from 'react-navigation';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths,
@@ -34,9 +38,6 @@ import {
 } from 'utils/identitiesUtils';
 import ButtonNewDerivation from 'components/ButtonNewDerivation';
 import PathCard from 'components/PathCard';
-import { PathDetailsView } from './PathDetails';
-import testIDs from '../../e2e/testIDs';
-
 import Separator from 'components/Separator';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';

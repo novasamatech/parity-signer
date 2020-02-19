@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
+
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import CustomScrollview from 'components/CustomScrollView';

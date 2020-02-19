@@ -26,6 +26,7 @@ import {
 	View,
 	ViewStyle
 } from 'react-native';
+
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';

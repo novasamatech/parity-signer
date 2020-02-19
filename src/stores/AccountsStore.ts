@@ -16,6 +16,13 @@
 
 import { Container } from 'unstated';
 
+import {
+	ETHEREUM_NETWORK_LIST,
+	NetworkProtocols,
+	SUBSTRATE_NETWORK_LIST,
+	UnknownNetworkKeys
+} from '../constants/networkSpecs';
+
 import { emptyAccount, generateAccountId } from 'utils/account';
 import {
 	loadAccounts,
@@ -31,12 +38,6 @@ import {
 	encryptData,
 	substrateAddress
 } from 'utils/native';
-import {
-	ETHEREUM_NETWORK_LIST,
-	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST,
-	UnknownNetworkKeys
-} from '../constants/networkSpecs';
 import {
 	deepCopyIdentities,
 	deepCopyIdentity,

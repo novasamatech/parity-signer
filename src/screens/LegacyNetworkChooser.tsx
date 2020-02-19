@@ -16,17 +16,19 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { NetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountProps, NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
-import colors from 'styles/colors';
-import fonts from 'styles/fonts';
-import TouchableItem from 'components/TouchableItem';
+
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
 } from '../constants/networkSpecs';
+
+import { NetworkParams } from 'types/networkSpecsTypes';
+import { NavigationAccountProps, NavigationProps } from 'types/props';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
+import TouchableItem from 'components/TouchableItem';
 import AccountsStore from 'stores/AccountsStore';
 import { emptyAccount } from 'utils/account';
 
