@@ -18,8 +18,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import colors from '../colors';
-import fonts from '../fonts';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
 import TextInput from './TextInput';
 
 export default function DerivationPasswordVerify(props: {

@@ -16,8 +16,8 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import colors from '../colors';
-import ScreenHeading from '../components/ScreenHeading';
+import colors from 'styles/colors';
+import ScreenHeading from 'components/ScreenHeading';
 
 export default class Security extends React.PureComponent {
 	render(): React.ReactElement {

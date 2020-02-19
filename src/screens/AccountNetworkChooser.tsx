@@ -22,30 +22,30 @@ import React, { FunctionComponent, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import colors from '../colors';
-import Button from '../components/Button';
+import colors from 'styles/colors';
+import Button from 'components/Button';
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
 	NetworkProtocols
-} from '../constants';
+} from '../constants/networkSpecs';
 import {
 	navigateToPathsList,
 	unlockSeedPhrase,
 	navigateToPathDetails
-} from '../util/navigationHelpers';
-import { withAccountStore } from '../util/HOC';
-import { alertPathDerivationError } from '../util/alertUtils';
+} from 'utils/navigationHelpers';
+import { withAccountStore } from 'utils/HOC';
+import { alertPathDerivationError } from 'utils/alertUtils';
 import {
 	getExistedNetworkKeys,
 	getIdentityName,
 	getPathsWithSubstrateNetworkKey
-} from '../util/identitiesUtils';
+} from 'utils/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading, { IdentityHeading } from '../components/ScreenHeading';
-import fontStyles from '../fontStyles';
-import { NetworkCard } from '../components/AccountCard';
+import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
+import fontStyles from 'styles/fontStyles';
+import { NetworkCard } from 'components/AccountCard';
 import {
 	NetworkParams,
 	SubstrateNetworkParams,

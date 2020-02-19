@@ -16,21 +16,21 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import colors from '../colors';
-import fonts from '../fonts';
-import AccountCard from '../components/AccountCard';
-import QrView from '../components/QrView';
-import PopupMenu from '../components/PopupMenu';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import { alertDeleteLegacyAccount } from '../util/alertUtils';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
+import AccountCard from 'components/AccountCard';
+import QrView from 'components/QrView';
+import PopupMenu from 'components/PopupMenu';
+import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
+import { alertDeleteLegacyAccount } from 'utils/alertUtils';
 import {
 	navigateToLandingPage,
 	navigateToLegacyAccountList
-} from '../util/navigationHelpers';
-import fontStyles from '../fontStyles';
-import UnknownAccountWarning from '../components/UnknownAccountWarning';
-import { withAccountStore } from '../util/HOC';
-import AccountIcon from '../components/AccountIcon';
+} from 'utils/navigationHelpers';
+import fontStyles from 'styles/fontStyles';
+import UnknownAccountWarning from 'components/UnknownAccountWarning';
+import { withAccountStore } from 'utils/HOC';
+import AccountIcon from 'components/AccountIcon';
 import { NavigationAccountProps } from 'types/props';
 
 function AccountDetails({

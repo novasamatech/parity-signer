@@ -20,14 +20,14 @@ import React, { useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { NavigationAccountProps } from 'types/props';
-import colors from '../colors';
-import Background from '../components/Background';
-import Button from '../components/Button';
-import KeyboardScrollView from '../components/KeyboardScrollView';
-import TextInput from '../components/TextInput';
-import fonts from '../fonts';
-import { withAccountStore } from '../util/HOC';
-import { navigateToLegacyAccountList } from '../util/navigationHelpers';
+import colors from 'styles/colors';
+import Background from 'components/Background';
+import Button from 'components/Button';
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import TextInput from 'components/TextInput';
+import fonts from 'styles/fonts';
+import { withAccountStore } from 'utils/HOC';
+import { navigateToLegacyAccountList } from 'utils/navigationHelpers';
 
 interface State {
 	confirmation: string;

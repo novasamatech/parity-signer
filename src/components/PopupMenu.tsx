@@ -23,8 +23,8 @@ import {
 	MenuTrigger
 } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../colors';
-import fonts from '../fonts';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
 
 type MenuItem = {
 	text: string;

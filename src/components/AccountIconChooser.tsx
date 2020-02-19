@@ -26,12 +26,12 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import AccountIcon from './AccountIcon';
 import Address from './Address';
-import colors from '../colors';
-import { NetworkProtocols } from '../constants';
-import fonts from '../fonts';
-import { debounce } from '../util/debounce';
-import { brainWalletAddress, substrateAddress, words } from '../util/native';
-import { constructSURI } from '../util/suri';
+import colors from 'styles/colors';
+import { NetworkProtocols } from 'constants/networkSpecs';
+import fonts from 'styles/fonts';
+import { debounce } from 'utils/debounce';
+import { brainWalletAddress, substrateAddress, words } from 'utils/native';
+import { constructSURI } from 'utils/suri';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
 
 interface IconType {

@@ -16,27 +16,27 @@
 
 import { Container } from 'unstated';
 
-import { emptyAccount, generateAccountId } from '../util/account';
+import { emptyAccount, generateAccountId } from 'utils/account';
 import {
 	loadAccounts,
 	saveAccount,
 	deleteAccount as deleteDbAccount,
 	saveIdentities,
 	loadIdentities
-} from '../util/db';
-import { constructSURI, parseSURI } from '../util/suri';
+} from 'utils/db';
+import { constructSURI, parseSURI } from 'utils/suri';
 import {
 	brainWalletAddress,
 	decryptData,
 	encryptData,
 	substrateAddress
-} from '../util/native';
+} from 'utils/native';
 import {
 	ETHEREUM_NETWORK_LIST,
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
-} from '../constants';
+} from '../constants/networkSpecs';
 import {
 	deepCopyIdentities,
 	deepCopyIdentity,
@@ -46,7 +46,7 @@ import {
 	getNetworkKey,
 	isEthereumAccountId,
 	parseFoundLegacyAccount
-} from '../util/identitiesUtils';
+} from 'utils/identitiesUtils';
 import {
 	AccountsStoreState,
 	Account,

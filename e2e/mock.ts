@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../src/constants';
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
 import { TxRequestData } from 'types/scannerTypes';
 
 export const signingTestIdentityPath = `//${

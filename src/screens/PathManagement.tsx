@@ -16,12 +16,12 @@
 
 import React from 'react';
 import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from '../util/HOC';
+import { withAccountStore } from 'utils/HOC';
 import { withNavigation } from 'react-navigation';
 import { ScrollView } from 'react-native';
-import TextInput from '../components/TextInput';
-import PathCard from '../components/PathCard';
-import colors from '../colors';
+import TextInput from 'components/TextInput';
+import PathCard from 'components/PathCard';
+import colors from 'styles/colors';
 
 function PathManagement({
 	accounts,

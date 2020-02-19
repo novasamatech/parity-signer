@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import colors from './colors';
+import colors from 'styles/colors';
 import {
 	EthereumNetworkParams,
 	NetworkParams,
@@ -84,7 +84,7 @@ const substrateNetworkBase: {
 		color: '#e6007a',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('../res/img/logos/kusama.png'),
+		logo: require('res/img/logos/kusama.png'),
 		pathId: 'kusama',
 		prefix: 2,
 		title: 'Kusama',
@@ -94,7 +94,7 @@ const substrateNetworkBase: {
 		color: '#e6007a',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('../res/img/logos/kusama.png'),
+		logo: require('res/img/logos/kusama.png'),
 		pathId: 'kusama_CC2',
 		prefix: 2,
 		title: 'Kusama',
@@ -138,7 +138,7 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 	[EthereumNetworkKeys.CLASSIC]: {
 		color: '#319C7C',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
-		logo: require('../res/img/logos/eth-classic.png'),
+		logo: require('res/img/logos/eth-classic.png'),
 		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum Classic'
 	},
@@ -158,14 +158,14 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 
 const ethereumDefaultValues = {
 	color: '#2968C7',
-	logo: require('../res/img/logos/eth.png'),
+	logo: require('res/img/logos/eth.png'),
 	protocol: NetworkProtocols.ETHEREUM,
 	secondaryColor: colors.card_text
 };
 
 const substrateDefaultValues = {
 	color: '#4C4646',
-	logo: require('../res/img/logos/substrate-dev.png'),
+	logo: require('res/img/logos/substrate-dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
 	secondaryColor: colors.card_bgSolid
 };

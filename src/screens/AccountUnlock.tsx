@@ -19,13 +19,13 @@ import { StyleSheet, View } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
 import { NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import fontStyles from '../fontStyles';
-import Background from '../components/Background';
-import ScreenHeading from '../components/ScreenHeading';
-import TextInput from '../components/TextInput';
-import AccountsStore from '../stores/AccountsStore';
-import ScannerStore from '../stores/ScannerStore';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import Background from 'components/Background';
+import ScreenHeading from 'components/ScreenHeading';
+import TextInput from 'components/TextInput';
+import AccountsStore from 'stores/AccountsStore';
+import ScannerStore from 'stores/ScannerStore';
 
 /* Used for unlock and sign tx and messages for legacy accounts */
 export class AccountUnlockAndSign extends React.PureComponent<

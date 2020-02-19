@@ -23,8 +23,8 @@ import {
 	TextStyle,
 	TextInputProps
 } from 'react-native';
-import fontStyles from '../fontStyles';
-import colors from '../colors';
+import fontStyles from 'styles/fontStyles';
+import colors from 'styles/colors';
 
 interface Props extends TextInputProps {
 	fixedPrefix?: string;

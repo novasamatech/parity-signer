@@ -22,19 +22,19 @@ import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 
-import colors from '../colors';
-import AccountCard from '../components/AccountCard';
-import AccountIconChooser from '../components/AccountIconChooser';
-import Background from '../components/Background';
-import Button from '../components/Button';
-import DerivationPathField from '../components/DerivationPathField';
-import KeyboardScrollView from '../components/KeyboardScrollView';
-import TextInput from '../components/TextInput';
-import { NETWORK_LIST, NetworkProtocols } from '../constants';
-import fonts from '../fonts';
-import { emptyAccount, validateSeed } from '../util/account';
-import { withAccountStore } from '../util/HOC';
-import { constructSURI } from '../util/suri';
+import colors from 'styles/colors';
+import AccountCard from 'components/AccountCard';
+import AccountIconChooser from 'components/AccountIconChooser';
+import Background from 'components/Background';
+import Button from 'components/Button';
+import DerivationPathField from 'components/DerivationPathField';
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import TextInput from 'components/TextInput';
+import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
+import fonts from 'styles/fonts';
+import { emptyAccount, validateSeed } from 'utils/account';
+import { withAccountStore } from 'utils/HOC';
+import { constructSURI } from 'utils/suri';
 
 interface State {
 	derivationPassword: string;

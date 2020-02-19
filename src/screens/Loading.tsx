@@ -24,19 +24,19 @@ import {
 } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 
-import colors from '../colors';
-import { generateAccountId } from '../util/account';
+import colors from 'styles/colors';
+import { generateAccountId } from 'utils/account';
 import {
 	loadAccounts,
 	loadIdentities,
 	loadToCAndPPConfirmation,
 	saveAccount,
 	saveIdentities
-} from '../util/db';
+} from 'utils/db';
 import {
 	extractAddressFromAccountId,
 	isEthereumAccountId
-} from '../util/identitiesUtils';
+} from 'utils/identitiesUtils';
 
 interface LegacyMeta extends AccountMeta {
 	accountId: string;

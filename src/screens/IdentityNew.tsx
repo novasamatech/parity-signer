@@ -19,28 +19,25 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { NavigationAccountProps } from 'types/props';
 
-import Button from '../components/Button';
-import TextInput from '../components/TextInput';
-import { emptyIdentity } from '../util/identitiesUtils';
-import colors from '../colors';
-import fonts from '../fonts';
-import { withAccountStore } from '../util/HOC';
-import { validateSeed } from '../util/account';
-import AccountSeed from '../components/AccountSeed';
-import {
-	navigateToNewIdentityNetwork,
-	setPin
-} from '../util/navigationHelpers';
+import Button from 'components/Button';
+import TextInput from 'components/TextInput';
+import { emptyIdentity } from 'utils/identitiesUtils';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
+import { withAccountStore } from 'utils/HOC';
+import { validateSeed } from 'utils/account';
+import AccountSeed from 'components/AccountSeed';
+import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import {
 	alertErrorWithMessage,
 	alertIdentityCreationError,
 	alertRisks
-} from '../util/alertUtils';
+} from 'utils/alertUtils';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading from '../components/ScreenHeading';
-import KeyboardScrollView from '../components/KeyboardScrollView';
-import { brainWalletAddress } from '../util/native';
-import { debounce } from '../util/debounce';
+import ScreenHeading from 'components/ScreenHeading';
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import { brainWalletAddress } from 'utils/native';
+import { debounce } from 'utils/debounce';
 
 function IdentityNew({
 	accounts,

@@ -19,17 +19,17 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation, ScrollView, NavigationParams } from 'react-navigation';
 
 import ButtonIcon from './ButtonIcon';
-import colors from '../colors';
-import fontStyles from '../fontStyles';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
 import Separator from './Separator';
-import { withAccountStore } from '../util/HOC';
-import { getIdentityName } from '../util/identitiesUtils';
+import { withAccountStore } from 'utils/HOC';
+import { getIdentityName } from 'utils/identitiesUtils';
 import testIDs from '../../e2e/testIDs';
 import {
 	navigateToLegacyAccountList,
 	resetNavigationTo,
 	resetNavigationWithNetworkChooser
-} from '../util/navigationHelpers';
+} from 'utils/navigationHelpers';
 import TransparentBackground from './TransparentBackground';
 import { NavigationAccountProps } from 'types/props';
 import { Identity } from 'types/identityTypes';

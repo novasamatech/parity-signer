@@ -19,16 +19,16 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
 
-import colors from '../colors';
-import PayloadDetailsCard from '../components/PayloadDetailsCard';
-import TxDetailsCard from '../components/TxDetailsCard';
-import QrView from '../components/QrView';
-import { NETWORK_LIST } from '../constants';
+import colors from 'styles/colors';
+import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import TxDetailsCard from 'components/TxDetailsCard';
+import QrView from 'components/QrView';
+import { NETWORK_LIST } from '../constants/networkSpecs';
 import testIDs from '../../e2e/testIDs';
-import { withAccountAndScannerStore } from '../util/HOC';
-import fontStyles from '../fontStyles';
-import CompatibleCard from '../components/CompatibleCard';
-import { Transaction } from '../util/transaction';
+import { withAccountAndScannerStore } from 'utils/HOC';
+import fontStyles from 'styles/fontStyles';
+import CompatibleCard from 'components/CompatibleCard';
+import { Transaction } from 'utils/transaction';
 
 function SignedTx({
 	scannerStore,

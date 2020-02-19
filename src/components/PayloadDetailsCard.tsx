@@ -26,13 +26,16 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
-import colors from '../colors';
-import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
-import kusamaMetadata from '../util/static-kusama';
-import substrateDevMetadata from '../util/static-substrate';
-import { shortString } from '../util/strings';
-import fontStyles from '../fontStyles';
-import { alertDecodeError } from '../util/alertUtils';
+import colors from 'styles/colors';
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
+import kusamaMetadata from 'constants/static-kusama';
+import substrateDevMetadata from 'constants/static-substrate';
+import { shortString } from 'utils/strings';
+import fontStyles from 'styles/fontStyles';
+import { alertDecodeError } from 'utils/alertUtils';
 import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { ExtrinsicEra } from '@polkadot/types/interfaces';
 

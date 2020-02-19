@@ -16,14 +16,14 @@
 
 import React from 'react';
 import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from '../util/HOC';
+import { withAccountStore } from 'utils/HOC';
 import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import PathCard from '../components/PathCard';
-import PopupMenu from '../components/PopupMenu';
-import { LeftScreenHeading } from '../components/ScreenHeading';
-import colors from '../colors';
-import QrView from '../components/QrView';
+import PathCard from 'components/PathCard';
+import PopupMenu from 'components/PopupMenu';
+import { LeftScreenHeading } from 'components/ScreenHeading';
+import colors from 'styles/colors';
+import QrView from 'components/QrView';
 import {
 	getAddressWithPath,
 	getNetworkKey,
@@ -31,16 +31,16 @@ import {
 	getPathName,
 	getPathsWithSubstrateNetworkKey,
 	isSubstratePath
-} from '../util/identitiesUtils';
-import { defaultNetworkKey, UnknownNetworkKeys } from '../constants';
-import { alertDeleteAccount, alertPathDeletionError } from '../util/alertUtils';
+} from 'utils/identitiesUtils';
 import {
-	navigateToPathsList,
-	unlockSeedPhrase
-} from '../util/navigationHelpers';
+	defaultNetworkKey,
+	UnknownNetworkKeys
+} from '../constants/networkSpecs';
+import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
+import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import testIDs from '../../e2e/testIDs';
-import { generateAccountId } from '../util/account';
-import UnknownAccountWarning from '../components/UnknownAccountWarning';
+import { generateAccountId } from 'utils/account';
+import UnknownAccountWarning from 'components/UnknownAccountWarning';
 
 interface Props extends NavigationAccountProps<{}> {
 	path: string;

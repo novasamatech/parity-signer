@@ -20,12 +20,12 @@ import { RNCamera } from 'react-native-camera';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
-import fonts from '../fonts';
-import AccountsStore from '../stores/AccountsStore';
-import ScannerStore from '../stores/ScannerStore';
-import { isAddressString, isJsonString, rawDataToU8A } from '../util/decoders';
-import ScreenHeading from '../components/ScreenHeading';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
+import AccountsStore from 'stores/AccountsStore';
+import ScannerStore from 'stores/ScannerStore';
+import { isAddressString, isJsonString, rawDataToU8A } from 'utils/decoders';
+import ScreenHeading from 'components/ScreenHeading';
 import { createMockSignRequest } from '../../e2e/mock';
 import { TxRequestData } from 'types/scannerTypes';
 

@@ -17,23 +17,23 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationAccountProps } from 'types/props';
 
-import { words } from '../util/native';
+import { words } from 'utils/native';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import TouchableItem from '../components/TouchableItem';
-import colors from '../colors';
-import fontStyles from '../fontStyles';
-import ButtonMainAction from '../components/ButtonMainAction';
+import TouchableItem from 'components/TouchableItem';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import ButtonMainAction from 'components/ButtonMainAction';
 import { withNavigation } from 'react-navigation';
 import {
 	navigateToNewIdentityNetwork,
 	setPin,
 	unlockSeedPhrase
-} from '../util/navigationHelpers';
-import { withAccountStore } from '../util/HOC';
+} from 'utils/navigationHelpers';
+import { withAccountStore } from 'utils/HOC';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading from '../components/ScreenHeading';
-import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
-import Button from '../components/Button';
+import ScreenHeading from 'components/ScreenHeading';
+import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
+import Button from 'components/Button';
 
 function IdentityBackup({
 	navigation,

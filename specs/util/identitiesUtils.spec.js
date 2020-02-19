@@ -21,12 +21,12 @@ import {
 	getPathName,
 	groupPaths,
 	serializeIdentities
-} from '../../src/util/identitiesUtils';
+} from 'utils/identitiesUtils';
 import {
 	EthereumNetworkKeys,
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys
-} from '../../src/constants';
+} from 'constants/networkSpecs';
 
 const raw = [
 	{

@@ -24,25 +24,22 @@ import {
 import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
-import { NETWORK_LIST } from '../constants';
-import Background from '../components/Background';
-import ButtonMainAction from '../components/ButtonMainAction';
-import ScreenHeading from '../components/ScreenHeading';
-import TxDetailsCard from '../components/TxDetailsCard';
-import AccountsStore from '../stores/AccountsStore';
-import ScannerStore from '../stores/ScannerStore';
-import PayloadDetailsCard from '../components/PayloadDetailsCard';
-import {
-	navigateToSignedTx,
-	unlockSeedPhrase
-} from '../util/navigationHelpers';
+import colors from 'styles/colors';
+import { NETWORK_LIST } from '../constants/networkSpecs';
+import Background from 'components/Background';
+import ButtonMainAction from 'components/ButtonMainAction';
+import ScreenHeading from 'components/ScreenHeading';
+import TxDetailsCard from 'components/TxDetailsCard';
+import AccountsStore from 'stores/AccountsStore';
+import ScannerStore from 'stores/ScannerStore';
+import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import { navigateToSignedTx, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import testIDs from '../../e2e/testIDs';
-import fontStyles from '../fontStyles';
-import CompatibleCard from '../components/CompatibleCard';
-import { getIdentityFromSender } from '../util/identitiesUtils';
-import { Transaction } from '../util/transaction';
+import fontStyles from 'styles/fontStyles';
+import CompatibleCard from 'components/CompatibleCard';
+import { getIdentityFromSender } from 'utils/identitiesUtils';
+import { Transaction } from 'utils/transaction';
 
 export default class TxDetails extends React.PureComponent<
 	NavigationProps<{}>

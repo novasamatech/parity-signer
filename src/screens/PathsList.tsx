@@ -24,23 +24,23 @@ import {
 	NETWORK_LIST,
 	NetworkProtocols,
 	UnknownNetworkKeys
-} from '../constants';
-import { withAccountStore } from '../util/HOC';
+} from '../constants/networkSpecs';
+import { withAccountStore } from 'utils/HOC';
 import { withNavigation } from 'react-navigation';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths,
 	removeSlash
-} from '../util/identitiesUtils';
-import ButtonNewDerivation from '../components/ButtonNewDerivation';
-import PathCard from '../components/PathCard';
+} from 'utils/identitiesUtils';
+import ButtonNewDerivation from 'components/ButtonNewDerivation';
+import PathCard from 'components/PathCard';
 import { PathDetailsView } from './PathDetails';
 import testIDs from '../../e2e/testIDs';
 
-import Separator from '../components/Separator';
-import fontStyles from '../fontStyles';
-import colors from '../colors';
-import { LeftScreenHeading } from '../components/ScreenHeading';
+import Separator from 'components/Separator';
+import fontStyles from 'styles/fontStyles';
+import colors from 'styles/colors';
+import { LeftScreenHeading } from 'components/ScreenHeading';
 
 function PathsList({
 	accounts,

@@ -18,7 +18,7 @@ import { isHex } from '@polkadot/util';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, StyleSheet, View, ViewStyle } from 'react-native';
 
-import { qrCode, qrCodeHex } from '../util/native';
+import { qrCode, qrCodeHex } from 'utils/native';
 
 interface Props {
 	data: string;

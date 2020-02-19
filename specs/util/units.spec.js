@@ -18,8 +18,8 @@ import { Metadata, TypeRegistry } from '@polkadot/types';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { formatBalance } from '@polkadot/util';
 
-import kusamaData from '../../src/util/static-kusama';
-import { fromWei } from '../../src/util/units';
+import kusamaData from 'constants/static-kusama';
+import { fromWei } from 'utils/units';
 const registry = new TypeRegistry();
 registry.setMetadata(new Metadata(registry, kusamaData));
 

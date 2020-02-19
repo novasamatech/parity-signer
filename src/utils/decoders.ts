@@ -24,7 +24,10 @@ import {
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import { blake2b } from './native';
-import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from '../constants/networkSpecs';
 import {
 	EthereumParsedData,
 	ParsedData,

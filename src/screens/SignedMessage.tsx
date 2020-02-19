@@ -17,11 +17,11 @@
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { NavigationScannerProps } from 'types/props';
-import colors from '../colors';
-import QrView from '../components/QrView';
-import { withScannerStore } from '../util/HOC';
-import fontStyles from '../fontStyles';
-import MessageDetailsCard from '../components/MessageDetailsCard';
+import colors from 'styles/colors';
+import QrView from 'components/QrView';
+import { withScannerStore } from 'utils/HOC';
+import fontStyles from 'styles/fontStyles';
+import MessageDetailsCard from 'components/MessageDetailsCard';
 
 function SignedMessage({
 	scannerStore

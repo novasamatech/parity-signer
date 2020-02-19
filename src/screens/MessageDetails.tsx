@@ -26,22 +26,22 @@ import {
 } from 'types/networkSpecsTypes';
 import { NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import { NETWORK_LIST } from '../constants';
-import Background from '../components/Background';
-import Button from '../components/Button';
-import PayloadDetailsCard from '../components/PayloadDetailsCard';
-import ScannerStore from '../stores/ScannerStore';
-import AccountsStore from '../stores/AccountsStore';
+import colors from 'styles/colors';
+import { NETWORK_LIST } from '../constants/networkSpecs';
+import Background from 'components/Background';
+import Button from 'components/Button';
+import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import ScannerStore from 'stores/ScannerStore';
+import AccountsStore from 'stores/AccountsStore';
 import {
 	navigateToSignedMessage,
 	unlockSeedPhrase
-} from '../util/navigationHelpers';
-import fontStyles from '../fontStyles';
-import MessageDetailsCard from '../components/MessageDetailsCard';
-import { alertMultipart } from '../util/alertUtils';
-import CompatibleCard from '../components/CompatibleCard';
-import { getIdentityFromSender } from '../util/identitiesUtils';
+} from 'utils/navigationHelpers';
+import fontStyles from 'styles/fontStyles';
+import MessageDetailsCard from 'components/MessageDetailsCard';
+import { alertMultipart } from 'utils/alertUtils';
+import CompatibleCard from 'components/CompatibleCard';
+import { getIdentityFromSender } from 'utils/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent<
 	NavigationProps<{}>

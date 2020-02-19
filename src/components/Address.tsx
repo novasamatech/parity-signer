@@ -17,10 +17,10 @@
 import React, { ReactElement } from 'react';
 import { StyleSheet, Text, TextStyle } from 'react-native';
 
-import colors from '../colors';
-import fonts from '../fonts';
-import fontStyles from '../fontStyles';
-import { NetworkProtocols } from '../constants';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
+import fontStyles from 'styles/fontStyles';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import { NetworkProtocol } from 'types/networkSpecsTypes';
 
 export default function Address(props: {

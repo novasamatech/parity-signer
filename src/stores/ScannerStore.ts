@@ -29,26 +29,26 @@ import {
 	NETWORK_LIST,
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
-} from '../constants';
+} from '../constants/networkSpecs';
 
-import { isAscii } from '../util/strings';
+import { isAscii } from 'utils/strings';
 import {
 	brainWalletSign,
 	decryptData,
 	keccak,
 	ethSign,
 	substrateSign
-} from '../util/native';
-import { mod } from '../util/numbers';
-import transaction, { Transaction } from '../util/transaction';
+} from 'utils/native';
+import { mod } from 'utils/numbers';
+import transaction, { Transaction } from 'utils/transaction';
 import {
 	constructDataFromBytes,
 	asciiToHex,
 	encodeNumber
-} from '../util/decoders';
+} from 'utils/decoders';
 import { Account, FoundAccount } from 'types/identityTypes';
-import { constructSURI } from '../util/suri';
-import { emptyAccount } from '../util/account';
+import { constructSURI } from 'utils/suri';
+import { emptyAccount } from 'utils/account';
 import AccountsStore from './AccountsStore';
 import {
 	CompletedParsedData,

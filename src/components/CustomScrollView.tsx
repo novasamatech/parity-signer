@@ -24,7 +24,7 @@ import {
 	ViewStyle
 } from 'react-native';
 
-import colors from '../colors';
+import colors from 'styles/colors';
 
 export default class CustomScrollview extends React.PureComponent<
 	{

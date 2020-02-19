@@ -27,12 +27,15 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
-import fontStyles from '../fontStyles';
-import { SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys } from '../constants';
+import fontStyles from 'styles/fontStyles';
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from '../constants/networkSpecs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import colors from '../colors';
+import colors from 'styles/colors';
 import TransparentBackground from './TransparentBackground';
-import fonts from '../fonts';
+import fonts from 'styles/fonts';
 
 const ACCOUNT_NETWORK = 'Account Network';
 const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =

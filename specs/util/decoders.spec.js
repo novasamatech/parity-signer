@@ -27,7 +27,7 @@ import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
-} from '../../src/constants';
+} from 'constants/networkSpecs';
 import {
 	constructDataFromBytes,
 	rawDataToU8A,
@@ -35,9 +35,9 @@ import {
 	hexToAscii,
 	decodeToString,
 	isJsonString
-} from '../../src/util/decoders';
-import { isAscii } from '../../src/util/strings';
-import kusamaData from '../../src/util/static-kusama';
+} from 'utils/decoders';
+import { isAscii } from 'utils/strings';
+import kusamaData from 'constants/static-kusama';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);

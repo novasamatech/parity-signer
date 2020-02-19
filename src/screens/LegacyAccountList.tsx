@@ -20,11 +20,11 @@ import { withNavigation } from 'react-navigation';
 import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 
-import colors from '../colors';
-import AccountCard from '../components/AccountCard';
-import Background from '../components/Background';
+import colors from 'styles/colors';
+import AccountCard from 'components/AccountCard';
+import Background from 'components/Background';
 import testIDs from '../../e2e/testIDs';
-import { withAccountStore } from '../util/HOC';
+import { withAccountStore } from 'utils/HOC';
 
 function LegacyAccountList({
 	navigation,

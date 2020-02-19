@@ -28,7 +28,7 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import AntIcon from 'react-native-vector-icons/AntDesign';
-import colors from '../colors';
+import colors from 'styles/colors';
 import { ButtonListener } from 'types/props';
 
 interface Props {

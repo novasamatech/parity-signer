@@ -16,17 +16,17 @@
 import React, { useState } from 'react';
 import { StyleSheet, TextInputProps } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import colors from '../colors';
-import Background from '../components/Background';
-import ButtonMainAction from '../components/ButtonMainAction';
-import TextInput from '../components/TextInput';
-import KeyboardScrollView from '../components/KeyboardScrollView';
-import { withAccountStore } from '../util/HOC';
+import colors from 'styles/colors';
+import Background from 'components/Background';
+import ButtonMainAction from 'components/ButtonMainAction';
+import TextInput from 'components/TextInput';
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import { withAccountStore } from 'utils/HOC';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading from '../components/ScreenHeading';
-import fontStyles from '../fontStyles';
-import { onlyNumberRegex } from '../util/regex';
-import { unlockIdentitySeed } from '../util/identitiesUtils';
+import ScreenHeading from 'components/ScreenHeading';
+import fontStyles from 'styles/fontStyles';
+import { onlyNumberRegex } from 'utils/regex';
+import { unlockIdentitySeed } from 'utils/identitiesUtils';
 import { NavigationAccountProps } from 'types/props';
 import { Identity } from 'types/identityTypes';
 

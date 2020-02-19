@@ -19,16 +19,16 @@ import { ScrollView, StyleSheet, Text } from 'react-native';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps, NavigationProps } from 'types/props';
 import { Subscribe } from 'unstated';
-import colors from '../colors';
-import fonts from '../fonts';
-import TouchableItem from '../components/TouchableItem';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
+import TouchableItem from 'components/TouchableItem';
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
-} from '../constants';
-import AccountsStore from '../stores/AccountsStore';
-import { emptyAccount } from '../util/account';
+} from '../constants/networkSpecs';
+import AccountsStore from 'stores/AccountsStore';
+import { emptyAccount } from 'utils/account';
 
 export default class LegacyNetworkChooser extends React.PureComponent<
 	NavigationProps<{}>,

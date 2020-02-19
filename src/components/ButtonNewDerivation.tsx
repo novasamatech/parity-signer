@@ -18,8 +18,8 @@ import React from 'react';
 import Button from './Button';
 
 import { StyleSheet } from 'react-native';
-import colors from '../colors';
-import fontStyles from '../fontStyles';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
 
 export default class ButtonNewDerivation extends React.PureComponent<{

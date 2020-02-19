@@ -19,8 +19,8 @@ import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 import React from 'react';
 import { FoundAccount } from 'types/identityTypes';
-import AccountsStore from '../stores/AccountsStore';
-import { isLegacyFoundAccount } from '../util/identitiesUtils';
+import AccountsStore from 'stores/AccountsStore';
+import { isLegacyFoundAccount } from 'utils/identitiesUtils';
 
 const CompatibleCard = ({
 	account,

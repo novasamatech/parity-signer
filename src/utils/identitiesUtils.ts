@@ -18,7 +18,7 @@ import {
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
-} from '../constants';
+} from '../constants/networkSpecs';
 import { pathsRegex } from './regex';
 import { decryptData } from './native';
 import { parseSURI } from './suri';

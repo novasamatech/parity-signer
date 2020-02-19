@@ -16,11 +16,11 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import colors from '../colors';
-import AccountCard from '../components/AccountCard';
-import TextInput from '../components/TextInput';
-import AccountsStore from '../stores/AccountsStore';
-import { withAccountStore } from '../util/HOC';
+import colors from 'styles/colors';
+import AccountCard from 'components/AccountCard';
+import TextInput from 'components/TextInput';
+import AccountsStore from 'stores/AccountsStore';
+import { withAccountStore } from 'utils/HOC';
 
 const onNameInput = async (
 	accounts: AccountsStore,

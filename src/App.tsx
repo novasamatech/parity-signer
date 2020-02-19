@@ -30,43 +30,43 @@ import {
 	createStackNavigator,
 	HeaderBackButton
 } from 'react-navigation-stack';
+import { StackNavigationOptions } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
-import Background from './components/Background';
-import colors from './colors';
-import HeaderLeftHome from './components/HeaderLeftHome';
-import SecurityHeader from './components/SecurityHeader';
+import Background from 'components/Background';
+import colors from 'styles/colors';
+import HeaderLeftHome from 'components/HeaderLeftHome';
+import SecurityHeader from 'components/SecurityHeader';
 import '../ReactotronConfig';
-import About from './screens/About';
-import LegacyAccountBackup from './screens/LegacyAccountBackup';
-import AccountDetails from './screens/AccountDetails';
-import AccountEdit from './screens/AccountEdit';
-import AccountNetworkChooser from './screens/AccountNetworkChooser';
-import AccountNew from './screens/AccountNew';
-import AccountPin from './screens/AccountPin';
-import { AccountUnlock, AccountUnlockAndSign } from './screens/AccountUnlock';
-import LegacyAccountList from './screens/LegacyAccountList';
-import Loading from './screens/Loading';
-import IdentityBackup from './screens/IdentityBackup';
-import IdentityManagement from './screens/IdentityManagement';
-import IdentityNew from './screens/IdentityNew';
-import IdentityPin from './screens/IdentityPin';
-import MessageDetails from './screens/MessageDetails';
-import PathDerivation from './screens/PathDerivation';
-import PathDetails from './screens/PathDetails';
-import PathsList from './screens/PathsList';
-import PathManagement from './screens/PathManagement';
-import PrivacyPolicy from './screens/PrivacyPolicy';
-import QrScanner from './screens/QrScanner';
-import Security from './screens/Security';
-import SignedMessage from './screens/SignedMessage';
-import SignedTx from './screens/SignedTx';
-import TermsAndConditions from './screens/TermsAndConditions';
-import TxDetails from './screens/TxDetails';
-import LegacyNetworkChooser from './screens/LegacyNetworkChooser';
-import testIDs from '../e2e/testIDs';
-import { StackNavigationOptions } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+import About from 'screens/About';
+import LegacyAccountBackup from 'screens/LegacyAccountBackup';
+import AccountDetails from 'screens/AccountDetails';
+import AccountEdit from 'screens/AccountEdit';
+import AccountNetworkChooser from 'screens/AccountNetworkChooser';
+import AccountNew from 'screens/AccountNew';
+import AccountPin from 'screens/AccountPin';
+import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
+import LegacyAccountList from 'screens/LegacyAccountList';
+import Loading from 'screens/Loading';
+import IdentityBackup from 'screens/IdentityBackup';
+import IdentityManagement from 'screens/IdentityManagement';
+import IdentityNew from 'screens/IdentityNew';
+import IdentityPin from 'screens/IdentityPin';
+import MessageDetails from 'screens/MessageDetails';
+import PathDerivation from 'screens/PathDerivation';
+import PathDetails from 'screens/PathDetails';
+import PathsList from 'screens/PathsList';
+import PathManagement from 'screens/PathManagement';
+import PrivacyPolicy from 'screens/PrivacyPolicy';
+import QrScanner from 'screens/QrScanner';
+import Security from 'screens/Security';
+import SignedMessage from 'screens/SignedMessage';
+import SignedTx from 'screens/SignedTx';
+import TermsAndConditions from 'screens/TermsAndConditions';
+import TxDetails from 'screens/TxDetails';
+import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
+import testIDs from 'e2e/testIDs';
 
 const getLaunchArgs = (props: Props): void => {
 	if (Platform.OS === 'ios') {

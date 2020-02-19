@@ -17,7 +17,7 @@
 import React from 'react';
 import { View, Image, ViewStyle, StyleSheet, ImageStyle } from 'react-native';
 
-import shadowImage from '../../res/img/card_shadow.png';
+import shadowImage from 'res/img/card_shadow.png';
 
 interface Props {
 	shadow?: boolean;

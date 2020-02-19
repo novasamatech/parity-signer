@@ -19,14 +19,14 @@ import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { NavigationProps } from 'types/props';
 import toc from '../../docs/terms-and-conditions.md';
-import colors from '../colors';
-import fontStyles from '../fontStyles';
-import Button from '../components/Button';
-import Markdown from '../components/Markdown';
-import TouchableItem from '../components/TouchableItem';
-import { saveToCAndPPConfirmation } from '../util/db';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import Button from 'components/Button';
+import Markdown from 'components/Markdown';
+import TouchableItem from 'components/TouchableItem';
+import { saveToCAndPPConfirmation } from 'utils/db';
 import testIDs from '../../e2e/testIDs';
-import CustomScrollview from '../components/CustomScrollView';
+import CustomScrollview from 'components/CustomScrollView';
 
 interface State {
 	tocAgreement: boolean;

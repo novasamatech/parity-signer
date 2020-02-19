@@ -19,20 +19,20 @@ import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { NavigationAccountProps } from 'types/props';
 
-import { withAccountStore } from '../util/HOC';
-import TextInput from '../components/TextInput';
+import { withAccountStore } from 'utils/HOC';
+import TextInput from 'components/TextInput';
 import {
 	navigateToLandingPage,
 	unlockSeedPhrase
-} from '../util/navigationHelpers';
+} from 'utils/navigationHelpers';
 import {
 	alertDeleteIdentity,
 	alertIdentityDeletionError
-} from '../util/alertUtils';
+} from 'utils/alertUtils';
 import testIDs from '../../e2e/testIDs';
-import ScreenHeading from '../components/ScreenHeading';
-import colors from '../colors';
-import PopupMenu from '../components/PopupMenu';
+import ScreenHeading from 'components/ScreenHeading';
+import colors from 'styles/colors';
+import PopupMenu from 'components/PopupMenu';
 
 function IdentityManagement({
 	accounts,

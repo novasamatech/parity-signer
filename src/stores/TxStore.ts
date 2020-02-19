@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 import { Container } from 'unstated';
-import { loadAccountTxs, saveTx } from '../util/db';
+import { loadAccountTxs, saveTx } from 'utils/db';
 import { TxParticipant } from 'types/tx';
 
 type State = {

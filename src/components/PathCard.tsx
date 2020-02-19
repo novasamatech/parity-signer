@@ -21,18 +21,18 @@ import {
 	getAddressWithPath,
 	getNetworkKeyByPath,
 	getPathName
-} from '../util/identitiesUtils';
+} from 'utils/identitiesUtils';
 import {
 	defaultNetworkKey,
 	NETWORK_LIST,
 	NetworkProtocols,
 	UnknownNetworkKeys
-} from '../constants';
-import Separator from '../components/Separator';
+} from '../constants/networkSpecs';
+import Separator from 'components/Separator';
 import AccountIcon from './AccountIcon';
 import Address from './Address';
-import colors from '../colors';
-import fontStyles from '../fontStyles';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 import { ButtonListener } from 'types/props';

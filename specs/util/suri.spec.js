@@ -14,11 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	constructSURI,
-	parseDerivationPath,
-	parseSURI
-} from '../../src/util/suri';
+import { constructSURI, parseDerivationPath, parseSURI } from 'utils/suri';
 
 describe('derivation path', () => {
 	describe('parsing', () => {

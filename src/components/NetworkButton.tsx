@@ -18,8 +18,8 @@ import TouchableItem from './TouchableItem';
 import { StyleSheet, Text } from 'react-native';
 import React from 'react';
 import { NavigationInjectedProps, withNavigation } from 'react-navigation';
-import colors from '../colors';
-import fonts from '../fonts';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
 
 interface Props extends NavigationInjectedProps {
 	network: {

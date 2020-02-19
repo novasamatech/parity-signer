@@ -27,18 +27,18 @@ import { withNavigation } from 'react-navigation';
 import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationAccountProps } from 'types/props';
 
-import colors from '../colors';
-import fonts from '../fonts';
-import fontStyles from '../fontStyles';
-import AccountCard from '../components/AccountCard';
-import Background from '../components/Background';
-import Button from '../components/Button';
-import ScreenHeading from '../components/ScreenHeading';
-import TouchableItem from '../components/TouchableItem';
-import DerivationPasswordVerify from '../components/DerivationPasswordVerify';
-import { withAccountStore } from '../util/HOC';
-import { NetworkProtocols, NETWORK_LIST } from '../constants';
-import { alertBackupDone, alertCopyBackupPhrase } from '../util/alertUtils';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
+import fontStyles from 'styles/fontStyles';
+import AccountCard from 'components/AccountCard';
+import Background from 'components/Background';
+import Button from 'components/Button';
+import ScreenHeading from 'components/ScreenHeading';
+import TouchableItem from 'components/TouchableItem';
+import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
+import { withAccountStore } from 'utils/HOC';
+import { NetworkProtocols, NETWORK_LIST } from '../constants/networkSpecs';
+import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 function LegacyAccountBackup({
 	navigation,

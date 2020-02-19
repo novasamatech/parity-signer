@@ -20,9 +20,9 @@ import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import colors from '../colors';
-import { NetworkProtocols } from '../constants';
-import { blockiesIcon } from '../util/native';
+import colors from 'styles/colors';
+import { NetworkProtocols } from 'constants/networkSpecs';
+import { blockiesIcon } from 'utils/native';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
 
 export default function AccountIcon(props: {

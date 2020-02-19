@@ -17,9 +17,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
-import fontStyles from '../fontStyles';
-import { hexToAscii, isAscii } from '../util/strings';
-import colors from '../colors';
+import fontStyles from 'styles/fontStyles';
+import { hexToAscii, isAscii } from 'utils/strings';
+import colors from 'styles/colors';
 
 export default function MessageDetailsCard({
 	isHash,

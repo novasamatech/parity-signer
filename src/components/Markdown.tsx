@@ -17,8 +17,8 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { default as MarkdownRender } from 'react-native-markdown-renderer';
-import colors from '../colors';
-import fonts from '../fonts';
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
 
 export default class Markdown extends React.PureComponent<any> {
 	render(): React.ReactElement {

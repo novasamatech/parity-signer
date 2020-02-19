@@ -24,7 +24,7 @@ import {
 	NetworkProtocols,
 	NETWORK_LIST,
 	SubstrateNetworkKeys
-} from '../constants';
+} from '../constants/networkSpecs';
 
 export function generateAccountId({
 	address,
