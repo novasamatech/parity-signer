@@ -75,12 +75,12 @@
     "forceConsistentCasingInFileNames": false  /* Disallow inconsistently-cased references to the same file. */
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "specs/**/*"
   ],
   "exclude": [
     "./node_modules",
     "**/*.json",
-    "**/*.spec.ts",
     "**/*.md"
   ]
 }

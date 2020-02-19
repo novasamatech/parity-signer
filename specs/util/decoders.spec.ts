@@ -20,6 +20,7 @@ import {
 	Metadata,
 	TypeRegistry
 } from '@polkadot/types';
+import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
@@ -28,6 +29,7 @@ import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
+import { SubstrateCompletedParsedData } from 'types/scannerTypes';
 import {
 	constructDataFromBytes,
 	rawDataToU8A,
@@ -157,8 +159,9 @@ describe('decoders', () => {
 	describe('rawDataToU8a', () => {
 		it('should properly extract only UOS relevant data from RNCamera txRequest.rawData', () => {
 			const strippedU8a = rawDataToU8A(RN_TX_REQUEST_RAW_DATA);
-			const frameInfo = strippedU8a.slice(0, 5);
-			const uos = strippedU8a.slice(5);
+			expect(strippedU8a).not.toBeNull();
+			const frameInfo = strippedU8a!.slice(0, 5);
+			const uos = strippedU8a!.slice(5);
 
 			expect(frameInfo).toEqual(new Uint8Array([0, 0, 1, 0, 0]));
 			expect(uos[0]).toEqual(SUBSTRATE_ID[0]);
@@ -173,30 +176,30 @@ describe('decoders', () => {
 			const unsignedData = await constructDataFromBytes(SIGN_MSG_TEST);
 
 			expect(unsignedData).toBeDefined();
-			expect(unsignedData.data.crypto).toEqual('sr25519');
-			expect(unsignedData.data.data).toEqual('THIS IS SPARTA!');
-			expect(unsignedData.data.account).toEqual(KUSAMA_ADDRESS);
+			expect(
+				(unsignedData as SubstrateCompletedParsedData).data.crypto
+			).toEqual('sr25519');
+			expect((unsignedData as SubstrateCompletedParsedData).data.data).toEqual(
+				'THIS IS SPARTA!'
+			);
+			expect(
+				(unsignedData as SubstrateCompletedParsedData).data.account
+			).toEqual(KUSAMA_ADDRESS);
 		});
 
 		it('from Substrate UOS Payload Mortal', async () => {
 			const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
+			const payload = (unsignedData as SubstrateCompletedParsedData).data
+				.data as ExtrinsicPayload;
 
-			expect(unsignedData.data.data.era.toHex()).toEqual(
-				SIGNER_PAYLOAD_TEST.era.toHex()
-			);
-			expect(unsignedData.data.data.method.toHex()).toEqual(
-				SIGNER_PAYLOAD_TEST.method
-			);
-			expect(unsignedData.data.data.blockHash.toHex()).toEqual(
-				SIGNER_PAYLOAD_TEST.blockHash
-			);
-			expect(unsignedData.data.data.nonce.eq(SIGNER_PAYLOAD_TEST.nonce)).toBe(
+			expect(payload.era.toHex()).toEqual(SIGNER_PAYLOAD_TEST.era.toHex());
+			expect(payload.method.toHex()).toEqual(SIGNER_PAYLOAD_TEST.method);
+			expect(payload.blockHash.toHex()).toEqual(SIGNER_PAYLOAD_TEST.blockHash);
+			expect(payload.nonce.eq(SIGNER_PAYLOAD_TEST.nonce)).toBe(true);
+			expect(payload.specVersion.eq(SIGNER_PAYLOAD_TEST.specVersion)).toBe(
 				true
 			);
-			expect(
-				unsignedData.data.data.specVersion.eq(SIGNER_PAYLOAD_TEST.specVersion)
-			).toBe(true);
-			expect(unsignedData.data.data.tip.eq(SIGNER_PAYLOAD_TEST.tip)).toBe(true);
+			expect(payload.tip.eq(SIGNER_PAYLOAD_TEST.tip)).toBe(true);
 		});
 	});
 

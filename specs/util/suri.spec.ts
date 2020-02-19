@@ -113,10 +113,10 @@ describe('suri', () => {
 				phrase: null
 			};
 
-			expect(() => constructSURI(empty)).toThrow(
+			expect(() => constructSURI(empty as any)).toThrow(
 				'Cannot construct an SURI from emtpy phrase.'
 			);
-			expect(() => constructSURI(malformed)).toThrow(
+			expect(() => constructSURI(malformed as any)).toThrow(
 				'Cannot construct an SURI from emtpy phrase.'
 			);
 		});

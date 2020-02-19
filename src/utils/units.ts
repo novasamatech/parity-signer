@@ -55,7 +55,7 @@ function getValueOfUnit(unit?: string): BigNumber {
 	return new BigNumber(unitValue, 10);
 }
 
-export function fromWei(number: string, unit?: string): string {
+export function fromWei(number: any, unit?: string): string {
 	return new BigNumber(number || 0, 16)
 		.dividedBy(getValueOfUnit(unit))
 		.toString(10);

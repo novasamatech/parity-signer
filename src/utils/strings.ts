@@ -17,9 +17,9 @@
 /*
  * @dev Check if input is in Ascii table.
  */
-export function isAscii(data: string): boolean {
+export function isAscii(data: string | number): boolean {
 	/* eslint-disable-next-line no-control-regex */
-	return /^[\x00-\x7F]*$/.test(data);
+	return /^[\x00-\x7F]*$/.test(data as string);
 }
 
 /*

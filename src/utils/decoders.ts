@@ -261,8 +261,8 @@ export async function constructDataFromBytes(
 	}
 }
 
-export function decodeToString(message: number[]): string {
-	const encodedString = String.fromCharCode.apply(null, message);
+export function decodeToString(message: Uint8Array): string {
+	const encodedString = String.fromCharCode.apply(null, Array.from(message));
 	return decodeURIComponent(escape(encodedString));
 }
 

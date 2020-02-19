@@ -41,9 +41,28 @@ describe('units', () => {
 	});
 
 	describe('kusama', () => {
-		let method_1;
-		let method_2;
-		let method_3;
+		let method_1: Call;
+		let method_2: Call;
+		let method_3: Call;
+
+		const getResultFromMethod = (method: Call): any => {
+			const { args, meta } = method;
+
+			const result = {} as any;
+			for (let i = 0; i < meta.args.length; i++) {
+				let value;
+				if (
+					args[i].toRawType() === 'Balance' ||
+					args[i].toRawType() === 'Compact<Balance>'
+				) {
+					value = formatBalance(args[i].toString(), true, 12);
+				} else {
+					value = args[i].toString();
+				}
+				result[meta.args[i].name.toString()] = value;
+			}
+			return result;
+		};
 
 		beforeAll(() => {
 			formatBalance.setDefaults({
@@ -66,22 +85,7 @@ describe('units', () => {
 		});
 
 		it('should format KSM', () => {
-			const { args, meta } = method_1;
-
-			const result = {};
-			for (let i = 0; i < meta.args.length; i++) {
-				let value;
-				if (
-					args[i].toRawType() === 'Balance' ||
-					args[i].toRawType() === 'Compact<Balance>'
-				) {
-					value = formatBalance(args[i].toString());
-				} else {
-					value = args[i].toString();
-				}
-				result[meta.args[i].name.toString()] = value;
-			}
-
+			const result = getResultFromMethod(method_1);
 			expect(result.dest).toBe(
 				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
 			);
@@ -89,21 +93,7 @@ describe('units', () => {
 		});
 
 		it('should format decimals for less than one KSM', () => {
-			const { args, meta } = method_2;
-
-			const result = {};
-			for (let i = 0; i < meta.args.length; i++) {
-				let value;
-				if (
-					args[i].toRawType() === 'Balance' ||
-					args[i].toRawType() === 'Compact<Balance>'
-				) {
-					value = formatBalance(args[i].toString(), true, 12);
-				} else {
-					value = args[i].toString();
-				}
-				result[meta.args[i].name.toString()] = value;
-			}
+			const result = getResultFromMethod(method_2);
 
 			expect(result.dest).toBe(
 				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
@@ -112,21 +102,7 @@ describe('units', () => {
 		});
 
 		it('should format absurdly large KSM', () => {
-			const { args, meta } = method_3;
-
-			const result = {};
-			for (let i = 0; i < meta.args.length; i++) {
-				let value;
-				if (
-					args[i].toRawType() === 'Balance' ||
-					args[i].toRawType() === 'Compact<Balance>'
-				) {
-					value = formatBalance(args[i].toString(), true, 12);
-				} else {
-					value = args[i].toString();
-				}
-				result[meta.args[i].name.toString()] = value;
-			}
+			const result = getResultFromMethod(method_3);
 
 			expect(result.dest).toBe(
 				'5GzJiY3oG9LcyDiJbEJ6UF8jDF1AGeE2MgeXgSwgGCPopWsb'
