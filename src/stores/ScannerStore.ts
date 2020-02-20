@@ -151,7 +151,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			multipartComplete
 		);
 
-
 		if (isMultipartData(parsedData)) {
 			this.setPartData(
 				parsedData.currentFrame,
