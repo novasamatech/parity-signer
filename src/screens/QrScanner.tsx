@@ -81,7 +81,6 @@ export default class Scanner extends React.PureComponent<
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
 								}
-								console.log('txRequestData is', txRequestData);
 								try {
 									if (isAddressString(txRequestData.data)) {
 										return this.showErrorMessage(
@@ -100,7 +99,6 @@ export default class Scanner extends React.PureComponent<
 												text.PARSE_ERROR_TITLE,
 												'There is no raw Data from the request'
 											);
-										console.log('strippedData is', strippedData);
 										await scannerStore.setParsedData(
 											strippedData,
 											accountsStore,

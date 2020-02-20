@@ -86,7 +86,6 @@ export default class TxDetails extends React.PureComponent<
 					const sender = scannerStore.getSender()!;
 					if (txRequest) {
 						const tx = scannerStore.getTx();
-						console.log('tx is ', tx);
 						return (
 							<TxDetailsView
 								{...{ ...this.props, ...(tx as Transaction) }}

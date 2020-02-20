@@ -67,8 +67,6 @@ export async function loadIdentities(version = 4): Promise<Identity[]> {
 
 	const identityStorageLabel = `identities_v${version}`;
 	try {
-		// TODO to be deleted before merging, used for clean the keychain.
-		// await SecureStorage.deleteItem(identityStorageLabel, identitiesStore);
 		const identities = await SecureStorage.getItem(
 			identityStorageLabel,
 			identitiesStore

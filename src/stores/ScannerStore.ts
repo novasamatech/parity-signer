@@ -131,7 +131,6 @@ export default class ScannerStore extends Container<ScannerState> {
 	state: ScannerState = DEFAULT_STATE;
 
 	async setUnsigned(data: string): Promise<void> {
-		console.log('parsed unsignedData is', JSON.parse(data));
 		this.setState({
 			unsignedData: JSON.parse(data)
 		});
@@ -152,7 +151,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			multipartComplete
 		);
 
-		console.log('parsed data: ', parsedData);
 
 		if (isMultipartData(parsedData)) {
 			this.setPartData(
