@@ -48,8 +48,8 @@ export function withScannerStore<T extends ScannerInjectedProps>(
 ): React.ComponentType<Omit<T, keyof AccountInjectedProps>> {
 	return (props): React.ReactElement => (
 		<Subscribe to={[ScannerStore]}>
-			{(scanner: ScannerStore): React.ReactElement => (
-				<WrappedComponent {...props} scanner={scanner} />
+			{(scannerStore): React.ReactElement => (
+				<WrappedComponent {...props} scannerStore={scannerStore} />
 			)}
 		</Subscribe>
 	);
@@ -62,8 +62,12 @@ export function withAccountAndScannerStore<
 ): React.ComponentType<Omit<T, keyof AccountAndScannerInjectedProps>> {
 	return (props): React.ReactElement => (
 		<Subscribe to={[ScannerStore, AccountsStore]}>
-			{(scanner: ScannerStore, accounts: AccountsStore): React.ReactElement => (
-				<WrappedComponent {...props} scanner={scanner} accounts={accounts} />
+			{(scannerStore, accounts: AccountsStore): React.ReactElement => (
+				<WrappedComponent
+					{...props}
+					scannerStore={scannerStore}
+					accounts={accounts}
+				/>
 			)}
 		</Subscribe>
 	);
