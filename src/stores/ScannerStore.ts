@@ -323,23 +323,17 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	async setData(accountsStore: AccountsStore): Promise<boolean | void> {
 		const { unsignedData } = this.state;
-		const throwError = (): never => {
-			throw new Error(
-				'Scanned QR should contain either transaction or a message to sign'
-			);
-		};
 		if (!isMultipartData(unsignedData) && unsignedData !== null) {
 			switch (unsignedData.action) {
 				case 'signTransaction':
 					return await this.setTXRequest(unsignedData, accountsStore);
 				case 'signData':
-					await this.setDataToSign(unsignedData, accountsStore);
-					return;
-				default:
-					throwError();
+					return await this.setDataToSign(unsignedData, accountsStore);
 			}
 		} else {
-			throwError();
+			throw new Error(
+				'Scanned QR should contain either transaction or a message to sign'
+			);
 		}
 	}
 
