@@ -329,6 +329,8 @@ export default class ScannerStore extends Container<ScannerState> {
 					return await this.setTXRequest(unsignedData, accountsStore);
 				case 'signData':
 					return await this.setDataToSign(unsignedData, accountsStore);
+				default:
+					return;
 			}
 		} else {
 			throw new Error(
