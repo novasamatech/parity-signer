@@ -19,25 +19,25 @@ const { defaults: tsjPreset } = require('ts-jest/presets');
 
 module.exports = {
 	...tsjPreset,
+	cacheDirectory: '.jest/cache',
+	globals: {
+		'ts-jest': {
+			babelConfig: true
+		}
+	},
 	moduleNameMapper: {
 		'^constants/(.*)$': '<rootDir>/src/constants/$1',
 		'^styles/(.*)$': '<rootDir>/src/styles/$1',
 		'^utils/(.*)$': '<rootDir>/src/utils/$1'
 	},
-	transform: {
-		...tsjPreset.transform,
-		'\\.js$': '<rootDir>/node_modules/react-native/jest/preprocessor.js',
-	},
-	globals: {
-		'ts-jest': {
-			babelConfig: true,
-		}
-	},
-	cacheDirectory: '.jest/cache',
 	preset: 'react-native',
 	roots: ['<rootDir>/specs'],
 	setupFiles: ['<rootDir>/jest-setup.js'],
 	testEnvironment: 'node',
 	testPathIgnorePatterns: ['/node_modules/'],
+	transform: {
+		...tsjPreset.transform,
+		'\\.js$': '<rootDir>/node_modules/react-native/jest/preprocessor.js'
+	},
 	verbose: true
 };

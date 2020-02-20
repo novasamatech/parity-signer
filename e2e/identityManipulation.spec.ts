@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { by, device, element } from 'detox';
+
 import testIDs from './testIDs';
 import {
 	tapBack,
@@ -52,7 +54,7 @@ const defaultPath = '//default',
 const mockSeedPhrase =
 	'split cradle example drum veteran swear cruel pizza guilt surface mansion film grant benefit educate marble cargo ignore bind include advance grunt exile grow';
 
-const testSetUpDefaultPath = async () => {
+const testSetUpDefaultPath = async (): Promise<void> => {
 	await testInput(IdentityPin.setPin, pinCode);
 	await testInputWithDone(IdentityPin.confirmPin, pinCode);
 	await testVisible(AccountNetworkChooser.chooserScreen);

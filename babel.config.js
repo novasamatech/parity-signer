@@ -21,13 +21,19 @@ module.exports = {
 			'module-resolver',
 			{
 				alias: {
-					types: './src/types'
+					components: './src/components',
+					constants: './src/constants',
+					e2e: './e2e',
+					res: './res',
+					screens: './src/screens',
+					stores: './src/stores',
+					styles: './src/styles',
+					types: './src/types',
+					utils: './src/utils'
 				},
 				root: ['.']
 			}
 		]
 	],
-	presets: [
-		'module:metro-react-native-babel-preset',
-	]
+	presets: ['module:metro-react-native-babel-preset']
 };

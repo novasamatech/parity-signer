@@ -14,34 +14,43 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { expect, element, by } from 'detox';
+
 import testIDs from './testIDs';
 const { IdentityPin } = testIDs;
 
-export const testTap = async buttonId => await element(by.id(buttonId)).tap();
+export const testTap = async (buttonId: string): Promise<Detox.Actions<any>> =>
+	await element(by.id(buttonId)).tap();
 
-export const testVisible = async componentId =>
+export const testVisible = async (componentId: string): Promise<void> =>
 	await expect(element(by.id(componentId))).toBeVisible();
 
-export const testExist = async componentId =>
+export const testExist = async (componentId: string): Promise<void> =>
 	await expect(element(by.id(componentId))).toExist();
 
-export const testNotExist = async componentId =>
+export const testNotExist = async (componentId: string): Promise<void> =>
 	await expect(element(by.id(componentId))).toNotExist();
 
-export const testNotVisible = async componentId =>
+export const testNotVisible = async (componentId: string): Promise<void> =>
 	await expect(element(by.id(componentId))).toBeNotVisible();
 
-export const tapBack = async () =>
+export const tapBack = async (): Promise<Detox.Actions<any>> =>
 	await element(by.id(testIDs.Header.headerBackButton))
 		.atIndex(0)
 		.tap();
 
-export const testInput = async (inputId, inputText) => {
+export const testInput = async (
+	inputId: string,
+	inputText: string
+): Promise<void> => {
 	await element(by.id(inputId)).typeText(inputText);
 	await element(by.id(inputId)).tapReturnKey();
 };
 
-export const testInputWithDone = async (inputId, inputText) => {
+export const testInputWithDone = async (
+	inputId: string,
+	inputText: string
+): Promise<void> => {
 	await element(by.id(inputId)).typeText(inputText);
 	if (device.getPlatform() === 'ios') {
 		await element(by.label('Done'))
@@ -52,7 +61,10 @@ export const testInputWithDone = async (inputId, inputText) => {
 	}
 };
 
-export const testScrollAndTap = async (buttonId, screenId) => {
+export const testScrollAndTap = async (
+	buttonId: string,
+	screenId: string
+): Promise<void> => {
 	await waitFor(element(by.id(buttonId)))
 		.toBeVisible()
 		.whileElement(by.id(screenId))
@@ -60,6 +72,6 @@ export const testScrollAndTap = async (buttonId, screenId) => {
 	await testTap(buttonId);
 };
 
-export const testUnlockPin = async pinCode => {
+export const testUnlockPin = async (pinCode: string): Promise<void> => {
 	await testInputWithDone(IdentityPin.unlockPinInput, pinCode);
 };

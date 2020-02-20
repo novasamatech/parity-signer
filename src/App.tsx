@@ -139,8 +139,6 @@ const globalStackNavigationOptions = ({
 			borderBottomWidth: 0,
 			elevation: 0,
 			height: 60,
-			paddingBottom: 0,
-			paddingTop: 0,
 			shadowColor: 'transparent'
 		},
 		headerTintColor: colors.bg_text_sec,

@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-const detox = require('detox');
-const adapter = require('detox/runners/jest/adapter');
-const specReporter = require('detox/runners/jest/specReporter');
+import { init, cleanup } from 'detox';
+import adapter from 'detox/runners/jest/adapter';
+import specReporter from 'detox/runners/jest/specReporter';
 
-const config = require('../package.json').detox;
+import { detox as config } from '../package.json';
 
 // Set the default timeout
 jest.setTimeout(120000);
@@ -29,7 +29,7 @@ jasmine.getEnv().addReporter(adapter);
 jasmine.getEnv().addReporter(specReporter);
 
 beforeAll(async () => {
-	await detox.init(config, { launchApp: false });
+	await init(config, { launchApp: false });
 });
 
 beforeEach(async () => {
@@ -38,5 +38,5 @@ beforeEach(async () => {
 
 afterAll(async () => {
 	await adapter.afterAll();
-	await detox.cleanup();
+	await cleanup();
 });

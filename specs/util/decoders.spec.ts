@@ -24,6 +24,7 @@ import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 import Call from '@polkadot/types/primitive/Generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
+import 'jest';
 
 import {
 	SUBSTRATE_NETWORK_LIST,
