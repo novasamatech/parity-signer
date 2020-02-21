@@ -27,9 +27,8 @@ import {
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
 	NetworkProtocols
-} from '../constants/networkSpecs';
-import testIDs from '../../e2e/testIDs';
-
+} from 'constants/networkSpecs';
+import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import Button from 'components/Button';
 import {
@@ -50,7 +49,8 @@ import { NetworkCard } from 'components/AccountCard';
 import {
 	NetworkParams,
 	SubstrateNetworkParams,
-	isSubstrateNetworkParams
+	isSubstrateNetworkParams,
+	EthereumNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 
@@ -258,10 +258,14 @@ function AccountNetworkChooser({
 		<View style={styles.body}>
 			{renderScreenHeading()}
 			<ScrollView testID={testIDs.AccountNetworkChooser.chooserScreen}>
-				{networkList.map(([networkKey, networkParams], index) => (
+				{networkList.map(([networkKey, networkParams]) => (
 					<NetworkCard
 						key={networkKey}
-						testID={testIDs.AccountNetworkChooser.networkButton + index}
+						testID={
+							testIDs.AccountNetworkChooser.networkButton +
+								(networkParams as SubstrateNetworkParams).pathId ||
+							(networkParams as EthereumNetworkParams).ethereumChainId
+						}
 						networkKey={networkKey}
 						onPress={(): Promise<void> =>
 							onNetworkChosen(networkKey, networkParams)

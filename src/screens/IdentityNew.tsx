@@ -18,8 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import testIDs from '../../e2e/testIDs';
-
+import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';

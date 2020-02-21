@@ -18,8 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import testIDs from '../../e2e/testIDs';
-
+import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';

@@ -17,8 +17,7 @@ import React, { useState } from 'react';
 import { StyleSheet, TextInputProps } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import testIDs from '../../e2e/testIDs';
-
+import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import Background from 'components/Background';
 import ButtonMainAction from 'components/ButtonMainAction';

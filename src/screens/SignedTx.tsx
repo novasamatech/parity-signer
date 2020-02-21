@@ -17,9 +17,8 @@
 import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { NETWORK_LIST } from '../constants/networkSpecs';
-import testIDs from '../../e2e/testIDs';
-
+import { NETWORK_LIST } from 'constants/networkSpecs';
+import testIDs from 'e2e/testIDs';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
 import colors from 'styles/colors';

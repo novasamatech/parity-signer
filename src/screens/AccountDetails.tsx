@@ -17,8 +17,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
-
+import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import AccountCard from 'components/AccountCard';

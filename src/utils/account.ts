@@ -18,8 +18,7 @@ import {
 	NetworkProtocols,
 	NETWORK_LIST,
 	SubstrateNetworkKeys
-} from '../constants/networkSpecs';
-
+} from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
 import {
 	EthereumNetworkParams,

@@ -20,8 +20,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 
-import { NETWORK_LIST } from '../constants/networkSpecs';
-
+import { NETWORK_LIST } from 'constants/networkSpecs';
 import { FoundAccount } from 'types/identityTypes';
 import {
 	isEthereumNetworkParams,

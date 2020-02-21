@@ -25,8 +25,7 @@ import {
 } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import { NetworkProtocols, NETWORK_LIST } from '../constants/networkSpecs';
-
+import { NetworkProtocols, NETWORK_LIST } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';

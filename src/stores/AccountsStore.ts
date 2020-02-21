@@ -21,8 +21,7 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
-} from '../constants/networkSpecs';
-
+} from 'constants/networkSpecs';
 import { emptyAccount, generateAccountId } from 'utils/account';
 import {
 	loadAccounts,

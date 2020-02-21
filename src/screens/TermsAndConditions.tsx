@@ -19,8 +19,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import toc from '../../docs/terms-and-conditions.md';
-import testIDs from '../../e2e/testIDs';
 
+import testIDs from 'e2e/testIDs';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';

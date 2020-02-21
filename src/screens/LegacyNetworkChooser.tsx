@@ -22,8 +22,7 @@ import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
-} from '../constants/networkSpecs';
-
+} from 'constants/networkSpecs';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps, NavigationProps } from 'types/props';
 import colors from 'styles/colors';

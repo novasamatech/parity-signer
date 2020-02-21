@@ -19,8 +19,7 @@ import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
 
-import { createMockSignRequest } from '../../e2e/mock';
-
+import { createMockSignRequest } from 'e2e/mock';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';

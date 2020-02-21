@@ -18,12 +18,11 @@ import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation, ScrollView, NavigationParams } from 'react-navigation';
 
-import testIDs from '../../e2e/testIDs';
-
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
+import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { withAccountStore } from 'utils/HOC';

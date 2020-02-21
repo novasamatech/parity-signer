@@ -18,8 +18,7 @@ import React, { useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import { NETWORK_LIST, NetworkProtocols } from '../constants/networkSpecs';
-
+import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';

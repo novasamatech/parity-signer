@@ -19,10 +19,9 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { NavigationInjectedProps, withNavigation } from 'react-navigation';
 
-import testIDs from '../../e2e/testIDs';
-
 import ButtonIcon from './ButtonIcon';
 
+import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import IdentitiesSwitch from 'components/IdentitiesSwitch';
 import { navigateToQrScanner } from 'utils/navigationHelpers';

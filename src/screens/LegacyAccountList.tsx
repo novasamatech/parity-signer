@@ -18,8 +18,7 @@ import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
-import testIDs from '../../e2e/testIDs';
-
+import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 import colors from 'styles/colors';

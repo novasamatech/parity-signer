@@ -29,13 +29,12 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import TransparentBackground from './TransparentBackground';
+
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
-} from '../constants/networkSpecs';
-
-import TransparentBackground from './TransparentBackground';
-
+} from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';

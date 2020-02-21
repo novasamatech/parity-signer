@@ -1,4 +1,4 @@
-import { NetworkProtocols } from '../constants/networkSpecs';
+import { NetworkProtocols } from 'constants/networkSpecs';
 
 export type NetworkProtocol = 'ethereum' | 'substrate' | 'unknown';
 

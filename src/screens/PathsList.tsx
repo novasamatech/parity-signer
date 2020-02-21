@@ -18,15 +18,14 @@ import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 
+import { PathDetailsView } from './PathDetails';
+
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
 	UnknownNetworkKeys
-} from '../constants/networkSpecs';
-import testIDs from '../../e2e/testIDs';
-
-import { PathDetailsView } from './PathDetails';
-
+} from 'constants/networkSpecs';
+import testIDs from 'e2e/testIDs';
 import { PathGroup } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';

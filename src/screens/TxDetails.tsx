@@ -19,9 +19,8 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 
-import { NETWORK_LIST } from '../constants/networkSpecs';
-import testIDs from '../../e2e/testIDs';
-
+import { NETWORK_LIST } from 'constants/networkSpecs';
+import testIDs from 'e2e/testIDs';
 import { FoundAccount } from 'types/identityTypes';
 import {
 	isEthereumNetworkParams,

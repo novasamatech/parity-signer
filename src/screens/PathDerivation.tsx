@@ -18,12 +18,8 @@ import React, { useRef, useState, useMemo } from 'react';
 import { withNavigation } from 'react-navigation';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
-import testIDs from '../../e2e/testIDs';
-import {
-	defaultNetworkKey,
-	UnknownNetworkKeys
-} from '../constants/networkSpecs';
-
+import testIDs from 'e2e/testIDs';
+import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';

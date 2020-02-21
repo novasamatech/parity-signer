@@ -18,18 +18,17 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 
-import {
-	defaultNetworkKey,
-	NETWORK_LIST,
-	NetworkProtocols,
-	UnknownNetworkKeys
-} from '../constants/networkSpecs';
-
 import AccountIcon from './AccountIcon';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 
+import {
+	defaultNetworkKey,
+	NETWORK_LIST,
+	NetworkProtocols,
+	UnknownNetworkKeys
+} from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import Separator from 'components/Separator';

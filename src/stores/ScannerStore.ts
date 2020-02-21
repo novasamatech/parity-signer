@@ -25,14 +25,13 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
+import AccountsStore from './AccountsStore';
+
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
-} from '../constants/networkSpecs';
-
-import AccountsStore from './AccountsStore';
-
+} from 'constants/networkSpecs';
 import { isAscii } from 'utils/strings';
 import {
 	brainWalletSign,

@@ -14,17 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	NETWORK_LIST,
-	SUBSTRATE_NETWORK_LIST,
-	UnknownNetworkKeys
-} from '../constants/networkSpecs';
-
 import { pathsRegex } from './regex';
 import { decryptData } from './native';
 import { parseSURI } from './suri';
 import { generateAccountId } from './account';
 
+import {
+	NETWORK_LIST,
+	SUBSTRATE_NETWORK_LIST,
+	UnknownNetworkKeys
+} from 'constants/networkSpecs';
 import {
 	Account,
 	FoundAccount,

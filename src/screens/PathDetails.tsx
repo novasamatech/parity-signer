@@ -18,12 +18,8 @@ import React from 'react';
 import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import {
-	defaultNetworkKey,
-	UnknownNetworkKeys
-} from '../constants/networkSpecs';
-import testIDs from '../../e2e/testIDs';
-
+import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
+import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import PathCard from 'components/PathCard';
