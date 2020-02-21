@@ -96,7 +96,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const accountKey = generateAccountId(account);
 		await this.save(accountKey, account, pin);
 
-		this.setState({
+		await this.setState({
 			accounts: this.state.accounts.set(accountKey, account),
 			newAccount: emptyAccount()
 		});
@@ -152,7 +152,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const identities = await loadIdentities();
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
-		this.setState({ accounts, currentIdentity, identities, loaded: true });
+		await this.setState({
+			accounts,
+			currentIdentity,
+			identities,
+			loaded: true
+		});
 	}
 
 	async save(
@@ -178,7 +183,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const { accounts } = this.state;
 
 		accounts.delete(accountKey);
-		this.setState({ accounts, selectedKey: '' });
+		await this.setState({ accounts, selectedKey: '' });
 		await deleteDbAccount(accountKey);
 	}
 
@@ -193,7 +198,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		try {
 			const decryptedSeed = await decryptData(account.encryptedSeed, pin);
 			const { phrase, derivePath, password } = parseSURI(decryptedSeed);
-			this.setState({
+			await this.setState({
 				accounts: this.state.accounts.set(accountKey, {
 					derivationPassword: password || '',
 					derivationPath: derivePath || '',
@@ -414,7 +419,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		// current encryption with only seedPhrase is compatible.
 		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
-		this.setState({
+		await this.setState({
 			currentIdentity: updatedIdentity,
 			identities: newIdentities,
 			newIdentity: emptyIdentity()
@@ -453,7 +458,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 				identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
 		);
 		newIdentities.splice(identityIndex, 1, this.state.currentIdentity);
-		this.setState({ identities: newIdentities });
+		await this.setState({ identities: newIdentities });
 		await saveIdentities(newIdentities);
 	}
 
@@ -535,7 +540,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 					identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
 			);
 			newIdentities.splice(identityIndex, 1);
-			this.setState({
+			await this.setState({
 				currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
 				identities: newIdentities
 			});

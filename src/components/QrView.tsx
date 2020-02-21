@@ -64,7 +64,9 @@ export default function QrView(props: Props): React.ReactElement {
 				props.style
 			]}
 		>
-			<Image source={{ uri: qr }} style={{ height: size, width: size }} />
+			{qr !== '' && (
+				<Image source={{ uri: qr }} style={{ height: size, width: size }} />
+			)}
 		</View>
 	);
 }
