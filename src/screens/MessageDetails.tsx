@@ -168,7 +168,7 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 					data={dataToSign}
 				/>
 				<Button
-					buttonStyles={{ height: 60 }}
+					buttonStyles={styles.signButton}
 					title="Sign Message"
 					onPress={(): void => {
 						isHash ? alertMultipart(onNext) : onNext();
@@ -207,7 +207,10 @@ const styles = StyleSheet.create({
 	deleteText: {
 		textAlign: 'right'
 	},
-
+	signButton: {
+		height: 60,
+		paddingHorizontal: 0
+	},
 	title: {
 		...fontStyles.h2,
 		paddingBottom: 20
