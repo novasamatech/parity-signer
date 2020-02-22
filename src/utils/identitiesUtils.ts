@@ -140,8 +140,8 @@ export const getPathsWithSubstrateNetworkKey = (
 		);
 		return paths.filter(path => {
 			const pathId = extractPathId(path);
-			if (!pathId) return false;
-			return isSubstratePath(path) && !pathIdList.includes(pathId);
+			if (!isSubstratePath(path)) return false;
+			return !pathId || !pathIdList.includes(pathId);
 		});
 	}
 	return paths.filter(
