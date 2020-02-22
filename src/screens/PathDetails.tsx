@@ -106,7 +106,11 @@ export function PathDetailsView({
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
 						{ text: 'Edit', value: 'PathManagement' },
-						{ text: 'Derive Account', value: 'PathDerivation' },
+						{
+							hide: !isSubstratePath(path),
+							text: 'Derive Account',
+							value: 'PathDerivation'
+						},
 						{
 							testID: testIDs.PathDetail.deleteButton,
 							text: 'Delete',
