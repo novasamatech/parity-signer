@@ -16,6 +16,23 @@ module.exports = {
 					vm: 'vm-browserify'
 				}
 			}
+		],
+		[
+			'module-resolver',
+			{
+				alias: {
+					components: './src/components',
+					constants: './src/constants',
+					e2e: './e2e',
+					res: './res',
+					screens: './src/screens',
+					stores: './src/stores',
+					styles: './src/styles',
+					types: './src/types',
+					utils: './src/utils'
+				},
+				root: ['.']
+			}
 		]
 	],
 	presets: ['module:metro-react-native-babel-preset']

@@ -1,6 +1,12 @@
 yarn-error.log
 package-lock.json
 
+# typescript output directory
+dist/
+
+# jest cache
+.jest/cache
+
 # NDK
 NDK/
 rust/.cargo
