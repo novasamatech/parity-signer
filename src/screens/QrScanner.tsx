@@ -33,13 +33,10 @@ interface State {
 	enableScan: boolean;
 }
 
-type Props = NavigationProps<{isScanningNetworkSpec: boolean}>;
+type Props = NavigationProps<{ isScanningNetworkSpec: boolean }>;
 
-export default class Scanner extends React.PureComponent<
-	Props,
-	State
-	> {
-	constructor(props:Props) {
+export default class Scanner extends React.PureComponent<Props, State> {
+	constructor(props: Props) {
 		super(props);
 		this.state = { enableScan: true };
 	}
@@ -142,7 +139,8 @@ export default class Scanner extends React.PureComponent<
 	}
 }
 
-interface ViewProps extends NavigationScannerProps<{isScanningNetworkSpec: boolean}> {
+interface ViewProps
+	extends NavigationScannerProps<{ isScanningNetworkSpec: boolean }> {
 	onBarCodeRead: (listener: TxRequestData) => void;
 	completedFramesCount: number;
 	isMultipart: boolean;
@@ -151,10 +149,10 @@ interface ViewProps extends NavigationScannerProps<{isScanningNetworkSpec: boole
 }
 
 function QrScannerView({
-												 navigation,
-												 scannerStore,
-												 ...props
-											 }: ViewProps): React.ReactElement {
+	navigation,
+	scannerStore,
+	...props
+}: ViewProps): React.ReactElement {
 	if (global.inTest) {
 		props.onBarCodeRead(createMockSignRequest());
 	}

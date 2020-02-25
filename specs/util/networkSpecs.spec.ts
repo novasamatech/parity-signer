@@ -18,15 +18,18 @@
 
 'use strict';
 
-import {defaultNetworkSpecs, getCompleteSubstrateNetworkSpec} from 'utils/networkSpecsUtils';
+import {
+	defaultNetworkSpecs,
+	getCompleteSubstrateNetworkSpec
+} from 'utils/networkSpecsUtils';
 
 describe('network specs', () => {
 	it('should return a valid empty', () => {
 		const emptyNetworkSpec = getCompleteSubstrateNetworkSpec({
-			title: 'CustomTestNet',
-			unit: 'CTN',
 			genesisHash: 'aaaaaa',
-			pathId: '/test'
+			pathId: '/test',
+			title: 'CustomTestNet',
+			unit: 'CTN'
 		});
 
 		expect(emptyNetworkSpec).toBeDefined();

@@ -16,7 +16,7 @@
 
 // @flow
 
-import {Metadata, TypeRegistry} from '@polkadot/types';
+import { Metadata, TypeRegistry } from '@polkadot/types';
 import { Container } from 'unstated';
 
 import { getMetadataByKey } from 'utils/db';
@@ -35,7 +35,8 @@ const DEFAULT_STATE = Object.freeze({
 	selected: null
 });
 
-export const getMetadata = (metadata: string): Metadata => new Metadata(registry, metadata);
+export const getMetadata = (metadata: string): Metadata =>
+	new Metadata(registry, metadata);
 
 export default class MetadataStore extends Container<State> {
 	state: State = DEFAULT_STATE;

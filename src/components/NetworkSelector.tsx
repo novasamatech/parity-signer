@@ -94,7 +94,10 @@ export function NetworkOptions({
 					onPress={(): void => onNetworkSelected(networkKey)}
 				>
 					<View style={styles.optionWrapper}>
-						<Image source={{uri: networkParams.logo}} style={styles.optionLogo} />
+						<Image
+							source={{ uri: networkParams.logo }}
+							style={styles.optionLogo}
+						/>
 						<Text style={styles.optionText}>{networkParams.title}</Text>
 					</View>
 				</Touchable>

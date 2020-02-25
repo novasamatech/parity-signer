@@ -23,7 +23,10 @@ import {
 	SubstrateNetworkBasics
 } from 'types/networkSpecsTypes';
 import { getNetworkSpecs, saveNetworkSpecs } from 'utils/db';
-import { getCompleteSubstrateNetworkSpec, checkNewNetworkSpec } from 'utils/networkSpecsUtils';
+import {
+	getCompleteSubstrateNetworkSpec,
+	checkNewNetworkSpec
+} from 'utils/networkSpecsUtils';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 

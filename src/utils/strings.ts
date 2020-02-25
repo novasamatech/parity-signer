@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Metadata } from '@polkadot/types';
 import { u8aToHex } from '@polkadot/util';
 import atob from 'atob';
-import {getMetadata} from 'stores/MetadataStore';
+
+import { getMetadata } from 'stores/MetadataStore';
 
 // bytes of base64 hex, convert it to hex then pass it in to Metadata constructor
 export function checkIfPayloadIsMetadata(payloadU8a: Uint8Array): boolean {

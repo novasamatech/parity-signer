@@ -28,7 +28,9 @@ import {
 	SubstrateNetworkParams
 } from 'types/networkSpecsTypes';
 
-export const checkNewNetworkSpec = (newNetworkSpec: SubstrateNetworkBasics): void => {
+export const checkNewNetworkSpec = (
+	newNetworkSpec: SubstrateNetworkBasics
+): void => {
 	//TODO give feedback to UI, check unique of pathId
 	if (
 		!newNetworkSpec.genesisHash ||

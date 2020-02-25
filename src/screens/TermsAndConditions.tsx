@@ -36,7 +36,7 @@ interface State {
 }
 
 export default class TermsAndConditions extends React.PureComponent<
-	NavigationProps<{ disableButtons?: boolean}>,
+	NavigationProps<{ disableButtons?: boolean }>,
 	State
 > {
 	state: State = {

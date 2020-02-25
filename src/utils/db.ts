@@ -223,15 +223,13 @@ export async function saveDefaultMetadata(): Promise<void> {
 	);
 }
 
-export async function getMetadataByKey(
-	networkKey: string
-): Promise<string> {
+export async function getMetadataByKey(networkKey: string): Promise<string> {
 	try {
 		const metadata = await AsyncStorage.getItem(networkKey);
-		if(metadata === null)
+		if (metadata === null)
 			throw new Error('Can not find the metaData with networkKey');
 		return metadata;
-	} catch(e) {
+	} catch (e) {
 		throw new Error(e);
 	}
 }

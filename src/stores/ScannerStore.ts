@@ -148,7 +148,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	): Promise<void> {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
-			multipartComplete,
+			multipartComplete
 		);
 
 		if (isMultipartData(parsedData)) {
