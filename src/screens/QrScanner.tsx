@@ -33,11 +33,13 @@ interface State {
 	enableScan: boolean;
 }
 
+type Props = NavigationProps<{isScanningNetworkSpec: boolean}>;
+
 export default class Scanner extends React.PureComponent<
-	NavigationProps<{}>,
+	Props,
 	State
-> {
-	constructor(props: NavigationProps<{}>) {
+	> {
+	constructor(props:Props) {
 		super(props);
 		this.state = { enableScan: true };
 	}
@@ -105,6 +107,7 @@ export default class Scanner extends React.PureComponent<
 										await scannerStore.setParsedData(
 											strippedData,
 											accountsStore,
+											false,
 											isNetworkSpec
 										);
 									}
@@ -139,7 +142,7 @@ export default class Scanner extends React.PureComponent<
 	}
 }
 
-interface ViewProps extends NavigationScannerProps<{}> {
+interface ViewProps extends NavigationScannerProps<{isScanningNetworkSpec: boolean}> {
 	onBarCodeRead: (listener: TxRequestData) => void;
 	completedFramesCount: number;
 	isMultipart: boolean;
@@ -148,10 +151,10 @@ interface ViewProps extends NavigationScannerProps<{}> {
 }
 
 function QrScannerView({
-	navigation,
-	scannerStore,
-	...props
-}: ViewProps): React.ReactElement {
+												 navigation,
+												 scannerStore,
+												 ...props
+											 }: ViewProps): React.ReactElement {
 	if (global.inTest) {
 		props.onBarCodeRead(createMockSignRequest());
 	}
@@ -175,7 +178,7 @@ function QrScannerView({
 	const missedFrames = scannerStore.getMissedFrames();
 	const missedFramesMessage = missedFrames && missedFrames.join(', ');
 
-	const renderScanningNetworkSpecMessage = () => {
+	const renderScanningNetworkSpecMessage = (): React.ReactElement => {
 		return (
 			<View style={styles.bottom}>
 				<Text style={styles.descTitle}>Scan QR Code</Text>
@@ -184,7 +187,7 @@ function QrScannerView({
 		);
 	};
 
-	const renderScanningTransactionMessage = () => {
+	const renderScanningTransactionMessage = (): React.ReactElement => {
 		return (
 			<View style={styles.bottom}>
 				<Text style={styles.descTitle}>Scan QR Code</Text>

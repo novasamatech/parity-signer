@@ -16,15 +16,18 @@
 
 // @flow
 
-import { Metadata } from '@polkadot/types';
+import {Metadata, TypeRegistry} from '@polkadot/types';
 import { Container } from 'unstated';
 
-import { getMetadataByKey } from '../util/db';
-import { base64ToHex } from '../util/strings';
+import { getMetadataByKey } from 'utils/db';
+import { base64ToHex } from 'utils/strings';
+const registry = new TypeRegistry();
+
+//TODO move all metadata related function here with central registry;
 
 type State = {
-	new: typeof Metadata,
-	selected: typeof Metadata
+	new: Metadata | null;
+	selected: Metadata | null;
 };
 
 const DEFAULT_STATE = Object.freeze({
@@ -32,8 +35,10 @@ const DEFAULT_STATE = Object.freeze({
 	selected: null
 });
 
+export const getMetadata = (metadata: string): Metadata => new Metadata(registry, metadata);
+
 export default class MetadataStore extends Container<State> {
-	state = DEFAULT_STATE;
+	state: State = DEFAULT_STATE;
 
 	// async saveNew(blob, networkKey) {
 	// 	try {
@@ -44,12 +49,10 @@ export default class MetadataStore extends Container<State> {
 	// 	}
 	// }
 
-	async getMetaByKey(networkKey) {
+	async getMetaByKey(networkKey: string): Promise<Metadata> {
 		try {
 			const blob = await getMetadataByKey(networkKey);
-
-			const result = new Metadata(base64ToHex(blob));
-
+			const result = new Metadata(registry, base64ToHex(blob));
 			return result;
 		} catch (e) {
 			throw new Error(e);

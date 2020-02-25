@@ -53,7 +53,7 @@ export default function AccountIcon(props: {
 			<View style={style as ViewStyle}>
 				{(network as SubstrateNetworkParams).logo ? (
 					<Image
-						source={{uri: (network as SubstrateNetworkParams).logo}}
+						source={{ uri: (network as SubstrateNetworkParams).logo }}
 						style={styles.logo}
 					/>
 				) : (

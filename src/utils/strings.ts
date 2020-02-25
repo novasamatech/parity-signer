@@ -16,23 +16,21 @@
 
 import { Metadata } from '@polkadot/types';
 import { u8aToHex } from '@polkadot/util';
-
 import atob from 'atob';
+import {getMetadata} from 'stores/MetadataStore';
 
 // bytes of base64 hex, convert it to hex then pass it in to Metadata constructor
-export function checkIfPayloadIsMetadata(payloadU8a) {
+export function checkIfPayloadIsMetadata(payloadU8a: Uint8Array): boolean {
 	try {
 		const hex = u8aToHex(payloadU8a);
-		const meta = new Metadata(hex);
-		if (meta) {
-			return true;
-		}
+		const meta = getMetadata(hex);
+		return !!meta;
 	} catch (e) {
 		return false;
 	}
 }
 
-export function base64ToHex(base64) {
+export function base64ToHex(base64: string): string {
 	const raw = atob(base64);
 	let result = '';
 

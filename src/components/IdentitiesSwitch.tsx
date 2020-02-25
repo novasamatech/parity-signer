@@ -278,34 +278,34 @@ function IdentitiesSwitch({
 						style={styles.indentedButton}
 					/>
 
-							<Separator />
+					<Separator />
 
+					<ButtonIcon
+						title="Network Settings"
+						testID={testIDs.IdentitiesSwitch.networkSettingsButton}
+						onPress={(): void => closeModalAndNavigate('NetworkSettings')}
+						iconName="wifi"
+						iconType="antdesign"
+						iconSize={24}
+						textStyle={fontStyles.t_big}
+						style={styles.indentedButton}
+					/>
+
+					<Separator />
+					{__DEV__ && (
+						<View>
 							<ButtonIcon
-								title="Network Settings"
-								testID={testIDs.IdentitiesSwitch.networkSettingsButton}
-								onPress={(): void => closeModalAndNavigate('NetworkSettings')}
-								iconName="wifi"
+								title="Add legacy account"
+								onPress={(): void => closeModalAndNavigate('AccountNew')}
+								iconName="plus"
 								iconType="antdesign"
 								iconSize={24}
 								textStyle={fontStyles.t_big}
 								style={styles.indentedButton}
 							/>
-
 							<Separator />
-							{__DEV__ && (
-								<View>
-									<ButtonIcon
-										title="Add legacy account"
-										onPress={() => closeModalAndNavigate('AccountNew')}
-										iconName="plus"
-										iconType="antdesign"
-										iconSize={24}
-										textStyle={fontStyles.t_big}
-										style={styles.indentedButton}
-									/>
-									<Separator />
-								</View>
-							)}
+						</View>
+					)}
 
 					{renderSettings()}
 				</View>

@@ -1,0 +1,86 @@
+// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// This file is part of Parity.
+
+// Parity is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Parity is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Parity.  If not, see <http://www.gnu.org/licenses/>.
+
+// @flow
+
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys,
+	defaultNetworkKey,
+	NETWORK_LIST,
+	NetworkProtocols
+} from 'constants/networkSpecs';
+import {
+	SubstrateNetworkBasics,
+	SubstrateNetworkParams
+} from 'types/networkSpecsTypes';
+
+export const checkNewNetworkSpec = (newNetworkSpec: SubstrateNetworkBasics): void => {
+	//TODO give feedback to UI, check unique of pathId
+	if (
+		!newNetworkSpec.genesisHash ||
+		!newNetworkSpec.title ||
+		!newNetworkSpec.unit ||
+		!newNetworkSpec.pathId
+	) {
+		throw new Error('Network spec must include required field to be valid.');
+	}
+};
+
+function generateRandomColor(): string {
+	const letters = '0123456789ABCDEF';
+	let color = '#';
+	for (let i = 0; i < 6; i++) {
+		color += letters[Math.floor(Math.random() * 16)];
+	}
+	return color;
+}
+
+export function getCompleteSubstrateNetworkSpec(
+	newNetworkParams: SubstrateNetworkBasics
+): SubstrateNetworkParams {
+	const defaultNetworkSpec = NETWORK_LIST[
+		defaultNetworkKey
+	] as SubstrateNetworkParams;
+	const defaultNewNetworkSpecParams = {
+		color: generateRandomColor(),
+		decimals: defaultNetworkSpec.decimals,
+		logo: defaultNetworkSpec.logo,
+		prefix: defaultNetworkSpec.prefix,
+		protocol: NetworkProtocols.SUBSTRATE,
+		secondaryColor: generateRandomColor()
+	};
+	return { ...defaultNewNetworkSpecParams, ...newNetworkParams };
+}
+
+export function defaultNetworkSpecs(): SubstrateNetworkParams[] {
+	const excludedNetworks = [SubstrateNetworkKeys.KUSAMA_CC2];
+	if (!__DEV__) {
+		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+	}
+	return Object.entries(SUBSTRATE_NETWORK_LIST).reduce(
+		(
+			networkSpecsList: SubstrateNetworkParams[],
+			[networkKey, networkParams]: [string, SubstrateNetworkParams]
+		) => {
+			if (excludedNetworks.includes(networkKey)) return networkSpecsList;
+			networkSpecsList.push(networkParams);
+			return networkSpecsList;
+		},
+		[]
+	);
+}

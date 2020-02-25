@@ -16,36 +16,29 @@
 
 // @flow
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {
 	Platform,
 	StyleSheet,
 	Text,
 	TouchableNativeFeedback,
+	TouchableNativeFeedbackProps,
 	TouchableOpacity,
 	View,
-	ViewPropTypes
+	ViewStyle
 } from 'react-native';
-import colors from '../colors';
-import fonts from '../fonts';
+
+import colors from 'styles/colors';
+import fonts from 'styles/fonts';
 
 export default class NetworkCard extends React.PureComponent<{
-	title: string,
-	secondaryText?: ?string,
-	labelText?: ?string,
-	footerStyle?: ?StyleSheet.Styles,
-	onPress: () => any
+	title: string;
+	secondaryText?: string;
+	labelText?: string;
+	footerStyle?: ViewStyle;
+	onPress?: () => any;
 }> {
-	static propTypes = {
-		footerStyle: ViewPropTypes.style,
-		labelText: PropTypes.string,
-		onPress: PropTypes.func,
-		secondaryText: PropTypes.string,
-		title: PropTypes.string.isRequired
-	};
-
-	render() {
+	render(): React.ReactElement {
 		const {
 			title,
 			secondaryText,
@@ -61,7 +54,7 @@ export default class NetworkCard extends React.PureComponent<{
 		const finalSecondaryTextStyle = [styles.secondaryText];
 		const finalFooterTextStyle = [styles.footerText];
 
-		const Touchable =
+		const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 		return (
 			<Touchable

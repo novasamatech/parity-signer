@@ -18,71 +18,71 @@
 
 import { Container } from 'unstated';
 
-import { getNetworkSpecs, saveNetworkSpecs } from '../util/db';
-import { empty } from '../util/networkSpecsUtils';
+import {
+	SubstrateNetworkParams,
+	SubstrateNetworkBasics
+} from 'types/networkSpecsTypes';
+import { getNetworkSpecs, saveNetworkSpecs } from 'utils/db';
+import { getCompleteSubstrateNetworkSpec, checkNewNetworkSpec } from 'utils/networkSpecsUtils';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
 // we will need the generate function to be standardized to take an ss58 check address and isSixPoint boolean flag and returns a Circle https://github.com/polkadot-js/ui/blob/ff351a0f3160552f38e393b87fdf6e85051270de/packages/ui-shared/src/polkadotIcon.ts#L12.
 
-type NetworkSpec = {};
-
 type State = {
-	networkSpecs: Array<NetworkSpec>,
-	newNetworkSpec: NetworkSpec,
-	selectedKey: NetworkSpec
+	networkSpecs: Array<SubstrateNetworkParams>;
+	newNetworkSpec: SubstrateNetworkBasics | null;
+	selectedSpec: SubstrateNetworkParams | null;
 };
 
-const deepCopy = networkSpecs => JSON.parse(JSON.stringify(networkSpecs));
+const deepCopy = (
+	networkSpecs: Array<SubstrateNetworkParams>
+): Array<SubstrateNetworkParams> => JSON.parse(JSON.stringify(networkSpecs));
 
 export default class NetworksStore extends Container<State> {
-	state = {
+	state: State = {
 		networkSpecs: [],
-		newNetworkSpec: empty(),
+		newNetworkSpec: null,
 		selectedSpec: null
 	};
 
-	constructor(props) {
-		super(props);
+	constructor() {
+		super();
 		this.refreshList();
 	}
 
-	async refreshList() {
+	async refreshList(): Promise<void> {
 		const networkSpecs = await getNetworkSpecs();
 		await this.setState({ networkSpecs });
 	}
 
-	async select(networkKey) {
+	async select(networkKey: string): Promise<void> {
 		const selectedSpec = this.state.networkSpecs.find(
 			networkSpec => networkSpec.genesisHash === networkKey
 		);
 		await this.setState({ selectedSpec });
 	}
 
-	async submitNewNetworkSpec() {
+	async submitNewNetworkSpec(): Promise<void> {
 		const { networkSpecs, newNetworkSpec } = this.state;
+		if (newNetworkSpec === null)
+			throw new Error('NetworkKey is not initialized.');
 
-		//TODO give feedback to UI
-		if (!newNetworkSpec.genesisHash) {
-			throw new Error('Must supply a network key to add new network spec.');
-		}
-
-		if (!newNetworkSpec.prefix) {
-			throw new Error('Network spec must include prefix to be valid.');
-		}
+		checkNewNetworkSpec(newNetworkSpec);
 		const updatedNetworkSpecs = deepCopy(networkSpecs);
 		const networkIndex = updatedNetworkSpecs.findIndex(
 			networkSpec => networkSpec.genesisHash === newNetworkSpec.genesisHash
 		);
+		const completeNetworkSpec = getCompleteSubstrateNetworkSpec(newNetworkSpec);
 		if (networkIndex === -1) {
-			updatedNetworkSpecs.push(newNetworkSpec);
+			updatedNetworkSpecs.push(completeNetworkSpec);
 		} else {
-			updatedNetworkSpecs.splice(networkIndex, 1, newNetworkSpec);
+			updatedNetworkSpecs.splice(networkIndex, 1, completeNetworkSpec);
 		}
 
 		await this.setState({
 			networkSpecs: updatedNetworkSpecs,
-			newNetworkSpec: empty()
+			newNetworkSpec: null
 		});
 
 		try {
@@ -93,7 +93,7 @@ export default class NetworksStore extends Container<State> {
 		}
 	}
 
-	async deleteNetwork(networkKey) {
+	async deleteNetwork(networkKey: string): Promise<void> {
 		const { networkSpecs } = this.state;
 		const updatedNetworkSpecs = deepCopy(networkSpecs);
 		const networkIndex = updatedNetworkSpecs.findIndex(
@@ -114,19 +114,15 @@ export default class NetworksStore extends Container<State> {
 		}
 	}
 
-	getNew() {
+	getNew(): SubstrateNetworkBasics | null {
 		return this.state.newNetworkSpec;
 	}
 
-	getSelected() {
+	getSelected(): SubstrateNetworkBasics | null {
 		return this.state.selectedSpec;
 	}
 
-	getNetworkByKey() {
-		return this.state.selectedKey;
-	}
-
-	getNetworkSpecs() {
+	getNetworkSpecs(): SubstrateNetworkBasics[] {
 		return this.state.networkSpecs;
 	}
 }

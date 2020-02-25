@@ -148,8 +148,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	): Promise<void> {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
-			multipartComplete
-		isNetworkSpec = false
+			multipartComplete,
 		);
 
 		if (isMultipartData(parsedData)) {
@@ -237,8 +236,8 @@ export default class ScannerStore extends Container<ScannerState> {
 		// Network spec is expected to be a JSON.
 		if (!isNetworkSpec) {
 			if (
-				partDataAsBytes[0] === new Uint8Array([0x00]) ||
-				partDataAsBytes[0] === new Uint8Array([0x7b])
+				partDataAsBytes[0] === new Uint8Array([0x00])[0] ||
+				partDataAsBytes[0] === new Uint8Array([0x7b])[0]
 			) {
 				// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
 				throw new Error('Error decoding invalid part data.');

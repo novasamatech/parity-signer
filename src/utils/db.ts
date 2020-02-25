@@ -20,19 +20,71 @@ import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 import { defaultNetworkSpecs } from './networkSpecsUtils';
-import kusamaMeta from './static-kusama';
-import substrateMeta from './static-substrate';
-import { SubstrateNetworkKeys } from 'constants/networkSpeces';
+
+import { SubstrateNetworkParams } from 'types/networkSpecsTypes';
+import { SubstrateNetworkKeys } from 'constants/networkSpecs';
+import kusamaMeta from 'constants/static-kusama';
+import substrateMeta from 'constants/static-substrate';
 import { Account, Identity } from 'types/identityTypes';
 import { Tx, TxParticipant } from 'types/tx';
 
+/*
+ * ========================================
+ *	UTILS
+ * ========================================
+ */
+
+function txKey(hash: string): string {
+	return 'tx_' + hash;
+}
+
+function accountTxsKey({
+	address,
+	networkKey
+}: {
+	address: string;
+	networkKey: string;
+}): string {
+	return 'account_txs_' + generateAccountId({ address, networkKey });
+}
+
+async function storagePushValue(key: string, value: string): Promise<void> {
+	let currentVal = await AsyncStorage.getItem(key);
+
+	if (currentVal === null) {
+		return AsyncStorage.setItem(key, JSON.stringify([value]));
+	} else {
+		currentVal = JSON.parse(currentVal);
+		const newVal = new Set([...(currentVal as NonNullable<any>), value]);
+		return AsyncStorage.setItem(key, JSON.stringify(Array.from(newVal)));
+	}
+}
+
+export async function clearAsyncStorage(): Promise<void> {
+	await AsyncStorage.clear();
+}
+
+export async function saveTx(tx: Tx): Promise<void> {
+	if (!tx.sender) {
+		throw new Error('Tx should contain sender to save');
+	}
+
+	if (!tx.recipient) {
+		throw new Error('Tx should contain recipient to save');
+	}
+
+	await Promise.all([
+		storagePushValue(accountTxsKey(tx.sender), tx.hash),
+		storagePushValue(accountTxsKey(tx.recipient), tx.hash),
+		AsyncStorage.setItem(txKey(tx.hash), JSON.stringify(tx))
+	]);
+}
 
 /*
  * ========================================
  * LEGACY ACCOUNTS
  * ========================================
  */
-
 
 const currentAccountsStore = {
 	keychainService: 'accounts_v3',
@@ -56,7 +108,6 @@ export async function loadAccountTxs(
 		await AsyncStorage.multiGet(hashes.map(txKey))
 	).map((v: [string, any]) => [v[0], JSON.parse(v[1])]);
 }
-
 
 export async function loadAccounts(version = 3): Promise<Map<string, any>> {
 	if (!SecureStorage) {
@@ -155,9 +206,9 @@ export async function saveToCAndPPConfirmation(): Promise<void> {
  */
 
 /*
-* @dev map: networkKey => metadata blob
-*/
-export async function saveDefaultMetadata() {
+ * @dev map: networkKey => metadata blob
+ */
+export async function saveDefaultMetadata(): Promise<void> {
 	await AsyncStorage.setItem(
 		SubstrateNetworkKeys.KUSAMA,
 		JSON.stringify(kusamaMeta)
@@ -172,8 +223,17 @@ export async function saveDefaultMetadata() {
 	);
 }
 
-export async function getMetadataByKey(networkKey) {
-	return await AsyncStorage.getItem(networkKey);
+export async function getMetadataByKey(
+	networkKey: string
+): Promise<string> {
+	try {
+		const metadata = await AsyncStorage.getItem(networkKey);
+		if(metadata === null)
+			throw new Error('Can not find the metaData with networkKey');
+		return metadata;
+	} catch(e) {
+		throw new Error(e);
+	}
 }
 
 /*
@@ -187,82 +247,33 @@ const networkSpecsStorageLabel = 'network_specs_v4';
 /*
  * save the new network specs array
  */
-export function saveNetworkSpecs(networkSpecs) {
-	AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecs);
+export function saveNetworkSpecs(networkSpecs: SubstrateNetworkParams[]): void {
+	AsyncStorage.setItem(networkSpecsStorageLabel, JSON.stringify(networkSpecs));
 }
 
 /*
  * get all the network specs
  */
-export async function getNetworkSpecs() {
+export async function getNetworkSpecs(): Promise<SubstrateNetworkParams[]> {
 	let networkSpecs;
 	try {
-		networkSpecs = await AsyncStorage.getItem(networkSpecsStorageLabel);
+		const networkSpecsString = await AsyncStorage.getItem(
+			networkSpecsStorageLabel
+		);
+		networkSpecs = JSON.parse(networkSpecsString ?? '');
 	} catch (e) {
 		console.warn('loading network specifications error', e);
 	}
 	if (networkSpecs === null) return defaultNetworkSpecs();
 
-	return JSON.parse(networkSpecs);
+	return JSON.parse(networkSpecs ?? '');
 }
 
 /*
  * Called once during onboarding. Populate the local storage with the default network specs.
  */
-export async function saveDefaultNetworks() {
+export async function saveDefaultNetworks(): Promise<void> {
 	const networkSpecsString = JSON.stringify(defaultNetworkSpecs());
 	console.log('networkSpecs to be stored is', networkSpecsString); //TODO to be removed
 	// AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecsString);
-}
-
-/*
- * ========================================
- *	UTILS
- * ========================================
- */
-
-function txKey(hash: string): string {
-	return 'tx_' + hash;
-}
-
-function accountTxsKey({
-												 address,
-												 networkKey
-											 }: {
-	address: string;
-	networkKey: string;
-}): string {
-	return 'account_txs_' + generateAccountId({ address, networkKey });
-}
-
-async function storagePushValue(key: string, value: string): Promise<void> {
-	let currentVal = await AsyncStorage.getItem(key);
-
-	if (currentVal === null) {
-		return AsyncStorage.setItem(key, JSON.stringify([value]));
-	} else {
-		currentVal = JSON.parse(currentVal);
-		const newVal = new Set([...(currentVal as NonNullable<any>), value]);
-		return AsyncStorage.setItem(key, JSON.stringify(Array.from(newVal)));
-	}
-}
-
-export async function clearAsyncStorage() {
-	await AsyncStorage.clear();
-}
-
-export async function saveTx(tx: Tx): Promise<void> {
-	if (!tx.sender) {
-		throw new Error('Tx should contain sender to save');
-	}
-
-	if (!tx.recipient) {
-		throw new Error('Tx should contain recipient to save');
-	}
-
-	await Promise.all([
-		storagePushValue(accountTxsKey(tx.sender), tx.hash),
-		storagePushValue(accountTxsKey(tx.recipient), tx.hash),
-		AsyncStorage.setItem(txKey(tx.hash), JSON.stringify(tx))
-	]);
 }

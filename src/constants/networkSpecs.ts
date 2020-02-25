@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import logos from 'constants/logos';
 import colors from 'styles/colors';
 import {
 	EthereumNetworkParams,
@@ -22,9 +23,6 @@ import {
 	SubstrateNetworkParams,
 	UnknownNetworkParams
 } from 'types/networkSpecsTypes';
-
-import colors from './colors';
-import logos from './logos';
 
 export const NetworkProtocols: {
 	[key: string]: NetworkProtocol;

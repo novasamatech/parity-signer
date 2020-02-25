@@ -36,7 +36,7 @@ interface State {
 }
 
 export default class TermsAndConditions extends React.PureComponent<
-	NavigationProps<{ disableButtons?: boolean }>,
+	NavigationProps<{ disableButtons?: boolean}>,
 	State
 > {
 	state: State = {
@@ -50,10 +50,11 @@ export default class TermsAndConditions extends React.PureComponent<
 		const disableButtons = navigation.getParam('disableButtons', false);
 
 		const onConfirm = async (): Promise<void> => {
-			const firstScreenActions = navigation.getParam('firstScreenActions');
+			//TODO Test the first onPress Confirm
+			// const firstScreenActions = navigation.getParam('firstScreenActions');
 			await saveToCAndPPConfirmation();
 			await saveDefaultNetworks(); // save the default networks to AsyncStorage;
-			navigation.dispatch(firstScreenActions);
+			// navigation.dispatch(firstScreenActions);
 			await saveToCAndPPConfirmation();
 			// navigation.navigate('Welcome');
 		};

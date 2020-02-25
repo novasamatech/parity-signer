@@ -20,13 +20,13 @@ import React from 'react';
 import { Button, ScrollView, StyleSheet } from 'react-native';
 import { Subscribe } from 'unstated';
 
-import colors from '../colors';
-import Background from '../components/Background';
-import NetworkCard from '../components/NetworkCard';
-import fonts from '../fonts';
+import colors from 'styles/colors';
+import Background from 'components/Background';
+import NetworkCard from 'components/NetworkCard';
+import fonts from 'styles/fonts';
 // import MetadataDetails from '../screens/MetadataDetails';
-import NetworksStore from '../stores/NetworksStore';
-import ScreenHeading from '../components/ScreenHeading';
+import NetworksStore from 'stores/NetworksStore';
+import ScreenHeading from 'components/ScreenHeading';
 
 export default class NetworkSettings extends React.PureComponent {
 	handleSelect = async (networkKey, networksStore) => {
