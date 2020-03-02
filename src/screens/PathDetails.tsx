@@ -70,15 +70,19 @@ export function PathDetailsView({
 					const deleteSucceed = await accounts.deletePath(path);
 					const paths = Array.from(accounts.state.currentIdentity!.meta.keys());
 					const pathIndicatedNetworkKey = getNetworkKeyByPath(path);
-					const listedPaths = getPathsWithSubstrateNetworkKey(
-						paths,
-						pathIndicatedNetworkKey
-					);
-					const hasOtherPaths = listedPaths.length > 0;
 					if (deleteSucceed) {
-						isSubstratePath(path) && hasOtherPaths
-							? navigateToPathsList(navigation, pathIndicatedNetworkKey)
-							: navigation.navigate('AccountNetworkChooser');
+						if (isSubstratePath(path)) {
+							const listedPaths = getPathsWithSubstrateNetworkKey(
+								paths,
+								pathIndicatedNetworkKey
+							);
+							const hasOtherPaths = listedPaths.length > 0;
+							hasOtherPaths
+								? navigateToPathsList(navigation, pathIndicatedNetworkKey)
+								: navigation.navigate('AccountNetworkChooser');
+						} else {
+							navigation.navigate('AccountNetworkChooser');
+						}
 					} else {
 						alertPathDeletionError();
 					}

@@ -31,10 +31,10 @@ export const alertIdentityCreationError = (): void =>
 	alertErrorWithMessage("Can't create Identity from the seed", 'Try again');
 
 export const alertPathDerivationError = (): void =>
-	alertErrorWithMessage("Can't Derive Key pairs from the seed", 'Try again');
+	alertErrorWithMessage("Can't derive account from the seed", 'Try again');
 
 export const alertPathDeletionError = (): void =>
-	alertErrorWithMessage("Can't delete Key pairs.", 'Try again');
+	alertErrorWithMessage("Can't delete this account.", 'Try again');
 
 export const alertIdentityDeletionError = (): void =>
 	alertErrorWithMessage("Can't delete Identity.", 'Try again');
@@ -64,7 +64,7 @@ export const alertDeleteAccount = (
 	onDelete: () => any
 ): void => {
 	Alert.alert(
-		'Delete Key Pairs',
+		'Delete Account',
 		`Do you really want to delete ${accountName}?`,
 		buildAlertDeleteButtons(onDelete)
 	);
@@ -75,7 +75,7 @@ export const alertDeleteLegacyAccount = (
 	onDelete: () => any
 ): void => {
 	Alert.alert(
-		'Delete Key Pairs',
+		'Delete Account',
 		`Do you really want to delete ${accountName}?
 The account can only be recovered with its associated recovery phrase.`,
 		buildAlertDeleteButtons(onDelete)
