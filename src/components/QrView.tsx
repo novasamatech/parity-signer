@@ -30,12 +30,14 @@ interface Props {
 export default function QrView(props: Props): React.ReactElement {
 	const [qr, setQr] = useState('');
 
-	useEffect(() => {
+	useEffect((): (() => void) => {
+		let promiseDisabled = false;
 		async function displayQrCode(data: string): Promise<void> {
 			try {
 				const generatedQr = isHex(data)
 					? await qrCodeHex(data)
 					: await qrCode(data);
+				if (promiseDisabled) return;
 				setQr(generatedQr);
 			} catch (e) {
 				console.error(e);
@@ -43,6 +45,9 @@ export default function QrView(props: Props): React.ReactElement {
 		}
 
 		displayQrCode(props.data);
+		return (): void => {
+			promiseDisabled = true;
+		};
 	}, [props.data]);
 
 	const { width: deviceWidth } = Dimensions.get('window');

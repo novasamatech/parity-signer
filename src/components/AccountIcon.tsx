@@ -34,18 +34,20 @@ export default function AccountIcon(props: {
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 	const protocol = network.protocol;
 
-	useEffect((): void => {
-		const loadEthereumIcon = function(ethereumAddress: string): void {
-			blockiesIcon('0x' + ethereumAddress)
-				.then(uri => {
-					setEthereumIconUri(uri);
-				})
-				.catch(console.error);
-		};
+	useEffect((): (() => void) => {
+		let promiseDisabled = false;
 
-		if (protocol === NetworkProtocols.ETHEREUM) {
-			loadEthereumIcon(address);
+		if (protocol === NetworkProtocols.ETHEREUM && address !== '') {
+			const setEthereumIcon = async (): Promise<void> => {
+				const generatedIconUri = await blockiesIcon('0x' + address);
+				if (promiseDisabled) return;
+				setEthereumIconUri(generatedIconUri);
+			};
+			setEthereumIcon();
 		}
+		return (): void => {
+			promiseDisabled = true;
+		};
 	}, [address, protocol]);
 
 	if (address === '') {
