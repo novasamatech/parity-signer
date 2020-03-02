@@ -120,31 +120,31 @@ const globalStackNavigationOptions = ({
 	navigation
 }: {
 	navigation: NavigationScreenProp<{ index: number }, {}>;
-}): StackNavigationOptions => {
-	const isFirstScreen = navigation.dangerouslyGetParent()?.state.index === 0;
-
-	return {
-		//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
-		cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-		headerBackTitleStyle: {
-			color: colors.bg_text_sec
-		},
-		headerBackTitleVisible: false,
-		headerLeft: (): React.ReactElement =>
-			isFirstScreen ? <HeaderLeftHome /> : <HeaderLeftWithBack />,
-		headerRight: (): React.ReactElement => <SecurityHeader />,
-		headerStyle: {
-			backgroundColor: colors.bg,
-			borderBottomColor: colors.bg,
-			borderBottomWidth: 0,
-			elevation: 0,
-			height: 60,
-			shadowColor: 'transparent'
-		},
-		headerTintColor: colors.bg_text_sec,
-		headerTitle: (): React.ReactNode => null
-	};
-};
+}): StackNavigationOptions => ({
+	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
+	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+	headerBackTitleStyle: {
+		color: colors.bg_text_sec
+	},
+	headerBackTitleVisible: false,
+	headerLeft: (): React.ReactElement =>
+		navigation.isFirstRouteInParent() ? (
+			<HeaderLeftHome />
+		) : (
+			<HeaderLeftWithBack />
+		),
+	headerRight: (): React.ReactElement => <SecurityHeader />,
+	headerStyle: {
+		backgroundColor: colors.bg,
+		borderBottomColor: colors.bg,
+		borderBottomWidth: 0,
+		elevation: 0,
+		height: 60,
+		shadowColor: 'transparent'
+	},
+	headerTintColor: colors.bg_text_sec,
+	headerTitle: (): React.ReactNode => null
+});
 
 const HeaderLeftWithBack = withNavigation(
 	class HeaderBackButtonComponent extends React.PureComponent<
