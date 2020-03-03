@@ -1,4 +1,4 @@
-name:                           Check
+name:                   Check
 
 on:
   pull_request:
@@ -8,88 +8,93 @@ on:
       - stable
 jobs:
   check:
-    name:                       Check
-    runs-on:                    macos-latest
+    name:               Check
+    runs-on:            macos-latest
     steps:
-      - name:                   Checkout sources
-        uses:                   actions/checkout@v2
+      - name:           Checkout sources
+        uses:           actions/checkout@v2
         with:
-          fetch-depth:          50
-      - name:                   Checkout submodules
-        shell:                  bash
-        run:                    git submodule update --init --recursive
-      - name:                   Install stable toolchain
-        uses:                   actions-rs/toolchain@v1.0.5
+          fetch-depth:  50
+      - name:           Checkout submodules
+        shell:          bash
+        run:            git submodule update --init --recursive
+      - name:           Install stable toolchain
+        uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:            stable
-          profile:              minimal
-          override:             true
-      - name:                   Add target i386-apple-ios
-        uses:                   actions-rs/toolchain@v1.0.5
+          toolchain:    stable
+          profile:      minimal
+          override:     true
+      - name:           Add target i386-apple-ios
+        uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:            stable
-          target:               i386-apple-ios
-      - name:                   Add target x86_64-apple-ios
-        uses:                   actions-rs/toolchain@v1.0.5
+          toolchain:    stable
+          target:       i386-apple-ios
+      - name:           Add target x86_64-apple-ios
+        uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:            stable
-          target:               x86_64-apple-ios
-      - name:                   Install stable toolchain
-        uses:                   actions-rs/toolchain@v1.0.5
+          toolchain:    stable
+          target:       x86_64-apple-ios
+      - name:           Add target armv7-apple-ios
+        uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:            stable
-          target:               armv7-apple-ios
-      - name:                   Install stable toolchain
-        uses:                   actions-rs/toolchain@v1.0.5
+          toolchain:    stable
+          target:       armv7-apple-ios
+      - name:           Add target armv7s-apple-ios
+        uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:            stable
-          target:               armv7s-apple-ios
-      - name:                   Install stable toolchain
-        uses:                   actions-rs/toolchain@v1.0.5
+          toolchain:    stable
+          target:       armv7s-apple-ios
+      - name:           Add target aarch64-apple-ios
+        uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:            stable
-          target:               aarch64-apple-ios
-      - name:                   Cache cargo registry
-        uses:                   actions/cache@v1.1.2
+          toolchain:    stable
+          target:       aarch64-apple-ios
+      - name:           Cache cargo registry
+        uses:           actions/cache@v1.1.2
         with:
-          path:                 ~/.cargo/registry
-          key:                  ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-      - name:                   Cache cargo index
-        uses:                   actions/cache@v1.1.2
+          path:         ~/.cargo/registry
+          key:          ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Cache cargo index
+        uses:           actions/cache@v1.1.2
         with:
-          path:                 ~/.cargo/git
-          key:                  ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
-      - name:                   Cache cargo build
-        uses:                   actions/cache@v1.1.2
+          path:         ~/.cargo/git
+          key:          ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Cache cargo build
+        uses:           actions/cache@v1.1.2
         with:
-          path:                 target
-          key:                  ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
-      # Install sccache based on https://github.com/denoland/rusty_v8/blob/master/.github/workflows/ci.yml#L69
-      - name:                   Cache sccache
-        uses:                   actions/cache@v1.1.2
+          path:         target
+          key:          ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Cache sccache MacOS
+        if:             ${{ runner.os }} == 'macos-latest'
+        uses:           actions/cache@v1.1.2
         with:
-          path:                 "/home/runner/.cache/sccache"
-          key:                  ${{ runner.os }}-sccache-check-${{ hashFiles('**/Cargo.lock') }}
-      - uses: actions/setup-node@v1
+          path:         "/home/runner/.cache/sccache"
+          key:          ${{ runner.os }}-sccache-check-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Install sccache for ${{ matrix.platform }}
+        shell:          pwsh
+        run:            pwsh scripts/actions/install-sccache.ps1 ${{ runner.os}}
+      - name:           Install NodeJS
+        uses:           actions/setup-node@v1
         with:
           node-version: '10.x'
-      - run: |
+      - name:           Install dependencies
+        run:            |
           brew tap wix/brew
           brew install applesimutils
-      - run: |
           npm install -g yarn
           npm install -g react-native-cli
           npm install -g detox-cli
           gem install xcpretty
           yarn
-          cd rust/signer && make ios && cd ../..
-      - name: Detox biuld
-        run: detox build -c ios.sim.release
-      - name: Detox test
-        run: detox test -c ios.sim.release
-      - name:                   Stop sccache
-        if:                     always()
-        run:                    sccache --stop-server
-      - name:                   Prepare build directory for cache
-        shell: bash
-        run:                    bash scripts/actions/clean-target.sh
+      - name:           Build targets
+        run:            cd rust/signer && make ios && cd ../..
+      - name:           Detox biuld
+        run:            detox build -c ios.sim.release
+      - name:           Detox test
+        run:            detox test -c ios.sim.release
+      - name:           Stop sccache
+        if:             always()
+        run:            sccache --stop-server
+      - name:           Prepare build directory for cache
+        shell:          bash
+        run:            bash scripts/actions/clean-target.sh
