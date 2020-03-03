@@ -77,7 +77,8 @@ export default class App extends React.Component<AppProps> {
 			YellowBox.ignoreWarnings([
 				'Warning: componentWillReceiveProps',
 				'Warning: componentWillMount',
-				'Warning: componentWillUpdate'
+				'Warning: componentWillUpdate',
+				'Warning: Sending `onAnimatedValueUpdate`'
 			]);
 		}
 	}

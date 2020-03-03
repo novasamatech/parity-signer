@@ -56,9 +56,6 @@ describe('Load test', async () => {
 	});
 
 	it('create a new identity with default substrate account', async () => {
-		// await element(by.id(IdentitiesSwitch.toggleButton))
-		// 	.atIndex(0)
-		// 	.tap();
 		await testTap(AccountNetworkChooser.createButton);
 		await testNotVisible(IdentityNew.seedInput);
 		await testTap(IdentityNew.createButton);
