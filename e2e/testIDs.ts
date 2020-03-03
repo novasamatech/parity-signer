@@ -59,6 +59,10 @@ const testIDs = {
 		unlockPinButton: 'identity_unlock_pin_button',
 		unlockPinInput: 'identity_unlock_pin_input'
 	},
+	MessageDetails: {
+		scrollScreen: 'message_details_scroll',
+		signButton: 'message_details_sign_button'
+	},
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
 		nameInput: 'path_derivation_name_input',
@@ -78,7 +82,9 @@ const testIDs = {
 	SecurityHeader: {
 		scanButton: 'security_header_scan_button'
 	},
-	SignedMessage: {},
+	SignedMessage: {
+		qrView: 'signed_message_qr_view'
+	},
 	SignedTx: {
 		qrView: 'signed_tx_qr_view'
 	},

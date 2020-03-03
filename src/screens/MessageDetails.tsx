@@ -20,6 +20,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 
+import testIDs from 'e2e/testIDs';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import { FoundAccount } from 'types/identityTypes';
 import {
@@ -150,6 +151,7 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 			<ScrollView
 				contentContainerStyle={styles.bodyContent}
 				style={styles.body}
+				testID={testIDs.MessageDetails.scrollScreen}
 			>
 				<Background />
 				<Text style={styles.topTitle}>Sign Message</Text>
@@ -169,6 +171,7 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 				/>
 				<Button
 					buttonStyles={styles.signButton}
+					testID={testIDs.MessageDetails.signButton}
 					title="Sign Message"
 					onPress={(): void => {
 						isHash ? alertMultipart(onNext) : onNext();

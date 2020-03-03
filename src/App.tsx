@@ -17,7 +17,7 @@
 import '../shim';
 
 import * as React from 'react';
-import { Platform, StatusBar, View, YellowBox } from 'react-native';
+import { StatusBar, View, YellowBox } from 'react-native';
 import {
 	createAppContainer,
 	createSwitchNavigator,
@@ -67,31 +67,10 @@ import TermsAndConditions from 'screens/TermsAndConditions';
 import TxDetails from 'screens/TxDetails';
 import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
 import testIDs from 'e2e/testIDs';
+import { AppProps, getLaunchArgs } from 'e2e/injections';
 
-const getLaunchArgs = (props: Props): void => {
-	if (Platform.OS === 'ios') {
-		if (
-			Array.isArray(props.launchArgs) &&
-			props.launchArgs.includes('-detoxServer')
-		) {
-			global.inTest = true;
-			return;
-		}
-	} else {
-		if (props.launchArgs && props.launchArgs.hasOwnProperty('detoxServer')) {
-			global.inTest = true;
-			return;
-		}
-	}
-	global.inTest = false;
-};
-
-interface Props {
-	launchArgs?: Array<string> | object;
-}
-
-export default class App<Props> extends React.Component<Props> {
-	constructor(props: Props) {
+export default class App extends React.Component<AppProps> {
+	constructor(props: AppProps) {
 		super(props);
 		getLaunchArgs(props);
 		if (__DEV__) {
