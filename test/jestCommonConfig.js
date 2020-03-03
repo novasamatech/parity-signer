@@ -26,5 +26,6 @@ module.exports = {
 	transform: {
 		...tsjPreset.transform,
 		'\\.js$': '<rootDir>/node_modules/react-native/jest/preprocessor.js'
-	}
+	},
+	verbose: true
 };
