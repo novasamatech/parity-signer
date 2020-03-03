@@ -96,7 +96,7 @@ describe('Signing test', () => {
 		await testSetUpDefaultPath();
 	});
 
-	describe.skip('Substrate Signing Test', () => {
+	describe('Substrate Signing Test', () => {
 		it('should sign the set remarks request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsic);
 			await testSignedTx();

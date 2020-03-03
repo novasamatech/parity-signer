@@ -38,10 +38,15 @@ export const testNotExist = async (componentId: string): Promise<void> =>
 export const testNotVisible = async (componentId: string): Promise<void> =>
 	await expect(element(by.id(componentId))).toBeNotVisible();
 
-export const tapBack = async (): Promise<Detox.Actions<any>> =>
-	await element(by.id(testIDs.Header.headerBackButton))
-		.atIndex(0)
-		.tap();
+export const tapBack = async (): Promise<void> => {
+	if (device.getPlatform() === 'ios') {
+		await element(by.id(testIDs.Header.headerBackButton))
+			.atIndex(0)
+			.tap();
+	} else {
+		await device.pressBack();
+	}
+};
 
 export const testInput = async (
 	inputId: string,

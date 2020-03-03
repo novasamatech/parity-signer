@@ -89,7 +89,7 @@
     "babel-jest": "^25.1.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-rewrite-require": "^1.14.5",
-    "detox": "^15.2.2",
+    "detox": "^15.4.2",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-import-resolver-typescript": "^2.0.0",
