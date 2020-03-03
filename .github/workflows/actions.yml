@@ -65,7 +65,7 @@ jobs:
           path:         target
           key:          ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
       - name:           Cache sccache MacOS
-        if:             ${{ runner.os }} == 'macos-latest'
+        if:             runner.os == 'macos-latest'
         uses:           actions/cache@v1.1.2
         with:
           path:         "/home/runner/.cache/sccache"
