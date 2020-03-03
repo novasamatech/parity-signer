@@ -80,6 +80,7 @@ export default class Scanner extends React.PureComponent<
 								if (scannerStore.isBusy() || !this.state.enableScan) {
 									return;
 								}
+								console.log('scan request is :', txRequestData);
 								try {
 									if (isAddressString(txRequestData.data)) {
 										return this.showErrorMessage(

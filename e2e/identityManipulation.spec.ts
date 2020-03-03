@@ -31,6 +31,8 @@ import {
 	pinCode
 } from './e2eUtils';
 
+import { EthereumNetworkKeys } from 'constants/networkSpecs';
+
 const {
 	TacScreen,
 	AccountNetworkChooser,
@@ -46,7 +48,7 @@ const {
 const defaultPath = '//default';
 const customPath = '//sunny_day/1';
 
-describe('Load test', async () => {
+describe('Load test', () => {
 	it('should have account list screen', async () => {
 		await testVisible(TacScreen.tacView);
 		await testTap(TacScreen.agreePrivacyButton);
@@ -100,7 +102,7 @@ describe('Load test', async () => {
 	it('is able to create ethereum account', async () => {
 		await tapBack();
 		const ethereumNetworkButtonIndex =
-			AccountNetworkChooser.networkButton + '1';
+			AccountNetworkChooser.networkButton + EthereumNetworkKeys.FRONTIER;
 		await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
 		await testScrollAndTap(
 			ethereumNetworkButtonIndex,

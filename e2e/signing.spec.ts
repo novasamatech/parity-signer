@@ -16,9 +16,12 @@
 
 import { by, element } from 'detox';
 
+import { EthereumNetworkKeys } from 'constants/networkSpecs';
 import {
 	launchWithScanRequest,
 	pinCode,
+	tapBack,
+	testExist,
 	testInput,
 	testScrollAndTap,
 	testSetUpDefaultPath,
@@ -33,6 +36,7 @@ const {
 	TacScreen,
 	AccountNetworkChooser,
 	IdentityNew,
+	PathDetail,
 	SecurityHeader,
 	TxDetails,
 	SignedMessage,
@@ -51,7 +55,7 @@ const testSignedTx = async (): Promise<void> => {
 	await testVisible(SignedTx.qrView);
 };
 
-const testSignedMessage = async (): Promise<void> => {
+const testMultiPartExtrinsic = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
 	await testScrollAndTap(
 		MessageDetails.signButton,
@@ -64,7 +68,17 @@ const testSignedMessage = async (): Promise<void> => {
 	await testVisible(SignedMessage.qrView);
 };
 
-describe('Signing test', async () => {
+const testEthereumMessage = async (): Promise<void> => {
+	await testTap(SecurityHeader.scanButton);
+	await testScrollAndTap(
+		MessageDetails.signButton,
+		MessageDetails.scrollScreen
+	);
+	await testUnlockPin(pinCode);
+	await testVisible(SignedMessage.qrView);
+};
+
+describe('Signing test', () => {
 	it('should have account list screen', async () => {
 		await testVisible(TacScreen.tacView);
 		await testTap(TacScreen.agreePrivacyButton);
@@ -82,18 +96,47 @@ describe('Signing test', async () => {
 		await testSetUpDefaultPath();
 	});
 
-	it('should sign the set remarks request', async () => {
-		await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsic);
-		await testSignedTx();
+	describe.skip('Substrate Signing Test', () => {
+		it('should sign the set remarks request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsic);
+			await testSignedTx();
+		});
+
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsic);
+			await testSignedTx();
+		});
+
+		it('should sign multipart request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPart);
+			await testMultiPartExtrinsic();
+		});
 	});
 
-	it('should sign transfer request', async () => {
-		await launchWithScanRequest(ScanTestRequest.TransferExtrinsic);
-		await testSignedTx();
-	});
+	describe('Ethereum Signing Test', () => {
+		it('generate Kovan account', async () => {
+			await tapBack();
+			const kovanNetworkButtonIndex =
+				AccountNetworkChooser.networkButton + EthereumNetworkKeys.KOVAN;
+			await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
+			await testScrollAndTap(
+				kovanNetworkButtonIndex,
+				testIDs.AccountNetworkChooser.chooserScreen
+			);
+			await testUnlockPin(pinCode);
+			await testVisible(PathDetail.screen);
+			await tapBack();
+			await testExist(AccountNetworkChooser.chooserScreen);
+		});
 
-	it('should sign multipart request', async () => {
-		await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPart);
-		await testSignedMessage();
+		it('should sign transactions', async () => {
+			await launchWithScanRequest(ScanTestRequest.EthereumTransaction);
+			await testSignedTx();
+		});
+
+		it('should sign message', async () => {
+			await launchWithScanRequest(ScanTestRequest.EthereumMessage);
+			await testEthereumMessage();
+		});
 	});
 });

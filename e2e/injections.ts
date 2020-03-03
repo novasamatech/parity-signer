@@ -16,7 +16,7 @@
 
 import { Platform } from 'react-native';
 
-import { rawDataMap, ScanTestRequest } from 'e2e/mock';
+import { scanRequestDataMap, ScanTestRequest } from 'e2e/mock';
 import { TxRequestData } from 'types/scannerTypes';
 
 type AndroidAppArgs = {
@@ -50,7 +50,7 @@ export const getLaunchArgs = (props: AppProps): void => {
 	global.inTest = false;
 };
 
-const buildSignRequest = (rawData: string): TxRequestData => ({
+const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	bounds: {
 		bounds: [
 			{ x: '50', y: '50' },
@@ -59,7 +59,7 @@ const buildSignRequest = (rawData: string): TxRequestData => ({
 		height: 1440,
 		width: 1920
 	},
-	data: '',
+	data,
 	rawData,
 	target: 319,
 	type: 'qr'
@@ -69,11 +69,14 @@ export const onMockBarCodeRead = (
 	txRequest: ScanTestRequest,
 	onBarCodeRead: (tx: any) => void
 ): void => {
-	if (typeof rawDataMap[txRequest] === 'string') {
-		onBarCodeRead(buildSignRequest(rawDataMap[txRequest] as string));
-	} else if (Array.isArray(rawDataMap[txRequest])) {
-		(rawDataMap[txRequest] as string[]).forEach((rawData: string): void => {
+	const scanRequest = scanRequestDataMap[txRequest];
+	if (typeof scanRequest === 'string') {
+		onBarCodeRead(buildSignRequest(scanRequest));
+	} else if (Array.isArray(scanRequest)) {
+		(scanRequest as string[]).forEach((rawData: string): void => {
 			onBarCodeRead(buildSignRequest(rawData));
 		});
+	} else if (typeof scanRequest === 'object') {
+		onBarCodeRead(buildSignRequest(scanRequest.rawData, scanRequest.data));
 	}
 };
