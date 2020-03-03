@@ -14,14 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-const { defaults } = require('jest-config');
+const { defaults: tsjPreset } = require('ts-jest/presets');
 
 module.exports = {
-	moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts', 'tsx'],
+	...tsjPreset,
+	cacheDirectory: '.jest/cache',
+	globals: {
+		'ts-jest': {
+			babelConfig: true
+		}
+	},
+	moduleNameMapper: {
+		'^constants/(.*)$': '<rootDir>/src/constants/$1',
+		'^styles/(.*)$': '<rootDir>/src/styles/$1',
+		'^utils/(.*)$': '<rootDir>/src/utils/$1'
+	},
 	preset: 'react-native',
 	roots: ['<rootDir>/specs'],
 	setupFiles: ['<rootDir>/jest-setup.js'],
 	testEnvironment: 'node',
 	testPathIgnorePatterns: ['/node_modules/'],
+	transform: {
+		...tsjPreset.transform,
+		'\\.js$': '<rootDir>/node_modules/react-native/jest/preprocessor.js'
+	},
 	verbose: true
 };

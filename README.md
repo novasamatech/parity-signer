@@ -35,7 +35,7 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 ## Build it
 ### Requirements
 
-- `node.js` (tested on `v8.4.0`)
+- `node.js` ( `>=10`)
 - `yarn` (tested on `1.6.0`)
 - `rustup` (tested on `rustup 1.16.0`)
 - `rustc` (tested on `rustc 1.32.0 (9fda7c223 2019-01-16)`)

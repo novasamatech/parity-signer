@@ -1,6 +1,6 @@
 {
 	"printWidth": 80,
-	"parser": "flow",
+	"parser": "typescript",
 	"singleQuote": true,
 	"useTabs": true,
 	"tabWidth": 2
