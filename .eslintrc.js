@@ -21,7 +21,7 @@ module.exports = {
   globals: { inTest: "writable" },
   overrides: [
     {
-      files: ["e2e/*.spec.js", "e2e/init.js", "e2e/e2eUtils.js"],
+      files: ["e2e/*.spec.js", "e2e/init.js", "e2e/utils.js"],
       rules: {
         "no-undef": "off"
       }

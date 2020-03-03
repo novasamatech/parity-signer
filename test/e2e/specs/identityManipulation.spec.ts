@@ -16,7 +16,7 @@
 
 import { by, element } from 'detox';
 
-import testIDs from './testIDs';
+import testIDs from 'e2e/testIDs';
 import {
 	tapBack,
 	testExist,
@@ -29,8 +29,7 @@ import {
 	testVisible,
 	testSetUpDefaultPath,
 	pinCode
-} from './e2eUtils';
-
+} from 'e2e/utils';
 import { EthereumNetworkKeys } from 'constants/networkSpecs';
 
 const {

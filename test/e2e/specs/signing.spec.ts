@@ -28,8 +28,8 @@ import {
 	testTap,
 	testUnlockPin,
 	testVisible
-} from 'e2e/e2eUtils';
-import { ScanTestRequest } from 'e2e/mock';
+} from 'e2e/utils';
+import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
 const {

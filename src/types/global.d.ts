@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ScanTestRequest } from 'e2e/mock';
+import { ScanTestRequest } from 'e2e/mockScanRequests';
 export {};
 
 /*~ If the app has properties exposed on a global variable,

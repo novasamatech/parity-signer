@@ -16,7 +16,7 @@
 
 import { Platform } from 'react-native';
 
-import { scanRequestDataMap, ScanTestRequest } from 'e2e/mock';
+import { scanRequestDataMap, ScanTestRequest } from 'e2e/mockScanRequests';
 import { TxRequestData } from 'types/scannerTypes';
 
 type AndroidAppArgs = {

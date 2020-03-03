@@ -5,7 +5,7 @@ package-lock.json
 dist/
 
 # jest cache
-.jest/cache
+test/.jest/cache
 
 # NDK
 NDK/
