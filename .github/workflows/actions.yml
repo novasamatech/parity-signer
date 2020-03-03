@@ -77,8 +77,6 @@ jobs:
           brew tap wix/brew
           brew install applesimutils
       - run: |
-          applesimutils --list
-      - run: |
           npm install -g yarn
           npm install -g react-native-cli
           npm install -g detox-cli
