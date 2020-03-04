@@ -28,12 +28,8 @@ import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 import colors from 'styles/colors';
-import {
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
-import kusamaMetadata from 'constants/static-kusama';
-import substrateDevMetadata from 'constants/static-substrate';
+import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
+import { getMetadata } from 'utils/identitiesUtils';
 import { shortString } from 'utils/strings';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
@@ -43,9 +39,9 @@ const registry = new TypeRegistry();
 interface Props {
 	description?: string;
 	payload?: GenericExtrinsicPayload;
-	prefix: number;
 	signature?: string;
 	style?: ViewStyle;
+	networkKey: string;
 }
 
 export default class PayloadDetailsCard extends React.PureComponent<
@@ -56,32 +52,15 @@ export default class PayloadDetailsCard extends React.PureComponent<
 > {
 	constructor(props: Props) {
 		super(props);
-		// KUSAMA and KUSAMA_DEV have the same metadata and Defaults values
-		const isKusama =
-			this.props.prefix ===
-				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix ||
-			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA_DEV].prefix;
-		const isSubstrateDev =
-			this.props.prefix ===
-			SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
+		const { networkKey } = this.props;
+		const networkMetadataRaw = getMetadata(networkKey);
+		const metadata = new Metadata(registry, networkMetadataRaw);
+		registry.setMetadata(metadata);
+		formatBalance.setDefaults({
+			decimals: SUBSTRATE_NETWORK_LIST[networkKey].decimals,
+			unit: SUBSTRATE_NETWORK_LIST[networkKey].unit
+		});
 
-		let metadata;
-		if (isKusama) {
-			metadata = new Metadata(registry, kusamaMetadata);
-			registry.setMetadata(metadata);
-			formatBalance.setDefaults({
-				decimals: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].decimals,
-				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].unit
-			});
-		} else if (__DEV__ && isSubstrateDev) {
-			metadata = new Metadata(registry, substrateDevMetadata);
-			registry.setMetadata(metadata);
-			formatBalance.setDefaults({
-				decimals:
-					SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].decimals,
-				unit: SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].unit
-			});
-		}
 		this.state = {
 			fallback: !metadata
 		};
@@ -89,7 +68,8 @@ export default class PayloadDetailsCard extends React.PureComponent<
 
 	render(): React.ReactElement {
 		const { fallback } = this.state;
-		const { description, payload, prefix, signature, style } = this.props;
+		const { description, payload, networkKey, signature, style } = this.props;
+		const prefix = SUBSTRATE_NETWORK_LIST[networkKey].prefix;
 
 		return (
 			<View style={[styles.body, style]}>

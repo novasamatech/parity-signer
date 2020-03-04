@@ -48,7 +48,7 @@ const {
 
 const pinCode = '123456';
 const mockIdentityName = 'mockIdentity';
-const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '2'; //Need change if network list changes
+const substrateNetworkButtonIndex = AccountNetworkChooser.networkButton + '3'; //Need change if network list changes
 const defaultPath = '//default',
 	customPath = '//sunny_day/1';
 const mockSeedPhrase =

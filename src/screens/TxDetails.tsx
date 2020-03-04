@@ -22,10 +22,7 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { FoundAccount } from 'types/identityTypes';
-import {
-	isEthereumNetworkParams,
-	SubstrateNetworkParams
-} from 'types/networkSpecsTypes';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import Background from 'components/Background';
@@ -133,8 +130,6 @@ export class TxDetailsView extends React.PureComponent<ViewProps> {
 
 		const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
-		const prefix = (NETWORK_LIST[sender.networkKey] as SubstrateNetworkParams)
-			?.prefix;
 
 		return (
 			<View style={styles.body}>
@@ -174,7 +169,7 @@ export class TxDetailsView extends React.PureComponent<ViewProps> {
 							<PayloadDetailsCard
 								style={{ marginBottom: 20 }}
 								payload={prehash}
-								prefix={prefix}
+								networkKey={sender.networkKey}
 							/>
 						)}
 					</View>

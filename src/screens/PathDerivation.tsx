@@ -25,6 +25,7 @@ import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import ButtonMainAction from 'components/ButtonMainAction';
 import {
+	getNetworkKey,
 	getNetworkKeyByPath,
 	validateDerivedPath
 } from 'utils/identitiesUtils';
@@ -45,9 +46,17 @@ function PathDerivation({
 	const [keyPairsName, setKeyPairsName] = useState('');
 	const [isPathValid, setIsPathValid] = useState(true);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [customNetworkKey, setCustomNetworkKey] = useState(defaultNetworkKey);
 	const pathNameInput = useRef<TextInput>(null);
 	const parentPath = navigation.getParam('parentPath');
+	const [customNetworkKey, setCustomNetworkKey] = useState(() => {
+		const parentNetworkKey = getNetworkKey(
+			parentPath,
+			accounts.state.currentIdentity!
+		);
+		return parentNetworkKey === UnknownNetworkKeys.UNKNOWN
+			? defaultNetworkKey
+			: parentNetworkKey;
+	});
 	const completePath = `${parentPath}${derivationPath}`;
 	const pathIndicatedNetworkKey = useMemo(
 		(): string => getNetworkKeyByPath(completePath),
