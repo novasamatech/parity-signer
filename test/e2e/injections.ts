@@ -30,7 +30,6 @@ export interface AppProps {
 }
 
 export const getLaunchArgs = (props: AppProps): void => {
-	console.log(props.launchArgs, typeof props.launchArgs);
 	const { launchArgs } = props;
 	if (Platform.OS === 'ios') {
 		if (Array.isArray(launchArgs) && launchArgs.includes('-detoxServer')) {
