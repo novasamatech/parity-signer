@@ -17,11 +17,17 @@
 import { expect, element, by, device } from 'detox';
 
 import testIDs from './testIDs';
+
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
 const { IdentityPin, AccountNetworkChooser, PathDetail, PathsList } = testIDs;
 
 export const pinCode = '000000';
 const substrateNetworkButtonIndex =
-	AccountNetworkChooser.networkButton + 'kusama';
+	AccountNetworkChooser.networkButton +
+	SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathId;
 
 export const testTap = async (buttonId: string): Promise<Detox.Actions<any>> =>
 	await element(by.id(buttonId)).tap();
