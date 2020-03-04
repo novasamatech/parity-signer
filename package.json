@@ -20,7 +20,7 @@
     "lint:fix": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
     "postinstall": "npx jetify && chmod +x ./scripts/fix-rn-camera-path.sh && ./scripts/fix-rn-camera-path.sh ./node_modules/react-native-camera/ios/RNCamera.xcodeproj/project.pbxproj",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
-    "test": "jest --config ./test/unit/jest.config.js",
+    "unit": "jest --config ./test/unit/jest.config.js",
     "test:debug": "node --inspect node_modules/.bin/jest --watch --runInBand",
     "test-rust": "cd ./rust/signer && cargo test && cd ../..",
     "build-e2e:android": "detox build -c android.emu.debug -l info",
