@@ -103,13 +103,13 @@ jobs:
           yarn
       - name:           Build targets
         run:            cd rust/signer && make ios && cd ../..
+      - name:           Stop sccache
+        if:             always()
+        run:            sccache --stop-server
       - name:           Detox biuld
         run:            detox build -c ios.sim.release
       - name:           Detox test
         run:            detox test -c ios.sim.release --cleanup
-      - name:           Stop sccache
-        if:             always()
-        run:            sccache --stop-server
       - name:           Prepare build directory for cache
         shell:          bash
         run:            bash scripts/actions/clean-target.sh
