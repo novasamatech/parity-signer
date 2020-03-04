@@ -124,9 +124,10 @@
       },
       "ios.sim.release": {
         "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
-        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=NO | xcpretty -t && exit ${PIPESTATUS[0]}",
+        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
         "type": "ios.simulator",
         "device": {
+          "os": "iOS 13.3",
           "type": "iPhone 8"
         }
       },
