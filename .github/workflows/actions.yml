@@ -65,18 +65,34 @@ jobs:
           path:         target
           key:          ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
       - name:           Cache sccache MacOS
-        if:             runner.os == 'macos-latest'
         uses:           actions/cache@v1.1.2
         with:
-          path:         "/home/runner/.cache/sccache"
-          key:          ${{ runner.os }}-sccache-check-${{ hashFiles('**/Cargo.lock') }}
+          path:         "/Users/runner/Library/Caches/Mozilla.sccache"
+          key:          ${{ runner.os }}-sccache-build-tests-${{ hashFiles('**/Cargo.lock') 
       - name:           Install sccache for ${{ matrix.platform }}
         shell:          pwsh
         run:            pwsh scripts/actions/install-sccache.ps1 ${{ runner.os}}
+      - name: Get npm cache directory
+        id: npm-cache
+        run: echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v1
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
       - name:           Install NodeJS
         uses:           actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: '10.x'      
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-
       - name:           Install dependencies
         run:            |
           brew tap wix/brew
