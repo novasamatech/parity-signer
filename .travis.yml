@@ -11,7 +11,7 @@ install:
 
 script:
   - yarn run lint
-  - yarn run test
+  - yarn run unit
 
 # TODO complete following part to Integrate E2E test
 

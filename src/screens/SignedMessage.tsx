@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import testIDs from 'e2e/testIDs';
 import { NavigationScannerProps } from 'types/props';
 import colors from 'styles/colors';
 import QrView from 'components/QrView';
@@ -42,7 +43,9 @@ function SignedMessage({
 	return (
 		<ScrollView style={styles.body}>
 			<Text style={styles.topTitle}>Signed Message</Text>
-			<QrView data={data} />
+			<View testID={testIDs.SignedMessage.qrView}>
+				<QrView data={data} />
+			</View>
 			<MessageDetailsCard
 				isHash={isHash}
 				message={message ?? ''}

@@ -23,7 +23,7 @@ module.exports = {
 				alias: {
 					components: './src/components',
 					constants: './src/constants',
-					e2e: './e2e',
+					e2e: './test/e2e',
 					res: './res',
 					screens: './src/screens',
 					stores: './src/stores',
