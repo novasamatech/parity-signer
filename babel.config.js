@@ -4,8 +4,6 @@ module.exports = {
 			'rewrite-require',
 			{
 				aliases: {
-					'@plugnet/util': '@polkadot/util',
-					'@polkadot/wasm-crypto': '@plugnet/wasm-crypto-js',
 					_stream_duplex: 'readable-stream/duplex',
 					_stream_passthrough: 'readable-stream/passthrough',
 					_stream_readable: 'readable-stream/readable',
@@ -33,7 +31,7 @@ module.exports = {
 				},
 				root: ['.']
 			}
-		]
-	],
-	presets: ['module:metro-react-native-babel-preset']
+		],
+		['./scripts/rewrite-node-global']
+	]
 };

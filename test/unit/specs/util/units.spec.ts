@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Metadata, TypeRegistry } from '@polkadot/types';
-import Call from '@polkadot/types/primitive/Generic/Call';
+import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
 
 import { kusamaMetadata } from 'constants/networkMetadata';
@@ -55,7 +55,7 @@ describe('units', () => {
 					args[i].toRawType() === 'Balance' ||
 					args[i].toRawType() === 'Compact<Balance>'
 				) {
-					value = formatBalance(args[i].toString(), true, 12);
+					value = formatBalance(args[i].toString(), undefined, 12);
 				} else {
 					value = args[i].toString();
 				}

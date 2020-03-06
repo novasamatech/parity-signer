@@ -19,7 +19,7 @@ import {
 	Metadata,
 	GenericExtrinsicPayload
 } from '@polkadot/types';
-import Call from '@polkadot/types/primitive/Generic/Call';
+import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useEffect, useState } from 'react';
@@ -133,10 +133,10 @@ function ExtrinsicPart({
 	value: AnyU8a | IMethod | IExtrinsicEra;
 	fallback?: string;
 }): React.ReactElement {
-	const [period, setPeriod] = useState();
-	const [phase, setPhase] = useState();
-	const [formattedCallArgs, setFormattedCallArgs] = useState();
-	const [tip, setTip] = useState();
+	const [period, setPeriod] = useState<string>();
+	const [phase, setPhase] = useState<string>();
+	const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
+	const [tip, setTip] = useState<string>();
 	const [useFallback, setUseFallBack] = useState(false);
 
 	useEffect(() => {

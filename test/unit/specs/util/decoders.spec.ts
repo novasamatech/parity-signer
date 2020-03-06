@@ -21,7 +21,7 @@ import {
 	TypeRegistry
 } from '@polkadot/types';
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
-import Call from '@polkadot/types/primitive/Generic/Call';
+import Call from '@polkadot/types/generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import 'jest';
