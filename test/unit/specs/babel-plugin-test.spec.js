@@ -6,11 +6,12 @@ const identifierReversePlugin = require('../../../scripts/rewrite-node-global');
 
 const dirName = path.join(process.cwd(), 'node_modules/@polkadot');
 pluginTester({
+	formatResult: r => r,
 	plugin: identifierReversePlugin,
 	tests: {
 		'changes this code': {
 			code: 'var hello = __dirname',
-			output: `var hello = '${dirName}';`
+			output: `var hello = "${dirName}";`
 		}
 	}
 });
