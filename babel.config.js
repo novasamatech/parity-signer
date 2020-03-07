@@ -33,5 +33,6 @@ module.exports = {
 			}
 		],
 		['./scripts/rewrite-node-global']
-	]
+	],
+	presets: ['module:metro-react-native-babel-preset']
 };
