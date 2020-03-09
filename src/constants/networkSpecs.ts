@@ -128,15 +128,17 @@ const substrateNetworkBase: {
 		prefix: 42,
 		title: 'Westend',
 		unit: 'WND'
+	},
+	//TODO genesisHash and Metadata need to be added
+	[SubstrateNetworkKeys.POLKADOT]: {
+		color: '#e7007a',
+		decimals: 12,
+		//genesisHash: SubstrateNetworkKeys.POLKADOT,
+		logo: require('res/img/logos/polkadot.png'),
+		prefix: 0,
+		title: 'Polkadot mainnet',
+		unit: 'DOT'
 	}
-	// [SubstrateNetworkKeys.POLKADOT]: {
-	//   color: '#e6007a',
-	//   decimals: 12,
-	//   genesisHash: SubstrateNetworkKeys.POLKADOT,
-	//   prefix: 0,
-	//   title: 'Polkadot mainnet',
-	//   unit: 'DOT'
-	// }
 };
 
 const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
