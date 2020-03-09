@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import '../shim';
+// import 'utils/iconLoader';
 
 import * as React from 'react';
 import { StatusBar, View, YellowBox } from 'react-native';
