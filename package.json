@@ -18,7 +18,6 @@
     "ios": "yarn run build-rust-ios && npx react-native run-ios",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
     "lint:fix": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
-    "postinstall": "npx jetify && chmod +x ./scripts/fix-rn-camera-path.sh && ./scripts/fix-rn-camera-path.sh ./node_modules/react-native-camera/ios/RNCamera.xcodeproj/project.pbxproj",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native start",
     "unit": "jest --config ./test/unit/jest.config.js",
     "unit:debug": "node --inspect node_modules/.bin/jest --watch --runInBand",
