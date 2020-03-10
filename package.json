@@ -20,8 +20,8 @@
     "lint:fix": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
     "postinstall": "npx jetify && chmod +x ./scripts/fix-rn-camera-path.sh && ./scripts/fix-rn-camera-path.sh ./node_modules/react-native-camera/ios/RNCamera.xcodeproj/project.pbxproj",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 react-native start",
-    "unit": "jest --config ./test/unit/jest.config.js",
-    "unit:debug": "node --inspect node_modules/.bin/jest --watch --runInBand",
+    "test": "jest",
+    "test:debug": "node --inspect node_modules/.bin/jest --watch --runInBand",
     "test-rust": "cd ./rust/signer && cargo test && cd ../..",
     "build-e2e:android": "detox build -c android.emu.debug -l info",
     "test-e2e:android": "detox test -c android.emu.debug -l info --noStackTrace",
@@ -83,13 +83,13 @@
     "@types/jest": "^25.1.3",
     "@types/react": "^16.9.19",
     "@types/react-native": "^0.61.10",
-    "@typescript-eslint/eslint-plugin": "^2.20.0",
+    "@typescript-eslint/eslint-plugin": "^2.15.0",
     "@typescript-eslint/parser": "^2.15.0",
     "babel-eslint": "10.0.3",
     "babel-jest": "^25.1.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-rewrite-require": "^1.14.5",
-    "detox": "^15.4.2",
+    "detox": "^14.7.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-import-resolver-typescript": "^2.0.0",
@@ -124,7 +124,7 @@
       },
       "ios.sim.release": {
         "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
-        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
+        "build": "xcodebuild -project ios/NativeSigner.xcodeproj -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=NO | xcpretty -t && exit ${PIPESTATUS[0]}",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone SE"
@@ -147,7 +147,7 @@
         }
       }
     },
-    "runner-config": "test/e2e/jest.config.js",
+    "runner-config": "e2e/config.json",
     "test-runner": "jest"
   }
 }

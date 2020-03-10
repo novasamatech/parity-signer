@@ -5,7 +5,7 @@ package-lock.json
 dist/
 
 # jest cache
-test/.jest/
+.jest/cache
 
 # NDK
 NDK/
@@ -52,7 +52,6 @@ build/
 local.properties
 *.iml
 gen/
-*.hprof
 
 # node.js
 #

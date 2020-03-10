@@ -50,7 +50,7 @@ import {
 	NetworkParams,
 	SubstrateNetworkParams,
 	isSubstrateNetworkParams,
-	isEthereumNetworkParams
+	EthereumNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 
@@ -258,24 +258,21 @@ function AccountNetworkChooser({
 		<View style={styles.body}>
 			{renderScreenHeading()}
 			<ScrollView testID={testIDs.AccountNetworkChooser.chooserScreen}>
-				{networkList.map(([networkKey, networkParams]) => {
-					const networkIndexSuffix = isEthereumNetworkParams(networkParams)
-						? networkParams.ethereumChainId
-						: networkParams.pathId;
-					return (
-						<NetworkCard
-							key={networkKey}
-							testID={
-								testIDs.AccountNetworkChooser.networkButton + networkIndexSuffix
-							}
-							networkKey={networkKey}
-							onPress={(): Promise<void> =>
-								onNetworkChosen(networkKey, networkParams)
-							}
-							title={networkParams.title}
-						/>
-					);
-				})}
+				{networkList.map(([networkKey, networkParams]) => (
+					<NetworkCard
+						key={networkKey}
+						testID={
+							testIDs.AccountNetworkChooser.networkButton +
+								(networkParams as SubstrateNetworkParams).pathId ||
+							(networkParams as EthereumNetworkParams).ethereumChainId
+						}
+						networkKey={networkKey}
+						onPress={(): Promise<void> =>
+							onNetworkChosen(networkKey, networkParams)
+						}
+						title={networkParams.title}
+					/>
+				))}
 				{renderAddButton()}
 			</ScrollView>
 		</View>

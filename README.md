@@ -119,12 +119,12 @@ Corresponding data:
 
 #### Unit Test
 
-Run `yarn unit` for all the units test.
+Run `yarn test` for all the units test.
 
 If debugging is needed:
 
 1. Insert `debugger;` in the code where you think it fails.
-2. Run `yarn unit:debug`
+2. Run `yarn test:debug`
 3. Open a new tab in Chrome and go to `chrome://inspect`
 4. Click the `inspect` button of target under `Remote Target`
 5. Back to the terminal, choose one of the node watch commands to run the tests again.

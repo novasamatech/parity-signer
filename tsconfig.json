@@ -47,7 +47,7 @@
        "screens/*": ["src/screens/*"],
        "styles/*": ["src/styles/*"],
        "utils/*": ["src/utils/*"],
-       "e2e/*": ["test/e2e/*"],
+       "e2e/*": ["e2e/*"],
        "constants/*":["src/constants/*"],
        "stores/*": ["src/stores/*"],
        "res/*": ["res/*"]
@@ -75,7 +75,8 @@
     "forceConsistentCasingInFileNames": false  /* Disallow inconsistently-cased references to the same file. */
   },
   "include": [
-    "test/**/*",
+    "e2e/**/*",
+    "specs/**/*",
     "src/**/*"
   ],
   "exclude": [
