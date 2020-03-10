@@ -105,7 +105,10 @@ function txKey(hash: string): string {
 export const deleteAccount = (accountKey: string): Promise<void> =>
 	SecureStorage.deleteItem(accountKey, currentAccountsStore);
 
-export const saveAccount = (accountKey: string, account: Account): Promise<void> =>
+export const saveAccount = (
+	accountKey: string,
+	account: Account
+): Promise<void> =>
 	SecureStorage.setItem(
 		accountKey,
 		JSON.stringify(account, null, 0),

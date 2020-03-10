@@ -52,6 +52,7 @@ local.properties
 *.iml
 gen/
 *.hprof
+!debug.keystore
 
 # node.js
 #
