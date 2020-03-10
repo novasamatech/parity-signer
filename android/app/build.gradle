@@ -165,6 +165,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-secure-storage')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.facebook.react:react-native:0.60.3'

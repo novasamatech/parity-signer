@@ -280,7 +280,7 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
-  - RNSecureStorage (from `../node_modules/react-native-secure-storage/ios`)
+  - RNSecureStorage (from `../node_modules/react-native-secure-storage`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -353,7 +353,7 @@ EXTERNAL SOURCES:
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSecureStorage:
-    :path: "../node_modules/react-native-secure-storage/ios"
+    :path: "../node_modules/react-native-secure-storage"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
@@ -394,7 +394,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: a88953beefbd347a29072d9eba90e42945fe291e
   RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa
   RNScreens: a55364dc1833101f836cee70975ce1fea615a12f
-  RNSecureStorage: a9fcd531691c16babcea41f2c6797afc768df506
+  RNSecureStorage: 2d9b9339fc0569bac5b8729ce109057afb889d14
   RNSVG: 9f7446f2e8fb1a5dc66a4aff58c33d367291d34c
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b

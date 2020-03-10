@@ -17,6 +17,8 @@
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 
+console.log('secure storage is', SecureStorage);
+
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
@@ -100,10 +102,10 @@ function txKey(hash: string): string {
 	return 'tx_' + hash;
 }
 
-export const deleteAccount = (accountKey: string): void =>
+export const deleteAccount = (accountKey: string): Promise<void> =>
 	SecureStorage.deleteItem(accountKey, currentAccountsStore);
 
-export const saveAccount = (accountKey: string, account: Account): void =>
+export const saveAccount = (accountKey: string, account: Account): Promise<void> =>
 	SecureStorage.setItem(
 		accountKey,
 		JSON.stringify(account, null, 0),
