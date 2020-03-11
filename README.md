@@ -208,7 +208,7 @@ This should open a menu on the device. In that menu go to `Dev Settings` > `Debu
 5. `yarn start --reset-cache`
 
 ##### build on iOS
-6. in Xcode, clean build with `shift + command + K`
+6. in Xcode (be sure to open with `./ios/NativeSigner.xcodeworkspace` file), clean build with `shift + command + K`
 7. `yarn run ios`
 
 ##### build on Android
