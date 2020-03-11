@@ -65,6 +65,7 @@ export const SubstrateNetworkKeys: {
 	SUBSTRATE_DEV:
 		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 	WESTEND: '0x4a31f96525a77959d97e267c8fc3066ca333d9ade161720e1b7de8d35ccc6bd2',
+	KULUPU: '0x37e1f8125397a98630013a4dff89b54cb758ff8eed894419e65a6dcf27a6fb8a',
 	EDGEWARE: '0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
 });
 
@@ -148,6 +149,15 @@ const substrateNetworkBase: {
 		prefix: 7,
 		title: 'Edgeware',
 		unit: 'EDG'
+	},
+	[SubstrateNetworkKeys.KULUPU]: {
+		color: '#eeffee',
+		decimals: 18,
+		genesisHash: SubstrateNetworkKeys.KULUPU,
+		pathId: 'kulupu',
+		prefix: 16,
+		title: 'Kulupu',
+		unit: 'KULU'
 	},
 };
 
