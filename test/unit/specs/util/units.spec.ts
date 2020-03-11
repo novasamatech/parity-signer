@@ -15,13 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Metadata, TypeRegistry } from '@polkadot/types';
-import Call from '@polkadot/types/primitive/Generic/Call';
+import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
 
-import kusamaData from 'constants/static-kusama';
+import { kusamaMetadata } from 'constants/networkMetadata';
 import { fromWei } from 'utils/units';
 const registry = new TypeRegistry();
-registry.setMetadata(new Metadata(registry, kusamaData));
+registry.setMetadata(new Metadata(registry, kusamaMetadata));
 
 describe('units', () => {
 	describe('ethereum', () => {
@@ -55,7 +55,7 @@ describe('units', () => {
 					args[i].toRawType() === 'Balance' ||
 					args[i].toRawType() === 'Compact<Balance>'
 				) {
-					value = formatBalance(args[i].toString(), true, 12);
+					value = formatBalance(args[i].toString(), undefined, 12);
 				} else {
 					value = args[i].toString();
 				}
