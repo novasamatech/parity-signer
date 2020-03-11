@@ -138,7 +138,7 @@ const substrateNetworkBase: {
 		prefix: 0,
 		title: 'Polkadot mainnet',
 		unit: 'DOT'
-	}
+	},
 };
 
 const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
