@@ -68,7 +68,7 @@ const raw = [
 		address: 'address5',
 		expectName: 'default',
 		name: '',
-		path: '//polkadot//default'
+		path: '//polkadot_test//default'
 	},
 	{
 		address: 'address6',
@@ -111,7 +111,13 @@ const raw = [
 		address: 'softAddress2',
 		expectName: '1',
 		name: '',
-		path: '/polkadot/1'
+		path: '/polkadot_test/1'
+	},
+	{
+		address: 'polkadotReservedAddress',
+		expectName: 'reserved',
+		name: '',
+		path: '//polkadot//reserved'
 	}
 ];
 const expectNames = raw.map(v => v.expectName);
@@ -184,12 +190,12 @@ describe('IdentitiesUtils', () => {
 
 	it('regroup the unknown paths', () => {
 		const unKnownPaths = [
-			'//polkadot//default',
+			'//polkadot_test//default',
 			'',
 			'//custom',
 			'/kusama',
 			'/kusama/1',
-			'/polkadot/1'
+			'/polkadot_test/1'
 		];
 		const groupResult = groupPaths(unKnownPaths);
 		expect(groupResult).toEqual([
@@ -202,12 +208,12 @@ describe('IdentitiesUtils', () => {
 				title: '//custom'
 			},
 			{
-				paths: ['/polkadot/1'],
-				title: '/polkadot'
+				paths: ['/polkadot_test/1'],
+				title: '/polkadot_test'
 			},
 			{
-				paths: ['//polkadot//default'],
-				title: '//polkadot'
+				paths: ['//polkadot_test//default'],
+				title: '//polkadot_test'
 			},
 			{
 				paths: ['/kusama', '/kusama/1'],
@@ -228,7 +234,8 @@ describe('IdentitiesUtils', () => {
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
-			UnknownNetworkKeys.UNKNOWN
+			UnknownNetworkKeys.UNKNOWN,
+			SubstrateNetworkKeys.POLKADOT
 		]);
 	});
 

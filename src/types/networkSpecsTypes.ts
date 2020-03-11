@@ -10,8 +10,9 @@ export type NetworkParams =
 export type SubstrateNetworkParams = {
 	color: string;
 	decimals: number;
-	genesisHash: string;
+	genesisHash: string | null;
 	logo: number;
+	order?: number;
 	pathId: string;
 	protocol: NetworkProtocol;
 	prefix: number;

@@ -271,6 +271,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = this.getAccountFromIdentity(accountId);
 		} else {
+			//TODO remove this function when we enable networkSpecs update and remove KUSAMA_CC2 network.
 			derivedAccount = this.getAccountFromIdentity(address);
 		}
 
