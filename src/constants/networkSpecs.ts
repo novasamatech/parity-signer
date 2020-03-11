@@ -138,7 +138,7 @@ const substrateNetworkBase: {
 		//TODO genesisHash to be added after launch
 		logo: require('res/img/logos/polkadot.png'),
 		prefix: 0,
-		title: 'Polkadot mainnet',
+		title: 'Polkadot',
 		unit: 'DOT'
 	},
 	[SubstrateNetworkKeys.EDGEWARE]: {
@@ -151,7 +151,7 @@ const substrateNetworkBase: {
 		unit: 'EDG'
 	},
 	[SubstrateNetworkKeys.KULUPU]: {
-		color: '#eeffee',
+		color: '#0effee',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
 		pathId: 'kulupu',
