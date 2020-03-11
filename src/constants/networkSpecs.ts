@@ -133,7 +133,7 @@ const substrateNetworkBase: {
 	[SubstrateNetworkKeys.POLKADOT]: {
 		color: '#e7007a',
 		decimals: 12,
-		//genesisHash: SubstrateNetworkKeys.POLKADOT,
+		//TODO genesisHash to be added after launch
 		logo: require('res/img/logos/polkadot.png'),
 		prefix: 0,
 		title: 'Polkadot mainnet',

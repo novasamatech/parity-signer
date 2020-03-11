@@ -40,6 +40,7 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 - `rustup` (tested on `rustup 1.16.0`)
 - `rustc` (tested on `rustc 1.32.0 (9fda7c223 2019-01-16)`)
 - `cargo` (tested on `cargo 1.32.0 (8610973aa 2019-01-02)`)
+- `cocoapods` (`$ sudo gem install cocoapods`)
 - `android_ndk` (tested on `r19`)
 - `Android Studio` (only for Android, tested on `Version 3.3`)
 - `Xcode` (only for iOS, tested on `Version 9.4.1 (9F2000)`)
@@ -71,7 +72,14 @@ Parity Signer was built to be used offline. The mobile device used to run the ap
 
 ### Usage
 
-- First start React Native server with increased heap to prevent out of memory error
+- Install Dependencies
+
+    ```
+    yarn
+    cd ios && pod install && cd ..
+    ```   
+
+- Start React Native server with increased heap to prevent out of memory error
 
     ```
     yarn start
@@ -190,3 +198,19 @@ This should open a menu on the device. In that menu go to `Dev Settings` > `Debu
 1. Edit `./android/local.properties` so that `ndk.dir` points to the absolute path to the NDK directory.
 1. Remove old NDK build with `rm -rf ./NDK`.
 1. Build the new NDK with `./create-ndk-standalone.sh`.
+
+#### Cannot run after upgrade to latest codebase
+
+1. `yarn clean`
+2. `yarn install`
+3. `cd ios && pod install && cd ..`
+4. delete app on device
+5. `yarn start --reset-cache`
+
+##### build on iOS
+6. in Xcode (be sure to open with `./ios/NativeSigner.xcodeworkspace` file), clean build with `shift + command + K`
+7. `yarn run ios`
+
+##### build on Android
+6. clean build with `cd android && ./gradlew clean && cd ..`
+7. `yarn run android`
