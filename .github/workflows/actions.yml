@@ -76,7 +76,8 @@ jobs:
         uses:           actions/setup-node@v1
         with:
           node-version: '10.x'
-      - uses:           actions/cache@v1
+      - name:           Cache Npm
+        uses:           actions/cache@v1
         with:
           path:         ~/.npm
           key:          ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
@@ -85,13 +86,21 @@ jobs:
       - name:           Get yarn cache directory path
         id:             yarn-cache-dir-path
         run:            echo "::set-output name=dir::$(yarn cache dir)"
-      - uses:           actions/cache@v1
+      - name:           Cache Yarn
+        uses:           actions/cache@v1
         id:             yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
           path:         ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key:          ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name:           Cache Pods
+        uses:           actions/cache@v1
+        with:
+          path:         ios/Pods
+          key:          ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
       - name:           Install dependencies
         run:            |
           brew tap wix/brew
@@ -101,6 +110,8 @@ jobs:
           npm install -g detox-cli
           gem install xcpretty
           yarn
+      - name:           Build CocoaPods
+        run:            cd ios && pod install && cd ..
       - name:           Build targets
         run:            cd rust/signer && make ios && cd ../..
       - name:           Stop sccache
