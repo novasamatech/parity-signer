@@ -42,7 +42,6 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
 
 # Android/IntelliJ
 #
@@ -53,6 +52,7 @@ local.properties
 *.iml
 gen/
 *.hprof
+!debug.keystore
 
 # node.js
 #

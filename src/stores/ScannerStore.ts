@@ -25,8 +25,7 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
-import AccountsStore from './AccountsStore';
-
+import AccountsStore from 'stores/AccountsStore';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,

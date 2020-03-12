@@ -68,8 +68,8 @@ function SignedTx({
 				<PayloadDetailsCard
 					style={{ marginBottom: 20 }}
 					description={TX_DETAILS_MSG}
-					prefix={networkParams.prefix}
 					signature={data}
+					networkKey={sender!.networkKey}
 				/>
 			);
 		}

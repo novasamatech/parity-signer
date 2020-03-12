@@ -23,11 +23,7 @@ import { Subscribe } from 'unstated';
 import testIDs from 'e2e/testIDs';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import { FoundAccount } from 'types/identityTypes';
-import {
-	isEthereumNetworkParams,
-	SubstrateNetworkParams,
-	UnknownNetworkParams
-} from 'types/networkSpecsTypes';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import Background from 'components/Background';
@@ -143,9 +139,6 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 
 		const networkParams = NETWORK_LIST[sender.networkKey];
 		const isEthereum = isEthereumNetworkParams(networkParams);
-		const prefix = (networkParams as
-			| SubstrateNetworkParams
-			| UnknownNetworkParams)?.prefix;
 
 		return (
 			<ScrollView
@@ -157,11 +150,11 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 				<Text style={styles.topTitle}>Sign Message</Text>
 				<Text style={styles.title}>From Account</Text>
 				<CompatibleCard account={sender} accountsStore={accountsStore} />
-				{!isEthereum && prehash && prefix ? (
+				{!isEthereum && prehash ? (
 					<PayloadDetailsCard
 						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
 						payload={prehash}
-						prefix={prefix}
+						networkKey={sender.networkKey}
 					/>
 				) : null}
 				<MessageDetailsCard

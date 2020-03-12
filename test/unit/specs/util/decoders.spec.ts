@@ -21,7 +21,7 @@ import {
 	TypeRegistry
 } from '@polkadot/types';
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
-import Call from '@polkadot/types/primitive/Generic/Call';
+import Call from '@polkadot/types/generic/Call';
 import { u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import 'jest';
@@ -40,14 +40,14 @@ import {
 	isJsonString
 } from 'utils/decoders';
 import { isAscii } from 'utils/strings';
-import kusamaData from 'constants/static-kusama';
+import { kusamaMetadata } from 'constants/networkMetadata';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 const registry = new TypeRegistry();
-registry.setMetadata(new Metadata(registry, kusamaData));
+registry.setMetadata(new Metadata(registry, kusamaMetadata));
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
