@@ -50,7 +50,8 @@ import {
 	NetworkParams,
 	SubstrateNetworkParams,
 	isSubstrateNetworkParams,
-	isEthereumNetworkParams
+	isEthereumNetworkParams,
+	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 
@@ -126,8 +127,25 @@ function AccountNetworkChooser({
 		</ScrollView>
 	);
 
-	const sortNetworkKeys = ([, networkParams]: [any, NetworkParams]): number =>
-		networkParams.protocol !== NetworkProtocols.SUBSTRATE ? 1 : -1;
+	const sortNetworkKeys = (
+		[, params1]: [any, NetworkParams],
+		[, params2]: [any, NetworkParams]
+	): number => {
+		const infinity = 999;
+		const getOrder = (param: NetworkParams): number => {
+			if (isEthereumNetworkParams(param)) return infinity;
+			if (isUnknownNetworkParams(param)) return 0;
+			return (param as SubstrateNetworkParams).order ?? infinity - 1;
+		};
+
+		if (getOrder(params1) > getOrder(params2)) {
+			return 1;
+		} else if (getOrder(params1) < getOrder(params2)) {
+			return -1;
+		} else {
+			return 0;
+		}
+	};
 
 	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
 		const shouldExclude = excludedNetworks.includes(networkKey);
