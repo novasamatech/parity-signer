@@ -9,7 +9,7 @@ on:
 jobs:
   check:
     name:               ESLint
-    runs-on:            macos-latest
+    runs-on:            ubuntu-latest
     steps:
       - name:           Checkout sources
         uses:           actions/checkout@v2
