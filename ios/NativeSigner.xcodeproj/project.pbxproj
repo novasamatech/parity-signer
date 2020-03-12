@@ -827,9 +827,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"<Multiple",
-					"values>",
 					"${PODS_ROOT}/",
+					"$(SRCROOT)/../rust/signer",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
