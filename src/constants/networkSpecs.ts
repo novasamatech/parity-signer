@@ -74,6 +74,7 @@ export const SubstrateNetworkKeys: {
 const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.bg_alert,
+		order: 0,
 		pathId: '',
 		prefix: 2,
 		protocol: NetworkProtocols.UNKNOWN,
@@ -178,6 +179,7 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 	[EthereumNetworkKeys.FRONTIER]: {
 		color: '#64A2F4',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
+		order: 101,
 		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum'
 	},
@@ -185,19 +187,23 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 		color: '#319C7C',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
 		logo: require('res/img/logos/eth-classic.png'),
+		order: 103,
 		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum Classic'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
 		ethereumChainId: EthereumNetworkKeys.ROPSTEN,
+		order: 104,
 		title: 'Ropsten Testnet'
 	},
 	[EthereumNetworkKeys.GOERLI]: {
 		ethereumChainId: EthereumNetworkKeys.GOERLI,
+		order: 105,
 		title: 'Görli Testnet'
 	},
 	[EthereumNetworkKeys.KOVAN]: {
 		ethereumChainId: EthereumNetworkKeys.KOVAN,
+		order: 103,
 		title: 'Kovan Testnet'
 	}
 };

@@ -131,16 +131,9 @@ function AccountNetworkChooser({
 		[, params1]: [any, NetworkParams],
 		[, params2]: [any, NetworkParams]
 	): number => {
-		const infinity = 999;
-		const getOrder = (param: NetworkParams): number => {
-			if (isEthereumNetworkParams(param)) return infinity;
-			if (isUnknownNetworkParams(param)) return 0;
-			return (param as SubstrateNetworkParams).order ?? infinity - 1;
-		};
-
-		if (getOrder(params1) > getOrder(params2)) {
+		if (params1.order > params2.order) {
 			return 1;
-		} else if (getOrder(params1) < getOrder(params2)) {
+		} else if (params1.order < params2.order) {
 			return -1;
 		} else {
 			return 0;
