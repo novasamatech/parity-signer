@@ -187,7 +187,7 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 		color: '#319C7C',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
 		logo: require('res/img/logos/eth-classic.png'),
-		order: 103,
+		order: 102,
 		secondaryColor: colors.card_bgSolid,
 		title: 'Ethereum Classic'
 	},
