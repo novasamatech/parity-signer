@@ -162,7 +162,7 @@ function PathsList({
 				)}
 				<ButtonNewDerivation
 					testID={testIDs.PathsList.deriveButton}
-					title="Create New Derivation"
+					title="Derive New Account"
 					onPress={(): boolean =>
 						navigation.navigate('PathDerivation', {
 							parentPath: isUnknownNetworkPath ? '' : rootPath
