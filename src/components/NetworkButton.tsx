@@ -16,14 +16,13 @@
 
 import { StyleSheet, Text } from 'react-native';
 import React from 'react';
-import { NavigationInjectedProps, withNavigation } from 'react-navigation';
-
+import {useNavigation} from '@react-navigation/native';
 import TouchableItem from './TouchableItem';
 
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 
-interface Props extends NavigationInjectedProps {
+interface Props {
 	network: {
 		title: number;
 		color: string;
@@ -33,7 +32,8 @@ interface Props extends NavigationInjectedProps {
 
 class NetworkButton extends React.PureComponent<Props> {
 	render(): React.ReactNode {
-		const { navigation, network } = this.props;
+		const { network } = this.props;
+		const navigation = useNavigation();
 
 		return (
 			<TouchableItem
@@ -72,4 +72,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withNavigation(NetworkButton);
+export default NetworkButton;

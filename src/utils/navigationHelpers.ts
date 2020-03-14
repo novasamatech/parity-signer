@@ -18,7 +18,7 @@ import {
 	NavigationActions,
 	NavigationScreenProp,
 	StackActions
-} from 'react-navigation';
+} from '@react-navigation/native';
 
 import { Identity } from 'types/identityTypes';
 

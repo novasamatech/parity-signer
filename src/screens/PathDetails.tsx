@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
@@ -135,9 +134,10 @@ export function PathDetailsView({
 
 function PathDetails({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ path?: string }>): React.ReactElement {
-	const path = navigation.getParam('path', '');
+	navigation,
+	route,
+}: NavigationAccountProps<'PathDetails'>): React.ReactElement {
+	const path = route.params?.path ?? '';
 	const networkKey = getNetworkKey(path, accounts.state.currentIdentity!);
 	return (
 		<PathDetailsView
@@ -167,4 +167,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withAccountStore(withNavigation(PathDetails));
+export default withAccountStore(PathDetails);

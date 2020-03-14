@@ -16,7 +16,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
@@ -28,7 +29,7 @@ import fonts from 'styles/fonts';
 import { withAccountStore } from 'utils/HOC';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
-import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
+import {navigateToNewIdentityNetwork, setPin} from 'utils/navigationHelpers';
 import {
 	alertErrorWithMessage,
 	alertIdentityCreationError,
@@ -41,10 +42,11 @@ import { debounce } from 'utils/debounce';
 
 function IdentityNew({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ isRecover: boolean }>): React.ReactElement {
+	navigation,
+	route,
+}: NavigationAccountProps<'IdentityNew'>): React.ReactElement {
 	const defaultSeedValidObject = validateSeed('', false);
-	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
+	const isRecoverDefaultValue = route.params.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
@@ -169,7 +171,7 @@ function IdentityNew({
 	);
 }
 
-export default withAccountStore(withNavigation(IdentityNew));
+export default withAccountStore(IdentityNew);
 
 const styles = StyleSheet.create({
 	body: {

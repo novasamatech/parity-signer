@@ -20,7 +20,7 @@
 
 import React, { FunctionComponent, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 
 import {
 	NETWORK_LIST,
@@ -29,8 +29,10 @@ import {
 	NetworkProtocols
 } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import type AccountsStore from 'stores/AccountsStore';
 import colors from 'styles/colors';
 import Button from 'components/Button';
+import {RootStackParamList} from 'types/router';
 import {
 	navigateToPathsList,
 	unlockSeedPhrase,
@@ -65,10 +67,11 @@ if (!__DEV__) {
 }
 
 function AccountNetworkChooser({
-	navigation,
-	accounts
-}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
-	const isNew = navigation.getParam('isNew', false);
+	accounts,
+}: AccountsStore): React.ReactElement {
+	const route: RouteProp<RootStackParamList, 'AccountNetworkChooser'> = useRoute();
+	const navigation = useNavigation();
+	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity, loaded } = accounts.state;
 	const hasLegacyAccount = accounts.getAccounts().size !== 0;
@@ -293,7 +296,7 @@ function AccountNetworkChooser({
 	);
 }
 
-export default withAccountStore(withNavigation(AccountNetworkChooser));
+export default withAccountStore(AccountNetworkChooser);
 
 const styles = StyleSheet.create({
 	body: {

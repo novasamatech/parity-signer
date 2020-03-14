@@ -16,7 +16,6 @@
 
 import React, { useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import { Account, UnlockedAccount } from 'types/identityTypes';
@@ -194,7 +193,7 @@ function AccountNew({
 	);
 }
 
-export default withAccountStore(withNavigation(AccountNew));
+export default withAccountStore(AccountNew);
 
 const styles = StyleSheet.create({
 	body: {

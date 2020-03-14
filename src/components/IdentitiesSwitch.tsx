@@ -16,7 +16,6 @@
 
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { withNavigation, ScrollView, NavigationParams } from 'react-navigation';
 
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
@@ -37,9 +36,10 @@ import { Identity } from 'types/identityTypes';
 
 function IdentitiesSwitch({
 	navigation,
-	accounts
-}: NavigationAccountProps<{ isSwitchOpen?: boolean }>): React.ReactElement {
-	const defaultVisible = navigation.getParam('isSwitchOpen', false);
+	accounts,
+	route
+}: NavigationAccountProps<'IdentitiesSwitch'>): React.ReactElement {
+	const defaultVisible = route.params?.isSwitchOpen ?? false;
 	const [visible, setVisible] = useState(defaultVisible);
 	const { currentIdentity, identities } = accounts.state;
 
@@ -329,4 +329,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withAccountStore(withNavigation(IdentitiesSwitch));
+export default withAccountStore(IdentitiesSwitch);

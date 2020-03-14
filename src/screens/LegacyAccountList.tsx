@@ -16,7 +16,6 @@
 
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
@@ -64,7 +63,7 @@ function LegacyAccountList({
 	);
 }
 
-export default withAccountStore(withNavigation(LegacyAccountList));
+export default withAccountStore(LegacyAccountList);
 
 const styles = StyleSheet.create({
 	body: {

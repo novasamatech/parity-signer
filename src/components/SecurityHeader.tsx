@@ -17,8 +17,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NavigationInjectedProps, withNavigation } from 'react-navigation';
-
+import {useNavigation} from '@react-navigation/native';
 import ButtonIcon from './ButtonIcon';
 
 import testIDs from 'e2e/testIDs';
@@ -26,11 +25,9 @@ import colors from 'styles/colors';
 import IdentitiesSwitch from 'components/IdentitiesSwitch';
 import { navigateToQrScanner } from 'utils/navigationHelpers';
 
-function SecurityHeader({
-	navigation
-}: NavigationInjectedProps): React.ReactElement<NavigationInjectedProps> {
+function SecurityHeader(): React.ReactElement {
 	const [isConnected, setIsConnected] = useState(false);
-
+	const navigation = useNavigation();
 	useEffect(
 		() =>
 			NetInfo.addEventListener(state => {
@@ -72,4 +69,4 @@ const styles = StyleSheet.create({
 	securityIconBgStyle: { backgroundColor: 'transparent', marginTop: -3 }
 });
 
-export default withNavigation(SecurityHeader);
+export default SecurityHeader;

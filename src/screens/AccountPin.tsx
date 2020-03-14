@@ -18,7 +18,7 @@
 
 import React, { useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { NavigationActions, StackActions } from 'react-navigation';
+import { NavigationActions, StackActions } from '@react-navigation/native';
 
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
@@ -39,7 +39,8 @@ interface State {
 }
 function AccountPin({
 	accounts,
-	navigation
+	navigation,
+	route
 }: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
 	const initialState: State = {
 		confirmation: '',
@@ -57,7 +58,7 @@ function AccountPin({
 
 	const submit = async (): Promise<void> => {
 		const { pin, confirmation } = state;
-		const accountCreation: boolean = navigation.getParam('isNew', false);
+		const accountCreation: boolean = route.params?.isNew ?? false;
 		const account = accountCreation
 			? accounts.getNew()
 			: accounts.getSelected()!;

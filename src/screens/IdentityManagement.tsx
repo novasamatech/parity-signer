@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { withNavigation } from 'react-navigation';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import testIDs from 'e2e/testIDs';
@@ -91,7 +90,7 @@ function IdentityManagement({
 	);
 }
 
-export default withAccountStore(withNavigation(IdentityManagement));
+export default withAccountStore(IdentityManagement);
 
 const styles = StyleSheet.create({
 	body: {

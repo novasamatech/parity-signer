@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NavigationActions, StackActions } from 'react-navigation';
+import { NavigationActions, StackActions } from '@react-navigation/native';
 import { Subscribe } from 'unstated';
 
 import { NavigationProps } from 'types/props';
@@ -30,11 +30,11 @@ import ScannerStore from 'stores/ScannerStore';
 
 /* Used for unlock and sign tx and messages for legacy accounts */
 export class AccountUnlockAndSign extends React.PureComponent<
-	NavigationProps<{ next: string }>
+	NavigationProps<'AccountUnlockAndSign'>
 > {
 	render(): React.ReactElement {
-		const { navigation } = this.props;
-		const next = navigation.getParam('next', 'SignedTx');
+		const { navigation, route } = this.props;
+		const next = route.params?.next ?? 'SignedTx';
 
 		return (
 			<Subscribe to={[AccountsStore, ScannerStore]}>
@@ -73,12 +73,12 @@ export class AccountUnlockAndSign extends React.PureComponent<
 }
 
 export class AccountUnlock extends React.PureComponent<
-	NavigationProps<{ next: string; onDelete: () => any }>
+	NavigationProps<'AccountUnlock'>
 > {
 	render(): React.ReactElement {
-		const { navigation } = this.props;
-		const next = navigation.getParam('next', 'LegacyAccountList');
-		const onDelete = navigation.getParam('onDelete', () => null);
+		const { navigation, route } = this.props;
+		const next = route.params?.next ?? 'LegacyAccountList';
+		const onDelete = route.params?.onDelete ?? (() => null);
 
 		return (
 			<Subscribe to={[AccountsStore]}>

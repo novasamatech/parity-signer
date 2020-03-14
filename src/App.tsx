@@ -20,18 +20,17 @@ import 'utils/iconLoader';
 import * as React from 'react';
 import { StatusBar, View, YellowBox } from 'react-native';
 import {
-	createAppContainer,
-	createSwitchNavigator,
-	NavigationInjectedProps,
-	NavigationScreenProp,
-	withNavigation
-} from 'react-navigation';
+	NavigationContainer,
+	RouteProp,
+	useRoute,useNavigationState,useNavigation
+} from '@react-navigation/native';
 import {
 	CardStyleInterpolators,
 	createStackNavigator,
-	HeaderBackButton
-} from 'react-navigation-stack';
-import { StackNavigationOptions } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+	HeaderBackButton,
+	StackNavigationOptions
+} from '@react-navigation/stack';
+import {RootStackParamList} from 'types/router';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 
@@ -70,50 +69,46 @@ import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
 import testIDs from 'e2e/testIDs';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
 
-export default class App extends React.Component<AppProps> {
-	constructor(props: AppProps) {
-		super(props);
-		getLaunchArgs(props);
-		if (__DEV__) {
-			YellowBox.ignoreWarnings([
-				'Warning: componentWillReceiveProps',
-				'Warning: componentWillMount',
-				'Warning: componentWillUpdate',
-				'Warning: Sending `onAnimatedValueUpdate`'
-			]);
-		}
+export default function App(props): React.ReactElement<AppProps> {
+	getLaunchArgs(props);
+	if (__DEV__) {
+		YellowBox.ignoreWarnings([
+			'Warning: componentWillReceiveProps',
+			'Warning: componentWillMount',
+			'Warning: componentWillUpdate',
+			'Warning: Sending `onAnimatedValueUpdate`'
+		]);
 	}
 
-	render(): React.ReactNode {
-		return (
-			<UnstatedProvider>
-				<MenuProvider backHandler={true}>
-					<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-					<Background />
-					<ScreensContainer />
-				</MenuProvider>
-			</UnstatedProvider>
-		);
-	}
+	return (
+		<UnstatedProvider>
+			<MenuProvider backHandler={true}>
+				<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+				<Background />
+				<ScreensContainer />
+			</MenuProvider>
+		</UnstatedProvider>
+	);
 }
 
-const globalStackNavigationOptions = ({
-	navigation
-}: {
-	navigation: NavigationScreenProp<{ index: number }, {}>;
-}): StackNavigationOptions => ({
+const globalStackNavigationOptions = {
 	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: {
 		color: colors.bg_text_sec
 	},
 	headerBackTitleVisible: false,
-	headerLeft: (): React.ReactElement =>
-		navigation.isFirstRouteInParent() ? (
-			<HeaderLeftHome />
+	headerLeft: (): React.ReactElement => {
+		const route = useRoute();
+		const isFirstRouteInParent = useNavigationState(
+			state => state.routes[0].key === route.key
+		);
+		return isFirstRouteInParent? (
+			<HeaderLeftHome/>
 		) : (
-			<HeaderLeftWithBack />
-		),
+			<HeaderLeftWithBack/>
+		);
+	},
 	headerRight: (): React.ReactElement => <SecurityHeader />,
 	headerStyle: {
 		backgroundColor: colors.bg,
@@ -125,49 +120,166 @@ const globalStackNavigationOptions = ({
 	},
 	headerTintColor: colors.bg_text_sec,
 	headerTitle: (): React.ReactNode => null
-});
+};
 
-const HeaderLeftWithBack = withNavigation(
-	class HeaderBackButtonComponent extends React.PureComponent<
-		NavigationInjectedProps
-	> {
-		render(): React.ReactNode {
-			const { navigation } = this.props;
-			return (
-				<View
-					style={{ flexDirection: 'row' }}
-					testID={testIDs.Header.headerBackButton}
-				>
-					<HeaderBackButton
-						{...this.props}
-						labelStyle={
-							globalStackNavigationOptions({ navigation }).headerBackTitleStyle!
-						}
-						labelVisible={false}
-						tintColor={colors.bg_text}
-						onPress={(): boolean => navigation.goBack()}
-					/>
-				</View>
-			);
-		}
-	}
-);
+const HeaderLeftWithBack = () => {
+	const {navigation} = useNavigation();
+	return (
+		<View
+			style={{flexDirection: 'row'}}
+			testID={testIDs.Header.headerBackButton}
+		>
+			<HeaderBackButton
+				{...this.props}
+				labelStyle={
+					globalStackNavigationOptions.headerBackTitleStyle
+				}
+				labelVisible={false}
+				tintColor={colors.bg_text}
+				onPress={(): boolean => navigation.goBack()}
+			/>
+		</View>
+	);
+};
 
 /* eslint-disable sort-keys */
 const tocAndPrivacyPolicyScreens = {
 	TermsAndConditions: {
-		navigationOptions: {
-			headerRight: (): React.ReactNode => null
-		},
+		options: { headerRight: (): React.ReactNode => null },
 		screen: TermsAndConditions
 	},
 	PrivacyPolicy: {
-		navigationOptions: {
-			headerRight: (): React.ReactNode => null
-		},
+		options: { headerRight: (): React.ReactNode => null },
 		screen: PrivacyPolicy
 	}
 };
+
+const ScreenStack = createStackNavigator<RootStackParamList>();
+
+const TocAndPrivacyPolicyScreens = () => (
+	<>
+		<ScreenStack.Screen
+			name="TermsAndConditions"
+			component={TermsAndConditions}
+			options={{ headerRight: (): React.ReactNode => null }}
+		/>
+		<ScreenStack.Screen
+			name="PrivacyPolicy"
+			component={PrivacyPolicy}
+			options={{ headerRight: (): React.ReactNode => null }}
+		/>
+	</>
+);
+
+const ToCStacks = () => {
+};
+
+const ScreenStacks = () => (
+	<ScreenStack.Navigator
+		initialRouteName="Screen"
+		screenOptions={}
+	>
+		{
+			<ScreenStack.Screen
+				name="AccountNetworkChooser"
+				component={AccountNetworkChooser}
+			/>
+			< ScreenStack.Screen
+			name="AccountPin"
+			component={AccountPin}
+			/>
+			<ScreenStack.Screen
+			name="AccountUnlock"
+			component={AccountUnlock}
+			/>
+			<ScreenStack.Screen
+			name="About"
+			component={About}
+			/>
+			<ScreenStack.Screen
+			name="AccountDetails"
+			component={AccountDetails}
+			/>
+			<ScreenStack.Screen
+			name="AccountEdit"
+			component={AccountEdit}
+			/>
+			<ScreenStack.Screen
+			name="AccountNew"
+			component={AccountNew}
+			/>
+			<ScreenStack.Screen
+			name="AccountUnlockAndSign"
+			component={AccountUnlockAndSign}
+			/>
+			<ScreenStack.Screen
+			name="LegacyAccountBackup"
+			component={LegacyAccountBackup}
+			/>
+			<ScreenStack.Screen
+			name="LegacyAccountList"
+			component={LegacyAccountList}
+			/>
+			<ScreenStack.Screen
+			name="LegacyNetworkChooser"
+			component={LegacyNetworkChooser}
+			/>
+			<ScreenStack.Screen
+			name="IdentityBackup"
+			component={IdentityBackup}
+			/>
+			<ScreenStack.Screen
+			name="IdentityManagement"
+			component={IdentityManagement}
+			/>
+			<ScreenStack.Screen
+			name="IdentityNew"
+			component={IdentityNew}
+			/>
+			<ScreenStack.Screen
+			name="IdentityPin"
+			component={IdentityPin}
+			/>
+			<ScreenStack.Screen
+			name="MessageDetails"
+			component={MessageDetails}
+			/>
+			<ScreenStack.Screen
+			name="PathDerivation"
+			component={PathDerivation}
+			/>
+			<ScreenStack.Screen
+			name="PathDetails"
+			component={PathDetails}
+			/>
+			<ScreenStack.Screen
+			name="PathsList"
+			component={PathsList}
+			/>
+			<ScreenStack.Screen
+			name="PathManagement"
+			component={PathManagement}
+			/>
+			<ScreenStack.Screen
+			name="QrScanner"
+			component={QrScanner}
+			/>
+			<ScreenStack.Screen
+			name="SignedMessage"
+			component={SignedMessage}
+			/>
+			<ScreenStack.Screen
+			name="SignedTx"
+			component={SignedTx}
+			/>
+			<ScreenStack.Screen
+			name="TxDetails"
+			component={TxDetails}
+			/>
+		{TocAndPrivacyPolicyScreens}
+		}
+	</ScreenStack.Navigator>
+);
 
 const Screens = createSwitchNavigator(
 	{

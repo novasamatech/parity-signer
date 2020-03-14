@@ -36,7 +36,7 @@ interface State {
 }
 
 export default class TermsAndConditions extends React.PureComponent<
-	NavigationProps<{ disableButtons?: boolean }>,
+	NavigationProps<'TermsAndConditions'>,
 	State
 > {
 	state: State = {
@@ -45,10 +45,9 @@ export default class TermsAndConditions extends React.PureComponent<
 	};
 
 	render(): React.ReactElement {
-		const { navigation } = this.props;
+		const { navigation, route } = this.props;
 		const { tocAgreement, ppAgreement } = this.state;
-		const disableButtons = navigation.getParam('disableButtons', false);
-
+		const disableButtons = route.params.disableButtons ?? false;
 		const onConfirm = async (): Promise<void> => {
 			await saveToCAndPPConfirmation();
 			navigation.navigate('Welcome');

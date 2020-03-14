@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { withNavigation } from 'react-navigation';
 import { ScrollView } from 'react-native';
 
 import { NavigationAccountProps } from 'types/props';
@@ -26,9 +25,10 @@ import colors from 'styles/colors';
 
 function PathManagement({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ path?: string }>): React.ReactElement {
-	const path = navigation.getParam('path', '');
+	navigation,
+	route,
+}: NavigationAccountProps<'PathManagement'>): React.ReactElement {
+	const path = route.params.path ?? '';
 	const { currentIdentity } = accounts.state;
 	const pathName = currentIdentity!.meta.get(path)?.name;
 
@@ -48,4 +48,4 @@ function PathManagement({
 	);
 }
 
-export default withAccountStore(withNavigation(PathManagement));
+export default withAccountStore(PathManagement);

@@ -16,7 +16,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
@@ -37,11 +36,12 @@ import Button from 'components/Button';
 
 function IdentityBackup({
 	navigation,
-	accounts
-}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
+	accounts,
+	route
+}: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(24);
-	const isNew = navigation.getParam('isNew', false);
+	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
 		await accounts.saveNewIdentity(seedPhrase, pin);
@@ -122,7 +122,7 @@ function IdentityBackup({
 	);
 }
 
-export default withAccountStore(withNavigation(IdentityBackup));
+export default withAccountStore(IdentityBackup);
 
 const styles = StyleSheet.create({
 	body: {

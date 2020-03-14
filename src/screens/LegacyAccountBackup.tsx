@@ -23,7 +23,6 @@ import {
 	Text,
 	View
 } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import { NetworkProtocols, NETWORK_LIST } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
@@ -41,9 +40,10 @@ import { withAccountStore } from 'utils/HOC';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 function LegacyAccountBackup({
-	navigation,
-	accounts
-}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
+															 accounts,
+															 navigation,
+															 route,
+}: NavigationAccountProps<'LegacyAccountBackup'>): React.ReactElement {
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
 			if (nextAppState === 'inactive') {
@@ -64,7 +64,7 @@ function LegacyAccountBackup({
 	}, [navigation, accounts]);
 
 	const { navigate } = navigation;
-	const isNew = navigation.getParam('isNew');
+	const isNew = route.params.isNew;
 	const {
 		address,
 		derivationPassword = '',
@@ -130,7 +130,7 @@ function LegacyAccountBackup({
 	);
 }
 
-export default withAccountStore(withNavigation(LegacyAccountBackup));
+export default withAccountStore(LegacyAccountBackup);
 
 const styles = StyleSheet.create({
 	body: {

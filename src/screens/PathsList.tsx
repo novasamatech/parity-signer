@@ -16,7 +16,6 @@
 
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import { PathDetailsView } from './PathDetails';
 
@@ -44,12 +43,10 @@ import { LeftScreenHeading } from 'components/ScreenHeading';
 
 function PathsList({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ networkKey?: string }>): React.ReactElement {
-	const networkKey = navigation.getParam(
-		'networkKey',
-		UnknownNetworkKeys.UNKNOWN
-	);
+	navigation,
+	route
+}: NavigationAccountProps<'PathsList'>): React.ReactElement {
+	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
 	const networkParams = NETWORK_LIST[networkKey];
 
 	const { currentIdentity } = accounts.state;
@@ -174,7 +171,7 @@ function PathsList({
 	);
 }
 
-export default withAccountStore(withNavigation(PathsList));
+export default withAccountStore(PathsList);
 
 const styles = StyleSheet.create({
 	body: {
