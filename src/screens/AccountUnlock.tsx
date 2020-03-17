@@ -34,7 +34,7 @@ export class AccountUnlockAndSign extends React.PureComponent<
 > {
 	render(): React.ReactElement {
 		const { navigation, route } = this.props;
-		const next = route.params?.next ?? 'SignedTx';
+		const next = route.params.next ?? 'SignedTx';
 
 		return (
 			<Subscribe to={[AccountsStore, ScannerStore]}>
@@ -76,8 +76,8 @@ export class AccountUnlock extends React.PureComponent<
 > {
 	render(): React.ReactElement {
 		const { navigation, route } = this.props;
-		const next = route.params?.next ?? 'LegacyAccountList';
-		const onDelete = route.params?.onDelete ?? ((): any => null);
+		const next = route.params.next ?? 'LegacyAccountList';
+		const onDelete = route.params.onDelete ?? ((): any => null);
 
 		return (
 			<Subscribe to={[AccountsStore]}>

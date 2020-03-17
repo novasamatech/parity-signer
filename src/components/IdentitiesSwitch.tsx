@@ -47,7 +47,7 @@ function IdentitiesSwitch({
 	const { currentIdentity, identities } = accounts.state;
 	useEffect(() => {
 		const firstLogin: boolean = identities.length === 0;
-		if (currentIdentity === null || firstLogin) {
+		if (currentIdentity === null && !firstLogin) {
 			setVisible(true);
 		}
 	}, [currentIdentity, identities]);
@@ -180,12 +180,9 @@ function IdentitiesSwitch({
 		);
 	};
 
-	const renderNonSelectedIdentity = ({
-		item
-	}: {
-		item: Identity;
-	}): React.ReactElement => {
-		const identity = item;
+	const renderNonSelectedIdentity = (
+		identity: Identity
+	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
 
 		return (
@@ -198,6 +195,7 @@ function IdentitiesSwitch({
 				onPress={(): Promise<void> =>
 					onIdentitySelectedAndNavigate(identity, 'AccountNetworkChooser')
 				}
+				key={identity.encryptedSeed}
 				iconType="antdesign"
 				iconName="user"
 				iconSize={24}
@@ -221,13 +219,8 @@ function IdentitiesSwitch({
 
 		return (
 			<>
-				<ScrollView style={{ maxHeight: 180 }}>
-					<FlatList
-						data={identitiesToShow}
-						renderItem={renderNonSelectedIdentity}
-						keyExtractor={(item: Identity): string => item.encryptedSeed}
-						style={{ paddingVertical: identities.length > 5 ? 8 : 0 }}
-					/>
+				<ScrollView style={{ maxHeight: 180, paddingVertical: identities.length > 5 ? 8 : 0 }}>
+					{identitiesToShow.map(renderNonSelectedIdentity)}
 				</ScrollView>
 				{identities.length > 5 && (
 					<Separator

@@ -64,7 +64,7 @@ function LegacyAccountBackup({
 	}, [navigation, accounts]);
 
 	const { navigate } = navigation;
-	const isNew = route.params.isNew;
+	const isNew = route.params?.isNew ?? false;
 	const {
 		address,
 		derivationPassword = '',

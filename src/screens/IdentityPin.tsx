@@ -51,10 +51,10 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 	const [state, setState] = useState(initialState);
 	const updateState = (delta: Partial<State>): void =>
 		setState({ ...state, ...delta });
-	const isUnlock = route.params?.isUnlock ?? false;
+	const isUnlock = route.params.isUnlock ?? false;
 
 	const submit = async (): Promise<void> => {
-		const isIdentityCreation = route.params.isNew;
+		const isIdentityCreation = route.params.isNew ?? false;
 		const { pin, confirmation } = state;
 		if (pin.length >= 6 && pin === confirmation) {
 			if (isIdentityCreation) {

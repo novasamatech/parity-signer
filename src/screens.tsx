@@ -61,6 +61,14 @@ import { RootStackParamList } from 'types/routes';
 
 export const ScreenStack = createStackNavigator<RootStackParamList>();
 
+const HeaderLeft = (): React.ReactElement => {
+	const route = useRoute();
+	const isFirstRouteInParent = useNavigationState(
+		state => state.routes[0].key === route.key
+	);
+	return isFirstRouteInParent ? <HeaderLeftHome /> : <HeaderLeftWithBack />;
+};
+
 const globalStackNavigationOptions = {
 	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
@@ -68,13 +76,7 @@ const globalStackNavigationOptions = {
 		color: colors.bg_text_sec
 	},
 	headerBackTitleVisible: false,
-	headerLeft: function HeaderLeft(): React.ReactElement {
-		const route = useRoute();
-		const isFirstRouteInParent = useNavigationState(
-			state => state.routes[0].key === route.key
-		);
-		return isFirstRouteInParent ? <HeaderLeftHome /> : <HeaderLeftWithBack />;
-	},
+	headerLeft: (): React.ReactElement => <HeaderLeft/>,
 	headerRight: (): React.ReactElement => <SecurityHeader />,
 	headerStyle: {
 		backgroundColor: colors.bg,
@@ -153,19 +155,23 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
 		<ScreenStack.Screen name="TxDetails" component={TxDetails} />
-		<TocAndPrivacyPolicyScreens />
-	</ScreenStack.Navigator>
-);
-
-const TocAndPrivacyPolicyScreens = (): React.ReactElement => (
-	<>
 		<ScreenStack.Screen
 			name="TermsAndConditions"
 			component={TermsAndConditions}
 		/>
 		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-	</>
+	</ScreenStack.Navigator>
 );
+
+// const TocAndPrivacyPolicyScreens = (): React.ReactElement => (
+// 	<React.Fragment>
+// 		<ScreenStack.Screen
+// 			name="TermsAndConditions"
+// 			component={TermsAndConditions}
+// 		/>
+// 		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+// 	</React.Fragment>
+// );
 
 export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
@@ -175,6 +181,10 @@ export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
 			headerRight: (): React.ReactNode => null
 		}}
 	>
-		<TocAndPrivacyPolicyScreens />
+		<ScreenStack.Screen
+			name="TermsAndConditions"
+			component={TermsAndConditions}
+		/>
+		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
 	</ScreenStack.Navigator>
 );

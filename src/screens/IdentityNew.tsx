@@ -44,7 +44,7 @@ function IdentityNew({
 	route
 }: NavigationAccountProps<'IdentityNew'>): React.ReactElement {
 	const defaultSeedValidObject = validateSeed('', false);
-	const isRecoverDefaultValue = route.params.isRecover ?? false;
+	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');

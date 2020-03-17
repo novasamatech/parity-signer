@@ -43,11 +43,12 @@ import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
 
-
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation: StackNavigationProp<RootStackParamList, 'PathDetails'> | StackNavigationProp<RootStackParamList, 'PathsList'>;
+	navigation:
+		| StackNavigationProp<RootStackParamList, 'PathDetails'>
+		| StackNavigationProp<RootStackParamList, 'PathsList'>;
 	accounts: AccountsStore;
 }
 
@@ -144,7 +145,7 @@ function PathDetails({
 	navigation,
 	route
 }: NavigationAccountProps<'PathDetails'>): React.ReactElement {
-	const path = route.params?.path ?? '';
+	const path = route.params.path ?? '';
 	const networkKey = getNetworkKey(path, accounts.state.currentIdentity!);
 	return (
 		<PathDetailsView
