@@ -25,8 +25,7 @@ import colors from 'styles/colors';
 
 function PathManagement({
 	accounts,
-	navigation,
-	route,
+	route
 }: NavigationAccountProps<'PathManagement'>): React.ReactElement {
 	const path = route.params.path ?? '';
 	const { currentIdentity } = accounts.state;

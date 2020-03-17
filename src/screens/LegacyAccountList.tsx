@@ -28,7 +28,7 @@ import { withAccountStore } from 'utils/HOC';
 function LegacyAccountList({
 	navigation,
 	accounts
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'LegacyAccountList'>): React.ReactElement {
 	const onAccountSelected = async (key: string): Promise<void> => {
 		await accounts.select(key);
 		navigation.navigate('AccountDetails');

@@ -39,7 +39,7 @@ import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { Transaction } from 'utils/transaction';
 
 export default class TxDetails extends React.PureComponent<
-	NavigationProps<{}>
+	NavigationProps<'TxDetails'>
 > {
 	async onSignTx(
 		scannerStore: ScannerStore,
@@ -104,7 +104,7 @@ export default class TxDetails extends React.PureComponent<
 	}
 }
 
-interface ViewProps extends NavigationAccountScannerProps<{}> {
+interface ViewProps extends NavigationAccountScannerProps<'TxDetails'> {
 	gas: string;
 	gasPrice: string;
 	nonce: string;

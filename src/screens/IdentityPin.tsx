@@ -28,11 +28,8 @@ import fontStyles from 'styles/fontStyles';
 import { onlyNumberRegex } from 'utils/regex';
 import { unlockIdentitySeed } from 'utils/identitiesUtils';
 import { NavigationAccountProps } from 'types/props';
-import { Identity } from 'types/identityTypes';
 
-interface Props
-	extends NavigationAccountProps<'IdentityPin'>,
-		TextInputProps {
+interface Props extends NavigationAccountProps<'IdentityPin'>, TextInputProps {
 	label: string;
 }
 
@@ -43,7 +40,7 @@ type State = {
 	pinMismatch: boolean;
 	pinTooShort: boolean;
 };
-function IdentityPin({ navigation, accounts, route }: Props): React.ReactElement {
+function IdentityPin({ accounts, route }: Props): React.ReactElement {
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,

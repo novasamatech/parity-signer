@@ -83,7 +83,7 @@ function PathsList({
 				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
-				onPress={(): boolean => navigate('PathDetails', { path })}
+				onPress={(): void => navigate('PathDetails', { path })}
 			/>
 		);
 	};
@@ -132,7 +132,7 @@ function PathsList({
 						testID={testIDs.PathsList.pathCard + path}
 						identity={currentIdentity}
 						path={path}
-						onPress={(): boolean => navigate('PathDetails', { path })}
+						onPress={(): void => navigate('PathDetails', { path })}
 					/>
 				</View>
 			))}
@@ -160,7 +160,7 @@ function PathsList({
 				<ButtonNewDerivation
 					testID={testIDs.PathsList.deriveButton}
 					title="Derive New Account"
-					onPress={(): boolean =>
+					onPress={(): void =>
 						navigation.navigate('PathDerivation', {
 							parentPath: isUnknownNetworkPath ? '' : rootPath
 						})

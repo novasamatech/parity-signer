@@ -40,9 +40,9 @@ import { withAccountStore } from 'utils/HOC';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 function LegacyAccountBackup({
-															 accounts,
-															 navigation,
-															 route,
+	accounts,
+	navigation,
+	route
 }: NavigationAccountProps<'LegacyAccountBackup'>): React.ReactElement {
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {

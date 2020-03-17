@@ -20,7 +20,6 @@
 
 import React, { FunctionComponent, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 
 import {
 	NETWORK_LIST,
@@ -29,10 +28,9 @@ import {
 	NetworkProtocols
 } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
-import type AccountsStore from 'stores/AccountsStore';
 import colors from 'styles/colors';
 import Button from 'components/Button';
-import {RootStackParamList} from 'types/router';
+import { NavigationAccountProps } from 'types/props';
 import {
 	navigateToPathsList,
 	unlockSeedPhrase,
@@ -52,10 +50,8 @@ import {
 	NetworkParams,
 	SubstrateNetworkParams,
 	isSubstrateNetworkParams,
-	isEthereumNetworkParams,
-	isUnknownNetworkParams
+	isEthereumNetworkParams
 } from 'types/networkSpecsTypes';
-import { NavigationAccountProps } from 'types/props';
 
 const excludedNetworks = [
 	UnknownNetworkKeys.UNKNOWN,
@@ -68,9 +64,9 @@ if (!__DEV__) {
 
 function AccountNetworkChooser({
 	accounts,
-}: AccountsStore): React.ReactElement {
-	const route: RouteProp<RootStackParamList, 'AccountNetworkChooser'> = useRoute();
-	const navigation = useNavigation();
+	navigation,
+	route
+}: NavigationAccountProps<'AccountNetworkChooser'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity, loaded } = accounts.state;
@@ -87,7 +83,7 @@ function AccountNetworkChooser({
 					? testIDs.AccountNetworkChooser.recoverButton
 					: testIDs.AccountNetworkChooser.createButton
 			}
-			onPress={(): boolean => navigation.navigate('IdentityNew', { isRecover })}
+			onPress={(): void => navigation.navigate('IdentityNew', { isRecover })}
 		>
 			{text}
 		</Text>
@@ -107,7 +103,7 @@ function AccountNetworkChooser({
 				{hasLegacyAccount && (
 					<Button
 						title="Show Legacy Accounts"
-						onPress={(): boolean => navigation.navigate('LegacyAccountList')}
+						onPress={(): void => navigation.navigate('LegacyAccountList')}
 						small={true}
 						onlyText={true}
 						style={{ marginLeft: 0 }}
@@ -190,7 +186,7 @@ function AccountNetworkChooser({
 	const renderCustomPathCard = (): React.ReactElement => (
 		<NetworkCard
 			isAdd={true}
-			onPress={(): boolean =>
+			onPress={(): void =>
 				navigation.navigate('PathDerivation', { parentPath: '' })
 			}
 			testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}

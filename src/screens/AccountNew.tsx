@@ -46,7 +46,7 @@ interface State {
 function AccountNew({
 	accounts,
 	navigation
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'AccountNew'>): React.ReactElement {
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -98,7 +98,7 @@ function AccountNew({
 				address={''}
 				title={selectedNetwork!.title}
 				networkKey={selectedAccount.networkKey}
-				onPress={(): boolean => navigation.navigate('LegacyNetworkChooser')}
+				onPress={(): void => navigation.navigate('LegacyNetworkChooser')}
 			/>
 			<View style={styles.body}>
 				<Text style={styles.title}>ICON & ADDRESS</Text>

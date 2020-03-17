@@ -27,7 +27,7 @@ import MessageDetailsCard from 'components/MessageDetailsCard';
 
 function SignedMessage({
 	scannerStore
-}: NavigationScannerProps<{}>): React.ReactElement {
+}: NavigationScannerProps<'SignedMessage'>): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
 	const isHash = scannerStore.getIsHash();
 	const message = scannerStore.getMessage();

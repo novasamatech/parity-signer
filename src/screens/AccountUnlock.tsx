@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NavigationActions, StackActions } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import { Subscribe } from 'unstated';
 
 import { NavigationProps } from 'types/props';
@@ -53,15 +53,14 @@ export class AccountUnlockAndSign extends React.PureComponent<
 							}
 						}}
 						navigate={(): void => {
-							const resetAction = StackActions.reset({
-								actions: [
-									NavigationActions.navigate({
-										routeName: 'LegacyAccountList'
-									}),
-									NavigationActions.navigate({ routeName: next })
-								],
-								index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-								key: undefined
+							const resetAction = CommonActions.reset({
+								index: 1,
+								routes: [
+									{
+										name: 'LegacyAccountList'
+									},
+									{ name: next }
+								]
 							});
 							navigation.dispatch(resetAction);
 						}}
@@ -78,7 +77,7 @@ export class AccountUnlock extends React.PureComponent<
 	render(): React.ReactElement {
 		const { navigation, route } = this.props;
 		const next = route.params?.next ?? 'LegacyAccountList';
-		const onDelete = route.params?.onDelete ?? (() => null);
+		const onDelete = route.params?.onDelete ?? ((): any => null);
 
 		return (
 			<Subscribe to={[AccountsStore]}>
@@ -96,16 +95,15 @@ export class AccountUnlock extends React.PureComponent<
 								navigation.goBack();
 								onDelete();
 							} else {
-								const resetAction = StackActions.reset({
-									actions: [
-										NavigationActions.navigate({
-											routeName: 'LegacyAccountList'
-										}),
-										NavigationActions.navigate({ routeName: 'AccountDetails' }),
-										NavigationActions.navigate({ routeName: next })
-									],
-									index: 2, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-									key: undefined
+								const resetAction = CommonActions.reset({
+									index: 2,
+									routes: [
+										{
+											name: 'LegacyAccountList'
+										},
+										{ name: 'AccountDetails' },
+										{ name: next }
+									]
 								});
 								this.props.navigation.dispatch(resetAction);
 							}

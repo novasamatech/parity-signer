@@ -14,13 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
+import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
+import { RootStackParamList } from 'types/routes';
+import AccountsStore from 'stores/AccountsStore';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -31,30 +35,38 @@ import {
 	resetNavigationTo,
 	resetNavigationWithNetworkChooser
 } from 'utils/navigationHelpers';
-import { NavigationAccountProps } from 'types/props';
 import { Identity } from 'types/identityTypes';
 
 function IdentitiesSwitch({
-	navigation,
-	accounts,
-	route
-}: NavigationAccountProps<'IdentitiesSwitch'>): React.ReactElement {
-	const defaultVisible = route.params?.isSwitchOpen ?? false;
-	const [visible, setVisible] = useState(defaultVisible);
+	accounts
+}: {
+	accounts: AccountsStore;
+}): React.ReactElement {
+	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
+	const [visible, setVisible] = useState(false);
 	const { currentIdentity, identities } = accounts.state;
+	useEffect(() => {
+		const firstLogin: boolean = identities.length === 0;
+		if (currentIdentity === null || firstLogin) {
+			setVisible(true);
+		}
+	}, [currentIdentity, identities]);
 
-	const closeModalAndNavigate = (
-		screenName: string,
-		params?: NavigationParams
+	const closeModalAndNavigate = <RouteName extends keyof RootStackParamList>(
+		screenName: RouteName,
+		params?: RootStackParamList[RouteName]
 	): void => {
 		setVisible(false);
+		// @ts-ignore
 		navigation.navigate(screenName, params);
 	};
 
-	const onIdentitySelectedAndNavigate = async (
+	const onIdentitySelectedAndNavigate = async <
+		RouteName extends keyof RootStackParamList
+	>(
 		identity: Identity,
-		screenName: string,
-		params?: NavigationParams
+		screenName: RouteName,
+		params?: RootStackParamList[RouteName]
 	): Promise<void> => {
 		await accounts.selectIdentity(identity);
 		setVisible(false);
@@ -146,11 +158,7 @@ function IdentitiesSwitch({
 				/>
 				<ButtonIcon
 					title="Terms and Conditions"
-					onPress={(): void =>
-						closeModalAndNavigate('TermsAndConditions', {
-							disableButtons: true
-						})
-					}
+					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
 					iconName="arrowright"

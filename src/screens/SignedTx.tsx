@@ -33,7 +33,7 @@ import { Transaction } from 'utils/transaction';
 function SignedTx({
 	scannerStore,
 	accounts
-}: NavigationAccountScannerProps<{}>): React.ReactElement {
+}: NavigationAccountScannerProps<'SignedTx'>): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
 	const recipient = scannerStore.getRecipient()!;
 	const sender = scannerStore.getSender();

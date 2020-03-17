@@ -42,7 +42,7 @@ import CompatibleCard from 'components/CompatibleCard';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent<
-	NavigationProps<{}>
+	NavigationProps<'MessageDetails'>
 > {
 	async onSignMessage(
 		scannerStore: ScannerStore,
@@ -114,7 +114,7 @@ export default class MessageDetails extends React.PureComponent<
 	}
 }
 
-interface Props extends NavigationProps<{}> {
+interface Props extends NavigationProps<'MessageDetails'> {
 	dataToSign: string;
 	isHash?: boolean;
 	message: string;

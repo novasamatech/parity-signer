@@ -36,7 +36,7 @@ import PopupMenu from 'components/PopupMenu';
 function IdentityManagement({
 	accounts,
 	navigation
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'IdentityManagement'>): React.ReactElement {
 	const { currentIdentity } = accounts.state;
 	if (!currentIdentity) return <View />;
 
@@ -47,7 +47,7 @@ function IdentityManagement({
 					await unlockSeedPhrase(navigation);
 					const deleteSucceed = await accounts.deleteCurrentIdentity();
 					if (deleteSucceed) {
-						navigateToLandingPage(navigation, true);
+						navigateToLandingPage(navigation);
 					} else {
 						alertIdentityDeletionError();
 					}

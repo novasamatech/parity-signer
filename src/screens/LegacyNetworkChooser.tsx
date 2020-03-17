@@ -32,7 +32,7 @@ import AccountsStore from 'stores/AccountsStore';
 import { emptyAccount } from 'utils/account';
 
 export default class LegacyNetworkChooser extends React.PureComponent<
-	NavigationProps<{}>,
+	NavigationProps<'LegacyNetworkChooser'>,
 	{}
 > {
 	static navigationOptions = {
@@ -51,7 +51,7 @@ export default class LegacyNetworkChooser extends React.PureComponent<
 }
 
 class LegacyNetworkChooserView extends React.PureComponent<
-	NavigationAccountProps<{}>,
+	NavigationAccountProps<'LegacyNetworkChooser'>,
 	{}
 > {
 	render(): React.ReactElement {

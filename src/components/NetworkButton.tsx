@@ -16,7 +16,8 @@
 
 import { StyleSheet, Text } from 'react-native';
 import React from 'react';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+
 import TouchableItem from './TouchableItem';
 
 import colors from 'styles/colors';
@@ -44,7 +45,7 @@ class NetworkButton extends React.PureComponent<Props> {
 						marginBottom: 20
 					}
 				]}
-				onPress={(): boolean => navigation.navigate('AccountNetworkChooser')}
+				onPress={(): void => navigation.navigate('AccountNetworkChooser')}
 			>
 				<Text style={[styles.cardText, { color: network.secondaryColor }]}>
 					{network.title}

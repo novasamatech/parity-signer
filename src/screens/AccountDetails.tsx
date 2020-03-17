@@ -37,7 +37,7 @@ import { NavigationAccountProps } from 'types/props';
 function AccountDetails({
 	accounts,
 	navigation
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'AccountDetails'>): React.ReactElement {
 	const account = accounts.getSelected();
 	const selectedKey = accounts.getSelectedKey();
 

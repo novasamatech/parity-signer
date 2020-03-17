@@ -18,7 +18,7 @@
 
 import React, { useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { NavigationActions, StackActions } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
@@ -41,7 +41,7 @@ function AccountPin({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
+}: NavigationAccountProps<'AccountPin'>): React.ReactElement {
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -68,13 +68,9 @@ function AccountPin({
 				return navigateToLegacyAccountList(navigation);
 			} else {
 				await accounts.save(accounts.getSelectedKey(), account, pin);
-				const resetAction = StackActions.reset({
-					actions: [
-						NavigationActions.navigate({ routeName: 'LegacyAccountList' }),
-						NavigationActions.navigate({ routeName: 'AccountDetails' })
-					],
-					index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-					key: undefined
+				const resetAction = CommonActions.reset({
+					index: 1,
+					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
 				});
 				navigation.dispatch(resetAction);
 			}
