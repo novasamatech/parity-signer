@@ -1,9 +1,4 @@
-import { Identity } from 'types/identityTypes';
-
 export type RootStackParamList = {
-	// Home: undefined;
-	// AccountNetworkChooser: { userId: string };
-	// Feed: { sort: 'latest' | 'top' } | undefined;
 	About: undefined;
 	AccountDetails: undefined;
 	AccountEdit: undefined;
@@ -18,14 +13,16 @@ export type RootStackParamList = {
 	IdentityPin: {
 		isUnlock?: boolean;
 		isNew?: boolean;
-		identity?: Identity;
+		identityEncryptedSeed?: string;
 		resolve: (returnValue: string) => void;
 	};
 	MessageDetails: undefined;
 	Empty: undefined;
-	LegacyAccountBackup: {
-		isNew: boolean;
-	} | undefined;
+	LegacyAccountBackup:
+		| {
+				isNew: boolean;
+		  }
+		| undefined;
 	LegacyAccountList: undefined;
 	LegacyNetworkChooser: undefined;
 	PathDerivation: { parentPath: string };

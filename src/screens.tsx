@@ -76,7 +76,7 @@ const globalStackNavigationOptions = {
 		color: colors.bg_text_sec
 	},
 	headerBackTitleVisible: false,
-	headerLeft: (): React.ReactElement => <HeaderLeft/>,
+	headerLeft: (): React.ReactElement => <HeaderLeft />,
 	headerRight: (): React.ReactElement => <SecurityHeader />,
 	headerStyle: {
 		backgroundColor: colors.bg,

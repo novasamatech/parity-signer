@@ -38,7 +38,12 @@ export const unlockSeedPhrase = async <
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
-		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
+		const identityEncryptedSeed = identity ? identity.encryptedSeed : undefined;
+		navigation.navigate('IdentityPin', {
+			identityEncryptedSeed,
+			isUnlock: true,
+			resolve
+		});
 	});
 
 export const navigateToPathDetails = <

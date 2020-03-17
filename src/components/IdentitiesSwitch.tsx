@@ -16,7 +16,7 @@
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import ButtonIcon from './ButtonIcon';
@@ -219,7 +219,12 @@ function IdentitiesSwitch({
 
 		return (
 			<>
-				<ScrollView style={{ maxHeight: 180, paddingVertical: identities.length > 5 ? 8 : 0 }}>
+				<ScrollView
+					style={{
+						maxHeight: 180,
+						paddingVertical: identities.length > 5 ? 8 : 0
+					}}
+				>
 					{identitiesToShow.map(renderNonSelectedIdentity)}
 				</ScrollView>
 				{identities.length > 5 && (

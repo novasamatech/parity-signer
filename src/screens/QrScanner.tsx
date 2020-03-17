@@ -155,11 +155,17 @@ function QrScannerView({
 
 	//TODO change to useFocusEffect
 	useEffect((): (() => void) => {
-		navigation.addListener('focus', scannerStore.setReady);
-		navigation.addListener('blur', () => scannerStore.setBusy);
+		const unsubscribeFocus = navigation.addListener(
+			'focus',
+			scannerStore.setReady.bind(scannerStore)
+		);
+		const unsubscribeBlur = navigation.addListener(
+			'blur',
+			scannerStore.setBusy.bind(scannerStore)
+		);
 		return (): void => {
-			navigation.removeListener('blur', scannerStore.setReady);
-			navigation.removeListener('focus', scannerStore.setBusy);
+			unsubscribeFocus();
+			unsubscribeBlur();
 			scannerStore.setReady();
 		};
 	}, [navigation, scannerStore]);
