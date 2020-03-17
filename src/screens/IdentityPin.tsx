@@ -71,16 +71,12 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 
 	const testPin = async (): Promise<void> => {
 		const { pin } = state;
-		const { identities, currentIdentity } = accounts.state;
+		const { currentIdentity } = accounts.state;
 		if (pin.length >= 6 && currentIdentity) {
 			try {
-				const identity = route.params.identityEncryptedSeed
-					? identities.find(
-							i => i.encryptedSeed === route.params.identityEncryptedSeed
-					  )
-					: currentIdentity;
+				const identity = route.params.identity ?? currentIdentity;
 				const resolve = route.params.resolve;
-				const seed = await unlockIdentitySeed(pin, identity!);
+				const seed = await unlockIdentitySeed(pin, identity);
 				setState(initialState);
 				resolve(seed);
 			} catch (e) {

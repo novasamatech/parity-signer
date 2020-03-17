@@ -1,3 +1,5 @@
+import { Identity } from 'types/identityTypes';
+
 export type RootStackParamList = {
 	About: undefined;
 	AccountDetails: undefined;
@@ -13,7 +15,7 @@ export type RootStackParamList = {
 	IdentityPin: {
 		isUnlock?: boolean;
 		isNew?: boolean;
-		identityEncryptedSeed?: string;
+		identity?: Identity;
 		resolve: (returnValue: string) => void;
 	};
 	MessageDetails: undefined;
