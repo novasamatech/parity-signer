@@ -33,7 +33,8 @@ import { getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToLegacyAccountList,
 	resetNavigationTo,
-	resetNavigationWithNetworkChooser
+	resetNavigationWithNetworkChooser,
+	unlockSeedPhrase
 } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
 
@@ -72,6 +73,12 @@ function IdentitiesSwitch({
 		setVisible(false);
 		if (screenName === 'AccountNetworkChooser') {
 			resetNavigationTo(navigation, screenName, params);
+		} else if (screenName === 'IdentityBackup') {
+			const seedPhrase = await unlockSeedPhrase(navigation);
+			resetNavigationWithNetworkChooser(navigation, screenName, {
+				isNew: false,
+				seedPhrase
+			});
 		} else {
 			resetNavigationWithNetworkChooser(navigation, screenName, params);
 		}
@@ -102,9 +109,7 @@ function IdentitiesSwitch({
 				<ButtonIcon
 					title="Show Recovery Phrase"
 					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(identity, 'IdentityBackup', {
-							isNew: false
-						})
+						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
 					}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"

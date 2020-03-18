@@ -9,7 +9,7 @@ export type RootStackParamList = {
 	AccountNetworkChooser: { isNew: boolean } | undefined;
 	AccountUnlockAndSign: { next: string };
 	AccountUnlock: { next: string; onDelete: () => any };
-	IdentityBackup: { isNew: boolean };
+	IdentityBackup: { isNew: true } | { isNew: false; seedPhrase: string };
 	IdentityManagement: undefined;
 	IdentityNew: { isRecover: boolean } | undefined;
 	IdentityPin: {

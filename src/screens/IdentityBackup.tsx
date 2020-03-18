@@ -25,11 +25,7 @@ import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import ButtonMainAction from 'components/ButtonMainAction';
-import {
-	navigateToNewIdentityNetwork,
-	setPin,
-	unlockSeedPhrase
-} from 'utils/navigationHelpers';
+import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
@@ -66,12 +62,10 @@ function IdentityBackup({
 	};
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
-			if (isNew) {
+			if (route.params.isNew) {
 				setSeedPhrase(await words(wordsNumber));
 			} else {
-				const backupSeedPhrase = await unlockSeedPhrase(navigation);
-				navigation.pop();
-				setSeedPhrase(backupSeedPhrase);
+				setSeedPhrase(route.params.seedPhrase);
 			}
 		};
 
@@ -79,7 +73,7 @@ function IdentityBackup({
 		return (): void => {
 			setSeedPhrase('');
 		};
-	}, [isNew, navigation, wordsNumber]);
+	}, [route.params, wordsNumber]);
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>

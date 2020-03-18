@@ -41,7 +41,7 @@ function IdentityManagement({
 	const { currentIdentity } = accounts.state;
 	if (!currentIdentity) return <View />;
 
-	const onOptionSelect = (value: string): void => {
+	const onOptionSelect = async (value: string): Promise<void> => {
 		if (value === 'PathDelete') {
 			alertDeleteIdentity(
 				async (): Promise<void> => {
@@ -54,8 +54,10 @@ function IdentityManagement({
 					}
 				}
 			);
-		} else {
-			navigation.navigate('IdentityBackup', { isNew: false });
+		} else if (value === 'IdentityBackup') {
+			const seedPhrase = await unlockSeedPhrase(navigation);
+			navigation.pop();
+			navigation.navigate(value, { isNew: false, seedPhrase });
 		}
 	};
 
