@@ -15,11 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationScannerProps } from 'types/props';
-import colors from 'styles/colors';
 import QrView from 'components/QrView';
 import { withScannerStore } from 'utils/HOC';
 import fontStyles from 'styles/fontStyles';
@@ -41,7 +41,7 @@ function SignedMessage({
 	);
 
 	return (
-		<ScrollView style={styles.body}>
+		<SafeAreaScrollViewContainer>
 			<Text style={styles.topTitle}>Signed Message</Text>
 			<View testID={testIDs.SignedMessage.qrView}>
 				<QrView data={data} />
@@ -52,19 +52,13 @@ function SignedMessage({
 				data={data}
 				style={styles.messageDetail}
 			/>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
 export default withScannerStore(SignedMessage);
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
-	},
 	messageDetail: {
 		paddingHorizontal: 20
 	},

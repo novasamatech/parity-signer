@@ -15,14 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { Subscribe } from 'unstated';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import Background from 'components/Background';
 import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
 import AccountsStore from 'stores/AccountsStore';
@@ -144,8 +144,7 @@ class AccountUnlockView extends React.PureComponent<
 		const { hasWrongPin, pin } = this.state;
 
 		return (
-			<View style={styles.body}>
-				<Background />
+			<SafeAreaViewContainer style={styles.body}>
 				<ScreenHeading
 					title={'Unlock Account'}
 					subtitle={this.showErrorMessage()}
@@ -166,7 +165,7 @@ class AccountUnlockView extends React.PureComponent<
 					}}
 					value={pin}
 				/>
-			</View>
+			</SafeAreaViewContainer>
 		);
 	}
 }

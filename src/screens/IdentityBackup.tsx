@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -81,7 +82,7 @@ function IdentityBackup({
 	}, [isNew, navigation, wordsNumber]);
 
 	return (
-		<ScrollView style={styles.body}>
+		<SafeAreaScrollViewContainer style={styles.body}>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
@@ -118,7 +119,7 @@ function IdentityBackup({
 					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
 			)}
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
@@ -126,9 +127,6 @@ export default withAccountStore(IdentityBackup);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
 		padding: 16
 	},
 	mnemonicSelectionButton: {

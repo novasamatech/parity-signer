@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
@@ -59,7 +60,7 @@ function IdentityManagement({
 	};
 
 	return (
-		<ScrollView style={styles.body}>
+		<SafeAreaViewContainer>
 			<ScreenHeading title="Manage Identity" />
 			<View style={styles.menuView}>
 				<PopupMenu
@@ -86,18 +87,13 @@ function IdentityManagement({
 				placeholder="Enter a new identity name"
 				focus
 			/>
-		</ScrollView>
+		</SafeAreaViewContainer>
 	);
 }
 
 export default withAccountStore(IdentityManagement);
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	},
 	deleteText: {
 		color: colors.bg_alert
 	},

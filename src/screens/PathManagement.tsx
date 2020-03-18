@@ -15,13 +15,12 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import PathCard from 'components/PathCard';
-import colors from 'styles/colors';
 
 function PathManagement({
 	accounts,
@@ -32,7 +31,7 @@ function PathManagement({
 	const pathName = currentIdentity!.meta.get(path)?.name;
 
 	return (
-		<ScrollView style={{ backgroundColor: colors.bg }}>
+		<SafeAreaScrollViewContainer>
 			<PathCard identity={currentIdentity!} path={path} />
 			<TextInput
 				label="Display Name"
@@ -43,7 +42,7 @@ function PathManagement({
 				placeholder="Enter a new account name"
 				focus={true}
 			/>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 

@@ -15,10 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
@@ -144,7 +145,7 @@ function PathsList({
 			? ''
 			: `//${networkParams.pathId}`;
 	return (
-		<View style={styles.body} testID={testIDs.PathsList.screen}>
+		<SafeAreaViewContainer testID={testIDs.PathsList.screen}>
 			<LeftScreenHeading
 				title={networkParams.title}
 				subtitle={subtitle}
@@ -167,16 +168,8 @@ function PathsList({
 					}
 				/>
 			</ScrollView>
-		</View>
+		</SafeAreaViewContainer>
 	);
 }
 
 export default withAccountStore(PathsList);
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	}
-});

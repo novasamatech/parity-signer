@@ -20,15 +20,14 @@ import {
 	LayoutChangeEvent,
 	ScrollView,
 	StyleSheet,
-	View,
 	ViewStyle
 } from 'react-native';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import colors from 'styles/colors';
 
-export default class CustomScrollview extends React.PureComponent<
+export default class CustomScrollView extends React.PureComponent<
 	{
-		containerStyle?: ViewStyle;
 		contentContainerStyle: ViewStyle;
 	},
 	{
@@ -58,7 +57,7 @@ export default class CustomScrollview extends React.PureComponent<
 				: 1;
 
 		return (
-			<View style={this.props.containerStyle}>
+			<SafeAreaViewContainer>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					onContentSizeChange={(width: number, height: number): void => {
@@ -99,7 +98,7 @@ export default class CustomScrollview extends React.PureComponent<
 						}
 					]}
 				/>
-			</View>
+			</SafeAreaViewContainer>
 		);
 	}
 }

@@ -18,7 +18,6 @@ import { StyleSheet, TextInputProps } from 'react-native';
 
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
-import Background from 'components/Background';
 import ButtonMainAction from 'components/ButtonMainAction';
 import TextInput from 'components/TextInput';
 import KeyboardScrollView from 'components/KeyboardScrollView';
@@ -179,7 +178,6 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 			extraHeight={200}
 			testID={testIDs.IdentityPin.scrollScreen}
 		>
-			<Background />
 			{renderPinInput()}
 		</KeyboardScrollView>
 	);

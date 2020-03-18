@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -45,12 +45,12 @@ function IdentitiesSwitch({
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
 	const { currentIdentity, identities } = accounts.state;
-	useEffect(() => {
-		const firstLogin: boolean = identities.length === 0;
-		if (currentIdentity === null && !firstLogin) {
-			setVisible(true);
-		}
-	}, [currentIdentity, identities]);
+	// useEffect(() => {
+	// 	const firstLogin: boolean = identities.length === 0;
+	// 	if (currentIdentity === null && !firstLogin) {
+	// 		setVisible(true);
+	// 	}
+	// }, [currentIdentity, identities]);
 
 	const closeModalAndNavigate = <RouteName extends keyof RootStackParamList>(
 		screenName: RouteName,

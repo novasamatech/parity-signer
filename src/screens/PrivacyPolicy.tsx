@@ -15,31 +15,18 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
 
 import privacyPolicy from '../../docs/privacy-policy.md';
 
-import colors from 'styles/colors';
 import Markdown from 'components/Markdown';
-import CustomScrollview from 'components/CustomScrollView';
+import CustomScrollView from 'components/CustomScrollView';
 
 export default class PrivacyPolicy extends React.PureComponent {
 	render(): React.ReactElement {
 		return (
-			<View style={styles.body}>
-				<CustomScrollview contentContainerStyle={{ paddingHorizontal: 16 }}>
-					<Markdown>{privacyPolicy}</Markdown>
-				</CustomScrollview>
-			</View>
+			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
+				<Markdown>{privacyPolicy}</Markdown>
+			</CustomScrollView>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
-	}
-});

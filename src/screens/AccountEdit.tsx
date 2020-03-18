@@ -17,7 +17,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
-import colors from 'styles/colors';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import AccountCard from 'components/AccountCard';
 import TextInput from 'components/TextInput';
 import AccountsStore from 'stores/AccountsStore';
@@ -43,7 +43,7 @@ function AccountEdit({
 	}
 
 	return (
-		<ScrollView style={styles.body}>
+		<SafeAreaScrollViewContainer style={styles.body}>
 			<AccountCard
 				address={selectedAccount.address}
 				title={selectedAccount.name}
@@ -58,7 +58,7 @@ function AccountEdit({
 				value={selectedAccount.name}
 				placeholder="New name"
 			/>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
@@ -67,8 +67,6 @@ export default withAccountStore(AccountEdit);
 const styles = StyleSheet.create({
 	body: {
 		alignContent: 'flex-start',
-		backgroundColor: colors.bg,
-		flex: 1,
 		paddingBottom: 40
 	}
 });

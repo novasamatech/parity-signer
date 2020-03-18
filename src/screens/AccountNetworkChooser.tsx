@@ -22,6 +22,10 @@ import React, { FunctionComponent, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
+	SafeAreaScrollViewContainer,
+	SafeAreaViewContainer
+} from 'components/SafeAreaContainer';
+import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys,
@@ -90,9 +94,8 @@ function AccountNetworkChooser({
 	);
 
 	const showOnboardingMessage = (): React.ReactElement => (
-		<ScrollView
+		<SafeAreaScrollViewContainer
 			testID={testIDs.AccountNetworkChooser.noAccountScreen}
-			style={styles.body}
 			contentContainerStyle={styles.scrollContent}
 		>
 			<View style={styles.onboardingWrapper}>
@@ -110,20 +113,17 @@ function AccountNetworkChooser({
 					/>
 				)}
 			</View>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 
 	const showNoCurrentIdentityMessage = (): React.ReactElement => (
-		<ScrollView
-			style={styles.body}
-			contentContainerStyle={styles.scrollContent}
-		>
+		<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollContent}>
 			<View style={styles.onboardingWrapper}>
 				<Text style={fontStyles.quote}>
 					Select one of your identity to get started.
 				</Text>
 			</View>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 
 	const sortNetworkKeys = (
@@ -257,7 +257,7 @@ function AccountNetworkChooser({
 		}
 	};
 
-	if (!loaded) return <ScrollView style={styles.body} />;
+	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0) return showOnboardingMessage();
 	if (!currentIdentity) return showNoCurrentIdentityMessage();
 
@@ -265,7 +265,7 @@ function AccountNetworkChooser({
 	networkList.sort(sortNetworkKeys);
 
 	return (
-		<View style={styles.body}>
+		<SafeAreaViewContainer>
 			{renderScreenHeading()}
 			<ScrollView testID={testIDs.AccountNetworkChooser.chooserScreen}>
 				{networkList.map(([networkKey, networkParams]) => {
@@ -288,18 +288,13 @@ function AccountNetworkChooser({
 				})}
 				{renderAddButton()}
 			</ScrollView>
-		</View>
+		</SafeAreaViewContainer>
 	);
 }
 
 export default withAccountStore(AccountNetworkChooser);
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	},
 	onboardingWrapper: {
 		alignItems: 'center',
 		flexDirection: 'row',

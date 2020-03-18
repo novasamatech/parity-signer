@@ -89,11 +89,13 @@ export function LeftScreenHeading({
 	title,
 	subtitle,
 	hasSubtitleIcon,
+	headMenu,
 	networkKey
 }: {
 	title: string;
 	subtitle?: string;
 	hasSubtitleIcon?: boolean;
+	headMenu?: React.ReactElement;
 	networkKey: string;
 }): ReactElement {
 	const titleStyle: TextStyle = {
@@ -118,6 +120,7 @@ export function LeftScreenHeading({
 				</Text>
 				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
 			</View>
+			<View style={baseStyles.menu}>{headMenu}</View>
 		</View>
 	);
 }
@@ -208,6 +211,10 @@ const baseStyles = StyleSheet.create({
 	},
 	linkIcon: {
 		marginLeft: 10
+	},
+	menu: {
+		marginLeft: 'auto',
+		marginRight: 10
 	},
 	networkIcon: {
 		paddingHorizontal: 16

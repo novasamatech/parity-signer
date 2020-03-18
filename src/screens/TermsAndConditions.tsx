@@ -29,7 +29,7 @@ import Button from 'components/Button';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
 import { saveToCAndPPConfirmation } from 'utils/db';
-import CustomScrollview from 'components/CustomScrollView';
+import CustomScrollView from 'components/CustomScrollView';
 
 export default function TermsAndConditions(
 	props: NavigationProps<'TermsAndConditions'>
@@ -48,12 +48,9 @@ export default function TermsAndConditions(
 
 	return (
 		<View style={styles.body} testID={testIDs.TacScreen.tacView}>
-			<CustomScrollview
-				containerStyle={styles.scrollView}
-				contentContainerStyle={{ paddingHorizontal: 16 }}
-			>
+			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{toc}</Markdown>
-			</CustomScrollview>
+			</CustomScrollView>
 
 			{!policyConfirmed && (
 				<View>
@@ -117,7 +114,6 @@ export default function TermsAndConditions(
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
 		flex: 1,
 		flexDirection: 'column',
 		overflow: 'hidden'
@@ -125,8 +121,5 @@ const styles = StyleSheet.create({
 	icon: {
 		color: colors.bg_text_sec,
 		fontSize: 30
-	},
-	scrollView: {
-		flex: 1
 	}
 });

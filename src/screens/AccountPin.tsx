@@ -22,7 +22,6 @@ import { CommonActions } from '@react-navigation/native';
 
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
-import Background from 'components/Background';
 import Button from 'components/Button';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
@@ -111,7 +110,6 @@ function AccountPin({
 	const title = 'ACCOUNT PIN';
 	return (
 		<KeyboardScrollView style={styles.body} extraHeight={120}>
-			<Background />
 			<Text style={styles.titleTop}>{title}</Text>
 			{showHintOrError()}
 			<Text style={styles.title}>PIN</Text>
@@ -161,9 +159,6 @@ export default withAccountStore(AccountPin);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		overflow: 'hidden',
 		padding: 20
 	},
 	errorText: {

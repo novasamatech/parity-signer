@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
@@ -74,49 +75,53 @@ function AccountDetails({
 	};
 
 	return (
-		<ScrollView contentContainerStyle={styles.body}>
-			<View style={styles.header}>
-				<AccountIcon
-					address={''}
-					network={NETWORK_LIST[account.networkKey]}
-					style={styles.icon}
-				/>
-				<Text style={fontStyles.h2}>Public Address</Text>
-				<View style={styles.menuView}>
-					<PopupMenu
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
-						menuItems={[
-							{ text: 'Edit', value: 'AccountEdit' },
-							{ text: 'Change Pin', value: 'AccountPin' },
-							{
-								text: 'View Recovery Phrase',
-								value: 'LegacyAccountBackup'
-							},
-							{
-								text: 'Delete',
-								textStyle: styles.deleteText,
-								value: 'AccountDelete'
-							}
-						]}
+		<SafeAreaView style={styles.body}>
+			<ScrollView contentContainerStyle={styles.scrollBody}>
+				<View style={styles.header}>
+					<AccountIcon
+						address={''}
+						network={NETWORK_LIST[account.networkKey]}
+						style={styles.icon}
 					/>
+					<Text style={fontStyles.h2}>Public Address</Text>
+					<View style={styles.menuView}>
+						<PopupMenu
+							onSelect={onOptionSelect}
+							menuTriggerIconName={'more-vert'}
+							menuItems={[
+								{ text: 'Edit', value: 'AccountEdit' },
+								{ text: 'Change Pin', value: 'AccountPin' },
+								{
+									text: 'View Recovery Phrase',
+									value: 'LegacyAccountBackup'
+								},
+								{
+									text: 'Delete',
+									textStyle: styles.deleteText,
+									value: 'AccountDelete'
+								}
+							]}
+						/>
+					</View>
 				</View>
-			</View>
-			<AccountCard
-				address={account.address}
-				networkKey={account.networkKey}
-				title={account.name}
-			/>
-			<View>
-				{protocol !== NetworkProtocols.UNKNOWN ? (
-					<QrView
-						data={account.name ? `${selectedKey}:${account.name}` : selectedKey}
-					/>
-				) : (
-					<UnknownAccountWarning />
-				)}
-			</View>
-		</ScrollView>
+				<AccountCard
+					address={account.address}
+					networkKey={account.networkKey}
+					title={account.name}
+				/>
+				<View>
+					{protocol !== NetworkProtocols.UNKNOWN ? (
+						<QrView
+							data={
+								account.name ? `${selectedKey}:${account.name}` : selectedKey
+							}
+						/>
+					) : (
+						<UnknownAccountWarning />
+					)}
+				</View>
+			</ScrollView>
+		</SafeAreaView>
 	);
 }
 
@@ -124,11 +129,8 @@ export default withAccountStore(AccountDetails);
 
 const styles = StyleSheet.create({
 	body: {
-		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
-		flex: 1,
-		paddingBottom: 40,
-		paddingTop: 8
+		flex: 1
 	},
 	deleteText: {
 		color: colors.bg_alert
@@ -145,6 +147,12 @@ const styles = StyleSheet.create({
 	menuView: {
 		alignItems: 'flex-end',
 		flex: 1
+	},
+	scrollBody: {
+		alignContent: 'flex-start',
+		flex: 1,
+		paddingBottom: 40,
+		paddingTop: 8
 	},
 	title: {
 		color: colors.bg_text_sec,

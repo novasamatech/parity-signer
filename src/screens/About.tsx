@@ -19,15 +19,12 @@ import { Linking, StyleSheet, Text, View } from 'react-native';
 
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
-import CustomScrollview from 'components/CustomScrollView';
+import CustomScrollView from 'components/CustomScrollView';
 
 export default class About extends React.PureComponent {
 	render(): React.ReactElement {
 		return (
-			<CustomScrollview
-				containerStyle={styles.body}
-				contentContainerStyle={{ padding: 20 }}
-			>
+			<CustomScrollView contentContainerStyle={{ padding: 20 }}>
 				<Text style={styles.title}>PARITY SIGNER</Text>
 				<View>
 					<Text style={styles.text}>
@@ -84,18 +81,12 @@ export default class About extends React.PureComponent {
 						.
 					</Text>
 				</View>
-			</CustomScrollview>
+			</CustomScrollView>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
-	},
 	bottom: {
 		flexBasis: 50,
 		paddingBottom: 15

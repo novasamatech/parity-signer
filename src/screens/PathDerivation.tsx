@@ -86,12 +86,12 @@ function PathDerivation({
 
 	return (
 		<View style={styles.container}>
-			<ScreenHeading
-				title="Derive Account"
-				subtitle={parentPath}
-				hasSubtitleIcon={true}
-			/>
 			<KeyboardScrollView extraHeight={Platform.OS === 'ios' ? 250 : 180}>
+				<ScreenHeading
+					title="Derive Account"
+					subtitle={parentPath}
+					hasSubtitleIcon={true}
+				/>
 				{!isPathValid && <Text>Invalid Path</Text>}
 				<TextInput
 					autoCompleteType="off"
@@ -138,14 +138,14 @@ function PathDerivation({
 					testID={testIDs.PathDerivation.deriveButton}
 					onPress={onPathDerivation}
 				/>
+				{isCustomNetwork && (
+					<NetworkOptions
+						setNetworkKey={setCustomNetworkKey}
+						visible={modalVisible}
+						setVisible={setModalVisible}
+					/>
+				)}
 			</KeyboardScrollView>
-			{isCustomNetwork && (
-				<NetworkOptions
-					setNetworkKey={setCustomNetworkKey}
-					visible={modalVisible}
-					setVisible={setModalVisible}
-				/>
-			)}
 		</View>
 	);
 }

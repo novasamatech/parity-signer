@@ -21,6 +21,7 @@ import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
 	AppNavigator,
@@ -28,7 +29,6 @@ import {
 	ScreenStack
 } from './screens';
 
-import Background from 'components/Background';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
@@ -43,7 +43,7 @@ export default function App(props: AppProps): React.ReactElement {
 			'Warning: componentWillReceiveProps',
 			'Warning: componentWillMount',
 			'Warning: componentWillUpdate',
-			'Warning: Sending `onAnimatedValueUpdate`',
+			'Sending `onAnimatedValueUpdate`',
 			'Non-serializable values were found in the navigation state' // https://reactnavigation.org/docs/troubleshooting/#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state
 		]);
 	}
@@ -91,15 +91,16 @@ export default function App(props: AppProps): React.ReactElement {
 	};
 
 	return (
-		<UnstatedProvider>
-			<MenuProvider backHandler={true}>
-				<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-				<Background />
-				<GlobalStateContext.Provider value={globalContext}>
-					<NavigationContainer>{renderStacks()}</NavigationContainer>
-				</GlobalStateContext.Provider>
-			</MenuProvider>
-		</UnstatedProvider>
+		<SafeAreaProvider>
+			<UnstatedProvider>
+				<MenuProvider backHandler={true}>
+					<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+					<GlobalStateContext.Provider value={globalContext}>
+						<NavigationContainer>{renderStacks()}</NavigationContainer>
+					</GlobalStateContext.Provider>
+				</MenuProvider>
+			</UnstatedProvider>
+		</SafeAreaProvider>
 	);
 }
 

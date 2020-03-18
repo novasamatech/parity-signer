@@ -24,7 +24,6 @@ import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import AccountIconChooser from 'components/AccountIconChooser';
-import Background from 'components/Background';
 import Button from 'components/Button';
 import DerivationPathField from 'components/DerivationPathField';
 import KeyboardScrollView from 'components/KeyboardScrollView';
@@ -90,7 +89,6 @@ function AccountNew({
 	return (
 		<KeyboardScrollView>
 			<View style={styles.body}>
-				<Background />
 				<Text style={styles.titleTop}>CREATE ACCOUNT</Text>
 				<Text style={styles.title}>NETWORK</Text>
 			</View>
@@ -197,9 +195,6 @@ export default withAccountStore(AccountNew);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		overflow: 'hidden',
 		padding: 16
 	},
 	bodyContainer: {

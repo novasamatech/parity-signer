@@ -15,15 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect } from 'react';
-import {
-	AppState,
-	AppStateStatus,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View
-} from 'react-native';
+import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NetworkProtocols, NETWORK_LIST } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationAccountProps } from 'types/props';
@@ -31,7 +25,6 @@ import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 import AccountCard from 'components/AccountCard';
-import Background from 'components/Background';
 import Button from 'components/Button';
 import ScreenHeading from 'components/ScreenHeading';
 import TouchableItem from 'components/TouchableItem';
@@ -79,8 +72,7 @@ function LegacyAccountBackup({
 		NetworkProtocols.UNKNOWN;
 
 	return (
-		<ScrollView style={styles.body}>
-			<Background />
+		<SafeAreaScrollViewContainer style={styles.body}>
 			<ScreenHeading
 				title="Recovery Phrase"
 				subtitle="Write these words down on paper. Keep the backup paper safe. These
@@ -126,7 +118,7 @@ function LegacyAccountBackup({
 					/>
 				)}
 			</View>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
@@ -135,8 +127,6 @@ export default withAccountStore(LegacyAccountBackup);
 const styles = StyleSheet.create({
 	body: {
 		alignContent: 'flex-start',
-		backgroundColor: colors.bg,
-		flex: 1,
 		paddingBottom: 40,
 		paddingTop: 24
 	},

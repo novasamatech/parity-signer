@@ -19,13 +19,12 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
-import colors from 'styles/colors';
-import Background from 'components/Background';
 import ButtonMainAction from 'components/ButtonMainAction';
 import ScreenHeading from 'components/ScreenHeading';
 import TxDetailsCard from 'components/TxDetailsCard';
@@ -132,7 +131,7 @@ export class TxDetailsView extends React.PureComponent<ViewProps> {
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 		return (
-			<View style={styles.body}>
+			<SafeAreaViewContainer style={styles.body}>
 				<ScreenHeading
 					title="Sign Transaction"
 					subtitle="step 1/2 – verify and sign"
@@ -146,7 +145,6 @@ export class TxDetailsView extends React.PureComponent<ViewProps> {
 							isEthereum ? 'transaction' : 'extrinsic'
 						}`}
 					</Text>
-					<Background />
 					<View style={styles.bodyContent}>
 						<CompatibleCard
 							account={sender}
@@ -179,16 +177,14 @@ export class TxDetailsView extends React.PureComponent<ViewProps> {
 					title="Sign Transaction"
 					onPress={(): any => onNext()}
 				/>
-			</View>
+			</SafeAreaViewContainer>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
 	body: {
-		alignContent: 'flex-start',
-		backgroundColor: colors.bg,
-		flex: 1
+		alignContent: 'flex-start'
 	},
 	bodyContent: {
 		marginVertical: 16,
