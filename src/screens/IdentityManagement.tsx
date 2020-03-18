@@ -61,23 +61,25 @@ function IdentityManagement({
 
 	return (
 		<SafeAreaViewContainer>
-			<ScreenHeading title="Manage Identity" />
-			<View style={styles.menuView}>
-				<PopupMenu
-					testID={testIDs.IdentityManagement.popupMenuButton}
-					onSelect={onOptionSelect}
-					menuTriggerIconName={'more-vert'}
-					menuItems={[
-						{ text: 'Backup', value: 'IdentityBackup' },
-						{
-							testID: testIDs.IdentityManagement.deleteButton,
-							text: 'Delete',
-							textStyle: styles.deleteText,
-							value: 'PathDelete'
-						}
-					]}
-				/>
-			</View>
+			<ScreenHeading
+				title="Manage Identity"
+				headMenu={
+					<PopupMenu
+						testID={testIDs.IdentityManagement.popupMenuButton}
+						onSelect={onOptionSelect}
+						menuTriggerIconName={'more-vert'}
+						menuItems={[
+							{ text: 'Backup', value: 'IdentityBackup' },
+							{
+								testID: testIDs.IdentityManagement.deleteButton,
+								text: 'Delete',
+								textStyle: styles.deleteText,
+								value: 'PathDelete'
+							}
+						]}
+					/>
+				}
+			/>
 			<TextInput
 				label="Display Name"
 				onChangeText={(name: string): Promise<void> =>
@@ -102,12 +104,5 @@ const styles = StyleSheet.create({
 		paddingBottom: 24,
 		paddingLeft: 16,
 		paddingRight: 16
-	},
-	menuView: {
-		alignItems: 'flex-end',
-		flex: 1,
-		position: 'absolute',
-		right: 16,
-		top: 5
 	}
 });

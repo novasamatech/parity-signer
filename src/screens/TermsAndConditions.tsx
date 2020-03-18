@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import toc from '../../docs/terms-and-conditions.md';
 
+import containerStyles from 'styles/containerStyles';
 import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
 import testIDs from 'e2e/testIDs';
 import { NavigationProps } from 'types/props';
@@ -47,7 +48,7 @@ export default function TermsAndConditions(
 	};
 
 	return (
-		<View style={styles.body} testID={testIDs.TacScreen.tacView}>
+		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>
@@ -113,11 +114,6 @@ export default function TermsAndConditions(
 }
 
 const styles = StyleSheet.create({
-	body: {
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
-	},
 	icon: {
 		color: colors.bg_text_sec,
 		fontSize: 30
