@@ -153,7 +153,6 @@ function QrScannerView({
 		onMockBarCodeRead(global.scanRequest, props.onBarCodeRead);
 	}
 
-	//TODO change to useFocusEffect
 	useEffect((): (() => void) => {
 		const unsubscribeFocus = navigation.addListener(
 			'focus',

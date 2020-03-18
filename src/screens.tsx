@@ -163,16 +163,6 @@ export const AppNavigator = (): React.ReactElement => (
 	</ScreenStack.Navigator>
 );
 
-// const TocAndPrivacyPolicyScreens = (): React.ReactElement => (
-// 	<React.Fragment>
-// 		<ScreenStack.Screen
-// 			name="TermsAndConditions"
-// 			component={TermsAndConditions}
-// 		/>
-// 		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-// 	</React.Fragment>
-// );
-
 export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
 		initialRouteName="TermsAndConditions"
