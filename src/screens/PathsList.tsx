@@ -15,11 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useMemo } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import {SafeAreaScrollViewContainer} from 'components/SafeAreaContainer';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
@@ -145,30 +145,28 @@ function PathsList({
 			? ''
 			: `//${networkParams.pathId}`;
 	return (
-		<SafeAreaViewContainer testID={testIDs.PathsList.screen}>
+		<SafeAreaScrollViewContainer testID={testIDs.PathsList.screen}>
 			<LeftScreenHeading
 				title={networkParams.title}
 				subtitle={subtitle}
 				hasSubtitleIcon={true}
 				networkKey={networkKey}
 			/>
-			<ScrollView>
-				{(pathsGroups as PathGroup[]).map(pathsGroup =>
-					pathsGroup.paths.length === 1
-						? renderSinglePath(pathsGroup)
-						: renderGroupPaths(pathsGroup)
-				)}
-				<ButtonNewDerivation
-					testID={testIDs.PathsList.deriveButton}
-					title="Derive New Account"
-					onPress={(): void =>
-						navigation.navigate('PathDerivation', {
-							parentPath: isUnknownNetworkPath ? '' : rootPath
-						})
-					}
-				/>
-			</ScrollView>
-		</SafeAreaViewContainer>
+			{(pathsGroups as PathGroup[]).map(pathsGroup =>
+				pathsGroup.paths.length === 1
+					? renderSinglePath(pathsGroup)
+					: renderGroupPaths(pathsGroup)
+			)}
+			<ButtonNewDerivation
+				testID={testIDs.PathsList.deriveButton}
+				title="Derive New Account"
+				onPress={(): void =>
+					navigation.navigate('PathDerivation', {
+						parentPath: isUnknownNetworkPath ? '' : rootPath
+					})
+				}
+			/>
+		</SafeAreaScrollViewContainer>
 	);
 }
 

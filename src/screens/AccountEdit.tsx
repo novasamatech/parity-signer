@@ -39,7 +39,7 @@ function AccountEdit({
 }): React.ReactElement {
 	const selectedAccount = accounts.getSelected()!;
 	if (!selectedAccount) {
-		return <ScrollView style={styles.body} />;
+		return <ScrollView bounces={false} style={styles.body} />;
 	}
 
 	return (

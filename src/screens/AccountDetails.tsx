@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import {SafeAreaScrollViewContainer} from 'components/SafeAreaContainer';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
@@ -75,8 +75,7 @@ function AccountDetails({
 	};
 
 	return (
-		<SafeAreaView style={styles.body}>
-			<ScrollView contentContainerStyle={styles.scrollBody}>
+			<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
 				<View style={styles.header}>
 					<AccountIcon
 						address={''}
@@ -120,8 +119,7 @@ function AccountDetails({
 						<UnknownAccountWarning />
 					)}
 				</View>
-			</ScrollView>
-		</SafeAreaView>
+			</SafeAreaScrollViewContainer>
 	);
 }
 

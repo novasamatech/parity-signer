@@ -225,6 +225,7 @@ function IdentitiesSwitch({
 		return (
 			<>
 				<ScrollView
+					bounces={false}
 					style={{
 						maxHeight: 180,
 						paddingVertical: identities.length > 5 ? 8 : 0

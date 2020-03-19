@@ -137,6 +137,7 @@ export class TxDetailsView extends React.PureComponent<ViewProps> {
 					subtitle="step 1/2 – verify and sign"
 				/>
 				<ScrollView
+					bounces={false}
 					contentContainerStyle={{ paddingBottom: 120 }}
 					testID={testIDs.TxDetails.scrollScreen}
 				>

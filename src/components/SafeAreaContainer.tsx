@@ -33,6 +33,7 @@ export const SafeAreaScrollViewContainer = (
 	<SafeAreaView style={containerStyles.background}>
 		<ScrollView
 			{...props}
+			bounces={false}
 			style={StyleSheet.flatten([containerStyles.background, props.style])}
 			children={props.children}
 		/>
