@@ -17,7 +17,7 @@
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
@@ -161,14 +161,16 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 					message={message}
 					data={dataToSign}
 				/>
-				<Button
-					buttonStyles={styles.signButton}
-					testID={testIDs.MessageDetails.signButton}
-					title="Sign Message"
-					onPress={(): void => {
-						isHash ? alertMultipart(onNext) : onNext();
-					}}
-				/>
+				<View style={styles.signButtonContainer}>
+					<Button
+						buttonStyles={styles.signButton}
+						testID={testIDs.MessageDetails.signButton}
+						title="Sign Message"
+						onPress={(): void => {
+							isHash ? alertMultipart(onNext) : onNext();
+						}}
+					/>
+				</View>
 			</SafeAreaScrollViewContainer>
 		);
 	}
@@ -200,7 +202,10 @@ const styles = StyleSheet.create({
 	},
 	signButton: {
 		height: 60,
-		paddingHorizontal: 0
+		paddingHorizontal: 60
+	},
+	signButtonContainer: {
+		alignItems: 'center'
 	},
 	title: {
 		...fontStyles.h2,
