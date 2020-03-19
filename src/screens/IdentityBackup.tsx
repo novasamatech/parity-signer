@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 5
 	},
 	mnemonicSelectionRow: {
-		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-around'
 	}
