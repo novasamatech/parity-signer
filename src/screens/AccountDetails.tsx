@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {SafeAreaScrollViewContainer} from 'components/SafeAreaContainer';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -75,51 +75,49 @@ function AccountDetails({
 	};
 
 	return (
-			<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
-				<View style={styles.header}>
-					<AccountIcon
-						address={''}
-						network={NETWORK_LIST[account.networkKey]}
-						style={styles.icon}
-					/>
-					<Text style={fontStyles.h2}>Public Address</Text>
-					<View style={styles.menuView}>
-						<PopupMenu
-							onSelect={onOptionSelect}
-							menuTriggerIconName={'more-vert'}
-							menuItems={[
-								{ text: 'Edit', value: 'AccountEdit' },
-								{ text: 'Change Pin', value: 'AccountPin' },
-								{
-									text: 'View Recovery Phrase',
-									value: 'LegacyAccountBackup'
-								},
-								{
-									text: 'Delete',
-									textStyle: styles.deleteText,
-									value: 'AccountDelete'
-								}
-							]}
-						/>
-					</View>
-				</View>
-				<AccountCard
-					address={account.address}
-					networkKey={account.networkKey}
-					title={account.name}
+		<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
+			<View style={styles.header}>
+				<AccountIcon
+					address={''}
+					network={NETWORK_LIST[account.networkKey]}
+					style={styles.icon}
 				/>
-				<View>
-					{protocol !== NetworkProtocols.UNKNOWN ? (
-						<QrView
-							data={
-								account.name ? `${selectedKey}:${account.name}` : selectedKey
+				<Text style={fontStyles.h2}>Public Address</Text>
+				<View style={styles.menuView}>
+					<PopupMenu
+						onSelect={onOptionSelect}
+						menuTriggerIconName={'more-vert'}
+						menuItems={[
+							{ text: 'Edit', value: 'AccountEdit' },
+							{ text: 'Change Pin', value: 'AccountPin' },
+							{
+								text: 'View Recovery Phrase',
+								value: 'LegacyAccountBackup'
+							},
+							{
+								text: 'Delete',
+								textStyle: styles.deleteText,
+								value: 'AccountDelete'
 							}
-						/>
-					) : (
-						<UnknownAccountWarning />
-					)}
+						]}
+					/>
 				</View>
-			</SafeAreaScrollViewContainer>
+			</View>
+			<AccountCard
+				address={account.address}
+				networkKey={account.networkKey}
+				title={account.name}
+			/>
+			<View>
+				{protocol !== NetworkProtocols.UNKNOWN ? (
+					<QrView
+						data={account.name ? `${selectedKey}:${account.name}` : selectedKey}
+					/>
+				) : (
+					<UnknownAccountWarning />
+				)}
+			</View>
+		</SafeAreaScrollViewContainer>
 	);
 }
 

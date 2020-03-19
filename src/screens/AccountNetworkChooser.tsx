@@ -267,7 +267,10 @@ function AccountNetworkChooser({
 	return (
 		<SafeAreaViewContainer>
 			{renderScreenHeading()}
-			<ScrollView bounces={false} testID={testIDs.AccountNetworkChooser.chooserScreen}>
+			<ScrollView
+				bounces={false}
+				testID={testIDs.AccountNetworkChooser.chooserScreen}
+			>
 				{networkList.map(([networkKey, networkParams]) => {
 					const networkIndexSuffix = isEthereumNetworkParams(networkParams)
 						? networkParams.ethereumChainId

@@ -19,7 +19,7 @@ import { Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
-import {SafeAreaScrollViewContainer} from 'components/SafeAreaContainer';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
