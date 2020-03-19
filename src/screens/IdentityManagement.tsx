@@ -15,9 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { withNavigation } from 'react-navigation';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
@@ -37,47 +37,51 @@ import PopupMenu from 'components/PopupMenu';
 function IdentityManagement({
 	accounts,
 	navigation
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'IdentityManagement'>): React.ReactElement {
 	const { currentIdentity } = accounts.state;
 	if (!currentIdentity) return <View />;
 
-	const onOptionSelect = (value: string): void => {
+	const onOptionSelect = async (value: string): Promise<void> => {
 		if (value === 'PathDelete') {
 			alertDeleteIdentity(
 				async (): Promise<void> => {
 					await unlockSeedPhrase(navigation);
 					const deleteSucceed = await accounts.deleteCurrentIdentity();
 					if (deleteSucceed) {
-						navigateToLandingPage(navigation, true);
+						navigateToLandingPage(navigation);
 					} else {
 						alertIdentityDeletionError();
 					}
 				}
 			);
-		} else {
-			navigation.navigate('IdentityBackup', { isNew: false });
+		} else if (value === 'IdentityBackup') {
+			const seedPhrase = await unlockSeedPhrase(navigation);
+			navigation.pop();
+			navigation.navigate(value, { isNew: false, seedPhrase });
 		}
 	};
 
 	return (
-		<ScrollView style={styles.body}>
-			<ScreenHeading title="Manage Identity" />
-			<View style={styles.menuView}>
-				<PopupMenu
-					testID={testIDs.IdentityManagement.popupMenuButton}
-					onSelect={onOptionSelect}
-					menuTriggerIconName={'more-vert'}
-					menuItems={[
-						{ text: 'Backup', value: 'IdentityBackup' },
-						{
-							testID: testIDs.IdentityManagement.deleteButton,
-							text: 'Delete',
-							textStyle: styles.deleteText,
-							value: 'PathDelete'
-						}
-					]}
-				/>
-			</View>
+		<SafeAreaViewContainer>
+			<ScreenHeading
+				title="Manage Identity"
+				headMenu={
+					<PopupMenu
+						testID={testIDs.IdentityManagement.popupMenuButton}
+						onSelect={onOptionSelect}
+						menuTriggerIconName={'more-vert'}
+						menuItems={[
+							{ text: 'Backup', value: 'IdentityBackup' },
+							{
+								testID: testIDs.IdentityManagement.deleteButton,
+								text: 'Delete',
+								textStyle: styles.deleteText,
+								value: 'PathDelete'
+							}
+						]}
+					/>
+				}
+			/>
 			<TextInput
 				label="Display Name"
 				onChangeText={(name: string): Promise<void> =>
@@ -87,18 +91,13 @@ function IdentityManagement({
 				placeholder="Enter a new identity name"
 				focus
 			/>
-		</ScrollView>
+		</SafeAreaViewContainer>
 	);
 }
 
-export default withAccountStore(withNavigation(IdentityManagement));
+export default withAccountStore(IdentityManagement);
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	},
 	deleteText: {
 		color: colors.bg_alert
 	},
@@ -107,12 +106,5 @@ const styles = StyleSheet.create({
 		paddingBottom: 24,
 		paddingLeft: 16,
 		paddingRight: 16
-	},
-	menuView: {
-		alignItems: 'flex-end',
-		flex: 1,
-		position: 'absolute',
-		right: 16,
-		top: 5
 	}
 });

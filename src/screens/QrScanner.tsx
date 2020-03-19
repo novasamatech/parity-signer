@@ -34,10 +34,10 @@ interface State {
 }
 
 export default class Scanner extends React.PureComponent<
-	NavigationProps<{}>,
+	NavigationProps<'QrScanner'>,
 	State
 > {
-	constructor(props: NavigationProps<{}>) {
+	constructor(props: NavigationProps<'QrScanner'>) {
 		super(props);
 		this.state = { enableScan: true };
 	}
@@ -72,6 +72,7 @@ export default class Scanner extends React.PureComponent<
 							isMultipart={scannerStore.getTotalFramesCount() > 1}
 							missedFrames={scannerStore.getMissedFrames()}
 							navigation={this.props.navigation}
+							route={this.props.route}
 							scannerStore={scannerStore}
 							totalFramesCount={scannerStore.getTotalFramesCount()}
 							onBarCodeRead={async (
@@ -135,7 +136,7 @@ export default class Scanner extends React.PureComponent<
 	}
 }
 
-interface ViewProps extends NavigationScannerProps<{}> {
+interface ViewProps extends NavigationScannerProps<'QrScanner'> {
 	onBarCodeRead: (listener: TxRequestData) => void;
 	completedFramesCount: number;
 	isMultipart: boolean;
@@ -153,15 +154,17 @@ function QrScannerView({
 	}
 
 	useEffect((): (() => void) => {
-		const setBusySubscription = navigation.addListener('willFocus', () => {
-			scannerStore.setReady();
-		});
-		const setReadySubscription = navigation.addListener('didBlur', () => {
-			scannerStore.setBusy();
-		});
+		const unsubscribeFocus = navigation.addListener(
+			'focus',
+			scannerStore.setReady.bind(scannerStore)
+		);
+		const unsubscribeBlur = navigation.addListener(
+			'blur',
+			scannerStore.setBusy.bind(scannerStore)
+		);
 		return (): void => {
-			setBusySubscription.remove();
-			setReadySubscription.remove();
+			unsubscribeFocus();
+			unsubscribeBlur();
 			scannerStore.setReady();
 		};
 	}, [navigation, scannerStore]);

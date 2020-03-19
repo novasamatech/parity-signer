@@ -14,14 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
-import { withNavigation, ScrollView, NavigationParams } from 'react-navigation';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
+import { RootStackParamList } from 'types/routes';
+import AccountsStore from 'stores/AccountsStore';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -30,36 +33,52 @@ import { getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToLegacyAccountList,
 	resetNavigationTo,
-	resetNavigationWithNetworkChooser
+	resetNavigationWithNetworkChooser,
+	unlockSeedPhrase
 } from 'utils/navigationHelpers';
-import { NavigationAccountProps } from 'types/props';
 import { Identity } from 'types/identityTypes';
 
 function IdentitiesSwitch({
-	navigation,
 	accounts
-}: NavigationAccountProps<{ isSwitchOpen?: boolean }>): React.ReactElement {
-	const defaultVisible = navigation.getParam('isSwitchOpen', false);
-	const [visible, setVisible] = useState(defaultVisible);
+}: {
+	accounts: AccountsStore;
+}): React.ReactElement {
+	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
+	const [visible, setVisible] = useState(false);
 	const { currentIdentity, identities } = accounts.state;
+	// useEffect(() => {
+	// 	const firstLogin: boolean = identities.length === 0;
+	// 	if (currentIdentity === null && !firstLogin) {
+	// 		setVisible(true);
+	// 	}
+	// }, [currentIdentity, identities]);
 
-	const closeModalAndNavigate = (
-		screenName: string,
-		params?: NavigationParams
+	const closeModalAndNavigate = <RouteName extends keyof RootStackParamList>(
+		screenName: RouteName,
+		params?: RootStackParamList[RouteName]
 	): void => {
 		setVisible(false);
+		// @ts-ignore
 		navigation.navigate(screenName, params);
 	};
 
-	const onIdentitySelectedAndNavigate = async (
+	const onIdentitySelectedAndNavigate = async <
+		RouteName extends keyof RootStackParamList
+	>(
 		identity: Identity,
-		screenName: string,
-		params?: NavigationParams
+		screenName: RouteName,
+		params?: RootStackParamList[RouteName]
 	): Promise<void> => {
 		await accounts.selectIdentity(identity);
 		setVisible(false);
 		if (screenName === 'AccountNetworkChooser') {
 			resetNavigationTo(navigation, screenName, params);
+		} else if (screenName === 'IdentityBackup') {
+			const seedPhrase = await unlockSeedPhrase(navigation);
+			resetNavigationWithNetworkChooser(navigation, screenName, {
+				isNew: false,
+				seedPhrase
+			});
 		} else {
 			resetNavigationWithNetworkChooser(navigation, screenName, params);
 		}
@@ -90,9 +109,7 @@ function IdentitiesSwitch({
 				<ButtonIcon
 					title="Show Recovery Phrase"
 					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(identity, 'IdentityBackup', {
-							isNew: false
-						})
+						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
 					}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
@@ -146,11 +163,7 @@ function IdentitiesSwitch({
 				/>
 				<ButtonIcon
 					title="Terms and Conditions"
-					onPress={(): void =>
-						closeModalAndNavigate('TermsAndConditions', {
-							disableButtons: true
-						})
-					}
+					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
 					iconBgStyle={styles.i_arrowBg}
 					iconType="antdesign"
 					iconName="arrowright"
@@ -172,12 +185,9 @@ function IdentitiesSwitch({
 		);
 	};
 
-	const renderNonSelectedIdentity = ({
-		item
-	}: {
-		item: Identity;
-	}): React.ReactElement => {
-		const identity = item;
+	const renderNonSelectedIdentity = (
+		identity: Identity
+	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
 
 		return (
@@ -190,6 +200,7 @@ function IdentitiesSwitch({
 				onPress={(): Promise<void> =>
 					onIdentitySelectedAndNavigate(identity, 'AccountNetworkChooser')
 				}
+				key={identity.encryptedSeed}
 				iconType="antdesign"
 				iconName="user"
 				iconSize={24}
@@ -213,13 +224,14 @@ function IdentitiesSwitch({
 
 		return (
 			<>
-				<ScrollView style={{ maxHeight: 180 }}>
-					<FlatList
-						data={identitiesToShow}
-						renderItem={renderNonSelectedIdentity}
-						keyExtractor={(item: Identity): string => item.encryptedSeed}
-						style={{ paddingVertical: identities.length > 5 ? 8 : 0 }}
-					/>
+				<ScrollView
+					bounces={false}
+					style={{
+						maxHeight: 180,
+						paddingVertical: identities.length > 5 ? 8 : 0
+					}}
+				>
+					{identitiesToShow.map(renderNonSelectedIdentity)}
 				</ScrollView>
 				{identities.length > 5 && (
 					<Separator
@@ -329,4 +341,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withAccountStore(withNavigation(IdentitiesSwitch));
+export default withAccountStore(IdentitiesSwitch);

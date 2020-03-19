@@ -17,16 +17,16 @@
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
-import Background from 'components/Background';
 import Button from 'components/Button';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
 import ScannerStore from 'stores/ScannerStore';
@@ -42,7 +42,7 @@ import CompatibleCard from 'components/CompatibleCard';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 
 export default class MessageDetails extends React.PureComponent<
-	NavigationProps<{}>
+	NavigationProps<'MessageDetails'>
 > {
 	async onSignMessage(
 		scannerStore: ScannerStore,
@@ -114,7 +114,7 @@ export default class MessageDetails extends React.PureComponent<
 	}
 }
 
-interface Props extends NavigationProps<{}> {
+interface Props extends NavigationProps<'MessageDetails'> {
 	dataToSign: string;
 	isHash?: boolean;
 	message: string;
@@ -141,12 +141,11 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 		const isEthereum = isEthereumNetworkParams(networkParams);
 
 		return (
-			<ScrollView
+			<SafeAreaScrollViewContainer
 				contentContainerStyle={styles.bodyContent}
 				style={styles.body}
 				testID={testIDs.MessageDetails.scrollScreen}
 			>
-				<Background />
 				<Text style={styles.topTitle}>Sign Message</Text>
 				<Text style={styles.title}>From Account</Text>
 				<CompatibleCard account={sender} accountsStore={accountsStore} />
@@ -170,7 +169,7 @@ export class MessageDetailsView extends React.PureComponent<Props> {
 						isHash ? alertMultipart(onNext) : onNext();
 					}}
 				/>
-			</ScrollView>
+			</SafeAreaScrollViewContainer>
 		);
 	}
 }
@@ -187,10 +186,6 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden',
 		padding: 20
 	},
 	bodyContent: {

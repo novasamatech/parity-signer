@@ -15,15 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
 
-import colors from 'styles/colors';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
 
 export default class Security extends React.PureComponent {
 	render(): React.ReactElement {
 		return (
-			<ScrollView style={styles.body}>
+			<SafeAreaScrollViewContainer>
 				<ScreenHeading
 					title="NOT SECURE"
 					iconName="shield-off"
@@ -36,16 +35,7 @@ export default class Security extends React.PureComponent {
 					error={true}
 					subtitleL={true}
 				/>
-			</ScrollView>
+			</SafeAreaScrollViewContainer>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
-	}
-});

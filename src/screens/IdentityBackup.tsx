@@ -15,9 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -25,11 +25,7 @@ import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import ButtonMainAction from 'components/ButtonMainAction';
-import {
-	navigateToNewIdentityNetwork,
-	setPin,
-	unlockSeedPhrase
-} from 'utils/navigationHelpers';
+import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
@@ -37,11 +33,12 @@ import Button from 'components/Button';
 
 function IdentityBackup({
 	navigation,
-	accounts
-}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
+	accounts,
+	route
+}: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(24);
-	const isNew = navigation.getParam('isNew', false);
+	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
 		await accounts.saveNewIdentity(seedPhrase, pin);
@@ -65,12 +62,10 @@ function IdentityBackup({
 	};
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
-			if (isNew) {
+			if (route.params.isNew) {
 				setSeedPhrase(await words(wordsNumber));
 			} else {
-				const backupSeedPhrase = await unlockSeedPhrase(navigation);
-				navigation.pop();
-				setSeedPhrase(backupSeedPhrase);
+				setSeedPhrase(route.params.seedPhrase);
 			}
 		};
 
@@ -78,10 +73,10 @@ function IdentityBackup({
 		return (): void => {
 			setSeedPhrase('');
 		};
-	}, [isNew, navigation, wordsNumber]);
+	}, [route.params, wordsNumber]);
 
 	return (
-		<ScrollView style={styles.body}>
+		<SafeAreaScrollViewContainer style={styles.body}>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
@@ -118,17 +113,14 @@ function IdentityBackup({
 					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
 			)}
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default withAccountStore(withNavigation(IdentityBackup));
+export default withAccountStore(IdentityBackup);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
 		padding: 16
 	},
 	mnemonicSelectionButton: {
@@ -139,7 +131,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 5
 	},
 	mnemonicSelectionRow: {
-		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-around'
 	}

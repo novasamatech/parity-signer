@@ -146,7 +146,6 @@ function ExtrinsicPart({
 
 				const methodArgs = {};
 
-				// todo: clean this up
 				function formatArgs(
 					callInstance: Call,
 					callMethodArgs: any,

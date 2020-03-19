@@ -15,11 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import {
 	NETWORK_LIST,
 	NetworkProtocols,
@@ -44,12 +44,10 @@ import { LeftScreenHeading } from 'components/ScreenHeading';
 
 function PathsList({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ networkKey?: string }>): React.ReactElement {
-	const networkKey = navigation.getParam(
-		'networkKey',
-		UnknownNetworkKeys.UNKNOWN
-	);
+	navigation,
+	route
+}: NavigationAccountProps<'PathsList'>): React.ReactElement {
+	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
 	const networkParams = NETWORK_LIST[networkKey];
 
 	const { currentIdentity } = accounts.state;
@@ -86,7 +84,7 @@ function PathsList({
 				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
-				onPress={(): boolean => navigate('PathDetails', { path })}
+				onPress={(): void => navigate('PathDetails', { path })}
 			/>
 		);
 	};
@@ -135,7 +133,7 @@ function PathsList({
 						testID={testIDs.PathsList.pathCard + path}
 						identity={currentIdentity}
 						path={path}
-						onPress={(): boolean => navigate('PathDetails', { path })}
+						onPress={(): void => navigate('PathDetails', { path })}
 					/>
 				</View>
 			))}
@@ -147,39 +145,29 @@ function PathsList({
 			? ''
 			: `//${networkParams.pathId}`;
 	return (
-		<View style={styles.body} testID={testIDs.PathsList.screen}>
+		<SafeAreaScrollViewContainer testID={testIDs.PathsList.screen}>
 			<LeftScreenHeading
 				title={networkParams.title}
 				subtitle={subtitle}
 				hasSubtitleIcon={true}
 				networkKey={networkKey}
 			/>
-			<ScrollView>
-				{(pathsGroups as PathGroup[]).map(pathsGroup =>
-					pathsGroup.paths.length === 1
-						? renderSinglePath(pathsGroup)
-						: renderGroupPaths(pathsGroup)
-				)}
-				<ButtonNewDerivation
-					testID={testIDs.PathsList.deriveButton}
-					title="Derive New Account"
-					onPress={(): boolean =>
-						navigation.navigate('PathDerivation', {
-							parentPath: isUnknownNetworkPath ? '' : rootPath
-						})
-					}
-				/>
-			</ScrollView>
-		</View>
+			{(pathsGroups as PathGroup[]).map(pathsGroup =>
+				pathsGroup.paths.length === 1
+					? renderSinglePath(pathsGroup)
+					: renderGroupPaths(pathsGroup)
+			)}
+			<ButtonNewDerivation
+				testID={testIDs.PathsList.deriveButton}
+				title="Derive New Account"
+				onPress={(): void =>
+					navigation.navigate('PathDerivation', {
+						parentPath: isUnknownNetworkPath ? '' : rootPath
+					})
+				}
+			/>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default withAccountStore(withNavigation(PathsList));
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	}
-});
+export default withAccountStore(PathsList);

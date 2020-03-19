@@ -14,146 +14,155 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	NavigationActions,
-	NavigationScreenProp,
-	StackActions
-} from 'react-navigation';
+import { CommonActions } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Identity } from 'types/identityTypes';
+import { RootStackParamList } from 'types/routes';
 
-export const setPin = async (
-	navigation: NavigationScreenProp<{}>
+type GenericNavigationProps<
+	RouteName extends keyof RootStackParamList
+> = StackNavigationProp<RootStackParamList, RouteName>;
+
+export const setPin = async <RouteName extends keyof RootStackParamList>(
+	navigation: GenericNavigationProps<RouteName>
 ): Promise<string> =>
 	new Promise(resolve => {
 		navigation.navigate('IdentityPin', { isNew: true, resolve });
 	});
 
-export const unlockSeedPhrase = async (
-	navigation: NavigationScreenProp<{}>,
+export const unlockSeedPhrase = async <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
-		navigation.navigate('IdentityPin', { identity, isUnlock: true, resolve });
+		navigation.navigate('IdentityPin', {
+			identity,
+			isUnlock: true,
+			resolve
+		});
 	});
 
-export const navigateToPathDetails = (
-	navigation: NavigationScreenProp<{}>,
+export const navigateToPathDetails = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
 	networkKey: string,
 	path: string
 ): void => {
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				params: { isNew: false },
-				routeName: 'AccountNetworkChooser'
-			}),
-			NavigationActions.navigate({
-				params: { networkKey },
-				routeName: 'PathsList'
-			}),
-			NavigationActions.navigate({
-				params: { path },
-				routeName: 'PathDetails'
-			})
-		],
+	const resetAction = CommonActions.reset({
 		index: 2,
-		key: undefined
+		routes: [
+			{
+				name: 'AccountNetworkChooser',
+				params: { isNew: false }
+			},
+			{
+				name: 'PathsList',
+				params: { networkKey }
+			},
+			{
+				name: 'PathDetails',
+				params: { path }
+			}
+		]
 	});
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToLandingPage = (
-	navigation: NavigationScreenProp<any>,
-	isSwitchOpen = false
+export const navigateToLandingPage = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
 ): void => {
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				params: { isSwitchOpen },
-				routeName: 'AccountNetworkChooser'
-			})
-		],
+	const resetAction = CommonActions.reset({
 		index: 0,
-		key: undefined
+		routes: [{ name: 'AccountNetworkChooser' }]
 	});
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToNewIdentityNetwork = (
-	navigation: NavigationScreenProp<{}>
+export const navigateToNewIdentityNetwork = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
 ): void => {
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				params: { isNew: true },
-				routeName: 'AccountNetworkChooser'
-			})
-		],
+	const resetAction = CommonActions.reset({
 		index: 0,
-		key: undefined
+		routes: [
+			{
+				name: 'AccountNetworkChooser',
+				params: { isNew: true }
+			}
+		]
 	});
 	navigation.dispatch(resetAction);
 };
 
-export const resetNavigationTo = (
-	navigation: NavigationScreenProp<{}>,
+export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(
+	navigation: GenericNavigationProps<RouteName>,
 	screenName: string,
 	params?: any
 ): void => {
-	const resetAction = StackActions.reset({
-		actions: [NavigationActions.navigate({ params, routeName: screenName })],
+	const resetAction = CommonActions.reset({
 		index: 0,
-		key: undefined
+		routes: [{ name: screenName, params }]
 	});
 	navigation.dispatch(resetAction);
 };
 
-export const resetNavigationWithNetworkChooser = (
-	navigation: NavigationScreenProp<{}>,
+export const resetNavigationWithNetworkChooser = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
 	screenName: string,
 	params: object = {},
 	isNew = false
 ): void => {
-	const resetAction = StackActions.reset({
-		actions: [
-			NavigationActions.navigate({
-				params: { isNew },
-				routeName: 'AccountNetworkChooser'
-			}),
-			NavigationActions.navigate({
-				params: params,
-				routeName: screenName
-			})
-		],
+	const resetAction = CommonActions.reset({
 		index: 1,
-		key: undefined
+		routes: [
+			{
+				name: 'AccountNetworkChooser',
+				params: { isNew }
+			},
+			{
+				name: screenName,
+				params: params
+			}
+		]
 	});
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToSignedMessage = (
-	navigation: NavigationScreenProp<{}>
+export const navigateToSignedMessage = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
 ): void =>
 	resetNavigationWithNetworkChooser(navigation, 'SignedMessage', {
 		isNew: true
 	});
 
-export const navigateToSignedTx = (
-	navigation: NavigationScreenProp<{}>
+export const navigateToSignedTx = <RouteName extends keyof RootStackParamList>(
+	navigation: GenericNavigationProps<RouteName>
 ): void =>
 	resetNavigationWithNetworkChooser(navigation, 'SignedTx', { isNew: true });
 
-export const navigateToPathsList = (
-	navigation: NavigationScreenProp<{}>,
+export const navigateToPathsList = <RouteName extends keyof RootStackParamList>(
+	navigation: GenericNavigationProps<RouteName>,
 	networkKey: string
 ): void =>
 	resetNavigationWithNetworkChooser(navigation, 'PathsList', { networkKey });
 
-export const navigateToQrScanner = (
-	navigation: NavigationScreenProp<{}>
+export const navigateToQrScanner = <RouteName extends keyof RootStackParamList>(
+	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationWithNetworkChooser(navigation, 'QrScanner');
 
-export const navigateToLegacyAccountList = (
-	navigation: NavigationScreenProp<{}>
+export const navigateToLegacyAccountList = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationTo(navigation, 'LegacyAccountList');

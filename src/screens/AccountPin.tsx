@@ -18,11 +18,10 @@
 
 import React, { useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { NavigationActions, StackActions } from 'react-navigation';
+import { CommonActions } from '@react-navigation/native';
 
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
-import Background from 'components/Background';
 import Button from 'components/Button';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
@@ -39,8 +38,9 @@ interface State {
 }
 function AccountPin({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ isNew: boolean }>): React.ReactElement {
+	navigation,
+	route
+}: NavigationAccountProps<'AccountPin'>): React.ReactElement {
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -57,7 +57,7 @@ function AccountPin({
 
 	const submit = async (): Promise<void> => {
 		const { pin, confirmation } = state;
-		const accountCreation: boolean = navigation.getParam('isNew', false);
+		const accountCreation: boolean = route.params?.isNew ?? false;
 		const account = accountCreation
 			? accounts.getNew()
 			: accounts.getSelected()!;
@@ -67,13 +67,9 @@ function AccountPin({
 				return navigateToLegacyAccountList(navigation);
 			} else {
 				await accounts.save(accounts.getSelectedKey(), account, pin);
-				const resetAction = StackActions.reset({
-					actions: [
-						NavigationActions.navigate({ routeName: 'LegacyAccountList' }),
-						NavigationActions.navigate({ routeName: 'AccountDetails' })
-					],
-					index: 1, // FIXME workaround for now, use SwitchNavigator later: https://github.com/react-navigation/react-navigation/issues/1127#issuecomment-295841343
-					key: undefined
+				const resetAction = CommonActions.reset({
+					index: 1,
+					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
 				});
 				navigation.dispatch(resetAction);
 			}
@@ -114,7 +110,6 @@ function AccountPin({
 	const title = 'ACCOUNT PIN';
 	return (
 		<KeyboardScrollView style={styles.body} extraHeight={120}>
-			<Background />
 			<Text style={styles.titleTop}>{title}</Text>
 			{showHintOrError()}
 			<Text style={styles.title}>PIN</Text>
@@ -164,9 +159,6 @@ export default withAccountStore(AccountPin);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		overflow: 'hidden',
 		padding: 20
 	},
 	errorText: {

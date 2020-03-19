@@ -143,7 +143,6 @@ const substrateNetworkBase: {
 	[SubstrateNetworkKeys.POLKADOT]: {
 		color: '#e7007a',
 		decimals: 12,
-		//TODO genesisHash to be added after launch
 		genesisHash: null,
 		logo: require('res/img/logos/polkadot.png'),
 		order: 1,

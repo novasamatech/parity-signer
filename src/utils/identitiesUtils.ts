@@ -214,8 +214,9 @@ export const getIdentityFromSender = (
 
 export const getAddressWithPath = (
 	path: string,
-	identity: Identity
+	identity: Identity | null
 ): string => {
+	if (identity == null) return '';
 	const pathMeta = identity.meta.get(path);
 	if (!pathMeta) return '';
 	const { address } = pathMeta;
@@ -262,7 +263,10 @@ export const getIdentityName = (
 	return `Identity_${identityIndex}`;
 };
 
-export const getPathName = (path: string, lookUpIdentity: Identity): string => {
+export const getPathName = (
+	path: string,
+	lookUpIdentity: Identity | null
+): string => {
 	if (
 		lookUpIdentity &&
 		lookUpIdentity.meta.has(path) &&

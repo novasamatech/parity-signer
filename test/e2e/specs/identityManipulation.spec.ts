@@ -133,6 +133,6 @@ describe('Load test', () => {
 		await testTap(IdentityManagement.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testUnlockPin(pinCode);
-		await testVisible(IdentitiesSwitch.modal);
+		await testVisible(AccountNetworkChooser.noAccountScreen);
 	});
 });

@@ -15,9 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { Subscribe } from 'unstated';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import {
 	NETWORK_LIST,
 	UnknownNetworkKeys,
@@ -32,13 +33,9 @@ import AccountsStore from 'stores/AccountsStore';
 import { emptyAccount } from 'utils/account';
 
 export default class LegacyNetworkChooser extends React.PureComponent<
-	NavigationProps<{}>,
+	NavigationProps<'LegacyNetworkChooser'>,
 	{}
 > {
-	static navigationOptions = {
-		headerBackTitle: 'Back',
-		title: 'Choose a network'
-	};
 	render(): React.ReactElement {
 		return (
 			<Subscribe to={[AccountsStore]}>
@@ -51,7 +48,7 @@ export default class LegacyNetworkChooser extends React.PureComponent<
 }
 
 class LegacyNetworkChooserView extends React.PureComponent<
-	NavigationAccountProps<{}>,
+	NavigationAccountProps<'LegacyNetworkChooser'>,
 	{}
 > {
 	render(): React.ReactElement {
@@ -64,7 +61,7 @@ class LegacyNetworkChooserView extends React.PureComponent<
 		}
 
 		return (
-			<ScrollView style={styles.body} contentContainerStyle={{ padding: 20 }}>
+			<SafeAreaScrollViewContainer contentContainerStyle={{ padding: 20 }}>
 				<Text style={styles.title}>CHOOSE NETWORK</Text>
 				{Object.entries(NETWORK_LIST)
 					.filter(
@@ -103,18 +100,12 @@ class LegacyNetworkChooserView extends React.PureComponent<
 							</TouchableItem>
 						)
 					)}
-			</ScrollView>
+			</SafeAreaScrollViewContainer>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden'
-	},
 	bottom: {
 		flexBasis: 50,
 		paddingBottom: 15

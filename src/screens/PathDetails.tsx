@@ -14,13 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { withNavigation } from 'react-navigation';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+// TODO use typescript 3.8's type import, Wait for prettier update.
+import AccountsStore from 'stores/AccountsStore';
 import { NavigationAccountProps } from 'types/props';
+import { RootStackParamList } from 'types/routes';
 import { withAccountStore } from 'utils/HOC';
 import PathCard from 'components/PathCard';
 import PopupMenu from 'components/PopupMenu';
@@ -40,9 +44,13 @@ import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
 
-interface Props extends NavigationAccountProps<{}> {
+interface Props {
 	path: string;
 	networkKey: string;
+	navigation:
+		| StackNavigationProp<RootStackParamList, 'PathDetails'>
+		| StackNavigationProp<RootStackParamList, 'PathsList'>;
+	accounts: AccountsStore;
 }
 
 export function PathDetailsView({
@@ -52,8 +60,8 @@ export function PathDetailsView({
 	networkKey
 }: Props): React.ReactElement {
 	const { currentIdentity } = accounts.state;
-	const address = getAddressWithPath(path, currentIdentity!);
-	const accountName = getPathName(path, currentIdentity!);
+	const address = getAddressWithPath(path, currentIdentity);
+	const accountName = getPathName(path, currentIdentity);
 	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
@@ -98,46 +106,45 @@ export function PathDetailsView({
 	};
 
 	return (
-		<View style={styles.body} testID={testIDs.PathDetail.screen}>
+		<SafeAreaScrollViewContainer testID={testIDs.PathDetail.screen}>
 			<LeftScreenHeading
 				title="Public Address"
 				networkKey={formattedNetworkKey}
+				headMenu={
+					<PopupMenu
+						testID={testIDs.PathDetail.popupMenuButton}
+						onSelect={onOptionSelect}
+						menuTriggerIconName={'more-vert'}
+						menuItems={[
+							{ text: 'Edit', value: 'PathManagement' },
+							{
+								hide: !isSubstratePath(path),
+								text: 'Derive Account',
+								value: 'PathDerivation'
+							},
+							{
+								testID: testIDs.PathDetail.deleteButton,
+								text: 'Delete',
+								textStyle: styles.deleteText,
+								value: 'PathDelete'
+							}
+						]}
+					/>
+				}
 			/>
-			<View style={styles.menuView}>
-				<PopupMenu
-					testID={testIDs.PathDetail.popupMenuButton}
-					onSelect={onOptionSelect}
-					menuTriggerIconName={'more-vert'}
-					menuItems={[
-						{ text: 'Edit', value: 'PathManagement' },
-						{
-							hide: !isSubstratePath(path),
-							text: 'Derive Account',
-							value: 'PathDerivation'
-						},
-						{
-							testID: testIDs.PathDetail.deleteButton,
-							text: 'Delete',
-							textStyle: styles.deleteText,
-							value: 'PathDelete'
-						}
-					]}
-				/>
-			</View>
-			<ScrollView>
-				<PathCard identity={currentIdentity!} path={path} />
-				<QrView data={`${accountId}:${accountName}`} />
-				{isUnknownNetwork && <UnknownAccountWarning isPath />}
-			</ScrollView>
-		</View>
+			<PathCard identity={currentIdentity!} path={path} />
+			<QrView data={`${accountId}:${accountName}`} />
+			{isUnknownNetwork && <UnknownAccountWarning isPath />}
+		</SafeAreaScrollViewContainer>
 	);
 }
 
 function PathDetails({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ path?: string }>): React.ReactElement {
-	const path = navigation.getParam('path', '');
+	navigation,
+	route
+}: NavigationAccountProps<'PathDetails'>): React.ReactElement {
+	const path = route.params.path ?? '';
 	const networkKey = getNetworkKey(path, accounts.state.currentIdentity!);
 	return (
 		<PathDetailsView
@@ -150,21 +157,9 @@ function PathDetails({
 }
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	},
 	deleteText: {
 		color: colors.bg_alert
-	},
-	menuView: {
-		alignItems: 'flex-end',
-		flex: 1,
-		position: 'absolute',
-		right: 16,
-		top: 5
 	}
 });
 
-export default withAccountStore(withNavigation(PathDetails));
+export default withAccountStore(PathDetails);
