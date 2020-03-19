@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import TextInput from 'components/TextInput';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -38,6 +40,7 @@ function IdentityBackup({
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(24);
+	const [password, setPassword] = useState('');
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
@@ -72,8 +75,13 @@ function IdentityBackup({
 		setSeedPhraseAsync();
 		return (): void => {
 			setSeedPhrase('');
+			setPassword('');
 		};
 	}, [route.params, wordsNumber]);
+
+	const onPasswordChange = (value) => {
+		setPassword(value);
+	};
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>
@@ -105,10 +113,19 @@ function IdentityBackup({
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
+			<TextInput
+				onChangeText={onPasswordChange}
+				testID={testIDs.IdentityNew.nameInput}
+				label="Advanced Option"
+				// onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
+				placeholder="Optional password"
+				focus={false}
+				value={password}
+			/>
 			{isNew && (
 				<ButtonMainAction
 					title={'Next'}
-					testID={testIDs.IdentityBackup.nextButton}
+					testID={testIDs.IdentityNew.passwordInput}
 					bottom={false}
 					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
