@@ -14,12 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import KeyboardScrollView from 'components/KeyboardScrollView';
-import TextInput from 'components/TextInput';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import TextInput from 'components/TextInput';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -79,12 +78,12 @@ function IdentityBackup({
 		};
 	}, [route.params, wordsNumber]);
 
-	const onPasswordChange = (value) => {
+	const onPasswordChange = (value: string): void => {
 		setPassword(value);
 	};
 
 	return (
-		<SafeAreaScrollViewContainer style={styles.body}>
+		<KeyboardScrollView style={styles.body}>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
@@ -130,7 +129,7 @@ function IdentityBackup({
 					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
 			)}
-		</SafeAreaScrollViewContainer>
+		</KeyboardScrollView>
 	);
 }
 
