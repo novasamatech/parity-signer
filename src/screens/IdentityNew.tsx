@@ -17,6 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
+import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import Button from 'components/Button';
@@ -48,6 +49,7 @@ function IdentityNew({
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const [password, setPassword] = useState('');
 
 	useEffect((): (() => void) => {
 		const clearNewIdentity = (): void =>
@@ -76,9 +78,9 @@ function IdentityNew({
 		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
-				await accounts.saveNewIdentity(seedPhrase.trimEnd(), pin);
+				await accounts.saveNewIdentity(seedPhrase.trimEnd(), pin, password);
 			} else {
-				await accounts.saveNewIdentity(seedPhrase, pin);
+				await accounts.saveNewIdentity(seedPhrase, pin, password);
 			}
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
@@ -114,6 +116,12 @@ function IdentityNew({
 				returnKeyType="done"
 				valid={isSeedValid.valid}
 				value={seedPhrase}
+			/>
+			<PasswordInput
+				password={password}
+				setPassword={setPassword}
+				onSubmitEditing={onRecoverConfirm}
+				testID={testIDs.IdentityNew.passwordInput}
 			/>
 			<View style={styles.btnBox}>
 				<Button

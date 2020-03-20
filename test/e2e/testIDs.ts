@@ -39,6 +39,7 @@ const testIDs = {
 	},
 	IdentityBackup: {
 		nextButton: 'identity_backup_next',
+		passwordInput: 'identity_backup_password_input',
 		seedText: 'identity_backup_seed'
 	},
 	IdentityManagement: {

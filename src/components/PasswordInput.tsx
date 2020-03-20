@@ -14,15 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-export const pathsRegex: {
-	[key: string]: RegExp;
-} = {
-	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
-	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
-};
+import React from 'react';
 
-export const passwordRegex = /^[\w-]{1,32}$/;
+import TextInput from 'components/TextInput';
+import { passwordRegex } from 'utils/regex';
 
-export const onlyNumberRegex = /^\d+$|^$/;
+export default function PasswordInput({
+	password,
+	setPassword,
+	testID,
+	onSubmitEditing
+}: {
+	password: string;
+	setPassword: (newPassword: string) => void;
+	testID?: string;
+	onSubmitEditing: () => void;
+}): React.ReactElement {
+	const onPasswordChange = (newPassword: string): void => {
+		if (passwordRegex.test(newPassword)) setPassword(newPassword);
+	};
+
+	return (
+		<TextInput
+			onChangeText={onPasswordChange}
+			testID={testID}
+			label="Advanced Option"
+			onSubmitEditing={onSubmitEditing}
+			placeholder="Optional password"
+			value={password}
+		/>
+	);
+}

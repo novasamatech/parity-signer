@@ -17,8 +17,8 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import PasswordInput from 'components/PasswordInput';
 import KeyboardScrollView from 'components/KeyboardScrollView';
-import TextInput from 'components/TextInput';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -43,7 +43,7 @@ function IdentityBackup({
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
-		await accounts.saveNewIdentity(seedPhrase, pin);
+		await accounts.saveNewIdentity(seedPhrase, pin, password);
 		setSeedPhrase('');
 		navigateToNewIdentityNetwork(navigation);
 	};
@@ -78,10 +78,6 @@ function IdentityBackup({
 		};
 	}, [route.params, wordsNumber]);
 
-	const onPasswordChange = (value: string): void => {
-		setPassword(value);
-	};
-
 	return (
 		<KeyboardScrollView style={styles.body}>
 			<ScreenHeading
@@ -112,23 +108,23 @@ function IdentityBackup({
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
-			<TextInput
-				onChangeText={onPasswordChange}
-				testID={testIDs.IdentityNew.nameInput}
-				label="Advanced Option"
-				// onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
-				placeholder="Optional password"
-				focus={false}
-				value={password}
-			/>
-			{isNew && (
-				<ButtonMainAction
-					title={'Next'}
+			{isNew ? (
+				<PasswordInput
+					password={password}
+					setPassword={setPassword}
+					onSubmitEditing={(): void => alertBackupDone(onBackupDone)}
 					testID={testIDs.IdentityNew.passwordInput}
-					bottom={false}
-					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
+			) : (
+				<Text>{password}</Text>
 			)}
+			<ButtonMainAction
+				title={'Next'}
+				testID={testIDs.IdentityBackup.nextButton}
+				bottom={false}
+				onPress={(): void => alertBackupDone(onBackupDone)}
+			/>
+			}
 		</KeyboardScrollView>
 	);
 }
