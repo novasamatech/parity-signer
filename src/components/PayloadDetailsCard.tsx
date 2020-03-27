@@ -273,8 +273,6 @@ export default class PayloadDetailsCard extends React.PureComponent<
 		const { fallback } = this.state;
 		const { description, payload, networkKey, signature, style } = this.props;
 
-		console.log('payload is', payload);
-
 		return (
 			<View style={[styles.body, style]}>
 				{!!description && <Text style={styles.titleText}>{description}</Text>}
