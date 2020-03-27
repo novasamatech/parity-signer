@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GenericExtrinsicPayload, TypeRegistry } from '@polkadot/types';
+import { TypeRegistry } from '@polkadot/types';
 import {
 	hexStripPrefix,
 	hexToU8a,
@@ -25,6 +25,7 @@ import { encodeAddress } from '@polkadot/util-crypto';
 
 import { blake2b } from './native';
 
+import { ExtrinsicPayloadLatestVersion } from 'constants/chainData';
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
@@ -56,6 +57,7 @@ import {
   */
 
 const registry = new TypeRegistry();
+
 export function rawDataToU8A(rawData: string): Uint8Array | null {
 	if (!rawData) {
 		return null;
@@ -182,11 +184,11 @@ export async function constructDataFromBytes(
 					switch (secondByte) {
 						case '00': // sign mortal extrinsic
 						case '02': // sign immortal extrinsic
-							extrinsicPayload = new GenericExtrinsicPayload(
-								registry,
+							extrinsicPayload = registry.createType(
+								'ExtrinsicPayload',
 								rawPayload,
 								{
-									version: 4
+									version: ExtrinsicPayloadLatestVersion
 								}
 							);
 							data.action = isOversized ? 'signData' : 'signTransaction';
