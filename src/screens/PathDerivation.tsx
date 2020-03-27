@@ -37,7 +37,6 @@ import colors from 'styles/colors';
 import PathCard from 'components/PathCard';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
-import set = Reflect.set;
 
 function PathDerivation({
 	accounts,

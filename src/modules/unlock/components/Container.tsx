@@ -14,10 +14,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import KeyboardScrollView from 'components/KeyboardScrollView';
-import testIDs from 'e2e/testIDs';
 
 import styles from '../styles';
+
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import testIDs from 'e2e/testIDs';
 
 export default function Container({ props }: any): React.ReactElement {
 	return (

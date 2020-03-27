@@ -328,11 +328,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return {
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
+			hasPassword: !!metaData.hasPassword,
 			isLegacy: false,
 			networkKey: targetNetworkKey!,
 			path: targetPath,
 			validBip39Seed: true,
-			hasPassword: !!metaData.hasPassword,
 			...metaData
 		};
 	}

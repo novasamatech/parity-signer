@@ -27,6 +27,9 @@ import {
 import * as React from 'react';
 import { View } from 'react-native';
 
+import PinNew from 'modules/unlock/screens/PinNew';
+import PinUnlock from 'modules/unlock/screens/PinUnlock';
+import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
@@ -48,9 +51,6 @@ import PathDerivation from 'screens/PathDerivation';
 import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
 import PathsList from 'screens/PathsList';
-import PinNew from 'modules/unlock/screens/PinNew';
-import PinUnlock from 'modules/unlock/screens/PinUnlock';
-import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
 import QrScanner from 'screens/QrScanner';
 import Security from 'screens/Security';

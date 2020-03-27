@@ -22,7 +22,7 @@ module.exports = {
 					components: './src/components',
 					constants: './src/constants',
 					e2e: './test/e2e',
-					modules: './src/modules/',
+					modules: './src/modules',
 					res: './res',
 					screens: './src/screens',
 					stores: './src/stores',

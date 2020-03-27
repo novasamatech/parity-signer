@@ -40,7 +40,7 @@ function IdentityBackup({
 	const [wordsNumber, setWordsNumber] = useState(24);
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
-		const { pin } = await setPin(navigation);
+		const pin = await setPin(navigation);
 		await accounts.saveNewIdentity(seedPhrase, pin);
 		setSeedPhrase('');
 		navigateToNewIdentityNetwork(navigation);

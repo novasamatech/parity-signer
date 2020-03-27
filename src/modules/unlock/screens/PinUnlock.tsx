@@ -15,70 +15,66 @@
 
 import React from 'react';
 
-import ButtonMainAction from 'components/ButtonMainAction';
-import ScreenHeading from 'components/ScreenHeading';
-import testIDs from 'e2e/testIDs';
 import Container from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
+import testIDs from 'e2e/testIDs';
+import ScreenHeading from 'components/ScreenHeading';
+import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
+import { withAccountStore } from 'utils/HOC';
+import { unlockIdentitySeed } from 'utils/identitiesUtils';
 
-export default function({
+function PinUnlock({
 	accounts,
 	route
-}: NavigationAccountProps<'PinNew'>): React.ReactElement {
+}: NavigationAccountProps<'PinUnlock'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
+	const targetIdentity =
+		route.params.identity ?? accounts.state.currentIdentity;
 
-	function submit() {
-		const { pin, confirmation } = state;
-		if (pin.length >= 6 && pin === confirmation) {
-			const resolve = route.params.resolve;
-			resetState();
-			resolve(pin);
+	async function submit(): Promise<void> {
+		const { pin } = state;
+		if (pin.length >= 6 && targetIdentity) {
+			try {
+				const resolve = route.params.resolve;
+				const seedPhrase = await unlockIdentitySeed(pin, targetIdentity);
+				resetState();
+				resolve(seedPhrase);
+			} catch (e) {
+				updateState({ pin: '', pinMismatch: true });
+				//TODO record error times;
+			}
 		} else {
-			if (pin.length < 6) {
-				updateState({ pinTooShort: true });
-			} else if (pin !== confirmation) updateState({ pinMismatch: true });
+			updateState({ pinTooShort: true });
 		}
 	}
-
 	return (
 		<Container>
 			<ScreenHeading
-				title={t.title.pinCreation}
-				subtitle={getSubtitle(state, false)}
+				title={t.title.pinUnlock}
 				error={state.pinMismatch || state.pinTooShort}
+				subtitle={getSubtitle(state, true)}
 			/>
-
 			<PinInput
 				label={t.pinLabel}
 				autoFocus
-				testID={testIDs.IdentityPin.setPin}
-				returnKeyType="next"
-				onFocus={(): void => updateState({ focusConfirmation: false })}
-				onSubmitEditing={(): void => {
-					updateState({ focusConfirmation: true });
-				}}
-				onChangeText={onPinInputChange('pin', updateState)}
+				testID={testIDs.IdentityPin.unlockPinInput}
+				returnKeyType="done"
+				onChangeText={onPinInputChange('confirmation', updateState)}
+				onSubmitEditing={submit}
 				value={state.pin}
 			/>
-			<PinInput
-				label={t.pinConfirmLabel}
-				returnKeyType="done"
-				testID={testIDs.IdentityPin.confirmPin}
-				focus={state.focusConfirmation}
-				onChangeText={onPinInputChange('confirmation', updateState)}
-				value={state.confirmation}
-				onSubmitEditing={submit}
-			/>
 			<ButtonMainAction
-				title={t.doneButton.pinCreation}
+				title={t.doneButton.pinUnlock}
 				bottom={false}
 				onPress={submit}
-				testID={testIDs.IdentityPin.submitButton}
+				testID={testIDs.IdentityPin.unlockPinButton}
 			/>
 		</Container>
 	);
 }
+
+export default withAccountStore(PinUnlock);

@@ -22,7 +22,7 @@ type InputListener = (v: string) => void;
 export const onPinInputChange = (
 	stateName: 'pin' | 'confirmation',
 	updateState: UpdateStateFunc
-): InputListener => (pinInput: string) => {
+): InputListener => (pinInput: string): void => {
 	if (onlyNumberRegex.test(pinInput)) {
 		updateState({
 			pinMismatch: false,

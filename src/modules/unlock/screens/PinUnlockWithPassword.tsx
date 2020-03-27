@@ -15,20 +15,21 @@
 
 import React, { useRef } from 'react';
 
-import ButtonMainAction from 'components/ButtonMainAction';
-import ScreenHeading from 'components/ScreenHeading';
-import TextInput from 'components/TextInput';
-import testIDs from 'e2e/testIDs';
 import Container from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
+import testIDs from 'e2e/testIDs';
+import TextInput from 'components/TextInput';
+import ScreenHeading from 'components/ScreenHeading';
+import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
+import { withAccountStore } from 'utils/HOC';
 import { unlockIdentitySeed, verifyPassword } from 'utils/identitiesUtils';
 import { constructSURI } from 'utils/suri';
 
-export default function PinUnlockWithPassword({
+function PinUnlockWithPassword({
 	accounts,
 	route
 }: NavigationAccountProps<'PinUnlockWithPassword'>): React.ReactElement {
@@ -70,10 +71,10 @@ export default function PinUnlockWithPassword({
 		}
 	}
 
-	function onPasswordInputChange(password: string) {
+	function onPasswordInputChange(password: string): void {
 		updateState({
-			pinMismatch: false,
-			password
+			password,
+			pinMismatch: false
 		});
 	}
 
@@ -112,3 +113,5 @@ export default function PinUnlockWithPassword({
 		</Container>
 	);
 }
+
+export default withAccountStore(PinUnlockWithPassword);
