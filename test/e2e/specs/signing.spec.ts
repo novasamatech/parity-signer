@@ -61,9 +61,7 @@ const testMultiPartExtrinsic = async (): Promise<void> => {
 		MessageDetails.signButton,
 		MessageDetails.scrollScreen
 	);
-	await element(by.text('I understand the risks'))
-		.atIndex(0)
-		.tap();
+	await element(by.text('I understand the risks')).atIndex(0).tap();
 	await testUnlockPin(pinCode);
 	await testVisible(SignedMessage.qrView);
 };
