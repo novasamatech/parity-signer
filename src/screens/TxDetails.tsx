@@ -15,17 +15,17 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Subscribe } from 'unstated';
 import { GenericExtrinsicPayload } from '@polkadot/types';
 
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
-import ButtonMainAction from 'components/ButtonMainAction';
+import Button from 'components/Button';
 import ScreenHeading from 'components/ScreenHeading';
 import TxDetailsCard from 'components/TxDetailsCard';
 import AccountsStore from 'stores/AccountsStore';
@@ -131,54 +131,55 @@ export class TxDetailsView extends React.PureComponent<ViewProps> {
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 		return (
-			<SafeAreaViewContainer style={styles.body}>
+			<SafeAreaScrollViewContainer
+				style={styles.body}
+				contentContainerStyle={{ paddingBottom: 120 }}
+				testID={testIDs.TxDetails.scrollScreen}
+			>
 				<ScreenHeading
 					title="Sign Transaction"
 					subtitle="step 1/2 – verify and sign"
 				/>
-				<ScrollView
-					bounces={false}
-					contentContainerStyle={{ paddingBottom: 120 }}
-					testID={testIDs.TxDetails.scrollScreen}
-				>
-					<Text style={[fontStyles.t_big, styles.bodyContent]}>
-						{`You are about to confirm sending the following ${
-							isEthereum ? 'transaction' : 'extrinsic'
-						}`}
-					</Text>
-					<View style={styles.bodyContent}>
-						<CompatibleCard
-							account={sender}
-							accountsStore={accounts}
-							titlePrefix={'from: '}
-						/>
-						{isEthereum ? (
-							<View style={{ marginTop: 16 }}>
-								<TxDetailsCard
-									style={{ marginBottom: 20 }}
-									description="You are about to send the following amount"
-									value={value}
-									gas={gas}
-									gasPrice={gasPrice}
-								/>
-								<Text style={styles.title}>Recipient</Text>
-								<CompatibleCard account={recipient} accountsStore={accounts} />
-							</View>
-						) : (
-							<PayloadDetailsCard
+				<Text style={[fontStyles.t_big, styles.bodyContent]}>
+					{`You are about to confirm sending the following ${
+						isEthereum ? 'transaction' : 'extrinsic'
+					}`}
+				</Text>
+				<View style={styles.bodyContent}>
+					<CompatibleCard
+						account={sender}
+						accountsStore={accounts}
+						titlePrefix={'from: '}
+					/>
+					{isEthereum ? (
+						<View style={{ marginTop: 16 }}>
+							<TxDetailsCard
 								style={{ marginBottom: 20 }}
-								payload={prehash}
-								networkKey={sender.networkKey}
+								description="You are about to send the following amount"
+								value={value}
+								gas={gas}
+								gasPrice={gasPrice}
 							/>
-						)}
-					</View>
-				</ScrollView>
-				<ButtonMainAction
-					testID={testIDs.TxDetails.signButton}
-					title="Sign Transaction"
-					onPress={(): any => onNext()}
-				/>
-			</SafeAreaViewContainer>
+							<Text style={styles.title}>Recipient</Text>
+							<CompatibleCard account={recipient} accountsStore={accounts} />
+						</View>
+					) : (
+						<PayloadDetailsCard
+							style={{ marginBottom: 20 }}
+							payload={prehash}
+							networkKey={sender.networkKey}
+						/>
+					)}
+				</View>
+				<View style={styles.signButtonContainer}>
+					<Button
+						buttonStyles={styles.signButton}
+						testID={testIDs.TxDetails.signButton}
+						title="Sign Transaction"
+						onPress={(): any => onNext()}
+					/>
+				</View>
+			</SafeAreaScrollViewContainer>
 		);
 	}
 }
@@ -193,6 +194,13 @@ const styles = StyleSheet.create({
 	},
 	marginBottom: {
 		marginBottom: 16
+	},
+	signButton: {
+		height: 60,
+		paddingHorizontal: 60
+	},
+	signButtonContainer: {
+		alignItems: 'center'
 	},
 	title: {
 		...fontStyles.t_regular,
