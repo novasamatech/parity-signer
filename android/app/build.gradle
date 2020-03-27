@@ -134,8 +134,8 @@ android {
         minSdkVersion 18
         missingDimensionStrategy 'react-native-camera', 'general'
         targetSdkVersion 28
-        versionCode 4100
-        versionName "4.1.0"
+        versionCode 4101
+        versionName "4.1.1"
         ndk {
             abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         }
