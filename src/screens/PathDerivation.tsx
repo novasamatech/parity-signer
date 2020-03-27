@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import PasswordInput from 'components/PasswordInput';
 import React, { useRef, useState, useMemo } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
@@ -36,16 +37,18 @@ import colors from 'styles/colors';
 import PathCard from 'components/PathCard';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
+import set = Reflect.set;
 
 function PathDerivation({
 	accounts,
 	navigation,
 	route
 }: NavigationAccountProps<'PathDerivation'>): React.ReactElement {
-	const [derivationPath, setDerivationPath] = useState('');
-	const [keyPairsName, setKeyPairsName] = useState('');
-	const [isPathValid, setIsPathValid] = useState(true);
-	const [modalVisible, setModalVisible] = useState(false);
+	const [derivationPath, setDerivationPath] = useState<string>('');
+	const [keyPairsName, setKeyPairsName] = useState<string>('');
+	const [isPathValid, setIsPathValid] = useState<boolean>(true);
+	const [modalVisible, setModalVisible] = useState<boolean>(false);
+	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
 	const parentPath = route.params.parentPath;
 	const [customNetworkKey, setCustomNetworkKey] = useState(() => {
@@ -74,7 +77,8 @@ function PathDerivation({
 			completePath,
 			seedPhrase,
 			isCustomNetwork ? customNetworkKey : pathIndicatedNetworkKey,
-			keyPairsName
+			keyPairsName,
+			password
 		);
 		if (derivationSucceed) {
 			navigateToPathsList(navigation, pathIndicatedNetworkKey);
@@ -124,6 +128,7 @@ function PathDerivation({
 					/>
 				)}
 				<Separator style={{ height: 0 }} />
+				<PasswordInput password={password} setPassword={setPassword} onSubmitEditing={onPathDerivation}/>
 				<PathCard
 					identity={accounts.state.currentIdentity!}
 					name={keyPairsName}

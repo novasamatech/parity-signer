@@ -161,7 +161,8 @@ function AccountNetworkChooser({
 			fullPath,
 			seedPhrase,
 			networkKey,
-			`${networkParams.title} root`
+			`${networkParams.title} root`,
+			''
 		);
 		if (derivationSucceed) {
 			navigateToPathDetails(navigation, networkKey, fullPath);

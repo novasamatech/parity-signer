@@ -385,14 +385,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		seedPhrase: string,
 		updatedIdentity: Identity,
 		name: string,
-		networkKey: string
+		networkKey: string,
+		password: string
 	): Promise<boolean> {
 		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
 		const suri = constructSURI({
 			derivePath: newPath,
-			password: '',
+			password: password,
 			phrase: seedPhrase
 		});
+		if (updatedIdentity.meta.has(newPath)) return false;
 		let address = '';
 		try {
 			address = await substrateAddress(suri, prefix);
@@ -400,10 +402,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			return false;
 		}
 		if (address === '') return false;
-		if (updatedIdentity.meta.has(newPath)) return false;
 		const pathMeta = {
 			address,
 			createdAt: new Date().getTime(),
+			hasPassword: password !== '',
 			name,
 			networkPathId: pathId,
 			updatedAt: new Date().getTime()
@@ -500,7 +502,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		newPath: string,
 		seedPhrase: string,
 		networkKey: string,
-		name: string
+		name: string,
+		password: string,
 	): Promise<boolean> {
 		const updatedCurrentIdentity = deepCopyIdentity(
 			this.state.currentIdentity!
@@ -510,7 +513,8 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			seedPhrase,
 			updatedCurrentIdentity,
 			name,
-			networkKey
+			networkKey,
+			password
 		);
 		if (!deriveSucceed) return false;
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
