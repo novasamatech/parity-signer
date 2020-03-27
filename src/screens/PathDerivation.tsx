@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PasswordInput from 'components/PasswordInput';
 import React, { useRef, useState, useMemo } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
+import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountProps } from 'types/props';
@@ -128,7 +128,11 @@ function PathDerivation({
 					/>
 				)}
 				<Separator style={{ height: 0 }} />
-				<PasswordInput password={password} setPassword={setPassword} onSubmitEditing={onPathDerivation}/>
+				<PasswordInput
+					password={password}
+					setPassword={setPassword}
+					onSubmitEditing={onPathDerivation}
+				/>
 				<PathCard
 					identity={accounts.state.currentIdentity!}
 					name={keyPairsName}

@@ -55,6 +55,7 @@ export type AccountMeta = {
 export interface FoundIdentityAccount extends AccountMeta {
 	accountId: string;
 	encryptedSeed: string;
+	hasPassword: boolean;
 	validBip39Seed: true;
 	isLegacy: false;
 	networkKey: string;

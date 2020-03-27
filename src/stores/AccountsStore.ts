@@ -126,7 +126,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async updateAccount(
+	private async updateAccount(
 		accountKey: string,
 		updatedAccount: Partial<LockedAccount>
 	): Promise<void> {
@@ -233,7 +233,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	getAccountWithoutCaseSensitive(accountId: string): Account | null {
+	private getAccountWithoutCaseSensitive(accountId: string): Account | null {
 		let findLegacyAccount = null;
 		for (const [key, value] of this.state.accounts) {
 			if (isEthereumAccountId(accountId)) {
@@ -280,7 +280,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return null;
 	}
 
-	getAccountFromIdentity(
+	private getAccountFromIdentity(
 		accountIdOrAddress: string
 	): false | FoundIdentityAccount {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
@@ -332,6 +332,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			networkKey: targetNetworkKey!,
 			path: targetPath,
 			validBip39Seed: true,
+			hasPassword: !!metaData.hasPassword,
 			...metaData
 		};
 	}
@@ -380,7 +381,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await this.setState({ currentIdentity: null });
 	}
 
-	async _addPathToIdentity(
+	private async addPathToIdentity(
 		newPath: string,
 		seedPhrase: string,
 		updatedIdentity: Identity,
@@ -415,10 +416,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return true;
 	}
 
-	async saveNewIdentity(
-		seedPhrase: string,
-		pin: string,
-	): Promise<void> {
+	async saveNewIdentity(seedPhrase: string, pin: string): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		const suri = seedPhrase;
 
@@ -442,12 +440,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		});
 	}
 
-	async updateCurrentIdentity(updatedIdentity: Identity): Promise<boolean> {
+	private async updateCurrentIdentity(
+		updatedIdentity: Identity
+	): Promise<boolean> {
 		try {
 			await this.setState({
 				currentIdentity: updatedIdentity
 			});
-			await this._updateIdentitiesWithCurrentIdentity();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('derive new Path error', e);
 			return false;
@@ -455,7 +455,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return true;
 	}
 
-	async _updateIdentitiesWithCurrentIdentity(): Promise<void> {
+	private async updateIdentitiesWithCurrentIdentity(): Promise<void> {
 		const newIdentities = deepCopyIdentities(this.state.identities);
 		if (this.state.currentIdentity === null) return;
 		const identityIndex = newIdentities.findIndex(
@@ -474,7 +474,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.name = name;
 		try {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
-			await this._updateIdentitiesWithCurrentIdentity();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('update identity name error', e);
 		}
@@ -492,7 +492,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.meta.set(path, updatedPathMeta);
 		try {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
-			await this._updateIdentitiesWithCurrentIdentity();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('update path name error', e);
 		}
@@ -503,12 +503,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		seedPhrase: string,
 		networkKey: string,
 		name: string,
-		password: string,
+		password: string
 	): Promise<boolean> {
 		const updatedCurrentIdentity = deepCopyIdentity(
 			this.state.currentIdentity!
 		);
-		const deriveSucceed = await this._addPathToIdentity(
+		const deriveSucceed = await this.addPathToIdentity(
 			newPath,
 			seedPhrase,
 			updatedCurrentIdentity,
@@ -531,7 +531,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			await this.setState({
 				currentIdentity: updatedCurrentIdentity
 			});
-			await this._updateIdentitiesWithCurrentIdentity();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('derive new Path error', e);
 			return false;
