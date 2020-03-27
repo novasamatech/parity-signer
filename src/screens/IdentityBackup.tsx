@@ -17,7 +17,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import PasswordInput from 'components/PasswordInput';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
@@ -39,11 +38,10 @@ function IdentityBackup({
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(24);
-	const [password, setPassword] = useState('');
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
-		await accounts.saveNewIdentity(seedPhrase, pin, password);
+		await accounts.saveNewIdentity(seedPhrase, pin);
 		setSeedPhrase('');
 		navigateToNewIdentityNetwork(navigation);
 	};
@@ -74,7 +72,6 @@ function IdentityBackup({
 		setSeedPhraseAsync();
 		return (): void => {
 			setSeedPhrase('');
-			setPassword('');
 		};
 	}, [route.params, wordsNumber]);
 
@@ -108,16 +105,6 @@ function IdentityBackup({
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
-			{isNew ? (
-				<PasswordInput
-					password={password}
-					setPassword={setPassword}
-					onSubmitEditing={(): void => alertBackupDone(onBackupDone)}
-					testID={testIDs.IdentityNew.passwordInput}
-				/>
-			) : (
-				<Text>{password}</Text>
-			)}
 			<ButtonMainAction
 				title={'Next'}
 				testID={testIDs.IdentityBackup.nextButton}

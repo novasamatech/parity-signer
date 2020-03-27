@@ -209,8 +209,6 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 
 	const renderPinInput = (): React.ReactElement => {
 		if(isUnlock){
-			if(targetIdentity?.hasPassword)
-				return <UnLockPinInputWithPassword/>
 			return <UnlockPinInput/>
 		}
 		return <CreatPin/>
