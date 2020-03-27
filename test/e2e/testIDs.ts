@@ -55,6 +55,7 @@ const testIDs = {
 	},
 	IdentityPin: {
 		confirmPin: 'identity_pin_confirm',
+		passwordInput: 'identity_pin_password_input',
 		scrollScreen: 'identity_pin_scroll',
 		setPin: 'identity_pin_set',
 		submitButton: 'identity_submit_button',

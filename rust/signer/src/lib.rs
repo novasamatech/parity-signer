@@ -246,7 +246,7 @@ mod tests {
         let result_24 = random_phrase(24);
         assert_eq!(24, result_24.split_whitespace().count());
         let result_17 = random_phrase(17);
-        assert_eq!(12, result_17.split_whitespace().count());
+        assert_eq!(24, result_17.split_whitespace().count());
     }
 
     #[test]

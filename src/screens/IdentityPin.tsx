@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState } from 'react';
+import React, {MutableRefObject, useRef, useState} from 'react';
 import { StyleSheet, TextInputProps } from 'react-native';
 
 import testIDs from 'e2e/testIDs';
@@ -35,6 +35,7 @@ interface Props extends NavigationAccountProps<'IdentityPin'>, TextInputProps {
 type State = {
 	confirmation: string;
 	focusConfirmation: boolean;
+	password: string;
 	pin: string;
 	pinMismatch: boolean;
 	pinTooShort: boolean;
@@ -43,11 +44,14 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
+		password: '',
 		pin: '',
 		pinMismatch: false,
 		pinTooShort: false
 	};
 	const [state, setState] = useState(initialState);
+	const targetIdentity = route.params.identity ?? accounts.state.currentIdentity;
+
 	const updateState = (delta: Partial<State>): void =>
 		setState({ ...state, ...delta });
 	const isUnlock = route.params.isUnlock ?? false;
@@ -70,12 +74,10 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 
 	const testPin = async (): Promise<void> => {
 		const { pin } = state;
-		const { currentIdentity } = accounts.state;
-		if (pin.length >= 6 && currentIdentity) {
+		if (pin.length >= 6 && targetIdentity) {
 			try {
-				const identity = route.params.identity ?? currentIdentity;
 				const resolve = route.params.resolve;
-				const seed = await unlockIdentitySeed(pin, identity);
+				const seed = await unlockIdentitySeed(pin, targetIdentity);
 				setState(initialState);
 				resolve(seed);
 			} catch (e) {
@@ -108,69 +110,111 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 		}
 	};
 
-	const renderPinInput = (): React.ReactElement =>
-		isUnlock ? (
-			<>
-				<ScreenHeading
-					title={t.title.pinUnlock}
-					error={state.pinMismatch || state.pinTooShort}
-					subtitle={showHintOrError()}
-				/>
-				<PinInput
-					label={t.pinLabel}
-					autoFocus
-					testID={testIDs.IdentityPin.unlockPinInput}
-					returnKeyType="done"
-					onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
-					onSubmitEditing={testPin}
-					value={state.pin}
-				/>
-				<ButtonMainAction
-					title={t.doneButton.pinUnlock}
-					bottom={false}
-					onPress={testPin}
-					testID={testIDs.IdentityPin.unlockPinButton}
-				/>
-			</>
-		) : (
-			<>
-				<ScreenHeading
-					title={t.title.pinCreation}
-					subtitle={showHintOrError()}
-					error={state.pinMismatch || state.pinTooShort}
-				/>
+	const UnlockPinInput = (): React.ReactElement => <>
+		<ScreenHeading
+			title={t.title.pinUnlock}
+			error={state.pinMismatch || state.pinTooShort}
+			subtitle={showHintOrError()}
+		/>
+		<PinInput
+			label={t.pinLabel}
+			autoFocus
+			testID={testIDs.IdentityPin.unlockPinInput}
+			returnKeyType="done"
+			onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
+			onSubmitEditing={testPin}
+			value={state.pin}
+		/>
+		<ButtonMainAction
+			title={t.doneButton.pinUnlock}
+			bottom={false}
+			onPress={testPin}
+			testID={testIDs.IdentityPin.unlockPinButton}
+		/>
+	</>
 
-				<PinInput
-					label={t.pinLabel}
-					autoFocus
-					testID={testIDs.IdentityPin.setPin}
-					returnKeyType="next"
-					onFocus={(): void => updateState({ focusConfirmation: false })}
-					onSubmitEditing={(): void => {
-						updateState({ focusConfirmation: true });
-					}}
-					onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
-					value={state.pin}
-				/>
-				<PinInput
-					label={t.pinConfirmLabel}
-					returnKeyType="done"
-					testID={testIDs.IdentityPin.confirmPin}
-					focus={state.focusConfirmation}
-					onChangeText={(confirmation: string): void =>
-						onPinInputChange('confirmation', confirmation)
-					}
-					value={state.confirmation}
-					onSubmitEditing={submit}
-				/>
-				<ButtonMainAction
-					title={t.doneButton.pinCreation}
-					bottom={false}
-					onPress={submit}
-					testID={testIDs.IdentityPin.submitButton}
-				/>
-			</>
-		);
+	const UnLockPinInputWithPassword = (): React.ReactElement => {
+		const passwordInput = useRef<TextInput>(null);
+		return <>
+			<ScreenHeading
+				title={t.title.pinUnlock}
+				error={state.pinMismatch || state.pinTooShort}
+				subtitle={showHintOrError()}
+			/>
+			<PinInput
+				label={t.pinLabel}
+				autoFocus
+				testID={testIDs.IdentityPin.unlockPinInput}
+				returnKeyType="done"
+				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
+				onSubmitEditing={(): void => passwordInput.current?.input?.focus()}
+				value={state.pin}
+			/>
+			<PinInput
+				label={t.passwordLabel}
+				autoFocus
+				testID={testIDs.IdentityPin.passwordInput}
+				returnKeyType="done"
+				ref={passwordInput}
+				onChangeText={(pin: string): void => onPinInputChange('password', pin)}
+				onSubmitEditing={testPin}
+				value={state.password}
+			/>
+			<ButtonMainAction
+				title={t.doneButton.pinUnlock}
+				bottom={false}
+				onPress={testPin}
+				testID={testIDs.IdentityPin.unlockPinButton}
+			/>
+		</>
+	};
+
+	const CreatPin = (): React.ReactElement => <>
+		<ScreenHeading
+			title={t.title.pinCreation}
+			subtitle={showHintOrError()}
+			error={state.pinMismatch || state.pinTooShort}
+		/>
+
+		<PinInput
+			label={t.pinLabel}
+			autoFocus
+			testID={testIDs.IdentityPin.setPin}
+			returnKeyType="next"
+			onFocus={(): void => updateState({ focusConfirmation: false })}
+			onSubmitEditing={(): void => {
+				updateState({ focusConfirmation: true });
+			}}
+			onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
+			value={state.pin}
+		/>
+		<PinInput
+			label={t.pinConfirmLabel}
+			returnKeyType="done"
+			testID={testIDs.IdentityPin.confirmPin}
+			focus={state.focusConfirmation}
+			onChangeText={(confirmation: string): void =>
+				onPinInputChange('confirmation', confirmation)
+			}
+			value={state.confirmation}
+			onSubmitEditing={submit}
+		/>
+		<ButtonMainAction
+			title={t.doneButton.pinCreation}
+			bottom={false}
+			onPress={submit}
+			testID={testIDs.IdentityPin.submitButton}
+		/>
+	</>
+
+	const renderPinInput = (): React.ReactElement => {
+		if(isUnlock){
+			if(targetIdentity?.hasPassword)
+				return <UnLockPinInputWithPassword/>
+			return <UnlockPinInput/>
+		}
+		return <CreatPin/>
+	};
 
 	return (
 		<KeyboardScrollView
@@ -186,6 +230,7 @@ function IdentityPin({ accounts, route }: Props): React.ReactElement {
 interface PinInputProps extends TextInputProps {
 	label: string;
 	focus?: boolean;
+	ref?: MutableRefObject<TextInput | null>;
 }
 
 function PinInput(props: PinInputProps): React.ReactElement {
@@ -216,6 +261,7 @@ const t = {
 		pinCreation: 'DONE',
 		pinUnlock: 'UNLOCK'
 	},
+	passwordLabel: 'Password',
 	pinConfirmLabel: 'Confirm PIN',
 	pinLabel: 'PIN',
 	pinMisMatchHint: {

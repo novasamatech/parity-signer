@@ -419,7 +419,14 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		password: string
 	): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
-		const suri = password === '' ? seedPhrase : `${seedPhrase}///${password}`;
+		const hasPassword = password !== '';
+		updatedIdentity.hasPassword = hasPassword;
+		if(hasPassword){
+			const suri = `${seedPhrase}///${password}`;
+
+		}
+		const suri = hasPassword ? `${seedPhrase}///${password}`: seedPhrase;
+
 		updatedIdentity.encryptedSeed = await encryptData(suri, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		await this.setState({

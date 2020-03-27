@@ -74,11 +74,12 @@ export interface FoundLegacyAccount {
 }
 
 export type FoundAccount = FoundIdentityAccount | FoundLegacyAccount;
-
+As Android API 29+ [removes execute permission for app home directory][1]
 export type Identity = {
 	// encrypted seed include seedPhrase and password
 	encryptedSeed: string;
 	derivationPassword: string;
+	hasPassword?: boolean;
 	meta: Map<string, AccountMeta>;
 	addresses: Map<string, string>;
 	name: string;

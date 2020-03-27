@@ -89,6 +89,7 @@ export function emptyIdentity(): Identity {
 		addresses: new Map(),
 		derivationPassword: '',
 		encryptedSeed: '',
+		hasPassword: false,
 		meta: new Map(),
 		name: ''
 	};
