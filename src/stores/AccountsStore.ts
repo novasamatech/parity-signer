@@ -270,10 +270,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = this.getAccountFromIdentity(accountId);
-		} else {
-			//TODO remove this function when we enable networkSpecs update and remove KUSAMA_CC2 network.
-			derivedAccount = this.getAccountFromIdentity(address);
 		}
+		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
+		derivedAccount = derivedAccount || this.getAccountFromIdentity(address);
 
 		if (derivedAccount instanceof Object)
 			return { ...derivedAccount, isLegacy: false };
