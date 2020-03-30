@@ -23,6 +23,8 @@ import {
 	UnknownNetworkParams
 } from 'types/networkSpecsTypes';
 
+export const unknownNetworkPathId = '';
+
 export const NetworkProtocols: {
 	[key: string]: NetworkProtocol;
 } = Object.freeze({
@@ -74,12 +76,12 @@ export const SubstrateNetworkKeys: {
 const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.bg_alert,
-		order: 0,
-		pathId: '',
+		order: 99,
+		pathId: unknownNetworkPathId,
 		prefix: 2,
 		protocol: NetworkProtocols.UNKNOWN,
 		secondaryColor: colors.card_bgSolid,
-		title: 'Custom network'
+		title: 'Unknown network'
 	}
 };
 

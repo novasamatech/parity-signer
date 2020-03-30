@@ -1,4 +1,4 @@
-import { NetworkProtocols } from 'constants/networkSpecs';
+import { NetworkProtocols, unknownNetworkPathId } from 'constants/networkSpecs';
 
 export type NetworkProtocol = 'ethereum' | 'substrate' | 'unknown';
 
@@ -47,9 +47,9 @@ export function isSubstrateNetworkParams(
 		| UnknownNetworkParams
 		| EthereumNetworkParams
 ): networkParams is SubstrateNetworkParams {
+	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
 	return (
-		(networkParams as SubstrateNetworkParams).protocol ===
-		NetworkProtocols.SUBSTRATE
+		protocol === NetworkProtocols.SUBSTRATE && pathId !== unknownNetworkPathId
 	);
 }
 
@@ -71,8 +71,10 @@ export function isUnknownNetworkParams(
 		| UnknownNetworkParams
 		| EthereumNetworkParams
 ): networkParams is UnknownNetworkParams {
+	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
 	return (
-		(networkParams as UnknownNetworkParams).protocol ===
-		NetworkProtocols.UNKNOWN
+		(protocol === NetworkProtocols.SUBSTRATE &&
+			pathId !== unknownNetworkPathId) ||
+		protocol === NetworkProtocols.UNKNOWN
 	);
 }

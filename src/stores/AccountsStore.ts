@@ -515,9 +515,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async deletePath(path: string): Promise<boolean> {
 		if (this.state.currentIdentity === null) return false;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const { address } = updatedCurrentIdentity.meta.get(path)!;
+		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
 		updatedCurrentIdentity.meta.delete(path);
-		updatedCurrentIdentity.addresses.delete(getAddressKeyByPath(address, path));
+		updatedCurrentIdentity.addresses.delete(
+			getAddressKeyByPath(path, pathMeta)
+		);
 
 		try {
 			await this.setState({
