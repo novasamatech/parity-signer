@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+//#![feature(trace_macros)]
+//trace_macros!(true);
+
 use bip39::{Language, Mnemonic, MnemonicType};
 use blake2_rfc::blake2b::blake2b;
 use ethsign::{keyfile::Crypto, Protected};
@@ -229,6 +232,48 @@ export! {
         let signature: Vec<u8> = signature.from_hex().ok()?;
         keypair.verify_signature(&message, &signature)
     }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyDecryptDataRef
+    fn decrypt_data_ref(data: &str, password: String) -> Option<i64> {
+        let password = Protected::new(password.into_bytes());
+        let crypto: Crypto = serde_json::from_str(data).ok()?;
+        let decrypted = crypto.decrypt(&password).ok()?;
+        let res = Box::into_raw(Box::new(String::from_utf8(decrypted).ok())) as i64; 
+        Some(res)
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyDestroyDataRef
+    fn destroy_data_ref(data_ref: i64) -> () {
+        unsafe { Box::from_raw(data_ref as *mut String) };
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletSignWithRef
+    fn ethkey_brainwallet_sign_with_ref(seed_ref: i64, message: &str) -> Option<String> {
+        let seed = unsafe { Box::from_raw(seed_ref as *mut String) };
+
+        let (_, keypair) = KeyPair::from_auto_phrase(&seed);
+        let message: Vec<u8> = message.from_hex().ok()?;
+        let signature = keypair.sign(&message).ok()?;
+
+        // so that the reference remains valid
+        let _ = Box::into_raw(seed) as i64;
+
+        Some(signature.to_hex())
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSignWithRef
+    fn substrate_brainwallet_sign_with_ref(seed_ref: i64, message: &str) -> Option<String> {
+        let seed = unsafe { Box::from_raw(seed_ref  as *mut String) };
+
+        let keypair = sr25519::KeyPair::from_suri(&seed)?;
+        let message: Vec<u8> = message.from_hex().ok()?;
+        let signature = keypair.sign(&message);
+
+        // so that the reference remains valid
+        let _ = Box::into_raw(seed) as i64;
+
+        Some(signature.to_hex())
+    }
 }
 
 #[cfg(test)]
@@ -293,7 +338,7 @@ mod tests {
     #[test]
     fn test_substrate_sign() {
         let msg: String = b"Build The Future".to_hex();
-        let signature = substrate_brainwallet_sign(SURI, &msg).unwrap();
+        let signature = dbg!(substrate_brainwallet_sign(SURI, &msg).unwrap());
 
         let is_valid = schnorrkel_verify(SURI, &msg, &signature).unwrap();
 

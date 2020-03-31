@@ -157,3 +157,28 @@ export function schnorrkelVerify(
 ): Promise<boolean> {
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
+
+export function decryptDataRef(
+	data: string,
+	password: string
+): Promise<number> {
+	return EthkeyBridge.decryptDataRef(data, password);
+}
+
+export function destroyDataRef(dataRef: number): Promise<number> {
+	return EthkeyBridge.destroyDataRef(dataRef);
+}
+
+export function brainWalletSignWithRef(
+	seedRef: number,
+	message: string
+): Promise<string> {
+	return EthkeyBridge.brainWalletSignWithRef(seedRef, message);
+}
+
+export function substrateSignWithRef(
+	seedRef: number,
+	message: string
+): Promise<string> {
+	return EthkeyBridge.substrateSignWithRef(seedRef, message);
+}
