@@ -74,7 +74,7 @@ export function isUnknownNetworkParams(
 	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
 	return (
 		(protocol === NetworkProtocols.SUBSTRATE &&
-			pathId !== unknownNetworkPathId) ||
+			pathId === unknownNetworkPathId) ||
 		protocol === NetworkProtocols.UNKNOWN
 	);
 }
