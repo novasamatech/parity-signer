@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-//#![feature(trace_macros)]
-//trace_macros!(true);
-
 use bip39::{Language, Mnemonic, MnemonicType};
 use blake2_rfc::blake2b::blake2b;
 use ethsign::{keyfile::Crypto, Protected};
@@ -338,7 +335,7 @@ mod tests {
     #[test]
     fn test_substrate_sign() {
         let msg: String = b"Build The Future".to_hex();
-        let signature = dbg!(substrate_brainwallet_sign(SURI, &msg).unwrap());
+        let signature = substrate_brainwallet_sign(SURI, &msg).unwrap();
 
         let is_valid = schnorrkel_verify(SURI, &msg, &signature).unwrap();
 
