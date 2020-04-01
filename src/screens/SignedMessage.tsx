@@ -34,7 +34,7 @@ function SignedMessage({
 
 	useEffect(
 		(): (() => void) =>
-			function(): void {
+			function (): void {
 				scannerStore.cleanup();
 			},
 		[scannerStore]
