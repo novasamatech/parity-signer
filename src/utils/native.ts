@@ -157,3 +157,32 @@ export function schnorrkelVerify(
 ): Promise<boolean> {
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
+
+// Decrypt data and return a reference to the result
+export function decryptDataRef(
+	data: string,
+	password: string
+): Promise<number> {
+	return EthkeyBridge.decryptDataRef(data, password);
+}
+
+// Clean up the memory allocation made by decryptDataRef
+export function destroyDataRef(dataRef: number): Promise<number> {
+	return EthkeyBridge.destroyDataRef(dataRef);
+}
+
+// Use a reference returned by decryptDataRef to sign a message
+export function brainWalletSignWithRef(
+	seedRef: number,
+	message: string
+): Promise<string> {
+	return EthkeyBridge.brainWalletSignWithRef(seedRef, message);
+}
+
+// Use a reference returned by decryptDataRef to sign a message
+export function substrateSignWithRef(
+	seedRef: number,
+	message: string
+): Promise<string> {
+	return EthkeyBridge.substrateSignWithRef(seedRef, message);
+}
