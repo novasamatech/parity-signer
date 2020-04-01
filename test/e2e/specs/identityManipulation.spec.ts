@@ -125,7 +125,9 @@ describe('Load test', () => {
 	});
 
 	it('delete identity', async () => {
-		await element(by.id(IdentitiesSwitch.toggleButton)).atIndex(0).tap();
+		await element(by.id(IdentitiesSwitch.toggleButton))
+			.atIndex(0)
+			.tap();
 		await testTap(IdentitiesSwitch.manageIdentityButton);
 		await testTap(IdentityManagement.popupMenuButton);
 		await testTap(IdentityManagement.deleteButton);
