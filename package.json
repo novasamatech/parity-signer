@@ -23,7 +23,7 @@
     "start": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native start",
     "unit": "jest --config ./test/unit/jest.config.js",
     "unit:debug": "node --inspect node_modules/.bin/jest --config ./test/unit/jest.config.js --watch --runInBand",
-    "test-rust": "cd ./rust/signer && cargo test && cd ../..",
+    "test-rust": "(cd ./rust/signer && cargo test)",
     "build-e2e:android": "detox build -c android.emu.debug -l info",
     "test-e2e:android": "detox test -c android.emu.debug -l info --noStackTrace",
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
