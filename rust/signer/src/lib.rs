@@ -349,18 +349,8 @@ mod tests {
         let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
         let signature_by_ref = substrate_brainwallet_sign_with_ref(data_pointer, &msg).unwrap();
         let is_valid = schnorrkel_verify(SURI, &msg, &signature_by_ref).unwrap();
-        assert!(is_valid);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_substrate_sign_with_ref_destroyed() {
-        let msg: String = b"Build The Future".to_hex();
-        let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
         destroy_data_ref(data_pointer);
-        let signature_by_ref = substrate_brainwallet_sign_with_ref(data_pointer, &msg).unwrap();
-        let is_valid = schnorrkel_verify(SURI, &msg, &signature_by_ref).unwrap();
-        assert!(!is_valid);
+        assert!(is_valid);
     }
 
 
