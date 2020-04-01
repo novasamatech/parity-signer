@@ -158,6 +158,7 @@ export function schnorrkelVerify(
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
 
+// Decrypt data and return a reference to the result
 export function decryptDataRef(
 	data: string,
 	password: string
@@ -165,10 +166,12 @@ export function decryptDataRef(
 	return EthkeyBridge.decryptDataRef(data, password);
 }
 
+// Clean up the memory allocation made by decryptDataRef
 export function destroyDataRef(dataRef: number): Promise<number> {
 	return EthkeyBridge.destroyDataRef(dataRef);
 }
 
+// Use a reference returned by decryptDataRef to sign a message
 export function brainWalletSignWithRef(
 	seedRef: number,
 	message: string
@@ -176,6 +179,7 @@ export function brainWalletSignWithRef(
 	return EthkeyBridge.brainWalletSignWithRef(seedRef, message);
 }
 
+// Use a reference returned by decryptDataRef to sign a message
 export function substrateSignWithRef(
 	seedRef: number,
 	message: string
