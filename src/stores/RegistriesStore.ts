@@ -15,25 +15,62 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Metadata, TypeRegistry } from '@polkadot/types';
-import { TYPES_SPEC } from '@polkadot/types/known/overrides';
-import { RegistryTypes } from '@polkadot/types/types';
+import { getSpecTypes } from '@polkadot/types-known';
 import { Container } from 'unstated';
 
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { getMetadata } from 'utils/identitiesUtils';
 
+//Map PathId to Polkadot.js/api spec names and chain names
+type NetworkTypes = {
+	alias?: string;
+	chains: {
+		[key: string]: string;
+	};
+};
+type NetworkTypesMap = {
+	[key: string]: NetworkTypes;
+};
+const networkTypesMap: NetworkTypesMap = {
+	centrifuge: {
+		alias: 'centrifuge-chain',
+		chains: {}
+	},
+	kusama: { chains: {} },
+	polkadot: {
+		chains: {
+			westend: 'Westend'
+		}
+	}
+};
+
+export const getOverrideTypes = (
+	registry: TypeRegistry,
+	pathId: string
+): any => {
+	let specName = '',
+		chainName = '';
+	Object.entries(networkTypesMap).find(
+		([networkName, networkTypes]: [string, NetworkTypes]) => {
+			if (networkName === pathId) {
+				specName = networkTypes.alias ?? networkName;
+			} else if (networkTypes.chains.hasOwnProperty(pathId)) {
+				const chainAlias = networkTypes.chains[pathId];
+				specName = networkTypes.alias ?? networkName;
+				chainName = chainAlias ?? pathId;
+			} else {
+				return false;
+			}
+			return true;
+		}
+	);
+	return getSpecTypes(registry, chainName, specName);
+};
+
 type RegistriesStoreState = {
 	registries: Map<string, TypeRegistry>;
 	dumbRegistry: TypeRegistry;
 };
-
-function getLatestVersionOverrideTypes(
-	networkPathId: string
-): undefined | RegistryTypes {
-	if (!TYPES_SPEC.hasOwnProperty(networkPathId)) return undefined;
-	const latestVersionNumber = TYPES_SPEC[networkPathId].length - 1;
-	return TYPES_SPEC[networkPathId][latestVersionNumber].types;
-}
 
 export default class RegistriesStore extends Container<RegistriesStoreState> {
 	state: RegistriesStoreState = {
@@ -50,10 +87,7 @@ export default class RegistriesStore extends Container<RegistriesStoreState> {
 		const networkParams = SUBSTRATE_NETWORK_LIST[networkKey];
 		const newRegistry = new TypeRegistry();
 		const networkMetadataRaw = getMetadata(networkKey);
-		const override = getLatestVersionOverrideTypes(networkParams.pathId);
-		if (override !== undefined) {
-			newRegistry.register(override);
-		}
+		newRegistry.register(getOverrideTypes(newRegistry, networkParams.pathId));
 		const metadata = new Metadata(newRegistry, networkMetadataRaw);
 		newRegistry.setMetadata(metadata);
 		registries.set(networkKey, newRegistry);

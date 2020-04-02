@@ -30,6 +30,7 @@ import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
+import { getOverrideTypes } from 'stores/RegistriesStore';
 import { SubstrateCompletedParsedData } from 'types/scannerTypes';
 import {
 	constructDataFromBytes,
@@ -117,6 +118,14 @@ describe.skip('sanity check', () => {
 
 		expect(payload).toMatchObject(fromBytes);
 		expect(payload.genesisHash.toHex()).toEqual(SubstrateNetworkKeys.KUSAMA);
+	});
+});
+
+describe('type registry should get override types', () => {
+	it('start correct', () => {
+		const testRegistry = new TypeRegistry();
+		const kusamaOverrideTypes = getOverrideTypes(testRegistry, 'westend');
+		expect(kusamaOverrideTypes).not.toEqual({});
 	});
 });
 
