@@ -163,6 +163,7 @@ export class SeedRef {
 	private valid: boolean;
 
 	constructor() {
+		this.dataRef = 0;
 		this.valid = false;
 	}
 
