@@ -65,7 +65,7 @@ export const getOverrideTypes = (
 		}
 	);
 	// @ts-ignore
-	return getSpecTypes(registry, chainName, specName,'0xffffffff');
+	return getSpecTypes(registry, chainName, specName, '0xffffffff');
 };
 
 type RegistriesStoreState = {
