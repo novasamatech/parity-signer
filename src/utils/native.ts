@@ -175,7 +175,7 @@ export class SeedRef {
 			);
 		}
 		return EthkeyBridge.decryptDataRef(encryptedSeed, password).then(
-			dataRef => {
+			(dataRef: number) => {
 				this.dataRef = dataRef;
 				this.valid = true;
 			}
