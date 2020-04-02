@@ -270,10 +270,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = this.getAccountFromIdentity(accountId);
-		} else {
-			//TODO remove this function when we enable networkSpecs update and remove KUSAMA_CC2 network.
-			derivedAccount = this.getAccountFromIdentity(address);
 		}
+		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
+		derivedAccount = derivedAccount || this.getAccountFromIdentity(address);
 
 		if (derivedAccount instanceof Object)
 			return { ...derivedAccount, isLegacy: false };
@@ -516,9 +515,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async deletePath(path: string): Promise<boolean> {
 		if (this.state.currentIdentity === null) return false;
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const { address } = updatedCurrentIdentity.meta.get(path)!;
+		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
 		updatedCurrentIdentity.meta.delete(path);
-		updatedCurrentIdentity.addresses.delete(getAddressKeyByPath(address, path));
+		updatedCurrentIdentity.addresses.delete(
+			getAddressKeyByPath(path, pathMeta)
+		);
 
 		try {
 			await this.setState({

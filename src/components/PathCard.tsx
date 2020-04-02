@@ -24,9 +24,12 @@ import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 
 import {
+	isSubstrateNetworkParams,
+	isUnknownNetworkParams
+} from 'types/networkSpecsTypes';
+import {
 	defaultNetworkKey,
 	NETWORK_LIST,
-	NetworkProtocols,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import colors from 'styles/colors';
@@ -45,6 +48,7 @@ export default function PathCard({
 	identity,
 	path,
 	name,
+	networkKey,
 	testID,
 	titlePrefix
 }: {
@@ -52,6 +56,7 @@ export default function PathCard({
 	identity: Identity;
 	path: string;
 	name?: string;
+	networkKey?: string;
 	testID?: string;
 	titlePrefix?: string;
 }): React.ReactElement {
@@ -60,11 +65,12 @@ export default function PathCard({
 	const address = getAddressWithPath(path, identity);
 	const isUnknownAddress = address === '';
 
-	const networkKey = getNetworkKeyByPath(path);
-	const network =
-		networkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress
+	const computedNetworkKey =
+		networkKey || getNetworkKeyByPath(path, identity.meta.get(path)!);
+	const networkParams =
+		computedNetworkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress
 			? NETWORK_LIST[defaultNetworkKey]
-			: NETWORK_LIST[networkKey];
+			: NETWORK_LIST[computedNetworkKey];
 
 	const nonSubstrateCard = (
 		<View testID={testID}>
@@ -77,21 +83,25 @@ export default function PathCard({
 				}}
 			/>
 			<View style={styles.content}>
-				<AccountIcon address={address} network={network} style={styles.icon} />
+				<AccountIcon
+					address={address}
+					network={networkParams}
+					style={styles.icon}
+				/>
 				<View style={styles.desc}>
 					<View>
 						<Text style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}>
-							{network.title}
+							{networkParams.title}
 						</Text>
 					</View>
 					<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
-					<Address address={address} protocol={network.protocol} />
+					<Address address={address} protocol={networkParams.protocol} />
 				</View>
 				<View
 					style={[
 						styles.footer,
 						{
-							backgroundColor: network.color
+							backgroundColor: networkParams.color
 						}
 					]}
 				/>
@@ -109,7 +119,7 @@ export default function PathCard({
 				<View style={[styles.content, styles.contentDer]}>
 					<AccountIcon
 						address={address}
-						network={network}
+						network={networkParams}
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
@@ -133,8 +143,8 @@ export default function PathCard({
 		</View>
 	);
 
-	return network.protocol === NetworkProtocols.SUBSTRATE ||
-		network.protocol === NetworkProtocols.UNKNOWN
+	return isSubstrateNetworkParams(networkParams) ||
+		isUnknownNetworkParams(networkParams)
 		? substrateDerivationCard
 		: nonSubstrateCard;
 }
