@@ -23,11 +23,7 @@ import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import ButtonMainAction from 'components/ButtonMainAction';
-import {
-	getNetworkKey,
-	getNetworkKeyByPath,
-	validateDerivedPath
-} from 'utils/identitiesUtils';
+import { getNetworkKey, validateDerivedPath } from 'utils/identitiesUtils';
 import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
@@ -48,22 +44,21 @@ function PathDerivation({
 	const [modalVisible, setModalVisible] = useState(false);
 	const pathNameInput = useRef<TextInput>(null);
 	const parentPath = route.params.parentPath;
-	const [customNetworkKey, setCustomNetworkKey] = useState(() => {
-		const parentNetworkKey = getNetworkKey(
-			parentPath,
-			accounts.state.currentIdentity!
-		);
-		return parentNetworkKey === UnknownNetworkKeys.UNKNOWN
-			? defaultNetworkKey
-			: parentNetworkKey;
-	});
-	const completePath = `${parentPath}${derivationPath}`;
-	const pathIndicatedNetworkKey = useMemo(
-		(): string => getNetworkKeyByPath(completePath),
-		[completePath]
+	const parentNetworkKey = useMemo(
+		() => getNetworkKey(parentPath, accounts.state.currentIdentity!),
+		[parentPath, accounts.state.currentIdentity]
 	);
-	const isCustomNetwork =
-		pathIndicatedNetworkKey === UnknownNetworkKeys.UNKNOWN;
+
+	const [customNetworkKey, setCustomNetworkKey] = useState(
+		parentNetworkKey === UnknownNetworkKeys.UNKNOWN
+			? defaultNetworkKey
+			: parentNetworkKey
+	);
+	const completePath = `${parentPath}${derivationPath}`;
+	const enableCustomNetwork = parentPath === '';
+	const currentNetworkKey = enableCustomNetwork
+		? customNetworkKey
+		: parentNetworkKey;
 
 	const onPathDerivation = async (): Promise<void> => {
 		if (!validateDerivedPath(derivationPath)) {
@@ -73,11 +68,11 @@ function PathDerivation({
 		const derivationSucceed = await accounts.deriveNewPath(
 			completePath,
 			seedPhrase,
-			isCustomNetwork ? customNetworkKey : pathIndicatedNetworkKey,
+			currentNetworkKey,
 			keyPairsName
 		);
 		if (derivationSucceed) {
-			navigateToPathsList(navigation, pathIndicatedNetworkKey);
+			navigateToPathsList(navigation, currentNetworkKey);
 		} else {
 			setIsPathValid(false);
 			alertPathDerivationError();
@@ -117,7 +112,7 @@ function PathDerivation({
 					testID={testIDs.PathDerivation.nameInput}
 					value={keyPairsName}
 				/>
-				{isCustomNetwork && (
+				{enableCustomNetwork && (
 					<NetworkSelector
 						networkKey={customNetworkKey}
 						setVisible={setModalVisible}
@@ -128,6 +123,7 @@ function PathDerivation({
 					identity={accounts.state.currentIdentity!}
 					name={keyPairsName}
 					path={completePath}
+					networkKey={currentNetworkKey}
 				/>
 
 				<ButtonMainAction
@@ -138,7 +134,7 @@ function PathDerivation({
 					testID={testIDs.PathDerivation.deriveButton}
 					onPress={onPathDerivation}
 				/>
-				{isCustomNetwork && (
+				{enableCustomNetwork && (
 					<NetworkOptions
 						setNetworkKey={setCustomNetworkKey}
 						visible={modalVisible}

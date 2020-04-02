@@ -20,14 +20,13 @@ import { Text, View } from 'react-native';
 import { PathDetailsView } from './PathDetails';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
+import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { PathGroup } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import {
+	isEthereumNetworkParams,
+	isUnknownNetworkParams
+} from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import {
@@ -52,12 +51,13 @@ function PathsList({
 
 	const { currentIdentity } = accounts.state;
 	const isEthereumPath = isEthereumNetworkParams(networkParams);
-	const isUnknownNetworkPath =
-		networkParams.protocol === NetworkProtocols.UNKNOWN;
+	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
 	const pathsGroups = useMemo((): PathGroup[] | null => {
 		if (!currentIdentity || isEthereumPath) return null;
-		const paths = Array.from(currentIdentity.meta.keys());
-		const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
+		const listedPaths = getPathsWithSubstrateNetworkKey(
+			currentIdentity,
+			networkKey
+		);
 		return groupPaths(listedPaths);
 	}, [currentIdentity, isEthereumPath, networkKey]);
 

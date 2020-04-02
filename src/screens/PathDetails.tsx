@@ -34,7 +34,6 @@ import QrView from 'components/QrView';
 import {
 	getAddressWithPath,
 	getNetworkKey,
-	getNetworkKeyByPath,
 	getPathName,
 	getPathsWithSubstrateNetworkKey,
 	isSubstratePath
@@ -76,17 +75,15 @@ export function PathDetailsView({
 				alertDeleteAccount('this account', async () => {
 					await unlockSeedPhrase(navigation);
 					const deleteSucceed = await accounts.deletePath(path);
-					const paths = Array.from(accounts.state.currentIdentity!.meta.keys());
-					const pathIndicatedNetworkKey = getNetworkKeyByPath(path);
 					if (deleteSucceed) {
 						if (isSubstratePath(path)) {
 							const listedPaths = getPathsWithSubstrateNetworkKey(
-								paths,
-								pathIndicatedNetworkKey
+								accounts.state.currentIdentity!,
+								networkKey
 							);
 							const hasOtherPaths = listedPaths.length > 0;
 							hasOtherPaths
-								? navigateToPathsList(navigation, pathIndicatedNetworkKey)
+								? navigateToPathsList(navigation, networkKey)
 								: navigation.navigate('AccountNetworkChooser');
 						} else {
 							navigation.navigate('AccountNetworkChooser');
