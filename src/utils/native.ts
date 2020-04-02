@@ -171,9 +171,7 @@ export class SeedRef {
 	tryCreate(encryptedSeed: string, password: string): Promise<void> {
 		if (this.valid) {
 			// Seed reference was already created.
-			throw new Error(
-				'cannot create a seed reference when one already exists'
-			);
+			throw new Error('cannot create a seed reference when one already exists');
 		}
 		return EthkeyBridge.decryptDataRef(encryptedSeed, password).then(
 			(dataRef: number) => {
