@@ -40,7 +40,7 @@ function SignedTx({
 
 	useEffect(
 		() =>
-			function(): void {
+			function (): void {
 				scannerStore.cleanup();
 			},
 		[scannerStore]

@@ -40,9 +40,7 @@ export const testNotVisible = async (componentId: string): Promise<void> =>
 
 export const tapBack = async (): Promise<void> => {
 	if (device.getPlatform() === 'ios') {
-		await element(by.id(testIDs.Header.headerBackButton))
-			.atIndex(0)
-			.tap();
+		await element(by.id(testIDs.Header.headerBackButton)).atIndex(0).tap();
 	} else {
 		await device.pressBack();
 	}
@@ -62,9 +60,7 @@ export const testInputWithDone = async (
 ): Promise<void> => {
 	await element(by.id(inputId)).typeText(inputText);
 	if (device.getPlatform() === 'ios') {
-		await element(by.label('Done'))
-			.atIndex(0)
-			.tap();
+		await element(by.label('Done')).atIndex(0).tap();
 	} else {
 		await element(by.id(inputId)).tapReturnKey();
 	}
