@@ -78,3 +78,11 @@ struct rust_string* substrate_brainwallet_address(unsigned* error, const struct 
 struct rust_string* substrate_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* data);
 
 struct rust_string* schnorrkel_verify(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* msg, const struct rust_string_ptr* signature);
+
+int64_t decrypt_data_ref(unsigned* error, const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password);
+
+void destroy_data_ref(unsigned* error, int64_t data_ref);
+
+struct rust_string* ethkey_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* message);
+
+struct rust_string* substrate_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* data);

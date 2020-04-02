@@ -103,6 +103,36 @@ impl<'a> Argument<'static> for &'a str {
 }
 
 #[cfg(not(feature = "jni"))]
+impl Argument<'static> for i64 {
+    type Ext = i64;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self::Ext) -> Self {
+        val
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl Return<'static> for () {
+    type Ext = *mut std::ffi::c_void;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, _val: Self) -> Self::Ext {
+        std::ptr::null_mut()
+    }
+}
+
+#[cfg(not(feature = "jni"))]
+impl Return<'static> for i64 {
+    type Ext = i64;
+    type Env = Cell<u32>;
+
+    fn convert(_: &Self::Env, val: Self) -> Self::Ext {
+        val
+    }
+}
+
+#[cfg(not(feature = "jni"))]
 impl Return<'static> for bool {
     type Ext = u8;
     type Env = Cell<u32>;
@@ -198,6 +228,36 @@ impl<'jni> Argument<'jni> for String {
 
     fn convert(env: &Self::Env, val: Self::Ext) -> Self {
         env.get_string(val).expect("Invalid java string").into()
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Argument<'jni> for i64 {
+    type Ext = jni::sys::jlong;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_env: &Self::Env, val: Self::Ext) -> Self {
+        val as i64
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Return<'jni> for () {
+    type Ext = *mut std::ffi::c_void;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_env: &Self::Env, _val: Self) -> Self::Ext {
+        std::ptr::null_mut()
+    }
+}
+
+#[cfg(feature = "jni")]
+impl<'jni> Return<'jni> for i64 {
+    type Ext = jni::sys::jlong;
+    type Env = JNIEnv<'jni>;
+
+    fn convert(_env: &Self::Env, val: Self) -> Self::Ext {
+        val as Self::Ext
     }
 }
 
