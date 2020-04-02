@@ -172,7 +172,7 @@ export class SeedRef {
 		if (this.valid) {
 			// Seed reference was already created.
 			throw new Error(
-				'cannot call `tryCreate` more than once on the same object'
+				'cannot create a seed reference when one already exists'
 			);
 		}
 		return EthkeyBridge.decryptDataRef(encryptedSeed, password).then(
@@ -197,7 +197,7 @@ export class SeedRef {
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	brainWalletSignWithRef(message: string): Promise<string> {
+	brainWalletSign(message: string): Promise<string> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
@@ -206,7 +206,7 @@ export class SeedRef {
 	}
 
 	// Use a reference returned by decryptDataRef to sign a message
-	substrateSignWithRef(message: string): Promise<string> {
+	substrateSign(message: string): Promise<string> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
