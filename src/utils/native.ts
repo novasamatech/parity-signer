@@ -158,31 +158,58 @@ export function schnorrkelVerify(
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
 
-// Decrypt data and return a reference to the result
-export function decryptDataRef(
-	data: string,
-	password: string
-): Promise<number> {
-	return EthkeyBridge.decryptDataRef(data, password);
-}
+export class SeedRef {
+	private dataRef: number;
+	private valid: boolean;
 
-// Clean up the memory allocation made by decryptDataRef
-export function destroyDataRef(dataRef: number): Promise<number> {
-	return EthkeyBridge.destroyDataRef(dataRef);
-}
+	constructor() {
+		this.valid = false;
+	}
 
-// Use a reference returned by decryptDataRef to sign a message
-export function brainWalletSignWithRef(
-	seedRef: number,
-	message: string
-): Promise<string> {
-	return EthkeyBridge.brainWalletSignWithRef(seedRef, message);
-}
+	// Decrypt a seed and store the reference. Must be called before signing.
+	tryCreate(encryptedSeed: string, password: string): Promise<void> {
+		if (this.valid) {
+			// Seed reference was already created.
+			throw new Error(
+				'cannot call `tryCreate` more than once on the same object'
+			);
+		}
+		return EthkeyBridge.decryptDataRef(encryptedSeed, password).then(
+			dataRef => {
+				this.dataRef = dataRef;
+				this.valid = true;
+			}
+		);
+	}
 
-// Use a reference returned by decryptDataRef to sign a message
-export function substrateSignWithRef(
-	seedRef: number,
-	message: string
-): Promise<string> {
-	return EthkeyBridge.substrateSignWithRef(seedRef, message);
+	// Destroy the decrypted seed. Must be called before this leaves scope or
+	// memory will leak.
+	tryDestroy(): Promise<void> {
+		if (!this.valid) {
+			// Seed reference was never created or was already destroyed.
+			throw new Error('cannot destroy an invalid seed reference');
+		}
+		return EthkeyBridge.destroyDataRef(this.dataRef).then(() => {
+			this.valid = false;
+		});
+	}
+
+	// Use the seed reference to sign a message. Will throw an error if
+	// `tryDestroy` has already been called or if `tryCreate` failed.
+	brainWalletSignWithRef(message: string): Promise<string> {
+		if (!this.valid) {
+			// Seed reference was never created or was already destroyed.
+			throw new Error('cannot sign with an invalid seed reference');
+		}
+		return EthkeyBridge.brainWalletSignWithRef(this.dataRef, message);
+	}
+
+	// Use a reference returned by decryptDataRef to sign a message
+	substrateSignWithRef(message: string): Promise<string> {
+		if (!this.valid) {
+			// Seed reference was never created or was already destroyed.
+			throw new Error('cannot sign with an invalid seed reference');
+		}
+		return EthkeyBridge.substrateSignWithRef(this.dataRef, message);
+	}
 }
