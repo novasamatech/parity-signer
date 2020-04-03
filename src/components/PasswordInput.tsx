@@ -49,13 +49,18 @@ export default function PasswordInput({
 				/>
 			</TouchableOpacity>
 			{isShow && (
-				<TextInput
-					onChangeText={onPasswordChange}
-					testID={testID}
-					onSubmitEditing={onSubmitEditing}
-					placeholder="Optional password"
-					value={password}
-				/>
+				<>
+					<TextInput
+						onChangeText={onPasswordChange}
+						testID={testID}
+						onSubmitEditing={onSubmitEditing}
+						placeholder="Optional password"
+						value={password}
+					/>
+					<Text style={styles.hintText}>
+						Password will be always needed when signing with this account.
+					</Text>
+				</>
 			)}
 		</View>
 	);
@@ -64,6 +69,10 @@ export default function PasswordInput({
 const styles = StyleSheet.create({
 	container: {
 		marginBottom: 16
+	},
+	hintText: {
+		...fontStyles.t_regular,
+		paddingHorizontal: 16
 	},
 	label: {
 		alignItems: 'center',
