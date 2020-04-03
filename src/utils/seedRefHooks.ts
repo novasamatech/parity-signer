@@ -7,7 +7,13 @@ type TryCreateFunc = (encryptedSeed: string, password: string) => Promise<void>;
 type TryDestroyFunc = () => Promise<void>;
 type TrySignFunc = (message: string) => Promise<string>;
 
-type SeedRefHooks = [IsValidFunc, TryCreateFunc, TryDestroyFunc, TrySignFunc];
+type SeedRefHooks = {
+	isValid: IsValidFunc;
+	create: TryCreateFunc;
+	destroy: TryDestroyFunc;
+	brainWalletSign: TrySignFunc;
+	substrateSign: TrySignFunc;
+};
 
 export function useSeedRef(): SeedRefHooks {
 	const [seedRef, setSeedRef] = useState<SeedRef>(new SeedRef());
@@ -46,5 +52,5 @@ export function useSeedRef(): SeedRefHooks {
 		return seedRef.trySubstrateSign(message);
 	};
 
-	return [isValid, create, destroy, brainWalletSign, substrateSign];
+	return { brainWalletSign, create, destroy, isValid, substrateSign };
 }
