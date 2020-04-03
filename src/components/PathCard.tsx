@@ -133,7 +133,9 @@ export default function PathCard({
 						</View>
 						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
-							<Text style={fontStyles.t_codeS}>{path}</Text>
+							<Text style={fontStyles.t_codeS}>
+								{hasPassword ? `${path}///***` : path}
+							</Text>
 						</View>
 						{address !== '' && (
 							<Text
@@ -192,7 +194,7 @@ const styles = StyleSheet.create({
 		width: 40
 	},
 	titleContainer: {
-		flexDirection: 'row',
-		alignItems: 'center'
+		alignItems: 'center',
+		flexDirection: 'row'
 	}
 });
