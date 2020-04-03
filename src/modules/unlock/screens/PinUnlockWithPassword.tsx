@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 
 import Container from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
@@ -21,7 +21,6 @@ import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
-import TextInput from 'components/TextInput';
 import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
@@ -34,7 +33,7 @@ function PinUnlockWithPassword({
 	route
 }: NavigationAccountProps<'PinUnlockWithPassword'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
-	const passwordInput = useRef<TextInput>(null);
+	const [focusPassword, setFocusPassword] = useState<boolean>(false);
 	const targetIdentity =
 		route.params.identity ?? accounts.state.currentIdentity;
 
@@ -81,15 +80,14 @@ function PinUnlockWithPassword({
 				testID={testIDs.IdentityPin.unlockPinInput}
 				returnKeyType="done"
 				onChangeText={onPinInputChange('pin', updateState)}
-				onSubmitEditing={(): void => passwordInput.current?.input?.focus()}
+				onSubmitEditing={(): void => setFocusPassword(true)}
 				value={state.pin}
 			/>
 			<PinInput
 				label={t.passwordLabel}
-				autoFocus
 				testID={testIDs.IdentityPin.passwordInput}
 				returnKeyType="done"
-				ref={passwordInput}
+				focus={focusPassword}
 				onChangeText={onPasswordInputChange}
 				onSubmitEditing={submit}
 				value={state.password}

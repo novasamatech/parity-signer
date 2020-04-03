@@ -31,7 +31,6 @@ export default function PinInput(props: PinInputProps): React.ReactElement {
 	return (
 		<TextInput
 			keyboardAppearance="dark"
-			clearTextOnFocus
 			editable
 			keyboardType="numeric"
 			multiline={false}

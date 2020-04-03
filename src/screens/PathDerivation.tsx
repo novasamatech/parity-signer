@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
 import PasswordInput from 'components/PasswordInput';
@@ -44,7 +44,7 @@ function PathDerivation({
 	const [isPathValid, setIsPathValid] = useState<boolean>(true);
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
-	const pathNameInput = useRef<TextInput>(null);
+	const [nameInputFocus, setNameInputFocus] = useState<boolean>(false);
 	const parentPath = route.params.parentPath;
 	const parentNetworkKey = useMemo(
 		() => getNetworkKey(parentPath, accounts.state.currentIdentity!),
@@ -94,9 +94,10 @@ function PathDerivation({
 				<TextInput
 					autoCompleteType="off"
 					autoCorrect={false}
+					autoFocus
 					label="Path"
 					onChangeText={setDerivationPath}
-					onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
+					onSubmitEditing={(): void => setNameInputFocus(true)}
 					placeholder="//hard/soft"
 					returnKeyType="next"
 					testID={testIDs.PathDerivation.pathInput}
@@ -110,7 +111,7 @@ function PathDerivation({
 						setKeyPairsName(keyParisName)
 					}
 					onSubmitEditing={onPathDerivation}
-					ref={pathNameInput}
+					focus={nameInputFocus}
 					returnKeyType="done"
 					testID={testIDs.PathDerivation.nameInput}
 					value={keyPairsName}
