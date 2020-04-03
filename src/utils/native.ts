@@ -172,7 +172,7 @@ export class SeedRef {
 	}
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	tryCreate(encryptedSeed: string, password: string): Promise<void> {
+	tryCreate(encryptedSeed: string, password: string): Promise<SeedRef> {
 		if (this.valid) {
 			// Seed reference was already created.
 			throw new Error('cannot create a seed reference when one already exists');
@@ -181,19 +181,21 @@ export class SeedRef {
 			(dataRef: number) => {
 				this.dataRef = dataRef;
 				this.valid = true;
+				return this;
 			}
 		);
 	}
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or
 	// memory will leak.
-	tryDestroy(): Promise<void> {
+	tryDestroy(): Promise<SeedRef> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot destroy an invalid seed reference');
 		}
 		return EthkeyBridge.destroyDataRef(this.dataRef).then(() => {
 			this.valid = false;
+			return this;
 		});
 	}
 
