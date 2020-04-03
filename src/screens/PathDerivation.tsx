@@ -67,18 +67,18 @@ function PathDerivation({
 			return setIsPathValid(false);
 		}
 		const seedPhrase = await unlockSeedPhrase(navigation);
-		const derivationSucceed = await accounts.deriveNewPath(
-			completePath,
-			seedPhrase,
-			currentNetworkKey,
-			keyPairsName,
-			password
-		);
-		if (derivationSucceed) {
+		try {
+			await accounts.deriveNewPath(
+				completePath,
+				seedPhrase,
+				currentNetworkKey,
+				keyPairsName,
+				password
+			);
 			navigateToPathsList(navigation, currentNetworkKey);
-		} else {
+		} catch (error) {
 			setIsPathValid(false);
-			alertPathDerivationError();
+			alertPathDerivationError(error.message);
 		}
 	};
 
@@ -130,7 +130,9 @@ function PathDerivation({
 				<PathCard
 					identity={accounts.state.currentIdentity!}
 					name={keyPairsName}
-					path={completePath}
+					path={
+						password === '' ? completePath : `${completePath}///${password}`
+					}
 					networkKey={currentNetworkKey}
 				/>
 

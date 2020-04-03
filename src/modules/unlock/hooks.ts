@@ -15,7 +15,7 @@
 
 import { useState } from 'react';
 
-import type { State, StateReducer, UpdateStateFunc } from './types';
+import { State, StateReducer, UpdateStateFunc } from './types';
 
 const initialState: State = {
 	confirmation: '',

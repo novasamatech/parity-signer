@@ -158,30 +158,27 @@ function AccountNetworkChooser({
 		const { pathId } = networkParams;
 		const seedPhrase = await unlockSeedPhrase(navigation);
 		const fullPath = `//${pathId}`;
-		const derivationSucceed = await accounts.deriveNewPath(
-			fullPath,
-			seedPhrase,
-			networkKey,
-			`${networkParams.title} root`,
-			''
-		);
-		if (derivationSucceed) {
+		try {
+			await accounts.deriveNewPath(
+				fullPath,
+				seedPhrase,
+				networkKey,
+				`${networkParams.title} root`,
+				''
+			);
 			navigateToPathDetails(navigation, networkKey, fullPath);
-		} else {
-			alertPathDerivationError();
+		} catch (error) {
+			alertPathDerivationError(error.message);
 		}
 	};
 
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
 		const seedPhrase = await unlockSeedPhrase(navigation);
-		const derivationSucceed = await accounts.deriveEthereumAccount(
-			seedPhrase,
-			networkKey
-		);
-		if (derivationSucceed) {
+		try {
+			await accounts.deriveEthereumAccount(seedPhrase, networkKey);
 			navigateToPathsList(navigation, networkKey);
-		} else {
-			alertPathDerivationError();
+		} catch (e) {
+			alertPathDerivationError(e.message);
 		}
 	};
 

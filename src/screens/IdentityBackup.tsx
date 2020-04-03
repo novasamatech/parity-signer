@@ -111,7 +111,6 @@ function IdentityBackup({
 				bottom={false}
 				onPress={(): void => alertBackupDone(onBackupDone)}
 			/>
-			}
 		</KeyboardScrollView>
 	);
 }

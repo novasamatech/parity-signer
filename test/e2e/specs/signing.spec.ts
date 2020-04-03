@@ -76,7 +76,7 @@ const testEthereumMessage = async (): Promise<void> => {
 	await testVisible(SignedMessage.qrView);
 };
 
-describe('Signing test', () => {
+describe.skip('Signing test', () => {
 	it('should have account list screen', async () => {
 		await testVisible(TacScreen.tacView);
 		await testTap(TacScreen.agreePrivacyButton);

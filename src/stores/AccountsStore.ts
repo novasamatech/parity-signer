@@ -30,6 +30,12 @@ import {
 	saveIdentities,
 	loadIdentities
 } from 'utils/db';
+import {
+	addressGenerateError,
+	emptyIdentityError,
+	identityUpdateError,
+	accountExistedError
+} from 'utils/errors';
 import { constructSURI, parseSURI } from 'utils/suri';
 import {
 	brainWalletAddress,
@@ -104,18 +110,20 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async deriveEthereumAccount(
 		seedPhrase: string,
 		networkKey: string
-	): Promise<boolean> {
+	): Promise<void> {
 		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
 		const ethereumAddress = await brainWalletAddress(seedPhrase);
-		if (ethereumAddress.address === '') return false;
+		if (ethereumAddress.address === '') throw new Error(addressGenerateError);
 		const { ethereumChainId } = networkParams;
 		const accountId = generateAccountId({
 			address: ethereumAddress.address,
 			networkKey
 		});
-		if (this.state.currentIdentity === null) return false;
+		if (this.state.currentIdentity === null)
+			throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		if (updatedCurrentIdentity.meta.has(ethereumChainId)) return false;
+		if (updatedCurrentIdentity.meta.has(ethereumChainId))
+			throw new Error(accountExistedError);
 		updatedCurrentIdentity.meta.set(ethereumChainId, {
 			address: ethereumAddress.address,
 			createdAt: new Date().getTime(),
@@ -123,7 +131,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			updatedAt: new Date().getTime()
 		});
 		updatedCurrentIdentity.addresses.set(accountId, ethereumChainId);
-		return await this.updateCurrentIdentity(updatedCurrentIdentity);
+		await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
 	private async updateAccount(
@@ -387,21 +395,21 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		name: string,
 		networkKey: string,
 		password: string
-	): Promise<boolean> {
+	): Promise<void> {
 		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
 		const suri = constructSURI({
 			derivePath: newPath,
 			password: password,
 			phrase: seedPhrase
 		});
-		if (updatedIdentity.meta.has(newPath)) return false;
+		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
 		try {
 			address = await substrateAddress(suri, prefix);
 		} catch (e) {
-			return false;
+			throw new Error(addressGenerateError);
 		}
-		if (address === '') return false;
+		if (address === '') throw new Error(addressGenerateError);
 		const pathMeta = {
 			address,
 			createdAt: new Date().getTime(),
@@ -412,7 +420,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		};
 		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
-		return true;
 	}
 
 	async saveNewIdentity(seedPhrase: string, pin: string): Promise<void> {
@@ -441,17 +448,15 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	private async updateCurrentIdentity(
 		updatedIdentity: Identity
-	): Promise<boolean> {
+	): Promise<void> {
 		try {
 			await this.setState({
 				currentIdentity: updatedIdentity
 			});
 			await this.updateIdentitiesWithCurrentIdentity();
-		} catch (e) {
-			console.warn('derive new Path error', e);
-			return false;
+		} catch (error) {
+			throw new Error(identityUpdateError);
 		}
-		return true;
 	}
 
 	private async updateIdentitiesWithCurrentIdentity(): Promise<void> {
@@ -475,7 +480,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
 			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
-			console.warn('update identity name error', e);
+			throw new Error(identityUpdateError);
 		}
 	}
 
@@ -503,11 +508,11 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		networkKey: string,
 		name: string,
 		password: string
-	): Promise<boolean> {
+	): Promise<void> {
 		const updatedCurrentIdentity = deepCopyIdentity(
 			this.state.currentIdentity!
 		);
-		const deriveSucceed = await this.addPathToIdentity(
+		await this.addPathToIdentity(
 			newPath,
 			seedPhrase,
 			updatedCurrentIdentity,
@@ -515,12 +520,12 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			networkKey,
 			password
 		);
-		if (!deriveSucceed) return false;
-		return await this.updateCurrentIdentity(updatedCurrentIdentity);
+		await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async deletePath(path: string): Promise<boolean> {
-		if (this.state.currentIdentity === null) return false;
+	async deletePath(path: string): Promise<void> {
+		if (this.state.currentIdentity === null)
+			throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
 		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
 		updatedCurrentIdentity.meta.delete(path);
@@ -534,28 +539,21 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			});
 			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
-			console.warn('derive new Path error', e);
-			return false;
+			throw new Error(identityUpdateError);
 		}
-		return true;
 	}
 
-	async deleteCurrentIdentity(): Promise<boolean> {
-		try {
-			const newIdentities = deepCopyIdentities(this.state.identities);
-			const identityIndex = newIdentities.findIndex(
-				(identity: Identity) =>
-					identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
-			);
-			newIdentities.splice(identityIndex, 1);
-			await this.setState({
-				currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
-				identities: newIdentities
-			});
-			await saveIdentities(newIdentities);
-			return true;
-		} catch (e) {
-			return false;
-		}
+	async deleteCurrentIdentity(): Promise<void> {
+		const newIdentities = deepCopyIdentities(this.state.identities);
+		const identityIndex = newIdentities.findIndex(
+			(identity: Identity) =>
+				identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
+		);
+		newIdentities.splice(identityIndex, 1);
+		await this.setState({
+			currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
+			identities: newIdentities
+		});
+		await saveIdentities(newIdentities);
 	}
 }

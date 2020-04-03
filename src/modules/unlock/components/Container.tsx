@@ -20,7 +20,7 @@ import styles from '../styles';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 
-export default function Container({ props }: any): React.ReactElement {
+export default function Container(props: any): React.ReactElement {
 	return (
 		<KeyboardScrollView
 			{...props}

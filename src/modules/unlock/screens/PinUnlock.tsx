@@ -63,7 +63,7 @@ function PinUnlock({
 				autoFocus
 				testID={testIDs.IdentityPin.unlockPinInput}
 				returnKeyType="done"
-				onChangeText={onPinInputChange('confirmation', updateState)}
+				onChangeText={onPinInputChange('pin', updateState)}
 				onSubmitEditing={submit}
 				value={state.pin}
 			/>

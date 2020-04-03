@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 import TextInput from 'components/TextInput';
+import fontStyles from 'styles/fontStyles';
 import { passwordRegex } from 'utils/regex';
 
 export default function PasswordInput({
@@ -33,15 +36,43 @@ export default function PasswordInput({
 	const onPasswordChange = (newPassword: string): void => {
 		if (passwordRegex.test(newPassword)) setPassword(newPassword);
 	};
+	const [isShow, setShow] = useState<boolean>(false);
+	const togglePasswordInput = (): void => setShow(!isShow);
 
 	return (
-		<TextInput
-			onChangeText={onPasswordChange}
-			testID={testID}
-			label="Advanced Option"
-			onSubmitEditing={onSubmitEditing}
-			placeholder="Optional password"
-			value={password}
-		/>
+		<View style={styles.container}>
+			<TouchableOpacity onPress={togglePasswordInput} style={styles.label}>
+				<Text style={fontStyles.t_regular}>Add Optional Password</Text>
+				<Icon
+					name={isShow ? 'caretup' : 'caretdown'}
+					style={styles.labelIcon}
+				/>
+			</TouchableOpacity>
+			{isShow && (
+				<TextInput
+					onChangeText={onPasswordChange}
+					testID={testID}
+					onSubmitEditing={onSubmitEditing}
+					placeholder="Optional password"
+					value={password}
+				/>
+			)}
+		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: {
+		marginBottom: 16
+	},
+	label: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		marginBottom: 3,
+		paddingHorizontal: 16
+	},
+	labelIcon: {
+		paddingLeft: 8,
+		...fontStyles.t_regular
+	}
+});

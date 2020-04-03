@@ -74,7 +74,7 @@
     "@babel/core": "^7.5.4",
     "@babel/plugin-proposal-class-properties": "^7.5.0",
     "@babel/plugin-transform-runtime": "^7.5.0",
-    "@babel/preset-typescript": "^7.8.3",
+    "@babel/preset-typescript": "^7.9.0",
     "@babel/runtime": "^7.5.4",
     "@react-native-community/eslint-config": "^0.0.5",
     "@types/detox": "^14.5.2",
@@ -106,7 +106,7 @@
     "react-test-renderer": "16.9.0",
     "reactotron-react-native": "^3.6.5",
     "ts-jest": "^25.3.0",
-    "typescript": "^3.8.3"
+    "typescript": "3.8.3"
   },
   "resolutions": {
     "@react-native-community/eslint-config/babel-eslint": "10.0.3",
