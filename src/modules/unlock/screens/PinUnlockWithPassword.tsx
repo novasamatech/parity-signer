@@ -45,25 +45,15 @@ function PinUnlockWithPassword({
 			try {
 				const resolve = route.params.resolve;
 				const seedPhrase = await unlockIdentitySeed(pin, targetIdentity);
-				const isPasswordValid = verifyPassword(
+				const suri = constructSURI({
+					derivePath,
 					password,
-					seedPhrase,
-					targetIdentity,
-					derivePath
-				);
-				if (isPasswordValid) {
-					const suri = constructSURI({
-						derivePath,
-						password,
-						phrase: seedPhrase
-					});
-					resetState();
-					resolve(suri);
-				} else {
-					updateState({ pin: '', pinMismatch: true });
-				}
+					phrase: seedPhrase
+				});
+				resetState();
+				resolve(suri);
 			} catch (e) {
-				updateState({ pin: '', pinMismatch: true });
+				updateState({ pin: '', password: '', pinMismatch: true });
 				//TODO record error times;
 			}
 		} else {
