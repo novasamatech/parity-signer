@@ -213,4 +213,48 @@ class EthkeyBridge: NSObject {
       reject("Failed to verify signature.", nil, nil)
     }
   }
+  
+  @objc func decryptDataRef(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var data_ptr = data.asPtr()
+    var password_ptr = password.asPtr()
+    let data_ref = decrypt_data_ref(&error, &data_ptr, &password_ptr)
+    if error == 0 {
+      resolve(data_ref)
+    } else {
+      reject("error in decrypt_data_ref", nil, nil)
+    }
+  }
+
+  @objc func destroyDataRef(_ data_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    destroy_data_ref(&error, data_ref)
+    if error == 0 {
+      resolve(0)
+    } else {
+      reject("error in destroy_data_ref", nil, nil)
+    }
+  }
+
+  @objc func brainWalletSignWithRef(_ seed_ref: Int64, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var message_ptr = message.asPtr()
+    let signature_rust_str = ethkey_brainwallet_sign_with_ref(&error, seed_ref, &message_ptr)
+    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
+    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(signature_rust_str_ptr)
+    rust_string_destroy(signature_rust_str)
+    resolve(signature)
+  }
+  
+  @objc func substrateSignWithRef(_ seed_ref: Int64, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var message_ptr = message.asPtr()
+    let signature_rust_str = substrate_brainwallet_sign_with_ref(&error, seed_ref, &message_ptr)
+    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
+    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
+    rust_string_ptr_destroy(signature_rust_str_ptr)
+    rust_string_destroy(signature_rust_str)
+    resolve(signature)
+  }
 }

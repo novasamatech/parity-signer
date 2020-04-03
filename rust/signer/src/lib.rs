@@ -229,6 +229,48 @@ export! {
         let signature: Vec<u8> = signature.from_hex().ok()?;
         keypair.verify_signature(&message, &signature)
     }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyDecryptDataRef
+    fn decrypt_data_ref(data: &str, password: String) -> Option<i64> {
+        let password = Protected::new(password.into_bytes());
+        let crypto: Crypto = serde_json::from_str(data).ok()?;
+        let decrypted = crypto.decrypt(&password).ok()?;
+        let res = Box::into_raw(Box::new(String::from_utf8(decrypted).ok())) as i64;
+        Some(res)
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyDestroyDataRef
+    fn destroy_data_ref(data_ref: i64) -> () {
+        unsafe { Box::from_raw(data_ref as *mut String) };
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletSignWithRef
+    fn ethkey_brainwallet_sign_with_ref(seed_ref: i64, message: &str) -> Option<String> {
+        let seed = unsafe { Box::from_raw(seed_ref as *mut String) };
+
+        let (_, keypair) = KeyPair::from_auto_phrase(&seed);
+        let message: Vec<u8> = message.from_hex().ok()?;
+        let signature = keypair.sign(&message).ok()?;
+
+        // so that the reference remains valid
+        let _ = Box::into_raw(seed) as i64;
+
+        Some(signature.to_hex())
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSignWithRef
+    fn substrate_brainwallet_sign_with_ref(seed_ref: i64, message: &str) -> Option<String> {
+        let seed = unsafe { Box::from_raw(seed_ref  as *mut String) };
+
+        let keypair = sr25519::KeyPair::from_suri(&seed)?;
+        let message: Vec<u8> = message.from_hex().ok()?;
+        let signature = keypair.sign(&message);
+
+        // so that the reference remains valid
+        let _ = Box::into_raw(seed) as i64;
+
+        Some(signature.to_hex())
+    }
 }
 
 #[cfg(test)]
@@ -236,8 +278,9 @@ mod tests {
     use super::*;
 
     static SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon";
-
     static DERIVED_SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
+    static ENCRYPTED_SEED: &str = "{\"cipher\":\"aes-128-ctr\",\"cipherparams\":{\"iv\":\"47b4b75d13045ff7569da858e234f7ea\"},\"ciphertext\":\"ca1cf5387822b70392c4aeec729676f91ab00a795d7593fb7e52ecc333dbc4a1acbedc744b5d8d519c714e194bd741995244c8128bfdce6c184d6bda4ca136ed265eedcee9\",\"kdf\":\"pbkdf2\",\"kdfparams\":{\"c\":10240,\"dklen\":32,\"prf\":\"hmac-sha256\",\"salt\":\"b4a2d1edd1a70fe2eb48d7aff15c19e234f6aa211f5142dddb05a59af12b3381\"},\"mac\":\"b38a54eb382f2aa1a8be2f7b86fe040fe112d0f42fea03fac186dccdd7ae3eb9\"}";
+    static PIN: &str = "000000";
 
     #[test]
     fn test_random_phrase() {
@@ -298,5 +341,22 @@ mod tests {
         let is_valid = schnorrkel_verify(SURI, &msg, &signature).unwrap();
 
         assert!(is_valid);
+    }
+
+    #[test]
+    fn test_substrate_sign_with_ref() {
+        let msg: String = b"Build The Future".to_hex();
+        let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
+        let signature_by_ref = substrate_brainwallet_sign_with_ref(data_pointer, &msg).unwrap();
+        let is_valid = schnorrkel_verify(SURI, &msg, &signature_by_ref).unwrap();
+        destroy_data_ref(data_pointer);
+        assert!(is_valid);
+    }
+
+
+    #[test]
+    fn decrypt_with_ref() {
+        let decrypted_result = decrypt_data(ENCRYPTED_SEED, String::from(PIN)).unwrap();
+        assert_eq!(SURI, decrypted_result);
     }
 }

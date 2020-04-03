@@ -55,6 +55,7 @@ const raw = [
 		expectName: 'funding2',
 		isKusamaPath: true,
 		name: '',
+		networkPathId: 'westend',
 		path: '//kusama//funding/2'
 	},
 	{
@@ -128,6 +129,7 @@ const metaMap = raw.reduce((acc, v) => {
 		address: v.address,
 		createdAt: 1573142786972,
 		name: v.name,
+		networkPathId: v.networkPathId,
 		updatedAt: 1573142786972
 	};
 	acc.set(v.path, meta);
@@ -234,22 +236,26 @@ describe('IdentitiesUtils', () => {
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
+			SubstrateNetworkKeys.WESTEND,
 			UnknownNetworkKeys.UNKNOWN,
 			SubstrateNetworkKeys.POLKADOT
 		]);
 	});
 
 	it('get networkKey correctly by path', () => {
-		expect(getNetworkKeyByPath('')).toEqual(UnknownNetworkKeys.UNKNOWN);
-		expect(getNetworkKeyByPath('//kusama')).toEqual(
+		const getNetworkKeyByPathTest = (path: string): string => {
+			return getNetworkKeyByPath(path, testIdentities[0].meta.get(path));
+		};
+		expect(getNetworkKeyByPathTest('')).toEqual(UnknownNetworkKeys.UNKNOWN);
+		expect(getNetworkKeyByPathTest('//kusama')).toEqual(
 			SubstrateNetworkKeys.KUSAMA
 		);
-		expect(getNetworkKeyByPath('//kusama//derived//anything')).toEqual(
+		expect(getNetworkKeyByPathTest('//kusama//funding/1')).toEqual(
 			SubstrateNetworkKeys.KUSAMA
 		);
-		expect(getNetworkKeyByPath('1')).toEqual(EthereumNetworkKeys.FRONTIER);
-		expect(getNetworkKeyByPath('//anything/could/be')).toEqual(
-			UnknownNetworkKeys.UNKNOWN
+		expect(getNetworkKeyByPathTest('//kusama//funding/2')).toEqual(
+			SubstrateNetworkKeys.WESTEND
 		);
+		expect(getNetworkKeyByPathTest('1')).toEqual(EthereumNetworkKeys.FRONTIER);
 	});
 });

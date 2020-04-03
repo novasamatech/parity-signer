@@ -53,8 +53,9 @@ import { NetworkCard } from 'components/AccountCard';
 import {
 	NetworkParams,
 	SubstrateNetworkParams,
+	isEthereumNetworkParams,
 	isSubstrateNetworkParams,
-	isEthereumNetworkParams
+	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
 
 const excludedNetworks = [
@@ -142,7 +143,7 @@ function AccountNetworkChooser({
 	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
 		const shouldExclude = excludedNetworks.includes(networkKey);
 		if (isNew && !shouldExclude) return true;
-		const availableNetworks = getExistedNetworkKeys(currentIdentity!);
+
 		if (shouldShowMoreNetworks) {
 			if (shouldExclude) return false;
 			return !availableNetworks.includes(networkKey);
@@ -241,9 +242,15 @@ function AccountNetworkChooser({
 			}
 		} else {
 			const paths = Array.from(currentIdentity!.meta.keys());
-			if (isSubstrateNetworkParams(networkParams)) {
-				const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
-				if (listedPaths.length === 0)
+			if (
+				isSubstrateNetworkParams(networkParams) ||
+				isUnknownNetworkParams(networkParams)
+			) {
+				const listedPaths = getPathsWithSubstrateNetworkKey(
+					currentIdentity!,
+					networkKey
+				);
+				if (listedPaths.length === 0 && isSubstrateNetworkParams(networkParams))
 					return await deriveSubstrateNetworkRootPath(
 						networkKey,
 						networkParams
@@ -262,6 +269,7 @@ function AccountNetworkChooser({
 	if (identities.length === 0) return showOnboardingMessage();
 	if (!currentIdentity) return showNoCurrentIdentityMessage();
 
+	const availableNetworks = getExistedNetworkKeys(currentIdentity!);
 	const networkList = Object.entries(NETWORK_LIST).filter(filterNetworkKeys);
 	networkList.sort(sortNetworkKeys);
 

@@ -27,6 +27,7 @@ import {
 } from 'constants/networkSpecs';
 import {
 	Account,
+	AccountMeta,
 	FoundAccount,
 	FoundLegacyAccount,
 	Identity,
@@ -51,7 +52,7 @@ export function isLegacyFoundAccount(
 	return foundAccount.isLegacy;
 }
 
-const extractPathId = (path: string): string | null => {
+export const extractPathId = (path: string): string | null => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);
 	if (!matchNetworkPath) return null;
 	return removeSlash(matchNetworkPath[0]);
@@ -79,10 +80,18 @@ export const extractAddressFromAccountId = (id: string): string => {
 	return address;
 };
 
-export const getAddressKeyByPath = (address: string, path: string): string =>
-	isSubstratePath(path)
+export const getAddressKeyByPath = (
+	path: string,
+	pathMeta: AccountMeta
+): string => {
+	const address = pathMeta.address;
+	return isSubstratePath(path)
 		? address
-		: generateAccountId({ address, networkKey: getNetworkKeyByPath(path) });
+		: generateAccountId({
+				address,
+				networkKey: getNetworkKeyByPath(path, pathMeta)
+		  });
+};
 
 export function emptyIdentity(): Identity {
 	return {
@@ -138,22 +147,37 @@ export const deepCopyIdentity = (identity: Identity): Identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
 export const getPathsWithSubstrateNetworkKey = (
-	paths: string[],
+	identity: Identity,
 	networkKey: string
 ): string[] => {
-	if (networkKey === UnknownNetworkKeys.UNKNOWN) {
-		const pathIdList = Object.values(SUBSTRATE_NETWORK_LIST).map(
-			networkParams => networkParams.pathId
-		);
-		return paths.filter(path => {
-			const pathId = extractPathId(path);
-			if (!isSubstratePath(path)) return false;
-			return !pathId || !pathIdList.includes(pathId);
-		});
-	}
-	return paths.filter(
-		path => extractPathId(path) === SUBSTRATE_NETWORK_LIST[networkKey].pathId
-	);
+	const pathEntries = Array.from(identity.meta.entries());
+	const isUnknownNetworkKey = networkKey === 'unknown';
+	const targetPathId = SUBSTRATE_NETWORK_LIST[networkKey]?.pathId;
+	const knownPathIds = Object.values(SUBSTRATE_NETWORK_LIST).map(v => v.pathId);
+	const pathReducer = (
+		groupedPaths: string[],
+		[path, pathMeta]: [string, AccountMeta]
+	): string[] => {
+		let pathId;
+		if (!isSubstratePath(path)) return groupedPaths;
+		if (pathMeta.hasOwnProperty('networkPathId')) {
+			pathId = pathMeta.networkPathId;
+		} else {
+			pathId = extractPathId(path);
+		}
+
+		if (!isUnknownNetworkKey) {
+			if (pathId === targetPathId) {
+				groupedPaths.push(path);
+			}
+		} else {
+			if (pathId && !knownPathIds.includes(pathId)) {
+				groupedPaths.push(path);
+			}
+		}
+		return groupedPaths;
+	};
+	return pathEntries.reduce(pathReducer, []);
 };
 
 const getNetworkKeyByPathId = (pathId: string): string => {
@@ -167,17 +191,19 @@ const getNetworkKeyByPathId = (pathId: string): string => {
 
 export const getNetworkKey = (path: string, identity: Identity): string => {
 	if (identity.meta.has(path)) {
-		const networkPathId = identity.meta.get(path)!.networkPathId;
-		if (networkPathId) return getNetworkKeyByPathId(networkPathId);
+		return getNetworkKeyByPath(path, identity.meta.get(path)!);
 	}
-	return getNetworkKeyByPath(path);
+	return UnknownNetworkKeys.UNKNOWN;
 };
 
-export const getNetworkKeyByPath = (path: string): string => {
+export const getNetworkKeyByPath = (
+	path: string,
+	pathMeta: AccountMeta
+): string => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
 		return path;
 	}
-	const pathId = extractPathId(path);
+	const pathId = pathMeta.networkPathId || extractPathId(path);
 	if (!pathId) return UnknownNetworkKeys.UNKNOWN;
 
 	return getNetworkKeyByPathId(pathId);
@@ -254,16 +280,19 @@ export const verifyPassword = async (
 };
 
 export const getExistedNetworkKeys = (identity: Identity): string[] => {
-	const pathsList = Array.from(identity.addresses.values());
-	const networkKeysSet = pathsList.reduce((networksSet, path) => {
-		let networkKey;
-		if (isSubstratePath(path)) {
-			networkKey = getNetworkKeyByPath(path);
-		} else {
-			networkKey = path;
-		}
-		return { ...networksSet, [networkKey]: true };
-	}, {});
+	const pathEntries = Array.from(identity.meta.entries());
+	const networkKeysSet = pathEntries.reduce(
+		(networksSet, [path, pathMeta]: [string, AccountMeta]) => {
+			let networkKey;
+			if (isSubstratePath(path)) {
+				networkKey = getNetworkKeyByPath(path, pathMeta);
+			} else {
+				networkKey = path;
+			}
+			return { ...networksSet, [networkKey]: true };
+		},
+		{}
+	);
 	return Object.keys(networkKeysSet);
 };
 
