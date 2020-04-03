@@ -26,7 +26,7 @@ import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
-import { unlockIdentitySeed, verifyPassword } from 'utils/identitiesUtils';
+import { unlockIdentitySeed } from 'utils/identitiesUtils';
 import { constructSURI } from 'utils/suri';
 
 function PinUnlockWithPassword({
@@ -53,7 +53,7 @@ function PinUnlockWithPassword({
 				resetState();
 				resolve(suri);
 			} catch (e) {
-				updateState({ pin: '', password: '', pinMismatch: true });
+				updateState({ password: '', pin: '', pinMismatch: true });
 				//TODO record error times;
 			}
 		} else {
