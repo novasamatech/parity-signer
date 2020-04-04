@@ -17,10 +17,11 @@
 import { init, cleanup, device } from 'detox';
 import adapter from 'detox/runners/jest/adapter';
 import specReporter from 'detox/runners/jest/specReporter';
-import testIDs from 'e2e/testIDs';
-import {testTap, testVisible} from 'e2e/utils';
 
 import { detox as config } from '../../package.json';
+
+import testIDs from 'e2e/testIDs';
+import { testTap, testVisible } from 'e2e/utils';
 
 // Set the default timeout
 jest.setTimeout(120000);
@@ -30,9 +31,7 @@ jasmine.getEnv().addReporter(adapter);
 // This is strictly optional.
 jasmine.getEnv().addReporter(specReporter);
 
-const {
-	TacScreen,
-} = testIDs;
+const { TacScreen } = testIDs;
 
 beforeAll(async () => {
 	await init(config, { launchApp: false });

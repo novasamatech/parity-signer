@@ -46,8 +46,7 @@ const {
 const defaultPath = '//default';
 const customPath = '//sunny_day/1';
 
-describe.skip('Load test', () => {
-
+describe('Load test', () => {
 	it('create a new identity with default substrate account', async () => {
 		await testTap(AccountNetworkChooser.createButton);
 		await testNotVisible(IdentityNew.seedInput);

@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import testIDs from 'e2e/testIDs';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 
+import testIDs from 'e2e/testIDs';
 import TextInput from 'components/TextInput';
 import fontStyles from 'styles/fontStyles';
 import { passwordRegex } from 'utils/regex';
@@ -26,12 +26,10 @@ import { passwordRegex } from 'utils/regex';
 export default function PasswordInput({
 	password,
 	setPassword,
-	testID,
 	onSubmitEditing
 }: {
 	password: string;
 	setPassword: (newPassword: string) => void;
-	testID?: string;
 	onSubmitEditing: () => void;
 }): React.ReactElement {
 	const onPasswordChange = (newPassword: string): void => {
@@ -42,7 +40,11 @@ export default function PasswordInput({
 
 	return (
 		<View style={styles.container}>
-			<TouchableOpacity onPress={togglePasswordInput} style={styles.label} testID={testIDs.PathDerivation.togglePasswordButton}>
+			<TouchableOpacity
+				onPress={togglePasswordInput}
+				style={styles.label}
+				testID={testIDs.PathDerivation.togglePasswordButton}
+			>
 				<Text style={fontStyles.t_regular}>Add Optional Password</Text>
 				<Icon
 					name={isShow ? 'caretup' : 'caretdown'}

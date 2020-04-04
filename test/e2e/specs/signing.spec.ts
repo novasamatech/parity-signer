@@ -22,9 +22,8 @@ import {
 	pinCode,
 	tapBack,
 	testExist,
-	testInput,
+	testRecoverIdentity,
 	testScrollAndTap,
-	testSetUpDefaultPath,
 	testTap,
 	testUnlockPin,
 	testVisible
@@ -34,7 +33,6 @@ import testIDs from 'e2e/testIDs';
 
 const {
 	AccountNetworkChooser,
-	IdentityNew,
 	PathDetail,
 	SecurityHeader,
 	TxDetails,
@@ -42,10 +40,6 @@ const {
 	SignedTx,
 	MessageDetails
 } = testIDs;
-
-const mockIdentityName = 'mockIdentity';
-const mockSeedPhrase =
-	'ability cave solid soccer gloom thought response hard around minor want welcome';
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
@@ -75,15 +69,8 @@ const testEthereumMessage = async (): Promise<void> => {
 	await testVisible(SignedMessage.qrView);
 };
 
-describe.skip('Signing test', () => {
-	it('recover a identity with seed phrase', async () => {
-		await testTap(AccountNetworkChooser.recoverButton);
-		await testVisible(IdentityNew.seedInput);
-		await testInput(IdentityNew.nameInput, mockIdentityName);
-		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
-		await element(by.id(IdentityNew.seedInput)).tapReturnKey();
-		await testSetUpDefaultPath();
-	});
+describe('Signing test', () => {
+	testRecoverIdentity();
 
 	describe('Substrate Signing Test', () => {
 		it('should sign the set remarks request', async () => {
