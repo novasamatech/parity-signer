@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import testIDs from 'e2e/testIDs';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -41,7 +42,7 @@ export default function PasswordInput({
 
 	return (
 		<View style={styles.container}>
-			<TouchableOpacity onPress={togglePasswordInput} style={styles.label}>
+			<TouchableOpacity onPress={togglePasswordInput} style={styles.label} testID={testIDs.PathDerivation.togglePasswordButton}>
 				<Text style={fontStyles.t_regular}>Add Optional Password</Text>
 				<Icon
 					name={isShow ? 'caretup' : 'caretdown'}
@@ -52,7 +53,8 @@ export default function PasswordInput({
 				<>
 					<TextInput
 						onChangeText={onPasswordChange}
-						testID={testID}
+						testID={testIDs.PathDerivation.passwordInput}
+						returnKeyType="done"
 						onSubmitEditing={onSubmitEditing}
 						placeholder="Optional password"
 						value={password}

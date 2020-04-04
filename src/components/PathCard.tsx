@@ -115,9 +115,8 @@ export default function PathCard({
 				accessibilityComponentType="button"
 				disabled={false}
 				onPress={onPress}
-				testID={testID}
 			>
-				<View style={[styles.content, styles.contentSubstrate]}>
+				<View style={[styles.content, styles.contentSubstrate]} testID={testID}>
 					<AccountIcon
 						address={address}
 						network={networkParams}

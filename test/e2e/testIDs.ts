@@ -69,7 +69,9 @@ const testIDs = {
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
 		nameInput: 'path_derivation_name_input',
-		pathInput: 'path_derivation_path_input'
+		passwordInput: 'path_derivation_password_input',
+		pathInput: 'path_derivation_path_input',
+		togglePasswordButton: 'path_derivation_toggle_password'
 	},
 	PathDetail: {
 		deleteButton: 'path_detail_delete_button',

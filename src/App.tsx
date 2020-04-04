@@ -44,6 +44,7 @@ export default function App(props: AppProps): React.ReactElement {
 			'Warning: componentWillMount',
 			'Warning: componentWillUpdate',
 			'Sending `onAnimatedValueUpdate`',
+			'MenuProviders',
 			'Non-serializable values were found in the navigation state' // https://reactnavigation.org/docs/troubleshooting/#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state
 		]);
 	}

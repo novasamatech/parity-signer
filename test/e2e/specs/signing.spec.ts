@@ -33,7 +33,6 @@ import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
 const {
-	TacScreen,
 	AccountNetworkChooser,
 	IdentityNew,
 	PathDetail,
@@ -77,14 +76,6 @@ const testEthereumMessage = async (): Promise<void> => {
 };
 
 describe.skip('Signing test', () => {
-	it('should have account list screen', async () => {
-		await testVisible(TacScreen.tacView);
-		await testTap(TacScreen.agreePrivacyButton);
-		await testTap(TacScreen.agreeTacButton);
-		await testTap(TacScreen.nextButton);
-		await testVisible(AccountNetworkChooser.noAccountScreen);
-	});
-
 	it('recover a identity with seed phrase', async () => {
 		await testTap(AccountNetworkChooser.recoverButton);
 		await testVisible(IdentityNew.seedInput);
