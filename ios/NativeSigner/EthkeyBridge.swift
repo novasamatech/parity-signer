@@ -191,14 +191,14 @@ class EthkeyBridge: NSObject {
 
   @objc func substrateSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
-    var seed_ptr = seed.asPtr()
-    var message_ptr = message.asPtr()
-    let signature_rust_str = substrate_brainwallet_sign(&error, &seed_ptr, &message_ptr)
-    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
-    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(signature_rust_str_ptr)
-    rust_string_destroy(signature_rust_str)
-    resolve(signature)
+	var err = ExternError();
+	var err_ptr = UnsafeMutablePointer(&err)
+    let res = substrate_brainwallet_sign(&error, err_ptr, seed, message)
+    let value = String(cString: res!)
+	print(String(cString: err_ptr.pointee.message))
+	signer_destroy_string(err_ptr.pointee.message)
+	signer_destroy_string(res)
+    resolve(value)
   }
 
   @objc func schnorrkelVerify(_ seed: String, message: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
@@ -257,4 +257,19 @@ class EthkeyBridge: NSObject {
     rust_string_destroy(signature_rust_str)
     resolve(signature)
   }
+
+/*
+  @objc func secureGet(_ app: String, key: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let res = sn_get(&error, app, key)
+    let value = String(cString: res!.pointee.value!)
+    let error_msg = String(cString: res!.pointee.error_msg!)
+    destroy_cresult_string(res)
+    if error == 0 {
+      resolve(value)
+    } else {
+      reject("get", error_msg, nil)
+    }
+  }
+*/
 }

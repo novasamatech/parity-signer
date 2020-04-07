@@ -212,16 +212,6 @@ export! {
         Some(keypair.ss58_address(prefix))
     }
 
-    @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
-    fn substrate_brainwallet_sign(suri: &str, message: &str) -> Option<String> {
-        let keypair = sr25519::KeyPair::from_suri(suri)?;
-
-        let message: Vec<u8> = message.from_hex().ok()?;
-        let signature = keypair.sign(&message);
-
-        Some(signature.to_hex())
-    }
-
     @Java_io_parity_signer_EthkeyBridge_schnorrkelVerify
     fn schnorrkel_verify(suri: &str, msg: &str, signature: &str) -> Option<bool> {
         let keypair = sr25519::KeyPair::from_suri(suri)?;
@@ -272,6 +262,24 @@ export! {
         Some(signature.to_hex())
     }
 }
+
+secure_native::export! {
+    @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
+    fn substrate_brainwallet_sign(err: &mut secure_native::ffi_support::ExternError, suri: &str, message: &str) -> Option<String> {
+        *err = secure_native::ffi_support::ExternError::new_error(
+            secure_native::ffi_support::ErrorCode::new(42), 
+            "testing 123");
+
+        let keypair = sr25519::KeyPair::from_suri(suri)?;
+
+        let message: Vec<u8> = message.from_hex().ok()?;
+        let signature = keypair.sign(&message);
+
+        Some(signature.to_hex())
+    }
+}
+
+secure_native::ffi_support::define_string_destructor!(signer_destroy_string);
 
 #[cfg(test)]
 mod tests {

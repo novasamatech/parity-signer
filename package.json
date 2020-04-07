@@ -14,8 +14,8 @@
     "build-rust-android": "(cd rust/signer && make android)",
     "build-rust-all": "yarn build-rust-ios && yarn build-rust-android",
     "build:ios": "yarn install && (cd ios && pod install) && yarn build-rust-ios",
-    "build:android": "yarn install && yarn buil-rust-android",
-    "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force && rm -rf ./android/app/build && rm -rf ./ios/build && yarn clean-rust && cd ios && pod deintegrate && cd ..",
+    "build:android": "yarn install && yarn build-rust-android",
+    "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force && rm -rf ./android/app/build && rm -rf ./ios/build && yarn clean-rust && (cd ios && pod deintegrate)",
     "clean-rust": "(cd rust/signer && cargo clean)",
     "commit": "commit-wizard",
     "ios": "yarn run build-rust-ios && npx react-native run-ios",
@@ -119,7 +119,7 @@
         "build": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone SE"
+          "type": "iPhone 8"
         }
       },
       "ios.sim.release": {

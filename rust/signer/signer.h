@@ -75,7 +75,14 @@ struct rust_string* qrcode_hex(unsigned* error, const struct rust_string_ptr* da
 // ss58 address (including prefix) for sr25519 key generated out of BIP39 phrase
 struct rust_string* substrate_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed, const unsigned prefix);
 
-struct rust_string* substrate_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* data);
+struct ExternError {
+    int32_t code;
+    char *message; // note: nullable
+};
+
+void signer_destroy_string(const char* cstring);
+
+const char* substrate_brainwallet_sign(unsigned* error, struct ExternError* err, const char* seed, const char* data);
 
 struct rust_string* schnorrkel_verify(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* msg, const struct rust_string_ptr* signature);
 
@@ -86,3 +93,4 @@ void destroy_data_ref(unsigned* error, int64_t data_ref);
 struct rust_string* ethkey_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* message);
 
 struct rust_string* substrate_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* data);
+
