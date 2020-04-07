@@ -132,14 +132,12 @@ describe('Load test', () => {
 	});
 
 	it('delete identity', async () => {
-		await element(by.id(IdentitiesSwitch.toggleButton))
-			.atIndex(0)
-			.tap();
+		await element(by.id(IdentitiesSwitch.toggleButton)).atIndex(0).tap();
 		await testTap(IdentitiesSwitch.manageIdentityButton);
 		await testTap(IdentityManagement.popupMenuButton);
 		await testTap(IdentityManagement.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testUnlockPin(pinCode);
-		await testVisible(IdentitiesSwitch.modal);
+		await testVisible(AccountNetworkChooser.noAccountScreen);
 	});
 });

@@ -96,7 +96,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -134,8 +134,8 @@ android {
         minSdkVersion 18
         missingDimensionStrategy 'react-native-camera', 'general'
         targetSdkVersion 28
-        versionCode 4008
-        versionName "4.0.8"
+        versionCode 4101
+        versionName "4.1.1"
         ndk {
             abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         }
@@ -165,9 +165,9 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://facebook.github.io/react-native/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // signingConfig signingConfigs.debug
+            // minifyEnabled enableProguardInReleaseBuilds
+            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
     splits {
@@ -202,7 +202,6 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-secure-storage')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"
 

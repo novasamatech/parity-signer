@@ -16,7 +16,6 @@
 
 import React, { useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import { Account, UnlockedAccount } from 'types/identityTypes';
@@ -25,7 +24,6 @@ import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import AccountIconChooser from 'components/AccountIconChooser';
-import Background from 'components/Background';
 import Button from 'components/Button';
 import DerivationPathField from 'components/DerivationPathField';
 import KeyboardScrollView from 'components/KeyboardScrollView';
@@ -47,7 +45,7 @@ interface State {
 function AccountNew({
 	accounts,
 	navigation
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'AccountNew'>): React.ReactElement {
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -91,7 +89,6 @@ function AccountNew({
 	return (
 		<KeyboardScrollView>
 			<View style={styles.body}>
-				<Background />
 				<Text style={styles.titleTop}>CREATE ACCOUNT</Text>
 				<Text style={styles.title}>NETWORK</Text>
 			</View>
@@ -99,7 +96,7 @@ function AccountNew({
 				address={''}
 				title={selectedNetwork!.title}
 				networkKey={selectedAccount.networkKey}
-				onPress={(): boolean => navigation.navigate('LegacyNetworkChooser')}
+				onPress={(): void => navigation.navigate('LegacyNetworkChooser')}
 			/>
 			<View style={styles.body}>
 				<Text style={styles.title}>ICON & ADDRESS</Text>
@@ -194,13 +191,10 @@ function AccountNew({
 	);
 }
 
-export default withAccountStore(withNavigation(AccountNew));
+export default withAccountStore(AccountNew);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		overflow: 'hidden',
 		padding: 16
 	},
 	bodyContainer: {

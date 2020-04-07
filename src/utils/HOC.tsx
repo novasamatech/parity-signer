@@ -18,6 +18,7 @@ import React from 'react';
 import { Subscribe } from 'unstated';
 
 import AccountsStore from 'stores/AccountsStore';
+import RegistriesStore from 'stores/RegistriesStore';
 import ScannerStore from 'stores/ScannerStore';
 
 interface AccountInjectedProps {
@@ -26,6 +27,10 @@ interface AccountInjectedProps {
 
 interface ScannerInjectedProps {
 	scanner: ScannerStore;
+}
+
+interface RegistriesInjectedProps {
+	registriesStore: RegistriesStore;
 }
 
 type AccountAndScannerInjectedProps = AccountInjectedProps &
@@ -68,6 +73,18 @@ export function withAccountAndScannerStore<
 					scannerStore={scannerStore}
 					accounts={accounts}
 				/>
+			)}
+		</Subscribe>
+	);
+}
+
+export function withRegistriesStore<T extends RegistriesInjectedProps>(
+	WrappedComponent: React.ComponentType<any>
+): React.ComponentType<Omit<T, keyof RegistriesInjectedProps>> {
+	return (props): React.ReactElement => (
+		<Subscribe to={[RegistriesStore]}>
+			{(registriesStore): React.ReactElement => (
+				<WrappedComponent {...props} registriesStore={registriesStore} />
 			)}
 		</Subscribe>
 	);

@@ -17,8 +17,6 @@
 import { AsyncStorage } from 'react-native';
 import SecureStorage from 'react-native-secure-storage';
 
-console.log('secure storage is', SecureStorage);
-
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 

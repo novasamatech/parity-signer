@@ -15,22 +15,22 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import NetInfo from '@react-native-community/netinfo';
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NavigationInjectedProps, withNavigation } from 'react-navigation';
+import { useNavigation } from '@react-navigation/native';
 
 import ButtonIcon from './ButtonIcon';
 
+import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import IdentitiesSwitch from 'components/IdentitiesSwitch';
 import { navigateToQrScanner } from 'utils/navigationHelpers';
 
-function SecurityHeader({
-	navigation
-}: NavigationInjectedProps): React.ReactElement<NavigationInjectedProps> {
+function SecurityHeader(): React.ReactElement {
 	const [isConnected, setIsConnected] = useState(false);
-
+	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 	useEffect(
 		() =>
 			NetInfo.addEventListener(state => {
@@ -43,7 +43,7 @@ function SecurityHeader({
 		<View style={styles.body}>
 			{isConnected && (
 				<ButtonIcon
-					onPress={(): boolean => navigation.navigate('Security')}
+					onPress={(): void => navigation.navigate('Security')}
 					iconName="shield-off"
 					iconType="feather"
 					iconColor={colors.bg_alert}
@@ -72,4 +72,4 @@ const styles = StyleSheet.create({
 	securityIconBgStyle: { backgroundColor: 'transparent', marginTop: -3 }
 });
 
-export default withNavigation(SecurityHeader);
+export default SecurityHeader;

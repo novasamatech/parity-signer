@@ -1,4 +1,4 @@
-import { NetworkProtocols } from 'constants/networkSpecs';
+import { NetworkProtocols, unknownNetworkPathId } from 'constants/networkSpecs';
 
 export type NetworkProtocol = 'ethereum' | 'substrate' | 'unknown';
 
@@ -10,8 +10,9 @@ export type NetworkParams =
 export type SubstrateNetworkParams = {
 	color: string;
 	decimals: number;
-	genesisHash: string;
+	genesisHash: string | null;
 	logo: number;
+	order: number;
 	pathId: string;
 	protocol: NetworkProtocol;
 	prefix: number;
@@ -24,6 +25,7 @@ export type EthereumNetworkParams = {
 	color: string;
 	ethereumChainId: string;
 	logo: number;
+	order: number;
 	protocol: NetworkProtocol;
 	secondaryColor: string;
 	title: string;
@@ -31,6 +33,7 @@ export type EthereumNetworkParams = {
 
 export type UnknownNetworkParams = {
 	color: string;
+	order: number;
 	pathId: string;
 	prefix: number;
 	protocol: NetworkProtocol;
@@ -44,9 +47,9 @@ export function isSubstrateNetworkParams(
 		| UnknownNetworkParams
 		| EthereumNetworkParams
 ): networkParams is SubstrateNetworkParams {
+	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
 	return (
-		(networkParams as SubstrateNetworkParams).protocol ===
-		NetworkProtocols.SUBSTRATE
+		protocol === NetworkProtocols.SUBSTRATE && pathId !== unknownNetworkPathId
 	);
 }
 
@@ -68,8 +71,10 @@ export function isUnknownNetworkParams(
 		| UnknownNetworkParams
 		| EthereumNetworkParams
 ): networkParams is UnknownNetworkParams {
+	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
 	return (
-		(networkParams as UnknownNetworkParams).protocol ===
-		NetworkProtocols.UNKNOWN
+		(protocol === NetworkProtocols.SUBSTRATE &&
+			pathId === unknownNetworkPathId) ||
+		protocol === NetworkProtocols.UNKNOWN
 	);
 }

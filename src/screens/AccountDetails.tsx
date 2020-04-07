@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -37,7 +38,7 @@ import { NavigationAccountProps } from 'types/props';
 function AccountDetails({
 	accounts,
 	navigation
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'AccountDetails'>): React.ReactElement {
 	const account = accounts.getSelected();
 	const selectedKey = accounts.getSelectedKey();
 
@@ -74,7 +75,7 @@ function AccountDetails({
 	};
 
 	return (
-		<ScrollView contentContainerStyle={styles.body}>
+		<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
 			<View style={styles.header}>
 				<AccountIcon
 					address={''}
@@ -116,7 +117,7 @@ function AccountDetails({
 					<UnknownAccountWarning />
 				)}
 			</View>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
@@ -124,11 +125,8 @@ export default withAccountStore(AccountDetails);
 
 const styles = StyleSheet.create({
 	body: {
-		alignContent: 'flex-start',
 		backgroundColor: colors.bg,
-		flex: 1,
-		paddingBottom: 40,
-		paddingTop: 8
+		flex: 1
 	},
 	deleteText: {
 		color: colors.bg_alert
@@ -145,6 +143,12 @@ const styles = StyleSheet.create({
 	menuView: {
 		alignItems: 'flex-end',
 		flex: 1
+	},
+	scrollBody: {
+		alignContent: 'flex-start',
+		flex: 1,
+		paddingBottom: 40,
+		paddingTop: 8
 	},
 	title: {
 		color: colors.bg_text_sec,

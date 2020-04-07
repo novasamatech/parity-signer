@@ -89,11 +89,13 @@ export function LeftScreenHeading({
 	title,
 	subtitle,
 	hasSubtitleIcon,
+	headMenu,
 	networkKey
 }: {
 	title: string;
 	subtitle?: string;
 	hasSubtitleIcon?: boolean;
+	headMenu?: React.ReactElement;
 	networkKey: string;
 }): ReactElement {
 	const titleStyle: TextStyle = {
@@ -118,6 +120,7 @@ export function LeftScreenHeading({
 				</Text>
 				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
 			</View>
+			<View style={baseStyles.menu}>{headMenu}</View>
 		</View>
 	);
 }
@@ -154,6 +157,7 @@ export default class ScreenHeading extends React.PureComponent<{
 	subtitle?: string;
 	subtitleL?: boolean;
 	hasSubtitleIcon?: boolean;
+	headMenu?: React.ReactElement;
 	title: string;
 	onPress?: ButtonListener;
 	error?: boolean;
@@ -166,16 +170,20 @@ export default class ScreenHeading extends React.PureComponent<{
 			subtitle,
 			subtitleL,
 			hasSubtitleIcon,
+			headMenu,
 			error,
 			iconName,
 			iconType
 		} = this.props;
 
 		return (
-			<View style={baseStyles.body}>
-				<Text style={baseStyles.text}>{title}</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, true)}
+			<View style={{ ...baseStyles.body, flexDirection: 'row' }}>
 				{renderIcon(iconName, iconType)}
+				<View style={baseStyles.titles}>
+					<Text style={baseStyles.text}>{title}</Text>
+					{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, true)}
+				</View>
+				<View style={baseStyles.menu}>{headMenu}</View>
 			</View>
 		);
 	}
@@ -209,6 +217,10 @@ const baseStyles = StyleSheet.create({
 	linkIcon: {
 		marginLeft: 10
 	},
+	menu: {
+		marginLeft: 'auto',
+		marginRight: 10
+	},
 	networkIcon: {
 		paddingHorizontal: 16
 	},
@@ -232,5 +244,9 @@ const baseStyles = StyleSheet.create({
 	text: {
 		...fontStyles.h1,
 		textAlign: 'center'
+	},
+	titles: {
+		alignItems: 'center',
+		flex: 1
 	}
 });

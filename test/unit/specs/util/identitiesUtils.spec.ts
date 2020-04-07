@@ -55,6 +55,7 @@ const raw = [
 		expectName: 'funding2',
 		isKusamaPath: true,
 		name: '',
+		networkPathId: 'westend',
 		path: '//kusama//funding/2'
 	},
 	{
@@ -68,7 +69,7 @@ const raw = [
 		address: 'address5',
 		expectName: 'default',
 		name: '',
-		path: '//polkadot//default'
+		path: '//polkadot_test//default'
 	},
 	{
 		address: 'address6',
@@ -111,7 +112,13 @@ const raw = [
 		address: 'softAddress2',
 		expectName: '1',
 		name: '',
-		path: '/polkadot/1'
+		path: '/polkadot_test/1'
+	},
+	{
+		address: 'polkadotReservedAddress',
+		expectName: 'reserved',
+		name: '',
+		path: '//polkadot//reserved'
 	}
 ];
 const expectNames = raw.map(v => v.expectName);
@@ -122,6 +129,7 @@ const metaMap = raw.reduce((acc, v) => {
 		address: v.address,
 		createdAt: 1573142786972,
 		name: v.name,
+		networkPathId: v.networkPathId,
 		updatedAt: 1573142786972
 	};
 	acc.set(v.path, meta);
@@ -184,12 +192,12 @@ describe('IdentitiesUtils', () => {
 
 	it('regroup the unknown paths', () => {
 		const unKnownPaths = [
-			'//polkadot//default',
+			'//polkadot_test//default',
 			'',
 			'//custom',
 			'/kusama',
 			'/kusama/1',
-			'/polkadot/1'
+			'/polkadot_test/1'
 		];
 		const groupResult = groupPaths(unKnownPaths);
 		expect(groupResult).toEqual([
@@ -202,12 +210,12 @@ describe('IdentitiesUtils', () => {
 				title: '//custom'
 			},
 			{
-				paths: ['/polkadot/1'],
-				title: '/polkadot'
+				paths: ['/polkadot_test/1'],
+				title: '/polkadot_test'
 			},
 			{
-				paths: ['//polkadot//default'],
-				title: '//polkadot'
+				paths: ['//polkadot_test//default'],
+				title: '//polkadot_test'
 			},
 			{
 				paths: ['/kusama', '/kusama/1'],
@@ -228,21 +236,26 @@ describe('IdentitiesUtils', () => {
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
-			UnknownNetworkKeys.UNKNOWN
+			SubstrateNetworkKeys.WESTEND,
+			UnknownNetworkKeys.UNKNOWN,
+			SubstrateNetworkKeys.POLKADOT
 		]);
 	});
 
 	it('get networkKey correctly by path', () => {
-		expect(getNetworkKeyByPath('')).toEqual(UnknownNetworkKeys.UNKNOWN);
-		expect(getNetworkKeyByPath('//kusama')).toEqual(
+		const getNetworkKeyByPathTest = (path: string): string => {
+			return getNetworkKeyByPath(path, testIdentities[0].meta.get(path));
+		};
+		expect(getNetworkKeyByPathTest('')).toEqual(UnknownNetworkKeys.UNKNOWN);
+		expect(getNetworkKeyByPathTest('//kusama')).toEqual(
 			SubstrateNetworkKeys.KUSAMA
 		);
-		expect(getNetworkKeyByPath('//kusama//derived//anything')).toEqual(
+		expect(getNetworkKeyByPathTest('//kusama//funding/1')).toEqual(
 			SubstrateNetworkKeys.KUSAMA
 		);
-		expect(getNetworkKeyByPath('1')).toEqual(EthereumNetworkKeys.FRONTIER);
-		expect(getNetworkKeyByPath('//anything/could/be')).toEqual(
-			UnknownNetworkKeys.UNKNOWN
+		expect(getNetworkKeyByPathTest('//kusama//funding/2')).toEqual(
+			SubstrateNetworkKeys.WESTEND
 		);
+		expect(getNetworkKeyByPathTest('1')).toEqual(EthereumNetworkKeys.FRONTIER);
 	});
 });

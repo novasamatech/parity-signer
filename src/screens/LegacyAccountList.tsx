@@ -15,64 +15,54 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { StyleSheet } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
-import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
-import Background from 'components/Background';
 import { withAccountStore } from 'utils/HOC';
 
 function LegacyAccountList({
 	navigation,
 	accounts
-}: NavigationAccountProps<{}>): React.ReactElement {
+}: NavigationAccountProps<'LegacyAccountList'>): React.ReactElement {
 	const onAccountSelected = async (key: string): Promise<void> => {
 		await accounts.select(key);
 		navigation.navigate('AccountDetails');
 	};
 	const accountsMap = accounts.getAccounts();
 
+	const renderAccountCard = ([accountKey, account]: [
+		string,
+		Account
+	]): React.ReactElement => (
+		<AccountCard
+			address={account.address}
+			networkKey={account.networkKey}
+			onPress={(): Promise<void> => onAccountSelected(accountKey)}
+			style={{ paddingBottom: 0 }}
+			title={account.name}
+			key={accountKey}
+		/>
+	);
+
 	return (
-		<View style={styles.body} testID={testIDs.AccountListScreen.accountList}>
-			<Background />
-			<FlatList
-				style={styles.content}
-				contentContainerStyle={{ paddingBottom: 120 }}
-				data={Array.from(accountsMap.entries())}
-				keyExtractor={([key]: [string, any]): string => key}
-				renderItem={({
-					item: [accountKey, account]
-				}: {
-					item: [string, Account];
-				}): React.ReactElement => {
-					return (
-						<AccountCard
-							address={account.address}
-							networkKey={account.networkKey}
-							onPress={(): Promise<void> => onAccountSelected(accountKey)}
-							style={{ paddingBottom: 0 }}
-							title={account.name}
-						/>
-					);
-				}}
-			/>
-		</View>
+		<SafeAreaScrollViewContainer
+			testID={testIDs.AccountListScreen.accountList}
+			style={styles.content}
+		>
+			{Array.from(accountsMap.entries()).map(renderAccountCard)}
+		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default withAccountStore(withNavigation(LegacyAccountList));
+export default withAccountStore(LegacyAccountList);
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	},
 	content: {
-		flex: 1
+		flex: 1,
+		paddingBottom: 40
 	}
 });

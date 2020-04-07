@@ -27,15 +27,12 @@ export default class HeaderLeftHome extends React.PureComponent<{
 	render(): React.ReactElement {
 		return (
 			<View
-				style={[
-					{
-						alignItems: 'center',
-						flexDirection: 'row',
-						marginTop: -10,
-						paddingLeft: 12
-					},
-					this.props.style
-				]}
+				style={{
+					alignItems: 'center',
+					flexDirection: 'row',
+					height: 48,
+					paddingLeft: 12
+				}}
 			>
 				<Image source={iconLogo} style={styles.logo} />
 				<Text style={[styles.headerTextLeft, styles.t_bold]}>parity</Text>

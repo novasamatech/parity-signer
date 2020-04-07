@@ -15,19 +15,18 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
+import { Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { PathGroup } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import {
+	isEthereumNetworkParams,
+	isUnknownNetworkParams
+} from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import {
@@ -44,22 +43,21 @@ import { LeftScreenHeading } from 'components/ScreenHeading';
 
 function PathsList({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ networkKey?: string }>): React.ReactElement {
-	const networkKey = navigation.getParam(
-		'networkKey',
-		UnknownNetworkKeys.UNKNOWN
-	);
+	navigation,
+	route
+}: NavigationAccountProps<'PathsList'>): React.ReactElement {
+	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
 	const networkParams = NETWORK_LIST[networkKey];
 
 	const { currentIdentity } = accounts.state;
 	const isEthereumPath = isEthereumNetworkParams(networkParams);
-	const isUnknownNetworkPath =
-		networkParams.protocol === NetworkProtocols.UNKNOWN;
+	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
 	const pathsGroups = useMemo((): PathGroup[] | null => {
 		if (!currentIdentity || isEthereumPath) return null;
-		const paths = Array.from(currentIdentity.meta.keys());
-		const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
+		const listedPaths = getPathsWithSubstrateNetworkKey(
+			currentIdentity,
+			networkKey
+		);
 		return groupPaths(listedPaths);
 	}, [currentIdentity, isEthereumPath, networkKey]);
 
@@ -86,7 +84,7 @@ function PathsList({
 				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
-				onPress={(): boolean => navigate('PathDetails', { path })}
+				onPress={(): void => navigate('PathDetails', { path })}
 			/>
 		);
 	};
@@ -135,7 +133,7 @@ function PathsList({
 						testID={testIDs.PathsList.pathCard + path}
 						identity={currentIdentity}
 						path={path}
-						onPress={(): boolean => navigate('PathDetails', { path })}
+						onPress={(): void => navigate('PathDetails', { path })}
 					/>
 				</View>
 			))}
@@ -147,39 +145,29 @@ function PathsList({
 			? ''
 			: `//${networkParams.pathId}`;
 	return (
-		<View style={styles.body} testID={testIDs.PathsList.screen}>
+		<SafeAreaScrollViewContainer testID={testIDs.PathsList.screen}>
 			<LeftScreenHeading
 				title={networkParams.title}
 				subtitle={subtitle}
 				hasSubtitleIcon={true}
 				networkKey={networkKey}
 			/>
-			<ScrollView>
-				{(pathsGroups as PathGroup[]).map(pathsGroup =>
-					pathsGroup.paths.length === 1
-						? renderSinglePath(pathsGroup)
-						: renderGroupPaths(pathsGroup)
-				)}
-				<ButtonNewDerivation
-					testID={testIDs.PathsList.deriveButton}
-					title="Create New Derivation"
-					onPress={(): boolean =>
-						navigation.navigate('PathDerivation', {
-							parentPath: isUnknownNetworkPath ? '' : rootPath
-						})
-					}
-				/>
-			</ScrollView>
-		</View>
+			{(pathsGroups as PathGroup[]).map(pathsGroup =>
+				pathsGroup.paths.length === 1
+					? renderSinglePath(pathsGroup)
+					: renderGroupPaths(pathsGroup)
+			)}
+			<ButtonNewDerivation
+				testID={testIDs.PathsList.deriveButton}
+				title="Derive New Account"
+				onPress={(): void =>
+					navigation.navigate('PathDerivation', {
+						parentPath: isUnknownNetworkPath ? '' : rootPath
+					})
+				}
+			/>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default withAccountStore(withNavigation(PathsList));
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.bg,
-		flex: 1,
-		flexDirection: 'column'
-	}
-});
+export default withAccountStore(PathsList);

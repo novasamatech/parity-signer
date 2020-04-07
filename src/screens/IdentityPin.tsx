@@ -15,11 +15,9 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, TextInputProps } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
-import Background from 'components/Background';
 import ButtonMainAction from 'components/ButtonMainAction';
 import TextInput from 'components/TextInput';
 import KeyboardScrollView from 'components/KeyboardScrollView';
@@ -29,18 +27,8 @@ import fontStyles from 'styles/fontStyles';
 import { onlyNumberRegex } from 'utils/regex';
 import { unlockIdentitySeed } from 'utils/identitiesUtils';
 import { NavigationAccountProps } from 'types/props';
-import { Identity } from 'types/identityTypes';
 
-type NavigationParams = {
-	isUnlock?: boolean;
-	isNew?: boolean;
-	identity?: Identity;
-	resolve: (returnValue: string) => Promise<string>;
-};
-
-interface Props
-	extends NavigationAccountProps<NavigationParams>,
-		TextInputProps {
+interface Props extends NavigationAccountProps<'IdentityPin'>, TextInputProps {
 	label: string;
 }
 
@@ -51,7 +39,7 @@ type State = {
 	pinMismatch: boolean;
 	pinTooShort: boolean;
 };
-function IdentityPin({ navigation, accounts }: Props): React.ReactElement {
+function IdentityPin({ accounts, route }: Props): React.ReactElement {
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -62,14 +50,14 @@ function IdentityPin({ navigation, accounts }: Props): React.ReactElement {
 	const [state, setState] = useState(initialState);
 	const updateState = (delta: Partial<State>): void =>
 		setState({ ...state, ...delta });
-	const isUnlock = navigation.getParam('isUnlock', false);
+	const isUnlock = route.params.isUnlock ?? false;
 
 	const submit = async (): Promise<void> => {
-		const isIdentityCreation = navigation.getParam('isNew');
+		const isIdentityCreation = route.params.isNew ?? false;
 		const { pin, confirmation } = state;
 		if (pin.length >= 6 && pin === confirmation) {
 			if (isIdentityCreation) {
-				const resolve = navigation.getParam('resolve');
+				const resolve = route.params.resolve;
 				setState(initialState);
 				resolve(pin);
 			}
@@ -82,11 +70,11 @@ function IdentityPin({ navigation, accounts }: Props): React.ReactElement {
 
 	const testPin = async (): Promise<void> => {
 		const { pin } = state;
-		if (pin.length >= 6 && accounts.state.currentIdentity) {
+		const { currentIdentity } = accounts.state;
+		if (pin.length >= 6 && currentIdentity) {
 			try {
-				const identity =
-					navigation.getParam('identity') || accounts.state.currentIdentity;
-				const resolve = navigation.getParam('resolve');
+				const identity = route.params.identity ?? currentIdentity;
+				const resolve = route.params.resolve;
 				const seed = await unlockIdentitySeed(pin, identity);
 				setState(initialState);
 				resolve(seed);
@@ -190,7 +178,6 @@ function IdentityPin({ navigation, accounts }: Props): React.ReactElement {
 			extraHeight={200}
 			testID={testIDs.IdentityPin.scrollScreen}
 		>
-			<Background />
 			{renderPinInput()}
 		</KeyboardScrollView>
 	);
@@ -246,7 +233,7 @@ const t = {
 	}
 };
 
-export default withAccountStore(withNavigation(IdentityPin));
+export default withAccountStore(IdentityPin);
 
 const styles = StyleSheet.create({
 	body: {

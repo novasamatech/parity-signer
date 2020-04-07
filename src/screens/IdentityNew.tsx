@@ -16,7 +16,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
-import { withNavigation } from 'react-navigation';
 
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
@@ -41,10 +40,11 @@ import { debounce } from 'utils/debounce';
 
 function IdentityNew({
 	accounts,
-	navigation
-}: NavigationAccountProps<{ isRecover: boolean }>): React.ReactElement {
+	navigation,
+	route
+}: NavigationAccountProps<'IdentityNew'>): React.ReactElement {
 	const defaultSeedValidObject = validateSeed('', false);
-	const isRecoverDefaultValue = navigation.getParam('isRecover', false);
+	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
@@ -169,7 +169,7 @@ function IdentityNew({
 	);
 }
 
-export default withAccountStore(withNavigation(IdentityNew));
+export default withAccountStore(IdentityNew);
 
 const styles = StyleSheet.create({
 	body: {

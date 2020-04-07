@@ -15,13 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
-import colors from 'styles/colors';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
 import TxDetailsCard from 'components/TxDetailsCard';
 import QrView from 'components/QrView';
@@ -33,14 +33,14 @@ import { Transaction } from 'utils/transaction';
 function SignedTx({
 	scannerStore,
 	accounts
-}: NavigationAccountScannerProps<{}>): React.ReactElement {
+}: NavigationAccountScannerProps<'SignedTx'>): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
 	const recipient = scannerStore.getRecipient()!;
 	const sender = scannerStore.getSender();
 
 	useEffect(
 		() =>
-			function(): void {
+			function (): void {
 				scannerStore.cleanup();
 			},
 		[scannerStore]
@@ -76,7 +76,7 @@ function SignedTx({
 	};
 
 	return (
-		<ScrollView
+		<SafeAreaScrollViewContainer
 			contentContainerStyle={{ paddingBottom: 40 }}
 			style={styles.body}
 		>
@@ -89,7 +89,7 @@ function SignedTx({
 			<View style={{ marginBottom: 20, marginHorizontal: 20 }}>
 				{renderTxPayload()}
 			</View>
-		</ScrollView>
+		</SafeAreaScrollViewContainer>
 	);
 }
 
@@ -99,9 +99,6 @@ const TX_DETAILS_MSG = 'After signing and publishing you will have sent';
 
 const styles = StyleSheet.create({
 	body: {
-		alignContent: 'flex-start',
-		backgroundColor: colors.bg,
-		flex: 1,
 		paddingTop: 24
 	},
 	qr: {
