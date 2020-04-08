@@ -186,6 +186,30 @@ export class SeedRef {
 		);
 	}
 
+	trySubstrateAddress(suriSuffix: string, prefix: number): Promise<string> {
+		if (!this.valid) {
+			throw new Error('there is no seed reference ');
+		}
+		return EthkeyBridge.substrateAddressWithRef(
+			this.dataRef,
+			suriSuffix,
+			prefix
+		).then((address: string) => {
+			return address;
+		});
+	}
+
+	tryBrainWalletAddress(): Promise<string> {
+		if (!this.valid) {
+			throw new Error('there is no seed reference ');
+		}
+		return EthkeyBridge.brainWalletAddressWithRef(this.dataRef).then(
+			(address: string) => {
+				return address;
+			}
+		);
+	}
+
 	// Destroy the decrypted seed. Must be called before this leaves scope or
 	// memory will leak.
 	tryDestroy(): Promise<SeedRef> {
@@ -210,11 +234,11 @@ export class SeedRef {
 	}
 
 	// Use a reference returned by decryptDataRef to sign a message
-	trySubstrateSign(message: string): Promise<string> {
+	trySubstrateSign(suriSuffix: string, message: string): Promise<string> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
-		return EthkeyBridge.substrateSignWithRef(this.dataRef, message);
+		return EthkeyBridge.substrateSignWithRef(this.dataRef, suriSuffix, message);
 	}
 }
