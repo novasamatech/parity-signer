@@ -158,7 +158,7 @@ export function schnorrkelVerify(
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
 
-export class SeedRef {
+export class SeedRefClass {
 	private dataRef: number;
 	private valid: boolean;
 
@@ -172,7 +172,7 @@ export class SeedRef {
 	}
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	tryCreate(encryptedSeed: string, password: string): Promise<SeedRef> {
+	tryCreate(encryptedSeed: string, password: string): Promise<SeedRefClass> {
 		if (this.valid) {
 			// Seed reference was already created.
 			throw new Error('cannot create a seed reference when one already exists');
@@ -188,7 +188,7 @@ export class SeedRef {
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or
 	// memory will leak.
-	tryDestroy(): Promise<SeedRef> {
+	tryDestroy(): Promise<SeedRefClass> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot destroy an invalid seed reference');
@@ -218,3 +218,5 @@ export class SeedRef {
 		return EthkeyBridge.substrateSignWithRef(this.dataRef, message);
 	}
 }
+
+export const SeedRef = new SeedRefClass();

@@ -17,11 +17,12 @@
 import '../shim';
 import 'utils/iconLoader';
 import * as React from 'react';
-import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
+import {AppState, AppStateStatus, StatusBar, StyleSheet, View, YellowBox} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {useSeedRef} from 'utils/seedRefHooks';
 
 import {
 	AppNavigator,
@@ -51,6 +52,23 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const [policyConfirmed, setPolicyConfirmed] = React.useState<boolean>(false);
 	const [dataLoaded, setDataLoaded] = React.useState<boolean>(false);
+	const [appState, setAppState] = React.useState<AppStateStatus>(AppState.currentState);
+	const {destroySeedRef, isSeedRefValid} = useSeedRef();
+
+	React.useEffect(() => {
+		const _handleAppStateChange = (nextAppState: AppStateStatus) => {
+			if (nextAppState.match(/inactive|background/) &&  appState === "active") {
+				destroySeedRef().then(()=>console.log("is seed ref valid: ", isSeedRefValid()));
+			}
+			setAppState(nextAppState);
+		};
+		AppState.addEventListener("change", _handleAppStateChange);
+
+		return () => {
+			AppState.removeEventListener("change", _handleAppStateChange);
+		};
+	}, [destroySeedRef]);
+
 	React.useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
 			const tocPP = await loadToCAndPPConfirmation();

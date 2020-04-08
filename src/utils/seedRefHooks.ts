@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { SeedRef } from 'utils/native';
+import {SeedRef, SeedRefClass} from 'utils/native';
 
 type IsValidFunc = () => boolean;
 type TryCreateFunc = (encryptedSeed: string, password: string) => Promise<void>;
@@ -8,22 +8,22 @@ type TryDestroyFunc = () => Promise<void>;
 type TrySignFunc = (message: string) => Promise<string>;
 
 type SeedRefHooks = {
-	isValid: IsValidFunc;
-	create: TryCreateFunc;
-	destroy: TryDestroyFunc;
+	isSeedRefValid: IsValidFunc;
+	createSeedRef: TryCreateFunc;
+	destroySeedRef: TryDestroyFunc;
 	brainWalletSign: TrySignFunc;
 	substrateSign: TrySignFunc;
 };
 
 export function useSeedRef(): SeedRefHooks {
-	const [seedRef, setSeedRef] = useState<SeedRef>(new SeedRef());
+	const [seedRef, setSeedRef] = useState<SeedRefClass>(SeedRef);
 
-	const isValid: IsValidFunc = function () {
+	const isSeedRefValid: IsValidFunc = function () {
 		return seedRef.isValid();
 	};
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	const create: TryCreateFunc = function (
+	const createSeedRef: TryCreateFunc = function (
 		encryptedSeed: string,
 		password: string
 	) {
@@ -34,7 +34,7 @@ export function useSeedRef(): SeedRefHooks {
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or
 	// memory will leak.
-	const destroy: TryDestroyFunc = function () {
+	const destroySeedRef: TryDestroyFunc = function () {
 		return seedRef.tryDestroy().then(destroyedRef => {
 			setSeedRef(destroyedRef);
 		});
@@ -52,5 +52,5 @@ export function useSeedRef(): SeedRefHooks {
 		return seedRef.trySubstrateSign(message);
 	};
 
-	return { brainWalletSign, create, destroy, isValid, substrateSign };
+	return { brainWalletSign, createSeedRef, destroySeedRef, isSeedRefValid, substrateSign };
 }
