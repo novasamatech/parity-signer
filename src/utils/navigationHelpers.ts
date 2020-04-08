@@ -19,6 +19,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
+import { SeedRefHooks } from 'utils/seedRefHooks';
 
 type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
@@ -35,19 +36,25 @@ export const unlockSeedPhrase = async <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
+	seedRefHooks: SeedRefHooks,
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
-		navigation.navigate('PinUnlock', {
-			identity,
-			resolve
-		});
+		if (seedRefHooks.isSeedRefValid()) {
+			// seedRefHooks.
+		} else {
+			navigation.navigate('PinUnlock', {
+				identity,
+				resolve
+			});
+		}
 	});
 
 export const unlockSeedPhraseWithPassword = async <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
+	seedRefHooks: SeedRefHooks,
 	path: string,
 	identity?: Identity
 ): Promise<string> =>

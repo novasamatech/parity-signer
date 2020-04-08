@@ -57,6 +57,7 @@ import {
 	isSubstrateNetworkParams,
 	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 const excludedNetworks = [
 	UnknownNetworkKeys.UNKNOWN,
@@ -75,6 +76,7 @@ function AccountNetworkChooser({
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity, loaded } = accounts.state;
+	const seedRefHooks = useSeedRef();
 	const hasLegacyAccount = accounts.getAccounts().size !== 0;
 
 	const TextButton: FunctionComponent<{ text: string; isRecover: boolean }> = ({
@@ -156,7 +158,7 @@ function AccountNetworkChooser({
 		networkParams: SubstrateNetworkParams
 	): Promise<void> => {
 		const { pathId } = networkParams;
-		const seedPhrase = await unlockSeedPhrase(navigation);
+		const seedPhrase = await unlockSeedPhrase(navigation, seedRefHooks);
 		const fullPath = `//${pathId}`;
 		try {
 			await accounts.deriveNewPath(

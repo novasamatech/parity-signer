@@ -5,28 +5,30 @@ import { SeedRef, SeedRefClass } from 'utils/native';
 type IsValidFunc = () => boolean;
 type TryCreateFunc = (encryptedSeed: string, password: string) => Promise<void>;
 type TryDestroyFunc = () => Promise<void>;
-type TrySignFunc = (message: string) => Promise<string>;
+type TrySignFunc = (suriSuffix: string, message: string) => Promise<string>;
+type TrySubstrateAddress = (
+	suriSuffix: string,
+	prefix: number
+) => Promise<string>;
+type TryBrainWalletAddress = () => Promise<string>;
 
-type SeedRefHooks = {
+export type SeedRefHooks = {
 	isSeedRefValid: IsValidFunc;
 	createSeedRef: TryCreateFunc;
 	destroySeedRef: TryDestroyFunc;
 	brainWalletSign: TrySignFunc;
 	substrateSign: TrySignFunc;
+	substrateAddress: TrySubstrateAddress;
+	brainWalletAddress: TryBrainWalletAddress;
 };
 
 export function useSeedRef(): SeedRefHooks {
 	const [seedRef, setSeedRef] = useState<SeedRefClass>(SeedRef);
 
-	const isSeedRefValid: IsValidFunc = function () {
-		return seedRef.isValid();
-	};
+	const isSeedRefValid: IsValidFunc = seedRef.isValid;
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	const createSeedRef: TryCreateFunc = function (
-		encryptedSeed: string,
-		password: string
-	) {
+	const createSeedRef: TryCreateFunc = function (encryptedSeed, password) {
 		return seedRef.tryCreate(encryptedSeed, password).then(createdRef => {
 			setSeedRef(createdRef);
 		});
@@ -42,21 +44,24 @@ export function useSeedRef(): SeedRefHooks {
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const brainWalletSign: TrySignFunc = function (message: string) {
-		return seedRef.tryBrainWalletSign(message);
-	};
+	const brainWalletSign: TrySignFunc = seedRef.tryBrainWalletSign;
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const substrateSign: TrySignFunc = function (message: string) {
-		return seedRef.trySubstrateSign(message);
-	};
+	const substrateSign: TrySignFunc = seedRef.trySubstrateSign;
+
+	const substrateAddress: TrySubstrateAddress = seedRef.trySubstrateAddress;
+
+	const brainWalletAddress: TryBrainWalletAddress =
+		seedRef.tryBrainWalletAddress;
 
 	return {
+		brainWalletAddress,
 		brainWalletSign,
 		createSeedRef,
 		destroySeedRef,
 		isSeedRefValid,
+		substrateAddress,
 		substrateSign
 	};
 }
