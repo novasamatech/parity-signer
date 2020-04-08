@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import {SeedRef, SeedRefClass} from 'utils/native';
+import { SeedRef, SeedRefClass } from 'utils/native';
 
 type IsValidFunc = () => boolean;
 type TryCreateFunc = (encryptedSeed: string, password: string) => Promise<void>;
@@ -52,5 +52,11 @@ export function useSeedRef(): SeedRefHooks {
 		return seedRef.trySubstrateSign(message);
 	};
 
-	return { brainWalletSign, createSeedRef, destroySeedRef, isSeedRefValid, substrateSign };
+	return {
+		brainWalletSign,
+		createSeedRef,
+		destroySeedRef,
+		isSeedRefValid,
+		substrateSign
+	};
 }

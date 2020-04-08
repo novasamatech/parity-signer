@@ -17,12 +17,18 @@
 import '../shim';
 import 'utils/iconLoader';
 import * as React from 'react';
-import {AppState, AppStateStatus, StatusBar, StyleSheet, View, YellowBox} from 'react-native';
+import {
+	AppState,
+	AppStateStatus,
+	StatusBar,
+	StyleSheet,
+	View,
+	YellowBox
+} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import {useSeedRef} from 'utils/seedRefHooks';
 
 import {
 	AppNavigator,
@@ -30,6 +36,7 @@ import {
 	ScreenStack
 } from './screens';
 
+import { useSeedRef } from 'utils/seedRefHooks';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
@@ -52,22 +59,26 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const [policyConfirmed, setPolicyConfirmed] = React.useState<boolean>(false);
 	const [dataLoaded, setDataLoaded] = React.useState<boolean>(false);
-	const [appState, setAppState] = React.useState<AppStateStatus>(AppState.currentState);
-	const {destroySeedRef, isSeedRefValid} = useSeedRef();
+	const [appState, setAppState] = React.useState<AppStateStatus>(
+		AppState.currentState
+	);
+	const { destroySeedRef, isSeedRefValid } = useSeedRef();
 
 	React.useEffect(() => {
-		const _handleAppStateChange = (nextAppState: AppStateStatus) => {
-			if (nextAppState.match(/inactive|background/) &&  appState === "active") {
-				destroySeedRef().then(()=>console.log("is seed ref valid: ", isSeedRefValid()));
+		const _handleAppStateChange = (nextAppState: AppStateStatus): void => {
+			if (nextAppState.match(/inactive|background/) && appState === 'active') {
+				destroySeedRef().then(() =>
+					console.log('is seed ref valid: ', isSeedRefValid())
+				);
 			}
 			setAppState(nextAppState);
 		};
-		AppState.addEventListener("change", _handleAppStateChange);
+		AppState.addEventListener('change', _handleAppStateChange);
 
-		return () => {
-			AppState.removeEventListener("change", _handleAppStateChange);
+		return (): void => {
+			AppState.removeEventListener('change', _handleAppStateChange);
 		};
-	}, [destroySeedRef]);
+	}, [appState, destroySeedRef, isSeedRefValid]);
 
 	React.useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
