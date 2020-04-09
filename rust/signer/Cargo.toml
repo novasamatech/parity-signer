@@ -26,6 +26,8 @@ tiny-hderive = "0.1"
 tiny-keccak = "1.4"
 pixelate = "0.1"
 qrcodegen = "1.4"
+thiserror = "1.0"
+anyhow = "1.0"
 secure-native = { path = "../../../secure-native" }
 
 [lib]

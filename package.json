@@ -13,7 +13,7 @@
     "build-rust:ios": "(cd rust/signer && make ios)",
     "build-rust:android": "(cd rust/signer && make android)",
     "build-rust": "yarn build-rust:ios && yarn build-rust:android",
-    "build:ios": "yarn install && (cd ios && pod install) && yarn build-rust-ios",
+    "build:ios": "yarn install && (cd ios && pod install) && yarn build-rust:ios",
     "build:android": "yarn install && yarn build-rust-android",
 	"xcbuild:debug": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
 	"xcbuild:release": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
