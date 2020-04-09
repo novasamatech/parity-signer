@@ -248,11 +248,12 @@ export! {
         Some(signature.to_hex())
     }
 
-    @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSignWithRef
-    fn substrate_brainwallet_sign_with_ref(seed_ref: i64, message: &str) -> Option<String> {
+    @Java_io_parity_signer_EthkeyBridge_ethkeySubstrateBrainwalletSignWithRef
+    fn substrate_brainwallet_sign_with_ref(seed_ref: i64, suri_suffix: &str, message: &str) -> Option<String> {
         let seed = unsafe { Box::from_raw(seed_ref  as *mut String) };
+        let suri = format!("{}{}", &seed, suri_suffix);
 
-        let keypair = sr25519::KeyPair::from_suri(&seed)?;
+        let keypair = sr25519::KeyPair::from_suri(&suri)?;
         let message: Vec<u8> = message.from_hex().ok()?;
         let signature = keypair.sign(&message);
 
@@ -260,6 +261,25 @@ export! {
         let _ = Box::into_raw(seed) as i64;
 
         Some(signature.to_hex())
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeySubstrateWalletAddressWithRef
+    fn substrate_address_with_ref(seed_ref: i64, suri_suffix: &str, prefix: u8) -> Option<String> {
+        let seed = unsafe { Box::from_raw(seed_ref  as *mut String) };
+        let suri = format!("{}{}", &seed, suri_suffix);
+        let keypair = sr25519::KeyPair::from_suri(&suri)?;
+        let _ = Box::into_raw(seed) as i64;
+        Some(keypair.ss58_address(prefix))
+    }
+
+    @Java_io_parity_signer_EthkeyBridge_ethkeyBrainWalletAddressWithRef
+    fn brain_wallet_address_with_ref(seed_ref: i64) -> Option<String> {
+        let seed = unsafe { Box::from_raw(seed_ref  as *mut String) };
+        let address = ethkey_brainwallet_address(&seed);
+
+        // so that the reference remains valid
+        let _ = Box::into_raw(seed) as i64;
+        Some(address)
     }
 }
 
@@ -286,10 +306,12 @@ secure_native::define_string_destructor!(signer_destroy_string);
 mod tests {
     use super::*;
 
-    static SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon";
-    static DERIVED_SURI: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon//hard/soft/0";
+    static SEED_PHRASE: &str = "grant jaguar wish bench exact find voice habit tank pony state salmon";
+    static SURI_SUFFIX: &str = "//hard/soft/0";
     static ENCRYPTED_SEED: &str = "{\"cipher\":\"aes-128-ctr\",\"cipherparams\":{\"iv\":\"47b4b75d13045ff7569da858e234f7ea\"},\"ciphertext\":\"ca1cf5387822b70392c4aeec729676f91ab00a795d7593fb7e52ecc333dbc4a1acbedc744b5d8d519c714e194bd741995244c8128bfdce6c184d6bda4ca136ed265eedcee9\",\"kdf\":\"pbkdf2\",\"kdfparams\":{\"c\":10240,\"dklen\":32,\"prf\":\"hmac-sha256\",\"salt\":\"b4a2d1edd1a70fe2eb48d7aff15c19e234f6aa211f5142dddb05a59af12b3381\"},\"mac\":\"b38a54eb382f2aa1a8be2f7b86fe040fe112d0f42fea03fac186dccdd7ae3eb9\"}";
     static PIN: &str = "000000";
+    static SUBSTRATE_ADDRESS: &str = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
+    static ETHEREUM_ADDRESS: &str = "bip39:f85f35e47e976650641ecd1a644e33edccc9cab1";
 
     #[test]
     fn test_random_phrase() {
@@ -329,25 +351,25 @@ mod tests {
         // Secret seed: 0xb139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224
         // Public key (hex): 0x944eeb240615f4a94f673f240a256584ba178e22dd7b67503a753968e2f95761
         let expected = "5FRAPSnpgmnXAnmPVv68fT6o7ntTvaZmkTED8jDttnXs9k4n";
-        let generated = substrate_brainwallet_address(SURI, 42).unwrap();
+        let generated = substrate_brainwallet_address(SEED_PHRASE, 42).unwrap();
 
         assert_eq!(expected, generated);
     }
 
     #[test]
     fn test_substrate_brainwallet_address_suri() {
-        let expected = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
-        let generated = substrate_brainwallet_address(DERIVED_SURI, 42).unwrap();
+        let suri = format!("{}{}", SEED_PHRASE, SURI_SUFFIX);
+        let generated = substrate_brainwallet_address(&suri, 42).unwrap();
 
-        assert_eq!(expected, generated);
+        assert_eq!(SUBSTRATE_ADDRESS, generated);
     }
 
     #[test]
     fn test_substrate_sign() {
         let msg: String = b"Build The Future".to_hex();
-        let signature = substrate_brainwallet_sign(SURI, &msg).unwrap();
+        let signature = substrate_brainwallet_sign(SEED_PHRASE, &msg).unwrap();
 
-        let is_valid = schnorrkel_verify(SURI, &msg, &signature).unwrap();
+        let is_valid = schnorrkel_verify(SEED_PHRASE, &msg, &signature).unwrap();
 
         assert!(is_valid);
     }
@@ -356,8 +378,9 @@ mod tests {
     fn test_substrate_sign_with_ref() {
         let msg: String = b"Build The Future".to_hex();
         let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
-        let signature_by_ref = substrate_brainwallet_sign_with_ref(data_pointer, &msg).unwrap();
-        let is_valid = schnorrkel_verify(SURI, &msg, &signature_by_ref).unwrap();
+        let signature_by_ref = substrate_brainwallet_sign_with_ref(data_pointer, SURI_SUFFIX, &msg).unwrap();
+        let suri = format!("{}{}", SEED_PHRASE, SURI_SUFFIX);
+        let is_valid = schnorrkel_verify(&suri, &msg, &signature_by_ref).unwrap();
         destroy_data_ref(data_pointer);
         assert!(is_valid);
     }
@@ -366,6 +389,22 @@ mod tests {
     #[test]
     fn decrypt_with_ref() {
         let decrypted_result = decrypt_data(ENCRYPTED_SEED, String::from(PIN)).unwrap();
-        assert_eq!(SURI, decrypted_result);
+        assert_eq!(SEED_PHRASE, decrypted_result);
+    }
+
+    #[test]
+    fn test_generate_substrate_address() {
+        let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
+        let address = substrate_wallet_address_with_ref(data_pointer, SURI_SUFFIX, 42).unwrap();
+        destroy_data_ref(data_pointer);
+        assert_eq!(address, SUBSTRATE_ADDRESS);
+    }
+
+    #[test]
+    fn test_generate_ethereum_address() {
+        let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
+        let address = brain_wallet_address_with_ref(data_pointer).unwrap();
+        destroy_data_ref(data_pointer);
+        assert_eq!(address, ETHEREUM_ADDRESS);
     }
 }

@@ -92,5 +92,8 @@ void destroy_data_ref(unsigned* error, int64_t data_ref);
 
 struct rust_string* ethkey_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* message);
 
-struct rust_string* substrate_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* data);
+struct rust_string* substrate_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* suri_suffix, const struct rust_string_ptr* data);
 
+struct rust_string* substrate_address_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* suri_suffix, const unsigned prefix);
+
+struct rust_string* brain_wallet_address_with_ref(unsigned* error, int64_t seed_ref);
