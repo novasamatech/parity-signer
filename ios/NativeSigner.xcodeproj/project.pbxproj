@@ -17,13 +17,14 @@
 		16614F66487241CE933918B8 /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 020454D0D3C74A398EC7F440 /* Roboto-Thin.ttf */; };
 		1F426F8F208D2CC500CA43DB /* EthkeyBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F8E208D2CC500CA43DB /* EthkeyBridge.m */; };
 		1F426F9C208D358500CA43DB /* EthkeyBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F99208D358500CA43DB /* EthkeyBridge.swift */; };
-		1F426F9D208D358500CA43DB /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F426F9A208D358500CA43DB /* String.swift */; };
 		1F73EE2721777A1D00706E91 /* libsigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F426F39208B7CC000CA43DB /* libsigner.a */; };
 		399D1B0E22DDDE1B00A815EB /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */; };
 		39B6F6432315B550009C3C05 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 39B6F6102315B550009C3C05 /* main.jsbundle */; };
 		3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */; };
 		3D7A98D07DE443E381067D3A /* Roboto-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */; };
 		423E02567C044AF6832B2388 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */; };
+		496F105150B638C164C72324 /* Pods_NativeSigner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A12C72223C2AF51390FC9C51 /* Pods_NativeSigner.framework */; };
+		50DF426684381AE2EFAF8FE5 /* Pods_NativeSignerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3005282E9BCA5A1FCB99E4B9 /* Pods_NativeSignerTests.framework */; };
 		5DC40D98E51D492C8FF692B5 /* Manifold-CF-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */; };
 		6701864923270B1100A14061 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 6701864823270B1100A14061 /* assets */; };
 		67E3BED3237C17A6007882FA /* RobotoMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67E3BEA2237C17A6007882FA /* RobotoMono-Regular.ttf */; };
@@ -33,8 +34,6 @@
 		A6DE194CA1E344F6B2BBDD09 /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F744F56289845F0A1085BBB /* Roboto-MediumItalic.ttf */; };
 		AD0B6F7EACB74BA7A42D2A2E /* Manifold-CF-Demi-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5D4F46832A564A6C98432D76 /* Manifold-CF-Demi-Bold.otf */; };
 		B43B3542B9ED441AB8AFBA0B /* Roboto-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */; };
-		D96E2E21C2F126471ACD281A /* Pods_NativeSignerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 407A0335F50106A186E0D2A8 /* Pods_NativeSignerTests.framework */; };
-		E0C0C19DFAB13F940846FA57 /* Pods_NativeSigner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 909A8581C322371B6616BBED /* Pods_NativeSigner.framework */; };
 		E501D58522AE41A9AF18340A /* Roboto-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0A3530DA239B43579EF02112 /* Roboto-BoldItalic.ttf */; };
 		EDCE1EC0CA1249279F03F2E2 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */; };
 		EE896FB251B94030AC713B6F /* Roboto-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */; };
@@ -98,10 +97,8 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* NativeSignerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeSignerTests.m; sourceTree = "<group>"; };
 		020454D0D3C74A398EC7F440 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Thin.ttf"; path = "../res/fonts/Roboto-Thin.ttf"; sourceTree = "<group>"; };
-		07E3A716ABBA17C7D5A64770 /* Pods-NativeSigner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.debug.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.debug.xcconfig"; sourceTree = "<group>"; };
+		08913B97B4DBDAE11F6982B5 /* Pods-NativeSigner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.release.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.release.xcconfig"; sourceTree = "<group>"; };
 		0A3530DA239B43579EF02112 /* Roboto-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BoldItalic.ttf"; path = "../res/fonts/Roboto-BoldItalic.ttf"; sourceTree = "<group>"; };
-		0C76C655B7644430CCD11068 /* Pods-NativeSignerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSignerTests.release.xcconfig"; path = "Target Support Files/Pods-NativeSignerTests/Pods-NativeSignerTests.release.xcconfig"; sourceTree = "<group>"; };
-		0FFB47A50CE38A1FDFBD96CC /* Pods-NativeSignerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSignerTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeSignerTests/Pods-NativeSignerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = NativeSigner/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = NativeSigner/AppDelegate.m; sourceTree = "<group>"; };
@@ -115,16 +112,17 @@
 		1F426F8E208D2CC500CA43DB /* EthkeyBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = EthkeyBridge.m; path = NativeSigner/EthkeyBridge.m; sourceTree = "<group>"; };
 		1F426F90208D31D200CA43DB /* signer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = signer.h; path = ../rust/signer/signer.h; sourceTree = "<group>"; };
 		1F426F99208D358500CA43DB /* EthkeyBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EthkeyBridge.swift; path = NativeSigner/EthkeyBridge.swift; sourceTree = "<group>"; };
-		1F426F9A208D358500CA43DB /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = String.swift; path = NativeSigner/String.swift; sourceTree = "<group>"; };
 		1F426F9B208D358500CA43DB /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NativeSigner-Bridging-Header.h"; path = "NativeSigner/NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
 		1F7FFA3B208B691700FF717A /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		2C61F416B48D3072E4BA4CE1 /* Pods-NativeSigner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.debug.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.debug.xcconfig"; sourceTree = "<group>"; };
 		2D0EA96B71FC4AFF8C35B80E /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF.otf"; path = "../res/fonts/Manifold-CF.otf"; sourceTree = "<group>"; };
+		3005282E9BCA5A1FCB99E4B9 /* Pods_NativeSignerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NativeSignerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		30A0DE0C81497077DBF39B94 /* Pods-NativeSignerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSignerTests.release.xcconfig"; path = "Target Support Files/Pods-NativeSignerTests/Pods-NativeSignerTests.release.xcconfig"; sourceTree = "<group>"; };
 		31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Light.otf"; path = "../res/fonts/Manifold-CF-Light.otf"; sourceTree = "<group>"; };
 		399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		39B6F6102315B550009C3C05 /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		3DB51A3702D94B6BA025DDE6 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
-		407A0335F50106A186E0D2A8 /* Pods_NativeSignerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NativeSignerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Italic.ttf"; path = "../res/fonts/Roboto-Italic.ttf"; sourceTree = "<group>"; };
 		431C560691184DF8B5347066 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		4BF2B8970DC245F4BA0574F9 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -143,10 +141,10 @@
 		84D1117E71B04C839F00F619 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		894E2A1A52DC44C28E9F9A71 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-LightItalic.ttf"; path = "../res/fonts/Roboto-LightItalic.ttf"; sourceTree = "<group>"; };
-		8E26CD7CCF58F47837727E3B /* Pods-NativeSigner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.release.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.release.xcconfig"; sourceTree = "<group>"; };
-		909A8581C322371B6616BBED /* Pods_NativeSigner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NativeSigner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		91D53BBCAE6D418EA362A703 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		99AC61BF1E3C4FE8B07077D3 /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
+		A12C72223C2AF51390FC9C51 /* Pods_NativeSigner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NativeSigner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B948D0548C4C61586B1AA842 /* Pods-NativeSignerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSignerTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeSignerTests/Pods-NativeSignerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BB0882DC34AE448DAA1E2320 /* RNCNetInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCNetInfo.xcodeproj; path = "../node_modules/@react-native-community/netinfo/ios/RNCNetInfo.xcodeproj"; sourceTree = "<group>"; };
 		C0205550495341279B513024 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		CB5C4A7F0E8B4E4E98E06EFD /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -168,7 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D96E2E21C2F126471ACD281A /* Pods_NativeSignerTests.framework in Frameworks */,
+				50DF426684381AE2EFAF8FE5 /* Pods_NativeSignerTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -178,7 +176,7 @@
 			files = (
 				399D1B0E22DDDE1B00A815EB /* JavaScriptCore.framework in Frameworks */,
 				1F73EE2721777A1D00706E91 /* libsigner.a in Frameworks */,
-				E0C0C19DFAB13F940846FA57 /* Pods_NativeSigner.framework in Frameworks */,
+				496F105150B638C164C72324 /* Pods_NativeSigner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,7 +205,6 @@
 			children = (
 				1F426F99208D358500CA43DB /* EthkeyBridge.swift */,
 				1F426F9B208D358500CA43DB /* NativeSigner-Bridging-Header.h */,
-				1F426F9A208D358500CA43DB /* String.swift */,
 				1F426F90208D31D200CA43DB /* signer.h */,
 				1F426F8E208D2CC500CA43DB /* EthkeyBridge.m */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -237,8 +234,8 @@
 				399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */,
 				1F426F39208B7CC000CA43DB /* libsigner.a */,
 				1F7FFA3B208B691700FF717A /* libresolv.tbd */,
-				909A8581C322371B6616BBED /* Pods_NativeSigner.framework */,
-				407A0335F50106A186E0D2A8 /* Pods_NativeSignerTests.framework */,
+				A12C72223C2AF51390FC9C51 /* Pods_NativeSigner.framework */,
+				3005282E9BCA5A1FCB99E4B9 /* Pods_NativeSignerTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -348,10 +345,10 @@
 		99E67DDEA1C0A1F7EACC69CB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				07E3A716ABBA17C7D5A64770 /* Pods-NativeSigner.debug.xcconfig */,
-				8E26CD7CCF58F47837727E3B /* Pods-NativeSigner.release.xcconfig */,
-				0FFB47A50CE38A1FDFBD96CC /* Pods-NativeSignerTests.debug.xcconfig */,
-				0C76C655B7644430CCD11068 /* Pods-NativeSignerTests.release.xcconfig */,
+				2C61F416B48D3072E4BA4CE1 /* Pods-NativeSigner.debug.xcconfig */,
+				08913B97B4DBDAE11F6982B5 /* Pods-NativeSigner.release.xcconfig */,
+				B948D0548C4C61586B1AA842 /* Pods-NativeSignerTests.debug.xcconfig */,
+				30A0DE0C81497077DBF39B94 /* Pods-NativeSignerTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -363,7 +360,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NativeSignerTests" */;
 			buildPhases = (
-				4B67F29A09E951F5424A437C /* [CP] Check Pods Manifest.lock */,
+				FD9529B52DB97CCEDE74BF42 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -382,12 +379,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NativeSigner" */;
 			buildPhases = (
-				0CB4B0EBC1F44DA27272200F /* [CP] Check Pods Manifest.lock */,
+				4CA110DEEBE8E41AEED8160F /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				15F013C8538A99856216FD1D /* [CP] Embed Pods Frameworks */,
+				7820E91E23B048003615D6AE /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -552,7 +549,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\nexport NODE_OPTIONS=\"--max_old_space_size=8192\"\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		0CB4B0EBC1F44DA27272200F /* [CP] Check Pods Manifest.lock */ = {
+		4CA110DEEBE8E41AEED8160F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -574,7 +571,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		15F013C8538A99856216FD1D /* [CP] Embed Pods Frameworks */ = {
+		7820E91E23B048003615D6AE /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -654,7 +651,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NativeSigner/Pods-NativeSigner-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4B67F29A09E951F5424A437C /* [CP] Check Pods Manifest.lock */ = {
+		FD9529B52DB97CCEDE74BF42 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -693,7 +690,6 @@
 			files = (
 				1F426F9C208D358500CA43DB /* EthkeyBridge.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				1F426F9D208D358500CA43DB /* String.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				1F426F8F208D2CC500CA43DB /* EthkeyBridge.m in Sources */,
 			);
@@ -724,7 +720,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0FFB47A50CE38A1FDFBD96CC /* Pods-NativeSignerTests.debug.xcconfig */;
+			baseConfigurationReference = B948D0548C4C61586B1AA842 /* Pods-NativeSignerTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -748,7 +744,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0C76C655B7644430CCD11068 /* Pods-NativeSignerTests.release.xcconfig */;
+			baseConfigurationReference = 30A0DE0C81497077DBF39B94 /* Pods-NativeSignerTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -770,7 +766,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 07E3A716ABBA17C7D5A64770 /* Pods-NativeSigner.debug.xcconfig */;
+			baseConfigurationReference = 2C61F416B48D3072E4BA4CE1 /* Pods-NativeSigner.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -810,7 +806,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8E26CD7CCF58F47837727E3B /* Pods-NativeSigner.release.xcconfig */;
+			baseConfigurationReference = 08913B97B4DBDAE11F6982B5 /* Pods-NativeSigner.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

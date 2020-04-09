@@ -32,7 +32,7 @@ secure-native = { path = "../../../secure-native" }
 
 [lib]
 name = "signer"
-crate-type = ["staticlib", "cdylib"]
+crate-type = ["staticlib"]
 
 [features]
 default = ["jni"]

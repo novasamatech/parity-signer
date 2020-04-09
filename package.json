@@ -14,7 +14,7 @@
     "build-rust:android": "(cd rust/signer && make android)",
     "build-rust": "yarn build-rust:ios && yarn build-rust:android",
     "build:ios": "yarn install && (cd ios && pod install) && yarn build-rust:ios",
-    "build:android": "yarn install && yarn build-rust-android",
+    "build:android": "yarn install && yarn build-rust:android",
 	"xcbuild:debug": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
 	"xcbuild:release": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force && rm -rf ./android/app/build && rm -rf ./ios/build && yarn clean-rust && (cd ios && pod deintegrate)",
@@ -32,7 +32,8 @@
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
     "build-e2e:ios": "detox build -c ios.sim.debug -l info",
     "test-e2e:ios": "detox test -c ios.sim.debug -l info --noStackTrace",
-    "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios"
+    "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios",
+	"e2e": "yarn e2e:ios && yarn e2e:android"
   },
   "husky": {
     "hooks": {
