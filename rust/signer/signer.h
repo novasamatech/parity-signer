@@ -82,7 +82,7 @@ struct ExternError {
 
 void signer_destroy_string(const char* cstring);
 
-const char* substrate_brainwallet_sign(unsigned* error, struct ExternError* err, const char* seed, const char* data);
+const char* substrate_brainwallet_sign(struct ExternError* err, const char* seed, const char* data);
 
 struct rust_string* schnorrkel_verify(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* msg, const struct rust_string_ptr* signature);
 

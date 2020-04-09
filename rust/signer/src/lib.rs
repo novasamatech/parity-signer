@@ -265,21 +265,22 @@ export! {
 
 secure_native::export! {
     @Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
-    fn substrate_brainwallet_sign(err: &mut secure_native::ffi_support::ExternError, suri: &str, message: &str) -> Option<String> {
-        *err = secure_native::ffi_support::ExternError::new_error(
-            secure_native::ffi_support::ErrorCode::new(42), 
-            "testing 123");
+    fn substrate_brainwallet_sign(
+        suri: &str, 
+        message: &str
+    ) -> secure_native::anyhow::Result<String> {
+        let keypair = sr25519::KeyPair::from_suri(suri)
+            .ok_or(secure_native::anyhow::anyhow!("KeyPair::from_suri returned None"))?;
 
-        let keypair = sr25519::KeyPair::from_suri(suri)?;
-
-        let message: Vec<u8> = message.from_hex().ok()?;
+        let message: Vec<u8> = message.from_hex()
+            .map_err(|e| secure_native::anyhow::anyhow!("{:?}", e))?;
         let signature = keypair.sign(&message);
 
-        Some(signature.to_hex())
+        Ok(signature.to_hex())
     }
 }
 
-secure_native::ffi_support::define_string_destructor!(signer_destroy_string);
+secure_native::define_string_destructor!(signer_destroy_string);
 
 #[cfg(test)]
 mod tests {
