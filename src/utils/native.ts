@@ -201,7 +201,7 @@ export class SeedRef {
 
 	tryBrainWalletAddress(): Promise<string> {
 		if (!this.valid) {
-			throw new Error('there is no seed reference ');
+			throw new Error('a seed reference has not been created');
 		}
 		return EthkeyBridge.brainWalletAddressWithRef(this.dataRef).then(
 			(address: string) => {
