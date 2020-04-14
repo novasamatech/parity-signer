@@ -37,6 +37,8 @@ import {
 	UnlockedAccount
 } from 'types/identityTypes';
 import {
+	centrifugeAmberMetadata,
+	centrifugeMetadata,
 	defaultMetaData,
 	kusamaMetadata,
 	substrateDevMetadata,
@@ -376,6 +378,10 @@ export const groupPaths = (paths: string[]): PathGroup[] => {
 
 export const getMetadata = (networkKey: string): string => {
 	switch (networkKey) {
+		case SubstrateNetworkKeys.CENTRIFUGE:
+			return centrifugeMetadata;
+		case SubstrateNetworkKeys.CENTRIFUGE_AMBER:
+			return centrifugeAmberMetadata;
 		case SubstrateNetworkKeys.KUSAMA:
 		case SubstrateNetworkKeys.KUSAMA_CC2:
 		case SubstrateNetworkKeys.KUSAMA_DEV:
