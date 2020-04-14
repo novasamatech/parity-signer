@@ -26,11 +26,15 @@ export type RootStackParamList = {
 	PathManagement: { path: string };
 	PathsList: { networkKey: string };
 	PinNew: { resolve: (pin: string) => void };
-	PinUnlock: { identity?: Identity; resolve: (seedPhrase: string) => void };
+	PinUnlock: {
+		identity?: Identity;
+		resolve: (seedPhrase?: string) => void;
+		shouldReturnSeed: boolean;
+	};
 	PinUnlockWithPassword: {
 		identity?: Identity;
-		path: string;
-		resolve: (suri: string) => void;
+		isSeedRefValid: boolean;
+		resolve: (password: string) => void;
 	};
 	PrivacyPolicy: undefined;
 	QrScanner: undefined;

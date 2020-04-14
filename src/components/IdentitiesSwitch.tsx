@@ -23,6 +23,7 @@ import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
+import { useSeedRef } from 'utils/seedRefHooks';
 import { RootStackParamList } from 'types/routes';
 import AccountsStore from 'stores/AccountsStore';
 import testIDs from 'e2e/testIDs';
@@ -46,6 +47,7 @@ function IdentitiesSwitch({
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
 	const { currentIdentity, identities } = accounts.state;
+	const { isSeedRefValid } = useSeedRef();
 	// useEffect(() => {
 	// 	const firstLogin: boolean = identities.length === 0;
 	// 	if (currentIdentity === null && !firstLogin) {
@@ -74,7 +76,7 @@ function IdentitiesSwitch({
 		if (screenName === 'AccountNetworkChooser') {
 			resetNavigationTo(navigation, screenName, params);
 		} else if (screenName === 'IdentityBackup') {
-			const seedPhrase = await unlockSeedPhrase(navigation);
+			const seedPhrase = await unlockSeedPhrase(navigation, isSeedRefValid);
 			resetNavigationWithNetworkChooser(navigation, screenName, {
 				isNew: false,
 				seedPhrase

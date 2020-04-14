@@ -68,7 +68,7 @@ export default function App(props: AppProps): React.ReactElement {
 		const _handleAppStateChange = (nextAppState: AppStateStatus): void => {
 			if (nextAppState.match(/inactive|background/) && appState === 'active') {
 				destroySeedRef().then(() =>
-					console.log('is seed ref valid: ', isSeedRefValid())
+					console.log('is seed ref valid: ', isSeedRefValid)
 				);
 			}
 			setAppState(nextAppState);

@@ -158,12 +158,12 @@ function AccountNetworkChooser({
 		networkParams: SubstrateNetworkParams
 	): Promise<void> => {
 		const { pathId } = networkParams;
-		const seedPhrase = await unlockSeedPhrase(navigation, seedRefHooks);
+		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		const fullPath = `//${pathId}`;
 		try {
 			await accounts.deriveNewPath(
 				fullPath,
-				seedPhrase,
+				seedRefHooks.substrateAddress,
 				networkKey,
 				`${networkParams.title} root`,
 				''
@@ -175,9 +175,12 @@ function AccountNetworkChooser({
 	};
 
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
-		const seedPhrase = await unlockSeedPhrase(navigation);
+		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		try {
-			await accounts.deriveEthereumAccount(seedPhrase, networkKey);
+			await accounts.deriveEthereumAccount(
+				seedRefHooks.brainWalletAddress,
+				networkKey
+			);
 			navigateToPathsList(navigation, networkKey);
 		} catch (e) {
 			alertPathDerivationError(e.message);

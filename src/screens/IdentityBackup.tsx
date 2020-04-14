@@ -38,7 +38,7 @@ function IdentityBackup({
 	route
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const [wordsNumber, setWordsNumber] = useState(24);
+	const [wordsNumber, setWordsNumber] = useState(12);
 	const { createSeedRef } = useSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {

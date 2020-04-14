@@ -19,6 +19,7 @@ import { decryptData, substrateAddress } from './native';
 import { constructSURI, parseSURI } from './suri';
 import { generateAccountId } from './account';
 
+import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
@@ -253,10 +254,21 @@ export const getAddressWithPath = (
 
 export const unlockIdentitySeed = async (
 	pin: string,
-	identity: Identity
+	identity: Identity,
+	createSeedRef: TryCreateFunc
+): Promise<void> => {
+	const { encryptedSeed } = identity;
+	await createSeedRef(encryptedSeed, pin);
+};
+
+export const unlockIdentitySeedWithReturn = async (
+	pin: string,
+	identity: Identity,
+	createSeedRef: TryCreateFunc
 ): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
+	await createSeedRef(encryptedSeed, pin);
 	const { phrase } = parseSURI(seed);
 	return phrase;
 };

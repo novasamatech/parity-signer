@@ -2,18 +2,23 @@ import { useState } from 'react';
 
 import { SeedRef, SeedRefClass } from 'utils/native';
 
-type IsValidFunc = () => boolean;
-type TryCreateFunc = (encryptedSeed: string, password: string) => Promise<void>;
-type TryDestroyFunc = () => Promise<void>;
-type TrySignFunc = (suriSuffix: string, message: string) => Promise<string>;
-type TrySubstrateAddress = (
+export type TryCreateFunc = (
+	encryptedSeed: string,
+	password: string
+) => Promise<void>;
+export type TryDestroyFunc = () => Promise<void>;
+export type TrySignFunc = (
+	suriSuffix: string,
+	message: string
+) => Promise<string>;
+export type TrySubstrateAddress = (
 	suriSuffix: string,
 	prefix: number
 ) => Promise<string>;
-type TryBrainWalletAddress = () => Promise<string>;
+export type TryBrainWalletAddress = () => Promise<string>;
 
 export type SeedRefHooks = {
-	isSeedRefValid: IsValidFunc;
+	isSeedRefValid: boolean;
 	createSeedRef: TryCreateFunc;
 	destroySeedRef: TryDestroyFunc;
 	brainWalletSign: TrySignFunc;
@@ -25,7 +30,7 @@ export type SeedRefHooks = {
 export function useSeedRef(): SeedRefHooks {
 	const [seedRef, setSeedRef] = useState<SeedRefClass>(SeedRef);
 
-	const isSeedRefValid: IsValidFunc = seedRef.isValid;
+	const isSeedRefValid: boolean = seedRef.isValid();
 
 	// Decrypt a seed and store the reference. Must be called before signing.
 	const createSeedRef: TryCreateFunc = function (encryptedSeed, password) {

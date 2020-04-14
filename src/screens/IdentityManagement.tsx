@@ -23,6 +23,7 @@ import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
+	getSeedPhrase,
 	navigateToLandingPage,
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
@@ -34,12 +35,14 @@ import {
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
+import {useSeedRef} from 'utils/seedRefHooks';
 
 function IdentityManagement({
 	accounts,
 	navigation
 }: NavigationAccountProps<'IdentityManagement'>): React.ReactElement {
 	const { currentIdentity } = accounts.state;
+	const { isSeedRefValid } = useSeedRef();
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
@@ -54,7 +57,7 @@ function IdentityManagement({
 		if (value === 'PathDelete') {
 			alertDeleteIdentity(
 				async (): Promise<void> => {
-					await unlockSeedPhrase(navigation);
+					await unlockSeedPhrase(navigation, isSeedRefValid);
 					try {
 						await accounts.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
@@ -64,7 +67,7 @@ function IdentityManagement({
 				}
 			);
 		} else if (value === 'IdentityBackup') {
-			const seedPhrase = await unlockSeedPhrase(navigation);
+			const seedPhrase = await getSeedPhrase(navigation);
 			navigation.pop();
 			navigation.navigate(value, { isNew: false, seedPhrase });
 		}

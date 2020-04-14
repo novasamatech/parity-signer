@@ -36,12 +36,12 @@ import {
 	identityUpdateError,
 	accountExistedError
 } from 'utils/errors';
-import { constructSURI, parseSURI } from 'utils/suri';
+import { TryBrainWalletAddress, TrySubstrateAddress } from 'utils/seedRefHooks';
+import { constructSuriSuffix, parseSURI } from 'utils/suri';
 import {
-	brainWalletAddress,
+	brainWalletAddressWithRef,
 	decryptData,
-	encryptData,
-	substrateAddress
+	encryptData
 } from 'utils/native';
 import {
 	deepCopyIdentities,
@@ -108,11 +108,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async deriveEthereumAccount(
-		seedPhrase: string,
+		createBrainWalletAddress: TryBrainWalletAddress,
 		networkKey: string
 	): Promise<void> {
 		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
-		const ethereumAddress = await brainWalletAddress(seedPhrase);
+		const ethereumAddress = await brainWalletAddressWithRef(
+			createBrainWalletAddress
+		);
 		if (ethereumAddress.address === '') throw new Error(addressGenerateError);
 		const { ethereumChainId } = networkParams;
 		const accountId = generateAccountId({
@@ -390,22 +392,21 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	private async addPathToIdentity(
 		newPath: string,
-		seedPhrase: string,
+		createSubstrateAddress: TrySubstrateAddress,
 		updatedIdentity: Identity,
 		name: string,
 		networkKey: string,
 		password: string
 	): Promise<void> {
 		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
-		const suri = constructSURI({
+		const suriSuffix = constructSuriSuffix({
 			derivePath: newPath,
-			password: password,
-			phrase: seedPhrase
+			password: password
 		});
 		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
 		try {
-			address = await substrateAddress(suri, prefix);
+			address = await createSubstrateAddress(suriSuffix, prefix);
 		} catch (e) {
 			throw new Error(addressGenerateError);
 		}
@@ -504,7 +505,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async deriveNewPath(
 		newPath: string,
-		seedPhrase: string,
+		createSubstrateAddress: TrySubstrateAddress,
 		networkKey: string,
 		name: string,
 		password: string
@@ -514,7 +515,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		);
 		await this.addPathToIdentity(
 			newPath,
-			seedPhrase,
+			createSubstrateAddress,
 			updatedCurrentIdentity,
 			name,
 			networkKey,

@@ -18,6 +18,8 @@ import { NativeModules } from 'react-native';
 
 import { checksummedAddress } from './checksum';
 
+import { TryBrainWalletAddress } from 'utils/seedRefHooks';
+
 const { EthkeyBridge } = NativeModules || {};
 
 interface AddressObject {
@@ -59,6 +61,19 @@ function toHex(x: string): string {
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
+	const { bip39, address } = untagAddress(taggedAddress);
+	const hash = await keccak(toHex(address));
+
+	return {
+		address: checksummedAddress(address, hash),
+		bip39
+	};
+}
+
+export async function brainWalletAddressWithRef(
+	createBrainWalletFn: TryBrainWalletAddress
+): Promise<AddressObject> {
+	const taggedAddress = await createBrainWalletFn();
 	const { bip39, address } = untagAddress(taggedAddress);
 	const hash = await keccak(toHex(address));
 

@@ -19,7 +19,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
-import { SeedRefHooks } from 'utils/seedRefHooks';
 
 type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
@@ -32,20 +31,31 @@ export const setPin = async <RouteName extends keyof RootStackParamList>(
 		navigation.navigate('PinNew', { resolve });
 	});
 
+export const getSeedPhrase = async <RouteName extends keyof RootStackParamList>(
+	navigation: GenericNavigationProps<RouteName>
+): Promise<string> =>
+	new Promise(resolve => {
+		navigation.navigate('PinUnlock', {
+			resolve,
+			shouldReturnSeed: true
+		});
+	});
+
 export const unlockSeedPhrase = async <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
-	seedRefHooks: SeedRefHooks,
+	isSeedRefValid: boolean,
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
-		if (seedRefHooks.isSeedRefValid()) {
-			// seedRefHooks.
+		if (isSeedRefValid) {
+			resolve();
 		} else {
 			navigation.navigate('PinUnlock', {
 				identity,
-				resolve
+				resolve,
+				shouldReturnSeed: false
 			});
 		}
 	});
@@ -54,14 +64,14 @@ export const unlockSeedPhraseWithPassword = async <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
-	seedRefHooks: SeedRefHooks,
+	isSeedRefValid: boolean,
 	path: string,
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
 		navigation.navigate('PinUnlockWithPassword', {
 			identity,
-			path,
+			isSeedRefValid,
 			resolve
 		});
 	});

@@ -25,13 +25,18 @@ import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
-import { unlockIdentitySeed } from 'utils/identitiesUtils';
+import {
+	unlockIdentitySeed,
+	unlockIdentitySeedWithReturn
+} from 'utils/identitiesUtils';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlock({
 	accounts,
 	route
 }: NavigationAccountProps<'PinUnlock'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
+	const { createSeedRef } = useSeedRef();
 	const targetIdentity =
 		route.params.identity ?? accounts.state.currentIdentity;
 
@@ -40,9 +45,19 @@ function PinUnlock({
 		if (pin.length >= 6 && targetIdentity) {
 			try {
 				const resolve = route.params.resolve;
-				const seedPhrase = await unlockIdentitySeed(pin, targetIdentity);
-				resetState();
-				resolve(seedPhrase);
+				if (route.params.shouldReturnSeed) {
+					const seedPhrase = await unlockIdentitySeedWithReturn(
+						pin,
+						targetIdentity,
+						createSeedRef
+					);
+					resetState();
+					resolve(seedPhrase);
+				} else {
+					await unlockIdentitySeed(pin, targetIdentity, createSeedRef);
+					resetState();
+					resolve();
+				}
 			} catch (e) {
 				updateState({ pin: '', pinMismatch: true });
 				//TODO record error times;

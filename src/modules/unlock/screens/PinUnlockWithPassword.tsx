@@ -26,7 +26,7 @@ import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import { unlockIdentitySeed } from 'utils/identitiesUtils';
-import { constructSURI } from 'utils/suri';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlockWithPassword({
 	accounts,
@@ -34,29 +34,29 @@ function PinUnlockWithPassword({
 }: NavigationAccountProps<'PinUnlockWithPassword'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
+	const { createSeedRef } = useSeedRef();
 	const targetIdentity =
 		route.params.identity ?? accounts.state.currentIdentity;
 
 	async function submit(): Promise<void> {
 		const { pin, password } = state;
-		const derivePath = route.params.path;
-		if (pin.length >= 6 && targetIdentity) {
-			try {
-				const resolve = route.params.resolve;
-				const seedPhrase = await unlockIdentitySeed(pin, targetIdentity);
-				const suri = constructSURI({
-					derivePath,
-					password,
-					phrase: seedPhrase
-				});
-				resetState();
-				resolve(suri);
-			} catch (e) {
-				updateState({ password: '', pin: '', pinMismatch: true });
-				//TODO record error times;
+		const resolve = route.params.resolve;
+		if (route.params.isSeedRefValid) {
+			if (pin.length >= 6 && targetIdentity) {
+				try {
+					await unlockIdentitySeed(pin, targetIdentity, createSeedRef);
+					resolve(password);
+					resetState();
+				} catch (e) {
+					updateState({ password: '', pin: '', pinMismatch: true });
+					//TODO record error times;
+				}
+			} else {
+				updateState({ pinTooShort: true });
 			}
 		} else {
-			updateState({ pinTooShort: true });
+			resolve(password);
+			resetState();
 		}
 	}
 
@@ -74,15 +74,17 @@ function PinUnlockWithPassword({
 				error={state.pinMismatch || state.pinTooShort}
 				subtitle={getSubtitle(state, true)}
 			/>
-			<PinInput
-				label={t.pinLabel}
-				autoFocus
-				testID={testIDs.IdentityPin.unlockPinInput}
-				returnKeyType="done"
-				onChangeText={onPinInputChange('pin', updateState)}
-				onSubmitEditing={(): void => setFocusPassword(true)}
-				value={state.pin}
-			/>
+			{!route.params.isSeedRefValid && (
+				<PinInput
+					label={t.pinLabel}
+					autoFocus
+					testID={testIDs.IdentityPin.unlockPinInput}
+					returnKeyType="done"
+					onChangeText={onPinInputChange('pin', updateState)}
+					onSubmitEditing={(): void => setFocusPassword(true)}
+					value={state.pin}
+				/>
+			)}
 			<PinInput
 				label={t.passwordLabel}
 				testID={testIDs.IdentityPin.passwordInput}
