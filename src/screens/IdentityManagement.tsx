@@ -35,7 +35,7 @@ import {
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
-import {useSeedRef} from 'utils/seedRefHooks';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function IdentityManagement({
 	accounts,

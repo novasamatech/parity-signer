@@ -11,6 +11,7 @@ export type TrySignFunc = (
 	suriSuffix: string,
 	message: string
 ) => Promise<string>;
+export type TryBrainWalletSignFunc = (message: string) => Promise<string>;
 export type TrySubstrateAddress = (
 	suriSuffix: string,
 	prefix: number
@@ -21,7 +22,7 @@ export type SeedRefHooks = {
 	isSeedRefValid: boolean;
 	createSeedRef: TryCreateFunc;
 	destroySeedRef: TryDestroyFunc;
-	brainWalletSign: TrySignFunc;
+	brainWalletSign: TryBrainWalletSignFunc;
 	substrateSign: TrySignFunc;
 	substrateAddress: TrySubstrateAddress;
 	brainWalletAddress: TryBrainWalletAddress;
@@ -49,7 +50,7 @@ export function useSeedRef(): SeedRefHooks {
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const brainWalletSign: TrySignFunc = seedRef.tryBrainWalletSign;
+	const brainWalletSign: TryBrainWalletSignFunc = seedRef.tryBrainWalletSign;
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.

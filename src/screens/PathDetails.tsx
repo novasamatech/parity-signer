@@ -73,7 +73,7 @@ export function PathDetailsView({
 		switch (value) {
 			case 'PathDelete':
 				alertDeleteAccount('this account', async () => {
-					await unlockSeedPhrase(navigation);
+					await unlockSeedPhrase(navigation, false);
 					try {
 						await accounts.deletePath(path);
 						if (isSubstratePath(path)) {

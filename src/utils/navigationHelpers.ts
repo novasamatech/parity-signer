@@ -20,7 +20,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
-type GenericNavigationProps<
+export type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
 > = StackNavigationProp<RootStackParamList, RouteName>;
 
@@ -65,7 +65,6 @@ export const unlockSeedPhraseWithPassword = async <
 >(
 	navigation: GenericNavigationProps<RouteName>,
 	isSeedRefValid: boolean,
-	path: string,
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
