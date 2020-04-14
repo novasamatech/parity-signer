@@ -199,16 +199,36 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void substrateSignWithRef(double seed_ref, String message, Promise promise) {
+	public void substrateSignWithRef(double seed_ref, String suriSuffix, String message, Promise promise) {
 		try {
-			String s = substrateBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), message);
+			String s = ethkeySubstrateBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), suriSuffix, message);
 			promise.resolve(s);
 		} catch (Exception e) {
 			promise.reject("invalid substrate phrase", "invalid substrate phrase");
 		}
 	}
 
-		private static native String ethkeyBrainwalletAddress(String seed);
+    @ReactMethod
+    public void brainWalletAddressWithRef(double seedRef, Promise promise) {
+        try {
+            String s = ethkeyBrainWalletAddressWithRef(Double.doubleToRawLongBits(seedRef));
+            promise.resolve(s);
+        } catch (Exception e) {
+            promise.reject("invalid substrate phrase", "invalid substrate phrase");
+        }
+    }
+
+	@ReactMethod
+    public void substrateAddressWithRef(double seedRef, String suriSuffix, int prefix, Promise promise) {
+        try {
+            String substrateAddress = ethkeySubstrateWalletAddressWithRef(Double.doubleToRawLongBits(seedRef), suriSuffix, prefix);
+            promise.resolve(substrateAddress);
+        } catch (Exception e) {
+            promise.reject("invalid suri suffix or prefix", "invalid suri suffix or prefix");
+        }
+    }
+
+    private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletBIP39Address(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
     private static native String ethkeyRlpItem(String data, int position);
@@ -224,8 +244,10 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native String substrateBrainwalletAddress(String seed, int prefix);
     private static native String substrateBrainwalletSign(String seed, String message);
     private static native boolean schnorrkelVerify(String seed, String message, String signature);
-		private static native long ethkeyDecryptDataRef(String data, String password);
-		private static native void ethkeyDestroyDataRef(long data_ref);
-		private static native String ethkeyBrainwalletSignWithRef(long seed_ref, String message);
-		private static native String substrateBrainwalletSignWithRef(long seed_ref, String message);
+    private static native long ethkeyDecryptDataRef(String data, String password);
+    private static native void ethkeyDestroyDataRef(long data_ref);
+    private static native String ethkeyBrainwalletSignWithRef(long seed_ref, String message);
+    private static native String ethkeySubstrateBrainwalletSignWithRef(long seed_ref, String suriSuffix, String message);
+    private static native String ethkeySubstrateWalletAddressWithRef(long seedRef, String suriSuffix, int prefix);
+    private static native String ethkeyBrainWalletAddressWithRef(long seedRef);
 }

@@ -178,10 +178,10 @@ class EthkeyBridge: NSObject {
     }
   }
 
-  @objc func substrateAddress(_ seed: String, version: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func substrateAddress(_ seed: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
     var seed_ptr = seed.asPtr()
-    let address_rust_str = substrate_brainwallet_address(&error, &seed_ptr, version)
+    let address_rust_str = substrate_brainwallet_address(&error, &seed_ptr, prefix)
     let address_rust_str_ptr = rust_string_ptr(address_rust_str)
     let address = String.fromStringPtr(ptr: address_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(address_rust_str_ptr)
@@ -247,14 +247,37 @@ class EthkeyBridge: NSObject {
     resolve(signature)
   }
   
-  @objc func substrateSignWithRef(_ seed_ref: Int64, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func substrateSignWithRef(_ seed_ref: Int64, suri_suffix: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     var error: UInt32 = 0
     var message_ptr = message.asPtr()
-    let signature_rust_str = substrate_brainwallet_sign_with_ref(&error, seed_ref, &message_ptr)
+    var suri_suffix_ptr = suri_suffix.asPtr()
+    let signature_rust_str = substrate_brainwallet_sign_with_ref(&error, seed_ref, &suri_suffix_ptr, &message_ptr)
     let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
     let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
     rust_string_ptr_destroy(signature_rust_str_ptr)
     rust_string_destroy(signature_rust_str)
     resolve(signature)
+  }
+  
+  @objc func brainWalletAddressWithRef(_ seed_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    let brain_wallet_address_str = brain_wallet_address_with_ref(&error, seed_ref)
+    let brain_wallett_address_ptr = rust_string_ptr(brain_wallet_address_str)
+    let brain_wallet_address = String.fromStringPtr(ptr: brain_wallett_address_ptr!.pointee)
+    rust_string_ptr_destroy(brain_wallett_address_ptr)
+    rust_string_destroy(brain_wallet_address_str)
+    resolve(brain_wallet_address)
+  }
+  
+  
+  @objc func substrateAddressWithRef(_ seed_ref: Int64, suri_suffix: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    var error: UInt32 = 0
+    var suri_suffix_ptr = suri_suffix.asPtr()
+    let substrate_address_str = substrate_address_with_ref(&error, seed_ref, &suri_suffix_ptr, prefix)
+    let substrate_address_ptr = rust_string_ptr(substrate_address_str)
+    let substrate_address = String.fromStringPtr(ptr: substrate_address_ptr!.pointee)
+    rust_string_ptr_destroy(substrate_address_ptr)
+    rust_string_destroy(substrate_address_str)
+    resolve(substrate_address)
   }
 }
