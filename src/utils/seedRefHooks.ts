@@ -50,16 +50,16 @@ export function useSeedRef(): SeedRefHooks {
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const brainWalletSign: TryBrainWalletSignFunc = seedRef.tryBrainWalletSign;
+	const brainWalletSign: TryBrainWalletSignFunc = seedRef.tryBrainWalletSign.bind(seedRef);
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const substrateSign: TrySignFunc = seedRef.trySubstrateSign;
+	const substrateSign: TrySignFunc = seedRef.trySubstrateSign.bind(seedRef);
 
-	const substrateAddress: TrySubstrateAddress = seedRef.trySubstrateAddress;
+	const substrateAddress: TrySubstrateAddress = seedRef.trySubstrateAddress.bind(seedRef);
 
 	const brainWalletAddress: TryBrainWalletAddress =
-		seedRef.tryBrainWalletAddress;
+		seedRef.tryBrainWalletAddress.bind(seedRef);
 
 	return {
 		brainWalletAddress,

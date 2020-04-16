@@ -32,6 +32,7 @@ import fontStyles from 'styles/fontStyles';
 import { withAccountStore } from 'utils/HOC';
 import { getIdentityName } from 'utils/identitiesUtils';
 import {
+	getSeedPhrase,
 	navigateToLegacyAccountList,
 	resetNavigationTo,
 	resetNavigationWithNetworkChooser,
@@ -76,7 +77,7 @@ function IdentitiesSwitch({
 		if (screenName === 'AccountNetworkChooser') {
 			resetNavigationTo(navigation, screenName, params);
 		} else if (screenName === 'IdentityBackup') {
-			const seedPhrase = await unlockSeedPhrase(navigation, isSeedRefValid);
+			const seedPhrase = await getSeedPhrase(navigation);
 			resetNavigationWithNetworkChooser(navigation, screenName, {
 				isNew: false,
 				seedPhrase

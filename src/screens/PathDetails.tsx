@@ -39,7 +39,7 @@ import {
 	isSubstratePath
 } from 'utils/identitiesUtils';
 import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
-import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
+import { navigateToPathsList } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
 
@@ -73,7 +73,6 @@ export function PathDetailsView({
 		switch (value) {
 			case 'PathDelete':
 				alertDeleteAccount('this account', async () => {
-					await unlockSeedPhrase(navigation, false);
 					try {
 						await accounts.deletePath(path);
 						if (isSubstratePath(path)) {

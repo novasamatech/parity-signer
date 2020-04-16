@@ -70,6 +70,7 @@ function PathDerivation({
 		}
 		await unlockSeedPhrase(navigation, isSeedRefValid);
 		try {
+			console.log('isSeedRefValid', isSeedRefValid);
 			await accounts.deriveNewPath(
 				completePath,
 				substrateAddress,

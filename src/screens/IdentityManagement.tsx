@@ -35,14 +35,12 @@ import {
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 function IdentityManagement({
 	accounts,
 	navigation
 }: NavigationAccountProps<'IdentityManagement'>): React.ReactElement {
 	const { currentIdentity } = accounts.state;
-	const { isSeedRefValid } = useSeedRef();
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
@@ -54,10 +52,10 @@ function IdentityManagement({
 	};
 
 	const onOptionSelect = async (value: string): Promise<void> => {
-		if (value === 'PathDelete') {
+		if (value === 'IdentityDelete') {
 			alertDeleteIdentity(
 				async (): Promise<void> => {
-					await unlockSeedPhrase(navigation, isSeedRefValid);
+					await unlockSeedPhrase(navigation, false);
 					try {
 						await accounts.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
@@ -88,7 +86,7 @@ function IdentityManagement({
 								testID: testIDs.IdentityManagement.deleteButton,
 								text: 'Delete',
 								textStyle: styles.deleteText,
-								value: 'PathDelete'
+								value: 'IdentityDelete'
 							}
 						]}
 					/>

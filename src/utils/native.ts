@@ -187,18 +187,15 @@ export class SeedRefClass {
 	}
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	tryCreate(encryptedSeed: string, password: string): Promise<SeedRefClass> {
+	async tryCreate(encryptedSeed: string, password: string): Promise<SeedRefClass> {
 		if (this.valid) {
 			// Seed reference was already created.
-			throw new Error('cannot create a seed reference when one already exists');
+			return this;
 		}
-		return EthkeyBridge.decryptDataRef(encryptedSeed, password).then(
-			(dataRef: number) => {
-				this.dataRef = dataRef;
-				this.valid = true;
-				return this;
-			}
-		);
+		const dataRef: number = await EthkeyBridge.decryptDataRef(encryptedSeed, password);
+		this.dataRef = dataRef;
+		this.valid = true;
+		return this;
 	}
 
 	trySubstrateAddress(suriSuffix: string, prefix: number): Promise<string> {
@@ -209,9 +206,7 @@ export class SeedRefClass {
 			this.dataRef,
 			suriSuffix,
 			prefix
-		).then((address: string) => {
-			return address;
-		});
+		)
 	}
 
 	tryBrainWalletAddress(): Promise<string> {

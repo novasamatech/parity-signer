@@ -108,12 +108,12 @@ function IdentityBackup({
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
-			<ButtonMainAction
+			{isNew && <ButtonMainAction
 				title={'Next'}
 				testID={testIDs.IdentityBackup.nextButton}
 				bottom={false}
 				onPress={(): void => alertBackupDone(onBackupDone)}
-			/>
+			/>}
 		</KeyboardScrollView>
 	);
 }
