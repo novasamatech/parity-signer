@@ -187,15 +187,18 @@ export class SeedRefClass {
 	}
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	async tryCreate(encryptedSeed: string, password: string): Promise<SeedRefClass> {
+	async tryCreate(encryptedSeed: string, password: string): Promise<number> {
 		if (this.valid) {
 			// Seed reference was already created.
-			return this;
+			return this.dataRef;
 		}
-		const dataRef: number = await EthkeyBridge.decryptDataRef(encryptedSeed, password);
+		const dataRef: number = await EthkeyBridge.decryptDataRef(
+			encryptedSeed,
+			password
+		);
 		this.dataRef = dataRef;
 		this.valid = true;
-		return this;
+		return this.dataRef;
 	}
 
 	trySubstrateAddress(suriSuffix: string, prefix: number): Promise<string> {
@@ -206,7 +209,7 @@ export class SeedRefClass {
 			this.dataRef,
 			suriSuffix,
 			prefix
-		)
+		);
 	}
 
 	tryBrainWalletAddress(): Promise<string> {
@@ -222,14 +225,13 @@ export class SeedRefClass {
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or
 	// memory will leak.
-	tryDestroy(): Promise<SeedRefClass> {
+	tryDestroy(): Promise<void> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot destroy an invalid seed reference');
 		}
 		return EthkeyBridge.destroyDataRef(this.dataRef).then(() => {
 			this.valid = false;
-			return this;
 		});
 	}
 
@@ -252,5 +254,3 @@ export class SeedRefClass {
 		return EthkeyBridge.substrateSignWithRef(this.dataRef, suriSuffix, message);
 	}
 }
-
-export const SeedRef = new SeedRefClass();

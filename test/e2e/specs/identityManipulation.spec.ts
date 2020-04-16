@@ -33,7 +33,7 @@ import {
 import { EthereumNetworkKeys } from 'constants/networkSpecs';
 
 const {
-	AccountNetworkChooser,
+	Main,
 	IdentitiesSwitch,
 	IdentityManagement,
 	IdentityNew,
@@ -48,7 +48,7 @@ const customPath = '//sunny_day/1';
 
 describe('Load test', () => {
 	it('create a new identity with default substrate account', async () => {
-		await testTap(AccountNetworkChooser.createButton);
+		await testTap(Main.createButton);
 		await testNotVisible(IdentityNew.seedInput);
 		await testTap(IdentityNew.createButton);
 		await testVisible(IdentityBackup.seedText);
@@ -67,10 +67,10 @@ describe('Load test', () => {
 
 	it('is able to create custom path', async () => {
 		await tapBack();
-		await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
+		await testTap(testIDs.Main.addNewNetworkButton);
 		await testScrollAndTap(
-			testIDs.AccountNetworkChooser.addCustomNetworkButton,
-			testIDs.AccountNetworkChooser.chooserScreen
+			testIDs.Main.addCustomNetworkButton,
+			testIDs.Main.chooserScreen
 		);
 		await testInput(PathDerivation.pathInput, customPath);
 		await testInput(PathDerivation.nameInput, 'custom network');
@@ -80,7 +80,7 @@ describe('Load test', () => {
 
 	it('delete a path', async () => {
 		await tapBack();
-		await testTap(AccountNetworkChooser.networkButton + 'kusama');
+		await testTap(Main.networkButton + 'kusama');
 		await testTap(PathsList.pathCard + `//kusama${defaultPath}`);
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
@@ -92,27 +92,27 @@ describe('Load test', () => {
 	it('is able to create ethereum account', async () => {
 		await tapBack();
 		const ethereumNetworkButtonIndex =
-			AccountNetworkChooser.networkButton + EthereumNetworkKeys.FRONTIER;
-		await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
+			Main.networkButton + EthereumNetworkKeys.FRONTIER;
+		await testTap(testIDs.Main.addNewNetworkButton);
 		await testScrollAndTap(
 			ethereumNetworkButtonIndex,
-			testIDs.AccountNetworkChooser.chooserScreen
+			testIDs.Main.chooserScreen
 		);
 		await testUnlockPin(pinCode);
 		await testVisible(PathDetail.screen);
 		await tapBack();
-		await testExist(AccountNetworkChooser.chooserScreen);
+		await testExist(Main.chooserScreen);
 	});
 
 	it('is able to delete it', async () => {
 		//'1' is frontier network chainId defined in networkSpecs.ts
-		await testTap(AccountNetworkChooser.networkButton + 1);
+		await testTap(Main.networkButton + 1);
 		await testVisible(PathDetail.screen);
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testUnlockPin(pinCode);
-		await testNotExist(AccountNetworkChooser.networkButton + 1);
+		await testNotExist(Main.networkButton + 1);
 	});
 
 	it('delete identity', async () => {
@@ -122,6 +122,6 @@ describe('Load test', () => {
 		await testTap(IdentityManagement.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testUnlockPin(pinCode);
-		await testVisible(AccountNetworkChooser.noAccountScreen);
+		await testVisible(Main.noAccountScreen);
 	});
 });

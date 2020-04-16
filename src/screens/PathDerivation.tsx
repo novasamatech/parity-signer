@@ -46,11 +46,14 @@ function PathDerivation({
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
-	const { isSeedRefValid, substrateAddress } = useSeedRef();
+	const currentIdentity = accounts.state.currentIdentity!;
+	const { isSeedRefValid, substrateAddress } = useSeedRef(
+		currentIdentity.encryptedSeed
+	);
 	const parentPath = route.params.parentPath;
 	const parentNetworkKey = useMemo(
-		() => getNetworkKey(parentPath, accounts.state.currentIdentity!),
-		[parentPath, accounts.state.currentIdentity]
+		() => getNetworkKey(parentPath, currentIdentity),
+		[parentPath, currentIdentity]
 	);
 
 	const [customNetworkKey, setCustomNetworkKey] = useState(

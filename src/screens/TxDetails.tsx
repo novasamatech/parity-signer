@@ -51,7 +51,9 @@ function TxDetails({
 	const sender = scannerStore.getSender()!;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
-	const { isSeedRefValid, substrateSign, brainWalletSign } = useSeedRef();
+	const { isSeedRefValid, substrateSign, brainWalletSign } = useSeedRef(
+		sender.encryptedSeed
+	);
 
 	async function onSignTx(): Promise<void> {
 		try {

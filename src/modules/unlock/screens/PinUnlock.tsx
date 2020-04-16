@@ -36,9 +36,10 @@ function PinUnlock({
 	route
 }: NavigationAccountProps<'PinUnlock'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
-	const { createSeedRef } = useSeedRef();
 	const targetIdentity =
-		route.params.identity ?? accounts.state.currentIdentity;
+		route.params.identity ?? accounts.state.currentIdentity!;
+
+	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
 		const { pin } = state;

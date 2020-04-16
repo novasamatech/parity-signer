@@ -18,16 +18,6 @@ const testIDs = {
 	AccountListScreen: {
 		accountList: 'accountList'
 	},
-	AccountNetworkChooser: {
-		addCustomNetworkButton: 'anc_add_custom_button',
-		addNewNetworkButton: 'anc_add_new_button',
-		chooserScreen: 'anc_chooser_screen',
-		createButton: 'anc_create_button',
-		networkButton: 'anc_network_button',
-		noAccountScreen: 'anc_no_account_screen',
-		recoverButton: 'anc_recover_button',
-		showExistedButton: 'anc_show_existed'
-	},
 	Header: {
 		headerBackButton: 'header_back_button'
 	},
@@ -61,6 +51,16 @@ const testIDs = {
 		submitButton: 'identity_submit_button',
 		unlockPinButton: 'identity_unlock_pin_button',
 		unlockPinInput: 'identity_unlock_pin_input'
+	},
+	Main: {
+		addCustomNetworkButton: 'anc_add_custom_button',
+		addNewNetworkButton: 'anc_add_new_button',
+		chooserScreen: 'anc_chooser_screen',
+		createButton: 'anc_create_button',
+		networkButton: 'anc_network_button',
+		noAccountScreen: 'anc_no_account_screen',
+		recoverButton: 'anc_recover_button',
+		showExistedButton: 'anc_show_existed'
 	},
 	MessageDetails: {
 		scrollScreen: 'message_details_scroll',

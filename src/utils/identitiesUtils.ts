@@ -32,7 +32,6 @@ import {
 	FoundAccount,
 	FoundLegacyAccount,
 	Identity,
-	LockedAccount,
 	PathGroup,
 	SerializedIdentity,
 	UnlockedAccount
@@ -218,15 +217,13 @@ export const parseFoundLegacyAccount = (
 		accountId,
 		address: legacyAccount.address,
 		createdAt: legacyAccount.createdAt,
+		encryptedSeed: legacyAccount.encryptedSeed,
 		isLegacy: true,
 		name: legacyAccount.name,
 		networkKey: legacyAccount.networkKey,
 		updatedAt: legacyAccount.updatedAt,
 		validBip39Seed: legacyAccount.validBip39Seed
 	};
-	if (legacyAccount.hasOwnProperty('encryptedSeed')) {
-		returnAccount.encryptedSeed = (legacyAccount as LockedAccount).encryptedSeed;
-	}
 	if (legacyAccount.hasOwnProperty('derivationPath')) {
 		returnAccount.path = (legacyAccount as UnlockedAccount).derivationPath;
 	}

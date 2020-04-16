@@ -86,7 +86,7 @@ export const navigateToPathDetails = <
 		index: 2,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew: false }
 			},
 			{
@@ -109,7 +109,7 @@ export const navigateToLandingPage = <
 ): void => {
 	const resetAction = CommonActions.reset({
 		index: 0,
-		routes: [{ name: 'AccountNetworkChooser' }]
+		routes: [{ name: 'Main' }]
 	});
 	navigation.dispatch(resetAction);
 };
@@ -123,7 +123,7 @@ export const navigateToNewIdentityNetwork = <
 		index: 0,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew: true }
 			}
 		]
@@ -155,7 +155,7 @@ export const resetNavigationWithNetworkChooser = <
 		index: 1,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew }
 			},
 			{

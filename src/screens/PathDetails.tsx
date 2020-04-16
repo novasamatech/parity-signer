@@ -83,9 +83,9 @@ export function PathDetailsView({
 							const hasOtherPaths = listedPaths.length > 0;
 							hasOtherPaths
 								? navigateToPathsList(navigation, networkKey)
-								: navigation.navigate('AccountNetworkChooser');
+								: navigation.navigate('Main');
 						} else {
-							navigation.navigate('AccountNetworkChooser');
+							navigation.navigate('Main');
 						}
 					} catch (err) {
 						alertPathDeletionError(err);

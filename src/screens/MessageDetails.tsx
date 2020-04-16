@@ -51,7 +51,9 @@ function MessageDetails({
 	const dataToSign = scannerStore.getDataToSign()!;
 	const message = scannerStore.getMessage()!;
 	const sender = scannerStore.getSender()!;
-	const { isSeedRefValid, substrateSign, brainWalletSign } = useSeedRef();
+	const { isSeedRefValid, substrateSign, brainWalletSign } = useSeedRef(
+		sender.encryptedSeed
+	);
 	const networkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(networkParams);
 

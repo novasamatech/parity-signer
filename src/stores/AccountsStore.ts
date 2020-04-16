@@ -36,7 +36,11 @@ import {
 	identityUpdateError,
 	accountExistedError
 } from 'utils/errors';
-import { TryBrainWalletAddress, TrySubstrateAddress } from 'utils/seedRefHooks';
+import {
+	GenerateSeedRef,
+	TryBrainWalletAddress,
+	TrySubstrateAddress
+} from 'utils/seedRefHooks';
 import { constructSuriSuffix, parseSURI } from 'utils/suri';
 import {
 	brainWalletAddressWithRef,
@@ -423,11 +427,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedIdentity.addresses.set(address, newPath);
 	}
 
-	async saveNewIdentity(seedPhrase: string, pin: string): Promise<void> {
+	async saveNewIdentity(
+		seedPhrase: string,
+		pin: string,
+		generateSeedRef: GenerateSeedRef
+	): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		const suri = seedPhrase;
 
 		updatedIdentity.encryptedSeed = await encryptData(suri, pin);
+		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		await this.setState({
 			currentIdentity: updatedIdentity,

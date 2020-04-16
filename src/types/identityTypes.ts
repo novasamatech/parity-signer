@@ -19,7 +19,7 @@ export type UnlockedAccount = {
 	createdAt: number;
 	derivationPassword: string;
 	derivationPath: string; // doesn't contain the ///password
-	encryptedSeed: string | undefined;
+	encryptedSeed: string;
 	isLegacy?: boolean;
 	name: string;
 	networkKey: string;
@@ -68,7 +68,7 @@ export interface FoundLegacyAccount {
 	createdAt: number;
 	name: string;
 	updatedAt: number;
-	encryptedSeed?: string;
+	encryptedSeed: string;
 	validBip39Seed: boolean;
 	isLegacy: true;
 	networkKey: string;
