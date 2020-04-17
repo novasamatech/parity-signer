@@ -34,7 +34,8 @@ import {
 	addressGenerateError,
 	emptyIdentityError,
 	identityUpdateError,
-	accountExistedError
+	accountExistedError,
+	duplicatedIdentityError
 } from 'utils/errors';
 import {
 	CreateSeedRefWithNewSeed,
@@ -165,6 +166,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const identities = await loadIdentities();
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
+		console.log('identitis are', identities);
 		await this.setState({
 			accounts,
 			currentIdentity,
@@ -436,6 +438,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const suri = seedPhrase;
 
 		updatedIdentity.encryptedSeed = await encryptData(suri, pin);
+		//prevent duplication
+		if (
+			this.state.identities.find(
+				i => i.encryptedSeed === updatedIdentity.encryptedSeed
+			)
+		)
+			throw new Error(duplicatedIdentityError);
 		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		await this.setState({

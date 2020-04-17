@@ -40,7 +40,7 @@ function PinUnlockWithPassword({
 	async function submit(): Promise<void> {
 		const { pin, password } = state;
 		const resolve = route.params.resolve;
-		if (route.params.isSeedRefValid) {
+		if (!route.params.isSeedRefValid) {
 			if (pin.length >= 6 && targetIdentity) {
 				try {
 					await createSeedRef(pin);

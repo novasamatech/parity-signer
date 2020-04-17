@@ -34,10 +34,12 @@ export type CreateSeedRefWithNewSeed = (
 export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 	const [seedRefs, setSeedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
 	return async (encryptedSeed, password): Promise<void> => {
-		const seedRef = new SeedRefClass();
-		await seedRef.tryCreate(encryptedSeed, password);
-		const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
-		setSeedRefs(newSeedRefs);
+		if (!seedRefs.has(encryptedSeed)) {
+			const seedRef = new SeedRefClass();
+			await seedRef.tryCreate(encryptedSeed, password);
+			const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
+			setSeedRefs(newSeedRefs);
+		}
 	};
 }
 

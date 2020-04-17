@@ -93,7 +93,7 @@ function IdentityNew({
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
-			alertIdentityCreationError();
+			alertIdentityCreationError(e.message);
 		}
 	};
 

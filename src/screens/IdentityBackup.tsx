@@ -28,7 +28,11 @@ import ButtonMainAction from 'components/ButtonMainAction';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
-import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
+import {
+	alertBackupDone,
+	alertCopyBackupPhrase,
+	alertIdentityCreationError
+} from 'utils/alertUtils';
 import Button from 'components/Button';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
@@ -43,9 +47,13 @@ function IdentityBackup({
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
-		await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
-		setSeedPhrase('');
-		navigateToNewIdentityNetwork(navigation);
+		try {
+			await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
+			setSeedPhrase('');
+			navigateToNewIdentityNetwork(navigation);
+		} catch (e) {
+			alertIdentityCreationError(e.message);
+		}
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
