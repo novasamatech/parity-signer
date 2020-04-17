@@ -59,6 +59,10 @@ export const EthereumNetworkKeys: {
 export const SubstrateNetworkKeys: {
 	[key: string]: string;
 } = Object.freeze({
+	CENTRIFUGE:
+		'0x67dddf2673b69e5f875f6f25277495834398eafd67f492e09f3f3345e003d1b5', // https://portal.chain.centrifuge.io/#/explorer/query/0
+	CENTRIFUGE_AMBER:
+		'0x092af6e7d25178ebab1677d15f66e37b30392b44ef442f728a53dd1bf48ec110', // https://portal.chain.centrifuge.io/#/explorer/query/0
 	EDGEWARE:
 		'0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
 	KULUPU: '0x37e1f8125397a98630013a4dff89b54cb758ff8eed894419e65a6dcf27a6fb8a',
@@ -88,6 +92,28 @@ const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 const substrateNetworkBase: {
 	[key: string]: Partial<SubstrateNetworkParams>;
 } = {
+	[SubstrateNetworkKeys.CENTRIFUGE]: {
+		color: '#fcc367',
+		decimals: 18,
+		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
+		logo: require('res/img/logos/centrifuge-chain.png'),
+		order: 6,
+		pathId: 'centrifuge',
+		prefix: 36,
+		title: 'Centrifuge Mainnet',
+		unit: 'RAD'
+	},
+	[SubstrateNetworkKeys.CENTRIFUGE_AMBER]: {
+		color: '#fcc367',
+		decimals: 18,
+		genesisHash: SubstrateNetworkKeys.CENTRIFUGE_AMBER,
+		logo: require('res/img/logos/centrifuge-chain.png'),
+		order: 7,
+		pathId: 'centrifuge_amber',
+		prefix: 42,
+		title: 'Centrifuge Testnet Amber',
+		unit: 'ARAD'
+	},
 	[SubstrateNetworkKeys.EDGEWARE]: {
 		color: '#0a95df',
 		decimals: 18,

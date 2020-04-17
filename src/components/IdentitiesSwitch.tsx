@@ -233,7 +233,7 @@ function IdentitiesSwitch({
 				{identities.length > 5 && (
 					<Separator
 						shadow={true}
-						style={{ backgroundColor: 'transparent', marginTop: 0 }}
+						style={styles.identitiesListSeparator}
 						shadowStyle={{ opacity: 0.9 }}
 					/>
 				)}
@@ -332,6 +332,11 @@ const styles = StyleSheet.create({
 		paddingBottom: 6,
 		paddingLeft: 64,
 		paddingTop: 0
+	},
+	identitiesListSeparator: {
+		backgroundColor: 'transparent',
+		marginTop: 10,
+		zIndex: -1
 	},
 	indentedButton: {
 		paddingLeft: 32
