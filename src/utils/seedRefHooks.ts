@@ -5,7 +5,7 @@ import { SeedRef } from 'utils/native';
 type IsValidFunc = () => boolean;
 type TryCreateFunc = (encryptedSeed: string, password: string) => Promise<void>;
 type TryDestroyFunc = () => Promise<void>;
-type TrySignFunc = (message: string) => Promise<string>;
+type TrySignFunc = (suriSuffix: string, message: string) => Promise<string>;
 
 type SeedRefHooks = {
 	isValid: IsValidFunc;
@@ -48,8 +48,11 @@ export function useSeedRef(): SeedRefHooks {
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const substrateSign: TrySignFunc = function (message: string) {
-		return seedRef.trySubstrateSign(message);
+	const substrateSign: TrySignFunc = function (
+		suriSuffix: string,
+		message: string
+	) {
+		return seedRef.trySubstrateSign(suriSuffix, message);
 	};
 
 	return { brainWalletSign, create, destroy, isValid, substrateSign };

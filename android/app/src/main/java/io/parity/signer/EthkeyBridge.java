@@ -221,7 +221,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
 	@ReactMethod
     public void substrateAddressWithRef(double seedRef, String suriSuffix, int prefix, Promise promise) {
         try {
-            String substrateAddress = ethkeySubstrateWalletAddressWithRef(Double.doubleToRawLongBits(seedRef), suriSuffix, prefix));
+            String substrateAddress = ethkeySubstrateWalletAddressWithRef(Double.doubleToRawLongBits(seedRef), suriSuffix, prefix);
             promise.resolve(substrateAddress);
         } catch (Exception e) {
             promise.reject("invalid suri suffix or prefix", "invalid suri suffix or prefix");
@@ -247,7 +247,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native long ethkeyDecryptDataRef(String data, String password);
     private static native void ethkeyDestroyDataRef(long data_ref);
     private static native String ethkeyBrainwalletSignWithRef(long seed_ref, String message);
-    private static native String ethkeySubstrateBrainwalletSignWithRef(long seed_ref, String suriSuffix, String message)
+    private static native String ethkeySubstrateBrainwalletSignWithRef(long seed_ref, String suriSuffix, String message);
     private static native String ethkeySubstrateWalletAddressWithRef(long seedRef, String suriSuffix, int prefix);
     private static native String ethkeyBrainWalletAddressWithRef(long seedRef);
 }
