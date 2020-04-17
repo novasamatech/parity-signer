@@ -249,15 +249,6 @@ export const getAddressWithPath = (
 		: address;
 };
 
-export const unlockIdentitySeed = async (
-	pin: string,
-	identity: Identity,
-	createSeedRef: TryCreateFunc
-): Promise<void> => {
-	const { encryptedSeed } = identity;
-	await createSeedRef(encryptedSeed, pin);
-};
-
 export const unlockIdentitySeedWithReturn = async (
 	pin: string,
 	identity: Identity,
@@ -265,7 +256,7 @@ export const unlockIdentitySeedWithReturn = async (
 ): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
-	await createSeedRef(encryptedSeed, pin);
+	await createSeedRef(pin);
 	const { phrase } = parseSURI(seed);
 	return phrase;
 };

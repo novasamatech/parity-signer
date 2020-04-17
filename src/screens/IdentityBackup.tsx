@@ -30,7 +30,7 @@ import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 import Button from 'components/Button';
-import { useGenerateSeedRef } from 'utils/seedRefHooks';
+import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({
 	navigation,
@@ -39,11 +39,11 @@ function IdentityBackup({
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
-	const createSeedRef = useGenerateSeedRef();
+	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
-		await accounts.saveNewIdentity(seedPhrase, pin, createSeedRef);
+		await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
 		setSeedPhrase('');
 		navigateToNewIdentityNetwork(navigation);
 	};

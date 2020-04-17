@@ -35,12 +35,14 @@ import {
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function IdentityManagement({
 	accounts,
 	navigation
 }: NavigationAccountProps<'IdentityManagement'>): React.ReactElement {
 	const { currentIdentity } = accounts.state;
+	const { destroySeedRef } = useSeedRef(currentIdentity!.encryptedSeed);
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
@@ -57,6 +59,7 @@ function IdentityManagement({
 				async (): Promise<void> => {
 					await unlockSeedPhrase(navigation, false);
 					try {
+						await destroySeedRef();
 						await accounts.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
 					} catch (err) {

@@ -3,10 +3,7 @@ import { useContext, useMemo } from 'react';
 import { SeedRefsContext } from 'stores/SeedRefStore';
 import { SeedRefClass } from 'utils/native';
 
-export type TryCreateFunc = (
-	encryptedSeed: string,
-	password: string
-) => Promise<void>;
+export type TryCreateFunc = (password: string) => Promise<void>;
 export type TryDestroyFunc = () => Promise<void>;
 export type TrySignFunc = (
 	suriSuffix: string,
@@ -29,12 +26,12 @@ export type SeedRefHooks = {
 	brainWalletAddress: TryBrainWalletAddress;
 };
 
-export type GenerateSeedRef = (
+export type CreateSeedRefWithNewSeed = (
 	encryptedSeed: string,
 	password: string
 ) => Promise<void>;
 
-export function useGenerateSeedRef(): GenerateSeedRef {
+export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 	const [seedRefs, setSeedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
 	return async (encryptedSeed, password): Promise<void> => {
 		const seedRef = new SeedRefClass();

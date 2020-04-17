@@ -25,7 +25,6 @@ import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
-import { unlockIdentitySeed } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlockWithPassword({
@@ -44,7 +43,7 @@ function PinUnlockWithPassword({
 		if (route.params.isSeedRefValid) {
 			if (pin.length >= 6 && targetIdentity) {
 				try {
-					await unlockIdentitySeed(pin, targetIdentity, createSeedRef);
+					await createSeedRef(pin);
 					resolve(password);
 					resetState();
 				} catch (e) {

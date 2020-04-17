@@ -25,10 +25,7 @@ import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
-import {
-	unlockIdentitySeed,
-	unlockIdentitySeedWithReturn
-} from 'utils/identitiesUtils';
+import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlock({
@@ -55,7 +52,7 @@ function PinUnlock({
 					resetState();
 					resolve(seedPhrase);
 				} else {
-					await unlockIdentitySeed(pin, targetIdentity, createSeedRef);
+					await createSeedRef(pin);
 					resetState();
 					resolve();
 				}

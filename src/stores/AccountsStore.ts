@@ -37,7 +37,7 @@ import {
 	accountExistedError
 } from 'utils/errors';
 import {
-	GenerateSeedRef,
+	CreateSeedRefWithNewSeed,
 	TryBrainWalletAddress,
 	TrySubstrateAddress
 } from 'utils/seedRefHooks';
@@ -430,7 +430,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	async saveNewIdentity(
 		seedPhrase: string,
 		pin: string,
-		generateSeedRef: GenerateSeedRef
+		generateSeedRef: CreateSeedRefWithNewSeed
 	): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		const suri = seedPhrase;
