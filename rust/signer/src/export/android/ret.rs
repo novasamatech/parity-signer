@@ -1,7 +1,7 @@
 use crate::export::Return;
+use jni::objects::JThrowable;
 use jni::sys::{jboolean, jlong, jstring, JNI_FALSE};
 use jni::JNIEnv;
-use jni::objects::JThrowable;
 
 impl<'a> Return<'a> for () {
 	type Ext = jboolean;
@@ -60,7 +60,7 @@ impl<'a, Inner: Return<'a, Env = &'a JNIEnv<'a>> + Default> Return<'a> for Optio
 					.into();
 				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				// !!!!														   !!!!
-				// !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THIS POINT !!!!
+				// !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THROWING   !!!!
 				// !!!!														   !!!!
 				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				env.throw(exception)
@@ -101,19 +101,7 @@ where
 				// !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THROWING   !!!!
 				// !!!!														   !!!!
 				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                
-//                let msg = jni::objects::JValue::Object(*env.new_string("testing 123").unwrap());
-//				let class = env
-//					.find_class("java/lang/Exception")
-//					.expect("Must have the Exception class; qed");
-//				let exception: JThrowable<'a> = env
-//					.new_object(class, "(Ljava/lang/String;)V", &[msg])
-//					.expect("Must be able to instantiate the Exception; qed")
-//					.into();
-//                env.set_field(exception, "detailMessage", "Ljava/lang/String", msg).unwrap();
-
 				env.throw(format!("testing 123 {:?}", e))
-//				env.throw(exception)
 					.expect("Must be able to throw the Exception; qed");
 				ret
 			}

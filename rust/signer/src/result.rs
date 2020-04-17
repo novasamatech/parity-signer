@@ -14,6 +14,6 @@ pub enum Error {
 	Signature(schnorrkel::SignatureError),
 	#[error("Error creating icon: {0:?}")]
 	Blockies(blockies::Error),
-    #[error("Error rendering QR code: {0:?}")]
-    Pixelate(pixelate::Error),
+	#[error("Error rendering QR code: {0:?}")]
+	Pixelate(pixelate::Error),
 }

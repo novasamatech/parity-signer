@@ -71,10 +71,12 @@ impl KeyPair {
 		self.0.sign(context.bytes(message)).to_bytes()
 	}
 
-	pub fn verify_signature(&self, message: &[u8], signature: &[u8]) -> crate::Result<bool> {
+	pub fn verify_signature(&self, message: &[u8], signature: &[u8]) -> Option<bool> {
 		let context = schnorrkel::signing_context(SIGNING_CTX);
-		let signature = Signature::from_bytes(signature).map_err(|e| crate::Error::Signature(e))?;
-		Ok(self.0.verify(context.bytes(&message), &signature).is_ok())
+
+		let signature = Signature::from_bytes(signature).ok()?;
+
+		Some(self.0.verify(context.bytes(&message), &signature).is_ok())
 	}
 }
 

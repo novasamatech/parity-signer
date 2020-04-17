@@ -18,21 +18,20 @@ use bip39::{Language, Mnemonic, MnemonicType};
 use blake2_rfc::blake2b::blake2b;
 use blockies::Ethereum;
 use ethsign::{keyfile::Crypto, Protected};
+use pixelate::{Color, Image, BLACK};
+use qrcodegen::{QrCode, QrCodeEcc};
 use rlp::decode_list;
 use rustc_hex::{FromHex, ToHex};
 use tiny_keccak::keccak256 as keccak;
 use tiny_keccak::Keccak;
-use pixelate::{Color, Image, BLACK};
-use qrcodegen::{QrCode, QrCodeEcc};
-
 
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
 
 mod eth;
+mod export;
 mod result;
 mod sr25519;
-mod export;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
 
@@ -59,8 +58,9 @@ fn qrcode_bytes(data: &[u8]) -> crate::Result<String> {
 		pixels: &pixels,
 		width: qr.size() as usize,
 		scale: 16,
-	}.render(&mut result)
-    .map_err(|e| crate::Error::Pixelate(e))?;
+	}
+	.render(&mut result)
+	.map_err(|e| crate::Error::Pixelate(e))?;
 	Ok(base64png(&result))
 }
 
@@ -84,7 +84,7 @@ export! {
 		seed: &str
 	) -> crate::Result<String> {
 		let keypair = KeyPair::from_bip39_phrase(seed)
-            .ok_or(crate::Error::KeyPairIsNone)?;
+			.ok_or(crate::Error::KeyPairIsNone)?;
 		Ok(keypair.address().to_hex())
 	}
 
@@ -110,7 +110,7 @@ export! {
 			.map_err(|e| crate::Error::FromHex(e))?;
 		let rlp = decode_list::<Vec<u8>>(&hex);
 		rlp.get(position as usize).map(|data| data.to_hex())
-			.ok_or(anyhow::anyhow!("index out of bounds")) 
+			.ok_or(anyhow::anyhow!("index out of bounds"))
 	}
 
 	@Java_io_parity_signer_EthkeyBridge_ethkeyKeccak
@@ -204,9 +204,9 @@ export! {
 	fn qrcode_hex(
 		data: &str
 	) -> crate::Result<String> {
-        let bytes = &data.from_hex::<Vec<u8>>()
-            .map_err(|e| crate::Error::FromHex(e))?;
-        qrcode_bytes(&bytes)
+		let bytes = &data.from_hex::<Vec<u8>>()
+			.map_err(|e| crate::Error::FromHex(e))?;
+		qrcode_bytes(&bytes)
 	}
 
 	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletAddress
