@@ -24,7 +24,7 @@ import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
+import { withAccountStore, withTargetIdentity } from 'utils/HOC';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlockWithPassword({
@@ -103,4 +103,4 @@ function PinUnlockWithPassword({
 	);
 }
 
-export default withAccountStore(PinUnlockWithPassword);
+export default withAccountStore(withTargetIdentity(PinUnlockWithPassword));

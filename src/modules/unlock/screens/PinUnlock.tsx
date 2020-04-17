@@ -24,7 +24,7 @@ import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
+import { withAccountStore, withTargetIdentity } from 'utils/HOC';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
@@ -35,7 +35,6 @@ function PinUnlock({
 	const [state, updateState, resetState] = usePinState();
 	const targetIdentity =
 		route.params.identity ?? accounts.state.currentIdentity!;
-
 	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
@@ -90,4 +89,4 @@ function PinUnlock({
 	);
 }
 
-export default withAccountStore(PinUnlock);
+export default withAccountStore(withTargetIdentity(PinUnlock));

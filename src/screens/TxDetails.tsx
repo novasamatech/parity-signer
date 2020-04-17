@@ -78,6 +78,8 @@ function TxDetails({
 						isSeedRefValid,
 						senderIdentity
 					);
+				} else {
+					await unlockSeedPhrase(navigation, isSeedRefValid);
 				}
 				const suriSuffix = constructSuriSuffix({
 					derivePath: sender.path,

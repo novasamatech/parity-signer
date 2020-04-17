@@ -91,7 +91,6 @@ export const testSetUpDefaultPath = async (): Promise<void> => {
 		substrateNetworkButtonIndex,
 		testIDs.Main.chooserScreen
 	);
-	await testUnlockPin(pinCode);
 	await testVisible(PathDetail.screen);
 	await tapBack();
 	await testExist(PathsList.screen);

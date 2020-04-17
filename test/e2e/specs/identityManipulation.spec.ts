@@ -45,6 +45,7 @@ const {
 
 const defaultPath = '//default';
 const customPath = '//sunny_day/1';
+const secondPath = '/2';
 
 describe('Load test', () => {
 	it('create a new identity with default substrate account', async () => {
@@ -61,8 +62,17 @@ describe('Load test', () => {
 		await testTap(PathsList.deriveButton);
 		await testInput(PathDerivation.pathInput, defaultPath);
 		await testInput(PathDerivation.nameInput, 'first one');
-		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}`);
+	});
+
+	it('need pin after application go to the background', async () => {
+		await device.sendToHome();
+		await device.launchApp({ newInstance: false });
+		await testTap(PathsList.deriveButton);
+		await testInput(PathDerivation.pathInput, secondPath);
+		await testInput(PathDerivation.nameInput, 'second one');
+		await testUnlockPin(pinCode);
+		await testExist(PathsList.pathCard + `//kusama${secondPath}`);
 	});
 
 	it('is able to create custom path', async () => {
@@ -74,7 +84,6 @@ describe('Load test', () => {
 		);
 		await testInput(PathDerivation.pathInput, customPath);
 		await testInput(PathDerivation.nameInput, 'custom network');
-		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + customPath);
 	});
 
@@ -85,7 +94,6 @@ describe('Load test', () => {
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
-		await testUnlockPin(pinCode);
 		await testNotExist(PathsList.pathCard + `//kusama${defaultPath}`);
 	});
 
@@ -98,7 +106,6 @@ describe('Load test', () => {
 			ethereumNetworkButtonIndex,
 			testIDs.Main.chooserScreen
 		);
-		await testUnlockPin(pinCode);
 		await testVisible(PathDetail.screen);
 		await tapBack();
 		await testExist(Main.chooserScreen);
@@ -111,7 +118,6 @@ describe('Load test', () => {
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
-		await testUnlockPin(pinCode);
 		await testNotExist(Main.networkButton + 1);
 	});
 

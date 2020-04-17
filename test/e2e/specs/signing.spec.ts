@@ -78,6 +78,13 @@ describe('Signing test', () => {
 			await testSignedTx();
 		});
 
+		it('does not need sign again after pin input', async () => {
+			await tapBack();
+			await testTap(SecurityHeader.scanButton);
+			await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
+			await testVisible(SignedTx.qrView);
+		});
+
 		it('should sign transfer request', async () => {
 			await launchWithScanRequest(ScanTestRequest.TransferExtrinsic);
 			await testSignedTx();
@@ -99,7 +106,6 @@ describe('Signing test', () => {
 				kovanNetworkButtonIndex,
 				testIDs.Main.chooserScreen
 			);
-			await testUnlockPin(pinCode);
 			await testVisible(PathDetail.screen);
 			await tapBack();
 			await testExist(Main.chooserScreen);
