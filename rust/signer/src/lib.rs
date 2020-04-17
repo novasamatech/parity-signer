@@ -28,41 +28,20 @@ use qrcodegen::{QrCode, QrCodeEcc};
 
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
-use util::StringPtr;
 
 mod eth;
 mod result;
 mod sr25519;
-mod util;
+mod export;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
 
 fn base64png(png: &[u8]) -> String {
 	static HEADER: &str = "data:image/png;base64,";
-
 	let mut out = String::with_capacity(png.len() + png.len() / 2 + HEADER.len());
-
 	out.push_str(HEADER);
-
 	base64::encode_config_buf(png, base64::STANDARD, &mut out);
-
 	out
-}
-
-// string ffi
-#[no_mangle]
-pub unsafe extern "C" fn rust_string_ptr(s: *mut String) -> *mut StringPtr {
-	Box::into_raw(Box::new(StringPtr::from(&**s)))
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn rust_string_destroy(s: *mut String) {
-	let _ = Box::from_raw(s);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn rust_string_ptr_destroy(s: *mut StringPtr) {
-	let _ = Box::from_raw(s);
 }
 
 fn qrcode_bytes(data: &[u8]) -> crate::Result<String> {
@@ -85,7 +64,7 @@ fn qrcode_bytes(data: &[u8]) -> crate::Result<String> {
 	Ok(base64png(&result))
 }
 
-secure_native::export! {
+export! {
 	@Java_io_parity_signer_EthkeyBridge_ethkeyBrainwalletAddress
 	fn ethkey_brainwallet_address(
 		seed: &str
@@ -346,7 +325,7 @@ secure_native::export! {
 	}
 }
 
-secure_native::define_string_destructor!(signer_destroy_string);
+ffi_support::define_string_destructor!(signer_destroy_string);
 
 #[cfg(test)]
 mod tests {

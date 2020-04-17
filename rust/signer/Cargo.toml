@@ -28,7 +28,7 @@ pixelate = "0.1"
 qrcodegen = "1.4"
 thiserror = "1.0"
 anyhow = "1.0"
-secure-native = { path = "../../../secure-native" }
+ffi-support = "0.4"
 
 [lib]
 name = "signer"
