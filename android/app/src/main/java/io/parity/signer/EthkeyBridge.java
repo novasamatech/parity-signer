@@ -27,12 +27,12 @@ import com.facebook.react.bridge.Promise;
 
 public class EthkeyBridge extends ReactContextBaseJavaModule {
     static {
-        System.loadLibrary("signer", e);
+        System.loadLibrary("signer");
     }
 
     private void rejectWithException(Promise promise, String code, Exception e) {
-        String[] sp = e.getMessage().split(": ", e);
-        String s = sp[sp.length - 1].trim().replace("\"", "", e);
+        String[] sp = e.getMessage().split(": ");
+        String s = sp[sp.length - 1].trim().replace("\"", "");
         promise.reject(code, s);
     }
 
