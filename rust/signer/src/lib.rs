@@ -358,21 +358,21 @@ mod tests {
 		let expected = "1025e5db74fdaf4d2818822dccf0e1604ae9ccc62f26cecfde23448ff0248abf";
 		let result = blake(data);
 
-		assert_eq!(Some(expected.to_string()), result);
+		assert_eq!(expected.to_string(), result.unwrap());
 	}
 
 	#[test]
 	fn test_rlp_item() {
 		let rlp = "f85f800182520894095e7baea6a6c7c4c2dfeb977efac326af552d870a801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804";
-		assert_eq!(rlp_item(rlp, 0), Some("".into()));
-		assert_eq!(rlp_item(rlp, 1), Some("01".into()));
-		assert_eq!(rlp_item(rlp, 2), Some("5208".into()));
+		assert_eq!(rlp_item(rlp, 0).unwrap(), "".to_owned());
+		assert_eq!(rlp_item(rlp, 1).unwrap(), "01".to_owned());
+		assert_eq!(rlp_item(rlp, 2).unwrap(), "5208".to_owned());
 		assert_eq!(
-			rlp_item(rlp, 3),
-			Some("095e7baea6a6c7c4c2dfeb977efac326af552d87".into())
+			rlp_item(rlp, 3).unwrap(),
+			"095e7baea6a6c7c4c2dfeb977efac326af552d87".to_owned()
 		);
-		assert_eq!(rlp_item(rlp, 4), Some("0a".into()));
-		assert_eq!(rlp_item(rlp, 5), Some("".into()));
+		assert_eq!(rlp_item(rlp, 4).unwrap(), "0a".to_owned());
+		assert_eq!(rlp_item(rlp, 5).unwrap(), "".to_owned());
 	}
 
 	#[test]
@@ -424,7 +424,7 @@ mod tests {
 	#[test]
 	fn test_generate_substrate_address() {
 		let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
-		let address = substrate_wallet_address_with_ref(data_pointer, SURI_SUFFIX, 42).unwrap();
+		let address = substrate_address_with_ref(data_pointer, SURI_SUFFIX, 42).unwrap();
 		destroy_data_ref(data_pointer);
 		assert_eq!(address, SUBSTRATE_ADDRESS);
 	}

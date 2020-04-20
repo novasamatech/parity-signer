@@ -18,7 +18,6 @@ impl KeyPair {
 		let mnemonic = Mnemonic::from_phrase(phrase, Language::English).ok()?;
 		let mini_secret_key =
 			mini_secret_from_entropy(mnemonic.entropy(), password.unwrap_or("")).ok()?;
-
 		Some(KeyPair(
 			mini_secret_key.expand_to_keypair(ExpansionMode::Ed25519),
 		))
@@ -71,12 +70,15 @@ impl KeyPair {
 		self.0.sign(context.bytes(message)).to_bytes()
 	}
 
-	pub fn verify_signature(&self, message: &[u8], signature: &[u8]) -> Option<bool> {
+	pub fn verify_signature(
+		&self,
+		message: &[u8],
+		signature: &[u8],
+	) -> crate::result::Result<bool> {
 		let context = schnorrkel::signing_context(SIGNING_CTX);
-
-		let signature = Signature::from_bytes(signature).ok()?;
-
-		Some(self.0.verify(context.bytes(&message), &signature).is_ok())
+		let signature =
+			Signature::from_bytes(signature).map_err(|e| crate::result::Error::Signature(e))?;
+		Ok(self.0.verify(context.bytes(&message), &signature).is_ok())
 	}
 }
 
