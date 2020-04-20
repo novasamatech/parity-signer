@@ -27,13 +27,13 @@ import com.facebook.react.bridge.Promise;
 
 public class EthkeyBridge extends ReactContextBaseJavaModule {
     static {
-        System.loadLibrary("signer");
+        System.loadLibrary("signer", e);
     }
 
-    private void rejectWithTitle (Promise promise, Exception e, String title) {
-        String[] sp = e.getMessage().split(": ");
-        String s = sp[sp.length - 1].trim().replace("\"", "");
-        promise.reject("brainwallet bip39 address", s);
+    private void rejectWithException(Promise promise, String code, Exception e) {
+        String[] sp = e.getMessage().split(": ", e);
+        String s = sp[sp.length - 1].trim().replace("\"", "", e);
+        promise.reject(code, s);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBrainwalletBIP39Address(seed));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "brainwallet bip39 address");
+            rejectWithException(promise, "brainwallet bip39 address", e);
         }
     }
 
@@ -64,7 +64,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBrainwalletSign(seed, message));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "brainwallet sign");
+            rejectWithException(promise, "brainwallet sign", e);
         }
     }
 
@@ -73,7 +73,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyRlpItem(rlp, position));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "rlp item");
+            rejectWithException(promise, "rlp item", e);
         }
     }
 
@@ -82,7 +82,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyKeccak(data));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "keccak");
+            rejectWithException(promise, "keccak", e);
         }
     }
 
@@ -91,7 +91,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBlake(data));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "blake2b");
+            rejectWithException(promise, "blake2b", e);
         }
     }
 
@@ -120,7 +120,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyDecryptData(data, password));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "decrypt data");
+            rejectWithException(promise, "decrypt data", e);
         }
     }
 
@@ -129,7 +129,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyQrCode(data));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "qr code");
+            rejectWithException(promise, "qr code", e);
         }
     }
 
@@ -138,7 +138,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyQrCodeHex(data));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "qr code hex");
+            rejectWithException(promise, "qr code hex", e);
         }
     }
 
@@ -147,7 +147,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(substrateBrainwalletAddress(seed, prefix));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "substrate address");
+            rejectWithException(promise, "substrate address", e);
         }
     }
 
@@ -156,7 +156,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(substrateBrainwalletSign(seed, message));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "substrate sign");
+            rejectWithException(promise, "substrate sign", e);
         }
     }
 
@@ -165,7 +165,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(schnorrkelVerify(seed, message, signature));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "schnorrkel verify");
+            rejectWithException(promise, "schnorrkel verify", e);
         }
     }
 
@@ -180,7 +180,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
                 promise.resolve(d);
             }
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "decrypt data ref");
+            rejectWithException(promise, "decrypt data ref", e);
         }
     }
 
@@ -190,7 +190,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
             ethkeyDestroyDataRef(Double.doubleToRawLongBits(data_ref));
             promise.resolve(0);
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "destroy data ref");
+            rejectWithException(promise, "destroy data ref", e);
         }
     }
 
@@ -199,7 +199,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), message));
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "brainwallet sign with ref");
+            rejectWithException(promise, "brainwallet sign with ref", e);
         }
     }
 
@@ -209,7 +209,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
             String s = ethkeySubstrateBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), suriSuffix, message);
             promise.resolve(s);
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "substrate sign with ref");
+            rejectWithException(promise, "substrate sign with ref", e);
         }
     }
 
@@ -219,7 +219,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
             String s = ethkeyBrainWalletAddressWithRef(Double.doubleToRawLongBits(seedRef));
             promise.resolve(s);
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "brainwallet address with ref");
+            rejectWithException(promise, "brainwallet address with ref", e);
         }
     }
 
@@ -229,7 +229,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
             String substrateAddress = ethkeySubstrateWalletAddressWithRef(Double.doubleToRawLongBits(seedRef), suriSuffix, prefix);
             promise.resolve(substrateAddress);
         } catch (Exception e) {
-            rejectWithTitle(promise, e, "substrate address with ref");
+            rejectWithException(promise, "substrate address with ref", e);
         }
     }
 
