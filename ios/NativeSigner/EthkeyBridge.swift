@@ -8,276 +8,272 @@
 
 import Foundation
 
+func handle_error<T, U>(
+  resolve: RCTPromiseResolveBlock,
+  reject: RCTPromiseRejectBlock,
+  get_result: (UnsafeMutablePointer<ExternError>) -> T,
+  success: (T) -> U
+) -> Void {
+  var err = ExternError()
+  let err_ptr: UnsafeMutablePointer<ExternError> = UnsafeMutablePointer(&err)
+  let res = get_result(err_ptr)
+  if err_ptr.pointee.code == 0 {
+    resolve(success(res))
+  } else {
+    let val = String(cString: err_ptr.pointee.message)
+    signer_destroy_string(err_ptr.pointee.message)
+    reject(String(describing: err_ptr.pointee.code), val, nil)
+  }
+}
+
 @objc(EthkeyBridge)
 class EthkeyBridge: NSObject {
-
+  
   public static func requiresMainQueueSetup() -> Bool {
     return true;
   }
-
+  
   @objc func brainWalletAddress(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var seed_ptr = seed.asPtr()
-    let address_rust_str = ethkey_brainwallet_address(&error, &seed_ptr)
-    let address_rust_str_ptr = rust_string_ptr(address_rust_str)
-    let address = String.fromStringPtr(ptr: address_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(address_rust_str_ptr)
-    rust_string_destroy(address_rust_str)
-    resolve(address)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { ethkey_brainwallet_address($0, seed) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var seed_ptr = seed.asPtr()
-    var message_ptr = message.asPtr()
-    let signature_rust_str = ethkey_brainwallet_sign(&error, &seed_ptr, &message_ptr)
-    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
-    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(signature_rust_str_ptr)
-    rust_string_destroy(signature_rust_str)
-    resolve(signature)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { ethkey_brainwallet_sign($0, seed, message) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func rlpItem(_ rlp: String, position: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var rlp_ptr = rlp.asPtr()
-    let item_rust_str = rlp_item(&error, &rlp_ptr, position)
-    let item_rust_str_ptr = rust_string_ptr(item_rust_str)
-    let item = String.fromStringPtr(ptr: item_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(item_rust_str_ptr)
-    rust_string_destroy(item_rust_str)
-    if (error == 0) {
-      resolve(item)
-    } else {
-      reject("invalid rlp", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { rlp_item($0, rlp, position) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func keccak(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    let hash_rust_str = keccak256(&error, &data_ptr)
-    let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
-    let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(hash_rust_str_ptr)
-    rust_string_destroy(hash_rust_str)
-    if (error == 0) {
-      resolve(hash)
-    } else {
-      reject("invalid data, expected hex-encoded string", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { keccak256($0, data) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func blake2b(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    let hash_rust_str = blake(&error, &data_ptr)
-    let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
-    let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(hash_rust_str_ptr)
-    rust_string_destroy(hash_rust_str)
-    if (error == 0) {
-      resolve(hash)
-    } else {
-      reject("invalid data, expected hex-encoded string", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { blake($0, data) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func ethSign(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    let hash_rust_str = eth_sign(&error, &data_ptr)
-    let hash_rust_str_ptr = rust_string_ptr(hash_rust_str)
-    let hash = String.fromStringPtr(ptr: hash_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(hash_rust_str_ptr)
-    rust_string_destroy(hash_rust_str)
-    resolve(hash)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { eth_sign($0, data) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func blockiesIcon(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var seed_ptr = seed.asPtr()
-    let icon_rust_str = blockies_icon(&error, &seed_ptr)
-    let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
-    let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(icon_rust_str_ptr)
-    rust_string_destroy(icon_rust_str)
-    if error == 0 {
-      resolve(icon)
-    } else {
-      reject("Failed to generate blockies", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { blockies_icon($0, seed) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func randomPhrase(_ wordsNumber:NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    let words_number: Int32 = Int32(wordsNumber)
-    let words_rust_str = random_phrase(&error, words_number)
-    let words_rust_str_ptr = rust_string_ptr(words_rust_str)
-    let words = String.fromStringPtr(ptr: words_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(words_rust_str_ptr)
-    rust_string_destroy(words_rust_str)
-    resolve(words)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { random_phrase($0, Int32(wordsNumber)) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func encryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    var password_ptr = password.asPtr()
-    let encrypted_data_rust_str = encrypt_data(&error, &data_ptr, &password_ptr)
-    let encrypted_data_rust_str_ptr = rust_string_ptr(encrypted_data_rust_str)
-    let encrypted_data = String.fromStringPtr(ptr: encrypted_data_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(encrypted_data_rust_str_ptr)
-    rust_string_destroy(encrypted_data_rust_str)
-    resolve(encrypted_data)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { encrypt_data($0, data, password) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func decryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    var password_ptr = password.asPtr()
-    let decrypted_data_rust_str = decrypt_data(&error, &data_ptr, &password_ptr)
-    let decrypted_data_rust_str_ptr = rust_string_ptr(decrypted_data_rust_str)
-    let decrypted_data = String.fromStringPtr(ptr: decrypted_data_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(decrypted_data_rust_str_ptr)
-    rust_string_destroy(decrypted_data_rust_str)
-    if error == 0 {
-      resolve(decrypted_data)
-    } else {
-      reject("invalid password", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { decrypt_data($0, data, password) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func qrCode(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    let icon_rust_str = qrcode(&error, &data_ptr)
-    let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
-    let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(icon_rust_str_ptr)
-    rust_string_destroy(icon_rust_str)
-    if error == 0 {
-      resolve(icon)
-    } else {
-      reject("Failed to generate blockies", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { qrcode($0, data) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func qrCodeHex(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    let icon_rust_str = qrcode_hex(&error, &data_ptr)
-    let icon_rust_str_ptr = rust_string_ptr(icon_rust_str)
-    let icon = String.fromStringPtr(ptr: icon_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(icon_rust_str_ptr)
-    rust_string_destroy(icon_rust_str)
-    if error == 0 {
-      resolve(icon)
-    } else {
-      reject("Failed to generate blockies", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { qrcode_hex($0, data) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func substrateAddress(_ seed: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var seed_ptr = seed.asPtr()
-    let address_rust_str = substrate_brainwallet_address(&error, &seed_ptr, prefix)
-    let address_rust_str_ptr = rust_string_ptr(address_rust_str)
-    let address = String.fromStringPtr(ptr: address_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(address_rust_str_ptr)
-    rust_string_destroy(address_rust_str)
-    resolve(address)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { substrate_brainwallet_address($0, seed, prefix) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func substrateSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var seed_ptr = seed.asPtr()
-    var message_ptr = message.asPtr()
-    let signature_rust_str = substrate_brainwallet_sign(&error, &seed_ptr, &message_ptr)
-    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
-    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(signature_rust_str_ptr)
-    rust_string_destroy(signature_rust_str)
-    resolve(signature)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { substrate_brainwallet_sign($0, seed, message) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
-
+  
   @objc func schnorrkelVerify(_ seed: String, message: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var seed_ptr = seed.asPtr()
-    var message_ptr = message.asPtr()
-    var signature_ptr = signature.asPtr()
-    let is_valid = schnorrkel_verify(&error, &seed_ptr, &message_ptr, &signature_ptr)
-    if error == 0 {
-      resolve(is_valid)
-    } else {
-      reject("Failed to verify signature.", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { schnorrkel_verify($0, seed, message, signature) },
+      // return a bool. no cleanup
+      success: { return $0 })
   }
   
   @objc func decryptDataRef(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var data_ptr = data.asPtr()
-    var password_ptr = password.asPtr()
-    let data_ref = decrypt_data_ref(&error, &data_ptr, &password_ptr)
-    if error == 0 {
-      resolve(data_ref)
-    } else {
-      reject("error in decrypt_data_ref", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { decrypt_data_ref($0, data, password) },
+      // return a long. no cleanup
+      success: { return $0 })
   }
-
+  
   @objc func destroyDataRef(_ data_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    destroy_data_ref(&error, data_ref)
-    if error == 0 {
-      resolve(0)
-    } else {
-      reject("error in destroy_data_ref", nil, nil)
-    }
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { destroy_data_ref($0, data_ref) },
+      // return zero. no cleanup
+      success: { return 0 })
   }
-
+  
   @objc func brainWalletSignWithRef(_ seed_ref: Int64, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var message_ptr = message.asPtr()
-    let signature_rust_str = ethkey_brainwallet_sign_with_ref(&error, seed_ref, &message_ptr)
-    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
-    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(signature_rust_str_ptr)
-    rust_string_destroy(signature_rust_str)
-    resolve(signature)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { ethkey_brainwallet_sign_with_ref($0, seed_ref, message) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
   
   @objc func substrateSignWithRef(_ seed_ref: Int64, suri_suffix: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var message_ptr = message.asPtr()
-    var suri_suffix_ptr = suri_suffix.asPtr()
-    let signature_rust_str = substrate_brainwallet_sign_with_ref(&error, seed_ref, &suri_suffix_ptr, &message_ptr)
-    let signature_rust_str_ptr = rust_string_ptr(signature_rust_str)
-    let signature = String.fromStringPtr(ptr: signature_rust_str_ptr!.pointee)
-    rust_string_ptr_destroy(signature_rust_str_ptr)
-    rust_string_destroy(signature_rust_str)
-    resolve(signature)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { substrate_brainwallet_sign_with_ref($0, seed_ref, suri_suffix, message) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
   
   @objc func brainWalletAddressWithRef(_ seed_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    let brain_wallet_address_str = brain_wallet_address_with_ref(&error, seed_ref)
-    let brain_wallett_address_ptr = rust_string_ptr(brain_wallet_address_str)
-    let brain_wallet_address = String.fromStringPtr(ptr: brain_wallett_address_ptr!.pointee)
-    rust_string_ptr_destroy(brain_wallett_address_ptr)
-    rust_string_destroy(brain_wallet_address_str)
-    resolve(brain_wallet_address)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { brain_wallet_address_with_ref($0, seed_ref) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
   
   
   @objc func substrateAddressWithRef(_ seed_ref: Int64, suri_suffix: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    var error: UInt32 = 0
-    var suri_suffix_ptr = suri_suffix.asPtr()
-    let substrate_address_str = substrate_address_with_ref(&error, seed_ref, &suri_suffix_ptr, prefix)
-    let substrate_address_ptr = rust_string_ptr(substrate_address_str)
-    let substrate_address = String.fromStringPtr(ptr: substrate_address_ptr!.pointee)
-    rust_string_ptr_destroy(substrate_address_ptr)
-    rust_string_destroy(substrate_address_str)
-    resolve(substrate_address)
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { substrate_address_with_ref($0, seed_ref, suri_suffix, prefix) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
   }
 }
