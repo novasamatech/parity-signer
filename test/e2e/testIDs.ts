@@ -39,6 +39,7 @@ const testIDs = {
 	},
 	IdentityBackup: {
 		nextButton: 'identity_backup_next',
+		passwordInput: 'identity_backup_password_input',
 		seedText: 'identity_backup_seed'
 	},
 	IdentityManagement: {
@@ -48,11 +49,13 @@ const testIDs = {
 	IdentityNew: {
 		createButton: 'identity_new_create_button',
 		nameInput: 'identity_new_name_input',
+		passwordInput: 'identity_new_password_input',
 		recoverButton: 'identity_new_recover_button',
 		seedInput: 'identity_new_seed_input'
 	},
 	IdentityPin: {
 		confirmPin: 'identity_pin_confirm',
+		passwordInput: 'identity_pin_password_input',
 		scrollScreen: 'identity_pin_scroll',
 		setPin: 'identity_pin_set',
 		submitButton: 'identity_submit_button',
@@ -66,7 +69,9 @@ const testIDs = {
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
 		nameInput: 'path_derivation_name_input',
-		pathInput: 'path_derivation_path_input'
+		passwordInput: 'path_derivation_password_input',
+		pathInput: 'path_derivation_path_input',
+		togglePasswordButton: 'path_derivation_toggle_password'
 	},
 	PathDetail: {
 		deleteButton: 'path_detail_delete_button',

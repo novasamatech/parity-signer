@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -76,7 +76,7 @@ function IdentityBackup({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<SafeAreaScrollViewContainer style={styles.body}>
+		<KeyboardScrollView style={styles.body}>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
@@ -105,15 +105,13 @@ function IdentityBackup({
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
-			{isNew && (
-				<ButtonMainAction
-					title={'Next'}
-					testID={testIDs.IdentityBackup.nextButton}
-					bottom={false}
-					onPress={(): void => alertBackupDone(onBackupDone)}
-				/>
-			)}
-		</SafeAreaScrollViewContainer>
+			<ButtonMainAction
+				title={'Next'}
+				testID={testIDs.IdentityBackup.nextButton}
+				bottom={false}
+				onPress={(): void => alertBackupDone(onBackupDone)}
+			/>
+		</KeyboardScrollView>
 	);
 }
 

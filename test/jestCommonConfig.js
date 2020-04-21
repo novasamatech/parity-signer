@@ -13,6 +13,7 @@ module.exports = {
 		'^components/(.*)$': '<rootDir>/src/components/$1',
 		'^constants/(.*)$': '<rootDir>/src/constants/$1',
 		'^e2e/(.*)$': '<rootDir>/test/e2e/$1',
+		'^modules/(.*)$': '<rootDir>/src/modules/$1',
 		'^res/(.*)$': '<rootDir>/res/$1',
 		'^screens/(.*)$': '<rootDir>/src/screens/$1',
 		'^stores/(.*)$': '<rootDir>/src/stores/$1',

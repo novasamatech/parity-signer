@@ -46,6 +46,7 @@ export function isUnlockedAccount(
 export type AccountMeta = {
 	address: string;
 	createdAt: number;
+	hasPassword?: boolean;
 	name: string;
 	updatedAt: number;
 	networkPathId?: string;
@@ -54,6 +55,7 @@ export type AccountMeta = {
 export interface FoundIdentityAccount extends AccountMeta {
 	accountId: string;
 	encryptedSeed: string;
+	hasPassword: boolean;
 	validBip39Seed: true;
 	isLegacy: false;
 	networkKey: string;

@@ -31,7 +31,11 @@ import TxDetailsCard from 'components/TxDetailsCard';
 import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
-import { navigateToSignedTx, unlockSeedPhrase } from 'utils/navigationHelpers';
+import {
+	navigateToSignedTx,
+	unlockSeedPhrase,
+	unlockSeedPhraseWithPassword
+} from 'utils/navigationHelpers';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
@@ -56,14 +60,23 @@ export default class TxDetails extends React.PureComponent<
 				sender,
 				accountsStore.state.identities
 			);
-			const seedPhrase = await unlockSeedPhrase(
-				this.props.navigation,
-				senderIdentity
-			);
-			await scannerStore.signDataWithSeedPhrase(
-				seedPhrase,
-				NETWORK_LIST[sender.networkKey].protocol
-			);
+			if (sender.hasPassword) {
+				const suri = await unlockSeedPhraseWithPassword(
+					this.props.navigation,
+					sender.path,
+					senderIdentity
+				);
+				await scannerStore.signData(suri);
+			} else {
+				const seedPhrase = await unlockSeedPhrase(
+					this.props.navigation,
+					senderIdentity
+				);
+				await scannerStore.signDataWithSeedPhrase(
+					seedPhrase,
+					NETWORK_LIST[sender.networkKey].protocol
+				);
+			}
 			return navigateToSignedTx(this.props.navigation);
 		} catch (e) {
 			scannerStore.setErrorMsg(e.message);
