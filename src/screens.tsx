@@ -27,6 +27,9 @@ import {
 import * as React from 'react';
 import { View } from 'react-native';
 
+import PinNew from 'modules/unlock/screens/PinNew';
+import PinUnlock from 'modules/unlock/screens/PinUnlock';
+import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
@@ -40,7 +43,6 @@ import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
 import IdentityNew from 'screens/IdentityNew';
-import IdentityPin from 'screens/IdentityPin';
 import LegacyAccountBackup from 'screens/LegacyAccountBackup';
 import LegacyAccountList from 'screens/LegacyAccountList';
 import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
@@ -144,12 +146,17 @@ export const AppNavigator = (): React.ReactElement => (
 			component={IdentityManagement}
 		/>
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
-		<ScreenStack.Screen name="IdentityPin" component={IdentityPin} />
 		<ScreenStack.Screen name="MessageDetails" component={MessageDetails} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
 		<ScreenStack.Screen name="PathManagement" component={PathManagement} />
+		<ScreenStack.Screen name="PinNew" component={PinNew} />
+		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
+		<ScreenStack.Screen
+			name="PinUnlockWithPassword"
+			component={PinUnlockWithPassword}
+		/>
 		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
 		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />

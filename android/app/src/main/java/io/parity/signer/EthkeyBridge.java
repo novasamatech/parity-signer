@@ -30,6 +30,12 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         System.loadLibrary("signer");
     }
 
+    private void rejectWithException(Promise promise, String code, Exception e) {
+        String[] sp = e.getMessage().split(": ");
+        String s = sp[sp.length - 1].trim().replace("\"", "");
+        promise.reject(code, s);
+    }
+
     @Override
     public String getName() {
         return "EthkeyBridge";
@@ -49,7 +55,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBrainwalletBIP39Address(seed));
         } catch (Exception e) {
-            promise.reject("invalid phrase", "invalid phrase");
+            rejectWithException(promise, "brainwallet bip39 address", e);
         }
     }
 
@@ -58,7 +64,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBrainwalletSign(seed, message));
         } catch (Exception e) {
-            promise.reject("invalid phrase", "invalid phrase");
+            rejectWithException(promise, "brainwallet sign", e);
         }
     }
 
@@ -67,8 +73,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyRlpItem(rlp, position));
         } catch (Exception e) {
-            promise.reject("invalid rlp", "invalid rlp");
-
+            rejectWithException(promise, "rlp item", e);
         }
     }
 
@@ -77,7 +82,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyKeccak(data));
         } catch (Exception e) {
-            promise.reject("invalid data, expected hex-encoded string", "invalid data, expected hex-encoded string");
+            rejectWithException(promise, "keccak", e);
         }
     }
 
@@ -86,7 +91,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyBlake(data));
         } catch (Exception e) {
-            promise.reject("invalid data, expected hex-encoded string", "invalid data, expected hex-encoded string");
+            rejectWithException(promise, "blake2b", e);
         }
     }
 
@@ -115,7 +120,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyDecryptData(data, password));
         } catch (Exception e) {
-            promise.reject("invalid password", "invalid password");
+            rejectWithException(promise, "decrypt data", e);
         }
     }
 
@@ -124,7 +129,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyQrCode(data));
         } catch (Exception e) {
-            promise.reject("failed to create QR code", "failed to create QR code");
+            rejectWithException(promise, "qr code", e);
         }
     }
 
@@ -133,7 +138,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(ethkeyQrCodeHex(data));
         } catch (Exception e) {
-            promise.reject("failed to create QR code", "failed to create QR code");
+            rejectWithException(promise, "qr code hex", e);
         }
     }
 
@@ -142,7 +147,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(substrateBrainwalletAddress(seed, prefix));
         } catch (Exception e) {
-            promise.reject("invalid phrase", "invalid phrase");
+            rejectWithException(promise, "substrate address", e);
         }
     }
 
@@ -151,7 +156,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(substrateBrainwalletSign(seed, message));
         } catch (Exception e) {
-            promise.reject("invalid phrase", "invalid phrase");
+            rejectWithException(promise, "substrate sign", e);
         }
     }
 
@@ -160,53 +165,53 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         try {
             promise.resolve(schnorrkelVerify(seed, message, signature));
         } catch (Exception e) {
-            promise.reject("invalid signature", "invalid signature");
+            rejectWithException(promise, "schnorrkel verify", e);
         }
     }
 
-	@ReactMethod
-	public void decryptDataRef(String data, String password, Promise promise) {
-		try {
-			// `long` is incompatible with the bridge so pass as a double
-			double d = Double.longBitsToDouble(ethkeyDecryptDataRef(data, password));
-			if (Double.isNaN(d)) {
-				promise.reject("reference is nan", "reference is nan");
-			} else {
-				promise.resolve(d);
-			}
-		} catch (Exception e) {
-			promise.reject("decrypted ref", "decrypted ref");
-		}
-	}
+    @ReactMethod
+    public void decryptDataRef(String data, String password, Promise promise) {
+        try {
+            // `long` is incompatible with the bridge so pass as a double
+            double d = Double.longBitsToDouble(ethkeyDecryptDataRef(data, password));
+            if (Double.isNaN(d)) {
+                promise.reject("reference is nan", "reference is nan");
+            } else {
+                promise.resolve(d);
+            }
+        } catch (Exception e) {
+            rejectWithException(promise, "decrypt data ref", e);
+        }
+    }
 
-	@ReactMethod
-	public void destroyDataRef(double data_ref, Promise promise) {
-		try {
-			ethkeyDestroyDataRef(Double.doubleToRawLongBits(data_ref));
-			promise.resolve(0);
-		} catch (Exception e) {
-			promise.reject("destroy ref", "destroy ref");
-		}
-	}
+    @ReactMethod
+    public void destroyDataRef(double data_ref, Promise promise) {
+        try {
+            ethkeyDestroyDataRef(Double.doubleToRawLongBits(data_ref));
+            promise.resolve(0);
+        } catch (Exception e) {
+            rejectWithException(promise, "destroy data ref", e);
+        }
+    }
 
-	@ReactMethod
-	public void brainWalletSignWithRef(double seed_ref, String message, Promise promise) {
-		try {
-			promise.resolve(ethkeyBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), message));
-		} catch (Exception e) {
-			promise.reject("invalid brain wallet phrase", "invalid brain wallet phrase");
-		}
-	}
+    @ReactMethod
+    public void brainWalletSignWithRef(double seed_ref, String message, Promise promise) {
+        try {
+            promise.resolve(ethkeyBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), message));
+        } catch (Exception e) {
+            rejectWithException(promise, "brainwallet sign with ref", e);
+        }
+    }
 
-	@ReactMethod
-	public void substrateSignWithRef(double seed_ref, String suriSuffix, String message, Promise promise) {
-		try {
-			String s = ethkeySubstrateBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), suriSuffix, message);
-			promise.resolve(s);
-		} catch (Exception e) {
-			promise.reject("invalid substrate phrase", "invalid substrate phrase");
-		}
-	}
+    @ReactMethod
+    public void substrateSignWithRef(double seed_ref, String suriSuffix, String message, Promise promise) {
+        try {
+            String s = ethkeySubstrateBrainwalletSignWithRef(Double.doubleToRawLongBits(seed_ref), suriSuffix, message);
+            promise.resolve(s);
+        } catch (Exception e) {
+            rejectWithException(promise, "substrate sign with ref", e);
+        }
+    }
 
     @ReactMethod
     public void brainWalletAddressWithRef(double seedRef, Promise promise) {
@@ -214,17 +219,17 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
             String s = ethkeyBrainWalletAddressWithRef(Double.doubleToRawLongBits(seedRef));
             promise.resolve(s);
         } catch (Exception e) {
-            promise.reject("invalid substrate phrase", "invalid substrate phrase");
+            rejectWithException(promise, "brainwallet address with ref", e);
         }
     }
 
-	@ReactMethod
+    @ReactMethod
     public void substrateAddressWithRef(double seedRef, String suriSuffix, int prefix, Promise promise) {
         try {
             String substrateAddress = ethkeySubstrateWalletAddressWithRef(Double.doubleToRawLongBits(seedRef), suriSuffix, prefix);
             promise.resolve(substrateAddress);
         } catch (Exception e) {
-            promise.reject("invalid suri suffix or prefix", "invalid suri suffix or prefix");
+            rejectWithException(promise, "substrate address with ref", e);
         }
     }
 

@@ -28,7 +28,8 @@ import {
 } from 'utils/navigationHelpers';
 import {
 	alertDeleteIdentity,
-	alertIdentityDeletionError
+	alertIdentityDeletionError,
+	alertRenamingError
 } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
@@ -41,15 +42,23 @@ function IdentityManagement({
 	const { currentIdentity } = accounts.state;
 	if (!currentIdentity) return <View />;
 
+	const onRenameIdentity = async (name: string): Promise<void> => {
+		try {
+			await accounts.updateIdentityName(name);
+		} catch (err) {
+			alertRenamingError(err.message);
+		}
+	};
+
 	const onOptionSelect = async (value: string): Promise<void> => {
 		if (value === 'PathDelete') {
 			alertDeleteIdentity(
 				async (): Promise<void> => {
 					await unlockSeedPhrase(navigation);
-					const deleteSucceed = await accounts.deleteCurrentIdentity();
-					if (deleteSucceed) {
+					try {
+						await accounts.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
-					} else {
+					} catch (err) {
 						alertIdentityDeletionError();
 					}
 				}
@@ -84,9 +93,7 @@ function IdentityManagement({
 			/>
 			<TextInput
 				label="Display Name"
-				onChangeText={(name: string): Promise<void> =>
-					accounts.updateIdentityName(name)
-				}
+				onChangeText={onRenameIdentity}
 				value={currentIdentity.name}
 				placeholder="Enter a new identity name"
 				focus
