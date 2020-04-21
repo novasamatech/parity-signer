@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -10,19 +10,26 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-export const pathsRegex: {
-	[key: string]: RegExp;
-} = {
-	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
-	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
-};
+import { StyleSheet } from 'react-native';
 
-export const passwordRegex = /^[\w-]{0,32}$/;
+import colors from 'styles/colors';
 
-export const onlyNumberRegex = /^\d+$|^$/;
+const styles = StyleSheet.create({
+	body: {
+		backgroundColor: colors.bg,
+		flex: 1,
+		overflow: 'hidden'
+	},
+	pinInput: {
+		borderBottomColor: colors.bg_button,
+		borderColor: colors.bg_button,
+		minHeight: 48,
+		paddingLeft: 10,
+		paddingRight: 10
+	}
+});
+
+export default styles;

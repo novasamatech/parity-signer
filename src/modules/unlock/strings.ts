@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -10,19 +10,30 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-export const pathsRegex: {
-	[key: string]: RegExp;
-} = {
-	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
-	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
+const t = {
+	doneButton: {
+		pinCreation: 'DONE',
+		pinUnlock: 'UNLOCK'
+	},
+	passwordLabel: 'Password',
+	pinConfirmLabel: 'Confirm PIN',
+	pinLabel: 'PIN',
+	pinMisMatchHint: {
+		pinCreation: "Pin codes don't match!",
+		pinUnlock: 'Input credential is not correct!'
+	},
+	pinTooShortHint: 'Your pin must be at least 6 digits long!',
+	subtitle: {
+		pinCreation: 'Choose a PIN code with 6 or more digits',
+		pinUnlock: 'Unlock the identity to use the seed'
+	},
+	title: {
+		pinCreation: 'Set Identity PIN',
+		pinUnlock: 'Unlock Identity'
+	}
 };
 
-export const passwordRegex = /^[\w-]{0,32}$/;
-
-export const onlyNumberRegex = /^\d+$|^$/;
+export default t;

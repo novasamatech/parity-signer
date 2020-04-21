@@ -33,7 +33,8 @@ import ScannerStore from 'stores/ScannerStore';
 import AccountsStore from 'stores/AccountsStore';
 import {
 	navigateToSignedMessage,
-	unlockSeedPhrase
+	unlockSeedPhrase,
+	unlockSeedPhraseWithPassword
 } from 'utils/navigationHelpers';
 import fontStyles from 'styles/fontStyles';
 import MessageDetailsCard from 'components/MessageDetailsCard';
@@ -60,14 +61,23 @@ export default class MessageDetails extends React.PureComponent<
 				sender,
 				accountsStore.state.identities
 			);
-			const seedPhrase = await unlockSeedPhrase(
-				this.props.navigation,
-				senderIdentity
-			);
-			await scannerStore.signDataWithSeedPhrase(
-				seedPhrase,
-				NETWORK_LIST[sender.networkKey].protocol
-			);
+			if (sender.hasPassword) {
+				const suri = await unlockSeedPhraseWithPassword(
+					this.props.navigation,
+					sender.path,
+					senderIdentity
+				);
+				await scannerStore.signData(suri);
+			} else {
+				const seedPhrase = await unlockSeedPhrase(
+					this.props.navigation,
+					senderIdentity
+				);
+				await scannerStore.signDataWithSeedPhrase(
+					seedPhrase,
+					NETWORK_LIST[sender.networkKey].protocol
+				);
+			}
 			return navigateToSignedMessage(this.props.navigation);
 		} catch (e) {
 			scannerStore.setErrorMsg(e.message);

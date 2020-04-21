@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -10,19 +10,23 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-export const pathsRegex: {
-	[key: string]: RegExp;
-} = {
-	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
-	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
-};
+import React from 'react';
 
-export const passwordRegex = /^[\w-]{0,32}$/;
+import styles from '../styles';
 
-export const onlyNumberRegex = /^\d+$|^$/;
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import testIDs from 'e2e/testIDs';
+
+export default function Container(props: any): React.ReactElement {
+	return (
+		<KeyboardScrollView
+			{...props}
+			style={styles.body}
+			extraHeight={200}
+			testID={testIDs.IdentityPin.scrollScreen}
+		/>
+	);
+}

@@ -124,8 +124,8 @@ describe.skip('sanity check', () => {
 describe('type registry should get override types', () => {
 	it('get network latest override types', () => {
 		const testRegistry = new TypeRegistry();
-		const kusamaOverrideTypes = getOverrideTypes(testRegistry, 'westend');
-		expect(kusamaOverrideTypes).not.toEqual({});
+		const westendOverrideTypes = getOverrideTypes(testRegistry, 'westend');
+		expect(westendOverrideTypes).not.toEqual({});
 	});
 });
 

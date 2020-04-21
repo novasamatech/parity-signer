@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -10,19 +10,18 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-export const pathsRegex: {
-	[key: string]: RegExp;
-} = {
-	allPath: /(\/|\/\/)[\w-.]+(?=(\/?))/g,
-	firstPath: /(\/|\/\/)[\w-.]+(?=(\/)?)/,
-	networkPath: /(\/\/)[\w-.]+(?=(\/)?)/,
-	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
+export type State = {
+	confirmation: string;
+	focusConfirmation: boolean;
+	password: string;
+	pin: string;
+	pinMismatch: boolean;
+	pinTooShort: boolean;
 };
 
-export const passwordRegex = /^[\w-]{0,32}$/;
+export type UpdateStateFunc = (delta: Partial<State>) => void;
 
-export const onlyNumberRegex = /^\d+$|^$/;
+export type StateReducer = [State, UpdateStateFunc, () => void];
