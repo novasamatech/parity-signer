@@ -166,7 +166,6 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const identities = await loadIdentities();
 		let { currentIdentity } = this.state;
 		if (identities.length > 0) currentIdentity = identities[0];
-		console.log('identitis are', identities);
 		await this.setState({
 			accounts,
 			currentIdentity,
