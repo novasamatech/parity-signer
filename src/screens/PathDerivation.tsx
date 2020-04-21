@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState, useMemo } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
@@ -42,7 +42,6 @@ function PathDerivation({
 }: NavigationAccountProps<'PathDerivation'>): React.ReactElement {
 	const [derivationPath, setDerivationPath] = useState<string>('');
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
-	const [isPathValid, setIsPathValid] = useState<boolean>(true);
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
@@ -66,14 +65,11 @@ function PathDerivation({
 	const currentNetworkKey = enableCustomNetwork
 		? customNetworkKey
 		: parentNetworkKey;
+	const isPathValid = validateDerivedPath(derivationPath);
 
 	const onPathDerivation = async (): Promise<void> => {
-		if (!validateDerivedPath(derivationPath)) {
-			return setIsPathValid(false);
-		}
 		await unlockSeedPhrase(navigation, isSeedRefValid);
 		try {
-			console.log('isSeedRefValid', isSeedRefValid);
 			await accounts.deriveNewPath(
 				completePath,
 				substrateAddress,
@@ -83,7 +79,6 @@ function PathDerivation({
 			);
 			navigateToPathsList(navigation, currentNetworkKey);
 		} catch (error) {
-			setIsPathValid(false);
 			alertPathDerivationError(error.message);
 		}
 	};
@@ -96,11 +91,11 @@ function PathDerivation({
 					subtitle={parentPath}
 					hasSubtitleIcon={true}
 				/>
-				{!isPathValid && <Text>Invalid Path</Text>}
 				<TextInput
 					autoCompleteType="off"
 					autoCorrect={false}
 					autoFocus
+					error={!isPathValid}
 					label="Path"
 					onChangeText={setDerivationPath}
 					onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
@@ -144,7 +139,7 @@ function PathDerivation({
 				/>
 
 				<ButtonMainAction
-					disabled={!validateDerivedPath(derivationPath)}
+					disabled={!isPathValid}
 					bottom={false}
 					style={{ marginTop: 8 }}
 					title="Next"
