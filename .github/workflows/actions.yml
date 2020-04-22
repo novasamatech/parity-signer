@@ -29,21 +29,6 @@ jobs:
         with:
           toolchain:    1.41.1
           target:       x86_64-apple-ios
-      - name:           Add target armv7-apple-ios
-        uses:           actions-rs/toolchain@v1.0.5
-        with:
-          toolchain:    1.41.1
-          target:       armv7-apple-ios
-      - name:           Add target armv7s-apple-ios
-        uses:           actions-rs/toolchain@v1.0.5
-        with:
-          toolchain:    1.41.1
-          target:       armv7s-apple-ios
-      - name:           Add target aarch64-apple-ios
-        uses:           actions-rs/toolchain@v1.0.5
-        with:
-          toolchain:    1.41.1
-          target:       aarch64-apple-ios
       - name:           Cache cargo registry
         uses:           actions/cache@v1.1.2
         with:
@@ -114,4 +99,8 @@ jobs:
       - name:           Stop sccache
         if:             always()
         run:            sccache --stop-server
+      - name:           Detox biuld
+        run:            yarn build-e2e:ci
+      - name:           Detox test
+        run:            yarn test-e2e:ci
 
