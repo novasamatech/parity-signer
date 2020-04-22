@@ -886,6 +886,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = x86_64;
 			};
 			name = GithubActions;
 		};
