@@ -65,6 +65,7 @@ export default function PathCard({
 	const address = getAddressWithPath(path, identity);
 	const isUnknownAddress = address === '';
 
+	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
 	const computedNetworkKey =
 		networkKey || getNetworkKeyByPath(path, identity.meta.get(path)!);
 	const networkParams =
@@ -86,7 +87,7 @@ export default function PathCard({
 				<AccountIcon
 					address={address}
 					network={networkParams}
-					style={styles.icon}
+					style={styles.iconUser}
 				/>
 				<View style={styles.desc}>
 					<View>
@@ -114,19 +115,26 @@ export default function PathCard({
 				accessibilityComponentType="button"
 				disabled={false}
 				onPress={onPress}
-				testID={testID}
 			>
-				<View style={[styles.content, styles.contentDer]}>
+				<View style={[styles.content, styles.contentSubstrate]} testID={testID}>
 					<AccountIcon
 						address={address}
 						network={networkParams}
-						style={styles.icon}
+						style={styles.iconUser}
 					/>
 					<View style={styles.desc}>
-						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
+						<View style={styles.titleContainer}>
+							<AccountPrefixedTitle
+								title={pathName!}
+								titlePrefix={titlePrefix}
+							/>
+							{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
+						</View>
 						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
-							<Text style={fontStyles.t_codeS}>{path}</Text>
+							<Text style={fontStyles.t_codeS}>
+								{hasPassword ? `${path}///***` : path}
+							</Text>
 						</View>
 						{address !== '' && (
 							<Text
@@ -159,7 +167,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingLeft: 16
 	},
-	contentDer: {
+	contentSubstrate: {
 		backgroundColor: colors.card_bg,
 		paddingVertical: 8
 	},
@@ -176,8 +184,16 @@ const styles = StyleSheet.create({
 		marginLeft: 8,
 		width: 8
 	},
-	icon: {
+	iconLock: {
+		marginLeft: 4,
+		...fontStyles.h2
+	},
+	iconUser: {
 		height: 40,
 		width: 40
+	},
+	titleContainer: {
+		alignItems: 'center',
+		flexDirection: 'row'
 	}
 });

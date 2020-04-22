@@ -74,8 +74,8 @@ export function PathDetailsView({
 			case 'PathDelete':
 				alertDeleteAccount('this account', async () => {
 					await unlockSeedPhrase(navigation);
-					const deleteSucceed = await accounts.deletePath(path);
-					if (deleteSucceed) {
+					try {
+						await accounts.deletePath(path);
 						if (isSubstratePath(path)) {
 							const listedPaths = getPathsWithSubstrateNetworkKey(
 								accounts.state.currentIdentity!,
@@ -88,8 +88,8 @@ export function PathDetailsView({
 						} else {
 							navigation.navigate('AccountNetworkChooser');
 						}
-					} else {
-						alertPathDeletionError();
+					} catch (err) {
+						alertPathDeletionError(err);
 					}
 				});
 				break;

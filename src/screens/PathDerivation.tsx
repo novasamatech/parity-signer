@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState, useMemo } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
+import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountProps } from 'types/props';
@@ -38,10 +39,10 @@ function PathDerivation({
 	navigation,
 	route
 }: NavigationAccountProps<'PathDerivation'>): React.ReactElement {
-	const [derivationPath, setDerivationPath] = useState('');
-	const [keyPairsName, setKeyPairsName] = useState('');
-	const [isPathValid, setIsPathValid] = useState(true);
-	const [modalVisible, setModalVisible] = useState(false);
+	const [derivationPath, setDerivationPath] = useState<string>('');
+	const [keyPairsName, setKeyPairsName] = useState<string>('');
+	const [modalVisible, setModalVisible] = useState<boolean>(false);
+	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
 	const parentPath = route.params.parentPath;
 	const parentNetworkKey = useMemo(
@@ -59,23 +60,21 @@ function PathDerivation({
 	const currentNetworkKey = enableCustomNetwork
 		? customNetworkKey
 		: parentNetworkKey;
+	const isPathValid = validateDerivedPath(derivationPath);
 
 	const onPathDerivation = async (): Promise<void> => {
-		if (!validateDerivedPath(derivationPath)) {
-			return setIsPathValid(false);
-		}
 		const seedPhrase = await unlockSeedPhrase(navigation);
-		const derivationSucceed = await accounts.deriveNewPath(
-			completePath,
-			seedPhrase,
-			currentNetworkKey,
-			keyPairsName
-		);
-		if (derivationSucceed) {
+		try {
+			await accounts.deriveNewPath(
+				completePath,
+				seedPhrase,
+				currentNetworkKey,
+				keyPairsName,
+				password
+			);
 			navigateToPathsList(navigation, currentNetworkKey);
-		} else {
-			setIsPathValid(false);
-			alertPathDerivationError();
+		} catch (error) {
+			alertPathDerivationError(error.message);
 		}
 	};
 
@@ -87,10 +86,11 @@ function PathDerivation({
 					subtitle={parentPath}
 					hasSubtitleIcon={true}
 				/>
-				{!isPathValid && <Text>Invalid Path</Text>}
 				<TextInput
 					autoCompleteType="off"
 					autoCorrect={false}
+					autoFocus
+					error={!isPathValid}
 					label="Path"
 					onChangeText={setDerivationPath}
 					onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
@@ -119,15 +119,22 @@ function PathDerivation({
 					/>
 				)}
 				<Separator style={{ height: 0 }} />
+				<PasswordInput
+					password={password}
+					setPassword={setPassword}
+					onSubmitEditing={onPathDerivation}
+				/>
 				<PathCard
 					identity={accounts.state.currentIdentity!}
 					name={keyPairsName}
-					path={completePath}
+					path={
+						password === '' ? completePath : `${completePath}///${password}`
+					}
 					networkKey={currentNetworkKey}
 				/>
 
 				<ButtonMainAction
-					disabled={!validateDerivedPath(derivationPath)}
+					disabled={!isPathValid}
 					bottom={false}
 					style={{ marginTop: 8 }}
 					title="Next"

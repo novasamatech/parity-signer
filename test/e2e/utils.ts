@@ -14,16 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import {SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys} from 'constants/networkSpecs';
 import { expect, element, by, device } from 'detox';
 
 import testIDs from './testIDs';
 
-import {
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
-const { IdentityPin, AccountNetworkChooser, PathDetail, PathsList } = testIDs;
+const {
+	IdentityPin,
+	IdentityNew,
+	AccountNetworkChooser,
+	PathDetail,
+	PathsList
+} = testIDs;
 
+export const mockIdentityName = 'mockIdentity';
+export const mockSeedPhrase =
+	'ability cave solid soccer gloom thought response hard around minor want welcome';
 export const pinCode = '000000';
 const substrateNetworkButtonIndex =
 	AccountNetworkChooser.networkButton +
@@ -108,5 +114,16 @@ export const launchWithScanRequest = async (
 		launchArgs: { scanRequest: txRequest.toString() },
 		newInstance: true,
 		permissions: { camera: 'YES' }
+	});
+};
+
+export const testRecoverIdentity = (): void => {
+	it('recover a identity with seed phrase', async () => {
+		await testTap(AccountNetworkChooser.recoverButton);
+		await testVisible(IdentityNew.seedInput);
+		await testInput(IdentityNew.nameInput, mockIdentityName);
+		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
+		await element(by.id(IdentityNew.seedInput)).tapReturnKey();
+		await testSetUpDefaultPath();
 	});
 };

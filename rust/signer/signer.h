@@ -20,69 +20,62 @@
 
 // rust ffi
 
-// string
-struct rust_string;
-
-// string_ptr
-struct rust_string_ptr {
-	const uint8_t* ptr;
-	size_t len;
+struct ExternError {
+    int32_t code;
+    char *message; // note: nullable
 };
 
-// return ptr to rust_str
-struct rust_string_ptr* rust_string_ptr(const struct rust_string* s);
-
-// removes rust string
-void rust_string_destroy(struct rust_string* s);
-
-// removes string pointer
-void rust_string_ptr_destroy(struct rust_string_ptr* s);
+void signer_destroy_string(const char* cstring);
 
 // ethkey ffi
 
 // return keypair address, automatically picking BIP39 or parity phrases
-struct rust_string* ethkey_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed);
+const char* ethkey_brainwallet_address(struct ExternError*, const char* seed);
 
 // return keypair address from BIP39 phrase
-struct rust_string* ethkey_brainwallet_bip39_address(unsigned* error, const struct rust_string_ptr* seed);
+const char* ethkey_brainwallet_bip39_address(struct ExternError*, const char* seed);
 
 // returns message signed with keypair
-struct rust_string* ethkey_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* message);
+const char* ethkey_brainwallet_sign(struct ExternError*, const char* seed, const char* message);
 
 // returns rlp item at given position
-struct rust_string* rlp_item(unsigned* error, const struct rust_string_ptr* rlp, const unsigned position);
+const char* rlp_item(struct ExternError*, const char* rlp, const unsigned position);
 
-struct rust_string* keccak256(unsigned* error, const struct rust_string_ptr* data);
+const char* keccak256(struct ExternError*, const char* data);
 
-struct rust_string* blake(unsigned* error, const struct rust_string_ptr* data);
+const char* blake(struct ExternError*, const char* data);
 
-struct rust_string* eth_sign(unsigned* error, const struct rust_string_ptr* data);
+const char* eth_sign(struct ExternError*, const char* data);
 
-struct rust_string* blockies_icon(unsigned* error, const struct rust_string_ptr* blockies_seed);
+const char* blockies_icon(struct ExternError*, const char* blockies_seed);
 
-struct rust_string* random_phrase(unsigned* error, int words_number);
+const char* random_phrase(struct ExternError*, int words_number);
 
-struct rust_string* encrypt_data(unsigned* error, const struct rust_string_ptr* data, const struct rust_string_ptr* password);
+const char* encrypt_data(struct ExternError*, const char* data, const char* password);
 
-struct rust_string* decrypt_data(unsigned* error, const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password);
+const char* decrypt_data(struct ExternError*, const char* encrypted_data, const char* password);
 
 // qr code generator for utf-8 strings
-struct rust_string* qrcode(unsigned* error, const struct rust_string_ptr* data);
+const char* qrcode(struct ExternError*, const char* data);
 
 // qr code generator for hex-encoded binary
-struct rust_string* qrcode_hex(unsigned* error, const struct rust_string_ptr* data);
+const char* qrcode_hex(struct ExternError*, const char* data);
 
 // ss58 address (including prefix) for sr25519 key generated out of BIP39 phrase
-struct rust_string* substrate_brainwallet_address(unsigned* error, const struct rust_string_ptr* seed, const unsigned prefix);
+const char* substrate_brainwallet_address(struct ExternError*, const char* seed, const unsigned prefix);
 
-struct rust_string* substrate_brainwallet_sign(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* data);
+const char* substrate_brainwallet_sign(struct ExternError* err, const char* seed, const char* data);
 
-struct rust_string* schnorrkel_verify(unsigned* error, const struct rust_string_ptr* seed, const struct rust_string_ptr* msg, const struct rust_string_ptr* signature);
+const char* schnorrkel_verify(struct ExternError*, const char* seed, const char* msg, const char* signature);
 
-int64_t decrypt_data_ref(unsigned* error, const struct rust_string_ptr* encrypted_data, const struct rust_string_ptr* password);
+int64_t decrypt_data_ref(struct ExternError*, const char* encrypted_data, const char* password);
 
-void destroy_data_ref(unsigned* error, int64_t data_ref);
+void destroy_data_ref(struct ExternError*, int64_t data_ref);
 
-struct rust_string* ethkey_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* message);
+const char* ethkey_brainwallet_sign_with_ref(struct ExternError*, int64_t seed_ref, const char* message);
 
-struct rust_string* substrate_brainwallet_sign_with_ref(unsigned* error, int64_t seed_ref, const struct rust_string_ptr* data);
+const char* substrate_brainwallet_sign_with_ref(struct ExternError*, int64_t seed_ref, const char* suri_suffix, const char* data);
+
+const char* substrate_address_with_ref(struct ExternError*, int64_t seed_ref, const char* suri_suffix, const unsigned prefix);
+
+const char* brain_wallet_address_with_ref(struct ExternError*, int64_t seed_ref);

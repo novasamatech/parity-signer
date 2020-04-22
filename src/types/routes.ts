@@ -12,12 +12,6 @@ export type RootStackParamList = {
 	IdentityBackup: { isNew: true } | { isNew: false; seedPhrase: string };
 	IdentityManagement: undefined;
 	IdentityNew: { isRecover: boolean } | undefined;
-	IdentityPin: {
-		isUnlock?: boolean;
-		isNew?: boolean;
-		identity?: Identity;
-		resolve: (returnValue: string) => void;
-	};
 	MessageDetails: undefined;
 	Empty: undefined;
 	LegacyAccountBackup:
@@ -31,6 +25,13 @@ export type RootStackParamList = {
 	PathDetails: { path: string };
 	PathManagement: { path: string };
 	PathsList: { networkKey: string };
+	PinNew: { resolve: (pin: string) => void };
+	PinUnlock: { identity?: Identity; resolve: (seedPhrase: string) => void };
+	PinUnlockWithPassword: {
+		identity?: Identity;
+		path: string;
+		resolve: (suri: string) => void;
+	};
 	PrivacyPolicy: undefined;
 	QrScanner: undefined;
 	Security: undefined;

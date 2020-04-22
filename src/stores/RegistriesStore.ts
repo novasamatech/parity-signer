@@ -34,7 +34,9 @@ type NetworkTypesMap = {
 const networkTypesMap: NetworkTypesMap = {
 	centrifuge: {
 		alias: 'centrifuge-chain',
-		chains: {}
+		chains: {
+			centrifuge_amber: 'centrifuge-chain-amber'
+		}
 	},
 	kusama: { chains: {} },
 	polkadot: {
@@ -87,7 +89,8 @@ export default class RegistriesStore extends Container<RegistriesStoreState> {
 		const networkParams = SUBSTRATE_NETWORK_LIST[networkKey];
 		const newRegistry = new TypeRegistry();
 		const networkMetadataRaw = getMetadata(networkKey);
-		newRegistry.register(getOverrideTypes(newRegistry, networkParams.pathId));
+		const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+		newRegistry.register(overrideTypes);
 		const metadata = new Metadata(newRegistry, networkMetadataRaw);
 		newRegistry.setMetadata(metadata);
 		registries.set(networkKey, newRegistry);

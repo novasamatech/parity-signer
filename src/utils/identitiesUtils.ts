@@ -15,8 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { pathsRegex } from './regex';
-import { decryptData } from './native';
-import { parseSURI } from './suri';
+import { decryptData, substrateAddress } from './native';
+import { constructSURI, parseSURI } from './suri';
 import { generateAccountId } from './account';
 
 import {
@@ -37,6 +37,8 @@ import {
 	UnlockedAccount
 } from 'types/identityTypes';
 import {
+	centrifugeAmberMetadata,
+	centrifugeMetadata,
 	defaultMetaData,
 	kusamaMetadata,
 	substrateDevMetadata,
@@ -261,6 +263,24 @@ export const unlockIdentitySeed = async (
 	return phrase;
 };
 
+export const verifyPassword = async (
+	password: string,
+	seedPhrase: string,
+	identity: Identity,
+	path: string
+): Promise<boolean> => {
+	const suri = constructSURI({
+		derivePath: path,
+		password: password,
+		phrase: seedPhrase
+	});
+	const networkKey = getNetworkKey(path, identity);
+	const networkParams = SUBSTRATE_NETWORK_LIST[networkKey];
+	const address = await substrateAddress(suri, networkParams.prefix);
+	const accountMeta = identity.meta.get(path);
+	return address === accountMeta?.address;
+};
+
 export const getExistedNetworkKeys = (identity: Identity): string[] => {
 	const pathEntries = Array.from(identity.meta.entries());
 	const networkKeysSet = pathEntries.reduce(
@@ -376,6 +396,10 @@ export const groupPaths = (paths: string[]): PathGroup[] => {
 
 export const getMetadata = (networkKey: string): string => {
 	switch (networkKey) {
+		case SubstrateNetworkKeys.CENTRIFUGE:
+			return centrifugeMetadata;
+		case SubstrateNetworkKeys.CENTRIFUGE_AMBER:
+			return centrifugeAmberMetadata;
 		case SubstrateNetworkKeys.KUSAMA:
 		case SubstrateNetworkKeys.KUSAMA_CC2:
 		case SubstrateNetworkKeys.KUSAMA_DEV:

@@ -36,7 +36,6 @@ import {
 } from 'constants/networkSpecs';
 
 const {
-	TacScreen,
 	AccountNetworkChooser,
 	IdentitiesSwitch,
 	IdentityManagement,
@@ -53,14 +52,6 @@ const ethereumButtonIndex =
 	ETHEREUM_NETWORK_LIST[EthereumNetworkKeys.FRONTIER].ethereumChainId;
 
 describe('Load test', () => {
-	it('should have account list screen', async () => {
-		await testVisible(TacScreen.tacView);
-		await testTap(TacScreen.agreePrivacyButton);
-		await testTap(TacScreen.agreeTacButton);
-		await testTap(TacScreen.nextButton);
-		await testVisible(AccountNetworkChooser.noAccountScreen);
-	});
-
 	it('create a new identity with default substrate account', async () => {
 		await testTap(AccountNetworkChooser.createButton);
 		await testNotVisible(IdentityNew.seedInput);

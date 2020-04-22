@@ -28,7 +28,7 @@ export const setPin = async <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
 ): Promise<string> =>
 	new Promise(resolve => {
-		navigation.navigate('IdentityPin', { isNew: true, resolve });
+		navigation.navigate('PinNew', { resolve });
 	});
 
 export const unlockSeedPhrase = async <
@@ -38,9 +38,23 @@ export const unlockSeedPhrase = async <
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
-		navigation.navigate('IdentityPin', {
+		navigation.navigate('PinUnlock', {
 			identity,
-			isUnlock: true,
+			resolve
+		});
+	});
+
+export const unlockSeedPhraseWithPassword = async <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
+	path: string,
+	identity?: Identity
+): Promise<string> =>
+	new Promise(resolve => {
+		navigation.navigate('PinUnlockWithPassword', {
+			identity,
+			path,
 			resolve
 		});
 	});
