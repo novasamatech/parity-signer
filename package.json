@@ -129,7 +129,7 @@
         }
       },
       "ios.sim.release": {
-        "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
+        "binaryPath": "ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app",
         "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
