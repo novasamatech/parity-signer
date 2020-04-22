@@ -1,4 +1,4 @@
-name:                   Check
+name:                   E2E Test
 
 on:
   pull_request:
@@ -109,6 +109,8 @@ jobs:
         run:            cd ios && pod install && cd ..
       - name:           Build targets
         run:            cd rust/signer && make ios && cd ../..
+      - name:           Rust Unit Test
+        run:            yarn test-rust
       - name:           Stop sccache
         if:             always()
         run:            sccache --stop-server

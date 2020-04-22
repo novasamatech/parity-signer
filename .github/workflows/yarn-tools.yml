@@ -1,4 +1,4 @@
-name:                   Yarn
+name:                   Lint & Unit Test
 
 on:
   pull_request:
@@ -40,9 +40,9 @@ jobs:
           key:          ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name:           Yarn
-        run:            |
-          yarn
-          yarn lint
-          yarn unit
-          yarn tsc
+      - name:           Lint
+        run:            yarn lint
+      - name:           Unit Test
+        run:            yarn unit
+      - name:           Type checking
+        run:            yarn tsc
