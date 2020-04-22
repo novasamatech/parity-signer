@@ -41,9 +41,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name:           Install dependencies
-             run:            |
-               npm install -g yarn
-               yarn
+        run:            |
+           npm install -g yarn
+           yarn
       - name:           ESLint
         uses:           stefanoeb/eslint-action@1.0.2
         with:
