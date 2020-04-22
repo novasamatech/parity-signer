@@ -114,8 +114,4 @@ jobs:
       - name:           Stop sccache
         if:             always()
         run:            sccache --stop-server
-      - name:           Detox biuld
-        run:            detox build -c ios.sim.release
-      - name:           Detox test
-        run:            detox test -c ios.sim.release --cleanup
 
