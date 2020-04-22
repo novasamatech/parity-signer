@@ -18,36 +18,31 @@ jobs:
       - name:           Checkout submodules
         shell:          bash
         run:            git submodule update --init --recursive
-      - name:           Install stable toolchain
+      - name:           Install 1.41.1 toolchain
         uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:    stable
+          toolchain:    1.41.1
           profile:      minimal
           override:     true
-      - name:           Add target i386-apple-ios
-        uses:           actions-rs/toolchain@v1.0.5
-        with:
-          toolchain:    stable
-          target:       i386-apple-ios
       - name:           Add target x86_64-apple-ios
         uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:    stable
+          toolchain:    1.41.1
           target:       x86_64-apple-ios
       - name:           Add target armv7-apple-ios
         uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:    stable
+          toolchain:    1.41.1
           target:       armv7-apple-ios
       - name:           Add target armv7s-apple-ios
         uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:    stable
+          toolchain:    1.41.1
           target:       armv7s-apple-ios
       - name:           Add target aarch64-apple-ios
         uses:           actions-rs/toolchain@v1.0.5
         with:
-          toolchain:    stable
+          toolchain:    1.41.1
           target:       aarch64-apple-ios
       - name:           Cache cargo registry
         uses:           actions/cache@v1.1.2
