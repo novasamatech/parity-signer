@@ -21,7 +21,7 @@ jobs:
       - name:           Install NodeJS
         uses:           actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: '13.x'
       - name:           Cache Npm
         uses:           actions/cache@v1
         with:
@@ -40,7 +40,11 @@ jobs:
           key:          ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+      - name:           Install dependencies
+             run:            |
+               npm install -g yarn
+               yarn
       - name:           ESLint
         uses:           stefanoeb/eslint-action@1.0.2
         with:
-          files:        src/
+          files:        .
