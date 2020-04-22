@@ -42,6 +42,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - name:           Yarn
         run:            |
+          yarn
           yarn lint
           yarn unit
           yarn tsc
