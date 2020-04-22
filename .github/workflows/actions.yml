@@ -93,7 +93,10 @@ jobs:
       - name:           Build CocoaPods
         run:            cd ios && pod install && cd ..
       - name:           Build targets
-        run:            cd rust/signer && make ios && cd ../..
+        run:            |
+          cd rust/signer
+          cargo build --target x86_64-apple-ios --release --no-default-features
+          lipo -create -output libsigner.a ./target/x86_64-apple-ios/release/libsigner.a
       - name:           Rust Unit Test
         run:            yarn test-rust
       - name:           Stop sccache
