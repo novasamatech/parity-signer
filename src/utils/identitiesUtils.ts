@@ -40,6 +40,8 @@ import {
 	centrifugeAmberMetadata,
 	centrifugeMetadata,
 	defaultMetaData,
+	edgewareMetadata,
+	kulupuMetadata,
 	kusamaMetadata,
 	substrateDevMetadata,
 	westendMetadata
@@ -408,6 +410,10 @@ export const getMetadata = (networkKey: string): string => {
 			return westendMetadata;
 		case SubstrateNetworkKeys.SUBSTRATE_DEV:
 			return substrateDevMetadata;
+		case SubstrateNetworkKeys.EDGEWARE:
+			return edgewareMetadata;
+		case SubstrateNetworkKeys.KULUPU:
+			return kulupuMetadata;
 		default:
 			return defaultMetaData;
 	}

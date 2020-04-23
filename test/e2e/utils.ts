@@ -17,13 +17,27 @@
 import { expect, element, by, device } from 'detox';
 
 import testIDs from './testIDs';
-const { IdentityPin, IdentityNew, Main, PathDetail, PathsList } = testIDs;
+
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
+
+const {
+	IdentityPin,
+	IdentityNew,
+	Main,
+	PathDetail,
+	PathsList
+} = testIDs;
 
 export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
 	'ability cave solid soccer gloom thought response hard around minor want welcome';
 export const pinCode = '000000';
-const substrateNetworkButtonIndex = Main.networkButton + 'kusama';
+const substrateNetworkButtonIndex =
+	Main.networkButton +
+	SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathId;
 
 export const testTap = async (buttonId: string): Promise<Detox.Actions<any>> =>
 	await element(by.id(buttonId)).tap();
