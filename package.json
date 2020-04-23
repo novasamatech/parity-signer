@@ -17,6 +17,7 @@
     "build:android": "yarn install && yarn build-rust:android",
 	"xcbuild:debug": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
 	"xcbuild:release": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
+	"xcbuild:githubActions": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration GithubActions -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force && rm -rf ./android/app/build && rm -rf ./ios/build && yarn clean-rust && (cd ios && pod deintegrate)",
     "clean-rust": "(cd rust/signer && cargo clean)",
     "commit": "commit-wizard",
@@ -31,7 +32,9 @@
     "test-e2e:android": "detox test -c android.emu.debug -l info --noStackTrace",
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
     "build-e2e:ios": "detox build -c ios.sim.debug -l info",
+    "build-e2e:ci": "detox build -c ios.sim.release -l info",
     "test-e2e:ios": "detox test -c ios.sim.debug -l info --noStackTrace",
+    "test-e2e:ci": "detox test -c ios.sim.release -l info --noStackTrace  --cleanup",
     "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios",
 	"e2e": "yarn e2e:ios && yarn e2e:android"
   },
@@ -126,11 +129,12 @@
         }
       },
       "ios.sim.release": {
-        "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
-        "build": "yarn xcbuild:release",
+        "binaryPath": "ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app",
+        "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone SE"
+          "os": "iOS 13.3",
+          "type": "iPhone 8"
         }
       },
       "android.emu.debug": {

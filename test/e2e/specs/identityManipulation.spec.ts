@@ -30,7 +30,10 @@ import {
 	testSetUpDefaultPath,
 	pinCode
 } from 'e2e/utils';
-import { EthereumNetworkKeys } from 'constants/networkSpecs';
+import {
+	ETHEREUM_NETWORK_LIST,
+	EthereumNetworkKeys
+} from 'constants/networkSpecs';
 
 const {
 	AccountNetworkChooser,
@@ -45,6 +48,8 @@ const {
 
 const defaultPath = '//default';
 const customPath = '//sunny_day/1';
+const ethereumButtonIndex =
+	ETHEREUM_NETWORK_LIST[EthereumNetworkKeys.FRONTIER].ethereumChainId;
 
 describe('Load test', () => {
 	it('create a new identity with default substrate account', async () => {
@@ -106,13 +111,15 @@ describe('Load test', () => {
 
 	it('is able to delete it', async () => {
 		//'1' is frontier network chainId defined in networkSpecs.ts
-		await testTap(AccountNetworkChooser.networkButton + 1);
+		await testTap(AccountNetworkChooser.networkButton + ethereumButtonIndex);
 		await testVisible(PathDetail.screen);
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
 		await testUnlockPin(pinCode);
-		await testNotExist(AccountNetworkChooser.networkButton + 1);
+		await testNotExist(
+			AccountNetworkChooser.networkButton + ethereumButtonIndex
+		);
 	});
 
 	it('delete identity', async () => {
