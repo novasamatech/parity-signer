@@ -1,0 +1,109 @@
+name:                   E2E & Rust Unit
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable
+jobs:
+  check:
+    name:               Check
+    runs-on:            macos-latest
+    steps:
+      - name:           Checkout sources
+        uses:           actions/checkout@v2
+        with:
+          fetch-depth:  50
+      - name:           Checkout submodules
+        shell:          bash
+        run:            git submodule update --init --recursive
+      - name:           Install 1.41.1 toolchain
+        uses:           actions-rs/toolchain@v1.0.5
+        with:
+          toolchain:    1.41.1
+          profile:      minimal
+          override:     true
+      - name:           Add target x86_64-apple-ios
+        uses:           actions-rs/toolchain@v1.0.5
+        with:
+          toolchain:    1.41.1
+          target:       x86_64-apple-ios
+      - name:           Cache cargo registry
+        uses:           actions/cache@v1.1.2
+        with:
+          path:         ~/.cargo/registry
+          key:          ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Cache cargo index
+        uses:           actions/cache@v1.1.2
+        with:
+          path:         ~/.cargo/git
+          key:          ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Cache cargo build
+        uses:           actions/cache@v1.1.2
+        with:
+          path:         target
+          key:          ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Cache sccache MacOS
+        uses:           actions/cache@v1.1.2
+        with:
+          path:         "/Users/runner/Library/Caches/Mozilla.sccache"
+          key:          ${{ runner.os }}-sccache-build-tests-${{ hashFiles('**/Cargo.lock') }}
+      - name:           Install sccache for MacOS
+        shell:          pwsh
+        run:            pwsh scripts/actions/install-sccache.ps1 ${{ runner.os}}
+      - name:           Install NodeJS
+        uses:           actions/setup-node@v1
+        with:
+          node-version: '13.x'
+      - name:           Cache Npm
+        uses:           actions/cache@v1
+        with:
+          path:         ~/.npm
+          key:          ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name:           Get yarn cache directory path
+        id:             yarn-cache-dir-path
+        run:            echo "::set-output name=dir::$(yarn cache dir)"
+      - name:           Cache Yarn
+        uses:           actions/cache@v1
+        id:             yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path:         ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key:          ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name:           Cache Pods
+        uses:           actions/cache@v1
+        with:
+          path:         ios/Pods
+          key:          ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+      - name:           Install dependencies
+        run:            |
+          brew tap wix/brew
+          brew install applesimutils
+          npm install -g yarn
+          npm install -g react-native-cli
+          npm install -g detox-cli
+          gem install xcpretty
+          yarn
+      - name:           Build CocoaPods
+        run:            cd ios && pod install && cd ..
+      - name:           Build targets
+        run:            |
+          cd rust/signer
+          cargo build --target x86_64-apple-ios --release --no-default-features
+          lipo -create -output libsigner.a ./target/x86_64-apple-ios/release/libsigner.a
+      - name:           Rust Unit Test
+        run:            yarn test-rust
+      - name:           Stop sccache
+        if:             always()
+        run:            sccache --stop-server
+      - name:           Detox biuld
+        run:            yarn build-e2e:ci
+      - name:           Detox test
+        run:            yarn test-e2e:ci
+
