@@ -23,13 +23,7 @@ import {
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
 
-const {
-	IdentityPin,
-	IdentityNew,
-	Main,
-	PathDetail,
-	PathsList
-} = testIDs;
+const { IdentityPin, IdentityNew, Main, PathDetail, PathsList } = testIDs;
 
 export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =

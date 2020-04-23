@@ -123,9 +123,7 @@ describe('Load test', () => {
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
 		await element(by.text('Delete')).tap();
-		await testNotExist(
-			Main.networkButton + ethereumButtonIndex
-		);
+		await testNotExist(Main.networkButton + ethereumButtonIndex);
 	});
 
 	it('delete identity', async () => {
