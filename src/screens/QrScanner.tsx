@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import { Subscribe } from 'unstated';
@@ -29,111 +29,100 @@ import { isAddressString, isJsonString, rawDataToU8A } from 'utils/decoders';
 import ScreenHeading from 'components/ScreenHeading';
 import { TxRequestData } from 'types/scannerTypes';
 
-interface State {
-	enableScan: boolean;
-}
+export default function Scanner ({navigation, route}: NavigationProps<'QrScanner'>): React.ReactElement{
 
-export default class Scanner extends React.PureComponent<
-	NavigationProps<'QrScanner'>,
-	State
-> {
-	constructor(props: NavigationProps<'QrScanner'>) {
-		super(props);
-		this.state = { enableScan: true };
-	}
+	const [enableScan, setEnableScan] = useState<boolean>(true);
 
-	showErrorMessage(
+	function showErrorMessage(
 		scannerStore: ScannerStore,
 		title: string,
 		message: string
 	): void {
-		this.setState({ enableScan: false });
+		setEnableScan(false);
 		Alert.alert(title, message, [
 			{
 				onPress: async (): Promise<void> => {
 					await scannerStore.cleanup();
-					this.setState({ enableScan: true });
+					setEnableScan(true);
 				},
 				text: 'Try again'
 			}
 		]);
 	}
 
-	render(): React.ReactElement {
-		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(
-					scannerStore: ScannerStore,
-					accountsStore: AccountsStore
-				): React.ReactElement => {
-					return (
-						<QrScannerView
-							completedFramesCount={scannerStore.getCompletedFramesCount()}
-							isMultipart={scannerStore.getTotalFramesCount() > 1}
-							missedFrames={scannerStore.getMissedFrames()}
-							navigation={this.props.navigation}
-							route={this.props.route}
-							scannerStore={scannerStore}
-							totalFramesCount={scannerStore.getTotalFramesCount()}
-							onBarCodeRead={async (
-								txRequestData: TxRequestData
-							): Promise<void> => {
-								if (scannerStore.isBusy() || !this.state.enableScan) {
-									return;
-								}
-								try {
-									if (isAddressString(txRequestData.data)) {
-										return this.showErrorMessage(
-											scannerStore,
-											text.ADDRESS_ERROR_TITLE,
-											text.ADDRESS_ERROR_MESSAGE
-										);
-									} else if (isJsonString(txRequestData.data)) {
-										// Ethereum Legacy
-										await scannerStore.setUnsigned(txRequestData.data);
-									} else if (!scannerStore.isMultipartComplete()) {
-										const strippedData = rawDataToU8A(txRequestData.rawData);
-										if (strippedData === null)
-											return this.showErrorMessage(
-												scannerStore,
-												text.PARSE_ERROR_TITLE,
-												'There is no raw Data from the request'
-											);
-										await scannerStore.setParsedData(
-											strippedData,
-											accountsStore,
-											false
-										);
-									}
-
-									if (scannerStore.getErrorMsg()) {
-										throw new Error(scannerStore.getErrorMsg());
-									}
-
-									if (scannerStore.getUnsigned()) {
-										await scannerStore.setData(accountsStore);
-										if (scannerStore.getType() === 'transaction') {
-											scannerStore.clearMultipartProgress();
-											this.props.navigation.navigate('TxDetails');
-										} else {
-											scannerStore.clearMultipartProgress();
-											this.props.navigation.navigate('MessageDetails');
-										}
-									}
-								} catch (e) {
-									return this.showErrorMessage(
+	return (
+		<Subscribe to={[ScannerStore, AccountsStore]}>
+			{(
+				scannerStore: ScannerStore,
+				accountsStore: AccountsStore
+			): React.ReactElement => {
+				return (
+					<QrScannerView
+						completedFramesCount={scannerStore.getCompletedFramesCount()}
+						isMultipart={scannerStore.getTotalFramesCount() > 1}
+						missedFrames={scannerStore.getMissedFrames()}
+						navigation={navigation}
+						route={route}
+						scannerStore={scannerStore}
+						totalFramesCount={scannerStore.getTotalFramesCount()}
+						onBarCodeRead={async (
+							txRequestData: TxRequestData
+						): Promise<void> => {
+							if (scannerStore.isBusy() || !enableScan) {
+								return;
+							}
+							try {
+								if (isAddressString(txRequestData.data)) {
+									return showErrorMessage(
 										scannerStore,
-										text.PARSE_ERROR_TITLE,
-										e.message
+										text.ADDRESS_ERROR_TITLE,
+										text.ADDRESS_ERROR_MESSAGE
+									);
+								} else if (isJsonString(txRequestData.data)) {
+									// Ethereum Legacy
+									await scannerStore.setUnsigned(txRequestData.data);
+								} else if (!scannerStore.isMultipartComplete()) {
+									const strippedData = rawDataToU8A(txRequestData.rawData);
+									if (strippedData === null)
+										return showErrorMessage(
+											scannerStore,
+											text.PARSE_ERROR_TITLE,
+											'There is no raw Data from the request'
+										);
+									await scannerStore.setParsedData(
+										strippedData,
+										accountsStore,
+										false
 									);
 								}
-							}}
-						/>
-					);
-				}}
-			</Subscribe>
-		);
-	}
+
+								if (scannerStore.getErrorMsg()) {
+									throw new Error(scannerStore.getErrorMsg());
+								}
+
+								if (scannerStore.getUnsigned()) {
+									await scannerStore.setData(accountsStore);
+									if (scannerStore.getType() === 'transaction') {
+										scannerStore.clearMultipartProgress();
+										navigation.navigate('TxDetails');
+									} else {
+										scannerStore.clearMultipartProgress();
+										navigation.navigate('MessageDetails');
+									}
+								}
+							} catch (e) {
+								return showErrorMessage(
+									scannerStore,
+									text.PARSE_ERROR_TITLE,
+									e.message
+								);
+							}
+						}}
+					/>
+				);
+			}}
+		</Subscribe>
+	);
 }
 
 interface ViewProps extends NavigationScannerProps<'QrScanner'> {
