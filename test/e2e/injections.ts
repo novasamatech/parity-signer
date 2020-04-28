@@ -66,7 +66,7 @@ const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 
 export const onMockBarCodeRead = (
 	txRequest: ScanTestRequest,
-	onBarCodeRead: (tx: any) => void
+	onBarCodeRead: (tx: TxRequestData) => void
 ): void => {
 	const scanRequest = scanRequestDataMap[txRequest];
 	if (typeof scanRequest === 'string') {

@@ -82,7 +82,6 @@ type ScannerState = {
 	multipartComplete: boolean;
 	prehash: GenericExtrinsicPayload | null;
 	recipient: FoundAccount | null;
-	scanErrorMsg: string;
 	sender: FoundAccount | null;
 	signedData: string;
 	signedTxList: SignedTX[];
@@ -106,7 +105,6 @@ const DEFAULT_STATE = Object.freeze({
 	multipartData: {},
 	prehash: null,
 	recipient: null,
-	scanErrorMsg: '',
 	sender: null,
 	signedData: '',
 	signedTxList: [],
@@ -187,7 +185,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			}
 
 			// if the account was not found, unsignedData was never set, alert the user appropriately.
-			this.setErrorMsg(
+			throw new Error(
 				`No private key found for ${parsedData.data.account} in your signer key storage.`
 			);
 		}
@@ -638,14 +636,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getSignedTxData(): string {
 		return this.state.signedData;
-	}
-
-	setErrorMsg(scanErrorMsg: string): void {
-		this.setState({ scanErrorMsg });
-	}
-
-	getErrorMsg(): string {
-		return this.state.scanErrorMsg;
 	}
 
 	getMissedFrames(): number[] {

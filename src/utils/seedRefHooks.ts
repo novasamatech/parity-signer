@@ -3,7 +3,7 @@ import { useContext, useMemo } from 'react';
 import { SeedRefsContext } from 'stores/SeedRefStore';
 import { SeedRefClass } from 'utils/native';
 
-export type TryCreateFunc = (password: string) => Promise<void>;
+export type TryCreateFunc = (password: string) => Promise<SeedRefClass>;
 export type TryDestroyFunc = () => Promise<void>;
 export type TrySignFunc = (
 	suriSuffix: string,
@@ -62,6 +62,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 		await seedRef.tryCreate(encryptedSeed, password);
 		const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
 		setSeedRefs(newSeedRefs);
+		return seedRef;
 	};
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or

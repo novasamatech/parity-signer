@@ -39,12 +39,12 @@ function PinUnlockWithPassword({
 
 	async function submit(): Promise<void> {
 		const { pin, password } = state;
-		const resolve = route.params.resolve;
 		if (!route.params.isSeedRefValid) {
+			const resolveWithSeedRef = route.params.resolve;
 			if (pin.length >= 6 && targetIdentity) {
 				try {
-					await createSeedRef(pin);
-					resolve(password);
+					const seedRef = await createSeedRef(pin);
+					resolveWithSeedRef([password, seedRef]);
 					resetState();
 				} catch (e) {
 					updateState({ password: '', pin: '', pinMismatch: true });
@@ -54,7 +54,8 @@ function PinUnlockWithPassword({
 				updateState({ pinTooShort: true });
 			}
 		} else {
-			resolve(password);
+			const resolvePassword = route.params.resolve;
+			resolvePassword(password);
 			resetState();
 		}
 	}

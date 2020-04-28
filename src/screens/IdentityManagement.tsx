@@ -23,7 +23,7 @@ import { NavigationAccountProps } from 'types/props';
 import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
-	getSeedPhrase,
+	unlockAndReturnSeed,
 	navigateToLandingPage,
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
@@ -69,7 +69,7 @@ function IdentityManagement({
 				}
 			);
 		} else if (value === 'IdentityBackup') {
-			const seedPhrase = await getSeedPhrase(navigation);
+			const seedPhrase = await unlockAndReturnSeed(navigation);
 			navigation.pop();
 			navigation.navigate(value, { isNew: false, seedPhrase });
 		}
