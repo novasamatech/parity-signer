@@ -18,7 +18,6 @@ import { isU8a, u8aToHex } from '@polkadot/util';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import Button from 'components/Button';
 import CompatibleCard from 'components/CompatibleCard';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
 import { NETWORK_LIST } from 'constants/networkSpecs';
@@ -27,11 +26,9 @@ import testIDs from 'e2e/testIDs';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import {
 	NavigationAccountScannerProps,
-	NavigationScannerProps
 } from 'types/props';
 import QrView from 'components/QrView';
-import { alertMultipart } from 'utils/alertUtils';
-import { withAccountAndScannerStore, withScannerStore } from 'utils/HOC';
+import { withAccountAndScannerStore } from 'utils/HOC';
 import fontStyles from 'styles/fontStyles';
 import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 

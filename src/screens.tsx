@@ -46,7 +46,6 @@ import IdentityNew from 'screens/IdentityNew';
 import LegacyAccountBackup from 'screens/LegacyAccountBackup';
 import LegacyAccountList from 'screens/LegacyAccountList';
 import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
-import MessageDetails from 'modules/sign/screens/MessageDetails';
 import PathDerivation from 'screens/PathDerivation';
 import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
@@ -57,7 +56,6 @@ import Security from 'screens/Security';
 import SignedMessage from 'modules/sign/screens/SignedMessage';
 import SignedTx from 'modules/sign/screens/SignedTx';
 import TermsAndConditions from 'screens/TermsAndConditions';
-import TxDetails from 'modules/sign/screens/TxDetails';
 import colors from 'styles/colors';
 import { RootStackParamList } from 'types/routes';
 
@@ -143,7 +141,6 @@ export const AppNavigator = (): React.ReactElement => (
 			component={IdentityManagement}
 		/>
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
-		<ScreenStack.Screen name="MessageDetails" component={MessageDetails} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
@@ -158,7 +155,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
-		<ScreenStack.Screen name="TxDetails" component={TxDetails} />
 		<ScreenStack.Screen
 			name="TermsAndConditions"
 			component={TermsAndConditions}

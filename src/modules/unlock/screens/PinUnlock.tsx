@@ -51,10 +51,10 @@ function PinUnlock({
 					resetState();
 					resolveSeedPhrase(seedPhrase);
 				} else {
-					const resolveSeedRef = route.params.resolve;
-					const seedRef = await createSeedRef(pin);
+					const resolve = route.params.resolve;
+					await createSeedRef(pin);
 					resetState();
-					resolveSeedRef(seedRef);
+					resolve();
 				}
 			} catch (e) {
 				updateState({ pin: '', pinMismatch: true });

@@ -6,15 +6,15 @@ import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { RootStackParamList } from 'types/routes';
-import { isMultipartData, TxRequestData } from 'types/scannerTypes';
+import { TxRequestData } from 'types/scannerTypes';
 import { isAddressString, isJsonString, rawDataToU8A } from 'utils/decoders';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
 	navigateToSignedMessage,
 	navigateToSignedTx,
-	unlockAndReturnSeedRef,
-	unlockSeedPhraseWithPasswordAndReturnSeedRef
+	unlockSeedPhrase,
+	unlockSeedPhraseWithPassword
 } from 'utils/navigationHelpers';
 import { constructSuriSuffix } from 'utils/suri';
 
@@ -69,22 +69,23 @@ export async function processBarCode(
 		if (!senderIdentity) throw new Error(text.NO_SENDER_IDENTITY_ERROR);
 
 		let seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
+		console.log('first get seed ref is ', seedRef, "with tx request", txRequestData.rawData);
 		let password = '';
 
 		// unlock and get Seed reference
 		if (seedRef === undefined || !seedRef.isValid()) {
 			if (sender.hasPassword) {
 				//need unlock with password
-				[
-					password,
-					seedRef
-				] = await unlockSeedPhraseWithPasswordAndReturnSeedRef(
+				[password] = await unlockSeedPhraseWithPassword(
 					navigation,
+					false,
 					senderIdentity
 				);
-				//TODO test get seed ref directly from seedRefs
+			} else {
+				await unlockSeedPhrase(navigation, false, senderIdentity);
 			}
-			seedRef = await unlockAndReturnSeedRef(navigation, senderIdentity);
+			seedRef = getSeedRef(sender.encryptedSeed, seedRefs)!;
+			console.log('third seed ref is ', seedRef);
 		}
 
 		// sign data
@@ -104,6 +105,7 @@ export async function processBarCode(
 
 	try {
 		await parseQrData();
+		console.log('continue with data', txRequestData.rawData);
 		if (scannerStore.getUnsigned() === null) return;
 		await scannerStore.setData(accounts);
 		scannerStore.clearMultipartProgress();

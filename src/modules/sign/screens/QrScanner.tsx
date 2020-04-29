@@ -26,6 +26,7 @@ import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { TxRequestData } from 'types/scannerTypes';
+import {Tx} from 'types/tx';
 import { withAccountAndScannerStore } from 'utils/HOC';
 
 export function Scanner({
@@ -35,6 +36,7 @@ export function Scanner({
 }: NavigationAccountScannerProps<'QrScanner'>): React.ReactElement {
 	const [seedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
+	const [lastFrame, setLastFrame] = useState<null|TxRequestData>(null);
 	useEffect((): (() => void) => {
 		const unsubscribeFocus = navigation.addListener(
 			'focus',
@@ -59,10 +61,13 @@ export function Scanner({
 
 	function showErrorMessage(title: string, message: string): void {
 		setEnableScan(false);
+		scannerStore.setBusy();
 		Alert.alert(title, message, [
 			{
 				onPress: async (): Promise<void> => {
 					await scannerStore.cleanup();
+					scannerStore.setReady();
+					setLastFrame(null);
 					setEnableScan(true);
 				},
 				text: 'Try again'
@@ -88,10 +93,13 @@ export function Scanner({
 		<RNCamera
 			captureAudio={false}
 			onBarCodeRead={(event: any): void => {
-				console.log('event is', event);
 				if (scannerStore.isBusy() || !enableScan) {
 					return;
 				}
+				if(event as TxRequestData === lastFrame) {
+					return;
+				}
+				setLastFrame(event);
 				processBarCode(
 					showErrorMessage,
 					event as TxRequestData,

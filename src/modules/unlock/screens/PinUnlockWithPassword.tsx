@@ -43,8 +43,8 @@ function PinUnlockWithPassword({
 			const resolveWithSeedRef = route.params.resolve;
 			if (pin.length >= 6 && targetIdentity) {
 				try {
-					const seedRef = await createSeedRef(pin);
-					resolveWithSeedRef([password, seedRef]);
+					await createSeedRef(pin);
+					resolveWithSeedRef(password);
 					resetState();
 				} catch (e) {
 					updateState({ password: '', pin: '', pinMismatch: true });

@@ -1,5 +1,4 @@
 import { Identity } from 'types/identityTypes';
-import { SeedRefClass } from 'utils/native';
 
 export type RootStackParamList = {
 	About: undefined;
@@ -35,20 +34,14 @@ export type RootStackParamList = {
 		  }
 		| {
 				identity?: Identity;
-				resolve: (seedRef: SeedRefClass) => void;
+				resolve: () => void;
 				shouldReturnSeed: false;
 		  };
-	PinUnlockWithPassword:
-		| {
-				identity?: Identity;
-				isSeedRefValid: true;
-				resolve: (password: string) => void;
-		  }
-		| {
-				identity?: Identity;
-				isSeedRefValid: false;
-				resolve: ([password, seedRef]: [string, SeedRefClass]) => void;
-		  };
+	PinUnlockWithPassword: {
+		identity?: Identity;
+		isSeedRefValid: boolean;
+		resolve: (password: string) => void;
+	};
 	PrivacyPolicy: undefined;
 	QrScanner: undefined;
 	Security: undefined;
