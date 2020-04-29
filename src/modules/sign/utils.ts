@@ -43,6 +43,7 @@ export async function processBarCode(
 			await scannerStore.setUnsigned(txRequestData.data);
 		} else if (!scannerStore.isMultipartComplete()) {
 			const strippedData = rawDataToU8A(txRequestData.rawData);
+			console.log('strippedData is ,', strippedData);
 			if (strippedData === null) throw new Error(text.NO_RAW_DATA_ERROR);
 			await scannerStore.setParsedData(strippedData, accounts, false);
 		}

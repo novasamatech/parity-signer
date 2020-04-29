@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST } from 'constants/networkSpecs';
@@ -29,6 +29,7 @@ import { withAccountAndScannerStore } from 'utils/HOC';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
+import styles from 'modules/sign/styles';
 
 function SignedTx({
 	scannerStore,
@@ -54,35 +55,6 @@ function SignedTx({
 		[scannerStore]
 	);
 
-	const renderTxPayload = (): React.ReactElement => {
-		const networkParams = NETWORK_LIST[sender!.networkKey];
-		if (isEthereumNetworkParams(networkParams)) {
-			const { gas, gasPrice, value } = scannerStore.getTx() as Transaction;
-			return (
-				<React.Fragment>
-					<TxDetailsCard
-						style={{ marginBottom: 20 }}
-						description={TX_DETAILS_MSG}
-						value={value}
-						gas={gas}
-						gasPrice={gasPrice}
-					/>
-					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient} accountsStore={accounts} />
-				</React.Fragment>
-			);
-		} else {
-			return (
-				<PayloadDetailsCard
-					style={{ marginBottom: 20 }}
-					description={TX_DETAILS_MSG}
-					signature={data}
-					networkKey={sender!.networkKey}
-				/>
-			);
-		}
-	};
-
 	return (
 		<SafeAreaScrollViewContainer
 			contentContainerStyle={{ paddingBottom: 40 }}
@@ -93,13 +65,8 @@ function SignedTx({
 				<QrView data={data} />
 			</View>
 
-			<Text style={styles.title}>Transaction Details</Text>
-			<View style={{ marginBottom: 20, marginHorizontal: 20 }}>
-				{renderTxPayload()}
-			</View>
-
 			<Text style={[fontStyles.t_big, styles.bodyContent]}>
-				{`You are about to confirm sending the following ${
+				{`You are about to sending the following ${
 					isEthereum ? 'transaction' : 'extrinsic'
 				}`}
 			</Text>
@@ -125,6 +92,7 @@ function SignedTx({
 					<PayloadDetailsCard
 						style={{ marginBottom: 20 }}
 						payload={prehash!}
+						signature={data}
 						networkKey={sender.networkKey}
 					/>
 				)}
@@ -136,26 +104,3 @@ function SignedTx({
 export default withAccountAndScannerStore(SignedTx);
 
 const TX_DETAILS_MSG = 'After signing and publishing you will have sent';
-
-const styles = StyleSheet.create({
-	body: {
-		paddingTop: 24
-	},
-	bodyContent: {
-		marginVertical: 16,
-		paddingHorizontal: 20
-	},
-	qr: {
-		marginBottom: 20
-	},
-	title: {
-		...fontStyles.h2,
-		marginHorizontal: 20,
-		paddingBottom: 20
-	},
-	topTitle: {
-		...fontStyles.h1,
-		paddingBottom: 20,
-		textAlign: 'center'
-	}
-});

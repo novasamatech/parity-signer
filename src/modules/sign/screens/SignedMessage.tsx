@@ -29,7 +29,7 @@ import {
 } from 'types/props';
 import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
-import fontStyles from 'styles/fontStyles';
+import styles from 'modules/sign/styles';
 import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 
 function SignedMessage({
@@ -61,43 +61,25 @@ function SignedMessage({
 			<View testID={testIDs.SignedMessage.qrView}>
 				<QrView data={data} />
 			</View>
-			<MessageDetailsCard
-				isHash={isHash}
-				message={message ?? ''}
-				data={data}
-				style={styles.messageDetail}
-			/>
-			<Text style={styles.topTitle}>Sign Message</Text>
-			<Text style={styles.title}>From Account</Text>
-			<CompatibleCard account={sender} accountsStore={accounts} />
-			{!isEthereum && prehash ? (
-				<PayloadDetailsCard
-					description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
-					payload={prehash}
-					networkKey={sender.networkKey}
+			<View style={styles.bodyContent}>
+				<Text style={styles.title}>From Account</Text>
+				<CompatibleCard account={sender} accountsStore={accounts} />
+				{!isEthereum && prehash ? (
+					<PayloadDetailsCard
+						description="You are about to sending the following extrinsic. We will sign the hash of the payload as it is oversized."
+						payload={prehash}
+						signature={data}
+						networkKey={sender.networkKey}
+					/>
+				) : null}
+				<MessageDetailsCard
+					isHash={isHash ?? false}
+					message={message}
+					data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
 				/>
-			) : null}
-			<MessageDetailsCard
-				isHash={isHash ?? false}
-				message={message}
-				data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
-			/>
+			</View>
 		</SafeAreaScrollViewContainer>
 	);
 }
 
 export default withAccountAndScannerStore(SignedMessage);
-
-const styles = StyleSheet.create({
-	messageDetail: {
-		paddingHorizontal: 20
-	},
-	title: {
-		...fontStyles.h2,
-		paddingBottom: 20
-	},
-	topTitle: {
-		...fontStyles.h1,
-		textAlign: 'center'
-	}
-});

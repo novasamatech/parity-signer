@@ -145,9 +145,9 @@ export default class ScannerStore extends Container<ScannerState> {
 			strippedData,
 			multipartComplete
 		);
-
+		console.log('parsed data result is', parsedData, 'is multiPart ?', isMultipartData(parsedData));
 		if (isMultipartData(parsedData)) {
-			this.setPartData(
+			await this.setPartData(
 				parsedData.currentFrame,
 				parsedData.frameCount,
 				parsedData.partData,
@@ -215,7 +215,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		// set it once only
 		if (!totalFrameCount) {
-			this.setState({
+			await this.setState({
 				totalFrameCount: frameCount
 			});
 		}
@@ -244,7 +244,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		) {
 			// all the frames are filled
 
-			this.setState({
+			await this.setState({
 				multipartComplete: true
 			});
 
@@ -268,7 +268,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
 			// handle the binary blob as a single UOS payload
-			this.setParsedData(concatMultipartData, accountsStore, true);
+			await this.setParsedData(concatMultipartData, accountsStore, true);
 		} else if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData;
@@ -295,7 +295,7 @@ export default class ScannerStore extends Container<ScannerState> {
 					...updatedMissedFrames
 				]);
 
-				this.setState({
+				await this.setState({
 					missedFrames: Array.from(dedupMissedFrames)
 				});
 			}
@@ -305,13 +305,13 @@ export default class ScannerStore extends Container<ScannerState> {
 				missedFrames.splice(missedFrames.indexOf(frame - 1), 1);
 			}
 
-			this.setState({
+			await this.setState({
 				latestFrame: frame,
 				multipartData: nextDataState
 			});
 		}
 
-		this.setState({
+		await this.setState({
 			completedFramesCount
 		});
 	}
