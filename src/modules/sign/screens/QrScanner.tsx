@@ -88,6 +88,7 @@ export function Scanner({
 		<RNCamera
 			captureAudio={false}
 			onBarCodeRead={(event: any): void => {
+				console.log('event is', event);
 				if (scannerStore.isBusy() || !enableScan) {
 					return;
 				}

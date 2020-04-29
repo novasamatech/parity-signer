@@ -23,7 +23,7 @@ import CompatibleCard from 'components/CompatibleCard';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
-import TxDetailsCard from 'components/TxDetailsCard';
+import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import AccountsStore from 'stores/AccountsStore';

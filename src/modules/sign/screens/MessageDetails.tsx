@@ -36,7 +36,7 @@ import {
 	unlockSeedPhraseWithPassword
 } from 'utils/navigationHelpers';
 import fontStyles from 'styles/fontStyles';
-import MessageDetailsCard from 'components/MessageDetailsCard';
+import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 import { alertMultipart } from 'utils/alertUtils';
 import CompatibleCard from 'components/CompatibleCard';
 import { getIdentityFromSender } from 'utils/identitiesUtils';

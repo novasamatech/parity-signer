@@ -6,11 +6,13 @@ import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { RootStackParamList } from 'types/routes';
-import { TxRequestData } from 'types/scannerTypes';
+import { isMultipartData, TxRequestData } from 'types/scannerTypes';
 import { isAddressString, isJsonString, rawDataToU8A } from 'utils/decoders';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
+	navigateToSignedMessage,
+	navigateToSignedTx,
 	unlockAndReturnSeedRef,
 	unlockSeedPhraseWithPasswordAndReturnSeedRef
 } from 'utils/navigationHelpers';
@@ -26,7 +28,7 @@ function getSeedRef(
 }
 
 export async function processBarCode(
-	showErrorMessage: any,
+	showErrorMessage: (title: string, message: string) => void,
 	txRequestData: TxRequestData,
 	navigation: StackNavigationProp<RootStackParamList, 'QrScanner'>,
 	accounts: AccountsStore,
@@ -80,6 +82,7 @@ export async function processBarCode(
 					navigation,
 					senderIdentity
 				);
+				//TODO test get seed ref directly from seedRefs
 			}
 			seedRef = await unlockAndReturnSeedRef(navigation, senderIdentity);
 		}
@@ -93,7 +96,7 @@ export async function processBarCode(
 				password
 			});
 			await scannerStore.signSubstrateData(
-				seedRef.trySubstrateSign,
+				seedRef.trySubstrateSign.bind(seedRef),
 				suriSuffix
 			);
 		}
@@ -105,12 +108,14 @@ export async function processBarCode(
 		await scannerStore.setData(accounts);
 		scannerStore.clearMultipartProgress();
 		await unlockSeedAndSign();
+		// TODO test multi part data
+		// if(!isMultipartData(unsignedData) && unsignedData !== null){}
 		if (scannerStore.getType() === 'transaction') {
-			navigation.navigate('SignedTx');
+			navigateToSignedTx(navigation);
 		} else {
-			navigation.navigate('SignedMessage');
+			navigateToSignedMessage(navigation);
 		}
 	} catch (e) {
-		return showErrorMessage(scannerStore, text.ERROR_TITLE, e.message);
+		return showErrorMessage(text.ERROR_TITLE, e.message);
 	}
 }

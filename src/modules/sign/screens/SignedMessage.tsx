@@ -14,23 +14,41 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { isU8a, u8aToHex } from '@polkadot/util';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import Button from 'components/Button';
+import CompatibleCard from 'components/CompatibleCard';
+import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import { NETWORK_LIST } from 'constants/networkSpecs';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { NavigationScannerProps } from 'types/props';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import {
+	NavigationAccountScannerProps,
+	NavigationScannerProps
+} from 'types/props';
 import QrView from 'components/QrView';
-import { withScannerStore } from 'utils/HOC';
+import { alertMultipart } from 'utils/alertUtils';
+import { withAccountAndScannerStore, withScannerStore } from 'utils/HOC';
 import fontStyles from 'styles/fontStyles';
-import MessageDetailsCard from 'components/MessageDetailsCard';
+import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 
 function SignedMessage({
+	accounts,
 	scannerStore
-}: NavigationScannerProps<'SignedMessage'>): React.ReactElement {
+}: NavigationAccountScannerProps<'SignedMessage'>): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
 	const isHash = scannerStore.getIsHash();
-	const message = scannerStore.getMessage();
+	const message = scannerStore.getMessage()!;
+	const prehash = scannerStore.getPrehashPayload();
+	const dataToSign = scannerStore.getDataToSign()!;
+
+	const sender = scannerStore.getSender()!;
+	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
+	// if it is legacy account
+	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 	useEffect(
 		(): (() => void) =>
@@ -52,15 +70,34 @@ function SignedMessage({
 				data={data}
 				style={styles.messageDetail}
 			/>
+			<Text style={styles.topTitle}>Sign Message</Text>
+			<Text style={styles.title}>From Account</Text>
+			<CompatibleCard account={sender} accountsStore={accounts} />
+			{!isEthereum && prehash ? (
+				<PayloadDetailsCard
+					description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
+					payload={prehash}
+					networkKey={sender.networkKey}
+				/>
+			) : null}
+			<MessageDetailsCard
+				isHash={isHash ?? false}
+				message={message}
+				data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
+			/>
 		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default withScannerStore(SignedMessage);
+export default withAccountAndScannerStore(SignedMessage);
 
 const styles = StyleSheet.create({
 	messageDetail: {
 		paddingHorizontal: 20
+	},
+	title: {
+		...fontStyles.h2,
+		paddingBottom: 20
 	},
 	topTitle: {
 		...fontStyles.h1,

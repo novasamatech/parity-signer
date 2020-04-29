@@ -23,7 +23,7 @@ import testIDs from 'e2e/testIDs';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
-import TxDetailsCard from 'components/TxDetailsCard';
+import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
 import fontStyles from 'styles/fontStyles';
@@ -36,7 +36,15 @@ function SignedTx({
 }: NavigationAccountScannerProps<'SignedTx'>): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
 	const recipient = scannerStore.getRecipient()!;
-	const sender = scannerStore.getSender();
+	const prehash = scannerStore.getPrehashPayload();
+	const txRequest = scannerStore.getTXRequest();
+
+	const tx = scannerStore.getTx();
+	const sender = scannerStore.getSender()!;
+	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
+	// if it is legacy account
+	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
+	const { value, gas, gasPrice } = tx as Transaction;
 
 	useEffect(
 		() =>
@@ -89,6 +97,38 @@ function SignedTx({
 			<View style={{ marginBottom: 20, marginHorizontal: 20 }}>
 				{renderTxPayload()}
 			</View>
+
+			<Text style={[fontStyles.t_big, styles.bodyContent]}>
+				{`You are about to confirm sending the following ${
+					isEthereum ? 'transaction' : 'extrinsic'
+				}`}
+			</Text>
+			<View style={styles.bodyContent}>
+				<CompatibleCard
+					account={sender}
+					accountsStore={accounts}
+					titlePrefix={'from: '}
+				/>
+				{isEthereum ? (
+					<View style={{ marginTop: 16 }}>
+						<TxDetailsCard
+							style={{ marginBottom: 20 }}
+							description="You are about to send the following amount"
+							value={value}
+							gas={gas}
+							gasPrice={gasPrice}
+						/>
+						<Text style={styles.title}>Recipient</Text>
+						<CompatibleCard account={recipient} accountsStore={accounts} />
+					</View>
+				) : (
+					<PayloadDetailsCard
+						style={{ marginBottom: 20 }}
+						payload={prehash!}
+						networkKey={sender.networkKey}
+					/>
+				)}
+			</View>
 		</SafeAreaScrollViewContainer>
 	);
 }
@@ -100,6 +140,10 @@ const TX_DETAILS_MSG = 'After signing and publishing you will have sent';
 const styles = StyleSheet.create({
 	body: {
 		paddingTop: 24
+	},
+	bodyContent: {
+		marginVertical: 16,
+		paddingHorizontal: 20
 	},
 	qr: {
 		marginBottom: 20
