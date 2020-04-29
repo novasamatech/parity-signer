@@ -49,7 +49,8 @@ export const unlockSeedPhrase = async <
 	navigation: GenericNavigationProps<RouteName>,
 	isSeedRefValid: boolean,
 	identity?: Identity
-): Promise<void> => new Promise(resolve => {
+): Promise<void> =>
+	new Promise(resolve => {
 		if (isSeedRefValid) {
 			resolve();
 		} else {

@@ -1,15 +1,8 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
+
 import fontStyles from 'styles/fontStyles';
 
 const styles = StyleSheet.create({
-	title: {
-		...fontStyles.h2,
-		paddingBottom: 20
-	},
-	topTitle: {
-		...fontStyles.h1,
-		textAlign: 'center'
-	},
 	body: {
 		paddingTop: 24
 	},
@@ -20,6 +13,14 @@ const styles = StyleSheet.create({
 	qr: {
 		marginBottom: 20
 	},
+	title: {
+		...fontStyles.h2,
+		paddingBottom: 20
+	},
+	topTitle: {
+		...fontStyles.h1,
+		textAlign: 'center'
+	}
 });
 
 export default styles;

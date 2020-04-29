@@ -34,7 +34,7 @@ export default function MessageDetailsCard({
 }): React.ReactElement {
 	return (
 		<View style={[styles.messageContainer, style]}>
-			<Text style={fontStyles.t_label}>{isHash ? 'Hash' : 'Message'}</Text>
+			<Text style={styles.titleText}>{isHash ? 'Hash' : 'Message'}</Text>
 			{isHash ? (
 				<Text style={styles.hashText}>{message}</Text>
 			) : (
@@ -50,8 +50,7 @@ const styles = StyleSheet.create({
 	hashText: {
 		...fontStyles.t_codeS,
 		color: colors.label_text,
-		marginBottom: 20,
-		paddingHorizontal: 8
+		marginBottom: 20
 	},
 	messageContainer: {
 		marginTop: 16
@@ -63,5 +62,9 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 		minHeight: 120,
 		padding: 10
+	},
+	titleText: {
+		...fontStyles.t_label,
+		paddingHorizontal: 8
 	}
 });

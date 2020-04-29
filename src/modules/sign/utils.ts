@@ -43,9 +43,8 @@ export async function processBarCode(
 			await scannerStore.setUnsigned(txRequestData.data);
 		} else if (!scannerStore.isMultipartComplete()) {
 			const strippedData = rawDataToU8A(txRequestData.rawData);
-			console.log('strippedData is ,', strippedData);
 			if (strippedData === null) throw new Error(text.NO_RAW_DATA_ERROR);
-			await scannerStore.setParsedData(strippedData, accounts, false);
+			await scannerStore.setParsedData(strippedData, false);
 		}
 	}
 
@@ -70,7 +69,6 @@ export async function processBarCode(
 		if (!senderIdentity) throw new Error(text.NO_SENDER_IDENTITY_ERROR);
 
 		let seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
-		console.log('first get seed ref is ', seedRef, "with tx request", txRequestData.rawData);
 		let password = '';
 
 		// unlock and get Seed reference
@@ -86,7 +84,6 @@ export async function processBarCode(
 				await unlockSeedPhrase(navigation, false, senderIdentity);
 			}
 			seedRef = getSeedRef(sender.encryptedSeed, seedRefs)!;
-			console.log('third seed ref is ', seedRef);
 		}
 
 		// sign data
@@ -106,7 +103,6 @@ export async function processBarCode(
 
 	try {
 		await parseQrData();
-		console.log('continue with data', txRequestData.rawData);
 		if (scannerStore.getUnsigned() === null) return;
 		await scannerStore.setData(accounts);
 		scannerStore.clearMultipartProgress();

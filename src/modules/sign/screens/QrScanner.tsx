@@ -26,7 +26,6 @@ import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { TxRequestData } from 'types/scannerTypes';
-import {Tx} from 'types/tx';
 import { withAccountAndScannerStore } from 'utils/HOC';
 
 export function Scanner({
@@ -36,7 +35,20 @@ export function Scanner({
 }: NavigationAccountScannerProps<'QrScanner'>): React.ReactElement {
 	const [seedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
-	const [lastFrame, setLastFrame] = useState<null|TxRequestData>(null);
+	const [lastFrame, setLastFrame] = useState<null | string>(null);
+	const [multiFrames, setMultiFrames] = useState<{
+		completedFramesCount: number;
+		isMultipart: boolean;
+		missedFrames: number[];
+		missingFramesMessage: string;
+		totalFramesCount: number;
+	}>({
+		completedFramesCount: 0,
+		isMultipart: false,
+		missedFrames: [],
+		missingFramesMessage: '',
+		totalFramesCount: 0
+	});
 	useEffect((): (() => void) => {
 		const unsubscribeFocus = navigation.addListener(
 			'focus',
@@ -53,11 +65,16 @@ export function Scanner({
 		};
 	}, [navigation, scannerStore]);
 
-	const completedFramesCount = scannerStore.getCompletedFramesCount();
-	const isMultipart = scannerStore.getTotalFramesCount() > 1;
-	const missedFrames = scannerStore.getMissedFrames();
-	const totalFramesCount = scannerStore.getTotalFramesCount();
-	const missedFramesMessage = missedFrames && missedFrames.join(', ');
+	useEffect(() => {
+		const missedFrames = scannerStore.getMissedFrames();
+		setMultiFrames({
+			completedFramesCount: scannerStore.getCompletedFramesCount(),
+			isMultipart: scannerStore.getTotalFramesCount() > 1,
+			missedFrames,
+			missingFramesMessage: missedFrames && missedFrames.join(', '),
+			totalFramesCount: scannerStore.getTotalFramesCount()
+		});
+	}, [lastFrame, scannerStore.state.completedFramesCount, scannerStore]);
 
 	function showErrorMessage(title: string, message: string): void {
 		setEnableScan(false);
@@ -88,18 +105,25 @@ export function Scanner({
 			);
 		});
 	}
-
+	const {
+		completedFramesCount,
+		isMultipart,
+		missedFrames,
+		totalFramesCount,
+		missingFramesMessage
+	} = multiFrames;
 	return (
 		<RNCamera
 			captureAudio={false}
 			onBarCodeRead={(event: any): void => {
+				if (event.type !== 'QR_CODE') return;
 				if (scannerStore.isBusy() || !enableScan) {
 					return;
 				}
-				if(event as TxRequestData === lastFrame) {
+				if (event.rawData === lastFrame) {
 					return;
 				}
-				setLastFrame(event);
+				setLastFrame(event.rawData);
 				processBarCode(
 					showErrorMessage,
 					event as TxRequestData,
@@ -142,7 +166,7 @@ export function Scanner({
 				{missedFrames && missedFrames.length >= 1 && (
 					<View style={styles.bottom}>
 						<Text style={styles.descTitle}>
-							You missed the following frames: {missedFramesMessage}
+							Missing following frame(s): {missingFramesMessage}
 						</Text>
 					</View>
 				)}

@@ -16,7 +16,7 @@
 
 import { isU8a, u8aToHex } from '@polkadot/util';
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import CompatibleCard from 'components/CompatibleCard';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
@@ -24,9 +24,7 @@ import { NETWORK_LIST } from 'constants/networkSpecs';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
-import {
-	NavigationAccountScannerProps,
-} from 'types/props';
+import { NavigationAccountScannerProps } from 'types/props';
 import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
 import styles from 'modules/sign/styles';
@@ -75,7 +73,9 @@ function SignedMessage({
 				<MessageDetailsCard
 					isHash={isHash ?? false}
 					message={message}
-					data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
+					data={
+						isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()
+					}
 				/>
 			</View>
 		</SafeAreaScrollViewContainer>
