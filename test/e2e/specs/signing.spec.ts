@@ -31,40 +31,22 @@ import {
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
-const {
-	Main,
-	PathDetail,
-	SecurityHeader,
-	TxDetails,
-	SignedMessage,
-	SignedTx,
-	MessageDetails
-} = testIDs;
+const { Main, PathDetail, SecurityHeader, SignedMessage, SignedTx } = testIDs;
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
-	await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
 	await testUnlockPin(pinCode);
 	await testVisible(SignedTx.qrView);
 };
 
 const testMultiPartExtrinsic = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
-	await testScrollAndTap(
-		MessageDetails.signButton,
-		MessageDetails.scrollScreen
-	);
-	await element(by.text('I understand the risks')).atIndex(0).tap();
 	await testUnlockPin(pinCode);
 	await testVisible(SignedMessage.qrView);
 };
 
 const testEthereumMessage = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
-	await testScrollAndTap(
-		MessageDetails.signButton,
-		MessageDetails.scrollScreen
-	);
 	await testUnlockPin(pinCode);
 	await testVisible(SignedMessage.qrView);
 };
@@ -81,7 +63,6 @@ describe('Signing test', () => {
 		it('does not need sign again after pin input', async () => {
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
-			await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
 			await testVisible(SignedTx.qrView);
 		});
 

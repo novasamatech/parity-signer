@@ -18,7 +18,6 @@ const {
 	PathsList,
 	SecurityHeader,
 	SignedTx,
-	TxDetails
 } = testIDs;
 
 const passwordedPath = '//passworded';
@@ -38,7 +37,6 @@ describe('Load test', () => {
 	it('should sign the set remarks request', async () => {
 		await launchWithScanRequest(ScanTestRequest.passwordedAccountExtrinsic);
 		await testTap(SecurityHeader.scanButton);
-		await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
 		await testInput(IdentityPin.unlockPinInput, pinCode);
 		await testInputWithDone(IdentityPin.passwordInput, password);
 		await testVisible(SignedTx.qrView);

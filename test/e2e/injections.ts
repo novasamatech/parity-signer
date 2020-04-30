@@ -61,21 +61,26 @@ const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	data,
 	rawData,
 	target: 319,
-	type: 'qr'
+	type: Platform.OS === 'ios' ? 'org.iso.QRCode' : 'QR_CODE'
 });
 
-export const onMockBarCodeRead = (
+function timeout(ms:number) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export const onMockBarCodeRead = async (
 	txRequest: ScanTestRequest,
 	onBarCodeRead: (tx: TxRequestData) => void
-): void => {
+): Promise<void> => {
 	const scanRequest = scanRequestDataMap[txRequest];
 	if (typeof scanRequest === 'string') {
-		onBarCodeRead(buildSignRequest(scanRequest));
+		await onBarCodeRead(buildSignRequest(scanRequest));
 	} else if (Array.isArray(scanRequest)) {
-		(scanRequest as string[]).forEach((rawData: string): void => {
-			onBarCodeRead(buildSignRequest(rawData));
-		});
+		for (let rawData of scanRequest as string[]) {
+			await timeout(200);
+			await onBarCodeRead(buildSignRequest(rawData));
+		}
 	} else if (typeof scanRequest === 'object') {
-		onBarCodeRead(buildSignRequest(scanRequest.rawData, scanRequest.data));
+		await onBarCodeRead(buildSignRequest(scanRequest.rawData, scanRequest.data));
 	}
 };
