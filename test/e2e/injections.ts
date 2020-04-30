@@ -16,6 +16,7 @@
 
 import { Platform } from 'react-native';
 
+import { timeout } from 'e2e/utils';
 import { scanRequestDataMap, ScanTestRequest } from 'e2e/mockScanRequests';
 import { TxRequestData } from 'types/scannerTypes';
 
@@ -64,10 +65,6 @@ const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	type: Platform.OS === 'ios' ? 'org.iso.QRCode' : 'QR_CODE'
 });
 
-function timeout(ms:number) {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export const onMockBarCodeRead = async (
 	txRequest: ScanTestRequest,
 	onBarCodeRead: (tx: TxRequestData) => void
@@ -76,11 +73,13 @@ export const onMockBarCodeRead = async (
 	if (typeof scanRequest === 'string') {
 		await onBarCodeRead(buildSignRequest(scanRequest));
 	} else if (Array.isArray(scanRequest)) {
-		for (let rawData of scanRequest as string[]) {
+		for (const rawData of scanRequest as string[]) {
 			await timeout(200);
 			await onBarCodeRead(buildSignRequest(rawData));
 		}
 	} else if (typeof scanRequest === 'object') {
-		await onBarCodeRead(buildSignRequest(scanRequest.rawData, scanRequest.data));
+		await onBarCodeRead(
+			buildSignRequest(scanRequest.rawData, scanRequest.data)
+		);
 	}
 };

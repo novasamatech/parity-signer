@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
@@ -94,7 +94,7 @@ export function Scanner({
 		]);
 	}
 
-	async function onBarCodeRead(event: any): void {
+	async function onBarCodeRead(event: any): Promise<void> {
 		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
 		if (scannerStore.isBusy() || !enableScan) {
 			return;
@@ -114,9 +114,12 @@ export function Scanner({
 	}
 
 	if (global.inTest && global.scanRequest !== undefined) {
-		onMockBarCodeRead(global.scanRequest, async (tx: TxRequestData): Promise<void> => {
-			await onBarCodeRead(tx);
-		});
+		onMockBarCodeRead(
+			global.scanRequest,
+			async (tx: TxRequestData): Promise<void> => {
+				await onBarCodeRead(tx);
+			}
+		);
 	}
 	const {
 		completedFramesCount,

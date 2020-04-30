@@ -223,13 +223,14 @@ export default class ScannerStore extends Container<ScannerState> {
 			nextDataState[currentFrame] = partDataAsBytes;
 
 			const nextMissedFrames = nextDataState.reduce(
-				(acc: number[], current: Uint8Array| null, index: number) => {
+				(acc: number[], current: Uint8Array | null, index: number) => {
 					if (current === null) acc.push(index + 1);
 					return acc;
 				},
 				[]
 			);
-			const nextCompletedFramesCount = totalFrameCount - nextMissedFrames.length;
+			const nextCompletedFramesCount =
+				totalFrameCount - nextMissedFrames.length;
 			await this.setState({
 				completedFramesCount: nextCompletedFramesCount,
 				latestFrame: currentFrame,
@@ -239,7 +240,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			if (
 				totalFrameCount > 0 &&
-				nextCompletedFramesCount == totalFrameCount &&
+				nextCompletedFramesCount === totalFrameCount &&
 				!multipartComplete
 			) {
 				// all the frames are filled

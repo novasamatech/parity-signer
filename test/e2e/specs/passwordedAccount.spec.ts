@@ -7,7 +7,6 @@ import {
 	testInput,
 	testInputWithDone,
 	testRecoverIdentity,
-	testScrollAndTap,
 	testTap,
 	testVisible
 } from 'e2e/utils';
@@ -17,7 +16,7 @@ const {
 	PathDerivation,
 	PathsList,
 	SecurityHeader,
-	SignedTx,
+	SignedTx
 } = testIDs;
 
 const passwordedPath = '//passworded';
