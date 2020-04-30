@@ -74,9 +74,9 @@ describe('Load test', () => {
 		await device.sendToHome();
 		await device.launchApp({ newInstance: false });
 		await testTap(PathsList.deriveButton);
+		await testUnlockPin(pinCode);
 		await testInput(PathDerivation.pathInput, secondPath);
 		await testInput(PathDerivation.nameInput, 'second one');
-		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + `//kusama${secondPath}`);
 	});
 

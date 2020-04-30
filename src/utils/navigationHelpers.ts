@@ -196,3 +196,16 @@ export const navigateToLegacyAccountList = <
 >(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationTo(navigation, 'LegacyAccountList');
+
+export const navigateToPathDerivation = async <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
+	parentPath: string,
+	isSeedRefValid: boolean
+): Promise<void> => {
+	if (!isSeedRefValid) {
+		await unlockSeedPhrase(navigation, isSeedRefValid);
+	}
+	navigation.navigate('PathDerivation', { parentPath });
+};

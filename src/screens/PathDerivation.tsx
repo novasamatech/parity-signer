@@ -20,7 +20,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import ButtonMainAction from 'components/ButtonMainAction';
@@ -39,13 +39,13 @@ function PathDerivation({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'PathDerivation'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'PathDerivation'>): React.ReactElement {
 	const [derivationPath, setDerivationPath] = useState<string>('');
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
-	const currentIdentity = accounts.state.currentIdentity!;
+	const currentIdentity = accounts.state.currentIdentity;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
 	);
@@ -130,7 +130,8 @@ function PathDerivation({
 					onSubmitEditing={onPathDerivation}
 				/>
 				<PathCard
-					identity={accounts.state.currentIdentity!}
+					identity={accounts.state.currentIdentity}
+					isPathValid={isPathValid}
 					name={keyPairsName}
 					path={
 						password === '' ? completePath : `${completePath}///${password}`

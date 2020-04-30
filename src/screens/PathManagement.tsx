@@ -17,22 +17,22 @@
 import React from 'react';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
+import { NavigationAccountIdentityProps } from 'types/props';
+import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import PathCard from 'components/PathCard';
 
 function PathManagement({
 	accounts,
 	route
-}: NavigationAccountProps<'PathManagement'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'PathManagement'>): React.ReactElement {
 	const path = route.params.path ?? '';
 	const { currentIdentity } = accounts.state;
-	const pathName = currentIdentity!.meta.get(path)?.name;
+	const pathName = currentIdentity.meta.get(path)?.name;
 
 	return (
 		<SafeAreaScrollViewContainer>
-			<PathCard identity={currentIdentity!} path={path} />
+			<PathCard identity={currentIdentity} path={path} />
 			<TextInput
 				label="Display Name"
 				onChangeText={(name: string): Promise<void> =>
@@ -46,4 +46,4 @@ function PathManagement({
 	);
 }
 
-export default withAccountStore(PathManagement);
+export default withAccountStore(withCurrentIdentity(PathManagement));

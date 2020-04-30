@@ -35,7 +35,7 @@ import {
 	NetworkParams,
 	SubstrateNetworkParams
 } from 'types/networkSpecsTypes';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import {
 	getExistedNetworkKeys,
@@ -43,6 +43,7 @@ import {
 	getPathsWithSubstrateNetworkKey
 } from 'utils/identitiesUtils';
 import {
+	navigateToPathDerivation,
 	navigateToPathDetails,
 	navigateToPathsList,
 	unlockSeedPhrase
@@ -62,11 +63,11 @@ export default function NetworkSelector({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'Main'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accounts.state;
-	const seedRefHooks = useSeedRef(currentIdentity!.encryptedSeed);
+	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 
 	const sortNetworkKeys = (
 		[, params1]: [any, NetworkParams],
@@ -129,8 +130,8 @@ export default function NetworkSelector({
 	const renderCustomPathCard = (): React.ReactElement => (
 		<NetworkCard
 			isAdd={true}
-			onPress={(): void =>
-				navigation.navigate('PathDerivation', { parentPath: '' })
+			onPress={(): Promise<void> =>
+				navigateToPathDerivation(navigation, '', seedRefHooks.isSeedRefValid)
 			}
 			testID={testIDs.Main.addCustomNetworkButton}
 			title="Create Custom Path"
@@ -166,7 +167,7 @@ export default function NetworkSelector({
 				/>
 			);
 		} else {
-			const identityName = getIdentityName(currentIdentity!, identities);
+			const identityName = getIdentityName(currentIdentity, identities);
 			return <IdentityHeading title={identityName} />;
 		}
 	};
@@ -182,13 +183,13 @@ export default function NetworkSelector({
 				await deriveEthereumAccount(networkKey);
 			}
 		} else {
-			const paths = Array.from(currentIdentity!.meta.keys());
+			const paths = Array.from(currentIdentity.meta.keys());
 			if (
 				isSubstrateNetworkParams(networkParams) ||
 				isUnknownNetworkParams(networkParams)
 			) {
 				const listedPaths = getPathsWithSubstrateNetworkKey(
-					currentIdentity!,
+					currentIdentity,
 					networkKey
 				);
 				if (listedPaths.length === 0 && isSubstrateNetworkParams(networkParams))
@@ -206,7 +207,7 @@ export default function NetworkSelector({
 		}
 	};
 
-	const availableNetworks = getExistedNetworkKeys(currentIdentity!);
+	const availableNetworks = getExistedNetworkKeys(currentIdentity);
 	const networkList = Object.entries(NETWORK_LIST).filter(filterNetworkKeys);
 	networkList.sort(sortNetworkKeys);
 

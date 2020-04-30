@@ -20,7 +20,10 @@ import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import OnBoardingView from 'modules/main/components/OnBoading';
 import NetworkSelector from 'modules/main/components/NetworkSelector';
-import { NavigationAccountProps } from 'types/props';
+import {
+	NavigationAccountIdentityProps,
+	NavigationAccountProps
+} from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 
 function Main(props: NavigationAccountProps<'Main'>): React.ReactElement {
@@ -30,8 +33,10 @@ function Main(props: NavigationAccountProps<'Main'>): React.ReactElement {
 	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0)
 		return <OnBoardingView hasLegacyAccount={hasLegacyAccount} />;
-	if (!currentIdentity) return <NoCurrentIdentity />;
-	return <NetworkSelector {...props} />;
+	if (currentIdentity === null) return <NoCurrentIdentity />;
+	return (
+		<NetworkSelector {...(props as NavigationAccountIdentityProps<'Main'>)} />
+	);
 }
 
 export default withAccountStore(Main);
