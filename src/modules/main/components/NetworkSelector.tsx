@@ -15,7 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { BackHandler, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { NetworkCard } from 'components/AccountCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -67,6 +68,25 @@ export default function NetworkSelector({
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accounts.state;
 	const seedRefHooks = useSeedRef(currentIdentity!.encryptedSeed);
+
+	// catch android back button and prevent exiting the app
+	useFocusEffect(
+		React.useCallback((): any => {
+			const handleBackButton = (): boolean => {
+				if (shouldShowMoreNetworks) {
+					setShouldShowMoreNetworks(false);
+					return true;
+				} else {
+					return false;
+				}
+			};
+			const backHandler = BackHandler.addEventListener(
+				'hardwareBackPress',
+				handleBackButton
+			);
+			return (): void => backHandler.remove();
+		}, [shouldShowMoreNetworks])
+	);
 
 	const sortNetworkKeys = (
 		[, params1]: [any, NetworkParams],
