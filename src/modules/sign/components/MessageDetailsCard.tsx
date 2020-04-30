@@ -50,7 +50,8 @@ const styles = StyleSheet.create({
 	hashText: {
 		...fontStyles.t_codeS,
 		color: colors.label_text,
-		marginBottom: 20
+		marginBottom: 20,
+		paddingHorizontal: 8
 	},
 	messageContainer: {
 		marginTop: 16

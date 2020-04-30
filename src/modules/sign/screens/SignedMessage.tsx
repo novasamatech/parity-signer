@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@ import { isU8a, u8aToHex } from '@polkadot/util';
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 
+import strings from 'modules/sign/strings';
 import CompatibleCard from 'components/CompatibleCard';
-import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
@@ -42,7 +43,6 @@ function SignedMessage({
 
 	const sender = scannerStore.getSender()!;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
-	// if it is legacy account
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 	useEffect(
@@ -64,7 +64,7 @@ function SignedMessage({
 				<CompatibleCard account={sender} accountsStore={accounts} />
 				{!isEthereum && prehash ? (
 					<PayloadDetailsCard
-						description="You are about to sending the following extrinsic. We will sign the hash of the payload as it is oversized."
+						description={strings.INFO_MULTI_PART}
 						payload={prehash}
 						signature={data}
 						networkKey={sender.networkKey}

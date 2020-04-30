@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -17,12 +17,13 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 
+import strings from 'modules/sign/strings';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
-import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
@@ -38,12 +39,10 @@ function SignedTx({
 	const data = scannerStore.getSignedTxData();
 	const recipient = scannerStore.getRecipient()!;
 	const prehash = scannerStore.getPrehashPayload();
-	const txRequest = scannerStore.getTXRequest();
 
 	const tx = scannerStore.getTx();
 	const sender = scannerStore.getSender()!;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
-	// if it is legacy account
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
 
@@ -80,7 +79,7 @@ function SignedTx({
 					<View style={{ marginTop: 16 }}>
 						<TxDetailsCard
 							style={{ marginBottom: 20 }}
-							description="You are about to send the following amount"
+							description={strings.INFO_ETH_TX}
 							value={value}
 							gas={gas}
 							gasPrice={gasPrice}
@@ -102,5 +101,3 @@ function SignedTx({
 }
 
 export default withAccountAndScannerStore(SignedTx);
-
-const TX_DETAILS_MSG = 'After signing and publishing you will have sent';

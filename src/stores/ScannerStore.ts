@@ -77,7 +77,6 @@ type ScannerState = {
 	signedTxList: SignedTX[];
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
-	txRequest: TXRequest | null;
 	type: 'transaction' | 'message' | null;
 	unsignedData: CompletedParsedData | null;
 };
@@ -100,7 +99,6 @@ const DEFAULT_STATE = Object.freeze({
 	signedTxList: [],
 	totalFrameCount: 0,
 	tx: null,
-	txRequest: null,
 	type: null,
 	unsignedData: null
 });
@@ -146,33 +144,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		await this.setState({
 			unsignedData: parsedData
 		});
-		// If the address is not found on device in its current encoding,
-		// try decoding the public key and encoding it to all the other known network prefixes.
-		// const networks = Object.keys(SUBSTRATE_NETWORK_LIST);
-		//
-		// for (let i = 0; i < networks.length; i++) {
-		// 	const key = networks[i];
-		// 	const account = accountsStore.getAccountByAddress(
-		// 		encodeAddress(
-		// 			decodeAddress(parsedData.data.account),
-		// 			SUBSTRATE_NETWORK_LIST[key].prefix
-		// 		)
-		// 	);
-		//
-		// 	if (account) {
-		// 		parsedData.data.account = account.address;
-		//
-		// 		this.setState({
-		// 			unsignedData: parsedData
-		// 		});
-		// 		return;
-		// 	}
-		// }
-
-		// if the account was not found, unsignedData was never set, alert the user appropriately.
-		// throw new Error(
-		// 	`No private key found for ${parsedData.data.account} in your signer key storage.`
-		// );
 
 		// set payload before it got hashed.
 		// signature will be generated from the hash, but we still want to display it.
@@ -183,7 +154,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 	}
 
-	async integrateMultiPartData() {
+	async integrateMultiPartData(): Promise<void> {
 		const { multipartData, totalFrameCount } = this.state;
 
 		// concatenate all the parts into one binary blob
@@ -252,15 +223,15 @@ export default class ScannerStore extends Container<ScannerState> {
 			nextDataState[currentFrame] = partDataAsBytes;
 
 			const nextMissedFrames = nextDataState.reduce(
-				(acc: number[], current, index) => {
+				(acc: number[], current: Uint8Array| null, index: number) => {
 					if (current === null) acc.push(index + 1);
 					return acc;
 				},
 				[]
 			);
-
+			const nextCompletedFramesCount = totalFrameCount - nextMissedFrames.length;
 			await this.setState({
-				completedFramesCount: completedFramesCount + 1,
+				completedFramesCount: nextCompletedFramesCount,
 				latestFrame: currentFrame,
 				missedFrames: nextMissedFrames,
 				multipartData: nextDataState
@@ -268,7 +239,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 			if (
 				totalFrameCount > 0 &&
-				completedFramesCount + 1 === totalFrameCount &&
+				nextCompletedFramesCount == totalFrameCount &&
 				!multipartComplete
 			) {
 				// all the frames are filled
@@ -402,7 +373,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			recipient: recipient as FoundAccount,
 			sender,
 			tx,
-			txRequest,
 			type: 'transaction'
 		});
 
@@ -567,10 +537,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getRecipient(): FoundAccount | null {
 		return this.state.recipient;
-	}
-
-	getTXRequest(): TXRequest | null {
-		return this.state.txRequest;
 	}
 
 	getMessage(): string | null {

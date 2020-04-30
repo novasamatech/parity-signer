@@ -137,12 +137,6 @@ export const alertRisks = (message: string, onPress: () => any): void =>
 		}
 	]);
 
-export const alertMultipart = (onNext: () => any): void =>
-	alertRisks(
-		'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
-		onNext
-	);
-
 export const alertDecodeError = (): void =>
 	Alert.alert(
 		'Could not decode method with available metadata.',

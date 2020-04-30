@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
@@ -28,6 +28,14 @@ import ScreenHeading from 'components/ScreenHeading';
 import { TxRequestData } from 'types/scannerTypes';
 import { withAccountAndScannerStore } from 'utils/HOC';
 
+type Frames = {
+	completedFramesCount: number;
+	isMultipart: boolean;
+	missedFrames: number[];
+	missingFramesMessage: string;
+	totalFramesCount: number;
+};
+
 export function Scanner({
 	navigation,
 	accounts,
@@ -36,13 +44,7 @@ export function Scanner({
 	const [seedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
-	const [multiFrames, setMultiFrames] = useState<{
-		completedFramesCount: number;
-		isMultipart: boolean;
-		missedFrames: number[];
-		missingFramesMessage: string;
-		totalFramesCount: number;
-	}>({
+	const [multiFrames, setMultiFrames] = useState<Frames>({
 		completedFramesCount: 0,
 		isMultipart: false,
 		missedFrames: [],
@@ -92,17 +94,28 @@ export function Scanner({
 		]);
 	}
 
-	//e2e signing test injection
+	async function onBarCodeRead(event: any): void {
+		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
+		if (scannerStore.isBusy() || !enableScan) {
+			return;
+		}
+		if (event.rawData === lastFrame) {
+			return;
+		}
+		setLastFrame(event.rawData);
+		await processBarCode(
+			showErrorMessage,
+			event as TxRequestData,
+			navigation,
+			accounts,
+			scannerStore,
+			seedRefs
+		);
+	}
+
 	if (global.inTest && global.scanRequest !== undefined) {
-		onMockBarCodeRead(global.scanRequest, (tx: TxRequestData) => {
-			processBarCode(
-				showErrorMessage,
-				tx as TxRequestData,
-				navigation,
-				accounts,
-				scannerStore,
-				seedRefs
-			);
+		onMockBarCodeRead(global.scanRequest, async (tx: TxRequestData): Promise<void> => {
+			await onBarCodeRead(tx);
 		});
 	}
 	const {
@@ -115,24 +128,7 @@ export function Scanner({
 	return (
 		<RNCamera
 			captureAudio={false}
-			onBarCodeRead={(event: any): void => {
-				if (event.type !== 'QR_CODE') return;
-				if (scannerStore.isBusy() || !enableScan) {
-					return;
-				}
-				if (event.rawData === lastFrame) {
-					return;
-				}
-				setLastFrame(event.rawData);
-				processBarCode(
-					showErrorMessage,
-					event as TxRequestData,
-					navigation,
-					accounts,
-					scannerStore,
-					seedRefs
-				);
-			}}
+			onBarCodeRead={onBarCodeRead}
 			style={styles.view}
 		>
 			<View style={styles.body}>

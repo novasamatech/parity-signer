@@ -13,7 +13,7 @@ export interface TxRequestData {
 			| [Point<string>, Point<string>]
 			| { origin: Point<string>; size: Size<string> };
 	};
-	type: keyof BarCodeType; //"QR_CODE"
+	type: string;
 	rawData: string;
 	data: string;
 	target?: number;
