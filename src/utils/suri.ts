@@ -114,3 +114,13 @@ export function constructSURI({
 
 	return `${phrase}${derivePath}///${password}`;
 }
+
+export function constructSuriSuffix({
+	derivePath = '',
+	password = ''
+}: {
+	derivePath?: string;
+	password?: string;
+}): string {
+	return `${derivePath}///${password}`;
+}

@@ -14,109 +14,105 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { GenericExtrinsicPayload } from '@polkadot/types';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
-import { GenericExtrinsicPayload } from '@polkadot/types';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NETWORK_LIST } from 'constants/networkSpecs';
-import testIDs from 'e2e/testIDs';
-import { FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
 import Button from 'components/Button';
+import CompatibleCard from 'components/CompatibleCard';
+import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
 import TxDetailsCard from 'components/TxDetailsCard';
+import { NETWORK_LIST } from 'constants/networkSpecs';
+import testIDs from 'e2e/testIDs';
 import AccountsStore from 'stores/AccountsStore';
-import ScannerStore from 'stores/ScannerStore';
-import PayloadDetailsCard from 'components/PayloadDetailsCard';
+import fontStyles from 'styles/fontStyles';
+import { FoundAccount } from 'types/identityTypes';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import { NavigationAccountScannerProps } from 'types/props';
+import { withAccountAndScannerStore } from 'utils/HOC';
+import { getIdentityFromSender } from 'utils/identitiesUtils';
 import {
 	navigateToSignedTx,
 	unlockSeedPhrase,
 	unlockSeedPhraseWithPassword
 } from 'utils/navigationHelpers';
-import fontStyles from 'styles/fontStyles';
-import CompatibleCard from 'components/CompatibleCard';
-import { getIdentityFromSender } from 'utils/identitiesUtils';
+import { useSeedRef } from 'utils/seedRefHooks';
+import { constructSuriSuffix } from 'utils/suri';
 import { Transaction } from 'utils/transaction';
 
-export default class TxDetails extends React.PureComponent<
-	NavigationProps<'TxDetails'>
-> {
-	async onSignTx(
-		scannerStore: ScannerStore,
-		accountsStore: AccountsStore,
-		sender: FoundAccount
-	): Promise<void> {
+function TxDetails({
+	navigation,
+	accounts,
+	scannerStore
+}: NavigationAccountScannerProps<'TxDetails'>): React.ReactElement {
+	const txRequest = scannerStore.getTXRequest();
+	const sender = scannerStore.getSender()!;
+	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
+	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
+	const { isSeedRefValid, substrateSign, brainWalletSign } = useSeedRef(
+		sender.encryptedSeed
+	);
+
+	async function onSignTx(): Promise<void> {
 		try {
 			if (sender.isLegacy) {
-				this.props.navigation.navigate('AccountUnlockAndSign', {
+				navigation.navigate('AccountUnlockAndSign', {
 					next: 'SignedTx'
 				});
 				return;
 			}
 			const senderIdentity = getIdentityFromSender(
 				sender,
-				accountsStore.state.identities
+				accounts.state.identities
 			);
-			if (sender.hasPassword) {
-				const suri = await unlockSeedPhraseWithPassword(
-					this.props.navigation,
-					sender.path,
-					senderIdentity
-				);
-				await scannerStore.signData(suri);
+			if (isEthereum) {
+				await unlockSeedPhrase(navigation, isSeedRefValid, senderIdentity);
+				await scannerStore.signEthereumData(brainWalletSign);
 			} else {
-				const seedPhrase = await unlockSeedPhrase(
-					this.props.navigation,
-					senderIdentity
-				);
-				await scannerStore.signDataWithSeedPhrase(
-					seedPhrase,
-					NETWORK_LIST[sender.networkKey].protocol
-				);
+				let password = '';
+				if (sender.hasPassword) {
+					password = await unlockSeedPhraseWithPassword(
+						navigation,
+						isSeedRefValid,
+						senderIdentity
+					);
+				} else {
+					await unlockSeedPhrase(navigation, isSeedRefValid, senderIdentity);
+				}
+				const suriSuffix = constructSuriSuffix({
+					derivePath: sender.path,
+					password
+				});
+				await scannerStore.signSubstrateData(substrateSign, suriSuffix);
 			}
-			return navigateToSignedTx(this.props.navigation);
+			return navigateToSignedTx(navigation);
 		} catch (e) {
 			scannerStore.setErrorMsg(e.message);
 		}
 	}
 
-	render(): React.ReactElement {
+	if (txRequest) {
+		const tx = scannerStore.getTx();
 		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(
-					scannerStore: ScannerStore,
-					accountsStore: AccountsStore
-				): React.ReactNode => {
-					const txRequest = scannerStore.getTXRequest();
-					const sender = scannerStore.getSender()!;
-					if (txRequest) {
-						const tx = scannerStore.getTx();
-						return (
-							<TxDetailsView
-								{...{ ...this.props, ...(tx as Transaction) }}
-								accounts={accountsStore}
-								scannerStore={scannerStore}
-								sender={sender!}
-								recipient={scannerStore.getRecipient()!}
-								prehash={scannerStore.getPrehashPayload()!}
-								onNext={(): Promise<void> =>
-									this.onSignTx(scannerStore, accountsStore, sender)
-								}
-							/>
-						);
-					} else {
-						return null;
-					}
-				}}
-			</Subscribe>
+			<TxDetailsView
+				{...(tx as Transaction)}
+				accounts={accounts}
+				isEthereum={isEthereum}
+				sender={sender!}
+				recipient={scannerStore.getRecipient()!}
+				prehash={scannerStore.getPrehashPayload()!}
+				onNext={onSignTx}
+			/>
 		);
+	} else {
+		return <View />;
 	}
 }
 
-interface ViewProps extends NavigationAccountScannerProps<'TxDetails'> {
+interface ViewProps extends Transaction {
+	accounts: AccountsStore;
 	gas: string;
 	gasPrice: string;
 	nonce: string;
@@ -125,77 +121,74 @@ interface ViewProps extends NavigationAccountScannerProps<'TxDetails'> {
 	recipient: FoundAccount;
 	sender: FoundAccount;
 	value: string;
+	isEthereum: boolean;
 }
 
-export class TxDetailsView extends React.PureComponent<ViewProps> {
-	render(): React.ReactElement {
-		const {
-			accounts,
-			gas,
-			gasPrice,
-			prehash,
-			sender,
-			recipient,
-			value,
-			onNext
-		} = this.props;
-
-		const senderNetworkParams = NETWORK_LIST[sender.networkKey];
-		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
-
-		return (
-			<SafeAreaScrollViewContainer
-				style={styles.body}
-				contentContainerStyle={{ paddingBottom: 120 }}
-				testID={testIDs.TxDetails.scrollScreen}
-			>
-				<ScreenHeading
-					title="Sign Transaction"
-					subtitle="step 1/2 – verify and sign"
+function TxDetailsView({
+	accounts,
+	isEthereum,
+	gas,
+	gasPrice,
+	onNext,
+	prehash,
+	recipient,
+	sender,
+	value
+}: ViewProps): React.ReactElement {
+	return (
+		<SafeAreaScrollViewContainer
+			style={styles.body}
+			contentContainerStyle={{ paddingBottom: 120 }}
+			testID={testIDs.TxDetails.scrollScreen}
+		>
+			<ScreenHeading
+				title="Sign Transaction"
+				subtitle="step 1/2 – verify and sign"
+			/>
+			<Text style={[fontStyles.t_big, styles.bodyContent]}>
+				{`You are about to confirm sending the following ${
+					isEthereum ? 'transaction' : 'extrinsic'
+				}`}
+			</Text>
+			<View style={styles.bodyContent}>
+				<CompatibleCard
+					account={sender}
+					accountsStore={accounts}
+					titlePrefix={'from: '}
 				/>
-				<Text style={[fontStyles.t_big, styles.bodyContent]}>
-					{`You are about to confirm sending the following ${
-						isEthereum ? 'transaction' : 'extrinsic'
-					}`}
-				</Text>
-				<View style={styles.bodyContent}>
-					<CompatibleCard
-						account={sender}
-						accountsStore={accounts}
-						titlePrefix={'from: '}
-					/>
-					{isEthereum ? (
-						<View style={{ marginTop: 16 }}>
-							<TxDetailsCard
-								style={{ marginBottom: 20 }}
-								description="You are about to send the following amount"
-								value={value}
-								gas={gas}
-								gasPrice={gasPrice}
-							/>
-							<Text style={styles.title}>Recipient</Text>
-							<CompatibleCard account={recipient} accountsStore={accounts} />
-						</View>
-					) : (
-						<PayloadDetailsCard
+				{isEthereum ? (
+					<View style={{ marginTop: 16 }}>
+						<TxDetailsCard
 							style={{ marginBottom: 20 }}
-							payload={prehash}
-							networkKey={sender.networkKey}
+							description="You are about to send the following amount"
+							value={value}
+							gas={gas}
+							gasPrice={gasPrice}
 						/>
-					)}
-				</View>
-				<View style={styles.signButtonContainer}>
-					<Button
-						buttonStyles={styles.signButton}
-						testID={testIDs.TxDetails.signButton}
-						title="Sign Transaction"
-						onPress={(): any => onNext()}
+						<Text style={styles.title}>Recipient</Text>
+						<CompatibleCard account={recipient} accountsStore={accounts} />
+					</View>
+				) : (
+					<PayloadDetailsCard
+						style={{ marginBottom: 20 }}
+						payload={prehash}
+						networkKey={sender.networkKey}
 					/>
-				</View>
-			</SafeAreaScrollViewContainer>
-		);
-	}
+				)}
+			</View>
+			<View style={styles.signButtonContainer}>
+				<Button
+					buttonStyles={styles.signButton}
+					testID={testIDs.TxDetails.signButton}
+					title="Sign Transaction"
+					onPress={(): any => onNext()}
+				/>
+			</View>
+		</SafeAreaScrollViewContainer>
+	);
 }
+
+export default withAccountAndScannerStore(TxDetails);
 
 const styles = StyleSheet.create({
 	body: {

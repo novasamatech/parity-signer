@@ -29,9 +29,9 @@ export const alertErrorWithMessage = (
 		}
 	]);
 
-export const alertIdentityCreationError = (): void =>
+export const alertIdentityCreationError = (errorMessage: string): void =>
 	alertErrorWithMessage(
-		"Can't create Identity from the seed",
+		"Can't create Identity from the seed: " + errorMessage,
 		tryAgainButtonText
 	);
 

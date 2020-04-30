@@ -9,7 +9,6 @@ import {
 	testRecoverIdentity,
 	testScrollAndTap,
 	testTap,
-	testUnlockPin,
 	testVisible
 } from 'e2e/utils';
 
@@ -33,7 +32,6 @@ describe('Load test', () => {
 		await testInput(PathDerivation.pathInput, passwordedPath);
 		await testTap(PathDerivation.togglePasswordButton);
 		await testInput(PathDerivation.passwordInput, password);
-		await testUnlockPin(pinCode);
 		await testExist(PathsList.pathCard + `//kusama${passwordedPath}`);
 	});
 

@@ -32,7 +32,7 @@ import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
 const {
-	AccountNetworkChooser,
+	Main,
 	PathDetail,
 	SecurityHeader,
 	TxDetails,
@@ -78,6 +78,13 @@ describe('Signing test', () => {
 			await testSignedTx();
 		});
 
+		it('does not need sign again after pin input', async () => {
+			await tapBack();
+			await testTap(SecurityHeader.scanButton);
+			await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
+			await testVisible(SignedTx.qrView);
+		});
+
 		it('should sign transfer request', async () => {
 			await launchWithScanRequest(ScanTestRequest.TransferExtrinsic);
 			await testSignedTx();
@@ -93,16 +100,15 @@ describe('Signing test', () => {
 		it('generate Kovan account', async () => {
 			await tapBack();
 			const kovanNetworkButtonIndex =
-				AccountNetworkChooser.networkButton + EthereumNetworkKeys.KOVAN;
-			await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
+				Main.networkButton + EthereumNetworkKeys.KOVAN;
+			await testTap(testIDs.Main.addNewNetworkButton);
 			await testScrollAndTap(
 				kovanNetworkButtonIndex,
-				testIDs.AccountNetworkChooser.chooserScreen
+				testIDs.Main.chooserScreen
 			);
-			await testUnlockPin(pinCode);
 			await testVisible(PathDetail.screen);
 			await tapBack();
-			await testExist(AccountNetworkChooser.chooserScreen);
+			await testExist(Main.chooserScreen);
 		});
 
 		it('should sign transactions', async () => {

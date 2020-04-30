@@ -1,59 +1,103 @@
-import { useState } from 'react';
+import { useContext, useMemo } from 'react';
 
-import { SeedRef } from 'utils/native';
+import { SeedRefsContext } from 'stores/SeedRefStore';
+import { SeedRefClass } from 'utils/native';
 
-type IsValidFunc = () => boolean;
-type TryCreateFunc = (encryptedSeed: string, password: string) => Promise<void>;
-type TryDestroyFunc = () => Promise<void>;
-type TrySignFunc = (suriSuffix: string, message: string) => Promise<string>;
+export type TryCreateFunc = (password: string) => Promise<void>;
+export type TryDestroyFunc = () => Promise<void>;
+export type TrySignFunc = (
+	suriSuffix: string,
+	message: string
+) => Promise<string>;
+export type TryBrainWalletSignFunc = (message: string) => Promise<string>;
+export type TrySubstrateAddress = (
+	suriSuffix: string,
+	prefix: number
+) => Promise<string>;
+export type TryBrainWalletAddress = () => Promise<string>;
 
-type SeedRefHooks = {
-	isValid: IsValidFunc;
-	create: TryCreateFunc;
-	destroy: TryDestroyFunc;
-	brainWalletSign: TrySignFunc;
+export type SeedRefHooks = {
+	isSeedRefValid: boolean;
+	createSeedRef: TryCreateFunc;
+	destroySeedRef: TryDestroyFunc;
+	brainWalletSign: TryBrainWalletSignFunc;
 	substrateSign: TrySignFunc;
+	substrateAddress: TrySubstrateAddress;
+	brainWalletAddress: TryBrainWalletAddress;
 };
 
-export function useSeedRef(): SeedRefHooks {
-	const [seedRef, setSeedRef] = useState<SeedRef>(new SeedRef());
+export type CreateSeedRefWithNewSeed = (
+	encryptedSeed: string,
+	password: string
+) => Promise<void>;
 
-	const isValid: IsValidFunc = function () {
-		return seedRef.isValid();
+export function useNewSeedRef(): CreateSeedRefWithNewSeed {
+	const [seedRefs, setSeedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
+	return async (encryptedSeed, password): Promise<void> => {
+		if (!seedRefs.has(encryptedSeed)) {
+			const seedRef = new SeedRefClass();
+			await seedRef.tryCreate(encryptedSeed, password);
+			const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
+			setSeedRefs(newSeedRefs);
+		}
 	};
+}
+
+export function useSeedRef(encryptedSeed: string): SeedRefHooks {
+	const [seedRefs, setSeedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
+	const seedRef = useMemo(() => {
+		if (seedRefs.has(encryptedSeed)) {
+			return seedRefs.get(encryptedSeed)!;
+		} else {
+			const newSeedRef = new SeedRefClass();
+			setSeedRefs(seedRefs.set(encryptedSeed, newSeedRef));
+			return newSeedRef;
+		}
+	}, [seedRefs, setSeedRefs, encryptedSeed]);
+
+	const isSeedRefValid: boolean = seedRef.isValid();
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	const create: TryCreateFunc = function (
-		encryptedSeed: string,
-		password: string
-	) {
-		return seedRef.tryCreate(encryptedSeed, password).then(createdRef => {
-			setSeedRef(createdRef);
-		});
+	const createSeedRef: TryCreateFunc = async function (password) {
+		await seedRef.tryCreate(encryptedSeed, password);
+		const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
+		setSeedRefs(newSeedRefs);
 	};
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or
 	// memory will leak.
-	const destroy: TryDestroyFunc = function () {
-		return seedRef.tryDestroy().then(destroyedRef => {
-			setSeedRef(destroyedRef);
+	const destroySeedRef: TryDestroyFunc = function () {
+		return seedRef.tryDestroy().then(() => {
+			seedRefs.delete(encryptedSeed);
+			setSeedRefs(seedRefs);
 		});
 	};
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const brainWalletSign: TrySignFunc = function (message: string) {
-		return seedRef.tryBrainWalletSign(message);
-	};
+	const brainWalletSign: TryBrainWalletSignFunc = seedRef.tryBrainWalletSign.bind(
+		seedRef
+	);
 
 	// Use the seed reference to sign a message. Will throw an error if
 	// `tryDestroy` has already been called or if `tryCreate` failed.
-	const substrateSign: TrySignFunc = function (
-		suriSuffix: string,
-		message: string
-	) {
-		return seedRef.trySubstrateSign(suriSuffix, message);
-	};
+	const substrateSign: TrySignFunc = seedRef.trySubstrateSign.bind(seedRef);
 
-	return { brainWalletSign, create, destroy, isValid, substrateSign };
+	const substrateAddress: TrySubstrateAddress = seedRef.trySubstrateAddress.bind(
+		seedRef
+	);
+
+	const brainWalletAddress: TryBrainWalletAddress = seedRef.tryBrainWalletAddress.bind(
+		seedRef
+	);
+
+	return {
+		brainWalletAddress,
+		brainWalletSign,
+		createSeedRef,
+		destroySeedRef,
+		isSeedRefValid,
+		substrateAddress,
+		substrateSign
+	};
 }

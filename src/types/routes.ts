@@ -6,7 +6,7 @@ export type RootStackParamList = {
 	AccountEdit: undefined;
 	AccountPin: { isNew: boolean } | undefined;
 	AccountNew: undefined;
-	AccountNetworkChooser: { isNew: boolean } | undefined;
+	Main: { isNew: boolean } | undefined;
 	AccountUnlockAndSign: { next: string };
 	AccountUnlock: { next: string; onDelete: () => any };
 	IdentityBackup: { isNew: true } | { isNew: false; seedPhrase: string };
@@ -26,11 +26,15 @@ export type RootStackParamList = {
 	PathManagement: { path: string };
 	PathsList: { networkKey: string };
 	PinNew: { resolve: (pin: string) => void };
-	PinUnlock: { identity?: Identity; resolve: (seedPhrase: string) => void };
+	PinUnlock: {
+		identity?: Identity;
+		resolve: (seedPhrase?: string) => void;
+		shouldReturnSeed: boolean;
+	};
 	PinUnlockWithPassword: {
 		identity?: Identity;
-		path: string;
-		resolve: (suri: string) => void;
+		isSeedRefValid: boolean;
+		resolve: (password: string) => void;
 	};
 	PrivacyPolicy: undefined;
 	QrScanner: undefined;

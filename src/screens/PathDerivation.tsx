@@ -33,6 +33,7 @@ import colors from 'styles/colors';
 import PathCard from 'components/PathCard';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function PathDerivation({
 	accounts,
@@ -44,10 +45,14 @@ function PathDerivation({
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
+	const currentIdentity = accounts.state.currentIdentity!;
+	const { isSeedRefValid, substrateAddress } = useSeedRef(
+		currentIdentity.encryptedSeed
+	);
 	const parentPath = route.params.parentPath;
 	const parentNetworkKey = useMemo(
-		() => getNetworkKey(parentPath, accounts.state.currentIdentity!),
-		[parentPath, accounts.state.currentIdentity]
+		() => getNetworkKey(parentPath, currentIdentity),
+		[parentPath, currentIdentity]
 	);
 
 	const [customNetworkKey, setCustomNetworkKey] = useState(
@@ -63,11 +68,11 @@ function PathDerivation({
 	const isPathValid = validateDerivedPath(derivationPath);
 
 	const onPathDerivation = async (): Promise<void> => {
-		const seedPhrase = await unlockSeedPhrase(navigation);
+		await unlockSeedPhrase(navigation, isSeedRefValid);
 		try {
 			await accounts.deriveNewPath(
 				completePath,
-				seedPhrase,
+				substrateAddress,
 				currentNetworkKey,
 				keyPairsName,
 				password

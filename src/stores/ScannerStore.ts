@@ -31,6 +31,7 @@ import {
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST
 } from 'constants/networkSpecs';
+import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
 import { isAscii } from 'utils/strings';
 import {
 	brainWalletSign,
@@ -47,7 +48,6 @@ import {
 	encodeNumber
 } from 'utils/decoders';
 import { Account, FoundAccount } from 'types/identityTypes';
-import { constructSURI } from 'utils/suri';
 import { emptyAccount } from 'utils/account';
 import {
 	CompletedParsedData,
@@ -56,7 +56,6 @@ import {
 	isMultipartData,
 	SubstrateCompletedParsedData
 } from 'types/scannerTypes';
-import { NetworkProtocol } from 'types/networkSpecsTypes';
 
 type TXRequest = Record<string, any>;
 
@@ -451,16 +450,52 @@ export default class ScannerStore extends Container<ScannerState> {
 		return true;
 	}
 
-	//seed is SURI on substrate and is seedPhrase on Ethereum
-	async signData(seed: string): Promise<void> {
-		const { dataToSign, isHash, sender } = this.state;
-
+	// signing ethereum data with seed reference
+	async signEthereumData(signFunction: TryBrainWalletSignFunc): Promise<void> {
+		const { dataToSign, sender } = this.state;
 		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
+		const signedData = await signFunction(dataToSign as string);
+		this.setState({ signedData });
+	}
 
+	// signing substrate data with seed reference
+	async signSubstrateData(
+		signFunction: TrySignFunc,
+		suriSuffix: string
+	): Promise<void> {
+		const { dataToSign, isHash, sender } = this.state;
+		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
+			throw new Error('Signing Error: sender could not be found.');
+		let signable;
+
+		if (dataToSign instanceof GenericExtrinsicPayload) {
+			signable = u8aToHex(dataToSign.toU8a(true), -1, false);
+		} else if (isHash) {
+			signable = hexStripPrefix(dataToSign);
+		} else if (isU8a(dataToSign)) {
+			signable = hexStripPrefix(u8aToHex(dataToSign));
+		} else if (isAscii(dataToSign)) {
+			signable = hexStripPrefix(asciiToHex(dataToSign));
+		} else {
+			throw new Error('Signing Error: cannot signing message');
+		}
+		let signed = await signFunction(suriSuffix, signable);
+		signed = '0x' + signed;
+		// TODO: tweak the first byte if and when sig type is not sr25519
+		const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
+		const signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
+		this.setState({ signedData });
+	}
+
+	// signing data with legacy account.
+	async signDataLegacy(pin = '1'): Promise<void> {
+		const { sender, dataToSign, isHash } = this.state;
+		if (!sender || !sender.encryptedSeed)
+			throw new Error('Signing Error: sender could not be found.');
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
-
+		const seed = await decryptData(sender.encryptedSeed, pin);
 		let signedData;
 		if (isEthereum) {
 			signedData = await brainWalletSign(seed, dataToSign as string);
@@ -485,33 +520,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
 		this.setState({ signedData });
-	}
-
-	async signDataWithSeedPhrase(
-		seedPhrase: string,
-		protocol: NetworkProtocol
-	): Promise<void> {
-		if (
-			protocol === NetworkProtocols.SUBSTRATE ||
-			protocol === NetworkProtocols.UNKNOWN
-		) {
-			const suri = constructSURI({
-				derivePath: this.state.sender?.path,
-				password: '',
-				phrase: seedPhrase
-			});
-			await this.signData(suri);
-		} else {
-			await this.signData(seedPhrase);
-		}
-	}
-
-	async signDataLegacy(pin = '1'): Promise<void> {
-		const { sender } = this.state;
-		if (!sender || !sender.encryptedSeed)
-			throw new Error('Signing Error: sender could not be found.');
-		const seed = await decryptData(sender.encryptedSeed, pin);
-		await this.signData(seed);
 	}
 
 	async cleanup(): Promise<void> {

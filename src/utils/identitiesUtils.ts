@@ -19,6 +19,7 @@ import { decryptData, substrateAddress } from './native';
 import { constructSURI, parseSURI } from './suri';
 import { generateAccountId } from './account';
 
+import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
@@ -31,7 +32,6 @@ import {
 	FoundAccount,
 	FoundLegacyAccount,
 	Identity,
-	LockedAccount,
 	PathGroup,
 	SerializedIdentity,
 	UnlockedAccount
@@ -221,15 +221,13 @@ export const parseFoundLegacyAccount = (
 		accountId,
 		address: legacyAccount.address,
 		createdAt: legacyAccount.createdAt,
+		encryptedSeed: legacyAccount.encryptedSeed,
 		isLegacy: true,
 		name: legacyAccount.name,
 		networkKey: legacyAccount.networkKey,
 		updatedAt: legacyAccount.updatedAt,
 		validBip39Seed: legacyAccount.validBip39Seed
 	};
-	if (legacyAccount.hasOwnProperty('encryptedSeed')) {
-		returnAccount.encryptedSeed = (legacyAccount as LockedAccount).encryptedSeed;
-	}
 	if (legacyAccount.hasOwnProperty('derivationPath')) {
 		returnAccount.path = (legacyAccount as UnlockedAccount).derivationPath;
 	}
@@ -255,12 +253,14 @@ export const getAddressWithPath = (
 		: address;
 };
 
-export const unlockIdentitySeed = async (
+export const unlockIdentitySeedWithReturn = async (
 	pin: string,
-	identity: Identity
+	identity: Identity,
+	createSeedRef: TryCreateFunc
 ): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
+	await createSeedRef(pin);
 	const { phrase } = parseSURI(seed);
 	return phrase;
 };

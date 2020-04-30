@@ -24,8 +24,9 @@ import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
-import { unlockIdentitySeed } from 'utils/identitiesUtils';
+import { withAccountStore, withTargetIdentity } from 'utils/HOC';
+import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlock({
 	accounts,
@@ -33,16 +34,27 @@ function PinUnlock({
 }: NavigationAccountProps<'PinUnlock'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
 	const targetIdentity =
-		route.params.identity ?? accounts.state.currentIdentity;
+		route.params.identity ?? accounts.state.currentIdentity!;
+	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
 		const { pin } = state;
 		if (pin.length >= 6 && targetIdentity) {
 			try {
 				const resolve = route.params.resolve;
-				const seedPhrase = await unlockIdentitySeed(pin, targetIdentity);
-				resetState();
-				resolve(seedPhrase);
+				if (route.params.shouldReturnSeed) {
+					const seedPhrase = await unlockIdentitySeedWithReturn(
+						pin,
+						targetIdentity,
+						createSeedRef
+					);
+					resetState();
+					resolve(seedPhrase);
+				} else {
+					await createSeedRef(pin);
+					resetState();
+					resolve();
+				}
 			} catch (e) {
 				updateState({ pin: '', pinMismatch: true });
 				//TODO record error times;
@@ -77,4 +89,4 @@ function PinUnlock({
 	);
 }
 
-export default withAccountStore(PinUnlock);
+export default withAccountStore(withTargetIdentity(PinUnlock));

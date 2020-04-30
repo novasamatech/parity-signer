@@ -36,7 +36,7 @@ import testIDs from 'e2e/testIDs';
 import About from 'screens/About';
 import AccountDetails from 'screens/AccountDetails';
 import AccountEdit from 'screens/AccountEdit';
-import AccountNetworkChooser from 'screens/AccountNetworkChooser';
+import Main from 'modules/main/screens/Main';
 import AccountNew from 'screens/AccountNew';
 import AccountPin from 'screens/AccountPin';
 import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
@@ -111,13 +111,10 @@ const HeaderLeftWithBack = (): React.ReactElement => {
 
 export const AppNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
-		initialRouteName="AccountNetworkChooser"
+		initialRouteName="Main"
 		screenOptions={globalStackNavigationOptions}
 	>
-		<ScreenStack.Screen
-			name="AccountNetworkChooser"
-			component={AccountNetworkChooser}
-		/>
+		<ScreenStack.Screen name="Main" component={Main} />
 		<ScreenStack.Screen name="About" component={About} />
 		<ScreenStack.Screen name="AccountDetails" component={AccountDetails} />
 		<ScreenStack.Screen name="AccountEdit" component={AccountEdit} />

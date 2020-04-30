@@ -18,6 +18,8 @@ import { NativeModules } from 'react-native';
 
 import { checksummedAddress } from './checksum';
 
+import { TryBrainWalletAddress } from 'utils/seedRefHooks';
+
 const { EthkeyBridge } = NativeModules || {};
 
 interface AddressObject {
@@ -59,6 +61,19 @@ function toHex(x: string): string {
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
+	const { bip39, address } = untagAddress(taggedAddress);
+	const hash = await keccak(toHex(address));
+
+	return {
+		address: checksummedAddress(address, hash),
+		bip39
+	};
+}
+
+export async function brainWalletAddressWithRef(
+	createBrainWalletFn: TryBrainWalletAddress
+): Promise<AddressObject> {
+	const taggedAddress = await createBrainWalletFn();
 	const { bip39, address } = untagAddress(taggedAddress);
 	const hash = await keccak(toHex(address));
 
@@ -158,7 +173,7 @@ export function schnorrkelVerify(
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
 
-export class SeedRef {
+export class SeedRefClass {
 	private dataRef: number;
 	private valid: boolean;
 
@@ -172,18 +187,18 @@ export class SeedRef {
 	}
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	tryCreate(encryptedSeed: string, password: string): Promise<SeedRef> {
+	async tryCreate(encryptedSeed: string, password: string): Promise<number> {
 		if (this.valid) {
 			// Seed reference was already created.
-			throw new Error('cannot create a seed reference when one already exists');
+			return this.dataRef;
 		}
-		return EthkeyBridge.decryptDataRef(encryptedSeed, password).then(
-			(dataRef: number) => {
-				this.dataRef = dataRef;
-				this.valid = true;
-				return this;
-			}
+		const dataRef: number = await EthkeyBridge.decryptDataRef(
+			encryptedSeed,
+			password
 		);
+		this.dataRef = dataRef;
+		this.valid = true;
+		return this.dataRef;
 	}
 
 	trySubstrateAddress(suriSuffix: string, prefix: number): Promise<string> {
@@ -194,9 +209,7 @@ export class SeedRef {
 			this.dataRef,
 			suriSuffix,
 			prefix
-		).then((address: string) => {
-			return address;
-		});
+		);
 	}
 
 	tryBrainWalletAddress(): Promise<string> {
@@ -212,14 +225,13 @@ export class SeedRef {
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or
 	// memory will leak.
-	tryDestroy(): Promise<SeedRef> {
+	tryDestroy(): Promise<void> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot destroy an invalid seed reference');
 		}
 		return EthkeyBridge.destroyDataRef(this.dataRef).then(() => {
 			this.valid = false;
-			return this;
 		});
 	}
 

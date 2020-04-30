@@ -31,10 +31,10 @@ import fontStyles from 'styles/fontStyles';
 import { withAccountStore } from 'utils/HOC';
 import { getIdentityName } from 'utils/identitiesUtils';
 import {
+	getSeedPhrase,
 	navigateToLegacyAccountList,
 	resetNavigationTo,
-	resetNavigationWithNetworkChooser,
-	unlockSeedPhrase
+	resetNavigationWithNetworkChooser
 } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
 
@@ -71,10 +71,10 @@ function IdentitiesSwitch({
 	): Promise<void> => {
 		await accounts.selectIdentity(identity);
 		setVisible(false);
-		if (screenName === 'AccountNetworkChooser') {
+		if (screenName === 'Main') {
 			resetNavigationTo(navigation, screenName, params);
 		} else if (screenName === 'IdentityBackup') {
-			const seedPhrase = await unlockSeedPhrase(navigation);
+			const seedPhrase = await getSeedPhrase(navigation);
 			resetNavigationWithNetworkChooser(navigation, screenName, {
 				isNew: false,
 				seedPhrase
@@ -132,10 +132,7 @@ function IdentitiesSwitch({
 				<ButtonIcon
 					title={currentIdentityTitle}
 					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(
-							currentIdentity,
-							'AccountNetworkChooser'
-						)
+						onIdentitySelectedAndNavigate(currentIdentity, 'Main')
 					}
 					iconType="antdesign"
 					iconName="user"
@@ -198,7 +195,7 @@ function IdentitiesSwitch({
 				}
 				title={title}
 				onPress={(): Promise<void> =>
-					onIdentitySelectedAndNavigate(identity, 'AccountNetworkChooser')
+					onIdentitySelectedAndNavigate(identity, 'Main')
 				}
 				key={identity.encryptedSeed}
 				iconType="antdesign"

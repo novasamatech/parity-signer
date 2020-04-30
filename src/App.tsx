@@ -29,6 +29,7 @@ import {
 	ScreenStack
 } from './screens';
 
+import { SeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
@@ -51,6 +52,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const [policyConfirmed, setPolicyConfirmed] = React.useState<boolean>(false);
 	const [dataLoaded, setDataLoaded] = React.useState<boolean>(false);
+
 	React.useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
 			const tocPP = await loadToCAndPPConfirmation();
@@ -93,14 +95,16 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<UnstatedProvider>
-				<MenuProvider backHandler={true}>
-					<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-					<GlobalStateContext.Provider value={globalContext}>
-						<NavigationContainer>{renderStacks()}</NavigationContainer>
-					</GlobalStateContext.Provider>
-				</MenuProvider>
-			</UnstatedProvider>
+			<SeedRefStore>
+				<UnstatedProvider>
+					<MenuProvider backHandler={true}>
+						<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+						<GlobalStateContext.Provider value={globalContext}>
+							<NavigationContainer>{renderStacks()}</NavigationContainer>
+						</GlobalStateContext.Provider>
+					</MenuProvider>
+				</UnstatedProvider>
+			</SeedRefStore>
 		</SafeAreaProvider>
 	);
 }

@@ -28,8 +28,13 @@ import ButtonMainAction from 'components/ButtonMainAction';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
-import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
+import {
+	alertBackupDone,
+	alertCopyBackupPhrase,
+	alertIdentityCreationError
+} from 'utils/alertUtils';
 import Button from 'components/Button';
+import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({
 	navigation,
@@ -37,13 +42,18 @@ function IdentityBackup({
 	route
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const [wordsNumber, setWordsNumber] = useState(24);
+	const [wordsNumber, setWordsNumber] = useState(12);
+	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
-		await accounts.saveNewIdentity(seedPhrase, pin);
-		setSeedPhrase('');
-		navigateToNewIdentityNetwork(navigation);
+		try {
+			await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
+			setSeedPhrase('');
+			navigateToNewIdentityNetwork(navigation);
+		} catch (e) {
+			alertIdentityCreationError(e.message);
+		}
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
@@ -105,12 +115,14 @@ function IdentityBackup({
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
-			<ButtonMainAction
-				title={'Next'}
-				testID={testIDs.IdentityBackup.nextButton}
-				bottom={false}
-				onPress={(): void => alertBackupDone(onBackupDone)}
-			/>
+			{isNew && (
+				<ButtonMainAction
+					title={'Next'}
+					testID={testIDs.IdentityBackup.nextButton}
+					bottom={false}
+					onPress={(): void => alertBackupDone(onBackupDone)}
+				/>
+			)}
 		</KeyboardScrollView>
 	);
 }
