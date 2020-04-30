@@ -125,7 +125,7 @@
         "build": "yarn xcbuild:debug",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone 8"
+          "type": "iPhone 11"
         }
       },
       "ios.sim.release": {
