@@ -70,7 +70,7 @@ function MessageDetails({
 				accounts.state.identities
 			);
 			if (isEthereum) {
-				await unlockSeedPhrase(navigation, isSeedRefValid);
+				await unlockSeedPhrase(navigation, isSeedRefValid, senderIdentity);
 				await scannerStore.signEthereumData(brainWalletSign);
 			} else {
 				let password = '';
@@ -81,7 +81,7 @@ function MessageDetails({
 						senderIdentity
 					);
 				} else {
-					await unlockSeedPhrase(navigation, isSeedRefValid);
+					await unlockSeedPhrase(navigation, isSeedRefValid, senderIdentity);
 				}
 				const suriSuffix = constructSuriSuffix({
 					derivePath: sender.path,
