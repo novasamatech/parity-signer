@@ -125,7 +125,7 @@
         "build": "yarn xcbuild:debug",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone 11"
+          "type": "iPhone 8"
         }
       },
       "ios.sim.release": {
@@ -133,7 +133,7 @@
         "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
-          "os": "iOS 13.3",
+          "os": "iOS 13.4",
           "type": "iPhone 8"
         }
       },
