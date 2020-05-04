@@ -14,19 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 
 import AccountIcon from './AccountIcon';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
-import AccountPrefixedTitle from './AccountPrefixedTitle';
 
-import {
-	isSubstrateNetworkParams,
-	isUnknownNetworkParams
-} from 'types/networkSpecsTypes';
+import Separator from 'components/Separator';
 import {
 	defaultNetworkKey,
 	NETWORK_LIST,
@@ -34,18 +31,24 @@ import {
 } from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import Separator from 'components/Separator';
+import { Identity } from 'types/identityTypes';
+import {
+	isSubstrateNetworkParams,
+	isUnknownNetworkParams,
+	SubstrateNetworkParams
+} from 'types/networkSpecsTypes';
+import { ButtonListener } from 'types/props';
 import {
 	getAddressWithPath,
 	getNetworkKeyByPath,
 	getPathName
 } from 'utils/identitiesUtils';
-import { ButtonListener } from 'types/props';
-import { Identity } from 'types/identityTypes';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
 	onPress,
 	identity,
+	isPathValid = true,
 	path,
 	name,
 	networkKey,
@@ -54,6 +57,7 @@ export default function PathCard({
 }: {
 	onPress?: ButtonListener;
 	identity: Identity;
+	isPathValid?: boolean;
 	path: string;
 	name?: string;
 	networkKey?: string;
@@ -62,12 +66,38 @@ export default function PathCard({
 }): React.ReactElement {
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
-	const address = getAddressWithPath(path, identity);
-	const isUnknownAddress = address === '';
-
-	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
+	const { isSeedRefValid, substrateAddress } = useSeedRef(
+		identity.encryptedSeed
+	);
+	const [address, setAddress] = useState('');
 	const computedNetworkKey =
 		networkKey || getNetworkKeyByPath(path, identity.meta.get(path)!);
+	useEffect(() => {
+		const getAddress = async (): Promise<void> => {
+			const existedAddress = getAddressWithPath(path, identity);
+			if (existedAddress !== '') return setAddress(existedAddress);
+			if (isSeedRefValid && isPathValid) {
+				const prefix = (NETWORK_LIST[
+					computedNetworkKey
+				] as SubstrateNetworkParams).prefix;
+				const generatedAddress = await substrateAddress(path, prefix);
+				return setAddress(generatedAddress);
+			}
+			setAddress('');
+		};
+		getAddress();
+	}, [
+		path,
+		identity,
+		isPathValid,
+		networkKey,
+		computedNetworkKey,
+		isSeedRefValid,
+		substrateAddress
+	]);
+
+	const isUnknownAddress = address === '';
+	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
 	const networkParams =
 		computedNetworkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress
 			? NETWORK_LIST[defaultNetworkKey]

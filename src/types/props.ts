@@ -9,6 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
+import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
 export interface NavigationProps<ScreenName extends keyof RootStackParamList> {
@@ -28,6 +29,18 @@ export interface NavigationAccountProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
 	accounts: AccountsStore;
+}
+
+export interface NavigationAccountIdentityProps<
+	ScreenName extends keyof RootStackParamList
+> extends NavigationProps<ScreenName> {
+	accounts: AccountsStoreStateWithIdentity;
+}
+
+export interface NavigationTargetIdentityProps<
+	ScreenName extends keyof RootStackParamList
+> extends NavigationProps<ScreenName> {
+	targetIdentity: Identity;
 }
 
 export interface NavigationAccountScannerProps<

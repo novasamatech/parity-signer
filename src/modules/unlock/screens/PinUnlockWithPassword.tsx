@@ -23,18 +23,16 @@ import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import ButtonMainAction from 'components/ButtonMainAction';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationTargetIdentityProps } from 'types/props';
 import { withAccountStore, withTargetIdentity } from 'utils/HOC';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlockWithPassword({
-	accounts,
+	targetIdentity,
 	route
-}: NavigationAccountProps<'PinUnlockWithPassword'>): React.ReactElement {
+}: NavigationTargetIdentityProps<'PinUnlockWithPassword'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
-	const targetIdentity =
-		route.params.identity ?? accounts.state.currentIdentity!;
 	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
