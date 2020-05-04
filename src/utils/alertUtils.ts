@@ -16,6 +16,8 @@
 
 import { Alert, AlertButton, Clipboard } from 'react-native';
 
+const tryAgainButtonText = 'Try again';
+
 export const alertErrorWithMessage = (
 	message: string,
 	buttonText: string
@@ -27,17 +29,29 @@ export const alertErrorWithMessage = (
 		}
 	]);
 
-export const alertIdentityCreationError = (): void =>
-	alertErrorWithMessage("Can't create Identity from the seed", 'Try again');
+export const alertIdentityCreationError = (errorMessage: string): void =>
+	alertErrorWithMessage(
+		"Can't create Identity from the seed: " + errorMessage,
+		tryAgainButtonText
+	);
 
-export const alertPathDerivationError = (): void =>
-	alertErrorWithMessage("Can't derive account from the seed", 'Try again');
+export const alertPathDerivationError = (errorMessage: string): void =>
+	alertErrorWithMessage(
+		"Can't derive account from the seed: " + errorMessage,
+		tryAgainButtonText
+	);
 
-export const alertPathDeletionError = (): void =>
-	alertErrorWithMessage("Can't delete this account.", 'Try again');
+export const alertPathDeletionError = (errorMessage: string): void =>
+	alertErrorWithMessage(
+		"Can't delete this account: " + errorMessage,
+		tryAgainButtonText
+	);
 
 export const alertIdentityDeletionError = (): void =>
-	alertErrorWithMessage("Can't delete Identity.", 'Try again');
+	alertErrorWithMessage("Can't delete Identity.", tryAgainButtonText);
+
+export const alertRenamingError = (errorMessage: string): void =>
+	alertErrorWithMessage("Can't rename: " + errorMessage, tryAgainButtonText);
 
 const buildAlertButtons = (
 	onConfirm: () => any,

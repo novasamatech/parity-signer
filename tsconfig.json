@@ -47,6 +47,7 @@
        "screens/*": ["src/screens/*"],
        "styles/*": ["src/styles/*"],
        "utils/*": ["src/utils/*"],
+       "modules/*": ["src/modules/*"],
        "e2e/*": ["test/e2e/*"],
        "constants/*":["src/constants/*"],
        "stores/*": ["src/stores/*"],

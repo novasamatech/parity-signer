@@ -22,10 +22,10 @@ import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 // TODO use typescript 3.8's type import, Wait for prettier update.
-import AccountsStore from 'stores/AccountsStore';
-import { NavigationAccountProps } from 'types/props';
+import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import { withAccountStore } from 'utils/HOC';
+import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import PathCard from 'components/PathCard';
 import PopupMenu from 'components/PopupMenu';
 import { LeftScreenHeading } from 'components/ScreenHeading';
@@ -34,15 +34,18 @@ import QrView from 'components/QrView';
 import {
 	getAddressWithPath,
 	getNetworkKey,
-	getNetworkKeyByPath,
 	getPathName,
 	getPathsWithSubstrateNetworkKey,
 	isSubstratePath
 } from 'utils/identitiesUtils';
 import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
-import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
+import {
+	navigateToPathDerivation,
+	navigateToPathsList
+} from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 interface Props {
 	path: string;
@@ -50,7 +53,7 @@ interface Props {
 	navigation:
 		| StackNavigationProp<RootStackParamList, 'PathDetails'>
 		| StackNavigationProp<RootStackParamList, 'PathsList'>;
-	accounts: AccountsStore;
+	accounts: AccountsStoreStateWithIdentity;
 }
 
 export function PathDetailsView({
@@ -62,6 +65,7 @@ export function PathDetailsView({
 	const { currentIdentity } = accounts.state;
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
+	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
@@ -74,30 +78,27 @@ export function PathDetailsView({
 		switch (value) {
 			case 'PathDelete':
 				alertDeleteAccount('this account', async () => {
-					await unlockSeedPhrase(navigation);
-					const deleteSucceed = await accounts.deletePath(path);
-					const paths = Array.from(accounts.state.currentIdentity!.meta.keys());
-					const pathIndicatedNetworkKey = getNetworkKeyByPath(path);
-					if (deleteSucceed) {
+					try {
+						await accounts.deletePath(path);
 						if (isSubstratePath(path)) {
 							const listedPaths = getPathsWithSubstrateNetworkKey(
-								paths,
-								pathIndicatedNetworkKey
+								accounts.state.currentIdentity,
+								networkKey
 							);
 							const hasOtherPaths = listedPaths.length > 0;
 							hasOtherPaths
-								? navigateToPathsList(navigation, pathIndicatedNetworkKey)
-								: navigation.navigate('AccountNetworkChooser');
+								? navigateToPathsList(navigation, networkKey)
+								: navigation.navigate('Main');
 						} else {
-							navigation.navigate('AccountNetworkChooser');
+							navigation.navigate('Main');
 						}
-					} else {
-						alertPathDeletionError();
+					} catch (err) {
+						alertPathDeletionError(err);
 					}
 				});
 				break;
 			case 'PathDerivation':
-				navigation.navigate('PathDerivation', { parentPath: path });
+				navigateToPathDerivation(navigation, path, isSeedRefValid);
 				break;
 			case 'PathManagement':
 				navigation.navigate('PathManagement', { path });
@@ -132,7 +133,7 @@ export function PathDetailsView({
 					/>
 				}
 			/>
-			<PathCard identity={currentIdentity!} path={path} />
+			<PathCard identity={currentIdentity} path={path} />
 			<QrView data={`${accountId}:${accountName}`} />
 			{isUnknownNetwork && <UnknownAccountWarning isPath />}
 		</SafeAreaScrollViewContainer>
@@ -143,9 +144,9 @@ function PathDetails({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'PathDetails'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
 	const path = route.params.path ?? '';
-	const networkKey = getNetworkKey(path, accounts.state.currentIdentity!);
+	const networkKey = getNetworkKey(path, accounts.state.currentIdentity);
 	return (
 		<PathDetailsView
 			accounts={accounts}
@@ -162,4 +163,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withAccountStore(PathDetails);
+export default withAccountStore(withCurrentIdentity(PathDetails));

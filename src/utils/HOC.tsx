@@ -14,9 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { RouteProp } from '@react-navigation/native';
 import React from 'react';
+import { View } from 'react-native';
 import { Subscribe } from 'unstated';
 
+import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
+import { RootStackParamList } from 'types/routes';
 import AccountsStore from 'stores/AccountsStore';
 import RegistriesStore from 'stores/RegistriesStore';
 import ScannerStore from 'stores/ScannerStore';
@@ -88,4 +92,32 @@ export function withRegistriesStore<T extends RegistriesInjectedProps>(
 			)}
 		</Subscribe>
 	);
+}
+
+export function withCurrentIdentity<
+	T extends { accounts: AccountsStoreStateWithIdentity }
+>(WrappedComponent: React.ComponentType<T>): React.ComponentType<T> {
+	return (props): React.ReactElement => {
+		const { currentIdentity } = props.accounts.state;
+		if (currentIdentity === null) return <View />;
+		return <WrappedComponent {...props} />;
+	};
+}
+
+interface UnlockScreenProps {
+	route:
+		| RouteProp<RootStackParamList, 'PinUnlock'>
+		| RouteProp<RootStackParamList, 'PinUnlockWithPassword'>;
+	targetIdentity: Identity;
+}
+
+export function withTargetIdentity<T extends UnlockScreenProps>(
+	WrappedComponent: React.ComponentType<T>
+): React.ComponentType<T & { accounts: AccountsStore }> {
+	return (props): React.ReactElement => {
+		const targetIdentity =
+			props.route.params.identity ?? props.accounts.state.currentIdentity;
+		if (!targetIdentity) return <View />;
+		return <WrappedComponent {...props} targetIdentity={targetIdentity} />;
+	};
 }

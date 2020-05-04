@@ -18,163 +18,172 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import { isU8a, u8aToHex } from '@polkadot/util';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Subscribe } from 'unstated';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
-import { NavigationProps } from 'types/props';
+import { NavigationAccountScannerProps, NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import Button from 'components/Button';
 import PayloadDetailsCard from 'components/PayloadDetailsCard';
-import ScannerStore from 'stores/ScannerStore';
 import AccountsStore from 'stores/AccountsStore';
+import { withAccountAndScannerStore } from 'utils/HOC';
 import {
 	navigateToSignedMessage,
-	unlockSeedPhrase
+	unlockSeedPhrase,
+	unlockSeedPhraseWithPassword
 } from 'utils/navigationHelpers';
 import fontStyles from 'styles/fontStyles';
 import MessageDetailsCard from 'components/MessageDetailsCard';
 import { alertMultipart } from 'utils/alertUtils';
 import CompatibleCard from 'components/CompatibleCard';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
+import { useSeedRef } from 'utils/seedRefHooks';
+import { constructSuriSuffix } from 'utils/suri';
 
-export default class MessageDetails extends React.PureComponent<
-	NavigationProps<'MessageDetails'>
-> {
-	async onSignMessage(
-		scannerStore: ScannerStore,
-		accountsStore: AccountsStore,
-		sender: FoundAccount
-	): Promise<void> {
+function MessageDetails({
+	navigation,
+	accounts,
+	scannerStore
+}: NavigationAccountScannerProps<'MessageDetails'>): React.ReactElement {
+	const dataToSign = scannerStore.getDataToSign()!;
+	const message = scannerStore.getMessage()!;
+	const sender = scannerStore.getSender()!;
+	const { isSeedRefValid, substrateSign, brainWalletSign } = useSeedRef(
+		sender.encryptedSeed
+	);
+	const networkParams = NETWORK_LIST[sender.networkKey];
+	const isEthereum = isEthereumNetworkParams(networkParams);
+
+	async function onSignMessage(): Promise<void> {
 		try {
 			if (sender.isLegacy) {
-				this.props.navigation.navigate('AccountUnlockAndSign', {
+				navigation.navigate('AccountUnlockAndSign', {
 					next: 'SignedMessage'
 				});
 				return;
 			}
 			const senderIdentity = getIdentityFromSender(
 				sender,
-				accountsStore.state.identities
+				accounts.state.identities
 			);
-			const seedPhrase = await unlockSeedPhrase(
-				this.props.navigation,
-				senderIdentity
-			);
-			await scannerStore.signDataWithSeedPhrase(
-				seedPhrase,
-				NETWORK_LIST[sender.networkKey].protocol
-			);
-			return navigateToSignedMessage(this.props.navigation);
+			if (isEthereum) {
+				await unlockSeedPhrase(navigation, isSeedRefValid, senderIdentity);
+				await scannerStore.signEthereumData(brainWalletSign);
+			} else {
+				let password = '';
+				if (sender.hasPassword) {
+					password = await unlockSeedPhraseWithPassword(
+						navigation,
+						isSeedRefValid,
+						senderIdentity
+					);
+				} else {
+					await unlockSeedPhrase(navigation, isSeedRefValid, senderIdentity);
+				}
+				const suriSuffix = constructSuriSuffix({
+					derivePath: sender.path,
+					password
+				});
+				await scannerStore.signSubstrateData(substrateSign, suriSuffix);
+			}
+			return navigateToSignedMessage(navigation);
 		} catch (e) {
 			scannerStore.setErrorMsg(e.message);
 		}
 	}
 
-	render(): React.ReactElement {
+	if (dataToSign) {
 		return (
-			<Subscribe to={[ScannerStore, AccountsStore]}>
-				{(
-					scannerStore: ScannerStore,
-					accountsStore: AccountsStore
-				): React.ReactNode => {
-					const dataToSign = scannerStore.getDataToSign()!;
-					const message = scannerStore.getMessage()!;
-					const sender = scannerStore.getSender()!;
-					if (dataToSign) {
-						return (
-							<MessageDetailsView
-								{...this.props}
-								scannerStore={scannerStore}
-								accountsStore={accountsStore}
-								sender={sender}
-								message={isU8a(message) ? u8aToHex(message) : message}
-								dataToSign={
-									//dataToSign could be U8A?
-									isU8a(dataToSign)
-										? u8aToHex(dataToSign)
-										: dataToSign.toString()
-								}
-								prehash={scannerStore.getPrehashPayload()}
-								isHash={scannerStore.getIsHash()}
-								onNext={(): Promise<void> =>
-									this.onSignMessage(scannerStore, accountsStore, sender)
-								}
-							/>
-						);
-					} else {
-						return null;
-					}
-				}}
-			</Subscribe>
+			<MessageDetailsView
+				accountsStore={accounts}
+				sender={sender}
+				isEthereum={isEthereum}
+				message={isU8a(message) ? u8aToHex(message) : message}
+				dataToSign={
+					//dataToSign could be U8A?
+					isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()
+				}
+				prehash={scannerStore.getPrehashPayload()}
+				isHash={scannerStore.getIsHash()}
+				onNext={onSignMessage}
+			/>
 		);
+	} else {
+		return <View />;
 	}
 }
 
 interface Props extends NavigationProps<'MessageDetails'> {
 	dataToSign: string;
+	isEthereum: boolean;
 	isHash?: boolean;
 	message: string;
 	onNext: () => void;
 	prehash: GenericExtrinsicPayload | null;
 	sender: FoundAccount;
-	scannerStore: ScannerStore;
 	accountsStore: AccountsStore;
 }
 
-export class MessageDetailsView extends React.PureComponent<Props> {
-	render(): React.ReactElement {
-		const {
-			accountsStore,
-			dataToSign,
-			isHash,
-			message,
-			onNext,
-			prehash,
-			sender
-		} = this.props;
-
-		const networkParams = NETWORK_LIST[sender.networkKey];
-		const isEthereum = isEthereumNetworkParams(networkParams);
-
-		return (
-			<SafeAreaScrollViewContainer
-				contentContainerStyle={styles.bodyContent}
-				style={styles.body}
-				testID={testIDs.MessageDetails.scrollScreen}
-			>
-				<Text style={styles.topTitle}>Sign Message</Text>
-				<Text style={styles.title}>From Account</Text>
-				<CompatibleCard account={sender} accountsStore={accountsStore} />
-				{!isEthereum && prehash ? (
-					<PayloadDetailsCard
-						description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
-						payload={prehash}
-						networkKey={sender.networkKey}
-					/>
-				) : null}
-				<MessageDetailsCard
-					isHash={isHash ?? false}
-					message={message}
-					data={dataToSign}
-				/>
-				<View style={styles.signButtonContainer}>
-					<Button
-						buttonStyles={styles.signButton}
-						testID={testIDs.MessageDetails.signButton}
-						title="Sign Message"
-						onPress={(): void => {
-							isHash ? alertMultipart(onNext) : onNext();
-						}}
-					/>
-				</View>
-			</SafeAreaScrollViewContainer>
-		);
-	}
+interface MessageDetailsViewProps {
+	accountsStore: AccountsStore;
+	dataToSign: string;
+	isEthereum: boolean;
+	isHash?: boolean;
+	message: string;
+	onNext: () => Promise<void>;
+	prehash: GenericExtrinsicPayload | null;
+	sender: FoundAccount;
 }
+
+export function MessageDetailsView({
+	accountsStore,
+	dataToSign,
+	isEthereum,
+	isHash,
+	message,
+	onNext,
+	prehash,
+	sender
+}: MessageDetailsViewProps): React.ReactElement {
+	return (
+		<SafeAreaScrollViewContainer
+			contentContainerStyle={styles.bodyContent}
+			style={styles.body}
+			testID={testIDs.MessageDetails.scrollScreen}
+		>
+			<Text style={styles.topTitle}>Sign Message</Text>
+			<Text style={styles.title}>From Account</Text>
+			<CompatibleCard account={sender} accountsStore={accountsStore} />
+			{!isEthereum && prehash ? (
+				<PayloadDetailsCard
+					description="You are about to confirm sending the following extrinsic. We will sign the hash of the payload as it is oversized."
+					payload={prehash}
+					networkKey={sender.networkKey}
+				/>
+			) : null}
+			<MessageDetailsCard
+				isHash={isHash ?? false}
+				message={message}
+				data={dataToSign}
+			/>
+			<View style={styles.signButtonContainer}>
+				<Button
+					buttonStyles={styles.signButton}
+					testID={testIDs.MessageDetails.signButton}
+					title="Sign Message"
+					onPress={(): void => {
+						isHash ? alertMultipart(onNext) : onNext();
+					}}
+				/>
+			</View>
+		</SafeAreaScrollViewContainer>
+	);
+}
+
+export default withAccountAndScannerStore(MessageDetails);
 
 const styles = StyleSheet.create({
 	actionButtonContainer: {

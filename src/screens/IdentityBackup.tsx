@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -28,8 +28,13 @@ import ButtonMainAction from 'components/ButtonMainAction';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
-import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
+import {
+	alertBackupDone,
+	alertCopyBackupPhrase,
+	alertIdentityCreationError
+} from 'utils/alertUtils';
 import Button from 'components/Button';
+import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({
 	navigation,
@@ -37,13 +42,18 @@ function IdentityBackup({
 	route
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const [wordsNumber, setWordsNumber] = useState(24);
+	const [wordsNumber, setWordsNumber] = useState(12);
+	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
-		await accounts.saveNewIdentity(seedPhrase, pin);
-		setSeedPhrase('');
-		navigateToNewIdentityNetwork(navigation);
+		try {
+			await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
+			setSeedPhrase('');
+			navigateToNewIdentityNetwork(navigation);
+		} catch (e) {
+			alertIdentityCreationError(e.message);
+		}
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
@@ -76,7 +86,7 @@ function IdentityBackup({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<SafeAreaScrollViewContainer style={styles.body}>
+		<KeyboardScrollView style={styles.body}>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
@@ -113,7 +123,7 @@ function IdentityBackup({
 					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
 			)}
-		</SafeAreaScrollViewContainer>
+		</KeyboardScrollView>
 	);
 }
 

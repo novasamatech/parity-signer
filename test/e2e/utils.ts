@@ -17,11 +17,21 @@
 import { expect, element, by, device } from 'detox';
 
 import testIDs from './testIDs';
-const { IdentityPin, AccountNetworkChooser, PathDetail, PathsList } = testIDs;
 
+import {
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
+
+const { IdentityPin, IdentityNew, Main, PathDetail, PathsList } = testIDs;
+
+export const mockIdentityName = 'mockIdentity';
+export const mockSeedPhrase =
+	'ability cave solid soccer gloom thought response hard around minor want welcome';
 export const pinCode = '000000';
 const substrateNetworkButtonIndex =
-	AccountNetworkChooser.networkButton + 'kusama';
+	Main.networkButton +
+	SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathId;
 
 export const testTap = async (buttonId: string): Promise<Detox.Actions<any>> =>
 	await element(by.id(buttonId)).tap();
@@ -84,12 +94,11 @@ export const testUnlockPin = async (inputPin: string): Promise<void> => {
 export const testSetUpDefaultPath = async (): Promise<void> => {
 	await testInput(IdentityPin.setPin, pinCode);
 	await testInputWithDone(IdentityPin.confirmPin, pinCode);
-	await testVisible(AccountNetworkChooser.chooserScreen);
+	await testVisible(Main.chooserScreen);
 	await testScrollAndTap(
 		substrateNetworkButtonIndex,
-		testIDs.AccountNetworkChooser.chooserScreen
+		testIDs.Main.chooserScreen
 	);
-	await testUnlockPin(pinCode);
 	await testVisible(PathDetail.screen);
 	await tapBack();
 	await testExist(PathsList.screen);
@@ -102,5 +111,16 @@ export const launchWithScanRequest = async (
 		launchArgs: { scanRequest: txRequest.toString() },
 		newInstance: true,
 		permissions: { camera: 'YES' }
+	});
+};
+
+export const testRecoverIdentity = (): void => {
+	it('recover a identity with seed phrase', async () => {
+		await testTap(Main.recoverButton);
+		await testVisible(IdentityNew.seedInput);
+		await testInput(IdentityNew.nameInput, mockIdentityName);
+		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
+		await element(by.id(IdentityNew.seedInput)).tapReturnKey();
+		await testSetUpDefaultPath();
 	});
 };

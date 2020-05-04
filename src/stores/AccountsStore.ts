@@ -30,12 +30,23 @@ import {
 	saveIdentities,
 	loadIdentities
 } from 'utils/db';
-import { constructSURI, parseSURI } from 'utils/suri';
 import {
-	brainWalletAddress,
+	addressGenerateError,
+	emptyIdentityError,
+	identityUpdateError,
+	accountExistedError,
+	duplicatedIdentityError
+} from 'utils/errors';
+import {
+	CreateSeedRefWithNewSeed,
+	TryBrainWalletAddress,
+	TrySubstrateAddress
+} from 'utils/seedRefHooks';
+import { constructSuriSuffix, parseSURI } from 'utils/suri';
+import {
+	brainWalletAddressWithRef,
 	decryptData,
-	encryptData,
-	substrateAddress
+	encryptData
 } from 'utils/native';
 import {
 	deepCopyIdentities,
@@ -102,20 +113,24 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async deriveEthereumAccount(
-		seedPhrase: string,
+		createBrainWalletAddress: TryBrainWalletAddress,
 		networkKey: string
-	): Promise<boolean> {
+	): Promise<void> {
 		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
-		const ethereumAddress = await brainWalletAddress(seedPhrase);
-		if (ethereumAddress.address === '') return false;
+		const ethereumAddress = await brainWalletAddressWithRef(
+			createBrainWalletAddress
+		);
+		if (ethereumAddress.address === '') throw new Error(addressGenerateError);
 		const { ethereumChainId } = networkParams;
 		const accountId = generateAccountId({
 			address: ethereumAddress.address,
 			networkKey
 		});
-		if (this.state.currentIdentity === null) return false;
+		if (this.state.currentIdentity === null)
+			throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		if (updatedCurrentIdentity.meta.has(ethereumChainId)) return false;
+		if (updatedCurrentIdentity.meta.has(ethereumChainId))
+			throw new Error(accountExistedError);
 		updatedCurrentIdentity.meta.set(ethereumChainId, {
 			address: ethereumAddress.address,
 			createdAt: new Date().getTime(),
@@ -123,10 +138,10 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 			updatedAt: new Date().getTime()
 		});
 		updatedCurrentIdentity.addresses.set(accountId, ethereumChainId);
-		return await this.updateCurrentIdentity(updatedCurrentIdentity);
+		await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async updateAccount(
+	private async updateAccount(
 		accountKey: string,
 		updatedAccount: Partial<LockedAccount>
 	): Promise<void> {
@@ -233,7 +248,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		}
 	}
 
-	getAccountWithoutCaseSensitive(accountId: string): Account | null {
+	private getAccountWithoutCaseSensitive(accountId: string): Account | null {
 		let findLegacyAccount = null;
 		for (const [key, value] of this.state.accounts) {
 			if (isEthereumAccountId(accountId)) {
@@ -270,17 +285,16 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = this.getAccountFromIdentity(accountId);
-		} else {
-			//TODO remove this function when we enable networkSpecs update and remove KUSAMA_CC2 network.
-			derivedAccount = this.getAccountFromIdentity(address);
 		}
+		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
+		derivedAccount = derivedAccount || this.getAccountFromIdentity(address);
 
 		if (derivedAccount instanceof Object)
 			return { ...derivedAccount, isLegacy: false };
 		return null;
 	}
 
-	getAccountFromIdentity(
+	private getAccountFromIdentity(
 		accountIdOrAddress: string
 	): false | FoundIdentityAccount {
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
@@ -328,6 +342,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		return {
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
+			hasPassword: !!metaData.hasPassword,
 			isLegacy: false,
 			networkKey: targetNetworkKey!,
 			path: targetPath,
@@ -380,44 +395,56 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		await this.setState({ currentIdentity: null });
 	}
 
-	async _addPathToIdentity(
+	private async addPathToIdentity(
 		newPath: string,
-		seedPhrase: string,
+		createSubstrateAddress: TrySubstrateAddress,
 		updatedIdentity: Identity,
 		name: string,
-		networkKey: string
-	): Promise<boolean> {
+		networkKey: string,
+		password: string
+	): Promise<void> {
 		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
-		const suri = constructSURI({
+		const suriSuffix = constructSuriSuffix({
 			derivePath: newPath,
-			password: '',
-			phrase: seedPhrase
+			password: password
 		});
+		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
 		try {
-			address = await substrateAddress(suri, prefix);
+			address = await createSubstrateAddress(suriSuffix, prefix);
 		} catch (e) {
-			return false;
+			throw new Error(addressGenerateError);
 		}
-		if (address === '') return false;
-		if (updatedIdentity.meta.has(newPath)) return false;
+		if (address === '') throw new Error(addressGenerateError);
 		const pathMeta = {
 			address,
 			createdAt: new Date().getTime(),
+			hasPassword: password !== '',
 			name,
 			networkPathId: pathId,
 			updatedAt: new Date().getTime()
 		};
 		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
-		return true;
 	}
 
-	async saveNewIdentity(seedPhrase: string, pin: string): Promise<void> {
+	async saveNewIdentity(
+		seedPhrase: string,
+		pin: string,
+		generateSeedRef: CreateSeedRefWithNewSeed
+	): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
-		//TODO encrypt seedPhrase with password in the future version,
-		// current encryption with only seedPhrase is compatible.
-		updatedIdentity.encryptedSeed = await encryptData(seedPhrase, pin);
+		const suri = seedPhrase;
+
+		updatedIdentity.encryptedSeed = await encryptData(suri, pin);
+		//prevent duplication
+		if (
+			this.state.identities.find(
+				i => i.encryptedSeed === updatedIdentity.encryptedSeed
+			)
+		)
+			throw new Error(duplicatedIdentityError);
+		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		await this.setState({
 			currentIdentity: updatedIdentity,
@@ -437,20 +464,20 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		});
 	}
 
-	async updateCurrentIdentity(updatedIdentity: Identity): Promise<boolean> {
+	private async updateCurrentIdentity(
+		updatedIdentity: Identity
+	): Promise<void> {
 		try {
 			await this.setState({
 				currentIdentity: updatedIdentity
 			});
-			await this._updateIdentitiesWithCurrentIdentity();
-		} catch (e) {
-			console.warn('derive new Path error', e);
-			return false;
+			await this.updateIdentitiesWithCurrentIdentity();
+		} catch (error) {
+			throw new Error(identityUpdateError);
 		}
-		return true;
 	}
 
-	async _updateIdentitiesWithCurrentIdentity(): Promise<void> {
+	private async updateIdentitiesWithCurrentIdentity(): Promise<void> {
 		const newIdentities = deepCopyIdentities(this.state.identities);
 		if (this.state.currentIdentity === null) return;
 		const identityIndex = newIdentities.findIndex(
@@ -469,9 +496,9 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.name = name;
 		try {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
-			await this._updateIdentitiesWithCurrentIdentity();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
-			console.warn('update identity name error', e);
+			throw new Error(identityUpdateError);
 		}
 	}
 
@@ -487,7 +514,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedCurrentIdentity.meta.set(path, updatedPathMeta);
 		try {
 			await this.setState({ currentIdentity: updatedCurrentIdentity });
-			await this._updateIdentitiesWithCurrentIdentity();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
 			console.warn('update path name error', e);
 		}
@@ -495,59 +522,56 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async deriveNewPath(
 		newPath: string,
-		seedPhrase: string,
+		createSubstrateAddress: TrySubstrateAddress,
 		networkKey: string,
-		name: string
-	): Promise<boolean> {
+		name: string,
+		password: string
+	): Promise<void> {
 		const updatedCurrentIdentity = deepCopyIdentity(
 			this.state.currentIdentity!
 		);
-		const deriveSucceed = await this._addPathToIdentity(
+		await this.addPathToIdentity(
 			newPath,
-			seedPhrase,
+			createSubstrateAddress,
 			updatedCurrentIdentity,
 			name,
-			networkKey
+			networkKey,
+			password
 		);
-		if (!deriveSucceed) return false;
-		return await this.updateCurrentIdentity(updatedCurrentIdentity);
+		await this.updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async deletePath(path: string): Promise<boolean> {
-		if (this.state.currentIdentity === null) return false;
+	async deletePath(path: string): Promise<void> {
+		if (this.state.currentIdentity === null)
+			throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(this.state.currentIdentity);
-		const { address } = updatedCurrentIdentity.meta.get(path)!;
+		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
 		updatedCurrentIdentity.meta.delete(path);
-		updatedCurrentIdentity.addresses.delete(getAddressKeyByPath(address, path));
+		updatedCurrentIdentity.addresses.delete(
+			getAddressKeyByPath(path, pathMeta)
+		);
 
 		try {
 			await this.setState({
 				currentIdentity: updatedCurrentIdentity
 			});
-			await this._updateIdentitiesWithCurrentIdentity();
+			await this.updateIdentitiesWithCurrentIdentity();
 		} catch (e) {
-			console.warn('derive new Path error', e);
-			return false;
+			throw new Error(identityUpdateError);
 		}
-		return true;
 	}
 
-	async deleteCurrentIdentity(): Promise<boolean> {
-		try {
-			const newIdentities = deepCopyIdentities(this.state.identities);
-			const identityIndex = newIdentities.findIndex(
-				(identity: Identity) =>
-					identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
-			);
-			newIdentities.splice(identityIndex, 1);
-			await this.setState({
-				currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
-				identities: newIdentities
-			});
-			await saveIdentities(newIdentities);
-			return true;
-		} catch (e) {
-			return false;
-		}
+	async deleteCurrentIdentity(): Promise<void> {
+		const newIdentities = deepCopyIdentities(this.state.identities);
+		const identityIndex = newIdentities.findIndex(
+			(identity: Identity) =>
+				identity.encryptedSeed === this.state.currentIdentity!.encryptedSeed
+		);
+		newIdentities.splice(identityIndex, 1);
+		await this.setState({
+			currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
+			identities: newIdentities
+		});
+		await saveIdentities(newIdentities);
 	}
 }

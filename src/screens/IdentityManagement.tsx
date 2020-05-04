@@ -15,47 +15,61 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
+import { NavigationAccountIdentityProps } from 'types/props';
+import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
+	getSeedPhrase,
 	navigateToLandingPage,
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
 import {
 	alertDeleteIdentity,
-	alertIdentityDeletionError
+	alertIdentityDeletionError,
+	alertRenamingError
 } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
+import { useSeedRef } from 'utils/seedRefHooks';
+
+type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
 function IdentityManagement({
 	accounts,
 	navigation
-}: NavigationAccountProps<'IdentityManagement'>): React.ReactElement {
+}: Props): React.ReactElement {
 	const { currentIdentity } = accounts.state;
-	if (!currentIdentity) return <View />;
+	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
+
+	const onRenameIdentity = async (name: string): Promise<void> => {
+		try {
+			await accounts.updateIdentityName(name);
+		} catch (err) {
+			alertRenamingError(err.message);
+		}
+	};
 
 	const onOptionSelect = async (value: string): Promise<void> => {
-		if (value === 'PathDelete') {
+		if (value === 'IdentityDelete') {
 			alertDeleteIdentity(
 				async (): Promise<void> => {
-					await unlockSeedPhrase(navigation);
-					const deleteSucceed = await accounts.deleteCurrentIdentity();
-					if (deleteSucceed) {
+					await unlockSeedPhrase(navigation, false);
+					try {
+						await destroySeedRef();
+						await accounts.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
-					} else {
+					} catch (err) {
 						alertIdentityDeletionError();
 					}
 				}
 			);
 		} else if (value === 'IdentityBackup') {
-			const seedPhrase = await unlockSeedPhrase(navigation);
+			const seedPhrase = await getSeedPhrase(navigation);
 			navigation.pop();
 			navigation.navigate(value, { isNew: false, seedPhrase });
 		}
@@ -76,7 +90,7 @@ function IdentityManagement({
 								testID: testIDs.IdentityManagement.deleteButton,
 								text: 'Delete',
 								textStyle: styles.deleteText,
-								value: 'PathDelete'
+								value: 'IdentityDelete'
 							}
 						]}
 					/>
@@ -84,9 +98,7 @@ function IdentityManagement({
 			/>
 			<TextInput
 				label="Display Name"
-				onChangeText={(name: string): Promise<void> =>
-					accounts.updateIdentityName(name)
-				}
+				onChangeText={onRenameIdentity}
 				value={currentIdentity.name}
 				placeholder="Enter a new identity name"
 				focus
@@ -95,7 +107,7 @@ function IdentityManagement({
 	);
 }
 
-export default withAccountStore(IdentityManagement);
+export default withAccountStore(withCurrentIdentity(IdentityManagement));
 
 const styles = StyleSheet.create({
 	deleteText: {

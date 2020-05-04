@@ -37,6 +37,7 @@ import ScreenHeading from 'components/ScreenHeading';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
+import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityNew({
 	accounts,
@@ -48,6 +49,7 @@ function IdentityNew({
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const createSeedRefWithNewSeed = useNewSeedRef();
 
 	useEffect((): (() => void) => {
 		const clearNewIdentity = (): void =>
@@ -76,14 +78,22 @@ function IdentityNew({
 		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
-				await accounts.saveNewIdentity(seedPhrase.trimEnd(), pin);
+				await accounts.saveNewIdentity(
+					seedPhrase.trimEnd(),
+					pin,
+					createSeedRefWithNewSeed
+				);
 			} else {
-				await accounts.saveNewIdentity(seedPhrase, pin);
+				await accounts.saveNewIdentity(
+					seedPhrase,
+					pin,
+					createSeedRefWithNewSeed
+				);
 			}
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
-			alertIdentityCreationError();
+			alertIdentityCreationError(e.message);
 		}
 	};
 

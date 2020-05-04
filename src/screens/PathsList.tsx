@@ -19,17 +19,18 @@ import { Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
+import { navigateToPathDerivation } from 'utils/navigationHelpers';
+import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
+import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { PathGroup } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
+import {
+	isEthereumNetworkParams,
+	isUnknownNetworkParams
+} from 'types/networkSpecsTypes';
+import { NavigationAccountIdentityProps } from 'types/props';
+import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths,
@@ -46,22 +47,23 @@ function PathsList({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'PathsList'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
 	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
 	const networkParams = NETWORK_LIST[networkKey];
 
 	const { currentIdentity } = accounts.state;
 	const isEthereumPath = isEthereumNetworkParams(networkParams);
-	const isUnknownNetworkPath =
-		networkParams.protocol === NetworkProtocols.UNKNOWN;
+	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
 	const pathsGroups = useMemo((): PathGroup[] | null => {
 		if (!currentIdentity || isEthereumPath) return null;
-		const paths = Array.from(currentIdentity.meta.keys());
-		const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
+		const listedPaths = getPathsWithSubstrateNetworkKey(
+			currentIdentity,
+			networkKey
+		);
 		return groupPaths(listedPaths);
 	}, [currentIdentity, isEthereumPath, networkKey]);
+	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 
-	if (!currentIdentity) return <View />;
 	if (isEthereumNetworkParams(networkParams)) {
 		return (
 			<PathDetailsView
@@ -160,14 +162,16 @@ function PathsList({
 			<ButtonNewDerivation
 				testID={testIDs.PathsList.deriveButton}
 				title="Derive New Account"
-				onPress={(): void =>
-					navigation.navigate('PathDerivation', {
-						parentPath: isUnknownNetworkPath ? '' : rootPath
-					})
+				onPress={(): Promise<void> =>
+					navigateToPathDerivation(
+						navigation,
+						isUnknownNetworkPath ? '' : rootPath,
+						isSeedRefValid
+					)
 				}
 			/>
 		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default withAccountStore(PathsList);
+export default withAccountStore(withCurrentIdentity(PathsList));

@@ -14,48 +14,42 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This is the current app's main landing page
- */
+import React, { useState } from 'react';
+import { BackHandler, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
-import React, { FunctionComponent, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-
-import {
-	SafeAreaScrollViewContainer,
-	SafeAreaViewContainer
-} from 'components/SafeAreaContainer';
+import { NetworkCard } from 'components/AccountCard';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import {
 	NETWORK_LIST,
-	UnknownNetworkKeys,
+	NetworkProtocols,
 	SubstrateNetworkKeys,
-	NetworkProtocols
+	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
-import Button from 'components/Button';
-import { NavigationAccountProps } from 'types/props';
 import {
-	navigateToPathsList,
-	unlockSeedPhrase,
-	navigateToPathDetails
-} from 'utils/navigationHelpers';
-import { withAccountStore } from 'utils/HOC';
+	isEthereumNetworkParams,
+	isSubstrateNetworkParams,
+	isUnknownNetworkParams,
+	NetworkParams,
+	SubstrateNetworkParams
+} from 'types/networkSpecsTypes';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import {
 	getExistedNetworkKeys,
 	getIdentityName,
 	getPathsWithSubstrateNetworkKey
 } from 'utils/identitiesUtils';
-import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
-import fontStyles from 'styles/fontStyles';
-import { NetworkCard } from 'components/AccountCard';
 import {
-	NetworkParams,
-	SubstrateNetworkParams,
-	isSubstrateNetworkParams,
-	isEthereumNetworkParams
-} from 'types/networkSpecsTypes';
+	navigateToPathDerivation,
+	navigateToPathDetails,
+	navigateToPathsList,
+	unlockSeedPhrase
+} from 'utils/navigationHelpers';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 const excludedNetworks = [
 	UnknownNetworkKeys.UNKNOWN,
@@ -66,64 +60,33 @@ if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 }
 
-function AccountNetworkChooser({
+export default function NetworkSelector({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'AccountNetworkChooser'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const { identities, currentIdentity, loaded } = accounts.state;
-	const hasLegacyAccount = accounts.getAccounts().size !== 0;
+	const { identities, currentIdentity } = accounts.state;
+	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 
-	const TextButton: FunctionComponent<{ text: string; isRecover: boolean }> = ({
-		text,
-		isRecover
-	}) => (
-		<Text
-			style={[fontStyles.quote, { textDecorationLine: 'underline' }]}
-			testID={
-				isRecover
-					? testIDs.AccountNetworkChooser.recoverButton
-					: testIDs.AccountNetworkChooser.createButton
-			}
-			onPress={(): void => navigation.navigate('IdentityNew', { isRecover })}
-		>
-			{text}
-		</Text>
-	);
-
-	const showOnboardingMessage = (): React.ReactElement => (
-		<SafeAreaScrollViewContainer
-			testID={testIDs.AccountNetworkChooser.noAccountScreen}
-			contentContainerStyle={styles.scrollContent}
-		>
-			<View style={styles.onboardingWrapper}>
-				<TextButton text="Create" isRecover={false} />
-				<Text style={fontStyles.quote}> or </Text>
-				<TextButton text="recover" isRecover={true} />
-				<Text style={fontStyles.quote}>your identity to get started.</Text>
-				{hasLegacyAccount && (
-					<Button
-						title="Show Legacy Accounts"
-						onPress={(): void => navigation.navigate('LegacyAccountList')}
-						small={true}
-						onlyText={true}
-						style={{ marginLeft: 0 }}
-					/>
-				)}
-			</View>
-		</SafeAreaScrollViewContainer>
-	);
-
-	const showNoCurrentIdentityMessage = (): React.ReactElement => (
-		<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollContent}>
-			<View style={styles.onboardingWrapper}>
-				<Text style={fontStyles.quote}>
-					Select one of your identity to get started.
-				</Text>
-			</View>
-		</SafeAreaScrollViewContainer>
+	// catch android back button and prevent exiting the app
+	useFocusEffect(
+		React.useCallback((): any => {
+			const handleBackButton = (): boolean => {
+				if (shouldShowMoreNetworks) {
+					setShouldShowMoreNetworks(false);
+					return true;
+				} else {
+					return false;
+				}
+			};
+			const backHandler = BackHandler.addEventListener(
+				'hardwareBackPress',
+				handleBackButton
+			);
+			return (): void => backHandler.remove();
+		}, [shouldShowMoreNetworks])
 	);
 
 	const sortNetworkKeys = (
@@ -142,7 +105,7 @@ function AccountNetworkChooser({
 	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
 		const shouldExclude = excludedNetworks.includes(networkKey);
 		if (isNew && !shouldExclude) return true;
-		const availableNetworks = getExistedNetworkKeys(currentIdentity!);
+
 		if (shouldShowMoreNetworks) {
 			if (shouldExclude) return false;
 			return !availableNetworks.includes(networkKey);
@@ -155,41 +118,42 @@ function AccountNetworkChooser({
 		networkParams: SubstrateNetworkParams
 	): Promise<void> => {
 		const { pathId } = networkParams;
-		const seedPhrase = await unlockSeedPhrase(navigation);
+		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		const fullPath = `//${pathId}`;
-		const derivationSucceed = await accounts.deriveNewPath(
-			fullPath,
-			seedPhrase,
-			networkKey,
-			`${networkParams.title} root`
-		);
-		if (derivationSucceed) {
+		try {
+			await accounts.deriveNewPath(
+				fullPath,
+				seedRefHooks.substrateAddress,
+				networkKey,
+				`${networkParams.title} root`,
+				''
+			);
 			navigateToPathDetails(navigation, networkKey, fullPath);
-		} else {
-			alertPathDerivationError();
+		} catch (error) {
+			alertPathDerivationError(error.message);
 		}
 	};
 
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
-		const seedPhrase = await unlockSeedPhrase(navigation);
-		const derivationSucceed = await accounts.deriveEthereumAccount(
-			seedPhrase,
-			networkKey
-		);
-		if (derivationSucceed) {
+		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
+		try {
+			await accounts.deriveEthereumAccount(
+				seedRefHooks.brainWalletAddress,
+				networkKey
+			);
 			navigateToPathsList(navigation, networkKey);
-		} else {
-			alertPathDerivationError();
+		} catch (e) {
+			alertPathDerivationError(e.message);
 		}
 	};
 
 	const renderCustomPathCard = (): React.ReactElement => (
 		<NetworkCard
 			isAdd={true}
-			onPress={(): void =>
-				navigation.navigate('PathDerivation', { parentPath: '' })
+			onPress={(): Promise<void> =>
+				navigateToPathDerivation(navigation, '', seedRefHooks.isSeedRefValid)
 			}
-			testID={testIDs.AccountNetworkChooser.addCustomNetworkButton}
+			testID={testIDs.Main.addCustomNetworkButton}
 			title="Create Custom Path"
 			networkColor={colors.bg}
 		/>
@@ -202,7 +166,7 @@ function AccountNetworkChooser({
 				<NetworkCard
 					isAdd={true}
 					onPress={(): void => setShouldShowMoreNetworks(true)}
-					testID={testIDs.AccountNetworkChooser.addNewNetworkButton}
+					testID={testIDs.Main.addNewNetworkButton}
 					title="Add Network Account"
 					networkColor={colors.bg}
 				/>
@@ -223,7 +187,7 @@ function AccountNetworkChooser({
 				/>
 			);
 		} else {
-			const identityName = getIdentityName(currentIdentity!, identities);
+			const identityName = getIdentityName(currentIdentity, identities);
 			return <IdentityHeading title={identityName} />;
 		}
 	};
@@ -239,10 +203,16 @@ function AccountNetworkChooser({
 				await deriveEthereumAccount(networkKey);
 			}
 		} else {
-			const paths = Array.from(currentIdentity!.meta.keys());
-			if (isSubstrateNetworkParams(networkParams)) {
-				const listedPaths = getPathsWithSubstrateNetworkKey(paths, networkKey);
-				if (listedPaths.length === 0)
+			const paths = Array.from(currentIdentity.meta.keys());
+			if (
+				isSubstrateNetworkParams(networkParams) ||
+				isUnknownNetworkParams(networkParams)
+			) {
+				const listedPaths = getPathsWithSubstrateNetworkKey(
+					currentIdentity,
+					networkKey
+				);
+				if (listedPaths.length === 0 && isSubstrateNetworkParams(networkParams))
 					return await deriveSubstrateNetworkRootPath(
 						networkKey,
 						networkParams
@@ -257,20 +227,14 @@ function AccountNetworkChooser({
 		}
 	};
 
-	if (!loaded) return <SafeAreaViewContainer />;
-	if (identities.length === 0) return showOnboardingMessage();
-	if (!currentIdentity) return showNoCurrentIdentityMessage();
-
+	const availableNetworks = getExistedNetworkKeys(currentIdentity);
 	const networkList = Object.entries(NETWORK_LIST).filter(filterNetworkKeys);
 	networkList.sort(sortNetworkKeys);
 
 	return (
 		<SafeAreaViewContainer>
 			{renderScreenHeading()}
-			<ScrollView
-				bounces={false}
-				testID={testIDs.AccountNetworkChooser.chooserScreen}
-			>
+			<ScrollView bounces={false} testID={testIDs.Main.chooserScreen}>
 				{networkList.map(([networkKey, networkParams]) => {
 					const networkIndexSuffix = isEthereumNetworkParams(networkParams)
 						? networkParams.ethereumChainId
@@ -278,9 +242,7 @@ function AccountNetworkChooser({
 					return (
 						<NetworkCard
 							key={networkKey}
-							testID={
-								testIDs.AccountNetworkChooser.networkButton + networkIndexSuffix
-							}
+							testID={testIDs.Main.networkButton + networkIndexSuffix}
 							networkKey={networkKey}
 							onPress={(): Promise<void> =>
 								onNetworkChosen(networkKey, networkParams)
@@ -294,19 +256,3 @@ function AccountNetworkChooser({
 		</SafeAreaViewContainer>
 	);
 }
-
-export default withAccountStore(AccountNetworkChooser);
-
-const styles = StyleSheet.create({
-	onboardingWrapper: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		flexWrap: 'wrap'
-	},
-	scrollContent: {
-		flex: 1,
-		justifyContent: 'center',
-		padding: 16,
-		paddingBottom: 100
-	}
-});

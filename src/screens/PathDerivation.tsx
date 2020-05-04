@@ -15,19 +15,16 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState, useMemo } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
+import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import ButtonMainAction from 'components/ButtonMainAction';
-import {
-	getNetworkKey,
-	getNetworkKeyByPath,
-	validateDerivedPath
-} from 'utils/identitiesUtils';
+import { getNetworkKey, validateDerivedPath } from 'utils/identitiesUtils';
 import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
@@ -36,51 +33,53 @@ import colors from 'styles/colors';
 import PathCard from 'components/PathCard';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function PathDerivation({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'PathDerivation'>): React.ReactElement {
-	const [derivationPath, setDerivationPath] = useState('');
-	const [keyPairsName, setKeyPairsName] = useState('');
-	const [isPathValid, setIsPathValid] = useState(true);
-	const [modalVisible, setModalVisible] = useState(false);
+}: NavigationAccountIdentityProps<'PathDerivation'>): React.ReactElement {
+	const [derivationPath, setDerivationPath] = useState<string>('');
+	const [keyPairsName, setKeyPairsName] = useState<string>('');
+	const [modalVisible, setModalVisible] = useState<boolean>(false);
+	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
-	const parentPath = route.params.parentPath;
-	const [customNetworkKey, setCustomNetworkKey] = useState(() => {
-		const parentNetworkKey = getNetworkKey(
-			parentPath,
-			accounts.state.currentIdentity!
-		);
-		return parentNetworkKey === UnknownNetworkKeys.UNKNOWN
-			? defaultNetworkKey
-			: parentNetworkKey;
-	});
-	const completePath = `${parentPath}${derivationPath}`;
-	const pathIndicatedNetworkKey = useMemo(
-		(): string => getNetworkKeyByPath(completePath),
-		[completePath]
+	const currentIdentity = accounts.state.currentIdentity;
+	const { isSeedRefValid, substrateAddress } = useSeedRef(
+		currentIdentity.encryptedSeed
 	);
-	const isCustomNetwork =
-		pathIndicatedNetworkKey === UnknownNetworkKeys.UNKNOWN;
+	const parentPath = route.params.parentPath;
+	const parentNetworkKey = useMemo(
+		() => getNetworkKey(parentPath, currentIdentity),
+		[parentPath, currentIdentity]
+	);
+
+	const [customNetworkKey, setCustomNetworkKey] = useState(
+		parentNetworkKey === UnknownNetworkKeys.UNKNOWN
+			? defaultNetworkKey
+			: parentNetworkKey
+	);
+	const completePath = `${parentPath}${derivationPath}`;
+	const enableCustomNetwork = parentPath === '';
+	const currentNetworkKey = enableCustomNetwork
+		? customNetworkKey
+		: parentNetworkKey;
+	const isPathValid = validateDerivedPath(derivationPath);
 
 	const onPathDerivation = async (): Promise<void> => {
-		if (!validateDerivedPath(derivationPath)) {
-			return setIsPathValid(false);
-		}
-		const seedPhrase = await unlockSeedPhrase(navigation);
-		const derivationSucceed = await accounts.deriveNewPath(
-			completePath,
-			seedPhrase,
-			isCustomNetwork ? customNetworkKey : pathIndicatedNetworkKey,
-			keyPairsName
-		);
-		if (derivationSucceed) {
-			navigateToPathsList(navigation, pathIndicatedNetworkKey);
-		} else {
-			setIsPathValid(false);
-			alertPathDerivationError();
+		await unlockSeedPhrase(navigation, isSeedRefValid);
+		try {
+			await accounts.deriveNewPath(
+				completePath,
+				substrateAddress,
+				currentNetworkKey,
+				keyPairsName,
+				password
+			);
+			navigateToPathsList(navigation, currentNetworkKey);
+		} catch (error) {
+			alertPathDerivationError(error.message);
 		}
 	};
 
@@ -92,10 +91,11 @@ function PathDerivation({
 					subtitle={parentPath}
 					hasSubtitleIcon={true}
 				/>
-				{!isPathValid && <Text>Invalid Path</Text>}
 				<TextInput
 					autoCompleteType="off"
 					autoCorrect={false}
+					autoFocus
+					error={!isPathValid}
 					label="Path"
 					onChangeText={setDerivationPath}
 					onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
@@ -117,28 +117,37 @@ function PathDerivation({
 					testID={testIDs.PathDerivation.nameInput}
 					value={keyPairsName}
 				/>
-				{isCustomNetwork && (
+				{enableCustomNetwork && (
 					<NetworkSelector
 						networkKey={customNetworkKey}
 						setVisible={setModalVisible}
 					/>
 				)}
 				<Separator style={{ height: 0 }} />
+				<PasswordInput
+					password={password}
+					setPassword={setPassword}
+					onSubmitEditing={onPathDerivation}
+				/>
 				<PathCard
-					identity={accounts.state.currentIdentity!}
+					identity={accounts.state.currentIdentity}
+					isPathValid={isPathValid}
 					name={keyPairsName}
-					path={completePath}
+					path={
+						password === '' ? completePath : `${completePath}///${password}`
+					}
+					networkKey={currentNetworkKey}
 				/>
 
 				<ButtonMainAction
-					disabled={!validateDerivedPath(derivationPath)}
+					disabled={!isPathValid}
 					bottom={false}
 					style={{ marginTop: 8 }}
 					title="Next"
 					testID={testIDs.PathDerivation.deriveButton}
 					onPress={onPathDerivation}
 				/>
-				{isCustomNetwork && (
+				{enableCustomNetwork && (
 					<NetworkOptions
 						setNetworkKey={setCustomNetworkKey}
 						visible={modalVisible}

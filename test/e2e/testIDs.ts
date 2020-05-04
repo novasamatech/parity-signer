@@ -18,16 +18,6 @@ const testIDs = {
 	AccountListScreen: {
 		accountList: 'accountList'
 	},
-	AccountNetworkChooser: {
-		addCustomNetworkButton: 'anc_add_custom_button',
-		addNewNetworkButton: 'anc_add_new_button',
-		chooserScreen: 'anc_chooser_screen',
-		createButton: 'anc_create_button',
-		networkButton: 'anc_network_button',
-		noAccountScreen: 'anc_no_account_screen',
-		recoverButton: 'anc_recover_button',
-		showExistedButton: 'anc_show_existed'
-	},
 	Header: {
 		headerBackButton: 'header_back_button'
 	},
@@ -39,6 +29,7 @@ const testIDs = {
 	},
 	IdentityBackup: {
 		nextButton: 'identity_backup_next',
+		passwordInput: 'identity_backup_password_input',
 		seedText: 'identity_backup_seed'
 	},
 	IdentityManagement: {
@@ -48,16 +39,28 @@ const testIDs = {
 	IdentityNew: {
 		createButton: 'identity_new_create_button',
 		nameInput: 'identity_new_name_input',
+		passwordInput: 'identity_new_password_input',
 		recoverButton: 'identity_new_recover_button',
 		seedInput: 'identity_new_seed_input'
 	},
 	IdentityPin: {
 		confirmPin: 'identity_pin_confirm',
+		passwordInput: 'identity_pin_password_input',
 		scrollScreen: 'identity_pin_scroll',
 		setPin: 'identity_pin_set',
 		submitButton: 'identity_submit_button',
 		unlockPinButton: 'identity_unlock_pin_button',
 		unlockPinInput: 'identity_unlock_pin_input'
+	},
+	Main: {
+		addCustomNetworkButton: 'anc_add_custom_button',
+		addNewNetworkButton: 'anc_add_new_button',
+		chooserScreen: 'anc_chooser_screen',
+		createButton: 'anc_create_button',
+		networkButton: 'anc_network_button',
+		noAccountScreen: 'anc_no_account_screen',
+		recoverButton: 'anc_recover_button',
+		showExistedButton: 'anc_show_existed'
 	},
 	MessageDetails: {
 		scrollScreen: 'message_details_scroll',
@@ -66,7 +69,9 @@ const testIDs = {
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
 		nameInput: 'path_derivation_name_input',
-		pathInput: 'path_derivation_path_input'
+		passwordInput: 'path_derivation_password_input',
+		pathInput: 'path_derivation_path_input',
+		togglePasswordButton: 'path_derivation_toggle_password'
 	},
 	PathDetail: {
 		deleteButton: 'path_detail_delete_button',

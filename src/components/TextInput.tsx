@@ -74,6 +74,7 @@ export default class TextInput extends React.PureComponent<Props, {}> {
 					)}
 					<TextInputOrigin
 						ref={(input: TextInputOrigin): any => (this.input = input)}
+						autoCapitalize="none"
 						keyboardAppearance="dark"
 						underlineColorAndroid="transparent"
 						{...this.props}

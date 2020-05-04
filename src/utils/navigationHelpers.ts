@@ -20,7 +20,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
-type GenericNavigationProps<
+export type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
 > = StackNavigationProp<RootStackParamList, RouteName>;
 
@@ -28,19 +28,49 @@ export const setPin = async <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
 ): Promise<string> =>
 	new Promise(resolve => {
-		navigation.navigate('IdentityPin', { isNew: true, resolve });
+		navigation.navigate('PinNew', { resolve });
+	});
+
+export const getSeedPhrase = async <RouteName extends keyof RootStackParamList>(
+	navigation: GenericNavigationProps<RouteName>
+): Promise<string> =>
+	new Promise(resolve => {
+		navigation.navigate('PinUnlock', {
+			resolve,
+			shouldReturnSeed: true
+		});
 	});
 
 export const unlockSeedPhrase = async <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
+	isSeedRefValid: boolean,
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
-		navigation.navigate('IdentityPin', {
+		if (isSeedRefValid) {
+			resolve();
+		} else {
+			navigation.navigate('PinUnlock', {
+				identity,
+				resolve,
+				shouldReturnSeed: false
+			});
+		}
+	});
+
+export const unlockSeedPhraseWithPassword = async <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
+	isSeedRefValid: boolean,
+	identity?: Identity
+): Promise<string> =>
+	new Promise(resolve => {
+		navigation.navigate('PinUnlockWithPassword', {
 			identity,
-			isUnlock: true,
+			isSeedRefValid,
 			resolve
 		});
 	});
@@ -56,7 +86,7 @@ export const navigateToPathDetails = <
 		index: 2,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew: false }
 			},
 			{
@@ -79,7 +109,7 @@ export const navigateToLandingPage = <
 ): void => {
 	const resetAction = CommonActions.reset({
 		index: 0,
-		routes: [{ name: 'AccountNetworkChooser' }]
+		routes: [{ name: 'Main' }]
 	});
 	navigation.dispatch(resetAction);
 };
@@ -93,7 +123,7 @@ export const navigateToNewIdentityNetwork = <
 		index: 0,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew: true }
 			}
 		]
@@ -125,7 +155,7 @@ export const resetNavigationWithNetworkChooser = <
 		index: 1,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew }
 			},
 			{
@@ -166,3 +196,16 @@ export const navigateToLegacyAccountList = <
 >(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationTo(navigation, 'LegacyAccountList');
+
+export const navigateToPathDerivation = async <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
+	parentPath: string,
+	isSeedRefValid: boolean
+): Promise<void> => {
+	if (!isSeedRefValid) {
+		await unlockSeedPhrase(navigation, isSeedRefValid);
+	}
+	navigation.navigate('PathDerivation', { parentPath });
+};

@@ -14,15 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	NetworkProtocols,
-	NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
+import { NETWORK_LIST, SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
 import {
 	EthereumNetworkParams,
-	isSubstrateNetworkParams
+	isSubstrateNetworkParams,
+	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
 import { ValidSeed } from 'types/utilTypes';
 
@@ -50,7 +47,7 @@ export function generateAccountId({
 	if (isSubstrateNetworkParams(networkParams)) {
 		const { genesisHash } = networkParams;
 		return `${protocol}:${address}:${genesisHash ?? ''}`;
-	} else if (protocol === NetworkProtocols.UNKNOWN) {
+	} else if (isUnknownNetworkParams(networkParams)) {
 		return `substrate:${address}`;
 	} else {
 		const { ethereumChainId } = networkParams as EthereumNetworkParams;
@@ -67,7 +64,7 @@ export function emptyAccount(
 		createdAt: new Date().getTime(),
 		derivationPassword: '',
 		derivationPath: '',
-		encryptedSeed: undefined,
+		encryptedSeed: '',
 		isLegacy: true,
 		name: '',
 		networkKey: networkKey,

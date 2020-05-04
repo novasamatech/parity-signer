@@ -18,6 +18,8 @@ import { NativeModules } from 'react-native';
 
 import { checksummedAddress } from './checksum';
 
+import { TryBrainWalletAddress } from 'utils/seedRefHooks';
+
 const { EthkeyBridge } = NativeModules || {};
 
 interface AddressObject {
@@ -59,6 +61,19 @@ function toHex(x: string): string {
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
+	const { bip39, address } = untagAddress(taggedAddress);
+	const hash = await keccak(toHex(address));
+
+	return {
+		address: checksummedAddress(address, hash),
+		bip39
+	};
+}
+
+export async function brainWalletAddressWithRef(
+	createBrainWalletFn: TryBrainWalletAddress
+): Promise<AddressObject> {
+	const taggedAddress = await createBrainWalletFn();
 	const { bip39, address } = untagAddress(taggedAddress);
 	const hash = await keccak(toHex(address));
 
@@ -156,4 +171,86 @@ export function schnorrkelVerify(
 	signature: string
 ): Promise<boolean> {
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
+}
+
+export class SeedRefClass {
+	private dataRef: number;
+	private valid: boolean;
+
+	constructor() {
+		this.dataRef = 0;
+		this.valid = false;
+	}
+
+	isValid(): boolean {
+		return this.valid;
+	}
+
+	// Decrypt a seed and store the reference. Must be called before signing.
+	async tryCreate(encryptedSeed: string, password: string): Promise<number> {
+		if (this.valid) {
+			// Seed reference was already created.
+			return this.dataRef;
+		}
+		const dataRef: number = await EthkeyBridge.decryptDataRef(
+			encryptedSeed,
+			password
+		);
+		this.dataRef = dataRef;
+		this.valid = true;
+		return this.dataRef;
+	}
+
+	trySubstrateAddress(suriSuffix: string, prefix: number): Promise<string> {
+		if (!this.valid) {
+			throw new Error('a seed reference has not been created');
+		}
+		return EthkeyBridge.substrateAddressWithRef(
+			this.dataRef,
+			suriSuffix,
+			prefix
+		);
+	}
+
+	tryBrainWalletAddress(): Promise<string> {
+		if (!this.valid) {
+			throw new Error('a seed reference has not been created');
+		}
+		return EthkeyBridge.brainWalletAddressWithRef(this.dataRef).then(
+			(address: string) => {
+				return address;
+			}
+		);
+	}
+
+	// Destroy the decrypted seed. Must be called before this leaves scope or
+	// memory will leak.
+	tryDestroy(): Promise<void> {
+		if (!this.valid) {
+			// Seed reference was never created or was already destroyed.
+			throw new Error('cannot destroy an invalid seed reference');
+		}
+		return EthkeyBridge.destroyDataRef(this.dataRef).then(() => {
+			this.valid = false;
+		});
+	}
+
+	// Use the seed reference to sign a message. Will throw an error if
+	// `tryDestroy` has already been called or if `tryCreate` failed.
+	tryBrainWalletSign(message: string): Promise<string> {
+		if (!this.valid) {
+			// Seed reference was never created or was already destroyed.
+			throw new Error('cannot sign with an invalid seed reference');
+		}
+		return EthkeyBridge.brainWalletSignWithRef(this.dataRef, message);
+	}
+
+	// Use a reference returned by decryptDataRef to sign a message
+	trySubstrateSign(suriSuffix: string, message: string): Promise<string> {
+		if (!this.valid) {
+			// Seed reference was never created or was already destroyed.
+			throw new Error('cannot sign with an invalid seed reference');
+		}
+		return EthkeyBridge.substrateSignWithRef(this.dataRef, suriSuffix, message);
+	}
 }

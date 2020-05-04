@@ -6,18 +6,12 @@ export type RootStackParamList = {
 	AccountEdit: undefined;
 	AccountPin: { isNew: boolean } | undefined;
 	AccountNew: undefined;
-	AccountNetworkChooser: { isNew: boolean } | undefined;
+	Main: { isNew: boolean } | undefined;
 	AccountUnlockAndSign: { next: string };
 	AccountUnlock: { next: string; onDelete: () => any };
 	IdentityBackup: { isNew: true } | { isNew: false; seedPhrase: string };
 	IdentityManagement: undefined;
 	IdentityNew: { isRecover: boolean } | undefined;
-	IdentityPin: {
-		isUnlock?: boolean;
-		isNew?: boolean;
-		identity?: Identity;
-		resolve: (returnValue: string) => void;
-	};
 	MessageDetails: undefined;
 	Empty: undefined;
 	LegacyAccountBackup:
@@ -31,6 +25,17 @@ export type RootStackParamList = {
 	PathDetails: { path: string };
 	PathManagement: { path: string };
 	PathsList: { networkKey: string };
+	PinNew: { resolve: (pin: string) => void };
+	PinUnlock: {
+		identity?: Identity;
+		resolve: (seedPhrase?: string) => void;
+		shouldReturnSeed: boolean;
+	};
+	PinUnlockWithPassword: {
+		identity?: Identity;
+		isSeedRefValid: boolean;
+		resolve: (password: string) => void;
+	};
 	PrivacyPolicy: undefined;
 	QrScanner: undefined;
 	Security: undefined;

@@ -22,9 +22,8 @@ import {
 	pinCode,
 	tapBack,
 	testExist,
-	testInput,
+	testRecoverIdentity,
 	testScrollAndTap,
-	testSetUpDefaultPath,
 	testTap,
 	testUnlockPin,
 	testVisible
@@ -33,9 +32,7 @@ import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
 const {
-	TacScreen,
-	AccountNetworkChooser,
-	IdentityNew,
+	Main,
 	PathDetail,
 	SecurityHeader,
 	TxDetails,
@@ -43,10 +40,6 @@ const {
 	SignedTx,
 	MessageDetails
 } = testIDs;
-
-const mockIdentityName = 'mockIdentity';
-const mockSeedPhrase =
-	'ability cave solid soccer gloom thought response hard around minor want welcome';
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
@@ -77,27 +70,19 @@ const testEthereumMessage = async (): Promise<void> => {
 };
 
 describe('Signing test', () => {
-	it('should have account list screen', async () => {
-		await testVisible(TacScreen.tacView);
-		await testTap(TacScreen.agreePrivacyButton);
-		await testTap(TacScreen.agreeTacButton);
-		await testTap(TacScreen.nextButton);
-		await testVisible(AccountNetworkChooser.noAccountScreen);
-	});
-
-	it('recover a identity with seed phrase', async () => {
-		await testTap(AccountNetworkChooser.recoverButton);
-		await testVisible(IdentityNew.seedInput);
-		await testInput(IdentityNew.nameInput, mockIdentityName);
-		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
-		await element(by.id(IdentityNew.seedInput)).tapReturnKey();
-		await testSetUpDefaultPath();
-	});
+	testRecoverIdentity();
 
 	describe('Substrate Signing Test', () => {
 		it('should sign the set remarks request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsic);
 			await testSignedTx();
+		});
+
+		it('does not need sign again after pin input', async () => {
+			await tapBack();
+			await testTap(SecurityHeader.scanButton);
+			await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
+			await testVisible(SignedTx.qrView);
 		});
 
 		it('should sign transfer request', async () => {
@@ -115,16 +100,15 @@ describe('Signing test', () => {
 		it('generate Kovan account', async () => {
 			await tapBack();
 			const kovanNetworkButtonIndex =
-				AccountNetworkChooser.networkButton + EthereumNetworkKeys.KOVAN;
-			await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
+				Main.networkButton + EthereumNetworkKeys.KOVAN;
+			await testTap(testIDs.Main.addNewNetworkButton);
 			await testScrollAndTap(
 				kovanNetworkButtonIndex,
-				testIDs.AccountNetworkChooser.chooserScreen
+				testIDs.Main.chooserScreen
 			);
-			await testUnlockPin(pinCode);
 			await testVisible(PathDetail.screen);
 			await tapBack();
-			await testExist(AccountNetworkChooser.chooserScreen);
+			await testExist(Main.chooserScreen);
 		});
 
 		it('should sign transactions', async () => {
