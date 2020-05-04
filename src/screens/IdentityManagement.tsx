@@ -19,7 +19,7 @@ import { StyleSheet } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
@@ -37,14 +37,14 @@ import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
 import { useSeedRef } from 'utils/seedRefHooks';
 
-type Props = NavigationAccountProps<'IdentityManagement'>;
+type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
 function IdentityManagement({
 	accounts,
 	navigation
 }: Props): React.ReactElement {
 	const { currentIdentity } = accounts.state;
-	const { destroySeedRef } = useSeedRef(currentIdentity!.encryptedSeed);
+	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
 		try {
@@ -99,7 +99,7 @@ function IdentityManagement({
 			<TextInput
 				label="Display Name"
 				onChangeText={onRenameIdentity}
-				value={currentIdentity!.name}
+				value={currentIdentity.name}
 				placeholder="Enter a new identity name"
 				focus
 			/>

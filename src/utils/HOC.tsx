@@ -19,6 +19,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Subscribe } from 'unstated';
 
+import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 import AccountsStore from 'stores/AccountsStore';
 import RegistriesStore from 'stores/RegistriesStore';
@@ -93,30 +94,30 @@ export function withRegistriesStore<T extends RegistriesInjectedProps>(
 	);
 }
 
-export function withCurrentIdentity<T extends AccountInjectedProps>(
-	WrappedComponent: React.ComponentType<T>
-): React.ComponentType<T> {
+export function withCurrentIdentity<
+	T extends { accounts: AccountsStoreStateWithIdentity }
+>(WrappedComponent: React.ComponentType<T>): React.ComponentType<T> {
 	return (props): React.ReactElement => {
 		const { currentIdentity } = props.accounts.state;
-		if (!currentIdentity) return <View />;
+		if (currentIdentity === null) return <View />;
 		return <WrappedComponent {...props} />;
 	};
 }
 
 interface UnlockScreenProps {
-	accounts: AccountsStore;
 	route:
 		| RouteProp<RootStackParamList, 'PinUnlock'>
 		| RouteProp<RootStackParamList, 'PinUnlockWithPassword'>;
+	targetIdentity: Identity;
 }
 
 export function withTargetIdentity<T extends UnlockScreenProps>(
 	WrappedComponent: React.ComponentType<T>
-): React.ComponentType<T> {
+): React.ComponentType<T & { accounts: AccountsStore }> {
 	return (props): React.ReactElement => {
 		const targetIdentity =
 			props.route.params.identity ?? props.accounts.state.currentIdentity;
 		if (!targetIdentity) return <View />;
-		return <WrappedComponent {...props} />;
+		return <WrappedComponent {...props} targetIdentity={targetIdentity} />;
 	};
 }

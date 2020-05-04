@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import AccountsStore from 'stores/AccountsStore';
+
 export type UnlockedAccount = {
 	address: string;
 	createdAt: number;
@@ -103,6 +105,12 @@ export type AccountsStoreState = {
 	newIdentity: Identity;
 	selectedKey: string;
 };
+
+type LensSet<T, R> = Omit<T, keyof R> & R;
+export type AccountsStoreStateWithIdentity = LensSet<
+	AccountsStore,
+	{ state: LensSet<AccountsStoreState, { currentIdentity: Identity }> }
+>;
 
 export type PathGroup = {
 	paths: string[];
