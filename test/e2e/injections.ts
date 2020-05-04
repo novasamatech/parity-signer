@@ -16,7 +16,6 @@
 
 import { Platform } from 'react-native';
 
-import { timeout } from 'e2e/utils';
 import { scanRequestDataMap, ScanTestRequest } from 'e2e/mockScanRequests';
 import { TxRequestData } from 'types/scannerTypes';
 
@@ -25,6 +24,9 @@ type AndroidAppArgs = {
 };
 
 type iOSAppArgs = Array<string>;
+
+const timeout = (ms: number): Promise<void> =>
+	new Promise(resolve => setTimeout(resolve, ms));
 
 export interface AppProps {
 	launchArgs?: AndroidAppArgs | iOSAppArgs;

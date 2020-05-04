@@ -56,10 +56,6 @@ export const tapBack = async (): Promise<void> => {
 	}
 };
 
-export function timeout(ms: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export const testInput = async (
 	inputId: string,
 	inputText: string
