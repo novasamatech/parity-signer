@@ -73,6 +73,7 @@ export const onMockBarCodeRead = async (
 ): Promise<void> => {
 	const scanRequest = scanRequestDataMap[txRequest];
 	if (typeof scanRequest === 'string') {
+		await timeout(200);
 		await onBarCodeRead(buildSignRequest(scanRequest));
 	} else if (Array.isArray(scanRequest)) {
 		for (const rawData of scanRequest as string[]) {
@@ -80,6 +81,7 @@ export const onMockBarCodeRead = async (
 			await onBarCodeRead(buildSignRequest(rawData));
 		}
 	} else if (typeof scanRequest === 'object') {
+		await timeout(200);
 		await onBarCodeRead(
 			buildSignRequest(scanRequest.rawData, scanRequest.data)
 		);
