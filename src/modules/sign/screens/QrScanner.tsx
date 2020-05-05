@@ -52,10 +52,10 @@ export function Scanner({
 		totalFramesCount: 0
 	});
 	useEffect((): (() => void) => {
-		const unsubscribeFocus = navigation.addListener(
-			'focus',
-			scannerStore.setReady.bind(scannerStore)
-		);
+		const unsubscribeFocus = navigation.addListener('focus', () => {
+			setLastFrame(null);
+			scannerStore.setReady();
+		});
 		const unsubscribeBlur = navigation.addListener(
 			'blur',
 			scannerStore.setBusy.bind(scannerStore)
