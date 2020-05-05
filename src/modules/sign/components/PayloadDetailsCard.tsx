@@ -134,8 +134,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			if (period && phase) {
 				return (
 					<View style={styles.era}>
-						<Text style={{ ...styles.subLabel, flex: 1 }}>phase: {phase} </Text>
-						<Text style={{ ...styles.subLabel, flex: 1 }}>
+						<Text style={{ ...styles.secondaryText, flex: 1 }}>
+							phase: {phase}{' '}
+						</Text>
+						<Text style={{ ...styles.secondaryText, flex: 1 }}>
 							period: {period}
 						</Text>
 					</View>
@@ -149,7 +151,9 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 							flexWrap: 'wrap'
 						}}
 					>
-						<Text style={{ ...styles.subLabel, flex: 1 }}>Immortal Era</Text>
+						<Text style={{ ...styles.secondaryText, flex: 1 }}>
+							Immortal Era
+						</Text>
 						<Text style={{ ...styles.secondaryText, flex: 3 }}>
 							{value.toString()}
 						</Text>
@@ -182,7 +186,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 
 					return (
 						<View key={index} style={styles.callDetails}>
-							<Text style={styles.subLabel}>
+							<Text style={styles.secondaryText}>
 								Call <Text style={styles.titleText}>{sectionMethod}</Text> with
 								the following arguments:
 							</Text>
@@ -345,12 +349,6 @@ const styles = StyleSheet.create({
 		...fontStyles.t_codeS,
 		color: colors.label_text,
 		paddingHorizontal: 8,
-		textAlign: 'left'
-	},
-	subLabel: {
-		...fontStyles.t_codeS,
-		color: colors.label_text,
-		paddingLeft: 8,
 		textAlign: 'left'
 	},
 	titleText: {

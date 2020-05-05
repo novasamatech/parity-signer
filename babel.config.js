@@ -1,4 +1,5 @@
 module.exports = {
+	ignore: ['node_modules/detox'],
 	plugins: [
 		[
 			'rewrite-require',

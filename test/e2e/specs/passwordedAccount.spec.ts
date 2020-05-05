@@ -7,7 +7,6 @@ import {
 	testInput,
 	testInputWithDone,
 	testRecoverIdentity,
-	testScrollAndTap,
 	testTap,
 	testVisible
 } from 'e2e/utils';
@@ -17,8 +16,7 @@ const {
 	PathDerivation,
 	PathsList,
 	SecurityHeader,
-	SignedTx,
-	TxDetails
+	SignedTx
 } = testIDs;
 
 const passwordedPath = '//passworded';
@@ -38,7 +36,6 @@ describe('Load test', () => {
 	it('should sign the set remarks request', async () => {
 		await launchWithScanRequest(ScanTestRequest.passwordedAccountExtrinsic);
 		await testTap(SecurityHeader.scanButton);
-		await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
 		await testInput(IdentityPin.unlockPinInput, pinCode);
 		await testInputWithDone(IdentityPin.passwordInput, password);
 		await testVisible(SignedTx.qrView);

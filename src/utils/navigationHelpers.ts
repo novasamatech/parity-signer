@@ -31,7 +31,9 @@ export const setPin = async <RouteName extends keyof RootStackParamList>(
 		navigation.navigate('PinNew', { resolve });
 	});
 
-export const getSeedPhrase = async <RouteName extends keyof RootStackParamList>(
+export const unlockAndReturnSeed = async <
+	RouteName extends keyof RootStackParamList
+>(
 	navigation: GenericNavigationProps<RouteName>
 ): Promise<string> =>
 	new Promise(resolve => {
@@ -47,7 +49,7 @@ export const unlockSeedPhrase = async <
 	navigation: GenericNavigationProps<RouteName>,
 	isSeedRefValid: boolean,
 	identity?: Identity
-): Promise<string> =>
+): Promise<void> =>
 	new Promise(resolve => {
 		if (isSeedRefValid) {
 			resolve();

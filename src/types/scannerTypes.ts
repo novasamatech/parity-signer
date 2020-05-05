@@ -1,5 +1,5 @@
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
-import { BarCodeType, Point, Size } from 'react-native-camera/types';
+import { Point, Size } from 'react-native-camera/types';
 
 export interface TxRequestData {
 	bounds: {
@@ -13,13 +13,11 @@ export interface TxRequestData {
 			| [Point<string>, Point<string>]
 			| { origin: Point<string>; size: Size<string> };
 	};
-	type: keyof BarCodeType; //"QR_CODE"
+	type: string;
 	rawData: string;
 	data: string;
 	target?: number;
 }
-
-export type StrippedData = Uint8Array;
 
 export type ParsedData = SubstrateParsedData | EthereumParsedData;
 

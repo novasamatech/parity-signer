@@ -62,10 +62,6 @@ const testIDs = {
 		recoverButton: 'anc_recover_button',
 		showExistedButton: 'anc_show_existed'
 	},
-	MessageDetails: {
-		scrollScreen: 'message_details_scroll',
-		signButton: 'message_details_sign_button'
-	},
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
 		nameInput: 'path_derivation_name_input',
@@ -98,10 +94,6 @@ const testIDs = {
 		agreeTacButton: 'tac_agree',
 		nextButton: 'tac_next',
 		tacView: 'tac_view'
-	},
-	TxDetails: {
-		scrollScreen: 'tx_details_scroll',
-		signButton: 'tx_details_sign_button'
 	}
 };
 

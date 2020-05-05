@@ -25,6 +25,9 @@ type AndroidAppArgs = {
 
 type iOSAppArgs = Array<string>;
 
+const timeout = (ms: number): Promise<void> =>
+	new Promise(resolve => setTimeout(resolve, ms));
+
 export interface AppProps {
 	launchArgs?: AndroidAppArgs | iOSAppArgs;
 }
@@ -61,21 +64,24 @@ const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	data,
 	rawData,
 	target: 319,
-	type: 'qr'
+	type: Platform.OS === 'ios' ? 'org.iso.QRCode' : 'QR_CODE'
 });
 
-export const onMockBarCodeRead = (
+export const onMockBarCodeRead = async (
 	txRequest: ScanTestRequest,
-	onBarCodeRead: (tx: any) => void
-): void => {
+	onBarCodeRead: (tx: TxRequestData) => void
+): Promise<void> => {
 	const scanRequest = scanRequestDataMap[txRequest];
 	if (typeof scanRequest === 'string') {
-		onBarCodeRead(buildSignRequest(scanRequest));
+		await onBarCodeRead(buildSignRequest(scanRequest));
 	} else if (Array.isArray(scanRequest)) {
-		(scanRequest as string[]).forEach((rawData: string): void => {
-			onBarCodeRead(buildSignRequest(rawData));
-		});
+		for (const rawData of scanRequest as string[]) {
+			await timeout(200);
+			await onBarCodeRead(buildSignRequest(rawData));
+		}
 	} else if (typeof scanRequest === 'object') {
-		onBarCodeRead(buildSignRequest(scanRequest.rawData, scanRequest.data));
+		await onBarCodeRead(
+			buildSignRequest(scanRequest.rawData, scanRequest.data)
+		);
 	}
 };

@@ -21,16 +21,11 @@ import {
 	u8aToHex,
 	u8aConcat
 } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
 import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
 import AccountsStore from 'stores/AccountsStore';
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST
-} from 'constants/networkSpecs';
+import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
 import { isAscii } from 'utils/strings';
 import {
@@ -40,7 +35,6 @@ import {
 	ethSign,
 	substrateSign
 } from 'utils/native';
-import { mod } from 'utils/numbers';
 import transaction, { Transaction } from 'utils/transaction';
 import {
 	constructDataFromBytes,
@@ -65,10 +59,6 @@ type SignedTX = {
 	txRequest: TXRequest;
 };
 
-type MultipartData = {
-	[x: string]: Uint8Array;
-};
-
 type ScannerState = {
 	busy: boolean;
 	completedFramesCount: number;
@@ -78,17 +68,15 @@ type ScannerState = {
 	latestFrame: number | null;
 	message: string | null;
 	missedFrames: Array<number>;
-	multipartData: MultipartData;
+	multipartData: null | Array<Uint8Array | null>;
 	multipartComplete: boolean;
 	prehash: GenericExtrinsicPayload | null;
 	recipient: FoundAccount | null;
-	scanErrorMsg: string;
 	sender: FoundAccount | null;
 	signedData: string;
 	signedTxList: SignedTX[];
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
-	txRequest: TXRequest | null;
 	type: 'transaction' | 'message' | null;
 	unsignedData: CompletedParsedData | null;
 };
@@ -103,16 +91,14 @@ const DEFAULT_STATE = Object.freeze({
 	message: null,
 	missedFrames: [],
 	multipartComplete: false,
-	multipartData: {},
+	multipartData: null,
 	prehash: null,
 	recipient: null,
-	scanErrorMsg: '',
 	sender: null,
 	signedData: '',
 	signedTxList: [],
 	totalFrameCount: 0,
 	tx: null,
-	txRequest: null,
 	type: null,
 	unsignedData: null
 });
@@ -140,57 +126,24 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	async setParsedData(
 		strippedData: Uint8Array,
-		accountsStore: AccountsStore,
 		multipartComplete = false
 	): Promise<void> {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
 		);
-
 		if (isMultipartData(parsedData)) {
-			this.setPartData(
+			await this.setPartData(
 				parsedData.currentFrame,
 				parsedData.frameCount,
-				parsedData.partData,
-				accountsStore
+				parsedData.partData
 			);
 			return;
 		}
 
-		if (accountsStore.getAccountByAddress(parsedData.data.account)) {
-			this.setState({
-				unsignedData: parsedData
-			});
-		} else {
-			// If the address is not found on device in its current encoding,
-			// try decoding the public key and encoding it to all the other known network prefixes.
-			const networks = Object.keys(SUBSTRATE_NETWORK_LIST);
-
-			for (let i = 0; i < networks.length; i++) {
-				const key = networks[i];
-				const account = accountsStore.getAccountByAddress(
-					encodeAddress(
-						decodeAddress(parsedData.data.account),
-						SUBSTRATE_NETWORK_LIST[key].prefix
-					)
-				);
-
-				if (account) {
-					parsedData.data.account = account.address;
-
-					this.setState({
-						unsignedData: parsedData
-					});
-					return;
-				}
-			}
-
-			// if the account was not found, unsignedData was never set, alert the user appropriately.
-			this.setErrorMsg(
-				`No private key found for ${parsedData.data.account} in your signer key storage.`
-			);
-		}
+		await this.setState({
+			unsignedData: parsedData
+		});
 
 		// set payload before it got hashed.
 		// signature will be generated from the hash, but we still want to display it.
@@ -201,26 +154,55 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 	}
 
+	async integrateMultiPartData(): Promise<void> {
+		const { multipartData, totalFrameCount } = this.state;
+
+		// concatenate all the parts into one binary blob
+		let concatMultipartData = multipartData!.reduce(
+			(acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
+				if (part === null) throw new Error('part data is not completed');
+				const c = new Uint8Array(acc.length + part.length);
+				c.set(acc);
+				c.set(part, acc.length);
+				return c;
+			},
+			new Uint8Array(0)
+		);
+
+		// unshift the frame info
+		const frameInfo = u8aConcat(
+			MULTIPART,
+			encodeNumber(totalFrameCount),
+			encodeNumber(0)
+		);
+		concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
+
+		await this.setState({
+			multipartComplete: true
+		});
+		// handle the binary blob as a single UOS payload
+		await this.setParsedData(concatMultipartData, true);
+	}
+
 	async setPartData(
-		frame: number,
+		currentFrame: number,
 		frameCount: number,
-		partData: string,
-		accountsStore: AccountsStore
+		partData: string
 	): Promise<boolean | void | Uint8Array> {
+		// set it once only
+		if (!this.state.totalFrameCount) {
+			const newArray = new Array(frameCount).fill(null);
+			await this.setState({
+				multipartData: newArray,
+				totalFrameCount: frameCount
+			});
+		}
 		const {
-			latestFrame,
-			missedFrames,
+			completedFramesCount,
 			multipartComplete,
 			multipartData,
 			totalFrameCount
 		} = this.state;
-
-		// set it once only
-		if (!totalFrameCount) {
-			this.setState({
-				totalFrameCount: frameCount
-			});
-		}
 
 		const partDataAsBytes = new Uint8Array(partData.length / 2);
 
@@ -235,87 +217,36 @@ export default class ScannerStore extends Container<ScannerState> {
 			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
 			throw new Error('Error decoding invalid part data.');
 		}
-
-		const completedFramesCount = Object.keys(multipartData).length;
-
-		if (
-			completedFramesCount > 0 &&
-			totalFrameCount > 0 &&
-			completedFramesCount === totalFrameCount &&
-			!multipartComplete
-		) {
-			// all the frames are filled
-
-			this.setState({
-				multipartComplete: true
-			});
-
-			// concatenate all the parts into one binary blob
-			let concatMultipartData = Object.values(multipartData).reduce(
-				(acc: Uint8Array, part: Uint8Array): Uint8Array => {
-					const c = new Uint8Array(acc.length + part.length);
-					c.set(acc);
-					c.set(part, acc.length);
-					return c;
-				},
-				new Uint8Array(0)
-			);
-
-			// unshift the frame info
-			const frameInfo = u8aConcat(
-				MULTIPART,
-				encodeNumber(totalFrameCount),
-				encodeNumber(frame)
-			);
-			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
-
-			// handle the binary blob as a single UOS payload
-			this.setParsedData(concatMultipartData, accountsStore, true);
-		} else if (completedFramesCount < totalFrameCount) {
+		if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
-			const nextDataState = multipartData;
-			nextDataState[frame] = partDataAsBytes;
+			const nextDataState = multipartData!;
+			nextDataState[currentFrame] = partDataAsBytes;
 
-			const missedFramesRange: number = latestFrame
-				? mod(frame - latestFrame, totalFrameCount) - 1
-				: 0;
-
-			// we skipped at least one frame that we haven't already scanned before
-			if (
-				latestFrame &&
-				missedFramesRange >= 1 &&
-				!missedFrames.includes(frame)
-			) {
-				// enumerate all the frames between (current)frame and latestFrame
-				const updatedMissedFrames = Array.from(
-					new Array(missedFramesRange),
-					(_, i) => mod(i + latestFrame, totalFrameCount)
-				);
-
-				const dedupMissedFrames = new Set([
-					...this.state.missedFrames,
-					...updatedMissedFrames
-				]);
-
-				this.setState({
-					missedFrames: Array.from(dedupMissedFrames)
-				});
-			}
-
-			// if we just filled a frame that was previously missed, remove it from the missedFrames list
-			if (missedFrames && missedFrames.includes(frame - 1)) {
-				missedFrames.splice(missedFrames.indexOf(frame - 1), 1);
-			}
-
-			this.setState({
-				latestFrame: frame,
+			const nextMissedFrames = nextDataState.reduce(
+				(acc: number[], current: Uint8Array | null, index: number) => {
+					if (current === null) acc.push(index + 1);
+					return acc;
+				},
+				[]
+			);
+			const nextCompletedFramesCount =
+				totalFrameCount - nextMissedFrames.length;
+			await this.setState({
+				completedFramesCount: nextCompletedFramesCount,
+				latestFrame: currentFrame,
+				missedFrames: nextMissedFrames,
 				multipartData: nextDataState
 			});
-		}
 
-		this.setState({
-			completedFramesCount
-		});
+			if (
+				totalFrameCount > 0 &&
+				nextCompletedFramesCount === totalFrameCount &&
+				!multipartComplete
+			) {
+				// all the frames are filled
+				await this.integrateMultiPartData();
+			}
+		}
 	}
 
 	async setData(accountsStore: AccountsStore): Promise<boolean | void> {
@@ -443,7 +374,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			recipient: recipient as FoundAccount,
 			sender,
 			tx,
-			txRequest,
 			type: 'transaction'
 		});
 
@@ -535,7 +465,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			latestFrame: DEFAULT_STATE.latestFrame,
 			missedFrames: DEFAULT_STATE.missedFrames,
 			multipartComplete: DEFAULT_STATE.multipartComplete,
-			multipartData: {},
+			multipartData: null,
 			totalFrameCount: DEFAULT_STATE.totalFrameCount,
 			unsignedData: DEFAULT_STATE.unsignedData
 		});
@@ -610,10 +540,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.recipient;
 	}
 
-	getTXRequest(): TXRequest | null {
-		return this.state.txRequest;
-	}
-
 	getMessage(): string | null {
 		return this.state.message;
 	}
@@ -638,14 +564,6 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getSignedTxData(): string {
 		return this.state.signedData;
-	}
-
-	setErrorMsg(scanErrorMsg: string): void {
-		this.setState({ scanErrorMsg });
-	}
-
-	getErrorMsg(): string {
-		return this.state.scanErrorMsg;
 	}
 
 	getMissedFrames(): number[] {
