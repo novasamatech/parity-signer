@@ -40,7 +40,7 @@ function getSeedRef(
 	seedRefs: Map<string, SeedRefClass>
 ): SeedRefClass | undefined {
 	if (seedRefs.has(encryptedSeed)) {
-		return seedRefs.get(encryptedSeed)!;
+		return seedRefs.get(encryptedSeed);
 	}
 }
 

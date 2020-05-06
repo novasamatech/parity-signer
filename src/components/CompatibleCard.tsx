@@ -40,6 +40,7 @@ const CompatibleCard = ({
 			networkKey={account.networkKey || ''}
 		/>
 	) : (
+		//Substrate tx do not need to render recipient
 		<PathCard
 			identity={accountsStore.getIdentityByAccountId(account.accountId)!}
 			path={account.path}
