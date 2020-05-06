@@ -21,6 +21,7 @@ import strings from 'modules/sign/strings';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
 import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
@@ -32,16 +33,30 @@ import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 
-function SignedTx({
-	scannerStore,
-	accounts
-}: NavigationAccountScannerProps<'SignedTx'>): React.ReactElement {
-	const data = scannerStore.getSignedTxData();
-	const recipient = scannerStore.getRecipient()!;
-	const prehash = scannerStore.getPrehashPayload();
+function SignedTx(
+	props: NavigationAccountScannerProps<'SignedTx'>
+): React.ReactElement {
+	const { scannerStore } = props;
+	const recipient = scannerStore.getRecipient();
+	const sender = scannerStore.getSender();
+	if (sender === null || recipient === null) return <View />;
+	return <SignedTxView sender={sender} recipient={recipient} {...props} />;
+}
 
+interface Props extends NavigationAccountScannerProps<'SignedTx'> {
+	sender: FoundAccount;
+	recipient: FoundAccount;
+}
+
+function SignedTxView({
+	sender,
+	recipient,
+	accounts,
+	scannerStore
+}: Props): React.ReactElement {
+	const data = scannerStore.getSignedTxData();
+	const prehash = scannerStore.getPrehashPayload();
 	const tx = scannerStore.getTx();
-	const sender = scannerStore.getSender()!;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;

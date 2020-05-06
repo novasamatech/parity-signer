@@ -274,6 +274,14 @@ export const UNKNOWN_NETWORK: {
 	[key: string]: UnknownNetworkParams;
 } = Object.freeze(unknownNetworkBase);
 
+const substrateNetworkMetas = Object.values({
+	...SUBSTRATE_NETWORK_LIST,
+	...UNKNOWN_NETWORK
+});
+export const PATH_IDS_LIST = substrateNetworkMetas.map(
+	(meta: UnknownNetworkParams | SubstrateNetworkParams) => meta.pathId
+);
+
 export const NETWORK_LIST: { [key: string]: NetworkParams } = Object.freeze(
 	Object.assign(
 		{},

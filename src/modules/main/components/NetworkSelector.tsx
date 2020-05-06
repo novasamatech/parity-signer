@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState } from 'react';
-import { BackHandler, ScrollView } from 'react-native';
+import React, { ReactElement, useState } from 'react';
+import { BackHandler, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { NetworkCard } from 'components/AccountCard';
@@ -23,7 +23,6 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import {
 	NETWORK_LIST,
-	NetworkProtocols,
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
@@ -32,17 +31,12 @@ import colors from 'styles/colors';
 import {
 	isEthereumNetworkParams,
 	isSubstrateNetworkParams,
-	isUnknownNetworkParams,
 	NetworkParams,
 	SubstrateNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
-import {
-	getExistedNetworkKeys,
-	getIdentityName,
-	getPathsWithSubstrateNetworkKey
-} from 'utils/identitiesUtils';
+import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToPathDerivation,
 	navigateToPathDetails,
@@ -196,33 +190,13 @@ export default function NetworkSelector({
 		networkKey: string,
 		networkParams: NetworkParams
 	): Promise<void> => {
-		if (isNew) {
+		if (isNew || shouldShowMoreNetworks) {
 			if (isSubstrateNetworkParams(networkParams)) {
 				await deriveSubstrateNetworkRootPath(networkKey, networkParams);
 			} else {
 				await deriveEthereumAccount(networkKey);
 			}
 		} else {
-			const paths = Array.from(currentIdentity.meta.keys());
-			if (
-				isSubstrateNetworkParams(networkParams) ||
-				isUnknownNetworkParams(networkParams)
-			) {
-				const listedPaths = getPathsWithSubstrateNetworkKey(
-					currentIdentity,
-					networkKey
-				);
-				if (listedPaths.length === 0 && isSubstrateNetworkParams(networkParams))
-					return await deriveSubstrateNetworkRootPath(
-						networkKey,
-						networkParams
-					);
-			} else if (
-				networkParams.protocol === NetworkProtocols.ETHEREUM &&
-				!paths.includes(networkKey)
-			) {
-				return await deriveEthereumAccount(networkKey);
-			}
 			navigation.navigate('PathsList', { networkKey });
 		}
 	};
@@ -231,28 +205,39 @@ export default function NetworkSelector({
 	const networkList = Object.entries(NETWORK_LIST).filter(filterNetworkKeys);
 	networkList.sort(sortNetworkKeys);
 
+	const renderNetwork = ({
+		item
+	}: {
+		item: [string, NetworkParams];
+	}): ReactElement => {
+		const [networkKey, networkParams] = item;
+		const networkIndexSuffix = isEthereumNetworkParams(networkParams)
+			? networkParams.ethereumChainId
+			: networkParams.pathId;
+		return (
+			<NetworkCard
+				key={networkKey}
+				testID={testIDs.Main.networkButton + networkIndexSuffix}
+				networkKey={networkKey}
+				onPress={(): Promise<void> =>
+					onNetworkChosen(networkKey, networkParams)
+				}
+				title={networkParams.title}
+			/>
+		);
+	};
+
 	return (
 		<SafeAreaViewContainer>
 			{renderScreenHeading()}
-			<ScrollView bounces={false} testID={testIDs.Main.chooserScreen}>
-				{networkList.map(([networkKey, networkParams]) => {
-					const networkIndexSuffix = isEthereumNetworkParams(networkParams)
-						? networkParams.ethereumChainId
-						: networkParams.pathId;
-					return (
-						<NetworkCard
-							key={networkKey}
-							testID={testIDs.Main.networkButton + networkIndexSuffix}
-							networkKey={networkKey}
-							onPress={(): Promise<void> =>
-								onNetworkChosen(networkKey, networkParams)
-							}
-							title={networkParams.title}
-						/>
-					);
-				})}
-				{renderAddButton()}
-			</ScrollView>
+			<FlatList
+				bounces={false}
+				data={networkList}
+				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
+				renderItem={renderNetwork}
+				testID={testIDs.Main.chooserScreen}
+				ListFooterComponent={renderAddButton}
+			/>
 		</SafeAreaViewContainer>
 	);
 }
