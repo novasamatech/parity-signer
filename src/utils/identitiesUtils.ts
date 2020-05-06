@@ -22,9 +22,11 @@ import { generateAccountId } from './account';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	NETWORK_LIST,
+	PATH_IDS_LIST,
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
-	UnknownNetworkKeys
+	UnknownNetworkKeys,
+	unknownNetworkPathId
 } from 'constants/networkSpecs';
 import {
 	Account,
@@ -56,10 +58,15 @@ export function isLegacyFoundAccount(
 	return foundAccount.isLegacy;
 }
 
-export const extractPathId = (path: string): string | null => {
+export const extractPathId = (path: string): string => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);
-	if (!matchNetworkPath) return null;
-	return removeSlash(matchNetworkPath[0]);
+	if (matchNetworkPath && matchNetworkPath[0]) {
+		const targetPathId = removeSlash(matchNetworkPath[0]);
+		if (PATH_IDS_LIST.includes(targetPathId)) {
+			return targetPathId;
+		}
+	}
+	return unknownNetworkPathId;
 };
 
 export const extractSubPathName = (path: string): string => {
@@ -155,9 +162,7 @@ export const getPathsWithSubstrateNetworkKey = (
 	networkKey: string
 ): string[] => {
 	const pathEntries = Array.from(identity.meta.entries());
-	const isUnknownNetworkKey = networkKey === 'unknown';
 	const targetPathId = SUBSTRATE_NETWORK_LIST[networkKey]?.pathId;
-	const knownPathIds = Object.values(SUBSTRATE_NETWORK_LIST).map(v => v.pathId);
 	const pathReducer = (
 		groupedPaths: string[],
 		[path, pathMeta]: [string, AccountMeta]
@@ -170,14 +175,9 @@ export const getPathsWithSubstrateNetworkKey = (
 			pathId = extractPathId(path);
 		}
 
-		if (!isUnknownNetworkKey) {
-			if (pathId === targetPathId) {
-				groupedPaths.push(path);
-			}
-		} else {
-			if (pathId && !knownPathIds.includes(pathId)) {
-				groupedPaths.push(path);
-			}
+		if (pathId === targetPathId) {
+			groupedPaths.push(path);
+			return groupedPaths;
 		}
 		return groupedPaths;
 	};
@@ -205,10 +205,10 @@ export const getNetworkKeyByPath = (
 	pathMeta: AccountMeta
 ): string => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
+		//It is a ethereum path
 		return path;
 	}
 	const pathId = pathMeta.networkPathId || extractPathId(path);
-	if (!pathId) return UnknownNetworkKeys.UNKNOWN;
 
 	return getNetworkKeyByPathId(pathId);
 };
