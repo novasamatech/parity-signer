@@ -24,6 +24,7 @@ import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
+	TabsAppNavigator,
 	AppNavigator,
 	TocAndPrivacyPolicyNavigator,
 	ScreenStack
@@ -76,7 +77,8 @@ export default function App(props: AppProps): React.ReactElement {
 	const renderStacks = (): React.ReactElement => {
 		if (dataLoaded) {
 			return policyConfirmed ? (
-				<AppNavigator />
+				// <AppNavigator />
+				<TabsAppNavigator />
 			) : (
 				<TocAndPrivacyPolicyNavigator />
 			);

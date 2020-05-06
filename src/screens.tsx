@@ -26,6 +26,7 @@ import {
 } from '@react-navigation/stack';
 import * as React from 'react';
 import { View } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import PinNew from 'modules/unlock/screens/PinNew';
 import PinUnlock from 'modules/unlock/screens/PinUnlock';
@@ -106,6 +107,13 @@ const HeaderLeftWithBack = (): React.ReactElement => {
 		</View>
 	);
 };
+
+const Tab = createBottomTabNavigator();
+export const TabsAppNavigator = (): React.ReactElement => (
+	<Tab.Navigator>
+		<Tab.Screen name="Main" component={Main} />
+	</Tab.Navigator>
+);
 
 export const AppNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
