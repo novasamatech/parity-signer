@@ -45,6 +45,7 @@ export type RootStackParamList = {
 	PrivacyPolicy: undefined;
 	QrScanner: undefined;
 	Security: undefined;
+	SettingsIndex: undefined;
 	SignedMessage: undefined;
 	SignedTx: undefined;
 	TermsAndConditions: undefined;
