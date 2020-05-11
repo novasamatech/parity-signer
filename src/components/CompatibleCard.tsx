@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -40,6 +40,7 @@ const CompatibleCard = ({
 			networkKey={account.networkKey || ''}
 		/>
 	) : (
+		//Substrate tx do not need to render recipient
 		<PathCard
 			identity={accountsStore.getIdentityByAccountId(account.accountId)!}
 			path={account.path}

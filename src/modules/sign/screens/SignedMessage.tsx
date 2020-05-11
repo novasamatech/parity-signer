@@ -24,6 +24,7 @@ import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
+import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
 import QrView from 'components/QrView';
@@ -31,17 +32,32 @@ import { withAccountAndScannerStore } from 'utils/HOC';
 import styles from 'modules/sign/styles';
 import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 
-function SignedMessage({
+interface Props extends NavigationAccountScannerProps<'SignedMessage'> {
+	sender: FoundAccount;
+	message: string;
+}
+
+function SignedMessage(
+	props: NavigationAccountScannerProps<'SignedMessage'>
+): React.ReactElement {
+	const { scannerStore } = props;
+	const sender = scannerStore.getSender();
+	const message = scannerStore.getMessage();
+	if (sender === null || message === null) return <View />;
+	return <SignedMessageView sender={sender} message={message} {...props} />;
+}
+
+function SignedMessageView({
+	sender,
+	message,
 	accounts,
 	scannerStore
-}: NavigationAccountScannerProps<'SignedMessage'>): React.ReactElement {
+}: Props): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
 	const isHash = scannerStore.getIsHash();
-	const message = scannerStore.getMessage()!;
 	const prehash = scannerStore.getPrehashPayload();
-	const dataToSign = scannerStore.getDataToSign()!;
+	const dataToSign = scannerStore.getDataToSign();
 
-	const sender = scannerStore.getSender()!;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 

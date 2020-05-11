@@ -34,7 +34,7 @@ export function SeedRefStore(props: any): React.ReactElement {
 					return Promise.resolve();
 				});
 				await Promise.all(promises);
-				seedRefs.clear();
+				setSeedRefs(new Map());
 			}
 			setAppState(nextAppState);
 		};

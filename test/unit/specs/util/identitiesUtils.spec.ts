@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@ import {
 	getExistedNetworkKeys,
 	getNetworkKeyByPath,
 	getPathName,
+	getPathsWithSubstrateNetworkKey,
 	groupPaths,
 	serializeIdentities
 } from 'utils/identitiesUtils';
@@ -257,5 +258,31 @@ describe('IdentitiesUtils', () => {
 			SubstrateNetworkKeys.WESTEND
 		);
 		expect(getNetworkKeyByPathTest('1')).toEqual(EthereumNetworkKeys.FRONTIER);
+	});
+
+	it('group path under their network correctly, has no missing accounts', () => {
+		const mockIdentity = testIdentities[0];
+		const existedNetworks = getExistedNetworkKeys(mockIdentity);
+		const existedAccounts = mockIdentity.meta.size;
+
+		const allListedAccounts = existedNetworks.reduce(
+			(acc: string[], networkKey: string) => {
+				if (Object.values(EthereumNetworkKeys).includes(networkKey)) {
+					//Get ethereum account into list
+					const accountMeta = mockIdentity.meta.get(networkKey);
+					if (accountMeta === undefined) return acc;
+					acc.push(networkKey);
+					return acc;
+				} else {
+					const networkAccounts = getPathsWithSubstrateNetworkKey(
+						mockIdentity,
+						networkKey
+					);
+					return acc.concat(networkAccounts);
+				}
+			},
+			[]
+		);
+		expect(existedAccounts).toEqual(allListedAccounts.length);
 	});
 });
