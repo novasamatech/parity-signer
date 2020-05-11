@@ -50,14 +50,14 @@ function SecurityHeader(): React.ReactElement {
 					iconBgStyle={styles.securityIconBgStyle}
 				/>
 			)}
-			<ButtonIcon
+			{/* <ButtonIcon
 				onPress={(): void => navigateToQrScanner(navigation)}
 				iconName="qrcode-scan"
 				iconType="material-community"
 				iconBgStyle={styles.scannerIconBgStyle}
 				testID={testIDs.SecurityHeader.scanButton}
-			/>
-			<IdentitiesSwitch />
+			/> */}
+			{/* <IdentitiesSwitch /> */}
 		</View>
 	);
 }

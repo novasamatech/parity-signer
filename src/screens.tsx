@@ -204,7 +204,6 @@ const SignerNavigator = (): React.ReactElement => (
 			component={AccountUnlockAndSign}
 		/>
 		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
-		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
 	</ScreenStack.Navigator>
@@ -216,6 +215,7 @@ const ManagementNavigator = (): React.ReactElement => (
 		initialRouteName="SettingsIndex"
 		// screenOptions={globalStackNavigationOptions}
 	>
+		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="SettingsIndex" component={SettingsIndex} />
 		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
 		<ScreenStack.Screen

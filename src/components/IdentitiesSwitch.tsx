@@ -44,7 +44,7 @@ function IdentitiesSwitch({
 	accounts: AccountsStore;
 }): React.ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
-	const [visible, setVisible] = useState(false);
+	const [visible, setVisible] = useState(true);
 	const { currentIdentity, identities } = accounts.state;
 	// useEffect(() => {
 	// 	const firstLogin: boolean = identities.length === 0;

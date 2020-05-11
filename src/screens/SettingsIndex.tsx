@@ -18,12 +18,14 @@ import React from 'react';
 
 import CustomScrollView from 'components/CustomScrollView';
 import ScreenHeading from 'components/ScreenHeading';
+import IdentitiesSwitch from 'components/IdentitiesSwitch';
 
 export default class SettingsIndex extends React.PureComponent {
 	render(): React.ReactElement {
 		return (
 			<CustomScrollView contentContainerStyle={{ padding: 20 }}>
 				<ScreenHeading title="Settings" />
+				<IdentitiesSwitch />
 			</CustomScrollView>
 		);
 	}
