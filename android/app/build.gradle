@@ -202,6 +202,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-navbar-color')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"
 

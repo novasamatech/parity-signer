@@ -18,6 +18,7 @@ export default {
 	bg: '#1B1B1B',
 	bg_alert: '#EB5757',
 	bg_button: '#48A5C2',
+	bg_os: '#000000',
 	bg_text: '#EEE',
 	bg_text_sec: '#AAA',
 	bg_warning: '#FAE265',

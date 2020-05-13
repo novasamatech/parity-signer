@@ -22,6 +22,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import NavigationBar from 'react-native-navbar-color';
 
 import {
 	AppNavigator,
@@ -39,6 +40,7 @@ import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
+	NavigationBar.setColor(colors.bg_os);
 	if (__DEV__) {
 		YellowBox.ignoreWarnings([
 			'Warning: componentWillReceiveProps',
