@@ -23,10 +23,8 @@ import { useNavigation } from '@react-navigation/native';
 import ButtonIcon from './ButtonIcon';
 
 import { RootStackParamList } from 'types/routes';
-import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import IdentitiesSwitch from 'components/IdentitiesSwitch';
-import { navigateToQrScanner } from 'utils/navigationHelpers';
 
 function SecurityHeader(): React.ReactElement {
 	const [isConnected, setIsConnected] = useState(false);
@@ -50,13 +48,6 @@ function SecurityHeader(): React.ReactElement {
 					iconBgStyle={styles.securityIconBgStyle}
 				/>
 			)}
-			<ButtonIcon
-				onPress={(): void => navigateToQrScanner(navigation)}
-				iconName="qrcode-scan"
-				iconType="material-community"
-				iconBgStyle={styles.scannerIconBgStyle}
-				testID={testIDs.SecurityHeader.scanButton}
-			/>
 			<IdentitiesSwitch />
 		</View>
 	);

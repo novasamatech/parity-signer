@@ -46,6 +46,7 @@ import {
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
 import { useSeedRef } from 'utils/seedRefHooks';
+import QrTab from 'components/QrTab';
 
 interface Props {
 	path: string;
@@ -107,36 +108,39 @@ export function PathDetailsView({
 	};
 
 	return (
-		<SafeAreaScrollViewContainer testID={testIDs.PathDetail.screen}>
-			<LeftScreenHeading
-				title="Public Address"
-				networkKey={formattedNetworkKey}
-				headMenu={
-					<PopupMenu
-						testID={testIDs.PathDetail.popupMenuButton}
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
-						menuItems={[
-							{ text: 'Edit', value: 'PathManagement' },
-							{
-								hide: !isSubstratePath(path),
-								text: 'Derive Account',
-								value: 'PathDerivation'
-							},
-							{
-								testID: testIDs.PathDetail.deleteButton,
-								text: 'Delete',
-								textStyle: styles.deleteText,
-								value: 'PathDelete'
-							}
-						]}
-					/>
-				}
-			/>
-			<PathCard identity={currentIdentity} path={path} />
-			<QrView data={`${accountId}:${accountName}`} />
-			{isUnknownNetwork && <UnknownAccountWarning isPath />}
-		</SafeAreaScrollViewContainer>
+		<>
+			<SafeAreaScrollViewContainer testID={testIDs.PathDetail.screen}>
+				<LeftScreenHeading
+					title="Public Address"
+					networkKey={formattedNetworkKey}
+					headMenu={
+						<PopupMenu
+							testID={testIDs.PathDetail.popupMenuButton}
+							onSelect={onOptionSelect}
+							menuTriggerIconName={'more-vert'}
+							menuItems={[
+								{ text: 'Edit', value: 'PathManagement' },
+								{
+									hide: !isSubstratePath(path),
+									text: 'Derive Account',
+									value: 'PathDerivation'
+								},
+								{
+									testID: testIDs.PathDetail.deleteButton,
+									text: 'Delete',
+									textStyle: styles.deleteText,
+									value: 'PathDelete'
+								}
+							]}
+						/>
+					}
+				/>
+				<PathCard identity={currentIdentity} path={path} />
+				<QrView data={`${accountId}:${accountName}`} />
+				{isUnknownNetwork && <UnknownAccountWarning isPath />}
+			</SafeAreaScrollViewContainer>
+			<QrTab />
+		</>
 	);
 }
 

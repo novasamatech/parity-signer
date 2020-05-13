@@ -20,6 +20,11 @@ import fonts from './fonts';
 import colors from './colors';
 
 export default StyleSheet.create({
+	a_text: {
+		color: colors.text.main,
+		fontFamily: fonts.robotoMono,
+		fontSize: 11
+	},
 	h1: {
 		color: colors.bg_text,
 		fontFamily: fonts.robotoBold,
@@ -29,6 +34,9 @@ export default StyleSheet.create({
 		color: colors.bg_text,
 		fontFamily: fonts.robotoMedium,
 		fontSize: 18
+	},
+	i_large: {
+		fontSize: 22
 	},
 	quote: {
 		color: colors.bg_text,

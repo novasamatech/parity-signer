@@ -27,5 +27,10 @@ export default {
 	card_bg_text_sec: '#999',
 	card_text: '#1A1A1A',
 	label_text: '#48A5C2',
-	label_text_sec: '#A8CDD9'
+	label_text_sec: '#A8CDD9',
+
+	text: {
+		faded: '#999999',
+		main: '#F2F2F2'
+	}
 };

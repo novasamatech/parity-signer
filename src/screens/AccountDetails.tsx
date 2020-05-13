@@ -34,6 +34,7 @@ import UnknownAccountWarning from 'components/UnknownAccountWarning';
 import { withAccountStore } from 'utils/HOC';
 import AccountIcon from 'components/AccountIcon';
 import { NavigationAccountProps } from 'types/props';
+import QrTab from 'components/QrTab';
 
 function AccountDetails({
 	accounts,
@@ -75,49 +76,54 @@ function AccountDetails({
 	};
 
 	return (
-		<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
-			<View style={styles.header}>
-				<AccountIcon
-					address={''}
-					network={NETWORK_LIST[account.networkKey]}
-					style={styles.icon}
-				/>
-				<Text style={fontStyles.h2}>Public Address</Text>
-				<View style={styles.menuView}>
-					<PopupMenu
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
-						menuItems={[
-							{ text: 'Edit', value: 'AccountEdit' },
-							{ text: 'Change Pin', value: 'AccountPin' },
-							{
-								text: 'View Recovery Phrase',
-								value: 'LegacyAccountBackup'
-							},
-							{
-								text: 'Delete',
-								textStyle: styles.deleteText,
-								value: 'AccountDelete'
-							}
-						]}
+		<>
+			<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
+				<View style={styles.header}>
+					<AccountIcon
+						address={''}
+						network={NETWORK_LIST[account.networkKey]}
+						style={styles.icon}
 					/>
+					<Text style={fontStyles.h2}>Public Address</Text>
+					<View style={styles.menuView}>
+						<PopupMenu
+							onSelect={onOptionSelect}
+							menuTriggerIconName={'more-vert'}
+							menuItems={[
+								{ text: 'Edit', value: 'AccountEdit' },
+								{ text: 'Change Pin', value: 'AccountPin' },
+								{
+									text: 'View Recovery Phrase',
+									value: 'LegacyAccountBackup'
+								},
+								{
+									text: 'Delete',
+									textStyle: styles.deleteText,
+									value: 'AccountDelete'
+								}
+							]}
+						/>
+					</View>
 				</View>
-			</View>
-			<AccountCard
-				address={account.address}
-				networkKey={account.networkKey}
-				title={account.name}
-			/>
-			<View>
-				{protocol !== NetworkProtocols.UNKNOWN ? (
-					<QrView
-						data={account.name ? `${selectedKey}:${account.name}` : selectedKey}
-					/>
-				) : (
-					<UnknownAccountWarning />
-				)}
-			</View>
-		</SafeAreaScrollViewContainer>
+				<AccountCard
+					address={account.address}
+					networkKey={account.networkKey}
+					title={account.name}
+				/>
+				<View>
+					{protocol !== NetworkProtocols.UNKNOWN ? (
+						<QrView
+							data={
+								account.name ? `${selectedKey}:${account.name}` : selectedKey
+							}
+						/>
+					) : (
+						<UnknownAccountWarning />
+					)}
+				</View>
+			</SafeAreaScrollViewContainer>
+			<QrTab />
+		</>
 	);
 }
 

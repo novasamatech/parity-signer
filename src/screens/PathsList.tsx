@@ -42,6 +42,7 @@ import Separator from 'components/Separator';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 import { LeftScreenHeading } from 'components/ScreenHeading';
+import QrTab from 'components/QrTab';
 
 function PathsList({
 	accounts,
@@ -147,30 +148,33 @@ function PathsList({
 			? ''
 			: `//${networkParams.pathId}`;
 	return (
-		<SafeAreaScrollViewContainer testID={testIDs.PathsList.screen}>
-			<LeftScreenHeading
-				title={networkParams.title}
-				subtitle={subtitle}
-				hasSubtitleIcon={true}
-				networkKey={networkKey}
-			/>
-			{(pathsGroups as PathGroup[]).map(pathsGroup =>
-				pathsGroup.paths.length === 1
-					? renderSinglePath(pathsGroup)
-					: renderGroupPaths(pathsGroup)
-			)}
-			<ButtonNewDerivation
-				testID={testIDs.PathsList.deriveButton}
-				title="Derive New Account"
-				onPress={(): Promise<void> =>
-					navigateToPathDerivation(
-						navigation,
-						isUnknownNetworkPath ? '' : rootPath,
-						isSeedRefValid
-					)
-				}
-			/>
-		</SafeAreaScrollViewContainer>
+		<>
+			<SafeAreaScrollViewContainer testID={testIDs.PathsList.screen}>
+				<LeftScreenHeading
+					title={networkParams.title}
+					subtitle={subtitle}
+					hasSubtitleIcon={true}
+					networkKey={networkKey}
+				/>
+				{(pathsGroups as PathGroup[]).map(pathsGroup =>
+					pathsGroup.paths.length === 1
+						? renderSinglePath(pathsGroup)
+						: renderGroupPaths(pathsGroup)
+				)}
+				<ButtonNewDerivation
+					testID={testIDs.PathsList.deriveButton}
+					title="Derive New Account"
+					onPress={(): Promise<void> =>
+						navigateToPathDerivation(
+							navigation,
+							isUnknownNetworkPath ? '' : rootPath,
+							isSeedRefValid
+						)
+					}
+				/>
+			</SafeAreaScrollViewContainer>
+			<QrTab />
+		</>
 	);
 }
 

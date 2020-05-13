@@ -44,6 +44,7 @@ import {
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
+import QrTab from 'components/QrTab';
 
 const excludedNetworks = [
 	UnknownNetworkKeys.UNKNOWN,
@@ -238,6 +239,7 @@ export default function NetworkSelector({
 				testID={testIDs.Main.chooserScreen}
 				ListFooterComponent={renderAddButton}
 			/>
+			{!shouldShowMoreNetworks && !isNew && <QrTab />}
 		</SafeAreaViewContainer>
 	);
 }

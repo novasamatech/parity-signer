@@ -23,6 +23,7 @@ import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 import AccountCard from 'components/AccountCard';
 import { withAccountStore } from 'utils/HOC';
+import QrTab from 'components/QrTab';
 
 function LegacyAccountList({
 	navigation,
@@ -49,12 +50,15 @@ function LegacyAccountList({
 	);
 
 	return (
-		<SafeAreaScrollViewContainer
-			testID={testIDs.AccountListScreen.accountList}
-			style={styles.content}
-		>
-			{Array.from(accountsMap.entries()).map(renderAccountCard)}
-		</SafeAreaScrollViewContainer>
+		<>
+			<SafeAreaScrollViewContainer
+				testID={testIDs.AccountListScreen.accountList}
+				style={styles.content}
+			>
+				{Array.from(accountsMap.entries()).map(renderAccountCard)}
+			</SafeAreaScrollViewContainer>
+			<QrTab />
+		</>
 	);
 }
 
