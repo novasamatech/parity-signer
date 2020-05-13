@@ -23,7 +23,7 @@ import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 import AccountCard from 'components/AccountCard';
 import { withAccountStore } from 'utils/HOC';
-import QrTab from 'components/QrTab';
+import QrScannerTab from 'components/QrScannerTab';
 
 function LegacyAccountList({
 	navigation,
@@ -57,7 +57,7 @@ function LegacyAccountList({
 			>
 				{Array.from(accountsMap.entries()).map(renderAccountCard)}
 			</SafeAreaScrollViewContainer>
-			<QrTab />
+			<QrScannerTab />
 		</>
 	);
 }

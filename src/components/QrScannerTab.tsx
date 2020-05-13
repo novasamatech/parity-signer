@@ -28,7 +28,7 @@ import testIDs from 'e2e/testIDs';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
 
-export default function QrTab(): React.ReactElement {
+export default function QrScannerTab(): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
 	return (

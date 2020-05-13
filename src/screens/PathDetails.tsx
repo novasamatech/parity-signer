@@ -46,7 +46,7 @@ import {
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
 import { useSeedRef } from 'utils/seedRefHooks';
-import QrTab from 'components/QrTab';
+import QrScannerTab from 'components/QrScannerTab';
 
 interface Props {
 	path: string;
@@ -139,7 +139,7 @@ export function PathDetailsView({
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</SafeAreaScrollViewContainer>
-			<QrTab />
+			<QrScannerTab />
 		</>
 	);
 }

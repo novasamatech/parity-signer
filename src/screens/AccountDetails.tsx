@@ -34,7 +34,7 @@ import UnknownAccountWarning from 'components/UnknownAccountWarning';
 import { withAccountStore } from 'utils/HOC';
 import AccountIcon from 'components/AccountIcon';
 import { NavigationAccountProps } from 'types/props';
-import QrTab from 'components/QrTab';
+import QrScannerTab from 'components/QrScannerTab';
 
 function AccountDetails({
 	accounts,
@@ -122,7 +122,7 @@ function AccountDetails({
 					)}
 				</View>
 			</SafeAreaScrollViewContainer>
-			<QrTab />
+			<QrScannerTab />
 		</>
 	);
 }

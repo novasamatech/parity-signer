@@ -42,7 +42,7 @@ import Separator from 'components/Separator';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 import { LeftScreenHeading } from 'components/ScreenHeading';
-import QrTab from 'components/QrTab';
+import QrScannerTab from 'components/QrScannerTab';
 
 function PathsList({
 	accounts,
@@ -173,7 +173,7 @@ function PathsList({
 					}
 				/>
 			</SafeAreaScrollViewContainer>
-			<QrTab />
+			<QrScannerTab />
 		</>
 	);
 }
