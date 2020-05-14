@@ -203,7 +203,6 @@ export default class ScannerStore extends Container<ScannerState> {
 			multipartData,
 			totalFrameCount
 		} = this.state;
-
 		const partDataAsBytes = new Uint8Array(partData.length / 2);
 
 		for (let i = 0; i < partDataAsBytes.length; i++) {
@@ -211,8 +210,9 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		if (
-			partDataAsBytes[0] === new Uint8Array([0x00])[0] ||
-			partDataAsBytes[0] === new Uint8Array([0x7b])[0]
+			currentFrame === 0 &&
+			(partDataAsBytes[0] === new Uint8Array([0x00])[0] ||
+				partDataAsBytes[0] === new Uint8Array([0x7b])[0])
 		) {
 			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
 			throw new Error('Error decoding invalid part data.');
