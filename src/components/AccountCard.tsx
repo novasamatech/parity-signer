@@ -174,9 +174,9 @@ const styles = StyleSheet.create({
 	},
 	footer: {
 		alignSelf: 'stretch',
-		height: 88,
+		height: 80,
 		marginLeft: 8,
-		width: 8
+		width: 4
 	},
 	icon: {
 		height: 40,

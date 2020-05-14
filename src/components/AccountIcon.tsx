@@ -77,10 +77,7 @@ export default function AccountIcon(props: {
 		return <Identicon value={address} size={iconSize || 40} />;
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
-			<Image
-				source={{ uri: ethereumIconUri }}
-				style={(style as ImageStyle) || { height: 40, width: 40 }}
-			/>
+			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
@@ -91,8 +88,6 @@ export default function AccountIcon(props: {
 const styles = StyleSheet.create({
 	logo: {
 		alignItems: 'center',
-		backgroundColor: colors.bg_text_sec,
-		borderRadius: 40,
 		height: 40,
 		justifyContent: 'center',
 		width: 40
