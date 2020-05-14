@@ -161,18 +161,18 @@ function PathsList({
 						? renderSinglePath(pathsGroup)
 						: renderGroupPaths(pathsGroup)
 				)}
-				<ButtonNewDerivation
-					testID={testIDs.PathsList.deriveButton}
-					title="Derive New Account"
-					onPress={(): Promise<void> =>
-						navigateToPathDerivation(
-							navigation,
-							isUnknownNetworkPath ? '' : rootPath,
-							isSeedRefValid
-						)
-					}
-				/>
 			</SafeAreaScrollViewContainer>
+			<ButtonNewDerivation
+				testID={testIDs.PathsList.deriveButton}
+				title="Derive New Account"
+				onPress={(): Promise<void> =>
+					navigateToPathDerivation(
+						navigation,
+						isUnknownNetworkPath ? '' : rootPath,
+						isSeedRefValid
+					)
+				}
+			/>
 			<QrScannerTab />
 		</>
 	);

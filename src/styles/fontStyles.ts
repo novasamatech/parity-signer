@@ -23,7 +23,8 @@ export default StyleSheet.create({
 	a_text: {
 		color: colors.text.main,
 		fontFamily: fonts.robotoMono,
-		fontSize: 11
+		fontSize: 12,
+		letterSpacing: 0.4
 	},
 	h1: {
 		color: colors.bg_text,

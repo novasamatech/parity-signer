@@ -54,6 +54,8 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.bg_os,
 		borderBottomColor: colors.bg,
 		borderBottomWidth: 1,
+		height: 72,
+		justifyContent: 'center',
 		paddingVertical: 9
 	},
 	textLabel: {
