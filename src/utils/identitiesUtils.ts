@@ -184,7 +184,7 @@ export const getPathsWithSubstrateNetworkKey = (
 	return pathEntries.reduce(pathReducer, []);
 };
 
-const getNetworkKeyByPathId = (pathId: string): string => {
+export const getNetworkKeyByPathId = (pathId: string): string => {
 	const networkKeyIndex = Object.values(SUBSTRATE_NETWORK_LIST).findIndex(
 		networkParams => networkParams.pathId === pathId
 	);
