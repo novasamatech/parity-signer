@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
 	},
 	icon: {
 		...fontStyles.i_large,
-		color: colors.text.main
+		color: colors.signal.main
 	},
 	textLabel: {
 		...fontStyles.a_text,

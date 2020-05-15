@@ -26,6 +26,7 @@ export default StyleSheet.create({
 		fontSize: 12,
 		letterSpacing: 0.4
 	},
+
 	h1: {
 		color: colors.bg_text,
 		fontFamily: fonts.robotoBold,
@@ -38,6 +39,9 @@ export default StyleSheet.create({
 	},
 	i_large: {
 		fontSize: 22
+	},
+	i_small: {
+		fontSize: 10
 	},
 	quote: {
 		color: colors.bg_text,
