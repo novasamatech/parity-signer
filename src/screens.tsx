@@ -73,20 +73,20 @@ const globalStackNavigationOptions = {
 	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: {
-		color: colors.bg_text_sec
+		color: colors.text.main
 	},
 	headerBackTitleVisible: false,
 	headerLeft: (): React.ReactElement => <HeaderLeft />,
 	headerRight: (): React.ReactElement => <SecurityHeader />,
 	headerStyle: {
-		backgroundColor: colors.bg,
-		borderBottomColor: colors.bg,
+		backgroundColor: colors.background.app,
+		borderBottomColor: colors.background.app,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: 60,
+		height: 40,
 		shadowColor: 'transparent'
 	},
-	headerTintColor: colors.bg_text_sec,
+	headerTintColor: colors.text.main,
 	headerTitle: (): React.ReactNode => null
 };
 
@@ -100,7 +100,7 @@ const HeaderLeftWithBack = (): React.ReactElement => {
 			<HeaderBackButton
 				labelStyle={globalStackNavigationOptions.headerBackTitleStyle}
 				labelVisible={false}
-				tintColor={colors.bg_text}
+				tintColor={colors.text.main}
 				onPress={(): void => navigation.goBack()}
 			/>
 		</View>

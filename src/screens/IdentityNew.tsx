@@ -23,7 +23,6 @@ import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 import { withAccountStore } from 'utils/HOC';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
@@ -183,7 +182,7 @@ export default withAccountStore(IdentityNew);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		overflow: 'hidden'
 	},
@@ -193,10 +192,5 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		justifyContent: 'space-around',
 		marginTop: 32
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18
 	}
 });

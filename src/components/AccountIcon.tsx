@@ -60,7 +60,7 @@ export default function AccountIcon(props: {
 					/>
 				) : (
 					<View style={styles.logo}>
-						<FontAwesome name="question" color={colors.bg} size={28} />
+						<FontAwesome name="question" color={colors.text.main} size={28} />
 					</View>
 				)}
 			</View>
@@ -81,7 +81,9 @@ export default function AccountIcon(props: {
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <MaterialIcon color={colors.bg_text} name={'error'} size={44} />;
+		return (
+			<MaterialIcon color={colors.signal.error} name={'error'} size={44} />
+		);
 	}
 }
 

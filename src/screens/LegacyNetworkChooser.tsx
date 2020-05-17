@@ -111,22 +111,22 @@ const styles = StyleSheet.create({
 		paddingBottom: 15
 	},
 	card: {
-		backgroundColor: colors.card_bg,
+		backgroundColor: colors.background.card,
 		padding: 20
 	},
 	cardText: {
-		color: colors.card_text,
+		color: colors.background.app,
 		fontFamily: fonts.bold,
 		fontSize: 20
 	},
 	title: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20
 	},
 	titleTop: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 24,
 		paddingBottom: 20,

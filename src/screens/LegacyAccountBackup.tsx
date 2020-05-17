@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
 		padding: 16
 	},
 	derivationText: {
-		backgroundColor: colors.card_bg,
+		backgroundColor: colors.background.card,
 		fontFamily: fonts.regular,
 		fontSize: 20,
 		lineHeight: 26,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
 		marginTop: 20
 	},
 	title: {
-		color: colors.bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20

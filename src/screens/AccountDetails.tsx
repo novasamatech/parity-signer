@@ -131,11 +131,11 @@ export default withAccountStore(AccountDetails);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1
 	},
 	deleteText: {
-		color: colors.bg_alert
+		color: colors.signal.error
 	},
 	header: {
 		alignItems: 'center',
@@ -155,12 +155,5 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingBottom: 40,
 		paddingTop: 8
-	},
-	title: {
-		color: colors.bg_text_sec,
-		flexDirection: 'column',
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		justifyContent: 'center'
 	}
 });

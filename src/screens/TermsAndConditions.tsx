@@ -115,7 +115,7 @@ export default function TermsAndConditions(
 
 const styles = StyleSheet.create({
 	icon: {
-		color: colors.bg_text_sec,
+		color: colors.text.faded,
 		fontSize: 30
 	}
 });

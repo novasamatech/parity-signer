@@ -55,19 +55,18 @@ export default class Button extends React.PureComponent<{
 			style
 		} = this.props;
 
-		const finalTextStyles = [textStyles];
+		const finalTextStyles = [styles.buttonText, textStyles];
 		const finalButtonStyles = [styles.button, buttonStyles];
 
 		if (small) {
-			finalTextStyles.push(fontStyles.t_important);
+			finalTextStyles.push({ fontSize: 14 });
 			finalButtonStyles.push(styles.buttonSmall);
 		}
 		if (onlyText) {
-			finalTextStyles.push({ color: colors.bg_button });
+			finalTextStyles.push({ color: colors.text.main });
 			finalButtonStyles.push(styles.buttonOnlyText);
 		}
 		if (disabled) {
-			finalTextStyles.push(styles.textDisabled);
 			finalButtonStyles.push(styles.buttonDisabled);
 		}
 
@@ -81,7 +80,9 @@ export default class Button extends React.PureComponent<{
 				testID={testID}
 			>
 				<View style={[finalButtonStyles, style]}>
-					<Text style={[fontStyles.h1, finalTextStyles]}>{title}</Text>
+					<Text style={[fontStyles.h1, styles.buttonText, finalTextStyles]}>
+						{title}
+					</Text>
 				</View>
 			</Touchable>
 		);
@@ -91,7 +92,7 @@ export default class Button extends React.PureComponent<{
 const styles = StyleSheet.create({
 	button: {
 		alignItems: 'center',
-		backgroundColor: colors.bg_button,
+		backgroundColor: colors.text.main,
 		borderRadius: 60,
 		elevation: 4,
 		height: 56,
@@ -100,11 +101,11 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 64
 	},
 	buttonDisabled: {
-		backgroundColor: colors.card_bgSolid,
+		backgroundColor: colors.background.card,
 		elevation: 0
 	},
 	buttonOnlyText: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		elevation: 0,
 		paddingHorizontal: 0
 	},
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
 		height: 48,
 		paddingHorizontal: 48
 	},
-	textDisabled: {
-		color: colors.card_bg
+	buttonText: {
+		color: colors.background.app
 	}
 });

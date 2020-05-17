@@ -106,7 +106,7 @@ export default class CustomScrollView extends React.PureComponent<
 
 const styles = StyleSheet.create({
 	indicator: {
-		backgroundColor: colors.bg_text_sec,
+		backgroundColor: colors.text.main,
 		borderRadius: 5,
 		position: 'absolute',
 		right: 0,

@@ -32,6 +32,7 @@ import fonts from 'styles/fonts';
 import { emptyAccount, validateSeed } from 'utils/account';
 import { withAccountStore } from 'utils/HOC';
 import { constructSURI } from 'utils/suri';
+import fontStyles from 'styles/fontStyles';
 
 interface State {
 	derivationPassword: string;
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 15
 	},
 	hintText: {
-		color: colors.bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.bold,
 		fontSize: 12,
 		paddingTop: 20,
@@ -217,12 +218,11 @@ const styles = StyleSheet.create({
 		marginTop: 15
 	},
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18
+		...fontStyles.h_subheading,
+		color: colors.text.main
 	},
 	titleTop: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 24,
 		paddingBottom: 20,

@@ -44,7 +44,7 @@ export default class ButtonNewDerivation extends React.PureComponent<{
 const styles = StyleSheet.create({
 	body: {
 		alignItems: 'center',
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		height: 76
 	},
 	icon: {

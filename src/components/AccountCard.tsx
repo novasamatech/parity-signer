@@ -83,8 +83,15 @@ export function NetworkCard({
 			<CardSeparator />
 			<View style={styles.content}>
 				{isAdd ? (
-					<View style={{ height: 40, width: 40 }}>
-						<Icon name="add" color={colors.bg_text} size={32} />
+					<View
+						style={{
+							alignItems: 'center',
+							height: 40,
+							justifyContent: 'center',
+							width: 40
+						}}
+					>
+						<Icon name="add" color={colors.text.main} size={30} />
 					</View>
 				) : (
 					<AccountIcon address={''} network={network} style={styles.icon} />
@@ -142,7 +149,7 @@ export default function AccountCard({
 				<AccountIcon address={address} network={network} style={styles.icon} />
 				<View style={styles.desc}>
 					<View>
-						<Text style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}>
+						<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
 							{`${network.title}${seedTypeDisplay} `}
 						</Text>
 					</View>

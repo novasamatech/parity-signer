@@ -44,8 +44,9 @@ function SecurityHeader(): React.ReactElement {
 					onPress={(): void => navigation.navigate('Security')}
 					iconName="shield-off"
 					iconType="feather"
-					iconColor={colors.bg_alert}
+					iconColor={colors.signal.error}
 					iconBgStyle={styles.securityIconBgStyle}
+					iconSize={26}
 				/>
 			)}
 			<IdentitiesSwitch />

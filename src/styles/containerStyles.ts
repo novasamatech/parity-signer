@@ -4,7 +4,7 @@ import colors from 'styles/colors';
 
 export default StyleSheet.create({
 	background: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		flexDirection: 'column',
 		overflow: 'hidden'

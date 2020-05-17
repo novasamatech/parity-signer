@@ -48,6 +48,7 @@ export default class Separator extends React.PureComponent<Props> {
 							{
 								height: 32,
 								marginTop: -32,
+								opacity: 0.9,
 								width: '100%'
 							},
 							shadowStyle

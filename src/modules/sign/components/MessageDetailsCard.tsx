@@ -49,7 +49,7 @@ export default function MessageDetailsCard({
 const styles = StyleSheet.create({
 	hashText: {
 		...fontStyles.t_codeS,
-		color: colors.label_text,
+		color: colors.signal.main,
 		marginBottom: 20,
 		paddingHorizontal: 8
 	},
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
 	},
 	messageText: {
 		...fontStyles.t_code,
-		color: colors.label_text,
+		color: colors.signal.main,
 		lineHeight: 26,
 		marginBottom: 20,
 		minHeight: 120,

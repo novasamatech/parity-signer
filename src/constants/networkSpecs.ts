@@ -79,12 +79,12 @@ export const SubstrateNetworkKeys: {
 
 const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 	[UnknownNetworkKeys.UNKNOWN]: {
-		color: colors.bg_alert,
+		color: colors.signal.error,
 		order: 99,
 		pathId: unknownNetworkPathId,
 		prefix: 2,
 		protocol: NetworkProtocols.UNKNOWN,
-		secondaryColor: colors.card_bgSolid,
+		secondaryColor: colors.background.card,
 		title: 'Unknown network'
 	}
 };
@@ -207,7 +207,7 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 		color: '#64A2F4',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
 		order: 101,
-		secondaryColor: colors.card_bgSolid,
+		secondaryColor: colors.background.card,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.CLASSIC]: {
@@ -215,7 +215,7 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
 		logo: require('res/img/logos/Ethereum_Classic.png'),
 		order: 102,
-		secondaryColor: colors.card_bgSolid,
+		secondaryColor: colors.background.card,
 		title: 'Ethereum Classic'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
@@ -239,14 +239,14 @@ const ethereumDefaultValues = {
 	color: '#2968C7',
 	logo: require('res/img/logos/Ethereum.png'),
 	protocol: NetworkProtocols.ETHEREUM,
-	secondaryColor: colors.card_text
+	secondaryColor: colors.background.card
 };
 
 const substrateDefaultValues = {
 	color: '#4C4646',
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
-	secondaryColor: colors.card_bgSolid
+	secondaryColor: colors.background.card
 };
 
 function setDefault(

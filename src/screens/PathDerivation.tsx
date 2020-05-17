@@ -161,7 +161,7 @@ function PathDerivation({
 
 const styles = StyleSheet.create({
 	container: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1
 	}
 });

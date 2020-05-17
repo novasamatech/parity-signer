@@ -64,11 +64,11 @@ export default function UnknownAccountWarning({
 
 const styles = StyleSheet.create({
 	warningText: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.regular
 	},
 	warningTitle: {
-		color: colors.bg_alert,
+		color: colors.signal.error,
 		fontFamily: fonts.bold,
 		fontSize: 20,
 		marginBottom: 10

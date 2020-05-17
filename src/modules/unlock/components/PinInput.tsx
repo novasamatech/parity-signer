@@ -16,10 +16,9 @@
 import React, { MutableRefObject } from 'react';
 import { StyleSheet, TextInputProps } from 'react-native';
 
-import styles from '../styles';
-
 import TextInput from 'components/TextInput';
 import fontStyles from 'styles/fontStyles';
+import colors from 'styles/colors';
 
 interface PinInputProps extends TextInputProps {
 	label: string;
@@ -48,3 +47,13 @@ export default function PinInput(props: PinInputProps): React.ReactElement {
 		/>
 	);
 }
+
+const styles = StyleSheet.create({
+	pinInput: {
+		borderBottomColor: colors.border.light,
+		borderColor: colors.border.light,
+		minHeight: 48,
+		paddingLeft: 10,
+		paddingRight: 10
+	}
+});

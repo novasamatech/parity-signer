@@ -189,10 +189,6 @@ function IdentitiesSwitch({
 
 		return (
 			<ButtonIcon
-				dropdown={false}
-				renderDropdownElement={(): React.ReactElement =>
-					renderIdentityOptions(identity)
-				}
 				title={title}
 				onPress={(): Promise<void> =>
 					onIdentitySelectedAndNavigate(identity, 'Main')
@@ -249,6 +245,7 @@ function IdentitiesSwitch({
 				iconType="antdesign"
 				iconBgStyle={{ backgroundColor: 'transparent' }}
 				testID={testIDs.IdentitiesSwitch.toggleButton}
+				iconSize={26}
 			/>
 
 			<TransparentBackground
@@ -312,7 +309,7 @@ function IdentitiesSwitch({
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		borderRadius: 5,
 		paddingBottom: 16,
 		paddingTop: 8
@@ -335,7 +332,7 @@ const styles = StyleSheet.create({
 	},
 	identitiesListSeparator: {
 		backgroundColor: 'transparent',
-		marginTop: 10,
+		marginTop: 12,
 		zIndex: -1
 	},
 	indentedButton: {

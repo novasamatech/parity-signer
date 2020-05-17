@@ -27,18 +27,18 @@ export default class Markdown extends React.PureComponent<any> {
 			<MarkdownRender
 				style={StyleSheet.create({
 					listOrderedItemIcon: {
-						color: colors.bg_text,
+						color: colors.text.main,
 						marginRight: 3,
 						marginTop: 19
 					},
 					listUnorderedItemIcon: {
-						color: colors.card_bg,
+						color: colors.text.faded,
 						fontFamily: fonts.bold,
 						marginRight: 3,
 						marginTop: 19
 					},
 					text: {
-						color: colors.bg_text_sec,
+						color: colors.text.main,
 						fontFamily: fonts.regular,
 						fontSize: 14,
 						marginTop: 10

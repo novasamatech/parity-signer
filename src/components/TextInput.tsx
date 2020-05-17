@@ -79,7 +79,7 @@ export default class TextInput extends React.PureComponent<Props, {}> {
 						underlineColorAndroid="transparent"
 						{...this.props}
 						style={[fontStyles.h2, finalInputStyles, style]}
-						placeholderTextColor={colors.card_bg_text_sec}
+						placeholderTextColor={colors.text.faded}
 					/>
 				</View>
 			</View>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16
 	},
 	input: {
-		borderBottomColor: colors.card_bg_text_sec,
+		borderBottomColor: colors.border.light,
 		borderBottomWidth: 0.8,
 		flex: 1,
 		height: 40,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
 		paddingTop: 11.5
 	},
 	input_error: {
-		borderBottomColor: colors.bg_alert
+		borderBottomColor: colors.signal.error
 	},
 	label: {
 		marginBottom: 3,

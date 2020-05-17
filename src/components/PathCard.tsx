@@ -196,7 +196,7 @@ export default function PathCard({
 					</View>
 					{address !== '' && (
 						<Text
-							style={fontStyles.t_codeS}
+							style={[fontStyles.t_codeS, { color: colors.text.faded }]}
 							ellipsizeMode="middle"
 							numberOfLines={1}
 						>
@@ -217,7 +217,7 @@ export default function PathCard({
 const styles = StyleSheet.create({
 	body: {
 		borderBottomWidth: 1,
-		borderColor: colors.bg,
+		borderColor: colors.background.app,
 		borderTopWidth: 1
 	},
 	content: {

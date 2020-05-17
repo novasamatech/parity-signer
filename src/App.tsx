@@ -40,7 +40,7 @@ import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
-	NavigationBar.setColor(colors.bg_os);
+	NavigationBar.setColor(colors.background.os);
 	if (__DEV__) {
 		YellowBox.ignoreWarnings([
 			'Warning: componentWillReceiveProps',
@@ -100,7 +100,10 @@ export default function App(props: AppProps): React.ReactElement {
 			<SeedRefStore>
 				<UnstatedProvider>
 					<MenuProvider backHandler={true}>
-						<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+						<StatusBar
+							barStyle="light-content"
+							backgroundColor={colors.background.app}
+						/>
 						<GlobalStateContext.Provider value={globalContext}>
 							<NavigationContainer>{renderStacks()}</NavigationContainer>
 						</GlobalStateContext.Provider>
@@ -113,7 +116,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 const emptyScreenStyles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		flexDirection: 'column',
 		padding: 20

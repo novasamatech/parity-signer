@@ -38,7 +38,7 @@ export default function QrScannerTab(): React.ReactElement {
 			style={styles.body}
 		>
 			<Icon
-				color={colors.bg_text}
+				color={colors.text.main}
 				size={fontStyles.i_large.fontSize}
 				name="qrcode-scan"
 				type="material-community"
@@ -51,8 +51,8 @@ export default function QrScannerTab(): React.ReactElement {
 const styles = StyleSheet.create({
 	body: {
 		alignItems: 'center',
-		backgroundColor: colors.bg_os,
-		borderBottomColor: colors.bg,
+		backgroundColor: colors.background.os,
+		borderBottomColor: colors.background.app,
 		borderBottomWidth: 1,
 		height: 72,
 		justifyContent: 'center',

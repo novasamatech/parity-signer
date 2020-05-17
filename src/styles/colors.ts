@@ -16,28 +16,22 @@
 
 export default {
 	background: {
-		card: '#333333'
+		app: '#1E1E1E',
+		button: '#F1F1F1',
+		card: '#333333',
+		os: '#000000'
 	},
-
-	bg: '#1B1B1B',
-	bg_alert: '#EB5757',
-	bg_button: '#48A5C2',
-	bg_os: '#000000',
-	bg_text: '#EEE',
-	bg_text_sec: '#AAA',
-	bg_warning: '#FAE265',
-	card_bg: '#333333',
-	card_bgSolid: '#323232',
-	card_bg_text_sec: '#999',
-	card_text: '#1A1A1A',
-	label_text: '#48A5C2',
-	label_text_sec: '#A8CDD9',
-
+	border: {
+		dark: '#000000',
+		light: '#555555',
+		signal: '#8E1F40'
+	},
 	signal: {
+		error: '#D73400',
 		main: '#FF1864'
 	},
 	text: {
-		faded: '#999999',
+		faded: '#9a9a9a',
 		main: '#F2F2F2'
 	}
 };

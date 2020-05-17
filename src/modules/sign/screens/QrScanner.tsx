@@ -190,20 +190,20 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15
 	},
 	descSecondary: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		paddingBottom: 20
 	},
 	descTitle: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 10,
 		textAlign: 'center'
 	},
 	inactive: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		flexDirection: 'column',
 		padding: 20

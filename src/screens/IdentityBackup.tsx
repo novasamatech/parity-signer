@@ -59,7 +59,7 @@ function IdentityBackup({
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
 		const textStyles =
 			wordsNumber === buttonWordsNumber
-				? { ...fontStyles.t_codeS, color: colors.label_text }
+				? { ...fontStyles.t_codeS, color: colors.signal.main }
 				: fontStyles.t_codeS;
 		return (
 			<Button
@@ -90,7 +90,7 @@ function IdentityBackup({
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
-					' Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
+					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
 				}
 			/>
 			<View />
@@ -134,11 +134,11 @@ const styles = StyleSheet.create({
 		padding: 16
 	},
 	mnemonicSelectionButton: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		height: 30,
-		paddingHorizontal: 5,
-		paddingVertical: 5
+		paddingHorizontal: 4,
+		paddingVertical: 4
 	},
 	mnemonicSelectionRow: {
 		flexDirection: 'row',

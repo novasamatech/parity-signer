@@ -26,16 +26,20 @@ export default StyleSheet.create({
 		fontSize: 12,
 		letterSpacing: 0.4
 	},
-
 	h1: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.robotoBold,
 		fontSize: 22
 	},
 	h2: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.robotoMedium,
 		fontSize: 18
+	},
+	h_subheading: {
+		color: colors.text.main,
+		fontFamily: fonts.roboto,
+		fontSize: 14
 	},
 	i_large: {
 		fontSize: 22
@@ -44,51 +48,51 @@ export default StyleSheet.create({
 		fontSize: 10
 	},
 	quote: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.robotoLight,
 		fontSize: 28
 	},
 	t_big: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.roboto,
 		fontSize: 16
 	},
 	t_code: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.robotoMono,
 		fontSize: 18
 	},
 	t_codeS: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.robotoMono,
 		fontSize: 11
 	},
 	t_important: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.robotoBold,
 		fontSize: 13
 	},
 	t_label: {
-		backgroundColor: colors.label_text,
-		color: colors.card_text,
+		backgroundColor: colors.signal.main,
+		color: colors.signal.main,
 		fontFamily: fonts.robotoMedium,
 		fontSize: 13
 	},
 	t_prefix: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.roboto,
 		fontSize: 14,
 		textTransform: 'uppercase'
 	},
 	t_regular: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.roboto,
 		fontSize: 12
 	},
 	t_seed: {
-		borderColor: colors.card_bg,
+		borderColor: colors.background.card,
 		borderWidth: 0.8,
-		color: colors.bg_button,
+		color: colors.signal.main,
 		fontFamily: fonts.light,
 		fontSize: 20,
 		letterSpacing: 0.1,

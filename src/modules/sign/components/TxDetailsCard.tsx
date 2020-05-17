@@ -63,29 +63,21 @@ function Amount({
 	const fee = (parseInt(gas, 10) * parseInt(gasPrice, 10)) / WEI_IN_ETH;
 	return (
 		<View style={[{ alignItems: 'center', justifyContent: 'center' }, style]}>
-			<View>
-				<View
-					style={{ backgroundColor: colors.bg, padding: 5, paddingVertical: 2 }}
+			<Text style={{ fontSize: 20, fontWeight: '800', textAlign: 'center' }}>
+				<Text style={{ color: colors.text.main }}>{value}</Text>
+				<Text style={{ color: colors.text.faded }}> ETH</Text>
+			</Text>
+			<View style={{ marginTop: 5 }}>
+				<Text
+					style={{
+						color: colors.text.main,
+						fontSize: 12,
+						fontWeight: '800',
+						textAlign: 'center'
+					}}
 				>
-					<Text
-						style={{ fontSize: 20, fontWeight: '800', textAlign: 'center' }}
-					>
-						<Text style={{ color: colors.bg_text }}>{value}</Text>
-						<Text style={{ color: colors.bg_text_sec }}> ETH</Text>
-					</Text>
-				</View>
-				<View style={{ backgroundColor: colors.bg_text_sec, padding: 5 }}>
-					<Text
-						style={{
-							color: colors.bg_text,
-							fontSize: 12,
-							fontWeight: '800',
-							textAlign: 'center'
-						}}
-					>
-						fee: {fee} ETH
-					</Text>
-				</View>
+					fee: {fee} ETH
+				</Text>
 			</View>
 		</View>
 	);
@@ -93,7 +85,7 @@ function Amount({
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.card_bg,
+		backgroundColor: colors.background.card,
 		flexDirection: 'column',
 		padding: 20,
 		paddingTop: 10
@@ -105,7 +97,7 @@ const styles = StyleSheet.create({
 		padding: 5
 	},
 	footerText: {
-		color: colors.card_bg,
+		color: colors.background.card,
 		fontFamily: fonts.bold
 	},
 	icon: {
@@ -113,13 +105,13 @@ const styles = StyleSheet.create({
 		width: 47
 	},
 	secondaryText: {
-		color: colors.card_bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.semiBold,
 		fontSize: 12,
 		textAlign: 'center'
 	},
 	titleText: {
-		color: colors.card_bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		textAlign: 'center'

@@ -163,7 +163,7 @@ function PathDetails({
 
 const styles = StyleSheet.create({
 	deleteText: {
-		color: colors.bg_alert
+		color: colors.signal.error
 	}
 });
 
