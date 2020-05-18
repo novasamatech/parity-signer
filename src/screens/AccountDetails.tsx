@@ -20,7 +20,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
 import PopupMenu from 'components/PopupMenu';

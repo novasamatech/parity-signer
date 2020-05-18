@@ -44,6 +44,9 @@ export default StyleSheet.create({
 	i_large: {
 		fontSize: 22
 	},
+	i_medium: {
+		fontSize: 18
+	},
 	i_small: {
 		fontSize: 10
 	},

@@ -98,25 +98,15 @@ function IdentitiesSwitch({
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
 					}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
+					{...i_arrowOptions}
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
 				/>
 				<ButtonIcon
 					title="Show Recovery Phrase"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
 					}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
+					{...i_arrowOptions}
 				/>
 			</>
 		);
@@ -161,22 +151,12 @@ function IdentitiesSwitch({
 				<ButtonIcon
 					title="Terms and Conditions"
 					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
+					{...i_arrowOptions}
 				/>
 				<ButtonIcon
 					title="Privacy Policy"
 					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
+					{...i_arrowOptions}
 				/>
 			</>
 		);
@@ -207,7 +187,7 @@ function IdentitiesSwitch({
 		// if no identity or the only one we have is the selected one
 
 		if (!identities.length || (identities.length === 1 && currentIdentity))
-			return;
+			return <View style={{ paddingTop: 8 }} />;
 
 		const identitiesToShow = currentIdentity
 			? identities.filter(
@@ -220,18 +200,15 @@ function IdentitiesSwitch({
 				<ScrollView
 					bounces={false}
 					style={{
-						maxHeight: 180,
-						paddingVertical: identities.length > 5 ? 8 : 0
+						maxHeight: 160
 					}}
 				>
-					{identitiesToShow.map(renderNonSelectedIdentity)}
+					<View style={{ paddingVertical: 8 }}>
+						{identitiesToShow.map(renderNonSelectedIdentity)}
+					</View>
 				</ScrollView>
 				{identities.length > 5 && (
-					<Separator
-						shadow={true}
-						style={styles.identitiesListSeparator}
-						shadowStyle={{ opacity: 0.9 }}
-					/>
+					<Separator shadow={true} style={{ marginTop: 0 }} />
 				)}
 			</>
 		);
@@ -310,34 +287,30 @@ function IdentitiesSwitch({
 const styles = StyleSheet.create({
 	card: {
 		backgroundColor: colors.background.app,
-		borderRadius: 5,
+		borderRadius: 4,
 		paddingBottom: 16,
 		paddingTop: 8
 	},
 	container: {
 		justifyContent: 'center',
-		marginTop: -24,
-		paddingLeft: 16,
-		paddingRight: 16
-	},
-	i_arrowBg: {
-		backgroundColor: 'rgba(0,0,0,0)',
-		marginRight: -3
+		paddingHorizontal: 16
 	},
 	i_arrowStyle: {
-		opacity: 0.7,
-		paddingBottom: 6,
 		paddingLeft: 64,
 		paddingTop: 0
-	},
-	identitiesListSeparator: {
-		backgroundColor: 'transparent',
-		marginTop: 12,
-		zIndex: -1
 	},
 	indentedButton: {
 		paddingLeft: 32
 	}
 });
+
+const i_arrowOptions = {
+	iconColor: colors.signal.main,
+	iconName: 'arrowright',
+	iconSize: fontStyles.i_medium.fontSize,
+	iconType: 'antdesign',
+	style: styles.i_arrowStyle,
+	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
+};
 
 export default withAccountStore(IdentitiesSwitch);
