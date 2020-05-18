@@ -98,8 +98,8 @@ function IdentitiesSwitch({
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
 					}
-					{...i_arrowOptions}
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
+					{...i_arrowOptions}
 				/>
 				<ButtonIcon
 					title="Show Recovery Phrase"

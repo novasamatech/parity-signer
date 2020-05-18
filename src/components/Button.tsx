@@ -36,6 +36,7 @@ export default class Button extends React.PureComponent<{
 	onPress: ButtonListener;
 	textStyles?: TextStyle;
 	buttonStyles?: ViewStyle;
+	aboveKeyboard?: boolean;
 	disabled?: boolean;
 	small?: boolean;
 	onlyText?: boolean;
@@ -46,6 +47,7 @@ export default class Button extends React.PureComponent<{
 		const {
 			onPress,
 			title,
+			aboveKeyboard,
 			disabled,
 			small,
 			textStyles,
@@ -69,6 +71,9 @@ export default class Button extends React.PureComponent<{
 		if (disabled) {
 			finalButtonStyles.push(styles.buttonDisabled);
 		}
+		if (aboveKeyboard) {
+			finalButtonStyles.push(styles.buttonAboveKeyboard);
+		}
 
 		const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
@@ -91,18 +96,20 @@ export default class Button extends React.PureComponent<{
 
 const styles = StyleSheet.create({
 	button: {
-		alignItems: 'center',
+		alignSelf: 'center',
 		backgroundColor: colors.text.main,
 		borderRadius: 60,
-		elevation: 4,
-		height: 56,
+		height: 48,
 		justifyContent: 'center',
-		margin: 8,
-		paddingHorizontal: 64
+		marginVertical: 40,
+		paddingHorizontal: 40
+	},
+	buttonAboveKeyboard: {
+		bottom: 56,
+		position: 'absolute'
 	},
 	buttonDisabled: {
-		backgroundColor: colors.background.card,
-		elevation: 0
+		backgroundColor: colors.background.card
 	},
 	buttonOnlyText: {
 		backgroundColor: colors.background.app,
@@ -110,10 +117,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 0
 	},
 	buttonSmall: {
-		height: 48,
-		paddingHorizontal: 48
+		height: 40,
+		paddingHorizontal: 24
 	},
 	buttonText: {
-		color: colors.background.app
+		...fontStyles.a_button
 	}
 });

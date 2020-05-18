@@ -15,15 +15,15 @@
 
 import React from 'react';
 
-import ButtonMainAction from 'components/ButtonMainAction';
 import ScreenHeading from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
-import Container from 'modules/unlock/components/Container';
+import Container, { AvoidKeyboard } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import { NavigationProps } from 'types/props';
+import Button from 'components/Button';
 
 export default function PinNew({
 	route
@@ -44,40 +44,42 @@ export default function PinNew({
 	}
 
 	return (
-		<Container>
-			<ScreenHeading
-				title={t.title.pinCreation}
-				subtitle={getSubtitle(state, false)}
-				error={state.pinMismatch || state.pinTooShort}
-			/>
+		<AvoidKeyboard>
+			<Container>
+				<ScreenHeading
+					title={t.title.pinCreation}
+					subtitle={getSubtitle(state, false)}
+					error={state.pinMismatch || state.pinTooShort}
+				/>
 
-			<PinInput
-				label={t.pinLabel}
-				autoFocus
-				testID={testIDs.IdentityPin.setPin}
-				returnKeyType="next"
-				onFocus={(): void => updateState({ focusConfirmation: false })}
-				onSubmitEditing={(): void => {
-					updateState({ focusConfirmation: true });
-				}}
-				onChangeText={onPinInputChange('pin', updateState)}
-				value={state.pin}
-			/>
-			<PinInput
-				label={t.pinConfirmLabel}
-				returnKeyType="done"
-				testID={testIDs.IdentityPin.confirmPin}
-				focus={state.focusConfirmation}
-				onChangeText={onPinInputChange('confirmation', updateState)}
-				value={state.confirmation}
-				onSubmitEditing={submit}
-			/>
-			<ButtonMainAction
+				<PinInput
+					label={t.pinLabel}
+					autoFocus
+					testID={testIDs.IdentityPin.setPin}
+					returnKeyType="next"
+					onFocus={(): void => updateState({ focusConfirmation: false })}
+					onSubmitEditing={(): void => {
+						updateState({ focusConfirmation: true });
+					}}
+					onChangeText={onPinInputChange('pin', updateState)}
+					value={state.pin}
+				/>
+				<PinInput
+					label={t.pinConfirmLabel}
+					returnKeyType="done"
+					testID={testIDs.IdentityPin.confirmPin}
+					focus={state.focusConfirmation}
+					onChangeText={onPinInputChange('confirmation', updateState)}
+					value={state.confirmation}
+					onSubmitEditing={submit}
+				/>
+			</Container>
+			<Button
 				title={t.doneButton.pinCreation}
-				bottom={false}
 				onPress={submit}
 				testID={testIDs.IdentityPin.submitButton}
+				aboveKeyboard
 			/>
-		</Container>
+		</AvoidKeyboard>
 	);
 }

@@ -17,14 +17,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import ButtonMainAction from 'components/ButtonMainAction';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
@@ -35,6 +33,7 @@ import {
 } from 'utils/alertUtils';
 import Button from 'components/Button';
 import { useNewSeedRef } from 'utils/seedRefHooks';
+import Container from 'modules/unlock/components/Container';
 
 function IdentityBackup({
 	navigation,
@@ -86,14 +85,13 @@ function IdentityBackup({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<KeyboardScrollView style={styles.body}>
+		<Container>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
 					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
 				}
 			/>
-			<View />
 			{isNew && (
 				<View style={styles.mnemonicSelectionRow}>
 					{renderTextButton(12)}
@@ -109,21 +107,20 @@ function IdentityBackup({
 				}}
 			>
 				<Text
-					style={fontStyles.t_seed}
+					style={[fontStyles.t_seed, { marginHorizontal: 16 }]}
 					testID={testIDs.IdentityBackup.seedText}
 				>
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
 			{isNew && (
-				<ButtonMainAction
+				<Button
 					title={'Next'}
 					testID={testIDs.IdentityBackup.nextButton}
-					bottom={false}
 					onPress={(): void => alertBackupDone(onBackupDone)}
 				/>
 			)}
-		</KeyboardScrollView>
+		</Container>
 	);
 }
 

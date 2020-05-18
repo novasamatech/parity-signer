@@ -23,7 +23,7 @@ export default StyleSheet.create({
 	a_button: {
 		color: colors.background.app,
 		fontFamily: fonts.robotoMonoMedium,
-		fontSize: 18
+		fontSize: 20
 	},
 	a_text: {
 		color: colors.text.main,

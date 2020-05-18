@@ -122,7 +122,8 @@ export function NetworkOptions({
 const styles = StyleSheet.create({
 	body: {
 		flex: 1,
-		marginVertical: 8,
+		marginBottom: 48,
+		marginTop: 24,
 		paddingHorizontal: 16
 	},
 	label: {
@@ -170,9 +171,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.background.app,
 		borderBottomColor: colors.border.light,
 		borderBottomWidth: 0.8,
-		flex: 1,
 		flexDirection: 'row',
-		height: 40,
-		paddingTop: 8
+		height: 40
 	}
 });

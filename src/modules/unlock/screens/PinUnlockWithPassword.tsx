@@ -15,17 +15,17 @@
 
 import React, { useState } from 'react';
 
-import Container from 'modules/unlock/components/Container';
+import Container, { AvoidKeyboard } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
-import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationTargetIdentityProps } from 'types/props';
 import { withAccountStore, withTargetIdentity } from 'utils/HOC';
 import { useSeedRef } from 'utils/seedRefHooks';
+import Button from 'components/Button';
 
 function PinUnlockWithPassword({
 	targetIdentity,
@@ -66,39 +66,41 @@ function PinUnlockWithPassword({
 	}
 
 	return (
-		<Container>
-			<ScreenHeading
-				title={t.title.pinUnlock}
-				error={state.pinMismatch || state.pinTooShort}
-				subtitle={getSubtitle(state, true)}
-			/>
-			{!route.params.isSeedRefValid && (
-				<PinInput
-					label={t.pinLabel}
-					autoFocus
-					testID={testIDs.IdentityPin.unlockPinInput}
-					returnKeyType="done"
-					onChangeText={onPinInputChange('pin', updateState)}
-					onSubmitEditing={(): void => setFocusPassword(true)}
-					value={state.pin}
+		<AvoidKeyboard>
+			<Container>
+				<ScreenHeading
+					title={t.title.pinUnlock}
+					error={state.pinMismatch || state.pinTooShort}
+					subtitle={getSubtitle(state, true)}
 				/>
-			)}
-			<PinInput
-				label={t.passwordLabel}
-				testID={testIDs.IdentityPin.passwordInput}
-				returnKeyType="done"
-				focus={focusPassword}
-				onChangeText={onPasswordInputChange}
-				onSubmitEditing={submit}
-				value={state.password}
-			/>
-			<ButtonMainAction
+				{!route.params.isSeedRefValid && (
+					<PinInput
+						label={t.pinLabel}
+						autoFocus
+						testID={testIDs.IdentityPin.unlockPinInput}
+						returnKeyType="done"
+						onChangeText={onPinInputChange('pin', updateState)}
+						onSubmitEditing={(): void => setFocusPassword(true)}
+						value={state.pin}
+					/>
+				)}
+				<PinInput
+					label={t.passwordLabel}
+					testID={testIDs.IdentityPin.passwordInput}
+					returnKeyType="done"
+					focus={focusPassword}
+					onChangeText={onPasswordInputChange}
+					onSubmitEditing={submit}
+					value={state.password}
+				/>
+			</Container>
+			<Button
 				title={t.doneButton.pinUnlock}
-				bottom={false}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
+				aboveKeyboard
 			/>
-		</Container>
+		</AvoidKeyboard>
 	);
 }
 

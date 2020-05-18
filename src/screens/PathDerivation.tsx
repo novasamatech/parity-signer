@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState, useMemo } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
 
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
@@ -23,17 +22,16 @@ import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
-import ButtonMainAction from 'components/ButtonMainAction';
 import { getNetworkKey, validateDerivedPath } from 'utils/identitiesUtils';
 import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
-import colors from 'styles/colors';
 import PathCard from 'components/PathCard';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
 import { useSeedRef } from 'utils/seedRefHooks';
+import Button from 'components/Button';
+import Container, { AvoidKeyboard } from 'modules/unlock/components/Container';
 
 function PathDerivation({
 	accounts,
@@ -84,8 +82,8 @@ function PathDerivation({
 	};
 
 	return (
-		<View style={styles.container}>
-			<KeyboardScrollView extraHeight={Platform.OS === 'ios' ? 250 : 180}>
+		<AvoidKeyboard>
+			<Container>
 				<ScreenHeading
 					title="Derive Account"
 					subtitle={parentPath}
@@ -138,32 +136,23 @@ function PathDerivation({
 					}
 					networkKey={currentNetworkKey}
 				/>
-
-				<ButtonMainAction
-					disabled={!isPathValid}
-					bottom={false}
-					style={{ marginTop: 8 }}
-					title="Next"
-					testID={testIDs.PathDerivation.deriveButton}
-					onPress={onPathDerivation}
+			</Container>
+			<Button
+				disabled={!isPathValid}
+				title="Next"
+				testID={testIDs.PathDerivation.deriveButton}
+				onPress={onPathDerivation}
+				aboveKeyboard
+			/>
+			{enableCustomNetwork && (
+				<NetworkOptions
+					setNetworkKey={setCustomNetworkKey}
+					visible={modalVisible}
+					setVisible={setModalVisible}
 				/>
-				{enableCustomNetwork && (
-					<NetworkOptions
-						setNetworkKey={setCustomNetworkKey}
-						visible={modalVisible}
-						setVisible={setModalVisible}
-					/>
-				)}
-			</KeyboardScrollView>
-		</View>
+			)}
+		</AvoidKeyboard>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		backgroundColor: colors.background.app,
-		flex: 1
-	}
-});
 
 export default withAccountStore(PathDerivation);

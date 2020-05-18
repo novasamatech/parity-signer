@@ -14,6 +14,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 import styles from '../styles';
 
@@ -25,8 +26,17 @@ export default function Container(props: any): React.ReactElement {
 		<KeyboardScrollView
 			{...props}
 			style={styles.body}
-			extraHeight={200}
 			testID={testIDs.IdentityPin.scrollScreen}
+		/>
+	);
+}
+
+export function AvoidKeyboard(props: any): React.ReactElement {
+	return (
+		<KeyboardAvoidingView
+			{...props}
+			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+			style={styles.body}
 		/>
 	);
 }
