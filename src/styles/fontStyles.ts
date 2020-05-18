@@ -20,6 +20,11 @@ import fonts from './fonts';
 import colors from './colors';
 
 export default StyleSheet.create({
+	a_button: {
+		color: colors.background.app,
+		fontFamily: fonts.robotoMonoMedium,
+		fontSize: 18
+	},
 	a_text: {
 		color: colors.text.main,
 		fontFamily: fonts.robotoMono,
