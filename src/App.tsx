@@ -41,7 +41,9 @@ import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
 	NavigationBar.setColor(colors.background.os);
-	if (__DEV__) {
+	if (global.inTest) {
+		console.disableYellowBox = true;
+	} else if (__DEV__) {
 		YellowBox.ignoreWarnings([
 			'Warning: componentWillReceiveProps',
 			'Warning: componentWillMount',
