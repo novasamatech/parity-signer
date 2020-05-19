@@ -19,10 +19,16 @@ import React, { useRef, useState, useMemo } from 'react';
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { Identity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
-import { getNetworkKey, validateDerivedPath } from 'utils/identitiesUtils';
+import {
+	extractPathId,
+	getNetworkKey,
+	getNetworkKeyByPathId,
+	validateDerivedPath
+} from 'utils/identitiesUtils';
 import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
@@ -32,6 +38,17 @@ import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
 import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
 import Container from 'modules/unlock/components/Container';
+
+function getParentNetworkKey(
+	parentPath: string,
+	currentIdentity: Identity
+): string {
+	if (currentIdentity.meta.has(parentPath)) {
+		return getNetworkKey(parentPath, currentIdentity);
+	}
+	const pathId = extractPathId(parentPath);
+	return getNetworkKeyByPathId(pathId);
+}
 
 function PathDerivation({
 	accounts,
@@ -49,7 +66,7 @@ function PathDerivation({
 	);
 	const parentPath = route.params.parentPath;
 	const parentNetworkKey = useMemo(
-		() => getNetworkKey(parentPath, currentIdentity),
+		() => getParentNetworkKey(parentPath, currentIdentity),
 		[parentPath, currentIdentity]
 	);
 
