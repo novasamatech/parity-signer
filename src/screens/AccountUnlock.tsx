@@ -197,7 +197,6 @@ const styles = StyleSheet.create({
 		overflow: 'hidden'
 	},
 	pinInput: {
-		borderBottomColor: colors.signal.main,
 		borderColor: colors.border.light,
 		minHeight: 48,
 		paddingLeft: 10,

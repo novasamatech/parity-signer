@@ -57,7 +57,7 @@ export default class Button extends React.PureComponent<{
 			style
 		} = this.props;
 
-		const finalTextStyles = [styles.buttonText, textStyles];
+		const finalTextStyles = [styles.buttonText, {}];
 		const finalButtonStyles = [styles.button, buttonStyles];
 
 		if (small) {
@@ -85,7 +85,14 @@ export default class Button extends React.PureComponent<{
 				testID={testID}
 			>
 				<View style={[finalButtonStyles, style]}>
-					<Text style={[fontStyles.h1, styles.buttonText, finalTextStyles]}>
+					<Text
+						style={[
+							fontStyles.h1,
+							styles.buttonText,
+							finalTextStyles,
+							textStyles
+						]}
+					>
 						{title}
 					</Text>
 				</View>
@@ -113,12 +120,12 @@ const styles = StyleSheet.create({
 	},
 	buttonOnlyText: {
 		backgroundColor: colors.background.app,
-		elevation: 0,
-		paddingHorizontal: 0
+		elevation: 8
 	},
 	buttonSmall: {
 		height: 40,
-		paddingHorizontal: 24
+		marginVertical: 8,
+		paddingHorizontal: 32
 	},
 	buttonText: {
 		...fontStyles.a_button

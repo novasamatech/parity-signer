@@ -106,6 +106,7 @@ export default function TermsAndConditions(
 						title="Next"
 						disabled={!ppAgreement || !tocAgreement}
 						onPress={onConfirm}
+						style={{ marginBottom: 24, marginTop: 16 }}
 					/>
 				</View>
 			)}

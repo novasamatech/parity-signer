@@ -105,10 +105,6 @@ function LegacyAccountBackup({
 				)}
 				{isNew && (
 					<Button
-						buttonStyles={StyleSheet.flatten([
-							styles.nextStep,
-							{ marginBottom: 20 }
-						])}
 						title="Backup Done"
 						onPress={(): void => {
 							alertBackupDone(() => {
@@ -141,9 +137,6 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		minHeight: 30,
 		padding: 10
-	},
-	nextStep: {
-		marginTop: 20
 	},
 	title: {
 		color: colors.text.faded,

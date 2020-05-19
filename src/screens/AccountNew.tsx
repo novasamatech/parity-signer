@@ -174,7 +174,6 @@ function AccountNew({
 						paper.
 					</Text>
 					<Button
-						buttonStyles={styles.nextStep}
 						title="Next Step"
 						disabled={
 							!validateSeed(seed, validBip39Seed).valid ||
@@ -213,9 +212,6 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		paddingTop: 20,
 		textAlign: 'center'
-	},
-	nextStep: {
-		marginTop: 15
 	},
 	title: {
 		...fontStyles.h_subheading,

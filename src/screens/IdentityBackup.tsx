@@ -56,16 +56,16 @@ function IdentityBackup({
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
-		const textStyles =
-			wordsNumber === buttonWordsNumber
-				? { ...fontStyles.t_codeS, color: colors.signal.main }
-				: fontStyles.t_codeS;
+		const textStyles = wordsNumber === buttonWordsNumber && {
+			color: colors.signal.main
+		};
 		return (
 			<Button
-				buttonStyles={styles.mnemonicSelectionButton}
-				textStyles={textStyles}
 				title={`${buttonWordsNumber} words`}
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
+				onlyText
+				small
+				textStyles={{ ...textStyles }}
 			/>
 		);
 	};

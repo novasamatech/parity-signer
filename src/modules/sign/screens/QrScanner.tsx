@@ -15,9 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
+import Button from 'components/Button';
 import { processBarCode } from 'modules/sign/utils';
 import { onMockBarCodeRead } from 'e2e/injections';
 import { SeedRefsContext } from 'stores/SeedRefStore';
@@ -154,6 +155,7 @@ export function Scanner({
 						<Button
 							onPress={(): void => scannerStore.clearMultipartProgress()}
 							title="Start Over"
+							small
 						/>
 					</View>
 				) : (

@@ -31,7 +31,7 @@ import PathCard from 'components/PathCard';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
 import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
-import Container, { AvoidKeyboard } from 'modules/unlock/components/Container';
+import Container from 'modules/unlock/components/Container';
 
 function PathDerivation({
 	accounts,
@@ -82,67 +82,62 @@ function PathDerivation({
 	};
 
 	return (
-		<AvoidKeyboard>
-			<Container>
-				<ScreenHeading
-					title="Derive Account"
-					subtitle={parentPath}
-					hasSubtitleIcon={true}
+		<Container>
+			<ScreenHeading
+				title="Derive Account"
+				subtitle={parentPath}
+				hasSubtitleIcon={true}
+			/>
+			<TextInput
+				autoCompleteType="off"
+				autoCorrect={false}
+				autoFocus
+				error={!isPathValid}
+				label="Path"
+				onChangeText={setDerivationPath}
+				onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
+				placeholder="//hard/soft"
+				returnKeyType="next"
+				testID={testIDs.PathDerivation.pathInput}
+				value={derivationPath}
+			/>
+			<TextInput
+				autoCompleteType="off"
+				autoCorrect={false}
+				label="Display Name"
+				onChangeText={(keyParisName: string): void =>
+					setKeyPairsName(keyParisName)
+				}
+				onSubmitEditing={onPathDerivation}
+				ref={pathNameInput}
+				returnKeyType="done"
+				testID={testIDs.PathDerivation.nameInput}
+				value={keyPairsName}
+			/>
+			{enableCustomNetwork && (
+				<NetworkSelector
+					networkKey={customNetworkKey}
+					setVisible={setModalVisible}
 				/>
-				<TextInput
-					autoCompleteType="off"
-					autoCorrect={false}
-					autoFocus
-					error={!isPathValid}
-					label="Path"
-					onChangeText={setDerivationPath}
-					onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
-					placeholder="//hard/soft"
-					returnKeyType="next"
-					testID={testIDs.PathDerivation.pathInput}
-					value={derivationPath}
-				/>
-				<TextInput
-					autoCompleteType="off"
-					autoCorrect={false}
-					label="Display Name"
-					onChangeText={(keyParisName: string): void =>
-						setKeyPairsName(keyParisName)
-					}
-					onSubmitEditing={onPathDerivation}
-					ref={pathNameInput}
-					returnKeyType="done"
-					testID={testIDs.PathDerivation.nameInput}
-					value={keyPairsName}
-				/>
-				{enableCustomNetwork && (
-					<NetworkSelector
-						networkKey={customNetworkKey}
-						setVisible={setModalVisible}
-					/>
-				)}
-				<Separator style={{ height: 0 }} />
-				<PasswordInput
-					password={password}
-					setPassword={setPassword}
-					onSubmitEditing={onPathDerivation}
-				/>
-				<PathCard
-					identity={accounts.state.currentIdentity}
-					isPathValid={isPathValid}
-					name={keyPairsName}
-					path={
-						password === '' ? completePath : `${completePath}///${password}`
-					}
-					networkKey={currentNetworkKey}
-				/>
-			</Container>
+			)}
+			<Separator style={{ height: 0 }} />
+			<PasswordInput
+				password={password}
+				setPassword={setPassword}
+				onSubmitEditing={onPathDerivation}
+			/>
+			<PathCard
+				identity={accounts.state.currentIdentity}
+				isPathValid={isPathValid}
+				name={keyPairsName}
+				path={password === '' ? completePath : `${completePath}///${password}`}
+				networkKey={currentNetworkKey}
+			/>
 			<Button
 				disabled={!isPathValid}
 				title="Next"
 				testID={testIDs.PathDerivation.deriveButton}
 				onPress={onPathDerivation}
-				aboveKeyboard
 			/>
 			{enableCustomNetwork && (
 				<NetworkOptions
@@ -151,7 +146,7 @@ function PathDerivation({
 					setVisible={setModalVisible}
 				/>
 			)}
-		</AvoidKeyboard>
+		</Container>
 	);
 }
 

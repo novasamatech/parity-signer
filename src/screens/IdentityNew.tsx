@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import Container from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import Button from 'components/Button';
@@ -33,7 +34,6 @@ import {
 	alertRisks
 } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
@@ -161,10 +161,7 @@ function IdentityNew({
 	);
 
 	return (
-		<KeyboardScrollView
-			style={styles.body}
-			extraHeight={Platform.OS === 'ios' ? 210 : 120}
-		>
+		<Container>
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
@@ -174,7 +171,7 @@ function IdentityNew({
 				focus={false}
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
-		</KeyboardScrollView>
+		</Container>
 	);
 }
 
@@ -187,10 +184,10 @@ const styles = StyleSheet.create({
 		overflow: 'hidden'
 	},
 	btnBox: {
-		alignContent: 'center',
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		justifyContent: 'space-around',
+		justifyContent: 'space-between',
+		marginHorizontal: 16,
 		marginTop: 32
 	}
 });
