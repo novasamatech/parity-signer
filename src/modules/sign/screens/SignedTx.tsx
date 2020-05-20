@@ -80,7 +80,7 @@ function SignedTxView({
 			</View>
 
 			<Text style={[fontStyles.t_big, styles.bodyContent]}>
-				{`You are about to sending the following ${
+				{`You are about to send the following ${
 					isEthereum ? 'transaction' : 'extrinsic'
 				}`}
 			</Text>
