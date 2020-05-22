@@ -18,14 +18,10 @@ import { isU8a, u8aToHex } from '@polkadot/util';
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 
-import strings from 'modules/sign/strings';
 import CompatibleCard from 'components/CompatibleCard';
-import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
-import { NETWORK_LIST } from 'constants/networkSpecs';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
 import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
@@ -55,11 +51,7 @@ function SignedMessageView({
 }: Props): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
 	const isHash = scannerStore.getIsHash();
-	const prehash = scannerStore.getPrehashPayload();
 	const dataToSign = scannerStore.getDataToSign();
-
-	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
-	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 	useEffect(
 		(): (() => void) =>
@@ -78,14 +70,6 @@ function SignedMessageView({
 			<View style={styles.bodyContent}>
 				<Text style={styles.title}>From Account</Text>
 				<CompatibleCard account={sender} accountsStore={accounts} />
-				{!isEthereum && prehash ? (
-					<PayloadDetailsCard
-						description={strings.INFO_MULTI_PART}
-						payload={prehash}
-						signature={data}
-						networkKey={sender.networkKey}
-					/>
-				) : null}
 				<MessageDetailsCard
 					isHash={isHash ?? false}
 					message={message}
