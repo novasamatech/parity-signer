@@ -24,7 +24,6 @@ import testIDs from 'e2e/testIDs';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountScannerProps } from 'types/props';
-import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
@@ -55,7 +54,6 @@ function SignedTxView({
 	scannerStore
 }: Props): React.ReactElement {
 	const data = scannerStore.getSignedTxData();
-	const prehash = scannerStore.getPrehashPayload();
 	const tx = scannerStore.getTx();
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
@@ -90,7 +88,7 @@ function SignedTxView({
 					accountsStore={accounts}
 					titlePrefix={'from: '}
 				/>
-				{isEthereum ? (
+				{isEthereum && (
 					<View style={{ marginTop: 16 }}>
 						<TxDetailsCard
 							style={{ marginBottom: 20 }}
@@ -102,13 +100,6 @@ function SignedTxView({
 						<Text style={styles.title}>Recipient</Text>
 						<CompatibleCard account={recipient} accountsStore={accounts} />
 					</View>
-				) : (
-					<PayloadDetailsCard
-						style={{ marginBottom: 20 }}
-						payload={prehash!}
-						signature={data}
-						networkKey={sender.networkKey}
-					/>
 				)}
 			</View>
 		</SafeAreaScrollViewContainer>

@@ -88,7 +88,8 @@ const SIGNER_PAYLOAD_TEST = {
 		'0x0600ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
 	nonce: 0x1234,
 	specVersion: 123,
-	tip: 0x5678
+	tip: 0x5678,
+	transactionVersion: 234
 };
 
 const SIGN_TX_TEST = u8aConcat(
