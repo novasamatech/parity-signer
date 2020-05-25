@@ -262,12 +262,15 @@ export default class PayloadDetailsCard extends React.PureComponent<
 	constructor(props: PayloadDetailsCardProps) {
 		super(props);
 		const { networkKey } = this.props;
-		formatBalance.setDefaults({
-			decimals: SUBSTRATE_NETWORK_LIST[networkKey].decimals,
-			unit: SUBSTRATE_NETWORK_LIST[networkKey].unit
-		});
-
 		const isKnownNetworkKey = SUBSTRATE_NETWORK_LIST.hasOwnProperty(networkKey);
+
+		if (isKnownNetworkKey) {
+			formatBalance.setDefaults({
+				decimals: SUBSTRATE_NETWORK_LIST[networkKey].decimals,
+				unit: SUBSTRATE_NETWORK_LIST[networkKey].unit
+			});
+		}
+
 		this.state = {
 			fallback: !isKnownNetworkKey
 		};
