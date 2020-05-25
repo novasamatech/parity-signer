@@ -57,6 +57,7 @@ import SignedMessage from 'modules/sign/screens/SignedMessage';
 import SignedTx from 'modules/sign/screens/SignedTx';
 import TermsAndConditions from 'screens/TermsAndConditions';
 import colors from 'styles/colors';
+import { headerHeight, horizontalPadding } from 'styles/containerStyles';
 import { RootStackParamList } from 'types/routes';
 
 export const ScreenStack = createStackNavigator<RootStackParamList>();
@@ -77,13 +78,21 @@ const globalStackNavigationOptions = {
 	},
 	headerBackTitleVisible: false,
 	headerLeft: (): React.ReactElement => <HeaderLeft />,
+	headerLeftContainerStyle: {
+		height: headerHeight,
+		paddingLeft: horizontalPadding
+	},
 	headerRight: (): React.ReactElement => <SecurityHeader />,
+	headerRightContainerStyle: {
+		height: headerHeight,
+		paddingRight: horizontalPadding
+	},
 	headerStyle: {
 		backgroundColor: colors.background.app,
 		borderBottomColor: colors.background.app,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: 40,
+		height: headerHeight,
 		shadowColor: 'transparent'
 	},
 	headerTintColor: colors.text.main,
@@ -93,10 +102,7 @@ const globalStackNavigationOptions = {
 const HeaderLeftWithBack = (): React.ReactElement => {
 	const navigation = useNavigation();
 	return (
-		<View
-			style={{ flexDirection: 'row' }}
-			testID={testIDs.Header.headerBackButton}
-		>
+		<View testID={testIDs.Header.headerBackButton}>
 			<HeaderBackButton
 				labelStyle={globalStackNavigationOptions.headerBackTitleStyle}
 				labelVisible={false}

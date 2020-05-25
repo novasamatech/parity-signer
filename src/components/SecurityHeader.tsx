@@ -56,9 +56,8 @@ function SecurityHeader(): React.ReactElement {
 
 const styles = StyleSheet.create({
 	body: {
-		alignItems: 'center',
 		flexDirection: 'row',
-		paddingRight: 16
+		justifyContent: 'center'
 	},
 	scannerIconBgStyle: { backgroundColor: 'transparent' },
 	securityIconBgStyle: { backgroundColor: 'transparent', marginTop: -3 }
