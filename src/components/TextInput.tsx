@@ -80,6 +80,7 @@ export default class TextInput extends React.PureComponent<Props, {}> {
 						{...this.props}
 						style={[fontStyles.h2, finalInputStyles, style]}
 						placeholderTextColor={colors.text.faded}
+						selectionColor={colors.border.light}
 					/>
 				</View>
 			</View>

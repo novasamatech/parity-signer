@@ -45,7 +45,6 @@ function SecurityHeader(): React.ReactElement {
 					iconName="shield-off"
 					iconType="feather"
 					iconColor={colors.signal.error}
-					iconBgStyle={styles.securityIconBgStyle}
 					iconSize={26}
 				/>
 			)}
@@ -58,9 +57,7 @@ const styles = StyleSheet.create({
 	body: {
 		flexDirection: 'row',
 		justifyContent: 'center'
-	},
-	scannerIconBgStyle: { backgroundColor: 'transparent' },
-	securityIconBgStyle: { backgroundColor: 'transparent', marginTop: -3 }
+	}
 });
 
 export default SecurityHeader;

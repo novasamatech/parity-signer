@@ -80,7 +80,7 @@ const globalStackNavigationOptions = {
 	headerLeft: (): React.ReactElement => <HeaderLeft />,
 	headerLeftContainerStyle: {
 		height: headerHeight,
-		paddingLeft: horizontalPadding
+		paddingLeft: 8
 	},
 	headerRight: (): React.ReactElement => <SecurityHeader />,
 	headerRightContainerStyle: {
