@@ -36,6 +36,7 @@ export default class ButtonNewDerivation extends React.PureComponent<{
 				<Separator
 					shadow={true}
 					style={{ backgroundColor: 'transparent', marginVertical: 0 }}
+					shadowStyle={{ height: 16, marginTop: -16 }}
 				/>
 				<Text style={styles.icon}>//</Text>
 				<Text style={styles.textLabel}>{title}</Text>
@@ -48,12 +49,12 @@ const styles = StyleSheet.create({
 	body: {
 		alignItems: 'center',
 		backgroundColor: colors.background.app,
-		height: 72
+		height: 68
 	},
 	icon: {
 		...fontStyles.i_large,
 		color: colors.signal.main,
-		marginTop: 9
+		marginTop: 8
 	},
 	textLabel: {
 		...fontStyles.a_text,
