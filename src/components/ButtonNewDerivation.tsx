@@ -33,7 +33,10 @@ export default class ButtonNewDerivation extends React.PureComponent<{
 		const { onPress, title, testID } = this.props;
 		return (
 			<TouchableItem onPress={onPress} testID={testID} style={styles.body}>
-				<Separator shadow={true} style={{ backgroundColor: 'transparent' }} />
+				<Separator
+					shadow={true}
+					style={{ backgroundColor: 'transparent', marginVertical: 0 }}
+				/>
 				<Text style={styles.icon}>//</Text>
 				<Text style={styles.textLabel}>{title}</Text>
 			</TouchableItem>
@@ -45,11 +48,12 @@ const styles = StyleSheet.create({
 	body: {
 		alignItems: 'center',
 		backgroundColor: colors.background.app,
-		height: 76
+		height: 72
 	},
 	icon: {
 		...fontStyles.i_large,
-		color: colors.signal.main
+		color: colors.signal.main,
+		marginTop: 9
 	},
 	textLabel: {
 		...fontStyles.a_text,

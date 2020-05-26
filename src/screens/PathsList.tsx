@@ -92,7 +92,7 @@ function PathsList({
 	};
 
 	const renderGroupPaths = (pathsGroup: PathGroup): React.ReactElement => (
-		<View key={`group${pathsGroup.title}`} style={{ marginTop: 16 }}>
+		<View key={`group${pathsGroup.title}`} style={{ marginVertical: 16 }}>
 			<Separator
 				shadow={true}
 				style={{
