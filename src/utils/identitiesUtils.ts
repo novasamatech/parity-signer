@@ -45,6 +45,7 @@ import {
 	edgewareMetadata,
 	kulupuMetadata,
 	kusamaMetadata,
+	polkadotMetaData,
 	substrateDevMetadata,
 	westendMetadata
 } from 'constants/networkMetadata';
@@ -414,6 +415,8 @@ export const getMetadata = (networkKey: string): string => {
 			return edgewareMetadata;
 		case SubstrateNetworkKeys.KULUPU:
 			return kulupuMetadata;
+		case SubstrateNetworkKeys.POLKADOT:
+			return polkadotMetaData;
 		default:
 			return defaultMetaData;
 	}
