@@ -71,7 +71,8 @@ export const SubstrateNetworkKeys: {
 		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
 	KUSAMA_DEV:
 		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
-	POLKADOT: 'polkadot_reserved',
+	POLKADOT:
+		'0x0000000091b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a',
 	SUBSTRATE_DEV:
 		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 	WESTEND: '0x4a31f96525a77959d97e267c8fc3066ca333d9ade161720e1b7de8d35ccc6bd2'
@@ -167,7 +168,6 @@ const substrateNetworkBase: {
 		title: 'Kusama Development',
 		unit: 'KSM'
 	},
-	//TODO genesisHash and Metadata need to be added
 	[SubstrateNetworkKeys.POLKADOT]: {
 		color: '#e7007a',
 		decimals: 12,
