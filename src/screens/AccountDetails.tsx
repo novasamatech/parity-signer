@@ -15,9 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
@@ -75,8 +75,8 @@ function AccountDetails({
 	};
 
 	return (
-		<>
-			<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
+		<SafeAreaViewContainer>
+			<ScrollView contentContainerStyle={styles.scrollBody}>
 				<View style={styles.header}>
 					<AccountIcon
 						address={''}
@@ -120,9 +120,9 @@ function AccountDetails({
 						<UnknownAccountWarning />
 					)}
 				</View>
-			</SafeAreaScrollViewContainer>
+			</ScrollView>
 			<QrScannerTab />
-		</>
+		</SafeAreaViewContainer>
 	);
 }
 

@@ -15,13 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
 import { navigateToPathDerivation } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { PathGroup } from 'types/identityTypes';
@@ -129,8 +129,8 @@ function PathsList({
 			? ''
 			: `//${networkParams.pathId}`;
 	return (
-		<>
-			<SafeAreaScrollViewContainer testID={testIDs.PathsList.screen}>
+		<SafeAreaViewContainer>
+			<ScrollView testID={testIDs.PathsList.screen}>
 				<LeftScreenHeading
 					title={networkParams.title}
 					subtitle={subtitle}
@@ -142,7 +142,7 @@ function PathsList({
 						? renderSinglePath(pathsGroup)
 						: renderGroupPaths(pathsGroup)
 				)}
-			</SafeAreaScrollViewContainer>
+			</ScrollView>
 			<ButtonNewDerivation
 				testID={testIDs.PathsList.deriveButton}
 				title="Derive New Account"
@@ -155,7 +155,7 @@ function PathsList({
 				}
 			/>
 			<QrScannerTab />
-		</>
+		</SafeAreaViewContainer>
 	);
 }
 

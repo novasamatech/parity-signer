@@ -10,6 +10,7 @@ export default StyleSheet.create({
 		backgroundColor: colors.background.app,
 		flex: 1,
 		flexDirection: 'column',
-		overflow: 'hidden'
+		overflow: 'hidden',
+		paddingBottom: 0
 	}
 });

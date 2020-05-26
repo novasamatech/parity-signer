@@ -15,9 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
@@ -50,15 +50,15 @@ function LegacyAccountList({
 	);
 
 	return (
-		<>
-			<SafeAreaScrollViewContainer
+		<SafeAreaViewContainer>
+			<ScrollView
 				testID={testIDs.AccountListScreen.accountList}
 				style={styles.content}
 			>
 				{Array.from(accountsMap.entries()).map(renderAccountCard)}
-			</SafeAreaScrollViewContainer>
+			</ScrollView>
 			<QrScannerTab />
-		</>
+		</SafeAreaViewContainer>
 	);
 }
 

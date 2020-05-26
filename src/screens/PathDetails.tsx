@@ -16,9 +16,9 @@
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 // TODO use typescript 3.8's type import, Wait for prettier update.
@@ -108,8 +108,8 @@ export function PathDetailsView({
 	};
 
 	return (
-		<>
-			<SafeAreaScrollViewContainer testID={testIDs.PathDetail.screen}>
+		<SafeAreaViewContainer>
+			<ScrollView testID={testIDs.PathDetail.screen}>
 				<LeftScreenHeading
 					title="Public Address"
 					networkKey={formattedNetworkKey}
@@ -138,9 +138,9 @@ export function PathDetailsView({
 				<PathCard identity={currentIdentity} path={path} />
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
-			</SafeAreaScrollViewContainer>
+			</ScrollView>
 			<QrScannerTab />
-		</>
+		</SafeAreaViewContainer>
 	);
 }
 
