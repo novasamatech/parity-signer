@@ -15,10 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import {
+	SafeAreaScrollViewContainer,
+	SafeAreaViewContainer
+} from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
+import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 import AccountCard from 'components/AccountCard';
@@ -34,10 +38,11 @@ function LegacyAccountList({
 	};
 	const accountsMap = accounts.getAccounts();
 
-	const renderAccountCard = ([accountKey, account]: [
-		string,
-		Account
-	]): React.ReactElement => (
+	const renderAccountCard = ({
+		item: [accountKey, account]
+	}: {
+		item: [string, Account];
+	}): React.ReactElement => (
 		<AccountCard
 			address={account.address}
 			networkKey={account.networkKey}
@@ -49,20 +54,15 @@ function LegacyAccountList({
 	);
 
 	return (
-		<SafeAreaScrollViewContainer
-			testID={testIDs.AccountListScreen.accountList}
-			style={styles.content}
-		>
-			{Array.from(accountsMap.entries()).map(renderAccountCard)}
-		</SafeAreaScrollViewContainer>
+		<SafeAreaViewContainer testID={testIDs.AccountListScreen.accountList}>
+			<FlatList
+				bounces={false}
+				data={Array.from(accountsMap.entries())}
+				renderItem={renderAccountCard}
+				keyExtractor={(item: [string, Account]): string => item[0]}
+			/>
+		</SafeAreaViewContainer>
 	);
 }
 
 export default withAccountStore(LegacyAccountList);
-
-const styles = StyleSheet.create({
-	content: {
-		flex: 1,
-		paddingBottom: 40
-	}
-});
