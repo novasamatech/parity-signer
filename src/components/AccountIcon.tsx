@@ -90,7 +90,7 @@ export default function AccountIcon(props: {
 const styles = StyleSheet.create({
 	logo: {
 		height: 36,
-		marginHorizontal: 4,
+		marginHorizontal: 2,
 		width: 36
 	}
 });
