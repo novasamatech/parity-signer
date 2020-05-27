@@ -20,9 +20,8 @@ import {
 	Metadata,
 	TypeRegistry
 } from '@polkadot/types';
-import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 import Call from '@polkadot/types/generic/Call';
-import { u8aConcat } from '@polkadot/util';
+import { hexToU8a, u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import 'jest';
 
@@ -66,17 +65,6 @@ const RN_TX_REQUEST_RAW_DATA =
 	'5448495320495320535041525441210' + // THIS IS SPARTA!
 	'ec11ec11ec11ec';
 
-/* eslint-disable prettier/prettier */
-const SIGN_MSG_TEST = new Uint8Array([
-    0,  0,  1,  0,  0,
-    83,   1,   3, 118,   2, 230, 253,  72, 157,  97,
-    235,  53, 198,  82,  55, 106, 143, 113, 176, 252,
-    203, 114,  24, 152, 116, 223,  74, 190, 250, 136,
-    232, 158, 164,   7, 118,  84,  72,  73,  83,  32,
-    73,  83,  32,  83,  80,  65,  82,  84,  65,  33
-  ]);
-/* eslint-enable prettier/prettier */
-
 const SIGNER_PAYLOAD_TEST = {
 	address: KUSAMA_ADDRESS,
 	blockHash:
@@ -100,7 +88,8 @@ const SIGN_TX_TEST = u8aConcat(
 	decodeAddress(KUSAMA_ADDRESS),
 	new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, {
 		version: 4
-	}).toU8a()
+	}).toU8a(),
+	new Uint8Array(hexToU8a(SubstrateNetworkKeys.KUSAMA))
 );
 
 /* eslint-disable-next-line jest/no-disabled-tests */
@@ -191,26 +180,14 @@ describe('decoders', () => {
 	});
 
 	describe('UOS parsing', () => {
-		// after stripping
-		it('from Substrate UOS message', async () => {
-			const unsignedData = await constructDataFromBytes(SIGN_MSG_TEST);
-
-			expect(unsignedData).toBeDefined();
-			expect(
-				(unsignedData as SubstrateCompletedParsedData).data.crypto
-			).toEqual('sr25519');
-			expect((unsignedData as SubstrateCompletedParsedData).data.data).toEqual(
-				'THIS IS SPARTA!'
-			);
-			expect(
-				(unsignedData as SubstrateCompletedParsedData).data.account
-			).toEqual(KUSAMA_ADDRESS);
-		});
-
 		it('from Substrate UOS Payload Mortal', async () => {
 			const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
-			const payload = (unsignedData as SubstrateCompletedParsedData).data
-				.data as ExtrinsicPayload;
+			const rawPayload = (unsignedData as SubstrateCompletedParsedData).data
+				.data;
+
+			const payload = registry.createType('ExtrinsicPayload', rawPayload, {
+				version: 4
+			});
 
 			expect(payload.era.toHex()).toEqual(SIGNER_PAYLOAD_TEST.era.toHex());
 			expect(payload.method.toHex()).toEqual(SIGNER_PAYLOAD_TEST.method);

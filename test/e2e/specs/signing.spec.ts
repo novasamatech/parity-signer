@@ -52,9 +52,9 @@ const testEthereumMessage = async (): Promise<void> => {
 describe('Signing test', () => {
 	testRecoverIdentity();
 
-	describe('Substrate Signing Test', () => {
+	describe('Kusama Signing Test', () => {
 		it('should sign the set remarks request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsic);
+			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicKusama);
 			await testSignedTx();
 		});
 
@@ -65,12 +65,47 @@ describe('Signing test', () => {
 		});
 
 		it('should sign transfer request', async () => {
-			await launchWithScanRequest(ScanTestRequest.TransferExtrinsic);
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
 			await testSignedTx();
 		});
 
 		it('should sign multipart request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPart);
+			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
+			await testMultiPartExtrinsic();
+		});
+	});
+
+	describe('Polkadot Signing Test', () => {
+		it('generate Polkadot account', async () => {
+			await tapBack();
+			const PolkadotNetworkButtonIndex =
+				Main.networkButton + EthereumNetworkKeys.POLKADOT;
+			await testTap(testIDs.Main.addNewNetworkButton);
+			await testScrollAndTap(
+				PolkadotNetworkButtonIndex,
+				testIDs.Main.chooserScreen
+			);
+			await testVisible(PathDetail.screen);
+		});
+
+		it('should sign the set remarks request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicPolkadot);
+			await testSignedTx();
+		});
+
+		it('does not need sign again after pin input', async () => {
+			await tapBack();
+			await testTap(SecurityHeader.scanButton);
+			await testVisible(SignedTx.qrView);
+		});
+
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
+			await testSignedTx();
+		});
+
+		it('should sign multipart request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
 			await testMultiPartExtrinsic();
 		});
 	});
