@@ -187,7 +187,7 @@ function IdentitiesSwitch({
 		// if no identity or the only one we have is the selected one
 
 		if (!identities.length || (identities.length === 1 && currentIdentity))
-			return <View style={{ paddingTop: 8 }} />;
+			return <Separator style={{ height: 0, marginVertical: 4 }} />;
 
 		const identitiesToShow = currentIdentity
 			? identities.filter(

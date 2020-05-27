@@ -68,40 +68,35 @@ function SignedTxView({
 	);
 
 	return (
-		<SafeAreaScrollViewContainer
-			contentContainerStyle={{ paddingBottom: 40 }}
-			style={styles.body}
-		>
+		<SafeAreaScrollViewContainer style={styles.body}>
 			<Text style={styles.topTitle}>Scan Signature</Text>
 			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
 				<QrView data={data} />
 			</View>
 
 			<Text style={[fontStyles.t_big, styles.bodyContent]}>
-				{`You are about to send the following ${
-					isEthereum ? 'transaction' : 'extrinsic'
+				{`You are about to sign ${
+					isEthereum ? 'the following transaction' : 'an extrinsic'
 				}`}
 			</Text>
-			<View style={styles.bodyContent}>
-				<CompatibleCard
-					account={sender}
-					accountsStore={accounts}
-					titlePrefix={'from: '}
-				/>
-				{isEthereum && (
-					<View style={{ marginTop: 16 }}>
-						<TxDetailsCard
-							style={{ marginBottom: 20 }}
-							description={strings.INFO_ETH_TX}
-							value={value}
-							gas={gas}
-							gasPrice={gasPrice}
-						/>
-						<Text style={styles.title}>Recipient</Text>
-						<CompatibleCard account={recipient} accountsStore={accounts} />
-					</View>
-				)}
-			</View>
+			<CompatibleCard
+				account={sender}
+				accountsStore={accounts}
+				titlePrefix={'from:'}
+			/>
+			{isEthereum && (
+				<View style={[styles.bodyContent, { marginTop: 16 }]}>
+					<TxDetailsCard
+						style={{ marginBottom: 20 }}
+						description={strings.INFO_ETH_TX}
+						value={value}
+						gas={gas}
+						gasPrice={gasPrice}
+					/>
+					<Text style={styles.title}>Recipient</Text>
+					<CompatibleCard account={recipient} accountsStore={accounts} />
+				</View>
+			)}
 		</SafeAreaScrollViewContainer>
 	);
 }

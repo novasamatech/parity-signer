@@ -34,7 +34,12 @@ export default function AccountPrefixedTitle({
 					numberOfLines={1}
 					style={[
 						fontStyles.t_codeS,
-						{ color: colors.signal.main, marginRight: 8, marginTop: 5 }
+						{
+							alignSelf: 'flex-end',
+							color: colors.signal.main,
+							marginBottom: 1,
+							marginRight: 4
+						}
 					]}
 				>
 					{titlePrefix}
