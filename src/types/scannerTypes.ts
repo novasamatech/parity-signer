@@ -1,4 +1,3 @@
-import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 import { Point, Size } from 'react-native-camera/types';
 
 export interface TxRequestData {
@@ -40,14 +39,14 @@ export type CompletedParsedData =
 
 export type SubstrateCompletedParsedData = {
 	data: {
-		crypto: 'ed25519' | 'sr25519' | null;
-		data: ExtrinsicPayload | Uint8Array | string;
 		account: string;
+		crypto: 'ed25519' | 'sr25519' | null;
+		data: Uint8Array;
+		genesisHash: string;
 	};
 	action: string; //"signTransaction"
 	oversized: boolean;
 	isHash: boolean;
-	preHash: ExtrinsicPayload;
 };
 
 export type SubstrateMultiParsedData = {

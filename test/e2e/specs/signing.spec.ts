@@ -14,7 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { EthereumNetworkKeys } from 'constants/networkSpecs';
+import {
+	EthereumNetworkKeys,
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
 import {
 	launchWithScanRequest,
 	pinCode,
@@ -52,9 +56,9 @@ const testEthereumMessage = async (): Promise<void> => {
 describe('Signing test', () => {
 	testRecoverIdentity();
 
-	describe('Substrate Signing Test', () => {
+	describe('Kusama Signing Test', () => {
 		it('should sign the set remarks request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsic);
+			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicKusama);
 			await testSignedTx();
 		});
 
@@ -65,12 +69,42 @@ describe('Signing test', () => {
 		});
 
 		it('should sign transfer request', async () => {
-			await launchWithScanRequest(ScanTestRequest.TransferExtrinsic);
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
 			await testSignedTx();
 		});
 
 		it('should sign multipart request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPart);
+			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
+			await testMultiPartExtrinsic();
+		});
+	});
+
+	describe('Polkadot Signing Test', () => {
+		it('generate Polkadot account', async () => {
+			await tapBack();
+			const PolkadotNetworkButtonIndex =
+				Main.networkButton +
+				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.POLKADOT].pathId;
+			await testTap(testIDs.Main.addNewNetworkButton);
+			await testScrollAndTap(
+				PolkadotNetworkButtonIndex,
+				testIDs.Main.chooserScreen
+			);
+			await testVisible(PathDetail.screen);
+		});
+
+		it('should sign the set remarks request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicPolkadot);
+			await testSignedTx();
+		});
+
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
+			await testSignedTx();
+		});
+
+		it('should sign multipart request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
 			await testMultiPartExtrinsic();
 		});
 	});
