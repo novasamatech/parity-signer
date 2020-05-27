@@ -92,7 +92,7 @@ function PathsList({
 	};
 
 	const renderGroupPaths = (pathsGroup: PathGroup): React.ReactElement => (
-		<View key={`group${pathsGroup.title}`} style={{ marginVertical: 16 }}>
+		<View key={`group${pathsGroup.title}`} style={{ marginTop: 24 }}>
 			<Separator
 				shadow={true}
 				style={{
@@ -124,16 +124,11 @@ function PathsList({
 		</View>
 	);
 
-	const subtitle =
-		networkKey === UnknownNetworkKeys.UNKNOWN
-			? ''
-			: `//${networkParams.pathId}`;
 	return (
 		<SafeAreaViewContainer>
 			<ScrollView testID={testIDs.PathsList.screen}>
 				<LeftScreenHeading
 					title={networkParams.title}
-					subtitle={subtitle}
 					hasSubtitleIcon={true}
 					networkKey={networkKey}
 				/>
@@ -142,6 +137,7 @@ function PathsList({
 						? renderSinglePath(pathsGroup)
 						: renderGroupPaths(pathsGroup)
 				)}
+				<Separator style={{ backgroundColor: 'transparent' }} />
 			</ScrollView>
 			<ButtonNewDerivation
 				testID={testIDs.PathsList.deriveButton}

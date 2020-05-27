@@ -89,9 +89,8 @@ export default function AccountIcon(props: {
 
 const styles = StyleSheet.create({
 	logo: {
-		alignItems: 'center',
-		height: 40,
-		justifyContent: 'center',
-		width: 40
+		height: 36,
+		marginHorizontal: 4,
+		width: 36
 	}
 });
