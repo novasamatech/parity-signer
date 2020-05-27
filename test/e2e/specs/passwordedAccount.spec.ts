@@ -3,6 +3,7 @@ import testIDs from 'e2e/testIDs';
 import {
 	launchWithScanRequest,
 	pinCode,
+	tapBack,
 	testExist,
 	testInput,
 	testInputWithDone,
@@ -37,6 +38,13 @@ describe('Load test', () => {
 		await launchWithScanRequest(ScanTestRequest.passwordedAccountExtrinsic);
 		await testTap(SecurityHeader.scanButton);
 		await testInput(IdentityPin.unlockPinInput, pinCode);
+		await testInputWithDone(IdentityPin.passwordInput, password);
+		await testVisible(SignedTx.qrView);
+	});
+
+	it('does only need password again in the second try', async () => {
+		await tapBack();
+		await testTap(SecurityHeader.scanButton);
 		await testInputWithDone(IdentityPin.passwordInput, password);
 		await testVisible(SignedTx.qrView);
 	});

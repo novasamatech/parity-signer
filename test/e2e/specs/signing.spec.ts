@@ -14,7 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {EthereumNetworkKeys, SUBSTRATE_NETWORK_LIST, SubstrateNetworkKeys} from 'constants/networkSpecs';
+import {
+	EthereumNetworkKeys,
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
 import {
 	launchWithScanRequest,
 	pinCode,
@@ -79,7 +83,8 @@ describe('Signing test', () => {
 		it('generate Polkadot account', async () => {
 			await tapBack();
 			const PolkadotNetworkButtonIndex =
-				Main.networkButton + SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.POLKADOT].pathId;
+				Main.networkButton +
+				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.POLKADOT].pathId;
 			await testTap(testIDs.Main.addNewNetworkButton);
 			await testScrollAndTap(
 				PolkadotNetworkButtonIndex,
@@ -91,12 +96,6 @@ describe('Signing test', () => {
 		it('should sign the set remarks request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicPolkadot);
 			await testSignedTx();
-		});
-
-		it('does not need sign again after pin input', async () => {
-			await tapBack();
-			await testTap(SecurityHeader.scanButton);
-			await testVisible(SignedTx.qrView);
 		});
 
 		it('should sign transfer request', async () => {

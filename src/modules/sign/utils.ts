@@ -84,7 +84,7 @@ export async function processBarCode(
 		if (seedRef === undefined || !seedRef.isValid()) {
 			if (sender.hasPassword) {
 				//need unlock with password
-				[password] = await unlockSeedPhraseWithPassword(
+				password = await unlockSeedPhraseWithPassword(
 					navigation,
 					false,
 					senderIdentity
@@ -93,6 +93,14 @@ export async function processBarCode(
 				await unlockSeedPhrase(navigation, false, senderIdentity);
 			}
 			seedRef = getSeedRef(sender.encryptedSeed, seedRefs)!;
+		} else {
+			if (sender.hasPassword) {
+				password = await unlockSeedPhraseWithPassword(
+					navigation,
+					true,
+					senderIdentity
+				);
+			}
 		}
 		// 3. sign data
 		if (isEthereum) {
@@ -112,6 +120,7 @@ export async function processBarCode(
 	}
 
 	try {
+		console.log('txrequest raw is', txRequestData.rawData);
 		await parseQrData();
 		if (scannerStore.getUnsigned() === null) return;
 		await scannerStore.setData(accounts);
