@@ -266,13 +266,10 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setBusy();
 
 		const address = signRequest.data.account;
-		const message = signRequest.data.data;
+		let message = '';
 		let isHash = false;
 		let isOversized = false;
 		let dataToSign = '';
-		const messageString = message?.toString();
-		if (messageString === undefined)
-			throw new Error('No message data to sign.');
 
 		if (isSubstrateCompletedParsedData(signRequest)) {
 			// only Substrate payload has crypto field
@@ -284,7 +281,9 @@ export default class ScannerStore extends Container<ScannerState> {
 			const [offset] = compactFromU8a(rawPayload);
 			const payload = rawPayload.subarray(offset);
 			dataToSign = await blake2b(u8aToHex(payload, -1, false));
+			message = dataToSign;
 		} else {
+			message = signRequest.data.data;
 			dataToSign = await ethSign(message.toString());
 		}
 

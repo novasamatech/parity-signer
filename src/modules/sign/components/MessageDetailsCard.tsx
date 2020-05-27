@@ -34,7 +34,9 @@ export default function MessageDetailsCard({
 }): React.ReactElement {
 	return (
 		<View style={[styles.messageContainer, style]}>
-			<Text style={styles.titleText}>{isHash ? 'Hash' : 'Message'}</Text>
+			<Text style={styles.titleText}>
+				{isHash ? 'Message Hash' : 'Message'}
+			</Text>
 			{isHash ? (
 				<Text style={styles.hashText}>{message}</Text>
 			) : (
