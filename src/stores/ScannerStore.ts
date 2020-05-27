@@ -15,41 +15,43 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import {
+	compactFromU8a,
 	hexStripPrefix,
 	hexToU8a,
 	isU8a,
-	u8aToHex,
-	u8aConcat
+	u8aConcat,
+	u8aToHex
 } from '@polkadot/util';
 import { Container } from 'unstated';
-import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
-import AccountsStore from 'stores/AccountsStore';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
-import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
-import { isAscii } from 'utils/strings';
-import {
-	brainWalletSign,
-	decryptData,
-	keccak,
-	ethSign,
-	substrateSign
-} from 'utils/native';
-import transaction, { Transaction } from 'utils/transaction';
-import {
-	constructDataFromBytes,
-	asciiToHex,
-	encodeNumber
-} from 'utils/decoders';
+import AccountsStore from 'stores/AccountsStore';
 import { Account, FoundAccount } from 'types/identityTypes';
-import { emptyAccount } from 'utils/account';
 import {
 	CompletedParsedData,
 	EthereumParsedData,
 	isEthereumCompletedParsedData,
 	isMultipartData,
+	isSubstrateCompletedParsedData,
 	SubstrateCompletedParsedData
 } from 'types/scannerTypes';
+import { emptyAccount } from 'utils/account';
+import {
+	asciiToHex,
+	constructDataFromBytes,
+	encodeNumber
+} from 'utils/decoders';
+import {
+	blake2b,
+	brainWalletSign,
+	decryptData,
+	ethSign,
+	keccak,
+	substrateSign
+} from 'utils/native';
+import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
+import { isAscii } from 'utils/strings';
+import transaction, { Transaction } from 'utils/transaction';
 
 type TXRequest = Record<string, any>;
 
@@ -70,7 +72,6 @@ type ScannerState = {
 	missedFrames: Array<number>;
 	multipartData: null | Array<Uint8Array | null>;
 	multipartComplete: boolean;
-	prehash: GenericExtrinsicPayload | null;
 	recipient: FoundAccount | null;
 	sender: FoundAccount | null;
 	signedData: string;
@@ -92,7 +93,6 @@ const DEFAULT_STATE = Object.freeze({
 	missedFrames: [],
 	multipartComplete: false,
 	multipartData: null,
-	prehash: null,
 	recipient: null,
 	sender: null,
 	signedData: '',
@@ -144,14 +144,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		await this.setState({
 			unsignedData: parsedData
 		});
-
-		// set payload before it got hashed.
-		// signature will be generated from the hash, but we still want to display it.
-		if (parsedData.hasOwnProperty('preHash')) {
-			this.setPrehashPayload(
-				(parsedData as SubstrateCompletedParsedData).preHash
-			);
-		}
 	}
 
 	async integrateMultiPartData(): Promise<void> {
@@ -275,22 +267,25 @@ export default class ScannerStore extends Container<ScannerState> {
 
 		const address = signRequest.data.account;
 		const message = signRequest.data.data;
-		const crypto = (signRequest as SubstrateCompletedParsedData).data?.crypto;
-		const isHash =
-			(signRequest as SubstrateCompletedParsedData)?.isHash || false;
-		const isOversized =
-			(signRequest as SubstrateCompletedParsedData)?.oversized || false;
-
+		let isHash = false;
+		let isOversized = false;
 		let dataToSign = '';
 		const messageString = message?.toString();
 		if (messageString === undefined)
 			throw new Error('No message data to sign.');
 
-		if (crypto === 'sr25519' || crypto === 'ed25519') {
+		if (isSubstrateCompletedParsedData(signRequest)) {
 			// only Substrate payload has crypto field
-			dataToSign = message!.toString();
+			if (signRequest.data.crypto !== 'sr25519')
+				throw new Error('currently Parity Signer only support sr25519');
+			isHash = signRequest.isHash;
+			isOversized = signRequest.oversized;
+			const rawPayload = signRequest.data.data;
+			const [offset] = compactFromU8a(rawPayload);
+			const payload = rawPayload.subarray(offset);
+			dataToSign = await blake2b(u8aToHex(payload, -1, false));
 		} else {
-			dataToSign = await ethSign(message!.toString());
+			dataToSign = await ethSign(message.toString());
 		}
 
 		const sender = accountsStore.getAccountByAddress(address);
@@ -342,11 +337,12 @@ export default class ScannerStore extends Container<ScannerState> {
 			// For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
 			dataToSign = await keccak(txRequest.data.rlp);
 		} else {
-			tx = txRequest.data.data;
-			networkKey = (txRequest.data
-				.data as ExtrinsicPayload)?.genesisHash.toHex();
+			const payloadU8a = txRequest.data.data;
+			const [offset] = compactFromU8a(payloadU8a);
+			tx = payloadU8a;
+			networkKey = txRequest.data.genesisHash;
 			recipientAddress = txRequest.data.account;
-			dataToSign = txRequest.data.data;
+			dataToSign = payloadU8a.subarray(offset);
 		}
 
 		const sender = await accountsStore.getById({
@@ -568,15 +564,5 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	getMissedFrames(): number[] {
 		return this.state.missedFrames;
-	}
-
-	getPrehashPayload(): GenericExtrinsicPayload | null {
-		return this.state.prehash;
-	}
-
-	setPrehashPayload(prehash: GenericExtrinsicPayload): void {
-		this.setState({
-			prehash
-		});
 	}
 }
