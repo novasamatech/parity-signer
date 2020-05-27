@@ -16,9 +16,9 @@
 
 export default {
 	background: {
-		app: '#1E1E1E',
+		app: '#171818',
 		button: '#F1F1F1',
-		card: '#333333',
+		card: '#262626',
 		os: '#000000'
 	},
 	border: {
@@ -28,10 +28,10 @@ export default {
 	},
 	signal: {
 		error: '#D73400',
-		main: '#FF1864'
+		main: '#FF4077'
 	},
 	text: {
-		faded: '#9a9a9a',
+		faded: '#9A9A9A',
 		main: '#F2F2F2'
 	}
 };

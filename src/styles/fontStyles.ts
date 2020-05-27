@@ -73,7 +73,8 @@ export default StyleSheet.create({
 	t_codeS: {
 		color: colors.text.main,
 		fontFamily: fonts.robotoMono,
-		fontSize: 11
+		fontSize: 11,
+		letterSpacing: 0.2
 	},
 	t_important: {
 		color: colors.text.main,
@@ -103,7 +104,7 @@ export default StyleSheet.create({
 		color: colors.signal.main,
 		fontFamily: fonts.light,
 		fontSize: 20,
-		letterSpacing: 0.1,
+		letterSpacing: 0.7,
 		lineHeight: 26,
 		minHeight: 140,
 		paddingHorizontal: 16,
