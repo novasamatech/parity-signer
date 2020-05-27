@@ -93,7 +93,7 @@ const substrateNetworkBase: {
 	[key: string]: Partial<SubstrateNetworkParams>;
 } = {
 	[SubstrateNetworkKeys.CENTRIFUGE]: {
-		color: '#fcc367',
+		color: '#FCC367',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
 		logo: require('res/img/logos/Centrifuge.png'),
@@ -104,7 +104,7 @@ const substrateNetworkBase: {
 		unit: 'RAD'
 	},
 	[SubstrateNetworkKeys.CENTRIFUGE_AMBER]: {
-		color: '#fcc367',
+		color: '#7C6136',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE_AMBER,
 		logo: require('res/img/logos/Centrifuge.png'),
@@ -115,7 +115,7 @@ const substrateNetworkBase: {
 		unit: 'ARAD'
 	},
 	[SubstrateNetworkKeys.EDGEWARE]: {
-		color: '#0a95df',
+		color: '#0B95E0',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.EDGEWARE,
 		logo: require('res/img/logos/Edgeware.png'),
@@ -126,7 +126,7 @@ const substrateNetworkBase: {
 		unit: 'EDG'
 	},
 	[SubstrateNetworkKeys.KULUPU]: {
-		color: '#0effee',
+		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
 		order: 5,
@@ -136,7 +136,7 @@ const substrateNetworkBase: {
 		unit: 'KULU'
 	},
 	[SubstrateNetworkKeys.KUSAMA]: {
-		color: '#e6007a',
+		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('res/img/logos/Kusama.png'),
@@ -147,7 +147,7 @@ const substrateNetworkBase: {
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_CC2]: {
-		color: '#e6007a',
+		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('res/img/logos/Kusama.png'),
@@ -158,7 +158,7 @@ const substrateNetworkBase: {
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {
-		color: '#A60037',
+		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		order: 99,
@@ -169,7 +169,7 @@ const substrateNetworkBase: {
 	},
 	//TODO genesisHash and Metadata need to be added
 	[SubstrateNetworkKeys.POLKADOT]: {
-		color: '#e7007a',
+		color: '#E6027A',
 		decimals: 12,
 		genesisHash: null,
 		logo: require('res/img/logos/Polkadot.png'),
@@ -180,7 +180,7 @@ const substrateNetworkBase: {
 		unit: 'DOT'
 	},
 	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#ff8c00',
+		color: '#18FFB2',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
 		order: 100,
@@ -190,7 +190,7 @@ const substrateNetworkBase: {
 		unit: 'UNIT'
 	},
 	[SubstrateNetworkKeys.WESTEND]: {
-		color: '#ffcf3d',
+		color: '#660D35',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.WESTEND,
 		logo: require('res/img/logos/Polkadot.png'),
@@ -204,14 +204,14 @@ const substrateNetworkBase: {
 
 const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 	[EthereumNetworkKeys.FRONTIER]: {
-		color: '#64A2F4',
+		color: '#8B94B3',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
 		order: 101,
 		secondaryColor: colors.background.card,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.CLASSIC]: {
-		color: '#319C7C',
+		color: '#1a4d33',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
 		logo: require('res/img/logos/Ethereum_Classic.png'),
 		order: 102,
@@ -236,7 +236,7 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 };
 
 const ethereumDefaultValues = {
-	color: '#2968C7',
+	color: '#434875',
 	logo: require('res/img/logos/Ethereum.png'),
 	protocol: NetworkProtocols.ETHEREUM,
 	secondaryColor: colors.background.card
