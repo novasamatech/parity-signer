@@ -17,6 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -33,7 +34,6 @@ import {
 } from 'utils/alertUtils';
 import Button from 'components/Button';
 import { useNewSeedRef } from 'utils/seedRefHooks';
-import { Container } from 'modules/unlock/components/Container';
 
 function IdentityBackup({
 	navigation,
@@ -85,7 +85,7 @@ function IdentityBackup({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<Container>
+		<SafeAreaViewContainer>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
@@ -121,7 +121,7 @@ function IdentityBackup({
 					aboveKeyboard
 				/>
 			)}
-		</Container>
+		</SafeAreaViewContainer>
 	);
 }
 

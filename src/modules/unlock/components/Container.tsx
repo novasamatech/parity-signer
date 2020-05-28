@@ -14,11 +14,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { KeyboardAvoidingView, Platform } from 'react-native';
 
 import styles from '../styles';
 
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 
@@ -30,17 +28,5 @@ export function KeyboardAwareContainer(props: any): React.ReactElement {
 			style={styles.body}
 			testID={testIDs.IdentityPin.scrollScreen}
 		/>
-	);
-}
-
-export function Container(props: any): React.ReactElement {
-	return (
-		<SafeAreaViewContainer>
-			<KeyboardAvoidingView
-				{...props}
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={styles.body}
-			/>
-		</SafeAreaViewContainer>
 	);
 }
