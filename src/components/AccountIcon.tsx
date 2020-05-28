@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
 	logo: {
 		height: 36,
 		marginHorizontal: 2,
+		opacity: 0.7,
 		width: 36
 	}
 });

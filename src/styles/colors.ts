@@ -17,7 +17,7 @@
 export default {
 	background: {
 		app: '#171818',
-		button: '#F1F1F1',
+		button: 'rgba(255,255, 255, 0.7)',
 		card: '#262626',
 		os: '#000000'
 	},
@@ -32,6 +32,6 @@ export default {
 	},
 	text: {
 		faded: '#9A9A9A',
-		main: '#F2F2F2'
+		main: 'rgba(255,255, 255, 0.7)'
 	}
 };
