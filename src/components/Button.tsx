@@ -23,7 +23,8 @@ import {
 	TouchableNativeFeedback,
 	TouchableNativeFeedbackProps,
 	TouchableOpacity,
-	ViewStyle
+	ViewStyle,
+	View
 } from 'react-native';
 
 import colors from 'styles/colors';
@@ -82,18 +83,19 @@ export default class Button extends React.PureComponent<{
 				disabled={disabled}
 				onPress={onPress}
 				testID={testID}
-				style={[finalButtonStyles, style]}
 			>
-				<Text
-					style={[
-						fontStyles.h1,
-						styles.buttonText,
-						finalTextStyles,
-						textStyles
-					]}
-				>
-					{title}
-				</Text>
+				<View style={[finalButtonStyles, style]}>
+					<Text
+						style={[
+							fontStyles.h1,
+							styles.buttonText,
+							finalTextStyles,
+							textStyles
+						]}
+					>
+						{title}
+					</Text>
+				</View>
 			</Touchable>
 		);
 	}
