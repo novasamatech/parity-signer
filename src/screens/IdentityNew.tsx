@@ -126,18 +126,18 @@ function IdentityNew({
 			/>
 			<View style={styles.btnBox}>
 				<Button
-					title="Create"
+					title="Recover"
+					testID={testIDs.IdentityNew.recoverButton}
+					onPress={onRecoverConfirm}
+					small={true}
+				/>
+				<Button
+					title="or create new identity"
 					onPress={(): void => {
 						setIsRecover(false);
 					}}
 					small={true}
 					onlyText={true}
-				/>
-				<Button
-					title="Recover Identity"
-					testID={testIDs.IdentityNew.recoverButton}
-					onPress={onRecoverConfirm}
-					small={true}
 				/>
 			</View>
 		</>
@@ -146,16 +146,16 @@ function IdentityNew({
 	const renderCreateView = (): React.ReactElement => (
 		<View style={styles.btnBox}>
 			<Button
-				title="Recover Identity"
-				onPress={(): void => setIsRecover(true)}
-				small={true}
-				onlyText={true}
-			/>
-			<Button
 				title="Create"
 				testID={testIDs.IdentityNew.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
+			/>
+			<Button
+				title="or recover existing identity"
+				onPress={(): void => setIsRecover(true)}
+				small={true}
+				onlyText={true}
 			/>
 		</View>
 	);
@@ -183,9 +183,7 @@ const styles = StyleSheet.create({
 		overflow: 'hidden'
 	},
 	btnBox: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
+		alignContent: 'center',
 		marginHorizontal: 16,
 		marginTop: 32
 	}
