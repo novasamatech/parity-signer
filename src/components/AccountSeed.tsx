@@ -182,12 +182,13 @@ const styles = StyleSheet.create({
 		borderColor: colors.border.signal
 	},
 	suggestion: {
-		padding: 14,
+		padding: 12,
 		paddingVertical: 4
 	},
 	suggestionText: {
 		color: colors.signal.main,
-		fontFamily: fonts.regular
+		fontFamily: fonts.regular,
+		letterSpacing: fontStyles.t_seed.letterSpacing
 	},
 	suggestions: {
 		alignItems: 'center',
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
 		borderColor: colors.background.card,
 		borderWidth: 0.5,
 		flexDirection: 'row',
-		height: 40,
+		height: 32,
 		marginHorizontal: 16,
 		marginTop: -8,
 		overflow: 'hidden'

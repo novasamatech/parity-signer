@@ -104,10 +104,10 @@ export default StyleSheet.create({
 		borderWidth: 0.8,
 		color: colors.signal.main,
 		fontFamily: fonts.light,
-		fontSize: 20,
+		fontSize: 18,
 		letterSpacing: 0.7,
-		lineHeight: 26,
-		minHeight: 140,
+		lineHeight: 23,
+		minHeight: 100,
 		paddingHorizontal: 16,
 		paddingVertical: 10
 	}
