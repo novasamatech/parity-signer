@@ -14,7 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { hexStripPrefix, hexToU8a, u8aToHex } from '@polkadot/util';
+import {
+	compactFromU8a,
+	hexStripPrefix,
+	hexToU8a,
+	u8aToHex
+} from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
@@ -24,6 +29,7 @@ import {
 	SubstrateCompletedParsedData,
 	SubstrateMultiParsedData
 } from 'types/scannerTypes';
+import { blake2b } from 'utils/native';
 
 /*
   Example Full Raw Data
@@ -165,27 +171,39 @@ export async function constructDataFromBytes(
 					const rawPayload = hexToU8a(hexPayload);
 					data.data.genesisHash = genesisHash;
 					const isOversized = rawPayload.length > 256;
-					let network;
+					const network = SUBSTRATE_NETWORK_LIST[genesisHash];
+					if (!network) {
+						throw new Error(
+							`Signer does not currently support a chain with genesis hash: ${genesisHash}`
+						);
+					}
+
 					switch (secondByte) {
 						case '00': // sign mortal extrinsic
 						case '02': // sign immortal extrinsic
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;
-							data.data.data = rawPayload;
-
-							network = SUBSTRATE_NETWORK_LIST[genesisHash];
-							if (!network) {
-								throw new Error(
-									`Signer does not currently support a chain with genesis hash: ${genesisHash}`
-								);
-							}
-
+							const [offset] = compactFromU8a(rawPayload);
+							const payload = rawPayload.subarray(offset);
+							data.data.data = isOversized
+								? await blake2b(u8aToHex(payload, -1, false))
+								: rawPayload;
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,
 								network.prefix
 							); // encode to the prefix;
 
+							break;
+						case '01': // data is a hash
+							data.action = 'signData';
+							data.oversized = false;
+							data.isHash = true;
+							data.data.data = hexPayload;
+							data.data.account = encodeAddress(
+								publicKeyAsBytes,
+								network.prefix
+							); // default to Kusama
 							break;
 						default:
 							break;
