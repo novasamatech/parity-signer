@@ -27,6 +27,8 @@ import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
 import styles from 'modules/sign/styles';
 import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
+import Separator from 'components/Separator';
+import fontStyles from 'styles/fontStyles';
 
 interface Props extends NavigationAccountScannerProps<'SignedMessage'> {
 	sender: FoundAccount;
@@ -63,20 +65,32 @@ function SignedMessageView({
 
 	return (
 		<SafeAreaScrollViewContainer>
-			<Text style={styles.topTitle}>Signed Message</Text>
+			<Text style={[styles.topTitle, { marginBottom: 16 }]}>
+				Signed Message
+			</Text>
+			<CompatibleCard
+				titlePrefix={'from:'}
+				account={sender}
+				accountsStore={accounts}
+			/>
+			<MessageDetailsCard
+				isHash={isHash ?? false}
+				message={message}
+				data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
+				style={styles.bodyContent}
+			/>
+			<Separator
+				shadow={true}
+				style={{
+					height: 0,
+					marginVertical: 24
+				}}
+			/>
+			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+				{'Scan to publish'}
+			</Text>
 			<View testID={testIDs.SignedMessage.qrView}>
 				<QrView data={data} />
-			</View>
-			<View style={styles.bodyContent}>
-				<Text style={styles.title}>From Account</Text>
-				<CompatibleCard account={sender} accountsStore={accounts} />
-				<MessageDetailsCard
-					isHash={isHash ?? false}
-					message={message}
-					data={
-						isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()
-					}
-				/>
 			</View>
 		</SafeAreaScrollViewContainer>
 	);
