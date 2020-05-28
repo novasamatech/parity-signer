@@ -184,7 +184,6 @@ const styles = StyleSheet.create({
 	},
 	btnBox: {
 		alignContent: 'center',
-		marginHorizontal: 16,
 		marginTop: 32
 	}
 });

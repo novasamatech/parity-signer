@@ -16,7 +16,7 @@
 
 export default {
 	background: {
-		app: '#161616',
+		app: '#151515',
 		button: 'C0C0C0',
 		card: '#262626',
 		os: '#000000'
