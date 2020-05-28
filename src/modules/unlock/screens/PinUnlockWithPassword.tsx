@@ -15,7 +15,7 @@
 
 import React, { useState } from 'react';
 
-import Container, { AvoidKeyboard } from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
@@ -65,41 +65,43 @@ function PinUnlockWithPassword({
 	}
 
 	return (
-		<AvoidKeyboard>
-			<Container>
-				<ScreenHeading
-					title={t.title.pinUnlock}
-					error={state.pinMismatch || state.pinTooShort}
-					subtitle={getSubtitle(state, true)}
-				/>
-				{!route.params.isSeedRefValid && (
-					<PinInput
-						label={t.pinLabel}
-						autoFocus
-						testID={testIDs.IdentityPin.unlockPinInput}
-						returnKeyType="done"
-						onChangeText={onPinInputChange('pin', updateState)}
-						onSubmitEditing={(): void => setFocusPassword(true)}
-						value={state.pin}
-					/>
-				)}
+		<KeyboardAwareContainer
+			contentContainerStyle={{
+				flexGrow: 1
+			}}
+		>
+			<ScreenHeading
+				title={t.title.pinUnlock}
+				error={state.pinMismatch || state.pinTooShort}
+				subtitle={getSubtitle(state, true)}
+			/>
+			{!route.params.isSeedRefValid && (
 				<PinInput
-					label={t.passwordLabel}
-					testID={testIDs.IdentityPin.passwordInput}
+					label={t.pinLabel}
+					autoFocus
+					testID={testIDs.IdentityPin.unlockPinInput}
 					returnKeyType="done"
-					focus={focusPassword}
-					onChangeText={onPasswordInputChange}
-					onSubmitEditing={submit}
-					value={state.password}
+					onChangeText={onPinInputChange('pin', updateState)}
+					onSubmitEditing={(): void => setFocusPassword(true)}
+					value={state.pin}
 				/>
-			</Container>
+			)}
+			<PinInput
+				label={t.passwordLabel}
+				testID={testIDs.IdentityPin.passwordInput}
+				returnKeyType="done"
+				focus={focusPassword}
+				onChangeText={onPasswordInputChange}
+				onSubmitEditing={submit}
+				value={state.password}
+			/>
 			<Button
 				title={t.doneButton.pinUnlock}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
 				aboveKeyboard
 			/>
-		</AvoidKeyboard>
+		</KeyboardAwareContainer>
 	);
 }
 

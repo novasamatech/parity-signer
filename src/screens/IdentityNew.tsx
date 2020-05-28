@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import Container from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import Button from 'components/Button';
@@ -161,7 +161,7 @@ function IdentityNew({
 	);
 
 	return (
-		<Container>
+		<KeyboardAwareContainer>
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
@@ -170,7 +170,7 @@ function IdentityNew({
 				placeholder="Identity Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
-		</Container>
+		</KeyboardAwareContainer>
 	);
 }
 

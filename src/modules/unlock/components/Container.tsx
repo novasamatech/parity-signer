@@ -18,25 +18,29 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 
 import styles from '../styles';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 
-export default function Container(props: any): React.ReactElement {
+export function KeyboardAwareContainer(props: any): React.ReactElement {
 	return (
 		<KeyboardScrollView
 			{...props}
+			bounces={false}
 			style={styles.body}
 			testID={testIDs.IdentityPin.scrollScreen}
 		/>
 	);
 }
 
-export function AvoidKeyboard(props: any): React.ReactElement {
+export function Container(props: any): React.ReactElement {
 	return (
-		<KeyboardAvoidingView
-			{...props}
-			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			style={styles.body}
-		/>
+		<SafeAreaViewContainer>
+			<KeyboardAvoidingView
+				{...props}
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+				style={styles.body}
+			/>
+		</SafeAreaViewContainer>
 	);
 }

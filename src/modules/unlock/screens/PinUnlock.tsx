@@ -15,7 +15,7 @@
 
 import React from 'react';
 
-import Container, { AvoidKeyboard } from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
@@ -63,30 +63,33 @@ function PinUnlock({
 		}
 	}
 	return (
-		<AvoidKeyboard>
-			<Container>
-				<ScreenHeading
-					title={t.title.pinUnlock}
-					error={state.pinMismatch || state.pinTooShort}
-					subtitle={getSubtitle(state, true)}
-				/>
-				<PinInput
-					label={t.pinLabel}
-					autoFocus
-					testID={testIDs.IdentityPin.unlockPinInput}
-					returnKeyType="done"
-					onChangeText={onPinInputChange('pin', updateState)}
-					onSubmitEditing={submit}
-					value={state.pin}
-				/>
-			</Container>
+		<KeyboardAwareContainer
+			contentContainerStyle={{
+				flexGrow: 1
+			}}
+		>
+			>
+			<ScreenHeading
+				title={t.title.pinUnlock}
+				error={state.pinMismatch || state.pinTooShort}
+				subtitle={getSubtitle(state, true)}
+			/>
+			<PinInput
+				label={t.pinLabel}
+				autoFocus
+				testID={testIDs.IdentityPin.unlockPinInput}
+				returnKeyType="done"
+				onChangeText={onPinInputChange('pin', updateState)}
+				onSubmitEditing={submit}
+				value={state.pin}
+			/>
 			<Button
 				title={t.doneButton.pinUnlock}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
 				aboveKeyboard
 			/>
-		</AvoidKeyboard>
+		</KeyboardAwareContainer>
 	);
 }
 

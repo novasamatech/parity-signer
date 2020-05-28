@@ -68,25 +68,16 @@ function Amount({
 				<Text style={{ color: colors.text.faded }}> ETH</Text>
 			</Text>
 			<View style={{ marginTop: 5 }}>
-				<Text
-					style={styles.amountText}
-				>
-					fee: {fee} ETH
-				</Text>
+				<Text style={styles.amountText}>fee: {fee} ETH</Text>
 			</View>
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.card,
-		flexDirection: 'column',
-		padding: 20,
-		paddingTop: 10
-	},
 	amountContainer: {
-		alignItems: 'center', justifyContent: 'center'
+		alignItems: 'center',
+		justifyContent: 'center'
 	},
 	amountText: {
 		color: colors.text.main,
@@ -95,7 +86,15 @@ const styles = StyleSheet.create({
 		textAlign: 'center'
 	},
 	amountTextContainer: {
-		fontSize: 20, fontWeight: '800', textAlign: 'center'
+		fontSize: 20,
+		fontWeight: '800',
+		textAlign: 'center'
+	},
+	body: {
+		backgroundColor: colors.background.card,
+		flexDirection: 'column',
+		padding: 20,
+		paddingTop: 10
 	},
 	titleText: {
 		color: colors.text.faded,

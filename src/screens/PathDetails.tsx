@@ -109,7 +109,7 @@ export function PathDetailsView({
 
 	return (
 		<SafeAreaViewContainer>
-			<ScrollView testID={testIDs.PathDetail.screen}>
+			<ScrollView testID={testIDs.PathDetail.screen} bounces={false}>
 				<LeftScreenHeading
 					title="Public Address"
 					networkKey={formattedNetworkKey}

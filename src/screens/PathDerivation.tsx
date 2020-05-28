@@ -37,7 +37,7 @@ import PathCard from 'components/PathCard';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
 import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
-import Container from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 
 function getParentNetworkKey(
 	parentPath: string,
@@ -99,7 +99,7 @@ function PathDerivation({
 	};
 
 	return (
-		<Container>
+		<KeyboardAwareContainer>
 			<ScreenHeading
 				title="Derive Account"
 				subtitle={parentPath}
@@ -163,7 +163,7 @@ function PathDerivation({
 					setVisible={setModalVisible}
 				/>
 			)}
-		</Container>
+		</KeyboardAwareContainer>
 	);
 }
 

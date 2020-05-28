@@ -209,5 +209,7 @@ export const navigateToPathDerivation = async <
 	if (!isSeedRefValid) {
 		await unlockSeedPhrase(navigation, isSeedRefValid);
 	}
-	navigation.navigate('PathDerivation', { parentPath });
+	resetNavigationWithNetworkChooser(navigation, 'PathDerivation', {
+		parentPath
+	});
 };

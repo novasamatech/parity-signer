@@ -23,7 +23,6 @@ import {
 	TouchableNativeFeedback,
 	TouchableNativeFeedbackProps,
 	TouchableOpacity,
-	View,
 	ViewStyle
 } from 'react-native';
 

@@ -33,7 +33,7 @@ import {
 } from 'utils/alertUtils';
 import Button from 'components/Button';
 import { useNewSeedRef } from 'utils/seedRefHooks';
-import Container from 'modules/unlock/components/Container';
+import { Container } from 'modules/unlock/components/Container';
 
 function IdentityBackup({
 	navigation,
@@ -118,6 +118,7 @@ function IdentityBackup({
 					title={'Next'}
 					testID={testIDs.IdentityBackup.nextButton}
 					onPress={(): void => alertBackupDone(onBackupDone)}
+					aboveKeyboard
 				/>
 			)}
 		</Container>

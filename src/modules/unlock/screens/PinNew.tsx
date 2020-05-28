@@ -17,7 +17,7 @@ import React from 'react';
 
 import ScreenHeading from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
-import Container, { AvoidKeyboard } from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
@@ -44,42 +44,43 @@ export default function PinNew({
 	}
 
 	return (
-		<AvoidKeyboard>
-			<Container>
-				<ScreenHeading
-					title={t.title.pinCreation}
-					subtitle={getSubtitle(state, false)}
-					error={state.pinMismatch || state.pinTooShort}
-				/>
-
-				<PinInput
-					label={t.pinLabel}
-					autoFocus
-					testID={testIDs.IdentityPin.setPin}
-					returnKeyType="next"
-					onFocus={(): void => updateState({ focusConfirmation: false })}
-					onSubmitEditing={(): void => {
-						updateState({ focusConfirmation: true });
-					}}
-					onChangeText={onPinInputChange('pin', updateState)}
-					value={state.pin}
-				/>
-				<PinInput
-					label={t.pinConfirmLabel}
-					returnKeyType="done"
-					testID={testIDs.IdentityPin.confirmPin}
-					focus={state.focusConfirmation}
-					onChangeText={onPinInputChange('confirmation', updateState)}
-					value={state.confirmation}
-					onSubmitEditing={submit}
-				/>
-			</Container>
+		<KeyboardAwareContainer
+			contentContainerStyle={{
+				flexGrow: 1
+			}}
+		>
+			<ScreenHeading
+				title={t.title.pinCreation}
+				subtitle={getSubtitle(state, false)}
+				error={state.pinMismatch || state.pinTooShort}
+			/>
+			<PinInput
+				label={t.pinLabel}
+				autoFocus
+				testID={testIDs.IdentityPin.setPin}
+				returnKeyType="next"
+				onFocus={(): void => updateState({ focusConfirmation: false })}
+				onSubmitEditing={(): void => {
+					updateState({ focusConfirmation: true });
+				}}
+				onChangeText={onPinInputChange('pin', updateState)}
+				value={state.pin}
+			/>
+			<PinInput
+				label={t.pinConfirmLabel}
+				returnKeyType="done"
+				testID={testIDs.IdentityPin.confirmPin}
+				focus={state.focusConfirmation}
+				onChangeText={onPinInputChange('confirmation', updateState)}
+				value={state.confirmation}
+				onSubmitEditing={submit}
+			/>
 			<Button
 				title={t.doneButton.pinCreation}
 				onPress={submit}
 				testID={testIDs.IdentityPin.submitButton}
 				aboveKeyboard
 			/>
-		</AvoidKeyboard>
+		</KeyboardAwareContainer>
 	);
 }
