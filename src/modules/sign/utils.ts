@@ -120,7 +120,6 @@ export async function processBarCode(
 	}
 
 	try {
-		console.log('txrequest raw is', txRequestData.rawData);
 		await parseQrData();
 		if (scannerStore.getUnsigned() === null) return;
 		await scannerStore.setData(accounts);

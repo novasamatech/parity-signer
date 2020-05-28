@@ -41,7 +41,7 @@ const testSignedTx = async (): Promise<void> => {
 	await testVisible(SignedTx.qrView);
 };
 
-const testMultiPartExtrinsic = async (): Promise<void> => {
+const testSignedMessage = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
 	await testUnlockPin(pinCode);
 	await testVisible(SignedMessage.qrView);
@@ -75,7 +75,12 @@ describe('Signing test', () => {
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
-			await testMultiPartExtrinsic();
+			await testSignedMessage();
+		});
+
+		it('should sign extrinsic hashes', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkHashKusama);
+			await testSignedMessage();
 		});
 	});
 
@@ -105,7 +110,7 @@ describe('Signing test', () => {
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
-			await testMultiPartExtrinsic();
+			await testSignedMessage();
 		});
 	});
 
