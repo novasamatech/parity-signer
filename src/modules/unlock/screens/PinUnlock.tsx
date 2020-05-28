@@ -68,7 +68,6 @@ function PinUnlock({
 				flexGrow: 1
 			}}
 		>
-			>
 			<ScreenHeading
 				title={t.title.pinUnlock}
 				error={state.pinMismatch || state.pinTooShort}
