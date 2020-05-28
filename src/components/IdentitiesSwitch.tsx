@@ -38,6 +38,14 @@ import {
 } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
 
+function ButtonWithArrow(props: {
+	onPress: () => void;
+	testID?: string;
+	title: string;
+}): React.ReactElement {
+	return <ButtonIcon {...props} {...i_arrowOptions} />;
+}
+
 function IdentitiesSwitch({
 	accounts
 }: {
@@ -93,20 +101,18 @@ function IdentitiesSwitch({
 	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
 		return (
 			<>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Manage Identity"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
 					}
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
-					{...i_arrowOptions}
 				/>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Show Recovery Phrase"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
 					}
-					{...i_arrowOptions}
 				/>
 			</>
 		);
@@ -148,15 +154,13 @@ function IdentitiesSwitch({
 					textStyle={fontStyles.t_big}
 					style={styles.indentedButton}
 				/>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Terms and Conditions"
 					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
-					{...i_arrowOptions}
 				/>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Privacy Policy"
 					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
-					{...i_arrowOptions}
 				/>
 			</>
 		);

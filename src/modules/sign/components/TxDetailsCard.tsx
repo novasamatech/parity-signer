@@ -62,19 +62,14 @@ function Amount({
 }: AmountProps): React.ReactElement<AmountProps> {
 	const fee = (parseInt(gas, 10) * parseInt(gasPrice, 10)) / WEI_IN_ETH;
 	return (
-		<View style={[{ alignItems: 'center', justifyContent: 'center' }, style]}>
-			<Text style={{ fontSize: 20, fontWeight: '800', textAlign: 'center' }}>
+		<View style={[styles.amountContainer, style]}>
+			<Text style={styles.amountTextContainer}>
 				<Text style={{ color: colors.text.main }}>{value}</Text>
 				<Text style={{ color: colors.text.faded }}> ETH</Text>
 			</Text>
 			<View style={{ marginTop: 5 }}>
 				<Text
-					style={{
-						color: colors.text.main,
-						fontSize: 12,
-						fontWeight: '800',
-						textAlign: 'center'
-					}}
+					style={styles.amountText}
 				>
 					fee: {fee} ETH
 				</Text>
@@ -90,25 +85,17 @@ const styles = StyleSheet.create({
 		padding: 20,
 		paddingTop: 10
 	},
-	content: {},
-	footer: {
-		backgroundColor: '#977CF6',
-		flexDirection: 'row-reverse',
-		padding: 5
+	amountContainer: {
+		alignItems: 'center', justifyContent: 'center'
 	},
-	footerText: {
-		color: colors.background.card,
-		fontFamily: fonts.bold
-	},
-	icon: {
-		height: 47,
-		width: 47
-	},
-	secondaryText: {
-		color: colors.text.faded,
-		fontFamily: fonts.semiBold,
+	amountText: {
+		color: colors.text.main,
 		fontSize: 12,
+		fontWeight: '800',
 		textAlign: 'center'
+	},
+	amountTextContainer: {
+		fontSize: 20, fontWeight: '800', textAlign: 'center'
 	},
 	titleText: {
 		color: colors.text.faded,
