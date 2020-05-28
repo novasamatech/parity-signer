@@ -186,6 +186,7 @@ export default function PathCard({
 									name="lock"
 									size={fontStyles.i_small.fontSize}
 									color={colors.signal.main}
+									style={{ alignSelf: 'center' }}
 								/>
 							</View>
 						) : (
