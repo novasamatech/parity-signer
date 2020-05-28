@@ -37,16 +37,32 @@ export type CompletedParsedData =
 	| SubstrateCompletedParsedData
 	| EthereumParsedData;
 
-export type SubstrateCompletedParsedData = {
+export type SubstrateCompletedParsedData =
+	| SubstrateTransactionParsedData
+	| SubstrateMessageParsedData;
+
+export type SubstrateTransactionParsedData = {
 	data: {
 		account: string;
 		crypto: 'ed25519' | 'sr25519' | null;
 		data: Uint8Array;
 		genesisHash: string;
 	};
-	action: string; //"signTransaction"
+	action: 'signTransaction';
 	oversized: boolean;
-	isHash: boolean;
+	isHash: false;
+};
+
+export type SubstrateMessageParsedData = {
+	data: {
+		account: string;
+		crypto: 'ed25519' | 'sr25519' | null;
+		data: string;
+		genesisHash: string;
+	};
+	action: 'signData';
+	oversized: boolean;
+	isHash: true;
 };
 
 export type SubstrateMultiParsedData = {
@@ -73,6 +89,15 @@ export function isSubstrateCompletedParsedData(
 ): parsedData is SubstrateCompletedParsedData {
 	return (
 		(parsedData as SubstrateCompletedParsedData)?.data?.crypto !== undefined
+	);
+}
+
+export function isSubstrateMessageParsedData(
+	parsedData: ParsedData | null
+): parsedData is SubstrateMessageParsedData {
+	return (
+		(parsedData as SubstrateCompletedParsedData)?.data?.crypto !== undefined &&
+		(parsedData as SubstrateCompletedParsedData)?.action === 'signData'
 	);
 }
 

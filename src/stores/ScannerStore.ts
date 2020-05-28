@@ -32,8 +32,10 @@ import {
 	EthereumParsedData,
 	isEthereumCompletedParsedData,
 	isMultipartData,
-	isSubstrateCompletedParsedData,
-	SubstrateCompletedParsedData
+	isSubstrateMessageParsedData,
+	SubstrateCompletedParsedData,
+	SubstrateMessageParsedData,
+	SubstrateTransactionParsedData
 } from 'types/scannerTypes';
 import { emptyAccount } from 'utils/account';
 import {
@@ -42,7 +44,6 @@ import {
 	encodeNumber
 } from 'utils/decoders';
 import {
-	blake2b,
 	brainWalletSign,
 	decryptData,
 	ethSign,
@@ -260,7 +261,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setDataToSign(
-		signRequest: CompletedParsedData,
+		signRequest: SubstrateMessageParsedData | EthereumParsedData,
 		accountsStore: AccountsStore
 	): Promise<boolean> {
 		this.setBusy();
@@ -271,16 +272,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		let isOversized = false;
 		let dataToSign = '';
 
-		if (isSubstrateCompletedParsedData(signRequest)) {
-			// only Substrate payload has crypto field
+		if (isSubstrateMessageParsedData(signRequest)) {
 			if (signRequest.data.crypto !== 'sr25519')
 				throw new Error('currently Parity Signer only support sr25519');
 			isHash = signRequest.isHash;
 			isOversized = signRequest.oversized;
-			const rawPayload = signRequest.data.data;
-			const [offset] = compactFromU8a(rawPayload);
-			const payload = rawPayload.subarray(offset);
-			dataToSign = await blake2b(u8aToHex(payload, -1, false));
+			dataToSign = signRequest.data.data;
 			message = dataToSign;
 		} else {
 			message = signRequest.data.data;
@@ -307,7 +304,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setTXRequest(
-		txRequest: CompletedParsedData,
+		txRequest: EthereumParsedData | SubstrateTransactionParsedData,
 		accountsStore: AccountsStore
 	): Promise<boolean> {
 		this.setBusy();
