@@ -83,19 +83,18 @@ export default class Button extends React.PureComponent<{
 				disabled={disabled}
 				onPress={onPress}
 				testID={testID}
+				style={[finalButtonStyles, style]}
 			>
-				<View style={[finalButtonStyles, style]}>
-					<Text
-						style={[
-							fontStyles.h1,
-							styles.buttonText,
-							finalTextStyles,
-							textStyles
-						]}
-					>
-						{title}
-					</Text>
-				</View>
+				<Text
+					style={[
+						fontStyles.h1,
+						styles.buttonText,
+						finalTextStyles,
+						textStyles
+					]}
+				>
+					{title}
+				</Text>
 			</Touchable>
 		);
 	}
