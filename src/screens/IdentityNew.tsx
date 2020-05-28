@@ -168,7 +168,6 @@ function IdentityNew({
 				testID={testIDs.IdentityNew.nameInput}
 				value={accounts.getNewIdentity().name}
 				placeholder="Identity Name"
-				focus={false}
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
 		</Container>

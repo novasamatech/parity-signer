@@ -44,7 +44,8 @@ export default StyleSheet.create({
 	h_subheading: {
 		color: colors.text.main,
 		fontFamily: fonts.roboto,
-		fontSize: 14
+		fontSize: 14,
+		textTransform: 'uppercase'
 	},
 	i_large: {
 		fontSize: 22
@@ -68,7 +69,7 @@ export default StyleSheet.create({
 	t_code: {
 		color: colors.text.main,
 		fontFamily: fonts.robotoMono,
-		fontSize: 18
+		fontSize: 15
 	},
 	t_codeS: {
 		color: colors.text.main,
