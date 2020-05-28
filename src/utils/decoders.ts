@@ -165,7 +165,13 @@ export async function constructDataFromBytes(
 					const rawPayload = hexToU8a(hexPayload);
 					data.data.genesisHash = genesisHash;
 					const isOversized = rawPayload.length > 256;
-					let network;
+					let network = SUBSTRATE_NETWORK_LIST[genesisHash];
+					if (!network) {
+						throw new Error(
+							`Signer does not currently support a chain with genesis hash: ${genesisHash}`
+						);
+					}
+
 					switch (secondByte) {
 						case '00': // sign mortal extrinsic
 						case '02': // sign immortal extrinsic
@@ -173,19 +179,21 @@ export async function constructDataFromBytes(
 							data.oversized = isOversized;
 							data.isHash = isOversized;
 							data.data.data = rawPayload;
-
-							network = SUBSTRATE_NETWORK_LIST[genesisHash];
-							if (!network) {
-								throw new Error(
-									`Signer does not currently support a chain with genesis hash: ${genesisHash}`
-								);
-							}
-
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,
 								network.prefix
 							); // encode to the prefix;
 
+							break;
+						case '01': // data is a hash
+							data.action = 'signData';
+							data.oversized = false;
+							data.isHash = true;
+							data.data.data = rawPayload;
+							data.data.account = encodeAddress(
+								publicKeyAsBytes,
+								network.prefix
+							); // default to Kusama
 							break;
 						default:
 							break;
