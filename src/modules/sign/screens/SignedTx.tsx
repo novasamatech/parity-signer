@@ -31,6 +31,7 @@ import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
+import Separator from 'components/Separator';
 
 function SignedTx(
 	props: NavigationAccountScannerProps<'SignedTx'>
@@ -69,15 +70,8 @@ function SignedTxView({
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>
-			<Text style={styles.topTitle}>Scan Signature</Text>
-			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
-				<QrView data={data} />
-			</View>
-
-			<Text style={[fontStyles.t_big, styles.bodyContent]}>
-				{`You are about to sign ${
-					isEthereum ? 'the following transaction' : 'an extrinsic'
-				}`}
+			<Text style={[styles.topTitle, { marginBottom: 16 }]}>
+				Signed {isEthereum ? 'transaction' : 'extrinsic'}
 			</Text>
 			<CompatibleCard
 				account={sender}
@@ -97,6 +91,19 @@ function SignedTxView({
 					<CompatibleCard account={recipient} accountsStore={accounts} />
 				</View>
 			)}
+			<Separator
+				shadow={true}
+				style={{
+					height: 0,
+					marginVertical: 24
+				}}
+			/>
+			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+				{'Scan to publish'}
+			</Text>
+			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+				<QrView data={data} />
+			</View>
 		</SafeAreaScrollViewContainer>
 	);
 }
