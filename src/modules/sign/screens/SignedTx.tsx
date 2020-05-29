@@ -69,10 +69,23 @@ function SignedTxView({
 	);
 
 	return (
-		<SafeAreaScrollViewContainer style={styles.body}>
-			<Text style={[styles.topTitle, { marginBottom: 16 }]}>
+		<SafeAreaScrollViewContainer>
+			<Text style={styles.topTitle}>
 				Signed {isEthereum ? 'transaction' : 'extrinsic'}
 			</Text>
+			<Separator
+				shadow={true}
+				style={{
+					height: 0,
+					marginVertical: 20
+				}}
+			/>
+			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+				{'Scan to publish'}
+			</Text>
+			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+				<QrView data={data} />
+			</View>
 			<CompatibleCard
 				account={sender}
 				accountsStore={accounts}
@@ -91,19 +104,6 @@ function SignedTxView({
 					<CompatibleCard account={recipient} accountsStore={accounts} />
 				</View>
 			)}
-			<Separator
-				shadow={true}
-				style={{
-					height: 0,
-					marginVertical: 24
-				}}
-			/>
-			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
-				{'Scan to publish'}
-			</Text>
-			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
-				<QrView data={data} />
-			</View>
 		</SafeAreaScrollViewContainer>
 	);
 }

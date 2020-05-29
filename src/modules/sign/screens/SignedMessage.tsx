@@ -65,9 +65,20 @@ function SignedMessageView({
 
 	return (
 		<SafeAreaScrollViewContainer>
-			<Text style={[styles.topTitle, { marginBottom: 16 }]}>
-				Signed Message
+			<Text style={styles.topTitle}>Signed Message</Text>
+			<Separator
+				shadow={true}
+				style={{
+					height: 0,
+					marginVertical: 20
+				}}
+			/>
+			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+				{'Scan to publish'}
 			</Text>
+			<View testID={testIDs.SignedMessage.qrView}>
+				<QrView data={data} />
+			</View>
 			<CompatibleCard
 				titlePrefix={'from:'}
 				account={sender}
@@ -79,19 +90,6 @@ function SignedMessageView({
 				data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
 				style={styles.bodyContent}
 			/>
-			<Separator
-				shadow={true}
-				style={{
-					height: 0,
-					marginVertical: 24
-				}}
-			/>
-			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
-				{'Scan to publish'}
-			</Text>
-			<View testID={testIDs.SignedMessage.qrView}>
-				<QrView data={data} />
-			</View>
 		</SafeAreaScrollViewContainer>
 	);
 }
