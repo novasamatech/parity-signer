@@ -21,7 +21,6 @@ import {
 	Text,
 	TextStyle,
 	TouchableNativeFeedback,
-	TouchableNativeFeedbackProps,
 	TouchableOpacity,
 	ViewStyle,
 	View
@@ -75,10 +74,8 @@ export default class Button extends React.PureComponent<{
 			finalButtonStyles.push(styles.buttonAboveKeyboard);
 		}
 
-		const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
-			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
-		return (
-			<Touchable
+		return Platform.OS === 'android' ? (
+			<TouchableNativeFeedback
 				accessibilityComponentType="button"
 				disabled={disabled}
 				onPress={onPress}
@@ -96,7 +93,26 @@ export default class Button extends React.PureComponent<{
 						{title}
 					</Text>
 				</View>
-			</Touchable>
+			</TouchableNativeFeedback>
+		) : (
+			<TouchableOpacity
+				accessibilityComponentType="button"
+				disabled={disabled}
+				onPress={onPress}
+				testID={testID}
+				style={[finalButtonStyles, style]}
+			>
+				<Text
+					style={[
+						fontStyles.h1,
+						styles.buttonText,
+						finalTextStyles,
+						textStyles
+					]}
+				>
+					{title}
+				</Text>
+			</TouchableOpacity>
 		);
 	}
 }
