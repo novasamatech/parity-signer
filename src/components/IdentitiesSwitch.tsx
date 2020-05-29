@@ -226,6 +226,7 @@ function IdentitiesSwitch({
 				iconType="antdesign"
 				iconBgStyle={{ backgroundColor: 'transparent' }}
 				testID={testIDs.IdentitiesSwitch.toggleButton}
+				style={{ paddingHorizontal: 6 }}
 				iconSize={26}
 			/>
 
