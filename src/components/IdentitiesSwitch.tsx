@@ -92,10 +92,10 @@ function IdentitiesSwitch({
 		}
 	};
 
-	const onLegacyListClicked = async (): Promise<void> => {
-		await accounts.resetCurrentIdentity();
+	const onLegacyListClicked = (): void => {
 		setVisible(false);
 		navigateToLegacyAccountList(navigation);
+		accounts.resetCurrentIdentity();
 	};
 
 	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
