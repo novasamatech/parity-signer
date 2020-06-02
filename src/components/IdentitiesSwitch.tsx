@@ -38,6 +38,14 @@ import {
 } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
 
+function ButtonWithArrow(props: {
+	onPress: () => void;
+	testID?: string;
+	title: string;
+}): React.ReactElement {
+	return <ButtonIcon {...props} {...i_arrowOptions} />;
+}
+
 function IdentitiesSwitch({
 	accounts
 }: {
@@ -93,30 +101,18 @@ function IdentitiesSwitch({
 	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
 		return (
 			<>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Manage Identity"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
 					}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
 				/>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Show Recovery Phrase"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
 					}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
 				/>
 			</>
 		);
@@ -158,25 +154,13 @@ function IdentitiesSwitch({
 					textStyle={fontStyles.t_big}
 					style={styles.indentedButton}
 				/>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Terms and Conditions"
 					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
 				/>
-				<ButtonIcon
+				<ButtonWithArrow
 					title="Privacy Policy"
 					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
-					iconBgStyle={styles.i_arrowBg}
-					iconType="antdesign"
-					iconName="arrowright"
-					iconSize={18}
-					textStyle={fontStyles.t_regular}
-					style={styles.i_arrowStyle}
 				/>
 			</>
 		);
@@ -189,10 +173,6 @@ function IdentitiesSwitch({
 
 		return (
 			<ButtonIcon
-				dropdown={false}
-				renderDropdownElement={(): React.ReactElement =>
-					renderIdentityOptions(identity)
-				}
 				title={title}
 				onPress={(): Promise<void> =>
 					onIdentitySelectedAndNavigate(identity, 'Main')
@@ -211,7 +191,7 @@ function IdentitiesSwitch({
 		// if no identity or the only one we have is the selected one
 
 		if (!identities.length || (identities.length === 1 && currentIdentity))
-			return;
+			return <Separator style={{ height: 0, marginVertical: 4 }} />;
 
 		const identitiesToShow = currentIdentity
 			? identities.filter(
@@ -224,18 +204,15 @@ function IdentitiesSwitch({
 				<ScrollView
 					bounces={false}
 					style={{
-						maxHeight: 180,
-						paddingVertical: identities.length > 5 ? 8 : 0
+						maxHeight: 160
 					}}
 				>
-					{identitiesToShow.map(renderNonSelectedIdentity)}
+					<View style={{ paddingVertical: 8 }}>
+						{identitiesToShow.map(renderNonSelectedIdentity)}
+					</View>
 				</ScrollView>
 				{identities.length > 5 && (
-					<Separator
-						shadow={true}
-						style={styles.identitiesListSeparator}
-						shadowStyle={{ opacity: 0.9 }}
-					/>
+					<Separator shadow={true} style={{ marginTop: 0 }} />
 				)}
 			</>
 		);
@@ -249,6 +226,8 @@ function IdentitiesSwitch({
 				iconType="antdesign"
 				iconBgStyle={{ backgroundColor: 'transparent' }}
 				testID={testIDs.IdentitiesSwitch.toggleButton}
+				style={{ paddingHorizontal: 6 }}
+				iconSize={26}
 			/>
 
 			<TransparentBackground
@@ -312,35 +291,31 @@ function IdentitiesSwitch({
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: colors.bg,
-		borderRadius: 5,
+		backgroundColor: colors.background.app,
+		borderRadius: 4,
 		paddingBottom: 16,
 		paddingTop: 8
 	},
 	container: {
 		justifyContent: 'center',
-		marginTop: -24,
-		paddingLeft: 16,
-		paddingRight: 16
-	},
-	i_arrowBg: {
-		backgroundColor: 'rgba(0,0,0,0)',
-		marginRight: -3
+		paddingHorizontal: 16
 	},
 	i_arrowStyle: {
-		opacity: 0.7,
-		paddingBottom: 6,
 		paddingLeft: 64,
 		paddingTop: 0
-	},
-	identitiesListSeparator: {
-		backgroundColor: 'transparent',
-		marginTop: 10,
-		zIndex: -1
 	},
 	indentedButton: {
 		paddingLeft: 32
 	}
 });
+
+const i_arrowOptions = {
+	iconColor: colors.signal.main,
+	iconName: 'arrowright',
+	iconSize: fontStyles.i_medium.fontSize,
+	iconType: 'antdesign',
+	style: styles.i_arrowStyle,
+	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
+};
 
 export default withAccountStore(IdentitiesSwitch);

@@ -15,17 +15,17 @@
 
 import React, { useState } from 'react';
 
-import Container from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
-import ButtonMainAction from 'components/ButtonMainAction';
 import { NavigationTargetIdentityProps } from 'types/props';
 import { withAccountStore, withTargetIdentity } from 'utils/HOC';
 import { useSeedRef } from 'utils/seedRefHooks';
+import Button from 'components/Button';
 
 function PinUnlockWithPassword({
 	targetIdentity,
@@ -65,7 +65,11 @@ function PinUnlockWithPassword({
 	}
 
 	return (
-		<Container>
+		<KeyboardAwareContainer
+			contentContainerStyle={{
+				flexGrow: 1
+			}}
+		>
 			<ScreenHeading
 				title={t.title.pinUnlock}
 				error={state.pinMismatch || state.pinTooShort}
@@ -91,13 +95,13 @@ function PinUnlockWithPassword({
 				onSubmitEditing={submit}
 				value={state.password}
 			/>
-			<ButtonMainAction
+			<Button
 				title={t.doneButton.pinUnlock}
-				bottom={false}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
+				aboveKeyboard
 			/>
-		</Container>
+		</KeyboardAwareContainer>
 	);
 }
 

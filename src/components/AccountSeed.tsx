@@ -121,7 +121,7 @@ export default class AccountSeed extends Component<
 				{suggestions.map((suggestion, i) => {
 					const sepStyle =
 						i !== suggestions.length - 1
-							? { borderColor: colors.card_bg_text_sec, borderRightWidth: 0.3 }
+							? { borderColor: colors.border.light, borderRightWidth: 0.3 }
 							: {};
 					return (
 						<TouchableItem
@@ -175,27 +175,28 @@ const styles = StyleSheet.create({
 		flexDirection: 'column'
 	},
 	input: {
-		borderBottomColor: colors.card_bg
+		borderBottomColor: colors.border.light
 	},
 	invalidInput: {
-		borderBottomColor: colors.bg_alert,
-		borderColor: colors.bg_alert
+		borderBottomColor: colors.border.signal,
+		borderColor: colors.border.signal
 	},
 	suggestion: {
-		padding: 14,
+		padding: 12,
 		paddingVertical: 4
 	},
 	suggestionText: {
-		color: colors.bg_button,
-		fontFamily: fonts.regular
+		color: colors.signal.main,
+		fontFamily: fonts.regular,
+		letterSpacing: fontStyles.t_seed.letterSpacing
 	},
 	suggestions: {
 		alignItems: 'center',
-		backgroundColor: colors.card_bg,
-		borderColor: colors.card_bg,
+		backgroundColor: colors.background.card,
+		borderColor: colors.background.card,
 		borderWidth: 0.5,
 		flexDirection: 'row',
-		height: 40,
+		height: 32,
 		marginHorizontal: 16,
 		marginTop: -8,
 		overflow: 'hidden'

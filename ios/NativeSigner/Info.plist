@@ -44,6 +44,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>RobotoMono-Regular.ttf</string>
+		<string>RobotoMono-Medium.ttf</string>
 		<string>Roboto-Black.ttf</string>
 		<string>Roboto-BlackItalic.ttf</string>
 		<string>Roboto-Bold.ttf</string>

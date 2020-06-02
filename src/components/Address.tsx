@@ -15,10 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement } from 'react';
-import { StyleSheet, Text, TextStyle } from 'react-native';
+import { Text, TextStyle } from 'react-native';
 
-import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import { NetworkProtocol } from 'types/networkSpecsTypes';
@@ -34,7 +32,7 @@ export default function Address(props: {
 	return (
 		<Text
 			numberOfLines={1}
-			style={[styles.secondaryText, style, fontStyles.t_codeS]}
+			style={[style, fontStyles.t_codeS]}
 			ellipsizeMode="middle"
 		>
 			{prefix}
@@ -42,12 +40,3 @@ export default function Address(props: {
 		</Text>
 	);
 }
-
-const styles = StyleSheet.create({
-	secondaryText: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.regular,
-		fontSize: 12,
-		lineHeight: 16
-	}
-});

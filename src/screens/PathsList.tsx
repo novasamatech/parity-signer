@@ -15,13 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
 import { navigateToPathDerivation } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { PathGroup } from 'types/identityTypes';
@@ -40,8 +40,8 @@ import ButtonNewDerivation from 'components/ButtonNewDerivation';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import fontStyles from 'styles/fontStyles';
-import colors from 'styles/colors';
 import { LeftScreenHeading } from 'components/ScreenHeading';
+import QrScannerTab from 'components/QrScannerTab';
 
 function PathsList({
 	accounts,
@@ -93,72 +93,52 @@ function PathsList({
 
 	const renderGroupPaths = (pathsGroup: PathGroup): React.ReactElement => (
 		<View key={`group${pathsGroup.title}`} style={{ marginTop: 24 }}>
+			<Separator
+				shadow={true}
+				style={{
+					height: 0,
+					marginVertical: 0
+				}}
+			/>
 			<View
 				style={{
-					backgroundColor: colors.bg,
-					height: 64,
-					marginBottom: 14
+					marginVertical: 16,
+					paddingHorizontal: 16
 				}}
 			>
-				<Separator
-					shadow={true}
-					style={{
-						backgroundColor: 'transparent',
-						height: 0,
-						marginVertical: 0
-					}}
-				/>
-				<View
-					style={{
-						alignItems: 'center',
-						flexDirection: 'row',
-						justifyContent: 'space-between',
-						marginTop: 16,
-						paddingHorizontal: 16
-					}}
-				>
-					<View>
-						<Text style={fontStyles.t_prefix}>
-							{removeSlash(pathsGroup.title)}
-						</Text>
-						<Text style={fontStyles.t_codeS}>
-							{networkParams.pathId}
-							{pathsGroup.title}
-						</Text>
-					</View>
-				</View>
+				<Text style={fontStyles.t_prefix}>{removeSlash(pathsGroup.title)}</Text>
+				<Text style={fontStyles.t_codeS}>
+					{networkParams.pathId}
+					{pathsGroup.title}
+				</Text>
 			</View>
 			{pathsGroup.paths.map(path => (
-				<View key={path} style={{ marginBottom: -8 }}>
-					<PathCard
-						key={path}
-						testID={testIDs.PathsList.pathCard + path}
-						identity={currentIdentity}
-						path={path}
-						onPress={(): void => navigate('PathDetails', { path })}
-					/>
-				</View>
+				<PathCard
+					key={path}
+					testID={testIDs.PathsList.pathCard + path}
+					identity={currentIdentity}
+					path={path}
+					onPress={(): void => navigate('PathDetails', { path })}
+				/>
 			))}
 		</View>
 	);
 
-	const subtitle =
-		networkKey === UnknownNetworkKeys.UNKNOWN
-			? ''
-			: `//${networkParams.pathId}`;
 	return (
-		<SafeAreaScrollViewContainer testID={testIDs.PathsList.screen}>
-			<LeftScreenHeading
-				title={networkParams.title}
-				subtitle={subtitle}
-				hasSubtitleIcon={true}
-				networkKey={networkKey}
-			/>
-			{(pathsGroups as PathGroup[]).map(pathsGroup =>
-				pathsGroup.paths.length === 1
-					? renderSinglePath(pathsGroup)
-					: renderGroupPaths(pathsGroup)
-			)}
+		<SafeAreaViewContainer>
+			<ScrollView testID={testIDs.PathsList.screen}>
+				<LeftScreenHeading
+					title={networkParams.title}
+					hasSubtitleIcon={true}
+					networkKey={networkKey}
+				/>
+				{(pathsGroups as PathGroup[]).map(pathsGroup =>
+					pathsGroup.paths.length === 1
+						? renderSinglePath(pathsGroup)
+						: renderGroupPaths(pathsGroup)
+				)}
+				<Separator style={{ backgroundColor: 'transparent' }} />
+			</ScrollView>
 			<ButtonNewDerivation
 				testID={testIDs.PathsList.deriveButton}
 				title="Derive New Account"
@@ -170,7 +150,8 @@ function PathsList({
 					)
 				}
 			/>
-		</SafeAreaScrollViewContainer>
+			<QrScannerTab />
+		</SafeAreaViewContainer>
 	);
 }
 

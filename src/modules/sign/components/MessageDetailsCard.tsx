@@ -20,6 +20,7 @@ import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import fontStyles from 'styles/fontStyles';
 import { hexToAscii, isAscii } from 'utils/strings';
 import colors from 'styles/colors';
+import Separator from 'components/Separator';
 
 export default function MessageDetailsCard({
 	isHash,
@@ -33,41 +34,40 @@ export default function MessageDetailsCard({
 	style?: ViewStyle;
 }): React.ReactElement {
 	return (
-		<View style={[styles.messageContainer, style]}>
-			<Text style={styles.titleText}>
-				{isHash ? 'Message Hash' : 'Message'}
-			</Text>
-			{isHash ? (
-				<Text style={styles.hashText}>{message}</Text>
-			) : (
-				<Text style={styles.messageText}>
-					{isAscii(message) ? hexToAscii(message) : data}
+		<>
+			<Separator
+				shadow={true}
+				style={{
+					height: 0,
+					marginTop: 16
+				}}
+			/>
+			<View style={[styles.messageContainer, style]}>
+				<Text style={styles.titleText}>
+					{isHash ? 'Message Hash' : 'Message'}
 				</Text>
-			)}
-		</View>
+				{isHash ? (
+					<Text style={styles.messageText}>{message}</Text>
+				) : (
+					<Text style={styles.messageText}>
+						{isAscii(message) ? hexToAscii(message) : data}
+					</Text>
+				)}
+			</View>
+		</>
 	);
 }
 
 const styles = StyleSheet.create({
-	hashText: {
-		...fontStyles.t_codeS,
-		color: colors.label_text,
-		marginBottom: 20,
-		paddingHorizontal: 8
-	},
 	messageContainer: {
 		marginTop: 16
 	},
 	messageText: {
 		...fontStyles.t_code,
-		color: colors.label_text,
-		lineHeight: 26,
-		marginBottom: 20,
-		minHeight: 120,
-		padding: 10
+		color: colors.signal.main
 	},
 	titleText: {
-		...fontStyles.t_label,
-		paddingHorizontal: 8
+		...fontStyles.h_subheading,
+		marginBottom: 8
 	}
 });

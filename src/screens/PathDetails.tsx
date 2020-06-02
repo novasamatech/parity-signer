@@ -16,9 +16,9 @@
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 // TODO use typescript 3.8's type import, Wait for prettier update.
@@ -46,6 +46,7 @@ import {
 import { generateAccountId } from 'utils/account';
 import UnknownAccountWarning from 'components/UnknownAccountWarning';
 import { useSeedRef } from 'utils/seedRefHooks';
+import QrScannerTab from 'components/QrScannerTab';
 
 interface Props {
 	path: string;
@@ -107,36 +108,39 @@ export function PathDetailsView({
 	};
 
 	return (
-		<SafeAreaScrollViewContainer testID={testIDs.PathDetail.screen}>
-			<LeftScreenHeading
-				title="Public Address"
-				networkKey={formattedNetworkKey}
-				headMenu={
-					<PopupMenu
-						testID={testIDs.PathDetail.popupMenuButton}
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
-						menuItems={[
-							{ text: 'Edit', value: 'PathManagement' },
-							{
-								hide: !isSubstratePath(path),
-								text: 'Derive Account',
-								value: 'PathDerivation'
-							},
-							{
-								testID: testIDs.PathDetail.deleteButton,
-								text: 'Delete',
-								textStyle: styles.deleteText,
-								value: 'PathDelete'
-							}
-						]}
-					/>
-				}
-			/>
-			<PathCard identity={currentIdentity} path={path} />
-			<QrView data={`${accountId}:${accountName}`} />
-			{isUnknownNetwork && <UnknownAccountWarning isPath />}
-		</SafeAreaScrollViewContainer>
+		<SafeAreaViewContainer>
+			<ScrollView testID={testIDs.PathDetail.screen} bounces={false}>
+				<LeftScreenHeading
+					title="Public Address"
+					networkKey={formattedNetworkKey}
+					headMenu={
+						<PopupMenu
+							testID={testIDs.PathDetail.popupMenuButton}
+							onSelect={onOptionSelect}
+							menuTriggerIconName={'more-vert'}
+							menuItems={[
+								{ text: 'Edit', value: 'PathManagement' },
+								{
+									hide: !isSubstratePath(path),
+									text: 'Derive Account',
+									value: 'PathDerivation'
+								},
+								{
+									testID: testIDs.PathDetail.deleteButton,
+									text: 'Delete',
+									textStyle: styles.deleteText,
+									value: 'PathDelete'
+								}
+							]}
+						/>
+					}
+				/>
+				<PathCard identity={currentIdentity} path={path} />
+				<QrView data={`${accountId}:${accountName}`} />
+				{isUnknownNetwork && <UnknownAccountWarning isPath />}
+			</ScrollView>
+			<QrScannerTab />
+		</SafeAreaViewContainer>
 	);
 }
 
@@ -159,7 +163,7 @@ function PathDetails({
 
 const styles = StyleSheet.create({
 	deleteText: {
-		color: colors.bg_alert
+		color: colors.signal.error
 	}
 });
 

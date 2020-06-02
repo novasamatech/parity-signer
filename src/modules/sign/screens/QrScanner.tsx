@@ -15,9 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
+import Button from 'components/Button';
 import { processBarCode } from 'modules/sign/utils';
 import { onMockBarCodeRead } from 'e2e/injections';
 import { SeedRefsContext } from 'stores/SeedRefStore';
@@ -154,6 +155,7 @@ export function Scanner({
 						<Button
 							onPress={(): void => scannerStore.clearMultipartProgress()}
 							title="Start Over"
+							small
 						/>
 					</View>
 				) : (
@@ -190,20 +192,20 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15
 	},
 	descSecondary: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		paddingBottom: 20
 	},
 	descTitle: {
-		color: colors.bg_text,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 10,
 		textAlign: 'center'
 	},
 	inactive: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		flexDirection: 'column',
 		padding: 20

@@ -62,64 +62,42 @@ function Amount({
 }: AmountProps): React.ReactElement<AmountProps> {
 	const fee = (parseInt(gas, 10) * parseInt(gasPrice, 10)) / WEI_IN_ETH;
 	return (
-		<View style={[{ alignItems: 'center', justifyContent: 'center' }, style]}>
-			<View>
-				<View
-					style={{ backgroundColor: colors.bg, padding: 5, paddingVertical: 2 }}
-				>
-					<Text
-						style={{ fontSize: 20, fontWeight: '800', textAlign: 'center' }}
-					>
-						<Text style={{ color: colors.bg_text }}>{value}</Text>
-						<Text style={{ color: colors.bg_text_sec }}> ETH</Text>
-					</Text>
-				</View>
-				<View style={{ backgroundColor: colors.bg_text_sec, padding: 5 }}>
-					<Text
-						style={{
-							color: colors.bg_text,
-							fontSize: 12,
-							fontWeight: '800',
-							textAlign: 'center'
-						}}
-					>
-						fee: {fee} ETH
-					</Text>
-				</View>
+		<View style={[styles.amountContainer, style]}>
+			<Text style={styles.amountTextContainer}>
+				<Text style={{ color: colors.text.main }}>{value}</Text>
+				<Text style={{ color: colors.text.faded }}> ETH</Text>
+			</Text>
+			<View style={{ marginTop: 5 }}>
+				<Text style={styles.amountText}>fee: {fee} ETH</Text>
 			</View>
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
+	amountContainer: {
+		alignItems: 'center',
+		justifyContent: 'center'
+	},
+	amountText: {
+		color: colors.text.main,
+		fontSize: 12,
+		fontWeight: '800',
+		textAlign: 'center'
+	},
+	amountTextContainer: {
+		fontSize: 20,
+		fontWeight: '800',
+		textAlign: 'center'
+	},
 	body: {
-		backgroundColor: colors.card_bg,
+		backgroundColor: colors.background.card,
 		flexDirection: 'column',
 		padding: 20,
 		paddingTop: 10
 	},
-	content: {},
-	footer: {
-		backgroundColor: '#977CF6',
-		flexDirection: 'row-reverse',
-		padding: 5
-	},
-	footerText: {
-		color: colors.card_bg,
-		fontFamily: fonts.bold
-	},
-	icon: {
-		height: 47,
-		width: 47
-	},
-	secondaryText: {
-		color: colors.card_bg_text_sec,
-		fontFamily: fonts.semiBold,
-		fontSize: 12,
-		textAlign: 'center'
-	},
 	titleText: {
-		color: colors.card_bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		textAlign: 'center'

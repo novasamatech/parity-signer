@@ -49,7 +49,7 @@ export default class PopupMenu extends React.PureComponent<Props> {
 			<Icon
 				name={menuTriggerIconName}
 				size={25}
-				color={colors.bg_text}
+				color={colors.text.main}
 				testID={testID}
 			/>
 		);

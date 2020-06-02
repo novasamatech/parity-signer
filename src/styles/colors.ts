@@ -15,16 +15,23 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 export default {
-	bg: '#1B1B1B',
-	bg_alert: '#EB5757',
-	bg_button: '#48A5C2',
-	bg_text: '#EEE',
-	bg_text_sec: '#AAA',
-	bg_warning: '#FAE265',
-	card_bg: 'rgba(255, 255, 255, 0.15)',
-	card_bgSolid: '#323232',
-	card_bg_text_sec: '#999',
-	card_text: '#1A1A1A',
-	label_text: '#48A5C2',
-	label_text_sec: '#A8CDD9'
+	background: {
+		app: '#151515',
+		button: 'C0C0C0',
+		card: '#262626',
+		os: '#000000'
+	},
+	border: {
+		dark: '#000000',
+		light: '#666666',
+		signal: '#8E1F40'
+	},
+	signal: {
+		error: '#D73400',
+		main: '#FF4077'
+	},
+	text: {
+		faded: '#9A9A9A',
+		main: '#C0C0C0'
+	}
 };

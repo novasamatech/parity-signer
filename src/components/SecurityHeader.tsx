@@ -23,10 +23,8 @@ import { useNavigation } from '@react-navigation/native';
 import ButtonIcon from './ButtonIcon';
 
 import { RootStackParamList } from 'types/routes';
-import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import IdentitiesSwitch from 'components/IdentitiesSwitch';
-import { navigateToQrScanner } from 'utils/navigationHelpers';
 
 function SecurityHeader(): React.ReactElement {
 	const [isConnected, setIsConnected] = useState(false);
@@ -46,17 +44,10 @@ function SecurityHeader(): React.ReactElement {
 					onPress={(): void => navigation.navigate('Security')}
 					iconName="shield-off"
 					iconType="feather"
-					iconColor={colors.bg_alert}
-					iconBgStyle={styles.securityIconBgStyle}
+					iconColor={colors.signal.error}
+					iconSize={26}
 				/>
 			)}
-			<ButtonIcon
-				onPress={(): void => navigateToQrScanner(navigation)}
-				iconName="qrcode-scan"
-				iconType="material-community"
-				iconBgStyle={styles.scannerIconBgStyle}
-				testID={testIDs.SecurityHeader.scanButton}
-			/>
 			<IdentitiesSwitch />
 		</View>
 	);
@@ -64,12 +55,9 @@ function SecurityHeader(): React.ReactElement {
 
 const styles = StyleSheet.create({
 	body: {
-		alignItems: 'center',
 		flexDirection: 'row',
-		paddingRight: 16
-	},
-	scannerIconBgStyle: { backgroundColor: 'transparent' },
-	securityIconBgStyle: { backgroundColor: 'transparent', marginTop: -3 }
+		justifyContent: 'center'
+	}
 });
 
 export default SecurityHeader;

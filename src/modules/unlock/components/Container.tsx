@@ -20,12 +20,12 @@ import styles from '../styles';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
 
-export default function Container(props: any): React.ReactElement {
+export function KeyboardAwareContainer(props: any): React.ReactElement {
 	return (
 		<KeyboardScrollView
 			{...props}
+			bounces={false}
 			style={styles.body}
-			extraHeight={200}
 			testID={testIDs.IdentityPin.scrollScreen}
 		/>
 	);

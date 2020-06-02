@@ -8169,6 +8169,11 @@ react-native-markdown-renderer@^3.2.8:
     prop-types "^15.5.10"
     react-native-fit-image "^1.5.2"
 
+react-native-navbar-color@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-navbar-color/-/react-native-navbar-color-1.0.3.tgz#b796e728226804d405335df53a64a9ed4091d5a6"
+  integrity sha512-VAouso41MWDFC+mLPJmgIaH/B2352MnEgCrqzwDCKf43+nfk7O5FuqtLN9pWKEvX06laSTQPdqy5Arln/GH0Pg==
+
 react-native-popup-menu@^0.15.6:
   version "0.15.6"
   resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.15.6.tgz#ebf885c289028e330dd66d887e685a8b0c2de970"

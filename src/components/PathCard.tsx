@@ -104,7 +104,7 @@ export default function PathCard({
 			: NETWORK_LIST[computedNetworkKey];
 
 	const nonSubstrateCard = (
-		<View testID={testID}>
+		<>
 			<Separator
 				shadow={true}
 				style={{
@@ -113,18 +113,22 @@ export default function PathCard({
 					marginVertical: 0
 				}}
 			/>
-			<View style={styles.content}>
+			<View
+				testID={testID}
+				style={[
+					styles.content,
+					{ backgroundColor: 'transparent', paddingVertical: 0 }
+				]}
+			>
 				<AccountIcon
 					address={address}
 					network={networkParams}
-					style={styles.iconUser}
+					style={styles.identicon}
 				/>
 				<View style={styles.desc}>
-					<View>
-						<Text style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}>
-							{networkParams.title}
-						</Text>
-					</View>
+					<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
+						{networkParams.title}
+					</Text>
 					<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
 					<Address address={address} protocol={networkParams.protocol} />
 				</View>
@@ -137,48 +141,72 @@ export default function PathCard({
 					]}
 				/>
 			</View>
-		</View>
+		</>
 	);
+
 	const substrateDerivationCard = (
-		<View style={styles.body}>
-			<TouchableItem
-				accessibilityComponentType="button"
-				disabled={false}
-				onPress={onPress}
-			>
-				<View style={[styles.content, styles.contentSubstrate]} testID={testID}>
-					<AccountIcon
-						address={address}
-						network={networkParams}
-						style={styles.iconUser}
-					/>
-					<View style={styles.desc}>
-						<View style={styles.titleContainer}>
-							<AccountPrefixedTitle
-								title={pathName!}
-								titlePrefix={titlePrefix}
-							/>
-							{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
-						</View>
-						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
-							<Text style={fontStyles.t_codeS}>
-								{hasPassword ? `${path}///***` : path}
-							</Text>
-						</View>
-						{address !== '' && (
-							<Text
-								style={fontStyles.t_codeS}
-								ellipsizeMode="middle"
-								numberOfLines={1}
-							>
-								{address}
+		<TouchableItem
+			accessibilityComponentType="button"
+			disabled={false}
+			onPress={onPress}
+			style={styles.body}
+		>
+			<View style={styles.content} testID={testID}>
+				<AccountIcon
+					address={address}
+					network={networkParams}
+					style={styles.identicon}
+				/>
+				<View style={styles.desc}>
+					<View style={styles.row}>
+						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
+						{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
+					</View>
+					<View
+						style={{
+							alignItems: 'center',
+							flexDirection: 'row'
+						}}
+					>
+						<AntIcon
+							name="user"
+							size={fontStyles.i_small.fontSize}
+							color={colors.signal.main}
+						/>
+
+						{hasPassword ? (
+							<View style={styles.row}>
+								<Text
+									style={[fontStyles.t_codeS, { color: colors.signal.main }]}
+								>
+									{path}///
+								</Text>
+
+								<AntIcon
+									name="lock"
+									size={fontStyles.i_small.fontSize}
+									color={colors.signal.main}
+									style={{ alignSelf: 'center' }}
+								/>
+							</View>
+						) : (
+							<Text style={[fontStyles.t_codeS, { color: colors.signal.main }]}>
+								{path}
 							</Text>
 						)}
 					</View>
+					{address !== '' && (
+						<Text
+							style={[fontStyles.t_codeS, { color: colors.text.faded }]}
+							ellipsizeMode="middle"
+							numberOfLines={1}
+						>
+							{address}
+						</Text>
+					)}
 				</View>
-			</TouchableItem>
-		</View>
+			</View>
+		</TouchableItem>
 	);
 
 	return isSubstrateNetworkParams(networkParams) ||
@@ -189,41 +217,35 @@ export default function PathCard({
 
 const styles = StyleSheet.create({
 	body: {
-		flexDirection: 'column',
-		marginBottom: 10
+		borderBottomWidth: 1,
+		borderColor: colors.background.app,
+		borderTopWidth: 1
 	},
 	content: {
 		alignItems: 'center',
+		backgroundColor: colors.background.card,
 		flexDirection: 'row',
-		paddingLeft: 16
-	},
-	contentSubstrate: {
-		backgroundColor: colors.card_bg,
+		paddingLeft: 16,
 		paddingVertical: 8
 	},
 	desc: {
 		flex: 1,
-		flexDirection: 'column',
-		justifyContent: 'space-between',
 		paddingLeft: 16
 	},
 	footer: {
-		alignSelf: 'stretch',
-		backgroundColor: '#977CF6',
-		height: 100,
+		height: 80,
 		marginLeft: 8,
-		width: 8
+		width: 4
 	},
 	iconLock: {
 		marginLeft: 4,
 		...fontStyles.h2
 	},
-	iconUser: {
+	identicon: {
 		height: 40,
 		width: 40
 	},
-	titleContainer: {
-		alignItems: 'center',
+	row: {
 		flexDirection: 'row'
 	}
 });

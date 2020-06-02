@@ -15,9 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
-import Button from './Button';
+import TouchableItem from './TouchableItem';
+import Separator from './Separator';
 
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -31,32 +32,33 @@ export default class ButtonNewDerivation extends React.PureComponent<{
 	render(): React.ReactElement {
 		const { onPress, title, testID } = this.props;
 		return (
-			<Button
-				title={title}
-				onPress={onPress}
-				testID={testID}
-				textStyles={StyleSheet.flatten([fontStyles.t_code, styles.text])}
-				buttonStyles={styles.button}
-			/>
+			<TouchableItem onPress={onPress} testID={testID} style={styles.body}>
+				<Separator
+					shadow={true}
+					style={{ backgroundColor: 'transparent', marginVertical: 0 }}
+					shadowStyle={{ height: 16, marginTop: -16 }}
+				/>
+				<Text style={styles.icon}>//</Text>
+				<Text style={styles.textLabel}>{title}</Text>
+			</TouchableItem>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
-	button: {
+	body: {
 		alignItems: 'center',
-		backgroundColor: 'transparent',
-		borderColor: colors.card_bgSolid,
-		borderRadius: 3,
-		borderWidth: 1,
-		elevation: 0,
-		height: 56,
-		marginBottom: 125,
-		marginTop: 24
+		backgroundColor: colors.background.app,
+		height: 68
 	},
-	text: {
-		letterSpacing: -0.4,
-		opacity: 0.4,
-		textAlign: 'center'
+	icon: {
+		...fontStyles.i_large,
+		color: colors.signal.main,
+		marginTop: 8
+	},
+	textLabel: {
+		...fontStyles.a_text,
+		color: colors.text.faded,
+		marginTop: 4
 	}
 });

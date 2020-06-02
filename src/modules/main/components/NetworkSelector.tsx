@@ -44,6 +44,7 @@ import {
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
+import QrScannerTab from 'components/QrScannerTab';
 
 const excludedNetworks = [
 	UnknownNetworkKeys.UNKNOWN,
@@ -149,7 +150,7 @@ export default function NetworkSelector({
 			}
 			testID={testIDs.Main.addCustomNetworkButton}
 			title="Create Custom Path"
-			networkColor={colors.bg}
+			networkColor={colors.background.app}
 		/>
 	);
 
@@ -162,7 +163,7 @@ export default function NetworkSelector({
 					onPress={(): void => setShouldShowMoreNetworks(true)}
 					testID={testIDs.Main.addNewNetworkButton}
 					title="Add Network Account"
-					networkColor={colors.bg}
+					networkColor={colors.background.app}
 				/>
 			);
 		} else {
@@ -238,6 +239,7 @@ export default function NetworkSelector({
 				testID={testIDs.Main.chooserScreen}
 				ListFooterComponent={renderAddButton}
 			/>
+			{!shouldShowMoreNetworks && !isNew && <QrScannerTab />}
 		</SafeAreaViewContainer>
 	);
 }

@@ -16,7 +16,7 @@
 
 import { isHex } from '@polkadot/util';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, StyleSheet, View, ViewStyle } from 'react-native';
+import { Dimensions, Image, View, ViewStyle } from 'react-native';
 
 import { qrCode, qrCodeHex } from 'utils/native';
 
@@ -57,13 +57,14 @@ export default function QrView(props: Props): React.ReactElement {
 	return (
 		<View
 			style={[
-				styles.rectangleContainer,
 				{
+					alignItems: 'center',
 					backgroundColor: 'white',
 					flexBasis,
 					height: flexBasis,
+					justifyContent: 'center',
 					marginHorizontal: 16,
-					marginVertical: 32,
+					marginVertical: 24,
 					width: deviceWidth - 32
 				},
 				props.style
@@ -75,12 +76,3 @@ export default function QrView(props: Props): React.ReactElement {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	rectangleContainer: {
-		alignItems: 'center',
-		backgroundColor: 'transparent',
-		flex: 1,
-		justifyContent: 'center'
-	}
-});

@@ -23,5 +23,6 @@ export default {
 	robotoLight: 'Roboto-Light',
 	robotoMedium: 'Roboto-Medium',
 	robotoMono: 'RobotoMono-Regular',
+	robotoMonoMedium: 'RobotoMono-Medium',
 	semiBold: 'ManifoldCF-DemiBold'
 };

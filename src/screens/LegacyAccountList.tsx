@@ -15,14 +15,15 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 import AccountCard from 'components/AccountCard';
 import { withAccountStore } from 'utils/HOC';
+import QrScannerTab from 'components/QrScannerTab';
 
 function LegacyAccountList({
 	navigation,
@@ -49,12 +50,15 @@ function LegacyAccountList({
 	);
 
 	return (
-		<SafeAreaScrollViewContainer
-			testID={testIDs.AccountListScreen.accountList}
-			style={styles.content}
-		>
-			{Array.from(accountsMap.entries()).map(renderAccountCard)}
-		</SafeAreaScrollViewContainer>
+		<SafeAreaViewContainer>
+			<ScrollView
+				testID={testIDs.AccountListScreen.accountList}
+				style={styles.content}
+			>
+				{Array.from(accountsMap.entries()).map(renderAccountCard)}
+			</ScrollView>
+			<QrScannerTab />
+		</SafeAreaViewContainer>
 	);
 }
 

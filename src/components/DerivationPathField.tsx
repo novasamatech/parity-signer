@@ -102,6 +102,6 @@ const ownStyles = StyleSheet.create({
 		paddingTop: 20
 	},
 	invalidInput: {
-		borderBottomColor: colors.bg_alert
+		borderBottomColor: colors.signal.error
 	}
 });

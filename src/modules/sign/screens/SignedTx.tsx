@@ -31,6 +31,7 @@ import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
+import Separator from 'components/Separator';
 
 function SignedTx(
 	props: NavigationAccountScannerProps<'SignedTx'>
@@ -68,40 +69,41 @@ function SignedTxView({
 	);
 
 	return (
-		<SafeAreaScrollViewContainer
-			contentContainerStyle={{ paddingBottom: 40 }}
-			style={styles.body}
-		>
-			<Text style={styles.topTitle}>Scan Signature</Text>
+		<SafeAreaScrollViewContainer>
+			<Text style={styles.topTitle}>
+				Signed {isEthereum ? 'transaction' : 'extrinsic'}
+			</Text>
+			<Separator
+				shadow={true}
+				style={{
+					height: 0,
+					marginVertical: 20
+				}}
+			/>
+			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+				{'Scan to publish'}
+			</Text>
 			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
 				<QrView data={data} />
 			</View>
-
-			<Text style={[fontStyles.t_big, styles.bodyContent]}>
-				{`You are about to send the following ${
-					isEthereum ? 'transaction' : 'extrinsic'
-				}`}
-			</Text>
-			<View style={styles.bodyContent}>
-				<CompatibleCard
-					account={sender}
-					accountsStore={accounts}
-					titlePrefix={'from: '}
-				/>
-				{isEthereum && (
-					<View style={{ marginTop: 16 }}>
-						<TxDetailsCard
-							style={{ marginBottom: 20 }}
-							description={strings.INFO_ETH_TX}
-							value={value}
-							gas={gas}
-							gasPrice={gasPrice}
-						/>
-						<Text style={styles.title}>Recipient</Text>
-						<CompatibleCard account={recipient} accountsStore={accounts} />
-					</View>
-				)}
-			</View>
+			<CompatibleCard
+				account={sender}
+				accountsStore={accounts}
+				titlePrefix={'from:'}
+			/>
+			{isEthereum && (
+				<View style={[styles.bodyContent, { marginTop: 16 }]}>
+					<TxDetailsCard
+						style={{ marginBottom: 20 }}
+						description={strings.INFO_ETH_TX}
+						value={value}
+						gas={gas}
+						gasPrice={gasPrice}
+					/>
+					<Text style={styles.title}>Recipient</Text>
+					<CompatibleCard account={recipient} accountsStore={accounts} />
+				</View>
+			)}
 		</SafeAreaScrollViewContainer>
 	);
 }

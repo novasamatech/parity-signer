@@ -21,10 +21,9 @@ import {
 	Text,
 	TextStyle,
 	TouchableNativeFeedback,
-	TouchableNativeFeedbackProps,
 	TouchableOpacity,
-	View,
-	ViewStyle
+	ViewStyle,
+	View
 } from 'react-native';
 
 import colors from 'styles/colors';
@@ -36,6 +35,7 @@ export default class Button extends React.PureComponent<{
 	onPress: ButtonListener;
 	textStyles?: TextStyle;
 	buttonStyles?: ViewStyle;
+	aboveKeyboard?: boolean;
 	disabled?: boolean;
 	small?: boolean;
 	onlyText?: boolean;
@@ -46,6 +46,7 @@ export default class Button extends React.PureComponent<{
 		const {
 			onPress,
 			title,
+			aboveKeyboard,
 			disabled,
 			small,
 			textStyles,
@@ -55,64 +56,94 @@ export default class Button extends React.PureComponent<{
 			style
 		} = this.props;
 
-		const finalTextStyles = [textStyles];
+		const finalTextStyles = [styles.buttonText, {}];
 		const finalButtonStyles = [styles.button, buttonStyles];
 
 		if (small) {
-			finalTextStyles.push(fontStyles.t_important);
+			finalTextStyles.push({ fontSize: 14 });
 			finalButtonStyles.push(styles.buttonSmall);
 		}
 		if (onlyText) {
-			finalTextStyles.push({ color: colors.bg_button });
+			finalTextStyles.push({ color: colors.text.main });
 			finalButtonStyles.push(styles.buttonOnlyText);
 		}
 		if (disabled) {
-			finalTextStyles.push(styles.textDisabled);
 			finalButtonStyles.push(styles.buttonDisabled);
 		}
+		if (aboveKeyboard) {
+			finalButtonStyles.push(styles.buttonAboveKeyboard);
+		}
 
-		const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
-			Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
-		return (
-			<Touchable
+		return Platform.OS === 'android' ? (
+			<TouchableNativeFeedback
 				accessibilityComponentType="button"
 				disabled={disabled}
 				onPress={onPress}
 				testID={testID}
 			>
 				<View style={[finalButtonStyles, style]}>
-					<Text style={[fontStyles.h1, finalTextStyles]}>{title}</Text>
+					<Text
+						style={[
+							fontStyles.h1,
+							styles.buttonText,
+							finalTextStyles,
+							textStyles
+						]}
+					>
+						{title}
+					</Text>
 				</View>
-			</Touchable>
+			</TouchableNativeFeedback>
+		) : (
+			<TouchableOpacity
+				accessibilityComponentType="button"
+				disabled={disabled}
+				onPress={onPress}
+				testID={testID}
+				style={[finalButtonStyles, style]}
+			>
+				<Text
+					style={[
+						fontStyles.h1,
+						styles.buttonText,
+						finalTextStyles,
+						textStyles
+					]}
+				>
+					{title}
+				</Text>
+			</TouchableOpacity>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
 	button: {
-		alignItems: 'center',
-		backgroundColor: colors.bg_button,
+		alignSelf: 'center',
+		backgroundColor: colors.text.main,
 		borderRadius: 60,
-		elevation: 4,
-		height: 56,
+		height: 48,
 		justifyContent: 'center',
-		margin: 8,
-		paddingHorizontal: 64
+		marginVertical: 40,
+		paddingHorizontal: 40
+	},
+	buttonAboveKeyboard: {
+		bottom: 56,
+		position: 'absolute'
 	},
 	buttonDisabled: {
-		backgroundColor: colors.card_bgSolid,
-		elevation: 0
+		backgroundColor: colors.background.card
 	},
 	buttonOnlyText: {
-		backgroundColor: colors.bg,
-		elevation: 0,
-		paddingHorizontal: 0
+		backgroundColor: colors.background.app,
+		elevation: 8
 	},
 	buttonSmall: {
-		height: 48,
-		paddingHorizontal: 48
+		height: 40,
+		marginVertical: 8,
+		paddingHorizontal: 32
 	},
-	textDisabled: {
-		color: colors.card_bg
+	buttonText: {
+		...fontStyles.a_button
 	}
 });

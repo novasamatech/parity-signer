@@ -22,6 +22,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import NavigationBar from 'react-native-navbar-color';
 
 import {
 	AppNavigator,
@@ -39,7 +40,10 @@ import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
-	if (__DEV__) {
+	NavigationBar.setColor(colors.background.os);
+	if (global.inTest) {
+		console.disableYellowBox = true;
+	} else if (__DEV__) {
 		YellowBox.ignoreWarnings([
 			'Warning: componentWillReceiveProps',
 			'Warning: componentWillMount',
@@ -98,7 +102,10 @@ export default function App(props: AppProps): React.ReactElement {
 			<SeedRefStore>
 				<UnstatedProvider>
 					<MenuProvider backHandler={true}>
-						<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+						<StatusBar
+							barStyle="light-content"
+							backgroundColor={colors.background.app}
+						/>
 						<GlobalStateContext.Provider value={globalContext}>
 							<NavigationContainer>{renderStacks()}</NavigationContainer>
 						</GlobalStateContext.Provider>
@@ -111,7 +118,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 const emptyScreenStyles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		flexDirection: 'column',
 		padding: 20

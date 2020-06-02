@@ -343,19 +343,19 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		...fontStyles.t_label,
-		backgroundColor: colors.label_text,
+		backgroundColor: colors.signal.main,
 		marginBottom: 10,
 		paddingLeft: 8,
 		textAlign: 'left'
 	},
 	secondaryText: {
 		...fontStyles.t_codeS,
-		color: colors.label_text,
+		color: colors.signal.main,
 		paddingHorizontal: 8,
 		textAlign: 'left'
 	},
 	titleText: {
 		...fontStyles.t_codeS,
-		color: colors.label_text_sec
+		color: colors.text.main
 	}
 });

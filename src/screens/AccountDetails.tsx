@@ -15,12 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
 import PopupMenu from 'components/PopupMenu';
@@ -34,6 +33,7 @@ import UnknownAccountWarning from 'components/UnknownAccountWarning';
 import { withAccountStore } from 'utils/HOC';
 import AccountIcon from 'components/AccountIcon';
 import { NavigationAccountProps } from 'types/props';
+import QrScannerTab from 'components/QrScannerTab';
 
 function AccountDetails({
 	accounts,
@@ -75,49 +75,54 @@ function AccountDetails({
 	};
 
 	return (
-		<SafeAreaScrollViewContainer contentContainerStyle={styles.scrollBody}>
-			<View style={styles.header}>
-				<AccountIcon
-					address={''}
-					network={NETWORK_LIST[account.networkKey]}
-					style={styles.icon}
-				/>
-				<Text style={fontStyles.h2}>Public Address</Text>
-				<View style={styles.menuView}>
-					<PopupMenu
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
-						menuItems={[
-							{ text: 'Edit', value: 'AccountEdit' },
-							{ text: 'Change Pin', value: 'AccountPin' },
-							{
-								text: 'View Recovery Phrase',
-								value: 'LegacyAccountBackup'
-							},
-							{
-								text: 'Delete',
-								textStyle: styles.deleteText,
-								value: 'AccountDelete'
-							}
-						]}
+		<SafeAreaViewContainer>
+			<ScrollView contentContainerStyle={styles.scrollBody}>
+				<View style={styles.header}>
+					<AccountIcon
+						address={''}
+						network={NETWORK_LIST[account.networkKey]}
+						style={styles.icon}
 					/>
+					<Text style={fontStyles.h2}>Public Address</Text>
+					<View style={styles.menuView}>
+						<PopupMenu
+							onSelect={onOptionSelect}
+							menuTriggerIconName={'more-vert'}
+							menuItems={[
+								{ text: 'Edit', value: 'AccountEdit' },
+								{ text: 'Change Pin', value: 'AccountPin' },
+								{
+									text: 'View Recovery Phrase',
+									value: 'LegacyAccountBackup'
+								},
+								{
+									text: 'Delete',
+									textStyle: styles.deleteText,
+									value: 'AccountDelete'
+								}
+							]}
+						/>
+					</View>
 				</View>
-			</View>
-			<AccountCard
-				address={account.address}
-				networkKey={account.networkKey}
-				title={account.name}
-			/>
-			<View>
-				{protocol !== NetworkProtocols.UNKNOWN ? (
-					<QrView
-						data={account.name ? `${selectedKey}:${account.name}` : selectedKey}
-					/>
-				) : (
-					<UnknownAccountWarning />
-				)}
-			</View>
-		</SafeAreaScrollViewContainer>
+				<AccountCard
+					address={account.address}
+					networkKey={account.networkKey}
+					title={account.name}
+				/>
+				<View>
+					{protocol !== NetworkProtocols.UNKNOWN ? (
+						<QrView
+							data={
+								account.name ? `${selectedKey}:${account.name}` : selectedKey
+							}
+						/>
+					) : (
+						<UnknownAccountWarning />
+					)}
+				</View>
+			</ScrollView>
+			<QrScannerTab />
+		</SafeAreaViewContainer>
 	);
 }
 
@@ -125,11 +130,11 @@ export default withAccountStore(AccountDetails);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1
 	},
 	deleteText: {
-		color: colors.bg_alert
+		color: colors.signal.error
 	},
 	header: {
 		alignItems: 'center',
@@ -149,12 +154,5 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingBottom: 40,
 		paddingTop: 8
-	},
-	title: {
-		color: colors.bg_text_sec,
-		flexDirection: 'column',
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		justifyContent: 'center'
 	}
 });

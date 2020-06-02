@@ -15,15 +15,15 @@
 
 import React from 'react';
 
-import ButtonMainAction from 'components/ButtonMainAction';
 import ScreenHeading from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
-import Container from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import { NavigationProps } from 'types/props';
+import Button from 'components/Button';
 
 export default function PinNew({
 	route
@@ -44,13 +44,16 @@ export default function PinNew({
 	}
 
 	return (
-		<Container>
+		<KeyboardAwareContainer
+			contentContainerStyle={{
+				flexGrow: 1
+			}}
+		>
 			<ScreenHeading
 				title={t.title.pinCreation}
 				subtitle={getSubtitle(state, false)}
 				error={state.pinMismatch || state.pinTooShort}
 			/>
-
 			<PinInput
 				label={t.pinLabel}
 				autoFocus
@@ -72,12 +75,12 @@ export default function PinNew({
 				value={state.confirmation}
 				onSubmitEditing={submit}
 			/>
-			<ButtonMainAction
+			<Button
 				title={t.doneButton.pinCreation}
-				bottom={false}
 				onPress={submit}
 				testID={testIDs.IdentityPin.submitButton}
+				aboveKeyboard
 			/>
-		</Container>
+		</KeyboardAwareContainer>
 	);
 }

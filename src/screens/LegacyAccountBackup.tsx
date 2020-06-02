@@ -105,10 +105,6 @@ function LegacyAccountBackup({
 				)}
 				{isNew && (
 					<Button
-						buttonStyles={StyleSheet.flatten([
-							styles.nextStep,
-							{ marginBottom: 20 }
-						])}
 						title="Backup Done"
 						onPress={(): void => {
 							alertBackupDone(() => {
@@ -134,7 +130,7 @@ const styles = StyleSheet.create({
 		padding: 16
 	},
 	derivationText: {
-		backgroundColor: colors.card_bg,
+		backgroundColor: colors.background.card,
 		fontFamily: fonts.regular,
 		fontSize: 20,
 		lineHeight: 26,
@@ -142,11 +138,8 @@ const styles = StyleSheet.create({
 		minHeight: 30,
 		padding: 10
 	},
-	nextStep: {
-		marginTop: 20
-	},
 	title: {
-		color: colors.bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20

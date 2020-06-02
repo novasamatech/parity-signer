@@ -37,7 +37,10 @@ const renderSubtitle = (
 ): ReactNode => {
 	if (!subtitle || subtitle === '') return;
 	const subtitleBodyStyle: ViewStyle[] = [baseStyles.subtitleBody],
-		subtitleTextStyle: TextStyle[] = [fontStyles.t_codeS];
+		subtitleTextStyle: TextStyle[] = [
+			fontStyles.t_codeS,
+			{ color: colors.text.faded }
+		];
 	if (isAlignLeft) {
 		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
 		subtitleTextStyle.push({ textAlign: 'left' });
@@ -61,7 +64,7 @@ const renderSubtitle = (
 };
 const renderSubtitleIcon = (hasSubtitleIcon?: boolean): ReactNode => {
 	if (!hasSubtitleIcon) return;
-	return <AntIcon name="user" size={10} color={colors.bg_text_sec} />;
+	return <AntIcon name="user" size={10} color={colors.text.faded} />;
 };
 
 const renderBack = (onPress?: ButtonListener): ReactNode => {
@@ -80,7 +83,7 @@ const renderIcon = (iconName?: string, iconType?: string): ReactNode => {
 	if (!iconName) return;
 	return (
 		<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
-			<Icon name={iconName} type={iconType} color={colors.bg_text} />
+			<Icon name={iconName} type={iconType} color={colors.text.main} />
 		</View>
 	);
 };
@@ -109,18 +112,20 @@ export function LeftScreenHeading({
 	};
 	return (
 		<View style={baseStyles.bodyWithIcon}>
-			<AccountIcon
-				address={''}
-				network={NETWORK_LIST[networkKey]}
-				style={baseStyles.networkIcon}
-			/>
-			<View>
-				<Text style={subtitle ? titleStyleWithSubtitle : titleStyle}>
-					{title}
-				</Text>
-				{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+			<View style={{ alignItems: 'center', flexDirection: 'row' }}>
+				<AccountIcon
+					address={''}
+					network={NETWORK_LIST[networkKey]}
+					style={baseStyles.networkIcon}
+				/>
+				<View>
+					<Text style={subtitle ? titleStyleWithSubtitle : titleStyle}>
+						{title}
+					</Text>
+					{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+				</View>
 			</View>
-			<View style={baseStyles.menu}>{headMenu}</View>
+			{headMenu}
 		</View>
 	);
 }
@@ -183,7 +188,7 @@ export default class ScreenHeading extends React.PureComponent<{
 					<Text style={baseStyles.text}>{title}</Text>
 					{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, true)}
 				</View>
-				<View style={baseStyles.menu}>{headMenu}</View>
+				{headMenu}
 			</View>
 		);
 	}
@@ -197,7 +202,9 @@ const baseStyles = StyleSheet.create({
 	bodyWithIcon: {
 		alignItems: 'center',
 		flexDirection: 'row',
-		marginBottom: 16
+		justifyContent: 'space-between',
+		marginBottom: 16,
+		paddingRight: 16
 	},
 	bodyWithIdentity: {
 		flexDirection: 'column',
@@ -217,10 +224,9 @@ const baseStyles = StyleSheet.create({
 	linkIcon: {
 		marginLeft: 10
 	},
-	menu: {
-		marginLeft: 'auto',
-		marginRight: 10
-	},
+	// menu: {
+	// 	alignSelf: 'flex-end'
+	// },
 	networkIcon: {
 		paddingHorizontal: 16
 	},
@@ -233,7 +239,7 @@ const baseStyles = StyleSheet.create({
 		textAlign: 'center'
 	},
 	t_error: {
-		color: colors.bg_alert
+		color: colors.signal.error
 	},
 	t_left: {
 		textAlign: 'left'
