@@ -24,6 +24,7 @@ use rlp::decode_list;
 use rustc_hex::{FromHex, ToHex};
 use tiny_keccak::keccak256 as keccak;
 use tiny_keccak::Keccak;
+use substrate_bip39::seed_from_entropy;
 
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
@@ -34,6 +35,7 @@ mod result;
 mod sr25519;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
+pub const MINI_SECRET_KEY_LENGTH: usize = 32;
 
 fn base64png(png: &[u8]) -> String {
 	static HEADER: &str = "data:image/png;base64,";
@@ -219,6 +221,18 @@ export! {
 		Ok(keypair.ss58_address(prefix))
 	}
 
+	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSeed
+	fn substrate_brainwallet_seed(
+		suri: &str
+	) -> crate::Result<String> {
+		let mnemonic = Mnemonic::from_phrase(suri, Language::English)
+			.map_err(|_e|crate::Error::KeyPairIsNone)?;
+		let seed = seed_from_entropy(mnemonic.entropy(), "")
+			.map_err(|_e|crate::Error::KeyPairIsNone)?;
+		let hex: String = seed[0..MINI_SECRET_KEY_LENGTH].to_hex();
+		Ok(hex)
+	}
+
 	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
 	fn substrate_brainwallet_sign(
 		suri: &str,
@@ -381,6 +395,14 @@ mod tests {
 		// Public key (hex): 0x944eeb240615f4a94f673f240a256584ba178e22dd7b67503a753968e2f95761
 		let expected = "5FRAPSnpgmnXAnmPVv68fT6o7ntTvaZmkTED8jDttnXs9k4n";
 		let generated = substrate_brainwallet_address(SEED_PHRASE, 42).unwrap();
+
+		assert_eq!(expected, generated);
+	}
+
+	#[test]
+	fn test_substrate_brainwallet_seed() {
+		let expected = "b139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224";
+		let generated = substrate_brainwallet_seed(SEED_PHRASE).unwrap();
 
 		assert_eq!(expected, generated);
 	}
