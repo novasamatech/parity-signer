@@ -221,15 +221,30 @@ export! {
 		Ok(keypair.ss58_address(prefix))
 	}
 
-	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSeed
-	fn substrate_brainwallet_seed(
+	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSecret
+	fn substrate_brainwallet_secret(
 		suri: &str
 	) -> crate::Result<String> {
 		let mnemonic = Mnemonic::from_phrase(suri, Language::English)
 			.map_err(|_e|crate::Error::KeyPairIsNone)?;
-		let seed = seed_from_entropy(mnemonic.entropy(), "")
+		let secret = seed_from_entropy(mnemonic.entropy(), "")
 			.map_err(|_e|crate::Error::KeyPairIsNone)?;
-		let hex: String = seed[0..MINI_SECRET_KEY_LENGTH].to_hex();
+		let hex: String = secret[0..MINI_SECRET_KEY_LENGTH].to_hex();
+		Ok(hex)
+	}
+
+	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSecretWithRef
+	fn substrate_brainwallet_secre_with_ref (
+		seed_ref: i64,
+		suri_suffix: &str,
+	) -> crate::Result<String>{
+		let seed = unsafe { Box::from_raw(seed_ref as *mut String) };
+		let suri = format!("{}{}", &seed, suri_suffix);
+		let mnemonic = Mnemonic::from_phrase(suri, Language::English)
+			.map_err(|_e|crate::Error::KeyPairIsNone)?;
+		let secret = seed_from_entropy(mnemonic.entropy(), "")
+			.map_err(|_e|crate::Error::KeyPairIsNone)?;
+		let hex: String = secret[0..MINI_SECRET_KEY_LENGTH].to_hex();
 		Ok(hex)
 	}
 

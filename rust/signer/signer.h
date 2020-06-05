@@ -79,3 +79,7 @@ const char* substrate_brainwallet_sign_with_ref(struct ExternError*, int64_t see
 const char* substrate_address_with_ref(struct ExternError*, int64_t seed_ref, const char* suri_suffix, const unsigned prefix);
 
 const char* brain_wallet_address_with_ref(struct ExternError*, int64_t seed_ref);
+
+const char* brain_wallet_secret_with_ref(struct ExternError*, int64_t seed_ref, const char* suri_suffix,)
+
+const char* brain_wallet_secret(struct ExternError*, const char* seed)
