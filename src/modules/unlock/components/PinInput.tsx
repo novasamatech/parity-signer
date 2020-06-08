@@ -14,7 +14,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { MutableRefObject } from 'react';
-import { StyleSheet, TextInputProps } from 'react-native';
+import { KeyboardTypeOptions, StyleSheet, TextInputProps } from 'react-native';
 
 import TextInput from 'components/TextInput';
 import fontStyles from 'styles/fontStyles';
@@ -23,6 +23,7 @@ import colors from 'styles/colors';
 interface PinInputProps extends TextInputProps {
 	label: string;
 	focus?: boolean;
+	keyboardType?: KeyboardTypeOptions;
 	ref?: MutableRefObject<TextInput | null>;
 }
 
@@ -31,7 +32,7 @@ export default function PinInput(props: PinInputProps): React.ReactElement {
 		<TextInput
 			keyboardAppearance="dark"
 			editable
-			keyboardType="numeric"
+			keyboardType={props.keyboardType ?? 'numeric'}
 			multiline={false}
 			autoCorrect={false}
 			numberOfLines={1}
