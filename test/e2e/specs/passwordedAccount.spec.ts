@@ -21,7 +21,7 @@ const {
 } = testIDs;
 
 const passwordedPath = '//passworded';
-const password = '111111';
+const password = 'random';
 
 describe('Load test', () => {
 	testRecoverIdentity();
@@ -37,15 +37,15 @@ describe('Load test', () => {
 	it('should sign the set remarks request', async () => {
 		await launchWithScanRequest(ScanTestRequest.passwordedAccountExtrinsic);
 		await testTap(SecurityHeader.scanButton);
-		await testInput(IdentityPin.unlockPinInput, pinCode);
-		await testInputWithDone(IdentityPin.passwordInput, password);
+		await testInputWithDone(IdentityPin.unlockPinInput, pinCode);
+		await testInput(IdentityPin.passwordInput, password);
 		await testVisible(SignedTx.qrView);
 	});
 
 	it('does only need password again in the second try', async () => {
 		await tapBack();
 		await testTap(SecurityHeader.scanButton);
-		await testInputWithDone(IdentityPin.passwordInput, password);
+		await testInput(IdentityPin.passwordInput, password);
 		await testVisible(SignedTx.qrView);
 	});
 });
