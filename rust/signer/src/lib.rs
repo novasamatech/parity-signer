@@ -35,7 +35,7 @@ mod result;
 mod sr25519;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
-pub const MINI_SECRET_KEY_LENGTH: usize = 32;
+const MINI_SECRET_KEY_LENGTH: usize = 32;
 
 fn base64png(png: &[u8]) -> String {
 	static HEADER: &str = "data:image/png;base64,";
@@ -225,26 +225,20 @@ export! {
 	fn substrate_brainwallet_secret(
 		suri: &str
 	) -> crate::Result<String> {
-		let mnemonic = Mnemonic::from_phrase(suri, Language::English)
-			.map_err(|_e|crate::Error::KeyPairIsNone)?;
-		let secret = seed_from_entropy(mnemonic.entropy(), "")
-			.map_err(|_e|crate::Error::KeyPairIsNone)?;
-		let hex: String = secret[0..MINI_SECRET_KEY_LENGTH].to_hex();
+		let hex = sr25519::KeyPair::from_suri_to_secret(suri)
+			.ok_or(crate::Error::KeyPairIsNone)?;
 		Ok(hex)
 	}
 
 	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSecretWithRef
-	fn substrate_brainwallet_secre_with_ref (
+	fn substrate_brainwallet_secret_with_ref (
 		seed_ref: i64,
-		suri_suffix: &str,
-	) -> crate::Result<String>{
+		suri_suffix: &str
+	) -> crate::Result<String> {
 		let seed = unsafe { Box::from_raw(seed_ref as *mut String) };
 		let suri = format!("{}{}", &seed, suri_suffix);
-		let mnemonic = Mnemonic::from_phrase(suri, Language::English)
-			.map_err(|_e|crate::Error::KeyPairIsNone)?;
-		let secret = seed_from_entropy(mnemonic.entropy(), "")
-			.map_err(|_e|crate::Error::KeyPairIsNone)?;
-		let hex: String = secret[0..MINI_SECRET_KEY_LENGTH].to_hex();
+		let hex = sr25519::KeyPair::from_suri_to_secret(&suri)
+			.ok_or(crate::Error::KeyPairIsNone)?;
 		Ok(hex)
 	}
 
@@ -362,7 +356,7 @@ mod tests {
 
 	static SEED_PHRASE: &str =
 		"grant jaguar wish bench exact find voice habit tank pony state salmon";
-	static SURI_SUFFIX: &str = "//hard/soft/0";
+	static SURI_SUFFIX: &str = "";
 	static ENCRYPTED_SEED: &str = "{\"cipher\":\"aes-128-ctr\",\"cipherparams\":{\"iv\":\"47b4b75d13045ff7569da858e234f7ea\"},\"ciphertext\":\"ca1cf5387822b70392c4aeec729676f91ab00a795d7593fb7e52ecc333dbc4a1acbedc744b5d8d519c714e194bd741995244c8128bfdce6c184d6bda4ca136ed265eedcee9\",\"kdf\":\"pbkdf2\",\"kdfparams\":{\"c\":10240,\"dklen\":32,\"prf\":\"hmac-sha256\",\"salt\":\"b4a2d1edd1a70fe2eb48d7aff15c19e234f6aa211f5142dddb05a59af12b3381\"},\"mac\":\"b38a54eb382f2aa1a8be2f7b86fe040fe112d0f42fea03fac186dccdd7ae3eb9\"}";
 	static PIN: &str = "000000";
 	static SUBSTRATE_ADDRESS: &str = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
@@ -417,8 +411,17 @@ mod tests {
 	#[test]
 	fn test_substrate_brainwallet_seed() {
 		let expected = "b139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224";
-		let generated = substrate_brainwallet_seed(SEED_PHRASE).unwrap();
+		let generated = substrate_brainwallet_secret(SEED_PHRASE).unwrap();
 
+		assert_eq!(expected, generated);
+	}
+
+	#[test]
+	fn test_substrate_brainwallet_seed_with_ref() {
+		let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
+		let expected = "b139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224";
+		let generated = substrate_brainwallet_secret_with_ref(data_pointer, SURI_SUFFIX).unwrap();
+		// let generated = "b111";
 		assert_eq!(expected, generated);
 	}
 

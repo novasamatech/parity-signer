@@ -6,12 +6,14 @@ use regex::Regex;
 use schnorrkel::derive::{ChainCode, Derivation};
 use schnorrkel::{ExpansionMode, SecretKey, Signature};
 use substrate_bip39::mini_secret_from_entropy;
+use rustc_hex::ToHex;
 
 pub struct KeyPair(schnorrkel::Keypair);
 
 const SIGNING_CTX: &[u8] = b"substrate";
 const JUNCTION_ID_LEN: usize = 32;
 const CHAIN_CODE_LENGTH: usize = 32;
+const MINI_SECRET_KEY_LENGTH: usize = 32;
 
 impl KeyPair {
 	pub fn from_bip39_phrase(phrase: &str, password: Option<&str>) -> Option<KeyPair> {
@@ -21,6 +23,38 @@ impl KeyPair {
 		Some(KeyPair(
 			mini_secret_key.expand_to_keypair(ExpansionMode::Ed25519),
 		))
+	}
+
+	pub fn from_suri_to_secret(suri: &str) -> Option<String> {
+		lazy_static! {
+			static ref RE_SURI: Regex = {
+				Regex::new(r"^(?P<phrase>\w+( \w+)*)?(?P<path>(//?[^/]+)*)(///(?P<password>.*))?$")
+					.expect("constructed from known-good static value; qed")
+			};
+			static ref RE_JUNCTION: Regex =
+				Regex::new(r"/(/?[^/]+)").expect("constructed from known-good static value; qed");
+		}
+
+		let cap = RE_SURI.captures(suri)?;
+		let path = RE_JUNCTION
+			.captures_iter(&cap["path"])
+			.map(|j| DeriveJunction::from(&j[1]));
+
+		let pair = Self::from_bip39_phrase(
+			cap.name("phrase").map(|p| p.as_str())?,
+			cap.name("password").map(|p| p.as_str()),
+		)?;
+
+		Some(pair.derive_secret(path).to_hex())
+	}
+
+	fn derive_secret(&self, path: impl Iterator<Item = DeriveJunction>) -> [u8; 64] {
+		let init = self.0.secret.clone();
+		let result = path.fold(init, |acc, j| match j {
+			DeriveJunction::Soft(cc) => acc.derived_key_simple(ChainCode(cc), &[]).0,
+			DeriveJunction::Hard(cc) => derive_hard_junction(&acc, cc),
+		});
+		result.to_bytes()
 	}
 
 	// Should match implementation at https://github.com/paritytech/substrate/blob/master/core/primitives/src/crypto.rs#L653-L682
