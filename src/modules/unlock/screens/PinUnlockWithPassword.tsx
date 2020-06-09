@@ -90,6 +90,7 @@ function PinUnlockWithPassword({
 				label={t.passwordLabel}
 				testID={testIDs.IdentityPin.passwordInput}
 				returnKeyType="done"
+				keyboardType="default"
 				focus={focusPassword}
 				onChangeText={onPasswordInputChange}
 				onSubmitEditing={submit}
