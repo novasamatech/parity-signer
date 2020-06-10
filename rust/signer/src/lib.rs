@@ -225,9 +225,9 @@ export! {
 	fn substrate_brainwallet_secret(
 		suri: &str
 	) -> crate::Result<String> {
-		let hex = sr25519::KeyPair::from_suri_to_secret(suri)
+		let bytes = sr25519::KeyPair::get_derived_secret(&suri)
 			.ok_or(crate::Error::KeyPairIsNone)?;
-		Ok(hex)
+		Ok(bytes.to_hex())
 	}
 
 	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSecretWithRef
@@ -237,9 +237,9 @@ export! {
 	) -> crate::Result<String> {
 		let seed = unsafe { Box::from_raw(seed_ref as *mut String) };
 		let suri = format!("{}{}", &seed, suri_suffix);
-		let hex = sr25519::KeyPair::from_suri_to_secret(&suri)
+		let bytes = sr25519::KeyPair::get_derived_secret(&suri)
 			.ok_or(crate::Error::KeyPairIsNone)?;
-		Ok(hex)
+		Ok(bytes.to_hex())
 	}
 
 	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
@@ -357,6 +357,7 @@ mod tests {
 	static SEED_PHRASE: &str =
 		"grant jaguar wish bench exact find voice habit tank pony state salmon";
 	static SURI_SUFFIX: &str = "";
+	static SURI_SUFFIX_HARD: &str = "//hard";
 	static ENCRYPTED_SEED: &str = "{\"cipher\":\"aes-128-ctr\",\"cipherparams\":{\"iv\":\"47b4b75d13045ff7569da858e234f7ea\"},\"ciphertext\":\"ca1cf5387822b70392c4aeec729676f91ab00a795d7593fb7e52ecc333dbc4a1acbedc744b5d8d519c714e194bd741995244c8128bfdce6c184d6bda4ca136ed265eedcee9\",\"kdf\":\"pbkdf2\",\"kdfparams\":{\"c\":10240,\"dklen\":32,\"prf\":\"hmac-sha256\",\"salt\":\"b4a2d1edd1a70fe2eb48d7aff15c19e234f6aa211f5142dddb05a59af12b3381\"},\"mac\":\"b38a54eb382f2aa1a8be2f7b86fe040fe112d0f42fea03fac186dccdd7ae3eb9\"}";
 	static PIN: &str = "000000";
 	static SUBSTRATE_ADDRESS: &str = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
@@ -410,8 +411,9 @@ mod tests {
 
 	#[test]
 	fn test_substrate_brainwallet_seed() {
+		let suri = format!("{}{}", SEED_PHRASE, SURI_SUFFIX_HARD);
 		let expected = "b139e4050f80172b44957ef9d1755ef5c96c296d63b8a2b50025bf477bd95224";
-		let generated = substrate_brainwallet_secret(SEED_PHRASE).unwrap();
+		let generated = substrate_brainwallet_secret(&suri).unwrap();
 
 		assert_eq!(expected, generated);
 	}
