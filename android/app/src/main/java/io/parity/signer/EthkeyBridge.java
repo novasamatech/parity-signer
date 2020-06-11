@@ -233,6 +233,26 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void substrateSeedWithRef(double seedRef, String suriSuffix, Promise promise) {
+        try {
+            String derivedSubstrateSecret = ethkeySubstrateMiniSecretKeyWithRef(Double.doubleToRawLongBits(seedRef), suriSuffix);
+            promise.resolve(derivedSubstrateSecret);
+        } catch (Exception e) {
+            rejectWithException(promise, "substrate secret", e);
+        }
+    }
+
+    @ReactMethod
+    public void substrateSeed(String suri, Promise promise) {
+        try {
+            String derivedSubstrateSecret = ethkeySubstrateMiniSecretKey(suri);
+            promise.resolve(derivedSubstrateSecret);
+        } catch (Exception e) {
+            rejectWithException(promise, "substrate secret with ref", e);
+        }
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletBIP39Address(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
@@ -255,4 +275,6 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     private static native String ethkeySubstrateBrainwalletSignWithRef(long seed_ref, String suriSuffix, String message);
     private static native String ethkeySubstrateWalletAddressWithRef(long seedRef, String suriSuffix, int prefix);
     private static native String ethkeyBrainWalletAddressWithRef(long seedRef);
+    private static native String ethkeySubstrateMiniSecretKey(String suri);
+    private static native String ethkeySubstrateMiniSecretKeyWithRef(long seedRef, String suriSuffix);
 }

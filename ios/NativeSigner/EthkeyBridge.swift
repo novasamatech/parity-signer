@@ -28,11 +28,11 @@ func handle_error<T, U>(
 
 @objc(EthkeyBridge)
 class EthkeyBridge: NSObject {
-  
+
   public static func requiresMainQueueSetup() -> Bool {
     return true;
   }
-  
+
   @objc func brainWalletAddress(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -44,7 +44,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func brainWalletSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -56,7 +56,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func rlpItem(_ rlp: String, position: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -68,7 +68,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func keccak(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -80,7 +80,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func blake2b(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -92,7 +92,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func ethSign(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -104,7 +104,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func blockiesIcon(_ seed: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -116,7 +116,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func randomPhrase(_ wordsNumber:NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -128,7 +128,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func encryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -140,7 +140,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func decryptData(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -152,7 +152,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func qrCode(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -164,7 +164,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func qrCodeHex(_ data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -176,7 +176,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func substrateAddress(_ seed: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -188,7 +188,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func substrateSign(_ seed: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -200,7 +200,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func schnorrkelVerify(_ seed: String, message: String, signature: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -209,7 +209,7 @@ class EthkeyBridge: NSObject {
       // return a bool. no cleanup
       success: { return $0 })
   }
-  
+
   @objc func decryptDataRef(_ data: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -218,7 +218,7 @@ class EthkeyBridge: NSObject {
       // return a long. no cleanup
       success: { return $0 })
   }
-  
+
   @objc func destroyDataRef(_ data_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -227,7 +227,7 @@ class EthkeyBridge: NSObject {
       // return zero. no cleanup
       success: { return 0 })
   }
-  
+
   @objc func brainWalletSignWithRef(_ seed_ref: Int64, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -239,7 +239,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func substrateSignWithRef(_ seed_ref: Int64, suri_suffix: String, message: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -251,7 +251,7 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
+
   @objc func brainWalletAddressWithRef(_ seed_ref: Int64, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
@@ -263,13 +263,37 @@ class EthkeyBridge: NSObject {
         return val
     })
   }
-  
-  
+
+
   @objc func substrateAddressWithRef(_ seed_ref: Int64, suri_suffix: String, prefix: UInt32, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
       get_result: { substrate_address_with_ref($0, seed_ref, suri_suffix, prefix) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
+  }
+
+  @objc func substrateSeed(_ suri: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { substrate_mini_secret_key($0, suri) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
+  }
+
+  @objc func substrateSeedWithRef(_ seed_ref: Int64, suri_suffix: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { substrate_mini_secret_key_with_ref($0, seed_ref, suri_suffix, prefix) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         signer_destroy_string(res!)
