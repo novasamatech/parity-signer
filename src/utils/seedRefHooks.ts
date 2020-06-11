@@ -93,7 +93,9 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 		seedRef
 	);
 
-	const substrateSecret: TrySubstrateSecret = seedRef.trySubstrateSecret.bind(seedRef);
+	const substrateSecret: TrySubstrateSecret = seedRef.trySubstrateSecret.bind(
+		seedRef
+	);
 
 	return {
 		brainWalletAddress,

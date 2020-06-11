@@ -24,6 +24,7 @@ export type RootStackParamList = {
 	PathDerivation: { parentPath: string };
 	PathDetails: { path: string };
 	PathManagement: { path: string };
+	PathSecret: { path: string; password?: string };
 	PathsList: { networkKey: string };
 	PinNew: { resolve: (pin: string) => void };
 	PinUnlock:
