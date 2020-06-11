@@ -21,6 +21,7 @@ import {
 	getPathName,
 	getPathsWithSubstrateNetworkKey,
 	groupPaths,
+	isSubstrateHardDerivedPath,
 	serializeIdentities
 } from 'utils/identitiesUtils';
 import {
@@ -284,5 +285,20 @@ describe('IdentitiesUtils', () => {
 			[]
 		);
 		expect(existedAccounts).toEqual(allListedAccounts.length);
+	});
+
+	it('decides account is only with hard derivation', () => {
+		const testPath1 = '//only//hard//derivation//1';
+		expect(isSubstrateHardDerivedPath(testPath1)).toBe(true);
+		const testPath2 = '//soft/in//the//middle';
+		expect(isSubstrateHardDerivedPath(testPath2)).toBe(false);
+		const testPath3 = '//soft//in//the/end';
+		expect(isSubstrateHardDerivedPath(testPath3)).toBe(false);
+		const testPath4 = '/soft//in//the//start';
+		expect(isSubstrateHardDerivedPath(testPath4)).toBe(false);
+		const testEthereumPath = '1';
+		expect(isSubstrateHardDerivedPath(testEthereumPath)).toBe(false);
+		const testRootPath = '';
+		expect(isSubstrateHardDerivedPath(testRootPath)).toBe(false);
 	});
 });
