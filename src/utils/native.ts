@@ -146,6 +146,10 @@ export function blake2b(data: string): Promise<string> {
 	return EthkeyBridge.blake2b(data);
 }
 
+export function substrateSecret(suri: string): Promise<string> {
+	return EthkeyBridge.substrateSecret(suri);
+}
+
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
 // Prefix is a number used in the SS58 encoding:
 //
@@ -252,5 +256,13 @@ export class SeedRefClass {
 			throw new Error('cannot sign with an invalid seed reference');
 		}
 		return EthkeyBridge.substrateSignWithRef(this.dataRef, suriSuffix, message);
+	}
+
+	trySubstrateSecret(suriSuffix: string): Promise<string> {
+		if (!this.valid) {
+			// Seed reference was never created or was already destroyed.
+			throw new Error('cannot sign with an invalid seed reference');
+		}
+		return EthkeyBridge.substrateSecretWithRef(this.dataRef, suriSuffix);
 	}
 }
