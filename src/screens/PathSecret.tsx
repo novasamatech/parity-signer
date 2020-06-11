@@ -26,7 +26,7 @@ import { PasswordedAccountExportWarning } from 'components/Warnings';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
-import { getPathName } from 'utils/identitiesUtils';
+import { getNetworkKey, getPathName } from 'utils/identitiesUtils';
 import {
 	unlockSeedPhrase,
 	unlockSeedPhraseWithPassword
@@ -38,7 +38,6 @@ function PathSecret({
 	route,
 	navigation
 }: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
-	const routes = useNavigationState(state => state.routes);
 	const { currentIdentity } = accounts.state;
 	const [secret, setSecret] = useState<string>('');
 	const { substrateSecret, isSeedRefValid } = useSeedRef(
@@ -49,6 +48,7 @@ function PathSecret({
 	useEffect(() => {
 		const getAndSetSecret = async (): Promise<void> => {
 			const pathMeta = currentIdentity.meta.get(path)!;
+			const networkKey = getNetworkKey(path, currentIdentity);
 			let password = route.params.password ?? '';
 			const accountName = getPathName(path, currentIdentity);
 			if (pathMeta.hasPassword) {
@@ -62,7 +62,7 @@ function PathSecret({
 				}
 			}
 			const generatedSecret = await substrateSecret(`${path}///${password}`);
-			setSecret(`secret:0x${generatedSecret}:${accountName}`);
+			setSecret(`secret:0x${generatedSecret}:${networkKey}:${accountName}`);
 		};
 
 		getAndSetSecret();
