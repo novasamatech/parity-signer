@@ -43,8 +43,7 @@ import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
 import {
 	navigateToPathDerivation,
 	navigateToPathsList,
-	unlockSeedPhrase,
-	unlockSeedPhraseWithPassword
+	useUnlockSeed
 } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
@@ -70,6 +69,7 @@ export function PathDetailsView({
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
+	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed();
 	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
@@ -104,14 +104,21 @@ export function PathDetailsView({
 			case 'PathSecret': {
 				const pathMeta = currentIdentity.meta.get(path)!;
 				if (pathMeta.hasPassword) {
-					const password = await unlockSeedPhraseWithPassword(
-						navigation,
-						false
+					await unlockWithPassword(
+						password => ({
+							name: 'PathSecret',
+							params: {
+								password,
+								path
+							}
+						}),
+						isSeedRefValid
 					);
-					navigation.navigate('PathSecret', { path, password });
 				} else {
-					await unlockSeedPhrase(navigation, isSeedRefValid);
-					navigation.navigate('PathSecret', { path });
+					await unlockWithoutPassword(
+						{ name: 'PathSecret', params: { path } },
+						isSeedRefValid
+					);
 				}
 				break;
 			}

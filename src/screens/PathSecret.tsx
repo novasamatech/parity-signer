@@ -16,7 +16,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
+import { useNavigationState } from '@react-navigation/native';
 
+import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
 import QrView from 'components/QrView';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -36,35 +38,49 @@ function PathSecret({
 	route,
 	navigation
 }: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
+	const routes = useNavigationState(state => state.routes);
 	const { currentIdentity } = accounts.state;
 	const [secret, setSecret] = useState<string>('');
 	const { substrateSecret, isSeedRefValid } = useSeedRef(
 		currentIdentity.encryptedSeed
 	);
 	const path = route.params.path;
-	const pathMeta = currentIdentity.meta.get(path)!;
-	const accountName = getPathName(path, currentIdentity);
-
-	const getAndSetSecret = async (): Promise<void> => {
-		let generatedSecret;
-		let password = route.params.password ?? '';
-		if (pathMeta.hasPassword) {
-			password = await unlockSeedPhraseWithPassword(navigation, isSeedRefValid);
-		} else {
-			if (!isSeedRefValid) {
-				await unlockSeedPhrase(navigation, isSeedRefValid);
-			}
-		}
-		generatedSecret = await substrateSecret(`${path}///${password}`);
-		setSecret(`secret:${generatedSecret}:${accountName}`);
-	};
 
 	useEffect(() => {
+		const getAndSetSecret = async (): Promise<void> => {
+			const pathMeta = currentIdentity.meta.get(path)!;
+			let password = route.params.password ?? '';
+			const accountName = getPathName(path, currentIdentity);
+			if (pathMeta.hasPassword) {
+				password = await unlockSeedPhraseWithPassword(
+					navigation,
+					isSeedRefValid
+				);
+			} else {
+				if (!isSeedRefValid) {
+					await unlockSeedPhrase(navigation, isSeedRefValid);
+				}
+			}
+			const generatedSecret = await substrateSecret(`${path}///${password}`);
+			setSecret(`secret:0x${generatedSecret}:${accountName}`);
+		};
+
 		getAndSetSecret();
-	}, [route, pathMeta, navigation, isSeedRefValid, substrateSecret]);
+	}, [
+		path,
+		route,
+		navigation,
+		currentIdentity,
+		isSeedRefValid,
+		substrateSecret
+	]);
 
 	return (
 		<SafeAreaViewContainer>
+			<ScreenHeading
+				title={'Export Account'}
+				subtitle={'export this account to an hot machine'}
+			/>
 			<ScrollView testID={testIDs.PathSecret.screen} bounces={false}>
 				<PathCard identity={currentIdentity} path={path} />
 				<QrView data={secret} />

@@ -234,7 +234,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void substrateSeedWithRef(double seedRef, String suriSuffix, Promise promise) {
+    public void substrateSecretWithRef(double seedRef, String suriSuffix, Promise promise) {
         try {
             String derivedSubstrateSecret = ethkeySubstrateMiniSecretKeyWithRef(Double.doubleToRawLongBits(seedRef), suriSuffix);
             promise.resolve(derivedSubstrateSecret);
@@ -244,7 +244,7 @@ public class EthkeyBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void substrateSeed(String suri, Promise promise) {
+    public void substrateSecret(String suri, Promise promise) {
         try {
             String derivedSubstrateSecret = ethkeySubstrateMiniSecretKey(suri);
             promise.resolve(derivedSubstrateSecret);

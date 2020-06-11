@@ -104,7 +104,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 		destroySeedRef,
 		isSeedRefValid,
 		substrateAddress,
-		substrateSign,
-		substrateSecret
+		substrateSecret,
+		substrateSign
 	};
 }

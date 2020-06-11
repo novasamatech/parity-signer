@@ -237,6 +237,7 @@ export! {
 		let suri = format!("{}{}", &seed, suri_suffix);
 		let bytes = sr25519::KeyPair::get_derived_secret(&suri)
 			.ok_or(crate::Error::KeyPairIsNone)?;
+		let _ = Box::into_raw(seed) as i64;
 		Ok(bytes.to_hex())
 	}
 
