@@ -410,13 +410,14 @@ mod tests {
 
 	#[test]
 	fn test_substrate_secret() {
+		let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
 		let suri = format!("{}{}", SEED_PHRASE, SURI_SUFFIX_HARD);
 		let expected = "0c4a1f0e772497883ba79c484dfed441008c38572769ab40260a959127949665";
 		let generated = substrate_mini_secret_key(&suri).unwrap();
-		let passworded_suri = format!("{}{}///password", SEED_PHRASE, SURI_SUFFIX_HARD);
 		assert_eq!(expected, generated);
+		let passworded_suri = format!("{}///password", SURI_SUFFIX_HARD);
 		let generated_passworded_secret= substrate_mini_secret_key_with_ref(data_pointer, &passworded_suri).unwrap();
-		let expected_passworded_secret = "0x057687d479e550b1c0caca121db7e7519c573ebb6a7ce6f771213e41900181f6";
+		let expected_passworded_secret = "057687d479e550b1c0caca121db7e7519c573ebb6a7ce6f771213e41900181f6";
 		assert_eq!(expected_passworded_secret, generated_passworded_secret);
 	}
 
