@@ -16,7 +16,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
-import { useNavigationState } from '@react-navigation/native';
 
 import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
@@ -27,10 +26,6 @@ import testIDs from 'e2e/testIDs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey, getPathName } from 'utils/identitiesUtils';
-import {
-	unlockSeedPhrase,
-	unlockSeedPhraseWithPassword
-} from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PathSecret({
@@ -44,23 +39,13 @@ function PathSecret({
 		currentIdentity.encryptedSeed
 	);
 	const path = route.params.path;
+	const pathMeta = currentIdentity.meta.get(path)!;
 
 	useEffect(() => {
 		const getAndSetSecret = async (): Promise<void> => {
-			const pathMeta = currentIdentity.meta.get(path)!;
 			const networkKey = getNetworkKey(path, currentIdentity);
-			let password = route.params.password ?? '';
+			const password = route.params.password ?? '';
 			const accountName = getPathName(path, currentIdentity);
-			if (pathMeta.hasPassword) {
-				password = await unlockSeedPhraseWithPassword(
-					navigation,
-					isSeedRefValid
-				);
-			} else {
-				if (!isSeedRefValid) {
-					await unlockSeedPhrase(navigation, isSeedRefValid);
-				}
-			}
 			const generatedSecret = await substrateSecret(`${path}///${password}`);
 			setSecret(`secret:0x${generatedSecret}:${networkKey}:${accountName}`);
 		};
@@ -68,6 +53,7 @@ function PathSecret({
 		getAndSetSecret();
 	}, [
 		path,
+		pathMeta,
 		route,
 		navigation,
 		currentIdentity,
@@ -83,7 +69,7 @@ function PathSecret({
 			/>
 			<ScrollView testID={testIDs.PathSecret.screen} bounces={false}>
 				<PathCard identity={currentIdentity} path={path} />
-				<QrView data={secret} />
+				<QrView data={secret} testID={secret} />
 				{pathMeta.hasPassword && <PasswordedAccountExportWarning />}
 			</ScrollView>
 		</SafeAreaViewContainer>

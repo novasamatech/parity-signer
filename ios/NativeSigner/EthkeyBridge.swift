@@ -277,7 +277,7 @@ class EthkeyBridge: NSObject {
     })
   }
 
-  @objc func substrateSeed(_ suri: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func substrateSecret(_ suri: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
@@ -289,11 +289,11 @@ class EthkeyBridge: NSObject {
     })
   }
 
-  @objc func substrateSeedWithRef(_ seed_ref: Int64, suri_suffix: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func substrateSecretWithRef(_ seed_ref: Int64, suri_suffix: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
       resolve: resolve,
       reject: reject,
-      get_result: { substrate_mini_secret_key_with_ref($0, seed_ref, suri_suffix, prefix) },
+      get_result: { substrate_mini_secret_key_with_ref($0, seed_ref, suri_suffix) },
       success: { (res: Optional<UnsafePointer<CChar>>) -> String in
         let val = String(cString: res!)
         signer_destroy_string(res!)
