@@ -58,4 +58,6 @@ RCT_EXTERN_METHOD(brainWalletSignWithRef:(int64_t)seedRef message:(NSString*)mes
 RCT_EXTERN_METHOD(substrateSignWithRef:(int64_t)seedRef suri_suffix:(NSString*)suri_suffix message:(NSString*)message  resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(substrateAddressWithRef:(int64_t)seedRef suri_suffix:(NSString*)suri_suffix prefix:(NSUInteger*)prefix resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(brainWalletAddressWithRef:(int64_t)seedRef resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(substrateSecret:(NSString*)suri resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(substrateSecretWithRef:(int64_t*)seedRef suri_suffix:(NSString*)suri_suffix resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 @end

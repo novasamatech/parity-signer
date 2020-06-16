@@ -133,7 +133,7 @@
         "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
-          "os": "iOS 13.4",
+          "os": "iOS 13.5",
           "type": "iPhone 8"
         }
       },

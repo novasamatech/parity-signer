@@ -15,6 +15,7 @@ export type TrySubstrateAddress = (
 	prefix: number
 ) => Promise<string>;
 export type TryBrainWalletAddress = () => Promise<string>;
+export type TrySubstrateSecret = (suriSuffix: string) => Promise<string>;
 
 export type SeedRefHooks = {
 	isSeedRefValid: boolean;
@@ -24,6 +25,7 @@ export type SeedRefHooks = {
 	substrateSign: TrySignFunc;
 	substrateAddress: TrySubstrateAddress;
 	brainWalletAddress: TryBrainWalletAddress;
+	substrateSecret: TrySubstrateSecret;
 };
 
 export type CreateSeedRefWithNewSeed = (
@@ -91,6 +93,10 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 		seedRef
 	);
 
+	const substrateSecret: TrySubstrateSecret = seedRef.trySubstrateSecret.bind(
+		seedRef
+	);
+
 	return {
 		brainWalletAddress,
 		brainWalletSign,
@@ -98,6 +104,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 		destroySeedRef,
 		isSeedRefValid,
 		substrateAddress,
+		substrateSecret,
 		substrateSign
 	};
 }

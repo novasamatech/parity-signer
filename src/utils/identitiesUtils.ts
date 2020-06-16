@@ -83,6 +83,15 @@ export const isSubstratePath = (path: string): boolean =>
 export const isEthereumAccountId = (v: string): boolean =>
 	v.indexOf('ethereum:') === 0;
 
+export const isSubstrateHardDerivedPath = (path: string): boolean => {
+	if (!isSubstratePath(path)) return false;
+	const pathFragments = path.match(pathsRegex.allPath);
+	if (!pathFragments || pathFragments.length === 0) return false;
+	return pathFragments.every((pathFragment: string) => {
+		return pathFragment.substring(0, 2) === '//';
+	});
+};
+
 export const extractAddressFromAccountId = (id: string): string => {
 	const withoutNetwork = id.split(':')[1];
 	const address = withoutNetwork.split('@')[0];
