@@ -146,11 +146,6 @@ export function PathDetailsView({
 							menuItems={[
 								{ text: 'Edit', value: 'PathManagement' },
 								{
-									hide: !isSubstratePath(path),
-									text: 'Derive Account',
-									value: 'PathDerivation'
-								},
-								{
 									hide: !isSubstrateHardDerivedPath(path),
 									testID: testIDs.PathDetail.exportButton,
 									text: 'Export Account',
@@ -170,11 +165,13 @@ export function PathDetailsView({
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
-			<ButtonNewDerivation
-				testID={testIDs.PathsList.deriveButton}
-				title="Derive New Account"
-				onPress={onTapDeriveButton}
-			/>
+			{isSubstratePath(path) && (
+				<ButtonNewDerivation
+					testID={testIDs.PathsList.deriveButton}
+					title="Derive New Account"
+					onPress={onTapDeriveButton}
+				/>
+			)}
 			<QrScannerTab />
 		</SafeAreaViewContainer>
 	);
