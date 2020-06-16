@@ -78,6 +78,13 @@ function PathsList({
 	const { navigate } = navigation;
 	const rootPath = `//${networkParams.pathId}`;
 
+	const onTapDeriveButton = (): Promise<void> =>
+		navigateToPathDerivation(
+			navigation,
+			isUnknownNetworkPath ? '' : rootPath,
+			isSeedRefValid
+		);
+
 	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
 		const path = pathsGroup.paths[0];
 		return (
@@ -142,13 +149,7 @@ function PathsList({
 			<ButtonNewDerivation
 				testID={testIDs.PathsList.deriveButton}
 				title="Derive New Account"
-				onPress={(): Promise<void> =>
-					navigateToPathDerivation(
-						navigation,
-						isUnknownNetworkPath ? '' : rootPath,
-						isSeedRefValid
-					)
-				}
+				onPress={onTapDeriveButton}
 			/>
 			<QrScannerTab />
 		</SafeAreaViewContainer>

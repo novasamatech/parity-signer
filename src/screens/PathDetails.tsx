@@ -18,6 +18,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import ButtonNewDerivation from 'components/ButtonNewDerivation';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
@@ -78,6 +79,9 @@ export function PathDetailsView({
 		networkKey: formattedNetworkKey
 	});
 
+	const onTapDeriveButton = (): Promise<void> =>
+		navigateToPathDerivation(navigation, path, isSeedRefValid);
+
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
 			case 'PathDelete':
@@ -122,9 +126,6 @@ export function PathDetailsView({
 				}
 				break;
 			}
-			case 'PathDerivation':
-				navigateToPathDerivation(navigation, path, isSeedRefValid);
-				break;
 			case 'PathManagement':
 				navigation.navigate('PathManagement', { path });
 				break;
@@ -169,6 +170,11 @@ export function PathDetailsView({
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
+			<ButtonNewDerivation
+				testID={testIDs.PathsList.deriveButton}
+				title="Derive New Account"
+				onPress={onTapDeriveButton}
+			/>
 			<QrScannerTab />
 		</SafeAreaViewContainer>
 	);
