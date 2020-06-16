@@ -49,6 +49,7 @@ import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
 import PathDerivation from 'screens/PathDerivation';
 import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
+import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
 import QrScanner from 'modules/sign/screens/QrScanner';
@@ -150,6 +151,7 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
+		<ScreenStack.Screen name="PathSecret" component={PathSecret} />
 		<ScreenStack.Screen name="PathManagement" component={PathManagement} />
 		<ScreenStack.Screen name="PinNew" component={PinNew} />
 		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />

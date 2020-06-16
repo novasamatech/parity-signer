@@ -18,12 +18,12 @@ use bip39::{Language, Mnemonic, MnemonicType};
 use blake2_rfc::blake2b::blake2b;
 use blockies::Ethereum;
 use ethsign::{keyfile::Crypto, Protected};
-use pixelate::{Color, Image, BLACK};
+use pixelate::{BLACK, Color, Image};
 use qrcodegen::{QrCode, QrCodeEcc};
 use rlp::decode_list;
 use rustc_hex::{FromHex, ToHex};
-use tiny_keccak::keccak256 as keccak;
 use tiny_keccak::Keccak;
+use tiny_keccak::keccak256 as keccak;
 
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
@@ -59,8 +59,8 @@ fn qrcode_bytes(data: &[u8]) -> crate::Result<String> {
 		width: qr.size() as usize,
 		scale: 16,
 	}
-	.render(&mut result)
-	.map_err(|e| crate::Error::Pixelate(e))?;
+		.render(&mut result)
+		.map_err(|e| crate::Error::Pixelate(e))?;
 	Ok(base64png(&result))
 }
 
@@ -219,6 +219,28 @@ export! {
 		Ok(keypair.ss58_address(prefix))
 	}
 
+	@Java_io_parity_signer_EthkeyBridge_ethkeySubstrateMiniSecretKey
+	fn substrate_mini_secret_key(
+		suri: &str
+	) -> crate::Result<String> {
+		let bytes = sr25519::KeyPair::get_derived_secret(&suri)
+			.ok_or(crate::Error::KeyPairIsNone)?;
+		Ok(bytes.to_hex())
+	}
+
+	@Java_io_parity_signer_EthkeyBridge_ethkeySubstrateMiniSecretKeyWithRef
+	fn substrate_mini_secret_key_with_ref (
+		seed_ref: i64,
+		suri_suffix: &str
+	) -> crate::Result<String> {
+		let seed = unsafe { Box::from_raw(seed_ref as *mut String) };
+		let suri = format!("{}{}", &seed, suri_suffix);
+		let bytes = sr25519::KeyPair::get_derived_secret(&suri)
+			.ok_or(crate::Error::KeyPairIsNone)?;
+		let _ = Box::into_raw(seed) as i64;
+		Ok(bytes.to_hex())
+	}
+
 	@Java_io_parity_signer_EthkeyBridge_substrateBrainwalletSign
 	fn substrate_brainwallet_sign(
 		suri: &str,
@@ -334,6 +356,7 @@ mod tests {
 	static SEED_PHRASE: &str =
 		"grant jaguar wish bench exact find voice habit tank pony state salmon";
 	static SURI_SUFFIX: &str = "//hard/soft/0";
+	static SURI_SUFFIX_HARD: &str = "//hard";
 	static ENCRYPTED_SEED: &str = "{\"cipher\":\"aes-128-ctr\",\"cipherparams\":{\"iv\":\"47b4b75d13045ff7569da858e234f7ea\"},\"ciphertext\":\"ca1cf5387822b70392c4aeec729676f91ab00a795d7593fb7e52ecc333dbc4a1acbedc744b5d8d519c714e194bd741995244c8128bfdce6c184d6bda4ca136ed265eedcee9\",\"kdf\":\"pbkdf2\",\"kdfparams\":{\"c\":10240,\"dklen\":32,\"prf\":\"hmac-sha256\",\"salt\":\"b4a2d1edd1a70fe2eb48d7aff15c19e234f6aa211f5142dddb05a59af12b3381\"},\"mac\":\"b38a54eb382f2aa1a8be2f7b86fe040fe112d0f42fea03fac186dccdd7ae3eb9\"}";
 	static PIN: &str = "000000";
 	static SUBSTRATE_ADDRESS: &str = "5D4kaJXj5HVoBw2tFFsDj56BjZdPhXKxgGxZuKk4K3bKqHZ6";
@@ -382,6 +405,27 @@ mod tests {
 		let expected = "5FRAPSnpgmnXAnmPVv68fT6o7ntTvaZmkTED8jDttnXs9k4n";
 		let generated = substrate_brainwallet_address(SEED_PHRASE, 42).unwrap();
 
+		assert_eq!(expected, generated);
+	}
+
+	#[test]
+	fn test_substrate_secret() {
+		let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
+		let suri = format!("{}{}", SEED_PHRASE, SURI_SUFFIX_HARD);
+		let expected = "0c4a1f0e772497883ba79c484dfed441008c38572769ab40260a959127949665";
+		let generated = substrate_mini_secret_key(&suri).unwrap();
+		assert_eq!(expected, generated);
+		let passworded_suri = format!("{}///password", SURI_SUFFIX_HARD);
+		let generated_passworded_secret= substrate_mini_secret_key_with_ref(data_pointer, &passworded_suri).unwrap();
+		let expected_passworded_secret = "057687d479e550b1c0caca121db7e7519c573ebb6a7ce6f771213e41900181f6";
+		assert_eq!(expected_passworded_secret, generated_passworded_secret);
+	}
+
+	#[test]
+	fn test_substrate_secret_with_ref() {
+		let data_pointer = decrypt_data_ref(ENCRYPTED_SEED, String::from(PIN)).unwrap();
+		let expected = "0c4a1f0e772497883ba79c484dfed441008c38572769ab40260a959127949665";
+		let generated = substrate_mini_secret_key_with_ref(data_pointer, SURI_SUFFIX_HARD).unwrap();
 		assert_eq!(expected, generated);
 	}
 

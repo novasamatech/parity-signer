@@ -29,7 +29,7 @@ import {
 	navigateToLegacyAccountList
 } from 'utils/navigationHelpers';
 import fontStyles from 'styles/fontStyles';
-import UnknownAccountWarning from 'components/UnknownAccountWarning';
+import { UnknownAccountWarning } from 'components/Warnings';
 import { withAccountStore } from 'utils/HOC';
 import AccountIcon from 'components/AccountIcon';
 import { NavigationAccountProps } from 'types/props';

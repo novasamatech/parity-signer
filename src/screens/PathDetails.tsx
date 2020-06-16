@@ -36,15 +36,17 @@ import {
 	getNetworkKey,
 	getPathName,
 	getPathsWithSubstrateNetworkKey,
+	isSubstrateHardDerivedPath,
 	isSubstratePath
 } from 'utils/identitiesUtils';
 import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
 import {
 	navigateToPathDerivation,
-	navigateToPathsList
+	navigateToPathsList,
+	useUnlockSeed
 } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
-import UnknownAccountWarning from 'components/UnknownAccountWarning';
+import { UnknownAccountWarning } from 'components/Warnings';
 import { useSeedRef } from 'utils/seedRefHooks';
 import QrScannerTab from 'components/QrScannerTab';
 
@@ -67,6 +69,7 @@ export function PathDetailsView({
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
+	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed();
 	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
@@ -75,7 +78,7 @@ export function PathDetailsView({
 		networkKey: formattedNetworkKey
 	});
 
-	const onOptionSelect = (value: string): void => {
+	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
 			case 'PathDelete':
 				alertDeleteAccount('this account', async () => {
@@ -98,6 +101,27 @@ export function PathDetailsView({
 					}
 				});
 				break;
+			case 'PathSecret': {
+				const pathMeta = currentIdentity.meta.get(path)!;
+				if (pathMeta.hasPassword) {
+					await unlockWithPassword(
+						password => ({
+							name: 'PathSecret',
+							params: {
+								password,
+								path
+							}
+						}),
+						isSeedRefValid
+					);
+				} else {
+					await unlockWithoutPassword(
+						{ name: 'PathSecret', params: { path } },
+						isSeedRefValid
+					);
+				}
+				break;
+			}
 			case 'PathDerivation':
 				navigateToPathDerivation(navigation, path, isSeedRefValid);
 				break;
@@ -126,6 +150,12 @@ export function PathDetailsView({
 									value: 'PathDerivation'
 								},
 								{
+									hide: !isSubstrateHardDerivedPath(path),
+									testID: testIDs.PathDetail.exportButton,
+									text: 'Export Account',
+									value: 'PathSecret'
+								},
+								{
 									testID: testIDs.PathDetail.deleteButton,
 									text: 'Delete',
 									textStyle: styles.deleteText,
@@ -149,7 +179,7 @@ function PathDetails({
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
-	const path = route.params.path ?? '';
+	const path = route.params.path;
 	const networkKey = getNetworkKey(path, accounts.state.currentIdentity);
 	return (
 		<PathDetailsView
