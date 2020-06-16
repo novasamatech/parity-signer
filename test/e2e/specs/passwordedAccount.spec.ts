@@ -36,7 +36,6 @@ describe('passworded account test', () => {
 	});
 
 	describe('Kusama exporting test', () => {
-
 		it('is able to export a hard derived account with password', async () => {
 			await testTap(`${PathsList.pathCard}//kusama${passwordedPath}`);
 			await testTap(PathDetail.popupMenuButton);

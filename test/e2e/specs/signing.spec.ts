@@ -23,7 +23,8 @@ import {
 	launchWithScanRequest,
 	pinCode,
 	tapBack,
-	testExist, testInput,
+	testExist,
+	testInput,
 	testRecoverIdentity,
 	testScrollAndTap,
 	testTap,
@@ -33,7 +34,15 @@ import {
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
-const { Main, PathDerivation, PathDetail, PathsList, SecurityHeader, SignedMessage, SignedTx } = testIDs;
+const {
+	Main,
+	PathDerivation,
+	PathDetail,
+	PathsList,
+	SecurityHeader,
+	SignedMessage,
+	SignedTx
+} = testIDs;
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
@@ -61,7 +70,7 @@ describe('Signing ane exporting test', () => {
 			await testTap(PathsList.deriveButton);
 			await testInput(PathDerivation.pathInput, '');
 			await testInput(PathDerivation.nameInput, 'kusama root');
-			await testExist(PathsList.pathCard + `//kusama`);
+			await testExist(PathsList.pathCard + '//kusama');
 		});
 
 		it('is able to export the signing account', async () => {
