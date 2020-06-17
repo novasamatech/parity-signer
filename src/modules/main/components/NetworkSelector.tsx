@@ -15,11 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useState } from 'react';
-import {
-	BackHandler,
-	FlatList,
-	FlatListProps,
-} from 'react-native';
+import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { NetworkCard } from 'components/AccountCard';
