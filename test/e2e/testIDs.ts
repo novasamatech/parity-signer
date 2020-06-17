@@ -71,6 +71,7 @@ const testIDs = {
 	},
 	PathDetail: {
 		deleteButton: 'path_detail_delete_button',
+		deriveButton: 'path_detail_delete_button',
 		exportButton: 'path_detail_export_button',
 		popupMenuButton: 'path_detail_popup_menu_button',
 		screen: 'path_detail_screen'

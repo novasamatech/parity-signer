@@ -81,6 +81,7 @@ describe('Signing ane exporting test', () => {
 				'secret:0xdf46d55a2d98695e9342b67edae6669e5c0b4e1a3895f1adf85989565b9ab827:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:kusama root'
 			);
 			await tapBack();
+			await testVisible(PathDetail.screen);
 		});
 
 		it('should sign the set remarks request', async () => {

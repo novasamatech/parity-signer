@@ -47,6 +47,7 @@ const {
 } = testIDs;
 
 const defaultPath = '//default';
+const childPath = '/funding';
 const customPath = '//sunny_day/1';
 const secondPath = '/2';
 const ethereumButtonIndex =
@@ -63,11 +64,24 @@ describe('Load test', () => {
 		await testSetUpDefaultPath();
 	});
 
-	it('derive a new key', async () => {
+	it('derive a new account from the path list', async () => {
 		await testTap(PathsList.deriveButton);
 		await testInput(PathDerivation.pathInput, defaultPath);
-		await testInput(PathDerivation.nameInput, 'first one');
+		await testInput(PathDerivation.nameInput, 'default account');
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}`);
+		await tapBack();
+		await testVisible(PathsList.screen);
+	});
+
+	it('derive a new account from the derived account', async () => {
+		await testTap(PathsList.pathCard + `//kusama${defaultPath}`);
+		await testTap(PathDetail.popupMenuButton);
+		await testTap(PathDetail.deriveButton);
+		await testInput(PathDerivation.pathInput, childPath);
+		await testInput(PathDerivation.nameInput, 'child of default');
+		await testExist(PathsList.pathCard + `//kusama${defaultPath}${childPath}`);
+		await tapBack();
+		await testVisible(PathDetail.screen);
 	});
 
 	it('need pin after application go to the background', async () => {
@@ -83,13 +97,12 @@ describe('Load test', () => {
 	it('is able to create custom path', async () => {
 		await tapBack();
 		await testTap(testIDs.Main.addNewNetworkButton);
-		await testScrollAndTap(
-			testIDs.Main.addCustomNetworkButton,
-			testIDs.Main.chooserScreen
-		);
+		await testTap(testIDs.Main.addCustomNetworkButton);
 		await testInput(PathDerivation.pathInput, customPath);
 		await testInput(PathDerivation.nameInput, 'custom network');
 		await testExist(PathsList.pathCard + customPath);
+		await tapBack();
+		await testVisible(testIDs.Main.chooserScreen);
 	});
 
 	it('delete a path', async () => {
