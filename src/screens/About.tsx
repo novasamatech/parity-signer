@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
+import {version} from '../../package.json';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 
 import colors from 'styles/colors';
@@ -25,7 +26,7 @@ export default class About extends React.PureComponent {
 	render(): React.ReactElement {
 		return (
 			<CustomScrollView contentContainerStyle={{ padding: 20 }}>
-				<Text style={styles.title}>PARITY SIGNER</Text>
+				<Text style={styles.title}>PARITY SIGNER v{version}</Text>
 				<View>
 					<Text style={styles.text}>
 						The Parity Signer mobile application is a secure air-gapped wallet
