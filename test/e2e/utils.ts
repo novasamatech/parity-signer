@@ -88,7 +88,7 @@ export const testScrollAndTap = async (
 };
 
 export const testUnlockPin = async (inputPin: string): Promise<void> => {
-	await testInputWithDone(IdentityPin.unlockPinInput, inputPin);
+	await testInput(IdentityPin.unlockPinInput, inputPin);
 };
 
 export const testSetUpDefaultPath = async (): Promise<void> => {

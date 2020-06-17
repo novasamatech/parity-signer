@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import {version} from '../../package.json';
 import { Linking, StyleSheet, Text, View } from 'react-native';
+
+import { version } from '../../package.json';
 
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';

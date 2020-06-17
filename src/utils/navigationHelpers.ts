@@ -69,7 +69,6 @@ export const useUnlockSeed = (): {
 } => {
 	const currentRoutes = useNavigationState(state => state.routes) as Route[];
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	console.log('new routes are', currentRoutes);
 	const resetRoutes = (routes: Route[]): void => {
 		const resetAction = CommonActions.reset({
 			index: routes.length,
