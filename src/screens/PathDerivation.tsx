@@ -29,8 +29,8 @@ import {
 	getNetworkKeyByPathId,
 	validateDerivedPath
 } from 'utils/identitiesUtils';
-import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
-import { alertPathDerivationError } from 'utils/alertUtils';
+import { unlockSeedPhrase } from 'utils/navigationHelpers';
+import { alertDeriveSuccess, alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
@@ -92,7 +92,8 @@ function PathDerivation({
 				keyPairsName,
 				password
 			);
-			navigateToPathsList(navigation, currentNetworkKey);
+			alertDeriveSuccess();
+			navigation.goBack();
 		} catch (error) {
 			alertPathDerivationError(error.message);
 		}

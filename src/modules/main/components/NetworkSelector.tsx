@@ -167,30 +167,32 @@ export default function NetworkSelector({
 		}
 	};
 
-	const renderCustomPathCard = (): React.ReactElement => (
-		<NetworkCard
-			isAdd={true}
-			onPress={onAddCustomPath}
-			testID={testIDs.Main.addCustomNetworkButton}
-			title="Create Custom Path"
-			networkColor={colors.background.app}
-		/>
-	);
-
-	const renderAddButton = (): React.ReactElement => {
-		if (isNew) return renderCustomPathCard();
-		if (!shouldShowMoreNetworks) {
-			return (
-				<NetworkCard
-					isAdd={true}
-					onPress={(): void => setShouldShowMoreNetworks(true)}
-					testID={testIDs.Main.addNewNetworkButton}
-					title="Add Network Account"
-					networkColor={colors.background.app}
-				/>
-			);
+	const getListOptions = () => {
+		if (isNew) return {};
+		if (shouldShowMoreNetworks) {
+			return {
+				ListHeaderComponent: (
+					<NetworkCard
+						isAdd={true}
+						onPress={onAddCustomPath}
+						testID={testIDs.Main.addCustomNetworkButton}
+						title="Create Custom Path"
+						networkColor={colors.background.app}
+					/>
+				)
+			};
 		} else {
-			return renderCustomPathCard();
+			return {
+				ListFooterComponent: (
+					<NetworkCard
+						isAdd={true}
+						onPress={(): void => setShouldShowMoreNetworks(true)}
+						testID={testIDs.Main.addNewNetworkButton}
+						title="Add Network Account"
+						networkColor={colors.background.app}
+					/>
+				)
+			};
 		}
 	};
 
@@ -264,7 +266,7 @@ export default function NetworkSelector({
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 				testID={testIDs.Main.chooserScreen}
-				ListFooterComponent={renderAddButton}
+				{...getListOptions()}
 			/>
 			{!shouldShowMoreNetworks && !isNew && <QrScannerTab />}
 		</SafeAreaViewContainer>

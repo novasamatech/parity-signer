@@ -69,18 +69,10 @@ export const useUnlockSeed = (): {
 } => {
 	const currentRoutes = useNavigationState(state => state.routes) as Route[];
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	const newRoutes: Route[] = currentRoutes
-		.slice(0, currentRoutes.length - 1)
-		.map(routeState => {
-			return {
-				name: routeState.name,
-				params: routeState.params
-			};
-		});
-
+	console.log('new routes are', currentRoutes);
 	const resetRoutes = (routes: Route[]): void => {
 		const resetAction = CommonActions.reset({
-			index: routes.length - 1,
+			index: routes.length,
 			routes: routes
 		});
 		navigation.dispatch(resetAction);
@@ -96,7 +88,7 @@ export const useUnlockSeed = (): {
 			isSeedRefValid,
 			identity
 		);
-		newRoutes.push(nextRoute(password));
+		const newRoutes = currentRoutes.concat(nextRoute(password));
 		resetRoutes(newRoutes);
 	};
 
@@ -106,7 +98,7 @@ export const useUnlockSeed = (): {
 		identity
 	) => {
 		await unlockSeedPhrase(navigation, isSeedRefValid, identity);
-		newRoutes.push(nextRoute);
+		const newRoutes = currentRoutes.concat(nextRoute);
 		resetRoutes(newRoutes);
 	};
 

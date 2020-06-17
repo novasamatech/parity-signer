@@ -104,7 +104,7 @@ export function PathDetailsView({
 					}
 				});
 				break;
-			case 'PathSecret': {
+			case 'PathExport': {
 				const pathMeta = currentIdentity.meta.get(path)!;
 				if (pathMeta.hasPassword) {
 					await unlockWithPassword(
@@ -148,7 +148,7 @@ export function PathDetailsView({
 									hide: !isSubstrateHardDerivedPath(path),
 									testID: testIDs.PathDetail.exportButton,
 									text: 'Export Account',
-									value: 'PathSecret'
+									value: 'PathExport'
 								},
 								{
 									testID: testIDs.PathDetail.deleteButton,
@@ -166,7 +166,7 @@ export function PathDetailsView({
 			</ScrollView>
 			{isSubstratePath(path) && (
 				<ButtonNewDerivation
-					testID={testIDs.PathsList.deriveButton}
+					testID={testIDs.PathDetail.deriveButton}
 					title="Derive New Account"
 					onPress={onTapDeriveButton}
 				/>
