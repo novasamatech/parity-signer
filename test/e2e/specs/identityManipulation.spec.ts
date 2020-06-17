@@ -68,6 +68,7 @@ describe('Load test', () => {
 		await testTap(PathsList.deriveButton);
 		await testInput(PathDerivation.pathInput, defaultPath);
 		await testInput(PathDerivation.nameInput, 'default account');
+		await element(by.text('Done')).tap();
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}`);
 		await tapBack();
 		await testVisible(PathsList.screen);
@@ -79,6 +80,7 @@ describe('Load test', () => {
 		await testTap(PathDetail.deriveButton);
 		await testInput(PathDerivation.pathInput, childPath);
 		await testInput(PathDerivation.nameInput, 'child of default');
+		await element(by.text('Done')).tap();
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}${childPath}`);
 		await tapBack();
 		await testVisible(PathDetail.screen);

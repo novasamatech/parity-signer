@@ -169,6 +169,6 @@ export const alertDeriveSuccess = (): void =>
 	Alert.alert('Success', 'New Account Successfully derived', [
 		{
 			style: 'default',
-			text: 'Okay'
+			text: 'Done'
 		}
 	]);
