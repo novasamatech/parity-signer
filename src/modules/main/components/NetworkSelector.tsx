@@ -38,10 +38,10 @@ import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import {
-	navigateToPathDerivation,
 	navigateToPathDetails,
 	navigateToPathsList,
-	unlockSeedPhrase
+	unlockSeedPhrase,
+	useUnlockSeed
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import QrScannerTab from 'components/QrScannerTab';
@@ -64,7 +64,7 @@ export default function NetworkSelector({
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accounts.state;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
-
+	const { unlockWithoutPassword } = useUnlockSeed();
 	// catch android back button and prevent exiting the app
 	useFocusEffect(
 		React.useCallback((): any => {
@@ -83,6 +83,12 @@ export default function NetworkSelector({
 			return (): void => backHandler.remove();
 		}, [shouldShowMoreNetworks])
 	);
+
+	const onAddCustomPath = (): Promise<void> =>
+		unlockWithoutPassword(
+			{ name: 'PathDerivation', params: { parentPath: '' } },
+			seedRefHooks.isSeedRefValid
+		);
 
 	const sortNetworkKeys = (
 		[, params1]: [any, NetworkParams],
@@ -164,9 +170,7 @@ export default function NetworkSelector({
 	const renderCustomPathCard = (): React.ReactElement => (
 		<NetworkCard
 			isAdd={true}
-			onPress={(): Promise<void> =>
-				navigateToPathDerivation(navigation, '', seedRefHooks.isSeedRefValid)
-			}
+			onPress={onAddCustomPath}
 			testID={testIDs.Main.addCustomNetworkButton}
 			title="Create Custom Path"
 			networkColor={colors.background.app}

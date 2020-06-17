@@ -41,11 +41,7 @@ import {
 	isSubstratePath
 } from 'utils/identitiesUtils';
 import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
-import {
-	navigateToPathDerivation,
-	navigateToPathsList,
-	useUnlockSeed
-} from 'utils/navigationHelpers';
+import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
 import { useSeedRef } from 'utils/seedRefHooks';
@@ -80,7 +76,10 @@ export function PathDetailsView({
 	});
 
 	const onTapDeriveButton = (): Promise<void> =>
-		navigateToPathDerivation(navigation, path, isSeedRefValid);
+		unlockWithoutPassword(
+			{ name: 'PathDerivation', params: { parentPath: path } },
+			isSeedRefValid
+		);
 
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {

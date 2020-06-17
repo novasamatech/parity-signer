@@ -19,7 +19,7 @@ import { ScrollView, Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
-import { navigateToPathDerivation } from 'utils/navigationHelpers';
+import { useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
@@ -63,6 +63,7 @@ function PathsList({
 		return groupPaths(listedPaths);
 	}, [currentIdentity, isEthereumPath, networkKey]);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
+	const { unlockWithoutPassword } = useUnlockSeed();
 
 	if (isEthereumNetworkParams(networkParams)) {
 		return (
@@ -79,9 +80,11 @@ function PathsList({
 	const rootPath = `//${networkParams.pathId}`;
 
 	const onTapDeriveButton = (): Promise<void> =>
-		navigateToPathDerivation(
-			navigation,
-			isUnknownNetworkPath ? '' : rootPath,
+		unlockWithoutPassword(
+			{
+				name: 'PathDerivation',
+				params: { parentPath: isUnknownNetworkPath ? '' : rootPath }
+			},
 			isSeedRefValid
 		);
 
