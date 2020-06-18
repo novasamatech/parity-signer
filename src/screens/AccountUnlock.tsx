@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -192,13 +192,12 @@ function PinInput(props: any): React.ReactElement {
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		overflow: 'hidden'
 	},
 	pinInput: {
-		borderBottomColor: colors.bg_button,
-		borderColor: colors.bg_button,
+		borderColor: colors.border.light,
 		minHeight: 48,
 		paddingLeft: 10,
 		paddingRight: 10

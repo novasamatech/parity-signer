@@ -15,15 +15,15 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 import { withAccountStore } from 'utils/HOC';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
@@ -34,9 +34,9 @@ import {
 	alertRisks
 } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
+import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityNew({
 	accounts,
@@ -48,6 +48,7 @@ function IdentityNew({
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const createSeedRefWithNewSeed = useNewSeedRef();
 
 	useEffect((): (() => void) => {
 		const clearNewIdentity = (): void =>
@@ -76,14 +77,22 @@ function IdentityNew({
 		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
-				await accounts.saveNewIdentity(seedPhrase.trimEnd(), pin);
+				await accounts.saveNewIdentity(
+					seedPhrase.trimEnd(),
+					pin,
+					createSeedRefWithNewSeed
+				);
 			} else {
-				await accounts.saveNewIdentity(seedPhrase, pin);
+				await accounts.saveNewIdentity(
+					seedPhrase,
+					pin,
+					createSeedRefWithNewSeed
+				);
 			}
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
-			alertIdentityCreationError();
+			alertIdentityCreationError(e.message);
 		}
 	};
 
@@ -117,18 +126,18 @@ function IdentityNew({
 			/>
 			<View style={styles.btnBox}>
 				<Button
-					title="Create"
+					title="Recover"
+					testID={testIDs.IdentityNew.recoverButton}
+					onPress={onRecoverConfirm}
+					small={true}
+				/>
+				<Button
+					title="or create new identity"
 					onPress={(): void => {
 						setIsRecover(false);
 					}}
 					small={true}
 					onlyText={true}
-				/>
-				<Button
-					title="Recover Identity"
-					testID={testIDs.IdentityNew.recoverButton}
-					onPress={onRecoverConfirm}
-					small={true}
 				/>
 			</View>
 		</>
@@ -137,35 +146,31 @@ function IdentityNew({
 	const renderCreateView = (): React.ReactElement => (
 		<View style={styles.btnBox}>
 			<Button
-				title="Recover Identity"
-				onPress={(): void => setIsRecover(true)}
-				small={true}
-				onlyText={true}
-			/>
-			<Button
 				title="Create"
 				testID={testIDs.IdentityNew.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
 			/>
+			<Button
+				title="or recover existing identity"
+				onPress={(): void => setIsRecover(true)}
+				small={true}
+				onlyText={true}
+			/>
 		</View>
 	);
 
 	return (
-		<KeyboardScrollView
-			style={styles.body}
-			extraHeight={Platform.OS === 'ios' ? 210 : 120}
-		>
+		<KeyboardAwareContainer>
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.IdentityNew.nameInput}
 				value={accounts.getNewIdentity().name}
 				placeholder="Identity Name"
-				focus={false}
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
-		</KeyboardScrollView>
+		</KeyboardAwareContainer>
 	);
 }
 
@@ -173,20 +178,12 @@ export default withAccountStore(IdentityNew);
 
 const styles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		overflow: 'hidden'
 	},
 	btnBox: {
 		alignContent: 'center',
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-around',
 		marginTop: 32
-	},
-	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18
 	}
 });

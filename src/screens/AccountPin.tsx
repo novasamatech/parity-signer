@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -15,11 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 //Deprecated
-
 import React, { useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
+import fontStyles from 'styles/fontStyles';
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
 import Button from 'components/Button';
@@ -162,14 +162,14 @@ const styles = StyleSheet.create({
 		padding: 20
 	},
 	errorText: {
-		color: colors.bg_alert,
+		color: colors.signal.error,
 		fontFamily: fonts.bold,
 		fontSize: 12,
 		paddingBottom: 20,
 		textAlign: 'center'
 	},
 	hintText: {
-		color: colors.bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.bold,
 		fontSize: 12,
 		paddingBottom: 20,
@@ -179,13 +179,11 @@ const styles = StyleSheet.create({
 		marginBottom: 20
 	},
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 10
+		...fontStyles.h_subheading,
+		color: colors.text.main
 	},
 	titleTop: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 24,
 		paddingBottom: 20,

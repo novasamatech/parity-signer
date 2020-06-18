@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
 		paddingBottom: 15
 	},
 	text: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.regular,
 		fontSize: 14,
 		marginBottom: 20
 	},
 	title: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 20

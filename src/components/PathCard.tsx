@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,19 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 
 import AccountIcon from './AccountIcon';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
-import AccountPrefixedTitle from './AccountPrefixedTitle';
 
-import {
-	isSubstrateNetworkParams,
-	isUnknownNetworkParams
-} from 'types/networkSpecsTypes';
+import Separator from 'components/Separator';
 import {
 	defaultNetworkKey,
 	NETWORK_LIST,
@@ -34,18 +31,24 @@ import {
 } from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import Separator from 'components/Separator';
+import { Identity } from 'types/identityTypes';
+import {
+	isSubstrateNetworkParams,
+	isUnknownNetworkParams,
+	SubstrateNetworkParams
+} from 'types/networkSpecsTypes';
+import { ButtonListener } from 'types/props';
 import {
 	getAddressWithPath,
 	getNetworkKeyByPath,
 	getPathName
 } from 'utils/identitiesUtils';
-import { ButtonListener } from 'types/props';
-import { Identity } from 'types/identityTypes';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
 	onPress,
 	identity,
+	isPathValid = true,
 	path,
 	name,
 	networkKey,
@@ -54,6 +57,7 @@ export default function PathCard({
 }: {
 	onPress?: ButtonListener;
 	identity: Identity;
+	isPathValid?: boolean;
 	path: string;
 	name?: string;
 	networkKey?: string;
@@ -62,19 +66,45 @@ export default function PathCard({
 }): React.ReactElement {
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
-	const address = getAddressWithPath(path, identity);
-	const isUnknownAddress = address === '';
-
-	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
+	const { isSeedRefValid, substrateAddress } = useSeedRef(
+		identity.encryptedSeed
+	);
+	const [address, setAddress] = useState('');
 	const computedNetworkKey =
 		networkKey || getNetworkKeyByPath(path, identity.meta.get(path)!);
+	useEffect(() => {
+		const getAddress = async (): Promise<void> => {
+			const existedAddress = getAddressWithPath(path, identity);
+			if (existedAddress !== '') return setAddress(existedAddress);
+			if (isSeedRefValid && isPathValid) {
+				const prefix = (NETWORK_LIST[
+					computedNetworkKey
+				] as SubstrateNetworkParams).prefix;
+				const generatedAddress = await substrateAddress(path, prefix);
+				return setAddress(generatedAddress);
+			}
+			setAddress('');
+		};
+		getAddress();
+	}, [
+		path,
+		identity,
+		isPathValid,
+		networkKey,
+		computedNetworkKey,
+		isSeedRefValid,
+		substrateAddress
+	]);
+
+	const isUnknownAddress = address === '';
+	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
 	const networkParams =
 		computedNetworkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress
 			? NETWORK_LIST[defaultNetworkKey]
 			: NETWORK_LIST[computedNetworkKey];
 
 	const nonSubstrateCard = (
-		<View testID={testID}>
+		<>
 			<Separator
 				shadow={true}
 				style={{
@@ -83,18 +113,22 @@ export default function PathCard({
 					marginVertical: 0
 				}}
 			/>
-			<View style={styles.content}>
+			<View
+				testID={testID}
+				style={[
+					styles.content,
+					{ backgroundColor: 'transparent', paddingVertical: 0 }
+				]}
+			>
 				<AccountIcon
 					address={address}
 					network={networkParams}
-					style={styles.iconUser}
+					style={styles.identicon}
 				/>
 				<View style={styles.desc}>
-					<View>
-						<Text style={[fontStyles.t_regular, { color: colors.bg_text_sec }]}>
-							{networkParams.title}
-						</Text>
-					</View>
+					<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
+						{networkParams.title}
+					</Text>
 					<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
 					<Address address={address} protocol={networkParams.protocol} />
 				</View>
@@ -107,48 +141,72 @@ export default function PathCard({
 					]}
 				/>
 			</View>
-		</View>
+		</>
 	);
+
 	const substrateDerivationCard = (
-		<View style={styles.body}>
-			<TouchableItem
-				accessibilityComponentType="button"
-				disabled={false}
-				onPress={onPress}
-			>
-				<View style={[styles.content, styles.contentSubstrate]} testID={testID}>
-					<AccountIcon
-						address={address}
-						network={networkParams}
-						style={styles.iconUser}
-					/>
-					<View style={styles.desc}>
-						<View style={styles.titleContainer}>
-							<AccountPrefixedTitle
-								title={pathName!}
-								titlePrefix={titlePrefix}
-							/>
-							{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
-						</View>
-						<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-							<AntIcon name="user" size={10} color={colors.bg_text_sec} />
-							<Text style={fontStyles.t_codeS}>
-								{hasPassword ? `${path}///***` : path}
-							</Text>
-						</View>
-						{address !== '' && (
-							<Text
-								style={fontStyles.t_codeS}
-								ellipsizeMode="middle"
-								numberOfLines={1}
-							>
-								{address}
+		<TouchableItem
+			accessibilityComponentType="button"
+			disabled={false}
+			onPress={onPress}
+			style={styles.body}
+		>
+			<View style={styles.content} testID={testID}>
+				<AccountIcon
+					address={address}
+					network={networkParams}
+					style={styles.identicon}
+				/>
+				<View style={styles.desc}>
+					<View style={styles.row}>
+						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
+						{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
+					</View>
+					<View
+						style={{
+							alignItems: 'center',
+							flexDirection: 'row'
+						}}
+					>
+						<AntIcon
+							name="user"
+							size={fontStyles.i_small.fontSize}
+							color={colors.signal.main}
+						/>
+
+						{hasPassword ? (
+							<View style={styles.row}>
+								<Text
+									style={[fontStyles.t_codeS, { color: colors.signal.main }]}
+								>
+									{path}///
+								</Text>
+
+								<AntIcon
+									name="lock"
+									size={fontStyles.i_small.fontSize}
+									color={colors.signal.main}
+									style={{ alignSelf: 'center' }}
+								/>
+							</View>
+						) : (
+							<Text style={[fontStyles.t_codeS, { color: colors.signal.main }]}>
+								{path}
 							</Text>
 						)}
 					</View>
+					{address !== '' && (
+						<Text
+							style={[fontStyles.t_codeS, { color: colors.text.faded }]}
+							ellipsizeMode="middle"
+							numberOfLines={1}
+						>
+							{address}
+						</Text>
+					)}
 				</View>
-			</TouchableItem>
-		</View>
+			</View>
+		</TouchableItem>
 	);
 
 	return isSubstrateNetworkParams(networkParams) ||
@@ -159,41 +217,35 @@ export default function PathCard({
 
 const styles = StyleSheet.create({
 	body: {
-		flexDirection: 'column',
-		marginBottom: 10
+		borderBottomWidth: 1,
+		borderColor: colors.background.app,
+		borderTopWidth: 1
 	},
 	content: {
 		alignItems: 'center',
+		backgroundColor: colors.background.card,
 		flexDirection: 'row',
-		paddingLeft: 16
-	},
-	contentSubstrate: {
-		backgroundColor: colors.card_bg,
+		paddingLeft: 16,
 		paddingVertical: 8
 	},
 	desc: {
 		flex: 1,
-		flexDirection: 'column',
-		justifyContent: 'space-between',
 		paddingLeft: 16
 	},
 	footer: {
-		alignSelf: 'stretch',
-		backgroundColor: '#977CF6',
-		height: 100,
+		height: 80,
 		marginLeft: 8,
-		width: 8
+		width: 4
 	},
 	iconLock: {
 		marginLeft: 4,
 		...fontStyles.h2
 	},
-	iconUser: {
+	identicon: {
 		height: 40,
 		width: 40
 	},
-	titleContainer: {
-		alignItems: 'center',
+	row: {
 		flexDirection: 'row'
 	}
 });

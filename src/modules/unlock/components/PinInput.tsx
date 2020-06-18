@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,16 +14,16 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { MutableRefObject } from 'react';
-import { StyleSheet, TextInputProps } from 'react-native';
-
-import styles from '../styles';
+import { KeyboardTypeOptions, StyleSheet, TextInputProps } from 'react-native';
 
 import TextInput from 'components/TextInput';
 import fontStyles from 'styles/fontStyles';
+import colors from 'styles/colors';
 
 interface PinInputProps extends TextInputProps {
 	label: string;
 	focus?: boolean;
+	keyboardType?: KeyboardTypeOptions;
 	ref?: MutableRefObject<TextInput | null>;
 }
 
@@ -32,7 +32,7 @@ export default function PinInput(props: PinInputProps): React.ReactElement {
 		<TextInput
 			keyboardAppearance="dark"
 			editable
-			keyboardType="numeric"
+			keyboardType={props.keyboardType ?? 'numeric'}
 			multiline={false}
 			autoCorrect={false}
 			numberOfLines={1}
@@ -42,9 +42,19 @@ export default function PinInput(props: PinInputProps): React.ReactElement {
 			style={StyleSheet.flatten([
 				fontStyles.t_seed,
 				styles.pinInput,
-				{ fontSize: 22 },
+				{ fontSize: 18 },
 				props.style
 			])}
 		/>
 	);
 }
+
+const styles = StyleSheet.create({
+	pinInput: {
+		borderBottomColor: colors.border.light,
+		borderColor: colors.border.light,
+		minHeight: 48,
+		paddingLeft: 10,
+		paddingRight: 10
+	}
+});

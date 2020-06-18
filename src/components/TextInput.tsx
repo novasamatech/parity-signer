@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -79,7 +79,8 @@ export default class TextInput extends React.PureComponent<Props, {}> {
 						underlineColorAndroid="transparent"
 						{...this.props}
 						style={[fontStyles.h2, finalInputStyles, style]}
-						placeholderTextColor={colors.card_bg_text_sec}
+						placeholderTextColor={colors.text.faded}
+						selectionColor={colors.border.light}
 					/>
 				</View>
 			</View>
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16
 	},
 	input: {
-		borderBottomColor: colors.card_bg_text_sec,
+		borderBottomColor: colors.border.light,
 		borderBottomWidth: 0.8,
 		flex: 1,
 		height: 40,
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
 		paddingTop: 11.5
 	},
 	input_error: {
-		borderBottomColor: colors.bg_alert
+		borderBottomColor: colors.signal.error
 	},
 	label: {
 		marginBottom: 3,

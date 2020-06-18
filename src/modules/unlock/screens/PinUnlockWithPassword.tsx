@@ -15,48 +15,45 @@
 
 import React, { useState } from 'react';
 
-import Container from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
-import ButtonMainAction from 'components/ButtonMainAction';
-import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
-import { unlockIdentitySeed } from 'utils/identitiesUtils';
-import { constructSURI } from 'utils/suri';
+import { NavigationTargetIdentityProps } from 'types/props';
+import { withAccountStore, withTargetIdentity } from 'utils/HOC';
+import { useSeedRef } from 'utils/seedRefHooks';
+import Button from 'components/Button';
 
 function PinUnlockWithPassword({
-	accounts,
+	targetIdentity,
 	route
-}: NavigationAccountProps<'PinUnlockWithPassword'>): React.ReactElement {
+}: NavigationTargetIdentityProps<'PinUnlockWithPassword'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
-	const targetIdentity =
-		route.params.identity ?? accounts.state.currentIdentity;
+	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
 		const { pin, password } = state;
-		const derivePath = route.params.path;
-		if (pin.length >= 6 && targetIdentity) {
-			try {
-				const resolve = route.params.resolve;
-				const seedPhrase = await unlockIdentitySeed(pin, targetIdentity);
-				const suri = constructSURI({
-					derivePath,
-					password,
-					phrase: seedPhrase
-				});
-				resetState();
-				resolve(suri);
-			} catch (e) {
-				updateState({ password: '', pin: '', pinMismatch: true });
-				//TODO record error times;
+		const resolvePassword = route.params.resolve;
+		if (!route.params.isSeedRefValid) {
+			if (pin.length >= 6 && targetIdentity) {
+				try {
+					await createSeedRef(pin);
+					resolvePassword(password);
+					resetState();
+				} catch (e) {
+					updateState({ password: '', pin: '', pinMismatch: true });
+					//TODO record error times;
+				}
+			} else {
+				updateState({ pinTooShort: true });
 			}
 		} else {
-			updateState({ pinTooShort: true });
+			resolvePassword(password);
+			resetState();
 		}
 	}
 
@@ -68,38 +65,45 @@ function PinUnlockWithPassword({
 	}
 
 	return (
-		<Container>
+		<KeyboardAwareContainer
+			contentContainerStyle={{
+				flexGrow: 1
+			}}
+		>
 			<ScreenHeading
 				title={t.title.pinUnlock}
 				error={state.pinMismatch || state.pinTooShort}
 				subtitle={getSubtitle(state, true)}
 			/>
-			<PinInput
-				label={t.pinLabel}
-				autoFocus
-				testID={testIDs.IdentityPin.unlockPinInput}
-				returnKeyType="done"
-				onChangeText={onPinInputChange('pin', updateState)}
-				onSubmitEditing={(): void => setFocusPassword(true)}
-				value={state.pin}
-			/>
+			{!route.params.isSeedRefValid && (
+				<PinInput
+					label={t.pinLabel}
+					autoFocus
+					testID={testIDs.IdentityPin.unlockPinInput}
+					returnKeyType="done"
+					onChangeText={onPinInputChange('pin', updateState)}
+					onSubmitEditing={(): void => setFocusPassword(true)}
+					value={state.pin}
+				/>
+			)}
 			<PinInput
 				label={t.passwordLabel}
 				testID={testIDs.IdentityPin.passwordInput}
 				returnKeyType="done"
+				keyboardType="default"
 				focus={focusPassword}
 				onChangeText={onPasswordInputChange}
 				onSubmitEditing={submit}
 				value={state.password}
 			/>
-			<ButtonMainAction
+			<Button
 				title={t.doneButton.pinUnlock}
-				bottom={false}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
+				aboveKeyboard
 			/>
-		</Container>
+		</KeyboardAwareContainer>
 	);
 }
 
-export default withAccountStore(PinUnlockWithPassword);
+export default withAccountStore(withTargetIdentity(PinUnlockWithPassword));

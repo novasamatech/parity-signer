@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -113,4 +113,14 @@ export function constructSURI({
 	}
 
 	return `${phrase}${derivePath}///${password}`;
+}
+
+export function constructSuriSuffix({
+	derivePath = '',
+	password = ''
+}: {
+	derivePath?: string;
+	password?: string;
+}): string {
+	return `${derivePath}///${password}`;
 }

@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -17,16 +17,6 @@
 const testIDs = {
 	AccountListScreen: {
 		accountList: 'accountList'
-	},
-	AccountNetworkChooser: {
-		addCustomNetworkButton: 'anc_add_custom_button',
-		addNewNetworkButton: 'anc_add_new_button',
-		chooserScreen: 'anc_chooser_screen',
-		createButton: 'anc_create_button',
-		networkButton: 'anc_network_button',
-		noAccountScreen: 'anc_no_account_screen',
-		recoverButton: 'anc_recover_button',
-		showExistedButton: 'anc_show_existed'
 	},
 	Header: {
 		headerBackButton: 'header_back_button'
@@ -62,9 +52,15 @@ const testIDs = {
 		unlockPinButton: 'identity_unlock_pin_button',
 		unlockPinInput: 'identity_unlock_pin_input'
 	},
-	MessageDetails: {
-		scrollScreen: 'message_details_scroll',
-		signButton: 'message_details_sign_button'
+	Main: {
+		addCustomNetworkButton: 'anc_add_custom_button',
+		addNewNetworkButton: 'anc_add_new_button',
+		chooserScreen: 'anc_chooser_screen',
+		createButton: 'anc_create_button',
+		networkButton: 'anc_network_button',
+		noAccountScreen: 'anc_no_account_screen',
+		recoverButton: 'anc_recover_button',
+		showExistedButton: 'anc_show_existed'
 	},
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
@@ -75,8 +71,12 @@ const testIDs = {
 	},
 	PathDetail: {
 		deleteButton: 'path_detail_delete_button',
+		exportButton: 'path_detail_export_button',
 		popupMenuButton: 'path_detail_popup_menu_button',
 		screen: 'path_detail_screen'
+	},
+	PathSecret: {
+		screen: 'path_secret_screen'
 	},
 	PathsList: {
 		deriveButton: 'path_list_derive_button',
@@ -98,10 +98,6 @@ const testIDs = {
 		agreeTacButton: 'tac_agree',
 		nextButton: 'tac_next',
 		tacView: 'tac_view'
-	},
-	TxDetails: {
-		scrollScreen: 'tx_details_scroll',
-		signButton: 'tx_details_sign_button'
 	}
 };
 

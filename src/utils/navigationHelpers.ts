@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,13 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { CommonActions } from '@react-navigation/native';
+import {
+	CommonActions,
+	useNavigation,
+	useNavigationState
+} from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
-type GenericNavigationProps<
+type Route = {
+	name: keyof RootStackParamList;
+	params?: RootStackParamList[keyof RootStackParamList];
+};
+
+export type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
 > = StackNavigationProp<RootStackParamList, RouteName>;
 
@@ -31,30 +40,109 @@ export const setPin = async <RouteName extends keyof RootStackParamList>(
 		navigation.navigate('PinNew', { resolve });
 	});
 
+export const unlockAndReturnSeed = async <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
+): Promise<string> =>
+	new Promise(resolve => {
+		navigation.navigate('PinUnlock', {
+			resolve,
+			shouldReturnSeed: true
+		});
+	});
+
+type UnlockWithPassword = (
+	nextRoute: (password: string) => Route,
+	isSeedRefValid: boolean,
+	identity?: Identity
+) => Promise<void>;
+
+type UnlockWithoutPassword = (
+	nextRoute: Route,
+	isSeedRefValid: boolean,
+	identity?: Identity
+) => Promise<void>;
+export const useUnlockSeed = (): {
+	unlockWithPassword: UnlockWithPassword;
+	unlockWithoutPassword: UnlockWithoutPassword;
+} => {
+	const currentRoutes = useNavigationState(state => state.routes) as Route[];
+	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+	const newRoutes: Route[] = currentRoutes
+		.slice(0, currentRoutes.length - 1)
+		.map(routeState => {
+			return {
+				name: routeState.name,
+				params: routeState.params
+			};
+		});
+
+	const resetRoutes = (routes: Route[]): void => {
+		const resetAction = CommonActions.reset({
+			index: routes.length - 1,
+			routes: routes
+		});
+		navigation.dispatch(resetAction);
+	};
+
+	const unlockWithPassword: UnlockWithPassword = async (
+		nextRoute,
+		isSeedRefValid,
+		identity
+	) => {
+		const password = await unlockSeedPhraseWithPassword(
+			navigation,
+			isSeedRefValid,
+			identity
+		);
+		newRoutes.push(nextRoute(password));
+		resetRoutes(newRoutes);
+	};
+
+	const unlockWithoutPassword: UnlockWithoutPassword = async (
+		nextRoute,
+		isSeedRefValid,
+		identity
+	) => {
+		await unlockSeedPhrase(navigation, isSeedRefValid, identity);
+		newRoutes.push(nextRoute);
+		resetRoutes(newRoutes);
+	};
+
+	return { unlockWithPassword, unlockWithoutPassword };
+};
+
 export const unlockSeedPhrase = async <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
+	isSeedRefValid: boolean,
 	identity?: Identity
-): Promise<string> =>
+): Promise<void> =>
 	new Promise(resolve => {
-		navigation.navigate('PinUnlock', {
-			identity,
-			resolve
-		});
+		if (isSeedRefValid) {
+			resolve();
+		} else {
+			navigation.navigate('PinUnlock', {
+				identity,
+				resolve,
+				shouldReturnSeed: false
+			});
+		}
 	});
 
 export const unlockSeedPhraseWithPassword = async <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
-	path: string,
+	isSeedRefValid: boolean,
 	identity?: Identity
 ): Promise<string> =>
 	new Promise(resolve => {
 		navigation.navigate('PinUnlockWithPassword', {
 			identity,
-			path,
+			isSeedRefValid,
 			resolve
 		});
 	});
@@ -70,7 +158,7 @@ export const navigateToPathDetails = <
 		index: 2,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew: false }
 			},
 			{
@@ -93,7 +181,7 @@ export const navigateToLandingPage = <
 ): void => {
 	const resetAction = CommonActions.reset({
 		index: 0,
-		routes: [{ name: 'AccountNetworkChooser' }]
+		routes: [{ name: 'Main' }]
 	});
 	navigation.dispatch(resetAction);
 };
@@ -107,7 +195,7 @@ export const navigateToNewIdentityNetwork = <
 		index: 0,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew: true }
 			}
 		]
@@ -139,7 +227,7 @@ export const resetNavigationWithNetworkChooser = <
 		index: 1,
 		routes: [
 			{
-				name: 'AccountNetworkChooser',
+				name: 'Main',
 				params: { isNew }
 			},
 			{
@@ -180,3 +268,18 @@ export const navigateToLegacyAccountList = <
 >(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationTo(navigation, 'LegacyAccountList');
+
+export const navigateToPathDerivation = async <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
+	parentPath: string,
+	isSeedRefValid: boolean
+): Promise<void> => {
+	if (!isSeedRefValid) {
+		await unlockSeedPhrase(navigation, isSeedRefValid);
+	}
+	resetNavigationWithNetworkChooser(navigation, 'PathDerivation', {
+		parentPath
+	});
+};

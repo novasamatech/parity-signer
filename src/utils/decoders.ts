@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,28 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { TypeRegistry } from '@polkadot/types';
 import {
+	compactFromU8a,
 	hexStripPrefix,
 	hexToU8a,
-	u8aToHex,
-	u8aToString
+	u8aToHex
 } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 
-import { blake2b } from './native';
-
-import { ExtrinsicPayloadLatestVersion } from 'constants/chainData';
-import {
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
+import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import {
 	EthereumParsedData,
 	ParsedData,
 	SubstrateCompletedParsedData,
 	SubstrateMultiParsedData
 } from 'types/scannerTypes';
+import { blake2b } from 'utils/native';
 
 /*
   Example Full Raw Data
@@ -51,12 +45,11 @@ import {
   00 // indicates action: signData
   f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
   544849532049532053504152544121 // actual payload to sign (should be SCALE or utf8)
+  91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3 // genesis hash
   0 // terminator
   --- SQRC Filler Bytes
   ec11ec11ec11ec // SQRC filler bytes
   */
-
-const registry = new TypeRegistry();
 
 export function rawDataToU8A(rawData: string): Uint8Array | null {
 	if (!rawData) {
@@ -173,45 +166,29 @@ export async function constructDataFromBytes(
 					const pubKeyHex = uosAfterFrames.substr(6, 64);
 					const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
 					const hexEncodedData = '0x' + uosAfterFrames.slice(70);
-					const rawPayload = hexToU8a(hexEncodedData);
-
+					const hexPayload = hexEncodedData.slice(0, -64);
+					const genesisHash = `0x${hexEncodedData.substr(-64)}`;
+					const rawPayload = hexToU8a(hexPayload);
+					data.data.genesisHash = genesisHash;
 					const isOversized = rawPayload.length > 256;
-					const defaultPrefix =
-						SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
-					let extrinsicPayload;
-					let network;
+					const network = SUBSTRATE_NETWORK_LIST[genesisHash];
+					if (!network) {
+						throw new Error(
+							`Signer does not currently support a chain with genesis hash: ${genesisHash}`
+						);
+					}
 
 					switch (secondByte) {
 						case '00': // sign mortal extrinsic
 						case '02': // sign immortal extrinsic
-							extrinsicPayload = registry.createType(
-								'ExtrinsicPayload',
-								rawPayload,
-								{
-									version: ExtrinsicPayloadLatestVersion
-								}
-							);
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;
+							const [offset] = compactFromU8a(rawPayload);
+							const payload = rawPayload.subarray(offset);
 							data.data.data = isOversized
-								? await blake2b(
-										u8aToHex(extrinsicPayload.toU8a(true), -1, false)
-								  )
-								: extrinsicPayload;
-
-							// while we are signing a hash, we still have the ability to know what the signing payload is, so we should get that information into the store.
-							data.preHash = extrinsicPayload;
-
-							network =
-								SUBSTRATE_NETWORK_LIST[extrinsicPayload.genesisHash.toHex()];
-
-							if (!network) {
-								throw new Error(
-									`Signer does not currently support a chain with genesis hash: ${extrinsicPayload.genesisHash.toHex()}`
-								);
-							}
-
+								? await blake2b(u8aToHex(payload, -1, false))
+								: rawPayload;
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,
 								network.prefix
@@ -222,25 +199,10 @@ export async function constructDataFromBytes(
 							data.action = 'signData';
 							data.oversized = false;
 							data.isHash = true;
-							data.data.data = rawPayload;
+							data.data.data = hexPayload;
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,
-								defaultPrefix
-							); // default to Kusama
-							break;
-						case '03': // Cold Signer should attempt to decode message to utf8
-							data.action = 'signData';
-							if (isOversized) {
-								data.data.data = await blake2b(u8aToHex(rawPayload, -1, false));
-								data.isHash = isOversized;
-								data.oversized = isOversized;
-							} else {
-								data.data.data = u8aToString(rawPayload);
-							}
-
-							data.data.account = encodeAddress(
-								publicKeyAsBytes,
-								defaultPrefix
+								network.prefix
 							); // default to Kusama
 							break;
 						default:

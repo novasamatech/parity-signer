@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -19,7 +19,9 @@ import {
 	getExistedNetworkKeys,
 	getNetworkKeyByPath,
 	getPathName,
+	getPathsWithSubstrateNetworkKey,
 	groupPaths,
+	isSubstrateHardDerivedPath,
 	serializeIdentities
 } from 'utils/identitiesUtils';
 import {
@@ -257,5 +259,46 @@ describe('IdentitiesUtils', () => {
 			SubstrateNetworkKeys.WESTEND
 		);
 		expect(getNetworkKeyByPathTest('1')).toEqual(EthereumNetworkKeys.FRONTIER);
+	});
+
+	it('group path under their network correctly, has no missing accounts', () => {
+		const mockIdentity = testIdentities[0];
+		const existedNetworks = getExistedNetworkKeys(mockIdentity);
+		const existedAccounts = mockIdentity.meta.size;
+
+		const allListedAccounts = existedNetworks.reduce(
+			(acc: string[], networkKey: string) => {
+				if (Object.values(EthereumNetworkKeys).includes(networkKey)) {
+					//Get ethereum account into list
+					const accountMeta = mockIdentity.meta.get(networkKey);
+					if (accountMeta === undefined) return acc;
+					acc.push(networkKey);
+					return acc;
+				} else {
+					const networkAccounts = getPathsWithSubstrateNetworkKey(
+						mockIdentity,
+						networkKey
+					);
+					return acc.concat(networkAccounts);
+				}
+			},
+			[]
+		);
+		expect(existedAccounts).toEqual(allListedAccounts.length);
+	});
+
+	it('decides account is only with hard derivation', () => {
+		const testPath1 = '//only//hard//derivation//1';
+		expect(isSubstrateHardDerivedPath(testPath1)).toBe(true);
+		const testPath2 = '//soft/in//the//middle';
+		expect(isSubstrateHardDerivedPath(testPath2)).toBe(false);
+		const testPath3 = '//soft//in//the/end';
+		expect(isSubstrateHardDerivedPath(testPath3)).toBe(false);
+		const testPath4 = '/soft//in//the//start';
+		expect(isSubstrateHardDerivedPath(testPath4)).toBe(false);
+		const testEthereumPath = '1';
+		expect(isSubstrateHardDerivedPath(testEthereumPath)).toBe(false);
+		const testRootPath = '';
+		expect(isSubstrateHardDerivedPath(testRootPath)).toBe(false);
 	});
 });

@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -64,7 +64,7 @@ export function emptyAccount(
 		createdAt: new Date().getTime(),
 		derivationPassword: '',
 		derivationPath: '',
-		encryptedSeed: undefined,
+		encryptedSeed: '',
 		isLegacy: true,
 		name: '',
 		networkKey: networkKey,

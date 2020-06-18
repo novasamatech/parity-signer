@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -23,5 +23,6 @@ export default {
 	robotoLight: 'Roboto-Light',
 	robotoMedium: 'Roboto-Medium',
 	robotoMono: 'RobotoMono-Regular',
+	robotoMonoMedium: 'RobotoMono-Medium',
 	semiBold: 'ManifoldCF-DemiBold'
 };

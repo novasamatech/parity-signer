@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -37,7 +37,6 @@ import {
 } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 
 const ACCOUNT_NETWORK = 'Account Network';
 const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
@@ -64,7 +63,7 @@ export function NetworkSelector({
 					<Text style={styles.triggerLabel}>
 						{SUBSTRATE_NETWORK_LIST[networkKey].title}
 					</Text>
-					<Icon name="more-vert" size={25} color={colors.bg_text} />
+					<Icon name="more-vert" size={25} color={colors.text.main} />
 				</View>
 			</Touchable>
 		</View>
@@ -123,7 +122,8 @@ export function NetworkOptions({
 const styles = StyleSheet.create({
 	body: {
 		flex: 1,
-		marginVertical: 8,
+		marginBottom: 48,
+		marginTop: 24,
 		paddingHorizontal: 16
 	},
 	label: {
@@ -135,23 +135,19 @@ const styles = StyleSheet.create({
 		width: '100%'
 	},
 	optionHeadingText: {
-		color: colors.bg_text,
-		fontFamily: fonts.robotoMedium,
-		fontSize: 14,
+		...fontStyles.h_subheading,
 		paddingLeft: 16
 	},
 	optionLogo: {
 		alignItems: 'center',
-		backgroundColor: colors.bg_text_sec,
-		borderRadius: 30,
-		height: 30,
+		height: 32,
 		justifyContent: 'center',
 		marginHorizontal: 16,
-		width: 30
+		width: 32
 	},
 	optionText: {
-		color: colors.bg_text,
-		...fontStyles.h2
+		...fontStyles.h2,
+		color: colors.text.main
 	},
 	optionWrapper: {
 		alignItems: 'center',
@@ -161,7 +157,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 8
 	},
 	optionsBackground: {
-		backgroundColor: colors.bg
+		backgroundColor: colors.background.app
 	},
 	optionsWrapper: {
 		justifyContent: 'flex-end'
@@ -172,12 +168,10 @@ const styles = StyleSheet.create({
 	},
 	triggerWrapper: {
 		alignItems: 'center',
-		backgroundColor: colors.bg,
-		borderBottomColor: colors.card_bg_text_sec,
+		backgroundColor: colors.background.app,
+		borderBottomColor: colors.border.light,
 		borderBottomWidth: 0.8,
-		flex: 1,
 		flexDirection: 'row',
-		height: 40,
-		paddingTop: 8
+		height: 40
 	}
 });

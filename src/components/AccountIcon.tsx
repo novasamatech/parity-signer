@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -60,7 +60,7 @@ export default function AccountIcon(props: {
 					/>
 				) : (
 					<View style={styles.logo}>
-						<FontAwesome name="question" color={colors.bg} size={28} />
+						<FontAwesome name="question" color={colors.text.main} size={28} />
 					</View>
 				)}
 			</View>
@@ -77,24 +77,21 @@ export default function AccountIcon(props: {
 		return <Identicon value={address} size={iconSize || 40} />;
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
-			<Image
-				source={{ uri: ethereumIconUri }}
-				style={(style as ImageStyle) || { height: 40, width: 40 }}
-			/>
+			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
 		);
 	} else {
 		// if there's no protocol or it's unknown we return a warning
-		return <MaterialIcon color={colors.bg_text} name={'error'} size={44} />;
+		return (
+			<MaterialIcon color={colors.signal.error} name={'error'} size={44} />
+		);
 	}
 }
 
 const styles = StyleSheet.create({
 	logo: {
-		alignItems: 'center',
-		backgroundColor: colors.bg_text_sec,
-		borderRadius: 40,
-		height: 40,
-		justifyContent: 'center',
-		width: 40
+		height: 36,
+		marginHorizontal: 2,
+		opacity: 0.7,
+		width: 36
 	}
 });

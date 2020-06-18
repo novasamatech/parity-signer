@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -19,11 +19,14 @@ import { decryptData, substrateAddress } from './native';
 import { constructSURI, parseSURI } from './suri';
 import { generateAccountId } from './account';
 
+import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	NETWORK_LIST,
+	PATH_IDS_LIST,
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
-	UnknownNetworkKeys
+	UnknownNetworkKeys,
+	unknownNetworkPathId
 } from 'constants/networkSpecs';
 import {
 	Account,
@@ -31,7 +34,6 @@ import {
 	FoundAccount,
 	FoundLegacyAccount,
 	Identity,
-	LockedAccount,
 	PathGroup,
 	SerializedIdentity,
 	UnlockedAccount
@@ -40,7 +42,10 @@ import {
 	centrifugeAmberMetadata,
 	centrifugeMetadata,
 	defaultMetaData,
+	edgewareMetadata,
+	kulupuMetadata,
 	kusamaMetadata,
+	polkadotMetaData,
 	substrateDevMetadata,
 	westendMetadata
 } from 'constants/networkMetadata';
@@ -54,10 +59,15 @@ export function isLegacyFoundAccount(
 	return foundAccount.isLegacy;
 }
 
-export const extractPathId = (path: string): string | null => {
+export const extractPathId = (path: string): string => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);
-	if (!matchNetworkPath) return null;
-	return removeSlash(matchNetworkPath[0]);
+	if (matchNetworkPath && matchNetworkPath[0]) {
+		const targetPathId = removeSlash(matchNetworkPath[0]);
+		if (PATH_IDS_LIST.includes(targetPathId)) {
+			return targetPathId;
+		}
+	}
+	return unknownNetworkPathId;
 };
 
 export const extractSubPathName = (path: string): string => {
@@ -72,6 +82,15 @@ export const isSubstratePath = (path: string): boolean =>
 
 export const isEthereumAccountId = (v: string): boolean =>
 	v.indexOf('ethereum:') === 0;
+
+export const isSubstrateHardDerivedPath = (path: string): boolean => {
+	if (!isSubstratePath(path)) return false;
+	const pathFragments = path.match(pathsRegex.allPath);
+	if (!pathFragments || pathFragments.length === 0) return false;
+	return pathFragments.every((pathFragment: string) => {
+		return pathFragment.substring(0, 2) === '//';
+	});
+};
 
 export const extractAddressFromAccountId = (id: string): string => {
 	const withoutNetwork = id.split(':')[1];
@@ -153,9 +172,7 @@ export const getPathsWithSubstrateNetworkKey = (
 	networkKey: string
 ): string[] => {
 	const pathEntries = Array.from(identity.meta.entries());
-	const isUnknownNetworkKey = networkKey === 'unknown';
 	const targetPathId = SUBSTRATE_NETWORK_LIST[networkKey]?.pathId;
-	const knownPathIds = Object.values(SUBSTRATE_NETWORK_LIST).map(v => v.pathId);
 	const pathReducer = (
 		groupedPaths: string[],
 		[path, pathMeta]: [string, AccountMeta]
@@ -168,21 +185,16 @@ export const getPathsWithSubstrateNetworkKey = (
 			pathId = extractPathId(path);
 		}
 
-		if (!isUnknownNetworkKey) {
-			if (pathId === targetPathId) {
-				groupedPaths.push(path);
-			}
-		} else {
-			if (pathId && !knownPathIds.includes(pathId)) {
-				groupedPaths.push(path);
-			}
+		if (pathId === targetPathId) {
+			groupedPaths.push(path);
+			return groupedPaths;
 		}
 		return groupedPaths;
 	};
 	return pathEntries.reduce(pathReducer, []);
 };
 
-const getNetworkKeyByPathId = (pathId: string): string => {
+export const getNetworkKeyByPathId = (pathId: string): string => {
 	const networkKeyIndex = Object.values(SUBSTRATE_NETWORK_LIST).findIndex(
 		networkParams => networkParams.pathId === pathId
 	);
@@ -203,10 +215,10 @@ export const getNetworkKeyByPath = (
 	pathMeta: AccountMeta
 ): string => {
 	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
+		//It is a ethereum path
 		return path;
 	}
 	const pathId = pathMeta.networkPathId || extractPathId(path);
-	if (!pathId) return UnknownNetworkKeys.UNKNOWN;
 
 	return getNetworkKeyByPathId(pathId);
 };
@@ -219,15 +231,13 @@ export const parseFoundLegacyAccount = (
 		accountId,
 		address: legacyAccount.address,
 		createdAt: legacyAccount.createdAt,
+		encryptedSeed: legacyAccount.encryptedSeed,
 		isLegacy: true,
 		name: legacyAccount.name,
 		networkKey: legacyAccount.networkKey,
 		updatedAt: legacyAccount.updatedAt,
 		validBip39Seed: legacyAccount.validBip39Seed
 	};
-	if (legacyAccount.hasOwnProperty('encryptedSeed')) {
-		returnAccount.encryptedSeed = (legacyAccount as LockedAccount).encryptedSeed;
-	}
 	if (legacyAccount.hasOwnProperty('derivationPath')) {
 		returnAccount.path = (legacyAccount as UnlockedAccount).derivationPath;
 	}
@@ -253,12 +263,14 @@ export const getAddressWithPath = (
 		: address;
 };
 
-export const unlockIdentitySeed = async (
+export const unlockIdentitySeedWithReturn = async (
 	pin: string,
-	identity: Identity
+	identity: Identity,
+	createSeedRef: TryCreateFunc
 ): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
+	await createSeedRef(pin);
 	const { phrase } = parseSURI(seed);
 	return phrase;
 };
@@ -408,6 +420,12 @@ export const getMetadata = (networkKey: string): string => {
 			return westendMetadata;
 		case SubstrateNetworkKeys.SUBSTRATE_DEV:
 			return substrateDevMetadata;
+		case SubstrateNetworkKeys.EDGEWARE:
+			return edgewareMetadata;
+		case SubstrateNetworkKeys.KULUPU:
+			return kulupuMetadata;
+		case SubstrateNetworkKeys.POLKADOT:
+			return polkadotMetaData;
 		default:
 			return defaultMetaData;
 	}

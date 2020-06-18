@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -65,13 +65,14 @@ export const SubstrateNetworkKeys: {
 		'0x092af6e7d25178ebab1677d15f66e37b30392b44ef442f728a53dd1bf48ec110', // https://portal.chain.centrifuge.io/#/explorer/query/0
 	EDGEWARE:
 		'0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
-	KULUPU: '0x37e1f8125397a98630013a4dff89b54cb758ff8eed894419e65a6dcf27a6fb8a',
+	KULUPU: '0xf7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba',
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
 	KUSAMA_CC2:
 		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
 	KUSAMA_DEV:
 		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
-	POLKADOT: 'polkadot_reserved',
+	POLKADOT:
+		'0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
 	SUBSTRATE_DEV:
 		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 	WESTEND: '0x4a31f96525a77959d97e267c8fc3066ca333d9ade161720e1b7de8d35ccc6bd2'
@@ -79,12 +80,12 @@ export const SubstrateNetworkKeys: {
 
 const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 	[UnknownNetworkKeys.UNKNOWN]: {
-		color: colors.bg_alert,
+		color: colors.signal.error,
 		order: 99,
 		pathId: unknownNetworkPathId,
 		prefix: 2,
 		protocol: NetworkProtocols.UNKNOWN,
-		secondaryColor: colors.card_bgSolid,
+		secondaryColor: colors.background.card,
 		title: 'Unknown network'
 	}
 };
@@ -93,10 +94,10 @@ const substrateNetworkBase: {
 	[key: string]: Partial<SubstrateNetworkParams>;
 } = {
 	[SubstrateNetworkKeys.CENTRIFUGE]: {
-		color: '#fcc367',
+		color: '#FCC367',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
-		logo: require('res/img/logos/centrifuge-chain.png'),
+		logo: require('res/img/logos/Centrifuge.png'),
 		order: 6,
 		pathId: 'centrifuge',
 		prefix: 36,
@@ -104,10 +105,10 @@ const substrateNetworkBase: {
 		unit: 'RAD'
 	},
 	[SubstrateNetworkKeys.CENTRIFUGE_AMBER]: {
-		color: '#fcc367',
+		color: '#7C6136',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE_AMBER,
-		logo: require('res/img/logos/centrifuge-chain.png'),
+		logo: require('res/img/logos/Centrifuge.png'),
 		order: 7,
 		pathId: 'centrifuge_amber',
 		prefix: 42,
@@ -115,10 +116,10 @@ const substrateNetworkBase: {
 		unit: 'ARAD'
 	},
 	[SubstrateNetworkKeys.EDGEWARE]: {
-		color: '#0a95df',
+		color: '#0B95E0',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.EDGEWARE,
-		logo: require('res/img/logos/edgeware.png'),
+		logo: require('res/img/logos/Edgeware.png'),
 		order: 4,
 		pathId: 'edgeware',
 		prefix: 7,
@@ -126,7 +127,7 @@ const substrateNetworkBase: {
 		unit: 'EDG'
 	},
 	[SubstrateNetworkKeys.KULUPU]: {
-		color: '#0effee',
+		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
 		order: 5,
@@ -136,10 +137,10 @@ const substrateNetworkBase: {
 		unit: 'KULU'
 	},
 	[SubstrateNetworkKeys.KUSAMA]: {
-		color: '#e6007a',
+		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('res/img/logos/kusama.png'),
+		logo: require('res/img/logos/Kusama.png'),
 		order: 2,
 		pathId: 'kusama',
 		prefix: 2,
@@ -147,10 +148,10 @@ const substrateNetworkBase: {
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_CC2]: {
-		color: '#e6007a',
+		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('res/img/logos/kusama.png'),
+		logo: require('res/img/logos/Kusama.png'),
 		order: 2,
 		pathId: 'kusama_CC2',
 		prefix: 2,
@@ -158,7 +159,7 @@ const substrateNetworkBase: {
 		unit: 'KSM'
 	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {
-		color: '#A60037',
+		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		order: 99,
@@ -167,12 +168,11 @@ const substrateNetworkBase: {
 		title: 'Kusama Development',
 		unit: 'KSM'
 	},
-	//TODO genesisHash and Metadata need to be added
 	[SubstrateNetworkKeys.POLKADOT]: {
-		color: '#e7007a',
+		color: '#E6027A',
 		decimals: 12,
 		genesisHash: null,
-		logo: require('res/img/logos/polkadot.png'),
+		logo: require('res/img/logos/Polkadot.png'),
 		order: 1,
 		pathId: 'polkadot',
 		prefix: 0,
@@ -180,7 +180,7 @@ const substrateNetworkBase: {
 		unit: 'DOT'
 	},
 	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#ff8c00',
+		color: '#18FFB2',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
 		order: 100,
@@ -190,10 +190,10 @@ const substrateNetworkBase: {
 		unit: 'UNIT'
 	},
 	[SubstrateNetworkKeys.WESTEND]: {
-		color: '#ffcf3d',
+		color: '#660D35',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.WESTEND,
-		logo: require('res/img/logos/westend.png'),
+		logo: require('res/img/logos/Polkadot.png'),
 		order: 3,
 		pathId: 'westend',
 		prefix: 42,
@@ -204,18 +204,18 @@ const substrateNetworkBase: {
 
 const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 	[EthereumNetworkKeys.FRONTIER]: {
-		color: '#64A2F4',
+		color: '#8B94B3',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
 		order: 101,
-		secondaryColor: colors.card_bgSolid,
+		secondaryColor: colors.background.card,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.CLASSIC]: {
-		color: '#319C7C',
+		color: '#1a4d33',
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
-		logo: require('res/img/logos/eth-classic.png'),
+		logo: require('res/img/logos/Ethereum_Classic.png'),
 		order: 102,
-		secondaryColor: colors.card_bgSolid,
+		secondaryColor: colors.background.card,
 		title: 'Ethereum Classic'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
@@ -236,17 +236,17 @@ const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
 };
 
 const ethereumDefaultValues = {
-	color: '#2968C7',
-	logo: require('res/img/logos/eth.png'),
+	color: '#434875',
+	logo: require('res/img/logos/Ethereum.png'),
 	protocol: NetworkProtocols.ETHEREUM,
-	secondaryColor: colors.card_text
+	secondaryColor: colors.background.card
 };
 
 const substrateDefaultValues = {
 	color: '#4C4646',
-	logo: require('res/img/logos/substrate-dev.png'),
+	logo: require('res/img/logos/Substrate_Dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
-	secondaryColor: colors.card_bgSolid
+	secondaryColor: colors.background.card
 };
 
 function setDefault(
@@ -273,6 +273,14 @@ export const SUBSTRATE_NETWORK_LIST: {
 export const UNKNOWN_NETWORK: {
 	[key: string]: UnknownNetworkParams;
 } = Object.freeze(unknownNetworkBase);
+
+const substrateNetworkMetas = Object.values({
+	...SUBSTRATE_NETWORK_LIST,
+	...UNKNOWN_NETWORK
+});
+export const PATH_IDS_LIST = substrateNetworkMetas.map(
+	(meta: UnknownNetworkParams | SubstrateNetworkParams) => meta.pathId
+);
 
 export const NETWORK_LIST: { [key: string]: NetworkParams } = Object.freeze(
 	Object.assign(

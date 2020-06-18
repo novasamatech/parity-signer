@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import TextInput from './TextInput';
@@ -38,28 +38,24 @@ export default function DerivationPasswordVerify(props: {
 	return (
 		<>
 			<TouchableOpacity onPress={toggleVerifyField}>
-				<View style={{ justifyContent: 'center' }}>
-					<Text style={styles.passwordText}>
-						<Icon name={'info'} size={20} color={colors.bg_text_sec} /> This
-						account countains a derivation password.{' '}
-						<Text style={styles.link} onPress={toggleVerifyField}>
-							Verify it here{' '}
-						</Text>
-						<Icon
-							name={verifyField ? 'arrow-drop-up' : 'arrow-drop-down'}
-							size={20}
-						/>
+				<Text style={styles.passwordText}>
+					<Icon name={'info'} size={14} color={colors.text.faded} /> This
+					account countains a derivation password.{' '}
+					<Text style={styles.link} onPress={toggleVerifyField}>
+						Verify it here
 					</Text>
-				</View>
+					<Icon
+						name={verifyField ? 'arrow-drop-up' : 'arrow-drop-down'}
+						size={20}
+					/>
+				</Text>
 			</TouchableOpacity>
 			{verifyField && (
-				<>
-					<TextInput
-						onChangeText={setEnteredPassword}
-						placeholder="derivation password"
-						style={isMatching ? styles.validInput : styles.invalidInput}
-					/>
-				</>
+				<TextInput
+					onChangeText={setEnteredPassword}
+					placeholder="derivation password"
+					style={isMatching ? styles.validInput : styles.invalidInput}
+				/>
 			)}
 		</>
 	);
@@ -73,7 +69,7 @@ const styles = StyleSheet.create({
 		textDecorationLine: 'underline'
 	},
 	passwordText: {
-		color: colors.bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.regular,
 		fontSize: 18,
 		marginBottom: 10,

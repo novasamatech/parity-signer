@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -29,9 +29,9 @@ export const alertErrorWithMessage = (
 		}
 	]);
 
-export const alertIdentityCreationError = (): void =>
+export const alertIdentityCreationError = (errorMessage: string): void =>
 	alertErrorWithMessage(
-		"Can't create Identity from the seed",
+		"Can't create Identity from the seed: " + errorMessage,
 		tryAgainButtonText
 	);
 
@@ -136,12 +136,6 @@ export const alertRisks = (message: string, onPress: () => any): void =>
 			text: 'Back'
 		}
 	]);
-
-export const alertMultipart = (onNext: () => any): void =>
-	alertRisks(
-		'The payload of the transaction you are signing is too big to be decoded. Not seeing what you are signing is inherently unsafe. If possible, contact the developer of the application generating the transaction to ask for multipart support.',
-		onNext
-	);
 
 export const alertDecodeError = (): void =>
 	Alert.alert(

@@ -15,8 +15,8 @@
 
 const t = {
 	doneButton: {
-		pinCreation: 'DONE',
-		pinUnlock: 'UNLOCK'
+		pinCreation: 'Done',
+		pinUnlock: 'Unlock'
 	},
 	passwordLabel: 'Password',
 	pinConfirmLabel: 'Confirm PIN',

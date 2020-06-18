@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -17,19 +17,23 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import KeyboardScrollView from 'components/KeyboardScrollView';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import ButtonMainAction from 'components/ButtonMainAction';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
-import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
+import {
+	alertBackupDone,
+	alertCopyBackupPhrase,
+	alertIdentityCreationError
+} from 'utils/alertUtils';
 import Button from 'components/Button';
+import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({
 	navigation,
@@ -37,26 +41,31 @@ function IdentityBackup({
 	route
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const [wordsNumber, setWordsNumber] = useState(24);
+	const [wordsNumber, setWordsNumber] = useState(12);
+	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
-		await accounts.saveNewIdentity(seedPhrase, pin);
-		setSeedPhrase('');
-		navigateToNewIdentityNetwork(navigation);
+		try {
+			await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
+			setSeedPhrase('');
+			navigateToNewIdentityNetwork(navigation);
+		} catch (e) {
+			alertIdentityCreationError(e.message);
+		}
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
-		const textStyles =
-			wordsNumber === buttonWordsNumber
-				? { ...fontStyles.t_codeS, color: colors.label_text }
-				: fontStyles.t_codeS;
+		const textStyles = wordsNumber === buttonWordsNumber && {
+			color: colors.signal.main
+		};
 		return (
 			<Button
-				buttonStyles={styles.mnemonicSelectionButton}
-				textStyles={textStyles}
 				title={`${buttonWordsNumber} words`}
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
+				onlyText
+				small
+				textStyles={{ ...textStyles }}
 			/>
 		);
 	};
@@ -76,14 +85,13 @@ function IdentityBackup({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<KeyboardScrollView style={styles.body}>
+		<SafeAreaViewContainer>
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
-					' Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
+					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
 				}
 			/>
-			<View />
 			{isNew && (
 				<View style={styles.mnemonicSelectionRow}>
 					{renderTextButton(12)}
@@ -99,19 +107,21 @@ function IdentityBackup({
 				}}
 			>
 				<Text
-					style={fontStyles.t_seed}
+					style={[fontStyles.t_seed, { marginHorizontal: 16 }]}
 					testID={testIDs.IdentityBackup.seedText}
 				>
 					{seedPhrase}
 				</Text>
 			</TouchableItem>
-			<ButtonMainAction
-				title={'Next'}
-				testID={testIDs.IdentityBackup.nextButton}
-				bottom={false}
-				onPress={(): void => alertBackupDone(onBackupDone)}
-			/>
-		</KeyboardScrollView>
+			{isNew && (
+				<Button
+					title={'Next'}
+					testID={testIDs.IdentityBackup.nextButton}
+					onPress={(): void => alertBackupDone(onBackupDone)}
+					aboveKeyboard
+				/>
+			)}
+		</SafeAreaViewContainer>
 	);
 }
 
@@ -122,11 +132,11 @@ const styles = StyleSheet.create({
 		padding: 16
 	},
 	mnemonicSelectionButton: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		height: 30,
-		paddingHorizontal: 5,
-		paddingVertical: 5
+		paddingHorizontal: 4,
+		paddingVertical: 4
 	},
 	mnemonicSelectionRow: {
 		flexDirection: 'row',

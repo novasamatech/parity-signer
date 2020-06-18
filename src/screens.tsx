@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import testIDs from 'e2e/testIDs';
 import About from 'screens/About';
 import AccountDetails from 'screens/AccountDetails';
 import AccountEdit from 'screens/AccountEdit';
-import AccountNetworkChooser from 'screens/AccountNetworkChooser';
+import Main from 'modules/main/screens/Main';
 import AccountNew from 'screens/AccountNew';
 import AccountPin from 'screens/AccountPin';
 import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
@@ -46,19 +46,19 @@ import IdentityNew from 'screens/IdentityNew';
 import LegacyAccountBackup from 'screens/LegacyAccountBackup';
 import LegacyAccountList from 'screens/LegacyAccountList';
 import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
-import MessageDetails from 'screens/MessageDetails';
 import PathDerivation from 'screens/PathDerivation';
 import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
+import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
-import QrScanner from 'screens/QrScanner';
+import QrScanner from 'modules/sign/screens/QrScanner';
 import Security from 'screens/Security';
-import SignedMessage from 'screens/SignedMessage';
-import SignedTx from 'screens/SignedTx';
+import SignedMessage from 'modules/sign/screens/SignedMessage';
+import SignedTx from 'modules/sign/screens/SignedTx';
 import TermsAndConditions from 'screens/TermsAndConditions';
-import TxDetails from 'screens/TxDetails';
 import colors from 'styles/colors';
+import { headerHeight, horizontalPadding } from 'styles/containerStyles';
 import { RootStackParamList } from 'types/routes';
 
 export const ScreenStack = createStackNavigator<RootStackParamList>();
@@ -75,34 +75,39 @@ const globalStackNavigationOptions = {
 	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: {
-		color: colors.bg_text_sec
+		color: colors.text.main
 	},
 	headerBackTitleVisible: false,
 	headerLeft: (): React.ReactElement => <HeaderLeft />,
+	headerLeftContainerStyle: {
+		height: headerHeight,
+		paddingLeft: 8
+	},
 	headerRight: (): React.ReactElement => <SecurityHeader />,
+	headerRightContainerStyle: {
+		height: headerHeight,
+		paddingRight: horizontalPadding
+	},
 	headerStyle: {
-		backgroundColor: colors.bg,
-		borderBottomColor: colors.bg,
+		backgroundColor: colors.background.app,
+		borderBottomColor: colors.background.app,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: 60,
+		height: headerHeight,
 		shadowColor: 'transparent'
 	},
-	headerTintColor: colors.bg_text_sec,
+	headerTintColor: colors.text.main,
 	headerTitle: (): React.ReactNode => null
 };
 
 const HeaderLeftWithBack = (): React.ReactElement => {
 	const navigation = useNavigation();
 	return (
-		<View
-			style={{ flexDirection: 'row' }}
-			testID={testIDs.Header.headerBackButton}
-		>
+		<View testID={testIDs.Header.headerBackButton}>
 			<HeaderBackButton
 				labelStyle={globalStackNavigationOptions.headerBackTitleStyle}
 				labelVisible={false}
-				tintColor={colors.bg_text}
+				tintColor={colors.text.main}
 				onPress={(): void => navigation.goBack()}
 			/>
 		</View>
@@ -111,13 +116,10 @@ const HeaderLeftWithBack = (): React.ReactElement => {
 
 export const AppNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
-		initialRouteName="AccountNetworkChooser"
+		initialRouteName="Main"
 		screenOptions={globalStackNavigationOptions}
 	>
-		<ScreenStack.Screen
-			name="AccountNetworkChooser"
-			component={AccountNetworkChooser}
-		/>
+		<ScreenStack.Screen name="Main" component={Main} />
 		<ScreenStack.Screen name="About" component={About} />
 		<ScreenStack.Screen name="AccountDetails" component={AccountDetails} />
 		<ScreenStack.Screen name="AccountEdit" component={AccountEdit} />
@@ -146,10 +148,10 @@ export const AppNavigator = (): React.ReactElement => (
 			component={IdentityManagement}
 		/>
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
-		<ScreenStack.Screen name="MessageDetails" component={MessageDetails} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
+		<ScreenStack.Screen name="PathSecret" component={PathSecret} />
 		<ScreenStack.Screen name="PathManagement" component={PathManagement} />
 		<ScreenStack.Screen name="PinNew" component={PinNew} />
 		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
@@ -161,7 +163,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
-		<ScreenStack.Screen name="TxDetails" component={TxDetails} />
 		<ScreenStack.Screen
 			name="TermsAndConditions"
 			component={TermsAndConditions}

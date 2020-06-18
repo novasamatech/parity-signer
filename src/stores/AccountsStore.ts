@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -34,14 +34,19 @@ import {
 	addressGenerateError,
 	emptyIdentityError,
 	identityUpdateError,
-	accountExistedError
+	accountExistedError,
+	duplicatedIdentityError
 } from 'utils/errors';
-import { constructSURI, parseSURI } from 'utils/suri';
 import {
-	brainWalletAddress,
+	CreateSeedRefWithNewSeed,
+	TryBrainWalletAddress,
+	TrySubstrateAddress
+} from 'utils/seedRefHooks';
+import { constructSuriSuffix, parseSURI } from 'utils/suri';
+import {
+	brainWalletAddressWithRef,
 	decryptData,
-	encryptData,
-	substrateAddress
+	encryptData
 } from 'utils/native';
 import {
 	deepCopyIdentities,
@@ -108,11 +113,13 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 	}
 
 	async deriveEthereumAccount(
-		seedPhrase: string,
+		createBrainWalletAddress: TryBrainWalletAddress,
 		networkKey: string
 	): Promise<void> {
 		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
-		const ethereumAddress = await brainWalletAddress(seedPhrase);
+		const ethereumAddress = await brainWalletAddressWithRef(
+			createBrainWalletAddress
+		);
 		if (ethereumAddress.address === '') throw new Error(addressGenerateError);
 		const { ethereumChainId } = networkParams;
 		const accountId = generateAccountId({
@@ -390,22 +397,21 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	private async addPathToIdentity(
 		newPath: string,
-		seedPhrase: string,
+		createSubstrateAddress: TrySubstrateAddress,
 		updatedIdentity: Identity,
 		name: string,
 		networkKey: string,
 		password: string
 	): Promise<void> {
 		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
-		const suri = constructSURI({
+		const suriSuffix = constructSuriSuffix({
 			derivePath: newPath,
-			password: password,
-			phrase: seedPhrase
+			password
 		});
 		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
 		try {
-			address = await substrateAddress(suri, prefix);
+			address = await createSubstrateAddress(suriSuffix, prefix);
 		} catch (e) {
 			throw new Error(addressGenerateError);
 		}
@@ -422,11 +428,23 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		updatedIdentity.addresses.set(address, newPath);
 	}
 
-	async saveNewIdentity(seedPhrase: string, pin: string): Promise<void> {
+	async saveNewIdentity(
+		seedPhrase: string,
+		pin: string,
+		generateSeedRef: CreateSeedRefWithNewSeed
+	): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(this.state.newIdentity);
 		const suri = seedPhrase;
 
 		updatedIdentity.encryptedSeed = await encryptData(suri, pin);
+		//prevent duplication
+		if (
+			this.state.identities.find(
+				i => i.encryptedSeed === updatedIdentity.encryptedSeed
+			)
+		)
+			throw new Error(duplicatedIdentityError);
+		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
 		const newIdentities = this.state.identities.concat(updatedIdentity);
 		await this.setState({
 			currentIdentity: updatedIdentity,
@@ -504,7 +522,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 
 	async deriveNewPath(
 		newPath: string,
-		seedPhrase: string,
+		createSubstrateAddress: TrySubstrateAddress,
 		networkKey: string,
 		name: string,
 		password: string
@@ -514,7 +532,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		);
 		await this.addPathToIdentity(
 			newPath,
-			seedPhrase,
+			createSubstrateAddress,
 			updatedCurrentIdentity,
 			name,
 			networkKey,

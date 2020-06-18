@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement } from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
@@ -30,13 +30,7 @@ export default function AccountPrefixedTitle({
 	return (
 		<View style={{ flexDirection: 'row' }}>
 			{titlePrefix && (
-				<Text
-					numberOfLines={1}
-					style={[
-						fontStyles.t_codeS,
-						{ color: colors.bg_button, marginTop: 5 }
-					]}
-				>
+				<Text numberOfLines={1} style={[fontStyles.t_codeS, styles.text]}>
 					{titlePrefix}
 				</Text>
 			)}
@@ -46,3 +40,12 @@ export default function AccountPrefixedTitle({
 		</View>
 	);
 }
+
+const styles = StyleSheet.create({
+	text: {
+		alignSelf: 'flex-end',
+		color: colors.signal.main,
+		marginBottom: 1,
+		marginRight: 4
+	}
+});

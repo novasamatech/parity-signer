@@ -1,5 +1,4 @@
-import { ExtrinsicPayload } from '@polkadot/types/interfaces';
-import { BarCodeType, Point, Size } from 'react-native-camera/types';
+import { Point, Size } from 'react-native-camera/types';
 
 export interface TxRequestData {
 	bounds: {
@@ -13,13 +12,11 @@ export interface TxRequestData {
 			| [Point<string>, Point<string>]
 			| { origin: Point<string>; size: Size<string> };
 	};
-	type: keyof BarCodeType; //"QR_CODE"
+	type: string;
 	rawData: string;
 	data: string;
 	target?: number;
 }
-
-export type StrippedData = Uint8Array;
 
 export type ParsedData = SubstrateParsedData | EthereumParsedData;
 
@@ -40,16 +37,32 @@ export type CompletedParsedData =
 	| SubstrateCompletedParsedData
 	| EthereumParsedData;
 
-export type SubstrateCompletedParsedData = {
+export type SubstrateCompletedParsedData =
+	| SubstrateTransactionParsedData
+	| SubstrateMessageParsedData;
+
+export type SubstrateTransactionParsedData = {
 	data: {
-		crypto: 'ed25519' | 'sr25519' | null;
-		data: ExtrinsicPayload | Uint8Array | string;
 		account: string;
+		crypto: 'ed25519' | 'sr25519' | null;
+		data: Uint8Array;
+		genesisHash: string;
 	};
-	action: string; //"signTransaction"
+	action: 'signTransaction';
 	oversized: boolean;
-	isHash: boolean;
-	preHash: ExtrinsicPayload;
+	isHash: false;
+};
+
+export type SubstrateMessageParsedData = {
+	data: {
+		account: string;
+		crypto: 'ed25519' | 'sr25519' | null;
+		data: string;
+		genesisHash: string;
+	};
+	action: 'signData';
+	oversized: boolean;
+	isHash: true;
 };
 
 export type SubstrateMultiParsedData = {
@@ -76,6 +89,15 @@ export function isSubstrateCompletedParsedData(
 ): parsedData is SubstrateCompletedParsedData {
 	return (
 		(parsedData as SubstrateCompletedParsedData)?.data?.crypto !== undefined
+	);
+}
+
+export function isSubstrateMessageParsedData(
+	parsedData: ParsedData | null
+): parsedData is SubstrateMessageParsedData {
+	return (
+		(parsedData as SubstrateCompletedParsedData)?.data?.crypto !== undefined &&
+		(parsedData as SubstrateCompletedParsedData)?.action === 'signData'
 	);
 }
 

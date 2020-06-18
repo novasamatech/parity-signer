@@ -1,6 +1,6 @@
 {
   "name": "NativeSigner",
-  "version": "4.1.1-beta",
+  "version": "4.3.-beta",
   "private": true,
   "license": "GPL-3.0",
   "engines": {
@@ -15,8 +15,9 @@
     "build-rust": "yarn build-rust:ios && yarn build-rust:android",
     "build:ios": "yarn install && (cd ios && pod install) && yarn build-rust:ios",
     "build:android": "yarn install && yarn build-rust:android",
-	"xcbuild:debug": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
-	"xcbuild:release": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
+    "xcbuild:debug": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
+    "xcbuild:release": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
+    "xcbuild:githubActions": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration GithubActions -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force && rm -rf ./android/app/build && rm -rf ./ios/build && yarn clean-rust && (cd ios && pod deintegrate)",
     "clean-rust": "(cd rust/signer && cargo clean)",
     "commit": "commit-wizard",
@@ -31,9 +32,11 @@
     "test-e2e:android": "detox test -c android.emu.debug -l info --noStackTrace",
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
     "build-e2e:ios": "detox build -c ios.sim.debug -l info",
+    "build-e2e:ci": "detox build -c ios.sim.release -l info",
     "test-e2e:ios": "detox test -c ios.sim.debug -l info --noStackTrace",
+    "test-e2e:ci": "detox test -c ios.sim.release -l info --noStackTrace  --cleanup",
     "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios",
-	"e2e": "yarn e2e:ios && yarn e2e:android"
+    "e2e": "yarn e2e:ios && yarn e2e:android"
   },
   "husky": {
     "hooks": {
@@ -41,16 +44,16 @@
     }
   },
   "dependencies": {
-    "@polkadot/api": "1.10.0-beta.3",
-    "@polkadot/reactnative-identicon": "0.52.0-beta.24",
-    "@polkadot/types": "1.10.0-beta.3",
-    "@polkadot/types-known": "1.10.0-beta.3",
-    "@polkadot/util": "2.8.0-beta.2",
-    "@polkadot/util-crypto": "2.8.0-beta.2",
+    "@polkadot/api": "1.16.1",
+    "@polkadot/reactnative-identicon": "0.53.1",
+    "@polkadot/types": "1.16.1",
+    "@polkadot/types-known": "1.16.1",
+    "@polkadot/util": "2.11.1",
+    "@polkadot/util-crypto": "2.11.1",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-native-community/netinfo": "^4.1.5",
-    "@react-navigation/native": "^5.0.10",
-    "@react-navigation/stack": "5.2.11",
+    "@react-navigation/native": "^5.3.2",
+    "@react-navigation/stack": "^5.3.5",
     "bignumber.js": "^9.0.0",
     "hoist-non-react-statics": "^3.3.0",
     "node-libs-react-native": "^1.0.3",
@@ -61,6 +64,7 @@
     "react-native-gesture-handler": "^1.6.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-markdown-renderer": "^3.2.8",
+    "react-native-navbar-color": "^1.0.3",
     "react-native-popup-menu": "^0.15.6",
     "react-native-randombytes": "^3.5.3",
     "react-native-screens": "^2.0.0-alpha.32",
@@ -74,12 +78,12 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
-    "@babel/core": "7.9.0",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-typescript": "^7.8.3",
-    "@babel/runtime": "^7.6.3",
-    "@react-native-community/eslint-config": "^0.0.5",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/runtime": "^7.9.6",
+    "@react-native-community/eslint-config": "^1.1.0",
     "@types/detox": "^14.5.2",
     "@types/jasmine": "^3.5.10",
     "@types/jest": "^25.2.1",
@@ -88,11 +92,11 @@
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.28.0",
     "babel-eslint": "10.1.0",
-    "babel-jest": "^25.4.0",
+    "babel-jest": "^25.5.1",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-rewrite-require": "^1.14.5",
-    "babel-plugin-tester": "^8.0.1",
-    "detox": "16.2.1",
+    "babel-plugin-tester": "^9.0.1",
+    "detox": "^16.5.1",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-import-resolver-typescript": "^2.0.0",
@@ -112,7 +116,6 @@
     "typescript": "^3.8.3"
   },
   "resolutions": {
-    "@react-native-community/eslint-config/babel-eslint": "10.0.3",
     "kind-of": ">=6.0.3"
   },
   "detox": {
@@ -126,11 +129,12 @@
         }
       },
       "ios.sim.release": {
-        "binaryPath": "ios/build/NativeSigner/Build/Products/Release-iphonesimulator/NativeSigner.app",
-        "build": "yarn xcbuild:release",
+        "binaryPath": "ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app",
+        "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
-          "type": "iPhone SE"
+          "os": "iOS 13.5",
+          "type": "iPhone 8"
         }
       },
       "android.emu.debug": {

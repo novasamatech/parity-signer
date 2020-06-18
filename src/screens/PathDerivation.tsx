@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -15,39 +15,59 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState, useMemo } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
 
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
-import { NavigationAccountProps } from 'types/props';
+import { Identity } from 'types/identityTypes';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
-import ButtonMainAction from 'components/ButtonMainAction';
-import { getNetworkKey, validateDerivedPath } from 'utils/identitiesUtils';
+import {
+	extractPathId,
+	getNetworkKey,
+	getNetworkKeyByPathId,
+	validateDerivedPath
+} from 'utils/identitiesUtils';
 import { navigateToPathsList, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
-import colors from 'styles/colors';
 import PathCard from 'components/PathCard';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
+import { useSeedRef } from 'utils/seedRefHooks';
+import Button from 'components/Button';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
+
+function getParentNetworkKey(
+	parentPath: string,
+	currentIdentity: Identity
+): string {
+	if (currentIdentity.meta.has(parentPath)) {
+		return getNetworkKey(parentPath, currentIdentity);
+	}
+	const pathId = extractPathId(parentPath);
+	return getNetworkKeyByPathId(pathId);
+}
 
 function PathDerivation({
 	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'PathDerivation'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'PathDerivation'>): React.ReactElement {
 	const [derivationPath, setDerivationPath] = useState<string>('');
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
+	const currentIdentity = accounts.state.currentIdentity;
+	const { isSeedRefValid, substrateAddress } = useSeedRef(
+		currentIdentity.encryptedSeed
+	);
 	const parentPath = route.params.parentPath;
 	const parentNetworkKey = useMemo(
-		() => getNetworkKey(parentPath, accounts.state.currentIdentity!),
-		[parentPath, accounts.state.currentIdentity]
+		() => getParentNetworkKey(parentPath, currentIdentity),
+		[parentPath, currentIdentity]
 	);
 
 	const [customNetworkKey, setCustomNetworkKey] = useState(
@@ -63,11 +83,11 @@ function PathDerivation({
 	const isPathValid = validateDerivedPath(derivationPath);
 
 	const onPathDerivation = async (): Promise<void> => {
-		const seedPhrase = await unlockSeedPhrase(navigation);
+		await unlockSeedPhrase(navigation, isSeedRefValid);
 		try {
 			await accounts.deriveNewPath(
 				completePath,
-				seedPhrase,
+				substrateAddress,
 				currentNetworkKey,
 				keyPairsName,
 				password
@@ -79,85 +99,72 @@ function PathDerivation({
 	};
 
 	return (
-		<View style={styles.container}>
-			<KeyboardScrollView extraHeight={Platform.OS === 'ios' ? 250 : 180}>
-				<ScreenHeading
-					title="Derive Account"
-					subtitle={parentPath}
-					hasSubtitleIcon={true}
+		<KeyboardAwareContainer>
+			<ScreenHeading
+				title="Derive Account"
+				subtitle={parentPath}
+				hasSubtitleIcon={true}
+			/>
+			<TextInput
+				autoCompleteType="off"
+				autoCorrect={false}
+				autoFocus
+				error={!isPathValid}
+				label="Path"
+				onChangeText={setDerivationPath}
+				onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
+				placeholder="//hard/soft"
+				returnKeyType="next"
+				testID={testIDs.PathDerivation.pathInput}
+				value={derivationPath}
+			/>
+			<TextInput
+				autoCompleteType="off"
+				autoCorrect={false}
+				label="Display Name"
+				onChangeText={(keyParisName: string): void =>
+					setKeyPairsName(keyParisName)
+				}
+				onSubmitEditing={onPathDerivation}
+				ref={pathNameInput}
+				returnKeyType="done"
+				testID={testIDs.PathDerivation.nameInput}
+				value={keyPairsName}
+			/>
+			{enableCustomNetwork && (
+				<NetworkSelector
+					networkKey={customNetworkKey}
+					setVisible={setModalVisible}
 				/>
-				<TextInput
-					autoCompleteType="off"
-					autoCorrect={false}
-					autoFocus
-					error={!isPathValid}
-					label="Path"
-					onChangeText={setDerivationPath}
-					onSubmitEditing={(): void => pathNameInput.current?.input?.focus()}
-					placeholder="//hard/soft"
-					returnKeyType="next"
-					testID={testIDs.PathDerivation.pathInput}
-					value={derivationPath}
+			)}
+			<Separator style={{ height: 0 }} />
+			<PasswordInput
+				password={password}
+				setPassword={setPassword}
+				onSubmitEditing={onPathDerivation}
+			/>
+			<PathCard
+				identity={accounts.state.currentIdentity}
+				isPathValid={isPathValid}
+				name={keyPairsName}
+				path={password === '' ? completePath : `${completePath}///${password}`}
+				networkKey={currentNetworkKey}
+			/>
+			<Button
+				disabled={!isPathValid}
+				title="Next"
+				testID={testIDs.PathDerivation.deriveButton}
+				onPress={onPathDerivation}
+			/>
+			{enableCustomNetwork && (
+				<NetworkOptions
+					setNetworkKey={setCustomNetworkKey}
+					visible={modalVisible}
+					setVisible={setModalVisible}
 				/>
-				<TextInput
-					autoCompleteType="off"
-					autoCorrect={false}
-					label="Display Name"
-					onChangeText={(keyParisName: string): void =>
-						setKeyPairsName(keyParisName)
-					}
-					onSubmitEditing={onPathDerivation}
-					ref={pathNameInput}
-					returnKeyType="done"
-					testID={testIDs.PathDerivation.nameInput}
-					value={keyPairsName}
-				/>
-				{enableCustomNetwork && (
-					<NetworkSelector
-						networkKey={customNetworkKey}
-						setVisible={setModalVisible}
-					/>
-				)}
-				<Separator style={{ height: 0 }} />
-				<PasswordInput
-					password={password}
-					setPassword={setPassword}
-					onSubmitEditing={onPathDerivation}
-				/>
-				<PathCard
-					identity={accounts.state.currentIdentity!}
-					name={keyPairsName}
-					path={
-						password === '' ? completePath : `${completePath}///${password}`
-					}
-					networkKey={currentNetworkKey}
-				/>
-
-				<ButtonMainAction
-					disabled={!isPathValid}
-					bottom={false}
-					style={{ marginTop: 8 }}
-					title="Next"
-					testID={testIDs.PathDerivation.deriveButton}
-					onPress={onPathDerivation}
-				/>
-				{enableCustomNetwork && (
-					<NetworkOptions
-						setNetworkKey={setCustomNetworkKey}
-						visible={modalVisible}
-						setVisible={setModalVisible}
-					/>
-				)}
-			</KeyboardScrollView>
-		</View>
+			)}
+		</KeyboardAwareContainer>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		backgroundColor: colors.bg,
-		flex: 1
-	}
-});
 
 export default withAccountStore(PathDerivation);

@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -27,18 +27,18 @@ export default class Markdown extends React.PureComponent<any> {
 			<MarkdownRender
 				style={StyleSheet.create({
 					listOrderedItemIcon: {
-						color: colors.bg_text,
+						color: colors.text.main,
 						marginRight: 3,
 						marginTop: 19
 					},
 					listUnorderedItemIcon: {
-						color: colors.card_bg,
+						color: colors.text.faded,
 						fontFamily: fonts.bold,
 						marginRight: 3,
 						marginTop: 19
 					},
 					text: {
-						color: colors.bg_text_sec,
+						color: colors.text.main,
 						fontFamily: fonts.regular,
 						fontSize: 14,
 						marginTop: 10

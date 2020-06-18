@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,14 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { by, element } from 'detox';
-
-import { EthereumNetworkKeys } from 'constants/networkSpecs';
+import {
+	EthereumNetworkKeys,
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys
+} from 'constants/networkSpecs';
 import {
 	launchWithScanRequest,
 	pinCode,
 	tapBack,
 	testExist,
+	testInput,
 	testRecoverIdentity,
 	testScrollAndTap,
 	testTap,
@@ -32,60 +35,108 @@ import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
 const {
-	AccountNetworkChooser,
+	Main,
+	PathDerivation,
 	PathDetail,
+	PathsList,
 	SecurityHeader,
-	TxDetails,
 	SignedMessage,
-	SignedTx,
-	MessageDetails
+	SignedTx
 } = testIDs;
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
-	await testScrollAndTap(TxDetails.signButton, TxDetails.scrollScreen);
 	await testUnlockPin(pinCode);
 	await testVisible(SignedTx.qrView);
 };
 
-const testMultiPartExtrinsic = async (): Promise<void> => {
+const testSignedMessage = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
-	await testScrollAndTap(
-		MessageDetails.signButton,
-		MessageDetails.scrollScreen
-	);
-	await element(by.text('I understand the risks')).atIndex(0).tap();
 	await testUnlockPin(pinCode);
 	await testVisible(SignedMessage.qrView);
 };
 
 const testEthereumMessage = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
-	await testScrollAndTap(
-		MessageDetails.signButton,
-		MessageDetails.scrollScreen
-	);
 	await testUnlockPin(pinCode);
 	await testVisible(SignedMessage.qrView);
 };
 
-describe('Signing test', () => {
+describe('Signing ane exporting test', () => {
 	testRecoverIdentity();
 
-	describe('Substrate Signing Test', () => {
+	describe('Kusama Signing Test', () => {
+		it('Recover a Kusama signing account', async () => {
+			await testTap(PathsList.deriveButton);
+			await testInput(PathDerivation.pathInput, '');
+			await testInput(PathDerivation.nameInput, 'kusama root');
+			await testExist(PathsList.pathCard + '//kusama');
+		});
+
+		it('is able to export the signing account', async () => {
+			await testTap(PathsList.pathCard + '//kusama');
+			await testTap(PathDetail.popupMenuButton);
+			await testTap(PathDetail.exportButton);
+			await testExist(
+				'secret:0xdf46d55a2d98695e9342b67edae6669e5c0b4e1a3895f1adf85989565b9ab827:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:kusama root'
+			);
+			await tapBack();
+		});
+
 		it('should sign the set remarks request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsic);
+			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicKusama);
 			await testSignedTx();
 		});
 
+		it('does not need sign again after pin input', async () => {
+			await tapBack();
+			await testTap(SecurityHeader.scanButton);
+			await testVisible(SignedTx.qrView);
+		});
+
 		it('should sign transfer request', async () => {
-			await launchWithScanRequest(ScanTestRequest.TransferExtrinsic);
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
 			await testSignedTx();
 		});
 
 		it('should sign multipart request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPart);
-			await testMultiPartExtrinsic();
+			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
+			await testSignedMessage();
+		});
+
+		it('should sign extrinsic hashes', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkHashKusama);
+			await testSignedMessage();
+		});
+	});
+
+	describe('Polkadot Signing Test', () => {
+		it('generate Polkadot account', async () => {
+			await tapBack();
+			const PolkadotNetworkButtonIndex =
+				Main.networkButton +
+				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.POLKADOT].pathId;
+			await testTap(testIDs.Main.addNewNetworkButton);
+			await testScrollAndTap(
+				PolkadotNetworkButtonIndex,
+				testIDs.Main.chooserScreen
+			);
+			await testVisible(PathDetail.screen);
+		});
+
+		it('should sign the set remarks request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicPolkadot);
+			await testSignedTx();
+		});
+
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
+			await testSignedTx();
+		});
+
+		it('should sign multipart request', async () => {
+			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
+			await testSignedMessage();
 		});
 	});
 
@@ -93,16 +144,15 @@ describe('Signing test', () => {
 		it('generate Kovan account', async () => {
 			await tapBack();
 			const kovanNetworkButtonIndex =
-				AccountNetworkChooser.networkButton + EthereumNetworkKeys.KOVAN;
-			await testTap(testIDs.AccountNetworkChooser.addNewNetworkButton);
+				Main.networkButton + EthereumNetworkKeys.KOVAN;
+			await testTap(testIDs.Main.addNewNetworkButton);
 			await testScrollAndTap(
 				kovanNetworkButtonIndex,
-				testIDs.AccountNetworkChooser.chooserScreen
+				testIDs.Main.chooserScreen
 			);
-			await testUnlockPin(pinCode);
 			await testVisible(PathDetail.screen);
 			await tapBack();
-			await testExist(AccountNetworkChooser.chooserScreen);
+			await testExist(Main.chooserScreen);
 		});
 
 		it('should sign transactions', async () => {

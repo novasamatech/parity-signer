@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -15,48 +15,44 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import {
+	compactFromU8a,
 	hexStripPrefix,
 	hexToU8a,
 	isU8a,
-	u8aToHex,
-	u8aConcat
+	u8aConcat,
+	u8aToHex
 } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Container } from 'unstated';
-import { ExtrinsicPayload } from '@polkadot/types/interfaces';
 
+import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import AccountsStore from 'stores/AccountsStore';
-import {
-	NETWORK_LIST,
-	NetworkProtocols,
-	SUBSTRATE_NETWORK_LIST
-} from 'constants/networkSpecs';
-import { isAscii } from 'utils/strings';
-import {
-	brainWalletSign,
-	decryptData,
-	keccak,
-	ethSign,
-	substrateSign
-} from 'utils/native';
-import { mod } from 'utils/numbers';
-import transaction, { Transaction } from 'utils/transaction';
-import {
-	constructDataFromBytes,
-	asciiToHex,
-	encodeNumber
-} from 'utils/decoders';
 import { Account, FoundAccount } from 'types/identityTypes';
-import { constructSURI } from 'utils/suri';
-import { emptyAccount } from 'utils/account';
 import {
 	CompletedParsedData,
 	EthereumParsedData,
 	isEthereumCompletedParsedData,
 	isMultipartData,
-	SubstrateCompletedParsedData
+	isSubstrateMessageParsedData,
+	SubstrateCompletedParsedData,
+	SubstrateMessageParsedData,
+	SubstrateTransactionParsedData
 } from 'types/scannerTypes';
-import { NetworkProtocol } from 'types/networkSpecsTypes';
+import { emptyAccount } from 'utils/account';
+import {
+	asciiToHex,
+	constructDataFromBytes,
+	encodeNumber
+} from 'utils/decoders';
+import {
+	brainWalletSign,
+	decryptData,
+	ethSign,
+	keccak,
+	substrateSign
+} from 'utils/native';
+import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
+import { isAscii } from 'utils/strings';
+import transaction, { Transaction } from 'utils/transaction';
 
 type TXRequest = Record<string, any>;
 
@@ -64,10 +60,6 @@ type SignedTX = {
 	recipient: Account;
 	sender: Account;
 	txRequest: TXRequest;
-};
-
-type MultipartData = {
-	[x: string]: Uint8Array;
 };
 
 type ScannerState = {
@@ -79,17 +71,14 @@ type ScannerState = {
 	latestFrame: number | null;
 	message: string | null;
 	missedFrames: Array<number>;
-	multipartData: MultipartData;
+	multipartData: null | Array<Uint8Array | null>;
 	multipartComplete: boolean;
-	prehash: GenericExtrinsicPayload | null;
 	recipient: FoundAccount | null;
-	scanErrorMsg: string;
 	sender: FoundAccount | null;
 	signedData: string;
 	signedTxList: SignedTX[];
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
-	txRequest: TXRequest | null;
 	type: 'transaction' | 'message' | null;
 	unsignedData: CompletedParsedData | null;
 };
@@ -104,16 +93,13 @@ const DEFAULT_STATE = Object.freeze({
 	message: null,
 	missedFrames: [],
 	multipartComplete: false,
-	multipartData: {},
-	prehash: null,
+	multipartData: null,
 	recipient: null,
-	scanErrorMsg: '',
 	sender: null,
 	signedData: '',
 	signedTxList: [],
 	totalFrameCount: 0,
 	tx: null,
-	txRequest: null,
 	type: null,
 	unsignedData: null
 });
@@ -141,88 +127,75 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	async setParsedData(
 		strippedData: Uint8Array,
-		accountsStore: AccountsStore,
 		multipartComplete = false
 	): Promise<void> {
 		const parsedData = await constructDataFromBytes(
 			strippedData,
 			multipartComplete
 		);
-
 		if (isMultipartData(parsedData)) {
-			this.setPartData(
+			await this.setPartData(
 				parsedData.currentFrame,
 				parsedData.frameCount,
-				parsedData.partData,
-				accountsStore
+				parsedData.partData
 			);
 			return;
 		}
 
-		if (accountsStore.getAccountByAddress(parsedData.data.account)) {
-			this.setState({
-				unsignedData: parsedData
-			});
-		} else {
-			// If the address is not found on device in its current encoding,
-			// try decoding the public key and encoding it to all the other known network prefixes.
-			const networks = Object.keys(SUBSTRATE_NETWORK_LIST);
+		await this.setState({
+			unsignedData: parsedData
+		});
+	}
 
-			for (let i = 0; i < networks.length; i++) {
-				const key = networks[i];
-				const account = accountsStore.getAccountByAddress(
-					encodeAddress(
-						decodeAddress(parsedData.data.account),
-						SUBSTRATE_NETWORK_LIST[key].prefix
-					)
-				);
+	async integrateMultiPartData(): Promise<void> {
+		const { multipartData, totalFrameCount } = this.state;
 
-				if (account) {
-					parsedData.data.account = account.address;
+		// concatenate all the parts into one binary blob
+		let concatMultipartData = multipartData!.reduce(
+			(acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
+				if (part === null) throw new Error('part data is not completed');
+				const c = new Uint8Array(acc.length + part.length);
+				c.set(acc);
+				c.set(part, acc.length);
+				return c;
+			},
+			new Uint8Array(0)
+		);
 
-					this.setState({
-						unsignedData: parsedData
-					});
-					return;
-				}
-			}
+		// unshift the frame info
+		const frameInfo = u8aConcat(
+			MULTIPART,
+			encodeNumber(totalFrameCount),
+			encodeNumber(0)
+		);
+		concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
-			// if the account was not found, unsignedData was never set, alert the user appropriately.
-			this.setErrorMsg(
-				`No private key found for ${parsedData.data.account} in your signer key storage.`
-			);
-		}
-
-		// set payload before it got hashed.
-		// signature will be generated from the hash, but we still want to display it.
-		if (parsedData.hasOwnProperty('preHash')) {
-			this.setPrehashPayload(
-				(parsedData as SubstrateCompletedParsedData).preHash
-			);
-		}
+		await this.setState({
+			multipartComplete: true
+		});
+		// handle the binary blob as a single UOS payload
+		await this.setParsedData(concatMultipartData, true);
 	}
 
 	async setPartData(
-		frame: number,
+		currentFrame: number,
 		frameCount: number,
-		partData: string,
-		accountsStore: AccountsStore
+		partData: string
 	): Promise<boolean | void | Uint8Array> {
+		// set it once only
+		if (!this.state.totalFrameCount) {
+			const newArray = new Array(frameCount).fill(null);
+			await this.setState({
+				multipartData: newArray,
+				totalFrameCount: frameCount
+			});
+		}
 		const {
-			latestFrame,
-			missedFrames,
+			completedFramesCount,
 			multipartComplete,
 			multipartData,
 			totalFrameCount
 		} = this.state;
-
-		// set it once only
-		if (!totalFrameCount) {
-			this.setState({
-				totalFrameCount: frameCount
-			});
-		}
-
 		const partDataAsBytes = new Uint8Array(partData.length / 2);
 
 		for (let i = 0; i < partDataAsBytes.length; i++) {
@@ -230,93 +203,43 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 
 		if (
-			partDataAsBytes[0] === new Uint8Array([0x00])[0] ||
-			partDataAsBytes[0] === new Uint8Array([0x7b])[0]
+			currentFrame === 0 &&
+			(partDataAsBytes[0] === new Uint8Array([0x00])[0] ||
+				partDataAsBytes[0] === new Uint8Array([0x7b])[0])
 		) {
 			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
 			throw new Error('Error decoding invalid part data.');
 		}
-
-		const completedFramesCount = Object.keys(multipartData).length;
-
-		if (
-			completedFramesCount > 0 &&
-			totalFrameCount > 0 &&
-			completedFramesCount === totalFrameCount &&
-			!multipartComplete
-		) {
-			// all the frames are filled
-
-			this.setState({
-				multipartComplete: true
-			});
-
-			// concatenate all the parts into one binary blob
-			let concatMultipartData = Object.values(multipartData).reduce(
-				(acc: Uint8Array, part: Uint8Array): Uint8Array => {
-					const c = new Uint8Array(acc.length + part.length);
-					c.set(acc);
-					c.set(part, acc.length);
-					return c;
-				},
-				new Uint8Array(0)
-			);
-
-			// unshift the frame info
-			const frameInfo = u8aConcat(
-				MULTIPART,
-				encodeNumber(totalFrameCount),
-				encodeNumber(frame)
-			);
-			concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
-
-			// handle the binary blob as a single UOS payload
-			this.setParsedData(concatMultipartData, accountsStore, true);
-		} else if (completedFramesCount < totalFrameCount) {
+		if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
-			const nextDataState = multipartData;
-			nextDataState[frame] = partDataAsBytes;
+			const nextDataState = multipartData!;
+			nextDataState[currentFrame] = partDataAsBytes;
 
-			const missedFramesRange: number = latestFrame
-				? mod(frame - latestFrame, totalFrameCount) - 1
-				: 0;
-
-			// we skipped at least one frame that we haven't already scanned before
-			if (
-				latestFrame &&
-				missedFramesRange >= 1 &&
-				!missedFrames.includes(frame)
-			) {
-				// enumerate all the frames between (current)frame and latestFrame
-				const updatedMissedFrames = Array.from(
-					new Array(missedFramesRange),
-					(_, i) => mod(i + latestFrame, totalFrameCount)
-				);
-
-				const dedupMissedFrames = new Set([
-					...this.state.missedFrames,
-					...updatedMissedFrames
-				]);
-
-				this.setState({
-					missedFrames: Array.from(dedupMissedFrames)
-				});
-			}
-
-			// if we just filled a frame that was previously missed, remove it from the missedFrames list
-			if (missedFrames && missedFrames.includes(frame - 1)) {
-				missedFrames.splice(missedFrames.indexOf(frame - 1), 1);
-			}
-
-			this.setState({
-				latestFrame: frame,
+			const nextMissedFrames = nextDataState.reduce(
+				(acc: number[], current: Uint8Array | null, index: number) => {
+					if (current === null) acc.push(index + 1);
+					return acc;
+				},
+				[]
+			);
+			const nextCompletedFramesCount =
+				totalFrameCount - nextMissedFrames.length;
+			await this.setState({
+				completedFramesCount: nextCompletedFramesCount,
+				latestFrame: currentFrame,
+				missedFrames: nextMissedFrames,
 				multipartData: nextDataState
 			});
-		}
 
-		this.setState({
-			completedFramesCount
-		});
+			if (
+				totalFrameCount > 0 &&
+				nextCompletedFramesCount === totalFrameCount &&
+				!multipartComplete
+			) {
+				// all the frames are filled
+				await this.integrateMultiPartData();
+			}
+		}
 	}
 
 	async setData(accountsStore: AccountsStore): Promise<boolean | void> {
@@ -338,29 +261,27 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setDataToSign(
-		signRequest: CompletedParsedData,
+		signRequest: SubstrateMessageParsedData | EthereumParsedData,
 		accountsStore: AccountsStore
 	): Promise<boolean> {
 		this.setBusy();
 
 		const address = signRequest.data.account;
-		const message = signRequest.data.data;
-		const crypto = (signRequest as SubstrateCompletedParsedData).data?.crypto;
-		const isHash =
-			(signRequest as SubstrateCompletedParsedData)?.isHash || false;
-		const isOversized =
-			(signRequest as SubstrateCompletedParsedData)?.oversized || false;
-
+		let message = '';
+		let isHash = false;
+		let isOversized = false;
 		let dataToSign = '';
-		const messageString = message?.toString();
-		if (messageString === undefined)
-			throw new Error('No message data to sign.');
 
-		if (crypto === 'sr25519' || crypto === 'ed25519') {
-			// only Substrate payload has crypto field
-			dataToSign = message!.toString();
+		if (isSubstrateMessageParsedData(signRequest)) {
+			if (signRequest.data.crypto !== 'sr25519')
+				throw new Error('currently Parity Signer only support sr25519');
+			isHash = signRequest.isHash;
+			isOversized = signRequest.oversized;
+			dataToSign = signRequest.data.data;
+			message = dataToSign;
 		} else {
-			dataToSign = await ethSign(message!.toString());
+			message = signRequest.data.data;
+			dataToSign = await ethSign(message.toString());
 		}
 
 		const sender = accountsStore.getAccountByAddress(address);
@@ -383,7 +304,7 @@ export default class ScannerStore extends Container<ScannerState> {
 	}
 
 	async setTXRequest(
-		txRequest: CompletedParsedData,
+		txRequest: EthereumParsedData | SubstrateTransactionParsedData,
 		accountsStore: AccountsStore
 	): Promise<boolean> {
 		this.setBusy();
@@ -412,11 +333,12 @@ export default class ScannerStore extends Container<ScannerState> {
 			// For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
 			dataToSign = await keccak(txRequest.data.rlp);
 		} else {
-			tx = txRequest.data.data;
-			networkKey = (txRequest.data
-				.data as ExtrinsicPayload)?.genesisHash.toHex();
+			const payloadU8a = txRequest.data.data;
+			const [offset] = compactFromU8a(payloadU8a);
+			tx = payloadU8a;
+			networkKey = txRequest.data.genesisHash;
 			recipientAddress = txRequest.data.account;
-			dataToSign = txRequest.data.data;
+			dataToSign = payloadU8a.subarray(offset);
 		}
 
 		const sender = await accountsStore.getById({
@@ -444,23 +366,58 @@ export default class ScannerStore extends Container<ScannerState> {
 			recipient: recipient as FoundAccount,
 			sender,
 			tx,
-			txRequest,
 			type: 'transaction'
 		});
 
 		return true;
 	}
 
-	//seed is SURI on substrate and is seedPhrase on Ethereum
-	async signData(seed: string): Promise<void> {
-		const { dataToSign, isHash, sender } = this.state;
-
+	// signing ethereum data with seed reference
+	async signEthereumData(signFunction: TryBrainWalletSignFunc): Promise<void> {
+		const { dataToSign, sender } = this.state;
 		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
+		const signedData = await signFunction(dataToSign as string);
+		this.setState({ signedData });
+	}
 
+	// signing substrate data with seed reference
+	async signSubstrateData(
+		signFunction: TrySignFunc,
+		suriSuffix: string
+	): Promise<void> {
+		const { dataToSign, isHash, sender } = this.state;
+		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
+			throw new Error('Signing Error: sender could not be found.');
+		let signable;
+
+		if (dataToSign instanceof GenericExtrinsicPayload) {
+			signable = u8aToHex(dataToSign.toU8a(true), -1, false);
+		} else if (isHash) {
+			signable = hexStripPrefix(dataToSign);
+		} else if (isU8a(dataToSign)) {
+			signable = hexStripPrefix(u8aToHex(dataToSign));
+		} else if (isAscii(dataToSign)) {
+			signable = hexStripPrefix(asciiToHex(dataToSign));
+		} else {
+			throw new Error('Signing Error: cannot signing message');
+		}
+		let signed = await signFunction(suriSuffix, signable);
+		signed = '0x' + signed;
+		// TODO: tweak the first byte if and when sig type is not sr25519
+		const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
+		const signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
+		this.setState({ signedData });
+	}
+
+	// signing data with legacy account.
+	async signDataLegacy(pin = '1'): Promise<void> {
+		const { sender, dataToSign, isHash } = this.state;
+		if (!sender || !sender.encryptedSeed)
+			throw new Error('Signing Error: sender could not be found.');
 		const isEthereum =
 			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
-
+		const seed = await decryptData(sender.encryptedSeed, pin);
 		let signedData;
 		if (isEthereum) {
 			signedData = await brainWalletSign(seed, dataToSign as string);
@@ -487,33 +444,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		this.setState({ signedData });
 	}
 
-	async signDataWithSeedPhrase(
-		seedPhrase: string,
-		protocol: NetworkProtocol
-	): Promise<void> {
-		if (
-			protocol === NetworkProtocols.SUBSTRATE ||
-			protocol === NetworkProtocols.UNKNOWN
-		) {
-			const suri = constructSURI({
-				derivePath: this.state.sender?.path,
-				password: '',
-				phrase: seedPhrase
-			});
-			await this.signData(suri);
-		} else {
-			await this.signData(seedPhrase);
-		}
-	}
-
-	async signDataLegacy(pin = '1'): Promise<void> {
-		const { sender } = this.state;
-		if (!sender || !sender.encryptedSeed)
-			throw new Error('Signing Error: sender could not be found.');
-		const seed = await decryptData(sender.encryptedSeed, pin);
-		await this.signData(seed);
-	}
-
 	async cleanup(): Promise<void> {
 		await this.setState({
 			...DEFAULT_STATE
@@ -527,7 +457,7 @@ export default class ScannerStore extends Container<ScannerState> {
 			latestFrame: DEFAULT_STATE.latestFrame,
 			missedFrames: DEFAULT_STATE.missedFrames,
 			multipartComplete: DEFAULT_STATE.multipartComplete,
-			multipartData: {},
+			multipartData: null,
 			totalFrameCount: DEFAULT_STATE.totalFrameCount,
 			unsignedData: DEFAULT_STATE.unsignedData
 		});
@@ -602,10 +532,6 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.recipient;
 	}
 
-	getTXRequest(): TXRequest | null {
-		return this.state.txRequest;
-	}
-
 	getMessage(): string | null {
 		return this.state.message;
 	}
@@ -632,25 +558,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		return this.state.signedData;
 	}
 
-	setErrorMsg(scanErrorMsg: string): void {
-		this.setState({ scanErrorMsg });
-	}
-
-	getErrorMsg(): string {
-		return this.state.scanErrorMsg;
-	}
-
 	getMissedFrames(): number[] {
 		return this.state.missedFrames;
-	}
-
-	getPrehashPayload(): GenericExtrinsicPayload | null {
-		return this.state.prehash;
-	}
-
-	setPrehashPayload(prehash: GenericExtrinsicPayload): void {
-		this.setState({
-			prehash
-		});
 	}
 }

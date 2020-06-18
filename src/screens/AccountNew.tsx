@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -32,6 +32,7 @@ import fonts from 'styles/fonts';
 import { emptyAccount, validateSeed } from 'utils/account';
 import { withAccountStore } from 'utils/HOC';
 import { constructSURI } from 'utils/suri';
+import fontStyles from 'styles/fontStyles';
 
 interface State {
 	derivationPassword: string;
@@ -173,7 +174,6 @@ function AccountNew({
 						paper.
 					</Text>
 					<Button
-						buttonStyles={styles.nextStep}
 						title="Next Step"
 						disabled={
 							!validateSeed(seed, validBip39Seed).valid ||
@@ -207,22 +207,18 @@ const styles = StyleSheet.create({
 		paddingBottom: 15
 	},
 	hintText: {
-		color: colors.bg_text_sec,
+		color: colors.text.faded,
 		fontFamily: fonts.bold,
 		fontSize: 12,
 		paddingTop: 20,
 		textAlign: 'center'
 	},
-	nextStep: {
-		marginTop: 15
-	},
 	title: {
-		color: colors.bg_text_sec,
-		fontFamily: fonts.bold,
-		fontSize: 18
+		...fontStyles.h_subheading,
+		color: colors.text.main
 	},
 	titleTop: {
-		color: colors.bg_text_sec,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 24,
 		paddingBottom: 20,

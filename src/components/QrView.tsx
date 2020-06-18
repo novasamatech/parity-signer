@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 
 import { isHex } from '@polkadot/util';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, StyleSheet, View, ViewStyle } from 'react-native';
+import { Dimensions, Image, View, ViewStyle } from 'react-native';
 
 import { qrCode, qrCodeHex } from 'utils/native';
 
@@ -25,6 +25,7 @@ interface Props {
 	size?: number;
 	height?: number;
 	style?: ViewStyle;
+	testID?: string;
 }
 
 export default function QrView(props: Props): React.ReactElement {
@@ -57,17 +58,19 @@ export default function QrView(props: Props): React.ReactElement {
 	return (
 		<View
 			style={[
-				styles.rectangleContainer,
 				{
+					alignItems: 'center',
 					backgroundColor: 'white',
 					flexBasis,
 					height: flexBasis,
+					justifyContent: 'center',
 					marginHorizontal: 16,
-					marginVertical: 32,
+					marginVertical: 24,
 					width: deviceWidth - 32
 				},
 				props.style
 			]}
+			testID={props.testID}
 		>
 			{qr !== '' && (
 				<Image source={{ uri: qr }} style={{ height: size, width: size }} />
@@ -75,12 +78,3 @@ export default function QrView(props: Props): React.ReactElement {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	rectangleContainer: {
-		alignItems: 'center',
-		backgroundColor: 'transparent',
-		flex: 1,
-		justifyContent: 'center'
-	}
-});

@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import AccountsStore from 'stores/AccountsStore';
+
 export type UnlockedAccount = {
 	address: string;
 	createdAt: number;
 	derivationPassword: string;
 	derivationPath: string; // doesn't contain the ///password
-	encryptedSeed: string | undefined;
+	encryptedSeed: string;
 	isLegacy?: boolean;
 	name: string;
 	networkKey: string;
@@ -68,7 +70,7 @@ export interface FoundLegacyAccount {
 	createdAt: number;
 	name: string;
 	updatedAt: number;
-	encryptedSeed?: string;
+	encryptedSeed: string;
 	validBip39Seed: boolean;
 	isLegacy: true;
 	networkKey: string;
@@ -103,6 +105,12 @@ export type AccountsStoreState = {
 	newIdentity: Identity;
 	selectedKey: string;
 };
+
+type LensSet<T, R> = Omit<T, keyof R> & R;
+export type AccountsStoreStateWithIdentity = LensSet<
+	AccountsStore,
+	{ state: LensSet<AccountsStoreState, { currentIdentity: Identity }> }
+>;
 
 export type PathGroup = {
 	paths: string[];

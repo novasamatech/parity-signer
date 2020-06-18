@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import NavigationBar from 'react-native-navbar-color';
 
 import {
 	AppNavigator,
@@ -29,6 +30,7 @@ import {
 	ScreenStack
 } from './screens';
 
+import { SeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
@@ -38,7 +40,10 @@ import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
-	if (__DEV__) {
+	NavigationBar.setColor(colors.background.os);
+	if (global.inTest) {
+		console.disableYellowBox = true;
+	} else if (__DEV__) {
 		YellowBox.ignoreWarnings([
 			'Warning: componentWillReceiveProps',
 			'Warning: componentWillMount',
@@ -51,6 +56,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const [policyConfirmed, setPolicyConfirmed] = React.useState<boolean>(false);
 	const [dataLoaded, setDataLoaded] = React.useState<boolean>(false);
+
 	React.useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
 			const tocPP = await loadToCAndPPConfirmation();
@@ -93,21 +99,26 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<UnstatedProvider>
-				<MenuProvider backHandler={true}>
-					<StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-					<GlobalStateContext.Provider value={globalContext}>
-						<NavigationContainer>{renderStacks()}</NavigationContainer>
-					</GlobalStateContext.Provider>
-				</MenuProvider>
-			</UnstatedProvider>
+			<SeedRefStore>
+				<UnstatedProvider>
+					<MenuProvider backHandler={true}>
+						<StatusBar
+							barStyle="light-content"
+							backgroundColor={colors.background.app}
+						/>
+						<GlobalStateContext.Provider value={globalContext}>
+							<NavigationContainer>{renderStacks()}</NavigationContainer>
+						</GlobalStateContext.Provider>
+					</MenuProvider>
+				</UnstatedProvider>
+			</SeedRefStore>
 		</SafeAreaProvider>
 	);
 }
 
 const emptyScreenStyles = StyleSheet.create({
 	body: {
-		backgroundColor: colors.bg,
+		backgroundColor: colors.background.app,
 		flex: 1,
 		flexDirection: 'column',
 		padding: 20

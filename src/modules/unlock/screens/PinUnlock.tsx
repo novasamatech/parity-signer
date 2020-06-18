@@ -15,34 +15,45 @@
 
 import React from 'react';
 
-import Container from 'modules/unlock/components/Container';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
-import ButtonMainAction from 'components/ButtonMainAction';
-import { NavigationAccountProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
-import { unlockIdentitySeed } from 'utils/identitiesUtils';
+import { NavigationTargetIdentityProps } from 'types/props';
+import { withAccountStore, withTargetIdentity } from 'utils/HOC';
+import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
+import { useSeedRef } from 'utils/seedRefHooks';
+import Button from 'components/Button';
 
 function PinUnlock({
-	accounts,
+	targetIdentity,
 	route
-}: NavigationAccountProps<'PinUnlock'>): React.ReactElement {
+}: NavigationTargetIdentityProps<'PinUnlock'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
-	const targetIdentity =
-		route.params.identity ?? accounts.state.currentIdentity;
+	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
 		const { pin } = state;
 		if (pin.length >= 6 && targetIdentity) {
 			try {
-				const resolve = route.params.resolve;
-				const seedPhrase = await unlockIdentitySeed(pin, targetIdentity);
-				resetState();
-				resolve(seedPhrase);
+				if (route.params.shouldReturnSeed) {
+					const resolveSeedPhrase = route.params.resolve;
+					const seedPhrase = await unlockIdentitySeedWithReturn(
+						pin,
+						targetIdentity,
+						createSeedRef
+					);
+					resetState();
+					resolveSeedPhrase(seedPhrase);
+				} else {
+					const resolve = route.params.resolve;
+					await createSeedRef(pin);
+					resetState();
+					resolve();
+				}
 			} catch (e) {
 				updateState({ pin: '', pinMismatch: true });
 				//TODO record error times;
@@ -52,7 +63,11 @@ function PinUnlock({
 		}
 	}
 	return (
-		<Container>
+		<KeyboardAwareContainer
+			contentContainerStyle={{
+				flexGrow: 1
+			}}
+		>
 			<ScreenHeading
 				title={t.title.pinUnlock}
 				error={state.pinMismatch || state.pinTooShort}
@@ -67,14 +82,14 @@ function PinUnlock({
 				onSubmitEditing={submit}
 				value={state.pin}
 			/>
-			<ButtonMainAction
+			<Button
 				title={t.doneButton.pinUnlock}
-				bottom={false}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
+				aboveKeyboard
 			/>
-		</Container>
+		</KeyboardAwareContainer>
 	);
 }
 
-export default withAccountStore(PinUnlock);
+export default withAccountStore(withTargetIdentity(PinUnlock));
