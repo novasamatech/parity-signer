@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 	derivationButton: {
 		alignItems: 'center',
 		backgroundColor: colors.background.os,
-		height: 68
+		height: 72
 	},
 	icon: {
 		...fontStyles.i_large,
