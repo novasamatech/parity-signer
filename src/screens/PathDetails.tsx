@@ -18,7 +18,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import ButtonNewDerivation from 'components/ButtonNewDerivation';
+import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
@@ -45,7 +45,6 @@ import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
 import { useSeedRef } from 'utils/seedRefHooks';
-import QrScannerTab from 'components/QrScannerTab';
 
 interface Props {
 	path: string;
@@ -66,7 +65,9 @@ export function PathDetailsView({
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed();
+	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed(
+		isSeedRefValid
+	);
 	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
@@ -76,10 +77,10 @@ export function PathDetailsView({
 	});
 
 	const onTapDeriveButton = (): Promise<void> =>
-		unlockWithoutPassword(
-			{ name: 'PathDerivation', params: { parentPath: path } },
-			isSeedRefValid
-		);
+		unlockWithoutPassword({
+			name: 'PathDerivation',
+			params: { parentPath: path }
+		});
 
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
@@ -107,21 +108,15 @@ export function PathDetailsView({
 			case 'PathExport': {
 				const pathMeta = currentIdentity.meta.get(path)!;
 				if (pathMeta.hasPassword) {
-					await unlockWithPassword(
-						password => ({
-							name: 'PathSecret',
-							params: {
-								password,
-								path
-							}
-						}),
-						isSeedRefValid
-					);
+					await unlockWithPassword(password => ({
+						name: 'PathSecret',
+						params: {
+							password,
+							path
+						}
+					}));
 				} else {
-					await unlockWithoutPassword(
-						{ name: 'PathSecret', params: { path } },
-						isSeedRefValid
-					);
+					await unlockWithoutPassword({ name: 'PathSecret', params: { path } });
 				}
 				break;
 			}
@@ -165,13 +160,12 @@ export function PathDetailsView({
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
 			{isSubstratePath(path) && (
-				<ButtonNewDerivation
-					testID={testIDs.PathDetail.deriveButton}
+				<QRScannerAndDerivationTab
+					derivationTestID={testIDs.PathDetail.deriveButton}
 					title="Derive New Account"
 					onPress={onTapDeriveButton}
 				/>
 			)}
-			<QrScannerTab />
 		</SafeAreaViewContainer>
 	);
 }

@@ -54,7 +54,7 @@ function PathSecret({
 	}, [
 		path,
 		pathMeta,
-		route,
+		route.params.password,
 		navigation,
 		currentIdentity,
 		isSeedRefValid,

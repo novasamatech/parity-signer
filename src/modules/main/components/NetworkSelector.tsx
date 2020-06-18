@@ -64,7 +64,7 @@ export default function NetworkSelector({
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accounts.state;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword } = useUnlockSeed();
+	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
 	// catch android back button and prevent exiting the app
 	useFocusEffect(
 		React.useCallback((): any => {
@@ -85,10 +85,10 @@ export default function NetworkSelector({
 	);
 
 	const onAddCustomPath = (): Promise<void> =>
-		unlockWithoutPassword(
-			{ name: 'PathDerivation', params: { parentPath: '' } },
-			seedRefHooks.isSeedRefValid
-		);
+		unlockWithoutPassword({
+			name: 'PathDerivation',
+			params: { parentPath: '' }
+		});
 
 	const sortNetworkKeys = (
 		[, params1]: [any, NetworkParams],

@@ -54,16 +54,16 @@ export const unlockAndReturnSeed = async <
 
 type UnlockWithPassword = (
 	nextRoute: (password: string) => Route,
-	isSeedRefValid: boolean,
 	identity?: Identity
 ) => Promise<void>;
 
 type UnlockWithoutPassword = (
 	nextRoute: Route,
-	isSeedRefValid: boolean,
 	identity?: Identity
 ) => Promise<void>;
-export const useUnlockSeed = (): {
+export const useUnlockSeed = (
+	isSeedRefValid: boolean
+): {
 	unlockWithPassword: UnlockWithPassword;
 	unlockWithoutPassword: UnlockWithoutPassword;
 } => {
@@ -79,7 +79,6 @@ export const useUnlockSeed = (): {
 
 	const unlockWithPassword: UnlockWithPassword = async (
 		nextRoute,
-		isSeedRefValid,
 		identity
 	) => {
 		const password = await unlockSeedPhraseWithPassword(
@@ -93,7 +92,6 @@ export const useUnlockSeed = (): {
 
 	const unlockWithoutPassword: UnlockWithoutPassword = async (
 		nextRoute,
-		isSeedRefValid,
 		identity
 	) => {
 		await unlockSeedPhrase(navigation, isSeedRefValid, identity);
