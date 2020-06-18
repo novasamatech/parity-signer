@@ -132,11 +132,12 @@ android {
 
     defaultConfig {
         applicationId "io.parity.signer"
+        multiDexEnabled true
         minSdkVersion 18
         missingDimensionStrategy 'react-native-camera', 'general'
         targetSdkVersion 28
-        versionCode 4301
-        versionName "4.3.1"
+        versionCode 4302
+        versionName "4.3.2"
         ndk {
             abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         }
@@ -215,6 +216,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation 'com.android.support:multidex:1.0.3'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
