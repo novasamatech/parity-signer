@@ -67,48 +67,44 @@ describe('Load test', () => {
 	it('derive a new account from the path list', async () => {
 		await testTap(PathsList.deriveButton);
 		await testInput(PathDerivation.pathInput, defaultPath);
-		await testInput(PathDerivation.nameInput, 'default account');
+		await testInput(PathDerivation.nameInput, 'default');
 		await element(by.text('Done')).tap();
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}`);
-		await tapBack();
-		await testVisible(PathsList.screen);
 	});
 
 	it('derive a new account from the derived account', async () => {
 		await testTap(PathsList.pathCard + `//kusama${defaultPath}`);
-		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deriveButton);
 		await testInput(PathDerivation.pathInput, childPath);
-		await testInput(PathDerivation.nameInput, 'child of default');
+		await testInput(PathDerivation.nameInput, 'child');
 		await element(by.text('Done')).tap();
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}${childPath}`);
-		await tapBack();
-		await testVisible(PathDetail.screen);
 	});
 
 	it('need pin after application go to the background', async () => {
 		await device.sendToHome();
 		await device.launchApp({ newInstance: false });
+		await tapBack();
 		await testTap(PathsList.deriveButton);
 		await testUnlockPin(pinCode);
 		await testInput(PathDerivation.pathInput, secondPath);
-		await testInput(PathDerivation.nameInput, 'second one');
+		await testInput(PathDerivation.nameInput, 'second');
+		await element(by.text('Done')).tap();
 		await testExist(PathsList.pathCard + `//kusama${secondPath}`);
 	});
 
 	it('is able to create custom path', async () => {
 		await tapBack();
-		await testTap(testIDs.Main.addNewNetworkButton);
-		await testTap(testIDs.Main.addCustomNetworkButton);
+		await testTap(Main.addNewNetworkButton);
+		await testTap(Main.addCustomNetworkButton);
 		await testInput(PathDerivation.pathInput, customPath);
-		await testInput(PathDerivation.nameInput, 'custom network');
-		await testExist(PathsList.pathCard + customPath);
-		await tapBack();
-		await testVisible(testIDs.Main.chooserScreen);
+		await testInput(PathDerivation.nameInput, 'custom');
+		await element(by.text('Done')).tap();
+		await testVisible(Main.chooserScreen);
 	});
 
 	it('delete a path', async () => {
-		await tapBack();
+		await testTap(Main.backButton);
 		await testTap(Main.networkButton + 'kusama');
 		await testTap(PathsList.pathCard + `//kusama${defaultPath}`);
 		await testTap(PathDetail.popupMenuButton);
@@ -132,7 +128,6 @@ describe('Load test', () => {
 	});
 
 	it('is able to delete it', async () => {
-		//'1' is frontier network chainId defined in networkSpecs.ts
 		await testTap(Main.networkButton + ethereumButtonIndex);
 		await testVisible(PathDetail.screen);
 		await testTap(PathDetail.popupMenuButton);

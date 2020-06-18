@@ -1,3 +1,5 @@
+import { by, element } from 'detox';
+
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 import {
@@ -32,6 +34,7 @@ describe('passworded account test', () => {
 		await testInput(PathDerivation.pathInput, passwordedPath);
 		await testTap(PathDerivation.togglePasswordButton);
 		await testInput(PathDerivation.passwordInput, password);
+		await element(by.text('Done')).tap();
 		await testExist(PathsList.pathCard + `//kusama${passwordedPath}`);
 	});
 
@@ -44,7 +47,6 @@ describe('passworded account test', () => {
 			await testExist(
 				'secret:0xffa534554346807099dfbf034157798cf94541b357a3fe27f37c2175594f4bf5:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:passworded'
 			);
-			await tapBack();
 			await testVisible(PathDetail.screen);
 		});
 	});
