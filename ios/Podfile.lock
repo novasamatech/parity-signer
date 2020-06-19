@@ -241,7 +241,7 @@ PODS:
     - React
   - react-native-camera/RN (3.21.0):
     - React
-  - react-native-netinfo (4.2.1):
+  - react-native-netinfo (5.9.3):
     - React
   - react-native-randombytes (3.5.3):
     - React
@@ -306,7 +306,7 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/callinvoker (= 0.62.2)
-  - RNCMaskedView (0.1.6):
+  - RNCMaskedView (0.1.10):
     - React
   - RNGestureHandler (1.6.0):
     - React
@@ -495,7 +495,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-camera: 4e12e877b8fef60b0914a49c942a0f32479e5b50
-  react-native-netinfo: aeb1752abb78a9c15cdcea067a6c95d596dcfc45
+  react-native-netinfo: 1b8691be19549f020d0757b40aca4f355cafeeec
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
@@ -508,7 +508,7 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  RNCMaskedView: a88953beefbd347a29072d9eba90e42945fe291e
+  RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
   RNScreens: a55364dc1833101f836cee70975ce1fea615a12f
   RNSecureStorage: af0099b5b9f3c41692848b7778fe98b4a6b0358d
