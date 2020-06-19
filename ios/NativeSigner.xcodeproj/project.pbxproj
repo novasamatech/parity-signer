@@ -830,13 +830,15 @@
 					"$(SRCROOT)/../node_modules/react-native-camera/ios",
 					"$(SRCROOT)/../rust/signer",
 					"${PODS_ROOT}/",
+					"$(inherited)",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"${PODS_ROOT}/",
-					"$(SRCROOT)/../rust/signer",
+					"<Multiple",
+					"values>",
+					"$(inherited)",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -870,13 +872,15 @@
 					"$(SRCROOT)/../node_modules/react-native-camera/ios",
 					"$(SRCROOT)/../rust/signer",
 					"${PODS_ROOT}/",
+					"$(inherited)",
 				);
 				INFOPLIST_FILE = NativeSigner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"${PODS_ROOT}/",
-					"$(SRCROOT)/../rust/signer",
+					"<Multiple",
+					"values>",
+					"$(inherited)",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -959,6 +963,7 @@
 					"$(SRCROOT)/../node_modules/react-native-camera/ios",
 					"$(SRCROOT)/../rust/signer",
 					"${PODS_ROOT}/",
+					"$(inherited)",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(SRCROOT)/../node_modules/react-native-camera/ios",
@@ -969,8 +974,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					"${PODS_ROOT}/",
-					"$(SRCROOT)/../rust/signer",
+					"<Multiple",
+					"values>",
+					"$(inherited)",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
