@@ -406,7 +406,7 @@ export default class AccountsStore extends Container<AccountsStoreState> {
 		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
 		const suriSuffix = constructSuriSuffix({
 			derivePath: newPath,
-			password: password
+			password
 		});
 		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
