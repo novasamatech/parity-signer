@@ -19,7 +19,7 @@ import { ScrollView, Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
-import { navigateToPathDerivation } from 'utils/navigationHelpers';
+import { useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
@@ -36,12 +36,11 @@ import {
 	groupPaths,
 	removeSlash
 } from 'utils/identitiesUtils';
-import ButtonNewDerivation from 'components/ButtonNewDerivation';
+import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import fontStyles from 'styles/fontStyles';
 import { LeftScreenHeading } from 'components/ScreenHeading';
-import QrScannerTab from 'components/QrScannerTab';
 
 function PathsList({
 	accounts,
@@ -63,6 +62,7 @@ function PathsList({
 		return groupPaths(listedPaths);
 	}, [currentIdentity, isEthereumPath, networkKey]);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
+	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 
 	if (isEthereumNetworkParams(networkParams)) {
 		return (
@@ -77,6 +77,12 @@ function PathsList({
 
 	const { navigate } = navigation;
 	const rootPath = `//${networkParams.pathId}`;
+
+	const onTapDeriveButton = (): Promise<void> =>
+		unlockWithoutPassword({
+			name: 'PathDerivation',
+			params: { parentPath: isUnknownNetworkPath ? '' : rootPath }
+		});
 
 	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
 		const path = pathsGroup.paths[0];
@@ -139,18 +145,11 @@ function PathsList({
 				)}
 				<Separator style={{ backgroundColor: 'transparent' }} />
 			</ScrollView>
-			<ButtonNewDerivation
-				testID={testIDs.PathsList.deriveButton}
+			<QRScannerAndDerivationTab
+				derivationTestID={testIDs.PathsList.deriveButton}
 				title="Derive New Account"
-				onPress={(): Promise<void> =>
-					navigateToPathDerivation(
-						navigation,
-						isUnknownNetworkPath ? '' : rootPath,
-						isSeedRefValid
-					)
-				}
+				onPress={onTapDeriveButton}
 			/>
-			<QrScannerTab />
 		</SafeAreaViewContainer>
 	);
 }

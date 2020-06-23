@@ -54,33 +54,24 @@ export const unlockAndReturnSeed = async <
 
 type UnlockWithPassword = (
 	nextRoute: (password: string) => Route,
-	isSeedRefValid: boolean,
 	identity?: Identity
 ) => Promise<void>;
 
 type UnlockWithoutPassword = (
 	nextRoute: Route,
-	isSeedRefValid: boolean,
 	identity?: Identity
 ) => Promise<void>;
-export const useUnlockSeed = (): {
+export const useUnlockSeed = (
+	isSeedRefValid: boolean
+): {
 	unlockWithPassword: UnlockWithPassword;
 	unlockWithoutPassword: UnlockWithoutPassword;
 } => {
 	const currentRoutes = useNavigationState(state => state.routes) as Route[];
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	const newRoutes: Route[] = currentRoutes
-		.slice(0, currentRoutes.length - 1)
-		.map(routeState => {
-			return {
-				name: routeState.name,
-				params: routeState.params
-			};
-		});
-
 	const resetRoutes = (routes: Route[]): void => {
 		const resetAction = CommonActions.reset({
-			index: routes.length - 1,
+			index: routes.length,
 			routes: routes
 		});
 		navigation.dispatch(resetAction);
@@ -88,7 +79,6 @@ export const useUnlockSeed = (): {
 
 	const unlockWithPassword: UnlockWithPassword = async (
 		nextRoute,
-		isSeedRefValid,
 		identity
 	) => {
 		const password = await unlockSeedPhraseWithPassword(
@@ -96,17 +86,16 @@ export const useUnlockSeed = (): {
 			isSeedRefValid,
 			identity
 		);
-		newRoutes.push(nextRoute(password));
+		const newRoutes = currentRoutes.concat(nextRoute(password));
 		resetRoutes(newRoutes);
 	};
 
 	const unlockWithoutPassword: UnlockWithoutPassword = async (
 		nextRoute,
-		isSeedRefValid,
 		identity
 	) => {
 		await unlockSeedPhrase(navigation, isSeedRefValid, identity);
-		newRoutes.push(nextRoute);
+		const newRoutes = currentRoutes.concat(nextRoute);
 		resetRoutes(newRoutes);
 	};
 
@@ -268,18 +257,3 @@ export const navigateToLegacyAccountList = <
 >(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationTo(navigation, 'LegacyAccountList');
-
-export const navigateToPathDerivation = async <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>,
-	parentPath: string,
-	isSeedRefValid: boolean
-): Promise<void> => {
-	if (!isSeedRefValid) {
-		await unlockSeedPhrase(navigation, isSeedRefValid);
-	}
-	resetNavigationWithNetworkChooser(navigation, 'PathDerivation', {
-		parentPath
-	});
-};

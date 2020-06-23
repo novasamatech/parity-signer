@@ -23,10 +23,10 @@ import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import { NavigationTargetIdentityProps } from 'types/props';
+import { debounce } from 'utils/debounce';
 import { withAccountStore, withTargetIdentity } from 'utils/HOC';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
-import Button from 'components/Button';
 
 function PinUnlock({
 	targetIdentity,
@@ -35,8 +35,7 @@ function PinUnlock({
 	const [state, updateState, resetState] = usePinState();
 	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
-	async function submit(): Promise<void> {
-		const { pin } = state;
+	async function submit(pin: string): Promise<void> {
 		if (pin.length >= 6 && targetIdentity) {
 			try {
 				if (route.params.shouldReturnSeed) {
@@ -55,13 +54,19 @@ function PinUnlock({
 					resolve();
 				}
 			} catch (e) {
-				updateState({ pin: '', pinMismatch: true });
-				//TODO record error times;
+				updateState({ pin, pinMismatch: true });
 			}
 		} else {
-			updateState({ pinTooShort: true });
+			updateState({ pin, pinTooShort: true });
 		}
 	}
+
+	const onPinInput = (pin: string): void => {
+		onPinInputChange('pin', updateState)(pin);
+		const debounceSubmit = debounce(() => submit(pin), 500);
+		debounceSubmit();
+	};
+
 	return (
 		<KeyboardAwareContainer
 			contentContainerStyle={{
@@ -78,15 +83,8 @@ function PinUnlock({
 				autoFocus
 				testID={testIDs.IdentityPin.unlockPinInput}
 				returnKeyType="done"
-				onChangeText={onPinInputChange('pin', updateState)}
-				onSubmitEditing={submit}
+				onChangeText={onPinInput}
 				value={state.pin}
-			/>
-			<Button
-				title={t.doneButton.pinUnlock}
-				onPress={submit}
-				testID={testIDs.IdentityPin.unlockPinButton}
-				aboveKeyboard
 			/>
 		</KeyboardAwareContainer>
 	);

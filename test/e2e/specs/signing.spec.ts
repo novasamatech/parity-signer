@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { by, element } from 'detox';
+
 import {
 	EthereumNetworkKeys,
 	SUBSTRATE_NETWORK_LIST,
@@ -70,6 +72,7 @@ describe('Signing ane exporting test', () => {
 			await testTap(PathsList.deriveButton);
 			await testInput(PathDerivation.pathInput, '');
 			await testInput(PathDerivation.nameInput, 'kusama root');
+			await element(by.text('Done')).tap();
 			await testExist(PathsList.pathCard + '//kusama');
 		});
 
@@ -81,6 +84,7 @@ describe('Signing ane exporting test', () => {
 				'secret:0xdf46d55a2d98695e9342b67edae6669e5c0b4e1a3895f1adf85989565b9ab827:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:kusama root'
 			);
 			await tapBack();
+			await testVisible(PathDetail.screen);
 		});
 
 		it('should sign the set remarks request', async () => {

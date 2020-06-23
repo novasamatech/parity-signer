@@ -100,7 +100,6 @@ function PinUnlockWithPassword({
 				title={t.doneButton.pinUnlock}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
-				aboveKeyboard
 			/>
 		</KeyboardAwareContainer>
 	);

@@ -22,6 +22,7 @@ import { Icon } from 'react-native-elements';
 import ButtonIcon from './ButtonIcon';
 import AccountIcon from './AccountIcon';
 
+import testIDs from 'e2e/testIDs';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import fonts from 'styles/fonts';
@@ -74,6 +75,7 @@ const renderBack = (onPress?: ButtonListener): ReactNode => {
 			iconName="arrowleft"
 			iconType="antdesign"
 			onPress={onPress}
+			testID={testIDs.Main.backButton}
 			style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
 			iconBgStyle={{ backgroundColor: 'transparent' }}
 		/>

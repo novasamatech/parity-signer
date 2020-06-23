@@ -164,3 +164,11 @@ export const alertBackupDone = (onPress: () => any): void =>
 			}
 		]
 	);
+
+export const alertDeriveSuccess = (): void =>
+	Alert.alert('Success', 'New Account Successfully derived', [
+		{
+			style: 'default',
+			text: 'Done'
+		}
+	]);
