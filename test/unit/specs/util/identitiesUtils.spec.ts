@@ -264,7 +264,7 @@ describe('IdentitiesUtils', () => {
 	it('group path under their network correctly, has no missing accounts', () => {
 		const mockIdentity = testIdentities[0];
 		const existedNetworks = getExistedNetworkKeys(mockIdentity);
-		const existedAccounts = mockIdentity.meta.size;
+		const existedAccountsSize = mockIdentity.meta.size;
 
 		const allListedAccounts = existedNetworks.reduce(
 			(acc: string[], networkKey: string) => {
@@ -284,7 +284,7 @@ describe('IdentitiesUtils', () => {
 			},
 			[]
 		);
-		expect(existedAccounts).toEqual(allListedAccounts.length);
+		expect(existedAccountsSize).toEqual(allListedAccounts.length);
 	});
 
 	it('decides account is only with hard derivation', () => {

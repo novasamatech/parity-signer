@@ -180,7 +180,7 @@ export const getPathsWithSubstrateNetworkKey = (
 	): string[] => {
 		let pathId;
 		if (!isSubstratePath(path)) return groupedPaths;
-		if (pathMeta.hasOwnProperty('networkPathId')) {
+		if (pathMeta.networkPathId !== undefined) {
 			pathId = pathMeta.networkPathId;
 		} else {
 			pathId = extractPathId(path);
