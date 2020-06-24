@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -231,7 +231,10 @@ export default function NetworkSelector({
 		}
 	};
 
-	const availableNetworks = getExistedNetworkKeys(currentIdentity);
+	const availableNetworks = useMemo(
+		() => getExistedNetworkKeys(currentIdentity),
+		[currentIdentity]
+	);
 	const networkList = Object.entries(NETWORK_LIST).filter(filterNetworkKeys);
 	networkList.sort(sortNetworkKeys);
 
