@@ -172,7 +172,8 @@ export const getPathsWithSubstrateNetworkKey = (
 	networkKey: string
 ): string[] => {
 	const pathEntries = Array.from(identity.meta.entries());
-	const targetPathId = SUBSTRATE_NETWORK_LIST[networkKey]?.pathId;
+	const targetPathId =
+		SUBSTRATE_NETWORK_LIST[networkKey]?.pathId || unknownNetworkPathId;
 	const pathReducer = (
 		groupedPaths: string[],
 		[path, pathMeta]: [string, AccountMeta]
