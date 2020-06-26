@@ -41,7 +41,7 @@ export function UnknownAccountWarning({
 					To bind the desired network with this account you need to:
 					{'\n'}- remember account path
 					{'\n'}- delete the account
-					{'\n'}- tap "Add Network Account -> Create Custom Path"
+					{'\n'}- tap "Add Network Account {'->'} Create Custom Path"
 					{'\n'}- derive an account with the same path as before
 				</Text>
 			) : (
