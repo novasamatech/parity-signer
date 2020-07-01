@@ -15,6 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import SubstrateSign from 'react-native-substrate-sign';
+
 import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
@@ -254,7 +255,11 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
-		return SubstrateSign.substrateSignWithRef(this.dataRef, suriSuffix, message);
+		return SubstrateSign.substrateSignWithRef(
+			this.dataRef,
+			suriSuffix,
+			message
+		);
 	}
 
 	trySubstrateSecret(suriSuffix: string): Promise<string> {
