@@ -20,8 +20,6 @@ import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 
-console.log('SubstrateSign is', SubstrateSign);
-
 interface AddressObject {
 	address: string;
 	bip39: boolean;
