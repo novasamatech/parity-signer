@@ -58,9 +58,6 @@ jobs:
           yarn
       - name:           Build CocoaPods
         run:            cd ios && pod install && cd ..
-      - name:           Stop sccache
-        if:             always()
-        run:            sccache --stop-server
       - name:           Detox biuld
         run:            yarn build-e2e:ci
       - name:           Detox test
