@@ -25,9 +25,6 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 - [Troubleshooting](https://github.com/paritytech/parity-signer/wiki/Troubleshooting)
 - [Publishing](https://github.com/paritytech/parity-signer/wiki/Publishing)
 
-## Changes from 4.3.1
-From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b176795b9386af640b3e73aff3) we use the latest prebuild NDK (r21) toolchains for building rust libraries for android, so that we do not need to build the standalone NDK toolchains manually. If you have built or develop Parity Signer before 4.3.1, please download the NDK r19 or newer[here](https://developer.android.com/ndk/downloads) and point the `NKD_HOME` environment variable to it with e.g. `export NDK_HOME=/path/to/latest/ndk`
-
 ## License
 
 Parity-Signer is [GPL 3.0 licensed](LICENSE).
