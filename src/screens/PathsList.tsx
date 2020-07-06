@@ -28,8 +28,7 @@ import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import {
 	isEthereumNetworkParams,
-	isUnknownNetworkParams,
-	SubstrateNetworkParams
+	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
@@ -112,7 +111,7 @@ function PathsList({
 						<PathGroupCard
 							currentIdentity={currentIdentity}
 							pathGroup={pathsGroup}
-							networkParams={networkParams as SubstrateNetworkParams}
+							networkParams={networkParams}
 							accounts={accounts}
 							key={pathsGroup.title}
 						/>

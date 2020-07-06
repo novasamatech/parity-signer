@@ -16,30 +16,37 @@
 
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import testIDs from '../../test/e2e/testIDs';
-import fontStyles from '../styles/fontStyles';
-import { Identity, PathGroup } from '../types/identityTypes';
-import { SubstrateNetworkParams } from '../types/networkSpecsTypes';
-import { removeSlash } from '../utils/identitiesUtils';
 
 import PathCard from './PathCard';
 import Separator from './Separator';
 
+import fontStyles from 'styles/fontStyles';
+import {
+	AccountsStoreStateWithIdentity,
+	Identity,
+	PathGroup
+} from 'types/identityTypes';
+import {
+	isSubstrateNetworkParams,
+	SubstrateNetworkParams,
+	UnknownNetworkParams
+} from 'types/networkSpecsTypes';
+import { removeSlash } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { RootStackParamList } from 'types/routes';
-import type AccountsStore from 'stores/AccountsStore';
 import Button from 'components/Button';
 
 type Props = {
-	accounts: AccountsStore;
+	accounts: AccountsStoreStateWithIdentity;
 	currentIdentity: Identity;
 	pathGroup: PathGroup;
-	networkParams: SubstrateNetworkParams;
+	networkParams: SubstrateNetworkParams | UnknownNetworkParams;
 };
 
 export default function PathGroupCard({
@@ -49,7 +56,7 @@ export default function PathGroupCard({
 	accounts
 }: Props): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	const [paths, setPaths] = useState<string[]>(pathGroup.paths);
+	const paths = pathGroup.paths;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
 	);
@@ -69,7 +76,10 @@ export default function PathGroupCard({
 	const _addDerivationPath = async (
 		isHardDerivation: boolean
 	): Promise<void> => {
-		await unlockSeedPhrase(navigation, isSeedRefValid);
+		if (!isSeedRefValid) {
+			await unlockSeedPhrase(navigation, isSeedRefValid);
+			navigation.goBack();
+		}
 		const nextIndex = _getNextIndex(isHardDerivation);
 		const nextPath = _getFullPath(nextIndex, isHardDerivation);
 		const name = removeSlash(`${pathGroup.title}${nextIndex}`);
@@ -77,15 +87,18 @@ export default function PathGroupCard({
 			await accounts.deriveNewPath(
 				nextPath,
 				substrateAddress,
-				networkParams.genesisHash,
+				(networkParams as SubstrateNetworkParams).genesisHash,
 				name,
 				''
 			);
-			const newPaths = paths.concat(nextPath);
-			setPaths(newPaths.sort());
 		} catch (error) {
 			alertPathDerivationError(error.message);
 		}
+	};
+
+	const _deletePath = async (): Promise<void> => {
+		const targetPath = paths[paths.length - 1];
+		await accounts.deletePath(targetPath);
 	};
 
 	const headerTitle = removeSlash(pathGroup.title);
@@ -98,20 +111,30 @@ export default function PathGroupCard({
 					<Text style={fontStyles.t_prefix}>{headerTitle}</Text>
 					<Text style={fontStyles.t_codeS}>{headerCode}</Text>
 				</View>
-				<View style={styles.derivationButtonContainer}>
-					<Button
-						title={'+ hard'}
-						textStyles={fontStyles.t_code}
-						style={styles.derivationButton}
-						onPress={(): any => _addDerivationPath(true)}
-					/>
-					<Button
-						title={'+ soft'}
-						textStyles={fontStyles.t_code}
-						style={styles.derivationButton}
-						onPress={(): any => _addDerivationPath(false)}
-					/>
-				</View>
+				{isSubstrateNetworkParams(networkParams) && (
+					<View style={styles.derivationButtonContainer}>
+						<Button
+							title={'+ hard'}
+							textStyles={fontStyles.t_code}
+							style={styles.derivationButton}
+							onPress={(): any => _addDerivationPath(true)}
+						/>
+						<Button
+							title={'+ soft'}
+							textStyles={fontStyles.t_code}
+							style={styles.derivationButton}
+							onPress={(): any => _addDerivationPath(false)}
+						/>
+						{__DEV__ && (
+							<Button
+								title={'- delete'}
+								textStyles={fontStyles.t_code}
+								style={styles.derivationButton}
+								onPress={(): any => _deletePath()}
+							/>
+						)}
+					</View>
+				)}
 			</View>
 			{paths.map(path => (
 				<PathCard
