@@ -83,6 +83,7 @@ const testIDs = {
 	PathsList: {
 		deriveButton: 'path_list_derive_button',
 		pathCard: 'path_list_path_card',
+		pathsGroup: 'path_list_paths_group',
 		scanButton: 'path_list_scan_button',
 		screen: 'path_list_screen'
 	},
