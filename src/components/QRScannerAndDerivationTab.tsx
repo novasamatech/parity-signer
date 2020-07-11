@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
 		...fontStyles.i_large,
 		color: colors.signal.main,
 		fontWeight: 'bold',
-		marginTop:8
+		marginTop: 8
 	},
 	tab: {
 		flex: 1,

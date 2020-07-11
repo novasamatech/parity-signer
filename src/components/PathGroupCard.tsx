@@ -115,7 +115,7 @@ export default function PathGroupCard({
 				</View>
 				{isSubstrateNetworkParams(networkParams) && (
 					<TouchableItem
-						onPress={(): any => addDerivationPath( true)}
+						onPress={(): any => addDerivationPath(true)}
 						style={styles.derivationButton}
 						testID={`${testIDs.PathsList.pathsGroup}${pathGroup.title}`}
 					>
@@ -140,27 +140,27 @@ export default function PathGroupCard({
 const styles = StyleSheet.create({
 	derivationButton: {
 		alignItems: 'center',
-		justifyContent: 'center',
 		backgroundColor: 'black',
+		height: 63,
+		justifyContent: 'center',
 		marginHorizontal: 0,
 		marginVertical: 0,
-		paddingHorizontal: 10,
-		height: 63
+		paddingHorizontal: 10
 	},
 	derivationIcon: {
 		...fontStyles.i_medium,
 		color: colors.text.main,
-		fontWeight: 'bold',
+		fontWeight: 'bold'
 	},
 	derivationTextLabel: {
 		...fontStyles.a_text,
-		color: colors.text.main,
+		color: colors.text.main
 	},
 	header: {
 		flexDirection: 'row',
+		height: 63,
 		paddingLeft: 16,
-		paddingRight: 0,
-		height: 63
+		paddingRight: 0
 	},
 	headerText: {
 		flexGrow: 1,
