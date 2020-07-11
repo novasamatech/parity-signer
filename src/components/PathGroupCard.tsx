@@ -24,6 +24,8 @@ import testIDs from '../../test/e2e/testIDs';
 import PathCard from './PathCard';
 import Separator from './Separator';
 
+import colors from 'styles/colors';
+import TouchableItem from 'components/TouchableItem';
 import fontStyles from 'styles/fontStyles';
 import {
 	AccountsStoreStateWithIdentity,
@@ -40,7 +42,6 @@ import { useSeedRef } from 'utils/seedRefHooks';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { RootStackParamList } from 'types/routes';
-import Button from 'components/Button';
 
 type Props = {
 	accounts: AccountsStoreStateWithIdentity;
@@ -60,7 +61,6 @@ export default function PathGroupCard({
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
 	);
-
 	const _getFullPath = (index: number, isHardDerivation: boolean): string =>
 		`//${networkParams.pathId}${pathGroup.title}${
 			isHardDerivation ? '//' : '/'
@@ -73,7 +73,7 @@ export default function PathGroupCard({
 		return index;
 	};
 
-	const _addDerivationPath = async (
+	const addDerivationPath = async (
 		isHardDerivation: boolean
 	): Promise<void> => {
 		if (!isSeedRefValid) {
@@ -108,32 +108,20 @@ export default function PathGroupCard({
 			<Separator shadow={true} style={styles.separator} />
 			<View style={styles.header}>
 				<View style={styles.headerText}>
-					<Text style={fontStyles.t_prefix}>{headerTitle}</Text>
-					<Text style={fontStyles.t_codeS}>{headerCode}</Text>
+					<View>
+						<Text style={fontStyles.t_prefix}>{headerTitle}</Text>
+						<Text style={fontStyles.t_codeS}>{headerCode}</Text>
+					</View>
 				</View>
 				{isSubstrateNetworkParams(networkParams) && (
-					<View style={styles.derivationButtonContainer}>
-						<Button
-							title={'+ hard'}
-							textStyles={fontStyles.t_code}
-							style={styles.derivationButton}
-							onPress={(): any => _addDerivationPath(true)}
-						/>
-						<Button
-							title={'+ soft'}
-							textStyles={fontStyles.t_code}
-							style={styles.derivationButton}
-							onPress={(): any => _addDerivationPath(false)}
-						/>
-						{__DEV__ && (
-							<Button
-								title={'- delete'}
-								textStyles={fontStyles.t_code}
-								style={styles.derivationButton}
-								onPress={(): any => _deletePath()}
-							/>
-						)}
-					</View>
+					<TouchableItem
+						onPress={(): any => addDerivationPath( true)}
+						style={styles.derivationButton}
+						testID={`${testIDs.PathsList.pathsGroup}${pathGroup.title}`}
+					>
+						<Text style={styles.derivationIcon}>+</Text>
+						<Text style={styles.derivationTextLabel}>{'new derivation'}</Text>
+					</TouchableItem>
 				)}
 			</View>
 			{paths.map(path => (
@@ -151,20 +139,28 @@ export default function PathGroupCard({
 
 const styles = StyleSheet.create({
 	derivationButton: {
+		alignItems: 'center',
+		justifyContent: 'center',
 		backgroundColor: 'black',
 		marginHorizontal: 0,
 		marginVertical: 0,
-		paddingHorizontal: 10
+		paddingHorizontal: 10,
+		height: 63
 	},
-	derivationButtonContainer: {
-		flexDirection: 'row'
+	derivationIcon: {
+		...fontStyles.i_medium,
+		color: colors.text.main,
+		fontWeight: 'bold',
 	},
-	derivationButtonText: {
-		fontSize: 16
+	derivationTextLabel: {
+		...fontStyles.a_text,
+		color: colors.text.main,
 	},
 	header: {
 		flexDirection: 'row',
-		paddingHorizontal: 16
+		paddingLeft: 16,
+		paddingRight: 0,
+		height: 63
 	},
 	headerText: {
 		flexGrow: 1,
