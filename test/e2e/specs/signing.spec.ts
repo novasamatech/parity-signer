@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { by, element } from 'detox';
-
 import {
 	EthereumNetworkKeys,
 	SUBSTRATE_NETWORK_LIST,
@@ -26,7 +24,6 @@ import {
 	pinCode,
 	tapBack,
 	testExist,
-	testInput,
 	testRecoverIdentity,
 	testScrollAndTap,
 	testTap,
@@ -38,7 +35,6 @@ import testIDs from 'e2e/testIDs';
 
 const {
 	Main,
-	PathDerivation,
 	PathDetail,
 	PathsList,
 	SecurityHeader,
@@ -68,14 +64,6 @@ describe('Signing ane exporting test', () => {
 	testRecoverIdentity();
 
 	describe('Kusama Signing Test', () => {
-		it('Recover a Kusama signing account', async () => {
-			await testTap(PathsList.deriveButton);
-			await testInput(PathDerivation.pathInput, '');
-			await testInput(PathDerivation.nameInput, 'kusama root');
-			await element(by.text('Done')).tap();
-			await testExist(PathsList.pathCard + '//kusama');
-		});
-
 		it('is able to export the signing account', async () => {
 			await testTap(PathsList.pathCard + '//kusama');
 			await testTap(PathDetail.popupMenuButton);
