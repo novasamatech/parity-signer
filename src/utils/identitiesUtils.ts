@@ -341,6 +341,39 @@ export const getPathName = (
 	return extractSubPathName(path);
 };
 
+const _comparePathGroups = (a: PathGroup, b: PathGroup): number => {
+	const isSingleGroupA = a.paths.length === 1;
+	const isSingleGroupB = b.paths.length === 1;
+	if (isSingleGroupA && isSingleGroupB) {
+		return a.paths[0].length - b.paths[0].length;
+	}
+	if (isSingleGroupA !== isSingleGroupB) {
+		return isSingleGroupA ? -1 : 1;
+	}
+	return a.title.localeCompare(b.title);
+};
+
+const _comparePathsInGroup = (a: string, b: string): number => {
+	const pathFragmentsA = a.match(pathsRegex.allPath)!;
+	const pathFragmentsB = b.match(pathsRegex.allPath)!;
+	if (pathFragmentsA.length !== pathFragmentsB.length) {
+		return pathFragmentsA.length - pathFragmentsB.length;
+	}
+	const lastFragmentA = pathFragmentsA[pathFragmentsA.length - 1];
+	const lastFragmentB = pathFragmentsB[pathFragmentsB.length - 1];
+	const numberA = parseInt(removeSlash(lastFragmentA), 10);
+	const numberB = parseInt(removeSlash(lastFragmentB), 10);
+	const isNumberA = !isNaN(numberA);
+	const isNumberB = !isNaN(numberB);
+	if (isNumberA && isNumberB) {
+		return numberA - numberB;
+	}
+	if (isNumberA !== isNumberB) {
+		return isNumberA ? -1 : 1;
+	}
+	return lastFragmentA.localeCompare(lastFragmentB);
+};
+
 /**
  * This function decides how to group the list of derivation paths in the display based on the following rules.
  * If the network is unknown: group by the first subpath, e.g. '/random' of '/random//derivation/1'
@@ -359,7 +392,7 @@ export const groupPaths = (paths: string[]): PathGroup[] => {
 		const existedItem = pathGroup.find(p => p.title === groupName);
 		if (existedItem) {
 			existedItem.paths.push(fullPath);
-			existedItem.paths.sort();
+			existedItem.paths.sort(_comparePathsInGroup);
 		} else {
 			pathGroup.push({ paths: [fullPath], title: groupName });
 		}
@@ -399,12 +432,7 @@ export const groupPaths = (paths: string[]): PathGroup[] => {
 		},
 		[]
 	);
-	return groupedPaths.sort((a, b) => {
-		if (a.paths.length === 1 && b.paths.length === 1) {
-			return a.paths[0].length - b.paths[0].length;
-		}
-		return a.paths.length - b.paths.length;
-	});
+	return groupedPaths.sort(_comparePathGroups);
 };
 
 export const getMetadata = (networkKey: string): string => {
