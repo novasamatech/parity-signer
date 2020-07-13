@@ -34,7 +34,6 @@ export default class Button extends React.PureComponent<{
 	title: string;
 	onPress: ButtonListener;
 	textStyles?: TextStyle;
-	buttonStyles?: ViewStyle;
 	aboveKeyboard?: boolean;
 	disabled?: boolean;
 	small?: boolean;
@@ -51,13 +50,12 @@ export default class Button extends React.PureComponent<{
 			small,
 			textStyles,
 			onlyText,
-			buttonStyles,
 			testID,
 			style
 		} = this.props;
 
 		const finalTextStyles = [styles.buttonText, {}];
-		const finalButtonStyles = [styles.button, buttonStyles];
+		const finalButtonStyles = [styles.button, {}];
 
 		if (small) {
 			finalTextStyles.push({ fontSize: 14 });

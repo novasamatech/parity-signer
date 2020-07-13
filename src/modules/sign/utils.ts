@@ -125,7 +125,11 @@ export async function processBarCode(
 		await scannerStore.setData(accounts);
 		scannerStore.clearMultipartProgress();
 		const sender = scannerStore.getSender();
-		if (!sender) throw new Error(strings.ERROR_NO_SENDER_FOUND);
+		if (!sender)
+			return showErrorMessage(
+				strings.ERROR_TITLE,
+				strings.ERROR_NO_SENDER_FOUND
+			);
 		if (sender.isLegacy) {
 			if (scannerStore.getType() === 'transaction') {
 				return navigation.navigate('AccountUnlockAndSign', {

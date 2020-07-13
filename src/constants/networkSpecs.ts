@@ -171,7 +171,7 @@ const substrateNetworkBase: {
 	[SubstrateNetworkKeys.POLKADOT]: {
 		color: '#E6027A',
 		decimals: 12,
-		genesisHash: null,
+		genesisHash: SubstrateNetworkKeys.POLKADOT,
 		logo: require('res/img/logos/Polkadot.png'),
 		order: 1,
 		pathId: 'polkadot',
