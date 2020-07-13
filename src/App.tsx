@@ -16,8 +16,9 @@
 
 import '../shim';
 import 'utils/iconLoader';
+import {useEffect, useMemo, useState} from 'react';
 import * as React from 'react';
-import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
+import {Animated, StatusBar, StyleSheet, View, YellowBox} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
@@ -30,6 +31,7 @@ import {
 	ScreenStack
 } from './screens';
 
+import CustomAlert from 'components/CustomAlert';
 import { SeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
@@ -37,6 +39,7 @@ import { AppProps, getLaunchArgs } from 'e2e/injections';
 import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
 import { loadToCAndPPConfirmation } from 'utils/db';
 import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
+import { AlertState, AlertStateContext } from 'stores/alertContext';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
@@ -54,10 +57,27 @@ export default function App(props: AppProps): React.ReactElement {
 		]);
 	}
 
-	const [policyConfirmed, setPolicyConfirmed] = React.useState<boolean>(false);
-	const [dataLoaded, setDataLoaded] = React.useState<boolean>(false);
+	const [policyConfirmed, setPolicyConfirmed] = useState<boolean>(false);
+	const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+	const [alertState, setAlertState] = useState<{
+		index: number;
+		title: string;
+		message: string;
+	}>({
+		index: 0,
+		title: '',
+		message: ''
+	});
+	const animatedValue = useMemo(()=> new Animated.Value(1), [alertState.index]);
 
-	React.useEffect(() => {
+	useEffect(() => {
+		Animated.timing(animatedValue, {
+			toValue: 0,
+			duration: 2000
+		}).start();
+	}, [alertState.index]);
+
+	useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
 			const tocPP = await loadToCAndPPConfirmation();
 			setPolicyConfirmed(tocPP);
@@ -75,6 +95,16 @@ export default function App(props: AppProps): React.ReactElement {
 		policyConfirmed,
 		setDataLoaded,
 		setPolicyConfirmed
+	};
+
+	const alertContext: AlertState = {
+		...alertState,
+		setAlert: (title, message) =>
+			setAlertState({
+				index: alertState.index + 1,
+				title,
+				message
+			})
 	};
 
 	const renderStacks = (): React.ReactElement => {
@@ -107,7 +137,10 @@ export default function App(props: AppProps): React.ReactElement {
 							backgroundColor={colors.background.app}
 						/>
 						<GlobalStateContext.Provider value={globalContext}>
-							<NavigationContainer>{renderStacks()}</NavigationContainer>
+							<AlertStateContext.Provider value={alertContext}>
+								<CustomAlert />
+								<NavigationContainer>{renderStacks()}</NavigationContainer>
+							</AlertStateContext.Provider>
 						</GlobalStateContext.Provider>
 					</MenuProvider>
 				</UnstatedProvider>
