@@ -81,10 +81,17 @@ describe('Load test', () => {
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}${childPath}`);
 	});
 
+	it('derive new account with quick derivation button', async () => {
+		await tapBack();
+		const deriveButtonId = `${PathsList.pathsGroup}${defaultPath}`;
+		await testExist(deriveButtonId);
+		await testTap(deriveButtonId);
+		await testExist(PathsList.pathCard + `//kusama${defaultPath}//0`);
+	});
+
 	it('need pin after application go to the background', async () => {
 		await device.sendToHome();
 		await device.launchApp({ newInstance: false });
-		await tapBack();
 		await testTap(PathsList.deriveButton);
 		await testUnlockPin(pinCode);
 		await testInput(PathDerivation.pathInput, secondPath);
