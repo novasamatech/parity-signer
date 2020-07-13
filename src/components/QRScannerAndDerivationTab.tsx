@@ -48,7 +48,7 @@ export default class QRScannerAndDerivationTab extends React.PureComponent<{
 						style={styles.derivationButton}
 						testID={derivationTestID}
 					>
-						<Text style={styles.icon}>//</Text>
+						<Text style={styles.icon}>+</Text>
 						<Text style={styles.textLabel}>{title}</Text>
 					</TouchableItem>
 				</View>
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
 	icon: {
 		...fontStyles.i_large,
 		color: colors.signal.main,
+		fontWeight: 'bold',
 		marginTop: 8
 	},
 	tab: {
