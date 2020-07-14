@@ -1,7 +1,8 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import * as React from 'react';
-import {loadToCAndPPConfirmation} from 'utils/db';
-import {migrateAccounts, migrateIdentity} from 'utils/migrationUtils';
+
+import { loadToCAndPPConfirmation } from 'utils/db';
+import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 export type GlobalState = {
@@ -18,7 +19,7 @@ export const defaultGlobalState: GlobalState = {
 	setPolicyConfirmed: (): void => {}
 };
 
-export function useGlobalStateContext(): GlobalState{
+export function useGlobalStateContext(): GlobalState {
 	const [policyConfirmed, setPolicyConfirmed] = useState<boolean>(false);
 	const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 

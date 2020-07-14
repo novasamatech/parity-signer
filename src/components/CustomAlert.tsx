@@ -14,56 +14,60 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import Button from 'components/Button';
-import React, {useContext, useEffect, useMemo, useState} from 'react';
-import {StyleSheet, View, Animated, Text} from 'react-native';
-import {AlertStateContext} from 'stores/alertContext';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, View, Animated, Text } from 'react-native';
 
+import Button from 'components/Button';
+import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 
-export default function CustomAlert() {
-	const {title, index, message} = useContext(AlertStateContext);
-	const animatedValue = useMemo(()=>new Animated.Value(1), [index]);
+export default function CustomAlert(): React.ReactElement {
+	const { title, index, message } = useContext(AlertStateContext);
+	/* eslint-disable-next-line react-hooks/exhaustive-deps */
+	const animatedValue = useMemo(() => new Animated.Value(1), [index]);
 	const [alertDisplay, setAlertDisplay] = useState<boolean>(false);
 
 	useEffect(() => {
 		setAlertDisplay(true);
 		Animated.timing(animatedValue, {
-			toValue: 0,
 			duration: 2000,
+			toValue: 0,
 			useNativeDriver: false
-		}).start(()=>{
+		}).start(() => {
 			setAlertDisplay(false);
 		});
+		/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	}, [index]);
-	 if(alertDisplay) {
-		 return <Animated.View style={{...styles.background, opacity: animatedValue}}>
-		 	<View style={styles.body}>
-				{title !== '' && <Text style={styles.textTitle}>{title}</Text>}
-				<Text style={styles.textMessage}>{message}</Text>
-				<Button title={"OK"} onPress={()=>{}}/>
-			</View>
-		 </Animated.View>;
-	 } else {
-	 	return null;
-	 }
+	if (alertDisplay) {
+		return (
+			<Animated.View style={{ ...styles.background, opacity: animatedValue }}>
+				<View style={styles.body}>
+					{title !== '' && <Text style={styles.textTitle}>{title}</Text>}
+					<Text style={styles.textMessage}>{message}</Text>
+					<Button title={'OK'} onPress={(): any => 0} />
+				</View>
+			</Animated.View>
+		);
+	} else {
+		return null;
+	}
 }
 
 const styles = StyleSheet.create({
 	background: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: 20,
 		position: 'absolute',
-		zIndex: 100,
 		top: 80,
 		width: '100%',
-		justifyContent: 'center',
-		alignItems: 'center',
-		padding: 20
+		zIndex: 100
 	},
 	body: {
-		width: '90%',
+		backgroundColor: colors.background.alert,
 		paddingHorizontal: 10,
-		backgroundColor: colors.background.alert
+		width: '90%'
 	},
 	textMessage: {
 		paddingTop: 10,
@@ -71,6 +75,6 @@ const styles = StyleSheet.create({
 	},
 	textTitle: {
 		paddingTop: 10,
-		...fontStyles.h1,
+		...fontStyles.h1
 	}
 });

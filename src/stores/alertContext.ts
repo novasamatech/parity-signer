@@ -1,5 +1,5 @@
-import {useState} from 'react';
 import * as React from 'react';
+import { useState } from 'react';
 
 export type AlertState = {
 	index: number;
@@ -10,33 +10,31 @@ export type AlertState = {
 
 export const defaultAlertState: AlertState = {
 	index: 0,
-	title: '',
 	message: '',
-	setAlert: (): void => {}
+	setAlert: (): any => 0,
+	title: ''
 };
 
-export function useAlertContext (){
+export function useAlertContext(): AlertState {
 	const [alertState, setAlertState] = useState<{
 		index: number;
 		title: string;
 		message: string;
 	}>({
 		index: 0,
-		title: '',
-		message: ''
+		message: '',
+		title: ''
 	});
 
-	const alertContext: AlertState = {
+	return {
 		...alertState,
-		setAlert: (title, message) =>
+		setAlert: (title, message): void =>
 			setAlertState({
 				index: alertState.index + 1,
-				title,
-				message
+				message,
+				title
 			})
 	};
-
-	return alertContext;
 }
 
 export const AlertStateContext = React.createContext(defaultAlertState);

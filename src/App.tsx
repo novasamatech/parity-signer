@@ -17,7 +17,7 @@
 import '../shim';
 import 'utils/iconLoader';
 import * as React from 'react';
-import {StatusBar, StyleSheet, View, YellowBox} from 'react-native';
+import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
@@ -35,8 +35,12 @@ import { SeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
-import {GlobalState, GlobalStateContext, useGlobalStateContext} from 'stores/globalStateContext';
-import {AlertStateContext, useAlertContext} from 'stores/alertContext';
+import {
+	GlobalState,
+	GlobalStateContext,
+	useGlobalStateContext
+} from 'stores/globalStateContext';
+import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
@@ -88,7 +92,7 @@ export default function App(props: AppProps): React.ReactElement {
 						/>
 						<GlobalStateContext.Provider value={globalContext}>
 							<AlertStateContext.Provider value={alertContext}>
-								<CustomAlert/>
+								<CustomAlert />
 								<NavigationContainer>{renderStacks()}</NavigationContainer>
 							</AlertStateContext.Provider>
 						</GlobalStateContext.Provider>
