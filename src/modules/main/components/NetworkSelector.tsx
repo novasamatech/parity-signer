@@ -114,25 +114,6 @@ export default function NetworkSelector({
 		return availableNetworks.includes(networkKey);
 	};
 
-	const deriveSubstrateSeedRootPath = async (
-		networkKey: string
-	): Promise<void> => {
-		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
-		const fullPath = '';
-		try {
-			await accounts.deriveNewPath(
-				fullPath,
-				seedRefHooks.substrateAddress,
-				networkKey,
-				'Root',
-				''
-			);
-			navigateToPathDetails(navigation, networkKey, fullPath);
-		} catch (error) {
-			alertPathDerivationError(error.message);
-		}
-	};
-
 	const deriveSubstrateNetworkRootPath = async (
 		networkKey: string,
 		networkParams: SubstrateNetworkParams
@@ -218,11 +199,7 @@ export default function NetworkSelector({
 	): Promise<void> => {
 		if (isNew || shouldShowMoreNetworks) {
 			if (isSubstrateNetworkParams(networkParams)) {
-				if (isNew) {
-					await deriveSubstrateSeedRootPath(networkKey);
-				} else {
-					await deriveSubstrateNetworkRootPath(networkKey, networkParams);
-				}
+				await deriveSubstrateNetworkRootPath(networkKey, networkParams);
 			} else {
 				await deriveEthereumAccount(networkKey);
 			}
