@@ -15,37 +15,55 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View, Animated, Text } from 'react-native';
+import { StyleSheet, View, Animated, Text, Easing } from 'react-native';
 
 import Button from 'components/Button';
-import { AlertStateContext } from 'stores/alertContext';
+import { Action, AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 
 export default function CustomAlert(): React.ReactElement {
-	const { title, index, message } = useContext(AlertStateContext);
+	const { title, index, message, actions } = useContext(AlertStateContext);
 	/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	const animatedValue = useMemo(() => new Animated.Value(1), [index]);
 	const [alertDisplay, setAlertDisplay] = useState<boolean>(false);
 
 	useEffect(() => {
 		setAlertDisplay(true);
-		Animated.timing(animatedValue, {
-			duration: 2000,
-			toValue: 0,
-			useNativeDriver: false
-		}).start(() => {
-			setAlertDisplay(false);
-		});
+		if (actions.length === 0) {
+			Animated.timing(animatedValue, {
+				duration: 1000,
+				easing: Easing.poly(8),
+				toValue: 0,
+				useNativeDriver: false
+			}).start(() => {
+				setAlertDisplay(false);
+			});
+		}
 		/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	}, [index]);
+
+	const renderActions = (action: Action): React.ReactElement => (
+		<Button
+			onlyText={true}
+			small={true}
+			title={action.text}
+			onPress={(): any => {
+				action.onClick();
+				setAlertDisplay(false);
+			}}
+		/>
+	);
+
 	if (alertDisplay) {
 		return (
 			<Animated.View style={{ ...styles.background, opacity: animatedValue }}>
 				<View style={styles.body}>
 					{title !== '' && <Text style={styles.textTitle}>{title}</Text>}
 					<Text style={styles.textMessage}>{message}</Text>
-					<Button title={'OK'} onPress={(): any => 0} />
+					<View style={styles.actionsContainer}>
+						{actions !== [] && actions.map(renderActions)}
+					</View>
 				</View>
 			</Animated.View>
 		);
@@ -55,10 +73,10 @@ export default function CustomAlert(): React.ReactElement {
 }
 
 const styles = StyleSheet.create({
+	actionsContainer: {},
 	background: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		padding: 20,
 		position: 'absolute',
 		top: 80,
 		width: '100%',
@@ -66,11 +84,11 @@ const styles = StyleSheet.create({
 	},
 	body: {
 		backgroundColor: colors.background.alert,
-		paddingHorizontal: 10,
+		paddingHorizontal: 20,
+		paddingVertical: 20,
 		width: '90%'
 	},
 	textMessage: {
-		paddingTop: 10,
 		...fontStyles.h2
 	},
 	textTitle: {
