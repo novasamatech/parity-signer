@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useContext } from 'react';
 
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { AlertStateContext } from 'stores/alertContext';
 import { Identity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore } from 'utils/HOC';
@@ -30,7 +31,7 @@ import {
 	validateDerivedPath
 } from 'utils/identitiesUtils';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';
-import { alertDeriveSuccess, alertPathDerivationError } from 'utils/alertUtils';
+import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
@@ -60,6 +61,7 @@ function PathDerivation({
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
 	const pathNameInput = useRef<TextInput>(null);
+	const { setAlert } = useContext(AlertStateContext);
 	const currentIdentity = accounts.state.currentIdentity;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
@@ -92,10 +94,10 @@ function PathDerivation({
 				keyPairsName,
 				password
 			);
-			alertDeriveSuccess();
+			setAlert('Success', 'New Account Successfully derived');
 			navigation.goBack();
 		} catch (error) {
-			alertPathDerivationError(error.message);
+			alertPathDerivationError(setAlert, error.message);
 		}
 	};
 

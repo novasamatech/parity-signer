@@ -16,7 +16,7 @@
 
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import testIDs from '../../test/e2e/testIDs';
@@ -24,6 +24,7 @@ import testIDs from '../../test/e2e/testIDs';
 import PathCard from './PathCard';
 import Separator from './Separator';
 
+import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import TouchableItem from 'components/TouchableItem';
 import fontStyles from 'styles/fontStyles';
@@ -57,6 +58,7 @@ export default function PathGroupCard({
 	accounts
 }: Props): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+	const { setAlert } = useContext(AlertStateContext);
 	const paths = pathGroup.paths;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
@@ -92,7 +94,7 @@ export default function PathGroupCard({
 				''
 			);
 		} catch (error) {
-			alertPathDerivationError(error.message);
+			alertPathDerivationError(setAlert, error.message);
 		}
 	};
 

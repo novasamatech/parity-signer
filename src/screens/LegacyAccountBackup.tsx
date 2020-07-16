@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NetworkProtocols, NETWORK_LIST } from 'constants/networkSpecs';
+import { AlertStateContext } from 'stores/alertContext';
 import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
@@ -57,6 +58,7 @@ function LegacyAccountBackup({
 	}, [navigation, accounts]);
 
 	const { navigate } = navigation;
+	const { setAlert } = useContext(AlertStateContext);
 	const isNew = route.params?.isNew ?? false;
 	const {
 		address,
@@ -86,9 +88,15 @@ function LegacyAccountBackup({
 						// only allow the copy of the recovery phrase in dev environment
 						if (__DEV__) {
 							if (protocol === NetworkProtocols.SUBSTRATE) {
-								alertCopyBackupPhrase(`${seedPhrase}${derivationPath}`);
+								alertCopyBackupPhrase(
+									setAlert,
+									`${seedPhrase}${derivationPath}`
+								);
 							} else {
-								alertCopyBackupPhrase(seedPhrase === '' ? seed : seedPhrase);
+								alertCopyBackupPhrase(
+									setAlert,
+									seedPhrase === '' ? seed : seedPhrase
+								);
 							}
 						}
 					}}
@@ -107,7 +115,7 @@ function LegacyAccountBackup({
 					<Button
 						title="Backup Done"
 						onPress={(): void => {
-							alertBackupDone(() => {
+							alertBackupDone(setAlert, () => {
 								navigate('AccountPin', { isNew });
 							});
 						}}

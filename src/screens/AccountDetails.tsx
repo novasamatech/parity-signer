@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
@@ -41,6 +42,7 @@ function AccountDetails({
 }: NavigationAccountProps<'AccountDetails'>): React.ReactElement {
 	const account = accounts.getSelected();
 	const selectedKey = accounts.getSelectedKey();
+	const { setAlert } = useContext(AlertStateContext);
 
 	if (!account) return <View />;
 
@@ -52,6 +54,7 @@ function AccountDetails({
 
 	const onDelete = (): void => {
 		alertDeleteLegacyAccount(
+			setAlert,
 			account.name || account.address || 'this account',
 			async () => {
 				await accounts.deleteAccount(selectedKey);

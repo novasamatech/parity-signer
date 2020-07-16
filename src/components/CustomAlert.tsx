@@ -20,6 +20,7 @@ import { StyleSheet, View, Animated, Text, Easing } from 'react-native';
 import Button from 'components/Button';
 import { Action, AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
+import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 
 export default function CustomAlert(): React.ReactElement {
@@ -49,10 +50,15 @@ export default function CustomAlert(): React.ReactElement {
 			small={true}
 			title={action.text}
 			onPress={(): any => {
-				action.onClick();
+				if (action.onPress) {
+					action.onPress();
+				}
 				setAlertDisplay(false);
 			}}
 			style={styles.button}
+			textStyles={
+				action.onPress ? styles.buttonBoldText : styles.buttonLightText
+			}
 		/>
 	);
 
@@ -62,19 +68,23 @@ export default function CustomAlert(): React.ReactElement {
 				<View style={styles.body}>
 					{title !== '' && <Text style={styles.textTitle}>{title}</Text>}
 					<Text style={styles.textMessage}>{message}</Text>
-					{actions !== [] && <View style={styles.actionsContainer}>
-						{actions.map(renderActions)}
-					</View>}
+					{actions !== [] && (
+						<View style={styles.actionsContainer}>
+							{actions.map(renderActions)}
+						</View>
+					)}
 				</View>
 			</Animated.View>
 		);
 	} else {
-		return null;
+		return <View />;
 	}
 }
 
 const styles = StyleSheet.create({
 	actionsContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-around',
 		marginTop: 20
 	},
 	background: {
@@ -93,6 +103,13 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		marginVertical: 0
+	},
+
+	buttonBoldText: {
+		fontFamily: fonts.robotoMonoMedium
+	},
+	buttonLightText: {
+		fontFamily: fonts.robotoMono
 	},
 	textMessage: {
 		...fontStyles.h2

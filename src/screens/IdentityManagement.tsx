@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
+import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
@@ -27,11 +28,7 @@ import {
 	navigateToLandingPage,
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
-import {
-	alertDeleteIdentity,
-	alertIdentityDeletionError,
-	alertRenamingError
-} from 'utils/alertUtils';
+import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
@@ -45,18 +42,20 @@ function IdentityManagement({
 }: Props): React.ReactElement {
 	const { currentIdentity } = accounts.state;
 	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
+	const { setAlert } = useContext(AlertStateContext);
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
 		try {
 			await accounts.updateIdentityName(name);
 		} catch (err) {
-			alertRenamingError(err.message);
+			alertError(setAlert, `Can't rename: ${err.message}`);
 		}
 	};
 
 	const onOptionSelect = async (value: string): Promise<void> => {
 		if (value === 'IdentityDelete') {
 			alertDeleteIdentity(
+				setAlert,
 				async (): Promise<void> => {
 					await unlockSeedPhrase(navigation, false);
 					try {
@@ -64,7 +63,7 @@ function IdentityManagement({
 						await accounts.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
 					} catch (err) {
-						alertIdentityDeletionError();
+						alertError(setAlert, "Can't delete Identity.");
 					}
 				}
 			);

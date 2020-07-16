@@ -15,13 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import { AlertStateContext } from 'stores/alertContext';
 // TODO use typescript 3.8's type import, Wait for prettier update.
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -40,7 +41,7 @@ import {
 	isSubstrateHardDerivedPath,
 	isSubstratePath
 } from 'utils/identitiesUtils';
-import { alertDeleteAccount, alertPathDeletionError } from 'utils/alertUtils';
+import { alertDeleteAccount, alertError } from 'utils/alertUtils';
 import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
@@ -64,6 +65,7 @@ export function PathDetailsView({
 	const { currentIdentity } = accounts.state;
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
+	const { setAlert } = useContext(AlertStateContext);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed(
 		isSeedRefValid
@@ -85,7 +87,7 @@ export function PathDetailsView({
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
 			case 'PathDelete':
-				alertDeleteAccount('this account', async () => {
+				alertDeleteAccount(setAlert, 'this account', async () => {
 					try {
 						await accounts.deletePath(path);
 						if (isSubstratePath(path)) {
@@ -101,7 +103,10 @@ export function PathDetailsView({
 							navigation.navigate('Main');
 						}
 					} catch (err) {
-						alertPathDeletionError(err);
+						alertError(
+							setAlert,
+							`Can't delete this account: ${err.toString()}`
+						);
 					}
 				});
 				break;

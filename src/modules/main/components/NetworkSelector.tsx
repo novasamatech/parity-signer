@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useMemo, useState } from 'react';
+import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -27,6 +27,7 @@ import {
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import {
 	isEthereumNetworkParams,
@@ -65,6 +66,8 @@ export default function NetworkSelector({
 	const { identities, currentIdentity } = accounts.state;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
+
+	const { setAlert } = useContext(AlertStateContext);
 	// catch android back button and prevent exiting the app
 	useFocusEffect(
 		React.useCallback((): any => {
@@ -129,7 +132,7 @@ export default function NetworkSelector({
 			);
 			navigateToPathDetails(navigation, networkKey, fullPath);
 		} catch (error) {
-			alertPathDerivationError(error.message);
+			alertPathDerivationError(setAlert, error.message);
 		}
 	};
 
@@ -150,7 +153,7 @@ export default function NetworkSelector({
 			);
 			navigateToPathDetails(navigation, networkKey, fullPath);
 		} catch (error) {
-			alertPathDerivationError(error.message);
+			alertPathDerivationError(setAlert, error.message);
 		}
 	};
 
@@ -163,7 +166,7 @@ export default function NetworkSelector({
 			);
 			navigateToPathsList(navigation, networkKey);
 		} catch (e) {
-			alertPathDerivationError(e.message);
+			alertPathDerivationError(setAlert, e.message);
 		}
 	};
 

@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
+import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
@@ -42,6 +43,7 @@ function IdentityBackup({
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
+	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
@@ -51,7 +53,7 @@ function IdentityBackup({
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
-			alertIdentityCreationError(e.message);
+			alertIdentityCreationError(setAlert, e.message);
 		}
 	};
 
@@ -102,7 +104,7 @@ function IdentityBackup({
 				onPress={(): void => {
 					// only allow the copy of the recovery phrase in dev environment
 					if (__DEV__) {
-						alertCopyBackupPhrase(seedPhrase);
+						alertCopyBackupPhrase(setAlert, seedPhrase);
 					}
 				}}
 			>
@@ -117,7 +119,7 @@ function IdentityBackup({
 				<Button
 					title={'Next'}
 					testID={testIDs.IdentityBackup.nextButton}
-					onPress={(): void => alertBackupDone(onBackupDone)}
+					onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
 					aboveKeyboard
 				/>
 			)}

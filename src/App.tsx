@@ -83,22 +83,22 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<SeedRefStore>
-				<UnstatedProvider>
-					<MenuProvider backHandler={true}>
-						<StatusBar
-							barStyle="light-content"
-							backgroundColor={colors.background.app}
-						/>
-						<GlobalStateContext.Provider value={globalContext}>
-							<AlertStateContext.Provider value={alertContext}>
+			<UnstatedProvider>
+				<SeedRefStore>
+					<GlobalStateContext.Provider value={globalContext}>
+						<AlertStateContext.Provider value={alertContext}>
+							<MenuProvider backHandler={true}>
+								<StatusBar
+									barStyle="light-content"
+									backgroundColor={colors.background.app}
+								/>
 								<CustomAlert />
 								<NavigationContainer>{renderStacks()}</NavigationContainer>
-							</AlertStateContext.Provider>
-						</GlobalStateContext.Provider>
-					</MenuProvider>
-				</UnstatedProvider>
-			</SeedRefStore>
+							</MenuProvider>
+						</AlertStateContext.Provider>
+					</GlobalStateContext.Provider>
+				</SeedRefStore>
+			</UnstatedProvider>
 		</SafeAreaProvider>
 	);
 }

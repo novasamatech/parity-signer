@@ -18,11 +18,12 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
+import { AlertStateContext } from 'stores/alertContext';
 import RegistriesStore from 'stores/RegistriesStore';
 import colors from 'styles/colors';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
@@ -55,6 +56,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
 		const [tip, setTip] = useState<string>();
 		const [useFallback, setUseFallBack] = useState(false);
+		const { setAlert } = useContext(AlertStateContext);
 		const prefix = SUBSTRATE_NETWORK_LIST[networkKey].prefix;
 
 		useEffect(() => {
@@ -113,7 +115,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 					formatArgs(call, methodArgs, 0);
 					setFormattedCallArgs(methodArgs);
 				} catch (e) {
-					alertDecodeError();
+					alertDecodeError(setAlert);
 					setUseFallBack(true);
 				}
 			}
@@ -128,7 +130,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			if (label === 'Tip' && !fallback) {
 				setTip(formatBalance(value as any));
 			}
-		}, [fallback, label, prefix, value, networkKey, registriesStore]);
+		}, [fallback, label, prefix, value, networkKey, registriesStore, setAlert]);
 
 		const renderEraDetails = (): React.ReactElement => {
 			if (period && phase) {
