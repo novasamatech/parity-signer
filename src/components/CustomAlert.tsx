@@ -52,6 +52,7 @@ export default function CustomAlert(): React.ReactElement {
 				action.onClick();
 				setAlertDisplay(false);
 			}}
+			style={styles.button}
 		/>
 	);
 
@@ -61,9 +62,9 @@ export default function CustomAlert(): React.ReactElement {
 				<View style={styles.body}>
 					{title !== '' && <Text style={styles.textTitle}>{title}</Text>}
 					<Text style={styles.textMessage}>{message}</Text>
-					<View style={styles.actionsContainer}>
-						{actions !== [] && actions.map(renderActions)}
-					</View>
+					{actions !== [] && <View style={styles.actionsContainer}>
+						{actions.map(renderActions)}
+					</View>}
 				</View>
 			</Animated.View>
 		);
@@ -73,7 +74,9 @@ export default function CustomAlert(): React.ReactElement {
 }
 
 const styles = StyleSheet.create({
-	actionsContainer: {},
+	actionsContainer: {
+		marginTop: 20
+	},
 	background: {
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -88,11 +91,14 @@ const styles = StyleSheet.create({
 		paddingVertical: 20,
 		width: '90%'
 	},
+	button: {
+		marginVertical: 0
+	},
 	textMessage: {
 		...fontStyles.h2
 	},
 	textTitle: {
-		paddingTop: 10,
+		paddingVertical: 10,
 		...fontStyles.h1
 	}
 });
