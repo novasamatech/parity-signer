@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { RouteProp } from '@react-navigation/native';
-import React from 'react';
+import React, {useContext} from 'react';
 import { View } from 'react-native';
+import {AccountsContext} from 'stores/AccountsContext';
 import { Subscribe } from 'unstated';
 
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
@@ -113,10 +114,11 @@ interface UnlockScreenProps {
 
 export function withTargetIdentity<T extends UnlockScreenProps>(
 	WrappedComponent: React.ComponentType<T>
-): React.ComponentType<T & { accounts: AccountsStore }> {
+): React.ComponentType<T> {
+	const accounts = useContext(AccountsContext);
 	return (props): React.ReactElement => {
 		const targetIdentity =
-			props.route.params.identity ?? props.accounts.state.currentIdentity;
+			props.route.params.identity ?? accounts.state.currentIdentity;
 		if (!targetIdentity) return <View />;
 		return <WrappedComponent {...props} targetIdentity={targetIdentity} />;
 	};

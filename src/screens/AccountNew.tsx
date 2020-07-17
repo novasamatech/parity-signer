@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useReducer } from 'react';
+import React, {useContext, useEffect, useReducer} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import {AccountsContext} from 'stores/AccountsContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';
@@ -30,7 +31,6 @@ import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
 import fonts from 'styles/fonts';
 import { emptyAccount, validateSeed } from 'utils/account';
-import { withAccountStore } from 'utils/HOC';
 import { constructSURI } from 'utils/suri';
 import fontStyles from 'styles/fontStyles';
 
@@ -43,10 +43,10 @@ interface State {
 	newAccount?: Account;
 }
 
-function AccountNew({
-	accounts,
+export default function AccountNew({
 	navigation
 }: NavigationAccountProps<'AccountNew'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -190,8 +190,6 @@ function AccountNew({
 		</KeyboardScrollView>
 	);
 }
-
-export default withAccountStore(AccountNew);
 
 const styles = StyleSheet.create({
 	body: {

@@ -28,7 +28,6 @@ export type FocusListener = (
 export interface NavigationAccountProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
-	accounts: AccountsStore;
 }
 
 export interface NavigationAccountIdentityProps<

@@ -19,7 +19,7 @@ import 'utils/iconLoader';
 import * as React from 'react';
 import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { Provider as UnstatedProvider } from 'unstated';
+import {useAccountContext, AccountsContext} from 'stores/AccountsContext';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
@@ -61,6 +61,7 @@ export default function App(props: AppProps): React.ReactElement {
 	const alertContext = useAlertContext();
 	const globalContext: GlobalState = useGlobalStateContext();
 	const seedRefContext = useSeedRefStore();
+	const accountsContext = useAccountContext();
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
@@ -84,23 +85,22 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
+			<AccountsContext.Provider value={accountsContext}>
 					<GlobalStateContext.Provider value={globalContext}>
 						<AlertStateContext.Provider value={alertContext}>
 							<SeedRefsContext.Provider value={seedRefContext}>
-							<UnstatedProvider>
 								<MenuProvider backHandler={true}>
 									<StatusBar
 										barStyle="light-content"
 										backgroundColor={colors.background.app}
 									/>
 									<CustomAlert />
-
 									<NavigationContainer>{renderStacks()}</NavigationContainer>
 								</MenuProvider>
-							</UnstatedProvider>
 							</SeedRefsContext.Provider>
 						</AlertStateContext.Provider>
 					</GlobalStateContext.Provider>
+			</AccountsContext.Provider>
 		</SafeAreaProvider>
 	);
 }

@@ -14,17 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, {useContext} from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import AccountCard from 'components/AccountCard';
 import TextInput from 'components/TextInput';
+import {AccountsContext, AccountsContextState} from 'stores/AccountsContext';
 import AccountsStore from 'stores/AccountsStore';
-import { withAccountStore } from 'utils/HOC';
 
 const onNameInput = async (
-	accounts: AccountsStore,
+	accounts: AccountsContextState,
 	name: string
 ): Promise<void> => {
 	await accounts.updateSelectedAccount({ name });
@@ -32,11 +32,10 @@ const onNameInput = async (
 	await accounts.save(accounts.getSelectedKey(), selectedAccount);
 };
 
-function AccountEdit({
-	accounts
+export default function AccountEdit({
 }: {
-	accounts: AccountsStore;
 }): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const selectedAccount = accounts.getSelected()!;
 	if (!selectedAccount) {
 		return <ScrollView bounces={false} style={styles.body} />;
@@ -61,8 +60,6 @@ function AccountEdit({
 		</SafeAreaScrollViewContainer>
 	);
 }
-
-export default withAccountStore(AccountEdit);
 
 const styles = StyleSheet.create({
 	body: {

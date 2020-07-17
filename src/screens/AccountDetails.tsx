@@ -19,6 +19,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import {AccountsContext} from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
@@ -31,15 +32,14 @@ import {
 } from 'utils/navigationHelpers';
 import fontStyles from 'styles/fontStyles';
 import { UnknownAccountWarning } from 'components/Warnings';
-import { withAccountStore } from 'utils/HOC';
 import AccountIcon from 'components/AccountIcon';
 import { NavigationAccountProps } from 'types/props';
 import QrScannerTab from 'components/QrScannerTab';
 
-function AccountDetails({
-	accounts,
+export default function AccountDetails({
 	navigation
 }: NavigationAccountProps<'AccountDetails'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const account = accounts.getSelected();
 	const selectedKey = accounts.getSelectedKey();
 	const { setAlert } = useContext(AlertStateContext);
@@ -128,8 +128,6 @@ function AccountDetails({
 		</SafeAreaViewContainer>
 	);
 }
-
-export default withAccountStore(AccountDetails);
 
 const styles = StyleSheet.create({
 	body: {
