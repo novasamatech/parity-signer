@@ -31,7 +31,7 @@ import {
 } from './screens';
 
 import CustomAlert from 'components/CustomAlert';
-import { SeedRefStore } from 'stores/SeedRefStore';
+import {SeedRefsContext, useSeedRefStore} from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
@@ -60,6 +60,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const alertContext = useAlertContext();
 	const globalContext: GlobalState = useGlobalStateContext();
+	const seedRefContext = useSeedRefStore();
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
@@ -83,22 +84,23 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<UnstatedProvider>
-				<SeedRefStore>
 					<GlobalStateContext.Provider value={globalContext}>
 						<AlertStateContext.Provider value={alertContext}>
-							<MenuProvider backHandler={true}>
-								<StatusBar
-									barStyle="light-content"
-									backgroundColor={colors.background.app}
-								/>
-								<CustomAlert />
-								<NavigationContainer>{renderStacks()}</NavigationContainer>
-							</MenuProvider>
+							<SeedRefsContext.Provider value={seedRefContext}>
+							<UnstatedProvider>
+								<MenuProvider backHandler={true}>
+									<StatusBar
+										barStyle="light-content"
+										backgroundColor={colors.background.app}
+									/>
+									<CustomAlert />
+
+									<NavigationContainer>{renderStacks()}</NavigationContainer>
+								</MenuProvider>
+							</UnstatedProvider>
+							</SeedRefsContext.Provider>
 						</AlertStateContext.Provider>
 					</GlobalStateContext.Provider>
-				</SeedRefStore>
-			</UnstatedProvider>
 		</SafeAreaProvider>
 	);
 }

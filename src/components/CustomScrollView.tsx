@@ -74,7 +74,9 @@ export default class CustomScrollView extends React.PureComponent<
 					scrollEventThrottle={16}
 					onScroll={Animated.event([
 						{ nativeEvent: { contentOffset: { y: this.state.indicator } } }
-					])}
+					], {
+						useNativeDriver: false
+					})}
 					{...this.props}
 				>
 					{this.props.children}

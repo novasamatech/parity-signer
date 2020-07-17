@@ -44,10 +44,11 @@ export default function CustomAlert(): React.ReactElement {
 		/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	}, [index]);
 
-	const renderActions = (action: Action): React.ReactElement => (
+	const renderActions = (action: Action, index: number): React.ReactElement => (
 		<Button
 			onlyText={true}
 			small={true}
+			key={'alert' + index}
 			title={action.text}
 			onPress={(): any => {
 				if (action.onPress) {

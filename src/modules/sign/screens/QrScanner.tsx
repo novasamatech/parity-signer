@@ -21,7 +21,7 @@ import { RNCamera } from 'react-native-camera';
 import Button from 'components/Button';
 import { processBarCode } from 'modules/sign/utils';
 import { onMockBarCodeRead } from 'e2e/injections';
-import { SeedRefsContext } from 'stores/SeedRefStore';
+import { SeedRefsState } from 'stores/SeedRefStore';
 import { NavigationAccountScannerProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -42,7 +42,7 @@ export function Scanner({
 	accounts,
 	scannerStore
 }: NavigationAccountScannerProps<'QrScanner'>): React.ReactElement {
-	const [seedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
+	const [seedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
 	const [multiFrames, setMultiFrames] = useState<Frames>({
