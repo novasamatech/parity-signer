@@ -14,14 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import AccountCard from 'components/AccountCard';
 import TextInput from 'components/TextInput';
-import {AccountsContext, AccountsContextState} from 'stores/AccountsContext';
-import AccountsStore from 'stores/AccountsStore';
+import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
 
 const onNameInput = async (
 	accounts: AccountsContextState,
@@ -32,9 +31,7 @@ const onNameInput = async (
 	await accounts.save(accounts.getSelectedKey(), selectedAccount);
 };
 
-export default function AccountEdit({
-}: {
-}): React.ReactElement {
+export default function AccountEdit({}: {}): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const selectedAccount = accounts.getSelected()!;
 	if (!selectedAccount) {

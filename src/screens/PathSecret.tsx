@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 
 import ScreenHeading from 'components/ScreenHeading';
@@ -23,8 +23,9 @@ import QrView from 'components/QrView';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { PasswordedAccountExportWarning } from 'components/Warnings';
 import testIDs from 'e2e/testIDs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
+import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey, getPathName } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
@@ -76,4 +77,4 @@ function PathSecret({
 	);
 }
 
-export default withAccountStore(withCurrentIdentity(PathSecret));
+export default withCurrentIdentity(PathSecret);

@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { Subscribe } from 'unstated';
 
+import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -37,11 +38,8 @@ export class AccountUnlockAndSign extends React.PureComponent<
 		const next = route.params.next ?? 'SignedTx';
 
 		return (
-			<Subscribe to={[AccountsStore, ScannerStore]}>
-				{(
-					accounts: AccountsStore,
-					scannerStore: ScannerStore
-				): React.ReactElement => (
+			<Subscribe to={[ScannerStore]}>
+				{(scannerStore: ScannerStore): React.ReactElement => (
 					<AccountUnlockView
 						{...this.props}
 						checkPin={async (pin: string): Promise<boolean> => {
@@ -71,48 +69,39 @@ export class AccountUnlockAndSign extends React.PureComponent<
 	}
 }
 
-export class AccountUnlock extends React.PureComponent<
-	NavigationProps<'AccountUnlock'>
-> {
-	render(): React.ReactElement {
-		const { navigation, route } = this.props;
-		const next = route.params.next ?? 'LegacyAccountList';
-		const onDelete = route.params.onDelete ?? ((): any => null);
+export function AccountUnlock({
+	navigation,
+	route
+}: NavigationProps<'AccountUnlock'>): React.ReactElement {
+	const next = route.params.next ?? 'LegacyAccountList';
+	const onDelete = route.params.onDelete ?? ((): any => null);
+	const accounts = useContext(AccountsContext);
 
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{(accounts: AccountsStore): React.ReactElement => (
-					<AccountUnlockView
-						{...this.props}
-						checkPin={async (pin: string): Promise<boolean> => {
-							return await accounts.unlockAccount(
-								accounts.getSelectedKey(),
-								pin
-							);
-						}}
-						navigate={(): void => {
-							if (next === 'AccountDelete') {
-								navigation.goBack();
-								onDelete();
-							} else {
-								const resetAction = CommonActions.reset({
-									index: 2,
-									routes: [
-										{
-											name: 'LegacyAccountList'
-										},
-										{ name: 'AccountDetails' },
-										{ name: next }
-									]
-								});
-								this.props.navigation.dispatch(resetAction);
-							}
-						}}
-					/>
-				)}
-			</Subscribe>
-		);
-	}
+	return (
+		<AccountUnlockView
+			checkPin={async (pin: string): Promise<boolean> => {
+				return await accounts.unlockAccount(accounts.getSelectedKey(), pin);
+			}}
+			navigate={(): void => {
+				if (next === 'AccountDelete') {
+					navigation.goBack();
+					onDelete();
+				} else {
+					const resetAction = CommonActions.reset({
+						index: 2,
+						routes: [
+							{
+								name: 'LegacyAccountList'
+							},
+							{ name: 'AccountDetails' },
+							{ name: next }
+						]
+					});
+					navigation.dispatch(resetAction);
+				}
+			}}
+		/>
+	);
 }
 
 interface AccountUnlockViewProps {

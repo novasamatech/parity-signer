@@ -15,10 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 //Deprecated
-import React, { useReducer } from 'react';
+import React, { useContext, useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
+import { AccountsContext } from 'stores/AccountsContext';
 import fontStyles from 'styles/fontStyles';
 import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
@@ -26,7 +27,6 @@ import Button from 'components/Button';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
 import fonts from 'styles/fonts';
-import { withAccountStore } from 'utils/HOC';
 import { navigateToLegacyAccountList } from 'utils/navigationHelpers';
 
 interface State {
@@ -37,10 +37,10 @@ interface State {
 	pinTooShort: boolean;
 }
 function AccountPin({
-	accounts,
 	navigation,
 	route
 }: NavigationAccountProps<'AccountPin'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -155,7 +155,7 @@ function PinInput(props: any): React.ReactElement {
 	);
 }
 
-export default withAccountStore(AccountPin);
+export default AccountPin;
 
 const styles = StyleSheet.create({
 	body: {

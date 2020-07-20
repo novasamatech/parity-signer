@@ -19,7 +19,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
-import {AccountsContext} from 'stores/AccountsContext';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';

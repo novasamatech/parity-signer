@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { Subscribe } from 'unstated';
 
+import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import {
 	NETWORK_LIST,
@@ -25,84 +25,65 @@ import {
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
 import { NetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountProps, NavigationProps } from 'types/props';
+import { NavigationAccountProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import TouchableItem from 'components/TouchableItem';
-import AccountsStore from 'stores/AccountsStore';
 import { emptyAccount } from 'utils/account';
 
-export default class LegacyNetworkChooser extends React.PureComponent<
-	NavigationProps<'LegacyNetworkChooser'>,
-	{}
-> {
-	render(): React.ReactElement {
-		return (
-			<Subscribe to={[AccountsStore]}>
-				{(accounts: AccountsStore): React.ReactElement => (
-					<LegacyNetworkChooserView {...this.props} accounts={accounts} />
-				)}
-			</Subscribe>
-		);
+export default function LegacyNetworkChooserView({
+	navigation
+}: NavigationAccountProps<'LegacyNetworkChooser'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
+	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
+
+	if (!__DEV__) {
+		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 	}
-}
 
-class LegacyNetworkChooserView extends React.PureComponent<
-	NavigationAccountProps<'LegacyNetworkChooser'>,
-	{}
-> {
-	render(): React.ReactElement {
-		const { navigation, accounts } = this.props;
-		const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
-
-		if (!__DEV__) {
-			excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-			excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-		}
-
-		return (
-			<SafeAreaScrollViewContainer contentContainerStyle={{ padding: 20 }}>
-				<Text style={styles.title}>CHOOSE NETWORK</Text>
-				{Object.entries(NETWORK_LIST)
-					.filter(
-						([networkKey]: [string, any]): boolean =>
-							!excludedNetworks.includes(networkKey)
-					)
-					.map(
-						([networkKey, networkParams]: [
-							string,
-							NetworkParams
-						]): React.ReactElement => (
-							<TouchableItem
-								key={networkKey}
+	return (
+		<SafeAreaScrollViewContainer contentContainerStyle={{ padding: 20 }}>
+			<Text style={styles.title}>CHOOSE NETWORK</Text>
+			{Object.entries(NETWORK_LIST)
+				.filter(
+					([networkKey]: [string, any]): boolean =>
+						!excludedNetworks.includes(networkKey)
+				)
+				.map(
+					([networkKey, networkParams]: [
+						string,
+						NetworkParams
+					]): React.ReactElement => (
+						<TouchableItem
+							key={networkKey}
+							style={[
+								styles.card,
+								{
+									backgroundColor: networkParams.color,
+									marginTop: 20
+								}
+							]}
+							onPress={(): void => {
+								accounts.updateNew(emptyAccount('', networkKey));
+								navigation.goBack();
+							}}
+						>
+							<Text
 								style={[
-									styles.card,
+									styles.cardText,
 									{
-										backgroundColor: networkParams.color,
-										marginTop: 20
+										color: networkParams.secondaryColor
 									}
 								]}
-								onPress={(): void => {
-									accounts.updateNew(emptyAccount('', networkKey));
-									navigation.goBack();
-								}}
 							>
-								<Text
-									style={[
-										styles.cardText,
-										{
-											color: networkParams.secondaryColor
-										}
-									]}
-								>
-									{networkParams.title}
-								</Text>
-							</TouchableItem>
-						)
-					)}
-			</SafeAreaScrollViewContainer>
-		);
-	}
+								{networkParams.title}
+							</Text>
+						</TouchableItem>
+					)
+				)}
+		</SafeAreaScrollViewContainer>
+	);
 }
 
 const styles = StyleSheet.create({

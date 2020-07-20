@@ -18,7 +18,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import strings from 'modules/sign/strings';
-import AccountsStore from 'stores/AccountsStore';
+import { AccountsContextState } from 'stores/AccountsContext';
 import ScannerStore from 'stores/ScannerStore';
 import { FoundIdentityAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
@@ -48,7 +48,7 @@ export async function processBarCode(
 	showErrorMessage: (title: string, message: string) => void,
 	txRequestData: TxRequestData,
 	navigation: StackNavigationProp<RootStackParamList, 'QrScanner'>,
-	accounts: AccountsStore,
+	accounts: AccountsContextState,
 	scannerStore: ScannerStore,
 	seedRefs: Map<string, SeedRefClass>
 ): Promise<void> {

@@ -14,19 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 
 import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import OnBoardingView from 'modules/main/components/OnBoading';
 import NetworkSelector from 'modules/main/components/NetworkSelector';
-import {AccountsContext} from 'stores/AccountsContext';
+import { AccountsContext } from 'stores/AccountsContext';
 import {
 	NavigationAccountIdentityProps,
 	NavigationAccountProps
 } from 'types/props';
 
-function Main(props: NavigationAccountProps<'Main'>): React.ReactElement {
+export default function Main(
+	props: NavigationAccountProps<'Main'>
+): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const { identities, currentIdentity, loaded } = accounts.state;
 	const hasLegacyAccount = accounts.getAccounts().size !== 0;

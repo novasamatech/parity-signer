@@ -27,6 +27,7 @@ import {
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import {
@@ -37,6 +38,7 @@ import {
 } from 'types/networkSpecsTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
+import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToPathDetails,
@@ -56,7 +58,7 @@ if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 }
 
-export default function NetworkSelector({
+function NetworkSelector({
 	accounts,
 	navigation,
 	route
@@ -278,3 +280,5 @@ export default function NetworkSelector({
 		</SafeAreaViewContainer>
 	);
 }
+
+export default withCurrentIdentity(NetworkSelector);

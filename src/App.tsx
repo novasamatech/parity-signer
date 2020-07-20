@@ -19,7 +19,6 @@ import 'utils/iconLoader';
 import * as React from 'react';
 import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import {useAccountContext, AccountsContext} from 'stores/AccountsContext';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
@@ -30,8 +29,9 @@ import {
 	ScreenStack
 } from './screens';
 
+import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import CustomAlert from 'components/CustomAlert';
-import {SeedRefsContext, useSeedRefStore} from 'stores/SeedRefStore';
+import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
@@ -86,20 +86,20 @@ export default function App(props: AppProps): React.ReactElement {
 	return (
 		<SafeAreaProvider>
 			<AccountsContext.Provider value={accountsContext}>
-					<GlobalStateContext.Provider value={globalContext}>
-						<AlertStateContext.Provider value={alertContext}>
-							<SeedRefsContext.Provider value={seedRefContext}>
-								<MenuProvider backHandler={true}>
-									<StatusBar
-										barStyle="light-content"
-										backgroundColor={colors.background.app}
-									/>
-									<CustomAlert />
-									<NavigationContainer>{renderStacks()}</NavigationContainer>
-								</MenuProvider>
-							</SeedRefsContext.Provider>
-						</AlertStateContext.Provider>
-					</GlobalStateContext.Provider>
+				<GlobalStateContext.Provider value={globalContext}>
+					<AlertStateContext.Provider value={alertContext}>
+						<SeedRefsContext.Provider value={seedRefContext}>
+							<MenuProvider backHandler={true}>
+								<StatusBar
+									barStyle="light-content"
+									backgroundColor={colors.background.app}
+								/>
+								<CustomAlert />
+								<NavigationContainer>{renderStacks()}</NavigationContainer>
+							</MenuProvider>
+						</SeedRefsContext.Provider>
+					</AlertStateContext.Provider>
+				</GlobalStateContext.Provider>
 			</AccountsContext.Provider>
 		</SafeAreaProvider>
 	);

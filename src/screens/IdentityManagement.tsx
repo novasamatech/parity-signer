@@ -15,13 +15,17 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NavigationAccountIdentityProps } from 'types/props';
-import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
+import {
+	NavigationAccountIdentityProps,
+	NavigationAccountProps
+} from 'types/props';
+import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
 	unlockAndReturnSeed,
@@ -41,8 +45,9 @@ function IdentityManagement({
 	navigation
 }: Props): React.ReactElement {
 	const { currentIdentity } = accounts.state;
-	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 	const { setAlert } = useContext(AlertStateContext);
+	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
+	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
 		try {
@@ -106,7 +111,7 @@ function IdentityManagement({
 	);
 }
 
-export default withAccountStore(withCurrentIdentity(IdentityManagement));
+export default withCurrentIdentity(IdentityManagement);
 
 const styles = StyleSheet.create({
 	deleteText: {

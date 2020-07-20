@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, {useContext, useEffect, useReducer} from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
-import {AccountsContext} from 'stores/AccountsContext';
+import { AccountsContext } from 'stores/AccountsContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkSpecsTypes';
 import { NavigationAccountProps } from 'types/props';

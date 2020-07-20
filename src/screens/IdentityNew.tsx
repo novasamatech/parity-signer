@@ -19,13 +19,13 @@ import { StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountProps } from 'types/props';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
-import { withAccountStore } from 'utils/HOC';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
@@ -40,10 +40,10 @@ import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityNew({
-	accounts,
 	navigation,
 	route
 }: NavigationAccountProps<'IdentityNew'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
@@ -176,7 +176,7 @@ function IdentityNew({
 	);
 }
 
-export default withAccountStore(IdentityNew);
+export default IdentityNew;
 
 const styles = StyleSheet.create({
 	body: {

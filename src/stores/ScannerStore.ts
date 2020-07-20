@@ -24,8 +24,8 @@ import {
 } from '@polkadot/util';
 import { Container } from 'unstated';
 
+import { AccountsContextState } from 'stores/AccountsContext';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
-import AccountsStore from 'stores/AccountsStore';
 import { Account, FoundAccount } from 'types/identityTypes';
 import {
 	CompletedParsedData,
@@ -242,7 +242,7 @@ export default class ScannerStore extends Container<ScannerState> {
 		}
 	}
 
-	async setData(accountsStore: AccountsStore): Promise<boolean | void> {
+	async setData(accountsStore: AccountsContextState): Promise<boolean | void> {
 		const { unsignedData } = this.state;
 		if (!isMultipartData(unsignedData) && unsignedData !== null) {
 			switch (unsignedData.action) {
@@ -262,7 +262,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	async setDataToSign(
 		signRequest: SubstrateMessageParsedData | EthereumParsedData,
-		accountsStore: AccountsStore
+		accountsStore: AccountsContextState
 	): Promise<boolean> {
 		this.setBusy();
 
@@ -305,7 +305,7 @@ export default class ScannerStore extends Container<ScannerState> {
 
 	async setTXRequest(
 		txRequest: EthereumParsedData | SubstrateTransactionParsedData,
-		accountsStore: AccountsStore
+		accountsStore: AccountsContextState
 	): Promise<boolean> {
 		this.setBusy();
 

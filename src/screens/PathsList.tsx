@@ -31,7 +31,7 @@ import {
 	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
+import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths
@@ -128,4 +128,4 @@ function PathsList({
 	);
 }
 
-export default withAccountStore(withCurrentIdentity(PathsList));
+export default withCurrentIdentity(PathsList);

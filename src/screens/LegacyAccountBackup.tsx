@@ -19,6 +19,7 @@ import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NetworkProtocols, NETWORK_LIST } from 'constants/networkSpecs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationAccountProps } from 'types/props';
@@ -30,14 +31,13 @@ import Button from 'components/Button';
 import ScreenHeading from 'components/ScreenHeading';
 import TouchableItem from 'components/TouchableItem';
 import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
-import { withAccountStore } from 'utils/HOC';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 function LegacyAccountBackup({
-	accounts,
 	navigation,
 	route
 }: NavigationAccountProps<'LegacyAccountBackup'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
 			if (nextAppState === 'inactive') {
@@ -126,7 +126,7 @@ function LegacyAccountBackup({
 	);
 }
 
-export default withAccountStore(LegacyAccountBackup);
+export default LegacyAccountBackup;
 
 const styles = StyleSheet.create({
 	body: {

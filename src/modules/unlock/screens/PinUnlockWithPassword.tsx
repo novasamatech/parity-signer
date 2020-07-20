@@ -105,4 +105,4 @@ function PinUnlockWithPassword({
 	);
 }
 
-export default  withTargetIdentity(PinUnlockWithPassword);
+export default withTargetIdentity(PinUnlockWithPassword);

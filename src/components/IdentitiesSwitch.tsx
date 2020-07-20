@@ -15,17 +15,16 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {AccountsContext, useAccountContext} from 'stores/AccountsContext';
 
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
+import { AccountsContext, useAccountContext } from 'stores/AccountsContext';
 import { RootStackParamList } from 'types/routes';
-import AccountsStore from 'stores/AccountsStore';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -46,9 +45,7 @@ function ButtonWithArrow(props: {
 	return <ButtonIcon {...props} {...i_arrowOptions} />;
 }
 
-function IdentitiesSwitch({
-}: {
-}): React.ReactElement {
+function IdentitiesSwitch({}: {}): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);

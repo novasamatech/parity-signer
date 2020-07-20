@@ -19,6 +19,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountProps } from 'types/props';
 import { words } from 'utils/native';
@@ -26,7 +27,6 @@ import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
-import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
 import {
 	alertBackupDone,
@@ -38,9 +38,9 @@ import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({
 	navigation,
-	accounts,
 	route
 }: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
 	const { setAlert } = useContext(AlertStateContext);
@@ -127,7 +127,7 @@ function IdentityBackup({
 	);
 }
 
-export default withAccountStore(IdentityBackup);
+export default IdentityBackup;
 
 const styles = StyleSheet.create({
 	body: {

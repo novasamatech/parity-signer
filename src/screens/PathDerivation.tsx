@@ -15,14 +15,15 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef, useState, useMemo, useContext } from 'react';
+import { View } from 'react-native';
 
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { Identity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withAccountStore } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
 	extractPathId,
@@ -52,10 +53,10 @@ function getParentNetworkKey(
 }
 
 function PathDerivation({
-	accounts,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathDerivation'>): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const [derivationPath, setDerivationPath] = useState<string>('');
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -63,6 +64,7 @@ function PathDerivation({
 	const pathNameInput = useRef<TextInput>(null);
 	const { setAlert } = useContext(AlertStateContext);
 	const currentIdentity = accounts.state.currentIdentity;
+	if (!currentIdentity) return <View />;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
 	);
@@ -147,7 +149,7 @@ function PathDerivation({
 				onSubmitEditing={onPathDerivation}
 			/>
 			<PathCard
-				identity={accounts.state.currentIdentity}
+				identity={accounts.state.currentIdentity!}
 				isPathValid={isPathValid}
 				name={keyPairsName}
 				path={password === '' ? completePath : `${completePath}///${password}`}
@@ -170,4 +172,4 @@ function PathDerivation({
 	);
 }
 
-export default withAccountStore(PathDerivation);
+export default PathDerivation;

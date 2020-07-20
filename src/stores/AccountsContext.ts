@@ -1,21 +1,30 @@
+import { default as React, useEffect, useReducer } from 'react';
+
 import {
 	ETHEREUM_NETWORK_LIST,
 	NetworkProtocols,
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
-import {default as React, useEffect, useReducer} from 'react';
-import {defaultGlobalState} from 'stores/globalStateContext';
+import { defaultGlobalState } from 'stores/globalStateContext';
 import {
 	Account,
-	AccountsStoreState, FoundAccount, FoundIdentityAccount,
+	AccountsStoreState,
+	FoundAccount,
+	FoundIdentityAccount,
 	Identity,
 	isUnlockedAccount,
 	LockedAccount,
 	UnlockedAccount
 } from 'types/identityTypes';
-import {emptyAccount, generateAccountId} from 'utils/account';
-import {deleteAccount as deleteDbAccount, loadAccounts, loadIdentities, saveAccount, saveIdentities} from 'utils/db';
+import { emptyAccount, generateAccountId } from 'utils/account';
+import {
+	deleteAccount as deleteDbAccount,
+	loadAccounts,
+	loadIdentities,
+	saveAccount,
+	saveIdentities
+} from 'utils/db';
 import {
 	accountExistedError,
 	addressGenerateError,
@@ -27,13 +36,23 @@ import {
 	deepCopyIdentities,
 	deepCopyIdentity,
 	emptyIdentity,
-	extractAddressFromAccountId, getAddressKeyByPath, getNetworkKey,
+	extractAddressFromAccountId,
+	getAddressKeyByPath,
+	getNetworkKey,
 	isEthereumAccountId,
 	parseFoundLegacyAccount
 } from 'utils/identitiesUtils';
-import {brainWalletAddressWithRef, decryptData, encryptData} from 'utils/native';
-import {CreateSeedRefWithNewSeed, TryBrainWalletAddress, TrySubstrateAddress} from 'utils/seedRefHooks';
-import {constructSuriSuffix, parseSURI} from 'utils/suri';
+import {
+	brainWalletAddressWithRef,
+	decryptData,
+	encryptData
+} from 'utils/native';
+import {
+	CreateSeedRefWithNewSeed,
+	TryBrainWalletAddress,
+	TrySubstrateAddress
+} from 'utils/seedRefHooks';
+import { constructSuriSuffix, parseSURI } from 'utils/suri';
 
 export type AccountsContextState = {
 	state: AccountsStoreState;
@@ -53,7 +72,7 @@ export type AccountsContextState = {
 	getAccountByAddress: any;
 	getSelected: any;
 	getSelectedKey: any;
-	getAccounts: any;
+	getAccounts: () => Map<string, UnlockedAccount | LockedAccount>;
 	getIdentityByAccountId: any;
 	getNewIdentity: any;
 	resetCurrentIdentity: any;
@@ -77,15 +96,18 @@ const defaultAccountState = {
 	selectedKey: ''
 };
 
-export function useAccountContext (): AccountsContextState {
+export function useAccountContext(): AccountsContextState {
 	const initialState: AccountsStoreState = defaultAccountState;
 
-	const reducer = (state: AccountsStoreState, delta: Partial<AccountsStoreState>): AccountsStoreState => ({
+	const reducer = (
+		state: AccountsStoreState,
+		delta: Partial<AccountsStoreState>
+	): AccountsStoreState => ({
 		...state,
 		...delta
 	});
 	const [state, setState] = useReducer(reducer, initialState);
-	useEffect(()=>{
+	useEffect(() => {
 		const refreshList = async (): Promise<void> => {
 			const accounts = await loadAccounts();
 			const identities = await loadIdentities();
@@ -99,7 +121,7 @@ export function useAccountContext (): AccountsContextState {
 			});
 		};
 		refreshList();
-	}, [])
+	}, []);
 
 	async function select(accountKey: string): Promise<void> {
 		await setState({ selectedKey: accountKey });
@@ -142,8 +164,7 @@ export function useAccountContext (): AccountsContextState {
 			address: ethereumAddress.address,
 			networkKey
 		});
-		if (state.currentIdentity === null)
-			throw new Error(emptyIdentityError);
+		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
 		if (updatedCurrentIdentity.meta.has(ethereumChainId))
 			throw new Error(accountExistedError);
@@ -217,7 +238,10 @@ export function useAccountContext (): AccountsContextState {
 		await deleteDbAccount(accountKey);
 	}
 
-	async function unlockAccount(accountKey: string, pin: string): Promise<boolean> {
+	async function unlockAccount(
+		accountKey: string,
+		pin: string
+	): Promise<boolean> {
 		const { accounts } = state;
 		const account = accounts.get(accountKey);
 
@@ -288,9 +312,9 @@ export function useAccountContext (): AccountsContextState {
 	}
 
 	function getById({
-										 address,
-										 networkKey
-									 }: {
+		address,
+		networkKey
+	}: {
 		address: string;
 		networkKey: string;
 	}): null | FoundAccount {
@@ -333,7 +357,7 @@ export function useAccountContext (): AccountsContextState {
 				const searchAccountIdOrAddress = isAccountId ? accountId : address;
 				const found = isEthereumAccountId(accountId)
 					? searchAccountIdOrAddress.toLowerCase() ===
-					accountIdOrAddress.toLowerCase()
+					  accountIdOrAddress.toLowerCase()
 					: searchAccountIdOrAddress === accountIdOrAddress;
 				if (found) {
 					targetPath = path;
@@ -506,9 +530,7 @@ export function useAccountContext (): AccountsContextState {
 	}
 
 	async function updateIdentityName(name: string): Promise<void> {
-		const updatedCurrentIdentity = deepCopyIdentity(
-			state.currentIdentity!
-		);
+		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
 		updatedCurrentIdentity.name = name;
 		try {
 			await setState({ currentIdentity: updatedCurrentIdentity });
@@ -519,9 +541,7 @@ export function useAccountContext (): AccountsContextState {
 	}
 
 	async function updatePathName(path: string, name: string): Promise<void> {
-		const updatedCurrentIdentity = deepCopyIdentity(
-			state.currentIdentity!
-		);
+		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
 		const updatedPathMeta = Object.assign(
 			{},
 			updatedCurrentIdentity.meta.get(path),
@@ -543,9 +563,7 @@ export function useAccountContext (): AccountsContextState {
 		name: string,
 		password: string
 	): Promise<void> {
-		const updatedCurrentIdentity = deepCopyIdentity(
-			state.currentIdentity!
-		);
+		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
 		await _addPathToIdentity(
 			newPath,
 			createSubstrateAddress,
@@ -558,8 +576,7 @@ export function useAccountContext (): AccountsContextState {
 	}
 
 	async function deletePath(path: string): Promise<void> {
-		if (state.currentIdentity === null)
-			throw new Error(emptyIdentityError);
+		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
 		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
 		updatedCurrentIdentity.meta.delete(path);
@@ -621,7 +638,7 @@ export function useAccountContext (): AccountsContextState {
 		deriveNewPath,
 		deletePath,
 		deleteCurrentIdentity
-	}
+	};
 }
 
 export const AccountsContext = React.createContext({} as AccountsContextState);

@@ -21,7 +21,7 @@ import { RNCamera } from 'react-native-camera';
 import Button from 'components/Button';
 import { processBarCode } from 'modules/sign/utils';
 import { onMockBarCodeRead } from 'e2e/injections';
-import { SeedRefsState } from 'stores/SeedRefStore';
+import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { NavigationAccountScannerProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';

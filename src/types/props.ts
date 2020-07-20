@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { AccountsContextState } from 'stores/AccountsContext';
 import AccountsStore from 'stores/AccountsStore';
 import ScannerStore from 'stores/ScannerStore';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
@@ -25,10 +26,7 @@ export type FocusListener = (
 	event: NativeSyntheticEvent<TextInputFocusEventData>
 ) => void;
 
-export interface NavigationAccountProps<
-	ScreenName extends keyof RootStackParamList
-> extends NavigationProps<ScreenName> {
-}
+export type NavigationAccountProps = NavigationProps<ScreenName>;
 
 export interface NavigationAccountIdentityProps<
 	ScreenName extends keyof RootStackParamList
@@ -46,6 +44,7 @@ export interface NavigationAccountScannerProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationAccountProps<ScreenName> {
 	scannerStore: ScannerStore;
+	accounts: AccountsContextState;
 }
 
 export interface NavigationScannerProps<

@@ -22,12 +22,12 @@ import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 // TODO use typescript 3.8's type import, Wait for prettier update.
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
 import PathCard from 'components/PathCard';
 import PopupMenu from 'components/PopupMenu';
 import { LeftScreenHeading } from 'components/ScreenHeading';
@@ -57,12 +57,13 @@ interface Props {
 }
 
 export function PathDetailsView({
-	accounts,
 	navigation,
 	path,
 	networkKey
 }: Props): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const { currentIdentity } = accounts.state;
+	if (!currentIdentity) return <View />;
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { setAlert } = useContext(AlertStateContext);
@@ -92,7 +93,7 @@ export function PathDetailsView({
 						await accounts.deletePath(path);
 						if (isSubstratePath(path)) {
 							const listedPaths = getPathsWithSubstrateNetworkKey(
-								accounts.state.currentIdentity,
+								accounts.state.currentIdentity!,
 								networkKey
 							);
 							const hasOtherPaths = listedPaths.length > 0;
@@ -198,4 +199,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withAccountStore(withCurrentIdentity(PathDetails));
+export default PathDetails;
