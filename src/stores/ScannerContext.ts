@@ -36,6 +36,7 @@ import {
 	isSubstrateMessageParsedData,
 	SubstrateCompletedParsedData,
 	SubstrateMessageParsedData,
+	SubstrateParsedData,
 	SubstrateTransactionParsedData
 } from 'types/scannerTypes';
 import { emptyAccount } from 'utils/account';
@@ -127,7 +128,7 @@ const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicit
 const SIG_TYPE_SR25519 = new Uint8Array([1]);
 // const SIG_TYPE_ECDSA = new Uint8Array([2]);
 
-export function useScannerContext() {
+export function useScannerContext(): ScannerContextState {
 	const initialState = DEFAULT_STATE;
 
 	const reducer = (
@@ -177,19 +178,14 @@ export function useScannerContext() {
 		);
 		concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
-		await setState({
-			multipartComplete: true
-		});
-		// handle the binary blob as a single UOS payload
-		await setParsedData(concatMultipartData, true);
-	}
+		const parsedData = (await constructDataFromBytes(
+			concatMultipartData,
+			true
+		)) as SubstrateCompletedParsedData;
 
-	/**
-	 * @dev allow write operations
-	 */
-	function setReady(): void {
-		setState({
-			busy: false
+		await setState({
+			multipartComplete: true,
+			unsignedData: parsedData
 		});
 	}
 
@@ -282,6 +278,15 @@ export function useScannerContext() {
 
 		await setState({
 			unsignedData: parsedData
+		});
+	}
+
+	/**
+	 * @dev allow write operations
+	 */
+	function setReady(): void {
+		setState({
+			busy: false
 		});
 	}
 
@@ -514,15 +519,15 @@ export function useScannerContext() {
 		cleanup,
 		clearMultipartProgress,
 		setBusy,
-		setReady,
-		state,
-		setUnsigned,
+		setData,
 		setParsedData,
 		setPartData,
-		setData,
+		setReady,
+		setUnsigned,
+		signDataLegacy,
 		signEthereumData,
 		signSubstrateData,
-		signDataLegacy
+		state
 	};
 }
 

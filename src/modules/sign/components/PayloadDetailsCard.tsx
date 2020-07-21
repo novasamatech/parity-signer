@@ -24,7 +24,7 @@ import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 import { AlertStateContext } from 'stores/alertContext';
-import RegistriesStore from 'stores/RegistriesStore';
+import { RegistriesStoreState } from 'stores/RegistriesStore';
 import colors from 'styles/colors';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { withRegistriesStore } from 'utils/HOC';
@@ -39,7 +39,7 @@ type ExtrinsicPartProps = {
 	fallback?: string;
 	label: string;
 	networkKey: string;
-	registriesStore: RegistriesStore;
+	registriesStore: RegistriesStoreState;
 	value: AnyU8a | IMethod | IExtrinsicEra;
 };
 

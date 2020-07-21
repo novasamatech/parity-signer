@@ -24,7 +24,10 @@ import { AccountsContext } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 import AccountsStore from 'stores/AccountsStore';
-import RegistriesStore from 'stores/RegistriesStore';
+import {
+	RegistriesContext,
+	RegistriesStoreState
+} from 'stores/RegistriesStore';
 import ScannerStore from 'stores/ScannerStore';
 
 interface AccountInjectedProps {
@@ -36,7 +39,7 @@ interface ScannerInjectedProps {
 }
 
 interface RegistriesInjectedProps {
-	registriesStore: RegistriesStore;
+	registriesStore: RegistriesStoreState;
 }
 
 type AccountAndScannerInjectedProps = AccountInjectedProps &
@@ -63,13 +66,10 @@ export function withAccountAndScannerStore<
 export function withRegistriesStore<T extends RegistriesInjectedProps>(
 	WrappedComponent: React.ComponentType<any>
 ): React.ComponentType<Omit<T, keyof RegistriesInjectedProps>> {
-	return (props): React.ReactElement => (
-		<Subscribe to={[RegistriesStore]}>
-			{(registriesStore): React.ReactElement => (
-				<WrappedComponent {...props} registriesStore={registriesStore} />
-			)}
-		</Subscribe>
-	);
+	return (props): React.ReactElement => {
+		const registriesStore = useContext(RegistriesContext);
+		return <WrappedComponent {...props} registriesStore={registriesStore} />;
+	};
 }
 
 export function withCurrentIdentity<
