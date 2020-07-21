@@ -33,6 +33,7 @@ import PopupMenu from 'components/PopupMenu';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import QrView from 'components/QrView';
+import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getAddressWithPath,
 	getNetworkKey,
@@ -57,13 +58,12 @@ interface Props {
 }
 
 export function PathDetailsView({
+	accounts,
 	navigation,
 	path,
 	networkKey
 }: Props): React.ReactElement {
-	const accounts = useContext(AccountsContext);
 	const { currentIdentity } = accounts.state;
-	if (!currentIdentity) return <View />;
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { setAlert } = useContext(AlertStateContext);
@@ -199,4 +199,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default PathDetails;
+export default withCurrentIdentity(PathDetails);

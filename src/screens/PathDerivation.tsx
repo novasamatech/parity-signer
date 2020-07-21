@@ -20,11 +20,12 @@ import { View } from 'react-native';
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
-import { AccountsContext } from 'stores/AccountsContext';
+import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { Identity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import TextInput from 'components/TextInput';
+import { withCurrentIdentity } from 'utils/HOC';
 import {
 	extractPathId,
 	getNetworkKey,
@@ -53,10 +54,10 @@ function getParentNetworkKey(
 }
 
 function PathDerivation({
+	accounts,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathDerivation'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
 	const [derivationPath, setDerivationPath] = useState<string>('');
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -64,7 +65,6 @@ function PathDerivation({
 	const pathNameInput = useRef<TextInput>(null);
 	const { setAlert } = useContext(AlertStateContext);
 	const currentIdentity = accounts.state.currentIdentity;
-	if (!currentIdentity) return <View />;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
 	);
@@ -172,4 +172,4 @@ function PathDerivation({
 	);
 }
 
-export default PathDerivation;
+export default withCurrentIdentity(PathDerivation);

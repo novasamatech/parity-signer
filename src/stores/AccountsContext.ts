@@ -137,6 +137,34 @@ export function useAccountContext(): AccountsContextState {
 		return state.newAccount;
 	}
 
+	function deleteSensitiveData(account: UnlockedAccount): LockedAccount {
+		delete account.seed;
+		delete account.seedPhrase;
+		delete account.derivationPassword;
+		delete account.derivationPath;
+
+		return account;
+	}
+
+	async function save(
+		accountKey: string,
+		account: Account,
+		pin: string | null = null
+	): Promise<void> {
+		try {
+			// for account creation
+			let accountToSave = account;
+			if (pin && isUnlockedAccount(account)) {
+				account.encryptedSeed = await encryptData(account.seed, pin);
+				accountToSave = deleteSensitiveData(account);
+			}
+
+			await saveAccount(accountKey, accountToSave);
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 	async function submitNew(pin: string): Promise<void> {
 		const account = state.newAccount;
 		if (!account.seed) return;
@@ -148,6 +176,42 @@ export function useAccountContext(): AccountsContextState {
 			accounts: state.accounts.set(accountKey, account),
 			newAccount: emptyAccount()
 		});
+	}
+
+	async function _updateIdentitiesWithCurrentIdentity(): Promise<void> {
+		const newIdentities = deepCopyIdentities(state.identities);
+		if (state.currentIdentity === null) return;
+		const identityIndex = newIdentities.findIndex(
+			(identity: Identity) =>
+				identity.encryptedSeed === state.currentIdentity!.encryptedSeed
+		);
+		newIdentities.splice(identityIndex, 1, state.currentIdentity);
+		await setState({ identities: newIdentities });
+		await saveIdentities(newIdentities);
+	}
+
+	async function updateIdentityName(name: string): Promise<void> {
+		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
+		updatedCurrentIdentity.name = name;
+		try {
+			await setState({ currentIdentity: updatedCurrentIdentity });
+			await _updateIdentitiesWithCurrentIdentity();
+		} catch (e) {
+			throw new Error(identityUpdateError);
+		}
+	}
+
+	async function _updateCurrentIdentity(
+		updatedIdentity: Identity
+	): Promise<void> {
+		try {
+			await setState({
+				currentIdentity: updatedIdentity
+			});
+			await _updateIdentitiesWithCurrentIdentity();
+		} catch (error) {
+			throw new Error(identityUpdateError);
+		}
 	}
 
 	async function deriveEthereumAccount(
@@ -211,25 +275,6 @@ export function useAccountContext(): AccountsContextState {
 		});
 	}
 
-	async function save(
-		accountKey: string,
-		account: Account,
-		pin: string | null = null
-	): Promise<void> {
-		try {
-			// for account creation
-			let accountToSave = account;
-			if (pin && isUnlockedAccount(account)) {
-				account.encryptedSeed = await encryptData(account.seed, pin);
-				accountToSave = deleteSensitiveData(account);
-			}
-
-			await saveAccount(accountKey, accountToSave);
-		} catch (e) {
-			console.error(e);
-		}
-	}
-
 	async function deleteAccount(accountKey: string): Promise<void> {
 		const { accounts } = state;
 
@@ -267,15 +312,6 @@ export function useAccountContext(): AccountsContextState {
 		return true;
 	}
 
-	function deleteSensitiveData(account: UnlockedAccount): LockedAccount {
-		delete account.seed;
-		delete account.seedPhrase;
-		delete account.derivationPassword;
-		delete account.derivationPath;
-
-		return account;
-	}
-
 	function lockAccount(accountKey: string): void {
 		const { accounts } = state;
 		const account = accounts.get(accountKey);
@@ -309,29 +345,6 @@ export function useAccountContext(): AccountsContextState {
 			}
 		}
 		return findLegacyAccount;
-	}
-
-	function getById({
-		address,
-		networkKey
-	}: {
-		address: string;
-		networkKey: string;
-	}): null | FoundAccount {
-		const accountId = generateAccountId({ address, networkKey });
-		const legacyAccount = _getAccountWithoutCaseSensitive(accountId);
-		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
-		let derivedAccount;
-		//assume it is an accountId
-		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
-			derivedAccount = _getAccountFromIdentity(accountId);
-		}
-		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
-		derivedAccount = derivedAccount || _getAccountFromIdentity(address);
-
-		if (derivedAccount instanceof Object)
-			return { ...derivedAccount, isLegacy: false };
-		return null;
 	}
 
 	function _getAccountFromIdentity(
@@ -389,6 +402,29 @@ export function useAccountContext(): AccountsContextState {
 			validBip39Seed: true,
 			...metaData
 		};
+	}
+
+	function getById({
+		address,
+		networkKey
+	}: {
+		address: string;
+		networkKey: string;
+	}): null | FoundAccount {
+		const accountId = generateAccountId({ address, networkKey });
+		const legacyAccount = _getAccountWithoutCaseSensitive(accountId);
+		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
+		let derivedAccount;
+		//assume it is an accountId
+		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
+			derivedAccount = _getAccountFromIdentity(accountId);
+		}
+		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
+		derivedAccount = derivedAccount || _getAccountFromIdentity(address);
+
+		if (derivedAccount instanceof Object)
+			return { ...derivedAccount, isLegacy: false };
+		return null;
 	}
 
 	function getAccountByAddress(address: string): false | FoundAccount {
@@ -502,42 +538,6 @@ export function useAccountContext(): AccountsContextState {
 		setState({
 			newIdentity: { ...state.newIdentity, ...identityUpdate }
 		});
-	}
-
-	async function _updateCurrentIdentity(
-		updatedIdentity: Identity
-	): Promise<void> {
-		try {
-			await setState({
-				currentIdentity: updatedIdentity
-			});
-			await _updateIdentitiesWithCurrentIdentity();
-		} catch (error) {
-			throw new Error(identityUpdateError);
-		}
-	}
-
-	async function _updateIdentitiesWithCurrentIdentity(): Promise<void> {
-		const newIdentities = deepCopyIdentities(state.identities);
-		if (state.currentIdentity === null) return;
-		const identityIndex = newIdentities.findIndex(
-			(identity: Identity) =>
-				identity.encryptedSeed === state.currentIdentity!.encryptedSeed
-		);
-		newIdentities.splice(identityIndex, 1, state.currentIdentity);
-		await setState({ identities: newIdentities });
-		await saveIdentities(newIdentities);
-	}
-
-	async function updateIdentityName(name: string): Promise<void> {
-		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
-		updatedCurrentIdentity.name = name;
-		try {
-			await setState({ currentIdentity: updatedCurrentIdentity });
-			await _updateIdentitiesWithCurrentIdentity();
-		} catch (e) {
-			throw new Error(identityUpdateError);
-		}
 	}
 
 	async function updatePathName(path: string, name: string): Promise<void> {
