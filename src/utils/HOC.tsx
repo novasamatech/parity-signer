@@ -19,6 +19,7 @@ import React, { useContext } from 'react';
 import { View } from 'react-native';
 import { Subscribe } from 'unstated';
 
+import { ScannerContext } from 'stores/ScannerContext';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
@@ -48,16 +49,13 @@ export function withAccountAndScannerStore<
 ): React.ComponentType<Omit<T, keyof AccountAndScannerInjectedProps>> {
 	return (props): React.ReactElement => {
 		const accounts = useContext(AccountsContext);
+		const scannerStore = useContext(ScannerContext);
 		return (
-			<Subscribe to={[ScannerStore]}>
-				{(scannerStore): React.ReactElement => (
-					<WrappedComponent
-						{...props}
-						scannerStore={scannerStore}
-						accounts={accounts}
-					/>
-				)}
-			</Subscribe>
+			<WrappedComponent
+				{...props}
+				scannerStore={scannerStore}
+				accounts={accounts}
+			/>
 		);
 	};
 }

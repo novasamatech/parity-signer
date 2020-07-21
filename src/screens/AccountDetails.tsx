@@ -33,12 +33,12 @@ import {
 import fontStyles from 'styles/fontStyles';
 import { UnknownAccountWarning } from 'components/Warnings';
 import AccountIcon from 'components/AccountIcon';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import QrScannerTab from 'components/QrScannerTab';
 
 export default function AccountDetails({
 	navigation
-}: NavigationAccountProps<'AccountDetails'>): React.ReactElement {
+}: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const account = accounts.getSelected();
 	const selectedKey = accounts.getSelectedKey();

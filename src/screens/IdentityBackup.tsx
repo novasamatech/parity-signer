@@ -21,7 +21,7 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
@@ -39,7 +39,7 @@ import { useNewSeedRef } from 'utils/seedRefHooks';
 function IdentityBackup({
 	navigation,
 	route
-}: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
+}: NavigationProps<'IdentityBackup'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);

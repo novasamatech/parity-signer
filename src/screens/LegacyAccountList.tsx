@@ -20,14 +20,14 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 import AccountCard from 'components/AccountCard';
 import QrScannerTab from 'components/QrScannerTab';
 
 function LegacyAccountList({
 	navigation
-}: NavigationAccountProps<'LegacyAccountList'>): React.ReactElement {
+}: NavigationProps<'LegacyAccountList'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const onAccountSelected = async (key: string): Promise<void> => {
 		await accounts.select(key);

@@ -21,7 +21,7 @@ import { CommonActions } from '@react-navigation/native';
 
 import { AccountsContext } from 'stores/AccountsContext';
 import fontStyles from 'styles/fontStyles';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import Button from 'components/Button';
 import KeyboardScrollView from 'components/KeyboardScrollView';
@@ -39,7 +39,7 @@ interface State {
 function AccountPin({
 	navigation,
 	route
-}: NavigationAccountProps<'AccountPin'>): React.ReactElement {
+}: NavigationProps<'AccountPin'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const initialState: State = {
 		confirmation: '',

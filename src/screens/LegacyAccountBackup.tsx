@@ -22,7 +22,7 @@ import { NetworkProtocols, NETWORK_LIST } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { UnlockedAccount } from 'types/identityTypes';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
@@ -36,7 +36,7 @@ import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 function LegacyAccountBackup({
 	navigation,
 	route
-}: NavigationAccountProps<'LegacyAccountBackup'>): React.ReactElement {
+}: NavigationProps<'LegacyAccountBackup'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {

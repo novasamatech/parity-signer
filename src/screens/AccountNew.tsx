@@ -21,7 +21,7 @@ import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import AccountIconChooser from 'components/AccountIconChooser';
@@ -45,7 +45,7 @@ interface State {
 
 export default function AccountNew({
 	navigation
-}: NavigationAccountProps<'AccountNew'>): React.ReactElement {
+}: NavigationProps<'AccountNew'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const initialState = {
 		derivationPassword: '',

@@ -23,7 +23,7 @@ import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import {
 	NavigationAccountIdentityProps,
-	NavigationAccountProps
+	NavigationProps
 } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';

@@ -26,8 +26,6 @@ export type FocusListener = (
 	event: NativeSyntheticEvent<TextInputFocusEventData>
 ) => void;
 
-export type NavigationAccountProps = NavigationProps<ScreenName>;
-
 export interface NavigationAccountIdentityProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
@@ -42,7 +40,7 @@ export interface NavigationTargetIdentityProps<
 
 export interface NavigationAccountScannerProps<
 	ScreenName extends keyof RootStackParamList
-> extends NavigationAccountProps<ScreenName> {
+> extends NavigationProps<ScreenName> {
 	scannerStore: ScannerStore;
 	accounts: AccountsContextState;
 }

@@ -25,7 +25,7 @@ import {
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
 import { NetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import TouchableItem from 'components/TouchableItem';
@@ -33,7 +33,7 @@ import { emptyAccount } from 'utils/account';
 
 export default function LegacyNetworkChooserView({
 	navigation
-}: NavigationAccountProps<'LegacyNetworkChooser'>): React.ReactElement {
+}: NavigationProps<'LegacyNetworkChooser'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 

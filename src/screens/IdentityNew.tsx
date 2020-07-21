@@ -21,7 +21,7 @@ import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { emptyIdentity } from 'utils/identitiesUtils';
@@ -42,7 +42,7 @@ import { useNewSeedRef } from 'utils/seedRefHooks';
 function IdentityNew({
 	navigation,
 	route
-}: NavigationAccountProps<'IdentityNew'>): React.ReactElement {
+}: NavigationProps<'IdentityNew'>): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
