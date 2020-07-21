@@ -58,7 +58,7 @@ export async function processBarCode(
 		} else if (isJsonString(txRequestData.data)) {
 			// Ethereum Legacy
 			await scannerStore.setUnsigned(txRequestData.data);
-		} else if (!scannerStore.isMultipartComplete()) {
+		} else if (!scannerStore.state.multipartComplete) {
 			const strippedData = rawDataToU8A(txRequestData.rawData);
 			if (strippedData === null) throw new Error(strings.ERROR_NO_RAW_DATA);
 			await scannerStore.setParsedData(strippedData, false);
@@ -121,17 +121,17 @@ export async function processBarCode(
 
 	try {
 		await parseQrData();
-		if (scannerStore.getUnsigned() === null) return;
+		if (scannerStore.state.unsignedData === null) return;
 		await scannerStore.setData(accounts);
 		scannerStore.clearMultipartProgress();
-		const sender = scannerStore.getSender();
+		const sender = scannerStore.state.sender;
 		if (!sender)
 			return showErrorMessage(
 				strings.ERROR_TITLE,
 				strings.ERROR_NO_SENDER_FOUND
 			);
 		if (sender.isLegacy) {
-			if (scannerStore.getType() === 'transaction') {
+			if (scannerStore.state.type === 'transaction') {
 				return navigation.navigate('AccountUnlockAndSign', {
 					next: 'SignedTx'
 				});
@@ -142,7 +142,7 @@ export async function processBarCode(
 			}
 		}
 		await unlockSeedAndSign(sender);
-		if (scannerStore.getType() === 'transaction') {
+		if (scannerStore.state.type === 'transaction') {
 			navigateToSignedTx(navigation);
 		} else {
 			navigateToSignedMessage(navigation);

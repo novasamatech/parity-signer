@@ -21,10 +21,7 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import {
-	NavigationAccountIdentityProps,
-	NavigationProps
-} from 'types/props';
+import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {

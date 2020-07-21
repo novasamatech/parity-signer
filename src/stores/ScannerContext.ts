@@ -154,6 +154,36 @@ export function useScannerContext() {
 		});
 	}
 
+	async function _integrateMultiPartData(): Promise<void> {
+		const { multipartData, totalFrameCount } = state;
+
+		// concatenate all the parts into one binary blob
+		let concatMultipartData = multipartData!.reduce(
+			(acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
+				if (part === null) throw new Error('part data is not completed');
+				const c = new Uint8Array(acc.length + part.length);
+				c.set(acc);
+				c.set(part, acc.length);
+				return c;
+			},
+			new Uint8Array(0)
+		);
+
+		// unshift the frame info
+		const frameInfo = u8aConcat(
+			MULTIPART,
+			encodeNumber(totalFrameCount),
+			encodeNumber(0)
+		);
+		concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
+
+		await setState({
+			multipartComplete: true
+		});
+		// handle the binary blob as a single UOS payload
+		await setParsedData(concatMultipartData, true);
+	}
+
 	/**
 	 * @dev allow write operations
 	 */
@@ -253,36 +283,6 @@ export function useScannerContext() {
 		await setState({
 			unsignedData: parsedData
 		});
-	}
-
-	async function _integrateMultiPartData(): Promise<void> {
-		const { multipartData, totalFrameCount } = state;
-
-		// concatenate all the parts into one binary blob
-		let concatMultipartData = multipartData!.reduce(
-			(acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
-				if (part === null) throw new Error('part data is not completed');
-				const c = new Uint8Array(acc.length + part.length);
-				c.set(acc);
-				c.set(part, acc.length);
-				return c;
-			},
-			new Uint8Array(0)
-		);
-
-		// unshift the frame info
-		const frameInfo = u8aConcat(
-			MULTIPART,
-			encodeNumber(totalFrameCount),
-			encodeNumber(0)
-		);
-		concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
-
-		await setState({
-			multipartComplete: true
-		});
-		// handle the binary blob as a single UOS payload
-		await setParsedData(concatMultipartData, true);
 	}
 
 	async function _setTXRequest(

@@ -69,13 +69,17 @@ export function Scanner({
 	}, [navigation, scannerStore]);
 
 	useEffect(() => {
-		const missedFrames = scannerStore.getMissedFrames();
+		const {
+			missedFrames,
+			completedFramesCount,
+			totalFrameCount
+		} = scannerStore.state;
 		setMultiFrames({
-			completedFramesCount: scannerStore.getCompletedFramesCount(),
-			isMultipart: scannerStore.getTotalFramesCount() > 1,
+			completedFramesCount,
+			isMultipart: totalFrameCount > 1,
 			missedFrames,
 			missingFramesMessage: missedFrames && missedFrames.join(', '),
-			totalFramesCount: scannerStore.getTotalFramesCount()
+			totalFramesCount: totalFrameCount
 		});
 	}, [lastFrame, scannerStore.state.completedFramesCount, scannerStore]);
 
@@ -97,7 +101,7 @@ export function Scanner({
 
 	async function onBarCodeRead(event: any): Promise<void> {
 		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
-		if (scannerStore.isBusy() || !enableScan) {
+		if (scannerStore.state.busy || !enableScan) {
 			return;
 		}
 		if (event.rawData === lastFrame) {

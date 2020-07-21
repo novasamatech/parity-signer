@@ -37,8 +37,7 @@ function SignedTx(
 	props: NavigationAccountScannerProps<'SignedTx'>
 ): React.ReactElement {
 	const { scannerStore } = props;
-	const recipient = scannerStore.getRecipient();
-	const sender = scannerStore.getSender();
+	const { recipient, sender } = scannerStore.state;
 	if (sender === null || recipient === null) return <View />;
 	return <SignedTxView sender={sender} recipient={recipient} {...props} />;
 }
@@ -54,8 +53,7 @@ function SignedTxView({
 	accounts,
 	scannerStore
 }: Props): React.ReactElement {
-	const data = scannerStore.getSignedTxData();
-	const tx = scannerStore.getTx();
+	const { signedData, tx } = scannerStore.state;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
@@ -84,7 +82,7 @@ function SignedTxView({
 				{'Scan to publish'}
 			</Text>
 			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
-				<QrView data={data} />
+				<QrView data={signedData} />
 			</View>
 			<CompatibleCard
 				account={sender}

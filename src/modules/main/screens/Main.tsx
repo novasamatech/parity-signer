@@ -21,13 +21,10 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import OnBoardingView from 'modules/main/components/OnBoading';
 import NetworkSelector from 'modules/main/components/NetworkSelector';
 import { AccountsContext } from 'stores/AccountsContext';
-import {
-	NavigationAccountIdentityProps,
-	NavigationAccountProps
-} from 'types/props';
+import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 
 export default function Main(
-	props: NavigationAccountProps<'Main'>
+	props: NavigationProps<'Main'>
 ): React.ReactElement {
 	const accounts = useContext(AccountsContext);
 	const { identities, currentIdentity, loaded } = accounts.state;

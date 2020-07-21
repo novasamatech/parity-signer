@@ -39,8 +39,7 @@ function SignedMessage(
 	props: NavigationAccountScannerProps<'SignedMessage'>
 ): React.ReactElement {
 	const { scannerStore } = props;
-	const sender = scannerStore.getSender();
-	const message = scannerStore.getMessage();
+	const { sender, message } = scannerStore.state;
 	if (sender === null || message === null) return <View />;
 	return <SignedMessageView sender={sender} message={message} {...props} />;
 }
@@ -51,9 +50,7 @@ function SignedMessageView({
 	accounts,
 	scannerStore
 }: Props): React.ReactElement {
-	const data = scannerStore.getSignedTxData();
-	const isHash = scannerStore.getIsHash();
-	const dataToSign = scannerStore.getDataToSign();
+	const { signedData, isHash, dataToSign } = scannerStore.state;
 
 	useEffect(
 		(): (() => void) =>
@@ -77,7 +74,7 @@ function SignedMessageView({
 				{'Scan to publish'}
 			</Text>
 			<View testID={testIDs.SignedMessage.qrView}>
-				<QrView data={data} />
+				<QrView data={signedData} />
 			</View>
 			<CompatibleCard
 				titlePrefix={'from:'}
