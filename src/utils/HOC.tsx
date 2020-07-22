@@ -17,7 +17,6 @@
 import { RouteProp } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { View } from 'react-native';
-import { Subscribe } from 'unstated';
 
 import { ScannerContext } from 'stores/ScannerContext';
 import { AccountsContext } from 'stores/AccountsContext';

@@ -19,6 +19,7 @@ import { getSpecTypes } from '@polkadot/types-known';
 import React, { useState } from 'react';
 
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
+import { deepCopyMap } from 'stores/utils';
 import { getMetadata } from 'utils/identitiesUtils';
 
 //Map PathId to Polkadot.js/api spec names and chain names
@@ -73,14 +74,6 @@ export type RegistriesStoreState = {
 	registries: Map<string, TypeRegistry>;
 	get: (networkKey: string) => TypeRegistry;
 };
-
-function deepCopyMap(
-	original: Map<string, TypeRegistry>
-): Map<string, TypeRegistry> {
-	const originalEntries = original.entries();
-	const copiedEntries = Array.from(originalEntries);
-	return new Map(copiedEntries);
-}
 
 export function useRegistriesStore(): RegistriesStoreState {
 	const dumbRegistry = new TypeRegistry();
