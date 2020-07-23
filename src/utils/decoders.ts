@@ -32,25 +32,9 @@ import {
 import { blake2b } from 'utils/native';
 
 /*
-  Example Full Raw Data
-  ---
-  4 // indicates binary
-  37 // indicates data length
-  --- UOS Specific Data
-  00 + // is it multipart?
-  0001 + // how many parts in total?
-  0000 +  // which frame are we on?
-  53 // indicates payload is for Substrate
-  01 // crypto: sr25519
-  00 // indicates action: signData
-  f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
-  544849532049532053504152544121 // actual payload to sign (should be SCALE or utf8)
-  91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3 // genesis hash
-  0 // terminator
-  --- SQRC Filler Bytes
-  ec11ec11ec11ec // SQRC filler bytes
-  */
-
+ * @return strippedData: the rawBytes from react-native-camera, stripped of the ec11 padding to fill the frame size. See: decoders.js
+ * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
+ */
 export function rawDataToU8A(rawData: string): Uint8Array | null {
 	if (!rawData) {
 		return null;
@@ -96,6 +80,26 @@ export function rawDataToU8A(rawData: string): Uint8Array | null {
 
 	return bytes;
 }
+
+/*
+  Example Full Raw Data
+  ---
+  4 // indicates binary
+  37 // indicates data length
+  --- UOS Specific Data
+  00 + // is it multipart?
+  0001 + // how many parts in total?
+  0000 +  // which frame are we on?
+  53 // indicates payload is for Substrate
+  01 // crypto: sr25519
+  00 // indicates action: signData
+  f4cd755672a8f9542ca9da4fbf2182e79135d94304002e6a09ffc96fef6e6c4c // public key
+  544849532049532053504152544121 // actual payload to sign (should be SCALE or utf8)
+  91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3 // genesis hash
+  0 // terminator
+  --- SQRC Filler Bytes
+  ec11ec11ec11ec // SQRC filler bytes
+  */
 
 export async function constructDataFromBytes(
 	bytes: Uint8Array,

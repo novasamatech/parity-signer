@@ -32,11 +32,9 @@ import {
 	CompletedParsedData,
 	EthereumParsedData,
 	isEthereumCompletedParsedData,
-	isMultipartData,
 	isSubstrateMessageParsedData,
 	SubstrateCompletedParsedData,
 	SubstrateMessageParsedData,
-	SubstrateParsedData,
 	SubstrateTransactionParsedData
 } from 'types/scannerTypes';
 import { emptyAccount } from 'utils/account';
@@ -82,17 +80,35 @@ type ScannerStoreState = {
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
 	type: 'transaction' | 'message' | null;
-	unsignedData: CompletedParsedData | null;
 };
 
-type ScannerContextState = {
+type MessageQRInfo = {
+	dataToSign: string | GenericExtrinsicPayload;
+	isHash: boolean;
+	isOversized: boolean;
+	message: string;
+	sender: FoundAccount;
+	type: 'message';
+};
+
+type TxQRInfo = {
+	sender: FoundAccount;
+	recipient: FoundAccount;
+	type: 'transaction';
+	dataToSign: string | GenericExtrinsicPayload;
+	isHash: boolean;
+	isOversized: boolean;
+	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array;
+};
+
+export type QrInfo = MessageQRInfo | TxQRInfo;
+
+export type ScannerContextState = {
 	cleanup: any;
 	clearMultipartProgress: any;
 	setBusy: any;
 	setReady: any;
 	state: ScannerStoreState;
-	setUnsigned: any;
-	setParsedData: any;
 	setPartData: any;
 	setData: any;
 	signEthereumData: any;
@@ -117,8 +133,7 @@ const DEFAULT_STATE: ScannerStoreState = {
 	signedTxList: [],
 	totalFrameCount: 0,
 	tx: null,
-	type: null,
-	unsignedData: null
+	type: null
 };
 
 const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicity's sake. Consistent with @polkadot/react-qr
@@ -140,12 +155,6 @@ export function useScannerContext(): ScannerContextState {
 	});
 	const [state, setState] = useReducer(reducer, initialState);
 
-	async function setUnsigned(data: string): Promise<void> {
-		setState({
-			unsignedData: JSON.parse(data)
-		});
-	}
-
 	/**
 	 * @dev sets a lock on writes
 	 */
@@ -155,7 +164,9 @@ export function useScannerContext(): ScannerContextState {
 		});
 	}
 
-	async function _integrateMultiPartData(): Promise<void> {
+	async function _integrateMultiPartData(): Promise<
+		SubstrateCompletedParsedData
+	> {
 		const { multipartData, totalFrameCount } = state;
 
 		// concatenate all the parts into one binary blob
@@ -183,21 +194,18 @@ export function useScannerContext(): ScannerContextState {
 			true
 		)) as SubstrateCompletedParsedData;
 
-		await setState({
-			multipartComplete: true,
-			unsignedData: parsedData
-		});
+		return parsedData;
 	}
 
 	async function setPartData(
 		currentFrame: number,
 		frameCount: number,
 		partData: string
-	): Promise<boolean | void | Uint8Array> {
+	): Promise<null | SubstrateCompletedParsedData> {
 		// set it once only
 		if (!state.totalFrameCount) {
 			const newArray = new Array(frameCount).fill(null);
-			await setState({
+			setState({
 				multipartData: newArray,
 				totalFrameCount: frameCount
 			});
@@ -236,7 +244,7 @@ export function useScannerContext(): ScannerContextState {
 			);
 			const nextCompletedFramesCount =
 				totalFrameCount - nextMissedFrames.length;
-			await setState({
+			setState({
 				completedFramesCount: nextCompletedFramesCount,
 				latestFrame: currentFrame,
 				missedFrames: nextMissedFrames,
@@ -249,36 +257,11 @@ export function useScannerContext(): ScannerContextState {
 				!multipartComplete
 			) {
 				// all the frames are filled
-				await _integrateMultiPartData();
+				return await _integrateMultiPartData();
 			}
+			return null;
 		}
-	}
-
-	/*
-	 * @param strippedData: the rawBytes from react-native-camera, stripped of the ec11 padding to fill the frame size. See: decoders.js
-	 * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
-	 */
-
-	async function setParsedData(
-		strippedData: Uint8Array,
-		multipartComplete = false
-	): Promise<void> {
-		const parsedData = await constructDataFromBytes(
-			strippedData,
-			multipartComplete
-		);
-		if (isMultipartData(parsedData)) {
-			await setPartData(
-				parsedData.currentFrame,
-				parsedData.frameCount,
-				parsedData.partData
-			);
-			return;
-		}
-
-		await setState({
-			unsignedData: parsedData
-		});
+		return null;
 	}
 
 	/**
@@ -293,7 +276,7 @@ export function useScannerContext(): ScannerContextState {
 	async function _setTXRequest(
 		txRequest: EthereumParsedData | SubstrateTransactionParsedData,
 		accountsStore: AccountsContextState
-	): Promise<boolean> {
+	): Promise<TxQRInfo> {
 		setBusy();
 
 		const isOversized =
@@ -347,22 +330,23 @@ export function useScannerContext(): ScannerContextState {
 				networkKey
 			})) || emptyAccount(recipientAddress, networkKey);
 
-		setState({
+		const qrInfo: TxQRInfo = {
 			dataToSign: dataToSign as string,
+			isHash: false,
 			isOversized,
 			recipient: recipient as FoundAccount,
 			sender,
 			tx,
 			type: 'transaction'
-		});
+		};
 
-		return true;
+		return qrInfo;
 	}
 
 	async function _setDataToSign(
 		signRequest: SubstrateMessageParsedData | EthereumParsedData,
 		accountsStore: AccountsContextState
-	): Promise<boolean> {
+	): Promise<MessageQRInfo> {
 		setBusy();
 
 		const address = signRequest.data.account;
@@ -390,30 +374,34 @@ export function useScannerContext(): ScannerContextState {
 			);
 		}
 
-		setState({
+		const qrInfo: MessageQRInfo = {
 			dataToSign,
 			isHash: isHash,
 			isOversized: isOversized,
 			message: message!.toString(),
 			sender: sender!,
 			type: 'message'
-		});
+		};
 
-		return true;
+		setState(qrInfo);
+
+		return qrInfo;
 	}
 
 	async function setData(
-		accountsStore: AccountsContextState
-	): Promise<boolean | void> {
-		const { unsignedData } = state;
-		if (!isMultipartData(unsignedData) && unsignedData !== null) {
+		accountsStore: AccountsContextState,
+		unsignedData: CompletedParsedData
+	): Promise<QrInfo> {
+		if (unsignedData !== null) {
 			switch (unsignedData.action) {
 				case 'signTransaction':
 					return await _setTXRequest(unsignedData, accountsStore);
 				case 'signData':
 					return await _setDataToSign(unsignedData, accountsStore);
 				default:
-					return;
+					throw new Error(
+						'Scanned QR should contain either transaction or a message to sign'
+					);
 			}
 		} else {
 			throw new Error(
@@ -424,9 +412,10 @@ export function useScannerContext(): ScannerContextState {
 
 	// signing ethereum data with seed reference
 	async function signEthereumData(
-		signFunction: TryBrainWalletSignFunc
+		signFunction: TryBrainWalletSignFunc,
+		qrInfo: QrInfo
 	): Promise<void> {
-		const { dataToSign, sender } = state;
+		const { dataToSign, sender } = qrInfo;
 		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		const signedData = await signFunction(dataToSign as string);
@@ -436,9 +425,10 @@ export function useScannerContext(): ScannerContextState {
 	// signing substrate data with seed reference
 	async function signSubstrateData(
 		signFunction: TrySignFunc,
-		suriSuffix: string
+		suriSuffix: string,
+		qrInfo: QrInfo
 	): Promise<void> {
-		const { dataToSign, isHash, sender } = state;
+		const { dataToSign, isHash, sender } = qrInfo;
 		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		let signable;
@@ -503,13 +493,12 @@ export function useScannerContext(): ScannerContextState {
 			missedFrames: DEFAULT_STATE.missedFrames,
 			multipartComplete: DEFAULT_STATE.multipartComplete,
 			multipartData: null,
-			totalFrameCount: DEFAULT_STATE.totalFrameCount,
-			unsignedData: DEFAULT_STATE.unsignedData
+			totalFrameCount: DEFAULT_STATE.totalFrameCount
 		});
 	}
 
-	async function cleanup(): Promise<void> {
-		await setState({
+	function cleanup(): void {
+		setState({
 			...DEFAULT_STATE
 		});
 		clearMultipartProgress();
@@ -520,10 +509,8 @@ export function useScannerContext(): ScannerContextState {
 		clearMultipartProgress,
 		setBusy,
 		setData,
-		setParsedData,
 		setPartData,
 		setReady,
-		setUnsigned,
 		signDataLegacy,
 		signEthereumData,
 		signSubstrateData,

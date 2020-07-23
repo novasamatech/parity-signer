@@ -68,8 +68,6 @@
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^6.6.0",
     "readable-stream": "^3.4.0",
-    "unstated": "^2.1.1",
-    "unstated-next": "^1.1.0",
     "vm-browserify": "1.1.0"
   },
   "devDependencies": {

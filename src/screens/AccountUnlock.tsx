@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
 import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import {ScannerContext} from 'stores/ScannerContext';
+import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -28,7 +28,9 @@ import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
 
 /* Used for unlock and sign tx and messages for legacy accounts */
-export function AccountUnlockAndSign (props: NavigationProps<'AccountUnlockAndSign'>): React.ReactElement{
+export function AccountUnlockAndSign(
+	props: NavigationProps<'AccountUnlockAndSign'>
+): React.ReactElement {
 	const { navigation, route } = props;
 	const next = route.params.next ?? 'SignedTx';
 	const scannerStore = useContext(ScannerContext);
@@ -56,13 +58,13 @@ export function AccountUnlockAndSign (props: NavigationProps<'AccountUnlockAndSi
 				navigation.dispatch(resetAction);
 			}}
 		/>
-	)
+	);
 }
 
 export function AccountUnlock({
-																navigation,
-																route
-															}: NavigationProps<'AccountUnlock'>): React.ReactElement {
+	navigation,
+	route
+}: NavigationProps<'AccountUnlock'>): React.ReactElement {
 	const next = route.params.next ?? 'LegacyAccountList';
 	const onDelete = route.params.onDelete ?? ((): any => null);
 	const accounts = useContext(AccountsContext);
@@ -105,11 +107,12 @@ interface AccountUnlockViewState {
 	pin: string;
 }
 
-function AccountUnlockView (props: AccountUnlockViewProps): React.ReactElement{
+function AccountUnlockView(props: AccountUnlockViewProps): React.ReactElement {
 	const [hasWrongPin, setHasWrongPin] = useState(false);
 	const [pin, setPin] = useState('');
 
-	const showErrorMessage = (): string => hasWrongPin ? 'Wrong pin, please try again' : '';
+	const showErrorMessage = (): string =>
+		hasWrongPin ? 'Wrong pin, please try again' : '';
 
 	const { checkPin, navigate } = props;
 

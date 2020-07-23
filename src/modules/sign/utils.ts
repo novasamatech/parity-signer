@@ -19,12 +19,18 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import strings from 'modules/sign/strings';
 import { AccountsContextState } from 'stores/AccountsContext';
-import ScannerStore from 'stores/ScannerStore';
+import { QrInfo, ScannerContextState } from 'stores/ScannerContext';
 import { FoundIdentityAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { RootStackParamList } from 'types/routes';
-import { TxRequestData } from 'types/scannerTypes';
-import { isAddressString, isJsonString, rawDataToU8A } from 'utils/decoders';
+import { isMultipartData, ParsedData, TxRequestData } from 'types/scannerTypes';
+import { assertNever } from 'types/utilTypes';
+import {
+	constructDataFromBytes,
+	isAddressString,
+	isJsonString,
+	rawDataToU8A
+} from 'utils/decoders';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
@@ -49,24 +55,29 @@ export async function processBarCode(
 	txRequestData: TxRequestData,
 	navigation: StackNavigationProp<RootStackParamList, 'QrScanner'>,
 	accounts: AccountsContextState,
-	scannerStore: ScannerStore,
+	scannerStore: ScannerContextState,
 	seedRefs: Map<string, SeedRefClass>
 ): Promise<void> {
-	async function parseQrData(): Promise<void> {
+	async function parseQrData(): Promise<ParsedData> {
 		if (isAddressString(txRequestData.data)) {
 			throw new Error(strings.ERROR_ADDRESS_MESSAGE);
 		} else if (isJsonString(txRequestData.data)) {
 			// Ethereum Legacy
-			await scannerStore.setUnsigned(txRequestData.data);
+			return JSON.parse(txRequestData.data);
 		} else if (!scannerStore.state.multipartComplete) {
+			debugger;
 			const strippedData = rawDataToU8A(txRequestData.rawData);
 			if (strippedData === null) throw new Error(strings.ERROR_NO_RAW_DATA);
-			await scannerStore.setParsedData(strippedData, false);
+			const parsedData = await constructDataFromBytes(strippedData, false);
+			return parsedData;
+		} else {
+			throw new Error(strings.ERROR_NO_RAW_DATA);
 		}
 	}
 
 	async function unlockSeedAndSign(
-		sender: FoundIdentityAccount
+		sender: FoundIdentityAccount,
+		qrInfo: QrInfo
 	): Promise<void> {
 		const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
@@ -105,7 +116,8 @@ export async function processBarCode(
 		// 3. sign data
 		if (isEthereum) {
 			await scannerStore.signEthereumData(
-				seedRef.tryBrainWalletSign.bind(seedRef)
+				seedRef.tryBrainWalletSign.bind(seedRef),
+				qrInfo
 			);
 		} else {
 			const suriSuffix = constructSuriSuffix({
@@ -114,24 +126,36 @@ export async function processBarCode(
 			});
 			await scannerStore.signSubstrateData(
 				seedRef.trySubstrateSign.bind(seedRef),
-				suriSuffix
+				suriSuffix,
+				qrInfo
 			);
 		}
 	}
 
 	try {
-		await parseQrData();
-		if (scannerStore.state.unsignedData === null) return;
-		await scannerStore.setData(accounts);
+		const parsedData = await parseQrData();
+
+		let unsignedData;
+		if (isMultipartData(parsedData)) {
+			unsignedData = await scannerStore.setPartData(
+				parsedData.currentFrame,
+				parsedData.frameCount,
+				parsedData.partData
+			);
+			if (unsignedData === null) return;
+		} else {
+			unsignedData = parsedData;
+		}
+		const qrInfo = await scannerStore.setData(accounts, unsignedData);
 		scannerStore.clearMultipartProgress();
-		const sender = scannerStore.state.sender;
+		const { sender, type } = qrInfo;
 		if (!sender)
 			return showErrorMessage(
 				strings.ERROR_TITLE,
 				strings.ERROR_NO_SENDER_FOUND
 			);
 		if (sender.isLegacy) {
-			if (scannerStore.state.type === 'transaction') {
+			if (type === 'transaction') {
 				return navigation.navigate('AccountUnlockAndSign', {
 					next: 'SignedTx'
 				});
@@ -141,8 +165,8 @@ export async function processBarCode(
 				});
 			}
 		}
-		await unlockSeedAndSign(sender);
-		if (scannerStore.state.type === 'transaction') {
+		await unlockSeedAndSign(sender, qrInfo);
+		if (type === 'transaction') {
 			navigateToSignedTx(navigation);
 		} else {
 			navigateToSignedMessage(navigation);

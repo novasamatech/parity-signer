@@ -30,6 +30,7 @@ export default function CustomAlert(): React.ReactElement {
 	const [alertDisplay, setAlertDisplay] = useState<boolean>(false);
 
 	useEffect(() => {
+		if (index === 0) return;
 		setAlertDisplay(true);
 		if (actions.length === 0) {
 			Animated.timing(animatedValue, {

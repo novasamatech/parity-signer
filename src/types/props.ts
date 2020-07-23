@@ -9,6 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { AccountsContextState } from 'stores/AccountsContext';
 import AccountsStore from 'stores/AccountsStore';
+import { ScannerContextState } from 'stores/ScannerContext';
 import ScannerStore from 'stores/ScannerStore';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
@@ -41,12 +42,12 @@ export interface NavigationTargetIdentityProps<
 export interface NavigationAccountScannerProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
-	scannerStore: ScannerStore;
+	scannerStore: ScannerContextState;
 	accounts: AccountsContextState;
 }
 
 export interface NavigationScannerProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
-	scannerStore: ScannerStore;
+	scannerStore: ScannerContextState;
 }

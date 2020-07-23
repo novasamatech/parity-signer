@@ -18,23 +18,21 @@ import { RouteProp } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { View } from 'react-native';
 
-import { ScannerContext } from 'stores/ScannerContext';
-import { AccountsContext } from 'stores/AccountsContext';
+import { ScannerContext, ScannerContextState } from 'stores/ScannerContext';
+import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
-import AccountsStore from 'stores/AccountsStore';
 import {
 	RegistriesContext,
 	RegistriesStoreState
 } from 'stores/RegistriesStore';
-import ScannerStore from 'stores/ScannerStore';
 
 interface AccountInjectedProps {
-	accounts: AccountsStore;
+	accounts: AccountsContextState;
 }
 
 interface ScannerInjectedProps {
-	scanner: ScannerStore;
+	scanner: ScannerContextState;
 }
 
 interface RegistriesInjectedProps {
