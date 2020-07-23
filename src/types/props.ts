@@ -8,9 +8,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { AccountsContextState } from 'stores/AccountsContext';
-import AccountsStore from 'stores/AccountsStore';
 import { ScannerContextState } from 'stores/ScannerContext';
-import ScannerStore from 'stores/ScannerStore';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 

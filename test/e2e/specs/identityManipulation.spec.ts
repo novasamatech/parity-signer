@@ -28,7 +28,8 @@ import {
 	testUnlockPin,
 	testVisible,
 	testSetUpDefaultPath,
-	pinCode, waitAlert
+	pinCode,
+	waitAlert
 } from 'e2e/utils';
 import {
 	ETHEREUM_NETWORK_LIST,

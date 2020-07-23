@@ -22,7 +22,6 @@ import PathCard from './PathCard';
 
 import { AccountsContextState } from 'stores/AccountsContext';
 import { FoundAccount } from 'types/identityTypes';
-import AccountsStore from 'stores/AccountsStore';
 import { isLegacyFoundAccount } from 'utils/identitiesUtils';
 
 const CompatibleCard = ({

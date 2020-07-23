@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import testIDs from 'e2e/testIDs';
 import { Clipboard } from 'react-native';
 
+import testIDs from 'e2e/testIDs';
 import { Action, SetAlert } from 'stores/alertContext';
 
 const alertTestIDs = testIDs.Alert;
@@ -38,7 +38,7 @@ export const alertPathDerivationError = (
 const buildAlertButtons = (
 	onConfirm: () => any,
 	confirmText: string,
-	testID?: string,
+	testID?: string
 ): Action[] => [
 	{
 		onPress: (): void => {
@@ -52,8 +52,10 @@ const buildAlertButtons = (
 	}
 ];
 
-const buildAlertDeleteButtons = (onDelete: () => any, testID?: string): Action[] =>
-	buildAlertButtons(onDelete, 'Delete', testID);
+const buildAlertDeleteButtons = (
+	onDelete: () => any,
+	testID?: string
+): Action[] => buildAlertButtons(onDelete, 'Delete', testID);
 
 export const alertDeleteAccount = (
 	setAlert: SetAlert,
