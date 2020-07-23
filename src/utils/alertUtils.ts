@@ -14,10 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Alert, Clipboard } from 'react-native';
+import testIDs from 'e2e/testIDs';
+import { Clipboard } from 'react-native';
 
 import { Action, SetAlert } from 'stores/alertContext';
 
+const alertTestIDs = testIDs.Alert;
 export const alertError = (setAlert: SetAlert, message: string): void =>
 	setAlert('Error', message);
 
@@ -35,12 +37,14 @@ export const alertPathDerivationError = (
 
 const buildAlertButtons = (
 	onConfirm: () => any,
-	confirmText: string
+	confirmText: string,
+	testID?: string,
 ): Action[] => [
 	{
 		onPress: (): void => {
 			onConfirm();
 		},
+		testID,
 		text: confirmText
 	},
 	{
@@ -48,8 +52,8 @@ const buildAlertButtons = (
 	}
 ];
 
-const buildAlertDeleteButtons = (onDelete: () => any): Action[] =>
-	buildAlertButtons(onDelete, 'Delete');
+const buildAlertDeleteButtons = (onDelete: () => any, testID?: string): Action[] =>
+	buildAlertButtons(onDelete, 'Delete', testID);
 
 export const alertDeleteAccount = (
 	setAlert: SetAlert,
@@ -59,7 +63,7 @@ export const alertDeleteAccount = (
 	setAlert(
 		'Delete Account',
 		`Do you really want to delete ${accountName}?`,
-		buildAlertDeleteButtons(onDelete)
+		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteAccount)
 	);
 };
 
@@ -84,7 +88,7 @@ export const alertDeleteIdentity = (
 		'Delete Identity',
 		`Do you really want to delete this Identity and all the related accounts?
 This identity can only be recovered with its associated recovery phrase.`,
-		buildAlertDeleteButtons(onDelete)
+		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteIdentity)
 	);
 };
 
@@ -136,6 +140,7 @@ export const alertBackupDone = (setAlert: SetAlert, onPress: () => any): void =>
 		[
 			{
 				onPress,
+				testID: alertTestIDs.backupDoneButton,
 				text: 'Proceed'
 			},
 			{

@@ -8,6 +8,7 @@ export type SetAlert = (
 ) => void;
 export type Action = {
 	text: string;
+	testID?: string;
 	onPress?: () => any;
 };
 export type AlertState = {
