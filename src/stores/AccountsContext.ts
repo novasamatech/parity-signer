@@ -114,7 +114,7 @@ export function useAccountContext(): AccountsContextState {
 			const identities = await loadIdentities();
 			let { currentIdentity } = state;
 			if (identities.length > 0) currentIdentity = identities[0];
-			await setState({
+			setState({
 				accounts,
 				currentIdentity,
 				identities,
@@ -124,8 +124,8 @@ export function useAccountContext(): AccountsContextState {
 		refreshList();
 	}, []);
 
-	async function select(accountKey: string): Promise<void> {
-		await setState({ selectedKey: accountKey });
+	function select(accountKey: string): void {
+		setState({ selectedKey: accountKey });
 	}
 
 	function updateNew(accountUpdate: Partial<UnlockedAccount>): void {
@@ -173,46 +173,41 @@ export function useAccountContext(): AccountsContextState {
 		const accountKey = generateAccountId(account);
 		await save(accountKey, account, pin);
 
-		await setState({
+		setState({
 			accounts: state.accounts.set(accountKey, account),
 			newAccount: emptyAccount()
 		});
 	}
 
-	async function _updateIdentitiesWithCurrentIdentity(): Promise<void> {
+	function _updateIdentitiesWithCurrentIdentity(
+		updatedCurrentIdentity: Identity
+	): void {
+		setState({
+			currentIdentity: updatedCurrentIdentity
+		});
 		const newIdentities = deepCopyIdentities(state.identities);
 		if (state.currentIdentity === null) return;
 		const identityIndex = newIdentities.findIndex(
 			(identity: Identity) =>
 				identity.encryptedSeed === state.currentIdentity!.encryptedSeed
 		);
-		newIdentities.splice(identityIndex, 1, state.currentIdentity);
-		await setState({ identities: newIdentities });
-		await saveIdentities(newIdentities);
+		newIdentities.splice(identityIndex, 1, updatedCurrentIdentity);
+		setState({ identities: newIdentities });
+		saveIdentities(newIdentities);
 	}
 
-	async function updateIdentityName(name: string): Promise<void> {
-		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
-		updatedCurrentIdentity.name = name;
+	function _updateCurrentIdentity(updatedIdentity: Identity): void {
 		try {
-			await setState({ currentIdentity: updatedCurrentIdentity });
-			await _updateIdentitiesWithCurrentIdentity();
-		} catch (e) {
-			throw new Error(identityUpdateError);
-		}
-	}
-
-	async function _updateCurrentIdentity(
-		updatedIdentity: Identity
-	): Promise<void> {
-		try {
-			await setState({
-				currentIdentity: updatedIdentity
-			});
-			await _updateIdentitiesWithCurrentIdentity();
+			_updateIdentitiesWithCurrentIdentity(updatedIdentity);
 		} catch (error) {
 			throw new Error(identityUpdateError);
 		}
+	}
+
+	function updateIdentityName(name: string): void {
+		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
+		updatedCurrentIdentity.name = name;
+		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
 	async function deriveEthereumAccount(
@@ -240,27 +235,25 @@ export function useAccountContext(): AccountsContextState {
 			updatedAt: new Date().getTime()
 		});
 		updatedCurrentIdentity.addresses.set(accountId, ethereumChainId);
-		await _updateCurrentIdentity(updatedCurrentIdentity);
+		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async function _updateAccount(
+	function _updateAccount(
 		accountKey: string,
 		updatedAccount: Partial<LockedAccount>
-	): Promise<void> {
+	): void {
 		const accounts = state.accounts;
 		const account = accounts.get(accountKey);
 
 		if (account && updatedAccount) {
-			await setState({
+			setState({
 				accounts: accounts.set(accountKey, { ...account, ...updatedAccount })
 			});
 		}
 	}
 
-	async function updateSelectedAccount(
-		updatedAccount: Partial<LockedAccount>
-	): Promise<void> {
-		await _updateAccount(state.selectedKey, updatedAccount);
+	function updateSelectedAccount(updatedAccount: Partial<LockedAccount>): void {
+		_updateAccount(state.selectedKey, updatedAccount);
 	}
 
 	async function refreshList(): Promise<void> {
@@ -268,7 +261,7 @@ export function useAccountContext(): AccountsContextState {
 		const identities = await loadIdentities();
 		let { currentIdentity } = state;
 		if (identities.length > 0) currentIdentity = identities[0];
-		await setState({
+		setState({
 			accounts,
 			currentIdentity,
 			identities,
@@ -280,7 +273,7 @@ export function useAccountContext(): AccountsContextState {
 		const { accounts } = state;
 
 		accounts.delete(accountKey);
-		await setState({ accounts, selectedKey: '' });
+		setState({ accounts, selectedKey: '' });
 		await deleteDbAccount(accountKey);
 	}
 
@@ -298,7 +291,7 @@ export function useAccountContext(): AccountsContextState {
 		try {
 			const decryptedSeed = await decryptData(account.encryptedSeed, pin);
 			const { phrase, derivePath, password } = parseSURI(decryptedSeed);
-			await setState({
+			setState({
 				accounts: state.accounts.set(accountKey, {
 					derivationPassword: password || '',
 					derivationPath: derivePath || '',
@@ -468,8 +461,8 @@ export function useAccountContext(): AccountsContextState {
 		return state.newIdentity;
 	}
 
-	async function resetCurrentIdentity(): Promise<void> {
-		await setState({ currentIdentity: null });
+	function resetCurrentIdentity(): void {
+		setState({ currentIdentity: null });
 	}
 
 	async function _addPathToIdentity(
@@ -479,7 +472,7 @@ export function useAccountContext(): AccountsContextState {
 		name: string,
 		networkKey: string,
 		password: string
-	): Promise<void> {
+	): Promise<Identity> {
 		const { prefix, pathId } = SUBSTRATE_NETWORK_LIST[networkKey];
 		const suriSuffix = constructSuriSuffix({
 			derivePath: newPath,
@@ -503,6 +496,7 @@ export function useAccountContext(): AccountsContextState {
 		};
 		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
+		return updatedIdentity;
 	}
 
 	async function saveNewIdentity(
@@ -523,7 +517,7 @@ export function useAccountContext(): AccountsContextState {
 			throw new Error(duplicatedIdentityError);
 		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
 		const newIdentities = state.identities.concat(updatedIdentity);
-		await setState({
+		setState({
 			currentIdentity: updatedIdentity,
 			identities: newIdentities,
 			newIdentity: emptyIdentity()
@@ -531,8 +525,8 @@ export function useAccountContext(): AccountsContextState {
 		await saveIdentities(newIdentities);
 	}
 
-	async function selectIdentity(identity: Identity): Promise<void> {
-		await setState({ currentIdentity: identity });
+	function selectIdentity(identity: Identity): void {
+		setState({ currentIdentity: identity });
 	}
 
 	function clearIdentity() {
@@ -545,7 +539,7 @@ export function useAccountContext(): AccountsContextState {
 		});
 	}
 
-	async function updatePathName(path: string, name: string): Promise<void> {
+	function updatePathName(path: string, name: string): void {
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
 		const updatedPathMeta = Object.assign(
 			{},
@@ -553,12 +547,7 @@ export function useAccountContext(): AccountsContextState {
 			{ name }
 		);
 		updatedCurrentIdentity.meta.set(path, updatedPathMeta);
-		try {
-			await setState({ currentIdentity: updatedCurrentIdentity });
-			await _updateIdentitiesWithCurrentIdentity();
-		} catch (e) {
-			console.warn('update path name error', e);
-		}
+		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
 	async function deriveNewPath(
@@ -577,10 +566,10 @@ export function useAccountContext(): AccountsContextState {
 			networkKey,
 			password
 		);
-		await _updateCurrentIdentity(updatedCurrentIdentity);
+		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async function deletePath(path: string): Promise<void> {
+	function deletePath(path: string): void {
 		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
 		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
@@ -588,15 +577,7 @@ export function useAccountContext(): AccountsContextState {
 		updatedCurrentIdentity.addresses.delete(
 			getAddressKeyByPath(path, pathMeta)
 		);
-
-		try {
-			await setState({
-				currentIdentity: updatedCurrentIdentity
-			});
-			await _updateIdentitiesWithCurrentIdentity();
-		} catch (e) {
-			throw new Error(identityUpdateError);
-		}
+		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
 	async function deleteCurrentIdentity(): Promise<void> {
@@ -606,7 +587,7 @@ export function useAccountContext(): AccountsContextState {
 				identity.encryptedSeed === state.currentIdentity!.encryptedSeed
 		);
 		newIdentities.splice(identityIndex, 1);
-		await setState({
+		setState({
 			currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
 			identities: newIdentities
 		});

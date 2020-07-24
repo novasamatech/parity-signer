@@ -64,7 +64,7 @@ const testEthereumMessage = async (): Promise<void> => {
 describe('Signing ane exporting test', () => {
 	testRecoverIdentity();
 
-	describe('Kusama Signing Test', () =>
+	describe('Kusama Signing Test', () => {
 		it('is able to export the signing account', async () => {
 			await testTap(PathsList.pathCard + '//kusama');
 			await testTap(PathDetail.popupMenuButton);

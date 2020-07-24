@@ -101,7 +101,6 @@ export default function Scanner({
 					scannerStore.setReady();
 					setLastFrame(null);
 					setEnableScan(true);
-					debugger;
 				},
 				text: 'Try again'
 			}
@@ -111,7 +110,6 @@ export default function Scanner({
 	const onBarCodeRead = async (event: any): Promise<void> => {
 		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
 		if (!enableScan) {
-			debugger;
 			return;
 		}
 		if (event.rawData === lastFrame) {

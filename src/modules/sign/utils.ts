@@ -65,7 +65,6 @@ export async function processBarCode(
 			// Ethereum Legacy
 			return JSON.parse(txRequestData.data);
 		} else if (!scannerStore.state.multipartComplete) {
-			debugger;
 			const strippedData = rawDataToU8A(txRequestData.rawData);
 			if (strippedData === null) throw new Error(strings.ERROR_NO_RAW_DATA);
 			const parsedData = await constructDataFromBytes(strippedData, false);
