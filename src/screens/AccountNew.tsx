@@ -63,7 +63,7 @@ export default function AccountNew({
 
 	useEffect((): void => {
 		accounts.updateNew(emptyAccount());
-	}, [accounts, accounts.updateNew]);
+	}, [accounts.updateNew]);
 
 	useEffect((): void => {
 		const selectedAccount = accounts.state.newAccount;

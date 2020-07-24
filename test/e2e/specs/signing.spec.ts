@@ -31,7 +31,8 @@ import {
 	testScrollAndTap,
 	testTap,
 	testUnlockPin,
-	testVisible
+	testVisible,
+	waitAlert
 } from 'e2e/utils';
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
@@ -72,7 +73,7 @@ describe('Signing ane exporting test', () => {
 			await testTap(PathsList.deriveButton);
 			await testInput(PathDerivation.pathInput, '');
 			await testInput(PathDerivation.nameInput, 'kusama root');
-			await element(by.text('Done')).tap();
+			await waitAlert();
 			await testExist(PathsList.pathCard + '//kusama');
 		});
 

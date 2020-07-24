@@ -50,6 +50,7 @@ export default function CustomAlert(): React.ReactElement {
 			onlyText={true}
 			small={true}
 			key={'alert' + index}
+			testID={action.testID}
 			title={action.text}
 			onPress={(): any => {
 				if (action.onPress) {

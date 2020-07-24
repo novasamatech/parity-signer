@@ -55,6 +55,7 @@ import {
 import { constructSuriSuffix, parseSURI } from 'utils/suri';
 
 export type AccountsContextState = {
+	clearIdentity: any;
 	state: AccountsStoreState;
 	select: any;
 	updateNew: any;
@@ -534,6 +535,10 @@ export function useAccountContext(): AccountsContextState {
 		await setState({ currentIdentity: identity });
 	}
 
+	function clearIdentity() {
+		setState({ newIdentity: emptyIdentity() });
+	}
+
 	function updateNewIdentity(identityUpdate: Partial<Identity>): void {
 		setState({
 			newIdentity: { ...state.newIdentity, ...identityUpdate }
@@ -609,6 +614,7 @@ export function useAccountContext(): AccountsContextState {
 	}
 
 	return {
+		clearIdentity,
 		deleteAccount,
 		deleteCurrentIdentity,
 		deletePath,

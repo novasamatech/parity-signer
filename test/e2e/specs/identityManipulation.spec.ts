@@ -55,7 +55,7 @@ const secondPath = '/2';
 const ethereumButtonIndex =
 	ETHEREUM_NETWORK_LIST[EthereumNetworkKeys.FRONTIER].ethereumChainId;
 
-describe('Load test', () => {
+describe.skip('Load test', () => {
 	it('create a new identity with default substrate account', async () => {
 		await testTap(Main.createButton);
 		await testNotVisible(IdentityNew.seedInput);
@@ -141,7 +141,7 @@ describe('Load test', () => {
 		await testVisible(PathDetail.screen);
 		await testTap(PathDetail.popupMenuButton);
 		await testTap(PathDetail.deleteButton);
-		await testTap(Alert.deleteIdentity);
+		await testTap(Alert.deleteAccount);
 		await testNotExist(Main.networkButton + ethereumButtonIndex);
 	});
 
@@ -150,7 +150,7 @@ describe('Load test', () => {
 		await testTap(IdentitiesSwitch.manageIdentityButton);
 		await testTap(IdentityManagement.popupMenuButton);
 		await testTap(IdentityManagement.deleteButton);
-		await element(by.text('Delete')).tap();
+		await testTap(Alert.deleteIdentity);
 		await testUnlockPin(pinCode);
 		await testVisible(Main.noAccountScreen);
 	});

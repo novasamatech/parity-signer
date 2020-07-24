@@ -11,7 +11,8 @@ import {
 	testInputWithDone,
 	testRecoverIdentity,
 	testTap,
-	testVisible
+	testVisible,
+	waitAlert
 } from 'e2e/utils';
 
 const {
@@ -26,7 +27,7 @@ const {
 const passwordedPath = '//passworded';
 const password = 'random';
 
-describe('passworded account test', () => {
+describe.skip('passworded account test', () => {
 	testRecoverIdentity();
 
 	it('derive a passworded account', async () => {
@@ -34,7 +35,7 @@ describe('passworded account test', () => {
 		await testInput(PathDerivation.pathInput, passwordedPath);
 		await testTap(PathDerivation.togglePasswordButton);
 		await testInput(PathDerivation.passwordInput, password);
-		await element(by.text('Done')).tap();
+		await waitAlert();
 		await testExist(PathsList.pathCard + `//kusama${passwordedPath}`);
 	});
 

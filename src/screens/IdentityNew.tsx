@@ -14,16 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NavigationProps } from 'types/props';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
+import { NavigationProps } from 'types/props';
 import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
 import { validateSeed } from 'utils/account';
@@ -51,13 +51,14 @@ function IdentityNew({
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
+	const clearIdentity = useRef(() =>
+		accounts.updateNewIdentity(emptyIdentity())
+	);
 
 	useEffect((): (() => void) => {
-		const clearNewIdentity = (): void =>
-			accounts.updateNewIdentity(emptyIdentity());
-		clearNewIdentity();
-		return clearNewIdentity;
-	}, [accounts]);
+		clearIdentity.current();
+		return clearIdentity.current;
+	}, [clearIdentity]);
 
 	const updateName = (name: string): void => {
 		accounts.updateNewIdentity({ name });
