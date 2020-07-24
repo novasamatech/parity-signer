@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { by, element } from 'detox';
-
 import {
 	EthereumNetworkKeys,
 	SUBSTRATE_NETWORK_LIST,
@@ -26,7 +24,6 @@ import {
 	pinCode,
 	tapBack,
 	testExist,
-	testInput,
 	testRecoverIdentity,
 	testScrollAndTap,
 	testTap,
@@ -39,7 +36,6 @@ import testIDs from 'e2e/testIDs';
 
 const {
 	Main,
-	PathDerivation,
 	PathDetail,
 	PathsList,
 	SecurityHeader,
@@ -68,21 +64,13 @@ const testEthereumMessage = async (): Promise<void> => {
 describe('Signing ane exporting test', () => {
 	testRecoverIdentity();
 
-	describe('Kusama Signing Test', () => {
-		it('Recover a Kusama signing account', async () => {
-			await testTap(PathsList.deriveButton);
-			await testInput(PathDerivation.pathInput, '');
-			await testInput(PathDerivation.nameInput, 'kusama root');
-			await waitAlert();
-			await testExist(PathsList.pathCard + '//kusama');
-		});
-
+	describe('Kusama Signing Test', () =>
 		it('is able to export the signing account', async () => {
 			await testTap(PathsList.pathCard + '//kusama');
 			await testTap(PathDetail.popupMenuButton);
 			await testTap(PathDetail.exportButton);
 			await testExist(
-				'secret:0xdf46d55a2d98695e9342b67edae6669e5c0b4e1a3895f1adf85989565b9ab827:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:kusama root'
+				'secret:0xdf46d55a2d98695e9342b67edae6669e5c0b4e1a3895f1adf85989565b9ab827:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:Kusama root'
 			);
 			await tapBack();
 			await testVisible(PathDetail.screen);
