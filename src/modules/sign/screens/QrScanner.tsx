@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import {SafeAreaViewContainer} from 'components/SafeAreaContainer';
 import React, {
 	useCallback,
 	useContext,
@@ -142,49 +143,51 @@ export default function Scanner({
 		missingFramesMessage
 	} = multiFrames;
 	return (
-		<RNCamera
-			captureAudio={false}
-			onBarCodeRead={onBarCodeRead}
-			style={styles.view}
-		>
-			<View style={styles.body}>
-				<View style={styles.top}>
-					<ScreenHeading title="Scanner" />
+		<SafeAreaViewContainer>
+			<RNCamera
+				captureAudio={false}
+				onBarCodeRead={onBarCodeRead}
+				style={styles.view}
+			>
+				<View style={styles.body}>
+					<View style={styles.top}>
+						<ScreenHeading title="Scanner" />
+					</View>
+					<View style={styles.middle}>
+						<View style={styles.middleLeft} />
+						<View style={styles.middleCenter} />
+						<View style={styles.middleRight} />
+					</View>
+					{isMultipart ? (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								Scanning Multipart Data, Please Hold Still...
+							</Text>
+							<Text style={styles.descSecondary}>
+								{completedFramesCount} / {totalFramesCount} Completed.
+							</Text>
+							<Button
+								onPress={(): void => scannerStore.clearMultipartProgress()}
+								title="Start Over"
+								small
+							/>
+						</View>
+					) : (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>Scan QR Code</Text>
+							<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
+						</View>
+					)}
+					{missedFrames && missedFrames.length >= 1 && (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								Missing following frame(s): {missingFramesMessage}
+							</Text>
+						</View>
+					)}
 				</View>
-				<View style={styles.middle}>
-					<View style={styles.middleLeft} />
-					<View style={styles.middleCenter} />
-					<View style={styles.middleRight} />
-				</View>
-				{isMultipart ? (
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>
-							Scanning Multipart Data, Please Hold Still...
-						</Text>
-						<Text style={styles.descSecondary}>
-							{completedFramesCount} / {totalFramesCount} Completed.
-						</Text>
-						<Button
-							onPress={(): void => scannerStore.clearMultipartProgress()}
-							title="Start Over"
-							small
-						/>
-					</View>
-				) : (
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>Scan QR Code</Text>
-						<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
-					</View>
-				)}
-				{missedFrames && missedFrames.length >= 1 && (
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>
-							Missing following frame(s): {missingFramesMessage}
-						</Text>
-					</View>
-				)}
-			</View>
-		</RNCamera>
+			</RNCamera>
+		</SafeAreaViewContainer>
 	);
 }
 
