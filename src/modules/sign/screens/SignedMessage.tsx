@@ -48,13 +48,7 @@ export default function SignedMessage(
 	const { sender, message } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
 
-	useEffect(
-		() => () => {
-			debugger;
-			cleanup.current();
-		},
-		[cleanup]
-	);
+	useEffect(() => cleanup.current, [cleanup]);
 
 	if (sender === null || message === null) return <View />;
 	return (

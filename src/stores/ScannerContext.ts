@@ -190,7 +190,6 @@ export function useScannerContext(): ScannerContextState {
 		const multipartData = !state.totalFrameCount
 			? newArray
 			: state.multipartData;
-		debugger;
 		const { completedFramesCount, multipartComplete } = state;
 		const partDataAsBytes = new Uint8Array(partData.length / 2);
 

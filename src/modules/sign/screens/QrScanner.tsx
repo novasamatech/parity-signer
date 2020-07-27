@@ -110,7 +110,6 @@ export default function Scanner({
 		if (event.rawData === lastFrame) {
 			return;
 		}
-		debugger;
 		setLastFrame(event.rawData);
 		await processBarCode(event as TxRequestData);
 	};

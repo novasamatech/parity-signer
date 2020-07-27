@@ -44,13 +44,7 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 	const { recipient, sender } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
 
-	useEffect(
-		() => () => {
-			debugger;
-			cleanup.current();
-		},
-		[cleanup]
-	);
+	useEffect(() => cleanup.current, [cleanup]);
 
 	if (sender === null || recipient === null) return <View />;
 	return (
