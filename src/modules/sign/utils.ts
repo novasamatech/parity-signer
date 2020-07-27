@@ -13,21 +13,28 @@
 
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
-
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Dispatch, SetStateAction, useContext } from 'react';
 
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import Scanner from 'modules/sign/screens/QrScanner';
 import strings from 'modules/sign/strings';
-import {useContext} from 'react';
-import {AccountsContext, AccountsContextState} from 'stores/AccountsContext';
-import {QrInfo, ScannerContext, ScannerContextState} from 'stores/ScannerContext';
-import {SeedRefsContext, SeedRefsState} from 'stores/SeedRefStore';
-import {FoundAccount, FoundIdentityAccount} from 'types/identityTypes';
+import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
+import { ScannerContext, ScannerContextState } from 'stores/ScannerContext';
+import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
+import { FoundAccount, FoundIdentityAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { RootStackParamList } from 'types/routes';
-import { isMultipartData, ParsedData, TxRequestData } from 'types/scannerTypes';
+import {
+	Frames,
+	isMultiFramesInfo,
+	isMultipartData,
+	ParsedData,
+	QrInfo,
+	SubstrateCompletedParsedData,
+	TxRequestData
+} from 'types/scannerTypes';
 import {
 	constructDataFromBytes,
 	isAddressString,
@@ -40,9 +47,10 @@ import {
 	navigateToSignedMessage,
 	navigateToSignedTx,
 	unlockSeedPhrase,
-	unlockSeedPhraseWithPassword, useUnlockSeed
+	unlockSeedPhraseWithPassword,
+	useUnlockSeed
 } from 'utils/navigationHelpers';
-import {useSeedRef} from 'utils/seedRefHooks';
+import { useSeedRef } from 'utils/seedRefHooks';
 import { constructSuriSuffix } from 'utils/suri';
 
 function getSeedRef(
@@ -54,15 +62,20 @@ function getSeedRef(
 	}
 }
 
-export async function processBarCode(
-	showErrorMessage: (title: string, message: string) => void,
-	txRequestData: TxRequestData,
-	navigation: StackNavigationProp<RootStackParamList, 'QrScanner'>,
-	accounts: AccountsContextState,
-	scannerStore: ScannerContextState,
-	seedRefs: Map<string, SeedRefClass>
-): Promise<void> {
-	async function parseQrData(): Promise<ParsedData> {
+export function useProcessBarCode(
+	showErrorMessage: (title: string, message: string) => void
+): (txRequestData: TxRequestData) => Promise<void> {
+	const accounts = useContext(AccountsContext);
+	const scannerStore = useContext(ScannerContext);
+	const [seedRefs] = useContext<SeedRefsState>(SeedRefsContext);
+	const navigation: StackNavigationProp<
+		RootStackParamList,
+		'QrScanner'
+	> = useNavigation();
+
+	async function parseQrData(
+		txRequestData: TxRequestData
+	): Promise<ParsedData> {
 		if (isAddressString(txRequestData.data)) {
 			throw new Error(strings.ERROR_ADDRESS_MESSAGE);
 		} else if (isJsonString(txRequestData.data)) {
@@ -78,9 +91,28 @@ export async function processBarCode(
 		}
 	}
 
+	async function checkMultiFramesData(
+		parsedData: ParsedData
+	): Promise<null | ParsedData> {
+		if (isMultipartData(parsedData)) {
+			const multiFramesResult = await scannerStore.setPartData(
+				parsedData.currentFrame,
+				parsedData.frameCount,
+				parsedData.partData
+			);
+			const isMultiPartUncompleted = isMultiFramesInfo(multiFramesResult);
+			if (isMultiPartUncompleted) {
+				return null;
+			}
+			return multiFramesResult;
+		} else {
+			return parsedData;
+		}
+	}
+
 	async function unlockSeedAndSign(
 		sender: FoundIdentityAccount,
-		qrInfo: QrInfo,
+		qrInfo: QrInfo
 	): Promise<void> {
 		const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
@@ -135,7 +167,7 @@ export async function processBarCode(
 		}
 	}
 
-	async function unlockAndNavigationToSignedQR (qrInfo: QrInfo) {
+	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo) {
 		const { sender, type } = qrInfo;
 		if (!sender)
 			return showErrorMessage(
@@ -154,37 +186,30 @@ export async function processBarCode(
 			}
 		}
 
-		let seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
-		const isSeedRefInvalid = (seedRef && seedRef.isValid());
+		const seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
+		const isSeedRefInvalid = seedRef && seedRef.isValid();
 		await unlockSeedAndSign(sender, qrInfo);
 		const nextRoute = type === 'transaction' ? 'SignedTx' : 'SignedMessage';
 
-		if(isSeedRefInvalid){
+		if (isSeedRefInvalid) {
 			navigation.navigate(nextRoute);
 		} else {
 			navigation.replace(nextRoute);
 		}
 	}
 
-	try {
-		const parsedData = await parseQrData();
-
-		let unsignedData;
-		if (isMultipartData(parsedData)) {
-			unsignedData = await scannerStore.setPartData(
-				parsedData.currentFrame,
-				parsedData.frameCount,
-				parsedData.partData
-			);
+	async function processBarCode(txRequestData: TxRequestData): Promise<void> {
+		try {
+			const parsedData = await parseQrData(txRequestData);
+			const unsignedData = await checkMultiFramesData(parsedData);
 			if (unsignedData === null) return;
-		} else {
-			unsignedData = parsedData;
+			const qrInfo = await scannerStore.setData(accounts, unsignedData);
+			await unlockAndNavigationToSignedQR(qrInfo);
+			scannerStore.clearMultipartProgress();
+		} catch (e) {
+			return showErrorMessage(strings.ERROR_TITLE, e.message);
 		}
-		const qrInfo = await scannerStore.setData(accounts, unsignedData);
-		scannerStore.clearMultipartProgress();
-		await unlockAndNavigationToSignedQR(qrInfo);
-
-	} catch (e) {
-		return showErrorMessage(strings.ERROR_TITLE, e.message);
 	}
+
+	return processBarCode;
 }

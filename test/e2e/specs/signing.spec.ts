@@ -107,6 +107,7 @@ describe('Signing ane exporting test', () => {
 	describe('Polkadot Signing Test', () => {
 		it('generate Polkadot account', async () => {
 			await tapBack();
+			await tapBack();
 			const PolkadotNetworkButtonIndex =
 				Main.networkButton +
 				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.POLKADOT].pathId;

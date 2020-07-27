@@ -33,9 +33,13 @@ import {
 	EthereumParsedData,
 	isEthereumCompletedParsedData,
 	isSubstrateMessageParsedData,
+	MessageQRInfo,
+	MultiFramesInfo,
+	QrInfo,
 	SubstrateCompletedParsedData,
 	SubstrateMessageParsedData,
-	SubstrateTransactionParsedData
+	SubstrateTransactionParsedData,
+	TxQRInfo
 } from 'types/scannerTypes';
 import { emptyAccount } from 'utils/account';
 import {
@@ -81,27 +85,6 @@ type ScannerStoreState = {
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
 	type: 'transaction' | 'message' | null;
 };
-
-type MessageQRInfo = {
-	dataToSign: string | GenericExtrinsicPayload;
-	isHash: boolean;
-	isOversized: boolean;
-	message: string;
-	sender: FoundAccount;
-	type: 'message';
-};
-
-type TxQRInfo = {
-	sender: FoundAccount;
-	recipient: FoundAccount;
-	type: 'transaction';
-	dataToSign: string | GenericExtrinsicPayload;
-	isHash: boolean;
-	isOversized: boolean;
-	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array;
-};
-
-export type QrInfo = MessageQRInfo | TxQRInfo;
 
 export type ScannerContextState = {
 	cleanup: any;
@@ -164,11 +147,10 @@ export function useScannerContext(): ScannerContextState {
 		});
 	}
 
-	async function _integrateMultiPartData(): Promise<
-		SubstrateCompletedParsedData
-	> {
-		const { multipartData, totalFrameCount } = state;
-
+	async function _integrateMultiPartData(
+		multipartData: Array<Uint8Array | null>,
+		totalFrameCount: number
+	): Promise<SubstrateCompletedParsedData> {
 		// concatenate all the parts into one binary blob
 		let concatMultipartData = multipartData!.reduce(
 			(acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
@@ -201,21 +183,15 @@ export function useScannerContext(): ScannerContextState {
 		currentFrame: number,
 		frameCount: number,
 		partData: string
-	): Promise<null | SubstrateCompletedParsedData> {
+	): Promise<MultiFramesInfo | SubstrateCompletedParsedData> {
+		const newArray = new Array(frameCount).fill(null);
+		const totalFrameCount = frameCount;
 		// set it once only
-		if (!state.totalFrameCount) {
-			const newArray = new Array(frameCount).fill(null);
-			setState({
-				multipartData: newArray,
-				totalFrameCount: frameCount
-			});
-		}
-		const {
-			completedFramesCount,
-			multipartComplete,
-			multipartData,
-			totalFrameCount
-		} = state;
+		const multipartData = !state.totalFrameCount
+			? newArray
+			: state.multipartData;
+		debugger;
+		const { completedFramesCount, multipartComplete } = state;
 		const partDataAsBytes = new Uint8Array(partData.length / 2);
 
 		for (let i = 0; i < partDataAsBytes.length; i++) {
@@ -248,20 +224,28 @@ export function useScannerContext(): ScannerContextState {
 				completedFramesCount: nextCompletedFramesCount,
 				latestFrame: currentFrame,
 				missedFrames: nextMissedFrames,
-				multipartData: nextDataState
+				multipartData: nextDataState,
+				totalFrameCount
 			});
-
 			if (
 				totalFrameCount > 0 &&
 				nextCompletedFramesCount === totalFrameCount &&
 				!multipartComplete
 			) {
 				// all the frames are filled
-				return await _integrateMultiPartData();
+				return await _integrateMultiPartData(nextDataState, totalFrameCount);
 			}
-			return null;
+			return {
+				completedFramesCount: nextCompletedFramesCount,
+				missedFrames: nextMissedFrames,
+				totalFrameCount
+			};
 		}
-		return null;
+		return {
+			completedFramesCount: totalFrameCount,
+			missedFrames: [],
+			totalFrameCount
+		};
 	}
 
 	/**

@@ -42,8 +42,15 @@ import Separator from 'components/Separator';
 function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const { recipient, sender } = scannerStore.state;
+	const cleanup = useRef(scannerStore.cleanup);
 
-	useEffect(() => scannerStore.cleanup, [scannerStore.cleanup]);
+	useEffect(
+		() => () => {
+			debugger;
+			cleanup.current();
+		},
+		[cleanup]
+	);
 
 	if (sender === null || recipient === null) return <View />;
 	return (

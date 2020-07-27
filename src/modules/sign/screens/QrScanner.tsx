@@ -18,7 +18,8 @@ import React, {
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo, useRef,
+	useMemo,
+	useRef,
 	useState
 } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -26,8 +27,8 @@ import { RNCamera } from 'react-native-camera';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
-import { processBarCode } from 'modules/sign/utils';
-import { onMockBarCodeRead } from 'e2e/injections';
+import { useProcessBarCode } from 'modules/sign/utils';
+import { onMockBarCodeRead, useInjectionQR } from 'e2e/injections';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { ScannerContext } from 'stores/ScannerContext';
@@ -36,16 +37,8 @@ import { NavigationAccountScannerProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
-import { TxRequestData } from 'types/scannerTypes';
+import { Frames, TxRequestData } from 'types/scannerTypes';
 import { withAccountAndScannerStore } from 'utils/HOC';
-
-type Frames = {
-	completedFramesCount: number;
-	isMultipart: boolean;
-	missedFrames: number[];
-	missingFramesMessage: string;
-	totalFramesCount: number;
-};
 
 export default function Scanner({
 	navigation
@@ -56,6 +49,7 @@ export default function Scanner({
 	const { setAlert } = useContext(AlertStateContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
+	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
 	const [multiFrames, setMultiFrames] = useState<Frames>({
 		completedFramesCount: 0,
 		isMultipart: false,
@@ -63,36 +57,6 @@ export default function Scanner({
 		missingFramesMessage: '',
 		totalFramesCount: 0
 	});
-	// useEffect((): (() => void) => {
-	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
-	// 		setLastFrame(null);
-	// 		scannerStore.setReady();
-	// 	});
-	// 	const unsubscribeBlur = navigation.addListener(
-	// 		'blur',
-	// 		scannerStore.setBusy
-	// 	);
-	// 	return (): void => {
-	// 		unsubscribeFocus();
-	// 		unsubscribeBlur();
-	// 	};
-	// }, [navigation, scannerStore.setReady, scannerStore.setBusy]);
-
-	useEffect(() => {
-		const {
-			missedFrames,
-			completedFramesCount,
-			totalFrameCount
-		} = scannerStore.state;
-		setMultiFrames({
-			completedFramesCount,
-			isMultipart: totalFrameCount > 1,
-			missedFrames,
-			missingFramesMessage: missedFrames && missedFrames.join(', '),
-			totalFramesCount: totalFrameCount
-		});
-	}, [lastFrame, scannerStore.state]);
-
 	function showErrorMessage(title: string, message: string): void {
 		setEnableScan(false);
 		setAlert(title, message, [
@@ -108,37 +72,59 @@ export default function Scanner({
 		]);
 	}
 
-	const onBarCodeRead = useRef(
-		async (event: any): Promise<void> => {
-			if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
-			if (!enableScan) {
-				return;
-			}
-			if (event.rawData === lastFrame) {
-				return;
-			}
-			setLastFrame(event.rawData);
-			await processBarCode(
-				showErrorMessage,
-				event as TxRequestData,
-				navigation,
-				accounts,
-				scannerStore,
-				seedRefs
-			);
+	const processBarCode = useProcessBarCode(showErrorMessage);
+	// useEffect((): (() => void) => {
+	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
+	// 		setLastFrame(null);
+	// 		scannerStore.setReady();
+	// 	});
+	// 	const unsubscribeBlur = navigation.addListener(
+	// 		'blur',
+	// 		scannerStore.setBusy
+	// 	);
+	// 	return (): void => {
+	// 		unsubscribeFocus();
+	// 		unsubscribeBlur();
+	// 	};
+	// }, [navigation, scannerStore.setReady, scannerStore.setBusy]);
+	useEffect(() => {
+		const {
+			missedFrames,
+			completedFramesCount,
+			totalFrameCount
+		} = scannerStore.state;
+		setMultiFrames({
+			completedFramesCount,
+			isMultipart: totalFrameCount > 1,
+			missedFrames,
+			missingFramesMessage: missedFrames && missedFrames.join(', '),
+			totalFramesCount: totalFrameCount
+		});
+	}, [lastFrame, scannerStore.state]);
+
+	const onBarCodeRead = async (event: any): Promise<void> => {
+		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
+		if (!enableScan) {
+			return;
 		}
-	);
+		if (event.rawData === lastFrame) {
+			return;
+		}
+		debugger;
+		setLastFrame(event.rawData);
+		await processBarCode(event as TxRequestData);
+	};
 
 	useEffect(() => {
 		if (global.inTest && global.scanRequest !== undefined) {
 			onMockBarCodeRead(
 				global.scanRequest,
 				async (tx: TxRequestData): Promise<void> => {
-					await onBarCodeRead.current(tx);
+					await processBarCode(tx);
 				}
 			);
 		}
-	}, [onBarCodeRead]);
+	}, [mockIndex]);
 
 	const {
 		completedFramesCount,
@@ -151,7 +137,7 @@ export default function Scanner({
 		<SafeAreaViewContainer>
 			<RNCamera
 				captureAudio={false}
-				onBarCodeRead={onBarCodeRead.current}
+				onBarCodeRead={onBarCodeRead}
 				style={styles.view}
 			>
 				<View style={styles.body}>
