@@ -228,19 +228,43 @@ export const resetNavigationWithNetworkChooser = <
 	navigation.dispatch(resetAction);
 };
 
+export const resetNavigationWithScanner = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
+	screenName: string
+): void => {
+	const resetAction = CommonActions.reset({
+		index: 1,
+		routes: [
+			{
+				name: 'Main',
+				params: { isNew: false }
+			},
+			{
+				name: 'QrScanner'
+			},
+			{
+				name: screenName
+			}
+		]
+	});
+	navigation.dispatch(resetAction);
+};
+
 export const navigateToSignedMessage = <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>
-): void =>
-	resetNavigationWithNetworkChooser(navigation, 'SignedMessage', {
-		isNew: true
-	});
+): void => {
+	resetNavigationWithScanner(navigation, 'SignedMessage');
+};
 
 export const navigateToSignedTx = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
-): void =>
-	resetNavigationWithNetworkChooser(navigation, 'SignedTx', { isNew: true });
+): void => {
+	resetNavigationWithScanner(navigation, 'SignedTx');
+};
 
 export const navigateToPathsList = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>,

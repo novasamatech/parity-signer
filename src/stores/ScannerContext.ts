@@ -340,6 +340,7 @@ export function useScannerContext(): ScannerContextState {
 			type: 'transaction'
 		};
 
+		setState(qrInfo);
 		return qrInfo;
 	}
 

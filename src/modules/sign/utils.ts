@@ -14,17 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import {useNavigation} from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { NETWORK_LIST } from 'constants/networkSpecs';
+import Scanner from 'modules/sign/screens/QrScanner';
 import strings from 'modules/sign/strings';
-import { AccountsContextState } from 'stores/AccountsContext';
-import { QrInfo, ScannerContextState } from 'stores/ScannerContext';
-import { FoundIdentityAccount } from 'types/identityTypes';
+import {useContext} from 'react';
+import {AccountsContext, AccountsContextState} from 'stores/AccountsContext';
+import {QrInfo, ScannerContext, ScannerContextState} from 'stores/ScannerContext';
+import {SeedRefsContext, SeedRefsState} from 'stores/SeedRefStore';
+import {FoundAccount, FoundIdentityAccount} from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { RootStackParamList } from 'types/routes';
 import { isMultipartData, ParsedData, TxRequestData } from 'types/scannerTypes';
-import { assertNever } from 'types/utilTypes';
 import {
 	constructDataFromBytes,
 	isAddressString,
@@ -37,8 +40,9 @@ import {
 	navigateToSignedMessage,
 	navigateToSignedTx,
 	unlockSeedPhrase,
-	unlockSeedPhraseWithPassword
+	unlockSeedPhraseWithPassword, useUnlockSeed
 } from 'utils/navigationHelpers';
+import {useSeedRef} from 'utils/seedRefHooks';
 import { constructSuriSuffix } from 'utils/suri';
 
 function getSeedRef(
@@ -76,7 +80,7 @@ export async function processBarCode(
 
 	async function unlockSeedAndSign(
 		sender: FoundIdentityAccount,
-		qrInfo: QrInfo
+		qrInfo: QrInfo,
 	): Promise<void> {
 		const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
@@ -131,22 +135,7 @@ export async function processBarCode(
 		}
 	}
 
-	try {
-		const parsedData = await parseQrData();
-
-		let unsignedData;
-		if (isMultipartData(parsedData)) {
-			unsignedData = await scannerStore.setPartData(
-				parsedData.currentFrame,
-				parsedData.frameCount,
-				parsedData.partData
-			);
-			if (unsignedData === null) return;
-		} else {
-			unsignedData = parsedData;
-		}
-		const qrInfo = await scannerStore.setData(accounts, unsignedData);
-		scannerStore.clearMultipartProgress();
+	async function unlockAndNavigationToSignedQR (qrInfo: QrInfo) {
 		const { sender, type } = qrInfo;
 		if (!sender)
 			return showErrorMessage(
@@ -164,12 +153,37 @@ export async function processBarCode(
 				});
 			}
 		}
+
+		let seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
+		const isSeedRefInvalid = (seedRef && seedRef.isValid());
 		await unlockSeedAndSign(sender, qrInfo);
-		if (type === 'transaction') {
-			navigateToSignedTx(navigation);
+		const nextRoute = type === 'transaction' ? 'SignedTx' : 'SignedMessage';
+
+		if(isSeedRefInvalid){
+			navigation.navigate(nextRoute);
 		} else {
-			navigateToSignedMessage(navigation);
+			navigation.replace(nextRoute);
 		}
+	}
+
+	try {
+		const parsedData = await parseQrData();
+
+		let unsignedData;
+		if (isMultipartData(parsedData)) {
+			unsignedData = await scannerStore.setPartData(
+				parsedData.currentFrame,
+				parsedData.frameCount,
+				parsedData.partData
+			);
+			if (unsignedData === null) return;
+		} else {
+			unsignedData = parsedData;
+		}
+		const qrInfo = await scannerStore.setData(accounts, unsignedData);
+		scannerStore.clearMultipartProgress();
+		await unlockAndNavigationToSignedQR(qrInfo);
+
 	} catch (e) {
 		return showErrorMessage(strings.ERROR_TITLE, e.message);
 	}

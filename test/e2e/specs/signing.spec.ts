@@ -83,6 +83,7 @@ describe('Signing ane exporting test', () => {
 
 		it('does not need sign again after pin input', async () => {
 			await tapBack();
+			await tapBack();
 			await testTap(SecurityHeader.scanButton);
 			await testVisible(SignedTx.qrView);
 		});

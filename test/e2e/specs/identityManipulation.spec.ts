@@ -55,7 +55,7 @@ const secondPath = '/2';
 const ethereumButtonIndex =
 	ETHEREUM_NETWORK_LIST[EthereumNetworkKeys.FRONTIER].ethereumChainId;
 
-describe('Load test', () => {
+describe.skip('Load test', () => {
 	it('create a new identity with default substrate account', async () => {
 		await testTap(Main.createButton);
 		await testNotVisible(IdentityNew.seedInput);

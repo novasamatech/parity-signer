@@ -14,16 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
 import strings from 'modules/sign/strings';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import { AccountsContext } from 'stores/AccountsContext';
+import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountScannerProps } from 'types/props';
+import {
+	NavigationAccountScannerProps,
+	NavigationProps,
+	NavigationScannerProps
+} from 'types/props';
 import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
 import { withAccountAndScannerStore } from 'utils/HOC';
@@ -33,16 +39,24 @@ import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 
-function SignedTx(
-	props: NavigationAccountScannerProps<'SignedTx'>
-): React.ReactElement {
-	const { scannerStore } = props;
+function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
+	const scannerStore = useContext(ScannerContext);
 	const { recipient, sender } = scannerStore.state;
+
+	useEffect(() => scannerStore.cleanup, [scannerStore.cleanup]);
+
 	if (sender === null || recipient === null) return <View />;
-	return <SignedTxView sender={sender} recipient={recipient} {...props} />;
+	return (
+		<SignedTxView
+			sender={sender}
+			recipient={recipient}
+			scannerStore={scannerStore}
+			{...props}
+		/>
+	);
 }
 
-interface Props extends NavigationAccountScannerProps<'SignedTx'> {
+interface Props extends NavigationScannerProps<'SignedTx'> {
 	sender: FoundAccount;
 	recipient: FoundAccount;
 }
@@ -50,21 +64,13 @@ interface Props extends NavigationAccountScannerProps<'SignedTx'> {
 function SignedTxView({
 	sender,
 	recipient,
-	accounts,
 	scannerStore
 }: Props): React.ReactElement {
+	const accounts = useContext(AccountsContext);
 	const { signedData, tx } = scannerStore.state;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
-
-	useEffect(
-		() =>
-			function (): void {
-				scannerStore.cleanup();
-			},
-		[scannerStore]
-	);
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -106,4 +112,4 @@ function SignedTxView({
 	);
 }
 
-export default withAccountAndScannerStore(SignedTx);
+export default SignedTx;

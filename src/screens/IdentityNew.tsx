@@ -169,7 +169,7 @@ function IdentityNew({
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.IdentityNew.nameInput}
-				value={accounts.getNewIdentity().name}
+				value={accounts.state.newIdentity.name}
 				placeholder="Identity Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}

@@ -75,7 +75,6 @@ export type AccountsContextState = {
 	getSelectedKey: any;
 	getAccounts: () => Map<string, UnlockedAccount | LockedAccount>;
 	getIdentityByAccountId: any;
-	getNewIdentity: any;
 	resetCurrentIdentity: any;
 	saveNewIdentity: any;
 	selectIdentity: any;
@@ -457,10 +456,6 @@ export function useAccountContext(): AccountsContextState {
 		);
 	}
 
-	function getNewIdentity(): Identity {
-		return state.newIdentity;
-	}
-
 	function resetCurrentIdentity(): void {
 		setState({ currentIdentity: null });
 	}
@@ -607,7 +602,6 @@ export function useAccountContext(): AccountsContextState {
 		getById,
 		getIdentityByAccountId,
 		getNew,
-		getNewIdentity,
 		getSelected,
 		getSelectedKey,
 		lockAccount,

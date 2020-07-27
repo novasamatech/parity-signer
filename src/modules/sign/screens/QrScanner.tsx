@@ -14,17 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {SafeAreaViewContainer} from 'components/SafeAreaContainer';
 import React, {
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo,
+	useMemo, useRef,
 	useState
 } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
 import { processBarCode } from 'modules/sign/utils';
 import { onMockBarCodeRead } from 'e2e/injections';
@@ -108,33 +108,38 @@ export default function Scanner({
 		]);
 	}
 
-	const onBarCodeRead = async (event: any): Promise<void> => {
-		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
-		if (!enableScan) {
-			return;
-		}
-		if (event.rawData === lastFrame) {
-			return;
-		}
-		setLastFrame(event.rawData);
-		await processBarCode(
-			showErrorMessage,
-			event as TxRequestData,
-			navigation,
-			accounts,
-			scannerStore,
-			seedRefs
-		);
-	};
-
-	if (global.inTest && global.scanRequest !== undefined) {
-		onMockBarCodeRead(
-			global.scanRequest,
-			async (tx: TxRequestData): Promise<void> => {
-				await onBarCodeRead(tx);
+	const onBarCodeRead = useRef(
+		async (event: any): Promise<void> => {
+			if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
+			if (!enableScan) {
+				return;
 			}
-		);
-	}
+			if (event.rawData === lastFrame) {
+				return;
+			}
+			setLastFrame(event.rawData);
+			await processBarCode(
+				showErrorMessage,
+				event as TxRequestData,
+				navigation,
+				accounts,
+				scannerStore,
+				seedRefs
+			);
+		}
+	);
+
+	useEffect(() => {
+		if (global.inTest && global.scanRequest !== undefined) {
+			onMockBarCodeRead(
+				global.scanRequest,
+				async (tx: TxRequestData): Promise<void> => {
+					await onBarCodeRead.current(tx);
+				}
+			);
+		}
+	}, [onBarCodeRead]);
+
 	const {
 		completedFramesCount,
 		isMultipart,
@@ -146,7 +151,7 @@ export default function Scanner({
 		<SafeAreaViewContainer>
 			<RNCamera
 				captureAudio={false}
-				onBarCodeRead={onBarCodeRead}
+				onBarCodeRead={onBarCodeRead.current}
 				style={styles.view}
 			>
 				<View style={styles.body}>
@@ -175,7 +180,9 @@ export default function Scanner({
 					) : (
 						<View style={styles.bottom}>
 							<Text style={styles.descTitle}>Scan QR Code</Text>
-							<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
+							<Text style={styles.descSecondary}>
+								To Sign a New Transaction
+							</Text>
 						</View>
 					)}
 					{missedFrames && missedFrames.length >= 1 && (
