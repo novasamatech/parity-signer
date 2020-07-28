@@ -87,16 +87,30 @@ type ScannerStoreState = {
 };
 
 export type ScannerContextState = {
-	cleanup: any;
-	clearMultipartProgress: any;
-	setBusy: any;
-	setReady: any;
+	cleanup: () => void;
+	clearMultipartProgress: () => void;
+	setBusy: () => void;
+	setReady: () => void;
 	state: ScannerStoreState;
-	setPartData: any;
-	setData: any;
-	signEthereumData: any;
-	signSubstrateData: any;
-	signDataLegacy: any;
+	setPartData: (
+		currentFrame: number,
+		frameCount: number,
+		partData: string
+	) => Promise<MultiFramesInfo | SubstrateCompletedParsedData>;
+	setData: (
+		accountsStore: AccountsContextState,
+		unsignedData: CompletedParsedData
+	) => Promise<QrInfo>;
+	signEthereumData: (
+		signFunction: TryBrainWalletSignFunc,
+		qrInfo: QrInfo
+	) => Promise<void>;
+	signSubstrateData: (
+		signFunction: TrySignFunc,
+		suriSuffix: string,
+		qrInfo: QrInfo
+	) => Promise<void>;
+	signDataLegacy: (pin: string) => Promise<void>;
 };
 
 const DEFAULT_STATE: ScannerStoreState = {

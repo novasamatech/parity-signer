@@ -41,9 +41,8 @@ export default function AccountDetails({
 }: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const account = accountsStore.getSelected();
-	const selectedKey = accountsStore.getSelectedKey();
 	const { setAlert } = useContext(AlertStateContext);
-	const { accounts } = accountsStore.state;
+	const { accounts, selectedKey } = accountsStore.state;
 
 	if (!account) return <View />;
 

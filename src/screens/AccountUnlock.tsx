@@ -68,14 +68,12 @@ export function AccountUnlock({
 	const next = route.params.next ?? 'LegacyAccountList';
 	const onDelete = route.params.onDelete ?? ((): any => null);
 	const accountsStore = useContext(AccountsContext);
+	const { selectedKey } = accountsStore.state;
 
 	return (
 		<AccountUnlockView
 			checkPin={async (pin: string): Promise<boolean> => {
-				return await accountsStore.unlockAccount(
-					accountsStore.getSelectedKey(),
-					pin
-				);
+				return await accountsStore.unlockAccount(selectedKey, pin);
 			}}
 			navigate={(): void => {
 				if (next === 'AccountDelete') {

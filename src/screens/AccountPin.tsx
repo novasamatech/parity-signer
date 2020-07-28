@@ -56,17 +56,16 @@ function AccountPin({
 	const [state, setState] = useReducer(reducer, initialState);
 
 	const submit = async (): Promise<void> => {
+		const { selectedKey, newAccount } = accountsStore.state;
 		const { pin, confirmation } = state;
 		const accountCreation: boolean = route.params?.isNew ?? false;
-		const account = accountCreation
-			? accountsStore.getNew()
-			: accountsStore.getSelected()!;
+		const account = accountCreation ? newAccount : accountsStore.getSelected()!;
 		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
 				await accountsStore.submitNew(pin);
 				return navigateToLegacyAccountList(navigation);
 			} else {
-				await accountsStore.save(accountsStore.getSelectedKey(), account, pin);
+				await accountsStore.save(selectedKey, account, pin);
 				const resetAction = CommonActions.reset({
 					index: 1,
 					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]

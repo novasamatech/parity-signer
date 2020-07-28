@@ -24,7 +24,7 @@ import { RootStackParamList } from 'types/routes';
 import {
 	RegistriesContext,
 	RegistriesStoreState
-} from 'stores/RegistriesStore';
+} from 'stores/RegistriesContext';
 
 interface RegistriesInjectedProps {
 	registriesStore: RegistriesStoreState;

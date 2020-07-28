@@ -38,6 +38,7 @@ function LegacyAccountBackup({
 	route
 }: NavigationProps<'LegacyAccountBackup'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
+	const { selectedKey, newAccount } = accountsStore.state;
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
 			if (nextAppState === 'inactive') {
@@ -47,8 +48,6 @@ function LegacyAccountBackup({
 
 		AppState.addEventListener('change', handleAppStateChange);
 		return (): void => {
-			const selectedKey = accountsStore.getSelectedKey();
-
 			if (selectedKey) {
 				accountsStore.lockAccount(selectedKey);
 			}
@@ -68,9 +67,7 @@ function LegacyAccountBackup({
 		networkKey,
 		seed = '',
 		seedPhrase = ''
-	} = isNew
-		? accountsStore.getNew()
-		: (accountsStore.getSelected() as UnlockedAccount);
+	} = isNew ? newAccount : (accountsStore.getSelected() as UnlockedAccount);
 	const protocol =
 		(NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol) ||
 		NetworkProtocols.UNKNOWN;

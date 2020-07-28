@@ -27,8 +27,9 @@ const onNameInput = async (
 	name: string
 ): Promise<void> => {
 	await accountsStore.updateSelectedAccount({ name });
+	const { selectedKey } = accountsStore.state;
 	const selectedAccount = accountsStore.getSelected()!;
-	await accountsStore.save(accountsStore.getSelectedKey(), selectedAccount);
+	await accountsStore.save(selectedKey, selectedAccount);
 };
 
 export default function AccountEdit({}: {}): React.ReactElement {
