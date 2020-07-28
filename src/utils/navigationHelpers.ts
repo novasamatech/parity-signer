@@ -252,20 +252,6 @@ export const resetNavigationWithScanner = <
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToSignedMessage = <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>
-): void => {
-	resetNavigationWithScanner(navigation, 'SignedMessage');
-};
-
-export const navigateToSignedTx = <RouteName extends keyof RootStackParamList>(
-	navigation: GenericNavigationProps<RouteName>
-): void => {
-	resetNavigationWithScanner(navigation, 'SignedTx');
-};
-
 export const navigateToPathsList = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>,
 	networkKey: string
