@@ -18,6 +18,12 @@ const testIDs = {
 	AccountListScreen: {
 		accountList: 'accountList'
 	},
+	Alert: {
+		backupDoneButton: 'alert_identity_backup_done',
+		deleteAccount: 'alert_delete_account',
+		deleteConfirmation: 'alert_delete_confirmation',
+		deleteIdentity: 'alert_delete_identity'
+	},
 	Header: {
 		headerBackButton: 'header_back_button'
 	},

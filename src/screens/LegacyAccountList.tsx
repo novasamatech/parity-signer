@@ -14,26 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { NavigationAccountProps } from 'types/props';
+import { AccountsContext } from 'stores/AccountsContext';
+import { NavigationProps } from 'types/props';
 import { Account } from 'types/identityTypes';
 import AccountCard from 'components/AccountCard';
-import { withAccountStore } from 'utils/HOC';
 import QrScannerTab from 'components/QrScannerTab';
 
 function LegacyAccountList({
-	navigation,
-	accounts
-}: NavigationAccountProps<'LegacyAccountList'>): React.ReactElement {
+	navigation
+}: NavigationProps<'LegacyAccountList'>): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
 	const onAccountSelected = async (key: string): Promise<void> => {
-		await accounts.select(key);
+		await accountsStore.select(key);
 		navigation.navigate('AccountDetails');
 	};
-	const accountsMap = accounts.getAccounts();
+	const accountsMap = accountsStore.state.accounts;
 
 	const renderAccountCard = ([accountKey, account]: [
 		string,
@@ -62,7 +62,7 @@ function LegacyAccountList({
 	);
 }
 
-export default withAccountStore(LegacyAccountList);
+export default LegacyAccountList;
 
 const styles = StyleSheet.create({
 	content: {

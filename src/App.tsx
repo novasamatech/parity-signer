@@ -19,7 +19,6 @@ import 'utils/iconLoader';
 import * as React from 'react';
 import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { Provider as UnstatedProvider } from 'unstated';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
@@ -30,13 +29,19 @@ import {
 	ScreenStack
 } from './screens';
 
-import { SeedRefStore } from 'stores/SeedRefStore';
+import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
+import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
+import CustomAlert from 'components/CustomAlert';
+import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
-import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
-import { loadToCAndPPConfirmation } from 'utils/db';
-import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
+import {
+	GlobalState,
+	GlobalStateContext,
+	useGlobalStateContext
+} from 'stores/globalStateContext';
+import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
@@ -54,32 +59,15 @@ export default function App(props: AppProps): React.ReactElement {
 		]);
 	}
 
-	const [policyConfirmed, setPolicyConfirmed] = React.useState<boolean>(false);
-	const [dataLoaded, setDataLoaded] = React.useState<boolean>(false);
-
-	React.useEffect(() => {
-		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
-			const tocPP = await loadToCAndPPConfirmation();
-			setPolicyConfirmed(tocPP);
-			if (!tocPP) {
-				await migrateAccounts();
-				await migrateIdentity();
-			}
-		};
-		setDataLoaded(true);
-		loadPolicyConfirmationAndMigrateData();
-	}, []);
-
-	const globalContext: GlobalState = {
-		dataLoaded,
-		policyConfirmed,
-		setDataLoaded,
-		setPolicyConfirmed
-	};
+	const alertContext = useAlertContext();
+	const globalContext: GlobalState = useGlobalStateContext();
+	const seedRefContext = useSeedRefStore();
+	const accountsContext = useAccountContext();
+	const scannerContext = useScannerContext();
 
 	const renderStacks = (): React.ReactElement => {
-		if (dataLoaded) {
-			return policyConfirmed ? (
+		if (globalContext.dataLoaded) {
+			return globalContext.policyConfirmed ? (
 				<AppNavigator />
 			) : (
 				<TocAndPrivacyPolicyNavigator />
@@ -99,19 +87,24 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<SeedRefStore>
-				<UnstatedProvider>
-					<MenuProvider backHandler={true}>
-						<StatusBar
-							barStyle="light-content"
-							backgroundColor={colors.background.app}
-						/>
-						<GlobalStateContext.Provider value={globalContext}>
-							<NavigationContainer>{renderStacks()}</NavigationContainer>
-						</GlobalStateContext.Provider>
-					</MenuProvider>
-				</UnstatedProvider>
-			</SeedRefStore>
+			<AccountsContext.Provider value={accountsContext}>
+				<ScannerContext.Provider value={scannerContext}>
+					<GlobalStateContext.Provider value={globalContext}>
+						<AlertStateContext.Provider value={alertContext}>
+							<SeedRefsContext.Provider value={seedRefContext}>
+								<MenuProvider backHandler={true}>
+									<StatusBar
+										barStyle="light-content"
+										backgroundColor={colors.background.app}
+									/>
+									<CustomAlert />
+									<NavigationContainer>{renderStacks()}</NavigationContainer>
+								</MenuProvider>
+							</SeedRefsContext.Provider>
+						</AlertStateContext.Provider>
+					</GlobalStateContext.Provider>
+				</ScannerContext.Provider>
+			</AccountsContext.Provider>
 		</SafeAreaProvider>
 	);
 }

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useMemo, useState } from 'react';
+import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -27,6 +27,7 @@ import {
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import {
 	isEthereumNetworkParams,
@@ -36,6 +37,7 @@ import {
 } from 'types/networkSpecsTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
+import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToPathDetails,
@@ -55,16 +57,18 @@ if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 }
 
-export default function NetworkSelector({
-	accounts,
+function NetworkSelector({
+	accountsStore,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const { identities, currentIdentity } = accounts.state;
+	const { identities, currentIdentity } = accountsStore.state;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
+
+	const { setAlert } = useContext(AlertStateContext);
 	// catch android back button and prevent exiting the app
 	useFocusEffect(
 		React.useCallback((): any => {
@@ -122,7 +126,7 @@ export default function NetworkSelector({
 		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		const fullPath = `//${pathId}`;
 		try {
-			await accounts.deriveNewPath(
+			await accountsStore.deriveNewPath(
 				fullPath,
 				seedRefHooks.substrateAddress,
 				networkKey,
@@ -131,20 +135,20 @@ export default function NetworkSelector({
 			);
 			navigateToPathDetails(navigation, networkKey, fullPath);
 		} catch (error) {
-			alertPathDerivationError(error.message);
+			alertPathDerivationError(setAlert, error.message);
 		}
 	};
 
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
 		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		try {
-			await accounts.deriveEthereumAccount(
+			await accountsStore.deriveEthereumAccount(
 				seedRefHooks.brainWalletAddress,
 				networkKey
 			);
 			navigateToPathsList(navigation, networkKey);
 		} catch (e) {
-			alertPathDerivationError(e.message);
+			alertPathDerivationError(setAlert, e.message);
 		}
 	};
 
@@ -252,3 +256,5 @@ export default function NetworkSelector({
 		</SafeAreaViewContainer>
 	);
 }
+
+export default withCurrentIdentity(NetworkSelector);

@@ -29,7 +29,7 @@ import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
-import { getOverrideTypes } from 'stores/RegistriesStore';
+import { getOverrideTypes } from 'stores/RegistriesContext';
 import { SubstrateCompletedParsedData } from 'types/scannerTypes';
 import {
 	constructDataFromBytes,

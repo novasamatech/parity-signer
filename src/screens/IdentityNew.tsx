@@ -14,22 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
-import { NavigationAccountProps } from 'types/props';
+import { AccountsContext } from 'stores/AccountsContext';
+import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
+import { NavigationProps } from 'types/props';
 import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
-import { withAccountStore } from 'utils/HOC';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import {
-	alertErrorWithMessage,
+	alertError,
 	alertIdentityCreationError,
 	alertRisks
 } from 'utils/alertUtils';
@@ -39,26 +40,28 @@ import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityNew({
-	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'IdentityNew'>): React.ReactElement {
+}: NavigationProps<'IdentityNew'>): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
 	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
+	const clearIdentity = useRef(() =>
+		accountsStore.updateNewIdentity(emptyIdentity())
+	);
 
 	useEffect((): (() => void) => {
-		const clearNewIdentity = (): void =>
-			accounts.updateNewIdentity(emptyIdentity());
-		clearNewIdentity();
-		return clearNewIdentity;
-	}, [accounts]);
+		clearIdentity.current();
+		return clearIdentity.current;
+	}, [clearIdentity]);
 
 	const updateName = (name: string): void => {
-		accounts.updateNewIdentity({ name });
+		accountsStore.updateNewIdentity({ name });
 	};
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
@@ -77,13 +80,13 @@ function IdentityNew({
 		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
-				await accounts.saveNewIdentity(
+				await accountsStore.saveNewIdentity(
 					seedPhrase.trimEnd(),
 					pin,
 					createSeedRefWithNewSeed
 				);
 			} else {
-				await accounts.saveNewIdentity(
+				await accountsStore.saveNewIdentity(
 					seedPhrase,
 					pin,
 					createSeedRefWithNewSeed
@@ -92,16 +95,16 @@ function IdentityNew({
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
-			alertIdentityCreationError(e.message);
+			alertIdentityCreationError(setAlert, e.message);
 		}
 	};
 
 	const onRecoverConfirm = (): void | Promise<void> => {
 		if (!isSeedValid.valid) {
 			if (isSeedValid.accountRecoveryAllowed) {
-				return alertRisks(`${isSeedValid.reason}`, onRecoverIdentity);
+				return alertRisks(setAlert, `${isSeedValid.reason}`, onRecoverIdentity);
 			} else {
-				return alertErrorWithMessage(`${isSeedValid.reason}`, 'Back');
+				return alertError(setAlert, `${isSeedValid.reason}`);
 			}
 		}
 		return onRecoverIdentity();
@@ -166,7 +169,7 @@ function IdentityNew({
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.IdentityNew.nameInput}
-				value={accounts.getNewIdentity().name}
+				value={accountsStore.state.newIdentity.name}
 				placeholder="Identity Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
@@ -174,7 +177,7 @@ function IdentityNew({
 	);
 }
 
-export default withAccountStore(IdentityNew);
+export default IdentityNew;
 
 const styles = StyleSheet.create({
 	body: {

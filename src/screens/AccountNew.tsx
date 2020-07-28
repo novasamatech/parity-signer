@@ -14,13 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import { AccountsContext } from 'stores/AccountsContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkSpecsTypes';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import AccountIconChooser from 'components/AccountIconChooser';
@@ -30,7 +31,6 @@ import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
 import fonts from 'styles/fonts';
 import { emptyAccount, validateSeed } from 'utils/account';
-import { withAccountStore } from 'utils/HOC';
 import { constructSURI } from 'utils/suri';
 import fontStyles from 'styles/fontStyles';
 
@@ -43,10 +43,10 @@ interface State {
 	newAccount?: Account;
 }
 
-function AccountNew({
-	accounts,
+export default function AccountNew({
 	navigation
-}: NavigationAccountProps<'AccountNew'>): React.ReactElement {
+}: NavigationProps<'AccountNew'>): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -62,17 +62,17 @@ function AccountNew({
 	const [state, updateState] = useReducer(reducer, initialState);
 
 	useEffect((): void => {
-		accounts.updateNew(emptyAccount());
-	}, [accounts, accounts.updateNew]);
+		accountsStore.updateNew(emptyAccount());
+	}, [accountsStore]);
 
 	useEffect((): void => {
-		const selectedAccount = accounts.state.newAccount;
+		const selectedAccount = accountsStore.state.newAccount;
 		const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 		updateState({
 			selectedAccount,
 			selectedNetwork
 		});
-	}, [accounts.state.newAccount]);
+	}, [accountsStore.state.newAccount]);
 
 	const {
 		derivationPassword,
@@ -114,7 +114,7 @@ function AccountNew({
 										phrase: newSeed
 									});
 
-									accounts.updateNew({
+									accountsStore.updateNew({
 										address: newAddress,
 										derivationPassword,
 										derivationPath,
@@ -127,14 +127,14 @@ function AccountNew({
 								}
 							} else {
 								// Ethereum account
-								accounts.updateNew({
+								accountsStore.updateNew({
 									address: newAddress,
 									seed: newSeed,
 									validBip39Seed: isBip39
 								});
 							}
 						} else {
-							accounts.updateNew({
+							accountsStore.updateNew({
 								address: '',
 								seed: '',
 								validBip39Seed: false
@@ -147,7 +147,7 @@ function AccountNew({
 				<Text style={styles.title}>NAME</Text>
 				<TextInput
 					onChangeText={(input: string): void =>
-						accounts.updateNew({ name: input })
+						accountsStore.updateNew({ name: input })
 					}
 					value={name}
 					placeholder="Enter a new account name"
@@ -190,8 +190,6 @@ function AccountNew({
 		</KeyboardScrollView>
 	);
 }
-
-export default withAccountStore(AccountNew);
 
 const styles = StyleSheet.create({
 	body: {

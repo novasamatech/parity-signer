@@ -14,30 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import AccountCard from 'components/AccountCard';
 import TextInput from 'components/TextInput';
-import AccountsStore from 'stores/AccountsStore';
-import { withAccountStore } from 'utils/HOC';
+import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
 
 const onNameInput = async (
-	accounts: AccountsStore,
+	accountsStore: AccountsContextState,
 	name: string
 ): Promise<void> => {
-	await accounts.updateSelectedAccount({ name });
-	const selectedAccount = accounts.getSelected()!;
-	await accounts.save(accounts.getSelectedKey(), selectedAccount);
+	await accountsStore.updateSelectedAccount({ name });
+	const { selectedKey } = accountsStore.state;
+	const selectedAccount = accountsStore.getSelected()!;
+	await accountsStore.save(selectedKey, selectedAccount);
 };
 
-function AccountEdit({
-	accounts
-}: {
-	accounts: AccountsStore;
-}): React.ReactElement {
-	const selectedAccount = accounts.getSelected()!;
+export default function AccountEdit({}: {}): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
+	const selectedAccount = accountsStore.getSelected()!;
 	if (!selectedAccount) {
 		return <ScrollView bounces={false} style={styles.body} />;
 	}
@@ -53,7 +50,7 @@ function AccountEdit({
 				label="Account Name"
 				style={{ marginBottom: 40 }}
 				onChangeText={(name: string): Promise<any> =>
-					onNameInput(accounts, name)
+					onNameInput(accountsStore, name)
 				}
 				value={selectedAccount.name}
 				placeholder="New name"
@@ -61,8 +58,6 @@ function AccountEdit({
 		</SafeAreaScrollViewContainer>
 	);
 }
-
-export default withAccountStore(AccountEdit);
 
 const styles = StyleSheet.create({
 	body: {

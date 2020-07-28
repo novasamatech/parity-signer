@@ -13,6 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
+
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import {
 	compactFromU8a,
@@ -22,20 +23,23 @@ import {
 	u8aConcat,
 	u8aToHex
 } from '@polkadot/util';
-import { Container } from 'unstated';
+import React, { useReducer } from 'react';
 
+import { AccountsContextState } from 'stores/AccountsContext';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
-import AccountsStore from 'stores/AccountsStore';
 import { Account, FoundAccount } from 'types/identityTypes';
 import {
 	CompletedParsedData,
 	EthereumParsedData,
 	isEthereumCompletedParsedData,
-	isMultipartData,
 	isSubstrateMessageParsedData,
+	MessageQRInfo,
+	MultiFramesInfo,
+	QrInfo,
 	SubstrateCompletedParsedData,
 	SubstrateMessageParsedData,
-	SubstrateTransactionParsedData
+	SubstrateTransactionParsedData,
+	TxQRInfo
 } from 'types/scannerTypes';
 import { emptyAccount } from 'utils/account';
 import {
@@ -62,7 +66,7 @@ type SignedTX = {
 	txRequest: TXRequest;
 };
 
-type ScannerState = {
+type ScannerStoreState = {
 	busy: boolean;
 	completedFramesCount: number;
 	dataToSign: string | GenericExtrinsicPayload;
@@ -80,10 +84,36 @@ type ScannerState = {
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
 	type: 'transaction' | 'message' | null;
-	unsignedData: CompletedParsedData | null;
 };
 
-const DEFAULT_STATE = Object.freeze({
+export type ScannerContextState = {
+	cleanup: () => void;
+	clearMultipartProgress: () => void;
+	setBusy: () => void;
+	setReady: () => void;
+	state: ScannerStoreState;
+	setPartData: (
+		currentFrame: number,
+		frameCount: number,
+		partData: string
+	) => Promise<MultiFramesInfo | SubstrateCompletedParsedData>;
+	setData: (
+		accountsStore: AccountsContextState,
+		unsignedData: CompletedParsedData
+	) => Promise<QrInfo>;
+	signEthereumData: (
+		signFunction: TryBrainWalletSignFunc,
+		qrInfo: QrInfo
+	) => Promise<void>;
+	signSubstrateData: (
+		signFunction: TrySignFunc,
+		suriSuffix: string,
+		qrInfo: QrInfo
+	) => Promise<void>;
+	signDataLegacy: (pin: string) => Promise<void>;
+};
+
+const DEFAULT_STATE: ScannerStoreState = {
 	busy: false,
 	completedFramesCount: 0,
 	dataToSign: '',
@@ -100,9 +130,8 @@ const DEFAULT_STATE = Object.freeze({
 	signedTxList: [],
 	totalFrameCount: 0,
 	tx: null,
-	type: null,
-	unsignedData: null
-});
+	type: null
+};
 
 const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicity's sake. Consistent with @polkadot/react-qr
 
@@ -111,45 +140,31 @@ const MULTIPART = new Uint8Array([0]); // always mark as multipart for simplicit
 const SIG_TYPE_SR25519 = new Uint8Array([1]);
 // const SIG_TYPE_ECDSA = new Uint8Array([2]);
 
-export default class ScannerStore extends Container<ScannerState> {
-	state: ScannerState = DEFAULT_STATE;
+export function useScannerContext(): ScannerContextState {
+	const initialState = DEFAULT_STATE;
 
-	async setUnsigned(data: string): Promise<void> {
-		this.setState({
-			unsignedData: JSON.parse(data)
-		});
-	}
+	const reducer = (
+		state: ScannerStoreState,
+		delta: Partial<ScannerStoreState>
+	): ScannerStoreState => ({
+		...state,
+		...delta
+	});
+	const [state, setState] = useReducer(reducer, initialState);
 
-	/*
-	 * @param strippedData: the rawBytes from react-native-camera, stripped of the ec11 padding to fill the frame size. See: decoders.js
-	 * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
+	/**
+	 * @dev sets a lock on writes
 	 */
-
-	async setParsedData(
-		strippedData: Uint8Array,
-		multipartComplete = false
-	): Promise<void> {
-		const parsedData = await constructDataFromBytes(
-			strippedData,
-			multipartComplete
-		);
-		if (isMultipartData(parsedData)) {
-			await this.setPartData(
-				parsedData.currentFrame,
-				parsedData.frameCount,
-				parsedData.partData
-			);
-			return;
-		}
-
-		await this.setState({
-			unsignedData: parsedData
+	function setBusy(): void {
+		setState({
+			busy: true
 		});
 	}
 
-	async integrateMultiPartData(): Promise<void> {
-		const { multipartData, totalFrameCount } = this.state;
-
+	async function _integrateMultiPartData(
+		multipartData: Array<Uint8Array | null>,
+		totalFrameCount: number
+	): Promise<SubstrateCompletedParsedData> {
 		// concatenate all the parts into one binary blob
 		let concatMultipartData = multipartData!.reduce(
 			(acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
@@ -170,32 +185,26 @@ export default class ScannerStore extends Container<ScannerState> {
 		);
 		concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
-		await this.setState({
-			multipartComplete: true
-		});
-		// handle the binary blob as a single UOS payload
-		await this.setParsedData(concatMultipartData, true);
+		const parsedData = (await constructDataFromBytes(
+			concatMultipartData,
+			true
+		)) as SubstrateCompletedParsedData;
+
+		return parsedData;
 	}
 
-	async setPartData(
+	async function setPartData(
 		currentFrame: number,
 		frameCount: number,
 		partData: string
-	): Promise<boolean | void | Uint8Array> {
+	): Promise<MultiFramesInfo | SubstrateCompletedParsedData> {
+		const newArray = new Array(frameCount).fill(null);
+		const totalFrameCount = frameCount;
 		// set it once only
-		if (!this.state.totalFrameCount) {
-			const newArray = new Array(frameCount).fill(null);
-			await this.setState({
-				multipartData: newArray,
-				totalFrameCount: frameCount
-			});
-		}
-		const {
-			completedFramesCount,
-			multipartComplete,
-			multipartData,
-			totalFrameCount
-		} = this.state;
+		const multipartData = !state.totalFrameCount
+			? newArray
+			: state.multipartData;
+		const { completedFramesCount, multipartComplete } = state;
 		const partDataAsBytes = new Uint8Array(partData.length / 2);
 
 		for (let i = 0; i < partDataAsBytes.length; i++) {
@@ -224,90 +233,48 @@ export default class ScannerStore extends Container<ScannerState> {
 			);
 			const nextCompletedFramesCount =
 				totalFrameCount - nextMissedFrames.length;
-			await this.setState({
+			setState({
 				completedFramesCount: nextCompletedFramesCount,
 				latestFrame: currentFrame,
 				missedFrames: nextMissedFrames,
-				multipartData: nextDataState
+				multipartData: nextDataState,
+				totalFrameCount
 			});
-
 			if (
 				totalFrameCount > 0 &&
 				nextCompletedFramesCount === totalFrameCount &&
 				!multipartComplete
 			) {
 				// all the frames are filled
-				await this.integrateMultiPartData();
+				return await _integrateMultiPartData(nextDataState, totalFrameCount);
 			}
+			return {
+				completedFramesCount: nextCompletedFramesCount,
+				missedFrames: nextMissedFrames,
+				totalFrameCount
+			};
 		}
+		return {
+			completedFramesCount: totalFrameCount,
+			missedFrames: [],
+			totalFrameCount
+		};
 	}
 
-	async setData(accountsStore: AccountsStore): Promise<boolean | void> {
-		const { unsignedData } = this.state;
-		if (!isMultipartData(unsignedData) && unsignedData !== null) {
-			switch (unsignedData.action) {
-				case 'signTransaction':
-					return await this.setTXRequest(unsignedData, accountsStore);
-				case 'signData':
-					return await this.setDataToSign(unsignedData, accountsStore);
-				default:
-					return;
-			}
-		} else {
-			throw new Error(
-				'Scanned QR should contain either transaction or a message to sign'
-			);
-		}
-	}
-
-	async setDataToSign(
-		signRequest: SubstrateMessageParsedData | EthereumParsedData,
-		accountsStore: AccountsStore
-	): Promise<boolean> {
-		this.setBusy();
-
-		const address = signRequest.data.account;
-		let message = '';
-		let isHash = false;
-		let isOversized = false;
-		let dataToSign = '';
-
-		if (isSubstrateMessageParsedData(signRequest)) {
-			if (signRequest.data.crypto !== 'sr25519')
-				throw new Error('currently Parity Signer only support sr25519');
-			isHash = signRequest.isHash;
-			isOversized = signRequest.oversized;
-			dataToSign = signRequest.data.data;
-			message = dataToSign;
-		} else {
-			message = signRequest.data.data;
-			dataToSign = await ethSign(message.toString());
-		}
-
-		const sender = accountsStore.getAccountByAddress(address);
-		if (!sender) {
-			throw new Error(
-				`No private key found for ${address} in your signer key storage.`
-			);
-		}
-
-		this.setState({
-			dataToSign,
-			isHash: isHash,
-			isOversized: isOversized,
-			message: message!.toString(),
-			sender: sender!,
-			type: 'message'
+	/**
+	 * @dev allow write operations
+	 */
+	function setReady(): void {
+		setState({
+			busy: false
 		});
-
-		return true;
 	}
 
-	async setTXRequest(
+	async function _setTXRequest(
 		txRequest: EthereumParsedData | SubstrateTransactionParsedData,
-		accountsStore: AccountsStore
-	): Promise<boolean> {
-		this.setBusy();
+		accountsStore: AccountsContextState
+	): Promise<TxQRInfo> {
+		setBusy();
 
 		const isOversized =
 			(txRequest as SubstrateCompletedParsedData)?.oversized || false;
@@ -360,33 +327,106 @@ export default class ScannerStore extends Container<ScannerState> {
 				networkKey
 			})) || emptyAccount(recipientAddress, networkKey);
 
-		this.setState({
+		const qrInfo: TxQRInfo = {
 			dataToSign: dataToSign as string,
+			isHash: false,
 			isOversized,
 			recipient: recipient as FoundAccount,
 			sender,
 			tx,
 			type: 'transaction'
-		});
+		};
 
-		return true;
+		setState(qrInfo);
+		return qrInfo;
+	}
+
+	async function _setDataToSign(
+		signRequest: SubstrateMessageParsedData | EthereumParsedData,
+		accountsStore: AccountsContextState
+	): Promise<MessageQRInfo> {
+		setBusy();
+
+		const address = signRequest.data.account;
+		let message = '';
+		let isHash = false;
+		let isOversized = false;
+		let dataToSign = '';
+
+		if (isSubstrateMessageParsedData(signRequest)) {
+			if (signRequest.data.crypto !== 'sr25519')
+				throw new Error('currently Parity Signer only support sr25519');
+			isHash = signRequest.isHash;
+			isOversized = signRequest.oversized;
+			dataToSign = signRequest.data.data;
+			message = dataToSign;
+		} else {
+			message = signRequest.data.data;
+			dataToSign = await ethSign(message.toString());
+		}
+
+		const sender = accountsStore.getAccountByAddress(address);
+		if (!sender) {
+			throw new Error(
+				`No private key found for ${address} in your signer key storage.`
+			);
+		}
+
+		const qrInfo: MessageQRInfo = {
+			dataToSign,
+			isHash: isHash,
+			isOversized: isOversized,
+			message: message!.toString(),
+			sender: sender!,
+			type: 'message'
+		};
+
+		setState(qrInfo);
+
+		return qrInfo;
+	}
+
+	async function setData(
+		accountsStore: AccountsContextState,
+		unsignedData: CompletedParsedData
+	): Promise<QrInfo> {
+		if (unsignedData !== null) {
+			switch (unsignedData.action) {
+				case 'signTransaction':
+					return await _setTXRequest(unsignedData, accountsStore);
+				case 'signData':
+					return await _setDataToSign(unsignedData, accountsStore);
+				default:
+					throw new Error(
+						'Scanned QR should contain either transaction or a message to sign'
+					);
+			}
+		} else {
+			throw new Error(
+				'Scanned QR should contain either transaction or a message to sign'
+			);
+		}
 	}
 
 	// signing ethereum data with seed reference
-	async signEthereumData(signFunction: TryBrainWalletSignFunc): Promise<void> {
-		const { dataToSign, sender } = this.state;
+	async function signEthereumData(
+		signFunction: TryBrainWalletSignFunc,
+		qrInfo: QrInfo
+	): Promise<void> {
+		const { dataToSign, sender } = qrInfo;
 		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		const signedData = await signFunction(dataToSign as string);
-		this.setState({ signedData });
+		setState({ signedData });
 	}
 
 	// signing substrate data with seed reference
-	async signSubstrateData(
+	async function signSubstrateData(
 		signFunction: TrySignFunc,
-		suriSuffix: string
+		suriSuffix: string,
+		qrInfo: QrInfo
 	): Promise<void> {
-		const { dataToSign, isHash, sender } = this.state;
+		const { dataToSign, isHash, sender } = qrInfo;
 		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		let signable;
@@ -407,12 +447,12 @@ export default class ScannerStore extends Container<ScannerState> {
 		// TODO: tweak the first byte if and when sig type is not sr25519
 		const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
 		const signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
-		this.setState({ signedData });
+		setState({ signedData });
 	}
 
 	// signing data with legacy account.
-	async signDataLegacy(pin = '1'): Promise<void> {
-		const { sender, dataToSign, isHash } = this.state;
+	async function signDataLegacy(pin = '1'): Promise<void> {
+		const { sender, dataToSign, isHash } = state;
 		if (!sender || !sender.encryptedSeed)
 			throw new Error('Signing Error: sender could not be found.');
 		const isEthereum =
@@ -441,124 +481,39 @@ export default class ScannerStore extends Container<ScannerState> {
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
-		this.setState({ signedData });
+		setState({ signedData });
 	}
 
-	async cleanup(): Promise<void> {
-		await this.setState({
-			...DEFAULT_STATE
-		});
-		this.clearMultipartProgress();
-	}
-
-	clearMultipartProgress(): void {
-		this.setState({
+	function clearMultipartProgress(): void {
+		setState({
 			completedFramesCount: DEFAULT_STATE.completedFramesCount,
 			latestFrame: DEFAULT_STATE.latestFrame,
 			missedFrames: DEFAULT_STATE.missedFrames,
 			multipartComplete: DEFAULT_STATE.multipartComplete,
 			multipartData: null,
-			totalFrameCount: DEFAULT_STATE.totalFrameCount,
-			unsignedData: DEFAULT_STATE.unsignedData
+			totalFrameCount: DEFAULT_STATE.totalFrameCount
 		});
 	}
 
-	/**
-	 * @dev signing payload type can be either transaction or message
-	 */
-	getType(): 'transaction' | 'message' | null {
-		return this.state.type;
-	}
-
-	/**
-	 * @dev sets a lock on writes
-	 */
-	setBusy(): void {
-		this.setState({
-			busy: true
+	function cleanup(): void {
+		setState({
+			...DEFAULT_STATE
 		});
+		clearMultipartProgress();
 	}
 
-	/**
-	 * @dev allow write operations
-	 */
-	setReady(): void {
-		this.setState({
-			busy: false
-		});
-	}
-
-	isBusy(): boolean {
-		return this.state.busy;
-	}
-
-	isMultipartComplete(): boolean {
-		return this.state.multipartComplete;
-	}
-
-	/**
-	 * @dev is the payload a hash
-	 */
-	getIsHash(): boolean {
-		return this.state.isHash;
-	}
-
-	/**
-	 * @dev is the payload size greater than 256 (in Substrate chains)
-	 */
-	getIsOversized(): boolean {
-		return this.state.isOversized;
-	}
-
-	/**
-	 * @dev returns the number of completed frames so far
-	 */
-	getCompletedFramesCount(): number {
-		return this.state.completedFramesCount;
-	}
-
-	/**
-	 * @dev returns the number of frames to fill in total
-	 */
-	getTotalFramesCount(): number {
-		return this.state.totalFrameCount;
-	}
-
-	getSender(): FoundAccount | null {
-		return this.state.sender;
-	}
-
-	getRecipient(): FoundAccount | null {
-		return this.state.recipient;
-	}
-
-	getMessage(): string | null {
-		return this.state.message;
-	}
-
-	/**
-	 * @dev unsigned data, not yet formatted as signable payload
-	 */
-	getUnsigned(): CompletedParsedData | null {
-		return this.state.unsignedData;
-	}
-
-	getTx(): GenericExtrinsicPayload | Transaction | string | Uint8Array | null {
-		return this.state.tx;
-	}
-
-	/**
-	 * @dev unsigned date, formatted as signable payload
-	 */
-	getDataToSign(): string | GenericExtrinsicPayload {
-		return this.state.dataToSign;
-	}
-
-	getSignedTxData(): string {
-		return this.state.signedData;
-	}
-
-	getMissedFrames(): number[] {
-		return this.state.missedFrames;
-	}
+	return {
+		cleanup,
+		clearMultipartProgress,
+		setBusy,
+		setData,
+		setPartData,
+		setReady,
+		signDataLegacy,
+		signEthereumData,
+		signSubstrateData,
+		state
+	};
 }
+
+export const ScannerContext = React.createContext({} as ScannerContextState);

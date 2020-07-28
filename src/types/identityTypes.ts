@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import AccountsStore from 'stores/AccountsStore';
+import { AccountsContextState } from 'stores/AccountsContext';
 
 export type UnlockedAccount = {
 	address: string;
@@ -108,7 +108,7 @@ export type AccountsStoreState = {
 
 type LensSet<T, R> = Omit<T, keyof R> & R;
 export type AccountsStoreStateWithIdentity = LensSet<
-	AccountsStore,
+	AccountsContextState,
 	{ state: LensSet<AccountsStoreState, { currentIdentity: Identity }> }
 >;
 

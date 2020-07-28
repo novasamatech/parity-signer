@@ -1,4 +1,16 @@
+import { GenericExtrinsicPayload } from '@polkadot/types';
 import { Point, Size } from 'react-native-camera/types';
+
+import { FoundAccount } from 'types/identityTypes';
+import { Transaction } from 'utils/transaction';
+
+export type Frames = {
+	completedFramesCount: number;
+	isMultipart: boolean;
+	missedFrames: number[];
+	missingFramesMessage: string;
+	totalFramesCount: number;
+};
 
 export interface TxRequestData {
 	bounds: {
@@ -77,6 +89,39 @@ export type SURIObject = {
 	password: string;
 	phrase: string;
 };
+
+export type MessageQRInfo = {
+	dataToSign: string | GenericExtrinsicPayload;
+	isHash: boolean;
+	isOversized: boolean;
+	message: string;
+	sender: FoundAccount;
+	type: 'message';
+};
+
+export type TxQRInfo = {
+	sender: FoundAccount;
+	recipient: FoundAccount;
+	type: 'transaction';
+	dataToSign: string | GenericExtrinsicPayload;
+	isHash: boolean;
+	isOversized: boolean;
+	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array;
+};
+
+export type MultiFramesInfo = {
+	missedFrames: number[];
+	completedFramesCount: number;
+	totalFrameCount: number;
+};
+
+export type QrInfo = MessageQRInfo | TxQRInfo;
+
+export function isMultiFramesInfo(
+	data: MultiFramesInfo | SubstrateCompletedParsedData
+): data is MultiFramesInfo {
+	return (data as MultiFramesInfo).completedFramesCount !== undefined;
+}
 
 export function isEthereumCompletedParsedData(
 	parsedData: ParsedData

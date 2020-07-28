@@ -23,7 +23,7 @@ import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import { NavigationTargetIdentityProps } from 'types/props';
-import { withAccountStore, withTargetIdentity } from 'utils/HOC';
+import { withTargetIdentity } from 'utils/HOC';
 import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
 
@@ -105,4 +105,4 @@ function PinUnlockWithPassword({
 	);
 }
 
-export default withAccountStore(withTargetIdentity(PinUnlockWithPassword));
+export default withTargetIdentity(PinUnlockWithPassword);

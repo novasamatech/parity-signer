@@ -16,9 +16,10 @@
 
 import { Metadata, TypeRegistry } from '@polkadot/types';
 import { getSpecTypes } from '@polkadot/types-known';
-import { Container } from 'unstated';
+import React, { useState } from 'react';
 
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
+import { deepCopyMap } from 'stores/utils';
 import { getMetadata } from 'utils/identitiesUtils';
 
 //Map PathId to Polkadot.js/api spec names and chain names
@@ -69,21 +70,17 @@ export const getOverrideTypes = (
 	return getSpecTypes(registry, chainName, specName, Number.MAX_SAFE_INTEGER);
 };
 
-type RegistriesStoreState = {
+export type RegistriesStoreState = {
 	registries: Map<string, TypeRegistry>;
-	dumbRegistry: TypeRegistry;
+	get: (networkKey: string) => TypeRegistry;
 };
 
-export default class RegistriesStore extends Container<RegistriesStoreState> {
-	state: RegistriesStoreState = {
-		dumbRegistry: new TypeRegistry(),
-		registries: new Map()
-	};
+export function useRegistriesStore(): RegistriesStoreState {
+	const dumbRegistry = new TypeRegistry();
+	const [registries, setRegistries] = useState(new Map());
 
-	get(networkKey: string): TypeRegistry {
-		const { registries } = this.state;
-		if (!SUBSTRATE_NETWORK_LIST.hasOwnProperty(networkKey))
-			return this.state.dumbRegistry;
+	function get(networkKey: string): TypeRegistry {
+		if (!SUBSTRATE_NETWORK_LIST.hasOwnProperty(networkKey)) return dumbRegistry;
 		if (registries.has(networkKey)) return registries.get(networkKey)!;
 
 		const networkParams = SUBSTRATE_NETWORK_LIST[networkKey];
@@ -93,7 +90,15 @@ export default class RegistriesStore extends Container<RegistriesStoreState> {
 		newRegistry.register(overrideTypes);
 		const metadata = new Metadata(newRegistry, networkMetadataRaw);
 		newRegistry.setMetadata(metadata);
-		registries.set(networkKey, newRegistry);
+		const newRegistries = deepCopyMap(registries);
+		newRegistries.set(networkKey, newRegistry);
+		setRegistries(newRegistries);
 		return newRegistry;
 	}
+
+	return { get, registries };
 }
+
+export const RegistriesContext = React.createContext(
+	{} as RegistriesStoreState
+);

@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
 
-import { SeedRefsContext } from 'stores/SeedRefStore';
+import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { SeedRefClass } from 'utils/native';
 
 export type TryCreateFunc = (password: string) => Promise<void>;
@@ -34,7 +34,7 @@ export type CreateSeedRefWithNewSeed = (
 ) => Promise<void>;
 
 export function useNewSeedRef(): CreateSeedRefWithNewSeed {
-	const [seedRefs, setSeedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
+	const [seedRefs, setSeedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	return async (encryptedSeed, password): Promise<void> => {
 		if (!seedRefs.has(encryptedSeed)) {
 			const seedRef = new SeedRefClass();
@@ -46,7 +46,7 @@ export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 }
 
 export function useSeedRef(encryptedSeed: string): SeedRefHooks {
-	const [seedRefs, setSeedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
+	const [seedRefs, setSeedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	const seedRef = useMemo(() => {
 		if (seedRefs.has(encryptedSeed)) {
 			return seedRefs.get(encryptedSeed)!;

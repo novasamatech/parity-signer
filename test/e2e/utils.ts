@@ -105,6 +105,9 @@ export const testSetUpDefaultPath = async (): Promise<void> => {
 	await testExist(PathsList.screen);
 };
 
+export const waitAlert = (ms?: number): Promise<void> =>
+	new Promise(resolve => setTimeout(resolve, ms || 1000));
+
 export const launchWithScanRequest = async (
 	txRequest: number
 ): Promise<void> => {

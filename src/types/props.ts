@@ -7,8 +7,8 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import AccountsStore from 'stores/AccountsStore';
-import ScannerStore from 'stores/ScannerStore';
+import { AccountsContextState } from 'stores/AccountsContext';
+import { ScannerContextState } from 'stores/ScannerContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
@@ -25,16 +25,10 @@ export type FocusListener = (
 	event: NativeSyntheticEvent<TextInputFocusEventData>
 ) => void;
 
-export interface NavigationAccountProps<
-	ScreenName extends keyof RootStackParamList
-> extends NavigationProps<ScreenName> {
-	accounts: AccountsStore;
-}
-
 export interface NavigationAccountIdentityProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
-	accounts: AccountsStoreStateWithIdentity;
+	accountsStore: AccountsStoreStateWithIdentity;
 }
 
 export interface NavigationTargetIdentityProps<
@@ -45,12 +39,13 @@ export interface NavigationTargetIdentityProps<
 
 export interface NavigationAccountScannerProps<
 	ScreenName extends keyof RootStackParamList
-> extends NavigationAccountProps<ScreenName> {
-	scannerStore: ScannerStore;
+> extends NavigationProps<ScreenName> {
+	scannerStore: ScannerContextState;
+	accountsStore: AccountsContextState;
 }
 
 export interface NavigationScannerProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
-	scannerStore: ScannerStore;
+	scannerStore: ScannerContextState;
 }
