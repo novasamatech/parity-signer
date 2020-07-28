@@ -68,27 +68,6 @@ const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	type: Platform.OS === 'ios' ? 'org.iso.QRCode' : 'QR_CODE'
 });
 
-export const onMockBarCodeRead = async (
-	txRequest: ScanTestRequest,
-	onBarCodeRead: (tx: TxRequestData) => void
-): Promise<void> => {
-	const scanRequest = scanRequestDataMap[txRequest];
-	if (typeof scanRequest === 'string') {
-		await timeout(200);
-		await onBarCodeRead(buildSignRequest(scanRequest));
-	} else if (Array.isArray(scanRequest)) {
-		for (const rawData of scanRequest as string[]) {
-			await timeout(1000);
-			await onBarCodeRead(buildSignRequest(rawData));
-		}
-	} else if (typeof scanRequest === 'object') {
-		await timeout(200);
-		await onBarCodeRead(
-			buildSignRequest(scanRequest.rawData, scanRequest.data)
-		);
-	}
-};
-
 export function useInjectionQR(): [
 	number,
 	(

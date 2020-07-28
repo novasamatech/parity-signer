@@ -27,7 +27,6 @@ import {
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import {
@@ -59,13 +58,13 @@ if (!__DEV__) {
 }
 
 function NetworkSelector({
-	accounts,
+	accountsStore,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const { identities, currentIdentity } = accounts.state;
+	const { identities, currentIdentity } = accountsStore.state;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
 
@@ -127,7 +126,7 @@ function NetworkSelector({
 		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		const fullPath = `//${pathId}`;
 		try {
-			await accounts.deriveNewPath(
+			await accountsStore.deriveNewPath(
 				fullPath,
 				seedRefHooks.substrateAddress,
 				networkKey,
@@ -143,7 +142,7 @@ function NetworkSelector({
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
 		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		try {
-			await accounts.deriveEthereumAccount(
+			await accountsStore.deriveEthereumAccount(
 				seedRefHooks.brainWalletAddress,
 				networkKey
 			);

@@ -45,7 +45,7 @@ import { alertPathDerivationError } from 'utils/alertUtils';
 import { RootStackParamList } from 'types/routes';
 
 type Props = {
-	accounts: AccountsStoreStateWithIdentity;
+	accountsStore: AccountsStoreStateWithIdentity;
 	currentIdentity: Identity;
 	pathGroup: PathGroup;
 	networkParams: SubstrateNetworkParams | UnknownNetworkParams;
@@ -55,7 +55,7 @@ export default function PathGroupCard({
 	currentIdentity,
 	pathGroup,
 	networkParams,
-	accounts
+	accountsStore
 }: Props): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 	const { setAlert } = useContext(AlertStateContext);
@@ -86,7 +86,7 @@ export default function PathGroupCard({
 		const nextPath = _getFullPath(nextIndex, isHardDerivation);
 		const name = removeSlash(`${pathGroup.title}${nextIndex}`);
 		try {
-			await accounts.deriveNewPath(
+			await accountsStore.deriveNewPath(
 				nextPath,
 				substrateAddress,
 				(networkParams as SubstrateNetworkParams).genesisHash,
@@ -100,7 +100,7 @@ export default function PathGroupCard({
 
 	const _deletePath = async (): Promise<void> => {
 		const targetPath = paths[paths.length - 1];
-		await accounts.deletePath(targetPath);
+		await accountsStore.deletePath(targetPath);
 	};
 
 	const headerTitle = removeSlash(pathGroup.title);

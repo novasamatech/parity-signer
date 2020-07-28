@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -23,11 +23,11 @@ import TextInput from 'components/TextInput';
 import PathCard from 'components/PathCard';
 
 function PathManagement({
-	accounts,
+	accountsStore,
 	route
 }: NavigationAccountIdentityProps<'PathManagement'>): React.ReactElement {
 	const path = route.params.path ?? '';
-	const { currentIdentity } = accounts.state;
+	const { currentIdentity } = accountsStore.state;
 	const pathName = currentIdentity.meta.get(path)?.name;
 
 	return (
@@ -36,7 +36,7 @@ function PathManagement({
 			<TextInput
 				label="Display Name"
 				onChangeText={(name: string): Promise<void> =>
-					accounts.updatePathName(path, name)
+					accountsStore.updatePathName(path, name)
 				}
 				value={pathName}
 				placeholder="Enter a new account name"

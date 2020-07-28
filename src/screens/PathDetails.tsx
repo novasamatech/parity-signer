@@ -22,7 +22,6 @@ import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 // TODO use typescript 3.8's type import, Wait for prettier update.
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
@@ -54,16 +53,16 @@ interface Props {
 	navigation:
 		| StackNavigationProp<RootStackParamList, 'PathDetails'>
 		| StackNavigationProp<RootStackParamList, 'PathsList'>;
-	accounts: AccountsStoreStateWithIdentity;
+	accountsStore: AccountsStoreStateWithIdentity;
 }
 
 export function PathDetailsView({
-	accounts,
+	accountsStore,
 	navigation,
 	path,
 	networkKey
 }: Props): React.ReactElement {
-	const { currentIdentity } = accounts.state;
+	const { currentIdentity } = accountsStore.state;
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { setAlert } = useContext(AlertStateContext);
@@ -90,10 +89,10 @@ export function PathDetailsView({
 			case 'PathDelete':
 				alertDeleteAccount(setAlert, 'this account', async () => {
 					try {
-						await accounts.deletePath(path);
+						await accountsStore.deletePath(path);
 						if (isSubstratePath(path)) {
 							const listedPaths = getPathsWithSubstrateNetworkKey(
-								accounts.state.currentIdentity!,
+								accountsStore.state.currentIdentity!,
 								networkKey
 							);
 							const hasOtherPaths = listedPaths.length > 0;
@@ -177,15 +176,15 @@ export function PathDetailsView({
 }
 
 function PathDetails({
-	accounts,
+	accountsStore,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
 	const path = route.params.path;
-	const networkKey = getNetworkKey(path, accounts.state.currentIdentity);
+	const networkKey = getNetworkKey(path, accountsStore.state.currentIdentity);
 	return (
 		<PathDetailsView
-			accounts={accounts}
+			accountsStore={accountsStore}
 			navigation={navigation}
 			path={path}
 			networkKey={networkKey}

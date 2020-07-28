@@ -1,5 +1,3 @@
-import { by, element } from 'detox';
-
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 import {
@@ -27,7 +25,7 @@ const {
 const passwordedPath = '//passworded';
 const password = 'random';
 
-describe.skip('passworded account test', () => {
+describe('passworded account test', () => {
 	testRecoverIdentity();
 
 	it('derive a passworded account', async () => {
@@ -61,6 +59,7 @@ describe.skip('passworded account test', () => {
 		});
 
 		it('does only need password again in the second try', async () => {
+			await tapBack();
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
 			await testInput(IdentityPin.passwordInput, password);

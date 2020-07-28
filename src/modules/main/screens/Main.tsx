@@ -26,9 +26,9 @@ import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 export default function Main(
 	props: NavigationProps<'Main'>
 ): React.ReactElement {
-	const accounts = useContext(AccountsContext);
-	const { identities, currentIdentity, loaded } = accounts.state;
-	const hasLegacyAccount = accounts.getAccounts().size !== 0;
+	const accountsStore = useContext(AccountsContext);
+	const { identities, currentIdentity, loaded, accounts } = accountsStore.state;
+	const hasLegacyAccount = accounts.size !== 0;
 
 	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0)

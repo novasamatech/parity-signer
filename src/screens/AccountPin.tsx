@@ -40,7 +40,7 @@ function AccountPin({
 	navigation,
 	route
 }: NavigationProps<'AccountPin'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -59,14 +59,14 @@ function AccountPin({
 		const { pin, confirmation } = state;
 		const accountCreation: boolean = route.params?.isNew ?? false;
 		const account = accountCreation
-			? accounts.getNew()
-			: accounts.getSelected()!;
+			? accountsStore.getNew()
+			: accountsStore.getSelected()!;
 		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
-				await accounts.submitNew(pin);
+				await accountsStore.submitNew(pin);
 				return navigateToLegacyAccountList(navigation);
 			} else {
-				await accounts.save(accounts.getSelectedKey(), account, pin);
+				await accountsStore.save(accountsStore.getSelectedKey(), account, pin);
 				const resetAction = CommonActions.reset({
 					index: 1,
 					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]

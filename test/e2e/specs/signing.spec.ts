@@ -28,8 +28,7 @@ import {
 	testScrollAndTap,
 	testTap,
 	testUnlockPin,
-	testVisible,
-	waitAlert
+	testVisible
 } from 'e2e/utils';
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
@@ -137,6 +136,7 @@ describe('Signing ane exporting test', () => {
 
 	describe('Ethereum Signing Test', () => {
 		it('generate Kovan account', async () => {
+			await tapBack();
 			await tapBack();
 			const kovanNetworkButtonIndex =
 				Main.networkButton + EthereumNetworkKeys.KOVAN;

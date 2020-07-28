@@ -19,9 +19,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
+import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
@@ -38,17 +37,17 @@ import { useSeedRef } from 'utils/seedRefHooks';
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
 function IdentityManagement({
-	accounts,
+	accountsStore,
 	navigation
 }: Props): React.ReactElement {
-	const { currentIdentity } = accounts.state;
+	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
 	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
 		try {
-			await accounts.updateIdentityName(name);
+			await accountsStore.updateIdentityName(name);
 		} catch (err) {
 			alertError(setAlert, `Can't rename: ${err.message}`);
 		}
@@ -62,7 +61,7 @@ function IdentityManagement({
 					await unlockSeedPhrase(navigation, false);
 					try {
 						await destroySeedRef();
-						await accounts.deleteCurrentIdentity();
+						await accountsStore.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
 					} catch (err) {
 						alertError(setAlert, "Can't delete Identity.");

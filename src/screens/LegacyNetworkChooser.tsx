@@ -34,7 +34,7 @@ import { emptyAccount } from 'utils/account';
 export default function LegacyNetworkChooserView({
 	navigation
 }: NavigationProps<'LegacyNetworkChooser'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 
 	if (!__DEV__) {
@@ -65,7 +65,7 @@ export default function LegacyNetworkChooserView({
 								}
 							]}
 							onPress={(): void => {
-								accounts.updateNew(emptyAccount('', networkKey));
+								accountsStore.updateNew(emptyAccount('', networkKey));
 								navigation.goBack();
 							}}
 						>

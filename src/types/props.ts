@@ -28,7 +28,7 @@ export type FocusListener = (
 export interface NavigationAccountIdentityProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
-	accounts: AccountsStoreStateWithIdentity;
+	accountsStore: AccountsStoreStateWithIdentity;
 }
 
 export interface NavigationTargetIdentityProps<
@@ -41,7 +41,7 @@ export interface NavigationAccountScannerProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
 	scannerStore: ScannerContextState;
-	accounts: AccountsContextState;
+	accountsStore: AccountsContextState;
 }
 
 export interface NavigationScannerProps<

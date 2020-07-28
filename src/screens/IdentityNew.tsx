@@ -43,7 +43,7 @@ function IdentityNew({
 	navigation,
 	route
 }: NavigationProps<'IdentityNew'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
@@ -52,7 +52,7 @@ function IdentityNew({
 	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const clearIdentity = useRef(() =>
-		accounts.updateNewIdentity(emptyIdentity())
+		accountsStore.updateNewIdentity(emptyIdentity())
 	);
 
 	useEffect((): (() => void) => {
@@ -61,7 +61,7 @@ function IdentityNew({
 	}, [clearIdentity]);
 
 	const updateName = (name: string): void => {
-		accounts.updateNewIdentity({ name });
+		accountsStore.updateNewIdentity({ name });
 	};
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
@@ -80,13 +80,13 @@ function IdentityNew({
 		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
-				await accounts.saveNewIdentity(
+				await accountsStore.saveNewIdentity(
 					seedPhrase.trimEnd(),
 					pin,
 					createSeedRefWithNewSeed
 				);
 			} else {
-				await accounts.saveNewIdentity(
+				await accountsStore.saveNewIdentity(
 					seedPhrase,
 					pin,
 					createSeedRefWithNewSeed
@@ -169,7 +169,7 @@ function IdentityNew({
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.IdentityNew.nameInput}
-				value={accounts.state.newIdentity.name}
+				value={accountsStore.state.newIdentity.name}
 				placeholder="Identity Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}

@@ -24,13 +24,13 @@ import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 
 export default function CustomAlert(): React.ReactElement {
-	const { title, index, message, actions } = useContext(AlertStateContext);
+	const { title, alertIndex, message, actions } = useContext(AlertStateContext);
 	/* eslint-disable-next-line react-hooks/exhaustive-deps */
-	const animatedValue = useMemo(() => new Animated.Value(1), [index]);
+	const animatedValue = useMemo(() => new Animated.Value(1), [alertIndex]);
 	const [alertDisplay, setAlertDisplay] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (index === 0) return;
+		if (alertIndex === 0) return;
 		setAlertDisplay(true);
 		if (actions.length === 0) {
 			Animated.timing(animatedValue, {
@@ -43,7 +43,7 @@ export default function CustomAlert(): React.ReactElement {
 			});
 		}
 		/* eslint-disable-next-line react-hooks/exhaustive-deps */
-	}, [index]);
+	}, [alertIndex]);
 
 	const renderActions = (action: Action, index: number): React.ReactElement => (
 		<Button

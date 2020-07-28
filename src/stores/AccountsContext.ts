@@ -6,7 +6,6 @@ import {
 	SUBSTRATE_NETWORK_LIST,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
-import { defaultGlobalState } from 'stores/globalStateContext';
 import {
 	Account,
 	AccountsStoreState,
@@ -73,7 +72,6 @@ export type AccountsContextState = {
 	getAccountByAddress: any;
 	getSelected: any;
 	getSelectedKey: any;
-	getAccounts: () => Map<string, UnlockedAccount | LockedAccount>;
 	getIdentityByAccountId: any;
 	resetCurrentIdentity: any;
 	saveNewIdentity: any;
@@ -108,11 +106,10 @@ export function useAccountContext(): AccountsContextState {
 	});
 	const [state, setState] = useReducer(reducer, initialState);
 	useEffect(() => {
-		const refreshList = async (): Promise<void> => {
+		const loadInitialContext = async (): Promise<void> => {
 			const accounts = await loadAccounts();
 			const identities = await loadIdentities();
-			let { currentIdentity } = state;
-			if (identities.length > 0) currentIdentity = identities[0];
+			const currentIdentity = identities.length > 0 ? identities[0] : null;
 			setState({
 				accounts,
 				currentIdentity,
@@ -120,7 +117,7 @@ export function useAccountContext(): AccountsContextState {
 				loaded: true
 			});
 		};
-		refreshList();
+		loadInitialContext();
 	}, []);
 
 	function select(accountKey: string): void {
@@ -441,10 +438,6 @@ export function useAccountContext(): AccountsContextState {
 		return state.selectedKey;
 	}
 
-	function getAccounts(): Map<string, Account> {
-		return state.accounts;
-	}
-
 	function getIdentityByAccountId(accountId: string): Identity | undefined {
 		const networkProtocol = accountId.split(':')[0];
 		const searchAddress =
@@ -524,7 +517,7 @@ export function useAccountContext(): AccountsContextState {
 		setState({ currentIdentity: identity });
 	}
 
-	function clearIdentity() {
+	function clearIdentity(): void {
 		setState({ newIdentity: emptyIdentity() });
 	}
 
@@ -598,7 +591,6 @@ export function useAccountContext(): AccountsContextState {
 		deriveEthereumAccount,
 		deriveNewPath,
 		getAccountByAddress,
-		getAccounts,
 		getById,
 		getIdentityByAccountId,
 		getNew,

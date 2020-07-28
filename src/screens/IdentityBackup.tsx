@@ -40,7 +40,7 @@ function IdentityBackup({
 	navigation,
 	route
 }: NavigationProps<'IdentityBackup'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
 	const { setAlert } = useContext(AlertStateContext);
@@ -49,7 +49,11 @@ function IdentityBackup({
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
 		try {
-			await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
+			await accountsStore.saveNewIdentity(
+				seedPhrase,
+				pin,
+				createSeedRefWithNewSeed
+			);
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {

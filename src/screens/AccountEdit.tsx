@@ -23,17 +23,17 @@ import TextInput from 'components/TextInput';
 import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
 
 const onNameInput = async (
-	accounts: AccountsContextState,
+	accountsStore: AccountsContextState,
 	name: string
 ): Promise<void> => {
-	await accounts.updateSelectedAccount({ name });
-	const selectedAccount = accounts.getSelected()!;
-	await accounts.save(accounts.getSelectedKey(), selectedAccount);
+	await accountsStore.updateSelectedAccount({ name });
+	const selectedAccount = accountsStore.getSelected()!;
+	await accountsStore.save(accountsStore.getSelectedKey(), selectedAccount);
 };
 
 export default function AccountEdit({}: {}): React.ReactElement {
-	const accounts = useContext(AccountsContext);
-	const selectedAccount = accounts.getSelected()!;
+	const accountsStore = useContext(AccountsContext);
+	const selectedAccount = accountsStore.getSelected()!;
 	if (!selectedAccount) {
 		return <ScrollView bounces={false} style={styles.body} />;
 	}
@@ -49,7 +49,7 @@ export default function AccountEdit({}: {}): React.ReactElement {
 				label="Account Name"
 				style={{ marginBottom: 40 }}
 				onChangeText={(name: string): Promise<any> =>
-					onNameInput(accounts, name)
+					onNameInput(accountsStore, name)
 				}
 				value={selectedAccount.name}
 				placeholder="New name"

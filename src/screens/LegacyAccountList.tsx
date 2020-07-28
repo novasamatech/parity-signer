@@ -28,12 +28,12 @@ import QrScannerTab from 'components/QrScannerTab';
 function LegacyAccountList({
 	navigation
 }: NavigationProps<'LegacyAccountList'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const onAccountSelected = async (key: string): Promise<void> => {
-		await accounts.select(key);
+		await accountsStore.select(key);
 		navigation.navigate('AccountDetails');
 	};
-	const accountsMap = accounts.getAccounts();
+	const accountsMap = accountsStore.state.accounts;
 
 	const renderAccountCard = ([accountKey, account]: [
 		string,

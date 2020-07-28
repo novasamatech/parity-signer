@@ -14,38 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, {
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState
-} from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
 import { useProcessBarCode } from 'modules/sign/utils';
-import { onMockBarCodeRead, useInjectionQR } from 'e2e/injections';
-import { AccountsContext } from 'stores/AccountsContext';
+import { useInjectionQR } from 'e2e/injections';
 import { AlertStateContext } from 'stores/alertContext';
 import { ScannerContext } from 'stores/ScannerContext';
-import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
-import { NavigationAccountScannerProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
-import { withAccountAndScannerStore } from 'utils/HOC';
 
-export default function Scanner({
-	navigation
-}: NavigationAccountScannerProps<'QrScanner'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+export default function Scanner({}: NavigationProps<
+	'QrScanner'
+>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
-	const [seedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	const { setAlert } = useContext(AlertStateContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
@@ -115,6 +103,7 @@ export default function Scanner({
 	};
 
 	useEffect(() => {
+		/** E2E Test Injection Code **/
 		if (global.inTest && global.scanRequest !== undefined) {
 			onMockBarCodeRead(
 				global.scanRequest,
@@ -123,6 +112,7 @@ export default function Scanner({
 				}
 			);
 		}
+		/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	}, [mockIndex]);
 
 	const {

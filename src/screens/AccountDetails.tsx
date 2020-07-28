@@ -39,10 +39,11 @@ import QrScannerTab from 'components/QrScannerTab';
 export default function AccountDetails({
 	navigation
 }: NavigationProps<'AccountDetails'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
-	const account = accounts.getSelected();
-	const selectedKey = accounts.getSelectedKey();
+	const accountsStore = useContext(AccountsContext);
+	const account = accountsStore.getSelected();
+	const selectedKey = accountsStore.getSelectedKey();
 	const { setAlert } = useContext(AlertStateContext);
+	const { accounts } = accountsStore.state;
 
 	if (!account) return <View />;
 
@@ -57,8 +58,8 @@ export default function AccountDetails({
 			setAlert,
 			account.name || account.address || 'this account',
 			async () => {
-				await accounts.deleteAccount(selectedKey);
-				if (accounts.getAccounts().size === 0) {
+				await accountsStore.deleteAccount(selectedKey);
+				if (accounts.size === 0) {
 					return navigateToLandingPage(navigation);
 				}
 				navigateToLegacyAccountList(navigation);

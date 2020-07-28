@@ -13,7 +13,7 @@ export type Action = {
 };
 export type AlertState = {
 	actions: Action[];
-	index: number;
+	alertIndex: number;
 	title: string;
 	message: string;
 	setAlert: SetAlert;
@@ -21,7 +21,7 @@ export type AlertState = {
 
 export const defaultAlertState: AlertState = {
 	actions: [],
-	index: 0,
+	alertIndex: 0,
 	message: '',
 	setAlert: (): any => 0,
 	title: ''
@@ -30,12 +30,12 @@ export const defaultAlertState: AlertState = {
 export function useAlertContext(): AlertState {
 	const [alertState, setAlertState] = useState<{
 		actions: Action[];
-		index: number;
+		alertIndex: number;
 		title: string;
 		message: string;
 	}>({
 		actions: [],
-		index: 0,
+		alertIndex: 0,
 		message: '',
 		title: ''
 	});
@@ -45,7 +45,7 @@ export function useAlertContext(): AlertState {
 		setAlert: (title, message, actions = []): void =>
 			setAlertState({
 				actions,
-				index: alertState.index + 1,
+				alertIndex: alertState.alertIndex + 1,
 				message,
 				title
 			})

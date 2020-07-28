@@ -24,13 +24,8 @@ import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
-import {
-	NavigationAccountScannerProps,
-	NavigationProps,
-	NavigationScannerProps
-} from 'types/props';
+import { NavigationProps, NavigationScannerProps } from 'types/props';
 import QrView from 'components/QrView';
-import { withAccountAndScannerStore } from 'utils/HOC';
 import styles from 'modules/sign/styles';
 import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 import Separator from 'components/Separator';
@@ -66,7 +61,7 @@ function SignedMessageView({
 	message,
 	scannerStore
 }: Props): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const { signedData, isHash, dataToSign } = scannerStore.state;
 
 	return (
@@ -88,7 +83,7 @@ function SignedMessageView({
 			<CompatibleCard
 				titlePrefix={'from:'}
 				account={sender}
-				accountsStore={accounts}
+				accountsStore={accountsStore}
 			/>
 			<MessageDetailsCard
 				isHash={isHash ?? false}

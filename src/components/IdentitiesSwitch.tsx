@@ -23,7 +23,7 @@ import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
-import { AccountsContext, useAccountContext } from 'stores/AccountsContext';
+import { AccountsContext } from 'stores/AccountsContext';
 import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
@@ -46,10 +46,10 @@ function ButtonWithArrow(props: {
 }
 
 function IdentitiesSwitch({}: {}): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
-	const { currentIdentity, identities } = accounts.state;
+	const { currentIdentity, identities, accounts } = accountsStore.state;
 	// useEffect(() => {
 	// 	const firstLogin: boolean = identities.length === 0;
 	// 	if (currentIdentity === null && !firstLogin) {
@@ -73,7 +73,7 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 		screenName: RouteName,
 		params?: RootStackParamList[RouteName]
 	): Promise<void> => {
-		await accounts.selectIdentity(identity);
+		await accountsStore.selectIdentity(identity);
 		setVisible(false);
 		if (screenName === 'Main') {
 			resetNavigationTo(navigation, screenName, params);
@@ -91,7 +91,7 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 	const onLegacyListClicked = (): void => {
 		setVisible(false);
 		navigateToLegacyAccountList(navigation);
-		accounts.resetCurrentIdentity();
+		accountsStore.resetCurrentIdentity();
 	};
 
 	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
@@ -236,7 +236,7 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 				<View style={styles.card}>
 					{renderCurrentIdentityCard()}
 					{renderIdentities()}
-					{accounts.getAccounts().size > 0 && (
+					{accounts.size > 0 && (
 						<>
 							<ButtonIcon
 								title="Legacy Accounts"

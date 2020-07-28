@@ -15,24 +15,21 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Dispatch, SetStateAction, useContext } from 'react';
+import { useContext } from 'react';
 
 import { NETWORK_LIST } from 'constants/networkSpecs';
-import Scanner from 'modules/sign/screens/QrScanner';
 import strings from 'modules/sign/strings';
-import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
-import { ScannerContext, ScannerContextState } from 'stores/ScannerContext';
+import { AccountsContext } from 'stores/AccountsContext';
+import { ScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
-import { FoundAccount, FoundIdentityAccount } from 'types/identityTypes';
+import { FoundIdentityAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { RootStackParamList } from 'types/routes';
 import {
-	Frames,
 	isMultiFramesInfo,
 	isMultipartData,
 	ParsedData,
 	QrInfo,
-	SubstrateCompletedParsedData,
 	TxRequestData
 } from 'types/scannerTypes';
 import {
@@ -44,13 +41,9 @@ import {
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
-	navigateToSignedMessage,
-	navigateToSignedTx,
 	unlockSeedPhrase,
-	unlockSeedPhraseWithPassword,
-	useUnlockSeed
+	unlockSeedPhraseWithPassword
 } from 'utils/navigationHelpers';
-import { useSeedRef } from 'utils/seedRefHooks';
 import { constructSuriSuffix } from 'utils/suri';
 
 function getSeedRef(
@@ -65,7 +58,7 @@ function getSeedRef(
 export function useProcessBarCode(
 	showErrorMessage: (title: string, message: string) => void
 ): (txRequestData: TxRequestData) => Promise<void> {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const scannerStore = useContext(ScannerContext);
 	const [seedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	const navigation: StackNavigationProp<
@@ -120,7 +113,7 @@ export function useProcessBarCode(
 		// 1. check if sender existed
 		const senderIdentity = getIdentityFromSender(
 			sender,
-			accounts.state.identities
+			accountsStore.state.identities
 		);
 		if (!senderIdentity) throw new Error(strings.ERROR_NO_SENDER_IDENTITY);
 
@@ -167,7 +160,7 @@ export function useProcessBarCode(
 		}
 	}
 
-	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo) {
+	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
 		const { sender, type } = qrInfo;
 		if (!sender)
 			return showErrorMessage(
@@ -203,7 +196,7 @@ export function useProcessBarCode(
 			const parsedData = await parseQrData(txRequestData);
 			const unsignedData = await checkMultiFramesData(parsedData);
 			if (unsignedData === null) return;
-			const qrInfo = await scannerStore.setData(accounts, unsignedData);
+			const qrInfo = await scannerStore.setData(accountsStore, unsignedData);
 			await unlockAndNavigationToSignedQR(qrInfo);
 			scannerStore.clearMultipartProgress();
 		} catch (e) {

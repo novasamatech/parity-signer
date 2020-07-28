@@ -18,8 +18,7 @@ import { RouteProp } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { View } from 'react-native';
 
-import { ScannerContext, ScannerContextState } from 'stores/ScannerContext';
-import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
+import { AccountsContext } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 import {
@@ -27,37 +26,8 @@ import {
 	RegistriesStoreState
 } from 'stores/RegistriesStore';
 
-interface AccountInjectedProps {
-	accounts: AccountsContextState;
-}
-
-interface ScannerInjectedProps {
-	scanner: ScannerContextState;
-}
-
 interface RegistriesInjectedProps {
 	registriesStore: RegistriesStoreState;
-}
-
-type AccountAndScannerInjectedProps = AccountInjectedProps &
-	ScannerInjectedProps;
-
-export function withAccountAndScannerStore<
-	T extends AccountAndScannerInjectedProps
->(
-	WrappedComponent: React.ComponentType<any>
-): React.ComponentType<Omit<T, keyof AccountAndScannerInjectedProps>> {
-	return (props): React.ReactElement => {
-		const accounts = useContext(AccountsContext);
-		const scannerStore = useContext(ScannerContext);
-		return (
-			<WrappedComponent
-				{...props}
-				scannerStore={scannerStore}
-				accounts={accounts}
-			/>
-		);
-	};
 }
 
 export function withRegistriesStore<T extends RegistriesInjectedProps>(
@@ -70,13 +40,13 @@ export function withRegistriesStore<T extends RegistriesInjectedProps>(
 }
 
 export function withCurrentIdentity<
-	T extends { accounts: AccountsStoreStateWithIdentity }
+	T extends { accountsStore: AccountsStoreStateWithIdentity }
 >(WrappedComponent: React.ComponentType<T>): React.ComponentType<T> {
 	return (props): React.ReactElement => {
-		const accounts = useContext(AccountsContext);
-		const { currentIdentity } = accounts.state;
+		const accountsStore = useContext(AccountsContext);
+		const { currentIdentity } = accountsStore.state;
 		if (currentIdentity === null) return <View />;
-		return <WrappedComponent {...props} accounts={accounts} />;
+		return <WrappedComponent {...props} accountsStore={accountsStore} />;
 	};
 }
 
@@ -91,9 +61,9 @@ export function withTargetIdentity<T extends UnlockScreenProps>(
 	WrappedComponent: React.ComponentType<T>
 ): React.ComponentType<T> {
 	return (props): React.ReactElement => {
-		const accounts = useContext(AccountsContext);
+		const accountsStore = useContext(AccountsContext);
 		const targetIdentity =
-			props.route.params.identity ?? accounts.state.currentIdentity;
+			props.route.params.identity ?? accountsStore.state.currentIdentity;
 		if (!targetIdentity) return <View />;
 		return <WrappedComponent {...props} targetIdentity={targetIdentity} />;
 	};

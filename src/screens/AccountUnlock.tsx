@@ -67,12 +67,15 @@ export function AccountUnlock({
 }: NavigationProps<'AccountUnlock'>): React.ReactElement {
 	const next = route.params.next ?? 'LegacyAccountList';
 	const onDelete = route.params.onDelete ?? ((): any => null);
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 
 	return (
 		<AccountUnlockView
 			checkPin={async (pin: string): Promise<boolean> => {
-				return await accounts.unlockAccount(accounts.getSelectedKey(), pin);
+				return await accountsStore.unlockAccount(
+					accountsStore.getSelectedKey(),
+					pin
+				);
 			}}
 			navigate={(): void => {
 				if (next === 'AccountDelete') {

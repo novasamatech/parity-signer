@@ -46,7 +46,7 @@ interface State {
 export default function AccountNew({
 	navigation
 }: NavigationProps<'AccountNew'>): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -62,17 +62,17 @@ export default function AccountNew({
 	const [state, updateState] = useReducer(reducer, initialState);
 
 	useEffect((): void => {
-		accounts.updateNew(emptyAccount());
-	}, [accounts.updateNew]);
+		accountsStore.updateNew(emptyAccount());
+	}, [accountsStore]);
 
 	useEffect((): void => {
-		const selectedAccount = accounts.state.newAccount;
+		const selectedAccount = accountsStore.state.newAccount;
 		const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
 		updateState({
 			selectedAccount,
 			selectedNetwork
 		});
-	}, [accounts.state.newAccount]);
+	}, [accountsStore.state.newAccount]);
 
 	const {
 		derivationPassword,
@@ -114,7 +114,7 @@ export default function AccountNew({
 										phrase: newSeed
 									});
 
-									accounts.updateNew({
+									accountsStore.updateNew({
 										address: newAddress,
 										derivationPassword,
 										derivationPath,
@@ -127,14 +127,14 @@ export default function AccountNew({
 								}
 							} else {
 								// Ethereum account
-								accounts.updateNew({
+								accountsStore.updateNew({
 									address: newAddress,
 									seed: newSeed,
 									validBip39Seed: isBip39
 								});
 							}
 						} else {
-							accounts.updateNew({
+							accountsStore.updateNew({
 								address: '',
 								seed: '',
 								validBip39Seed: false
@@ -147,7 +147,7 @@ export default function AccountNew({
 				<Text style={styles.title}>NAME</Text>
 				<TextInput
 					onChangeText={(input: string): void =>
-						accounts.updateNew({ name: input })
+						accountsStore.updateNew({ name: input })
 					}
 					value={name}
 					placeholder="Enter a new account name"

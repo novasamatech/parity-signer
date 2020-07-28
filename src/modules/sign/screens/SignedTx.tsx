@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
 import strings from 'modules/sign/strings';
@@ -25,14 +25,9 @@ import { AccountsContext } from 'stores/AccountsContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
-import {
-	NavigationAccountScannerProps,
-	NavigationProps,
-	NavigationScannerProps
-} from 'types/props';
+import { NavigationProps, NavigationScannerProps } from 'types/props';
 import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
-import { withAccountAndScannerStore } from 'utils/HOC';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
@@ -67,7 +62,7 @@ function SignedTxView({
 	recipient,
 	scannerStore
 }: Props): React.ReactElement {
-	const accounts = useContext(AccountsContext);
+	const accountsStore = useContext(AccountsContext);
 	const { signedData, tx } = scannerStore.state;
 	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
@@ -93,7 +88,7 @@ function SignedTxView({
 			</View>
 			<CompatibleCard
 				account={sender}
-				accountsStore={accounts}
+				accountsStore={accountsStore}
 				titlePrefix={'from:'}
 			/>
 			{isEthereum && (
@@ -106,7 +101,7 @@ function SignedTxView({
 						gasPrice={gasPrice}
 					/>
 					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient} accountsStore={accounts} />
+					<CompatibleCard account={recipient} accountsStore={accountsStore} />
 				</View>
 			)}
 		</SafeAreaScrollViewContainer>
