@@ -54,7 +54,7 @@ function LegacyAccountBackup({
 
 			AppState.removeEventListener('change', handleAppStateChange);
 		};
-	}, [navigation, accountsStore]);
+	}, [navigation, accountsStore, selectedKey]);
 
 	const { navigate } = navigation;
 	const { setAlert } = useContext(AlertStateContext);

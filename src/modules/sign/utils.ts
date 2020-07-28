@@ -31,7 +31,6 @@ import {
 	isMultipartData,
 	ParsedData,
 	QrInfo,
-	SubstrateCompletedParsedData,
 	TxRequestData
 } from 'types/scannerTypes';
 import {

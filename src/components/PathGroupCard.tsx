@@ -98,11 +98,6 @@ export default function PathGroupCard({
 		}
 	};
 
-	const _deletePath = async (): Promise<void> => {
-		const targetPath = paths[paths.length - 1];
-		await accountsStore.deletePath(targetPath);
-	};
-
 	const headerTitle = removeSlash(pathGroup.title);
 	const headerCode = `//${networkParams.pathId}${pathGroup.title}`;
 	return (
