@@ -35,7 +35,7 @@ function PathManagement({
 			<PathCard identity={currentIdentity} path={path} />
 			<TextInput
 				label="Display Name"
-				onChangeText={(name: string): Promise<void> =>
+				onChangeText={(name: string): void =>
 					accountsStore.updatePathName(path, name)
 				}
 				value={pathName}

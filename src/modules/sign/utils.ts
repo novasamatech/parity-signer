@@ -26,10 +26,12 @@ import { FoundIdentityAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import { RootStackParamList } from 'types/routes';
 import {
+	CompletedParsedData,
 	isMultiFramesInfo,
 	isMultipartData,
 	ParsedData,
 	QrInfo,
+	SubstrateCompletedParsedData,
 	TxRequestData
 } from 'types/scannerTypes';
 import {
@@ -86,17 +88,17 @@ export function useProcessBarCode(
 
 	async function checkMultiFramesData(
 		parsedData: ParsedData
-	): Promise<null | ParsedData> {
+	): Promise<null | CompletedParsedData> {
 		if (isMultipartData(parsedData)) {
 			const multiFramesResult = await scannerStore.setPartData(
 				parsedData.currentFrame,
 				parsedData.frameCount,
 				parsedData.partData
 			);
-			const isMultiPartUncompleted = isMultiFramesInfo(multiFramesResult);
-			if (isMultiPartUncompleted) {
+			if (isMultiFramesInfo(multiFramesResult)) {
 				return null;
 			}
+			//Otherwise all the frames are assembled as completed parsed data
 			return multiFramesResult;
 		} else {
 			return parsedData;
