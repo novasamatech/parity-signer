@@ -1,5 +1,3 @@
-import { by, element } from 'detox';
-
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 import {
@@ -11,7 +9,8 @@ import {
 	testInputWithDone,
 	testRecoverIdentity,
 	testTap,
-	testVisible
+	testVisible,
+	waitAlert
 } from 'e2e/utils';
 
 const {
@@ -34,7 +33,7 @@ describe('passworded account test', () => {
 		await testInput(PathDerivation.pathInput, passwordedPath);
 		await testTap(PathDerivation.togglePasswordButton);
 		await testInput(PathDerivation.passwordInput, password);
-		await element(by.text('Done')).tap();
+		await waitAlert();
 		await testExist(PathsList.pathCard + `//kusama${passwordedPath}`);
 	});
 
@@ -60,6 +59,7 @@ describe('passworded account test', () => {
 		});
 
 		it('does only need password again in the second try', async () => {
+			await tapBack();
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
 			await testInput(IdentityPin.passwordInput, password);

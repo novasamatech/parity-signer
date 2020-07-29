@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -23,12 +23,11 @@ import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
+import { AccountsContext } from 'stores/AccountsContext';
 import { RootStackParamList } from 'types/routes';
-import AccountsStore from 'stores/AccountsStore';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { withAccountStore } from 'utils/HOC';
 import { getIdentityName } from 'utils/identitiesUtils';
 import {
 	unlockAndReturnSeed,
@@ -46,14 +45,11 @@ function ButtonWithArrow(props: {
 	return <ButtonIcon {...props} {...i_arrowOptions} />;
 }
 
-function IdentitiesSwitch({
-	accounts
-}: {
-	accounts: AccountsStore;
-}): React.ReactElement {
+function IdentitiesSwitch({}: {}): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
-	const { currentIdentity, identities } = accounts.state;
+	const { currentIdentity, identities, accounts } = accountsStore.state;
 	// useEffect(() => {
 	// 	const firstLogin: boolean = identities.length === 0;
 	// 	if (currentIdentity === null && !firstLogin) {
@@ -77,7 +73,7 @@ function IdentitiesSwitch({
 		screenName: RouteName,
 		params?: RootStackParamList[RouteName]
 	): Promise<void> => {
-		await accounts.selectIdentity(identity);
+		await accountsStore.selectIdentity(identity);
 		setVisible(false);
 		if (screenName === 'Main') {
 			resetNavigationTo(navigation, screenName, params);
@@ -95,7 +91,7 @@ function IdentitiesSwitch({
 	const onLegacyListClicked = (): void => {
 		setVisible(false);
 		navigateToLegacyAccountList(navigation);
-		accounts.resetCurrentIdentity();
+		accountsStore.resetCurrentIdentity();
 	};
 
 	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
@@ -240,7 +236,7 @@ function IdentitiesSwitch({
 				<View style={styles.card}>
 					{renderCurrentIdentityCard()}
 					{renderIdentities()}
-					{accounts.getAccounts().size > 0 && (
+					{accounts.size > 0 && (
 						<>
 							<ButtonIcon
 								title="Legacy Accounts"
@@ -318,4 +314,4 @@ const i_arrowOptions = {
 	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
 };
 
-export default withAccountStore(IdentitiesSwitch);
+export default IdentitiesSwitch;

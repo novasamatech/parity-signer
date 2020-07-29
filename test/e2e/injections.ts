@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { useState } from 'react';
 import { Platform } from 'react-native';
 
 import { scanRequestDataMap, ScanTestRequest } from 'e2e/mockScanRequests';
@@ -67,23 +68,36 @@ const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	type: Platform.OS === 'ios' ? 'org.iso.QRCode' : 'QR_CODE'
 });
 
-export const onMockBarCodeRead = async (
-	txRequest: ScanTestRequest,
-	onBarCodeRead: (tx: TxRequestData) => void
-): Promise<void> => {
-	const scanRequest = scanRequestDataMap[txRequest];
-	if (typeof scanRequest === 'string') {
-		await timeout(200);
-		await onBarCodeRead(buildSignRequest(scanRequest));
-	} else if (Array.isArray(scanRequest)) {
-		for (const rawData of scanRequest as string[]) {
+export function useInjectionQR(): [
+	number,
+	(
+		txRequest: ScanTestRequest,
+		onBarCodeRead: (tx: TxRequestData) => void
+	) => Promise<void>
+] {
+	const [mockIndex, setMockIndex] = useState(0);
+
+	const onMockBarCodeRead = async (
+		txRequest: ScanTestRequest,
+		onBarCodeRead: (tx: TxRequestData) => void
+	): Promise<void> => {
+		const scanRequest = scanRequestDataMap[txRequest];
+		if (typeof scanRequest === 'string') {
 			await timeout(200);
-			await onBarCodeRead(buildSignRequest(rawData));
+			await onBarCodeRead(buildSignRequest(scanRequest));
+		} else if (Array.isArray(scanRequest)) {
+			await timeout(200);
+			if (mockIndex < scanRequest.length) {
+				await onBarCodeRead(buildSignRequest(scanRequest[mockIndex]));
+				setMockIndex(mockIndex + 1);
+			}
+		} else if (typeof scanRequest === 'object') {
+			await timeout(200);
+			await onBarCodeRead(
+				buildSignRequest(scanRequest.rawData, scanRequest.data)
+			);
 		}
-	} else if (typeof scanRequest === 'object') {
-		await timeout(200);
-		await onBarCodeRead(
-			buildSignRequest(scanRequest.rawData, scanRequest.data)
-		);
-	}
-};
+	};
+
+	return [mockIndex, onMockBarCodeRead];
+}

@@ -15,18 +15,18 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 //Deprecated
-import React, { useReducer } from 'react';
+import React, { useContext, useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
+import { AccountsContext } from 'stores/AccountsContext';
 import fontStyles from 'styles/fontStyles';
-import { NavigationAccountProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import Button from 'components/Button';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
 import fonts from 'styles/fonts';
-import { withAccountStore } from 'utils/HOC';
 import { navigateToLegacyAccountList } from 'utils/navigationHelpers';
 
 interface State {
@@ -37,10 +37,10 @@ interface State {
 	pinTooShort: boolean;
 }
 function AccountPin({
-	accounts,
 	navigation,
 	route
-}: NavigationAccountProps<'AccountPin'>): React.ReactElement {
+}: NavigationProps<'AccountPin'>): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -56,17 +56,16 @@ function AccountPin({
 	const [state, setState] = useReducer(reducer, initialState);
 
 	const submit = async (): Promise<void> => {
+		const { selectedKey, newAccount } = accountsStore.state;
 		const { pin, confirmation } = state;
 		const accountCreation: boolean = route.params?.isNew ?? false;
-		const account = accountCreation
-			? accounts.getNew()
-			: accounts.getSelected()!;
+		const account = accountCreation ? newAccount : accountsStore.getSelected()!;
 		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
-				await accounts.submitNew(pin);
+				await accountsStore.submitNew(pin);
 				return navigateToLegacyAccountList(navigation);
 			} else {
-				await accounts.save(accounts.getSelectedKey(), account, pin);
+				await accountsStore.save(selectedKey, account, pin);
 				const resetAction = CommonActions.reset({
 					index: 1,
 					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
@@ -155,7 +154,7 @@ function PinInput(props: any): React.ReactElement {
 	);
 }
 
-export default withAccountStore(AccountPin);
+export default AccountPin;
 
 const styles = StyleSheet.create({
 	body: {

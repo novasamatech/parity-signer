@@ -31,7 +31,7 @@ import {
 	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
+import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths
@@ -42,14 +42,14 @@ import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 
 function PathsList({
-	accounts,
+	accountsStore,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
 	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
 	const networkParams = NETWORK_LIST[networkKey];
 
-	const { currentIdentity } = accounts.state;
+	const { currentIdentity } = accountsStore.state;
 	const isEthereumPath = isEthereumNetworkParams(networkParams);
 	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
 	const pathsGroups = useMemo((): PathGroup[] | null => {
@@ -69,7 +69,7 @@ function PathsList({
 				networkKey={networkKey}
 				path={networkKey}
 				navigation={navigation}
-				accounts={accounts}
+				accountsStore={accountsStore}
 			/>
 		);
 	}
@@ -112,7 +112,7 @@ function PathsList({
 							currentIdentity={currentIdentity}
 							pathGroup={pathsGroup}
 							networkParams={networkParams}
-							accounts={accounts}
+							accountsStore={accountsStore}
 							key={pathsGroup.title}
 						/>
 					)
@@ -128,4 +128,4 @@ function PathsList({
 	);
 }
 
-export default withAccountStore(withCurrentIdentity(PathsList));
+export default withCurrentIdentity(PathsList);

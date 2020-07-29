@@ -16,7 +16,7 @@
 
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import testIDs from '../../test/e2e/testIDs';
@@ -24,6 +24,7 @@ import testIDs from '../../test/e2e/testIDs';
 import PathCard from './PathCard';
 import Separator from './Separator';
 
+import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import TouchableItem from 'components/TouchableItem';
 import fontStyles from 'styles/fontStyles';
@@ -44,7 +45,7 @@ import { alertPathDerivationError } from 'utils/alertUtils';
 import { RootStackParamList } from 'types/routes';
 
 type Props = {
-	accounts: AccountsStoreStateWithIdentity;
+	accountsStore: AccountsStoreStateWithIdentity;
 	currentIdentity: Identity;
 	pathGroup: PathGroup;
 	networkParams: SubstrateNetworkParams | UnknownNetworkParams;
@@ -54,9 +55,10 @@ export default function PathGroupCard({
 	currentIdentity,
 	pathGroup,
 	networkParams,
-	accounts
+	accountsStore
 }: Props): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+	const { setAlert } = useContext(AlertStateContext);
 	const paths = pathGroup.paths;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		currentIdentity.encryptedSeed
@@ -84,7 +86,7 @@ export default function PathGroupCard({
 		const nextPath = _getFullPath(nextIndex, isHardDerivation);
 		const name = removeSlash(`${pathGroup.title}${nextIndex}`);
 		try {
-			await accounts.deriveNewPath(
+			await accountsStore.deriveNewPath(
 				nextPath,
 				substrateAddress,
 				(networkParams as SubstrateNetworkParams).genesisHash,
@@ -92,13 +94,8 @@ export default function PathGroupCard({
 				''
 			);
 		} catch (error) {
-			alertPathDerivationError(error.message);
+			alertPathDerivationError(setAlert, error.message);
 		}
-	};
-
-	const _deletePath = async (): Promise<void> => {
-		const targetPath = paths[paths.length - 1];
-		await accounts.deletePath(targetPath);
 	};
 
 	const headerTitle = removeSlash(pathGroup.title);

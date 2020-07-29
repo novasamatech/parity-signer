@@ -14,18 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { NavigationAccountProps } from 'types/props';
+import { AccountsContext } from 'stores/AccountsContext';
+import { AlertStateContext } from 'stores/alertContext';
+import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
-import { withAccountStore } from 'utils/HOC';
 import ScreenHeading from 'components/ScreenHeading';
 import {
 	alertBackupDone,
@@ -37,21 +38,26 @@ import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({
 	navigation,
-	accounts,
 	route
-}: NavigationAccountProps<'IdentityBackup'>): React.ReactElement {
+}: NavigationProps<'IdentityBackup'>): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
+	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
 		try {
-			await accounts.saveNewIdentity(seedPhrase, pin, createSeedRefWithNewSeed);
+			await accountsStore.saveNewIdentity(
+				seedPhrase,
+				pin,
+				createSeedRefWithNewSeed
+			);
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
-			alertIdentityCreationError(e.message);
+			alertIdentityCreationError(setAlert, e.message);
 		}
 	};
 
@@ -102,7 +108,7 @@ function IdentityBackup({
 				onPress={(): void => {
 					// only allow the copy of the recovery phrase in dev environment
 					if (__DEV__) {
-						alertCopyBackupPhrase(seedPhrase);
+						alertCopyBackupPhrase(setAlert, seedPhrase);
 					}
 				}}
 			>
@@ -117,7 +123,7 @@ function IdentityBackup({
 				<Button
 					title={'Next'}
 					testID={testIDs.IdentityBackup.nextButton}
-					onPress={(): void => alertBackupDone(onBackupDone)}
+					onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
 					aboveKeyboard
 				/>
 			)}
@@ -125,7 +131,7 @@ function IdentityBackup({
 	);
 }
 
-export default withAccountStore(IdentityBackup);
+export default IdentityBackup;
 
 const styles = StyleSheet.create({
 	body: {

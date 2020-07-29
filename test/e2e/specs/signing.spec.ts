@@ -82,6 +82,7 @@ describe('Signing ane exporting test', () => {
 
 		it('does not need sign again after pin input', async () => {
 			await tapBack();
+			await tapBack();
 			await testTap(SecurityHeader.scanButton);
 			await testVisible(SignedTx.qrView);
 		});
@@ -104,6 +105,7 @@ describe('Signing ane exporting test', () => {
 
 	describe('Polkadot Signing Test', () => {
 		it('generate Polkadot account', async () => {
+			await tapBack();
 			await tapBack();
 			const PolkadotNetworkButtonIndex =
 				Main.networkButton +
@@ -134,6 +136,7 @@ describe('Signing ane exporting test', () => {
 
 	describe('Ethereum Signing Test', () => {
 		it('generate Kovan account', async () => {
+			await tapBack();
 			await tapBack();
 			const kovanNetworkButtonIndex =
 				Main.networkButton + EthereumNetworkKeys.KOVAN;

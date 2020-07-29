@@ -15,36 +15,29 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
-import { processBarCode } from 'modules/sign/utils';
-import { onMockBarCodeRead } from 'e2e/injections';
-import { SeedRefsContext } from 'stores/SeedRefStore';
-import { NavigationAccountScannerProps } from 'types/props';
+import { useProcessBarCode } from 'modules/sign/utils';
+import { useInjectionQR } from 'e2e/injections';
+import { AlertStateContext } from 'stores/alertContext';
+import { ScannerContext } from 'stores/ScannerContext';
+import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
-import { TxRequestData } from 'types/scannerTypes';
-import { withAccountAndScannerStore } from 'utils/HOC';
+import { Frames, TxRequestData } from 'types/scannerTypes';
 
-type Frames = {
-	completedFramesCount: number;
-	isMultipart: boolean;
-	missedFrames: number[];
-	missingFramesMessage: string;
-	totalFramesCount: number;
-};
-
-export function Scanner({
-	navigation,
-	accounts,
-	scannerStore
-}: NavigationAccountScannerProps<'QrScanner'>): React.ReactElement {
-	const [seedRefs] = useContext<SeedRefsContext>(SeedRefsContext);
+export default function Scanner({}: NavigationProps<
+	'QrScanner'
+>): React.ReactElement {
+	const scannerStore = useContext(ScannerContext);
+	const { setAlert } = useContext(AlertStateContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
+	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
 	const [multiFrames, setMultiFrames] = useState<Frames>({
 		completedFramesCount: 0,
 		isMultipart: false,
@@ -52,40 +45,12 @@ export function Scanner({
 		missingFramesMessage: '',
 		totalFramesCount: 0
 	});
-	useEffect((): (() => void) => {
-		const unsubscribeFocus = navigation.addListener('focus', () => {
-			setLastFrame(null);
-			scannerStore.setReady();
-		});
-		const unsubscribeBlur = navigation.addListener(
-			'blur',
-			scannerStore.setBusy.bind(scannerStore)
-		);
-		return (): void => {
-			unsubscribeFocus();
-			unsubscribeBlur();
-			scannerStore.setReady();
-		};
-	}, [navigation, scannerStore]);
-
-	useEffect(() => {
-		const missedFrames = scannerStore.getMissedFrames();
-		setMultiFrames({
-			completedFramesCount: scannerStore.getCompletedFramesCount(),
-			isMultipart: scannerStore.getTotalFramesCount() > 1,
-			missedFrames,
-			missingFramesMessage: missedFrames && missedFrames.join(', '),
-			totalFramesCount: scannerStore.getTotalFramesCount()
-		});
-	}, [lastFrame, scannerStore.state.completedFramesCount, scannerStore]);
-
 	function showErrorMessage(title: string, message: string): void {
 		setEnableScan(false);
-		scannerStore.setBusy();
-		Alert.alert(title, message, [
+		setAlert(title, message, [
 			{
 				onPress: async (): Promise<void> => {
-					await scannerStore.cleanup();
+					scannerStore.cleanup();
 					scannerStore.setReady();
 					setLastFrame(null);
 					setEnableScan(true);
@@ -95,33 +60,61 @@ export function Scanner({
 		]);
 	}
 
-	async function onBarCodeRead(event: any): Promise<void> {
+	const processBarCode = useProcessBarCode(showErrorMessage);
+	// useEffect((): (() => void) => {
+	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
+	// 		setLastFrame(null);
+	// 		scannerStore.setReady();
+	// 	});
+	// 	const unsubscribeBlur = navigation.addListener(
+	// 		'blur',
+	// 		scannerStore.setBusy
+	// 	);
+	// 	return (): void => {
+	// 		unsubscribeFocus();
+	// 		unsubscribeBlur();
+	// 	};
+	// }, [navigation, scannerStore.setReady, scannerStore.setBusy]);
+	useEffect(() => {
+		const {
+			missedFrames,
+			completedFramesCount,
+			totalFrameCount
+		} = scannerStore.state;
+		setMultiFrames({
+			completedFramesCount,
+			isMultipart: totalFrameCount > 1,
+			missedFrames,
+			missingFramesMessage: missedFrames && missedFrames.join(', '),
+			totalFramesCount: totalFrameCount
+		});
+	}, [lastFrame, scannerStore.state]);
+
+	const onBarCodeRead = async (event: any): Promise<void> => {
 		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
-		if (scannerStore.isBusy() || !enableScan) {
+		if (!enableScan) {
 			return;
 		}
 		if (event.rawData === lastFrame) {
 			return;
 		}
 		setLastFrame(event.rawData);
-		await processBarCode(
-			showErrorMessage,
-			event as TxRequestData,
-			navigation,
-			accounts,
-			scannerStore,
-			seedRefs
-		);
-	}
+		await processBarCode(event as TxRequestData);
+	};
 
-	if (global.inTest && global.scanRequest !== undefined) {
-		onMockBarCodeRead(
-			global.scanRequest,
-			async (tx: TxRequestData): Promise<void> => {
-				await onBarCodeRead(tx);
-			}
-		);
-	}
+	useEffect(() => {
+		/** E2E Test Injection Code **/
+		if (global.inTest && global.scanRequest !== undefined) {
+			onMockBarCodeRead(
+				global.scanRequest,
+				async (tx: TxRequestData): Promise<void> => {
+					await processBarCode(tx);
+				}
+			);
+		}
+		/* eslint-disable-next-line react-hooks/exhaustive-deps */
+	}, [mockIndex]);
+
 	const {
 		completedFramesCount,
 		isMultipart,
@@ -130,53 +123,55 @@ export function Scanner({
 		missingFramesMessage
 	} = multiFrames;
 	return (
-		<RNCamera
-			captureAudio={false}
-			onBarCodeRead={onBarCodeRead}
-			style={styles.view}
-		>
-			<View style={styles.body}>
-				<View style={styles.top}>
-					<ScreenHeading title="Scanner" />
+		<SafeAreaViewContainer>
+			<RNCamera
+				captureAudio={false}
+				onBarCodeRead={onBarCodeRead}
+				style={styles.view}
+			>
+				<View style={styles.body}>
+					<View style={styles.top}>
+						<ScreenHeading title="Scanner" />
+					</View>
+					<View style={styles.middle}>
+						<View style={styles.middleLeft} />
+						<View style={styles.middleCenter} />
+						<View style={styles.middleRight} />
+					</View>
+					{isMultipart ? (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								Scanning Multipart Data, Please Hold Still...
+							</Text>
+							<Text style={styles.descSecondary}>
+								{completedFramesCount} / {totalFramesCount} Completed.
+							</Text>
+							<Button
+								onPress={(): void => scannerStore.clearMultipartProgress()}
+								title="Start Over"
+								small
+							/>
+						</View>
+					) : (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>Scan QR Code</Text>
+							<Text style={styles.descSecondary}>
+								To Sign a New Transaction
+							</Text>
+						</View>
+					)}
+					{missedFrames && missedFrames.length >= 1 && (
+						<View style={styles.bottom}>
+							<Text style={styles.descTitle}>
+								Missing following frame(s): {missingFramesMessage}
+							</Text>
+						</View>
+					)}
 				</View>
-				<View style={styles.middle}>
-					<View style={styles.middleLeft} />
-					<View style={styles.middleCenter} />
-					<View style={styles.middleRight} />
-				</View>
-				{isMultipart ? (
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>
-							Scanning Multipart Data, Please Hold Still...
-						</Text>
-						<Text style={styles.descSecondary}>
-							{completedFramesCount} / {totalFramesCount} Completed.
-						</Text>
-						<Button
-							onPress={(): void => scannerStore.clearMultipartProgress()}
-							title="Start Over"
-							small
-						/>
-					</View>
-				) : (
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>Scan QR Code</Text>
-						<Text style={styles.descSecondary}>To Sign a New Transaction</Text>
-					</View>
-				)}
-				{missedFrames && missedFrames.length >= 1 && (
-					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>
-							Missing following frame(s): {missingFramesMessage}
-						</Text>
-					</View>
-				)}
-			</View>
-		</RNCamera>
+			</RNCamera>
+		</SafeAreaViewContainer>
 	);
 }
-
-export default withAccountAndScannerStore(Scanner);
 
 const styles = StyleSheet.create({
 	body: {

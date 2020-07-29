@@ -24,16 +24,16 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { PasswordedAccountExportWarning } from 'components/Warnings';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withAccountStore, withCurrentIdentity } from 'utils/HOC';
+import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey, getPathName } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PathSecret({
-	accounts,
+	accountsStore,
 	route,
 	navigation
 }: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
-	const { currentIdentity } = accounts.state;
+	const { currentIdentity } = accountsStore.state;
 	const [secret, setSecret] = useState<string>('');
 	const { substrateSecret, isSeedRefValid } = useSeedRef(
 		currentIdentity.encryptedSeed
@@ -76,4 +76,4 @@ function PathSecret({
 	);
 }
 
-export default withAccountStore(withCurrentIdentity(PathSecret));
+export default withCurrentIdentity(PathSecret);

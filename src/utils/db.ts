@@ -33,11 +33,11 @@ export async function loadAccounts(version = 3): Promise<Map<string, any>> {
 		return Promise.resolve(new Map());
 	}
 
-	const accountStoreVersion =
+	const accountsStoreVersion =
 		version === 1 ? 'accounts' : `accounts_v${version}`;
 	const accountsStore = {
-		keychainService: accountStoreVersion,
-		sharedPreferencesName: accountStoreVersion
+		keychainService: accountsStoreVersion,
+		sharedPreferencesName: accountsStoreVersion
 	};
 
 	return SecureStorage.getAllItems(accountsStore).then(
