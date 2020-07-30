@@ -125,7 +125,6 @@ function IdentityNew({
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
 				valid={isSeedValid.valid}
-				value={seedPhrase}
 			/>
 			<View style={styles.btnBox}>
 				<Button
