@@ -47,17 +47,15 @@ export default function AccountSeed({
 	valid,
 	onChangeText
 }: Props): React.ReactElement {
-	const [cursorPosition, setCursorPosition] = useState(0);
+	const [cursorPosition, setCursorPosition] = useState({
+		end: 0,
+		start: 0
+	});
 	const [value, setValue] = useState('');
 	function handleCursorPosition(
 		event: NativeSyntheticEvent<TextInputSelectionChangeEventData>
 	): void {
-		const { start, end } = event.nativeEvent.selection;
-
-		if (start !== end) {
-			return;
-		}
-		setCursorPosition(start);
+		setCursorPosition(event.nativeEvent.selection);
 	}
 
 	/**
@@ -96,18 +94,20 @@ export default function AccountSeed({
 
 	function onNativeChangeText(text: string): void {
 		setValue(text);
-		// setCursorPosition(text.length);
 		onChangeText(text);
 	}
 
 	function renderSuggestions(): ReactElement {
-		let left = value.substring(0, cursorPosition).split(' ');
-		let right = value.substring(cursorPosition).split(' ');
+		const { start, end } = cursorPosition;
+		if (start !== end) return <View style={styles.suggestions} />;
+		const currentPosition = end;
+		let left = value.substring(0, currentPosition).split(' ');
+		let right = value.substring(currentPosition).split(' ');
 
 		const isLeftSpace =
-			cursorPosition === 0 || value[cursorPosition - 1] === '';
+			currentPosition === 0 || value[currentPosition - 1] === '';
 		const isRightSpace =
-			cursorPosition === value.length - 1 || value[cursorPosition + 1] === '';
+			currentPosition === value.length - 1 || value[currentPosition + 1] === '';
 		const leftInput = isLeftSpace ? '' : left[left.length - 1];
 		const rightInput = isRightSpace ? '' : right[0];
 		// combine last nibble before cursor and first nibble after cursor into a word
@@ -164,9 +164,7 @@ export default function AccountSeed({
 				blurOnSubmit={true}
 				textAlignVertical="top"
 				onSelectionChange={handleCursorPosition}
-				// selection={{
-				// 	end: cursorPosition, start:cursorPosition
-				// }}
+				selection={cursorPosition}
 				value={value}
 				onChangeText={onNativeChangeText}
 			/>
