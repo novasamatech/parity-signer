@@ -45,7 +45,8 @@ interface Props extends TextInputProps {
 
 export default function AccountSeed({
 	valid,
-	onChangeText
+	onChangeText,
+	...props
 }: Props): React.ReactElement {
 	const [cursorPosition, setCursorPosition] = useState({
 		end: 0,
@@ -167,6 +168,7 @@ export default function AccountSeed({
 				selection={cursorPosition}
 				value={value}
 				onChangeText={onNativeChangeText}
+				{...props}
 			/>
 			{value.length > 0 && renderSuggestions()}
 		</View>

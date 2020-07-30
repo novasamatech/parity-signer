@@ -26,7 +26,7 @@ import fontStyles from 'styles/fontStyles';
 export default function CustomAlert(): React.ReactElement {
 	const { title, alertIndex, message, actions } = useContext(AlertStateContext);
 	/* eslint-disable-next-line react-hooks/exhaustive-deps */
-	const animatedValue = useMemo(() => new Animated.Value(0), [alertIndex]);
+	const animatedValue = useMemo(() => new Animated.Value(1), [alertIndex]);
 	const [alertDisplay, setAlertDisplay] = useState<boolean>(false);
 
 	useEffect(() => {
