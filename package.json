@@ -1,6 +1,6 @@
 {
   "name": "NativeSigner",
-  "version": "4.4.0-beta",
+  "version": "4.4.2-beta",
   "private": true,
   "license": "GPL-3.0",
   "engines": {
@@ -10,7 +10,7 @@
   "scripts": {
     "android": "npx react-native run-android",
     "build-prod:ios": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native bundle --dev false --entry-file index.js --bundle-output ios/main.jsbundle --platform ios --assets-dest='./ios'",
-    "build": "yarn install && (cd ios && pod install)",
+    "build": "yarn install && npx pod-install",
     "xcbuild:debug": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
     "xcbuild:release": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
     "xcbuild:githubActions": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration GithubActions -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
@@ -44,6 +44,7 @@
     "@polkadot/types-known": "1.26.1",
     "@polkadot/util": "2.11.1",
     "@polkadot/util-crypto": "2.11.1",
+    "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-native-community/netinfo": "^5.9.3",
     "@react-navigation/native": "^5.7.1",
