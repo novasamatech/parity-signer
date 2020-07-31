@@ -106,7 +106,7 @@ export const alertCopyBackupPhrase = (
 				onPress: (): void => {
 					Clipboard.setString(seedPhrase);
 				},
-				text: 'Copy anyway'
+				text: 'Copy'
 			},
 			{
 				text: 'Cancel'
@@ -122,7 +122,7 @@ export const alertRisks = (
 	setAlert('Warning', message, [
 		{
 			onPress,
-			text: 'I understand the risks'
+			text: 'Proceed'
 		},
 		{
 			text: 'Back'

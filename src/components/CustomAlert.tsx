@@ -105,7 +105,13 @@ const styles = StyleSheet.create({
 		width: '90%'
 	},
 	button: {
-		marginVertical: 0
+		alignItems: 'center',
+		borderRadius: 0,
+		flex: 1,
+		flexGrow: 1,
+		justifyContent: 'center',
+		marginHorizontal: 2,
+		paddingHorizontal: 0
 	},
 
 	buttonBoldText: {
