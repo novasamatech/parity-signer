@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Component, ReactElement } from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
 	NativeSyntheticEvent,
 	StyleSheet,
@@ -41,34 +41,28 @@ const SUGGESTIONS_COUNT = 5;
 interface Props extends TextInputProps {
 	onChangeText: (text: string) => void;
 	valid: boolean;
-	value: string;
 }
 
-export default class AccountSeed extends Component<
-	Props,
-	{
-		cursorPosition: number;
-	}
-> {
-	state = {
-		cursorPosition: 0
-	};
-
-	handleCursorPosition = (
+export default function AccountSeed({
+	valid,
+	onChangeText,
+	...props
+}: Props): React.ReactElement {
+	const [cursorPosition, setCursorPosition] = useState({
+		end: 0,
+		start: 0
+	});
+	const [value, setValue] = useState('');
+	function handleCursorPosition(
 		event: NativeSyntheticEvent<TextInputSelectionChangeEventData>
-	): void => {
-		const { start, end } = event.nativeEvent.selection;
-
-		if (start !== end) {
-			return;
-		}
-		this.setState({ cursorPosition: start });
-	};
+	): void {
+		setCursorPosition(event.nativeEvent.selection);
+	}
 
 	/**
 	 * Generate a list of suggestions for input
 	 */
-	generateSuggestions(input: string, wordList: string[]): string[] {
+	function generateSuggestions(input: string, wordList: string[]): string[] {
 		const fromIndex = binarySearch(wordList, input).index; // index to start search from
 
 		let suggestions = wordList.slice(fromIndex, fromIndex + SUGGESTIONS_COUNT);
@@ -84,7 +78,7 @@ export default class AccountSeed extends Component<
 		return suggestions;
 	}
 
-	selectWordList(otherWords: string[]): string[] {
+	function selectWordList(otherWords: string[]): string[] {
 		for (const word of otherWords) {
 			const isBIP39 = binarySearch(BIP39_WORDS, word).hit;
 			const isParity = binarySearch(PARITY_WORDS, word).hit;
@@ -99,22 +93,33 @@ export default class AccountSeed extends Component<
 		return ALL_WORDS as string[];
 	}
 
-	renderSuggestions(): ReactElement {
-		const { value } = this.props;
-		const { cursorPosition } = this.state;
+	function onNativeChangeText(text: string): void {
+		setValue(text);
+		onChangeText(text);
+	}
 
-		let left = value.substring(0, cursorPosition).split(' ');
-		let right = value.substring(cursorPosition).split(' ');
+	function renderSuggestions(): ReactElement {
+		const { start, end } = cursorPosition;
+		if (start !== end) return <View style={styles.suggestions} />;
+		const currentPosition = end;
+		let left = value.substring(0, currentPosition).split(' ');
+		let right = value.substring(currentPosition).split(' ');
 
+		const isLeftSpace =
+			currentPosition === 0 || value[currentPosition - 1] === '';
+		const isRightSpace =
+			currentPosition === value.length - 1 || value[currentPosition + 1] === '';
+		const leftInput = isLeftSpace ? '' : left[left.length - 1];
+		const rightInput = isRightSpace ? '' : right[0];
 		// combine last nibble before cursor and first nibble after cursor into a word
-		const input = left[left.length - 1] + right[0];
+		const input = leftInput + rightInput;
 
 		left = left.slice(0, -1);
 		right = right.slice(1);
 
 		// find a wordList using words around as discriminator
-		const wordList = this.selectWordList(left.concat(right));
-		const suggestions = this.generateSuggestions(input.toLowerCase(), wordList);
+		const wordList = selectWordList(left.concat(right));
+		const suggestions = generateSuggestions(input.toLowerCase(), wordList);
 
 		return (
 			<View style={styles.suggestions}>
@@ -130,7 +135,7 @@ export default class AccountSeed extends Component<
 								let phrase = left.concat(suggestion, right).join(' ').trimEnd();
 								const is24words = phrase.split(' ').length === 24;
 								if (!is24words) phrase += ' ';
-								this.props.onChangeText(phrase);
+								onNativeChangeText(phrase);
 							}}
 						>
 							<View key={suggestion} style={[styles.suggestion, sepStyle]}>
@@ -143,31 +148,31 @@ export default class AccountSeed extends Component<
 		);
 	}
 
-	render(): ReactElement {
-		const { valid, value } = this.props;
-		const invalidStyles = !valid ? styles.invalidInput : {};
-		return (
-			<View>
-				<TextInput
-					style={StyleSheet.flatten([
-						fontStyles.t_seed,
-						styles.input,
-						invalidStyles
-					])}
-					multiline
-					autoCorrect={false}
-					autoCompleteType="off"
-					autoCapitalize="none"
-					returnKeyType="done"
-					blurOnSubmit={true}
-					textAlignVertical="top"
-					onSelectionChange={this.handleCursorPosition}
-					{...this.props}
-				/>
-				{value.length > 0 && this.renderSuggestions()}
-			</View>
-		);
-	}
+	const invalidStyles = !valid ? styles.invalidInput : {};
+	return (
+		<View>
+			<TextInput
+				style={StyleSheet.flatten([
+					fontStyles.t_seed,
+					styles.input,
+					invalidStyles
+				])}
+				multiline
+				autoCorrect={false}
+				autoCompleteType="off"
+				autoCapitalize="none"
+				returnKeyType="done"
+				blurOnSubmit={true}
+				textAlignVertical="top"
+				onSelectionChange={handleCursorPosition}
+				selection={cursorPosition}
+				value={value}
+				onChangeText={onNativeChangeText}
+				{...props}
+			/>
+			{value.length > 0 && renderSuggestions()}
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({

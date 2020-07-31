@@ -38,10 +38,10 @@
     }
   },
   "dependencies": {
-    "@polkadot/api": "1.16.1",
+    "@polkadot/api": "1.26.1",
     "@polkadot/reactnative-identicon": "0.53.1",
-    "@polkadot/types": "1.16.1",
-    "@polkadot/types-known": "1.16.1",
+    "@polkadot/types": "1.26.1",
+    "@polkadot/types-known": "1.26.1",
     "@polkadot/util": "2.11.1",
     "@polkadot/util-crypto": "2.11.1",
     "@react-native-community/async-storage": "^1.11.0",
