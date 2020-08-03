@@ -165,7 +165,6 @@ export default function AccountSeed({
 				blurOnSubmit={true}
 				textAlignVertical="top"
 				onSelectionChange={handleCursorPosition}
-				selection={cursorPosition}
 				value={value}
 				onChangeText={onNativeChangeText}
 				{...props}
