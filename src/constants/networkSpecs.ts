@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import logo from 'constants/logo';
 import colors from 'styles/colors';
 import {
 	EthereumNetworkParams,
@@ -140,7 +141,7 @@ const substrateNetworkBase: {
 		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('res/img/logos/Kusama.png'),
+		logo: logo.kusama,
 		order: 2,
 		pathId: 'kusama',
 		prefix: 2,

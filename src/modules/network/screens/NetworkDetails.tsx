@@ -14,18 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 
-import { AppRegistry, YellowBox } from 'react-native';
-
-import App from './src/App';
-YellowBox.ignoreWarnings([
-	'Warning: isMounted(...) is deprecated',
-	'Module RCTImageLoader'
-]);
-
-AppRegistry.registerComponent('NativeSigner', () => App);
+export default function NetworkDetails(): React.ReactElement {
+	return <SafeAreaScrollViewContainer />;
+}

@@ -20,6 +20,8 @@ import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
+import { SubstrateNetworkParams } from 'types/networkSpecsTypes';
+import { defaultNetworkSpecs } from 'modules/network/utils';
 import { Account, Identity } from 'types/identityTypes';
 import { Tx, TxParticipant } from 'types/tx';
 
@@ -167,4 +169,46 @@ export async function loadToCAndPPConfirmation(): Promise<boolean> {
 
 export async function saveToCAndPPConfirmation(): Promise<void> {
 	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
+}
+
+/*
+ * ========================================
+ *	NETWORK SPECS
+ * ========================================
+ */
+
+const networkSpecsStorageLabel = 'network_specs_v4';
+
+/*
+ * save the new network specs array
+ */
+export function saveNetworkSpecs(networkSpecs: SubstrateNetworkParams[]): void {
+	AsyncStorage.setItem(networkSpecsStorageLabel, JSON.stringify(networkSpecs));
+}
+
+/*
+ * get all the network specs
+ */
+export async function getNetworkSpecs(): Promise<SubstrateNetworkParams[]> {
+	let networkSpecs;
+	try {
+		const networkSpecsString = await AsyncStorage.getItem(
+			networkSpecsStorageLabel
+		);
+		networkSpecs = JSON.parse(networkSpecsString ?? '');
+	} catch (e) {
+		console.warn('loading network specifications error', e);
+	}
+	if (networkSpecs === null) return defaultNetworkSpecs();
+
+	return JSON.parse(networkSpecs ?? '');
+}
+
+/*
+ * Called once during onboarding. Populate the local storage with the default network specs.
+ */
+export async function saveDefaultNetworks(): Promise<void> {
+	const networkSpecsString = JSON.stringify(defaultNetworkSpecs());
+	console.log('networkSpecs to be stored is', networkSpecsString); //TODO to be removed
+	// AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecsString);
 }
