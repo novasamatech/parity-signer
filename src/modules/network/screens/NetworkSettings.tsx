@@ -14,42 +14,52 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
+import React, { ReactElement } from 'react';
+import { FlatList, StyleSheet } from 'react-native';
 
-import React from 'react';
-import { Button, StyleSheet } from 'react-native';
-
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { useNetworksContext } from 'stores/NetworkContext';
+import { NetworkCard } from 'components/AccountCard';
+import { filterSubstrateNetworks } from 'modules/network/utils';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
-import NetworkCard from 'modules/network/components/NetworkCard';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 
 export default function NetworkSettings({
 	navigation
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
-	const { networkSpecs } = useNetworksContext();
+	// const { networkSpecs } = useNetworksContext();
+	const networkSpecs = filterSubstrateNetworks();
+	const renderNetwork = ({
+		item
+	}: {
+		item: [string, SubstrateNetworkParams];
+	}): ReactElement => {
+		const networkSpec = item[1];
+		return (
+			<NetworkCard
+				key={networkSpec.genesisHash + networkSpec.pathId}
+				networkKey={networkSpec.genesisHash}
+				onPress={(): void =>
+					navigation.navigate('NetworkDetails', {
+						pathId: networkSpec.pathId
+					})
+				}
+				title={networkSpec.title}
+			/>
+		);
+	};
 
 	return (
-		<SafeAreaScrollViewContainer
-			contentContainerStyle={styles.bodyContent}
-			style={styles.body}
-		>
+		<SafeAreaViewContainer style={styles.body}>
 			<ScreenHeading title="Supported Networks" />
-			{networkSpecs.map(networkSpec => (
-				<NetworkCard
-					key={networkSpec.genesisHash}
-					title={networkSpec.title}
-					secondaryText={networkSpec.genesisHash}
-					onPress={() =>
-						navigation.navigate('NetworkDetails', {
-							pathId: networkSpec.pathId
-						})
-					}
-				/>
-			))}
+			<FlatList
+				data={networkSpecs}
+				renderItem={renderNetwork}
+				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
+			/>
+			{/**
 			<Button
 				title="Add new network"
 				onPress={() => {
@@ -58,7 +68,8 @@ export default function NetworkSettings({
 					});
 				}}
 			/>
-		</SafeAreaScrollViewContainer>
+			 **/}
+		</SafeAreaViewContainer>
 	);
 }
 
@@ -77,7 +88,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 20
 	},
 	descTitle: {
-		color: colors.background.app,
+		color: colors.text.main,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 10,

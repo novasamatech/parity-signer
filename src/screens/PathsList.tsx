@@ -103,6 +103,11 @@ function PathsList({
 					title={networkParams.title}
 					hasSubtitleIcon={true}
 					networkKey={networkKey}
+					onPress={(): void =>
+						navigation.navigate('NetworkDetails', {
+							pathId: networkParams.pathId
+						})
+					}
 				/>
 				{(pathsGroups as PathGroup[]).map(pathsGroup =>
 					pathsGroup.paths.length === 1 ? (

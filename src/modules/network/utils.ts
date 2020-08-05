@@ -21,12 +21,36 @@ import {
 	SubstrateNetworkKeys,
 	defaultNetworkKey,
 	NETWORK_LIST,
-	NetworkProtocols
+	NetworkProtocols,
+	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import {
 	SubstrateNetworkBasics,
 	SubstrateNetworkParams
 } from 'types/networkSpecsTypes';
+
+export const filterSubstrateNetworks = (
+	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
+): Array<[string, SubstrateNetworkParams]> => {
+	const excludedNetworks = [
+		UnknownNetworkKeys.UNKNOWN,
+		SubstrateNetworkKeys.KUSAMA_CC2
+	];
+	if (!__DEV__) {
+		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+	}
+
+	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
+		const shouldExclude = excludedNetworks.includes(networkKey);
+		if (extraFilter !== undefined)
+			return extraFilter(networkKey, shouldExclude);
+		return !shouldExclude;
+	};
+	return Object.entries(SUBSTRATE_NETWORK_LIST)
+		.filter(filterNetworkKeys)
+		.sort((a, b) => a[1].order - b[1].order);
+};
 
 export const checkNewNetworkSpecs = (
 	newNetworkSpec: SubstrateNetworkBasics

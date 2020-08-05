@@ -151,6 +151,10 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 					style={styles.indentedButton}
 				/>
 				<ButtonWithArrow
+					title="Network Settings"
+					onPress={(): void => closeModalAndNavigate('NetworkSettings')}
+				/>
+				<ButtonWithArrow
 					title="Terms and Conditions"
 					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
 				/>

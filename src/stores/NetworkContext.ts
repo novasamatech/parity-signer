@@ -34,31 +34,31 @@ import {
 
 type NetworkContextState = {
 	networkSpecs: Array<SubstrateNetworkParams>;
-	newNetworkSpec: SubstrateNetworkBasics | null;
+	newNetworkSpecs: SubstrateNetworkBasics | null;
 };
 
 const defaultState: NetworkContextState = {
 	networkSpecs: [],
-	newNetworkSpec: null
+	newNetworkSpecs: null
 };
 
 const deepCopy = (
 	networkSpecs: Array<SubstrateNetworkParams>
 ): Array<SubstrateNetworkParams> => JSON.parse(JSON.stringify(networkSpecs));
 
-export function useNetworksContext() {
+export function useNetworksContext(): NetworkContextState {
 	const [networkSpecs, setNetworkSpecs] = useState<
 		Array<SubstrateNetworkParams>
 	>(defaultState.networkSpecs);
 	const [
 		newNetworkSpecs,
 		setNewNetworkSpecs
-	] = useState<SubstrateNetworkBasics | null>(defaultState.newNetworkSpec);
+	] = useState<SubstrateNetworkBasics | null>(defaultState.newNetworkSpecs);
 
 	useEffect(() => {
 		const refreshList = async function (): Promise<void> {
-			const networkSpecs = await getNetworkSpecs();
-			setNetworkSpecs(networkSpecs);
+			const initNetworkSpecs = await getNetworkSpecs();
+			setNetworkSpecs(initNetworkSpecs);
 		};
 		refreshList();
 	}, []);
@@ -82,7 +82,7 @@ export function useNetworksContext() {
 		}
 
 		setNetworkSpecs(updatedNetworkSpecs);
-		setNewNetworkSpecs(defaultState.newNetworkSpec);
+		setNewNetworkSpecs(defaultState.newNetworkSpecs);
 
 		try {
 			await saveNetworkSpecs(updatedNetworkSpecs);
@@ -111,9 +111,7 @@ export function useNetworksContext() {
 	}
 
 	return {
-		deleteNetwork,
 		networkSpecs,
-		newNetworkSpecs,
-		submitNewNetworkSpec
+		newNetworkSpecs
 	};
 }

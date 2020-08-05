@@ -11,7 +11,7 @@ export type SubstrateNetworkBasics = {
 	color?: string;
 	decimals?: number;
 	genesisHash: string;
-	logo?: string;
+	logo?: number;
 	pathId: string;
 	protocol?: NetworkProtocol;
 	prefix?: number;
@@ -21,10 +21,10 @@ export type SubstrateNetworkBasics = {
 };
 
 export type SubstrateNetworkParams = {
-	color: string | number;
+	color: string;
 	decimals: number;
 	genesisHash: string;
-	logo: number | string;
+	logo: number;
 	order: number;
 	pathId: string;
 	protocol: NetworkProtocol;

@@ -1504,12 +1504,12 @@
     "@types/istanbul-lib-coverage" "*"
     "@types/istanbul-lib-report" "*"
 
-"@types/jasmine@^3.5.10":
+"@types/jasmine@^3.5.12":
   version "3.5.12"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.5.12.tgz#5c378c1545cdc7cb339cff5578f854b6d1e0a17d"
   integrity sha512-vJaQ58oceFao+NzpKNqLOWwHPsqA7YEhKv+mOXvYU4/qh+BfVWIxaBtL0Ck5iCS67yOkNwGkDCrzepnzIWF+7g==
 
-"@types/jest@^25.2.1":
+"@types/jest@^25.2.3":
   version "25.2.3"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-25.2.3.tgz#33d27e4c4716caae4eced355097a47ad363fdcaf"
   integrity sha512-JXc1nK/tXHiDhV55dvfzqtmP4S3sy3T3ouV2tkViZgxY/zeUkcpQcQPGRlgF4KmWzWW5oiWYSZwtCB+2RsE4Fw==
@@ -7265,10 +7265,10 @@ react-native-typescript-transformer@^1.2.13:
     semver "^5.4.1"
     source-map "^0.5.6"
 
-react-native-vector-icons@^6.6.0:
-  version "6.7.0"
-  resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-6.7.0.tgz#8871ba52ef8e98878ba7a932847f96b6dfc1c137"
-  integrity sha512-LKdwqDIGVxV1+4HnmFIPaok9hba3WyTQ7H2Wj5RFv54zIdIjixrAiV9VD/Ej9Mc5/rUhTpmMiIVF3LVmVYD7dg==
+react-native-vector-icons@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-7.0.0.tgz#5b92ed363c867645daad48c559e1f99efcfbb813"
+  integrity sha512-Ku8+dTUAnR9pexRPQqsUcQEZlxEpFZsIy8iOFqVL/3mrUyncZJHtqJyx2cUOmltZIC6W2GI4IkD3EYzPerXV5g==
   dependencies:
     lodash "^4.17.15"
     prop-types "^15.7.2"
