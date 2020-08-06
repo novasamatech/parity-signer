@@ -31,9 +31,9 @@ export default function NetworkSettings({
 	navigation
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	// const { networkSpecs } = useNetworksContext();
-	const networkParams = filterSubstrateNetworks(SUBSTRATE_NETWORK_LIST) as Array<
-		[string, SubstrateNetworkParams]
-	>;
+	const networkParams = filterSubstrateNetworks(
+		SUBSTRATE_NETWORK_LIST
+	) as Array<[string, SubstrateNetworkParams]>;
 	const renderNetwork = ({
 		item
 	}: {
