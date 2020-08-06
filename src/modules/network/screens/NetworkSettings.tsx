@@ -17,6 +17,7 @@
 import React, { ReactElement } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 
+import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { NetworkCard } from 'components/AccountCard';
 import { filterSubstrateNetworks } from 'modules/network/utils';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -30,7 +31,9 @@ export default function NetworkSettings({
 	navigation
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	// const { networkSpecs } = useNetworksContext();
-	const networkSpecs = filterSubstrateNetworks();
+	const networkParams = filterSubstrateNetworks(SUBSTRATE_NETWORK_LIST) as Array<
+		[string, SubstrateNetworkParams]
+	>;
 	const renderNetwork = ({
 		item
 	}: {
@@ -55,7 +58,7 @@ export default function NetworkSettings({
 		<SafeAreaViewContainer style={styles.body}>
 			<ScreenHeading title="Supported Networks" />
 			<FlatList
-				data={networkSpecs}
+				data={networkParams}
 				renderItem={renderNetwork}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 			/>

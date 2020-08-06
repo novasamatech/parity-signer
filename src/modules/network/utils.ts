@@ -25,13 +25,15 @@ import {
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import {
+	NetworkParams,
 	SubstrateNetworkBasics,
 	SubstrateNetworkParams
 } from 'types/networkSpecsTypes';
 
 export const filterSubstrateNetworks = (
+	networkList: Record<string, NetworkParams>,
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
-): Array<[string, SubstrateNetworkParams]> => {
+): Array<[string, NetworkParams]> => {
 	const excludedNetworks = [
 		UnknownNetworkKeys.UNKNOWN,
 		SubstrateNetworkKeys.KUSAMA_CC2
@@ -47,7 +49,7 @@ export const filterSubstrateNetworks = (
 			return extraFilter(networkKey, shouldExclude);
 		return !shouldExclude;
 	};
-	return Object.entries(SUBSTRATE_NETWORK_LIST)
+	return Object.entries(networkList)
 		.filter(filterNetworkKeys)
 		.sort((a, b) => a[1].order - b[1].order);
 };

@@ -18,6 +18,7 @@ import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
+import { NETWORK_LIST } from 'constants/networkSpecs';
 import { filterSubstrateNetworks } from 'modules/network/utils';
 import { NetworkCard } from 'components/AccountCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -182,7 +183,7 @@ function NetworkSelector({
 
 	const networkList = useMemo(
 		() =>
-			filterSubstrateNetworks((networkKey, shouldExclude) => {
+			filterSubstrateNetworks(NETWORK_LIST, (networkKey, shouldExclude) => {
 				if (isNew && !shouldExclude) return true;
 
 				if (shouldShowMoreNetworks) {

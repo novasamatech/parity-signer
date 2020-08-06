@@ -28,27 +28,27 @@ export default function NetworkDetails({
 }: NavigationProps<'NetworkDetails'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
 	const networkKey = getNetworkKeyByPathId(networkPathId);
-	const networkSpecs = SUBSTRATE_NETWORK_LIST[networkKey];
+	const networkParams = SUBSTRATE_NETWORK_LIST[networkKey];
 	return (
 		<SafeAreaScrollViewContainer>
 			<NetworkCard
-				networkKey={networkSpecs.genesisHash}
-				title={networkSpecs.title}
+				networkKey={networkParams.genesisHash}
+				title={networkParams.title}
 			/>
-			<NetworkInfoCard text={networkSpecs.title} label="Title" />
-			<NetworkInfoCard text={networkSpecs.pathId} label="Path ID" />
+			<NetworkInfoCard text={networkParams.title} label="Title" />
+			<NetworkInfoCard text={networkParams.pathId} label="Path ID" />
 			<NetworkInfoCard
-				text={networkSpecs.genesisHash}
+				text={networkParams.genesisHash}
 				label="Genesis Hash"
 				small
 			/>
-			<NetworkInfoCard text={networkSpecs.unit} label="Unit" />
+			<NetworkInfoCard text={networkParams.unit} label="Unit" />
 			<NetworkInfoCard
-				text={networkSpecs.decimals.toString()}
+				text={networkParams.decimals.toString()}
 				label="Decimals"
 			/>
 			<NetworkInfoCard
-				text={networkSpecs.prefix.toString()}
+				text={networkParams.prefix.toString()}
 				label="Address prefix"
 			/>
 		</SafeAreaScrollViewContainer>
