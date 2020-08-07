@@ -65,7 +65,9 @@ function PathSecret({
 		<SafeAreaViewContainer>
 			<ScreenHeading
 				title={'Export Account'}
-				subtitle={'export this account to an hot machine'}
+				subtitle={
+					'Export this account to an hot machine, keep this QR safe, the QR allows any one to recover the account and access its fund'
+				}
 			/>
 			<ScrollView testID={testIDs.PathSecret.screen} bounces={false}>
 				<PathCard identity={currentIdentity} path={path} />
