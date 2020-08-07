@@ -35,7 +35,10 @@ import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
-import { NetworkSelector, NetworkOptions } from 'components/NetworkSelector';
+import {
+	DerivationNetworkSelector,
+	NetworkOptions
+} from 'components/DerivationNetworkSelector';
 import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
@@ -135,7 +138,7 @@ function PathDerivation({
 				value={keyPairsName}
 			/>
 			{enableCustomNetwork && (
-				<NetworkSelector
+				<DerivationNetworkSelector
 					networkKey={customNetworkKey}
 					setVisible={setModalVisible}
 				/>

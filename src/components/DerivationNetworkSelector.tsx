@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 import React from 'react';
 import {
 	Image,
@@ -48,7 +46,7 @@ if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 }
 
-export function NetworkSelector({
+export function DerivationNetworkSelector({
 	networkKey,
 	setVisible
 }: {

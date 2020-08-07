@@ -27,6 +27,8 @@ import {
 import * as React from 'react';
 import { View } from 'react-native';
 
+import NetworkDetails from 'modules/network/screens/NetworkDetails';
+import NetworkSettings from 'modules/network/screens/NetworkSettings';
 import PinNew from 'modules/unlock/screens/PinNew';
 import PinUnlock from 'modules/unlock/screens/PinUnlock';
 import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
@@ -148,6 +150,8 @@ export const AppNavigator = (): React.ReactElement => (
 			component={IdentityManagement}
 		/>
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
+		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
+		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
