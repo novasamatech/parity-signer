@@ -7234,10 +7234,10 @@ react-native-status-bar-height@^2.2.0:
   resolved "https://registry.yarnpkg.com/react-native-status-bar-height/-/react-native-status-bar-height-2.5.0.tgz#bc0fb85230603850aab9667ee8111a62954de90c"
   integrity sha512-sYBCPYA/NapBSHkdm/IVL4ID3LLlIuLqINi2FBDyMkc2BU9pfSGOtkz9yfxoK39mYJuTrlTOQ7mManARUsYDSA==
 
-react-native-substrate-sign@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/react-native-substrate-sign/-/react-native-substrate-sign-1.0.3.tgz#d5cc4f4df83975c0f23151dfe6ac5797ca03fa56"
-  integrity sha512-JM2mcR7/ScKSeCTWu/dRsBoWa2QKa9urVmVMNKC0BCskX+rB1vLy0HqWtd95IljovAGxgdGspEglaELUARID5w==
+react-native-substrate-sign@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-substrate-sign/-/react-native-substrate-sign-1.1.0.tgz#e079e18f16538d01698e58742e23148d25c6e08e"
+  integrity sha512-few+xNCPd0B0cXExqFFlPJsm1GGUy3Ga2Y3+y9uMyi+Rjt7dC6ayW4CoY8hotNhPt0G80ht5pLV/+d2KPBtlcw==
 
 react-native-svg@12.1.0, react-native-svg@^12.1.0:
   version "12.1.0"
