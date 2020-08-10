@@ -233,15 +233,15 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
   - React-jsinspector (0.62.2)
-  - react-native-camera (3.21.0):
+  - react-native-camera (3.35.0):
     - React
-    - react-native-camera/RCT (= 3.21.0)
-    - react-native-camera/RN (= 3.21.0)
-  - react-native-camera/RCT (3.21.0):
+    - react-native-camera/RCT (= 3.35.0)
+    - react-native-camera/RN (= 3.35.0)
+  - react-native-camera/RCT (3.35.0):
     - React
-  - react-native-camera/RN (3.21.0):
+  - react-native-camera/RN (3.35.0):
     - React
-  - react-native-netinfo (5.9.3):
+  - react-native-netinfo (5.9.5):
     - React
   - react-native-randombytes (3.5.3):
     - React
@@ -312,15 +312,15 @@ PODS:
     - React
   - RNCMaskedView (0.1.10):
     - React
-  - RNGestureHandler (1.6.0):
+  - RNGestureHandler (1.7.0):
     - React
-  - RNScreens (2.0.0-alpha.32):
+  - RNScreens (2.9.0):
     - React
   - RNSecureStorage (1.0.1):
     - React
   - RNSVG (12.1.0):
     - React
-  - RNVectorIcons (6.6.0):
+  - RNVectorIcons (7.0.0):
     - React
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -504,8 +504,8 @@ SPEC CHECKSUMS:
   React-jsi: b6dc94a6a12ff98e8877287a0b7620d365201161
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
-  react-native-camera: 4e12e877b8fef60b0914a49c942a0f32479e5b50
-  react-native-netinfo: 1b8691be19549f020d0757b40aca4f355cafeeec
+  react-native-camera: d9e7b66e40420dcef111f3265a00f01eea54c52c
+  react-native-netinfo: a53b00d949b6456913aaf507d9dba90c4008c611
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
   react-native-substrate-sign: 5989744fc9ad11e5c6d622dd56d774a0a18cdffe
@@ -521,11 +521,11 @@ SPEC CHECKSUMS:
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
   RNCAsyncStorage: d059c3ee71738c39834a627476322a5a8cd5bf36
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
-  RNScreens: a55364dc1833101f836cee70975ce1fea615a12f
+  RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08
+  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   RNSecureStorage: af0099b5b9f3c41692848b7778fe98b4a6b0358d
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
-  RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
+  RNVectorIcons: da6fe858f5a65d7bbc3379540a889b0b12aa5976
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

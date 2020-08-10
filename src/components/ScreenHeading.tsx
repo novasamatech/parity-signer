@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Parity Technologies (UK) Ltd.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import { Icon } from 'react-native-elements';
 import ButtonIcon from './ButtonIcon';
 import AccountIcon from './AccountIcon';
 
+import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
@@ -95,13 +96,15 @@ export function LeftScreenHeading({
 	subtitle,
 	hasSubtitleIcon,
 	headMenu,
-	networkKey
+	networkKey,
+	onPress
 }: {
 	title: string;
 	subtitle?: string;
 	hasSubtitleIcon?: boolean;
 	headMenu?: React.ReactElement;
 	networkKey: string;
+	onPress?: () => any;
 }): ReactElement {
 	const titleStyle: TextStyle = {
 		...fontStyles.h2,
@@ -112,8 +115,13 @@ export function LeftScreenHeading({
 		...baseStyles.text,
 		...baseStyles.t_left
 	};
+	const isDisabled = onPress === undefined;
 	return (
-		<View style={baseStyles.bodyWithIcon}>
+		<TouchableItem
+			style={baseStyles.bodyWithIcon}
+			onPress={onPress}
+			disabled={isDisabled}
+		>
 			<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 				<AccountIcon
 					address={''}
@@ -128,7 +136,7 @@ export function LeftScreenHeading({
 				</View>
 			</View>
 			{headMenu}
-		</View>
+		</TouchableItem>
 	);
 }
 

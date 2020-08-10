@@ -21,6 +21,8 @@ export type RootStackParamList = {
 		| undefined;
 	LegacyAccountList: undefined;
 	LegacyNetworkChooser: undefined;
+	NetworkDetails: { pathId: string };
+	NetworkSettings: undefined;
 	PathDerivation: { parentPath: string };
 	PathDetails: { path: string };
 	PathManagement: { path: string };
@@ -44,7 +46,11 @@ export type RootStackParamList = {
 		resolve: (password: string) => void;
 	};
 	PrivacyPolicy: undefined;
-	QrScanner: undefined;
+	QrScanner:
+		| undefined
+		| {
+				isScanningNetworkSpec: true;
+		  };
 	Security: undefined;
 	SignedMessage: undefined;
 	SignedTx: undefined;
