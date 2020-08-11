@@ -59,8 +59,6 @@ export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 		'0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
 	KULUPU: '0xf7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba',
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
-	KUSAMA_CC2:
-		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
 	KUSAMA_DEV:
 		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
 	POLKADOT:
@@ -133,17 +131,6 @@ const substrateNetworkBase: Record<string, Partial<SubstrateNetworkParams>> = {
 		logo: require('res/img/logos/Kusama.png'),
 		order: 2,
 		pathId: 'kusama',
-		prefix: 2,
-		title: 'Kusama',
-		unit: 'KSM'
-	},
-	[SubstrateNetworkKeys.KUSAMA_CC2]: {
-		color: '#000',
-		decimals: 12,
-		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('res/img/logos/Kusama.png'),
-		order: 2,
-		pathId: 'kusama_CC2',
 		prefix: 2,
 		title: 'Kusama',
 		unit: 'KSM'

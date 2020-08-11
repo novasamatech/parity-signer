@@ -34,10 +34,7 @@ export const filterSubstrateNetworks = (
 	networkList: Record<string, NetworkParams>,
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
 ): Array<[string, NetworkParams]> => {
-	const excludedNetworks = [
-		UnknownNetworkKeys.UNKNOWN,
-		SubstrateNetworkKeys.KUSAMA_CC2
-	];
+	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 	if (!__DEV__) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
@@ -96,7 +93,7 @@ export function getCompleteSubstrateNetworkSpec(
 }
 
 export function defaultNetworkSpecs(): SubstrateNetworkParams[] {
-	const excludedNetworks = [SubstrateNetworkKeys.KUSAMA_CC2];
+	const excludedNetworks: string[] = [];
 	if (!__DEV__) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);

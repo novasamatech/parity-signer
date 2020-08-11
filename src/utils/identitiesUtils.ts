@@ -181,11 +181,12 @@ export const getPathsWithSubstrateNetworkKey = (
 		let pathId;
 		if (!isSubstratePath(path)) return groupedPaths;
 		if (pathMeta.networkPathId !== undefined) {
-			pathId = pathMeta.networkPathId;
+			pathId = PATH_IDS_LIST.includes(pathMeta.networkPathId)
+				? pathMeta.networkPathId
+				: unknownNetworkPathId;
 		} else {
 			pathId = extractPathId(path);
 		}
-
 		if (pathId === targetPathId) {
 			groupedPaths.push(path);
 			return groupedPaths;
@@ -442,7 +443,6 @@ export const getMetadata = (networkKey: string): string => {
 		case SubstrateNetworkKeys.CENTRIFUGE_AMBER:
 			return centrifugeAmberMetadata;
 		case SubstrateNetworkKeys.KUSAMA:
-		case SubstrateNetworkKeys.KUSAMA_CC2:
 		case SubstrateNetworkKeys.KUSAMA_DEV:
 			return kusamaMetadata;
 		case SubstrateNetworkKeys.WESTEND:

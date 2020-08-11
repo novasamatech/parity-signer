@@ -40,7 +40,7 @@ const ACCOUNT_NETWORK = 'Account Network';
 const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
-const excludedNetworks = [SubstrateNetworkKeys.KUSAMA_CC2];
+const excludedNetworks: string[] = [];
 if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
