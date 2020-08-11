@@ -209,6 +209,5 @@ export async function getNetworkSpecs(): Promise<SubstrateNetworkParams[]> {
  */
 export async function saveDefaultNetworks(): Promise<void> {
 	const networkSpecsString = JSON.stringify(defaultNetworkSpecs());
-	console.log('networkSpecs to be stored is', networkSpecsString); //TODO to be removed
 	// AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecsString);
 }
