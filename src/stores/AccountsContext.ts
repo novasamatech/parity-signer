@@ -277,7 +277,6 @@ export function useAccountContext(): AccountsContextState {
 	): Promise<boolean> {
 		const { accounts } = state;
 		const account = accounts.get(accountKey);
-
 		if (!accountKey || !account || !account.encryptedSeed) {
 			return false;
 		}

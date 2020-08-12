@@ -19,7 +19,6 @@ import { Text, View } from 'react-native';
 
 import strings from 'modules/sign/strings';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NETWORK_LIST } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { ScannerContext } from 'stores/ScannerContext';
@@ -30,6 +29,7 @@ import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
+import { getNetworkParams } from 'utils/identitiesUtils';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
@@ -64,7 +64,7 @@ function SignedTxView({
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { signedData, tx } = scannerStore.state;
-	const senderNetworkParams = NETWORK_LIST[sender.networkKey];
+	const senderNetworkParams = getNetworkParams(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
 

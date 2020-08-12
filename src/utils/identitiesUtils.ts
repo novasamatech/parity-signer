@@ -19,6 +19,7 @@ import { decryptData, substrateAddress } from './native';
 import { constructSURI, parseSURI } from './suri';
 import { generateAccountId } from './account';
 
+import { NetworkParams } from 'types/networkSpecsTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	NETWORK_LIST,
@@ -293,6 +294,15 @@ export const verifyPassword = async (
 	const address = await substrateAddress(suri, networkParams.prefix);
 	const accountMeta = identity.meta.get(path);
 	return address === accountMeta?.address;
+};
+
+export const getNetworkParams = (
+	networkKey: string | undefined
+): NetworkParams => {
+	if (networkKey === undefined) return NETWORK_LIST[UnknownNetworkKeys.UNKNOWN];
+	return NETWORK_LIST.hasOwnProperty(networkKey)
+		? NETWORK_LIST[networkKey]
+		: NETWORK_LIST[UnknownNetworkKeys.UNKNOWN];
 };
 
 export const getExistedNetworkKeys = (identity: Identity): string[] => {

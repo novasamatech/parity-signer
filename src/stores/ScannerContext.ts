@@ -26,8 +26,9 @@ import {
 import React, { useReducer } from 'react';
 
 import { AccountsContextState } from 'stores/AccountsContext';
-import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import { NETWORK_LIST } from 'constants/networkSpecs';
 import { Account, FoundAccount } from 'types/identityTypes';
+import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
 import {
 	CompletedParsedData,
 	EthereumParsedData,
@@ -47,6 +48,7 @@ import {
 	constructDataFromBytes,
 	encodeNumber
 } from 'utils/decoders';
+import { getNetworkParams } from 'utils/identitiesUtils';
 import {
 	brainWalletSign,
 	decryptData,
@@ -313,7 +315,7 @@ export function useScannerContext(): ScannerContextState {
 			networkKey
 		});
 
-		const networkTitle = NETWORK_LIST[networkKey].title;
+		const networkTitle = getNetworkParams(networkKey).title;
 
 		if (!sender) {
 			throw new Error(
@@ -455,8 +457,8 @@ export function useScannerContext(): ScannerContextState {
 		const { sender, dataToSign, isHash } = state;
 		if (!sender || !sender.encryptedSeed)
 			throw new Error('Signing Error: sender could not be found.');
-		const isEthereum =
-			NETWORK_LIST[sender.networkKey].protocol === NetworkProtocols.ETHEREUM;
+		const networkParams = getNetworkParams(sender.networkKey);
+		const isEthereum = isEthereumNetworkParams(networkParams);
 		const seed = await decryptData(sender.encryptedSeed, pin);
 		let signedData;
 		if (isEthereum) {
@@ -499,7 +501,6 @@ export function useScannerContext(): ScannerContextState {
 		setState({
 			...DEFAULT_STATE
 		});
-		clearMultipartProgress();
 	}
 
 	return {
