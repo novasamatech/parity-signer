@@ -28,7 +28,7 @@ export default function AccountPrefixedTitle({
 	titlePrefix?: string;
 }): ReactElement {
 	return (
-		<View style={{ flexDirection: 'row' }}>
+		<View style={{ flexDirection: 'column' }}>
 			{titlePrefix && (
 				<Text numberOfLines={1} style={[fontStyles.t_codeS, styles.text]}>
 					{titlePrefix}
@@ -43,7 +43,6 @@ export default function AccountPrefixedTitle({
 
 const styles = StyleSheet.create({
 	text: {
-		alignSelf: 'flex-end',
 		color: colors.signal.main,
 		marginBottom: 1,
 		marginRight: 4
