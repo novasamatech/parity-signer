@@ -66,7 +66,7 @@ export default function AccountIcon(props: {
 			</View>
 		);
 	}
-	if (protocol === NetworkProtocols.SUBSTRATE) {
+	if (protocol === NetworkProtocols.SUBSTRATE || protocol === NetworkProtocols.UNKNOWN) {
 		let iconSize;
 		if (typeof style?.width === 'string') {
 			const parseIconSize = parseInt(style.width, 10);
@@ -78,11 +78,6 @@ export default function AccountIcon(props: {
 	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
 			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
-		);
-	} else {
-		// if there's no protocol or it's unknown we return a warning
-		return (
-			<MaterialIcon color={colors.signal.error} name={'error'} size={44} />
 		);
 	}
 }
