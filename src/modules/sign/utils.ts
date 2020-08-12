@@ -17,7 +17,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useContext } from 'react';
 
-import { NETWORK_LIST } from 'constants/networkSpecs';
 import strings from 'modules/sign/strings';
 import { AccountsContext } from 'stores/AccountsContext';
 import { ScannerContext } from 'stores/ScannerContext';
@@ -39,7 +38,7 @@ import {
 	isJsonString,
 	rawDataToU8A
 } from 'utils/decoders';
-import { getIdentityFromSender } from 'utils/identitiesUtils';
+import { getIdentityFromSender, getNetworkParams } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
 	unlockSeedPhrase,
@@ -108,7 +107,7 @@ export function useProcessBarCode(
 		sender: FoundIdentityAccount,
 		qrInfo: QrInfo
 	): Promise<void> {
-		const senderNetworkParams = NETWORK_LIST[sender.networkKey];
+		const senderNetworkParams = getNetworkParams(sender.networkKey);
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 		// 1. check if sender existed
