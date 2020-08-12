@@ -34,7 +34,7 @@ import {
 	PathGroup
 } from 'types/identityTypes';
 import {
-	isSubstrateNetworkParams,
+	isUnknownNetworkParams,
 	SubstrateNetworkParams,
 	UnknownNetworkParams
 } from 'types/networkSpecsTypes';
@@ -98,8 +98,11 @@ export default function PathGroupCard({
 		}
 	};
 
+	const isUnknownNetwork = isUnknownNetworkParams(networkParams);
 	const headerTitle = removeSlash(pathGroup.title);
-	const headerCode = `//${networkParams.pathId}${pathGroup.title}`;
+	const headerCode = isUnknownNetwork
+		? pathGroup.title
+		: `//${networkParams.pathId}${pathGroup.title}`;
 	return (
 		<View key={`group${pathGroup.title}`} style={{ marginTop: 24 }}>
 			<Separator shadow={true} style={styles.separator} />
@@ -110,7 +113,7 @@ export default function PathGroupCard({
 						<Text style={fontStyles.t_codeS}>{headerCode}</Text>
 					</View>
 				</View>
-				{isSubstrateNetworkParams(networkParams) && (
+				{!isUnknownNetwork && (
 					<TouchableItem
 						onPress={(): any => addDerivationPath(true)}
 						style={styles.derivationButton}

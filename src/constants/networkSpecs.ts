@@ -25,26 +25,20 @@ import {
 
 export const unknownNetworkPathId = '';
 
-export const NetworkProtocols: {
-	[key: string]: NetworkProtocol;
-} = Object.freeze({
+export const NetworkProtocols: Record<string, NetworkProtocol> = Object.freeze({
 	ETHEREUM: 'ethereum',
 	SUBSTRATE: 'substrate',
 	UNKNOWN: 'unknown'
 });
 
 // accounts for which the network couldn't be found (failed migration, removed network)
-export const UnknownNetworkKeys: {
-	[key: string]: string;
-} = Object.freeze({
+export const UnknownNetworkKeys: Record<string, string> = Object.freeze({
 	UNKNOWN: 'unknown'
 });
 
 // ethereumChainId is used as Network key for Ethereum networks
 /* eslint-disable sort-keys */
-export const EthereumNetworkKeys: {
-	[key: string]: string;
-} = Object.freeze({
+export const EthereumNetworkKeys: Record<string, string> = Object.freeze({
 	FRONTIER: '1',
 	ROPSTEN: '3',
 	RINKEBY: '4',
@@ -56,9 +50,7 @@ export const EthereumNetworkKeys: {
 /* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
-export const SubstrateNetworkKeys: {
-	[key: string]: string;
-} = Object.freeze({
+export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 	CENTRIFUGE:
 		'0x67dddf2673b69e5f875f6f25277495834398eafd67f492e09f3f3345e003d1b5', // https://portal.chain.centrifuge.io/#/explorer/query/0
 	CENTRIFUGE_AMBER:
@@ -67,8 +59,6 @@ export const SubstrateNetworkKeys: {
 		'0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
 	KULUPU: '0xf7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba',
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
-	KUSAMA_CC2:
-		'0xe3777fa922cafbff200cadeaea1a76bd7898ad5b89f7848999058b50e715f636',
 	KUSAMA_DEV:
 		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
 	POLKADOT:
@@ -78,7 +68,7 @@ export const SubstrateNetworkKeys: {
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
 });
 
-const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
+const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
 	[UnknownNetworkKeys.UNKNOWN]: {
 		color: colors.signal.error,
 		order: 99,
@@ -90,9 +80,7 @@ const unknownNetworkBase: { [key: string]: UnknownNetworkParams } = {
 	}
 };
 
-const substrateNetworkBase: {
-	[key: string]: Partial<SubstrateNetworkParams>;
-} = {
+const substrateNetworkBase: Record<string, Partial<SubstrateNetworkParams>> = {
 	[SubstrateNetworkKeys.CENTRIFUGE]: {
 		color: '#FCC367',
 		decimals: 18,
@@ -147,17 +135,6 @@ const substrateNetworkBase: {
 		title: 'Kusama',
 		unit: 'KSM'
 	},
-	[SubstrateNetworkKeys.KUSAMA_CC2]: {
-		color: '#000',
-		decimals: 12,
-		genesisHash: SubstrateNetworkKeys.KUSAMA,
-		logo: require('res/img/logos/Kusama.png'),
-		order: 2,
-		pathId: 'kusama_CC2',
-		prefix: 2,
-		title: 'Kusama',
-		unit: 'KSM'
-	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {
 		color: '#000',
 		decimals: 12,
@@ -202,7 +179,7 @@ const substrateNetworkBase: {
 	}
 };
 
-const ethereumNetworkBase: { [key: string]: Partial<EthereumNetworkParams> } = {
+const ethereumNetworkBase: Record<string, Partial<EthereumNetworkParams>> = {
 	[EthereumNetworkKeys.FRONTIER]: {
 		color: '#8B94B3',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
@@ -264,15 +241,18 @@ function setDefault(
 	}, {});
 }
 
-export const ETHEREUM_NETWORK_LIST: {
-	[key: string]: EthereumNetworkParams;
-} = Object.freeze(setDefault(ethereumNetworkBase, ethereumDefaultValues));
-export const SUBSTRATE_NETWORK_LIST: {
-	[key: string]: SubstrateNetworkParams;
-} = Object.freeze(setDefault(substrateNetworkBase, substrateDefaultValues));
-export const UNKNOWN_NETWORK: {
-	[key: string]: UnknownNetworkParams;
-} = Object.freeze(unknownNetworkBase);
+export const ETHEREUM_NETWORK_LIST: Record<
+	string,
+	EthereumNetworkParams
+> = Object.freeze(setDefault(ethereumNetworkBase, ethereumDefaultValues));
+export const SUBSTRATE_NETWORK_LIST: Record<
+	string,
+	SubstrateNetworkParams
+> = Object.freeze(setDefault(substrateNetworkBase, substrateDefaultValues));
+export const UNKNOWN_NETWORK: Record<
+	string,
+	UnknownNetworkParams
+> = Object.freeze(unknownNetworkBase);
 
 const substrateNetworkMetas = Object.values({
 	...SUBSTRATE_NETWORK_LIST,
@@ -282,7 +262,7 @@ export const PATH_IDS_LIST = substrateNetworkMetas.map(
 	(meta: UnknownNetworkParams | SubstrateNetworkParams) => meta.pathId
 );
 
-export const NETWORK_LIST: { [key: string]: NetworkParams } = Object.freeze(
+export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(
 	Object.assign(
 		{},
 		SUBSTRATE_NETWORK_LIST,

@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-'use strict';
-
 import React from 'react';
 import {
 	Image,
@@ -42,13 +40,13 @@ const ACCOUNT_NETWORK = 'Account Network';
 const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
-const excludedNetworks = [SubstrateNetworkKeys.KUSAMA_CC2];
+const excludedNetworks: string[] = [];
 if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 }
 
-export function NetworkSelector({
+export function DerivationNetworkSelector({
 	networkKey,
 	setVisible
 }: {

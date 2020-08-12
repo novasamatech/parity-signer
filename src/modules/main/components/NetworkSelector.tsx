@@ -18,14 +18,11 @@ import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
+import { NETWORK_LIST } from 'constants/networkSpecs';
+import { filterSubstrateNetworks } from 'modules/network/utils';
 import { NetworkCard } from 'components/AccountCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
-import {
-	NETWORK_LIST,
-	SubstrateNetworkKeys,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
@@ -47,15 +44,6 @@ import {
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import QrScannerTab from 'components/QrScannerTab';
-
-const excludedNetworks = [
-	UnknownNetworkKeys.UNKNOWN,
-	SubstrateNetworkKeys.KUSAMA_CC2
-];
-if (!__DEV__) {
-	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-}
 
 function NetworkSelector({
 	accountsStore,
@@ -93,30 +81,6 @@ function NetworkSelector({
 			name: 'PathDerivation',
 			params: { parentPath: '' }
 		});
-
-	const sortNetworkKeys = (
-		[, params1]: [any, NetworkParams],
-		[, params2]: [any, NetworkParams]
-	): number => {
-		if (params1.order > params2.order) {
-			return 1;
-		} else if (params1.order < params2.order) {
-			return -1;
-		} else {
-			return 0;
-		}
-	};
-
-	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
-		const shouldExclude = excludedNetworks.includes(networkKey);
-		if (isNew && !shouldExclude) return true;
-
-		if (shouldShowMoreNetworks) {
-			if (shouldExclude) return false;
-			return !availableNetworks.includes(networkKey);
-		}
-		return availableNetworks.includes(networkKey);
-	};
 
 	const deriveSubstrateNetworkRootPath = async (
 		networkKey: string,
@@ -216,8 +180,20 @@ function NetworkSelector({
 		() => getExistedNetworkKeys(currentIdentity),
 		[currentIdentity]
 	);
-	const networkList = Object.entries(NETWORK_LIST).filter(filterNetworkKeys);
-	networkList.sort(sortNetworkKeys);
+
+	const networkList = useMemo(
+		() =>
+			filterSubstrateNetworks(NETWORK_LIST, (networkKey, shouldExclude) => {
+				if (isNew && !shouldExclude) return true;
+
+				if (shouldShowMoreNetworks) {
+					if (shouldExclude) return false;
+					return !availableNetworks.includes(networkKey);
+				}
+				return availableNetworks.includes(networkKey);
+			}),
+		[availableNetworks, isNew, shouldShowMoreNetworks]
+	);
 
 	const renderNetwork = ({
 		item

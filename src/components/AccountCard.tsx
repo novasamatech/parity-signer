@@ -27,7 +27,6 @@ import Separator from 'components/Separator';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
-import { NetworkParams } from 'types/networkSpecsTypes';
 import { ButtonListener } from 'types/props';
 
 const CardSeparator = (): ReactElement => (
@@ -41,18 +40,12 @@ const CardSeparator = (): ReactElement => (
 	/>
 );
 
-const NetworkFooter = ({
-	networkColor,
-	network
-}: {
-	networkColor: string;
-	network: NetworkParams;
-}): React.ReactElement => (
+const NetworkFooter = ({ color }: { color: string }): React.ReactElement => (
 	<View
 		style={[
 			styles.footer,
 			{
-				backgroundColor: networkColor || network.color
+				backgroundColor: color
 			}
 		]}
 	/>
@@ -69,7 +62,7 @@ export function NetworkCard({
 	isAdd?: boolean;
 	networkColor?: string;
 	networkKey?: string;
-	onPress: ButtonListener;
+	onPress?: ButtonListener;
 	testID?: string;
 	title: string;
 }): ReactElement {
@@ -77,9 +70,9 @@ export function NetworkCard({
 		networkKey !== undefined
 			? NETWORK_LIST[networkKey]
 			: NETWORK_LIST[NetworkProtocols.UNKNOWN];
-
+	const isDisabled = onPress === undefined;
 	return (
-		<TouchableItem testID={testID} disabled={false} onPress={onPress}>
+		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
 			<CardSeparator />
 			<View style={styles.content}>
 				{isAdd ? (
@@ -99,10 +92,7 @@ export function NetworkCard({
 				<View style={styles.desc}>
 					<AccountPrefixedTitle title={title} />
 				</View>
-				<NetworkFooter
-					network={network}
-					networkColor={networkColor ?? network.color}
-				/>
+				<NetworkFooter color={networkColor ?? network.color} />
 			</View>
 		</TouchableItem>
 	);
@@ -161,7 +151,7 @@ export default function AccountCard({
 						<Address address={address} protocol={network.protocol} />
 					)}
 				</View>
-				<NetworkFooter network={network} networkColor={network.color} />
+				<NetworkFooter color={network.color} />
 			</View>
 		</TouchableItem>
 	);
