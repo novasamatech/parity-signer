@@ -501,7 +501,6 @@ export function useScannerContext(): ScannerContextState {
 		setState({
 			...DEFAULT_STATE
 		});
-		clearMultipartProgress();
 	}
 
 	return {

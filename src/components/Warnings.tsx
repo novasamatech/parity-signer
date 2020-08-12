@@ -47,8 +47,8 @@ export function UnknownAccountWarning({
 			) : (
 				<Text style={styles.warningText}>
 					This account wasn't retrieved successfully. This could be because
-					network's genesisHash is changed, or you upgraded Parity Signer without wiping
-					your device and this account couldn't be migrated.
+					network's genesisHash is changed, or you upgraded Parity Signer
+					without wiping your device and this account couldn't be migrated.
 					{'\n'}
 					{'\n'}
 					To be able to use this account you need to:

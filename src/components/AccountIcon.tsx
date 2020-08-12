@@ -66,7 +66,11 @@ export default function AccountIcon(props: {
 			</View>
 		);
 	}
-	if (protocol === NetworkProtocols.SUBSTRATE || protocol === NetworkProtocols.UNKNOWN) {
+	if (protocol === NetworkProtocols.ETHEREUM) {
+		return (
+			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
+		);
+	} else if (address !== '') {
 		let iconSize;
 		if (typeof style?.width === 'string') {
 			const parseIconSize = parseInt(style.width, 10);
@@ -75,9 +79,9 @@ export default function AccountIcon(props: {
 			iconSize = style?.width;
 		}
 		return <Identicon value={address} size={iconSize || 40} />;
-	} else if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
+	} else {
 		return (
-			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
+			<MaterialIcon color={colors.signal.error} name={'error'} size={44} />
 		);
 	}
 }
