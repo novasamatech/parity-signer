@@ -1,6 +1,6 @@
 {
   "name": "NativeSigner",
-  "version": "4.4.3-beta",
+  "version": "4.5.0-beta",
   "private": true,
   "license": "GPL-3.0",
   "engines": {
@@ -64,7 +64,7 @@
     "react-native-randombytes": "^3.5.3",
     "react-native-screens": "^2.0.0-alpha.32",
     "react-native-secure-storage": "git+https://github.com/paritytech/react-native-secure-storage.git#master",
-    "react-native-substrate-sign": "1.1.0",
+    "react-native-substrate-sign": "1.1.1",
     "react-native-svg": "12.1.0",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^7.0.0",

@@ -247,7 +247,7 @@ PODS:
     - React
   - react-native-safe-area-context (0.7.3):
     - React
-  - react-native-substrate-sign (1.1.0):
+  - react-native-substrate-sign (1.1.1):
     - React
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
@@ -508,7 +508,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: a53b00d949b6456913aaf507d9dba90c4008c611
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
-  react-native-substrate-sign: 5989744fc9ad11e5c6d622dd56d774a0a18cdffe
+  react-native-substrate-sign: 77515bc7fe68e2f8bd23f1aba8ecc40ef27bb50e
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
