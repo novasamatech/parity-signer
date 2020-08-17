@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NETWORK_LIST, SubstrateNetworkKeys } from 'constants/networkSpecs';
+import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
 import {
 	EthereumNetworkParams,
@@ -22,6 +22,7 @@ import {
 	isUnknownNetworkParams
 } from 'types/networkSpecsTypes';
 import { ValidSeed } from 'types/utilTypes';
+import { getNetworkParams } from 'utils/identitiesUtils';
 
 export function generateAccountId({
 	address,
@@ -30,25 +31,20 @@ export function generateAccountId({
 	address: string;
 	networkKey: string;
 }): string {
-	if (
-		typeof address !== 'string' ||
-		address.length === 0 ||
-		!networkKey ||
-		!NETWORK_LIST[networkKey]
-	) {
+	if (typeof address !== 'string' || address.length === 0 || !networkKey) {
 		throw new Error(
 			"Couldn't create an accountId. Address or networkKey missing, or network key was invalid."
 		);
 	}
 
-	const networkParams = NETWORK_LIST[networkKey];
+	const networkParams = getNetworkParams(networkKey);
 	const { protocol } = networkParams;
 
 	if (isSubstrateNetworkParams(networkParams)) {
 		const { genesisHash } = networkParams;
 		return `${protocol}:${address}:${genesisHash ?? ''}`;
 	} else if (isUnknownNetworkParams(networkParams)) {
-		return `substrate:${address}`;
+		return `substrate:${address}:${networkKey ?? ''}`;
 	} else {
 		const { ethereumChainId } = networkParams as EthereumNetworkParams;
 		return `${protocol}:0x${address}@${ethereumChainId}`;

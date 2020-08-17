@@ -21,7 +21,11 @@ import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 
 import { AccountsContextState } from 'stores/AccountsContext';
-import { FoundAccount } from 'types/identityTypes';
+import {
+	FoundAccount,
+	FoundIdentityAccount,
+	FoundLegacyAccount
+} from 'types/identityTypes';
 import { isLegacyFoundAccount } from 'utils/identitiesUtils';
 
 const CompatibleCard = ({
@@ -32,21 +36,36 @@ const CompatibleCard = ({
 	account: FoundAccount;
 	accountsStore: AccountsContextState;
 	titlePrefix?: string;
-}): React.ReactElement =>
-	isLegacyFoundAccount(account) || account.isLegacy === undefined ? (
+}): React.ReactElement => {
+	const renderLegacyAccountCard = (
+		legacyAccount: FoundLegacyAccount
+	): React.ReactElement => (
 		<AccountCard
-			title={account.name}
-			address={account.address}
-			networkKey={account.networkKey || ''}
-		/>
-	) : (
-		//Substrate tx do not need to render recipient
-		<PathCard
-			identity={accountsStore.getIdentityByAccountId(account.accountId)!}
-			path={account.path}
-			titlePrefix={titlePrefix}
+			title={legacyAccount.name}
+			address={legacyAccount.address}
+			networkKey={legacyAccount.networkKey || ''}
 		/>
 	);
+
+	const renderIdentityPathCard = (
+		identityAccount: FoundIdentityAccount
+	): React.ReactElement => {
+		const identity = accountsStore.getIdentityByAccountId(
+			identityAccount.accountId
+		)!;
+		return (
+			<PathCard
+				identity={identity}
+				path={identityAccount.path}
+				titlePrefix={titlePrefix + identity.name}
+			/>
+		);
+	};
+
+	return isLegacyFoundAccount(account) || account.isLegacy === undefined
+		? renderLegacyAccountCard(account)
+		: renderIdentityPathCard(account);
+};
 
 CompatibleCard.propTypes = {
 	account: PropTypes.object.isRequired,

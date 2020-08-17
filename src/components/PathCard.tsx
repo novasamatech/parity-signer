@@ -246,6 +246,7 @@ const styles = StyleSheet.create({
 		width: 40
 	},
 	row: {
+		alignItems: 'flex-end',
 		flexDirection: 'row'
 	}
 });

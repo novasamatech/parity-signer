@@ -18,7 +18,7 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
@@ -26,6 +26,7 @@ import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
 import PopupMenu from 'components/PopupMenu';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
+import { getNetworkParams } from 'utils/identitiesUtils';
 import {
 	navigateToLandingPage,
 	navigateToLegacyAccountList
@@ -46,11 +47,9 @@ export default function AccountDetails({
 
 	if (!account) return <View />;
 
-	const protocol =
-		(account.networkKey &&
-			NETWORK_LIST[account.networkKey] &&
-			NETWORK_LIST[account.networkKey].protocol) ||
-		NetworkProtocols.UNKNOWN;
+	const network = getNetworkParams(account.networkKey);
+
+	const protocol = network.protocol;
 
 	const onDelete = (): void => {
 		alertDeleteLegacyAccount(
@@ -79,13 +78,9 @@ export default function AccountDetails({
 
 	return (
 		<SafeAreaViewContainer>
-			<ScrollView contentContainerStyle={styles.scrollBody}>
+			<ScrollView style={styles.scrollBody} bounces={false}>
 				<View style={styles.header}>
-					<AccountIcon
-						address={''}
-						network={NETWORK_LIST[account.networkKey]}
-						style={styles.icon}
-					/>
+					<AccountIcon address={''} network={network} style={styles.icon} />
 					<Text style={fontStyles.h2}>Public Address</Text>
 					<View style={styles.menuView}>
 						<PopupMenu
@@ -113,15 +108,10 @@ export default function AccountDetails({
 					title={account.name}
 				/>
 				<View>
-					{protocol !== NetworkProtocols.UNKNOWN ? (
-						<QrView
-							data={
-								account.name ? `${selectedKey}:${account.name}` : selectedKey
-							}
-						/>
-					) : (
-						<UnknownAccountWarning />
-					)}
+					<QrView
+						data={account.name ? `${selectedKey}:${account.name}` : selectedKey}
+					/>
+					{protocol === NetworkProtocols.UNKNOWN && <UnknownAccountWarning />}
 				</View>
 			</ScrollView>
 			<QrScannerTab />
@@ -153,7 +143,6 @@ const styles = StyleSheet.create({
 	scrollBody: {
 		alignContent: 'flex-start',
 		flex: 1,
-		paddingBottom: 40,
 		paddingTop: 8
 	}
 });

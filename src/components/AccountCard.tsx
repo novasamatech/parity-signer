@@ -23,8 +23,8 @@ import Address from './Address';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 
+import { getNetworkParams } from 'utils/identitiesUtils';
 import Separator from 'components/Separator';
-import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 import { ButtonListener } from 'types/props';
@@ -66,10 +66,7 @@ export function NetworkCard({
 	testID?: string;
 	title: string;
 }): ReactElement {
-	const network =
-		networkKey !== undefined
-			? NETWORK_LIST[networkKey]
-			: NETWORK_LIST[NetworkProtocols.UNKNOWN];
+	const networkParams = getNetworkParams(networkKey);
 	const isDisabled = onPress === undefined;
 	return (
 		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
@@ -87,12 +84,16 @@ export function NetworkCard({
 						<Icon name="add" color={colors.text.main} size={30} />
 					</View>
 				) : (
-					<AccountIcon address={''} network={network} style={styles.icon} />
+					<AccountIcon
+						address={''}
+						network={networkParams}
+						style={styles.icon}
+					/>
 				)}
 				<View style={styles.desc}>
 					<AccountPrefixedTitle title={title} />
 				</View>
-				<NetworkFooter color={networkColor ?? network.color} />
+				<NetworkFooter color={networkColor ?? networkParams.color} />
 			</View>
 		</TouchableItem>
 	);
@@ -122,10 +123,7 @@ export default function AccountCard({
 	const defaultTitle = 'No name';
 	const displayTitle = title.length > 0 ? title : defaultTitle;
 	const seedTypeDisplay = seedType || '';
-	const network =
-		networkKey !== undefined
-			? NETWORK_LIST[networkKey]
-			: NETWORK_LIST[NetworkProtocols.UNKNOWN];
+	const network = getNetworkParams(networkKey);
 
 	return (
 		<TouchableItem

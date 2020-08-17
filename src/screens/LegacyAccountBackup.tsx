@@ -18,7 +18,7 @@ import React, { useContext, useEffect } from 'react';
 import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NetworkProtocols, NETWORK_LIST } from 'constants/networkSpecs';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { UnlockedAccount } from 'types/identityTypes';
@@ -32,6 +32,7 @@ import ScreenHeading from 'components/ScreenHeading';
 import TouchableItem from 'components/TouchableItem';
 import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
+import { getNetworkParams } from 'utils/identitiesUtils';
 
 function LegacyAccountBackup({
 	navigation,
@@ -68,9 +69,7 @@ function LegacyAccountBackup({
 		seed = '',
 		seedPhrase = ''
 	} = isNew ? newAccount : (accountsStore.getSelected() as UnlockedAccount);
-	const protocol =
-		(NETWORK_LIST[networkKey] && NETWORK_LIST[networkKey].protocol) ||
-		NetworkProtocols.UNKNOWN;
+	const protocol = getNetworkParams(networkKey).protocol;
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>
