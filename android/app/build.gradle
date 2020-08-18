@@ -136,8 +136,8 @@ android {
         minSdkVersion 18
         missingDimensionStrategy 'react-native-camera', 'general'
         targetSdkVersion 28
-        versionCode 4500
-        versionName "4.5.0"
+        versionCode 4501
+        versionName "4.5.1"
         ndk {
             abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         }
@@ -170,6 +170,8 @@ android {
             // signingConfig signingConfigs.debug
              minifyEnabled enableProguardInReleaseBuilds
              proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // Detox-specific additions to pro-guard, uncomment following line if pro-guard is enabled.
+            // proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
     splits {
@@ -178,14 +180,6 @@ android {
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-        }
-    }
-    buildTypes {
-        release {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            // Detox-specific additions to pro-guard, uncomment following line if pro-guard is enabled.
-            // proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
 
