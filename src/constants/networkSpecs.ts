@@ -147,7 +147,7 @@ const substrateNetworkBase: Record<string, Partial<SubstrateNetworkParams>> = {
 	},
 	[SubstrateNetworkKeys.POLKADOT]: {
 		color: '#E6027A',
-		decimals: 12,
+		decimals: 10,
 		genesisHash: SubstrateNetworkKeys.POLKADOT,
 		logo: require('res/img/logos/Polkadot.png'),
 		order: 1,
