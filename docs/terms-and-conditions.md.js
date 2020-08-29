@@ -33,15 +33,15 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   2.5.1  generate private keys using a recovery phrase ("**Private Key(s**)") and a corresponding public key and store them on such Device;
 
-  2.5.2  verify and sign transactions on Blockchains (as defined below) using the relevant Private Key ("**Digital Signature**"); and
+  2.5.2  verify and sign extrinsics on Blockchains (as defined below) using the relevant Private Key ("**Digital Signature**"); and
 
-  2.5.3  when used in conjunction with certain Third Party Services (which are defined in clause 4.3), can be used to broadcast transactions on the relevant Blockchains,
+  2.5.3  when used in conjunction with certain Third Party Services (which are defined in clause 4.3), can be used to broadcast extrinsics on the relevant Blockchains,
 
 (the "**App** **Functionality**").
 
   2.6  The App Functionality the App, can only be used on the Ethereum public blockchain protocol, blockchain protocols built on our "Substrate" technology, including Kusama and Polkadot, and other blockchain protocols as are indicated within the App itself ("**Blockchain(s)**"). You are responsible for your choice of and interaction with the relevant Blockchain.
 
-  2.7  The App is not itself part of any blockchain. For this reason, we will have no liability to you in relation to any activity on any blockchain or the performance or availability of any blockchain. In addition, we do not guarantee that a Digital Signature will result in the related transaction being recorded on the relevant Blockchain. You are responsible for ensuring that any transactions you broadcast, or Digital Signatures you create, conform to the applicable rules of the relevant Blockchain.
+  2.7  The App is not itself part of any blockchain. For this reason, we will have no liability to you in relation to any activity on any blockchain or the performance or availability of any blockchain. In addition, we do not guarantee that a Digital Signature will result in the related extrinsic being recorded on the relevant Blockchain. You are responsible for ensuring that any transactions you broadcast, or Digital Signatures you create, conform to the applicable rules of the relevant Blockchain.
 
   2.8  You should only download, access and/or use the App if you are familiar with interacting with the Blockchains. We recommend you learn about and understand the basics of the Blockchains in connection with which you intend to use the App before downloading, accessing and/or using the App.
 
@@ -71,7 +71,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
 *Use with other software and hardware*
 
-  4.3  When you make use of the App, you may use the App Functionality to enter into transactions on the relevant Blockchain (for example, transferring crypto currency, entering into a smart contract, or purchasing goods) (“**Transactions**”). You may also use the App in conjunction with other services or software (including cryptographic wallet technology such as software wallets) which are provided by a person or company other than Parity (“**Third Party Services**”). You agree and understand that you are responsible for any Transaction which you enter into and we do not operate or control any such Third Party Services. We have no responsibility for any Transactions you enter into and your use of Third Party Services is at your sole risk and we provide no warranty or guarantee of any in respect of Third Party Services. You further agree that under no circumstances will we be liable to you for any losses or damages arising from any Transactions or any interactions between you and the provider of any such Third Party Services or for any information that such Third Party Services provider provides you or you to them.
+  4.3  When you make use of the App, you may use the App Functionality to enter into extrinsics on the relevant Blockchain (for example, transferring crypto currency, entering into a smart contract, or purchasing goods) (“**Transactions**”). You may also use the App in conjunction with other services or software (including cryptographic wallet technology such as software wallets) which are provided by a person or company other than Parity (“**Third Party Services**”). You agree and understand that you are responsible for any Transaction which you enter into and we do not operate or control any such Third Party Services. We have no responsibility for any Transactions you enter into and your use of Third Party Services is at your sole risk and we provide no warranty or guarantee of any in respect of Third Party Services. You further agree that under no circumstances will we be liable to you for any losses or damages arising from any Transactions or any interactions between you and the provider of any such Third Party Services or for any information that such Third Party Services provider provides you or you to them.
 
 *Bugs and Viruses*
 
@@ -109,7 +109,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   6.6  The App may contain inaccuracies or typographical errors. We make no representations about the reliability, availability, timeliness or accuracy of the content included on the App.
 
-  6.7  We assume no responsibility for the content of any websites or services which you use the App to authenticate transactions on. We will not be liable for any loss or damage that may arise from your use of them.
+  6.7  We assume no responsibility for the content of any websites or services which you use the App to authenticate extrinsics on. We will not be liable for any loss or damage that may arise from your use of them.
 
   6.8  Save as set out in clause 6.1 above, our maximum liability to you under this EULA is £100.
 
