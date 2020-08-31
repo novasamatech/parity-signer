@@ -20,7 +20,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
-import { NetworkParams } from 'types/networkSpecsTypes';
+import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';

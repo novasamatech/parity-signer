@@ -26,7 +26,7 @@ import {
 	NetworkParams,
 	SubstrateNetworkBasics,
 	SubstrateNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 
 export const filterSubstrateNetworks = (
 	networkList: Record<string, NetworkParams>,

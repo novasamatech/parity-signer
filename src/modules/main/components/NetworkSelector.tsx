@@ -31,7 +31,7 @@ import {
 	isSubstrateNetworkParams,
 	NetworkParams,
 	SubstrateNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';

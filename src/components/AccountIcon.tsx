@@ -23,7 +23,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import colors from 'styles/colors';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import { blockiesIcon } from 'utils/native';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 
 export default function AccountIcon(props: {
 	address: string;

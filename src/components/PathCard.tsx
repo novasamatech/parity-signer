@@ -36,7 +36,7 @@ import {
 	isSubstrateNetworkParams,
 	isUnknownNetworkParams,
 	SubstrateNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 import { ButtonListener } from 'types/props';
 import {
 	getAddressWithPath,

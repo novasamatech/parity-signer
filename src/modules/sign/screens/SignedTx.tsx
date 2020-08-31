@@ -23,7 +23,7 @@ import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';

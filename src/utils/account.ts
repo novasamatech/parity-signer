@@ -20,7 +20,7 @@ import {
 	EthereumNetworkParams,
 	isSubstrateNetworkParams,
 	isUnknownNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 import { ValidSeed } from 'types/utilTypes';
 import { getNetworkParams } from 'utils/identitiesUtils';
 

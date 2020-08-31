@@ -24,7 +24,7 @@ import {
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
-import { NetworkParams } from 'types/networkSpecsTypes';
+import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';

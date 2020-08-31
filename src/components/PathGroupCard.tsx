@@ -37,7 +37,7 @@ import {
 	isUnknownNetworkParams,
 	SubstrateNetworkParams,
 	UnknownNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 import { removeSlash } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';

@@ -22,7 +22,7 @@ import { AccountsContext } from 'stores/AccountsContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { FoundIdentityAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import { isEthereumNetworkParams } from 'types/networkTypes';
 import { RootStackParamList } from 'types/routes';
 import {
 	CompletedParsedData,

@@ -28,7 +28,7 @@ import React, { useReducer } from 'react';
 import { AccountsContextState } from 'stores/AccountsContext';
 import { NETWORK_LIST } from 'constants/networkSpecs';
 import { Account, FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkSpecsTypes';
+import { isEthereumNetworkParams } from 'types/networkTypes';
 import {
 	CompletedParsedData,
 	EthereumParsedData,

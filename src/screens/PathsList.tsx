@@ -29,7 +29,7 @@ import testIDs from 'e2e/testIDs';
 import {
 	isEthereumNetworkParams,
 	isUnknownNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import {

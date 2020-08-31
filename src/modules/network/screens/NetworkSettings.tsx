@@ -21,7 +21,7 @@ import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { NetworkCard } from 'components/AccountCard';
 import { filterSubstrateNetworks } from 'modules/network/utils';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';

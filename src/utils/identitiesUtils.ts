@@ -19,7 +19,7 @@ import { decryptData, substrateAddress } from './native';
 import { constructSURI, parseSURI } from './suri';
 import { generateAccountId } from './account';
 
-import { NetworkParams } from 'types/networkSpecsTypes';
+import { NetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	NETWORK_LIST,
