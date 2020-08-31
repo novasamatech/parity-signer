@@ -7,14 +7,29 @@ export type NetworkParams =
 	| EthereumNetworkParams
 	| UnknownNetworkParams;
 
-export type SubstrateNetworkBasics = {
-	color?: string;
-	decimals?: number;
+export type SubstrateNetworkDefaultConstant = {
+	color: string;
+	decimals: number;
 	genesisHash: string;
 	logo?: number;
+	order: number;
 	pathId: string;
 	protocol?: NetworkProtocol;
-	prefix?: number;
+	prefix: number;
+	secondaryColor?: string;
+	title: string;
+	unit: string;
+};
+
+export type SubstrateNetworkBasics = {
+	color?: string;
+	decimals: number;
+	deleted?: boolean;
+	genesisHash: string;
+	order?: number;
+	pathId: string;
+	protocol?: NetworkProtocol;
+	prefix: number;
 	secondaryColor?: string;
 	title: string;
 	unit: string;
@@ -32,6 +47,16 @@ export type SubstrateNetworkParams = {
 	secondaryColor: string;
 	title: string;
 	unit: string;
+};
+
+export type EthereumNetworkDefaultConstants = {
+	color?: string;
+	ethereumChainId: string;
+	logo?: number;
+	order: number;
+	protocol?: NetworkProtocol;
+	secondaryColor?: string;
+	title: string;
 };
 
 export type EthereumNetworkParams = {

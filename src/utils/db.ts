@@ -20,11 +20,26 @@ import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
-import { SubstrateNetworkParams } from 'types/networkSpecsTypes';
+import { deserializeNetworks, mergeNetworks } from 'utils/networksUtils';
+import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
+import {
+	SubstrateNetworkBasics,
+	SubstrateNetworkParams
+} from 'types/networkTypes';
 import { defaultNetworkSpecs } from 'modules/network/utils';
 import { Account, Identity } from 'types/identityTypes';
 import { Tx, TxParticipant } from 'types/tx';
 
+function handleError(e: Error, label: string): any[] {
+	console.warn(`loading ${label} error`, e);
+	return [];
+}
+
+/*
+ * ========================================
+ *	Accounts Store
+ * ========================================
+ */
 const currentAccountsStore = {
 	keychainService: 'accounts_v3',
 	sharedPreferencesName: 'accounts_v3'
@@ -55,6 +70,11 @@ export async function loadAccounts(version = 3): Promise<Map<string, any>> {
 	);
 }
 
+/*
+ * ========================================
+ *	Identities Store
+ * ========================================
+ */
 const identitiesStore = {
 	keychainService: 'parity_signer_identities',
 	sharedPreferencesName: 'parity_signer_identities'
@@ -62,11 +82,6 @@ const identitiesStore = {
 const currentIdentityStorageLabel = 'identities_v4';
 
 export async function loadIdentities(version = 4): Promise<Identity[]> {
-	function handleError(e: Error): Identity[] {
-		console.warn('loading identities error', e);
-		return [];
-	}
-
 	const identityStorageLabel = `identities_v${version}`;
 	try {
 		const identities = await SecureStorage.getItem(
@@ -76,7 +91,7 @@ export async function loadIdentities(version = 4): Promise<Identity[]> {
 		if (!identities) return [];
 		return deserializeIdentities(identities);
 	} catch (e) {
-		return handleError(e);
+		return handleError(e, 'identity');
 	}
 }
 
@@ -87,6 +102,56 @@ export const saveIdentities = (identities: Identity[]): void => {
 		identitiesStore
 	);
 };
+
+/*
+ * ========================================
+ *	Networks Store
+ * ========================================
+ */
+const networkStorage = {
+	keychainService: 'parity_signer_networks',
+	sharedPreferencesName: 'parity_signer_networks'
+};
+const currentNetworkStorageLabel = 'networks_v4';
+
+export async function loadNetworks(): Promise<
+	Map<string, SubstrateNetworkParams>
+> {
+	try {
+		const networksJson = await SecureStorage.getItem(
+			currentNetworkStorageLabel,
+			networkStorage
+		);
+		if (!networksJson) return new Map();
+		const networksEntries = JSON.parse(networksJson);
+		return mergeNetworks(SUBSTRATE_NETWORK_LIST, networksEntries);
+	} catch (e) {
+		handleError(e, 'networks');
+		return new Map();
+	}
+}
+
+/*
+ * ========================================
+ *	Privacy Policy and Terms Conditions Store
+ * ========================================
+ */
+
+export async function loadToCAndPPConfirmation(): Promise<boolean> {
+	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v4');
+
+	return !!result;
+}
+
+export async function saveToCAndPPConfirmation(): Promise<void> {
+	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
+}
+
+/*
+ * ========================================
+ *	Tx Store (Archived)
+ * ========================================
+ */
 
 function accountTxsKey({
 	address,
@@ -161,53 +226,43 @@ export async function loadAccountTxs(
 	).map((v: [string, any]) => [v[0], JSON.parse(v[1])]);
 }
 
-export async function loadToCAndPPConfirmation(): Promise<boolean> {
-	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v4');
-
-	return !!result;
-}
-
-export async function saveToCAndPPConfirmation(): Promise<void> {
-	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
-}
-
 /*
  * ========================================
  *	NETWORK SPECS
  * ========================================
  */
 
-const networkSpecsStorageLabel = 'network_specs_v4';
-
-/*
- * save the new network specs array
- */
-export function saveNetworkSpecs(networkSpecs: SubstrateNetworkParams[]): void {
-	AsyncStorage.setItem(networkSpecsStorageLabel, JSON.stringify(networkSpecs));
-}
-
-/*
- * get all the network specs
- */
-export async function getNetworkSpecs(): Promise<SubstrateNetworkParams[]> {
-	let networkSpecs;
-	try {
-		const networkSpecsString = await AsyncStorage.getItem(
-			networkSpecsStorageLabel
-		);
-		networkSpecs = JSON.parse(networkSpecsString ?? '');
-	} catch (e) {
-		console.warn('loading network specifications error', e);
-	}
-	if (networkSpecs === null) return defaultNetworkSpecs();
-
-	return JSON.parse(networkSpecs ?? '');
-}
-
-/*
- * Called once during onboarding. Populate the local storage with the default network specs.
- */
-export async function saveDefaultNetworks(): Promise<void> {
-	const networkSpecsString = JSON.stringify(defaultNetworkSpecs());
-	// AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecsString);
-}
+// const networkSpecsStorageLabel = 'network_specs_v4';
+//
+// /*
+//  * save the new network specs array
+//  */
+// export function saveNetworkSpecs(networkSpecs: SubstrateNetworkParams[]): void {
+// 	AsyncStorage.setItem(networkSpecsStorageLabel, JSON.stringify(networkSpecs));
+// }
+//
+// /*
+//  * get all the network specs
+//  */
+// export async function getNetworkSpecs(): Promise<SubstrateNetworkParams[]> {
+// 	let networkSpecs;
+// 	try {
+// 		const networkSpecsString = await AsyncStorage.getItem(
+// 			networkSpecsStorageLabel
+// 		);
+// 		networkSpecs = JSON.parse(networkSpecsString ?? '');
+// 	} catch (e) {
+// 		console.warn('loading network specifications error', e);
+// 	}
+// 	if (networkSpecs === null) return defaultNetworkSpecs();
+//
+// 	return JSON.parse(networkSpecs ?? '');
+// }
+//
+// /*
+//  * Called once during onboarding. Populate the local storage with the default network specs.
+//  */
+// export async function saveDefaultNetworks(): Promise<void> {
+// 	const networkSpecsString = JSON.stringify(defaultNetworkSpecs());
+// 	// AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecsString);
+// }
