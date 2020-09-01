@@ -30,16 +30,22 @@ export const mergeNetworks = (
 			acc,
 			[networkKey, networkParams]
 		): Record<string, SubstrateNetworkParams> => {
+			const newNetworksList = Object.assign({}, acc);
 			if (!defaultNetworks.hasOwnProperty(networkKey)) {
-				acc[networkKey] = {
+				// const newAcc = Object.assign({}, acc);
+				newNetworksList[networkKey] = {
 					...networkParams,
 					logo: require('res/img/logos/Substrate_Dev.png')
 				};
-				return acc;
+				return newNetworksList;
 			}
+
 			const defaultParams = defaultNetworks[networkKey];
-			acc[networkKey] = { ...networkParams, logo: defaultParams.logo };
-			return acc;
+			newNetworksList[networkKey] = {
+				...networkParams,
+				logo: defaultParams.logo
+			};
+			return newNetworksList;
 		},
 		defaultNetworks
 	);

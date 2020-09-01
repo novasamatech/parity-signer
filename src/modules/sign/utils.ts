@@ -80,7 +80,6 @@ export function useProcessBarCode(
 	async function parseQrData(
 		txRequestData: TxRequestData
 	): Promise<ParsedData> {
-		console.log('txrequest data is', txRequestData);
 		if (isAddressString(txRequestData.data)) {
 			throw new Error(strings.ERROR_ADDRESS_MESSAGE);
 		} else if (isJsonString(txRequestData.data)) {

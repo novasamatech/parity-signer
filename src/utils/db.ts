@@ -105,8 +105,8 @@ export const saveIdentities = (identities: Identity[]): void => {
  * ========================================
  */
 const networkStorage = {
-	keychainService: 'parity_signer_networks',
-	sharedPreferencesName: 'parity_signer_networks'
+	keychainService: 'parity_signer_updated_networks',
+	sharedPreferencesName: 'parity_signer_updated_networks'
 };
 const currentNetworkStorageLabel = 'networks_v4';
 
@@ -114,12 +114,11 @@ export async function loadNetworks(): Promise<
 	Map<string, SubstrateNetworkParams>
 > {
 	try {
-		console.log('start load');
 		const networksJson = await SecureStorage.getItem(
 			currentNetworkStorageLabel,
 			networkStorage
 		);
-		console.log('start finished with json', networksJson);
+
 		if (!networksJson) return new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
 		const networksEntries = JSON.parse(networksJson);
 		return mergeNetworks(SUBSTRATE_NETWORK_LIST, networksEntries);
@@ -130,12 +129,20 @@ export async function loadNetworks(): Promise<
 }
 
 export async function saveNetworks(
-	networks: Map<string, SubstrateNetworkParams>
+	newNetwork: SubstrateNetworkParams
 ): Promise<void> {
 	try {
+		let addedNetworks = new Map();
+		const addedNetworkJson = await SecureStorage.getItem(
+			currentNetworkStorageLabel,
+			networkStorage
+		);
+		if (addedNetworkJson) addedNetworks = new Map(JSON.parse(addedNetworkJson));
+
+		addedNetworks.set(newNetwork.genesisHash, newNetwork);
 		SecureStorage.setItem(
 			currentNetworkStorageLabel,
-			serializeNetworks(networks),
+			serializeNetworks(addedNetworks),
 			networkStorage
 		);
 	} catch (e) {
