@@ -19,7 +19,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
-import {NetworksContext} from 'stores/NetworkContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
@@ -48,7 +48,7 @@ export default function AccountNew({
 	navigation
 }: NavigationProps<'AccountNew'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const {getNetwork} = useContext(NetworksContext);
+	const { getNetwork } = useContext(NetworksContext);
 
 	const initialState = {
 		derivationPassword: '',

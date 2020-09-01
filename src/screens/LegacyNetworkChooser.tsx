@@ -23,7 +23,7 @@ import {
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
-import {NetworksContext} from 'stores/NetworkContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -35,7 +35,7 @@ export default function LegacyNetworkChooserView({
 	navigation
 }: NavigationProps<'LegacyNetworkChooser'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const {allNetworks} = useContext(NetworksContext);
+	const { allNetworks } = useContext(NetworksContext);
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 
 	if (!__DEV__) {

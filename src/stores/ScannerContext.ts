@@ -26,7 +26,7 @@ import {
 import React, { useReducer } from 'react';
 
 import { AccountsContextState } from 'stores/AccountsContext';
-import {ETHEREUM_NETWORK_LIST} from 'constants/networkSpecs';
+import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
 import { GetNetwork, NetworksContextState } from 'stores/NetworkContext';
 import { Account, FoundAccount } from 'types/identityTypes';
 import {

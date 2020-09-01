@@ -99,7 +99,9 @@ export default function PathCard({
 	const isUnknownAddress = address === '';
 	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
 	const networkParams =
-		computedNetworkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress && !allNetworks.has(computedNetworkKey)
+		computedNetworkKey === UnknownNetworkKeys.UNKNOWN &&
+		!isUnknownAddress &&
+		!allNetworks.has(computedNetworkKey)
 			? NETWORK_LIST[defaultNetworkKey]
 			: allNetworks.get(computedNetworkKey)!;
 
