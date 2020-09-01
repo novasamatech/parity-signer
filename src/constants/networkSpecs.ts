@@ -70,7 +70,7 @@ export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
 });
 
-const unknownNetworkParams = {
+export const unknownNetworkParams: UnknownNetworkParams = {
 	color: colors.signal.error,
 	order: 99,
 	pathId: unknownNetworkPathId,
@@ -83,6 +83,7 @@ const unknownNetworkParams = {
 export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	...unknownNetworkParams,
 	decimals: 12,
+	deleted: false,
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
@@ -234,6 +235,7 @@ const ethereumDefaultValues = {
 
 const substrateDefaultValues = {
 	color: '#4C4646',
+	deleted: false,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
 	secondaryColor: colors.background.card

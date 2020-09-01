@@ -10,6 +10,7 @@ export type NetworkParams =
 export type SubstrateNetworkDefaultConstant = {
 	color: string;
 	decimals: number;
+	deleted?: boolean;
 	genesisHash: string;
 	logo?: number;
 	order: number;
@@ -38,6 +39,7 @@ export type SubstrateNetworkBasics = {
 export type SubstrateNetworkParams = {
 	color: string;
 	decimals: number;
+	deleted: boolean;
 	genesisHash: string;
 	logo: number;
 	order: number;

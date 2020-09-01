@@ -22,11 +22,7 @@ import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 import { deserializeNetworks, mergeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
-import {
-	NetworkParams,
-	SubstrateNetworkBasics,
-	SubstrateNetworkParams
-} from 'types/networkTypes';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
 import { Tx, TxParticipant } from 'types/tx';
 

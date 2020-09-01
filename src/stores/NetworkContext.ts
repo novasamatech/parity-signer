@@ -19,10 +19,17 @@ import { default as React, useEffect, useMemo, useState } from 'react';
 import {
 	dummySubstrateNetworkParams,
 	ETHEREUM_NETWORK_LIST,
+	UnknownNetworkKeys,
+	unknownNetworkParams,
 	unknownNetworkPathId
 } from 'constants/networkSpecs';
 import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
+import { NetworkParsedData } from 'types/scannerTypes';
 import { loadNetworks } from 'utils/db';
+import {
+	deepCopyNetworks,
+	generateNetworkParamsFromParsedData
+} from 'utils/networksUtils';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
@@ -33,16 +40,13 @@ export type GetSubstrateNetwork = (
 	networkKey: string
 ) => SubstrateNetworkParams;
 export type NetworksContextState = {
+	addNetwork(networkParsedData: NetworkParsedData): void;
 	networks: Map<string, SubstrateNetworkParams>;
 	allNetworks: Map<string, NetworkParams>;
 	getSubstrateNetwork: GetSubstrateNetwork;
 	getNetwork: GetNetwork;
 	pathIds: string[];
 };
-
-const deepCopy = (
-	networkSpecs: Array<SubstrateNetworkParams>
-): Array<SubstrateNetworkParams> => JSON.parse(JSON.stringify(networkSpecs));
 
 export function useNetworksContext(): NetworksContextState {
 	const [substrateNetworks, setSubstrateNetworks] = useState<
@@ -52,9 +56,11 @@ export function useNetworksContext(): NetworksContextState {
 		const ethereumNetworks: Map<string, NetworkParams> = new Map(
 			Object.entries(ETHEREUM_NETWORK_LIST)
 		);
-		const all = new Map([...ethereumNetworks, ...substrateNetworks]);
-		console.log('all is', all);
-		return all;
+		return new Map([
+			...ethereumNetworks,
+			...substrateNetworks,
+			[UnknownNetworkKeys.UNKNOWN, unknownNetworkParams]
+		]);
 	}, [substrateNetworks]);
 
 	const pathIds = useMemo(() => {
@@ -84,55 +90,19 @@ export function useNetworksContext(): NetworksContextState {
 		return allNetworks.get(networkKey) || dummySubstrateNetworkParams;
 	}
 
-	// async function submitNewNetworkSpec(): Promise<void> {
-	// 	if (newNetworkSpecs === null)
-	// 		throw new Error('NetworkKey is not initialized.');
-	//
-	// 	checkNewNetworkSpecs(newNetworkSpecs);
-	// 	const updatedNetworkSpecs = deepCopy(networkSpecs);
-	// 	const networkIndex = updatedNetworkSpecs.findIndex(
-	// 		networkSpec => networkSpec.genesisHash === newNetworkSpecs.genesisHash
-	// 	);
-	// 	const completeNetworkSpec = getCompleteSubstrateNetworkSpec(
-	// 		newNetworkSpecs
-	// 	);
-	// 	if (networkIndex === -1) {
-	// 		updatedNetworkSpecs.push(completeNetworkSpec);
-	// 	} else {
-	// 		updatedNetworkSpecs.splice(networkIndex, 1, completeNetworkSpec);
-	// 	}
-	//
-	// 	setNetworkSpecs(updatedNetworkSpecs);
-	// 	setNewNetworkSpecs(defaultState.newNetworkSpecs);
-	//
-	// 	try {
-	// 		await saveNetworkSpecs(updatedNetworkSpecs);
-	// 	} catch (e) {
-	// 		//TODO give feedback to UI
-	// 		console.error(e);
-	// 	}
-	// }
-	//
-	// async function deleteNetwork(networkKey: string): Promise<void> {
-	// 	const updatedNetworkSpecs = deepCopy(networkSpecs);
-	// 	const networkIndex = updatedNetworkSpecs.findIndex(
-	// 		networkSpec => networkSpec.genesisHash === networkKey
-	// 	);
-	// 	if (networkIndex === -1) return;
-	//
-	// 	updatedNetworkSpecs.splice(networkIndex, 1);
-	// 	setNetworkSpecs(networkSpecs);
-	//
-	// 	try {
-	// 		await saveNetworkSpecs(updatedNetworkSpecs);
-	// 	} catch (e) {
-	// 		//TODO give feedback to UI
-	// 		console.error(e);
-	// 	}
-	// }
+	function addNetwork(networkParsedData: NetworkParsedData): void {
+		const newNetworkParams = generateNetworkParamsFromParsedData(
+			networkParsedData
+		);
+		const networkKey = newNetworkParams.genesisHash;
+		const newNetworksList = deepCopyNetworks(substrateNetworks);
+		newNetworksList.set(networkKey, newNetworkParams);
+		setSubstrateNetworks(newNetworksList);
+	}
 
 	return {
-		allNetworks: allNetworks,
+		addNetwork,
+		allNetworks,
 		getNetwork,
 		getSubstrateNetwork: getSubstrateNetworkParams,
 		networks: substrateNetworks,

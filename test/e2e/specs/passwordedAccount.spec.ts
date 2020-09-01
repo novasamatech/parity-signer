@@ -51,7 +51,7 @@ describe('passworded account test', () => {
 
 	describe('Kusama signing Test', () => {
 		it('should sign the set remarks request', async () => {
-			await launchWithScanRequest(ScanTestRequest.passwordedAccountExtrinsic);
+			await launchWithScanRequest(ScanTestRequest.PasswordedAccountExtrinsic);
 			await testTap(SecurityHeader.scanButton);
 			await testInputWithDone(IdentityPin.unlockPinInput, pinCode);
 			await testInput(IdentityPin.passwordInput, password);

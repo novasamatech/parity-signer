@@ -9,7 +9,9 @@ const strings = {
 	ERROR_TITLE: 'Unable to parse QR data',
 	INFO_ETH_TX: 'You are about to send the following amount',
 	INFO_MULTI_PART:
-		'You are about to send the following extrinsic. We will sign the hash of the payload as it is oversized.'
+		'You are about to send the following extrinsic. We will sign the hash of the payload as it is oversized.',
+	SUCCESS_ADD_NETWORK: 'Successfully updated new network: ',
+	SUCCESS_TITLE: 'Success'
 };
 
 export default strings;

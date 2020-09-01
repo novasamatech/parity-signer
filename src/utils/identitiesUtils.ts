@@ -68,7 +68,6 @@ export const extractPathId = (path: string, pathIds: string[]): string => {
 			return targetPathId;
 		}
 	}
-	debugger;
 	return unknownNetworkPathId;
 };
 

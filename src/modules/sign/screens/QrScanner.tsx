@@ -30,10 +30,11 @@ import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
+import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 
-export default function Scanner({}: NavigationProps<
-	'QrScanner'
->): React.ReactElement {
+export default function Scanner({
+	navigation
+}: NavigationProps<'QrScanner'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const networksContextState = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertStateContext);
@@ -47,23 +48,40 @@ export default function Scanner({}: NavigationProps<
 		missingFramesMessage: '',
 		totalFramesCount: 0
 	});
-	function showErrorMessage(title: string, message: string): void {
+	function showAlertMessage(
+		title: string,
+		message: string,
+		isSuccess?: boolean
+	): void {
+		const clearByTap = async (): Promise<void> => {
+			scannerStore.cleanup();
+			scannerStore.setReady();
+			setLastFrame(null);
+			setEnableScan(true);
+		};
 		setEnableScan(false);
-		setAlert(title, message, [
-			{
-				onPress: async (): Promise<void> => {
-					scannerStore.cleanup();
-					scannerStore.setReady();
-					setLastFrame(null);
-					setEnableScan(true);
-				},
-				text: 'Try again'
-			}
-		]);
+		if (isSuccess) {
+			setAlert(title, message, [
+				{
+					onPress: clearByTap,
+					text: 'Try again'
+				}
+			]);
+		} else {
+			setAlert(title, message, [
+				{
+					onPress: async () => {
+						await clearByTap();
+						navigateToNetworkSettings(navigation);
+					},
+					text: 'Done'
+				}
+			]);
+		}
 	}
 
 	const processBarCode = useProcessBarCode(
-		showErrorMessage,
+		showAlertMessage,
 		networksContextState
 	);
 	// useEffect((): (() => void) => {

@@ -46,13 +46,13 @@ const pathIds = Object.values(SUBSTRATE_NETWORK_LIST)
 const getNetwork = allNetworks.get as GetNetwork;
 const getSubstrateNetwork = networks.get as GetSubstrateNetwork;
 
-const dummyNetworkContext: NetworksContextState = {
+const dummyNetworkContext = {
 	allNetworks,
 	getNetwork,
 	getSubstrateNetwork,
 	networks,
 	pathIds
-};
+} as NetworksContextState;
 
 const raw = [
 	{

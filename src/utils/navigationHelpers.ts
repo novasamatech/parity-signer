@@ -252,6 +252,12 @@ export const resetNavigationWithScanner = <
 	navigation.dispatch(resetAction);
 };
 
+export const navigateToNetworkSettings = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
+): void => resetNavigationWithNetworkChooser(navigation, 'NetworkSettings');
+
 export const navigateToPathsList = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>,
 	networkKey: string

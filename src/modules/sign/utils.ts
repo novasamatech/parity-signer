@@ -27,10 +27,14 @@ import { isEthereumNetworkParams } from 'types/networkTypes';
 import { RootStackParamList } from 'types/routes';
 import {
 	CompletedParsedData,
+	EthereumParsedData,
 	isMultiFramesInfo,
 	isMultipartData,
+	isNetworkParsedData,
+	NetworkParsedData,
 	ParsedData,
 	QrInfo,
+	SubstrateParsedData,
 	TxRequestData
 } from 'types/scannerTypes';
 import {
@@ -57,7 +61,11 @@ function getSeedRef(
 }
 
 export function useProcessBarCode(
-	showErrorMessage: (title: string, message: string) => void,
+	showAlertMessage: (
+		title: string,
+		message: string,
+		isSuccess?: boolean
+	) => void,
 	networksContextState: NetworksContextState
 ): (txRequestData: TxRequestData) => Promise<void> {
 	const { allNetworks, networks } = networksContextState;
@@ -72,11 +80,20 @@ export function useProcessBarCode(
 	async function parseQrData(
 		txRequestData: TxRequestData
 	): Promise<ParsedData> {
+		console.log('txrequest data is', txRequestData);
 		if (isAddressString(txRequestData.data)) {
 			throw new Error(strings.ERROR_ADDRESS_MESSAGE);
 		} else if (isJsonString(txRequestData.data)) {
+			// Add Network
+			const parsedJsonData = JSON.parse(txRequestData.data);
+			if (parsedJsonData.hasOwnProperty('genesisHash')) {
+				return {
+					action: 'addNetwork',
+					data: parsedJsonData
+				} as NetworkParsedData;
+			}
 			// Ethereum Legacy
-			return JSON.parse(txRequestData.data);
+			return parsedJsonData;
 		} else if (!scannerStore.state.multipartComplete) {
 			const strippedData = rawDataToU8A(txRequestData.rawData);
 			if (strippedData === null) throw new Error(strings.ERROR_NO_RAW_DATA);
@@ -92,7 +109,7 @@ export function useProcessBarCode(
 	}
 
 	async function checkMultiFramesData(
-		parsedData: ParsedData
+		parsedData: SubstrateParsedData | EthereumParsedData
 	): Promise<null | CompletedParsedData> {
 		if (isMultipartData(parsedData)) {
 			const multiFramesResult = await scannerStore.setPartData(
@@ -173,7 +190,7 @@ export function useProcessBarCode(
 	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
 		const { sender, type } = qrInfo;
 		if (!sender)
-			return showErrorMessage(
+			return showAlertMessage(
 				strings.ERROR_TITLE,
 				strings.ERROR_NO_SENDER_FOUND
 			);
@@ -201,9 +218,21 @@ export function useProcessBarCode(
 		}
 	}
 
+	function addNewNetwork(networkParsedData: NetworkParsedData) {
+		networksContextState.addNetwork(networkParsedData);
+		return showAlertMessage(
+			strings.SUCCESS_TITLE,
+			strings.SUCCESS_ADD_NETWORK + networkParsedData.data.title
+		);
+	}
+
 	async function processBarCode(txRequestData: TxRequestData): Promise<void> {
 		try {
 			const parsedData = await parseQrData(txRequestData);
+			if (isNetworkParsedData(parsedData)) {
+				addNewNetwork(parsedData);
+				return;
+			}
 			const unsignedData = await checkMultiFramesData(parsedData);
 			if (unsignedData === null) return;
 			const qrInfo = await scannerStore.setData(
@@ -214,7 +243,7 @@ export function useProcessBarCode(
 			await unlockAndNavigationToSignedQR(qrInfo);
 			scannerStore.clearMultipartProgress();
 		} catch (e) {
-			return showErrorMessage(strings.ERROR_TITLE, e.message);
+			return showAlertMessage(strings.ERROR_TITLE, e.message);
 		}
 	}
 

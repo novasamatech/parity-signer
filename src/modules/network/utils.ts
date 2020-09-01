@@ -80,6 +80,7 @@ export function getCompleteSubstrateNetworkSpec(
 	const defaultNewNetworkSpecParams = {
 		color: generateRandomColor(),
 		decimals: defaultNetworkSpec.decimals,
+		deleted: false,
 		logo: defaultNetworkSpec.logo,
 		order: 102, //TODO
 		prefix: defaultNetworkSpec.prefix,
