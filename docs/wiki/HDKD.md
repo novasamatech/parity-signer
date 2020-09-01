@@ -16,7 +16,7 @@ In the v4 version, the data schema is significantly refactored in order to suppo
 
 Furthermore, in the new Identity schema, we support hard spoon network in the Substrate network like Kusama, since the Substrate keypairs/accounts generated on Signer will decouple with network's genesisHash, but will use the path as identifier of their networks. From network genesisHash and path's meta data, the `accountId` is generated for signing.
 ```javascript
- const networkParams = getNetwork(meta.path)
+ const networkParams = getSubstrateNetworkParams(meta.path)
  const accountId = getAccountId(meta.address, networkParams.genesisHash)
 ```
 Once the network is hard-spooned, users just need to update network params by scanning QR code, without requring new version of the Signer.

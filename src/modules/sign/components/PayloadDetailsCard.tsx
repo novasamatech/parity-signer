@@ -24,9 +24,9 @@ import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { RegistriesStoreState } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
-import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';
 import fontStyles from 'styles/fontStyles';
@@ -57,12 +57,14 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const [tip, setTip] = useState<string>();
 		const [useFallback, setUseFallBack] = useState(false);
 		const { setAlert } = useContext(AlertStateContext);
-		const prefix = SUBSTRATE_NETWORK_LIST[networkKey].prefix;
+		const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+		const networkParams = getSubstrateNetwork(networkKey);
+		const prefix = networkParams.prefix;
 
 		useEffect(() => {
 			if (label === 'Method' && !fallback) {
 				try {
-					const registry = registriesStore.get(networkKey);
+					const registry = registriesStore.get(networks, networkKey);
 					const call = registry.createType('Call', value);
 
 					const methodArgs = {};
@@ -130,7 +132,16 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			if (label === 'Tip' && !fallback) {
 				setTip(formatBalance(value as any));
 			}
-		}, [fallback, label, prefix, value, networkKey, registriesStore, setAlert]);
+		}, [
+			fallback,
+			label,
+			prefix,
+			value,
+			networkKey,
+			registriesStore,
+			setAlert,
+			networks
+		]);
 
 		const renderEraDetails = (): React.ReactElement => {
 			if (period && phase) {
@@ -255,79 +266,67 @@ interface PayloadDetailsCardProps {
 	networkKey: string;
 }
 
-export default class PayloadDetailsCard extends React.PureComponent<
-	PayloadDetailsCardProps,
-	{
-		fallback: boolean;
-	}
-> {
-	constructor(props: PayloadDetailsCardProps) {
-		super(props);
-		const { networkKey } = this.props;
-		const isKnownNetworkKey = SUBSTRATE_NETWORK_LIST.hasOwnProperty(networkKey);
+export default function PayloadDetailsCard(
+	props: PayloadDetailsCardProps
+): React.ReactElement {
+	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+	const { networkKey, description, payload, signature, style } = props;
+	const isKnownNetworkKey = networks.has(networkKey);
+	const fallback = !isKnownNetworkKey;
+	const networkParams = getSubstrateNetwork(networkKey);
 
-		if (isKnownNetworkKey) {
-			formatBalance.setDefaults({
-				decimals: SUBSTRATE_NETWORK_LIST[networkKey].decimals,
-				unit: SUBSTRATE_NETWORK_LIST[networkKey].unit
-			});
-		}
-
-		this.state = {
-			fallback: !isKnownNetworkKey
-		};
+	if (isKnownNetworkKey) {
+		formatBalance.setDefaults({
+			decimals: networkParams.decimals,
+			unit: networkParams.unit
+		});
 	}
 
-	render(): React.ReactElement {
-		const { fallback } = this.state;
-		const { description, payload, networkKey, signature, style } = this.props;
-
-		return (
-			<View style={[styles.body, style]}>
-				{!!description && <Text style={styles.titleText}>{description}</Text>}
-				{!!payload && (
-					<View style={styles.extrinsicContainer}>
-						<ExtrinsicPart
-							label="Method"
-							networkKey={networkKey}
-							value={fallback ? payload.method.toString() : payload.method}
-						/>
-						<ExtrinsicPart
-							label="Block Hash"
-							networkKey={networkKey}
-							value={payload.blockHash.toString()}
-						/>
-						<ExtrinsicPart
-							label="Era"
-							networkKey={networkKey}
-							value={fallback ? payload.era.toString() : payload.era}
-						/>
-						<ExtrinsicPart
-							label="Nonce"
-							networkKey={networkKey}
-							value={payload.nonce.toString()}
-						/>
-						<ExtrinsicPart
-							label="Tip"
-							networkKey={networkKey}
-							value={payload.tip.toString()}
-						/>
-						<ExtrinsicPart
-							label="Genesis Hash"
-							networkKey={networkKey}
-							value={payload.genesisHash.toString()}
-						/>
-					</View>
-				)}
-				{!!signature && (
-					<View style={styles.extrinsicContainer}>
-						<Text style={styles.label}>Signature</Text>
-						<Text style={styles.secondaryText}>{signature}</Text>
-					</View>
-				)}
-			</View>
-		);
-	}
+	return (
+		<View style={[styles.body, style]}>
+			{!!description && <Text style={styles.titleText}>{description}</Text>}
+			{!!payload && (
+				<View style={styles.extrinsicContainer}>
+					<ExtrinsicPart
+						label="Method"
+						networkKey={networkKey}
+						value={fallback ? payload.method.toString() : payload.method}
+					/>
+					<ExtrinsicPart
+						label="Block Hash"
+						networkKey={networkKey}
+						value={payload.blockHash.toString()}
+					/>
+					<ExtrinsicPart
+						label="Era"
+						networkKey={networkKey}
+						value={fallback ? payload.era.toString() : payload.era}
+					/>
+					<ExtrinsicPart
+						label="Nonce"
+						networkKey={networkKey}
+						value={payload.nonce.toString()}
+					/>
+					<ExtrinsicPart
+						label="Tip"
+						networkKey={networkKey}
+						value={payload.tip.toString()}
+					/>
+					<ExtrinsicPart
+						label="Genesis Hash"
+						networkKey={networkKey}
+						value={payload.genesisHash.toString()}
+					/>
+				</View>
+			)}
+			{!!signature && (
+				<View style={styles.extrinsicContainer}>
+					<Text style={styles.label}>Signature</Text>
+					<Text style={styles.secondaryText}>{signature}</Text>
+				</View>
+			)}
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({

@@ -89,7 +89,7 @@ export default function PathGroupCard({
 			await accountsStore.deriveNewPath(
 				nextPath,
 				substrateAddress,
-				(networkParams as SubstrateNetworkParams).genesisHash,
+				networkParams as SubstrateNetworkParams,
 				name,
 				''
 			);

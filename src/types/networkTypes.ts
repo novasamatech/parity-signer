@@ -79,6 +79,9 @@ export type UnknownNetworkParams = {
 	title: string;
 };
 
+export type Networks = Map<string, NetworkParams>;
+export type SubstrateNetworks = Map<string, SubstrateNetworkParams>;
+
 export function isSubstrateNetworkParams(
 	networkParams:
 		| SubstrateNetworkParams

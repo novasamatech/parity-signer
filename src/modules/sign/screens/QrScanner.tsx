@@ -23,6 +23,7 @@ import Button from 'components/Button';
 import { useProcessBarCode } from 'modules/sign/utils';
 import { useInjectionQR } from 'e2e/injections';
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -34,6 +35,7 @@ export default function Scanner({}: NavigationProps<
 	'QrScanner'
 >): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
+	const networksContextState = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertStateContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
@@ -60,7 +62,10 @@ export default function Scanner({}: NavigationProps<
 		]);
 	}
 
-	const processBarCode = useProcessBarCode(showErrorMessage);
+	const processBarCode = useProcessBarCode(
+		showErrorMessage,
+		networksContextState
+	);
 	// useEffect((): (() => void) => {
 	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
 	// 		setLastFrame(null);

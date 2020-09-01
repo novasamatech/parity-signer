@@ -14,46 +14,65 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { useEffect, useState } from 'react';
+import { default as React, useEffect, useMemo, useState } from 'react';
 
 import {
-	SubstrateNetworkParams,
-	SubstrateNetworkBasics
-} from 'types/networkTypes';
-import {
-	getCompleteSubstrateNetworkSpec,
-	checkNewNetworkSpecs
-} from 'modules/network/utils';
+	dummySubstrateNetworkParams,
+	ETHEREUM_NETWORK_LIST
+} from 'constants/networkSpecs';
+import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
 import { loadNetworks } from 'utils/db';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
 // we will need the generate function to be standardized to take an ss58 check address and isSixPoint boolean flag and returns a Circle https://github.com/polkadot-js/ui/blob/ff351a0f3160552f38e393b87fdf6e85051270de/packages/ui-shared/src/polkadotIcon.ts#L12.
 
-type NetworkContextState = {
-	networkSpecs: Map<string, SubstrateNetworkParams>;
-};
-
-const defaultState: NetworkContextState = {
-	networkSpecs: new Map()
+export type GetNetwork = (networkKey: string) => NetworkParams;
+export type GetSubstrateNetwork = (
+	networkKey: string
+) => SubstrateNetworkParams;
+export type NetworksContextState = {
+	networks: Map<string, SubstrateNetworkParams>;
+	allNetworks: Map<string, NetworkParams>;
+	getSubstrateNetwork: GetSubstrateNetwork;
+	getNetwork: GetNetwork;
 };
 
 const deepCopy = (
 	networkSpecs: Array<SubstrateNetworkParams>
 ): Array<SubstrateNetworkParams> => JSON.parse(JSON.stringify(networkSpecs));
 
-export function useNetworksContext(): NetworkContextState {
-	const [networkSpecs, setNetworkSpecs] = useState<
+export function useNetworksContext(): NetworksContextState {
+	const [substrateNetworks, setSubstrateNetworks] = useState<
 		Map<string, SubstrateNetworkParams>
-	>(defaultState.networkSpecs);
+	>(new Map());
+	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
+		const ethereumNetworks: Map<string, NetworkParams> = new Map(
+			Object.entries(ETHEREUM_NETWORK_LIST)
+		);
+		const all = new Map([...ethereumNetworks, ...substrateNetworks]);
+		console.log('all is', all);
+		return all;
+	}, [substrateNetworks]);
 
 	useEffect(() => {
 		const refreshList = async function (): Promise<void> {
 			const initNetworkSpecs = await loadNetworks();
-			setNetworkSpecs(initNetworkSpecs);
+			setSubstrateNetworks(initNetworkSpecs);
+			console.log('loaded Networks are:', initNetworkSpecs);
 		};
 		refreshList();
 	}, []);
+
+	function getSubstrateNetworkParams(
+		networkKey: string
+	): SubstrateNetworkParams {
+		return substrateNetworks.get(networkKey) || dummySubstrateNetworkParams;
+	}
+
+	function getNetwork(networkKey: string): NetworkParams {
+		return allNetworks.get(networkKey) || dummySubstrateNetworkParams;
+	}
 
 	// async function submitNewNetworkSpec(): Promise<void> {
 	// 	if (newNetworkSpecs === null)
@@ -103,6 +122,11 @@ export function useNetworksContext(): NetworkContextState {
 	// }
 
 	return {
-		networkSpecs
+		allNetworks: allNetworks,
+		getNetwork,
+		getSubstrateNetwork: getSubstrateNetworkParams,
+		networks: substrateNetworks
 	};
 }
+
+export const NetworksContext = React.createContext({} as NetworksContextState);

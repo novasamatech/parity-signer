@@ -19,12 +19,14 @@ import { decryptData, substrateAddress } from './native';
 import { constructSURI, parseSURI } from './suri';
 import { generateAccountId } from './account';
 
-import { NetworkParams } from 'types/networkTypes';
+import { NetworksContextState } from 'stores/NetworkContext';
+import strings from 'modules/sign/strings';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
+	ETHEREUM_NETWORK_LIST,
 	NETWORK_LIST,
 	PATH_IDS_LIST,
-	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys,
 	unknownNetworkPathId
@@ -104,15 +106,18 @@ export const extractAddressFromAccountId = (id: string): string => {
 
 export const getAddressKeyByPath = (
 	path: string,
-	pathMeta: AccountMeta
+	pathMeta: AccountMeta,
+	networkContext: NetworksContextState
 ): string => {
+	const { networks, allNetworks } = networkContext;
 	const address = pathMeta.address;
 	return isSubstratePath(path)
 		? address
-		: generateAccountId({
+		: generateAccountId(
 				address,
-				networkKey: getNetworkKeyByPath(path, pathMeta)
-		  });
+				getNetworkKeyByPath(path, pathMeta, networks),
+				allNetworks
+		  );
 };
 
 export function emptyIdentity(): Identity {
@@ -170,11 +175,13 @@ export const deepCopyIdentity = (identity: Identity): Identity =>
 
 export const getPathsWithSubstrateNetworkKey = (
 	identity: Identity,
-	networkKey: string
+	networkKey: string,
+	networks: Map<string, SubstrateNetworkParams>
 ): string[] => {
 	const pathEntries = Array.from(identity.meta.entries());
-	const targetPathId =
-		SUBSTRATE_NETWORK_LIST[networkKey]?.pathId || unknownNetworkPathId;
+	const targetPathId = networks.has(networkKey)
+		? networks.get(networkKey)!.pathId
+		: unknownNetworkPathId;
 	const pathReducer = (
 		groupedPaths: string[],
 		[path, pathMeta]: [string, AccountMeta]
@@ -197,33 +204,45 @@ export const getPathsWithSubstrateNetworkKey = (
 	return pathEntries.reduce(pathReducer, []);
 };
 
-export const getNetworkKeyByPathId = (pathId: string): string => {
-	const networkKeyIndex = Object.values(SUBSTRATE_NETWORK_LIST).findIndex(
-		networkParams => networkParams.pathId === pathId
+export const getSubstrateNetworkKeyByPathId = (
+	pathId: string,
+	networks: Map<string, SubstrateNetworkParams>
+): string => {
+	const networkKeyIndex = Object.entries(networks).findIndex(
+		([, networkParams]) => networkParams.pathId === pathId
 	);
-	if (networkKeyIndex !== -1)
-		return Object.keys(SUBSTRATE_NETWORK_LIST)[networkKeyIndex];
+	if (networkKeyIndex !== -1) {
+		const findNetworkEntry: [string, SubstrateNetworkParams] = Object.entries(
+			networks
+		)[networkKeyIndex];
+		return findNetworkEntry[0];
+	}
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
-export const getNetworkKey = (path: string, identity: Identity): string => {
+export const getNetworkKey = (
+	path: string,
+	identity: Identity,
+	networks: Map<string, SubstrateNetworkParams>
+): string => {
 	if (identity.meta.has(path)) {
-		return getNetworkKeyByPath(path, identity.meta.get(path)!);
+		return getNetworkKeyByPath(path, identity.meta.get(path)!, networks);
 	}
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
 export const getNetworkKeyByPath = (
 	path: string,
-	pathMeta: AccountMeta
+	pathMeta: AccountMeta,
+	networks: Map<string, SubstrateNetworkParams>
 ): string => {
-	if (!isSubstratePath(path) && NETWORK_LIST.hasOwnProperty(path)) {
+	if (!isSubstratePath(path) && ETHEREUM_NETWORK_LIST.hasOwnProperty(path)) {
 		//It is a ethereum path
 		return path;
 	}
 	const pathId = pathMeta.networkPathId || extractPathId(path);
 
-	return getNetworkKeyByPathId(pathId);
+	return getSubstrateNetworkKeyByPathId(pathId, networks);
 };
 
 export const parseFoundLegacyAccount = (
@@ -282,36 +301,32 @@ export const verifyPassword = async (
 	password: string,
 	seedPhrase: string,
 	identity: Identity,
-	path: string
+	path: string,
+	networks: Map<string, SubstrateNetworkParams>
 ): Promise<boolean> => {
 	const suri = constructSURI({
 		derivePath: path,
 		password: password,
 		phrase: seedPhrase
 	});
-	const networkKey = getNetworkKey(path, identity);
-	const networkParams = SUBSTRATE_NETWORK_LIST[networkKey];
+	const networkKey = getNetworkKey(path, identity, networks);
+	const networkParams = networks.get(networkKey);
+	if (!networkParams) throw new Error(strings.ERROR_NO_NETWORK);
 	const address = await substrateAddress(suri, networkParams.prefix);
 	const accountMeta = identity.meta.get(path);
 	return address === accountMeta?.address;
 };
 
-export const getNetworkParams = (
-	networkKey: string | undefined
-): NetworkParams => {
-	if (networkKey === undefined) return NETWORK_LIST[UnknownNetworkKeys.UNKNOWN];
-	return NETWORK_LIST.hasOwnProperty(networkKey)
-		? NETWORK_LIST[networkKey]
-		: NETWORK_LIST[UnknownNetworkKeys.UNKNOWN];
-};
-
-export const getExistedNetworkKeys = (identity: Identity): string[] => {
+export const getExistedNetworkKeys = (
+	identity: Identity,
+	networks: Map<string, SubstrateNetworkParams>
+): string[] => {
 	const pathEntries = Array.from(identity.meta.entries());
 	const networkKeysSet = pathEntries.reduce(
 		(networksSet, [path, pathMeta]: [string, AccountMeta]) => {
 			let networkKey;
 			if (isSubstratePath(path)) {
-				networkKey = getNetworkKeyByPath(path, pathMeta);
+				networkKey = getNetworkKeyByPath(path, pathMeta, networks);
 			} else {
 				networkKey = path;
 			}
@@ -391,7 +406,10 @@ const _comparePathsInGroup = (a: string, b: string): number => {
  * If the network is known: group by the second subpath, e.g. '//staking' of '//kusama//staking/0'
  * Please refer to identitiesUtils.spec.js for more examples.
  **/
-export const groupPaths = (paths: string[]): PathGroup[] => {
+export const groupPaths = (
+	paths: string[],
+	networks: Map<string, SubstrateNetworkParams>
+): PathGroup[] => {
 	const insertPathIntoGroup = (
 		matchingPath: string,
 		fullPath: string,
@@ -419,10 +437,10 @@ export const groupPaths = (paths: string[]): PathGroup[] => {
 			const rootPath = path.match(pathsRegex.firstPath)?.[0];
 			if (rootPath === undefined) return groupedPath;
 
-			const networkParams = Object.values(SUBSTRATE_NETWORK_LIST).find(
-				v => `//${v.pathId}` === rootPath
+			const networkEntry = Object.entries(networks).find(
+				([, v]) => `//${v.pathId}` === rootPath
 			);
-			if (networkParams === undefined) {
+			if (networkEntry === undefined) {
 				insertPathIntoGroup(path, path, groupedPath);
 				return groupedPath;
 			}
@@ -431,7 +449,7 @@ export const groupPaths = (paths: string[]): PathGroup[] => {
 			if (isRootPath) {
 				groupedPath.push({
 					paths: [path],
-					title: `${networkParams.title} root`
+					title: `${networkEntry[1].title} root`
 				});
 				return groupedPath;
 			}

@@ -20,7 +20,6 @@ import {
 	EthereumNetworkParams,
 	NetworkParams,
 	NetworkProtocol,
-	SubstrateNetworkBasics,
 	SubstrateNetworkDefaultConstant,
 	SubstrateNetworkParams,
 	UnknownNetworkParams
@@ -71,16 +70,27 @@ export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
 });
 
+const unknownNetworkParams = {
+	color: colors.signal.error,
+	order: 99,
+	pathId: unknownNetworkPathId,
+	prefix: 2,
+	protocol: NetworkProtocols.UNKNOWN,
+	secondaryColor: colors.background.card,
+	title: 'Unknown network'
+};
+
+export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
+	...unknownNetworkParams,
+	decimals: 12,
+	genesisHash: UnknownNetworkKeys.UNKNOWN,
+	logo: require('res/img/logos/Substrate_Dev.png'),
+	protocol: NetworkProtocols.SUBSTRATE,
+	unit: 'UNIT'
+};
+
 const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
-	[UnknownNetworkKeys.UNKNOWN]: {
-		color: colors.signal.error,
-		order: 99,
-		pathId: unknownNetworkPathId,
-		prefix: 2,
-		protocol: NetworkProtocols.UNKNOWN,
-		secondaryColor: colors.background.card,
-		title: 'Unknown network'
-	}
+	[UnknownNetworkKeys.UNKNOWN]: unknownNetworkParams
 };
 
 const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {

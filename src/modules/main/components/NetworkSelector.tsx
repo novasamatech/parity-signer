@@ -18,13 +18,13 @@ import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
-import { NETWORK_LIST } from 'constants/networkSpecs';
 import { filterSubstrateNetworks } from 'modules/network/utils';
 import { NetworkCard } from 'components/AccountCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import {
 	isEthereumNetworkParams,
@@ -53,6 +53,9 @@ function NetworkSelector({
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accountsStore.state;
+	const { networks, getSubstrateNetwork, allNetworks } = useContext(
+		NetworksContext
+	);
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
 
@@ -93,7 +96,7 @@ function NetworkSelector({
 			await accountsStore.deriveNewPath(
 				fullPath,
 				seedRefHooks.substrateAddress,
-				networkKey,
+				getSubstrateNetwork(networkKey),
 				`${networkParams.title} root`,
 				''
 			);
@@ -108,7 +111,8 @@ function NetworkSelector({
 		try {
 			await accountsStore.deriveEthereumAccount(
 				seedRefHooks.brainWalletAddress,
-				networkKey
+				networkKey,
+				allNetworks
 			);
 			navigateToPathsList(navigation, networkKey);
 		} catch (e) {
@@ -177,13 +181,13 @@ function NetworkSelector({
 	};
 
 	const availableNetworks = useMemo(
-		() => getExistedNetworkKeys(currentIdentity),
-		[currentIdentity]
+		() => getExistedNetworkKeys(currentIdentity, networks),
+		[currentIdentity, networks]
 	);
 
 	const networkList = useMemo(
 		() =>
-			filterSubstrateNetworks(NETWORK_LIST, (networkKey, shouldExclude) => {
+			filterSubstrateNetworks(networks, (networkKey, shouldExclude) => {
 				if (isNew && !shouldExclude) return true;
 
 				if (shouldShowMoreNetworks) {
@@ -192,7 +196,7 @@ function NetworkSelector({
 				}
 				return availableNetworks.includes(networkKey);
 			}),
-		[availableNetworks, isNew, shouldShowMoreNetworks]
+		[availableNetworks, isNew, shouldShowMoreNetworks, networks]
 	);
 
 	const renderNetwork = ({

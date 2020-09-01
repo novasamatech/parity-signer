@@ -21,6 +21,7 @@ import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -32,13 +33,13 @@ import ScreenHeading from 'components/ScreenHeading';
 import TouchableItem from 'components/TouchableItem';
 import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
-import { getNetworkParams } from 'utils/identitiesUtils';
 
 function LegacyAccountBackup({
 	navigation,
 	route
 }: NavigationProps<'LegacyAccountBackup'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
+	const { getNetwork } = useContext(NetworksContext);
 	const { selectedKey, newAccount } = accountsStore.state;
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
@@ -69,7 +70,7 @@ function LegacyAccountBackup({
 		seed = '',
 		seedPhrase = ''
 	} = isNew ? newAccount : (accountsStore.getSelected() as UnlockedAccount);
-	const protocol = getNetworkParams(networkKey).protocol;
+	const protocol = getNetwork(networkKey).protocol;
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>

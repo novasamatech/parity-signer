@@ -19,27 +19,27 @@ import { UnlockedAccount } from 'types/identityTypes';
 import {
 	EthereumNetworkParams,
 	isSubstrateNetworkParams,
-	isUnknownNetworkParams
+	isUnknownNetworkParams,
+	NetworkParams
 } from 'types/networkTypes';
 import { ValidSeed } from 'types/utilTypes';
-import { getNetworkParams } from 'utils/identitiesUtils';
 
-export function generateAccountId({
-	address,
-	networkKey
-}: {
-	address: string;
-	networkKey: string;
-}): string {
+export function generateAccountId(
+	address: string,
+	networkKey: string,
+	allNetworks: Map<string, NetworkParams>
+): string {
 	if (typeof address !== 'string' || address.length === 0 || !networkKey) {
 		throw new Error(
 			"Couldn't create an accountId. Address or networkKey missing, or network key was invalid."
 		);
 	}
 
-	const networkParams = getNetworkParams(networkKey);
-	const { protocol } = networkParams;
+	const networkParams = allNetworks.get(networkKey);
+	if (networkParams === undefined)
+		return `substrate:${address}:${networkKey ?? ''}`;
 
+	const { protocol } = networkParams;
 	if (isSubstrateNetworkParams(networkParams)) {
 		const { genesisHash } = networkParams;
 		return `${protocol}:${address}:${genesisHash ?? ''}`;

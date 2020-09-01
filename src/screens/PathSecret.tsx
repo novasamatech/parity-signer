@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 
 import ScreenHeading from 'components/ScreenHeading';
@@ -23,6 +23,7 @@ import QrView from 'components/QrView';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { PasswordedAccountExportWarning } from 'components/Warnings';
 import testIDs from 'e2e/testIDs';
+import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey, getPathName } from 'utils/identitiesUtils';
@@ -33,6 +34,7 @@ function PathSecret({
 	route,
 	navigation
 }: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
+	const { networks } = useContext(NetworksContext);
 	const { currentIdentity } = accountsStore.state;
 	const [secret, setSecret] = useState<string>('');
 	const { substrateSecret, isSeedRefValid } = useSeedRef(
@@ -43,7 +45,7 @@ function PathSecret({
 
 	useEffect(() => {
 		const getAndSetSecret = async (): Promise<void> => {
-			const networkKey = getNetworkKey(path, currentIdentity);
+			const networkKey = getNetworkKey(path, currentIdentity, networks);
 			const password = route.params.password ?? '';
 			const accountName = getPathName(path, currentIdentity);
 			const generatedSecret = await substrateSecret(`${path}///${password}`);

@@ -1,6 +1,8 @@
 const strings = {
 	ERROR_ADDRESS_MESSAGE:
 		'Please create a transaction using software such as MyCrypto or Fether so that Parity Signer can sign it.',
+	ERROR_NO_NETWORK:
+		'Signer does not currently recognize a chain with genesis hash, please add the network first',
 	ERROR_NO_RAW_DATA: 'There is no raw data from the request',
 	ERROR_NO_SENDER_FOUND: 'There is no related account in the app',
 	ERROR_NO_SENDER_IDENTITY: 'There is no related identity in the app',

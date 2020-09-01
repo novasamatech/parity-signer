@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useContext } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -23,7 +23,7 @@ import Address from './Address';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 
-import { getNetworkParams } from 'utils/identitiesUtils';
+import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
@@ -66,7 +66,8 @@ export function NetworkCard({
 	testID?: string;
 	title: string;
 }): ReactElement {
-	const networkParams = getNetworkParams(networkKey);
+	const { getNetwork } = useContext(NetworksContext);
+	const networkParams = getNetwork(networkKey ?? '');
 	const isDisabled = onPress === undefined;
 	return (
 		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
@@ -120,10 +121,11 @@ export default function AccountCard({
 	title,
 	titlePrefix
 }: AccountCardProps): ReactElement {
+	const { getNetwork } = useContext(NetworksContext);
 	const defaultTitle = 'No name';
 	const displayTitle = title.length > 0 ? title : defaultTitle;
 	const seedTypeDisplay = seedType || '';
-	const network = getNetworkParams(networkKey);
+	const network = getNetwork(networkKey ?? '');
 
 	return (
 		<TouchableItem

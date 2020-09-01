@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ScrollView } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
+import { NetworksContext } from 'stores/NetworkContext';
 import { PathGroup } from 'types/identityTypes';
 import PathGroupCard from 'components/PathGroupCard';
 import { useUnlockSeed } from 'utils/navigationHelpers';
@@ -47,7 +48,8 @@ function PathsList({
 	route
 }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
 	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
-	const networkParams = NETWORK_LIST[networkKey];
+	const { networks, getNetwork } = useContext(NetworksContext);
+	const networkParams = getNetwork(networkKey);
 
 	const { currentIdentity } = accountsStore.state;
 	const isEthereumPath = isEthereumNetworkParams(networkParams);
@@ -56,9 +58,10 @@ function PathsList({
 		if (!currentIdentity || isEthereumPath) return null;
 		const listedPaths = getPathsWithSubstrateNetworkKey(
 			currentIdentity,
-			networkKey
+			networkKey,
+			networks
 		);
-		return groupPaths(listedPaths);
+		return groupPaths(listedPaths, networks);
 	}, [currentIdentity, isEthereumPath, networkKey]);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);

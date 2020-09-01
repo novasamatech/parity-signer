@@ -23,10 +23,10 @@ import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 import { deserializeNetworks, mergeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import {
+	NetworkParams,
 	SubstrateNetworkBasics,
 	SubstrateNetworkParams
 } from 'types/networkTypes';
-import { defaultNetworkSpecs } from 'modules/network/utils';
 import { Account, Identity } from 'types/identityTypes';
 import { Tx, TxParticipant } from 'types/tx';
 
@@ -122,7 +122,7 @@ export async function loadNetworks(): Promise<
 			currentNetworkStorageLabel,
 			networkStorage
 		);
-		if (!networksJson) return new Map();
+		if (!networksJson) return new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
 		const networksEntries = JSON.parse(networksJson);
 		return mergeNetworks(SUBSTRATE_NETWORK_LIST, networksEntries);
 	} catch (e) {
@@ -153,14 +153,12 @@ export async function saveToCAndPPConfirmation(): Promise<void> {
  * ========================================
  */
 
-function accountTxsKey({
-	address,
-	networkKey
-}: {
-	address: string;
-	networkKey: string;
-}): string {
-	return 'account_txs_' + generateAccountId({ address, networkKey });
+function accountTxsKey(
+	address: string,
+	networkKey: string,
+	allNetworks: Map<string, NetworkParams>
+): string {
+	return 'account_txs_' + generateAccountId(address, networkKey, allNetworks);
 }
 
 function txKey(hash: string): string {
@@ -192,7 +190,10 @@ async function storagePushValue(key: string, value: string): Promise<void> {
 	}
 }
 
-export async function saveTx(tx: Tx): Promise<void> {
+export async function saveTx(
+	tx: Tx,
+	allNetworks: Map<string, NetworkParams>
+): Promise<void> {
 	if (!tx.sender) {
 		throw new Error('Tx should contain sender to save');
 	}
@@ -202,24 +203,34 @@ export async function saveTx(tx: Tx): Promise<void> {
 	}
 
 	await Promise.all([
-		storagePushValue(accountTxsKey(tx.sender), tx.hash),
-		storagePushValue(accountTxsKey(tx.recipient), tx.hash),
+		storagePushValue(
+			accountTxsKey(tx.sender.address, tx.sender.networkKey, allNetworks),
+			tx.hash
+		),
+		storagePushValue(
+			accountTxsKey(tx.recipient.address, tx.sender.networkKey, allNetworks),
+			tx.hash
+		),
 		AsyncStorage.setItem(txKey(tx.hash), JSON.stringify(tx))
 	]);
 }
 
 export async function loadAccountTxHashes(
-	account: TxParticipant
+	account: TxParticipant,
+	allNetworks: Map<string, NetworkParams>
 ): Promise<string[]> {
-	const result = await AsyncStorage.getItem(accountTxsKey(account));
+	const result = await AsyncStorage.getItem(
+		accountTxsKey(account.address, account.networkKey, allNetworks)
+	);
 
 	return result ? JSON.parse(result) : [];
 }
 
 export async function loadAccountTxs(
-	account: TxParticipant
+	account: TxParticipant,
+	allNetworks: Map<string, NetworkParams>
 ): Promise<Array<[string, Tx]>> {
-	const hashes = await loadAccountTxHashes(account);
+	const hashes = await loadAccountTxHashes(account, allNetworks);
 
 	return (
 		await AsyncStorage.multiGet(hashes.map(txKey))

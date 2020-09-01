@@ -26,9 +26,14 @@ import {
 } from 'utils/identitiesUtils';
 import {
 	EthereumNetworkKeys,
+	NETWORK_LIST,
+	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
+
+const networks = new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
+const allNetworks = new Map(Object.entries(NETWORK_LIST));
 
 const raw = [
 	{
@@ -167,7 +172,7 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('regroup the kusama paths', () => {
-		const groupResult = groupPaths(kusamaPaths);
+		const groupResult = groupPaths(kusamaPaths, networks);
 		expect(groupResult).toEqual([
 			{
 				paths: ['//kusama'],
@@ -201,7 +206,7 @@ describe('IdentitiesUtils', () => {
 			'/kusama/1',
 			'/polkadot_test/1'
 		];
-		const groupResult = groupPaths(unKnownPaths);
+		const groupResult = groupPaths(unKnownPaths, networks);
 		expect(groupResult).toEqual([
 			{
 				paths: [''],
@@ -234,7 +239,7 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('get the correspond networkKeys', () => {
-		const networkKeys = getExistedNetworkKeys(testIdentities[0]);
+		const networkKeys = getExistedNetworkKeys(testIdentities[0], networks);
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
@@ -246,7 +251,11 @@ describe('IdentitiesUtils', () => {
 
 	it('get networkKey correctly by path', () => {
 		const getNetworkKeyByPathTest = (path: string): string => {
-			return getNetworkKeyByPath(path, testIdentities[0].meta.get(path));
+			return getNetworkKeyByPath(
+				path,
+				testIdentities[0].meta.get(path),
+				networks
+			);
 		};
 		expect(getNetworkKeyByPathTest('')).toEqual(UnknownNetworkKeys.UNKNOWN);
 		expect(getNetworkKeyByPathTest('//kusama')).toEqual(
@@ -263,7 +272,7 @@ describe('IdentitiesUtils', () => {
 
 	it('group path under their network correctly, has no missing accounts', () => {
 		const mockIdentity = testIdentities[0];
-		const existedNetworks = getExistedNetworkKeys(mockIdentity);
+		const existedNetworks = getExistedNetworkKeys(mockIdentity, networks);
 		const existedAccountsSize = mockIdentity.meta.size;
 
 		const allListedAccounts = existedNetworks.reduce(
@@ -277,7 +286,8 @@ describe('IdentitiesUtils', () => {
 				} else {
 					const networkAccounts = getPathsWithSubstrateNetworkKey(
 						mockIdentity,
-						networkKey
+						networkKey,
+						networks
 					);
 					return acc.concat(networkAccounts);
 				}

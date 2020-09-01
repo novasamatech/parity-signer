@@ -21,12 +21,12 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
 import PopupMenu from 'components/PopupMenu';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
-import { getNetworkParams } from 'utils/identitiesUtils';
 import {
 	navigateToLandingPage,
 	navigateToLegacyAccountList
@@ -42,12 +42,13 @@ export default function AccountDetails({
 }: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const account = accountsStore.getSelected();
+	const { getNetwork } = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertStateContext);
 	const { accounts, selectedKey } = accountsStore.state;
 
 	if (!account) return <View />;
 
-	const network = getNetworkParams(account.networkKey);
+	const network = getNetwork(account.networkKey);
 
 	const protocol = network.protocol;
 

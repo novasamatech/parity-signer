@@ -179,7 +179,12 @@ describe('decoders', () => {
 
 	describe('UOS parsing', () => {
 		it('from Substrate UOS Payload Mortal', async () => {
-			const unsignedData = await constructDataFromBytes(SIGN_TX_TEST);
+			const networks = new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
+			const unsignedData = await constructDataFromBytes(
+				SIGN_TX_TEST,
+				false,
+				networks
+			);
 			const rawPayload = (unsignedData as SubstrateCompletedParsedData).data
 				.data;
 

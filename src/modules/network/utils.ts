@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
 	defaultNetworkKey,
 	NETWORK_LIST,
@@ -29,7 +28,7 @@ import {
 } from 'types/networkTypes';
 
 export const filterSubstrateNetworks = (
-	networkList: Record<string, NetworkParams>,
+	networkList: Map<string, SubstrateNetworkParams>,
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
 ): Array<[string, NetworkParams]> => {
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
@@ -88,23 +87,4 @@ export function getCompleteSubstrateNetworkSpec(
 		secondaryColor: generateRandomColor()
 	};
 	return { ...defaultNewNetworkSpecParams, ...newNetworkParams };
-}
-
-export function defaultNetworkSpecs(): SubstrateNetworkParams[] {
-	const excludedNetworks: string[] = [];
-	if (!__DEV__) {
-		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-	}
-	return Object.entries(SUBSTRATE_NETWORK_LIST).reduce(
-		(
-			networkSpecsList: SubstrateNetworkParams[],
-			[networkKey, networkParams]: [string, SubstrateNetworkParams]
-		) => {
-			if (excludedNetworks.includes(networkKey)) return networkSpecsList;
-			networkSpecsList.push(networkParams);
-			return networkSpecsList;
-		},
-		[]
-	);
 }

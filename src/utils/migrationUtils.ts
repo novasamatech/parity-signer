@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { NETWORK_LIST } from 'constants/networkSpecs';
 import {
 	Account,
 	AccountMeta,
@@ -111,8 +112,12 @@ export const migrateAccounts = async (): Promise<void> => {
 	);
 
 	accounts.forEach((account: Account): void => {
+		const allNetworks = new Map(Object.entries(NETWORK_LIST));
 		try {
-			saveAccount(generateAccountId(account), account);
+			saveAccount(
+				generateAccountId(account.address, account.networkKey, allNetworks),
+				account
+			);
 		} catch (e) {
 			console.error(e);
 		}

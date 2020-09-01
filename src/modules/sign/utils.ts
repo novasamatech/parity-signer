@@ -19,6 +19,7 @@ import { useContext } from 'react';
 
 import strings from 'modules/sign/strings';
 import { AccountsContext } from 'stores/AccountsContext';
+import { NetworksContextState } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { FoundIdentityAccount } from 'types/identityTypes';
@@ -38,7 +39,7 @@ import {
 	isJsonString,
 	rawDataToU8A
 } from 'utils/decoders';
-import { getIdentityFromSender, getNetworkParams } from 'utils/identitiesUtils';
+import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
 	unlockSeedPhrase,
@@ -56,8 +57,10 @@ function getSeedRef(
 }
 
 export function useProcessBarCode(
-	showErrorMessage: (title: string, message: string) => void
+	showErrorMessage: (title: string, message: string) => void,
+	networksContextState: NetworksContextState
 ): (txRequestData: TxRequestData) => Promise<void> {
+	const { allNetworks, networks } = networksContextState;
 	const accountsStore = useContext(AccountsContext);
 	const scannerStore = useContext(ScannerContext);
 	const [seedRefs] = useContext<SeedRefsState>(SeedRefsContext);
@@ -77,7 +80,11 @@ export function useProcessBarCode(
 		} else if (!scannerStore.state.multipartComplete) {
 			const strippedData = rawDataToU8A(txRequestData.rawData);
 			if (strippedData === null) throw new Error(strings.ERROR_NO_RAW_DATA);
-			const parsedData = await constructDataFromBytes(strippedData, false);
+			const parsedData = await constructDataFromBytes(
+				strippedData,
+				false,
+				networks
+			);
 			return parsedData;
 		} else {
 			throw new Error(strings.ERROR_NO_RAW_DATA);
@@ -91,7 +98,8 @@ export function useProcessBarCode(
 			const multiFramesResult = await scannerStore.setPartData(
 				parsedData.currentFrame,
 				parsedData.frameCount,
-				parsedData.partData
+				parsedData.partData,
+				networksContextState
 			);
 			if (isMultiFramesInfo(multiFramesResult)) {
 				return null;
@@ -103,11 +111,12 @@ export function useProcessBarCode(
 		}
 	}
 
-	async function unlockSeedAndSign(
+	async function _unlockSeedAndSign(
 		sender: FoundIdentityAccount,
 		qrInfo: QrInfo
 	): Promise<void> {
-		const senderNetworkParams = getNetworkParams(sender.networkKey);
+		const senderNetworkParams = allNetworks.get(sender.networkKey);
+		if (!senderNetworkParams) throw new Error(strings.ERROR_NO_NETWORK);
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 		// 1. check if sender existed
@@ -181,7 +190,7 @@ export function useProcessBarCode(
 
 		const seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
 		const isSeedRefInvalid = seedRef && seedRef.isValid();
-		await unlockSeedAndSign(sender, qrInfo);
+		await _unlockSeedAndSign(sender, qrInfo);
 		const nextRoute = type === 'transaction' ? 'SignedTx' : 'SignedMessage';
 
 		if (isSeedRefInvalid) {
@@ -196,7 +205,11 @@ export function useProcessBarCode(
 			const parsedData = await parseQrData(txRequestData);
 			const unsignedData = await checkMultiFramesData(parsedData);
 			if (unsignedData === null) return;
-			const qrInfo = await scannerStore.setData(accountsStore, unsignedData);
+			const qrInfo = await scannerStore.setData(
+				accountsStore,
+				unsignedData,
+				networksContextState
+			);
 			await unlockAndNavigationToSignedQR(qrInfo);
 			scannerStore.clearMultipartProgress();
 		} catch (e) {

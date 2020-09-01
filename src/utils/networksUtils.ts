@@ -1,5 +1,4 @@
 import {
-	NetworkParams,
 	SubstrateNetworkBasics,
 	SubstrateNetworkParams
 } from 'types/networkTypes';
@@ -34,8 +33,7 @@ export const mergeNetworks = (
 	const mergedNetworksObject = newNetworksEntries.reduce(
 		(
 			acc,
-			[networkKey, networkParams],
-			index
+			[networkKey, networkParams]
 		): Record<string, SubstrateNetworkParams> => {
 			if (!defaultNetworks.hasOwnProperty(networkKey)) {
 				acc[networkKey] = {
