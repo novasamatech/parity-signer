@@ -25,7 +25,7 @@ import {
 } from 'constants/networkSpecs';
 import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
 import { NetworkParsedData } from 'types/scannerTypes';
-import { loadNetworks } from 'utils/db';
+import { loadNetworks, saveNetworks } from 'utils/db';
 import {
 	deepCopyNetworks,
 	generateNetworkParamsFromParsedData
@@ -67,7 +67,6 @@ export function useNetworksContext(): NetworksContextState {
 		const result = Array.from(substrateNetworks.values())
 			.map(n => n.pathId)
 			.concat([unknownNetworkPathId]);
-		console.log('path ids are', result);
 		return result;
 	}, [substrateNetworks]);
 
@@ -98,6 +97,7 @@ export function useNetworksContext(): NetworksContextState {
 		const newNetworksList = deepCopyNetworks(substrateNetworks);
 		newNetworksList.set(networkKey, newNetworkParams);
 		setSubstrateNetworks(newNetworksList);
+		saveNetworks(newNetworksList);
 	}
 
 	return {

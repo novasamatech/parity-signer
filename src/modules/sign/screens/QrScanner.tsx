@@ -70,7 +70,7 @@ export default function Scanner({
 		} else {
 			setAlert(title, message, [
 				{
-					onPress: async () => {
+					onPress: async (): Promise<void> => {
 						await clearByTap();
 						navigateToNetworkSettings(navigation);
 					},

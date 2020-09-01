@@ -72,7 +72,7 @@ export function PathDetailsView({
 		isSeedRefValid
 	);
 	const networksContextState = useContext(NetworksContext);
-	const { allNetworks, networks } = networksContextState;
+	const { allNetworks } = networksContextState;
 	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;

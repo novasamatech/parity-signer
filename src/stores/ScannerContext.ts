@@ -292,7 +292,7 @@ export function useScannerContext(): ScannerContextState {
 	): Promise<TxQRInfo> {
 		setBusy();
 
-		const { allNetworks, getNetwork } = networkContext;
+		const { getNetwork } = networkContext;
 		const isOversized =
 			(txRequest as SubstrateCompletedParsedData)?.oversized || false;
 

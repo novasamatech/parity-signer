@@ -63,7 +63,13 @@ function PathsList({
 			networkContextState
 		);
 		return groupPaths(listedPaths, networks);
-	}, [currentIdentity, isEthereumPath, networkKey]);
+	}, [
+		currentIdentity,
+		isEthereumPath,
+		networkKey,
+		networkContextState,
+		networks
+	]);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 

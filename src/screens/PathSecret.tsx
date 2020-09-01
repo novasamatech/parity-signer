@@ -64,7 +64,8 @@ function PathSecret({
 		navigation,
 		currentIdentity,
 		isSeedRefValid,
-		substrateSecret
+		substrateSecret,
+		networksContextState
 	]);
 
 	return (

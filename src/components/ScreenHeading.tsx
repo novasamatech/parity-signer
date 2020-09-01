@@ -25,7 +25,6 @@ import AccountIcon from './AccountIcon';
 import { NetworksContext } from 'stores/NetworkContext';
 import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
-import { NETWORK_LIST } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import fonts from 'styles/fonts';
 import colors from 'styles/colors';

@@ -54,7 +54,7 @@ function NetworkSelector({
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
-	const { networks, getSubstrateNetwork, allNetworks } = networkContextState;
+	const { getSubstrateNetwork, allNetworks } = networkContextState;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
 
@@ -181,7 +181,7 @@ function NetworkSelector({
 
 	const availableNetworks = useMemo(
 		() => getExistedNetworkKeys(currentIdentity, networkContextState),
-		[currentIdentity, networks]
+		[currentIdentity, networkContextState]
 	);
 
 	const networkList = useMemo(
@@ -195,7 +195,7 @@ function NetworkSelector({
 				}
 				return availableNetworks.includes(networkKey);
 			}),
-		[availableNetworks, isNew, shouldShowMoreNetworks, networks]
+		[availableNetworks, isNew, shouldShowMoreNetworks, allNetworks]
 	);
 
 	const renderNetwork = ({

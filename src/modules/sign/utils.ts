@@ -218,7 +218,7 @@ export function useProcessBarCode(
 		}
 	}
 
-	function addNewNetwork(networkParsedData: NetworkParsedData) {
+	function addNewNetwork(networkParsedData: NetworkParsedData): void {
 		networksContextState.addNetwork(networkParsedData);
 		return showAlertMessage(
 			strings.SUCCESS_TITLE,
@@ -230,8 +230,7 @@ export function useProcessBarCode(
 		try {
 			const parsedData = await parseQrData(txRequestData);
 			if (isNetworkParsedData(parsedData)) {
-				addNewNetwork(parsedData);
-				return;
+				return addNewNetwork(parsedData);
 			}
 			const unsignedData = await checkMultiFramesData(parsedData);
 			if (unsignedData === null) return;

@@ -241,36 +241,24 @@ const substrateDefaultValues = {
 	secondaryColor: colors.background.card
 };
 
-function setEthereumNetworkDefault(
-	ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants>,
-	defaultProps: Pick<
-		EthereumNetworkParams,
-		'color' | 'logo' | 'protocol' | 'secondaryColor'
-	>
-): Record<string, EthereumNetworkParams> {
+function setEthereumNetworkDefault(): Record<string, EthereumNetworkParams> {
 	return Object.keys(ethereumNetworkBase).reduce((acc, networkKey) => {
 		return {
 			...acc,
 			[networkKey]: {
-				...defaultProps,
+				...ethereumDefaultValues,
 				...ethereumNetworkBase[networkKey]
 			}
 		};
 	}, {});
 }
 
-function setSubstrateNetworkDefault(
-	substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant>,
-	defaultProps: Pick<
-		SubstrateNetworkParams,
-		'color' | 'logo' | 'protocol' | 'secondaryColor'
-	>
-): Record<string, SubstrateNetworkParams> {
+function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
 	return Object.keys(substrateNetworkBase).reduce((acc, networkKey) => {
 		return {
 			...acc,
 			[networkKey]: {
-				...defaultProps,
+				...substrateDefaultValues,
 				...substrateNetworkBase[networkKey]
 			}
 		};
@@ -280,15 +268,11 @@ function setSubstrateNetworkDefault(
 export const ETHEREUM_NETWORK_LIST: Record<
 	string,
 	EthereumNetworkParams
-> = Object.freeze(
-	setEthereumNetworkDefault(ethereumNetworkBase, ethereumDefaultValues)
-);
+> = Object.freeze(setEthereumNetworkDefault());
 export const SUBSTRATE_NETWORK_LIST: Record<
 	string,
 	SubstrateNetworkParams
-> = Object.freeze(
-	setSubstrateNetworkDefault(substrateNetworkBase, substrateDefaultValues)
-);
+> = Object.freeze(setSubstrateNetworkDefault());
 export const UNKNOWN_NETWORK: Record<
 	string,
 	UnknownNetworkParams

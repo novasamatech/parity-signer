@@ -20,7 +20,7 @@ import SecureStorage from 'react-native-secure-storage';
 import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
-import { deserializeNetworks, mergeNetworks } from 'utils/networksUtils';
+import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
@@ -114,16 +114,32 @@ export async function loadNetworks(): Promise<
 	Map<string, SubstrateNetworkParams>
 > {
 	try {
+		console.log('start load');
 		const networksJson = await SecureStorage.getItem(
 			currentNetworkStorageLabel,
 			networkStorage
 		);
+		console.log('start finished with json', networksJson);
 		if (!networksJson) return new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
 		const networksEntries = JSON.parse(networksJson);
 		return mergeNetworks(SUBSTRATE_NETWORK_LIST, networksEntries);
 	} catch (e) {
 		handleError(e, 'networks');
 		return new Map();
+	}
+}
+
+export async function saveNetworks(
+	networks: Map<string, SubstrateNetworkParams>
+): Promise<void> {
+	try {
+		SecureStorage.setItem(
+			currentNetworkStorageLabel,
+			serializeNetworks(networks),
+			networkStorage
+		);
+	} catch (e) {
+		handleError(e, 'networks');
 	}
 }
 

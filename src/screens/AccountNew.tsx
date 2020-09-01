@@ -75,7 +75,7 @@ export default function AccountNew({
 			selectedAccount,
 			selectedNetwork
 		});
-	}, [accountsStore.state.newAccount]);
+	}, [accountsStore.state.newAccount, getNetwork]);
 
 	const {
 		derivationPassword,

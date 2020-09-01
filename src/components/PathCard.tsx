@@ -35,8 +35,7 @@ import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
 import {
 	isSubstrateNetworkParams,
-	isUnknownNetworkParams,
-	SubstrateNetworkParams
+	isUnknownNetworkParams
 } from 'types/networkTypes';
 import { ButtonListener } from 'types/props';
 import {
@@ -95,7 +94,8 @@ export default function PathCard({
 		networkKey,
 		computedNetworkKey,
 		isSeedRefValid,
-		substrateAddress
+		substrateAddress,
+		networks
 	]);
 
 	const isUnknownAddress = address === '';
