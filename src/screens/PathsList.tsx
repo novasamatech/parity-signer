@@ -48,7 +48,8 @@ function PathsList({
 	route
 }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
 	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
-	const { networks, getNetwork } = useContext(NetworksContext);
+	const networkContextState = useContext(NetworksContext);
+	const { networks, getNetwork } = networkContextState;
 	const networkParams = getNetwork(networkKey);
 
 	const { currentIdentity } = accountsStore.state;
@@ -59,7 +60,7 @@ function PathsList({
 		const listedPaths = getPathsWithSubstrateNetworkKey(
 			currentIdentity,
 			networkKey,
-			networks
+			networkContextState
 		);
 		return groupPaths(listedPaths, networks);
 	}, [currentIdentity, isEthereumPath, networkKey]);

@@ -34,7 +34,7 @@ function PathSecret({
 	route,
 	navigation
 }: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
-	const { networks } = useContext(NetworksContext);
+	const networksContextState = useContext(NetworksContext);
 	const { currentIdentity } = accountsStore.state;
 	const [secret, setSecret] = useState<string>('');
 	const { substrateSecret, isSeedRefValid } = useSeedRef(
@@ -45,7 +45,11 @@ function PathSecret({
 
 	useEffect(() => {
 		const getAndSetSecret = async (): Promise<void> => {
-			const networkKey = getNetworkKey(path, currentIdentity, networks);
+			const networkKey = getNetworkKey(
+				path,
+				currentIdentity,
+				networksContextState
+			);
 			const password = route.params.password ?? '';
 			const accountName = getPathName(path, currentIdentity);
 			const generatedSecret = await substrateSecret(`${path}///${password}`);

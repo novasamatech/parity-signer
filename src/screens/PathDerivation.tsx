@@ -53,7 +53,8 @@ function PathDerivation({
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
-	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+	const networkContextState = useContext(NetworksContext);
+	const { networks, getSubstrateNetwork, pathIds } = networkContextState;
 	const pathNameInput = useRef<TextInput>(null);
 	const { setAlert } = useContext(AlertStateContext);
 	const currentIdentity = accountsStore.state.currentIdentity;
@@ -67,9 +68,9 @@ function PathDerivation({
 		currentIdentity: Identity
 	): string {
 		if (currentIdentity.meta.has(parentPath)) {
-			return getNetworkKey(parentPath, currentIdentity, networks);
+			return getNetworkKey(parentPath, currentIdentity, networkContextState);
 		}
-		const pathId = extractPathId(parentPath);
+		const pathId = extractPathId(parentPath, pathIds);
 		return getSubstrateNetworkKeyByPathId(pathId, networks);
 	}
 

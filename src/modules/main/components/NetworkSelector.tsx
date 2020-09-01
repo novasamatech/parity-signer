@@ -53,9 +53,8 @@ function NetworkSelector({
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accountsStore.state;
-	const { networks, getSubstrateNetwork, allNetworks } = useContext(
-		NetworksContext
-	);
+	const networkContextState = useContext(NetworksContext);
+	const { networks, getSubstrateNetwork, allNetworks } = networkContextState;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
 
@@ -181,7 +180,7 @@ function NetworkSelector({
 	};
 
 	const availableNetworks = useMemo(
-		() => getExistedNetworkKeys(currentIdentity, networks),
+		() => getExistedNetworkKeys(currentIdentity, networkContextState),
 		[currentIdentity, networks]
 	);
 

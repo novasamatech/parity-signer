@@ -353,7 +353,7 @@ export function useAccountContext(): AccountsContextState {
 		accountIdOrAddress: string,
 		networkContext: NetworksContextState
 	): false | FoundIdentityAccount {
-		const { networks, allNetworks } = networkContext;
+		const { allNetworks } = networkContext;
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetAccountId = null;
 		let targetIdentity = null;
@@ -362,7 +362,7 @@ export function useAccountContext(): AccountsContextState {
 		for (const identity of state.identities) {
 			const searchList = Array.from(identity.addresses.entries());
 			for (const [addressKey, path] of searchList) {
-				const networkKey = getNetworkKey(path, identity, networks);
+				const networkKey = getNetworkKey(path, identity, networkContext);
 				let accountId, address;
 				if (isEthereumAccountId(addressKey)) {
 					accountId = addressKey;

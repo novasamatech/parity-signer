@@ -18,7 +18,8 @@ import { default as React, useEffect, useMemo, useState } from 'react';
 
 import {
 	dummySubstrateNetworkParams,
-	ETHEREUM_NETWORK_LIST
+	ETHEREUM_NETWORK_LIST,
+	unknownNetworkPathId
 } from 'constants/networkSpecs';
 import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
 import { loadNetworks } from 'utils/db';
@@ -36,6 +37,7 @@ export type NetworksContextState = {
 	allNetworks: Map<string, NetworkParams>;
 	getSubstrateNetwork: GetSubstrateNetwork;
 	getNetwork: GetNetwork;
+	pathIds: string[];
 };
 
 const deepCopy = (
@@ -53,6 +55,14 @@ export function useNetworksContext(): NetworksContextState {
 		const all = new Map([...ethereumNetworks, ...substrateNetworks]);
 		console.log('all is', all);
 		return all;
+	}, [substrateNetworks]);
+
+	const pathIds = useMemo(() => {
+		const result = Array.from(substrateNetworks.values())
+			.map(n => n.pathId)
+			.concat([unknownNetworkPathId]);
+		console.log('path ids are', result);
+		return result;
 	}, [substrateNetworks]);
 
 	useEffect(() => {
@@ -125,7 +135,8 @@ export function useNetworksContext(): NetworksContextState {
 		allNetworks: allNetworks,
 		getNetwork,
 		getSubstrateNetwork: getSubstrateNetworkParams,
-		networks: substrateNetworks
+		networks: substrateNetworks,
+		pathIds
 	};
 }
 

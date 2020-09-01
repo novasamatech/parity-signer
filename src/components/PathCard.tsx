@@ -65,7 +65,8 @@ export default function PathCard({
 	testID?: string;
 	titlePrefix?: string;
 }): React.ReactElement {
-	const { networks, allNetworks } = useContext(NetworksContext);
+	const networksContext = useContext(NetworksContext);
+	const { networks, allNetworks } = networksContext;
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
@@ -73,7 +74,8 @@ export default function PathCard({
 	);
 	const [address, setAddress] = useState('');
 	const computedNetworkKey =
-		networkKey || getNetworkKeyByPath(path, identity.meta.get(path)!, networks);
+		networkKey ||
+		getNetworkKeyByPath(path, identity.meta.get(path)!, networksContext);
 	useEffect(() => {
 		const getAddress = async (): Promise<void> => {
 			const existedAddress = getAddressWithPath(path, identity);

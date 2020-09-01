@@ -15,6 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
+	GetNetwork,
+	GetSubstrateNetwork,
+	NetworksContextState
+} from 'stores/NetworkContext';
+import {
 	deserializeIdentities,
 	getExistedNetworkKeys,
 	getNetworkKeyByPath,
@@ -29,11 +34,25 @@ import {
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
-	UnknownNetworkKeys
+	UnknownNetworkKeys,
+	unknownNetworkPathId
 } from 'constants/networkSpecs';
 
 const networks = new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
 const allNetworks = new Map(Object.entries(NETWORK_LIST));
+const pathIds = Object.values(SUBSTRATE_NETWORK_LIST)
+	.map(n => n.pathId)
+	.concat(unknownNetworkPathId);
+const getNetwork = allNetworks.get as GetNetwork;
+const getSubstrateNetwork = networks.get as GetSubstrateNetwork;
+
+const dummyNetworkContext: NetworksContextState = {
+	allNetworks,
+	getNetwork,
+	getSubstrateNetwork,
+	networks,
+	pathIds
+};
 
 const raw = [
 	{
@@ -239,7 +258,10 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('get the correspond networkKeys', () => {
-		const networkKeys = getExistedNetworkKeys(testIdentities[0], networks);
+		const networkKeys = getExistedNetworkKeys(
+			testIdentities[0],
+			dummyNetworkContext
+		);
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
@@ -254,7 +276,7 @@ describe('IdentitiesUtils', () => {
 			return getNetworkKeyByPath(
 				path,
 				testIdentities[0].meta.get(path),
-				networks
+				dummyNetworkContext
 			);
 		};
 		expect(getNetworkKeyByPathTest('')).toEqual(UnknownNetworkKeys.UNKNOWN);
@@ -272,7 +294,10 @@ describe('IdentitiesUtils', () => {
 
 	it('group path under their network correctly, has no missing accounts', () => {
 		const mockIdentity = testIdentities[0];
-		const existedNetworks = getExistedNetworkKeys(mockIdentity, networks);
+		const existedNetworks = getExistedNetworkKeys(
+			mockIdentity,
+			dummyNetworkContext
+		);
 		const existedAccountsSize = mockIdentity.meta.size;
 
 		const allListedAccounts = existedNetworks.reduce(
@@ -287,7 +312,7 @@ describe('IdentitiesUtils', () => {
 					const networkAccounts = getPathsWithSubstrateNetworkKey(
 						mockIdentity,
 						networkKey,
-						networks
+						dummyNetworkContext
 					);
 					return acc.concat(networkAccounts);
 				}

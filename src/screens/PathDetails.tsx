@@ -98,7 +98,7 @@ export function PathDetailsView({
 							const listedPaths = getPathsWithSubstrateNetworkKey(
 								accountsStore.state.currentIdentity!,
 								networkKey,
-								networks
+								networksContextState
 							);
 							const hasOtherPaths = listedPaths.length > 0;
 							hasOtherPaths
@@ -186,11 +186,11 @@ function PathDetails({
 	route
 }: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
 	const path = route.params.path;
-	const { networks } = useContext(NetworksContext);
+	const networksContextState = useContext(NetworksContext);
 	const networkKey = getNetworkKey(
 		path,
 		accountsStore.state.currentIdentity,
-		networks
+		networksContextState
 	);
 	return (
 		<PathDetailsView
