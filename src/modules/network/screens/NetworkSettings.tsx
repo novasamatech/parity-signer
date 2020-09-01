@@ -17,6 +17,7 @@
 import React, { ReactElement, useContext } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 
+import testIDs from 'e2e/testIDs';
 import { NetworkCard } from 'components/AccountCard';
 import { filterNetworks } from 'modules/network/utils';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -42,6 +43,7 @@ export default function NetworkSettings({
 		const networkSpec = item[1];
 		return (
 			<NetworkCard
+				testID={testIDs.NetworkSettings.networkCard + networkSpec.genesisHash}
 				key={networkSpec.genesisHash + networkSpec.pathId}
 				networkKey={networkSpec.genesisHash}
 				onPress={(): void =>
@@ -62,16 +64,6 @@ export default function NetworkSettings({
 				renderItem={renderNetwork}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 			/>
-			{/**
-			<Button
-				title="Add new network"
-				onPress={() => {
-					navigation.navigate('QrScanner', {
-						isScanningNetworkSpec: true
-					});
-				}}
-			/>
-			 **/}
 		</SafeAreaViewContainer>
 	);
 }

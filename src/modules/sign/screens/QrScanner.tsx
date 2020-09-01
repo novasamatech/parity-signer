@@ -18,6 +18,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
+import testIDs from 'e2e/testIDs';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
 import { useProcessBarCode } from 'modules/sign/utils';
@@ -74,6 +75,7 @@ export default function Scanner({
 						await clearByTap();
 						navigateToNetworkSettings(navigation);
 					},
+					testID: testIDs.QrScanner.networkAddSuccessButton,
 					text: 'Done'
 				}
 			]);
