@@ -26,12 +26,11 @@ import {
 import React, { useReducer } from 'react';
 
 import { AccountsContextState } from 'stores/AccountsContext';
-import { NETWORK_LIST } from 'constants/networkSpecs';
+import {ETHEREUM_NETWORK_LIST} from 'constants/networkSpecs';
 import { GetNetwork, NetworksContextState } from 'stores/NetworkContext';
 import { Account, FoundAccount } from 'types/identityTypes';
 import {
 	isEthereumNetworkParams,
-	NetworkParams,
 	SubstrateNetworkParams
 } from 'types/networkTypes';
 import {
@@ -116,7 +115,8 @@ export type ScannerContextState = {
 	signSubstrateData: (
 		signFunction: TrySignFunc,
 		suriSuffix: string,
-		qrInfo: QrInfo
+		qrInfo: QrInfo,
+		networks: Map<string, SubstrateNetworkParams>
 	) => Promise<void>;
 	signDataLegacy: (pin: string, getNetwork: GetNetwork) => Promise<void>;
 };
@@ -443,7 +443,7 @@ export function useScannerContext(): ScannerContextState {
 		qrInfo: QrInfo
 	): Promise<void> {
 		const { dataToSign, sender } = qrInfo;
-		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
+		if (!sender || !ETHEREUM_NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		const signedData = await signFunction(dataToSign as string);
 		setState({ signedData });
@@ -453,10 +453,11 @@ export function useScannerContext(): ScannerContextState {
 	async function signSubstrateData(
 		signFunction: TrySignFunc,
 		suriSuffix: string,
-		qrInfo: QrInfo
+		qrInfo: QrInfo,
+		networks: Map<string, SubstrateNetworkParams>
 	): Promise<void> {
 		const { dataToSign, isHash, sender } = qrInfo;
-		if (!sender || !NETWORK_LIST.hasOwnProperty(sender.networkKey))
+		if (!sender || !networks.has(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		let signable;
 

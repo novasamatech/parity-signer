@@ -27,8 +27,8 @@ import {
 	SubstrateNetworkParams
 } from 'types/networkTypes';
 
-export const filterSubstrateNetworks = (
-	networkList: Map<string, SubstrateNetworkParams>,
+export const filterNetworks = (
+	networkList: Map<string, NetworkParams>,
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
 ): Array<[string, NetworkParams]> => {
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
@@ -43,7 +43,7 @@ export const filterSubstrateNetworks = (
 			return extraFilter(networkKey, shouldExclude);
 		return !shouldExclude;
 	};
-	return Object.entries(networkList)
+	return Array.from(networkList.entries())
 		.filter(filterNetworkKeys)
 		.sort((a, b) => a[1].order - b[1].order);
 };

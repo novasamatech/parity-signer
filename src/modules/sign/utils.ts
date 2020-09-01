@@ -164,7 +164,8 @@ export function useProcessBarCode(
 			await scannerStore.signSubstrateData(
 				seedRef.trySubstrateSign.bind(seedRef),
 				suriSuffix,
-				qrInfo
+				qrInfo,
+				networks
 			);
 		}
 	}

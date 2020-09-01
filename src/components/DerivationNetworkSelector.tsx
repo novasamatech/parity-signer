@@ -81,7 +81,7 @@ export function NetworkOptions({
 		setVisible(false);
 	};
 
-	const menuOptions = Object.entries(networks)
+	const menuOptions = Array.from(networks.entries())
 		.filter(([networkKey]) => !excludedNetworks.includes(networkKey))
 		.map(([networkKey, networkParams]) => {
 			return (

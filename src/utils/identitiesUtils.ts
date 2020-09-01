@@ -21,11 +21,10 @@ import { generateAccountId } from './account';
 
 import { NetworksContextState } from 'stores/NetworkContext';
 import strings from 'modules/sign/strings';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	ETHEREUM_NETWORK_LIST,
-	NETWORK_LIST,
 	PATH_IDS_LIST,
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys,
@@ -208,12 +207,12 @@ export const getSubstrateNetworkKeyByPathId = (
 	pathId: string,
 	networks: Map<string, SubstrateNetworkParams>
 ): string => {
-	const networkKeyIndex = Object.entries(networks).findIndex(
+	const networkKeyIndex = Array.from(networks.entries()).findIndex(
 		([, networkParams]) => networkParams.pathId === pathId
 	);
 	if (networkKeyIndex !== -1) {
-		const findNetworkEntry: [string, SubstrateNetworkParams] = Object.entries(
-			networks
+		const findNetworkEntry: [string, SubstrateNetworkParams] = Array.from(
+			networks.entries()
 		)[networkKeyIndex];
 		return findNetworkEntry[0];
 	}
@@ -437,7 +436,7 @@ export const groupPaths = (
 			const rootPath = path.match(pathsRegex.firstPath)?.[0];
 			if (rootPath === undefined) return groupedPath;
 
-			const networkEntry = Object.entries(networks).find(
+			const networkEntry = Array.from(networks.entries()).find(
 				([, v]) => `//${v.pathId}` === rootPath
 			);
 			if (networkEntry === undefined) {

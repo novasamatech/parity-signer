@@ -17,8 +17,9 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
+import {NetworksContext} from 'stores/NetworkContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
@@ -47,6 +48,8 @@ export default function AccountNew({
 	navigation
 }: NavigationProps<'AccountNew'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
+	const {getNetwork} = useContext(NetworksContext);
+
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -67,7 +70,7 @@ export default function AccountNew({
 
 	useEffect((): void => {
 		const selectedAccount = accountsStore.state.newAccount;
-		const selectedNetwork = NETWORK_LIST[selectedAccount.networkKey];
+		const selectedNetwork = getNetwork(selectedAccount.networkKey);
 		updateState({
 			selectedAccount,
 			selectedNetwork

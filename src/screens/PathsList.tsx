@@ -25,7 +25,7 @@ import PathGroupCard from 'components/PathGroupCard';
 import { useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import {
 	isEthereumNetworkParams,

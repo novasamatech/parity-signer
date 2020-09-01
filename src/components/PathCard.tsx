@@ -65,7 +65,7 @@ export default function PathCard({
 	testID?: string;
 	titlePrefix?: string;
 }): React.ReactElement {
-	const { networks } = useContext(NetworksContext);
+	const { networks, allNetworks } = useContext(NetworksContext);
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
@@ -78,10 +78,8 @@ export default function PathCard({
 		const getAddress = async (): Promise<void> => {
 			const existedAddress = getAddressWithPath(path, identity);
 			if (existedAddress !== '') return setAddress(existedAddress);
-			if (isSeedRefValid && isPathValid) {
-				const prefix = (NETWORK_LIST[
-					computedNetworkKey
-				] as SubstrateNetworkParams).prefix;
+			if (isSeedRefValid && isPathValid && networks.has(computedNetworkKey)) {
+				const prefix = networks.get(computedNetworkKey)!.prefix;
 				const generatedAddress = await substrateAddress(path, prefix);
 				return setAddress(generatedAddress);
 			}
@@ -101,9 +99,9 @@ export default function PathCard({
 	const isUnknownAddress = address === '';
 	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
 	const networkParams =
-		computedNetworkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress
+		computedNetworkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress && !allNetworks.has(computedNetworkKey)
 			? NETWORK_LIST[defaultNetworkKey]
-			: NETWORK_LIST[computedNetworkKey];
+			: allNetworks.get(computedNetworkKey)!;
 
 	const nonSubstrateCard = (
 		<>

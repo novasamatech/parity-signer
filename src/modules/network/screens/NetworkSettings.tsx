@@ -18,7 +18,7 @@ import React, { ReactElement, useContext } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 
 import { NetworkCard } from 'components/AccountCard';
-import { filterSubstrateNetworks } from 'modules/network/utils';
+import { filterNetworks } from 'modules/network/utils';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
@@ -31,7 +31,7 @@ export default function NetworkSettings({
 	navigation
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	const { networks } = useContext(NetworksContext);
-	const networkParams = filterSubstrateNetworks(networks) as Array<
+	const networkParams = filterNetworks(networks) as Array<
 		[string, SubstrateNetworkParams]
 	>;
 	const renderNetwork = ({

@@ -6,7 +6,7 @@ import {
 export const serializeNetworks = (
 	networks: Map<string, SubstrateNetworkBasics>
 ): string => {
-	const networksEntries = Object.entries(networks);
+	const networksEntries = Array.from(networks.entries());
 	return JSON.stringify(networksEntries);
 };
 
