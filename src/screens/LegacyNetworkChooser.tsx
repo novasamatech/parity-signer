@@ -20,11 +20,11 @@ import { StyleSheet, Text } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import {
-	NETWORK_LIST,
 	UnknownNetworkKeys,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
-import { NetworkParams } from 'types/networkSpecsTypes';
+import { NetworksContext } from 'stores/NetworkContext';
+import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -35,6 +35,7 @@ export default function LegacyNetworkChooserView({
 	navigation
 }: NavigationProps<'LegacyNetworkChooser'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
+	const { allNetworks } = useContext(NetworksContext);
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 
 	if (!__DEV__) {
@@ -45,7 +46,7 @@ export default function LegacyNetworkChooserView({
 	return (
 		<SafeAreaScrollViewContainer contentContainerStyle={{ padding: 20 }}>
 			<Text style={styles.title}>CHOOSE NETWORK</Text>
-			{Object.entries(NETWORK_LIST)
+			{Array.from(allNetworks.entries())
 				.filter(
 					([networkKey]: [string, any]): boolean =>
 						!excludedNetworks.includes(networkKey)

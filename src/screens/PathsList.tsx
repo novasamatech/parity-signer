@@ -14,22 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ScrollView } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
+import { NetworksContext } from 'stores/NetworkContext';
 import { PathGroup } from 'types/identityTypes';
 import PathGroupCard from 'components/PathGroupCard';
 import { useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import {
 	isEthereumNetworkParams,
 	isUnknownNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
@@ -47,7 +48,9 @@ function PathsList({
 	route
 }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
 	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
-	const networkParams = NETWORK_LIST[networkKey];
+	const networkContextState = useContext(NetworksContext);
+	const { networks, getNetwork } = networkContextState;
+	const networkParams = getNetwork(networkKey);
 
 	const { currentIdentity } = accountsStore.state;
 	const isEthereumPath = isEthereumNetworkParams(networkParams);
@@ -56,10 +59,17 @@ function PathsList({
 		if (!currentIdentity || isEthereumPath) return null;
 		const listedPaths = getPathsWithSubstrateNetworkKey(
 			currentIdentity,
-			networkKey
+			networkKey,
+			networkContextState
 		);
-		return groupPaths(listedPaths);
-	}, [currentIdentity, isEthereumPath, networkKey]);
+		return groupPaths(listedPaths, networks);
+	}, [
+		currentIdentity,
+		isEthereumPath,
+		networkKey,
+		networkContextState,
+		networks
+	]);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 

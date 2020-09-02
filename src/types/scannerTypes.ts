@@ -30,7 +30,22 @@ export interface TxRequestData {
 	target?: number;
 }
 
-export type ParsedData = SubstrateParsedData | EthereumParsedData;
+export type ParsedData =
+	| SubstrateParsedData
+	| EthereumParsedData
+	| NetworkParsedData;
+
+export type NetworkParsedData = {
+	action: 'addNetwork';
+	data: {
+		color: string;
+		decimals: number;
+		genesisHash: string;
+		prefix: number;
+		title: string;
+		unit: string;
+	};
+};
 
 export type EthereumParsedData = {
 	data: {
@@ -155,4 +170,10 @@ export function isMultipartData(
 	return (
 		(parsedData as SubstrateMultiParsedData)?.isMultipart || hasMultiFrames
 	);
+}
+
+export function isNetworkParsedData(
+	parsedData: ParsedData | null
+): parsedData is NetworkParsedData {
+	return (parsedData as NetworkParsedData).action === 'addNetwork';
 }

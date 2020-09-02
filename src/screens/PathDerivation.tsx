@@ -20,14 +20,14 @@ import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AlertStateContext } from 'stores/alertContext';
-import { Identity } from 'types/identityTypes';
+import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import TextInput from 'components/TextInput';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
 	extractPathId,
 	getNetworkKey,
-	getNetworkKeyByPathId,
+	getSubstrateNetworkKeyByPathId,
 	validateDerivedPath
 } from 'utils/identitiesUtils';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';
@@ -43,17 +43,6 @@ import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 
-function getParentNetworkKey(
-	parentPath: string,
-	currentIdentity: Identity
-): string {
-	if (currentIdentity.meta.has(parentPath)) {
-		return getNetworkKey(parentPath, currentIdentity);
-	}
-	const pathId = extractPathId(parentPath);
-	return getNetworkKeyByPathId(pathId);
-}
-
 function PathDerivation({
 	accountsStore,
 	navigation,
@@ -63,6 +52,7 @@ function PathDerivation({
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
 	const [password, setPassword] = useState<string>('');
+	const networkContextState = useContext(NetworksContext);
 	const pathNameInput = useRef<TextInput>(null);
 	const { setAlert } = useContext(AlertStateContext);
 	const currentIdentity = accountsStore.state.currentIdentity;
@@ -70,10 +60,18 @@ function PathDerivation({
 		currentIdentity.encryptedSeed
 	);
 	const parentPath = route.params.parentPath;
-	const parentNetworkKey = useMemo(
-		() => getParentNetworkKey(parentPath, currentIdentity),
-		[parentPath, currentIdentity]
-	);
+
+	const parentNetworkKey = useMemo((): string => {
+		const { networks, pathIds } = networkContextState;
+		function getParentNetworkKey(): string {
+			if (currentIdentity.meta.has(parentPath)) {
+				return getNetworkKey(parentPath, currentIdentity, networkContextState);
+			}
+			const pathId = extractPathId(parentPath, pathIds);
+			return getSubstrateNetworkKeyByPathId(pathId, networks);
+		}
+		return getParentNetworkKey();
+	}, [currentIdentity, networkContextState, parentPath]);
 
 	const [customNetworkKey, setCustomNetworkKey] = useState(
 		parentNetworkKey === UnknownNetworkKeys.UNKNOWN
@@ -93,7 +91,7 @@ function PathDerivation({
 			await accountsStore.deriveNewPath(
 				completePath,
 				substrateAddress,
-				currentNetworkKey,
+				networkContextState.getSubstrateNetwork(currentNetworkKey),
 				keyPairsName,
 				password
 			);

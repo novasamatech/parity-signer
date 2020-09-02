@@ -18,8 +18,8 @@ import { Metadata, TypeRegistry } from '@polkadot/types';
 import { getSpecTypes } from '@polkadot/types-known';
 import React, { useState } from 'react';
 
-import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { deepCopyMap } from 'stores/utils';
+import { SubstrateNetworkParams } from 'types/networkTypes';
 import { getMetadata } from 'utils/identitiesUtils';
 
 //Map PathId to Polkadot.js/api spec names and chain names
@@ -72,18 +72,24 @@ export const getOverrideTypes = (
 
 export type RegistriesStoreState = {
 	registries: Map<string, TypeRegistry>;
-	get: (networkKey: string) => TypeRegistry;
+	get: (
+		networks: Map<string, SubstrateNetworkParams>,
+		networkKey: string
+	) => TypeRegistry;
 };
 
 export function useRegistriesStore(): RegistriesStoreState {
 	const dumbRegistry = new TypeRegistry();
 	const [registries, setRegistries] = useState(new Map());
 
-	function get(networkKey: string): TypeRegistry {
-		if (!SUBSTRATE_NETWORK_LIST.hasOwnProperty(networkKey)) return dumbRegistry;
+	function get(
+		networks: Map<string, SubstrateNetworkParams>,
+		networkKey: string
+	): TypeRegistry {
+		if (!networks.has(networkKey)) return dumbRegistry;
 		if (registries.has(networkKey)) return registries.get(networkKey)!;
 
-		const networkParams = SUBSTRATE_NETWORK_LIST[networkKey];
+		const networkParams = networks.get(networkKey)!;
 		const newRegistry = new TypeRegistry();
 		const networkMetadataRaw = getMetadata(networkKey);
 		const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);

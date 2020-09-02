@@ -19,7 +19,7 @@ import { Text, TextStyle } from 'react-native';
 
 import fontStyles from 'styles/fontStyles';
 import { NetworkProtocols } from 'constants/networkSpecs';
-import { NetworkProtocol } from 'types/networkSpecsTypes';
+import { NetworkProtocol } from 'types/networkTypes';
 
 export default function Address(props: {
 	address: string;

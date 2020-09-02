@@ -18,22 +18,26 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
+import testIDs from 'e2e/testIDs';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
 import { useProcessBarCode } from 'modules/sign/utils';
 import { useInjectionQR } from 'e2e/injections';
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
+import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 
-export default function Scanner({}: NavigationProps<
-	'QrScanner'
->): React.ReactElement {
+export default function Scanner({
+	navigation
+}: NavigationProps<'QrScanner'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
+	const networksContextState = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertStateContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
@@ -45,22 +49,43 @@ export default function Scanner({}: NavigationProps<
 		missingFramesMessage: '',
 		totalFramesCount: 0
 	});
-	function showErrorMessage(title: string, message: string): void {
+	function showAlertMessage(
+		title: string,
+		message: string,
+		isSuccess?: boolean
+	): void {
+		const clearByTap = async (): Promise<void> => {
+			scannerStore.cleanup();
+			scannerStore.setReady();
+			setLastFrame(null);
+			setEnableScan(true);
+		};
 		setEnableScan(false);
-		setAlert(title, message, [
-			{
-				onPress: async (): Promise<void> => {
-					scannerStore.cleanup();
-					scannerStore.setReady();
-					setLastFrame(null);
-					setEnableScan(true);
-				},
-				text: 'Try again'
-			}
-		]);
+		if (isSuccess) {
+			setAlert(title, message, [
+				{
+					onPress: clearByTap,
+					text: 'Try again'
+				}
+			]);
+		} else {
+			setAlert(title, message, [
+				{
+					onPress: async (): Promise<void> => {
+						await clearByTap();
+						navigateToNetworkSettings(navigation);
+					},
+					testID: testIDs.QrScanner.networkAddSuccessButton,
+					text: 'Done'
+				}
+			]);
+		}
 	}
 
-	const processBarCode = useProcessBarCode(showErrorMessage);
+	const processBarCode = useProcessBarCode(
+		showAlertMessage,
+		networksContextState
+	);
 	// useEffect((): (() => void) => {
 	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
 	// 		setLastFrame(null);

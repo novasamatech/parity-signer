@@ -29,6 +29,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 - [Manage Accounts on Parity Signer](./docs/tutorials/Hierarchical-Deterministic-Key-Derivation.md)
 - [Signing with MyCrypto](./docs/tutorials/MyCrypto-tutorial.md)
 - [Signing with Fether](./docs/tutorials/Fether-tutorial.md)
+- [Update New Network](./docs/tutorials/New-Network.md)
 
 ### Wiki
 

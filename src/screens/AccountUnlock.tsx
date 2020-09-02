@@ -20,6 +20,7 @@ import { CommonActions } from '@react-navigation/native';
 
 import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -34,12 +35,13 @@ export function AccountUnlockAndSign(
 	const { navigation, route } = props;
 	const next = route.params.next ?? 'SignedTx';
 	const scannerStore = useContext(ScannerContext);
+	const { getNetwork } = useContext(NetworksContext);
 
 	return (
 		<AccountUnlockView
 			checkPin={async (pin: string): Promise<boolean> => {
 				try {
-					await scannerStore.signDataLegacy(pin);
+					await scannerStore.signDataLegacy(pin, getNetwork);
 					return true;
 				} catch (e) {
 					return false;

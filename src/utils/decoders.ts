@@ -22,7 +22,8 @@ import {
 } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 
-import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
+import strings from 'modules/sign/strings';
+import { SubstrateNetworkParams } from 'types/networkTypes';
 import {
 	EthereumParsedData,
 	ParsedData,
@@ -103,7 +104,8 @@ export function rawDataToU8A(rawData: string): Uint8Array | null {
 
 export async function constructDataFromBytes(
 	bytes: Uint8Array,
-	multipartComplete = false
+	multipartComplete = false,
+	networks: Map<string, SubstrateNetworkParams>
 ): Promise<ParsedData> {
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
@@ -175,11 +177,9 @@ export async function constructDataFromBytes(
 					const rawPayload = hexToU8a(hexPayload);
 					data.data.genesisHash = genesisHash;
 					const isOversized = rawPayload.length > 256;
-					const network = SUBSTRATE_NETWORK_LIST[genesisHash];
+					const network = networks.get(genesisHash);
 					if (!network) {
-						throw new Error(
-							`Signer does not currently support a chain with genesis hash: ${genesisHash}`
-						);
+						throw new Error(strings.ERROR_NO_NETWORK);
 					}
 
 					switch (secondByte) {

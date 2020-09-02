@@ -69,6 +69,9 @@ const testIDs = {
 		recoverButton: 'anc_recover_button',
 		showExistedButton: 'anc_show_existed'
 	},
+	NetworkSettings: {
+		networkCard: 'network_settings_network_card'
+	},
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
 		nameInput: 'path_derivation_name_input',
@@ -92,6 +95,9 @@ const testIDs = {
 		pathsGroup: 'path_list_paths_group',
 		scanButton: 'path_list_scan_button',
 		screen: 'path_list_screen'
+	},
+	QrScanner: {
+		networkAddSuccessButton: 'qr_scanner_add_network_button'
 	},
 	SecurityHeader: {
 		scanButton: 'security_header_scan_button'

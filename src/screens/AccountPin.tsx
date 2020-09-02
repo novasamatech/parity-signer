@@ -20,6 +20,7 @@ import { StyleSheet, Text } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
 import { AccountsContext } from 'stores/AccountsContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -41,6 +42,7 @@ function AccountPin({
 	route
 }: NavigationProps<'AccountPin'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
+	const { allNetworks } = useContext(NetworksContext);
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,
@@ -62,7 +64,7 @@ function AccountPin({
 		const account = accountCreation ? newAccount : accountsStore.getSelected()!;
 		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
-				await accountsStore.submitNew(pin);
+				await accountsStore.submitNew(pin, allNetworks);
 				return navigateToLegacyAccountList(navigation);
 			} else {
 				await accountsStore.save(selectedKey, account, pin);

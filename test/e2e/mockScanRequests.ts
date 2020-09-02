@@ -24,8 +24,17 @@ export enum ScanTestRequest {
 	SetRemarkMultiPartPolkadot,
 	EthereumTransaction,
 	EthereumMessage,
-	passwordedAccountExtrinsic
+	PasswordedAccountExtrinsic,
+	AddNewNetwork,
+	AddedNetworkRemarkExtrinsic
 }
+
+const addNetworkTitle = 'Acala Mandala TC4';
+export const addNetworkGenesisHash =
+	'0x783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade36';
+export const addNetworkPathId = addNetworkTitle
+	.toLowerCase()
+	.replace(/ /g, '_');
 
 export const scanRequestDataMap = {
 	[ScanTestRequest.SetRemarkExtrinsicKusama]:
@@ -58,6 +67,12 @@ export const scanRequestDataMap = {
 		rawData:
 			'47b7b22616374696f6e223a227369676e44617461222c2264617461223a7b226163636f756e74223a2233313161364430333334313431353937383238393939636338396346656237333864303646646332222c2264617461223a22343236353635373232303639373332303734363836353732363137303739227d7d0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec'
 	},
-	[ScanTestRequest.passwordedAccountExtrinsic]:
-		'49500000100005301028a476a30a7fd07657fa2e3648ec74b76aea0e9c032772ed108b78924539ce61f10000104112501000026040000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe3ca87fad296dc36e2070c536142e2e9a74fe221f0b9dbce0e9f85921bd0c5e77b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec'
+	[ScanTestRequest.PasswordedAccountExtrinsic]:
+		'49500000100005301028a476a30a7fd07657fa2e3648ec74b76aea0e9c032772ed108b78924539ce61f10000104112501000026040000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe3ca87fad296dc36e2070c536142e2e9a74fe221f0b9dbce0e9f85921bd0c5e77b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe0ec11ec',
+	[ScanTestRequest.AddNewNetwork]: {
+		data: `{"color":"#98F789","decimals":18,"genesisHash":"${addNetworkGenesisHash}","prefix":0,"title":"${addNetworkTitle}","unit":"ACA"}`,
+		rawData: ''
+	},
+	[ScanTestRequest.AddedNetworkRemarkExtrinsic]:
+		'499000001000053010210c431b78448702621d5fd79d7661b1dd6bfce01067a2280039ea6b2352c4b2d100001041186050000fa01000001000000783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade361f688cef5e80e4065ff312c4d36215fb41b0e8410360df8dbeb6501bedefe05f783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade360ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec'
 };

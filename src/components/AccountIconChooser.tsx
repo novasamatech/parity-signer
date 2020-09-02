@@ -33,7 +33,7 @@ import fonts from 'styles/fonts';
 import { debounce } from 'utils/debounce';
 import { brainWalletAddress, substrateAddress, words } from 'utils/native';
 import { constructSURI } from 'utils/suri';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkSpecsTypes';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 
 interface IconType {
 	address: string;

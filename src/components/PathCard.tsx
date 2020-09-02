@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 
@@ -23,6 +23,7 @@ import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
+import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import {
 	defaultNetworkKey,
@@ -34,9 +35,8 @@ import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
 import {
 	isSubstrateNetworkParams,
-	isUnknownNetworkParams,
-	SubstrateNetworkParams
-} from 'types/networkSpecsTypes';
+	isUnknownNetworkParams
+} from 'types/networkTypes';
 import { ButtonListener } from 'types/props';
 import {
 	getAddressWithPath,
@@ -64,6 +64,8 @@ export default function PathCard({
 	testID?: string;
 	titlePrefix?: string;
 }): React.ReactElement {
+	const networksContext = useContext(NetworksContext);
+	const { networks, allNetworks } = networksContext;
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
@@ -71,15 +73,14 @@ export default function PathCard({
 	);
 	const [address, setAddress] = useState('');
 	const computedNetworkKey =
-		networkKey || getNetworkKeyByPath(path, identity.meta.get(path)!);
+		networkKey ||
+		getNetworkKeyByPath(path, identity.meta.get(path)!, networksContext);
 	useEffect(() => {
 		const getAddress = async (): Promise<void> => {
 			const existedAddress = getAddressWithPath(path, identity);
 			if (existedAddress !== '') return setAddress(existedAddress);
-			if (isSeedRefValid && isPathValid) {
-				const prefix = (NETWORK_LIST[
-					computedNetworkKey
-				] as SubstrateNetworkParams).prefix;
+			if (isSeedRefValid && isPathValid && networks.has(computedNetworkKey)) {
+				const prefix = networks.get(computedNetworkKey)!.prefix;
 				const generatedAddress = await substrateAddress(path, prefix);
 				return setAddress(generatedAddress);
 			}
@@ -93,15 +94,18 @@ export default function PathCard({
 		networkKey,
 		computedNetworkKey,
 		isSeedRefValid,
-		substrateAddress
+		substrateAddress,
+		networks
 	]);
 
 	const isUnknownAddress = address === '';
 	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
 	const networkParams =
-		computedNetworkKey === UnknownNetworkKeys.UNKNOWN && !isUnknownAddress
+		computedNetworkKey === UnknownNetworkKeys.UNKNOWN &&
+		!isUnknownAddress &&
+		!allNetworks.has(computedNetworkKey)
 			? NETWORK_LIST[defaultNetworkKey]
-			: NETWORK_LIST[computedNetworkKey];
+			: allNetworks.get(computedNetworkKey)!;
 
 	const nonSubstrateCard = (
 		<>

@@ -15,7 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
 	defaultNetworkKey,
 	NETWORK_LIST,
@@ -26,10 +25,10 @@ import {
 	NetworkParams,
 	SubstrateNetworkBasics,
 	SubstrateNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 
-export const filterSubstrateNetworks = (
-	networkList: Record<string, NetworkParams>,
+export const filterNetworks = (
+	networkList: Map<string, NetworkParams>,
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
 ): Array<[string, NetworkParams]> => {
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
@@ -44,7 +43,7 @@ export const filterSubstrateNetworks = (
 			return extraFilter(networkKey, shouldExclude);
 		return !shouldExclude;
 	};
-	return Object.entries(networkList)
+	return Array.from(networkList.entries())
 		.filter(filterNetworkKeys)
 		.sort((a, b) => a[1].order - b[1].order);
 };
@@ -81,6 +80,7 @@ export function getCompleteSubstrateNetworkSpec(
 	const defaultNewNetworkSpecParams = {
 		color: generateRandomColor(),
 		decimals: defaultNetworkSpec.decimals,
+		deleted: false,
 		logo: defaultNetworkSpec.logo,
 		order: 102, //TODO
 		prefix: defaultNetworkSpec.prefix,
@@ -88,23 +88,4 @@ export function getCompleteSubstrateNetworkSpec(
 		secondaryColor: generateRandomColor()
 	};
 	return { ...defaultNewNetworkSpecParams, ...newNetworkParams };
-}
-
-export function defaultNetworkSpecs(): SubstrateNetworkParams[] {
-	const excludedNetworks: string[] = [];
-	if (!__DEV__) {
-		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-	}
-	return Object.entries(SUBSTRATE_NETWORK_LIST).reduce(
-		(
-			networkSpecsList: SubstrateNetworkParams[],
-			[networkKey, networkParams]: [string, SubstrateNetworkParams]
-		) => {
-			if (excludedNetworks.includes(networkKey)) return networkSpecsList;
-			networkSpecsList.push(networkParams);
-			return networkSpecsList;
-		},
-		[]
-	);
 }

@@ -15,6 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
+	GetNetwork,
+	GetSubstrateNetwork,
+	NetworksContextState
+} from 'stores/NetworkContext';
+import {
 	deserializeIdentities,
 	getExistedNetworkKeys,
 	getNetworkKeyByPath,
@@ -26,9 +31,28 @@ import {
 } from 'utils/identitiesUtils';
 import {
 	EthereumNetworkKeys,
+	NETWORK_LIST,
+	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
-	UnknownNetworkKeys
+	UnknownNetworkKeys,
+	unknownNetworkPathId
 } from 'constants/networkSpecs';
+
+const networks = new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
+const allNetworks = new Map(Object.entries(NETWORK_LIST));
+const pathIds = Object.values(SUBSTRATE_NETWORK_LIST)
+	.map(n => n.pathId)
+	.concat(unknownNetworkPathId);
+const getNetwork = allNetworks.get as GetNetwork;
+const getSubstrateNetwork = networks.get as GetSubstrateNetwork;
+
+const dummyNetworkContext = {
+	allNetworks,
+	getNetwork,
+	getSubstrateNetwork,
+	networks,
+	pathIds
+} as NetworksContextState;
 
 const raw = [
 	{
@@ -167,7 +191,7 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('regroup the kusama paths', () => {
-		const groupResult = groupPaths(kusamaPaths);
+		const groupResult = groupPaths(kusamaPaths, networks);
 		expect(groupResult).toEqual([
 			{
 				paths: ['//kusama'],
@@ -201,7 +225,7 @@ describe('IdentitiesUtils', () => {
 			'/kusama/1',
 			'/polkadot_test/1'
 		];
-		const groupResult = groupPaths(unKnownPaths);
+		const groupResult = groupPaths(unKnownPaths, networks);
 		expect(groupResult).toEqual([
 			{
 				paths: [''],
@@ -234,7 +258,10 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('get the correspond networkKeys', () => {
-		const networkKeys = getExistedNetworkKeys(testIdentities[0]);
+		const networkKeys = getExistedNetworkKeys(
+			testIdentities[0],
+			dummyNetworkContext
+		);
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
@@ -246,7 +273,11 @@ describe('IdentitiesUtils', () => {
 
 	it('get networkKey correctly by path', () => {
 		const getNetworkKeyByPathTest = (path: string): string => {
-			return getNetworkKeyByPath(path, testIdentities[0].meta.get(path));
+			return getNetworkKeyByPath(
+				path,
+				testIdentities[0].meta.get(path),
+				dummyNetworkContext
+			);
 		};
 		expect(getNetworkKeyByPathTest('')).toEqual(UnknownNetworkKeys.UNKNOWN);
 		expect(getNetworkKeyByPathTest('//kusama')).toEqual(
@@ -263,7 +294,10 @@ describe('IdentitiesUtils', () => {
 
 	it('group path under their network correctly, has no missing accounts', () => {
 		const mockIdentity = testIdentities[0];
-		const existedNetworks = getExistedNetworkKeys(mockIdentity);
+		const existedNetworks = getExistedNetworkKeys(
+			mockIdentity,
+			dummyNetworkContext
+		);
 		const existedAccountsSize = mockIdentity.meta.size;
 
 		const allListedAccounts = existedNetworks.reduce(
@@ -277,7 +311,8 @@ describe('IdentitiesUtils', () => {
 				} else {
 					const networkAccounts = getPathsWithSubstrateNetworkKey(
 						mockIdentity,
-						networkKey
+						networkKey,
+						dummyNetworkContext
 					);
 					return acc.concat(networkAccounts);
 				}

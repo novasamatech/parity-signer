@@ -16,12 +16,14 @@
 
 import colors from 'styles/colors';
 import {
+	EthereumNetworkDefaultConstants,
 	EthereumNetworkParams,
 	NetworkParams,
 	NetworkProtocol,
+	SubstrateNetworkDefaultConstant,
 	SubstrateNetworkParams,
 	UnknownNetworkParams
-} from 'types/networkSpecsTypes';
+} from 'types/networkTypes';
 
 export const unknownNetworkPathId = '';
 
@@ -68,19 +70,31 @@ export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
 });
 
-const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
-	[UnknownNetworkKeys.UNKNOWN]: {
-		color: colors.signal.error,
-		order: 99,
-		pathId: unknownNetworkPathId,
-		prefix: 2,
-		protocol: NetworkProtocols.UNKNOWN,
-		secondaryColor: colors.background.card,
-		title: 'Unknown network'
-	}
+export const unknownNetworkParams: UnknownNetworkParams = {
+	color: colors.signal.error,
+	order: 99,
+	pathId: unknownNetworkPathId,
+	prefix: 2,
+	protocol: NetworkProtocols.UNKNOWN,
+	secondaryColor: colors.background.card,
+	title: 'Unknown network'
 };
 
-const substrateNetworkBase: Record<string, Partial<SubstrateNetworkParams>> = {
+export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
+	...unknownNetworkParams,
+	decimals: 12,
+	deleted: false,
+	genesisHash: UnknownNetworkKeys.UNKNOWN,
+	logo: require('res/img/logos/Substrate_Dev.png'),
+	protocol: NetworkProtocols.SUBSTRATE,
+	unit: 'UNIT'
+};
+
+const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
+	[UnknownNetworkKeys.UNKNOWN]: unknownNetworkParams
+};
+
+const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 	[SubstrateNetworkKeys.CENTRIFUGE]: {
 		color: '#FCC367',
 		decimals: 18,
@@ -179,7 +193,7 @@ const substrateNetworkBase: Record<string, Partial<SubstrateNetworkParams>> = {
 	}
 };
 
-const ethereumNetworkBase: Record<string, Partial<EthereumNetworkParams>> = {
+const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
 	[EthereumNetworkKeys.FRONTIER]: {
 		color: '#8B94B3',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
@@ -221,21 +235,31 @@ const ethereumDefaultValues = {
 
 const substrateDefaultValues = {
 	color: '#4C4646',
+	deleted: false,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
 	secondaryColor: colors.background.card
 };
 
-function setDefault(
-	networkBase: any,
-	defaultProps: object
-): { [key: string]: any } {
-	return Object.keys(networkBase).reduce((acc, networkKey) => {
+function setEthereumNetworkDefault(): Record<string, EthereumNetworkParams> {
+	return Object.keys(ethereumNetworkBase).reduce((acc, networkKey) => {
 		return {
 			...acc,
 			[networkKey]: {
-				...defaultProps,
-				...networkBase[networkKey]
+				...ethereumDefaultValues,
+				...ethereumNetworkBase[networkKey]
+			}
+		};
+	}, {});
+}
+
+function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
+	return Object.keys(substrateNetworkBase).reduce((acc, networkKey) => {
+		return {
+			...acc,
+			[networkKey]: {
+				...substrateDefaultValues,
+				...substrateNetworkBase[networkKey]
 			}
 		};
 	}, {});
@@ -244,23 +268,15 @@ function setDefault(
 export const ETHEREUM_NETWORK_LIST: Record<
 	string,
 	EthereumNetworkParams
-> = Object.freeze(setDefault(ethereumNetworkBase, ethereumDefaultValues));
+> = Object.freeze(setEthereumNetworkDefault());
 export const SUBSTRATE_NETWORK_LIST: Record<
 	string,
 	SubstrateNetworkParams
-> = Object.freeze(setDefault(substrateNetworkBase, substrateDefaultValues));
+> = Object.freeze(setSubstrateNetworkDefault());
 export const UNKNOWN_NETWORK: Record<
 	string,
 	UnknownNetworkParams
 > = Object.freeze(unknownNetworkBase);
-
-const substrateNetworkMetas = Object.values({
-	...SUBSTRATE_NETWORK_LIST,
-	...UNKNOWN_NETWORK
-});
-export const PATH_IDS_LIST = substrateNetworkMetas.map(
-	(meta: UnknownNetworkParams | SubstrateNetworkParams) => meta.pathId
-);
 
 export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(
 	Object.assign(

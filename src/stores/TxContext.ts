@@ -17,28 +17,38 @@
 import React, { useState } from 'react';
 
 import { deepCopyMap } from 'stores/utils';
+import { NetworkParams } from 'types/networkTypes';
 import { loadAccountTxs, saveTx as saveTxDB } from 'utils/db';
 import { TxParticipant } from 'types/tx';
 
 type TxContextState = {
-	saveTx: (tx: any) => Promise<void>;
+	saveTx: (tx: any, allNetworks: Map<string, NetworkParams>) => Promise<void>;
 	getTxList: ({ address }: { address: string }) => string[];
-	loadTxsForAccount: (account: TxParticipant) => Promise<void>;
+	loadTxsForAccount: (
+		account: TxParticipant,
+		allNetworks: Map<string, NetworkParams>
+	) => Promise<void>;
 	signedTxs: Map<string, Record<string, any>>;
 };
 
 export function useTxStore(): TxContextState {
 	const [signedTxs, setSignedTxs] = useState(new Map());
 
-	async function saveTx(tx: any): Promise<void> {
-		await saveTxDB(tx);
+	async function saveTx(
+		tx: any,
+		allNetworks: Map<string, NetworkParams>
+	): Promise<void> {
+		await saveTxDB(tx, allNetworks);
 		const newSignedTxs = deepCopyMap(signedTxs);
 		signedTxs.set(tx.hash, tx);
 		setSignedTxs(newSignedTxs);
 	}
 
-	async function loadTxsForAccount(account: TxParticipant): Promise<void> {
-		const txs = await loadAccountTxs(account);
+	async function loadTxsForAccount(
+		account: TxParticipant,
+		allNetworks: Map<string, NetworkParams>
+	): Promise<void> {
+		const txs = await loadAccountTxs(account, allNetworks);
 		const newSignedTxs = new Map([...signedTxs, ...txs]);
 		setSignedTxs(newSignedTxs);
 	}

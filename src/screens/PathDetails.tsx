@@ -23,6 +23,7 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 // TODO use typescript 3.8's type import, Wait for prettier update.
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -70,13 +71,16 @@ export function PathDetailsView({
 	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed(
 		isSeedRefValid
 	);
+	const networksContextState = useContext(NetworksContext);
+	const { allNetworks } = networksContextState;
 	if (!address) return <View />;
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
-	const accountId = generateAccountId({
+	const accountId = generateAccountId(
 		address,
-		networkKey: formattedNetworkKey
-	});
+		formattedNetworkKey,
+		allNetworks
+	);
 
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
@@ -89,11 +93,12 @@ export function PathDetailsView({
 			case 'PathDelete':
 				alertDeleteAccount(setAlert, 'this account', async () => {
 					try {
-						await accountsStore.deletePath(path);
+						await accountsStore.deletePath(path, networksContextState);
 						if (isSubstratePath(path)) {
 							const listedPaths = getPathsWithSubstrateNetworkKey(
 								accountsStore.state.currentIdentity!,
-								networkKey
+								networkKey,
+								networksContextState
 							);
 							const hasOtherPaths = listedPaths.length > 0;
 							hasOtherPaths
@@ -181,7 +186,12 @@ function PathDetails({
 	route
 }: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
 	const path = route.params.path;
-	const networkKey = getNetworkKey(path, accountsStore.state.currentIdentity);
+	const networksContextState = useContext(NetworksContext);
+	const networkKey = getNetworkKey(
+		path,
+		accountsStore.state.currentIdentity,
+		networksContextState
+	);
 	return (
 		<PathDetailsView
 			accountsStore={accountsStore}

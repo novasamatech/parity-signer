@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import {
 	Image,
 	Platform,
@@ -29,10 +29,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import TransparentBackground from './TransparentBackground';
 
-import {
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
+import { NetworksContext } from 'stores/NetworkContext';
+import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 
@@ -53,14 +51,14 @@ export function DerivationNetworkSelector({
 	networkKey: string;
 	setVisible: (shouldVisible: boolean) => void;
 }): React.ReactElement {
+	const { getSubstrateNetwork } = useContext(NetworksContext);
+	const network = getSubstrateNetwork(networkKey);
 	return (
 		<View style={styles.body}>
 			<Text style={styles.label}>{ACCOUNT_NETWORK}</Text>
 			<Touchable onPress={(): void => setVisible(true)}>
 				<View style={styles.triggerWrapper}>
-					<Text style={styles.triggerLabel}>
-						{SUBSTRATE_NETWORK_LIST[networkKey].title}
-					</Text>
+					<Text style={styles.triggerLabel}>{network.title}</Text>
 					<Icon name="more-vert" size={25} color={colors.text.main} />
 				</View>
 			</Touchable>
@@ -77,12 +75,13 @@ export function NetworkOptions({
 	visible: boolean;
 	setVisible: (shouldVisible: boolean) => void;
 }): React.ReactElement {
+	const { networks } = useContext(NetworksContext);
 	const onNetworkSelected = (networkKey: string): void => {
 		setNetworkKey(networkKey);
 		setVisible(false);
 	};
 
-	const menuOptions = Object.entries(SUBSTRATE_NETWORK_LIST)
+	const menuOptions = Array.from(networks.entries())
 		.filter(([networkKey]) => !excludedNetworks.includes(networkKey))
 		.map(([networkKey, networkParams]) => {
 			return (
