@@ -306,7 +306,7 @@ export function useScannerContext(): ScannerContextState {
 				txRequest.data.account
 			)
 		) {
-			throw new Error('Scanned QR contains no valid transaction');
+			throw new Error('Scanned QR contains no valid extrinsic');
 		}
 		let tx, networkKey, recipientAddress, dataToSign;
 		if (isEthereumCompletedParsedData(txRequest)) {
@@ -427,12 +427,12 @@ export function useScannerContext(): ScannerContextState {
 					);
 				default:
 					throw new Error(
-						'Scanned QR should contain either transaction or a message to sign'
+						'Scanned QR should contain either extrinsic or a message to sign'
 					);
 			}
 		} else {
 			throw new Error(
-				'Scanned QR should contain either transaction or a message to sign'
+				'Scanned QR should contain either extrinsic or a message to sign'
 			);
 		}
 	}

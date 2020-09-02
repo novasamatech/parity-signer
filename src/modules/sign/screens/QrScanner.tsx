@@ -180,9 +180,6 @@ export default function Scanner({
 					) : (
 						<View style={styles.bottom}>
 							<Text style={styles.descTitle}>Scan QR Code</Text>
-							<Text style={styles.descSecondary}>
-								To Sign a New Transaction
-							</Text>
 						</View>
 					)}
 					{missedFrames && missedFrames.length >= 1 && (
