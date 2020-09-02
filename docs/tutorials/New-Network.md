@@ -14,6 +14,8 @@ Here we can see the chain specifications like `Network Name`, `Address Prefix`, 
 
 On the right side is the QR Code we need.
 
+## 2. Scan metadata QR code with Parity Signer
+
 Now on the Parity Signer app, click the QR scanner Button anywhere on the app, and scan this QR code, you will have the new Network added to Parity Signer. You can now create accounts under it and sign extrinsic with this network. 
 
 ![Network Metadata Added on Parity Signer](images/Network-Metadata-Added.png)
