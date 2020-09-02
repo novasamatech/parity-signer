@@ -22,7 +22,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
-import {useRegistriesStore, RegistriesContext} from 'stores/RegistriesContext';
 
 import {
 	AppNavigator,
@@ -30,6 +29,10 @@ import {
 	ScreenStack
 } from './screens';
 
+import {
+	useRegistriesStore,
+	RegistriesContext
+} from 'stores/RegistriesContext';
 import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
 import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
 import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
@@ -95,20 +98,22 @@ export default function App(props: AppProps): React.ReactElement {
 				<AccountsContext.Provider value={accountsContext}>
 					<ScannerContext.Provider value={scannerContext}>
 						<RegistriesContext.Provider value={registriesContext}>
-						<GlobalStateContext.Provider value={globalContext}>
-							<AlertStateContext.Provider value={alertContext}>
-								<SeedRefsContext.Provider value={seedRefContext}>
-									<MenuProvider backHandler={true}>
-										<StatusBar
-											barStyle="light-content"
-											backgroundColor={colors.background.app}
-										/>
-										<CustomAlert />
-										<NavigationContainer>{renderStacks()}</NavigationContainer>
-									</MenuProvider>
-								</SeedRefsContext.Provider>
-							</AlertStateContext.Provider>
-						</GlobalStateContext.Provider>
+							<GlobalStateContext.Provider value={globalContext}>
+								<AlertStateContext.Provider value={alertContext}>
+									<SeedRefsContext.Provider value={seedRefContext}>
+										<MenuProvider backHandler={true}>
+											<StatusBar
+												barStyle="light-content"
+												backgroundColor={colors.background.app}
+											/>
+											<CustomAlert />
+											<NavigationContainer>
+												{renderStacks()}
+											</NavigationContainer>
+										</MenuProvider>
+									</SeedRefsContext.Provider>
+								</AlertStateContext.Provider>
+							</GlobalStateContext.Provider>
 						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
 				</AccountsContext.Provider>
