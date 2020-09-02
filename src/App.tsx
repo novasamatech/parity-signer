@@ -22,6 +22,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
+import {useRegistriesStore, RegistriesContext} from 'stores/RegistriesContext';
 
 import {
 	AppNavigator,
@@ -66,6 +67,7 @@ export default function App(props: AppProps): React.ReactElement {
 	const networkContext = useNetworksContext();
 	const accountsContext = useAccountContext();
 	const scannerContext = useScannerContext();
+	const registriesContext = useRegistriesStore();
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
@@ -92,6 +94,7 @@ export default function App(props: AppProps): React.ReactElement {
 			<NetworksContext.Provider value={networkContext}>
 				<AccountsContext.Provider value={accountsContext}>
 					<ScannerContext.Provider value={scannerContext}>
+						<RegistriesContext.Provider value={registriesContext}>
 						<GlobalStateContext.Provider value={globalContext}>
 							<AlertStateContext.Provider value={alertContext}>
 								<SeedRefsContext.Provider value={seedRefContext}>
@@ -106,6 +109,7 @@ export default function App(props: AppProps): React.ReactElement {
 								</SeedRefsContext.Provider>
 							</AlertStateContext.Provider>
 						</GlobalStateContext.Provider>
+						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
 				</AccountsContext.Provider>
 			</NetworksContext.Provider>

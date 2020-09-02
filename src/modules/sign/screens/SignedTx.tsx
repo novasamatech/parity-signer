@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
@@ -92,7 +93,7 @@ function SignedTxView({
 				accountsStore={accountsStore}
 				titlePrefix={'from:'}
 			/>
-			{isEthereum && (
+			{isEthereum ? (
 				<View style={[styles.bodyContent, { marginTop: 16 }]}>
 					<TxDetailsCard
 						style={{ marginBottom: 20 }}
@@ -104,7 +105,7 @@ function SignedTxView({
 					<Text style={styles.title}>Recipient</Text>
 					<CompatibleCard account={recipient} accountsStore={accountsStore} />
 				</View>
-			)}
+			): <PayloadDetailsCard networkKey={sender.networkKey} payload={} }
 		</SafeAreaScrollViewContainer>
 	);
 }

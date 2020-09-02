@@ -89,6 +89,7 @@ type ScannerStoreState = {
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
 	type: 'transaction' | 'message' | null;
+	payload: GenericExtrinsicPayload;
 };
 
 export type ScannerContextState = {
