@@ -169,7 +169,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'polkadot',
 		prefix: 0,
 		title: 'Polkadot',
-		unit: 'New DOT'
+		unit: 'DOT'
 	},
 	[SubstrateNetworkKeys.ROCOCO]: {
 		color: '#6f36dc',
