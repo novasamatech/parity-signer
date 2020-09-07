@@ -52,7 +52,7 @@ export default function Scanner({
 	function showAlertMessage(
 		title: string,
 		message: string,
-		isSuccess?: boolean
+		isAddNetworkSuccess?: boolean
 	): void {
 		const clearByTap = async (): Promise<void> => {
 			scannerStore.cleanup();
@@ -61,14 +61,7 @@ export default function Scanner({
 			setEnableScan(true);
 		};
 		setEnableScan(false);
-		if (isSuccess) {
-			setAlert(title, message, [
-				{
-					onPress: clearByTap,
-					text: 'Try again'
-				}
-			]);
-		} else {
+		if (isAddNetworkSuccess) {
 			setAlert(title, message, [
 				{
 					onPress: async (): Promise<void> => {
@@ -77,6 +70,13 @@ export default function Scanner({
 					},
 					testID: testIDs.QrScanner.networkAddSuccessButton,
 					text: 'Done'
+				}
+			]);
+		} else {
+			setAlert(title, message, [
+				{
+					onPress: clearByTap,
+					text: 'Try again'
 				}
 			]);
 		}

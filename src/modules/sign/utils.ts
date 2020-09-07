@@ -221,7 +221,8 @@ export function useProcessBarCode(
 		networksContextState.addNetwork(networkParsedData);
 		return showAlertMessage(
 			strings.SUCCESS_TITLE,
-			strings.SUCCESS_ADD_NETWORK + networkParsedData.data.title
+			strings.SUCCESS_ADD_NETWORK + networkParsedData.data.title,
+			true
 		);
 	}
 
