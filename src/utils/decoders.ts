@@ -185,13 +185,6 @@ export async function constructDataFromBytes(
 					switch (secondByte) {
 						case '00': // sign mortal extrinsic
 						case '02': // sign immortal extrinsic
-							extrinsicPayload = registry.createType(
-								'ExtrinsicPayload',
-								rawPayload,
-								{
-									version: ExtrinsicPayloadLatestVersion
-								}
-							);
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;

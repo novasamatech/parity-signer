@@ -44,7 +44,7 @@ export default function SignedMessage(
 	props: NavigationProps<'SignedMessage'>
 ): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
-	const { sender, message } = scannerStore.state;
+	const { sender, message, dataToSign } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
 
 	useEffect(() => cleanup.current, [cleanup]);
@@ -92,11 +92,10 @@ function SignedMessageView({
 				account={sender}
 				accountsStore={accountsStore}
 			/>
-			{!isEthereum && prehash ? (
+			{!isEthereum && dataToSign ? (
 				<PayloadDetailsCard
 					description={strings.INFO_MULTI_PART}
-					payload={prehash}
-					signature={data}
+					signature={signedData.toString()}
 					networkKey={sender.networkKey}
 				/>
 			) : null}

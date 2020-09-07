@@ -44,7 +44,8 @@ const networkTypesMap: NetworkTypesMap = {
 		chains: {
 			westend: 'Westend'
 		}
-	}
+	},
+	rococo: { chains: {} }
 };
 
 export const getOverrideTypes = (
@@ -72,26 +73,26 @@ export const getOverrideTypes = (
 
 export type RegistriesStoreState = {
 	registries: Map<string, TypeRegistry>;
-	get: (
+	getTypeRegistry: (
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
-	) => TypeRegistry;
+	) => TypeRegistry | null;
 };
 
 export function useRegistriesStore(): RegistriesStoreState {
-	const dumbRegistry = new TypeRegistry();
 	const [registries, setRegistries] = useState(new Map());
 
-	function get(
+	function getTypeRegistry(
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
-	): TypeRegistry {
-		if (!networks.has(networkKey)) return dumbRegistry;
+	): TypeRegistry | null {
+		const networkMetadataRaw = getMetadata(networkKey);
+		if (networkMetadataRaw === null) return null;
+
 		if (registries.has(networkKey)) return registries.get(networkKey)!;
 
 		const networkParams = networks.get(networkKey)!;
 		const newRegistry = new TypeRegistry();
-		const networkMetadataRaw = getMetadata(networkKey);
 		const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
 		newRegistry.register(overrideTypes);
 		const metadata = new Metadata(newRegistry, networkMetadataRaw);
@@ -102,7 +103,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 		return newRegistry;
 	}
 
-	return { get, registries };
+	return { getTypeRegistry, registries };
 }
 
 export const RegistriesContext = React.createContext(

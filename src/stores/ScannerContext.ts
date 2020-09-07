@@ -74,7 +74,7 @@ type SignedTX = {
 type ScannerStoreState = {
 	busy: boolean;
 	completedFramesCount: number;
-	dataToSign: string | GenericExtrinsicPayload;
+	dataToSign: string | Uint8Array;
 	isHash: boolean;
 	isOversized: boolean;
 	latestFrame: number | null;
@@ -89,7 +89,6 @@ type ScannerStoreState = {
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
 	type: 'transaction' | 'message' | null;
-	payload: GenericExtrinsicPayload;
 };
 
 export type ScannerContextState = {
@@ -348,7 +347,7 @@ export function useScannerContext(): ScannerContextState {
 			)) || emptyAccount(recipientAddress, networkKey);
 
 		const qrInfo: TxQRInfo = {
-			dataToSign: dataToSign as string,
+			dataToSign: dataToSign,
 			isHash: false,
 			isOversized,
 			recipient: recipient as FoundAccount,
@@ -465,7 +464,8 @@ export function useScannerContext(): ScannerContextState {
 		if (dataToSign instanceof GenericExtrinsicPayload) {
 			signable = u8aToHex(dataToSign.toU8a(true), -1, false);
 		} else if (isHash) {
-			signable = hexStripPrefix(dataToSign);
+			console.log('sign substrate data type is', typeof dataToSign);
+			signable = hexStripPrefix(dataToSign.toString());
 		} else if (isU8a(dataToSign)) {
 			signable = hexStripPrefix(u8aToHex(dataToSign));
 		} else if (isAscii(dataToSign)) {
@@ -501,7 +501,8 @@ export function useScannerContext(): ScannerContextState {
 			if (dataToSign instanceof GenericExtrinsicPayload) {
 				signable = u8aToHex(dataToSign.toU8a(true), -1, false);
 			} else if (isHash) {
-				signable = hexStripPrefix(dataToSign);
+				console.log('sign legacy data type is', typeof dataToSign);
+				signable = hexStripPrefix(dataToSign.toString());
 			} else if (isU8a(dataToSign)) {
 				signable = hexStripPrefix(u8aToHex(dataToSign));
 			} else if (isAscii(dataToSign)) {

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GenericExtrinsicPayload } from '@polkadot/types';
+import { GenericExtrinsicPayload, TypeRegistry } from '@polkadot/types';
 import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
@@ -25,7 +25,10 @@ import { ExtrinsicEra } from '@polkadot/types/interfaces';
 
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import { RegistriesStoreState } from 'stores/RegistriesContext';
+import {
+	RegistriesContext,
+	RegistriesStoreState
+} from 'stores/RegistriesContext';
 import colors from 'styles/colors';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';
@@ -56,17 +59,17 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
 		const [tip, setTip] = useState<string>();
 		const [useFallback, setUseFallBack] = useState(false);
+		const { getTypeRegistry } = useContext(RegistriesContext);
 		const { setAlert } = useContext(AlertStateContext);
 		const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 		const networkParams = getSubstrateNetwork(networkKey);
 		const prefix = networkParams.prefix;
+		const typeRegistry = getTypeRegistry(networks, networkKey)!;
 
 		useEffect(() => {
 			if (label === 'Method' && !fallback) {
 				try {
-					const registry = registriesStore.get(networks, networkKey);
-					const call = registry.createType('Call', value);
-
+					const call = typeRegistry.createType('Call', value);
 					const methodArgs = {};
 
 					function formatArgs(

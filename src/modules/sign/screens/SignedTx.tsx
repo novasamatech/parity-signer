@@ -17,6 +17,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
+import { usePayloadDetails } from 'modules/sign/hooks';
 import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import strings from 'modules/sign/strings';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
@@ -65,10 +66,42 @@ function SignedTxView({
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const { signedData, tx } = scannerStore.state;
+	const { signedData, tx, dataToSign } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
+	const [isProcessing, payload] = usePayloadDetails(
+		dataToSign,
+		sender.networkKey
+	);
+
+	function renderPayloadDetails(): React.ReactNode {
+		if (isEthereum) {
+			return (
+				<View style={[styles.bodyContent, { marginTop: 16 }]}>
+					<TxDetailsCard
+						style={{ marginBottom: 20 }}
+						description={strings.INFO_ETH_TX}
+						value={value}
+						gas={gas}
+						gasPrice={gasPrice}
+					/>
+					<Text style={styles.title}>Recipient</Text>
+					<CompatibleCard account={recipient} accountsStore={accountsStore} />
+				</View>
+			);
+		} else {
+			if (!isProcessing && payload !== null) {
+				return (
+					<PayloadDetailsCard
+						networkKey={sender.networkKey}
+						payload={payload}
+						signature={signedData}
+					/>
+				);
+			}
+		}
+	}
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -93,21 +126,7 @@ function SignedTxView({
 				accountsStore={accountsStore}
 				titlePrefix={'from:'}
 			/>
-			{isEthereum ? (
-				<View style={[styles.bodyContent, { marginTop: 16 }]}>
-					<TxDetailsCard
-						style={{ marginBottom: 20 }}
-						description={strings.INFO_ETH_TX}
-						value={value}
-						gas={gas}
-						gasPrice={gasPrice}
-					/>
-					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient} accountsStore={accountsStore} />
-				</View>
-			) : (
-				<PayloadDetailsCard networkKey={sender.networkKey} />
-			)}
+			{renderPayloadDetails()}
 		</SafeAreaScrollViewContainer>
 	);
 }
