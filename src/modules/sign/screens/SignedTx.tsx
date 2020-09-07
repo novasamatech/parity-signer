@@ -72,9 +72,7 @@ function SignedTxView({
 
 	return (
 		<SafeAreaScrollViewContainer>
-			<Text style={styles.topTitle}>
-				Signed {isEthereum ? 'transaction' : 'extrinsic'}
-			</Text>
+			<Text style={styles.topTitle}>Signed extrinsic</Text>
 			<Separator
 				shadow={true}
 				style={{
