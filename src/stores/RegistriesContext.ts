@@ -93,9 +93,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 
 		const networkParams = networks.get(networkKey)!;
 		const newRegistry = new TypeRegistry();
-		debugger;
 		const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
-		debugger;
 		newRegistry.register(overrideTypes);
 		const metadata = new Metadata(newRegistry, networkMetadataRaw);
 		newRegistry.setMetadata(metadata);
