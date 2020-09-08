@@ -7,6 +7,8 @@ const strings = {
 	ERROR_NO_SENDER_FOUND: 'There is no related account in the app',
 	ERROR_NO_SENDER_IDENTITY: 'There is no related identity in the app',
 	ERROR_TITLE: 'Unable to parse QR data',
+	ERROR_WRONG_RAW:
+		'Frames number is too big, the QR seems not to be a recognized extrinsic raw data',
 	INFO_ETH_TX: 'You are about to send the following amount',
 	INFO_MULTI_PART:
 		'You are about to send the following extrinsic. We will sign the hash of the payload as it is oversized.',
