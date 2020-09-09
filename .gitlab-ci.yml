@@ -18,7 +18,7 @@ android-test:
   only:
     - master
     - /^[0-9]+$/
-    # testing Android build on this branch
+    # testing Android build on this branch 
     - tbaut-without-version
   script:
     - curl -sL https://deb.nodesource.com/setup_8.x | bash -
