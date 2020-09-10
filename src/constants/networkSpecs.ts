@@ -175,7 +175,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#6f36dc',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
-		logo: require('res/img/logos/Substrate_Dev.png'),
+		logo: require('res/img/logos/Rococo.png'),
 		order: 3,
 		pathId: 'rococo',
 		prefix: 0,
