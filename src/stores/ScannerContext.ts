@@ -82,6 +82,7 @@ type ScannerStoreState = {
 	missedFrames: Array<number>;
 	multipartData: null | Array<Uint8Array | null>;
 	multipartComplete: boolean;
+	rawPayload: Uint8Array | string | null;
 	recipient: FoundAccount | null;
 	sender: FoundAccount | null;
 	signedData: string;
@@ -132,6 +133,7 @@ const DEFAULT_STATE: ScannerStoreState = {
 	missedFrames: [],
 	multipartComplete: false,
 	multipartData: null,
+	rawPayload: null,
 	recipient: null,
 	sender: null,
 	signedData: '',
@@ -356,7 +358,7 @@ export function useScannerContext(): ScannerContextState {
 			type: 'transaction'
 		};
 
-		setState(qrInfo);
+		setState({ ...qrInfo, rawPayload: txRequest.data.data });
 		return qrInfo;
 	}
 

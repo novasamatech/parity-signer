@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GenericExtrinsicPayload, TypeRegistry } from '@polkadot/types';
+import { GenericExtrinsicPayload } from '@polkadot/types';
 import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
@@ -143,6 +143,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			networkKey,
 			registriesStore,
 			setAlert,
+			typeRegistry,
 			networks
 		]);
 
@@ -348,6 +349,7 @@ const styles = StyleSheet.create({
 	label: {
 		...fontStyles.t_label,
 		backgroundColor: colors.signal.main,
+		color: colors.text.main,
 		marginBottom: 10,
 		paddingLeft: 8,
 		textAlign: 'left'

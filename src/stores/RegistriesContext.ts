@@ -86,21 +86,25 @@ export function useRegistriesStore(): RegistriesStoreState {
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
 	): TypeRegistry | null {
-		const networkMetadataRaw = getMetadata(networkKey);
-		if (networkMetadataRaw === null) return null;
+		try {
+			const networkMetadataRaw = getMetadata(networkKey);
+			if (networkMetadataRaw === null) return null;
 
-		if (registries.has(networkKey)) return registries.get(networkKey)!;
+			if (registries.has(networkKey)) return registries.get(networkKey)!;
 
-		const networkParams = networks.get(networkKey)!;
-		const newRegistry = new TypeRegistry();
-		const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
-		newRegistry.register(overrideTypes);
-		const metadata = new Metadata(newRegistry, networkMetadataRaw);
-		newRegistry.setMetadata(metadata);
-		const newRegistries = deepCopyMap(registries);
-		newRegistries.set(networkKey, newRegistry);
-		setRegistries(newRegistries);
-		return newRegistry;
+			const networkParams = networks.get(networkKey)!;
+			const newRegistry = new TypeRegistry();
+			const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+			newRegistry.register(overrideTypes);
+			const metadata = new Metadata(newRegistry, networkMetadataRaw);
+			newRegistry.setMetadata(metadata);
+			const newRegistries = deepCopyMap(registries);
+			newRegistries.set(networkKey, newRegistry);
+			setRegistries(newRegistries);
+			return newRegistry;
+		} catch (e) {
+			return null;
+		}
 	}
 
 	return { getTypeRegistry, registries };

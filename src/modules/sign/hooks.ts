@@ -6,7 +6,7 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { RegistriesContext } from 'stores/RegistriesContext';
 
 export function usePayloadDetails(
-	dataToSign: Uint8Array | string,
+	rawPayload: Uint8Array | string | null,
 	networkKey: string
 ): [boolean, GenericExtrinsicPayload | null] {
 	const [payload, setPayload] = useState<GenericExtrinsicPayload | null>(null);
@@ -16,22 +16,27 @@ export function usePayloadDetails(
 
 	useEffect(() => {
 		setIsProcessing(true);
+		if (getTypeRegistry === null) return;
 		const typeRegistry = getTypeRegistry(networks, networkKey);
-		if (typeRegistry === null || typeof dataToSign === 'string') {
+		if (typeRegistry === null || typeof rawPayload === 'string') {
 			setIsProcessing(false);
 			return;
 		} else {
-			const extrinsicPayload = typeRegistry.createType(
-				'ExtrinsicPayload',
-				dataToSign,
-				{
-					version: ExtrinsicPayloadLatestVersion
-				}
-			);
-			setPayload(extrinsicPayload);
-			setIsProcessing(false);
+			try {
+				const extrinsicPayload = typeRegistry.createType(
+					'ExtrinsicPayload',
+					rawPayload,
+					{
+						version: ExtrinsicPayloadLatestVersion
+					}
+				);
+				setPayload(extrinsicPayload);
+				setIsProcessing(false);
+			} catch (e) {
+				//can't generate extrinsic payload, don't display.
+			}
 		}
-	}, [dataToSign, networkKey, getTypeRegistry, networks]);
+	}, [rawPayload, networkKey, getTypeRegistry, networks]);
 
 	return [isProcessing, payload];
 }

@@ -66,12 +66,12 @@ function SignedTxView({
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const { signedData, tx, dataToSign } = scannerStore.state;
+	const { signedData, tx, rawPayload } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
 	const [isProcessing, payload] = usePayloadDetails(
-		dataToSign,
+		rawPayload,
 		sender.networkKey
 	);
 

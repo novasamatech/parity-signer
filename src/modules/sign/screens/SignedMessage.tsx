@@ -44,7 +44,7 @@ export default function SignedMessage(
 	props: NavigationProps<'SignedMessage'>
 ): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
-	const { sender, message, dataToSign } = scannerStore.state;
+	const { sender, message } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
 
 	useEffect(() => cleanup.current, [cleanup]);
