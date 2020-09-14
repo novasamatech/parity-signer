@@ -110,6 +110,7 @@ export async function constructDataFromBytes(
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
 	const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
+	if (frameCount > 50) throw new Error(strings.ERROR_WRONG_RAW);
 	const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
 	const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
 

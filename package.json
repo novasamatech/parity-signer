@@ -1,6 +1,6 @@
 {
   "name": "NativeSigner",
-  "version": "4.5.2-beta",
+  "version": "4.5.3-beta",
   "private": true,
   "license": "GPL-3.0",
   "engines": {
@@ -126,7 +126,7 @@
         "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
-          "os": "iOS 13.6",
+          "os": "iOS 13.7",
           "type": "iPhone 8"
         }
       },
