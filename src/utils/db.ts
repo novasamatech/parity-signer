@@ -17,14 +17,12 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import SecureStorage from 'react-native-secure-storage';
 
-import { generateAccountId } from './account';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
-import { Tx, TxParticipant } from 'types/tx';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
@@ -65,6 +63,19 @@ export async function loadAccounts(version = 3): Promise<Map<string, any>> {
 		}
 	);
 }
+
+export const deleteAccount = (accountKey: string): Promise<void> =>
+	SecureStorage.deleteItem(accountKey, currentAccountsStore);
+
+export const saveAccount = (
+	accountKey: string,
+	account: Account
+): Promise<void> =>
+	SecureStorage.setItem(
+		accountKey,
+		JSON.stringify(account, null, 0),
+		currentAccountsStore
+	);
 
 /*
  * ========================================
@@ -165,134 +176,3 @@ export async function loadToCAndPPConfirmation(): Promise<boolean> {
 export async function saveToCAndPPConfirmation(): Promise<void> {
 	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
 }
-
-/*
- * ========================================
- *	Tx Store (Archived)
- * ========================================
- */
-
-function accountTxsKey(
-	address: string,
-	networkKey: string,
-	allNetworks: Map<string, NetworkParams>
-): string {
-	return 'account_txs_' + generateAccountId(address, networkKey, allNetworks);
-}
-
-function txKey(hash: string): string {
-	return 'tx_' + hash;
-}
-
-export const deleteAccount = (accountKey: string): Promise<void> =>
-	SecureStorage.deleteItem(accountKey, currentAccountsStore);
-
-export const saveAccount = (
-	accountKey: string,
-	account: Account
-): Promise<void> =>
-	SecureStorage.setItem(
-		accountKey,
-		JSON.stringify(account, null, 0),
-		currentAccountsStore
-	);
-
-async function storagePushValue(key: string, value: string): Promise<void> {
-	let currentVal = await AsyncStorage.getItem(key);
-
-	if (currentVal === null) {
-		return AsyncStorage.setItem(key, JSON.stringify([value]));
-	} else {
-		currentVal = JSON.parse(currentVal);
-		const newVal = new Set([...(currentVal as NonNullable<any>), value]);
-		return AsyncStorage.setItem(key, JSON.stringify(Array.from(newVal)));
-	}
-}
-
-export async function saveTx(
-	tx: Tx,
-	allNetworks: Map<string, NetworkParams>
-): Promise<void> {
-	if (!tx.sender) {
-		throw new Error('Tx should contain sender to save');
-	}
-
-	if (!tx.recipient) {
-		throw new Error('Tx should contain recipient to save');
-	}
-
-	await Promise.all([
-		storagePushValue(
-			accountTxsKey(tx.sender.address, tx.sender.networkKey, allNetworks),
-			tx.hash
-		),
-		storagePushValue(
-			accountTxsKey(tx.recipient.address, tx.sender.networkKey, allNetworks),
-			tx.hash
-		),
-		AsyncStorage.setItem(txKey(tx.hash), JSON.stringify(tx))
-	]);
-}
-
-export async function loadAccountTxHashes(
-	account: TxParticipant,
-	allNetworks: Map<string, NetworkParams>
-): Promise<string[]> {
-	const result = await AsyncStorage.getItem(
-		accountTxsKey(account.address, account.networkKey, allNetworks)
-	);
-
-	return result ? JSON.parse(result) : [];
-}
-
-export async function loadAccountTxs(
-	account: TxParticipant,
-	allNetworks: Map<string, NetworkParams>
-): Promise<Array<[string, Tx]>> {
-	const hashes = await loadAccountTxHashes(account, allNetworks);
-
-	return (
-		await AsyncStorage.multiGet(hashes.map(txKey))
-	).map((v: [string, any]) => [v[0], JSON.parse(v[1])]);
-}
-
-/*
- * ========================================
- *	NETWORK SPECS
- * ========================================
- */
-
-// const networkSpecsStorageLabel = 'network_specs_v4';
-//
-// /*
-//  * save the new network specs array
-//  */
-// export function saveNetworkSpecs(networkSpecs: SubstrateNetworkParams[]): void {
-// 	AsyncStorage.setItem(networkSpecsStorageLabel, JSON.stringify(networkSpecs));
-// }
-//
-// /*
-//  * get all the network specs
-//  */
-// export async function getNetworkSpecs(): Promise<SubstrateNetworkParams[]> {
-// 	let networkSpecs;
-// 	try {
-// 		const networkSpecsString = await AsyncStorage.getItem(
-// 			networkSpecsStorageLabel
-// 		);
-// 		networkSpecs = JSON.parse(networkSpecsString ?? '');
-// 	} catch (e) {
-// 		console.warn('loading network specifications error', e);
-// 	}
-// 	if (networkSpecs === null) return defaultNetworkSpecs();
-//
-// 	return JSON.parse(networkSpecs ?? '');
-// }
-//
-// /*
-//  * Called once during onboarding. Populate the local storage with the default network specs.
-//  */
-// export async function saveDefaultNetworks(): Promise<void> {
-// 	const networkSpecsString = JSON.stringify(defaultNetworkSpecs());
-// 	// AsyncStorage.setItem(networkSpecsStorageLabel, networkSpecsString);
-// }
