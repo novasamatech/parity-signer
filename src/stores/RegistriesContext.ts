@@ -50,7 +50,8 @@ const networkTypesMap: NetworkTypesMap = {
 
 export const getOverrideTypes = (
 	registry: TypeRegistry,
-	pathId: string
+	pathId: string,
+	specVersion: number
 ): any => {
 	let specName = '',
 		chainName = '';
@@ -68,14 +69,15 @@ export const getOverrideTypes = (
 			return true;
 		}
 	);
-	return getSpecTypes(registry, chainName, specName, Number.MAX_SAFE_INTEGER);
+	return getSpecTypes(registry, chainName, specName, specVersion);
 };
 
 export type RegistriesStoreState = {
 	registries: Map<string, TypeRegistry>;
 	getTypeRegistry: (
 		networks: Map<string, SubstrateNetworkParams>,
-		networkKey: string
+		networkKey: string,
+		specVersion?: number
 	) => TypeRegistry | null;
 };
 
@@ -84,7 +86,8 @@ export function useRegistriesStore(): RegistriesStoreState {
 
 	function getTypeRegistry(
 		networks: Map<string, SubstrateNetworkParams>,
-		networkKey: string
+		networkKey: string,
+		specVersion?: number
 	): TypeRegistry | null {
 		try {
 			const networkMetadataRaw = getMetadata(networkKey);
@@ -94,7 +97,12 @@ export function useRegistriesStore(): RegistriesStoreState {
 
 			const networkParams = networks.get(networkKey)!;
 			const newRegistry = new TypeRegistry();
-			const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+			//TODO: need to check specVersion, if the specVersion from QR is higher than in Signer, we should prevent parsing and return null
+			const overrideTypes = getOverrideTypes(
+				newRegistry,
+				networkParams.pathId,
+				specVersion ?? Number.MAX_SAFE_INTEGER
+			);
 			newRegistry.register(overrideTypes);
 			const metadata = new Metadata(newRegistry, networkMetadataRaw);
 			newRegistry.setMetadata(metadata);

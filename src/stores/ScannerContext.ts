@@ -87,6 +87,7 @@ type ScannerStoreState = {
 	sender: FoundAccount | null;
 	signedData: string;
 	signedTxList: SignedTX[];
+	specVersion: number;
 	totalFrameCount: number;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array | null;
 	type: 'transaction' | 'message' | null;
@@ -138,6 +139,7 @@ const DEFAULT_STATE: ScannerStoreState = {
 	sender: null,
 	signedData: '',
 	signedTxList: [],
+	specVersion: Number.MAX_SAFE_INTEGER,
 	totalFrameCount: 0,
 	tx: null,
 	type: null
@@ -357,8 +359,10 @@ export function useScannerContext(): ScannerContextState {
 			tx,
 			type: 'transaction'
 		};
-
-		setState({ ...qrInfo, rawPayload: txRequest.data.data });
+		const specVersion =
+			(txRequest as SubstrateTransactionParsedData).data.specVersion ||
+			Number.MAX_SAFE_INTEGER;
+		setState({ ...qrInfo, rawPayload: txRequest.data.data, specVersion });
 		return qrInfo;
 	}
 

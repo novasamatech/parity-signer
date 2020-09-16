@@ -173,9 +173,11 @@ export async function constructDataFromBytes(
 					const pubKeyHex = uosAfterFrames.substr(6, 64);
 					const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
 					const hexEncodedData = '0x' + uosAfterFrames.slice(70);
-					const hexPayload = hexEncodedData.slice(0, -64);
-					const genesisHash = `0x${hexEncodedData.substr(-64)}`;
+					const hexPayload = hexEncodedData.slice(0, -70);
+					const genesisHash = `0x${hexEncodedData.substr(-70, -6)}`;
+					const specVersion = parseInt(hexEncodedData.substr(-6));
 					const rawPayload = hexToU8a(hexPayload);
+					data.data.specVersion = specVersion;
 					data.data.genesisHash = genesisHash;
 					const isOversized = rawPayload.length > 256;
 					const network = networks.get(genesisHash);

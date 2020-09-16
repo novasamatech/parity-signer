@@ -74,6 +74,7 @@ export type SubstrateTransactionParsedData = {
 		crypto: 'ed25519' | 'sr25519' | null;
 		data: Uint8Array;
 		genesisHash: string;
+		specVersion: number;
 	};
 	action: 'signTransaction';
 	oversized: boolean;
@@ -86,6 +87,7 @@ export type SubstrateMessageParsedData = {
 		crypto: 'ed25519' | 'sr25519' | null;
 		data: string;
 		genesisHash: string;
+		specVersion?: number;
 	};
 	action: 'signData';
 	oversized: boolean;
