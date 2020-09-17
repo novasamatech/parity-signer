@@ -37,7 +37,7 @@ export function usePayloadDetails(
 				//can't generate extrinsic payload, don't display.
 			}
 		}
-	}, [rawPayload, networkKey, getTypeRegistry, networks]);
+	}, [rawPayload, networkKey, getTypeRegistry, networks, specVersion]);
 
 	return [isProcessing, payload];
 }

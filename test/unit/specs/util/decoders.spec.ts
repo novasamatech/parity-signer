@@ -112,7 +112,11 @@ describe('sanity check', () => {
 describe('type registry should get override types', () => {
 	it('get network latest override types', () => {
 		const testRegistry = new TypeRegistry();
-		const westendOverrideTypes = getOverrideTypes(testRegistry, 'westend');
+		const westendOverrideTypes = getOverrideTypes(
+			testRegistry,
+			'westend',
+			Number.MAX_SAFE_INTEGER
+		);
 		expect(westendOverrideTypes).not.toEqual({});
 	});
 });
