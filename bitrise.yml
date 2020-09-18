@@ -40,10 +40,7 @@ workflows:
             set -ex
             TMPDIR=${BITRISE_SOURCE_DIR}/metro-cache
             NODE_OPTIONS=--max_old_space_size=8192
-            time npx react-native bundle --dev false --platform android 
-                --entry-file index.js --bundle-output
-                ./android/app/src/main/assets/index.android.bundle --assets-dest
-                ./android/app/src/main/res
+            time npx react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res
     - gradle-runner@1:
         inputs:
         - gradlew_path: ./android/gradlew
