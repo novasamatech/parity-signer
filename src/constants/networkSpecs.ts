@@ -65,6 +65,7 @@ export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
 	POLKADOT:
 		'0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+	ROCOCO: '0x78ae7dc7e64637e01fa6a6b6e4fa252c486f62af7aa71c471ad17f015bd375ce',
 	SUBSTRATE_DEV:
 		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
@@ -100,7 +101,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
 		logo: require('res/img/logos/Centrifuge.png'),
-		order: 6,
+		order: 7,
 		pathId: 'centrifuge',
 		prefix: 36,
 		title: 'Centrifuge Mainnet',
@@ -111,7 +112,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE_AMBER,
 		logo: require('res/img/logos/Centrifuge.png'),
-		order: 7,
+		order: 8,
 		pathId: 'centrifuge_amber',
 		prefix: 42,
 		title: 'Centrifuge Testnet Amber',
@@ -122,7 +123,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.EDGEWARE,
 		logo: require('res/img/logos/Edgeware.png'),
-		order: 4,
+		order: 6,
 		pathId: 'edgeware',
 		prefix: 7,
 		title: 'Edgeware',
@@ -169,6 +170,17 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		prefix: 0,
 		title: 'Polkadot',
 		unit: 'DOT'
+	},
+	[SubstrateNetworkKeys.ROCOCO]: {
+		color: '#6f36dc',
+		decimals: 12,
+		genesisHash: SubstrateNetworkKeys.ROCOCO,
+		logo: require('res/img/logos/Rococo.png'),
+		order: 4,
+		pathId: 'rococo',
+		prefix: 0,
+		title: 'Rococo',
+		unit: 'ROC'
 	},
 	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
 		color: '#18FFB2',
