@@ -1,0 +1,202 @@
+---
+format_version: '8'
+default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
+project_type: react-native
+trigger_map:
+- pull_request_source_branch: '*'
+  workflow: android_assembleDebug
+- tag: '/^v[0-9]+\.[0-9]+.*$/'
+  workflow: android_release_unsigned
+- tag: v*
+  workflow: android_release_unsigned
+workflows:
+  android_assembleDebug:
+  # Produces a debug release, good for AVD or manual testing.
+    steps:
+    - activate-ssh-key@4:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - cache-pull@2: {}
+    - git-clone@4: {}
+    - nvm@1:
+        inputs:
+        - node_version: '13'
+    - npm@1:
+        inputs:
+        - cache_local_deps: 'true'
+        - npm_version: ''
+        - command: |-
+            install -g yarn
+            install -g react-native-cli
+    - yarn@0:
+        title: install
+        inputs:
+        - command: install
+    - script@1:
+        title: Generate React native
+        inputs:
+        - is_debug: 'yes'
+        - content: >
+            #!/usr/bin/env bash
+            set -ex
+            TMPDIR=${BITRISE_SOURCE_DIR}/metro-cache
+            NODE_OPTIONS=--max_old_space_size=8192
+            time npx react-native bundle --dev false --platform android 
+                --entry-file index.js --bundle-output
+                ./android/app/src/main/assets/index.android.bundle --assets-dest
+                ./android/app/src/main/res
+    - gradle-runner@1:
+        inputs:
+        - gradlew_path: ./android/gradlew
+        - gradle_options: ''
+        - gradle_task: assembleDebug
+        - gradle_file: /Users/vagrant/git/android/build.gradle
+    - cache-push@2:
+        run_if: true
+        inputs:
+        - is_debug_mode: 'true'
+        - compress_archive: 'true'
+        - cache_paths: |-
+            $BITRISE_CACHE_DIR
+            $BITRISE_SOURCE_DIR/metro-cache
+    - deploy-to-bitrise-io@1:
+        inputs:
+        - deploy_path: $BITRISE_APK_PATH
+    - amazon-s3-uploader@1:
+        inputs:
+        - aws_access_key: ${AWS_ACC_KEY}
+        - aws_secret_key: ${AWS_SEC_KEY}
+        - bucket_name: signer-builds/unsigned
+        - file_path: $BITRISE_APK_PATH
+        - path_in_bucket: '$debug_build_${BITRISE_BUILD_SLUG}'
+        - bucket_region: eu-central-1
+  android_release_unsigned:
+  # Produces a release binary, should be signed before using or publishing.
+    steps:
+    - activate-ssh-key@4:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - cache-pull@2: {}
+    - git-clone@4: {}
+    - nvm@1:
+        inputs:
+        - node_version: '13'
+    - npm@1:
+        inputs:
+        - cache_local_deps: 'true'
+        - npm_version: ''
+        - command: |-
+            install -g yarn
+            install -g react-native-cli
+    - yarn@0:
+        title: install
+        inputs:
+        - command: install
+    - gradle-runner@1:
+        inputs:
+        - gradlew_path: ./android/gradlew
+        - gradle_options: ''
+        - gradle_file: /Users/vagrant/git/android/build.gradle
+        - gradle_task: assembleRelease
+    - cache-push@2:
+        run_if: true
+        inputs:
+        - is_debug_mode: 'true'
+        - compress_archive: 'true'
+        - cache_paths: |-
+            $BITRISE_CACHE_DIR
+            $BITRISE_SOURCE_DIR/metro-cache
+    - deploy-to-bitrise-io@1:
+        inputs:
+        - deploy_path: $BITRISE_APK_PATH
+    - amazon-s3-uploader@1:
+        inputs:
+        - aws_access_key: ${AWS_ACC_KEY}
+        - aws_secret_key: ${AWS_SEC_KEY}
+        - bucket_name: signer-builds/unsigned
+        - bucket_region: eu-central-1
+        - path_in_bucket: '$unsigned_build_${BITRISE_BUILD_SLUG}'
+        - file_path: $BITRISE_APK_PATH
+  iOS_iphonesimulator_build:
+    steps:
+    - activate-ssh-key@4:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - cache-pull@2:
+        inputs:
+        - is_debug_mode: 'true'
+    - git-clone@4: {}
+    - nvm@1:
+        inputs:
+        - node_version: '13'
+    - npm@1:
+        inputs:
+        - cache_local_deps: 'true'
+        - npm_version: ''
+        - command: install -g yarn
+    - yarn@0:
+        title: build
+        inputs:
+        - command: build
+    - yarn@0:
+        title: 'xcbuild:githubActions'
+        inputs:
+        - command: 'xcbuild:githubActions'
+    - script@1:
+        title: Generate React native
+        inputs:
+        - is_debug: 'yes'
+        - content: >-
+            #!/usr/bin/env bash
+            set -ex
+            # install all the related dependencies.
+            #gem install xcpretty
+            # Build the JS bundle with
+            #yarn build-prod:ios
+            # yarn archive
+            git status
+            ls $BITRISE_SOURCE_DIR/ios/build || true
+            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner || true
+            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build || true
+            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products || true
+            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator || true
+            # ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner.xarchive || true
+    - cache-push@2:
+        inputs:
+        - compress_archive: 'true'
+        - cache_paths: |
+            $BITRISE_CACHE_DIR
+            $BITRISE_SOURCE_DIR/ios/build
+            $BITRISE_SOURCE_DIR/node_modules
+        - is_debug_mode: 'true'
+    - deploy-to-bitrise-io@1:
+        inputs:
+        - is_compress: 'true'
+        - deploy_path: >-
+            $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app
+    - amazon-s3-uploader@1:
+        inputs:
+        - aws_access_key: ${AWS_ACC_KEY}
+        - aws_secret_key: ${AWS_SEC_KEY}
+        - bucket_name: signer-builds/test-ci
+        - bucket_region: eu-central-1
+        - path_in_bucket: '$test_unsigned_build_${BITRISE_BUILD_SLUG}'
+        - file_path: >-
+            $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app
+app:
+  envs:
+  - opts:
+      is_expand: false
+    PROJECT_LOCATION: android
+  - opts:
+      is_expand: false
+    MODULE: app
+  - opts:
+      is_expand: false
+    VARIANT: ''
+  - opts:
+      is_expand: false
+    BITRISE_PROJECT_PATH: ios/NativeSigner.xcworkspace
+  - opts:
+      is_expand: false
+    BITRISE_SCHEME: NativeSigner
+  - opts:
+      is_expand: false
+    BITRISE_EXPORT_METHOD: development
