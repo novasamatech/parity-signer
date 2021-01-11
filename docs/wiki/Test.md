@@ -27,7 +27,7 @@ Corresponding data:
 
 ### Unit Test
 
-If dependencies are not installed please first run `yarn build:ios` or `yarn install` for android.
+If dependencies are not installed please first run `yarn install:ios` or `yarn install` for android.
 
 Run `yarn unit` for all the units test.
 
@@ -51,7 +51,7 @@ yarn global add detox-cli
 
 #### Complete Test
 
-If dependencies are not installed please first run `yarn build:ios` or `yarn install` for android.
+If dependencies are not installed please first run `yarn install:ios` or `yarn install` for android.
 
 1. run react native server with `yarn start`
 

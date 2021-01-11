@@ -23,7 +23,7 @@
 - Install Dependencies
 
     ```
-    yarn build:ios
+    yarn install:ios
     ```
 #### Android
 - Install Dependencies
