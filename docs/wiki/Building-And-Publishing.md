@@ -6,7 +6,7 @@ In this page we will list the steps to publish the app on iOS App Store / Androi
 
 ##### Build production version
 
-1. Switch to the `master` branch and run `yarn install:ios`
+1. Switch to the `master` branch and build the dependencies with `yarn install:ios`
 3. Build the JS bundle with `yarn build-prod:ios`
 4. Start the react-native server with `yarn start`
 5. Build the project in Xcode, with `Generic iOS Device` selected on the top left
