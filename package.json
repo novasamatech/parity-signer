@@ -16,8 +16,8 @@
     "xcbuild:githubActions": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration GithubActions -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
     "archive": "xcodebuild -scheme NativeSigner -workspace ios/NativeSigner.xcworkspace -configuration Release clean archive -archivePath \"ios/build/NativeSigner.xcarchive\" \n    CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force",
-		"clean:ios": "yarn clean && rm -rf ./android/app/build",
-		"clean:android": "yarn clean && rm -rf ./ios/build && (cd ios && pod deintegrate)",
+		"clean:android": "yarn clean && rm -rf ./android/app/build",
+		"clean:ios": "yarn clean && rm -rf ./ios/build && (cd ios && pod deintegrate)",
 		"commit": "commit-wizard",
     "ios": "npx react-native run-ios",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
@@ -131,7 +131,6 @@
         "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
-          "os": "iOS 13.7",
           "type": "iPhone 8"
         }
       },
