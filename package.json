@@ -10,12 +10,14 @@
   "scripts": {
     "android": "npx react-native run-android",
     "build-prod:ios": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native bundle --dev false --entry-file index.js --bundle-output ios/main.jsbundle --platform ios --assets-dest='./ios'",
-    "build": "yarn install && npx pod-install",
+    "install:ios": "yarn install && npx pod-install",
     "xcbuild:debug": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner",
     "xcbuild:release": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration Release -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
     "xcbuild:githubActions": "xcodebuild -workspace ios/NativeSigner.xcworkspace -scheme NativeSigner -configuration GithubActions -sdk iphonesimulator -derivedDataPath ios/build/NativeSigner -UseModernBuildSystem=YES | xcpretty -t && exit ${PIPESTATUS[0]}",
     "archive": "xcodebuild -scheme NativeSigner -workspace ios/NativeSigner.xcworkspace -configuration Release clean archive -archivePath \"ios/build/NativeSigner.xcarchive\" \n    CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO",
-    "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force && rm -rf ./android/app/build && rm -rf ./ios/build && (cd ios && pod deintegrate)",
+    "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force",
+    "clean:android": "yarn clean && rm -rf ./android/app/build",
+    "clean:ios": "yarn clean && rm -rf ./ios/build && (cd ios && pod deintegrate)",
     "commit": "commit-wizard",
     "ios": "npx react-native run-ios",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
@@ -32,11 +34,6 @@
     "test-e2e:ci": "detox test -c ios.sim.release -l info --noStackTrace  --cleanup",
     "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios",
     "e2e": "yarn e2e:ios && yarn e2e:android"
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "yarn run lint"
-    }
   },
   "dependencies": {
     "@polkadot/api": "1.26.1",
@@ -99,7 +96,6 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react-hooks": "^3.0.0",
-    "husky": "^3.0.8",
     "jest": "^25.4.0",
     "jetifier": "^1.6.5",
     "metro-react-native-babel-preset": "^0.59.0",
@@ -129,7 +125,6 @@
         "build": "yarn xcbuild:githubActions",
         "type": "ios.simulator",
         "device": {
-          "os": "iOS 13.7",
           "type": "iPhone 8"
         }
       },
