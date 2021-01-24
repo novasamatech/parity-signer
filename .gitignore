@@ -4,6 +4,9 @@ yarn-error.log
 # typescript output directory
 dist/
 
+#rust
+target
+
 # jest cache
 test/.jest/
 
