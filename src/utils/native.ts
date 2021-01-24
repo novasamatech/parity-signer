@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import SubstrateSign from 'react-native-substrate-sign';
+import { NativeModules } from 'react-native';
 
 import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
+
+const { EthkeyBridge } = NativeModules || {};
 
 interface AddressObject {
 	address: string;
@@ -26,7 +28,7 @@ interface AddressObject {
 }
 
 export function keccak(data: string): Promise<string> {
-	return SubstrateSign.keccak(data);
+	return EthkeyBridge.keccak(data);
 }
 
 /**
@@ -58,7 +60,7 @@ function toHex(x: string): string {
 }
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
-	const taggedAddress = await SubstrateSign.brainWalletAddress(seed);
+	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
 	const { bip39, address } = untagAddress(taggedAddress);
 	const hash = await keccak(toHex(address));
 
@@ -85,7 +87,7 @@ export async function brainWalletBIP39Address(
 	seed: string
 ): Promise<AddressObject | null> {
 	try {
-		const taggedAddress = await SubstrateSign.brainWalletBIP39Address(seed);
+		const taggedAddress = await EthkeyBridge.brainWalletBIP(seed);
 		const { bip39, address } = untagAddress(taggedAddress);
 
 		const hash = await keccak(toHex(address));
@@ -103,49 +105,49 @@ export function brainWalletSign(
 	seed: string,
 	message: string
 ): Promise<string> {
-	return SubstrateSign.brainWalletSign(seed, message);
+	return EthkeyBridge.brainWalletSign(seed, message);
 }
 
 export function rlpItem(rlp: string, position: number): Promise<string> {
-	return SubstrateSign.rlpItem(rlp, position);
+	return EthkeyBridge.rlpItem(rlp, position);
 }
 
 export function ethSign(data: string): Promise<string> {
-	return SubstrateSign.ethSign(data);
+	return EthkeyBridge.ethSign(data);
 }
 
 export function blockiesIcon(seed: string): Promise<string> {
-	return SubstrateSign.blockiesIcon(seed.toLowerCase());
+	return EthkeyBridge.blockiesIcon(seed.toLowerCase());
 }
 
 export function words(wordsNumber: number): Promise<string> {
-	return SubstrateSign.randomPhrase(wordsNumber);
+	return EthkeyBridge.randomPhrase(wordsNumber);
 }
 
 export function encryptData(data: string, password: string): Promise<string> {
-	return SubstrateSign.encryptData(data, password);
+	return EthkeyBridge.encryptData(data, password);
 }
 
 export function decryptData(data: string, password: string): Promise<string> {
-	return SubstrateSign.decryptData(data, password);
+	return EthkeyBridge.decryptData(data, password);
 }
 
 // Creates a QR code for the UTF-8 representation of a string
 export function qrCode(data: string): Promise<string> {
-	return SubstrateSign.qrCode(data);
+	return EthkeyBridge.qrCode(data);
 }
 
 // Creates a QR code for binary data from a hex-encoded string
 export function qrCodeHex(data: string): Promise<string> {
-	return SubstrateSign.qrCodeHex(data);
+	return EthkeyBridge.qrCodeHex(data);
 }
 
 export function blake2b(data: string): Promise<string> {
-	return SubstrateSign.blake2b(data);
+	return EthkeyBridge.blake2b(data);
 }
 
 export function substrateSecret(suri: string): Promise<string> {
-	return SubstrateSign.substrateSecret(suri);
+	return EthkeyBridge.substrateSecret(suri);
 }
 
 // Get an SS58 encoded address for a sr25519 account from a BIP39 phrase and a prefix.
@@ -158,12 +160,12 @@ export function substrateAddress(
 	seed: string,
 	prefix: number
 ): Promise<string> {
-	return SubstrateSign.substrateAddress(seed, prefix);
+	return EthkeyBridge.substrateAddress(seed, prefix);
 }
 
 // Sign data using sr25519 crypto for a BIP39 phrase. Message is hex-encoded byte array.
 export function substrateSign(seed: string, message: string): Promise<string> {
-	return SubstrateSign.substrateSign(seed, message);
+	return EthkeyBridge.substrateSign(seed, message);
 }
 
 // Verify a sr25519 signature is valid
@@ -172,7 +174,7 @@ export function schnorrkelVerify(
 	message: string,
 	signature: string
 ): Promise<boolean> {
-	return SubstrateSign.schnorrkelVerify(seed, message, signature);
+	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
 
 export class SeedRefClass {
@@ -194,7 +196,7 @@ export class SeedRefClass {
 			// Seed reference was already created.
 			return this.dataRef;
 		}
-		const dataRef: number = await SubstrateSign.decryptDataRef(
+		const dataRef: number = await EthkeyBridge.decryptDataRef(
 			encryptedSeed,
 			password
 		);
@@ -207,7 +209,7 @@ export class SeedRefClass {
 		if (!this.valid) {
 			throw new Error('a seed reference has not been created');
 		}
-		return SubstrateSign.substrateAddressWithRef(
+		return EthkeyBridge.substrateAddressWithRef(
 			this.dataRef,
 			suriSuffix,
 			prefix
@@ -218,7 +220,7 @@ export class SeedRefClass {
 		if (!this.valid) {
 			throw new Error('a seed reference has not been created');
 		}
-		return SubstrateSign.brainWalletAddressWithRef(this.dataRef).then(
+		return EthkeyBridge.brainWalletAddressWithRef(this.dataRef).then(
 			(address: string) => {
 				return address;
 			}
@@ -232,7 +234,7 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot destroy an invalid seed reference');
 		}
-		return SubstrateSign.destroyDataRef(this.dataRef).then(() => {
+		return EthkeyBridge.destroyDataRef(this.dataRef).then(() => {
 			this.valid = false;
 		});
 	}
@@ -244,7 +246,7 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
-		return SubstrateSign.brainWalletSignWithRef(this.dataRef, message);
+		return EthkeyBridge.brainWalletSignWithRef(this.dataRef, message);
 	}
 
 	// Use a reference returned by decryptDataRef to sign a message
@@ -253,11 +255,7 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
-		return SubstrateSign.substrateSignWithRef(
-			this.dataRef,
-			suriSuffix,
-			message
-		);
+		return EthkeyBridge.substrateSignWithRef(this.dataRef, suriSuffix, message);
 	}
 
 	trySubstrateSecret(suriSuffix: string): Promise<string> {
@@ -265,6 +263,6 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
-		return SubstrateSign.substrateSecretWithRef(this.dataRef, suriSuffix);
+		return EthkeyBridge.substrateSecretWithRef(this.dataRef, suriSuffix);
 	}
 }

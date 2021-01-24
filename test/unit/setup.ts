@@ -18,5 +18,3 @@
 // import mockCamera from './__mocks__/Camera'
 
 jest.doMock('react-native', () => 'reactNativeMock');
-
-jest.doMock('react-native-substrate-sign', () => 'substrateSignMock');
