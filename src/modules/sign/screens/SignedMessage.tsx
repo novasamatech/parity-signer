@@ -18,12 +18,16 @@ import { isU8a, u8aToHex } from '@polkadot/util';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
+import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
+import strings from 'modules/sign/strings';
 import CompatibleCard from 'components/CompatibleCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
+import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import QrView from 'components/QrView';
 import styles from 'modules/sign/styles';
@@ -63,6 +67,9 @@ function SignedMessageView({
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { signedData, isHash, dataToSign } = scannerStore.state;
+	const { getNetwork } = useContext(NetworksContext);
+	const senderNetworkParams = getNetwork(sender.networkKey);
+	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -85,6 +92,13 @@ function SignedMessageView({
 				account={sender}
 				accountsStore={accountsStore}
 			/>
+			{!isEthereum && dataToSign ? (
+				<PayloadDetailsCard
+					description={strings.INFO_MULTI_PART}
+					signature={signedData.toString()}
+					networkKey={sender.networkKey}
+				/>
+			) : null}
 			<MessageDetailsCard
 				isHash={isHash ?? false}
 				message={message}

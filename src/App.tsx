@@ -29,6 +29,10 @@ import {
 	ScreenStack
 } from './screens';
 
+import {
+	useRegistriesStore,
+	RegistriesContext
+} from 'stores/RegistriesContext';
 import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
 import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
 import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
@@ -66,6 +70,7 @@ export default function App(props: AppProps): React.ReactElement {
 	const networkContext = useNetworksContext();
 	const accountsContext = useAccountContext();
 	const scannerContext = useScannerContext();
+	const registriesContext = useRegistriesStore();
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
@@ -92,20 +97,24 @@ export default function App(props: AppProps): React.ReactElement {
 			<NetworksContext.Provider value={networkContext}>
 				<AccountsContext.Provider value={accountsContext}>
 					<ScannerContext.Provider value={scannerContext}>
-						<GlobalStateContext.Provider value={globalContext}>
-							<AlertStateContext.Provider value={alertContext}>
-								<SeedRefsContext.Provider value={seedRefContext}>
-									<MenuProvider backHandler={true}>
-										<StatusBar
-											barStyle="light-content"
-											backgroundColor={colors.background.app}
-										/>
-										<CustomAlert />
-										<NavigationContainer>{renderStacks()}</NavigationContainer>
-									</MenuProvider>
-								</SeedRefsContext.Provider>
-							</AlertStateContext.Provider>
-						</GlobalStateContext.Provider>
+						<RegistriesContext.Provider value={registriesContext}>
+							<GlobalStateContext.Provider value={globalContext}>
+								<AlertStateContext.Provider value={alertContext}>
+									<SeedRefsContext.Provider value={seedRefContext}>
+										<MenuProvider backHandler={true}>
+											<StatusBar
+												barStyle="light-content"
+												backgroundColor={colors.background.app}
+											/>
+											<CustomAlert />
+											<NavigationContainer>
+												{renderStacks()}
+											</NavigationContainer>
+										</MenuProvider>
+									</SeedRefsContext.Provider>
+								</AlertStateContext.Provider>
+							</GlobalStateContext.Provider>
+						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
 				</AccountsContext.Provider>
 			</NetworksContext.Provider>
