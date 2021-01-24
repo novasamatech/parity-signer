@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Metadata, TypeRegistry } from '@polkadot/types';
+import { Metadata } from '@polkadot/metadata';
+import { TypeRegistry } from '@polkadot/types';
 import { getSpecTypes } from '@polkadot/types-known';
 import React, { useState } from 'react';
 
@@ -88,6 +89,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 	): TypeRegistry | null {
 		try {
 			const networkMetadataRaw = getMetadata(networkKey);
+
 			if (networkMetadataRaw === null) return null;
 
 			if (registries.has(networkKey)) return registries.get(networkKey)!;
@@ -103,6 +105,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 			setRegistries(newRegistries);
 			return newRegistry;
 		} catch (e) {
+			console.log('oops', e);
 			return null;
 		}
 	}
