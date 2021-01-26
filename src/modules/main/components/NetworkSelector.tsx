@@ -120,8 +120,8 @@ function NetworkSelector({
 	};
 
 	const getListOptions = (): Partial<FlatListProps<any>> => {
-		if (isNew) return {};
-		if (shouldShowMoreNetworks) {
+		// if (isNew) return {};
+		// if (shouldShowMoreNetworks) {
 			return {
 				ListHeaderComponent: (
 					<NetworkCard
@@ -133,19 +133,20 @@ function NetworkSelector({
 					/>
 				)
 			};
-		} else {
-			return {
-				ListFooterComponent: (
-					<NetworkCard
-						isAdd={true}
-						onPress={(): void => setShouldShowMoreNetworks(true)}
-						testID={testIDs.Main.addNewNetworkButton}
-						title="Add Network Account"
-						networkColor={colors.background.app}
-					/>
-				)
-			};
-		}
+		// }
+		// else {
+		// 	return {
+		// 		ListFooterComponent: (
+		// 			<NetworkCard
+		// 				isAdd={true}
+		// 				onPress={(): void => setShouldShowMoreNetworks(true)}
+		// 				testID={testIDs.Main.addNewNetworkButton}
+		// 				title="Add Network Account"
+		// 				networkColor={colors.background.app}
+		// 			/>
+		// 		)
+		// 	};
+		// }
 	};
 
 	const renderScreenHeading = (): React.ReactElement => {

@@ -101,7 +101,7 @@ function PathsList({
 				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
-				onPress={(): void => navigate('PathDetails', { path })}
+				onPress={(): void => {console.log('PathDetails', path); navigate('PathDetails', { path })}}
 			/>
 		);
 	};

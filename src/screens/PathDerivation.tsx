@@ -30,7 +30,7 @@ import {
 	getSubstrateNetworkKeyByPathId,
 	validateDerivedPath
 } from 'utils/identitiesUtils';
-import { unlockSeedPhrase } from 'utils/navigationHelpers';
+import { navigateToPathDetails, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
@@ -96,7 +96,7 @@ function PathDerivation({
 				password
 			);
 			setAlert('Success', 'New Account Successfully derived');
-			navigation.goBack();
+			navigateToPathDetails(navigation, currentNetworkKey, derivationPath)
 		} catch (error) {
 			alertPathDerivationError(setAlert, error.message);
 		}
