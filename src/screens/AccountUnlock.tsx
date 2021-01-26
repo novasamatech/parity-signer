@@ -28,6 +28,67 @@ import fontStyles from 'styles/fontStyles';
 import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
 
+interface AccountUnlockViewProps {
+	checkPin: (pin: string) => Promise<boolean>;
+	hasWrongPin?: boolean;
+	navigate: () => void;
+}
+
+function PinInput(props: any): React.ReactElement {
+	return (
+		<TextInput
+			autoFocus
+			keyboardAppearance="dark"
+			clearTextOnFocus
+			editable
+			fontSize={24}
+			keyboardType="numeric"
+			multiline={false}
+			autoCorrect={false}
+			numberOfLines={1}
+			returnKeyType="next"
+			secureTextEntry
+			style={[fontStyles.t_seed, styles.pinInput]}
+			{...props}
+		/>
+	);
+}
+
+function AccountUnlockView(props: AccountUnlockViewProps): React.ReactElement {
+	const [hasWrongPin, setHasWrongPin] = useState(false);
+	const [pin, setPin] = useState('');
+
+	const showErrorMessage = (): string =>
+		hasWrongPin ? 'Wrong pin, please try again' : '';
+
+	const { checkPin, navigate } = props;
+
+	return (
+		<SafeAreaViewContainer style={styles.body}>
+			<ScreenHeading
+				title={'Unlock Account'}
+				subtitle={showErrorMessage()}
+				error={hasWrongPin}
+			/>
+			<PinInput
+				label="PIN"
+				onChangeText={async (inputPin: string): Promise<void> => {
+					setPin(inputPin);
+					if (inputPin.length < 4) {
+						return;
+					}
+					if (await checkPin(inputPin)) {
+						navigate();
+					} else if (inputPin.length > 5) {
+						setHasWrongPin(true);
+					}
+				}}
+				value={pin}
+			/>
+		</SafeAreaViewContainer>
+	);
+}
+
 /* Used for unlock and sign tx and messages for legacy accounts */
 export function AccountUnlockAndSign(
 	props: NavigationProps<'AccountUnlockAndSign'>
@@ -95,72 +156,6 @@ export function AccountUnlock({
 					navigation.dispatch(resetAction);
 				}
 			}}
-		/>
-	);
-}
-
-interface AccountUnlockViewProps {
-	checkPin: (pin: string) => Promise<boolean>;
-	hasWrongPin?: boolean;
-	navigate: () => void;
-}
-
-interface AccountUnlockViewState {
-	hasWrongPin: boolean;
-	pin: string;
-}
-
-function AccountUnlockView(props: AccountUnlockViewProps): React.ReactElement {
-	const [hasWrongPin, setHasWrongPin] = useState(false);
-	const [pin, setPin] = useState('');
-
-	const showErrorMessage = (): string =>
-		hasWrongPin ? 'Wrong pin, please try again' : '';
-
-	const { checkPin, navigate } = props;
-
-	return (
-		<SafeAreaViewContainer style={styles.body}>
-			<ScreenHeading
-				title={'Unlock Account'}
-				subtitle={showErrorMessage()}
-				error={hasWrongPin}
-			/>
-			<PinInput
-				label="PIN"
-				onChangeText={async (inputPin: string): Promise<void> => {
-					setPin(inputPin);
-					if (inputPin.length < 4) {
-						return;
-					}
-					if (await checkPin(inputPin)) {
-						navigate();
-					} else if (inputPin.length > 5) {
-						setHasWrongPin(true);
-					}
-				}}
-				value={pin}
-			/>
-		</SafeAreaViewContainer>
-	);
-}
-
-function PinInput(props: any): React.ReactElement {
-	return (
-		<TextInput
-			autoFocus
-			keyboardAppearance="dark"
-			clearTextOnFocus
-			editable
-			fontSize={24}
-			keyboardType="numeric"
-			multiline={false}
-			autoCorrect={false}
-			numberOfLines={1}
-			returnKeyType="next"
-			secureTextEntry
-			style={[fontStyles.t_seed, styles.pinInput]}
-			{...props}
 		/>
 	);
 }

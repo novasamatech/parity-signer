@@ -40,26 +40,6 @@ interface Props extends NavigationScannerProps<'SignedMessage'> {
 	message: string;
 }
 
-export default function SignedMessage(
-	props: NavigationProps<'SignedMessage'>
-): React.ReactElement {
-	const scannerStore = useContext(ScannerContext);
-	const { sender, message } = scannerStore.state;
-	const cleanup = useRef(scannerStore.cleanup);
-
-	useEffect(() => cleanup.current, [cleanup]);
-
-	if (sender === null || message === null) return <View />;
-	return (
-		<SignedMessageView
-			sender={sender}
-			message={message}
-			scannerStore={scannerStore}
-			{...props}
-		/>
-	);
-}
-
 function SignedMessageView({
 	sender,
 	message,
@@ -106,5 +86,25 @@ function SignedMessageView({
 				style={styles.bodyContent}
 			/>
 		</SafeAreaScrollViewContainer>
+	);
+}
+
+export default function SignedMessage(
+	props: NavigationProps<'SignedMessage'>
+): React.ReactElement {
+	const scannerStore = useContext(ScannerContext);
+	const { sender, message } = scannerStore.state;
+	const cleanup = useRef(scannerStore.cleanup);
+
+	useEffect(() => cleanup.current, [cleanup]);
+
+	if (sender === null || message === null) return <View />;
+	return (
+		<SignedMessageView
+			sender={sender}
+			message={message}
+			scannerStore={scannerStore}
+			{...props}
+		/>
 	);
 }

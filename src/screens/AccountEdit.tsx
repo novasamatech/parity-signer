@@ -32,7 +32,7 @@ const onNameInput = async (
 	await accountsStore.save(selectedKey, selectedAccount);
 };
 
-export default function AccountEdit({}: {}): React.ReactElement {
+export default function AccountEdit(): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const selectedAccount = accountsStore.getSelected()!;
 	if (!selectedAccount) {

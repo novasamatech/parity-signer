@@ -34,7 +34,7 @@ interface Props extends TextInputProps {
 	error?: boolean;
 }
 
-export default class TextInput extends React.PureComponent<Props, {}> {
+export default class TextInput extends React.PureComponent<Props> {
 	static defaultProps = {
 		focus: false
 	};

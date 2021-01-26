@@ -29,23 +29,6 @@ interface Props {
 	gasPrice: string;
 	style: ViewStyle;
 }
-export default class TxDetailsCard extends React.PureComponent<Props> {
-	render(): React.ReactNode {
-		const { value, description, gas, gasPrice, style } = this.props;
-
-		return (
-			<View style={[styles.body, style]}>
-				<Text style={styles.titleText}>{description}</Text>
-				<Amount
-					style={{ marginTop: 10 }}
-					value={value}
-					gas={gas}
-					gasPrice={gasPrice}
-				/>
-			</View>
-		);
-	}
-}
 
 interface AmountProps {
 	value: string;
@@ -72,6 +55,24 @@ function Amount({
 			</View>
 		</View>
 	);
+}
+
+export default class TxDetailsCard extends React.PureComponent<Props> {
+	render(): React.ReactNode {
+		const { value, description, gas, gasPrice, style } = this.props;
+
+		return (
+			<View style={[styles.body, style]}>
+				<Text style={styles.titleText}>{description}</Text>
+				<Amount
+					style={{ marginTop: 10 }}
+					value={value}
+					gas={gas}
+					gasPrice={gasPrice}
+				/>
+			</View>
+		);
+	}
 }
 
 const styles = StyleSheet.create({

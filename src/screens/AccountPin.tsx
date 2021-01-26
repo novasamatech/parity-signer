@@ -37,6 +37,25 @@ interface State {
 	pinMismatch: boolean;
 	pinTooShort: boolean;
 }
+
+function PinInput(props: any): React.ReactElement {
+	return (
+		<TextInput
+			keyboardAppearance="dark"
+			clearTextOnFocus
+			editable
+			keyboardType="numeric"
+			multiline={false}
+			autoCorrect={false}
+			numberOfLines={1}
+			returnKeyType="next"
+			secureTextEntry
+			style={StyleSheet.flatten([styles.pinInput, { fontSize: 24 }])}
+			{...props}
+		/>
+	);
+}
+
 function AccountPin({
 	navigation,
 	route
@@ -135,24 +154,6 @@ function AccountPin({
 			/>
 			<Button onPress={submit} title="Done" />
 		</KeyboardScrollView>
-	);
-}
-
-function PinInput(props: any): React.ReactElement {
-	return (
-		<TextInput
-			keyboardAppearance="dark"
-			clearTextOnFocus
-			editable
-			keyboardType="numeric"
-			multiline={false}
-			autoCorrect={false}
-			numberOfLines={1}
-			returnKeyType="next"
-			secureTextEntry
-			style={StyleSheet.flatten([styles.pinInput, { fontSize: 24 }])}
-			{...props}
-		/>
 	);
 }
 

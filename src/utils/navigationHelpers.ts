@@ -209,7 +209,7 @@ export const resetNavigationWithNetworkChooser = <
 >(
 	navigation: GenericNavigationProps<RouteName>,
 	screenName: string,
-	params: object = {},
+	params: Record<string, unknown> = {},
 	isNew = false
 ): void => {
 	const resetAction = CommonActions.reset({

@@ -36,24 +36,6 @@ import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 
-function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
-	const scannerStore = useContext(ScannerContext);
-	const { recipient, sender } = scannerStore.state;
-	const cleanup = useRef(scannerStore.cleanup);
-
-	useEffect(() => cleanup.current, [cleanup]);
-
-	if (sender === null || recipient === null) return <View />;
-	return (
-		<SignedTxView
-			sender={sender}
-			recipient={recipient}
-			scannerStore={scannerStore}
-			{...props}
-		/>
-	);
-}
-
 interface Props extends NavigationScannerProps<'SignedTx'> {
 	sender: FoundAccount;
 	recipient: FoundAccount;
@@ -126,6 +108,24 @@ function SignedTxView({
 				<QrView data={signedData} />
 			</View>
 		</SafeAreaScrollViewContainer>
+	);
+}
+
+function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
+	const scannerStore = useContext(ScannerContext);
+	const { recipient, sender } = scannerStore.state;
+	const cleanup = useRef(scannerStore.cleanup);
+
+	useEffect(() => cleanup.current, [cleanup]);
+
+	if (sender === null || recipient === null) return <View />;
+	return (
+		<SignedTxView
+			sender={sender}
+			recipient={recipient}
+			scannerStore={scannerStore}
+			{...props}
+		/>
 	);
 }
 

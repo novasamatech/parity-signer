@@ -17,7 +17,7 @@
 import '../shim';
 import 'utils/iconLoader';
 import * as React from 'react';
-import { StatusBar, StyleSheet, View, YellowBox } from 'react-native';
+import { StatusBar, StyleSheet, View, LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -51,10 +51,8 @@ import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
 	NavigationBar.setColor(colors.background.os);
-	if (global.inTest) {
-		console.disableYellowBox = true;
-	} else if (__DEV__) {
-		YellowBox.ignoreWarnings([
+	if (__DEV__) {
+		LogBox.ignoreLogs([
 			'Warning: componentWillReceiveProps',
 			'Warning: componentWillMount',
 			'Warning: componentWillUpdate',

@@ -45,7 +45,7 @@ function ButtonWithArrow(props: {
 	return <ButtonIcon {...props} {...i_arrowOptions} />;
 }
 
-function IdentitiesSwitch({}: {}): React.ReactElement {
+function IdentitiesSwitch(): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
