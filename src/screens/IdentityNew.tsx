@@ -54,6 +54,7 @@ function IdentityNew({
 	const clearIdentity = useRef(() =>
 		accountsStore.updateNewIdentity(emptyIdentity())
 	);
+	const [isValidBIP39, setIsBIP39Valid] = useState(false);
 
 	useEffect((): (() => void) => {
 		clearIdentity.current();
@@ -69,6 +70,7 @@ function IdentityNew({
 		const addressGeneration = (): Promise<void> =>
 			brainWalletAddress(inputSeedPhrase.trimEnd())
 				.then(({ bip39 }) => {
+					setIsBIP39Valid(bip39)
 					setIsSeedValid(validateSeed(inputSeedPhrase, bip39));
 				})
 				.catch(() => setIsSeedValid(defaultSeedValidObject));
@@ -124,7 +126,7 @@ function IdentityNew({
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
-				valid={isSeedValid.valid}
+				valid={isValidBIP39}
 			/>
 			<View style={styles.btnBox}>
 				<Button

@@ -148,14 +148,14 @@ export default function AccountSeed({
 		);
 	}
 
-	const invalidStyles = !valid ? styles.invalidInput : {};
+	const validStyles = valid ? styles.validInput : styles.invalidInput;
 	return (
 		<View>
 			<TextInput
 				style={StyleSheet.flatten([
 					fontStyles.t_seed,
 					styles.input,
-					invalidStyles
+					validStyles
 				])}
 				multiline
 				autoCorrect={false}
@@ -184,6 +184,9 @@ const styles = StyleSheet.create({
 	invalidInput: {
 		borderBottomColor: colors.border.signal,
 		borderColor: colors.border.signal
+	},
+	validInput: {
+		borderColor: colors.border.valid
 	},
 	suggestion: {
 		padding: 12,

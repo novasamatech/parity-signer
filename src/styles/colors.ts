@@ -25,7 +25,8 @@ export default {
 	border: {
 		dark: '#000000',
 		light: '#666666',
-		signal: '#8E1F40'
+		signal: '#8E1F40',
+		valid: '#4d7e31'
 	},
 	signal: {
 		error: '#D73400',
