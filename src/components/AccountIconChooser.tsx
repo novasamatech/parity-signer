@@ -73,6 +73,8 @@ export default class AccountIconChooser extends React.PureComponent<
 			onSelect
 		} = this.props;
 
+		const { identities, currentIdentity } = accountsStore.state;
+
 		// clean previous selection
 		onSelect({ isBip39: false, newAddress: '', newSeed: '' });
 		try {
@@ -101,7 +103,8 @@ export default class AccountIconChooser extends React.PureComponent<
 
 								result.address = await substrateAddress(
 									suri,
-									(network as SubstrateNetworkParams).prefix
+									(network as SubstrateNetworkParams).prefix,
+									currentIdentity.multisignatureType
 								);
 								result.bip39 = true;
 							} catch (e) {
