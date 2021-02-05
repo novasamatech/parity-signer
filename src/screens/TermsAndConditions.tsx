@@ -14,23 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import Button from 'components/Button';
+import CustomScrollView from 'components/CustomScrollView';
+import Markdown from 'components/Markdown';
+import TouchableItem from 'components/TouchableItem';
+import testIDs from 'e2e/testIDs';
 import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
+import colors from 'styles/colors';
+import containerStyles from 'styles/containerStyles';
+import fontStyles from 'styles/fontStyles';
+import { NavigationProps } from 'types/props';
+import { saveToCAndPPConfirmation } from 'utils/db';
 
 import toc from '../../docs/terms-and-conditions.md';
-
-import containerStyles from 'styles/containerStyles';
-import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
-import testIDs from 'e2e/testIDs';
-import { NavigationProps } from 'types/props';
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
-import Button from 'components/Button';
-import Markdown from 'components/Markdown';
-import TouchableItem from 'components/TouchableItem';
-import { saveToCAndPPConfirmation } from 'utils/db';
-import CustomScrollView from 'components/CustomScrollView';
 
 export default function TermsAndConditions(
 	props: NavigationProps<'TermsAndConditions'>

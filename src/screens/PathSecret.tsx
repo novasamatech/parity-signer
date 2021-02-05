@@ -14,15 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
-
-import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
 import QrView from 'components/QrView';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading from 'components/ScreenHeading';
 import { PasswordedAccountExportWarning } from 'components/Warnings';
 import testIDs from 'e2e/testIDs';
+import React, { useContext, useEffect, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';

@@ -16,17 +16,11 @@
 
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import TouchableItem from 'components/TouchableItem';
 import React, { useContext } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
-import testIDs from '../../test/e2e/testIDs';
-
-import PathCard from './PathCard';
-import Separator from './Separator';
-
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
-import TouchableItem from 'components/TouchableItem';
 import fontStyles from 'styles/fontStyles';
 import {
 	AccountsStoreStateWithIdentity,
@@ -38,11 +32,15 @@ import {
 	SubstrateNetworkParams,
 	UnknownNetworkParams
 } from 'types/networkTypes';
-import { removeSlash } from 'utils/identitiesUtils';
-import { useSeedRef } from 'utils/seedRefHooks';
-import { unlockSeedPhrase } from 'utils/navigationHelpers';
-import { alertPathDerivationError } from 'utils/alertUtils';
 import { RootStackParamList } from 'types/routes';
+import { alertPathDerivationError } from 'utils/alertUtils';
+import { removeSlash } from 'utils/identitiesUtils';
+import { unlockSeedPhrase } from 'utils/navigationHelpers';
+import { useSeedRef } from 'utils/seedRefHooks';
+
+import testIDs from '../../test/e2e/testIDs';
+import PathCard from './PathCard';
+import Separator from './Separator';
 
 type Props = {
 	accountsStore: AccountsStoreStateWithIdentity;

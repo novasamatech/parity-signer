@@ -14,13 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
-
+import PathCard from 'components/PathCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import TextInput from 'components/TextInput';
+import React from 'react';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
-import TextInput from 'components/TextInput';
-import PathCard from 'components/PathCard';
 
 function PathManagement({
 	accountsStore,

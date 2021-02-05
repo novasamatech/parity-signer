@@ -14,14 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { expect, element, by, device } from 'detox';
-
-import testIDs from './testIDs';
-
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
+import { by, device,element, expect } from 'detox';
+
+import testIDs from './testIDs';
 
 const { IdentityPin, IdentityNew, Main, PathDetail, PathsList } = testIDs;
 

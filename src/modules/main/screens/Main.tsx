@@ -14,12 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext } from 'react';
-
-import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import OnBoardingView from 'modules/main/components/OnBoading';
 import NetworkSelector from 'modules/main/components/NetworkSelector';
+import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
+import OnBoardingView from 'modules/main/components/OnBoading';
+import React, { useContext } from 'react';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 

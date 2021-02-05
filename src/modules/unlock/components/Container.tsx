@@ -13,12 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import KeyboardScrollView from 'components/KeyboardScrollView';
+import testIDs from 'e2e/testIDs';
 import React from 'react';
 
 import styles from '../styles';
-
-import KeyboardScrollView from 'components/KeyboardScrollView';
-import testIDs from 'e2e/testIDs';
 
 export function KeyboardAwareContainer(props: any): React.ReactElement {
 	return (

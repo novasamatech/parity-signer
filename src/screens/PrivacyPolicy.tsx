@@ -14,12 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import CustomScrollView from 'components/CustomScrollView';
+import Markdown from 'components/Markdown';
 import React from 'react';
 
 import privacyPolicy from '../../docs/privacy-policy.md';
-
-import Markdown from 'components/Markdown';
-import CustomScrollView from 'components/CustomScrollView';
 
 export default class PrivacyPolicy extends React.PureComponent {
 	render(): React.ReactElement {

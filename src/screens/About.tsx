@@ -14,14 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import CustomScrollView from 'components/CustomScrollView';
 import React from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
-
-import { version } from '../../package.json';
-
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
-import CustomScrollView from 'components/CustomScrollView';
+
+import { version } from '../../package.json';
 
 export default class About extends React.PureComponent {
 	render(): React.ReactElement {

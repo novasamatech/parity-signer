@@ -15,10 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { NativeModules } from 'react-native';
+import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 
 import { checksummedAddress } from './checksum';
-
-import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 
 const { EthkeyBridge } = NativeModules || {};
 

@@ -15,9 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useContext } from 'react';
-
 import strings from 'modules/sign/strings';
+import { useContext } from 'react';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContextState } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';

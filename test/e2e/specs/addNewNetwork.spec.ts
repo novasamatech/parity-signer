@@ -15,6 +15,12 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
+	addNetworkGenesisHash,
+	addNetworkPathId,
+	ScanTestRequest
+} from 'e2e/mockScanRequests';
+import testIDs from 'e2e/testIDs';
+import {
 	launchWithScanRequest,
 	pinCode,
 	tapBack,
@@ -24,12 +30,6 @@ import {
 	testUnlockPin,
 	testVisible
 } from 'e2e/utils';
-import {
-	addNetworkGenesisHash,
-	addNetworkPathId,
-	ScanTestRequest
-} from 'e2e/mockScanRequests';
-import testIDs from 'e2e/testIDs';
 
 const {
 	Main,

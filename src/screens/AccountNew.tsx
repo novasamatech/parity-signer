@@ -14,26 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useReducer } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
-import { NetworkProtocols } from 'constants/networkSpecs';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
-import { Account, UnlockedAccount } from 'types/identityTypes';
-import { NetworkParams } from 'types/networkTypes';
-import { NavigationProps } from 'types/props';
-import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import AccountIconChooser from 'components/AccountIconChooser';
 import Button from 'components/Button';
 import DerivationPathField from 'components/DerivationPathField';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
+import { NetworkProtocols } from 'constants/networkSpecs';
+import React, { useContext, useEffect, useReducer } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { AccountsContext } from 'stores/AccountsContext';
+import { NetworksContext } from 'stores/NetworkContext';
+import colors from 'styles/colors';
 import fonts from 'styles/fonts';
+import fontStyles from 'styles/fontStyles';
+import { Account, UnlockedAccount } from 'types/identityTypes';
+import { NetworkParams } from 'types/networkTypes';
+import { NavigationProps } from 'types/props';
 import { emptyAccount, validateSeed } from 'utils/account';
 import { constructSURI } from 'utils/suri';
-import fontStyles from 'styles/fontStyles';
 
 interface State {
 	derivationPassword: string;

@@ -16,7 +16,6 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 

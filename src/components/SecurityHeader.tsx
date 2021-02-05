@@ -15,16 +15,15 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import NetInfo from '@react-native-community/netinfo';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import IdentitiesSwitch from 'components/IdentitiesSwitch';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import colors from 'styles/colors';
+import { RootStackParamList } from 'types/routes';
 
 import ButtonIcon from './ButtonIcon';
-
-import { RootStackParamList } from 'types/routes';
-import colors from 'styles/colors';
-import IdentitiesSwitch from 'components/IdentitiesSwitch';
 
 function SecurityHeader(): React.ReactElement {
 	const [isConnected, setIsConnected] = useState(false);

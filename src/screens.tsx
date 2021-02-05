@@ -24,21 +24,23 @@ import {
 	createStackNavigator,
 	HeaderBackButton
 } from '@react-navigation/stack';
-import * as React from 'react';
-import { View } from 'react-native';
-
-import NetworkDetails from 'modules/network/screens/NetworkDetails';
-import NetworkSettings from 'modules/network/screens/NetworkSettings';
-import PinNew from 'modules/unlock/screens/PinNew';
-import PinUnlock from 'modules/unlock/screens/PinUnlock';
-import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
+import Main from 'modules/main/screens/Main';
+import NetworkDetails from 'modules/network/screens/NetworkDetails';
+import NetworkSettings from 'modules/network/screens/NetworkSettings';
+import QrScanner from 'modules/sign/screens/QrScanner';
+import SignedMessage from 'modules/sign/screens/SignedMessage';
+import SignedTx from 'modules/sign/screens/SignedTx';
+import PinNew from 'modules/unlock/screens/PinNew';
+import PinUnlock from 'modules/unlock/screens/PinUnlock';
+import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
+import * as React from 'react';
+import { View } from 'react-native';
 import About from 'screens/About';
 import AccountDetails from 'screens/AccountDetails';
 import AccountEdit from 'screens/AccountEdit';
-import Main from 'modules/main/screens/Main';
 import AccountNew from 'screens/AccountNew';
 import AccountPin from 'screens/AccountPin';
 import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
@@ -54,10 +56,7 @@ import PathManagement from 'screens/PathManagement';
 import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
-import QrScanner from 'modules/sign/screens/QrScanner';
 import Security from 'screens/Security';
-import SignedMessage from 'modules/sign/screens/SignedMessage';
-import SignedTx from 'modules/sign/screens/SignedTx';
 import TermsAndConditions from 'screens/TermsAndConditions';
 import colors from 'styles/colors';
 import { headerHeight, horizontalPadding } from 'styles/containerStyles';

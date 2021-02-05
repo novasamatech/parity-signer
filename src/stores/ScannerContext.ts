@@ -23,10 +23,9 @@ import {
 	u8aConcat,
 	u8aToHex
 } from '@polkadot/util';
-import React, { useReducer } from 'react';
-
-import { AccountsContextState } from 'stores/AccountsContext';
 import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
+import React, { useReducer } from 'react';
+import { AccountsContextState } from 'stores/AccountsContext';
 import { GetNetwork, NetworksContextState } from 'stores/NetworkContext';
 import { Account, FoundAccount } from 'types/identityTypes';
 import {

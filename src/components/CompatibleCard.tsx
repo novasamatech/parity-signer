@@ -16,10 +16,6 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-
-import AccountCard from './AccountCard';
-import PathCard from './PathCard';
-
 import { AccountsContextState } from 'stores/AccountsContext';
 import {
 	FoundAccount,
@@ -27,6 +23,9 @@ import {
 	FoundLegacyAccount
 } from 'types/identityTypes';
 import { isLegacyFoundAccount } from 'utils/identitiesUtils';
+
+import AccountCard from './AccountCard';
+import PathCard from './PathCard';
 
 const CompatibleCard = ({
 	account,

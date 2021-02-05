@@ -6,7 +6,6 @@ import {
 	ViewProps
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import containerStyles from 'styles/containerStyles';
 
 interface SafeAreaContainerProps extends ViewProps {

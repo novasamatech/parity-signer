@@ -23,12 +23,11 @@ import {
 	View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-import TextInput from './TextInput';
-
-import { parseDerivationPath } from 'utils/suri';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
+import { parseDerivationPath } from 'utils/suri';
+
+import TextInput from './TextInput';
 
 export default function DerivationPathField(props: {
 	onChange: (derivationEvent: {

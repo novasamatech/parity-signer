@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import {
 	Image,
@@ -26,13 +27,11 @@ import {
 	View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { NetworksContext } from 'stores/NetworkContext';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
 
 import TransparentBackground from './TransparentBackground';
-
-import { NetworksContext } from 'stores/NetworkContext';
-import { SubstrateNetworkKeys } from 'constants/networkSpecs';
-import fontStyles from 'styles/fontStyles';
-import colors from 'styles/colors';
 
 const ACCOUNT_NETWORK = 'Account Network';
 const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =

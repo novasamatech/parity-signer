@@ -14,27 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import CompatibleCard from 'components/CompatibleCard';
+import QrView from 'components/QrView';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import Separator from 'components/Separator';
+import testIDs from 'e2e/testIDs';
+import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
+import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
+import { usePayloadDetails } from 'modules/sign/hooks';
+import strings from 'modules/sign/strings';
+import styles from 'modules/sign/styles';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
-
-import { usePayloadDetails } from 'modules/sign/hooks';
-import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
-import strings from 'modules/sign/strings';
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
+import fontStyles from 'styles/fontStyles';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
-import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
-import QrView from 'components/QrView';
-import fontStyles from 'styles/fontStyles';
-import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
-import styles from 'modules/sign/styles';
-import Separator from 'components/Separator';
 
 interface Props extends NavigationScannerProps<'SignedTx'> {
 	sender: FoundAccount;

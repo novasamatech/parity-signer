@@ -14,13 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	CommonActions,
-	useNavigation,
-	useNavigationState
-} from '@react-navigation/native';
+import { CommonActions, useNavigation, useNavigationState } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-
 import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
@@ -36,8 +31,8 @@ export type GenericNavigationProps<
 export const setPin = async <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
 ): Promise<string> =>
-	new Promise(resolve => {
-		navigation.navigate('PinNew', { resolve });
+	new Promise((resolve) => {
+	navigation.navigate('PinNew', { resolve });
 	});
 
 export const unlockAndReturnSeed = async <
@@ -45,7 +40,7 @@ export const unlockAndReturnSeed = async <
 >(
 	navigation: GenericNavigationProps<RouteName>
 ): Promise<string> =>
-	new Promise(resolve => {
+	new Promise((resolve) => {
 		navigation.navigate('PinUnlock', {
 			resolve,
 			shouldReturnSeed: true
@@ -67,7 +62,7 @@ export const useUnlockSeed = (
 	unlockWithPassword: UnlockWithPassword;
 	unlockWithoutPassword: UnlockWithoutPassword;
 } => {
-	const currentRoutes = useNavigationState(state => state.routes) as Route[];
+	const currentRoutes = useNavigationState((state) => state.routes) as Route[];
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 	const resetRoutes = (routes: Route[]): void => {
 		const resetAction = CommonActions.reset({
@@ -109,7 +104,7 @@ export const unlockSeedPhrase = async <
 	isSeedRefValid: boolean,
 	identity?: Identity
 ): Promise<void> =>
-	new Promise(resolve => {
+	new Promise((resolve) => {
 		if (isSeedRefValid) {
 			resolve();
 		} else {
@@ -128,7 +123,7 @@ export const unlockSeedPhraseWithPassword = async <
 	isSeedRefValid: boolean,
 	identity?: Identity
 ): Promise<string> =>
-	new Promise(resolve => {
+	new Promise((resolve) => {
 		navigation.navigate('PinUnlockWithPassword', {
 			identity,
 			isSeedRefValid,

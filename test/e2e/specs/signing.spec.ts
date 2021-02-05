@@ -19,6 +19,8 @@ import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
+import { ScanTestRequest } from 'e2e/mockScanRequests';
+import testIDs from 'e2e/testIDs';
 import {
 	launchWithScanRequest,
 	pinCode,
@@ -30,8 +32,6 @@ import {
 	testUnlockPin,
 	testVisible
 } from 'e2e/utils';
-import { ScanTestRequest } from 'e2e/mockScanRequests';
-import testIDs from 'e2e/testIDs';
 
 const {
 	Main,

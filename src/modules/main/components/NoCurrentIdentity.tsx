@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
-import { Text, View } from 'react-native';
-
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import styles from 'modules/main/styles';
+import React from 'react';
+import { Text, View } from 'react-native';
 import fontStyles from 'styles/fontStyles';
 
 export default function NoCurrentIdentity(): React.ReactElement {

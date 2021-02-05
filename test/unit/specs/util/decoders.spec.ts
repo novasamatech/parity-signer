@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { describe, expect, it } from '@jest/globals';
 import {
 	createType,
 	GenericExtrinsicPayload,
@@ -23,8 +24,7 @@ import {
 import Call from '@polkadot/types/generic/Call';
 import { hexToU8a, u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
-import { describe, expect, it } from '@jest/globals';
-
+import { kusamaMetadata } from 'constants/networkMetadata';
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
@@ -32,15 +32,13 @@ import {
 import { getOverrideTypes } from 'stores/RegistriesContext';
 import { SubstrateCompletedParsedData } from 'types/scannerTypes';
 import {
-	constructDataFromBytes,
-	rawDataToU8A,
 	asciiToHex,
-	hexToAscii,
+	constructDataFromBytes,
 	decodeToString,
-	isJsonString
-} from 'utils/decoders';
+	hexToAscii,
+	isJsonString,
+	rawDataToU8A } from 'utils/decoders';
 import { isAscii } from 'utils/strings';
-import { kusamaMetadata } from 'constants/networkMetadata';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
@@ -135,7 +133,6 @@ describe('decoders', () => {
 		});
 
 		it('converts bytes to ascii', () => {
-			/* eslint-disable-next-line prettier/prettier */
       const messageBytes = new Uint8Array([84,  72,  73,  83,  32, 73,  83,  32,  83,  80,  65,  82,  84,  65,  33]);
 			const message = decodeToString(messageBytes);
 
@@ -168,7 +165,6 @@ describe('decoders', () => {
 		});
 
 		it('works for extrinsic of kusama transferring', () => {
-			// prettier-ignore
 			const receiveSigner = [0, 0, 1, 0, 0, 83, 1, 2, 90, 74, 3, 248, 74, 25, 207, 142, 189, 164, 14, 98, 53, 140, 89, 40, 112, 105, 26, 156, 244, 86, 19, 139, 180, 130, 153, 105, 209, 15, 233, 105, 160, 4, 0, 34, 89, 2, 152, 77, 89, 94, 72, 235, 188, 163, 222, 48, 73, 75, 190, 61, 85, 240, 76, 223, 82, 83, 185, 206, 135, 220, 108, 253, 109, 101, 100, 7, 0, 228, 11, 84, 2, 117, 3, 4, 0, 31, 4, 0, 0, 176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254, 249, 14, 158, 218, 236, 196, 15, 137, 75, 114, 19, 61, 247, 7, 46, 106, 185, 128, 128, 172, 127, 21, 50, 149, 7, 47, 66, 149, 129, 126, 115, 107];
 			const rawData =
 				'49900000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a00400225902984d595e48ebbca3de30494bbe3d55f04cdf5253b9ce87dc6cfd6d65640700e40b5402750304001f040000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafef90e9edaecc40f894b72133df7072e6ab98080ac7f153295072f4295817e736b0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec';

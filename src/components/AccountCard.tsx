@@ -14,20 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import Separator from 'components/Separator';
 import React, { ReactElement, useContext } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { NetworksContext } from 'stores/NetworkContext';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import { ButtonListener } from 'types/props';
 
 import AccountIcon from './AccountIcon';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
-import AccountPrefixedTitle from './AccountPrefixedTitle';
-
-import { NetworksContext } from 'stores/NetworkContext';
-import Separator from 'components/Separator';
-import fontStyles from 'styles/fontStyles';
-import colors from 'styles/colors';
-import { ButtonListener } from 'types/props';
 
 const CardSeparator = (): ReactElement => (
 	<Separator

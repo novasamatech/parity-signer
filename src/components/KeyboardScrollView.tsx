@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import React from 'react';
 import { Keyboard, Platform, ScrollViewProps } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 
 interface Props extends ScrollViewProps {
 	enableAutomaticScroll?: boolean;

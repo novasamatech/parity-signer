@@ -14,27 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import {
+	ETHEREUM_NETWORK_LIST,
+	EthereumNetworkKeys
+} from 'constants/networkSpecs';
 import { by, element } from 'detox';
-
 import testIDs from 'e2e/testIDs';
 import {
+	pinCode,
 	tapBack,
 	testExist,
 	testInput,
 	testNotExist,
 	testNotVisible,
 	testScrollAndTap,
+	testSetUpDefaultPath,
 	testTap,
 	testUnlockPin,
 	testVisible,
-	testSetUpDefaultPath,
-	pinCode,
 	waitAlert
 } from 'e2e/utils';
-import {
-	ETHEREUM_NETWORK_LIST,
-	EthereumNetworkKeys
-} from 'constants/networkSpecs';
 
 const {
 	Alert,

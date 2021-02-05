@@ -14,24 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import AccountCard from 'components/AccountCard';
+import Button from 'components/Button';
+import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading from 'components/ScreenHeading';
+import TouchableItem from 'components/TouchableItem';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { useContext, useEffect } from 'react';
 import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
-
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import { UnlockedAccount } from 'types/identityTypes';
-import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
-import AccountCard from 'components/AccountCard';
-import Button from 'components/Button';
-import ScreenHeading from 'components/ScreenHeading';
-import TouchableItem from 'components/TouchableItem';
-import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
+import { UnlockedAccount } from 'types/identityTypes';
+import { NavigationProps } from 'types/props';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 function LegacyAccountBackup({

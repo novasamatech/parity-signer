@@ -1,10 +1,9 @@
-import { default as React, useEffect, useReducer } from 'react';
-
 import {
 	ETHEREUM_NETWORK_LIST,
 	NetworkProtocols,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
+import { default as React, useEffect, useReducer } from 'react';
 import { NetworksContextState } from 'stores/NetworkContext';
 import {
 	Account,
@@ -126,6 +125,7 @@ export function useAccountContext(): AccountsContextState {
 		...delta
 	});
 	const [state, setState] = useReducer(reducer, initialState);
+
 	useEffect(() => {
 		const loadInitialContext = async (): Promise<void> => {
 			const accounts = await loadAccounts();
@@ -151,20 +151,21 @@ export function useAccountContext(): AccountsContextState {
 		});
 	}
 
-	function _deleteSensitiveData(account: UnlockedAccount): LockedAccount {
-		delete account.seed;
-		delete account.seedPhrase;
-		delete account.derivationPassword;
-		delete account.derivationPath;
-
-		return account;
+	function _deleteSensitiveData({ address, createdAt, encryptedSeed, isLegacy, name, networkKey, recovered, updatedAt, validBip39Seed }: UnlockedAccount): LockedAccount {
+		return {
+			address,
+			createdAt,
+			encryptedSeed,
+			isLegacy,
+			name,
+			networkKey,
+			recovered,
+			updatedAt,
+			validBip39Seed
+		} as LockedAccount;
 	}
 
-	async function save(
-		accountKey: string,
-		account: Account,
-		pin?: string
-	): Promise<void> {
+	async function save( accountKey: string, account: Account, pin?: string ): Promise<void> {
 		try {
 			// for account creation
 			let accountToSave = account;
@@ -179,10 +180,7 @@ export function useAccountContext(): AccountsContextState {
 		}
 	}
 
-	async function submitNew(
-		pin: string,
-		allNetworks: Map<string, NetworkParams>
-	): Promise<void> {
+	async function submitNew( pin: string, allNetworks: Map<string, NetworkParams>): Promise<void> {
 		const account = state.newAccount;
 		if (!account.seed) return;
 
@@ -199,9 +197,7 @@ export function useAccountContext(): AccountsContextState {
 		});
 	}
 
-	function _updateIdentitiesWithCurrentIdentity(
-		updatedCurrentIdentity: Identity
-	): void {
+	function _updateIdentitiesWithCurrentIdentity(updatedCurrentIdentity: Identity): void {
 		setState({
 			currentIdentity: updatedCurrentIdentity
 		});

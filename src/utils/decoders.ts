@@ -21,7 +21,6 @@ import {
 	u8aToHex
 } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
-
 import strings from 'modules/sign/strings';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import {

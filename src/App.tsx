@@ -16,37 +16,35 @@
 
 import '../shim';
 import 'utils/iconLoader';
-import * as React from 'react';
-import { StatusBar, StyleSheet, View, LogBox } from 'react-native';
+import '../ReactotronConfig';
+
 import { NavigationContainer } from '@react-navigation/native';
+import CustomAlert from 'components/CustomAlert';
+import { AppProps, getLaunchArgs } from 'e2e/injections';
+import * as React from 'react';
+import { LogBox,StatusBar, StyleSheet, View } from 'react-native';
+import NavigationBar from 'react-native-navbar-color';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import NavigationBar from 'react-native-navbar-color';
-
-import {
-	AppNavigator,
-	TocAndPrivacyPolicyNavigator,
-	ScreenStack
-} from './screens';
-
-import {
-	useRegistriesStore,
-	RegistriesContext
-} from 'stores/RegistriesContext';
-import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
-import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
-import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
-import CustomAlert from 'components/CustomAlert';
-import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
-import colors from 'styles/colors';
-import '../ReactotronConfig';
-import { AppProps, getLaunchArgs } from 'e2e/injections';
+import { AccountsContext,useAccountContext } from 'stores/AccountsContext';
+import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 import {
 	GlobalState,
 	GlobalStateContext,
 	useGlobalStateContext
 } from 'stores/globalStateContext';
-import { AlertStateContext, useAlertContext } from 'stores/alertContext';
+import { NetworksContext,useNetworksContext } from 'stores/NetworkContext';
+import {
+	RegistriesContext,
+	useRegistriesStore } from 'stores/RegistriesContext';
+import { ScannerContext,useScannerContext } from 'stores/ScannerContext';
+import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
+import colors from 'styles/colors';
+
+import {
+	AppNavigator,
+	ScreenStack,
+	TocAndPrivacyPolicyNavigator } from './screens';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);

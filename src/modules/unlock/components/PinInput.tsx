@@ -13,12 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import TextInput from 'components/TextInput';
 import React, { MutableRefObject } from 'react';
 import { KeyboardTypeOptions, StyleSheet, TextInputProps } from 'react-native';
-
-import TextInput from 'components/TextInput';
-import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
 
 interface PinInputProps extends TextInputProps {
 	label: string;

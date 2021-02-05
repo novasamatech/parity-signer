@@ -14,31 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { pathsRegex } from './regex';
-import { decryptData, substrateAddress } from './native';
-import { constructSURI, parseSURI } from './suri';
-import { generateAccountId } from './account';
-
-import { NetworksContextState } from 'stores/NetworkContext';
-import strings from 'modules/sign/strings';
-import { SubstrateNetworkParams } from 'types/networkTypes';
-import { TryCreateFunc } from 'utils/seedRefHooks';
-import {
-	ETHEREUM_NETWORK_LIST,
-	SubstrateNetworkKeys,
-	UnknownNetworkKeys,
-	unknownNetworkPathId
-} from 'constants/networkSpecs';
-import {
-	Account,
-	AccountMeta,
-	FoundAccount,
-	FoundLegacyAccount,
-	Identity,
-	PathGroup,
-	SerializedIdentity,
-	UnlockedAccount
-} from 'types/identityTypes';
 import {
 	centrifugeAmberMetadata,
 	centrifugeMetadata,
@@ -49,6 +24,31 @@ import {
 	rococoMetadata,
 	westendMetadata
 } from 'constants/networkMetadata';
+import {
+	ETHEREUM_NETWORK_LIST,
+	SubstrateNetworkKeys,
+	UnknownNetworkKeys,
+	unknownNetworkPathId
+} from 'constants/networkSpecs';
+import strings from 'modules/sign/strings';
+import { NetworksContextState } from 'stores/NetworkContext';
+import {
+	Account,
+	AccountMeta,
+	FoundAccount,
+	FoundLegacyAccount,
+	Identity,
+	PathGroup,
+	SerializedIdentity,
+	UnlockedAccount
+} from 'types/identityTypes';
+import { SubstrateNetworkParams } from 'types/networkTypes';
+import { TryCreateFunc } from 'utils/seedRefHooks';
+
+import { generateAccountId } from './account';
+import { decryptData, substrateAddress } from './native';
+import { pathsRegex } from './regex';
+import { constructSURI, parseSURI } from './suri';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = (str: string): string => str.replace(/\//g, '');

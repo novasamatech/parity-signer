@@ -14,19 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useState } from 'react';
-import { StyleSheet } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
-
-import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NetworksContext } from 'stores/NetworkContext';
-import { ScannerContext } from 'stores/ScannerContext';
-import { NavigationProps } from 'types/props';
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
 import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
+import React, { useContext, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { AccountsContext } from 'stores/AccountsContext';
+import { NetworksContext } from 'stores/NetworkContext';
+import { ScannerContext } from 'stores/ScannerContext';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import { NavigationProps } from 'types/props';
 
 interface AccountUnlockViewProps {
 	checkPin: (pin: string) => Promise<boolean>;

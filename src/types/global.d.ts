@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+/* eslint-disable no-unused-vars */
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 export {};
 
@@ -21,7 +22,6 @@ export {};
  *~ place them here.
  *~ You should also place types (interfaces and type alias) here.
  */
-/* eslint-disable prettier/prettier */
 declare global {
     namespace NodeJS {
         interface Global {

@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import QrScannerTab from 'components/QrScannerTab';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
-import TouchableItem from './TouchableItem';
-import Separator from './Separator';
-
-import QrScannerTab from 'components/QrScannerTab';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
+
+import Separator from './Separator';
+import TouchableItem from './TouchableItem';
 
 export default class QRScannerAndDerivationTab extends React.PureComponent<{
 	onPress: ButtonListener;

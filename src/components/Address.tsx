@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { ReactElement } from 'react';
 import { Text, TextStyle } from 'react-native';
-
 import fontStyles from 'styles/fontStyles';
-import { NetworkProtocols } from 'constants/networkSpecs';
 import { NetworkProtocol } from 'types/networkTypes';
 
 export default function Address(props: {

@@ -17,15 +17,13 @@
 import React from 'react';
 import {
 	StyleSheet,
-	TextInput as TextInputOrigin,
-	View,
 	Text,
+	TextInput as TextInputOrigin,
+	TextInputProps,
 	TextStyle,
-	TextInputProps
-} from 'react-native';
-
-import fontStyles from 'styles/fontStyles';
+	View } from 'react-native';
 import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
 
 interface Props extends TextInputProps {
 	fixedPrefix?: string;

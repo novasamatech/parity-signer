@@ -18,7 +18,6 @@ import { Metadata } from '@polkadot/metadata';
 import { TypeRegistry } from '@polkadot/types';
 import { getSpecTypes } from '@polkadot/types-known';
 import React, { useState } from 'react';
-
 import { deepCopyMap } from 'stores/utils';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { getMetadata } from 'utils/identitiesUtils';

@@ -16,12 +16,11 @@
 
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
+import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
-
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
@@ -29,10 +28,10 @@ import {
 	RegistriesStoreState
 } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
-import { withRegistriesStore } from 'utils/HOC';
-import { shortString } from 'utils/strings';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
+import { withRegistriesStore } from 'utils/HOC';
+import { shortString } from 'utils/strings';
 
 const recodeAddress = (encodedAddress: string, prefix: number): string =>
 	encodeAddress(decodeAddress(encodedAddress), prefix);

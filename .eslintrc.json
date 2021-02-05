@@ -1,0 +1,59 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true,
+		"node": true
+	},
+	"extends": [
+		"plugin:import/errors",
+		"plugin:import/warnings",
+		"plugin:import/typescript",
+		"plugin:@typescript-eslint/eslint-recommended"
+	],
+	"globals": { "inTest": "writable" },
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": 6,
+		"sourceType": "module"
+	},
+	"plugins": [
+		"@typescript-eslint",
+		"promise",
+		"react",
+		"react-hooks",
+		"simple-import-sort"
+	],
+	"rules": {
+			"comma-dangle": ["error", "never"],
+			"no-bitwise": "off",
+			"object-curly-spacing": ["error", "always"],
+			"quotes": ["error", "single", { "avoidEscape": true }],
+			"react-native/no-inline-styles": "off",
+			"sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}],
+			"no-trailing-spaces": ["warn"],
+			"react-hooks/exhaustive-deps": "warn",
+			"react-hooks/rules-of-hooks": "error",
+			"semi": "off",
+			"no-unused-vars": ["error", { "args": "none" }],
+			"no-multiple-empty-lines": ["error", {"max": 1}],
+			"simple-import-sort/imports": "error",
+			"switch-colon-spacing": ["error", {"after": true, "before": false}]
+	},
+	"settings": {
+		"import/ignore": "react-navigation",
+		"import/resolver": {
+			"node": {
+				"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			},
+			"typescript": {
+				"alwaysTryTypes": true // always try to resolve types under `<roo/>@types` directory even it doesn"t contain any source code, like `@types/unist`
+			}
+		},
+		"react": {
+			"pragma": "React" // Pragma to use, default to "React"
+		}
+	}
+}

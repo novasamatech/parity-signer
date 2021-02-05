@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
-
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
+import React from 'react';
 
 export default class Security extends React.PureComponent {
 	render(): React.ReactElement {

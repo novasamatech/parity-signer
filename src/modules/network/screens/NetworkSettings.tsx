@@ -14,19 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { NetworkCard } from 'components/AccountCard';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading from 'components/ScreenHeading';
+import testIDs from 'e2e/testIDs';
+import { filterNetworks } from 'modules/network/utils';
 import React, { ReactElement, useContext } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
-
-import testIDs from 'e2e/testIDs';
-import { NetworkCard } from 'components/AccountCard';
-import { filterNetworks } from 'modules/network/utils';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
-import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
-import ScreenHeading from 'components/ScreenHeading';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+import { NavigationProps } from 'types/props';
 
 export default function NetworkSettings({
 	navigation

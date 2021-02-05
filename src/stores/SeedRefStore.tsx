@@ -1,6 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-
 import { SeedRefClass } from 'utils/native';
 
 export type SeedRefsState = [

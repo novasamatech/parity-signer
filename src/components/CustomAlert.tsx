@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View, Animated, Text, Easing } from 'react-native';
-
 import Button from 'components/Button';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Animated, Easing,StyleSheet, Text, View } from 'react-native';
 import { Action, AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';

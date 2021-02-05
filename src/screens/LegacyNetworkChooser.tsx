@@ -14,21 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import TouchableItem from 'components/TouchableItem';
+import {
+	SubstrateNetworkKeys,
+	UnknownNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import { StyleSheet, Text } from 'react-native';
-
 import { AccountsContext } from 'stores/AccountsContext';
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import {
-	UnknownNetworkKeys,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
-import { NetworkParams } from 'types/networkTypes';
-import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
-import TouchableItem from 'components/TouchableItem';
+import { NetworkParams } from 'types/networkTypes';
+import { NavigationProps } from 'types/props';
 import { emptyAccount } from 'utils/account';
 
 export default function LegacyNetworkChooserView({

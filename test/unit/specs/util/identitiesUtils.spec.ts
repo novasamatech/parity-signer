@@ -15,6 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
+	EthereumNetworkKeys,
+	NETWORK_LIST,
+	SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys,
+	UnknownNetworkKeys,
+	unknownNetworkPathId
+} from 'constants/networkSpecs';
+import {
 	GetNetwork,
 	GetSubstrateNetwork,
 	NetworksContextState
@@ -29,14 +37,6 @@ import {
 	isSubstrateHardDerivedPath,
 	serializeIdentities
 } from 'utils/identitiesUtils';
-import {
-	EthereumNetworkKeys,
-	NETWORK_LIST,
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys,
-	UnknownNetworkKeys,
-	unknownNetworkPathId
-} from 'constants/networkSpecs';
 
 const networks = new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
 const allNetworks = new Map(Object.entries(NETWORK_LIST));

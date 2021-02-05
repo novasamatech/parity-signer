@@ -14,19 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useMemo } from 'react';
-import { ScrollView } from 'react-native';
-
-import { PathDetailsView } from './PathDetails';
-
-import { NetworksContext } from 'stores/NetworkContext';
-import { PathGroup } from 'types/identityTypes';
+import PathCard from 'components/PathCard';
 import PathGroupCard from 'components/PathGroupCard';
-import { useUnlockSeed } from 'utils/navigationHelpers';
-import { useSeedRef } from 'utils/seedRefHooks';
+import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { LeftScreenHeading } from 'components/ScreenHeading';
+import Separator from 'components/Separator';
 import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
+import React, { useContext, useMemo } from 'react';
+import { ScrollView } from 'react-native';
+import { NetworksContext } from 'stores/NetworkContext';
+import { PathGroup } from 'types/identityTypes';
 import {
 	isEthereumNetworkParams,
 	isUnknownNetworkParams
@@ -37,10 +36,10 @@ import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths
 } from 'utils/identitiesUtils';
-import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
-import PathCard from 'components/PathCard';
-import Separator from 'components/Separator';
-import { LeftScreenHeading } from 'components/ScreenHeading';
+import { useUnlockSeed } from 'utils/navigationHelpers';
+import { useSeedRef } from 'utils/seedRefHooks';
+
+import { PathDetailsView } from './PathDetails';
 
 function PathsList({
 	accountsStore,

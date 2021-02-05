@@ -14,22 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import Button from 'components/Button';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading from 'components/ScreenHeading';
+import { useInjectionQR } from 'e2e/injections';
+import testIDs from 'e2e/testIDs';
+import { useProcessBarCode } from 'modules/sign/utils';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
-
-import testIDs from 'e2e/testIDs';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import Button from 'components/Button';
-import { useProcessBarCode } from 'modules/sign/utils';
-import { useInjectionQR } from 'e2e/injections';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
-import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
-import ScreenHeading from 'components/ScreenHeading';
+import { NavigationProps } from 'types/props';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 

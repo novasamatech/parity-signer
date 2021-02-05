@@ -23,16 +23,15 @@ import {
 	TextInputSelectionChangeEventData,
 	View
 } from 'react-native';
-
-import TextInput from './TextInput';
-import TouchableItem from './TouchableItem';
-
+import BIP39_WORDS from 'res/bip39_wordlist.json';
+import PARITY_WORDS from 'res/parity_wordlist.json';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
-import PARITY_WORDS from 'res/parity_wordlist.json';
-import BIP39_WORDS from 'res/bip39_wordlist.json';
 import { binarySearch } from 'utils/array';
+
+import TextInput from './TextInput';
+import TouchableItem from './TouchableItem';
 
 // Combined, de-duplicated, sorted word list (could be a precompute from json as well)
 const ALL_WORDS = Array.from(new Set(PARITY_WORDS.concat(BIP39_WORDS))).sort();
@@ -185,9 +184,6 @@ const styles = StyleSheet.create({
 		borderBottomColor: colors.border.signal,
 		borderColor: colors.border.signal
 	},
-	validInput: {
-		borderColor: colors.border.valid
-	},
 	suggestion: {
 		padding: 12,
 		paddingVertical: 4
@@ -207,5 +203,8 @@ const styles = StyleSheet.create({
 		marginHorizontal: 16,
 		marginTop: -8,
 		overflow: 'hidden'
+	},
+	validInput: {
+		borderColor: colors.border.valid
 	}
 });

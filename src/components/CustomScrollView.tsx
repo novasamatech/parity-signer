@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import React from 'react';
 import {
 	Animated,
@@ -22,8 +23,6 @@ import {
 	StyleSheet,
 	ViewStyle
 } from 'react-native';
-
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import colors from 'styles/colors';
 
 export default class CustomScrollView extends React.PureComponent<

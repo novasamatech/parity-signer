@@ -14,12 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import TextInput from 'components/TextInput';
+import testIDs from 'e2e/testIDs';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-
-import testIDs from 'e2e/testIDs';
-import TextInput from 'components/TextInput';
 import fontStyles from 'styles/fontStyles';
 import { passwordRegex } from 'utils/regex';
 

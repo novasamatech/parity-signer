@@ -15,10 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	SubstrateNetworkKeys,
 	defaultNetworkKey,
 	NETWORK_LIST,
 	NetworkProtocols,
+	SubstrateNetworkKeys,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
 import {

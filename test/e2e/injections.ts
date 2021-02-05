@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { scanRequestDataMap, ScanTestRequest } from 'e2e/mockScanRequests';
 import { useState } from 'react';
 import { Platform } from 'react-native';
-
-import { scanRequestDataMap, ScanTestRequest } from 'e2e/mockScanRequests';
 import { TxRequestData } from 'types/scannerTypes';
 
 type AndroidAppArgs = {

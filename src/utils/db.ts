@@ -15,14 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import AsyncStorage from '@react-native-community/async-storage';
+import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import SecureStorage from 'react-native-secure-storage';
+import { Account, Identity } from 'types/identityTypes';
+import { SubstrateNetworkParams } from 'types/networkTypes';
+import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
-
-import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
-import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
-import { SubstrateNetworkParams } from 'types/networkTypes';
-import { Account, Identity } from 'types/identityTypes';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);

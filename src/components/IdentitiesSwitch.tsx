@@ -14,28 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import testIDs from 'e2e/testIDs';
 import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { AccountsContext } from 'stores/AccountsContext';
+import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import { Identity } from 'types/identityTypes';
+import { RootStackParamList } from 'types/routes';
+import { getIdentityName } from 'utils/identitiesUtils';
+import {
+	navigateToLegacyAccountList,
+	resetNavigationTo,
+	resetNavigationWithNetworkChooser,
+	unlockAndReturnSeed } from 'utils/navigationHelpers';
 
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
-
-import { AccountsContext } from 'stores/AccountsContext';
-import { RootStackParamList } from 'types/routes';
-import testIDs from 'e2e/testIDs';
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
-import { getIdentityName } from 'utils/identitiesUtils';
-import {
-	unlockAndReturnSeed,
-	navigateToLegacyAccountList,
-	resetNavigationTo,
-	resetNavigationWithNetworkChooser
-} from 'utils/navigationHelpers';
-import { Identity } from 'types/identityTypes';
 
 function ButtonWithArrow(props: {
 	onPress: () => void;

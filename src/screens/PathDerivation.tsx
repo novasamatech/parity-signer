@@ -14,15 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useRef, useState, useMemo, useContext } from 'react';
-
+import Button from 'components/Button';
+import {
+	DerivationNetworkSelector,
+	NetworkOptions
+} from 'components/DerivationNetworkSelector';
 import PasswordInput from 'components/PasswordInput';
-import testIDs from 'e2e/testIDs';
+import PathCard from 'components/PathCard';
+import ScreenHeading from 'components/ScreenHeading';
+import Separator from 'components/Separator';
+import TextInput from 'components/TextInput';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
+import testIDs from 'e2e/testIDs';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
+import React, { useContext,useMemo, useRef, useState } from 'react';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
-import TextInput from 'components/TextInput';
+import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
 	extractPathId,
@@ -30,18 +39,11 @@ import {
 	getSubstrateNetworkKeyByPathId,
 	validateDerivedPath
 } from 'utils/identitiesUtils';
-import { navigateToPathDetails, unlockSeedPhrase } from 'utils/navigationHelpers';
-import { alertPathDerivationError } from 'utils/alertUtils';
-import Separator from 'components/Separator';
-import ScreenHeading from 'components/ScreenHeading';
-import PathCard from 'components/PathCard';
 import {
-	DerivationNetworkSelector,
-	NetworkOptions
-} from 'components/DerivationNetworkSelector';
+	navigateToPathDetails,
+	unlockSeedPhrase
+} from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
-import Button from 'components/Button';
-import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 
 function PathDerivation({
 	accountsStore,
@@ -63,14 +65,14 @@ function PathDerivation({
 
 	const parentNetworkKey = useMemo((): string => {
 		const { networks, pathIds } = networkContextState;
-		function getParentNetworkKey(): string {
-			if (currentIdentity.meta.has(parentPath)) {
-				return getNetworkKey(parentPath, currentIdentity, networkContextState);
-			}
-			const pathId = extractPathId(parentPath, pathIds);
-			return getSubstrateNetworkKeyByPathId(pathId, networks);
+
+		if (currentIdentity.meta.has(parentPath)) {
+			return getNetworkKey(parentPath, currentIdentity, networkContextState);
 		}
-		return getParentNetworkKey();
+
+		const pathId = extractPathId(parentPath, pathIds);
+
+		return getSubstrateNetworkKeyByPathId(pathId, networks);
 	}, [currentIdentity, networkContextState, parentPath]);
 
 	const [customNetworkKey, setCustomNetworkKey] = useState(
@@ -96,7 +98,7 @@ function PathDerivation({
 				password
 			);
 			setAlert('Success', 'New Account Successfully derived');
-			navigateToPathDetails(navigation, currentNetworkKey, derivationPath)
+			navigateToPathDetails(navigation, currentNetworkKey, derivationPath);
 		} catch (error) {
 			alertPathDerivationError(setAlert, error.message);
 		}

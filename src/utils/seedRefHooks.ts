@@ -1,5 +1,4 @@
 import { useContext, useMemo } from 'react';
-
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { SeedRefClass } from 'utils/native';
 

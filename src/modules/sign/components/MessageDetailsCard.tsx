@@ -14,13 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import Separator from 'components/Separator';
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-
+import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { hexToAscii, isAscii } from 'utils/strings';
-import colors from 'styles/colors';
-import Separator from 'components/Separator';
 
 export default function MessageDetailsCard({
 	isHash,

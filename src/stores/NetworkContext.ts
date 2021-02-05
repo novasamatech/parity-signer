@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { default as React, useEffect, useMemo, useState } from 'react';
-
 import {
 	dummySubstrateNetworkParams,
 	ETHEREUM_NETWORK_LIST,
@@ -23,7 +21,8 @@ import {
 	unknownNetworkParams,
 	unknownNetworkPathId
 } from 'constants/networkSpecs';
-import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
+import { default as React, useEffect, useMemo, useState } from 'react';
+import { NetworkParams,SubstrateNetworkParams } from 'types/networkTypes';
 import { NetworkParsedData } from 'types/scannerTypes';
 import { loadNetworks, saveNetworks } from 'utils/db';
 import {

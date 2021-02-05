@@ -14,28 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import AccountCard from 'components/AccountCard';
+import AccountIcon from 'components/AccountIcon';
+import PopupMenu from 'components/PopupMenu';
+import QrScannerTab from 'components/QrScannerTab';
+import QrView from 'components/QrView';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { UnknownAccountWarning } from 'components/Warnings';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
-import AccountCard from 'components/AccountCard';
-import QrView from 'components/QrView';
-import PopupMenu from 'components/PopupMenu';
+import fontStyles from 'styles/fontStyles';
+import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
 import {
 	navigateToLandingPage,
 	navigateToLegacyAccountList
 } from 'utils/navigationHelpers';
-import fontStyles from 'styles/fontStyles';
-import { UnknownAccountWarning } from 'components/Warnings';
-import AccountIcon from 'components/AccountIcon';
-import { NavigationProps } from 'types/props';
-import QrScannerTab from 'components/QrScannerTab';
 
 export default function AccountDetails({
 	navigation

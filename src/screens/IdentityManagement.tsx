@@ -14,24 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import PopupMenu from 'components/PopupMenu';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading from 'components/ScreenHeading';
+import TextInput from 'components/TextInput';
+import testIDs from 'e2e/testIDs';
 import React, { useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
-
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
+import colors from 'styles/colors';
 import { NavigationAccountIdentityProps } from 'types/props';
+import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
-import TextInput from 'components/TextInput';
 import {
-	unlockAndReturnSeed,
 	navigateToLandingPage,
+	unlockAndReturnSeed,
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
-import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
-import ScreenHeading from 'components/ScreenHeading';
-import colors from 'styles/colors';
-import PopupMenu from 'components/PopupMenu';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;

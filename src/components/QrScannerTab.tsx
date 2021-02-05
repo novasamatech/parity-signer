@@ -14,19 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Icon } from 'react-native-elements';
-
-import TouchableItem from './TouchableItem';
-
-import colors from 'styles/colors';
-import { navigateToQrScanner } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
+import React from 'react';
+import { StyleSheet, Text } from 'react-native';
+import { Icon } from 'react-native-elements';
+import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
+import { navigateToQrScanner } from 'utils/navigationHelpers';
+
+import TouchableItem from './TouchableItem';
 
 export default function QrScannerTab(): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();

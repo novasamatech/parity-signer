@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { ReactElement } from 'react';
 import {
 	FlatList,
@@ -23,17 +24,15 @@ import {
 	View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-import AccountIcon from './AccountIcon';
-import Address from './Address';
-
 import colors from 'styles/colors';
-import { NetworkProtocols } from 'constants/networkSpecs';
 import fonts from 'styles/fonts';
+import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { debounce } from 'utils/debounce';
 import { brainWalletAddress, substrateAddress, words } from 'utils/native';
 import { constructSURI } from 'utils/suri';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+
+import AccountIcon from './AccountIcon';
+import Address from './Address';
 
 interface IconType {
 	address: string;

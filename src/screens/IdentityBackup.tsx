@@ -14,26 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import Button from 'components/Button';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading from 'components/ScreenHeading';
+import TouchableItem from 'components/TouchableItem';
+import testIDs from 'e2e/testIDs';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NavigationProps } from 'types/props';
-import { words } from 'utils/native';
-import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
-import ScreenHeading from 'components/ScreenHeading';
+import { NavigationProps } from 'types/props';
 import {
 	alertBackupDone,
 	alertCopyBackupPhrase,
 	alertIdentityCreationError
 } from 'utils/alertUtils';
-import Button from 'components/Button';
+import { words } from 'utils/native';
+import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({

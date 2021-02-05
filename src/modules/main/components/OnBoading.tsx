@@ -16,13 +16,12 @@
 
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React from 'react';
-import { Text, View } from 'react-native';
-
 import Button from 'components/Button';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import styles from 'modules/main/styles';
+import React from 'react';
+import { Text, View } from 'react-native';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
 

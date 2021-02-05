@@ -14,29 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import AccountSeed from 'components/AccountSeed';
+import Button from 'components/Button';
+import ScreenHeading from 'components/ScreenHeading';
+import TextInput from 'components/TextInput';
+import testIDs from 'e2e/testIDs';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-
-import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
-import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import Button from 'components/Button';
-import TextInput from 'components/TextInput';
-import { NavigationProps } from 'types/props';
-import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
+import { NavigationProps } from 'types/props';
 import { validateSeed } from 'utils/account';
-import AccountSeed from 'components/AccountSeed';
-import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import {
 	alertError,
 	alertIdentityCreationError,
 	alertRisks
 } from 'utils/alertUtils';
-import ScreenHeading from 'components/ScreenHeading';
-import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
+import { emptyIdentity } from 'utils/identitiesUtils';
+import { brainWalletAddress } from 'utils/native';
+import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityNew({

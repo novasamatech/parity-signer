@@ -15,15 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import Identicon from '@polkadot/reactnative-identicon';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import colors from 'styles/colors';
-import { NetworkProtocols } from 'constants/networkSpecs';
-import { blockiesIcon } from 'utils/native';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+import { blockiesIcon } from 'utils/native';
 
 export default function AccountIcon(props: {
 	address: string;

@@ -15,25 +15,24 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { isU8a, u8aToHex } from '@polkadot/util';
-import React, { useContext, useEffect, useRef } from 'react';
-import { Text, View } from 'react-native';
-
+import CompatibleCard from 'components/CompatibleCard';
+import QrView from 'components/QrView';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import Separator from 'components/Separator';
+import testIDs from 'e2e/testIDs';
+import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import strings from 'modules/sign/strings';
-import CompatibleCard from 'components/CompatibleCard';
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import testIDs from 'e2e/testIDs';
+import styles from 'modules/sign/styles';
+import React, { useContext, useEffect, useRef } from 'react';
+import { Text, View } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
+import fontStyles from 'styles/fontStyles';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
-import QrView from 'components/QrView';
-import styles from 'modules/sign/styles';
-import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
-import Separator from 'components/Separator';
-import fontStyles from 'styles/fontStyles';
 
 interface Props extends NavigationScannerProps<'SignedMessage'> {
 	sender: FoundAccount;

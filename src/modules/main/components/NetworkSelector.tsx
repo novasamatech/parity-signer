@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext, useMemo, useState } from 'react';
-import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-
-import { filterNetworks } from 'modules/network/utils';
 import { NetworkCard } from 'components/AccountCard';
+import QrScannerTab from 'components/QrScannerTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
+import { filterNetworks } from 'modules/network/utils';
+import React, { ReactElement, useContext, useMemo, useState } from 'react';
+import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
@@ -43,7 +43,6 @@ import {
 	useUnlockSeed
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
-import QrScannerTab from 'components/QrScannerTab';
 
 function NetworkSelector({
 	accountsStore,
@@ -80,7 +79,7 @@ function NetworkSelector({
 
 	const onAddCustomPath = (): Promise<void> =>
 		unlockWithoutPassword({
-			name: 'PathDerivation',
+name: 'PathDerivation',
 			params: { parentPath: '' }
 		});
 

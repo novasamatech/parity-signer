@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NavigationProps } from 'types/props';
-import { Account } from 'types/identityTypes';
 import AccountCard from 'components/AccountCard';
 import QrScannerTab from 'components/QrScannerTab';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import testIDs from 'e2e/testIDs';
+import React, { useContext } from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
+import { AccountsContext } from 'stores/AccountsContext';
+import { Account } from 'types/identityTypes';
+import { NavigationProps } from 'types/props';
 
 function LegacyAccountList({
 	navigation

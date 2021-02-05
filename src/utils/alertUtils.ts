@@ -14,9 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Clipboard } from 'react-native';
-
 import testIDs from 'e2e/testIDs';
+import { Clipboard } from 'react-native';
 import { Action, SetAlert } from 'stores/alertContext';
 
 const alertTestIDs = testIDs.Alert;

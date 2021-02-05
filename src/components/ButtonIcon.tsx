@@ -16,16 +16,14 @@
 
 import React, { FunctionComponent } from 'react';
 import {
+	StyleSheet,
+	Text,
+	TextStyle,
 	TouchableOpacity,
 	View,
-	Text,
-	ViewStyle,
-	TextStyle,
-	StyleSheet
-} from 'react-native';
+	ViewStyle } from 'react-native';
 import { Icon } from 'react-native-elements';
 import AntIcon from 'react-native-vector-icons/AntDesign';
-
 import colors from 'styles/colors';
 import { ButtonListener } from 'types/props';
 

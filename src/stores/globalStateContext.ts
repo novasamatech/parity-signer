@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-
 import { loadToCAndPPConfirmation } from 'utils/db';
 import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 

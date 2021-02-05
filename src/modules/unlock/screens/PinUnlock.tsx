@@ -13,15 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react';
-
+import ScreenHeading from 'components/ScreenHeading';
+import testIDs from 'e2e/testIDs';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
 import { usePinState } from 'modules/unlock/hooks';
 import t from 'modules/unlock/strings';
 import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
-import testIDs from 'e2e/testIDs';
-import ScreenHeading from 'components/ScreenHeading';
+import React from 'react';
 import { NavigationTargetIdentityProps } from 'types/props';
 import { debounce } from 'utils/debounce';
 import { withTargetIdentity } from 'utils/HOC';

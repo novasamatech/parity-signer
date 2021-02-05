@@ -14,22 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import AntIcon from 'react-native-vector-icons/AntDesign';
-
-import AccountIcon from './AccountIcon';
-import AccountPrefixedTitle from './AccountPrefixedTitle';
-import Address from './Address';
-import TouchableItem from './TouchableItem';
-
-import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import {
 	defaultNetworkKey,
 	NETWORK_LIST,
 	UnknownNetworkKeys
 } from 'constants/networkSpecs';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import AntIcon from 'react-native-vector-icons/AntDesign';
+import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
@@ -44,6 +38,11 @@ import {
 	getPathName
 } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
+
+import AccountIcon from './AccountIcon';
+import AccountPrefixedTitle from './AccountPrefixedTitle';
+import Address from './Address';
+import TouchableItem from './TouchableItem';
 
 export default function PathCard({
 	onPress,

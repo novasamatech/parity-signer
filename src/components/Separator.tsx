@@ -15,8 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { View, Image, ViewStyle, StyleSheet, ImageStyle } from 'react-native';
-
+import { Image, ImageStyle,StyleSheet, View, ViewStyle } from 'react-native';
 import shadowImage from 'res/img/card_shadow.png';
 
 interface Props {
