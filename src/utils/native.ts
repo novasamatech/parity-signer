@@ -155,25 +155,73 @@ export function substrateSecret(suri: string): Promise<string> {
 //   Kusama = 2
 //   Default (testnets) = 42
 export function substrateAddress(
-	seed: string,
-	prefix: number
+	seed: number,
+	prefix: number,
+	algorithm: string
 ): Promise<string> {
-	return SubstrateSign.substrateAddress(seed, prefix);
+	switch (algorithm) {
+		case 'Sr25519': {
+			return SubstrateSign.substrateAddress(seed, prefix);
+			break;
+		}
+		case 'Ed25519': {
+			throw new Error();
+			return '';
+			break;
+		}
+		case 'Ecdsa': {
+			throw new Error();
+			return '';
+			break;
+		}
+		default:
+		{
+			throw new Error();
+			break;
+		}
+	}
 }
 
-// Sign data using sr25519 crypto for a BIP39 phrase. Message is hex-encoded byte array.
-export function substrateSign(seed: string, message: string): Promise<string> {
-	return SubstrateSign.substrateSign(seed, message);
+// Sign data using multisignature (sr25519) crypto for a BIP39 phrase. Message is hex-encoded byte array.
+export function substrateSign(
+	seed: string,
+	message: string,
+	algorithm: string
+): Promise<string> {
+	switch (algorithm) {
+		case 'Sr25519': {
+			return SubstrateSign.substrateSign(seed, message);
+			break;
+		}
+		case 'Ed25519': {
+			throw new Error();
+			return '';
+			break;
+		}
+		case 'Ecdsa': {
+			throw new Error();
+			return '';
+			break;
+		}
+		default:
+		{
+			throw new Error();
+			break;
+		}
+	}
 }
 
 // Verify a sr25519 signature is valid
+// TODO: add other encription algorithms
 export function schnorrkelVerify(
 	seed: string,
 	message: string,
-	signature: string
+	signature: string,
+	algorithm: string
 ): Promise<boolean> {
 	return SubstrateSign.schnorrkelVerify(seed, message, signature);
 }
+
 
 export class SeedRefClass {
 	private dataRef: number;
@@ -203,15 +251,36 @@ export class SeedRefClass {
 		return this.dataRef;
 	}
 
-	trySubstrateAddress(suriSuffix: string, prefix: number): Promise<string> {
+	trySubstrateAddress(suriSuffix: string, prefix: number, algorithm: string): Promise<string> {
 		if (!this.valid) {
 			throw new Error('a seed reference has not been created');
 		}
-		return SubstrateSign.substrateAddressWithRef(
-			this.dataRef,
-			suriSuffix,
-			prefix
-		);
+		switch (algorithm) {
+			case 'Sr25519': {
+				return SubstrateSign.substrateAddressWithRef(
+					this.dataRef,
+					suriSuffix,
+					prefix
+				);
+				break;
+			}
+			case 'Ed25519': {	
+				throw new Error();
+				return '';
+				break;
+			}
+			case 'Ecdsa': {
+				throw new Error();
+				return '';
+				break;
+			}
+			default:
+			{
+				throw new Error();
+				break;
+			}
+		}
+
 	}
 
 	tryBrainWalletAddress(): Promise<string> {
@@ -248,16 +317,36 @@ export class SeedRefClass {
 	}
 
 	// Use a reference returned by decryptDataRef to sign a message
-	trySubstrateSign(suriSuffix: string, message: string): Promise<string> {
+	trySubstrateSign(suriSuffix: string, message: string, algorithm: string): Promise<string> {
 		if (!this.valid) {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
-		return SubstrateSign.substrateSignWithRef(
-			this.dataRef,
-			suriSuffix,
-			message
-		);
+		switch (algorithm) {
+			case 'Sr25519': {
+				return SubstrateSign.substrateSignWithRef(
+					this.dataRef,
+					suriSuffix,
+					message
+				);
+				break;
+			}
+			case 'Ed25519': {	
+				throw new Error();
+				return '';
+				break;
+			}
+			case 'Ecdsa': {
+				throw new Error();
+				return '';
+				break;
+			}
+			default:
+			{
+				throw new Error();
+				break;
+			}
+		}
 	}
 
 	trySubstrateSecret(suriSuffix: string): Promise<string> {

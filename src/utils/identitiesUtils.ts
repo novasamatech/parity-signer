@@ -319,7 +319,7 @@ export const verifyPassword = async (
 	const networkKey = getNetworkKey(path, identity, networkContextState);
 	const networkParams = networks.get(networkKey);
 	if (!networkParams) throw new Error(strings.ERROR_NO_NETWORK);
-	const address = await substrateAddress(suri, networkParams.prefix);
+	const address = await substrateAddress(suri, networkParams.prefix, identity.multisignatureType);
 	const accountMeta = identity.meta.get(path);
 	return address === accountMeta?.address;
 };

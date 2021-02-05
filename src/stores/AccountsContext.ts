@@ -479,10 +479,11 @@ export function useAccountContext(): AccountsContextState {
 			derivePath: newPath,
 			password
 		});
+		const algorithm = updatedIdentity.multisignatureType;
 		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
 		try {
-			address = await createSubstrateAddress(suriSuffix, prefix);
+			address = await createSubstrateAddress(suriSuffix, prefix, algorithm);
 		} catch (e) {
 			throw new Error(addressGenerateError);
 		}

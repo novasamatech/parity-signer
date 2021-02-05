@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
@@ -103,6 +103,9 @@ function IdentityManagement({
 				placeholder="Enter a new identity name"
 				focus
 			/>
+			<View>
+				<Text style={styles.infoText}>Substrate encription algorithm: {currentIdentity.multisignatureType}</Text>
+			</View>
 		</SafeAreaViewContainer>
 	);
 }
@@ -118,5 +121,9 @@ const styles = StyleSheet.create({
 		paddingBottom: 24,
 		paddingLeft: 16,
 		paddingRight: 16
+	},
+	infoText: {
+		color: colors.text.main,
+		padding: 10
 	}
 });
