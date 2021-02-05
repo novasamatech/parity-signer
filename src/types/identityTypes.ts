@@ -37,6 +37,10 @@ export type LockedAccount = Omit<
 	'seedPhrase' | 'seed' | 'derivationPassword' | 'derivationPath'
 >;
 
+// Multisignature support on identity level
+// conforming to https://substrate.dev/rustdocs/v2.0.0/sp_runtime/enum.MultiSignature.html
+export type MultiSignatureIdentityType =   "Ed25519" | "Sr25519" | "Ecdsa";
+
 export type Account = UnlockedAccount | LockedAccount;
 
 export function isUnlockedAccount(
@@ -86,6 +90,7 @@ export type Identity = {
 	meta: Map<string, AccountMeta>;
 	addresses: Map<string, string>;
 	name: string;
+	multisignatureType: MultiSignatureIdentityType;
 };
 
 export type SerializedIdentity = {
@@ -94,6 +99,7 @@ export type SerializedIdentity = {
 	meta: Array<[string, AccountMeta]>;
 	addresses: Array<[string, string]>;
 	name: string;
+	multisignatureType: MultiSignatureIdentityType;
 };
 
 export type AccountsStoreState = {

@@ -35,6 +35,7 @@ import {
 	FoundAccount,
 	FoundLegacyAccount,
 	Identity,
+	MultiSignatureIdentityType,
 	PathGroup,
 	SerializedIdentity,
 	UnlockedAccount
@@ -124,7 +125,8 @@ export function emptyIdentity(): Identity {
 		derivationPassword: '',
 		encryptedSeed: '',
 		meta: new Map(),
-		name: ''
+		name: '',
+		multisignatureType: 'Sr25519'
 	};
 }
 

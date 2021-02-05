@@ -15,7 +15,15 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { 
+	StyleSheet,
+	View,
+	Text,
+	TouchableHighlight,
+	TouchableNativeFeedback,
+	TouchableNativeFeedbackProps,
+	TouchableOpacity,
+} from 'react-native';
 
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
@@ -25,6 +33,7 @@ import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { NavigationProps } from 'types/props';
 import { emptyIdentity } from 'utils/identitiesUtils';
+import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
@@ -38,6 +47,9 @@ import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
+
+const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
+	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
 function IdentityNew({
 	navigation,
@@ -63,6 +75,10 @@ function IdentityNew({
 	const updateName = (name: string): void => {
 		accountsStore.updateNewIdentity({ name });
 	};
+
+	const setMultisignatureAlgorithm = (multisignatureType: MultiSignatureIdentityType): void => {
+		accountsStore.updateNewIdentity({ multisignatureType });
+	}
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
 		setSeedPhrase(inputSeedPhrase);
@@ -171,6 +187,24 @@ function IdentityNew({
 				value={accountsStore.state.newIdentity.name}
 				placeholder="Identity Name"
 			/>
+			<View style={styles.button}>
+				<Text style={styles.optionText}>Signature algorithm: {accountsStore.state.newIdentity.multisignatureType}</Text>
+			</View>
+			<TouchableHighlight onPress={() => setMultisignatureAlgorithm('Sr25519')}>
+				<View style={styles.button}>
+					<Text style={styles.optionText}>sr25519</Text>
+				</View>
+			</TouchableHighlight>
+			<TouchableHighlight onPress={() => setMultisignatureAlgorithm('Ed25519')}>
+				<View style={styles.button}>
+					<Text style={styles.optionText}>ed25519</Text>
+				</View>
+			</TouchableHighlight>
+			<TouchableHighlight onPress={() => setMultisignatureAlgorithm('Ecdsa')}>
+				<View style={styles.button}>
+					<Text style={styles.optionText}>ECDSA</Text>
+				</View>
+			</TouchableHighlight>
 			{isRecover ? renderRecoverView() : renderCreateView()}
 		</KeyboardAwareContainer>
 	);
@@ -187,5 +221,14 @@ const styles = StyleSheet.create({
 	btnBox: {
 		alignContent: 'center',
 		marginTop: 32
+	},
+	optionText: {
+		...fontStyles.h2,
+		color: colors.text.main
+	},
+	button: {
+		alignItems: 'center',
+		color: colors.text.main,
+		padding: 10
 	}
 });
