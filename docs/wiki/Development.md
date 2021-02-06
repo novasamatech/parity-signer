@@ -5,6 +5,14 @@
 
 - `node.js` ( `>=10`)
 - `yarn` (tested on `1.6.0`)
+- rustup [https://rustup.rs/](https://rustup.rs/)
+- watchman [install instructions](https://facebook.github.io/watchman/docs/install.html) also you may need to increase the number of inogtify watches with 
+```bash
+echo 999999 | sudo tee -a /proc/sys/fs/inotify/max_user_watches &&\
+echo 999999 | sudo tee -a /proc/sys/fs/inotify/max_queued_events &&\
+echo 999999 | sudo tee -a /proc/sys/fs/inotify/max_user_instances &&\
+watchman shutdown-server
+```
 
 #### iOS
 - `cocoapods` (`$ sudo gem install cocoapods`)
@@ -29,7 +37,9 @@ example of `~/.bashrc` or `~/.zhrc`:
  export PATH=$PATH:$ANDROID_HOME/tools/bin
  export PATH=$PATH:$ANDROID_HOME/platform-tools
  export PATH=$PATH:$JAVA_HOME/bin
-``` 
+```
+- run `./scripts/init.sh` to install rust dependancies
+- it might be needed to run `mkdir ~/Android/Sdk/ndk-bundle && mv ~/Android/Sdk/ndk/<ndk-version>`
 
 ### Setup
 
