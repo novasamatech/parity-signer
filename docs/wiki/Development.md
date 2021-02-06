@@ -17,6 +17,20 @@
 
 \* It's recommended to install **Android Studio** and use that to install the necessary build tools and SDKs for the Android version you want to test on. It's also the best way to test in the emulator.
 
+example of `~/.bashrc` or `~/.zhrc`:
+```
+# React native Android development
+ export ANDROID_HOME=$HOME/Android/Sdk
+ export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+ export NDK_HOME=$ANDROID_HOME/ndk-bundle
+
+ export PATH=$PATH:$ANDROID_HOME/emulator
+ export PATH=$PATH:$ANDROID_HOME/tools
+ export PATH=$PATH:$ANDROID_HOME/tools/bin
+ export PATH=$PATH:$ANDROID_HOME/platform-tools
+ export PATH=$PATH:$JAVA_HOME/bin
+``` 
+
 ### Setup
 
 #### iOS
