@@ -133,95 +133,95 @@ export async function constructDataFromBytes(
 	try {
 		// decode payload appropriately via UOS
 		switch (zerothByte) {
-			case '45': {
-				// Ethereum UOS payload
-				const data = {
-					data: {} // for consistency with legacy data format.
-				} as EthereumParsedData;
-				action =
+		case '45': {
+			// Ethereum UOS payload
+			const data = {
+				data: {} // for consistency with legacy data format.
+			} as EthereumParsedData;
+			action =
 					firstByte === '00' || firstByte === '01'
 						? 'signData'
 						: firstByte === '01'
-						? 'signTransaction'
-						: null;
-				const address = uosAfterFrames.substr(4, 44);
+							? 'signTransaction'
+							: null;
+			const address = uosAfterFrames.substr(4, 44);
 
-				data.action = action;
-				data.data.account = address;
-				if (action === 'signData') {
-					data.data.rlp = uosAfterFrames[13];
-				} else if (action === 'signTransaction') {
-					data.data.data = uosAfterFrames[13];
-				} else {
-					throw new Error('Could not determine action type.');
-				}
-				return data;
+			data.action = action;
+			data.data.account = address;
+			if (action === 'signData') {
+				data.data.rlp = uosAfterFrames[13];
+			} else if (action === 'signTransaction') {
+				data.data.data = uosAfterFrames[13];
+			} else {
+				throw new Error('Could not determine action type.');
 			}
-			case '53': {
-				// Substrate UOS payload
-				const data = {
-					data: {} // for consistency with legacy data format.
-				} as SubstrateCompletedParsedData;
-				try {
-					data.data.crypto =
+			return data;
+		}
+		case '53': {
+			// Substrate UOS payload
+			const data = {
+				data: {} // for consistency with legacy data format.
+			} as SubstrateCompletedParsedData;
+			try {
+				data.data.crypto =
 						firstByte === '00'
 							? 'ed25519'
 							: firstByte === '01'
-							? 'sr25519'
-							: null;
-					const pubKeyHex = uosAfterFrames.substr(6, 64);
-					const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
-					const hexEncodedData = '0x' + uosAfterFrames.slice(70);
-					const hexPayload = hexEncodedData.slice(0, -64);
-					const genesisHash = `0x${hexEncodedData.substr(-64)}`;
-					const rawPayload = hexToU8a(hexPayload);
-					data.data.genesisHash = genesisHash;
-					const isOversized = rawPayload.length > 256;
-					const network = networks.get(genesisHash);
-					if (!network) {
-						throw new Error(strings.ERROR_NO_NETWORK);
-					}
-
-					switch (secondByte) {
-						case '00': // sign mortal extrinsic
-						case '02': // sign immortal extrinsic
-							data.action = isOversized ? 'signData' : 'signTransaction';
-							data.oversized = isOversized;
-							data.isHash = isOversized;
-							const [offset] = compactFromU8a(rawPayload);
-							const payload = rawPayload.subarray(offset);
-							data.data.data = isOversized
-								? await blake2b(u8aToHex(payload, -1, false))
-								: rawPayload;
-							data.data.account = encodeAddress(
-								publicKeyAsBytes,
-								network.prefix
-							); // encode to the prefix;
-
-							break;
-						case '01': // data is a hash
-							data.action = 'signData';
-							data.oversized = false;
-							data.isHash = true;
-							data.data.data = hexPayload;
-							data.data.account = encodeAddress(
-								publicKeyAsBytes,
-								network.prefix
-							); // default to Kusama
-							break;
-						default:
-							break;
-					}
-				} catch (e) {
-					throw new Error(
-						'Error: something went wrong decoding the Substrate UOS payload: ' +
-							uosAfterFrames
-					);
+								? 'sr25519'
+								: null;
+				const pubKeyHex = uosAfterFrames.substr(6, 64);
+				const publicKeyAsBytes = hexToU8a('0x' + pubKeyHex);
+				const hexEncodedData = '0x' + uosAfterFrames.slice(70);
+				const hexPayload = hexEncodedData.slice(0, -64);
+				const genesisHash = `0x${hexEncodedData.substr(-64)}`;
+				const rawPayload = hexToU8a(hexPayload);
+				data.data.genesisHash = genesisHash;
+				const isOversized = rawPayload.length > 256;
+				const network = networks.get(genesisHash);
+				if (!network) {
+					throw new Error(strings.ERROR_NO_NETWORK);
 				}
-				return data;
+
+				switch (secondByte) {
+				case '00': // sign mortal extrinsic
+				case '02': // sign immortal extrinsic
+					data.action = isOversized ? 'signData' : 'signTransaction';
+					data.oversized = isOversized;
+					data.isHash = isOversized;
+					const [offset] = compactFromU8a(rawPayload);
+					const payload = rawPayload.subarray(offset);
+					data.data.data = isOversized
+						? await blake2b(u8aToHex(payload, -1, false))
+						: rawPayload;
+					data.data.account = encodeAddress(
+						publicKeyAsBytes,
+						network.prefix
+					); // encode to the prefix;
+
+					break;
+				case '01': // data is a hash
+					data.action = 'signData';
+					data.oversized = false;
+					data.isHash = true;
+					data.data.data = hexPayload;
+					data.data.account = encodeAddress(
+						publicKeyAsBytes,
+						network.prefix
+					); // default to Kusama
+					break;
+				default:
+					break;
+				}
+			} catch (e) {
+				throw new Error(
+					'Error: something went wrong decoding the Substrate UOS payload: ' +
+							uosAfterFrames
+				);
 			}
-			default:
-				throw new Error('Error: Payload is not formatted correctly: ' + bytes);
+			return data;
+		}
+		default:
+			throw new Error('Error: Payload is not formatted correctly: ' + bytes);
 		}
 	} catch (e) {
 		throw new Error('we cannot handle the payload: ' + bytes);

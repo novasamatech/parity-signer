@@ -44,18 +44,14 @@ import {
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
-function NetworkSelector({
-	accountsStore,
-	navigation,
-	route
-}: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
+function NetworkSelector({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
 	const { getSubstrateNetwork, allNetworks } = networkContextState;
-	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
+	const { brainWalletAddress, isSeedRefValid, substrateAddress } = useSeedRef(currentIdentity.encryptedSeed);
+	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 
 	const { setAlert } = useContext(AlertStateContext);
 	// catch android back button and prevent exiting the app
@@ -79,7 +75,7 @@ function NetworkSelector({
 
 	const onAddCustomPath = (): Promise<void> =>
 		unlockWithoutPassword({
-name: 'PathDerivation',
+			name: 'PathDerivation',
 			params: { parentPath: '' }
 		});
 
@@ -88,12 +84,12 @@ name: 'PathDerivation',
 		networkParams: SubstrateNetworkParams
 	): Promise<void> => {
 		const { pathId } = networkParams;
-		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
+		await unlockSeedPhrase(navigation, isSeedRefValid);
 		const fullPath = `//${pathId}`;
 		try {
 			await accountsStore.deriveNewPath(
 				fullPath,
-				seedRefHooks.substrateAddress,
+				substrateAddress,
 				getSubstrateNetwork(networkKey),
 				`${networkParams.title} root`,
 				''
@@ -105,10 +101,10 @@ name: 'PathDerivation',
 	};
 
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
-		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
+		await unlockSeedPhrase(navigation, isSeedRefValid);
 		try {
 			await accountsStore.deriveEthereumAccount(
-				seedRefHooks.brainWalletAddress,
+				brainWalletAddress,
 				networkKey,
 				allNetworks
 			);
@@ -121,17 +117,17 @@ name: 'PathDerivation',
 	const getListOptions = (): Partial<FlatListProps<any>> => {
 		// if (isNew) return {};
 		// if (shouldShowMoreNetworks) {
-			return {
-				ListHeaderComponent: (
-					<NetworkCard
-						isAdd={true}
-						onPress={onAddCustomPath}
-						testID={testIDs.Main.addCustomNetworkButton}
-						title="Create Custom Path"
-						networkColor={colors.background.app}
-					/>
-				)
-			};
+		return {
+			ListHeaderComponent: (
+				<NetworkCard
+					isAdd={true}
+					onPress={onAddCustomPath}
+					testID={testIDs.Main.addCustomNetworkButton}
+					title="Create Custom Path"
+					networkColor={colors.background.app}
+				/>
+			)
+		};
 		// }
 		// else {
 		// 	return {

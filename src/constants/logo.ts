@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 // this file includes the base64 encoded logo string, which could be used to replace file requiring module on
-// 	 on React Native.
+// on React Native.
 
 export default {
 	ethClassic:

@@ -25,11 +25,7 @@ import { Text, View } from 'react-native';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
 
-export default function OnBoardingView({
-	hasLegacyAccount
-}: {
-	hasLegacyAccount: boolean;
-}): React.ReactElement {
+export default function OnBoardingView({ hasLegacyAccount }: {hasLegacyAccount: boolean}): React.ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 
 	function TextButton({

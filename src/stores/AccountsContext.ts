@@ -124,7 +124,9 @@ export function useAccountContext(): AccountsContextState {
 		...state,
 		...delta
 	});
-	const [state, setState] = useReducer(reducer, initialState);
+	const [state, setState] = useReducer(reducer, initialState)
+
+	console.log(JSON.stringify(state, null, 2))
 
 	useEffect(() => {
 		const loadInitialContext = async (): Promise<void> => {

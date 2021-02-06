@@ -90,49 +90,49 @@ export function PathDetailsView({
 
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
-			case 'PathDelete':
-				alertDeleteAccount(setAlert, 'this account', async () => {
-					try {
-						await accountsStore.deletePath(path, networksContextState);
-						if (isSubstratePath(path)) {
-							const listedPaths = getPathsWithSubstrateNetworkKey(
+		case 'PathDelete':
+			alertDeleteAccount(setAlert, 'this account', async () => {
+				try {
+					await accountsStore.deletePath(path, networksContextState);
+					if (isSubstratePath(path)) {
+						const listedPaths = getPathsWithSubstrateNetworkKey(
 								accountsStore.state.currentIdentity!,
 								networkKey,
 								networksContextState
-							);
-							const hasOtherPaths = listedPaths.length > 0;
-							hasOtherPaths
-								? navigateToPathsList(navigation, networkKey)
-								: navigation.navigate('Main');
-						} else {
-							navigation.navigate('Main');
-						}
-					} catch (err) {
-						alertError(
-							setAlert,
-							`Can't delete this account: ${err.toString()}`
 						);
+						const hasOtherPaths = listedPaths.length > 0;
+						hasOtherPaths
+							? navigateToPathsList(navigation, networkKey)
+							: navigation.navigate('Main');
+					} else {
+						navigation.navigate('Main');
 					}
-				});
-				break;
-			case 'PathExport': {
-				const pathMeta = currentIdentity.meta.get(path)!;
-				if (pathMeta.hasPassword) {
-					await unlockWithPassword(password => ({
-						name: 'PathSecret',
-						params: {
-							password,
-							path
-						}
-					}));
-				} else {
-					await unlockWithoutPassword({ name: 'PathSecret', params: { path } });
+				} catch (err) {
+					alertError(
+						setAlert,
+						`Can't delete this account: ${err.toString()}`
+					);
 				}
-				break;
+			});
+			break;
+		case 'PathExport': {
+			const pathMeta = currentIdentity.meta.get(path)!;
+			if (pathMeta.hasPassword) {
+				await unlockWithPassword(password => ({
+					name: 'PathSecret',
+					params: {
+						password,
+						path
+					}
+				}));
+			} else {
+				await unlockWithoutPassword({ name: 'PathSecret', params: { path } });
 			}
-			case 'PathManagement':
-				navigation.navigate('PathManagement', { path });
-				break;
+			break;
+		}
+		case 'PathManagement':
+			navigation.navigate('PathManagement', { path });
+			break;
 		}
 	};
 

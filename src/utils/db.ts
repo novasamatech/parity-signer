@@ -122,7 +122,7 @@ const currentNetworkStorageLabel = 'networks_v4';
 
 export async function loadNetworks(): Promise<
 	Map<string, SubstrateNetworkParams>
-> {
+	> {
 	try {
 		const networksJson = await SecureStorage.getItem(
 			currentNetworkStorageLabel,

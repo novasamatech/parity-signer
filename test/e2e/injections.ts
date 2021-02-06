@@ -73,7 +73,7 @@ export function useInjectionQR(): [
 		txRequest: ScanTestRequest,
 		onBarCodeRead: (tx: TxRequestData) => void
 	) => Promise<void>
-] {
+	] {
 	const [mockIndex, setMockIndex] = useState(0);
 
 	const onMockBarCodeRead = async (

@@ -214,8 +214,8 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 											{arg && arg.length > 50
 												? shortString(arg)
 												: arg instanceof Array
-												? arg.join(', ')
-												: arg}{' '}
+													? arg.join(', ')
+													: arg}{' '}
 											{'}'}
 										</Text>
 									</View>

@@ -414,22 +414,22 @@ export function useScannerContext(): ScannerContextState {
 	): Promise<QrInfo> {
 		if (unsignedData !== null) {
 			switch (unsignedData.action) {
-				case 'signTransaction':
-					return await _setTXRequest(
-						unsignedData,
-						accountsStore,
-						networkContext
-					);
-				case 'signData':
-					return await _setDataToSign(
-						unsignedData,
-						accountsStore,
-						networkContext
-					);
-				default:
-					throw new Error(
-						'Scanned QR should contain either extrinsic or a message to sign'
-					);
+			case 'signTransaction':
+				return await _setTXRequest(
+					unsignedData,
+					accountsStore,
+					networkContext
+				);
+			case 'signData':
+				return await _setDataToSign(
+					unsignedData,
+					accountsStore,
+					networkContext
+				);
+			default:
+				throw new Error(
+					'Scanned QR should contain either extrinsic or a message to sign'
+				);
 			}
 		} else {
 			throw new Error(

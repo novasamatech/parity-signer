@@ -133,7 +133,7 @@ describe('decoders', () => {
 		});
 
 		it('converts bytes to ascii', () => {
-      const messageBytes = new Uint8Array([84,  72,  73,  83,  32, 73,  83,  32,  83,  80,  65,  82,  84,  65,  33]);
+			const messageBytes = new Uint8Array([84,  72,  73,  83,  32, 73,  83,  32,  83,  80,  65,  82,  84,  65,  33]);
 			const message = decodeToString(messageBytes);
 
 			expect(message).toBeDefined();

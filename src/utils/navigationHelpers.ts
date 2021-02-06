@@ -32,7 +32,7 @@ export const setPin = async <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
 ): Promise<string> =>
 	new Promise((resolve) => {
-	navigation.navigate('PinNew', { resolve });
+		navigation.navigate('PinNew', { resolve });
 	});
 
 export const unlockAndReturnSeed = async <
@@ -134,10 +134,10 @@ export const unlockSeedPhraseWithPassword = async <
 export const navigateToPathDetails = <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>,
-	networkKey: string,
-	path: string
-): void => {
+		navigation: GenericNavigationProps<RouteName>,
+		networkKey: string,
+		path: string
+	): void => {
 	const resetAction = CommonActions.reset({
 		index: 2,
 		routes: [
@@ -161,8 +161,8 @@ export const navigateToPathDetails = <
 export const navigateToLandingPage = <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>
-): void => {
+		navigation: GenericNavigationProps<RouteName>
+	): void => {
 	const resetAction = CommonActions.reset({
 		index: 0,
 		routes: [{ name: 'Main' }]
@@ -173,8 +173,8 @@ export const navigateToLandingPage = <
 export const navigateToNewIdentityNetwork = <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>
-): void => {
+		navigation: GenericNavigationProps<RouteName>
+	): void => {
 	const resetAction = CommonActions.reset({
 		index: 0,
 		routes: [
@@ -202,11 +202,11 @@ export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(
 export const resetNavigationWithNetworkChooser = <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>,
-	screenName: string,
-	params: Record<string, unknown> = {},
-	isNew = false
-): void => {
+		navigation: GenericNavigationProps<RouteName>,
+		screenName: string,
+		params: Record<string, unknown> = {},
+		isNew = false
+	): void => {
 	const resetAction = CommonActions.reset({
 		index: 1,
 		routes: [
@@ -226,9 +226,9 @@ export const resetNavigationWithNetworkChooser = <
 export const resetNavigationWithScanner = <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>,
-	screenName: string
-): void => {
+		navigation: GenericNavigationProps<RouteName>,
+		screenName: string
+	): void => {
 	const resetAction = CommonActions.reset({
 		index: 1,
 		routes: [
@@ -250,14 +250,14 @@ export const resetNavigationWithScanner = <
 export const navigateToNetworkSettings = <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>
-): void => resetNavigationWithNetworkChooser(navigation, 'NetworkSettings');
+		navigation: GenericNavigationProps<RouteName>
+	): void => resetNavigationWithNetworkChooser(navigation, 'NetworkSettings');
 
 export const navigateToPathsList = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>,
 	networkKey: string
 ): void =>
-	resetNavigationWithNetworkChooser(navigation, 'PathsList', { networkKey });
+		resetNavigationWithNetworkChooser(navigation, 'PathsList', { networkKey });
 
 export const navigateToQrScanner = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
@@ -266,5 +266,5 @@ export const navigateToQrScanner = <RouteName extends keyof RootStackParamList>(
 export const navigateToLegacyAccountList = <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>
-): void => resetNavigationTo(navigation, 'LegacyAccountList');
+		navigation: GenericNavigationProps<RouteName>
+	): void => resetNavigationTo(navigation, 'LegacyAccountList');

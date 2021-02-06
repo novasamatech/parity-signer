@@ -193,7 +193,7 @@ function IdentitiesSwitch(): React.ReactElement {
 
 		const identitiesToShow = currentIdentity
 			? identities.filter(
-					identity => identity.encryptedSeed !== currentIdentity.encryptedSeed
+				identity => identity.encryptedSeed !== currentIdentity.encryptedSeed
 			  )
 			: identities;
 

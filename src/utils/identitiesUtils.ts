@@ -111,9 +111,9 @@ export const getAddressKeyByPath = (
 	return isSubstratePath(path)
 		? address
 		: generateAccountId(
-				address,
-				getNetworkKeyByPath(path, pathMeta, networkContext),
-				allNetworks
+			address,
+			getNetworkKeyByPath(path, pathMeta, networkContext),
+			allNetworks
 		  );
 };
 
@@ -470,24 +470,24 @@ export const groupPaths = (
 
 export const getMetadata = (networkKey: string): string | null => {
 	switch (networkKey) {
-		case SubstrateNetworkKeys.CENTRIFUGE:
-			return centrifugeMetadata;
-		case SubstrateNetworkKeys.CENTRIFUGE_AMBER:
-			return centrifugeAmberMetadata;
-		case SubstrateNetworkKeys.KUSAMA:
-		case SubstrateNetworkKeys.KUSAMA_DEV:
-			return kusamaMetadata;
-		case SubstrateNetworkKeys.WESTEND:
-			return westendMetadata;
-		case SubstrateNetworkKeys.EDGEWARE:
-			return edgewareMetadata;
-		case SubstrateNetworkKeys.KULUPU:
-			return kulupuMetadata;
-		case SubstrateNetworkKeys.POLKADOT:
-			return polkadotMetaData;
-		case SubstrateNetworkKeys.ROCOCO:
-			return rococoMetadata;
-		default:
-			return null;
+	case SubstrateNetworkKeys.CENTRIFUGE:
+		return centrifugeMetadata;
+	case SubstrateNetworkKeys.CENTRIFUGE_AMBER:
+		return centrifugeAmberMetadata;
+	case SubstrateNetworkKeys.KUSAMA:
+	case SubstrateNetworkKeys.KUSAMA_DEV:
+		return kusamaMetadata;
+	case SubstrateNetworkKeys.WESTEND:
+		return westendMetadata;
+	case SubstrateNetworkKeys.EDGEWARE:
+		return edgewareMetadata;
+	case SubstrateNetworkKeys.KULUPU:
+		return kulupuMetadata;
+	case SubstrateNetworkKeys.POLKADOT:
+		return polkadotMetaData;
+	case SubstrateNetworkKeys.ROCOCO:
+		return rococoMetadata;
+	default:
+		return null;
 	}
 };
