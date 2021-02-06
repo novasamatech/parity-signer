@@ -16,21 +16,19 @@ watchman shutdown-server
 
 #### iOS
 - `cocoapods` (`$ sudo gem install cocoapods`)
-- `Xcode` (only for iOS, tested on `Version 11.3.1 (9F2000)`)
+- `Xcode` (tested on `Version 11.3.1 (9F2000)`)
 
 #### Android
-- `Android Studio` (only for Android, tested on `Version 3.3`)
-- `$JAVA_HOME` envarionment variable set to java home directory (eg. `/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home`)
-- `$ANDROID_HOME` environment variable set to Android SDK directory (eg. `/home/your_username/Android/Sdk`)*.
-
-\* It's recommended to install **Android Studio** and use that to install the necessary build tools and SDKs for the Android version you want to test on. It's also the best way to test in the emulator.
+- `Android Studio` (only for Android, tested on `Version 4.1`)
+- In Android studio, install 
+- Set environment variable for`$JAVA_HOME` set to java home directory, `$ANDROID_HOME` set to Android SDK directory and `$NDK_HOME` to point to the ndk directory and version installed by Android Studio.
 
 example of `~/.bashrc` or `~/.zhrc`:
 ```
 # React native Android development
  export ANDROID_HOME=$HOME/Android/Sdk
  export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
- export NDK_HOME=$ANDROID_HOME/ndk-bundle
+ export NDK_HOME=$ANDROID_HOME/ndk/22.0.7026061
 
  export PATH=$PATH:$ANDROID_HOME/emulator
  export PATH=$PATH:$ANDROID_HOME/tools
@@ -38,10 +36,9 @@ example of `~/.bashrc` or `~/.zhrc`:
  export PATH=$PATH:$ANDROID_HOME/platform-tools
  export PATH=$PATH:$JAVA_HOME/bin
 ```
-- run `./scripts/init.sh` to install rust dependancies
-- it might be needed to run `mkdir ~/Android/Sdk/ndk-bundle && mv ~/Android/Sdk/ndk/<ndk-version>`
-
 ### Setup
+
+- run `./scripts/init.sh` to install rust dependancies
 
 #### iOS
 - Install Dependencies
@@ -84,3 +81,6 @@ Then:
     ```
     yarn android
     ```
+	
+	Magic command to clean, reinstall deps and launch the RN server with the cache cleaned:  
+  `yarn clean:android && yarn && yarn start --reset-cache` 
