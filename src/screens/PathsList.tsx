@@ -26,12 +26,10 @@ import React, { useContext, useMemo } from 'react';
 import { ScrollView } from 'react-native';
 import { NetworksContext } from 'stores/NetworkContext';
 import { PathGroup } from 'types/identityTypes';
-import { isEthereumNetworkParams,
-	isUnknownNetworkParams } from 'types/networkTypes';
+import { isEthereumNetworkParams, isUnknownNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
-import { getPathsWithSubstrateNetworkKey,
-	groupPaths } from 'utils/identitiesUtils';
+import { getPathsWithSubstrateNetworkKey, groupPaths } from 'utils/identitiesUtils';
 import { useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
@@ -84,9 +82,7 @@ function PathsList({
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
-			params: {
-				parentPath: isUnknownNetworkPath ? '' : rootPath
-			}
+			params: { parentPath: isUnknownNetworkPath ? '' : rootPath }
 		});
 
 	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
@@ -98,9 +94,7 @@ function PathsList({
 				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
 				path={path}
-				onPress={(): void => {console.log('PathDetails', path); navigate('PathDetails', {
-					path
-				})}}
+				onPress={(): void => {console.log('PathDetails', path); navigate('PathDetails', { path })}}
 			/>
 		);
 	};
@@ -125,9 +119,7 @@ function PathsList({
 							key={pathsGroup.title}
 						/>
 					))}
-				<Separator style={{
-					backgroundColor: 'transparent'
-				}} />
+				<Separator style={{ backgroundColor: 'transparent' }} />
 			</ScrollView>
 			<QRScannerAndDerivationTab
 				derivationTestID={testIDs.PathsList.deriveButton}

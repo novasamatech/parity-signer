@@ -57,9 +57,7 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 				<AccountIcon address={address} network={network} style={styles.icon} />
 				<View style={styles.desc}>
 					<View>
-						<Text style={[fontStyles.t_regular, {
-							color: colors.text.faded
-						}]}>
+						<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
 							{`${network.title}${seedTypeDisplay} `}
 						</Text>
 					</View>

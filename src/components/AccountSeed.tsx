@@ -15,12 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useState } from 'react';
-import { NativeSyntheticEvent,
-	StyleSheet,
-	Text,
-	TextInputProps,
-	TextInputSelectionChangeEventData,
-	View } from 'react-native';
+import { NativeSyntheticEvent, StyleSheet, Text, TextInputProps, TextInputSelectionChangeEventData, View } from 'react-native';
 import BIP39_WORDS from 'res/bip39_wordlist.json';
 import PARITY_WORDS from 'res/parity_wordlist.json';
 import colors from 'styles/colors';
@@ -119,11 +114,8 @@ export default function AccountSeed({
 				{suggestions.map((suggestion, i) => {
 					const sepStyle =
 						i !== suggestions.length - 1
-							? {
-								borderColor: colors.border.light, borderRightWidth: 0.3
-							}
-							: {
-							};
+							? { borderColor: colors.border.light, borderRightWidth: 0.3 }
+							: {};
 
 					return (
 						<TouchableItem
@@ -173,12 +165,8 @@ export default function AccountSeed({
 }
 
 const styles = StyleSheet.create({
-	body: {
-		flexDirection: 'column'
-	},
-	input: {
-		borderBottomColor: colors.border.light
-	},
+	body: { flexDirection: 'column' },
+	input: { borderBottomColor: colors.border.light },
 	invalidInput: {
 		borderBottomColor: colors.border.signal,
 		borderColor: colors.border.signal
@@ -203,7 +191,5 @@ const styles = StyleSheet.create({
 		marginTop: -8,
 		overflow: 'hidden'
 	},
-	validInput: {
-		borderColor: colors.border.valid
-	}
+	validInput: { borderColor: colors.border.valid }
 });

@@ -15,18 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 const testIDs = {
-	AccountListScreen: {
-		accountList: 'accountList'
-	},
+	AccountListScreen: { accountList: 'accountList' },
 	Alert: {
 		backupDoneButton: 'alert_identity_backup_done',
 		deleteAccount: 'alert_delete_account',
 		deleteConfirmation: 'alert_delete_confirmation',
 		deleteIdentity: 'alert_delete_identity'
 	},
-	Header: {
-		headerBackButton: 'header_back_button'
-	},
+	Header: { headerBackButton: 'header_back_button' },
 	IdentitiesSwitch: {
 		addIdentityButton: 'identities_switch_add_identity',
 		manageIdentityButton: 'identities_switch_manager_button',
@@ -69,9 +65,7 @@ const testIDs = {
 		recoverButton: 'anc_recover_button',
 		showExistedButton: 'anc_show_existed'
 	},
-	NetworkSettings: {
-		networkCard: 'network_settings_network_card'
-	},
+	NetworkSettings: { networkCard: 'network_settings_network_card' },
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
 		nameInput: 'path_derivation_name_input',
@@ -86,9 +80,7 @@ const testIDs = {
 		popupMenuButton: 'path_detail_popup_menu_button',
 		screen: 'path_detail_screen'
 	},
-	PathSecret: {
-		screen: 'path_secret_screen'
-	},
+	PathSecret: { screen: 'path_secret_screen' },
 	PathsList: {
 		deriveButton: 'path_list_derive_button',
 		pathCard: 'path_list_path_card',
@@ -96,18 +88,10 @@ const testIDs = {
 		scanButton: 'path_list_scan_button',
 		screen: 'path_list_screen'
 	},
-	QrScanner: {
-		networkAddSuccessButton: 'qr_scanner_add_network_button'
-	},
-	SecurityHeader: {
-		scanButton: 'security_header_scan_button'
-	},
-	SignedMessage: {
-		qrView: 'signed_message_qr_view'
-	},
-	SignedTx: {
-		qrView: 'signed_tx_qr_view'
-	},
+	QrScanner: { networkAddSuccessButton: 'qr_scanner_add_network_button' },
+	SecurityHeader: { scanButton: 'security_header_scan_button' },
+	SignedMessage: { qrView: 'signed_message_qr_view' },
+	SignedTx: { qrView: 'signed_tx_qr_view' },
 	TacScreen: {
 		agreePrivacyButton: 'tac_privacy',
 		agreeTacButton: 'tac_agree',

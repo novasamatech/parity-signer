@@ -35,23 +35,11 @@ type NetworkTypesMap = {
 const networkTypesMap: NetworkTypesMap = {
 	centrifuge: {
 		alias: 'centrifuge-chain',
-		chains: {
-			centrifuge_amber: 'centrifuge-chain-amber'
-		}
+		chains: { centrifuge_amber: 'centrifuge-chain-amber' }
 	},
-	kusama: {
-		chains: {
-		}
-	},
-	polkadot: {
-		chains: {
-			westend: 'Westend'
-		}
-	},
-	rococo: {
-		chains: {
-		}
-	}
+	kusama: { chains: {} },
+	polkadot: { chains: { westend: 'Westend' } },
+	rococo: { chains: {} }
 };
 
 export const getOverrideTypes = (registry: TypeRegistry,
@@ -113,10 +101,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 		}
 	}
 
-	return {
-		getTypeRegistry, registries
-	};
+	return { getTypeRegistry, registries };
 }
 
-export const RegistriesContext = React.createContext({
-} as RegistriesStoreState);
+export const RegistriesContext = React.createContext({} as RegistriesStoreState);

@@ -15,39 +15,17 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { compactFromU8a,
-	hexStripPrefix,
-	hexToU8a,
-	isU8a,
-	u8aConcat,
-	u8aToHex } from '@polkadot/util';
+import { compactFromU8a, hexStripPrefix, hexToU8a, isU8a, u8aConcat, u8aToHex } from '@polkadot/util';
 import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
 import React, { useReducer } from 'react';
 import { AccountsContextState } from 'stores/AccountsContext';
 import { GetNetwork, NetworksContextState } from 'stores/NetworkContext';
 import { Account, FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams,
-	SubstrateNetworkParams } from 'types/networkTypes';
-import { CompletedParsedData,
-	EthereumParsedData,
-	isEthereumCompletedParsedData,
-	isSubstrateMessageParsedData,
-	MessageQRInfo,
-	MultiFramesInfo,
-	QrInfo,
-	SubstrateCompletedParsedData,
-	SubstrateMessageParsedData,
-	SubstrateTransactionParsedData,
-	TxQRInfo } from 'types/scannerTypes';
+import { isEthereumNetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+import { CompletedParsedData, EthereumParsedData, isEthereumCompletedParsedData, isSubstrateMessageParsedData, MessageQRInfo, MultiFramesInfo, QrInfo, SubstrateCompletedParsedData, SubstrateMessageParsedData, SubstrateTransactionParsedData, TxQRInfo } from 'types/scannerTypes';
 import { emptyAccount } from 'utils/account';
-import { asciiToHex,
-	constructDataFromBytes,
-	encodeNumber } from 'utils/decoders';
-import { brainWalletSign,
-	decryptData,
-	ethSign,
-	keccak,
-	substrateSign } from 'utils/native';
+import { asciiToHex, constructDataFromBytes, encodeNumber } from 'utils/decoders';
+import { brainWalletSign, decryptData, ethSign, keccak, substrateSign } from 'utils/native';
 import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
 import { isAscii } from 'utils/strings';
 import transaction, { Transaction } from 'utils/transaction';
@@ -153,9 +131,7 @@ export function useScannerContext(): ScannerContextState {
 	 * @dev sets a lock on writes
 	 */
 	function setBusy(): void {
-		setState({
-			busy: true
-		});
+		setState({ busy: true });
 	}
 
 	async function _integrateMultiPartData(multipartData: Array<Uint8Array | null>,
@@ -259,9 +235,7 @@ export function useScannerContext(): ScannerContextState {
 	 * @dev allow write operations
 	 */
 	function setReady(): void {
-		setState({
-			busy: false
-		});
+		setState({ busy: false });
 	}
 
 	async function _setTXRequest(txRequest: EthereumParsedData | SubstrateTransactionParsedData,
@@ -327,9 +301,7 @@ export function useScannerContext(): ScannerContextState {
 			type: 'transaction'
 		};
 
-		setState({
-			...qrInfo, rawPayload: txRequest.data.data
-		});
+		setState({ ...qrInfo, rawPayload: txRequest.data.data });
 
 		return qrInfo;
 	}
@@ -404,9 +376,7 @@ export function useScannerContext(): ScannerContextState {
 		if (!sender || !ETHEREUM_NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		const signedData = await signFunction(dataToSign as string);
-		setState({
-			signedData
-		});
+		setState({ signedData });
 	}
 
 	// signing substrate data with seed reference
@@ -436,9 +406,7 @@ export function useScannerContext(): ScannerContextState {
 		// TODO: tweak the first byte if and when sig type is not sr25519
 		const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
 		const signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
-		setState({
-			signedData
-		});
+		setState({ signedData });
 	}
 
 	// signing data with legacy account.
@@ -474,9 +442,7 @@ export function useScannerContext(): ScannerContextState {
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
-		setState({
-			signedData
-		});
+		setState({ signedData });
 	}
 
 	function clearMultipartProgress(): void {
@@ -491,9 +457,7 @@ export function useScannerContext(): ScannerContextState {
 	}
 
 	function cleanup(): void {
-		setState({
-			...DEFAULT_STATE
-		});
+		setState({ ...DEFAULT_STATE });
 	}
 
 	return {
@@ -510,5 +474,4 @@ export function useScannerContext(): ScannerContextState {
 	};
 }
 
-export const ScannerContext = React.createContext({
-} as ScannerContextState);
+export const ScannerContext = React.createContext({} as ScannerContextState);

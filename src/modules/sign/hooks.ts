@@ -23,9 +23,7 @@ export function usePayloadDetails(rawPayload: Uint8Array | string | null,
 			try {
 				const extrinsicPayload = typeRegistry.createType('ExtrinsicPayload',
 					rawPayload,
-					{
-						version: ExtrinsicPayloadLatestVersion
-					});
+					{ version: ExtrinsicPayloadLatestVersion });
 				setPayload(extrinsicPayload);
 				setIsProcessing(false);
 			} catch (e) {

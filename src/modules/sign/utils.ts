@@ -24,24 +24,11 @@ import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { FoundIdentityAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { RootStackParamList } from 'types/routes';
-import { CompletedParsedData,
-	EthereumParsedData,
-	isMultiFramesInfo,
-	isMultipartData,
-	isNetworkParsedData,
-	NetworkParsedData,
-	ParsedData,
-	QrInfo,
-	SubstrateParsedData,
-	TxRequestData } from 'types/scannerTypes';
-import { constructDataFromBytes,
-	isAddressString,
-	isJsonString,
-	rawDataToU8A } from 'utils/decoders';
+import { CompletedParsedData, EthereumParsedData, isMultiFramesInfo, isMultipartData, isNetworkParsedData, NetworkParsedData, ParsedData, QrInfo, SubstrateParsedData, TxRequestData } from 'types/scannerTypes';
+import { constructDataFromBytes, isAddressString, isJsonString, rawDataToU8A } from 'utils/decoders';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
-import { unlockSeedPhrase,
-	unlockSeedPhraseWithPassword } from 'utils/navigationHelpers';
+import { unlockSeedPhrase, unlockSeedPhraseWithPassword } from 'utils/navigationHelpers';
 import { constructSuriSuffix } from 'utils/suri';
 
 function getSeedRef(encryptedSeed: string,
@@ -165,13 +152,9 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 				strings.ERROR_NO_SENDER_FOUND);
 		if (sender.isLegacy) {
 			if (type === 'transaction') {
-				return navigation.navigate('AccountUnlockAndSign', {
-					next: 'SignedTx'
-				});
+				return navigation.navigate('AccountUnlockAndSign', { next: 'SignedTx' });
 			} else {
-				return navigation.navigate('AccountUnlockAndSign', {
-					next: 'SignedMessage'
-				});
+				return navigation.navigate('AccountUnlockAndSign', { next: 'SignedMessage' });
 			}
 		}
 

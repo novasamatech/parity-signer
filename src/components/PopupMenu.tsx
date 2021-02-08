@@ -16,10 +16,7 @@
 
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
-import { Menu,
-	MenuOption,
-	MenuOptions,
-	MenuTrigger } from 'react-native-popup-menu';
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -82,7 +79,5 @@ const menuOptionsStyles = {
 		fontFamily: fonts.regular,
 		fontSize: 16
 	},
-	optionWrapper: {
-		padding: 15
-	}
+	optionWrapper: { padding: 15 }
 };

@@ -15,13 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import colors from 'styles/colors';
-import { EthereumNetworkDefaultConstants,
-	EthereumNetworkParams,
-	NetworkParams,
-	NetworkProtocol,
-	SubstrateNetworkDefaultConstant,
-	SubstrateNetworkParams,
-	UnknownNetworkParams } from 'types/networkTypes';
+import { EthereumNetworkDefaultConstants, EthereumNetworkParams, NetworkParams, NetworkProtocol, SubstrateNetworkDefaultConstant, SubstrateNetworkParams, UnknownNetworkParams } from 'types/networkTypes';
 
 export const unknownNetworkPathId = '';
 
@@ -32,9 +26,7 @@ export const NetworkProtocols: Record<string, NetworkProtocol> = Object.freeze({
 });
 
 // accounts for which the network couldn't be found (failed migration, removed network)
-export const UnknownNetworkKeys: Record<string, string> = Object.freeze({
-	UNKNOWN: 'unknown'
-});
+export const UnknownNetworkKeys: Record<string, string> = Object.freeze({ UNKNOWN: 'unknown' });
 
 // ethereumChainId is used as Network key for Ethereum networks
 /* eslint-disable sort-keys */
@@ -83,9 +75,7 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	unit: 'UNIT'
 };
 
-const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
-	[UnknownNetworkKeys.UNKNOWN]: unknownNetworkParams
-};
+const unknownNetworkBase: Record<string, UnknownNetworkParams> = { [UnknownNetworkKeys.UNKNOWN]: unknownNetworkParams };
 
 const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 	[SubstrateNetworkKeys.CENTRIFUGE]: {
@@ -259,8 +249,7 @@ function setEthereumNetworkDefault(): Record<string, EthereumNetworkParams> {
 				...ethereumNetworkBase[networkKey]
 			}
 		};
-	}, {
-	});
+	}, {});
 }
 
 function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
@@ -272,18 +261,16 @@ function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
 				...substrateNetworkBase[networkKey]
 			}
 		};
-	}, {
-	});
+	}, {});
 }
 
 export const ETHEREUM_NETWORK_LIST: Record< string, EthereumNetworkParams> = Object.freeze(setEthereumNetworkDefault());
 export const SUBSTRATE_NETWORK_LIST: Record< string, SubstrateNetworkParams> = Object.freeze(setSubstrateNetworkDefault());
 export const UNKNOWN_NETWORK: Record< string, UnknownNetworkParams> = Object.freeze(unknownNetworkBase);
 
-export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(Object.assign({
-},
-SUBSTRATE_NETWORK_LIST,
-ETHEREUM_NETWORK_LIST,
-UNKNOWN_NETWORK));
+export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(Object.assign({},
+	SUBSTRATE_NETWORK_LIST,
+	ETHEREUM_NETWORK_LIST,
+	UNKNOWN_NETWORK));
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;

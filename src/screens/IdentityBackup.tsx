@@ -26,9 +26,7 @@ import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
-import { alertBackupDone,
-	alertCopyBackupPhrase,
-	alertIdentityCreationError } from 'utils/alertUtils';
+import { alertBackupDone, alertCopyBackupPhrase, alertIdentityCreationError } from 'utils/alertUtils';
 import { words } from 'utils/native';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
@@ -57,9 +55,7 @@ function IdentityBackup({
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
-		const textStyles = wordsNumber === buttonWordsNumber && {
-			color: colors.signal.main
-		};
+		const textStyles = wordsNumber === buttonWordsNumber && { color: colors.signal.main };
 
 		return (
 			<Button
@@ -67,9 +63,7 @@ function IdentityBackup({
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
 				onlyText
 				small
-				textStyles={{
-					...textStyles
-				}}
+				textStyles={{ ...textStyles }}
 			/>
 		);
 	};
@@ -112,9 +106,7 @@ function IdentityBackup({
 				}}
 			>
 				<Text
-					style={[fontStyles.t_seed, {
-						marginHorizontal: 16
-					}]}
+					style={[fontStyles.t_seed, { marginHorizontal: 16 }]}
 					testID={testIDs.IdentityBackup.seedText}
 				>
 					{seedPhrase}
@@ -135,9 +127,7 @@ function IdentityBackup({
 export default IdentityBackup;
 
 const styles = StyleSheet.create({
-	body: {
-		padding: 16
-	},
+	body: { padding: 16 },
 	mnemonicSelectionButton: {
 		backgroundColor: colors.background.app,
 		flex: 1,

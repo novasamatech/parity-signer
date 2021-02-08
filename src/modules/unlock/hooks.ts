@@ -29,9 +29,7 @@ const initialState: State = {
 export function usePinState(): StateReducer {
 	const [state, setState] = useState<State>(initialState);
 	const updateState: UpdateStateFunc = delta =>
-		setState({
-			...state, ...delta
-		});
+		setState({ ...state, ...delta });
 	const resetState = (): void => setState(initialState);
 
 	return [state, updateState, resetState];

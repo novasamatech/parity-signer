@@ -68,9 +68,7 @@ export default function AccountIcon(props: {
 	}
 	if (protocol === NetworkProtocols.ETHEREUM) {
 		return (
-			<Image source={{
-				uri: ethereumIconUri
-			}} style={style as ImageStyle} />
+			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
 		);
 	} else if (address !== '') {
 		let iconSize;

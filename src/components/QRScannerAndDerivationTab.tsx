@@ -36,12 +36,8 @@ export default class QRScannerAndDerivationTab extends React.PureComponent<{
 			<View style={styles.body}>
 				<Separator
 					shadow={true}
-					style={{
-						backgroundColor: 'transparent', marginVertical: 0
-					}}
-					shadowStyle={{
-						height: 16, marginTop: -16
-					}}
+					style={{ backgroundColor: 'transparent', marginVertical: 0 }}
+					shadowStyle={{ height: 16, marginTop: -16 }}
 				/>
 				<View style={styles.tab}>
 					<QrScannerTab />
@@ -62,9 +58,7 @@ export default class QRScannerAndDerivationTab extends React.PureComponent<{
 }
 
 const styles = StyleSheet.create({
-	body: {
-		flexDirection: 'row'
-	},
+	body: { flexDirection: 'row' },
 	derivationButton: {
 		alignItems: 'center',
 		backgroundColor: colors.background.os,

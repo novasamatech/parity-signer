@@ -25,10 +25,7 @@ export default function Address(props: {
 	protocol?: NetworkProtocol;
 	style?: TextStyle;
 }): ReactElement {
-	const {
-		address, protocol = NetworkProtocols.SUBSTRATE, style = {
-		}
-	} = props;
+	const { address, protocol = NetworkProtocols.SUBSTRATE, style = {} } = props;
 	const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
 
 	return (

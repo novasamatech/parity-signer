@@ -23,8 +23,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import { RegistriesContext,
-	RegistriesStoreState } from 'stores/RegistriesContext';
+import { RegistriesContext, RegistriesStoreState } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
@@ -65,8 +64,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 		if (label === 'Method' && !fallback) {
 			try {
 				const call = typeRegistry.createType('Call', value);
-				const methodArgs = {
-				};
+				const methodArgs = {};
 
 				function formatArgs(callInstance: Call,
 					callMethodArgs: any,
@@ -145,14 +143,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 		if (period && phase) {
 			return (
 				<View style={styles.era}>
-					<Text style={{
-						...styles.secondaryText, flex: 1
-					}}>
+					<Text style={{ ...styles.secondaryText, flex: 1 }}>
 							phase: {phase}{' '}
 					</Text>
-					<Text style={{
-						...styles.secondaryText, flex: 1
-					}}>
+					<Text style={{ ...styles.secondaryText, flex: 1 }}>
 							period: {period}
 					</Text>
 				</View>
@@ -166,14 +160,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 						flexWrap: 'wrap'
 					}}
 				>
-					<Text style={{
-						...styles.secondaryText, flex: 1
-					}}>
+					<Text style={{ ...styles.secondaryText, flex: 1 }}>
 							Immortal Era
 					</Text>
-					<Text style={{
-						...styles.secondaryText, flex: 3
-					}}>
+					<Text style={{ ...styles.secondaryText, flex: 3 }}>
 						{value?.toString()}
 					</Text>
 				</View>
@@ -237,21 +227,15 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 
 		const renderTipDetails = (): React.ReactElement => {
 			return (
-				<View style={{
-					display: 'flex', flexDirection: 'column'
-				}}>
+				<View style={{ display: 'flex', flexDirection: 'column' }}>
 					<Text style={styles.secondaryText}>{tip}</Text>
 				</View>
 			);
 		};
 
 		return (
-			<View style={[{
-				alignItems: 'baseline', justifyContent: 'flex-start'
-			}]}>
-				<View style={{
-					marginBottom: 12, width: '100%'
-				}}>
+			<View style={[{ alignItems: 'baseline', justifyContent: 'flex-start' }]}>
+				<View style={{ marginBottom: 12, width: '100%' }}>
 					<Text style={styles.label}>{label}</Text>
 					{label === 'Method' && !useFallback ? (
 						renderMethodDetails()
@@ -339,18 +323,10 @@ export default function PayloadDetailsCard(props: PayloadDetailsCardProps): Reac
 }
 
 const styles = StyleSheet.create({
-	body: {
-		marginTop: 8
-	},
-	callDetails: {
-		marginBottom: 4
-	},
-	era: {
-		flexDirection: 'row'
-	},
-	extrinsicContainer: {
-		paddingTop: 16
-	},
+	body: { marginTop: 8 },
+	callDetails: { marginBottom: 4 },
+	era: { flexDirection: 'row' },
+	extrinsicContainer: { paddingTop: 16 },
 	label: {
 		...fontStyles.t_label,
 		backgroundColor: colors.signal.main,

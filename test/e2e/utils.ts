@@ -99,13 +99,9 @@ export const waitAlert = (ms?: number): Promise<void> =>
 
 export const launchWithScanRequest = async (txRequest: number): Promise<void> => {
 	await device.launchApp({
-		launchArgs: {
-			scanRequest: txRequest.toString()
-		},
+		launchArgs: { scanRequest: txRequest.toString() },
 		newInstance: true,
-		permissions: {
-			camera: 'YES'
-		}
+		permissions: { camera: 'YES' }
 	});
 };
 

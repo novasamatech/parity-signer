@@ -111,9 +111,7 @@ function LegacyAccountBackup({
 						title="Backup Done"
 						onPress={(): void => {
 							alertBackupDone(setAlert, () => {
-								navigate('AccountPin', {
-									isNew
-								});
+								navigate('AccountPin', { isNew });
 							});
 						}}
 					/>
@@ -131,9 +129,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 40,
 		paddingTop: 24
 	},
-	bodyContent: {
-		padding: 16
-	},
+	bodyContent: { padding: 16 },
 	derivationText: {
 		backgroundColor: colors.background.card,
 		fontFamily: fonts.regular,

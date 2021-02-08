@@ -88,9 +88,7 @@ describe('Load test', () => {
 
 	it('need pin after application go to the background', async () => {
 		await device.sendToHome();
-		await device.launchApp({
-			newInstance: false
-		});
+		await device.launchApp({ newInstance: false });
 		await testTap(PathsList.deriveButton);
 		await testUnlockPin(pinCode);
 		await testInput(PathDerivation.pathInput, secondPath);

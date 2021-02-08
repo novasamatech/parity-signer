@@ -63,9 +63,7 @@ const SIGNER_PAYLOAD_TEST = {
 	blockHash:
 		'0xde8f69eeb5e065e18c6950ff708d7e551f68dc9bf59a07c52367c0280f805ec7',
 	blockNumber: '0x231d30',
-	era: createType(registry, 'ExtrinsicEra', {
-		current: 2301232, period: 200
-	}),
+	era: createType(registry, 'ExtrinsicEra', { current: 2301232, period: 200 }),
 	genesisHash: SubstrateNetworkKeys.KUSAMA,
 	method:
 		'0x0600ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
@@ -80,9 +78,7 @@ const SIGN_TX_TEST = u8aConcat(new Uint8Array([0, 0, 1, 0, 0]),
 	CRYPTO_SR25519,
 	CMD_SIGN_MORTAL,
 	decodeAddress(KUSAMA_ADDRESS),
-	new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, {
-		version: 4
-	}).toU8a(),
+	new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, { version: 4 }).toU8a(),
 	new Uint8Array(hexToU8a(SubstrateNetworkKeys.KUSAMA)));
 
 describe('sanity check', () => {
@@ -91,9 +87,7 @@ describe('sanity check', () => {
 	});
 
 	it('sanity check payload encodes as expected', () => {
-		const payload = new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, {
-			version: 4
-		});
+		const payload = new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, { version: 4 });
 		// const fromBytes = new GenericExtrinsicPayload(registry, payload.toU8a(), {
 		// 	version: 4
 		// });
@@ -106,8 +100,7 @@ describe('type registry should get override types', () => {
 	it('get network latest override types', () => {
 		const testRegistry = new TypeRegistry();
 		const westendOverrideTypes = getOverrideTypes(testRegistry, 'westend');
-		expect(westendOverrideTypes).not.toEqual({
-		});
+		expect(westendOverrideTypes).not.toEqual({});
 	});
 });
 
@@ -137,9 +130,7 @@ describe('decoders', () => {
 		});
 
 		it('checks if string is JSON parseable', () => {
-			const jsonString = JSON.stringify({
-				a: 1, b: 2
-			});
+			const jsonString = JSON.stringify({ a: 1, b: 2 });
 			const notJsonString = '0x90u23jaiof';
 			const validExample = isJsonString(jsonString);
 			const inValidExample = isJsonString(notJsonString);
@@ -180,9 +171,7 @@ describe('decoders', () => {
 			const rawPayload = (unsignedData as SubstrateCompletedParsedData).data
 				.data;
 
-			const payload = registry.createType('ExtrinsicPayload', rawPayload, {
-				version: 4
-			});
+			const payload = registry.createType('ExtrinsicPayload', rawPayload, { version: 4 });
 
 			expect(payload.era.toHex()).toEqual(SIGNER_PAYLOAD_TEST.era.toHex());
 			expect(payload.method.toHex()).toEqual(SIGNER_PAYLOAD_TEST.method);
@@ -206,9 +195,7 @@ describe('decoders', () => {
 		it('decodes Payload Method to something human readable with Kusama metadata', () => {
 			const payload = new GenericExtrinsicPayload(registry,
 				SIGNER_PAYLOAD_TEST,
-				{
-					version: 4
-				});
+				{ version: 4 });
 
 			const call = new Call(registry, payload.method);
 

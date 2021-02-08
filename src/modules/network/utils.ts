@@ -14,14 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { defaultNetworkKey,
-	NETWORK_LIST,
-	NetworkProtocols,
-	SubstrateNetworkKeys,
-	UnknownNetworkKeys } from 'constants/networkSpecs';
-import { NetworkParams,
-	SubstrateNetworkBasics,
-	SubstrateNetworkParams } from 'types/networkTypes';
+import { defaultNetworkKey, NETWORK_LIST, NetworkProtocols, SubstrateNetworkKeys, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { NetworkParams, SubstrateNetworkBasics, SubstrateNetworkParams } from 'types/networkTypes';
 
 export const filterNetworks = (networkList: Map<string, NetworkParams>,
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean): Array<[string, NetworkParams]> => {
@@ -81,7 +75,5 @@ export function getCompleteSubstrateNetworkSpec(newNetworkParams: SubstrateNetwo
 		secondaryColor: generateRandomColor()
 	};
 
-	return {
-		...defaultNewNetworkSpecParams, ...newNetworkParams
-	};
+	return { ...defaultNewNetworkSpecParams, ...newNetworkParams };
 }

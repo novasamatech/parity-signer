@@ -25,9 +25,7 @@ import { version } from '../../package.json';
 export default class About extends React.PureComponent {
 	render(): React.ReactElement {
 		return (
-			<CustomScrollView contentContainerStyle={{
-				padding: 20
-			}}>
+			<CustomScrollView contentContainerStyle={{ padding: 20 }}>
 				<Text style={styles.title}>PARITY SIGNER v{version}</Text>
 				<View>
 					<Text style={styles.text}>
@@ -59,9 +57,7 @@ export default class About extends React.PureComponent {
 					<Text style={styles.text}>
 						The code of this application is available on Github (
 						<Text
-							style={[styles.text, {
-								textDecorationLine: 'underline'
-							}]}
+							style={[styles.text, { textDecorationLine: 'underline' }]}
 							onPress={(): Promise<any> =>
 								Linking.openURL('https://github.com/paritytech/parity-signer')
 							}
@@ -74,9 +70,7 @@ export default class About extends React.PureComponent {
 						Find on the Parity Signer wiki more information about this
 						application as well as some tutorials:
 						<Text
-							style={[styles.text, {
-								textDecorationLine: 'underline'
-							}]}
+							style={[styles.text, { textDecorationLine: 'underline' }]}
 							onPress={(): Promise<any> =>
 								Linking.openURL('https://wiki.parity.io/Parity-Signer-Mobile-App')
 							}
@@ -108,7 +102,5 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		paddingBottom: 20
 	},
-	top: {
-		flex: 1
-	}
+	top: { flex: 1 }
 });

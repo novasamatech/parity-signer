@@ -26,9 +26,7 @@ interface Props extends ScrollViewProps {
 
 class KeyboardScrollView extends React.PureComponent<Props> {
 	render(): React.ReactElement | undefined {
-		const defaultProps = {
-			enableAutomaticScroll: true
-		};
+		const defaultProps = { enableAutomaticScroll: true };
 
 		return Platform.select({
 			android: (

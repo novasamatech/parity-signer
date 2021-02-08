@@ -40,9 +40,7 @@ const buildAlertButtons = (onConfirm: () => any,
 		testID,
 		text: confirmText
 	},
-	{
-		text: 'Cancel'
-	}
+	{ text: 'Cancel' }
 ];
 
 const buildAlertDeleteButtons = (onDelete: () => any,
@@ -84,9 +82,7 @@ export const alertCopyBackupPhrase = (setAlert: SetAlert,
 				},
 				text: 'Copy'
 			},
-			{
-				text: 'Cancel'
-			}
+			{ text: 'Cancel' }
 		]);
 
 export const alertRisks = (setAlert: SetAlert,
@@ -97,9 +93,7 @@ export const alertRisks = (setAlert: SetAlert,
 			onPress,
 			text: 'Proceed'
 		},
-		{
-			text: 'Back'
-		}
+		{ text: 'Back' }
 	]);
 
 export const alertDecodeError = (setAlert: SetAlert): void =>
@@ -115,7 +109,5 @@ export const alertBackupDone = (setAlert: SetAlert, onPress: () => any): void =>
 				testID: alertTestIDs.backupDoneButton,
 				text: 'Proceed'
 			},
-			{
-				text: 'Cancel'
-			}
+			{ text: 'Cancel' }
 		]);

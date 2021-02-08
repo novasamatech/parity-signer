@@ -35,12 +35,7 @@ import { RootStackParamList } from 'types/routes';
 import { generateAccountId } from 'utils/account';
 import { alertDeleteAccount, alertError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
-import { getAddressWithPath,
-	getNetworkKey,
-	getPathName,
-	getPathsWithSubstrateNetworkKey,
-	isSubstrateHardDerivedPath,
-	isSubstratePath } from 'utils/identitiesUtils';
+import { getAddressWithPath, getNetworkKey, getPathName, getPathsWithSubstrateNetworkKey, isSubstrateHardDerivedPath, isSubstratePath } from 'utils/identitiesUtils';
 import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
@@ -79,9 +74,7 @@ export function PathDetailsView({
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
-			params: {
-				parentPath: path
-			}
+			params: { parentPath: path }
 		});
 
 	const onOptionSelect = async (value: string): Promise<void> => {
@@ -118,18 +111,12 @@ export function PathDetailsView({
 					}
 				}));
 			} else {
-				await unlockWithoutPassword({
-					name: 'PathSecret', params: {
-						path
-					}
-				});
+				await unlockWithoutPassword({ name: 'PathSecret', params: { path } });
 			}
 			break;
 		}
 		case 'PathManagement':
-			navigation.navigate('PathManagement', {
-				path
-			});
+			navigation.navigate('PathManagement', { path });
 			break;
 		}
 	};
@@ -146,9 +133,7 @@ export function PathDetailsView({
 							onSelect={onOptionSelect}
 							menuTriggerIconName={'more-vert'}
 							menuItems={[
-								{
-									text: 'Edit', value: 'PathManagement'
-								},
+								{ text: 'Edit', value: 'PathManagement' },
 								{
 									hide: !isSubstrateHardDerivedPath(path),
 									testID: testIDs.PathDetail.exportButton,
@@ -201,10 +186,6 @@ function PathDetails({
 	);
 }
 
-const styles = StyleSheet.create({
-	deleteText: {
-		color: colors.signal.error
-	}
-});
+const styles = StyleSheet.create({ deleteText: { color: colors.signal.error } });
 
 export default withCurrentIdentity(PathDetails);

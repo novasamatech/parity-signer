@@ -115,8 +115,7 @@ export const serializeIdentity = (identity: Identity): SerializedIdentity =>
 		}
 
 		return newIdentity;
-	}, {
-	});
+	}, {});
 
 export const deserializeIdentity = (identityJSON: SerializedIdentity): Identity =>
 	Object.entries(identityJSON).reduce((newIdentity: any, entry: [string, any]) => {
@@ -129,8 +128,7 @@ export const deserializeIdentity = (identityJSON: SerializedIdentity): Identity 
 
 		return newIdentity;
 	},
-	{
-	});
+	{});
 
 export const serializeIdentities = (identities: Identity[]): string => {
 	const identitiesWithObject = identities.map(serializeIdentity);
@@ -283,12 +281,9 @@ export const getExistedNetworkKeys = (identity: Identity, networkContextState: N
 			networkKey = path;
 		}
 
-		return {
-			...networksSet, [networkKey]: true
-		};
+		return { ...networksSet, [networkKey]: true };
 	},
-	{
-	});
+	{});
 
 	return Object.keys(networkKeysSet);
 };
@@ -376,17 +371,13 @@ export const groupPaths = (paths: string[], networks: Map<string, SubstrateNetwo
 			existedItem.paths.push(fullPath);
 			existedItem.paths.sort(_comparePathsInGroup);
 		} else {
-			pathGroup.push({
-				paths: [fullPath], title: groupName
-			});
+			pathGroup.push({ paths: [fullPath], title: groupName });
 		}
 	};
 
 	const groupedPaths = paths.reduce((groupedPath: PathGroup[], path: string) => {
 		if (path === '') {
-			groupedPath.push({
-				paths: [''], title: 'Identity root'
-			});
+			groupedPath.push({ paths: [''], title: 'Identity root' });
 
 			return groupedPath;
 		}

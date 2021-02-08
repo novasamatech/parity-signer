@@ -45,9 +45,7 @@ export function binarySearch(array: Array<any>,
 	item: any,
 	compare: (a: any, b: any) => number = defaultCompare): { hit: boolean; index: number } {
 	if (array.length === 0) {
-		return {
-			hit: false, index: 0
-		};
+		return { hit: false, index: 0 };
 	}
 
 	let min = 0;
@@ -63,15 +61,11 @@ export function binarySearch(array: Array<any>,
 		} else if (result > 0) {
 			min = guess + 1;
 		} else {
-			return {
-				hit: true, index: guess
-			};
+			return { hit: true, index: guess };
 		}
 	}
 
-	return {
-		hit: false, index: min
-	};
+	return { hit: false, index: min };
 }
 
 export function zip(left: any[], right: any[]): any[] {

@@ -38,17 +38,11 @@ const renderSubtitle = (subtitle?: string,
 	const subtitleBodyStyle: ViewStyle[] = [baseStyles.subtitleBody],
 		subtitleTextStyle: TextStyle[] = [
 			fontStyles.t_codeS,
-			{
-				color: colors.text.faded
-			}
+			{ color: colors.text.faded }
 		];
 	if (isAlignLeft) {
-		subtitleBodyStyle.push({
-			justifyContent: 'flex-start'
-		});
-		subtitleTextStyle.push({
-			textAlign: 'left'
-		});
+		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
+		subtitleTextStyle.push({ textAlign: 'left' });
 	}
 	if (isError) {
 		subtitleTextStyle.push(baseStyles.t_error);
@@ -82,12 +76,8 @@ const renderBack = (onPress?: ButtonListener): ReactNode => {
 			iconType="antdesign"
 			onPress={onPress}
 			testID={testIDs.Main.backButton}
-			style={StyleSheet.flatten([baseStyles.icon, {
-				left: 0
-			}])}
-			iconBgStyle={{
-				backgroundColor: 'transparent'
-			}}
+			style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
+			iconBgStyle={{ backgroundColor: 'transparent' }}
 		/>
 	);
 };
@@ -95,9 +85,7 @@ const renderIcon = (iconName?: string, iconType?: string): ReactNode => {
 	if (!iconName) return;
 
 	return (
-		<View style={[baseStyles.icon, {
-			paddingLeft: 16
-		}]}>
+		<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
 			<Icon name={iconName} type={iconType} color={colors.text.main} />
 		</View>
 	);
@@ -136,9 +124,7 @@ export function LeftScreenHeading({
 			onPress={onPress}
 			disabled={isDisabled}
 		>
-			<View style={{
-				alignItems: 'center', flexDirection: 'row'
-			}}>
+			<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 				<AccountIcon
 					address={''}
 					network={getNetwork(networkKey)}
@@ -208,9 +194,7 @@ export default class ScreenHeading extends React.PureComponent<{
 		} = this.props;
 
 		return (
-			<View style={{
-				...baseStyles.body, flexDirection: 'row'
-			}}>
+			<View style={{ ...baseStyles.body, flexDirection: 'row' }}>
 				{renderIcon(iconName, iconType)}
 				<View style={baseStyles.titles}>
 					<Text style={baseStyles.text}>{title}</Text>
@@ -249,32 +233,20 @@ const baseStyles = StyleSheet.create({
 		alignItems: 'center',
 		flexDirection: 'row'
 	},
-	linkIcon: {
-		marginLeft: 10
-	},
+	linkIcon: { marginLeft: 10 },
 	// menu: {
 	// 	alignSelf: 'flex-end'
 	// },
-	networkIcon: {
-		paddingHorizontal: 16
-	},
+	networkIcon: { paddingHorizontal: 16 },
 	subtitleBody: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		justifyContent: 'center'
 	},
-	t_center: {
-		textAlign: 'center'
-	},
-	t_error: {
-		color: colors.signal.error
-	},
-	t_left: {
-		textAlign: 'left'
-	},
-	t_normal: {
-		fontFamily: fonts.roboto
-	},
+	t_center: { textAlign: 'center' },
+	t_error: { color: colors.signal.error },
+	t_left: { textAlign: 'left' },
+	t_normal: { fontFamily: fonts.roboto },
 	text: {
 		...fontStyles.h1,
 		textAlign: 'center'

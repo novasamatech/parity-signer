@@ -44,15 +44,11 @@ function PinUnlockWithPassword({
 					resolvePassword(password);
 					resetState();
 				} catch (e) {
-					updateState({
-						password: '', pin: '', pinMismatch: true
-					});
+					updateState({ password: '', pin: '', pinMismatch: true });
 					//TODO record error times;
 				}
 			} else {
-				updateState({
-					pinTooShort: true
-				});
+				updateState({ pinTooShort: true });
 			}
 		} else {
 			resolvePassword(password);
@@ -69,9 +65,7 @@ function PinUnlockWithPassword({
 
 	return (
 		<KeyboardAwareContainer
-			contentContainerStyle={{
-				flexGrow: 1
-			}}
+			contentContainerStyle={{ flexGrow: 1 }}
 		>
 			<ScreenHeading
 				title={t.title.pinUnlock}

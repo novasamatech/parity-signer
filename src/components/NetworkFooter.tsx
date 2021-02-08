@@ -21,9 +21,7 @@ export const NetworkFooter = ({ color }: { color: string }): React.ReactElement 
 	<View
 		style={[
 			styles.footer,
-			{
-				backgroundColor: color
-			}
+			{ backgroundColor: color }
 		]}
 	/>
 );

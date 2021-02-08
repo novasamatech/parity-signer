@@ -96,17 +96,11 @@ export function useAccountContext(): AccountsContextState {
 	}, []);
 
 	function select(accountKey: string): void {
-		setState({
-			selectedKey: accountKey
-		});
+		setState({ selectedKey: accountKey });
 	}
 
 	function updateNew(accountUpdate: Partial<UnlockedAccount>): void {
-		setState({
-			newAccount: {
-				...state.newAccount, ...accountUpdate
-			}
-		});
+		setState({ newAccount: { ...state.newAccount, ...accountUpdate } });
 	}
 
 	function _deleteSensitiveData({ address, createdAt, encryptedSeed, isLegacy, name, networkKey, recovered, updatedAt, validBip39Seed }: UnlockedAccount): LockedAccount {
@@ -154,17 +148,13 @@ export function useAccountContext(): AccountsContextState {
 	}
 
 	function _updateIdentitiesWithCurrentIdentity(updatedCurrentIdentity: Identity): void {
-		setState({
-			currentIdentity: updatedCurrentIdentity
-		});
+		setState({ currentIdentity: updatedCurrentIdentity });
 		const newIdentities = deepCopyIdentities(state.identities);
 		if (state.currentIdentity === null) return;
 		const identityIndex = newIdentities.findIndex((identity: Identity) =>
 			identity.encryptedSeed === state.currentIdentity!.encryptedSeed);
 		newIdentities.splice(identityIndex, 1, updatedCurrentIdentity);
-		setState({
-			identities: newIdentities
-		});
+		setState({ identities: newIdentities });
 		saveIdentities(newIdentities);
 	}
 
@@ -219,11 +209,7 @@ export function useAccountContext(): AccountsContextState {
 		const account = accounts.get(accountKey);
 
 		if (account && updatedAccount) {
-			setState({
-				accounts: accounts.set(accountKey, {
-					...account, ...updatedAccount
-				})
-			});
+			setState({ accounts: accounts.set(accountKey, { ...account, ...updatedAccount }) });
 		}
 	}
 
@@ -235,9 +221,7 @@ export function useAccountContext(): AccountsContextState {
 		const { accounts } = state;
 
 		accounts.delete(accountKey);
-		setState({
-			accounts, selectedKey: ''
-		});
+		setState({ accounts, selectedKey: '' });
 		await deleteDbAccount(accountKey);
 	}
 
@@ -274,9 +258,7 @@ export function useAccountContext(): AccountsContextState {
 
 		if (account && isUnlockedAccount(account)) {
 			const lockedAccount = _deleteSensitiveData(account);
-			setState({
-				accounts: state.accounts.set(accountKey, lockedAccount)
-			});
+			setState({ accounts: state.accounts.set(accountKey, lockedAccount) });
 		}
 	}
 
@@ -345,9 +327,7 @@ export function useAccountContext(): AccountsContextState {
 			targetAccountId === null
 		)
 			return false;
-		setState({
-			currentIdentity: targetIdentity
-		});
+		setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
 		if (metaData === undefined) return false;
@@ -381,9 +361,7 @@ export function useAccountContext(): AccountsContextState {
 			derivedAccount || _getAccountFromIdentity(address, networkContext);
 
 		if (derivedAccount instanceof Object)
-			return {
-				...derivedAccount, isLegacy: false
-			};
+			return { ...derivedAccount, isLegacy: false };
 
 		return null;
 	}
@@ -396,9 +374,7 @@ export function useAccountContext(): AccountsContextState {
 
 		for (const [k, v] of state.accounts.entries()) {
 			if (v.address.toLowerCase() === address.toLowerCase()) {
-				return {
-					...v, accountId: k, isLegacy: true
-				};
+				return { ...v, accountId: k, isLegacy: true };
 			}
 		}
 
@@ -421,9 +397,7 @@ export function useAccountContext(): AccountsContextState {
 	}
 
 	function resetCurrentIdentity(): void {
-		setState({
-			currentIdentity: null
-		});
+		setState({ currentIdentity: null });
 	}
 
 	async function _addPathToIdentity(newPath: string,
@@ -482,33 +456,22 @@ export function useAccountContext(): AccountsContextState {
 	}
 
 	function selectIdentity(identity: Identity): void {
-		setState({
-			currentIdentity: identity
-		});
+		setState({ currentIdentity: identity });
 	}
 
 	function clearIdentity(): void {
-		setState({
-			newIdentity: emptyIdentity()
-		});
+		setState({ newIdentity: emptyIdentity() });
 	}
 
 	function updateNewIdentity(identityUpdate: Partial<Identity>): void {
-		setState({
-			newIdentity: {
-				...state.newIdentity, ...identityUpdate
-			}
-		});
+		setState({ newIdentity: { ...state.newIdentity, ...identityUpdate } });
 	}
 
 	function updatePathName(path: string, name: string): void {
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
-		const updatedPathMeta = Object.assign({
-		},
-		updatedCurrentIdentity.meta.get(path),
-		{
-			name
-		});
+		const updatedPathMeta = Object.assign({},
+			updatedCurrentIdentity.meta.get(path),
+			{ name });
 		updatedCurrentIdentity.meta.set(path, updatedPathMeta);
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
@@ -578,5 +541,4 @@ export function useAccountContext(): AccountsContextState {
 	};
 }
 
-export const AccountsContext = React.createContext({
-} as AccountsContextState);
+export const AccountsContext = React.createContext({} as AccountsContextState);

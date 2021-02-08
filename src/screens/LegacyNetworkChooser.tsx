@@ -16,8 +16,7 @@
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import TouchableItem from 'components/TouchableItem';
-import { SubstrateNetworkKeys,
-	UnknownNetworkKeys } from 'constants/networkSpecs';
+import { SubstrateNetworkKeys, UnknownNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -39,9 +38,7 @@ export default function LegacyNetworkChooserView({ navigation }: NavigationProps
 	}
 
 	return (
-		<SafeAreaScrollViewContainer contentContainerStyle={{
-			padding: 20
-		}}>
+		<SafeAreaScrollViewContainer contentContainerStyle={{ padding: 20 }}>
 			<Text style={styles.title}>CHOOSE NETWORK</Text>
 			{Array.from(allNetworks.entries())
 				.filter(([networkKey]: [string, any]): boolean =>
@@ -67,9 +64,7 @@ export default function LegacyNetworkChooserView({ navigation }: NavigationProps
 						<Text
 							style={[
 								styles.cardText,
-								{
-									color: networkParams.secondaryColor
-								}
+								{ color: networkParams.secondaryColor }
 							]}
 						>
 							{networkParams.title}
@@ -107,7 +102,5 @@ const styles = StyleSheet.create({
 		paddingBottom: 20,
 		textAlign: 'center'
 	},
-	top: {
-		flex: 1
-	}
+	top: { flex: 1 }
 });

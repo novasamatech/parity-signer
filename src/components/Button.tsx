@@ -15,14 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Platform,
-	StyleSheet,
-	Text,
-	TextStyle,
-	TouchableNativeFeedback,
-	TouchableOpacity,
-	View,
-	ViewStyle } from 'react-native';
+import { Platform, StyleSheet, Text, TextStyle, TouchableNativeFeedback, TouchableOpacity, View, ViewStyle } from 'react-native';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
@@ -39,33 +32,17 @@ export default class Button extends React.PureComponent<{
 	style?: ViewStyle;
 }> {
 	render(): React.ReactElement {
-		const {
-			onPress,
-			title,
-			aboveKeyboard,
-			disabled,
-			small,
-			textStyles,
-			onlyText,
-			testID,
-			style
-		} = this.props;
+		const { onPress, title, aboveKeyboard, disabled, small, textStyles, onlyText, testID, style } = this.props;
 
-		const finalTextStyles = [styles.buttonText, {
-		}];
-		const finalButtonStyles = [styles.button, {
-		}];
+		const finalTextStyles = [styles.buttonText, {}];
+		const finalButtonStyles = [styles.button, {}];
 
 		if (small) {
-			finalTextStyles.push({
-				fontSize: 14
-			});
+			finalTextStyles.push({ fontSize: 14 });
 			finalButtonStyles.push(styles.buttonSmall);
 		}
 		if (onlyText) {
-			finalTextStyles.push({
-				color: colors.text.main
-			});
+			finalTextStyles.push({ color: colors.text.main });
 			finalButtonStyles.push(styles.buttonOnlyText);
 		}
 		if (disabled) {
@@ -77,7 +54,6 @@ export default class Button extends React.PureComponent<{
 
 		return Platform.OS === 'android' ? (
 			<TouchableNativeFeedback
-				accessibilityComponentType="button"
 				disabled={disabled}
 				onPress={onPress}
 				testID={testID}
@@ -97,7 +73,6 @@ export default class Button extends React.PureComponent<{
 			</TouchableNativeFeedback>
 		) : (
 			<TouchableOpacity
-				accessibilityComponentType="button"
 				disabled={disabled}
 				onPress={onPress}
 				testID={testID}
@@ -132,9 +107,7 @@ const styles = StyleSheet.create({
 		bottom: 56,
 		position: 'absolute'
 	},
-	buttonDisabled: {
-		backgroundColor: colors.background.card
-	},
+	buttonDisabled: { backgroundColor: colors.background.card },
 	buttonOnlyText: {
 		backgroundColor: colors.background.app,
 		elevation: 8
@@ -144,7 +117,5 @@ const styles = StyleSheet.create({
 		marginVertical: 8,
 		paddingHorizontal: 32
 	},
-	buttonText: {
-		...fontStyles.a_button
-	}
+	buttonText: { ...fontStyles.a_button }
 });

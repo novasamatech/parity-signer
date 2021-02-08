@@ -16,11 +16,7 @@
 
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { ReactElement } from 'react';
-import { FlatList,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -57,9 +53,7 @@ export default class AccountIconChooser extends React.PureComponent<
 	constructor(props: any) {
 		super(props);
 
-		this.state = {
-			icons: []
-		};
+		this.state = { icons: [] };
 	}
 
 	refreshIcons = async (): Promise<void> => {
@@ -71,9 +65,7 @@ export default class AccountIconChooser extends React.PureComponent<
 		} = this.props;
 
 		// clean previous selection
-		onSelect({
-			isBip39: false, newAddress: '', newSeed: ''
-		});
+		onSelect({ isBip39: false, newAddress: '', newSeed: '' });
 		try {
 			const icons = await Promise.all(Array(4)
 				.join(' ')
@@ -108,9 +100,7 @@ export default class AccountIconChooser extends React.PureComponent<
 
 					return result;
 				}));
-			this.setState({
-				icons
-			});
+			this.setState({ icons });
 		} catch (e) {
 			console.error(e);
 		}
@@ -154,12 +144,9 @@ export default class AccountIconChooser extends React.PureComponent<
 		return (
 			<TouchableOpacity
 				key={index}
-				style={[styles.iconBorder, isSelected ? styles.selected : {
-				}]}
+				style={[styles.iconBorder, isSelected ? styles.selected : {}]}
 				onPress={(): void =>
-					onSelect({
-						isBip39: bip39, newAddress: address, newSeed: seed
-					})
+					onSelect({ isBip39: bip39, newAddress: address, newSeed: seed })
 				}
 			>
 				<AccountIcon address={address} network={network} style={styles.icon} />
@@ -246,10 +233,6 @@ const styles = StyleSheet.create({
 		borderWidth: 6,
 		height: 62 // height = icon height + borderWidth * 2
 	},
-	refreshIcon: {
-		color: colors.text.faded
-	},
-	selected: {
-		borderColor: colors.border.light
-	}
+	refreshIcon: { color: colors.text.faded },
+	selected: { borderColor: colors.border.light }
 });

@@ -38,7 +38,7 @@
 			"no-unused-vars": ["error", { "args": "none" }],
 			"object-curly-spacing": ["error", "always"],
 			"object-curly-newline": ["error", {
-				"ObjectExpression": "always",
+				"ObjectExpression": { "multiline": true, "minProperties": 8 },
 				"ObjectPattern": { "multiline": true },
 				"ImportDeclaration": "never",
 				"ExportDeclaration": { "multiline": true, "minProperties": 8 }

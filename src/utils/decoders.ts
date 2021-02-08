@@ -14,17 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { compactFromU8a,
-	hexStripPrefix,
-	hexToU8a,
-	u8aToHex } from '@polkadot/util';
+import { compactFromU8a, hexStripPrefix, hexToU8a, u8aToHex } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 import strings from 'modules/sign/strings';
 import { SubstrateNetworkParams } from 'types/networkTypes';
-import { EthereumParsedData,
-	ParsedData,
-	SubstrateCompletedParsedData,
-	SubstrateMultiParsedData } from 'types/scannerTypes';
+import { EthereumParsedData, ParsedData, SubstrateCompletedParsedData, SubstrateMultiParsedData } from 'types/scannerTypes';
 import { blake2b } from 'utils/native';
 
 /*
@@ -130,10 +124,8 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 		switch (zerothByte) {
 		case '45': {
 			// Ethereum UOS payload
-			const data = {
-				data: {
-				} // for consistency with legacy data format.
-			} as EthereumParsedData;
+			// for consistency with legacy data format.
+			const data = { data: {} } as EthereumParsedData;
 			action =
 					firstByte === '00' || firstByte === '01'
 						? 'signData'
@@ -156,10 +148,8 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 		}
 		case '53': {
 			// Substrate UOS payload
-			const data = {
-				data: {
-				} // for consistency with legacy data format.
-			} as SubstrateCompletedParsedData;
+			// for consistency with legacy data format.
+			const data = { data: {} } as SubstrateCompletedParsedData;
 			try {
 				data.data.crypto =
 						firstByte === '00'

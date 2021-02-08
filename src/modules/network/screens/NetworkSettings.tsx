@@ -43,9 +43,7 @@ export default function NetworkSettings({ navigation }: NavigationProps<'Network
 				key={networkSpec.genesisHash + networkSpec.pathId}
 				networkKey={networkSpec.genesisHash}
 				onPress={(): void =>
-					navigation.navigate('NetworkDetails', {
-						pathId: networkSpec.pathId
-					})
+					navigation.navigate('NetworkDetails', { pathId: networkSpec.pathId })
 				}
 				title={networkSpec.title}
 			/>
@@ -65,12 +63,8 @@ export default function NetworkSettings({ navigation }: NavigationProps<'Network
 }
 
 const styles = StyleSheet.create({
-	body: {
-		padding: 20
-	},
-	bodyContent: {
-		paddingBottom: 40
-	},
+	body: { padding: 20 },
+	bodyContent: { paddingBottom: 40 },
 	descSecondary: {
 		color: colors.background.app,
 		flex: 1,

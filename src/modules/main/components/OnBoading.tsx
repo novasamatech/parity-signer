@@ -37,15 +37,11 @@ export default function OnBoardingView({ hasLegacyAccount }: {hasLegacyAccount: 
 	}): React.ReactElement {
 		return (
 			<Text
-				style={[fontStyles.quote, {
-					textDecorationLine: 'underline'
-				}]}
+				style={[fontStyles.quote, { textDecorationLine: 'underline' }]}
 				testID={
 					isRecover ? testIDs.Main.recoverButton : testIDs.Main.createButton
 				}
-				onPress={(): void => navigation.navigate('IdentityNew', {
-					isRecover
-				})}
+				onPress={(): void => navigation.navigate('IdentityNew', { isRecover })}
 			>
 				{text}
 			</Text>
@@ -68,9 +64,7 @@ export default function OnBoardingView({ hasLegacyAccount }: {hasLegacyAccount: 
 						onPress={(): void => navigation.navigate('LegacyAccountList')}
 						small={true}
 						onlyText={true}
-						style={{
-							marginLeft: 0
-						}}
+						style={{ marginLeft: 0 }}
 					/>
 				)}
 			</View>

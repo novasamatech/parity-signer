@@ -47,8 +47,7 @@ describe('units', () => {
 		const getResultFromMethod = (method: Call): any => {
 			const { args, meta } = method;
 
-			const result = {
-			} as any;
+			const result = {} as any;
 			for (let i = 0; i < meta.args.length; i++) {
 				let value;
 				if (

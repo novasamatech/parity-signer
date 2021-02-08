@@ -95,5 +95,4 @@ export function useNetworksContext(): NetworksContextState {
 	};
 }
 
-export const NetworksContext = React.createContext({
-} as NetworksContextState);
+export const NetworksContext = React.createContext({} as NetworksContextState);

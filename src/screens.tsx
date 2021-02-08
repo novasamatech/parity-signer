@@ -14,12 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { useNavigation,
-	useNavigationState,
-	useRoute } from '@react-navigation/native';
-import { CardStyleInterpolators,
-	createStackNavigator,
-	HeaderBackButton } from '@react-navigation/stack';
+import { useNavigation, useNavigationState, useRoute } from '@react-navigation/native';
+import { CardStyleInterpolators, createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
@@ -70,9 +66,7 @@ const HeaderLeft = (): React.ReactElement => {
 const globalStackNavigationOptions = {
 	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-	headerBackTitleStyle: {
-		color: colors.text.main
-	},
+	headerBackTitleStyle: { color: colors.text.main },
 	headerBackTitleVisible: false,
 	headerLeft: (): React.ReactElement => <HeaderLeft />,
 	headerLeftContainerStyle: {

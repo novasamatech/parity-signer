@@ -22,12 +22,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { AccountsStoreStateWithIdentity,
-	Identity,
-	PathGroup } from 'types/identityTypes';
-import { isUnknownNetworkParams,
-	SubstrateNetworkParams,
-	UnknownNetworkParams } from 'types/networkTypes';
+import { AccountsStoreStateWithIdentity, Identity, PathGroup } from 'types/identityTypes';
+import { isUnknownNetworkParams, SubstrateNetworkParams, UnknownNetworkParams } from 'types/networkTypes';
 import { RootStackParamList } from 'types/routes';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { removeSlash } from 'utils/identitiesUtils';
@@ -94,9 +90,7 @@ export default function PathGroupCard({
 		: `//${networkParams.pathId}${pathGroup.title}`;
 
 	return (
-		<View key={`group${pathGroup.title}`} style={{
-			marginTop: 24
-		}}>
+		<View key={`group${pathGroup.title}`} style={{ marginTop: 24 }}>
 			<Separator shadow={true} style={styles.separator} />
 			<View style={styles.header}>
 				<View style={styles.headerText}>
@@ -122,9 +116,7 @@ export default function PathGroupCard({
 					testID={testIDs.PathsList.pathCard + path}
 					identity={currentIdentity}
 					path={path}
-					onPress={(): void => navigation.navigate('PathDetails', {
-						path
-					})}
+					onPress={(): void => navigation.navigate('PathDetails', { path })}
 				/>
 			))}
 		</View>

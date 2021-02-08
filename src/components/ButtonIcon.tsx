@@ -15,12 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { FunctionComponent } from 'react';
-import { StyleSheet,
-	Text,
-	TextStyle,
-	TouchableOpacity,
-	View,
-	ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Icon } from 'react-native-elements';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import colors from 'styles/colors';
@@ -49,8 +44,7 @@ const ButtonIcon: FunctionComponent<Props> = ({
 	testID,
 	textStyle,
 	title,
-	style = {
-	}
+	style = {}
 }) => {
 	const size = iconSize || 28;
 
@@ -71,9 +65,7 @@ const ButtonIcon: FunctionComponent<Props> = ({
 			paddingTop: size / 8,
 			width: size
 		},
-		title: {
-			marginLeft: 8
-		}
+		title: { marginLeft: 8 }
 	});
 
 	const renderIcon = (): React.ReactElement => {
@@ -99,12 +91,9 @@ const ButtonIcon: FunctionComponent<Props> = ({
 
 	return (
 		<TouchableOpacity
-			accessibilityComponentType="button"
 			onPress={onPress}
 			activeOpacity={0.5}
-			style={{
-				...styles.generalView, ...style
-			}}
+			style={{ ...styles.generalView, ...style }}
 			testID={testID}
 		>
 			<View style={styles.iconTitleView}>

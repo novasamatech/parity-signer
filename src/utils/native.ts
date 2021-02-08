@@ -19,8 +19,7 @@ import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 
 import { checksummedAddress } from './checksum';
 
-const { EthkeyBridge } = NativeModules || {
-};
+const { EthkeyBridge } = NativeModules || {};
 
 interface AddressObject {
 	address: string;

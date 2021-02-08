@@ -61,12 +61,8 @@ export default function DerivationPasswordVerify(props: {
 }
 
 const styles = StyleSheet.create({
-	invalidInput: {
-		backgroundColor: '#fee3e3'
-	},
-	link: {
-		textDecorationLine: 'underline'
-	},
+	invalidInput: { backgroundColor: '#fee3e3' },
+	link: { textDecorationLine: 'underline' },
 	passwordText: {
 		color: colors.text.faded,
 		fontFamily: fonts.regular,
@@ -75,7 +71,5 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		paddingBottom: 0
 	},
-	validInput: {
-		backgroundColor: '#e4fee4'
-	}
+	validInput: { backgroundColor: '#e4fee4' }
 });

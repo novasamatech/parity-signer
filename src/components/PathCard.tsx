@@ -15,9 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import Separator from 'components/Separator';
-import { defaultNetworkKey,
-	NETWORK_LIST,
-	UnknownNetworkKeys } from 'constants/networkSpecs';
+import { defaultNetworkKey, NETWORK_LIST, UnknownNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
@@ -25,12 +23,9 @@ import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
-import { isSubstrateNetworkParams,
-	isUnknownNetworkParams } from 'types/networkTypes';
+import { isSubstrateNetworkParams, isUnknownNetworkParams } from 'types/networkTypes';
 import { ButtonListener } from 'types/props';
-import { getAddressWithPath,
-	getNetworkKeyByPath,
-	getPathName } from 'utils/identitiesUtils';
+import { getAddressWithPath, getNetworkKeyByPath, getPathName } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 import AccountIcon from './AccountIcon';
@@ -113,9 +108,7 @@ export default function PathCard({
 				testID={testID}
 				style={[
 					styles.content,
-					{
-						backgroundColor: 'transparent', paddingVertical: 0
-					}
+					{ backgroundColor: 'transparent', paddingVertical: 0 }
 				]}
 			>
 				<AccountIcon
@@ -124,9 +117,7 @@ export default function PathCard({
 					style={styles.identicon}
 				/>
 				<View style={styles.desc}>
-					<Text style={[fontStyles.t_regular, {
-						color: colors.text.faded
-					}]}>
+					<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
 						{networkParams.title}
 					</Text>
 					<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
@@ -135,9 +126,7 @@ export default function PathCard({
 				<View
 					style={[
 						styles.footer,
-						{
-							backgroundColor: networkParams.color
-						}
+						{ backgroundColor: networkParams.color }
 					]}
 				/>
 			</View>
@@ -146,7 +135,6 @@ export default function PathCard({
 
 	const substrateDerivationCard = (
 		<TouchableItem
-			accessibilityComponentType="button"
 			disabled={false}
 			onPress={onPress}
 			style={styles.body}
@@ -177,9 +165,7 @@ export default function PathCard({
 						{hasPassword ? (
 							<View style={styles.row}>
 								<Text
-									style={[fontStyles.t_codeS, {
-										color: colors.signal.main
-									}]}
+									style={[fontStyles.t_codeS, { color: colors.signal.main }]}
 								>
 									{path}///
 								</Text>
@@ -188,24 +174,18 @@ export default function PathCard({
 									name="lock"
 									size={fontStyles.i_small.fontSize}
 									color={colors.signal.main}
-									style={{
-										alignSelf: 'center'
-									}}
+									style={{ alignSelf: 'center' }}
 								/>
 							</View>
 						) : (
-							<Text style={[fontStyles.t_codeS, {
-								color: colors.signal.main
-							}]}>
+							<Text style={[fontStyles.t_codeS, { color: colors.signal.main }]}>
 								{path}
 							</Text>
 						)}
 					</View>
 					{address !== '' && (
 						<Text
-							style={[fontStyles.t_codeS, {
-								color: colors.text.faded
-							}]}
+							style={[fontStyles.t_codeS, { color: colors.text.faded }]}
 							ellipsizeMode="middle"
 							numberOfLines={1}
 						>

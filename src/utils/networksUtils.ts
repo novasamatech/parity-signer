@@ -21,8 +21,7 @@ export const mergeNetworks = (defaultNetworks: Record<string, SubstrateNetworkPa
 	newNetworksEntries: [string, SubstrateNetworkParams][]): Map<string, SubstrateNetworkParams> => {
 	const mergedNetworksObject = newNetworksEntries.reduce((acc,
 		[networkKey, networkParams]): Record<string, SubstrateNetworkParams> => {
-		const newNetworksList = Object.assign({
-		}, acc);
+		const newNetworksList = Object.assign({}, acc);
 		if (!defaultNetworks.hasOwnProperty(networkKey)) {
 			// const newAcc = Object.assign({}, acc);
 			newNetworksList[networkKey] = {

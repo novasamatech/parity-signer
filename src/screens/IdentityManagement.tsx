@@ -26,9 +26,7 @@ import colors from 'styles/colors';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
-import { navigateToLandingPage,
-	unlockAndReturnSeed,
-	unlockSeedPhrase } from 'utils/navigationHelpers';
+import { navigateToLandingPage, unlockAndReturnSeed, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
@@ -66,9 +64,7 @@ function IdentityManagement({
 		} else if (value === 'IdentityBackup') {
 			const seedPhrase = await unlockAndReturnSeed(navigation);
 			navigation.pop();
-			navigation.navigate(value, {
-				isNew: false, seedPhrase
-			});
+			navigation.navigate(value, { isNew: false, seedPhrase });
 		}
 	};
 
@@ -82,9 +78,7 @@ function IdentityManagement({
 						onSelect={onOptionSelect}
 						menuTriggerIconName={'more-vert'}
 						menuItems={[
-							{
-								text: 'Backup', value: 'IdentityBackup'
-							},
+							{ text: 'Backup', value: 'IdentityBackup' },
 							{
 								testID: testIDs.IdentityManagement.deleteButton,
 								text: 'Delete',
@@ -109,9 +103,7 @@ function IdentityManagement({
 export default withCurrentIdentity(IdentityManagement);
 
 const styles = StyleSheet.create({
-	deleteText: {
-		color: colors.signal.error
-	},
+	deleteText: { color: colors.signal.error },
 	header: {
 		flexDirection: 'row',
 		paddingBottom: 24,

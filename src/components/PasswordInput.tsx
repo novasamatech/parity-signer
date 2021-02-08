@@ -70,9 +70,7 @@ export default function PasswordInput({
 }
 
 const styles = StyleSheet.create({
-	container: {
-		marginBottom: 16
-	},
+	container: { marginBottom: 16 },
 	hintText: {
 		...fontStyles.t_regular,
 		paddingHorizontal: 16

@@ -26,18 +26,12 @@ import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
-import { isEthereumNetworkParams,
-	isSubstrateNetworkParams,
-	NetworkParams,
-	SubstrateNetworkParams } from 'types/networkTypes';
+import { isEthereumNetworkParams, isSubstrateNetworkParams, NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import { navigateToPathDetails,
-	navigateToPathsList,
-	unlockSeedPhrase,
-	useUnlockSeed } from 'utils/navigationHelpers';
+import { navigateToPathDetails, navigateToPathsList, unlockSeedPhrase, useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function NetworkSelector({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
@@ -70,9 +64,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 	const onAddCustomPath = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
-			params: {
-				parentPath: ''
-			}
+			params: { parentPath: '' }
 		});
 
 	const deriveSubstrateNetworkRootPath = async (networkKey: string,
@@ -160,9 +152,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 				await deriveEthereumAccount(networkKey);
 			}
 		} else {
-			navigation.navigate('PathsList', {
-				networkKey
-			});
+			navigation.navigate('PathsList', { networkKey });
 		}
 	};
 

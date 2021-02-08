@@ -35,20 +35,14 @@ export default function PinNew({ route }: NavigationProps<'PinNew'>): React.Reac
 			resolve(pin);
 		} else {
 			if (pin.length < 6) {
-				updateState({
-					pinTooShort: true
-				});
-			} else if (pin !== confirmation) updateState({
-				pinMismatch: true
-			});
+				updateState({ pinTooShort: true });
+			} else if (pin !== confirmation) updateState({ pinMismatch: true });
 		}
 	}
 
 	return (
 		<KeyboardAwareContainer
-			contentContainerStyle={{
-				flexGrow: 1
-			}}
+			contentContainerStyle={{ flexGrow: 1 }}
 		>
 			<ScreenHeading
 				title={t.title.pinCreation}
@@ -60,13 +54,9 @@ export default function PinNew({ route }: NavigationProps<'PinNew'>): React.Reac
 				autoFocus
 				testID={testIDs.IdentityPin.setPin}
 				returnKeyType="next"
-				onFocus={(): void => updateState({
-					focusConfirmation: false
-				})}
+				onFocus={(): void => updateState({ focusConfirmation: false })}
 				onSubmitEditing={(): void => {
-					updateState({
-						focusConfirmation: true
-					});
+					updateState({ focusConfirmation: true });
 				}}
 				onChangeText={onPinInputChange('pin', updateState)}
 				value={state.pin}

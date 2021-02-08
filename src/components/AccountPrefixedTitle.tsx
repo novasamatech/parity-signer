@@ -27,17 +27,13 @@ export default function AccountPrefixedTitle({
 	titlePrefix?: string;
 }): ReactElement {
 	return (
-		<View style={{
-			flexDirection: 'column'
-		}}>
+		<View style={{ flexDirection: 'column' }}>
 			{titlePrefix && (
 				<Text numberOfLines={1} style={[fontStyles.t_codeS, styles.text]}>
 					{titlePrefix}
 				</Text>
 			)}
-			<Text numberOfLines={1} style={[fontStyles.h2, {
-				marginTop: -2
-			}]}>
+			<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
 				{title}
 			</Text>
 		</View>

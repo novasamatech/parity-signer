@@ -44,9 +44,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 
 	return (
 		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
-			<CustomScrollView contentContainerStyle={{
-				paddingHorizontal: 16
-			}}>
+			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>
 
@@ -88,9 +86,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						<Text style={fontStyles.t_big}>
 							<Text>{'  I agree to the '}</Text>
 							<Text
-								style={{
-									textDecorationLine: 'underline'
-								}}
+								style={{ textDecorationLine: 'underline' }}
 								onPress={(): void => {
 									navigation.navigate('PrivacyPolicy');
 								}}
@@ -105,9 +101,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						title="Next"
 						disabled={!ppAgreement || !tocAgreement}
 						onPress={onConfirm}
-						style={{
-							marginBottom: 24, marginTop: 16
-						}}
+						style={{ marginBottom: 24, marginTop: 16 }}
 					/>
 				</View>
 			)}

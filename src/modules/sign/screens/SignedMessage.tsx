@@ -60,9 +60,7 @@ function SignedMessageView({
 					marginVertical: 20
 				}}
 			/>
-			<Text style={[fontStyles.h_subheading, {
-				paddingHorizontal: 16
-			}]}>
+			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
 				{'Scan to publish'}
 			</Text>
 			<View testID={testIDs.SignedMessage.qrView}>

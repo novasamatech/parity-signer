@@ -25,11 +25,7 @@
  */
 
 import React, { ReactElement } from 'react';
-import { Platform,
-	TouchableNativeFeedback,
-	TouchableOpacity,
-	TouchableOpacityProps,
-	View } from 'react-native';
+import { Platform, TouchableNativeFeedback, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 
 const ANDROID_VERSION_LOLLIPOP = 21;
 

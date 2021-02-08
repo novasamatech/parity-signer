@@ -49,9 +49,7 @@ function PinInput(props: any): React.ReactElement {
 			numberOfLines={1}
 			returnKeyType="next"
 			secureTextEntry
-			style={StyleSheet.flatten([styles.pinInput, {
-				fontSize: 24
-			}])}
+			style={StyleSheet.flatten([styles.pinInput, { fontSize: 24 }])}
 			{...props}
 		/>
 	);
@@ -91,22 +89,14 @@ function AccountPin({
 				await accountsStore.save(selectedKey, account, pin);
 				const resetAction = CommonActions.reset({
 					index: 1,
-					routes: [{
-						name: 'LegacyAccountList'
-					}, {
-						name: 'AccountDetails'
-					}]
+					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
 				});
 				navigation.dispatch(resetAction);
 			}
 		} else {
 			if (pin.length < 6) {
-				setState({
-					pinTooShort: true
-				});
-			} else if (pin !== confirmation) setState({
-				pinMismatch: true
-			});
+				setState({ pinTooShort: true });
+			} else if (pin !== confirmation) setState({ pinMismatch: true });
 		}
 	};
 
@@ -148,13 +138,9 @@ function AccountPin({
 			<PinInput
 				autoFocus
 				returnKeyType="next"
-				onFocus={(): void => setState({
-					focusConfirmation: false
-				})}
+				onFocus={(): void => setState({ focusConfirmation: false })}
 				onSubmitEditing={(): void => {
-					setState({
-						focusConfirmation: true
-					});
+					setState({ focusConfirmation: true });
 				}}
 				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
 				value={state.pin}
@@ -176,9 +162,7 @@ function AccountPin({
 export default AccountPin;
 
 const styles = StyleSheet.create({
-	body: {
-		padding: 20
-	},
+	body: { padding: 20 },
 	errorText: {
 		color: colors.signal.error,
 		fontFamily: fonts.bold,
@@ -193,9 +177,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 20,
 		textAlign: 'center'
 	},
-	pinInput: {
-		marginBottom: 20
-	},
+	pinInput: { marginBottom: 20 },
 	title: {
 		...fontStyles.h_subheading,
 		color: colors.text.main

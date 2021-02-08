@@ -17,9 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { AccountsContextState } from 'stores/AccountsContext';
-import { FoundAccount,
-	FoundIdentityAccount,
-	FoundLegacyAccount } from 'types/identityTypes';
+import { FoundAccount, FoundIdentityAccount, FoundLegacyAccount } from 'types/identityTypes';
 import { isLegacyFoundAccount } from 'utils/identitiesUtils';
 
 import AccountCard from './AccountCard';

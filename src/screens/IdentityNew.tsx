@@ -27,9 +27,7 @@ import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import { NavigationProps } from 'types/props';
 import { validateSeed } from 'utils/account';
-import { alertError,
-	alertIdentityCreationError,
-	alertRisks } from 'utils/alertUtils';
+import { alertError, alertIdentityCreationError, alertRisks } from 'utils/alertUtils';
 import { debounce } from 'utils/debounce';
 import { emptyIdentity } from 'utils/identitiesUtils';
 import { brainWalletAddress } from 'utils/native';
@@ -59,9 +57,7 @@ function IdentityNew({
 	}, [clearIdentity]);
 
 	const updateName = (name: string): void => {
-		accountsStore.updateNewIdentity({
-			name
-		});
+		accountsStore.updateNewIdentity({ name });
 	};
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
@@ -110,9 +106,7 @@ function IdentityNew({
 
 	const onCreateNewIdentity = (): void => {
 		setSeedPhrase('');
-		navigation.navigate('IdentityBackup', {
-			isNew: true
-		});
+		navigation.navigate('IdentityBackup', { isNew: true });
 	};
 
 	const renderRecoverView = (): React.ReactElement => (

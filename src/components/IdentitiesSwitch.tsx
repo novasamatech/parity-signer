@@ -25,10 +25,7 @@ import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 import { getIdentityName } from 'utils/identitiesUtils';
-import { navigateToLegacyAccountList,
-	resetNavigationTo,
-	resetNavigationWithNetworkChooser,
-	unlockAndReturnSeed } from 'utils/navigationHelpers';
+import { navigateToLegacyAccountList, resetNavigationTo, resetNavigationWithNetworkChooser, unlockAndReturnSeed } from 'utils/navigationHelpers';
 
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
@@ -126,15 +123,11 @@ function IdentitiesSwitch(): React.ReactElement {
 					iconType="antdesign"
 					iconName="user"
 					iconSize={40}
-					style={{
-						paddingLeft: 16
-					}}
+					style={{ paddingLeft: 16 }}
 					textStyle={fontStyles.h1}
 				/>
 				{renderIdentityOptions(currentIdentity)}
-				<Separator style={{
-					marginBottom: 0
-				}} />
+				<Separator style={{ marginBottom: 0 }} />
 			</>
 		);
 	};
@@ -190,9 +183,7 @@ function IdentitiesSwitch(): React.ReactElement {
 		// if no identity or the only one we have is the selected one
 
 		if (!identities.length || (identities.length === 1 && currentIdentity))
-			return <Separator style={{
-				height: 0, marginVertical: 4
-			}} />;
+			return <Separator style={{ height: 0, marginVertical: 4 }} />;
 
 		const identitiesToShow = currentIdentity
 			? identities.filter(identity => identity.encryptedSeed !== currentIdentity.encryptedSeed)
@@ -202,20 +193,14 @@ function IdentitiesSwitch(): React.ReactElement {
 			<>
 				<ScrollView
 					bounces={false}
-					style={{
-						maxHeight: 160
-					}}
+					style={{ maxHeight: 160 }}
 				>
-					<View style={{
-						paddingVertical: 8
-					}}>
+					<View style={{ paddingVertical: 8 }}>
 						{identitiesToShow.map(renderNonSelectedIdentity)}
 					</View>
 				</ScrollView>
 				{identities.length > 5 && (
-					<Separator shadow={true} style={{
-						marginTop: 0
-					}} />
+					<Separator shadow={true} style={{ marginTop: 0 }} />
 				)}
 			</>
 		);
@@ -227,13 +212,9 @@ function IdentitiesSwitch(): React.ReactElement {
 				onPress={(): void => setVisible(!visible)}
 				iconName="user"
 				iconType="antdesign"
-				iconBgStyle={{
-					backgroundColor: 'transparent'
-				}}
+				iconBgStyle={{ backgroundColor: 'transparent' }}
 				testID={testIDs.IdentitiesSwitch.toggleButton}
-				style={{
-					paddingHorizontal: 6
-				}}
+				style={{ paddingHorizontal: 6 }}
 				iconSize={26}
 			/>
 
@@ -311,9 +292,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 64,
 		paddingTop: 0
 	},
-	indentedButton: {
-		paddingLeft: 32
-	}
+	indentedButton: { paddingLeft: 32 }
 });
 
 const i_arrowOptions = {
@@ -322,9 +301,7 @@ const i_arrowOptions = {
 	iconSize: fontStyles.i_medium.fontSize,
 	iconType: 'antdesign',
 	style: styles.i_arrowStyle,
-	textStyle: {
-		...fontStyles.a_text, color: colors.signal.main
-	}
+	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
 };
 
 export default IdentitiesSwitch;

@@ -64,9 +64,7 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 	const onAddCustomPath = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
-			params: {
-				parentPath: ''
-			}
+			params: { parentPath: '' }
 		});
 
 	const deriveSubstrateNetworkRootPath = async (networkKey: string,
@@ -154,9 +152,7 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 				await deriveEthereumAccount(networkKey);
 			}
 		} else {
-			navigation.navigate('PathsList', {
-				networkKey
-			});
+			navigation.navigate('PathsList', { networkKey });
 		}
 	};
 

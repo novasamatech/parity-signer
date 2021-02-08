@@ -47,15 +47,9 @@ export default StyleSheet.create({
 		fontSize: 14,
 		textTransform: 'uppercase'
 	},
-	i_large: {
-		fontSize: 22
-	},
-	i_medium: {
-		fontSize: 18
-	},
-	i_small: {
-		fontSize: 10
-	},
+	i_large: { fontSize: 22 },
+	i_medium: { fontSize: 18 },
+	i_small: { fontSize: 10 },
 	quote: {
 		color: colors.text.main,
 		fontFamily: fonts.robotoLight,

@@ -15,12 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet,
-	Text,
-	TextInput as TextInputOrigin,
-	TextInputProps,
-	TextStyle,
-	View } from 'react-native';
+import { StyleSheet, Text, TextInput as TextInputOrigin, TextInputProps, TextStyle, View } from 'react-native';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 
@@ -32,9 +27,7 @@ interface Props extends TextInputProps {
 }
 
 export default class TextInput extends React.PureComponent<Props> {
-	static defaultProps = {
-		focus: false
-	};
+	static defaultProps = { focus: false };
 	input: TextInputOrigin | null = null;
 
 	// Methods:
@@ -104,14 +97,10 @@ const styles = StyleSheet.create({
 		flex: 0,
 		paddingTop: 11.5
 	},
-	input_error: {
-		borderBottomColor: colors.signal.error
-	},
+	input_error: { borderBottomColor: colors.signal.error },
 	label: {
 		marginBottom: 3,
 		...fontStyles.t_regular
 	},
-	viewStyle: {
-		flexDirection: 'row'
-	}
+	viewStyle: { flexDirection: 'row' }
 });

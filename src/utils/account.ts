@@ -16,10 +16,7 @@
 
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
-import { EthereumNetworkParams,
-	isSubstrateNetworkParams,
-	isUnknownNetworkParams,
-	NetworkParams } from 'types/networkTypes';
+import { EthereumNetworkParams, isSubstrateNetworkParams, isUnknownNetworkParams, NetworkParams } from 'types/networkTypes';
 import { ValidSeed } from 'types/utilTypes';
 
 export function generateAccountId(address: string,

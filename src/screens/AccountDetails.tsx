@@ -31,8 +31,7 @@ import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
-import { navigateToLandingPage,
-	navigateToLegacyAccountList } from 'utils/navigationHelpers';
+import { navigateToLandingPage, navigateToLegacyAccountList } from 'utils/navigationHelpers';
 
 export default function AccountDetails({ navigation }: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
@@ -81,12 +80,8 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 							onSelect={onOptionSelect}
 							menuTriggerIconName={'more-vert'}
 							menuItems={[
-								{
-									text: 'Edit', value: 'AccountEdit'
-								},
-								{
-									text: 'Change Pin', value: 'AccountPin'
-								},
+								{ text: 'Edit', value: 'AccountEdit' },
+								{ text: 'Change Pin', value: 'AccountPin' },
 								{
 									text: 'View Recovery Phrase',
 									value: 'LegacyAccountBackup'
@@ -122,18 +117,14 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.background.app,
 		flex: 1
 	},
-	deleteText: {
-		color: colors.signal.error
-	},
+	deleteText: { color: colors.signal.error },
 	header: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		paddingBottom: 24,
 		paddingRight: 19
 	},
-	icon: {
-		paddingHorizontal: 16
-	},
+	icon: { paddingHorizontal: 16 },
 	menuView: {
 		alignItems: 'flex-end',
 		flex: 1

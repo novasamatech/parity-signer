@@ -58,9 +58,7 @@ export default function MessageDetailsCard({
 }
 
 const styles = StyleSheet.create({
-	messageContainer: {
-		marginTop: 16
-	},
+	messageContainer: { marginTop: 16 },
 	messageText: {
 		...fontStyles.t_code,
 		color: colors.signal.main

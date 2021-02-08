@@ -55,9 +55,7 @@ export async function loadAccounts(version = 3): Promise<Map<string, any>> {
 		const accountMap = new Map();
 		for (const [key, value] of Object.entries(accounts)) {
 			const account = JSON.parse(value);
-			accountMap.set(key, {
-				...account
-			});
+			accountMap.set(key, { ...account });
 		}
 
 		return accountMap;

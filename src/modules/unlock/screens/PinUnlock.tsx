@@ -51,14 +51,10 @@ function PinUnlock({
 					resolve();
 				}
 			} catch (e) {
-				updateState({
-					pin, pinMismatch: true
-				});
+				updateState({ pin, pinMismatch: true });
 			}
 		} else {
-			updateState({
-				pin, pinTooShort: true
-			});
+			updateState({ pin, pinTooShort: true });
 		}
 	}
 
@@ -70,9 +66,7 @@ function PinUnlock({
 
 	return (
 		<KeyboardAwareContainer
-			contentContainerStyle={{
-				flexGrow: 1
-			}}
+			contentContainerStyle={{ flexGrow: 1 }}
 		>
 			<ScreenHeading
 				title={t.title.pinUnlock}

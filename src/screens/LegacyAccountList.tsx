@@ -40,9 +40,7 @@ function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>)
 			address={account.address}
 			networkKey={account.networkKey}
 			onPress={(): Promise<void> => onAccountSelected(accountKey)}
-			style={{
-				paddingBottom: 0
-			}}
+			style={{ paddingBottom: 0 }}
 			title={account.name}
 			key={accountKey}
 		/>

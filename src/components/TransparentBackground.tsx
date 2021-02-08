@@ -15,11 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { Modal,
-	StyleSheet,
-	TouchableWithoutFeedback,
-	View,
-	ViewStyle } from 'react-native';
+import { Modal, StyleSheet, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 
 interface Props {
 	animationType: 'none' | 'slide' | 'fade';
@@ -46,9 +42,7 @@ export default function TransparentBackground({
 			onRequestClose={(): void => setVisible(false)}
 		>
 			<TouchableWithoutFeedback
-				style={{
-					flex: 1
-				}}
+				style={{ flex: 1 }}
 				onPressIn={(): void => setVisible(false)}
 			>
 				<View

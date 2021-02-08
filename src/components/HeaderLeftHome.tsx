@@ -55,7 +55,5 @@ const styles = StyleSheet.create({
 		marginTop: -5,
 		width: 24
 	},
-	t_bold: {
-		fontFamily: fonts.semiBold
-	}
+	t_bold: { fontFamily: fonts.semiBold }
 });

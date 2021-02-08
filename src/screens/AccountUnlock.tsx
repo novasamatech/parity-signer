@@ -110,12 +110,8 @@ export function AccountUnlockAndSign(props: NavigationProps<'AccountUnlockAndSig
 				const resetAction = CommonActions.reset({
 					index: 1,
 					routes: [
-						{
-							name: 'LegacyAccountList'
-						},
-						{
-							name: next
-						}
+						{ name: 'LegacyAccountList' },
+						{ name: next }
 					]
 				});
 				navigation.dispatch(resetAction);
@@ -146,15 +142,9 @@ export function AccountUnlock({
 					const resetAction = CommonActions.reset({
 						index: 2,
 						routes: [
-							{
-								name: 'LegacyAccountList'
-							},
-							{
-								name: 'AccountDetails'
-							},
-							{
-								name: next
-							}
+							{ name: 'LegacyAccountList' },
+							{ name: 'AccountDetails' },
+							{ name: next }
 						]
 					});
 					navigation.dispatch(resetAction);

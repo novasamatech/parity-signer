@@ -85,7 +85,5 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		marginBottom: 10
 	},
-	warningView: {
-		padding: 20
-	}
+	warningView: { padding: 20 }
 });

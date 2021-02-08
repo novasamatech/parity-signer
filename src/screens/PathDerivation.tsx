@@ -122,9 +122,7 @@ function PathDerivation({ accountsStore, navigation, route }: NavigationAccountI
 					setVisible={setModalVisible}
 				/>
 			)}
-			<Separator style={{
-				height: 0
-			}} />
+			<Separator style={{ height: 0 }} />
 			<PasswordInput
 				password={password}
 				setPassword={setPassword}

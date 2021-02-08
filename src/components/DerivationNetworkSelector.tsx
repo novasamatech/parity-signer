@@ -16,14 +16,7 @@
 
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
-import { Image,
-	Platform,
-	StyleSheet,
-	Text,
-	TouchableNativeFeedback,
-	TouchableNativeFeedbackProps,
-	TouchableOpacity,
-	View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableNativeFeedback, TouchableNativeFeedbackProps, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
@@ -103,9 +96,7 @@ export function NetworkOptions({
 			animationType="fade"
 		>
 			<View style={styles.optionsBackground}>
-				<View style={{
-					...styles.optionWrapper, borderTopWidth: 0
-				}}>
+				<View style={{ ...styles.optionWrapper, borderTopWidth: 0 }}>
 					<Text style={styles.optionHeadingText}>
 						{ACCOUNT_NETWORK.toUpperCase()}
 					</Text>
@@ -128,9 +119,7 @@ const styles = StyleSheet.create({
 		marginBottom: 3,
 		...fontStyles.t_regular
 	},
-	menuOption: {
-		width: '100%'
-	},
+	menuOption: { width: '100%' },
 	optionHeadingText: {
 		...fontStyles.h_subheading,
 		paddingLeft: 16
@@ -153,12 +142,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		paddingVertical: 8
 	},
-	optionsBackground: {
-		backgroundColor: colors.background.app
-	},
-	optionsWrapper: {
-		justifyContent: 'flex-end'
-	},
+	optionsBackground: { backgroundColor: colors.background.app },
+	optionsWrapper: { justifyContent: 'flex-end' },
 	triggerLabel: {
 		flex: 1,
 		...fontStyles.h2

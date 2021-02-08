@@ -147,9 +147,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 				<Text style={styles.title}>NAME</Text>
 				<TextInput
 					onChangeText={(input: string): void =>
-						accountsStore.updateNew({
-							name: input
-						})
+						accountsStore.updateNew({ name: input })
 					}
 					value={name}
 					placeholder="Enter a new account name"
@@ -182,9 +180,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 							!isDerivationPathValid
 						}
 						onPress={(): void => {
-							navigation.navigate('LegacyAccountBackup', {
-								isNew: true
-							});
+							navigation.navigate('LegacyAccountBackup', { isNew: true });
 						}}
 					/>
 				</View>
@@ -194,9 +190,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 }
 
 const styles = StyleSheet.create({
-	body: {
-		padding: 16
-	},
+	body: { padding: 16 },
 	bodyContainer: {
 		flex: 1,
 		flexDirection: 'column',

@@ -15,14 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { NETWORK_LIST } from 'constants/networkSpecs';
-import { Account,
-	AccountMeta,
-	Identity,
-	LockedAccount } from 'types/identityTypes';
+import { Account, AccountMeta, Identity, LockedAccount } from 'types/identityTypes';
 import { generateAccountId } from 'utils/account';
 import { loadAccounts, loadIdentities, saveAccount, saveIdentities } from 'utils/db';
-import { extractAddressFromAccountId,
-	isEthereumAccountId } from 'utils/identitiesUtils';
+import { extractAddressFromAccountId, isEthereumAccountId } from 'utils/identitiesUtils';
 
 interface LegacyMeta extends AccountMeta {
 	accountId: string;
@@ -84,8 +80,7 @@ export const migrateAccounts = async (): Promise<void> => {
 	const oldAccounts_v2 = await loadAccounts(2);
 	const oldAccounts = [...oldAccounts_v1, ...oldAccounts_v2];
 	const accounts = oldAccounts.map(([_, value]: [any, LegacyAccount]): Account => {
-		let result = {
-		} as LegacyAccount;
+		let result = {} as LegacyAccount;
 		if (value.chainId) {
 			// The networkKey for Ethereum accounts is the chain id
 			result = {

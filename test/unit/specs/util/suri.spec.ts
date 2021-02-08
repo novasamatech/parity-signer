@@ -97,12 +97,9 @@ describe('suri', () => {
 		});
 
 		it('should throw if the suri object is not valid', () => {
-			const empty = {
-			};
+			const empty = {};
 
-			const malformed = {
-				phrase: null
-			};
+			const malformed = { phrase: null };
 
 			expect(() => constructSURI(empty as any)).toThrow('Cannot construct an SURI from emtpy phrase.');
 			expect(() => constructSURI(malformed as any)).toThrow('Cannot construct an SURI from emtpy phrase.');

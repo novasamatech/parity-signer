@@ -57,13 +57,9 @@ function SignedTxView({
 	function renderPayloadDetails(): React.ReactNode {
 		if (isEthereum) {
 			return (
-				<View style={[styles.bodyContent, {
-					marginTop: 16
-				}]}>
+				<View style={[styles.bodyContent, { marginTop: 16 }]}>
 					<TxDetailsCard
-						style={{
-							marginBottom: 20
-						}}
+						style={{ marginBottom: 20 }}
 						description={strings.INFO_ETH_TX}
 						value={value}
 						gas={gas}
@@ -102,9 +98,7 @@ function SignedTxView({
 					marginVertical: 20
 				}}
 			/>
-			<Text style={[fontStyles.h_subheading, {
-				paddingHorizontal: 16
-			}]}>
+			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
 				{'Scan to publish'}
 			</Text>
 			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
