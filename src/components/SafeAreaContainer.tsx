@@ -14,8 +14,8 @@ interface SafeAreaScrollViewProps extends ScrollViewProps {
 export const SafeAreaViewContainer = (props: SafeAreaContainerProps): React.ReactElement => (
 	<SafeAreaView
 		{...props}
-		style={StyleSheet.flatten([containerStyles.background, props.style])}
 		children={props.children}
+		style={StyleSheet.flatten([containerStyles.background, props.style])}
 	/>
 );
 
@@ -24,8 +24,8 @@ export const SafeAreaScrollViewContainer = (props: SafeAreaScrollViewProps): Rea
 		<ScrollView
 			{...props}
 			bounces={false}
-			style={StyleSheet.flatten([containerStyles.background, props.style])}
 			children={props.children}
+			style={StyleSheet.flatten([containerStyles.background, props.style])}
 		/>
 	</SafeAreaView>
 );

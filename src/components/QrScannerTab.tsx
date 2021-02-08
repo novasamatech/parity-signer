@@ -33,13 +33,13 @@ export default function QrScannerTab(): React.ReactElement {
 	return (
 		<TouchableItem
 			onPress={(): void => navigateToQrScanner(navigation)}
-			testID={testIDs.SecurityHeader.scanButton}
 			style={styles.body}
+			testID={testIDs.SecurityHeader.scanButton}
 		>
 			<Icon
 				color={colors.text.main}
-				size={fontStyles.i_large.fontSize}
 				name="qrcode-scan"
+				size={fontStyles.i_large.fontSize}
 				type="material-community"
 			/>
 			<Text style={styles.textLabel}>QR Scanner</Text>

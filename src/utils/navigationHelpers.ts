@@ -56,17 +56,20 @@ type UnlockWithoutPassword = (
 	nextRoute: Route,
 	identity?: Identity
 ) => Promise<void>;
+
 export const useUnlockSeed = (isSeedRefValid: boolean): {
 	unlockWithPassword: UnlockWithPassword;
 	unlockWithoutPassword: UnlockWithoutPassword;
 } => {
 	const currentRoutes = useNavigationState((state) => state.routes) as Route[];
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
 	const resetRoutes = (routes: Route[]): void => {
 		const resetAction = CommonActions.reset({
 			index: routes.length,
 			routes: routes
 		});
+
 		navigation.dispatch(resetAction);
 	};
 
@@ -76,6 +79,7 @@ export const useUnlockSeed = (isSeedRefValid: boolean): {
 			isSeedRefValid,
 			identity);
 		const newRoutes = currentRoutes.concat(nextRoute(password));
+
 		resetRoutes(newRoutes);
 	};
 
@@ -83,6 +87,7 @@ export const useUnlockSeed = (isSeedRefValid: boolean): {
 		identity) => {
 		await unlockSeedPhrase(navigation, isSeedRefValid, identity);
 		const newRoutes = currentRoutes.concat(nextRoute);
+
 		resetRoutes(newRoutes);
 	};
 
@@ -147,6 +152,7 @@ export const navigateToPathDetails = <
 			}
 		]
 	});
+
 	navigation.dispatch(resetAction);
 };
 
@@ -159,6 +165,7 @@ export const navigateToLandingPage = <
 		index: 0,
 		routes: [{ name: 'Main' }]
 	});
+
 	navigation.dispatch(resetAction);
 };
 
@@ -172,6 +179,7 @@ export const navigateToNewIdentityNetwork = <RouteName extends keyof RootStackPa
 			}
 		]
 	});
+
 	navigation.dispatch(resetAction);
 };
 
@@ -184,6 +192,7 @@ export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(
 		index: 0,
 		routes: [{ name: screenName, params }]
 	});
+
 	navigation.dispatch(resetAction);
 };
 
@@ -208,6 +217,7 @@ export const resetNavigationWithNetworkChooser = <
 			}
 		]
 	});
+
 	navigation.dispatch(resetAction);
 };
 
@@ -228,6 +238,7 @@ export const resetNavigationWithScanner = <
 			{ name: screenName }
 		]
 	});
+
 	navigation.dispatch(resetAction);
 };
 

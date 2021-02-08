@@ -141,6 +141,7 @@ export function useScannerContext(): ScannerContextState {
 		let concatMultipartData = multipartData!.reduce((acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
 			if (part === null) throw new Error('part data is not completed');
 			const c = new Uint8Array(acc.length + part.length);
+
 			c.set(acc);
 			c.set(part, acc.length);
 
@@ -152,6 +153,7 @@ export function useScannerContext(): ScannerContextState {
 		const frameInfo = u8aConcat(MULTIPART,
 			encodeNumber(totalFrameCount),
 			encodeNumber(0));
+
 		concatMultipartData = u8aConcat(frameInfo, concatMultipartData);
 
 		const parsedData = (await constructDataFromBytes(concatMultipartData,
@@ -186,9 +188,11 @@ export function useScannerContext(): ScannerContextState {
 			// part_data for frame 0 MUST NOT begin with byte 00 or byte 7B.
 			throw new Error('Error decoding invalid part data.');
 		}
+
 		if (completedFramesCount < totalFrameCount) {
 			// we haven't filled all the frames yet
 			const nextDataState = multipartData!;
+
 			nextDataState[currentFrame] = partDataAsBytes;
 
 			const nextMissedFrames = nextDataState.reduce((acc: number[], current: Uint8Array | null, index: number) => {
@@ -199,6 +203,7 @@ export function useScannerContext(): ScannerContextState {
 			[]);
 			const nextCompletedFramesCount =
 				totalFrameCount - nextMissedFrames.length;
+
 			setState({
 				completedFramesCount: nextCompletedFramesCount,
 				latestFrame: currentFrame,
@@ -206,6 +211,7 @@ export function useScannerContext(): ScannerContextState {
 				multipartData: nextDataState,
 				totalFrameCount
 			});
+
 			if (
 				totalFrameCount > 0 &&
 				nextCompletedFramesCount === totalFrameCount &&
@@ -259,7 +265,9 @@ export function useScannerContext(): ScannerContextState {
 		) {
 			throw new Error('Scanned QR contains no valid extrinsic');
 		}
+
 		let tx, networkKey, recipientAddress, dataToSign;
+
 		if (isEthereumCompletedParsedData(txRequest)) {
 			tx = await transaction(txRequest.data.rlp);
 			networkKey = tx.ethereumChainId;
@@ -270,6 +278,7 @@ export function useScannerContext(): ScannerContextState {
 		} else {
 			const payloadU8a = txRequest.data.data;
 			const [offset] = compactFromU8a(payloadU8a);
+
 			tx = payloadU8a;
 			networkKey = txRequest.data.genesisHash;
 			recipientAddress = txRequest.data.account;
@@ -330,6 +339,7 @@ export function useScannerContext(): ScannerContextState {
 		}
 
 		const sender = accountsStore.getAccountByAddress(address, networkContext);
+
 		if (!sender) {
 			throw new Error(`No private key found for ${address} in your signer key storage.`);
 		}
@@ -373,9 +383,11 @@ export function useScannerContext(): ScannerContextState {
 	async function signEthereumData(signFunction: TryBrainWalletSignFunc,
 		qrInfo: QrInfo): Promise<void> {
 		const { dataToSign, sender } = qrInfo;
+
 		if (!sender || !ETHEREUM_NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		const signedData = await signFunction(dataToSign as string);
+
 		setState({ signedData });
 	}
 
@@ -385,6 +397,7 @@ export function useScannerContext(): ScannerContextState {
 		qrInfo: QrInfo,
 		networks: Map<string, SubstrateNetworkParams>): Promise<void> {
 		const { dataToSign, isHash, sender } = qrInfo;
+
 		if (!sender || !networks.has(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
 		let signable;
@@ -401,24 +414,29 @@ export function useScannerContext(): ScannerContextState {
 		} else {
 			throw new Error('Signing Error: cannot signing message');
 		}
+
 		let signed = await signFunction(suriSuffix, signable);
+
 		signed = '0x' + signed;
 		// TODO: tweak the first byte if and when sig type is not sr25519
 		const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
 		const signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
+
 		setState({ signedData });
 	}
 
 	// signing data with legacy account.
 	async function signDataLegacy(pin = '1',
 		getNetwork: GetNetwork): Promise<void> {
-		const { sender, dataToSign, isHash } = state;
+		const { dataToSign, isHash, sender } = state;
+
 		if (!sender || !sender.encryptedSeed)
 			throw new Error('Signing Error: sender could not be found.');
 		const networkParams = getNetwork(sender.networkKey);
 		const isEthereum = isEthereumNetworkParams(networkParams);
 		const seed = await decryptData(sender.encryptedSeed, pin);
 		let signedData;
+
 		if (isEthereum) {
 			signedData = await brainWalletSign(seed, dataToSign as string);
 		} else {
@@ -436,12 +454,16 @@ export function useScannerContext(): ScannerContextState {
 			} else {
 				throw new Error('Signing Error: cannot signing message');
 			}
+
 			let signed = await substrateSign(seed, signable);
+
 			signed = '0x' + signed;
 			// TODO: tweak the first byte if and when sig type is not sr25519
 			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
+
 			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
 		}
+
 		setState({ signedData });
 	}
 

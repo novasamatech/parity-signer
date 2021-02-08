@@ -48,23 +48,20 @@ interface Props {
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
-export function PathDetailsView({
-	accountsStore,
-	navigation,
-	path,
-	networkKey
-}: Props): React.ReactElement {
+export function PathDetailsView({ accountsStore, navigation, networkKey, path }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { setAlert } = useContext(AlertStateContext);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed(isSeedRefValid);
+	const { unlockWithPassword, unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 	const networksContextState = useContext(NetworksContext);
 	const { allNetworks } = networksContextState;
+
 	if (!address) {
 		return <View />;
 	}
+
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 	const accountId = generateAccountId(address,
@@ -83,11 +80,13 @@ export function PathDetailsView({
 			alertDeleteAccount(setAlert, 'this account', async () => {
 				try {
 					await accountsStore.deletePath(path, networksContextState);
+
 					if (isSubstratePath(path)) {
 						const listedPaths = getPathsWithSubstrateNetworkKey(accountsStore.state.currentIdentity!,
 							networkKey,
 							networksContextState);
 						const hasOtherPaths = listedPaths.length > 0;
+
 						hasOtherPaths
 							? navigateToPathsList(navigation, networkKey)
 							: navigation.navigate('Main');
@@ -100,8 +99,10 @@ export function PathDetailsView({
 				}
 			});
 			break;
+
 		case 'PathExport': {
 			const pathMeta = currentIdentity.meta.get(path)!;
+
 			if (pathMeta.hasPassword) {
 				await unlockWithPassword(password => ({
 					name: 'PathSecret',
@@ -113,8 +114,10 @@ export function PathDetailsView({
 			} else {
 				await unlockWithoutPassword({ name: 'PathSecret', params: { path } });
 			}
+
 			break;
 		}
+
 		case 'PathManagement':
 			navigation.navigate('PathManagement', { path });
 			break;
@@ -123,15 +126,11 @@ export function PathDetailsView({
 
 	return (
 		<SafeAreaViewContainer>
-			<ScrollView testID={testIDs.PathDetail.screen} bounces={false}>
+			<ScrollView bounces={false}
+				testID={testIDs.PathDetail.screen}>
 				<LeftScreenHeading
-					title="Public Address"
-					networkKey={formattedNetworkKey}
 					headMenu={
 						<PopupMenu
-							testID={testIDs.PathDetail.popupMenuButton}
-							onSelect={onOptionSelect}
-							menuTriggerIconName={'more-vert'}
 							menuItems={[
 								{ text: 'Edit', value: 'PathManagement' },
 								{
@@ -147,29 +146,31 @@ export function PathDetailsView({
 									value: 'PathDelete'
 								}
 							]}
+							menuTriggerIconName={'more-vert'}
+							onSelect={onOptionSelect}
+							testID={testIDs.PathDetail.popupMenuButton}
 						/>
 					}
+					networkKey={formattedNetworkKey}
+					title="Public Address"
 				/>
-				<PathCard identity={currentIdentity} path={path} />
+				<PathCard identity={currentIdentity}
+					path={path} />
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
 			{isSubstratePath(path) && (
 				<QRScannerAndDerivationTab
 					derivationTestID={testIDs.PathDetail.deriveButton}
-					title="Derive New Account"
 					onPress={onTapDeriveButton}
+					title="Derive New Account"
 				/>
 			)}
 		</SafeAreaViewContainer>
 	);
 }
 
-function PathDetails({
-	accountsStore,
-	navigation,
-	route
-}: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
+function PathDetails({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
 	const path = route.params.path;
 	const networksContextState = useContext(NetworksContext);
 	const networkKey = getNetworkKey(path,
@@ -180,8 +181,8 @@ function PathDetails({
 		<PathDetailsView
 			accountsStore={accountsStore}
 			navigation={navigation}
-			path={path}
 			networkKey={networkKey}
+			path={path}
 		/>
 	);
 }

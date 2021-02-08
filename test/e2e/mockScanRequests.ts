@@ -31,6 +31,7 @@ export enum ScanTestRequest {
 }
 
 const addNetworkTitle = 'Acala Mandala TC4';
+
 export const addNetworkGenesisHash =
 	'0x783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade36';
 export const addNetworkPathId = addNetworkTitle

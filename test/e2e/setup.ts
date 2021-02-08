@@ -34,9 +34,11 @@ const { TacScreen } = testIDs;
 
 beforeAll(async () => {
 	await init(config, { launchApp: false });
+
 	if (device.getPlatform() === 'ios') {
 		await device.clearKeychain();
 	}
+
 	await device.launchApp({ permissions: { camera: 'YES' } });
 	await testVisible(TacScreen.tacView);
 	await testTap(TacScreen.agreePrivacyButton);

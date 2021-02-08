@@ -37,19 +37,22 @@ export default class TextInput extends React.PureComponent<Props> {
 
 	componentDidUpdate(): void {
 		const { focus } = this.props;
+
 		focus && this.focus();
 	}
 
 	renderLabel(): React.ReactNode {
 		const { label } = this.props;
+
 		if (!label) return;
 
 		return <Text style={styles.label}>{label}</Text>;
 	}
 
 	render(): React.ReactElement {
-		const { fixedPrefix, style, error } = this.props;
+		const { error, fixedPrefix, style } = this.props;
 		const finalInputStyles: TextStyle[] = [styles.input];
+
 		if (error) {
 			finalInputStyles.push(styles.input_error);
 		}
@@ -64,14 +67,14 @@ export default class TextInput extends React.PureComponent<Props> {
 						</Text>
 					)}
 					<TextInputOrigin
-						ref={(input: TextInputOrigin): any => (this.input = input)}
 						autoCapitalize="none"
 						keyboardAppearance="dark"
+						ref={(input: TextInputOrigin): any => (this.input = input)}
 						underlineColorAndroid="transparent"
 						{...this.props}
-						style={[fontStyles.h2, finalInputStyles, style]}
 						placeholderTextColor={colors.text.faded}
 						selectionColor={colors.border.light}
+						style={[fontStyles.h2, finalInputStyles, style]}
 					/>
 				</View>
 			</View>

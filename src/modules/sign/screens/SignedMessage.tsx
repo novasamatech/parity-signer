@@ -39,13 +39,9 @@ interface Props extends NavigationScannerProps<'SignedMessage'> {
 	message: string;
 }
 
-function SignedMessageView({
-	sender,
-	message,
-	scannerStore
-}: Props): React.ReactElement {
+function SignedMessageView({ message, scannerStore, sender }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { signedData, isHash, dataToSign } = scannerStore.state;
+	const { dataToSign, isHash, signedData } = scannerStore.state;
 	const { getNetwork } = useContext(NetworksContext);
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
@@ -67,21 +63,21 @@ function SignedMessageView({
 				<QrView data={signedData} />
 			</View>
 			<CompatibleCard
-				titlePrefix={'from:'}
 				account={sender}
 				accountsStore={accountsStore}
+				titlePrefix={'from:'}
 			/>
 			{!isEthereum && dataToSign ? (
 				<PayloadDetailsCard
 					description={strings.INFO_MULTI_PART}
-					signature={signedData.toString()}
 					networkKey={sender.networkKey}
+					signature={signedData.toString()}
 				/>
 			) : null}
 			<MessageDetailsCard
+				data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
 				isHash={isHash ?? false}
 				message={message}
-				data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
 				style={styles.bodyContent}
 			/>
 		</SafeAreaScrollViewContainer>
@@ -90,7 +86,7 @@ function SignedMessageView({
 
 export default function SignedMessage(props: NavigationProps<'SignedMessage'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
-	const { sender, message } = scannerStore.state;
+	const { message, sender } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
 
 	useEffect(() => cleanup.current, [cleanup]);
@@ -99,9 +95,9 @@ export default function SignedMessage(props: NavigationProps<'SignedMessage'>): 
 
 	return (
 		<SignedMessageView
-			sender={sender}
 			message={message}
 			scannerStore={scannerStore}
+			sender={sender}
 			{...props}
 		/>
 	);

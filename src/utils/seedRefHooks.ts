@@ -38,8 +38,10 @@ export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 	return async (encryptedSeed, password): Promise<void> => {
 		if (!seedRefs.has(encryptedSeed)) {
 			const seedRef = new SeedRefClass();
+
 			await seedRef.tryCreate(encryptedSeed, password);
 			const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
+
 			setSeedRefs(newSeedRefs);
 		}
 	};
@@ -52,6 +54,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 			return seedRefs.get(encryptedSeed)!;
 		} else {
 			const newSeedRef = new SeedRefClass();
+
 			setSeedRefs(seedRefs.set(encryptedSeed, newSeedRef));
 
 			return newSeedRef;
@@ -64,6 +67,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 	const createSeedRef: TryCreateFunc = async function (password) {
 		await seedRef.tryCreate(encryptedSeed, password);
 		const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
+
 		setSeedRefs(newSeedRefs);
 	};
 

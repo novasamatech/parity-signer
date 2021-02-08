@@ -38,12 +38,8 @@ function getSeedRef(encryptedSeed: string,
 	}
 }
 
-export function useProcessBarCode(showAlertMessage: (
-		title: string,
-		message: string,
-		isSuccess?: boolean
-	) => void,
-networksContextState: NetworksContextState): (txRequestData: TxRequestData) => Promise<void> {
+export function useProcessBarCode(showAlertMessage: (title: string, message: string, isSuccess?: boolean) => void,
+	networksContextState: NetworksContextState): (txRequestData: TxRequestData) => Promise<void> {
 	const { allNetworks, networks } = networksContextState;
 	const accountsStore = useContext(AccountsContext);
 	const scannerStore = useContext(ScannerContext);
@@ -59,6 +55,7 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 		} else if (isJsonString(txRequestData.data)) {
 			// Add Network
 			const parsedJsonData = JSON.parse(txRequestData.data);
+
 			if (parsedJsonData.hasOwnProperty('genesisHash')) {
 				return {
 					action: 'addNetwork',
@@ -70,6 +67,7 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 			return parsedJsonData;
 		} else if (!scannerStore.state.multipartComplete) {
 			const strippedData = rawDataToU8A(txRequestData.rawData);
+
 			if (strippedData === null) throw new Error(strings.ERROR_NO_RAW_DATA);
 			const parsedData = await constructDataFromBytes(strippedData,
 				false,
@@ -87,6 +85,7 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 				parsedData.frameCount,
 				parsedData.partData,
 				networksContextState);
+
 			if (isMultiFramesInfo(multiFramesResult)) {
 				return null;
 			}
@@ -101,16 +100,19 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 	async function _unlockSeedAndSign(sender: FoundIdentityAccount,
 		qrInfo: QrInfo): Promise<void> {
 		const senderNetworkParams = allNetworks.get(sender.networkKey);
+
 		if (!senderNetworkParams) throw new Error(strings.ERROR_NO_NETWORK);
 		const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 
 		// 1. check if sender existed
 		const senderIdentity = getIdentityFromSender(sender,
 			accountsStore.state.identities);
+
 		if (!senderIdentity) throw new Error(strings.ERROR_NO_SENDER_IDENTITY);
 
 		let seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
 		let password = '';
+
 		// 2. unlock and get Seed reference
 		if (seedRef === undefined || !seedRef.isValid()) {
 			if (sender.hasPassword) {
@@ -121,6 +123,7 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 			} else {
 				await unlockSeedPhrase(navigation, false, senderIdentity);
 			}
+
 			seedRef = getSeedRef(sender.encryptedSeed, seedRefs)!;
 		} else {
 			if (sender.hasPassword) {
@@ -129,6 +132,7 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 					senderIdentity);
 			}
 		}
+
 		// 3. sign data
 		if (isEthereum) {
 			await scannerStore.signEthereumData(seedRef.tryBrainWalletSign.bind(seedRef),
@@ -138,6 +142,7 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 				derivePath: sender.path,
 				password
 			});
+
 			await scannerStore.signSubstrateData(seedRef.trySubstrateSign.bind(seedRef),
 				suriSuffix,
 				qrInfo,
@@ -147,9 +152,11 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 
 	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
 		const { sender, type } = qrInfo;
+
 		if (!sender)
 			return showAlertMessage(strings.ERROR_TITLE,
 				strings.ERROR_NO_SENDER_FOUND);
+
 		if (sender.isLegacy) {
 			if (type === 'transaction') {
 				return navigation.navigate('AccountUnlockAndSign', { next: 'SignedTx' });
@@ -160,6 +167,7 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 
 		const seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
 		const isSeedRefInvalid = seedRef && seedRef.isValid();
+
 		await _unlockSeedAndSign(sender, qrInfo);
 		const nextRoute = type === 'transaction' ? 'SignedTx' : 'SignedMessage';
 
@@ -181,14 +189,18 @@ networksContextState: NetworksContextState): (txRequestData: TxRequestData) => P
 	async function processBarCode(txRequestData: TxRequestData): Promise<void> {
 		try {
 			const parsedData = await parseQrData(txRequestData);
+
 			if (isNetworkParsedData(parsedData)) {
 				return addNewNetwork(parsedData);
 			}
+
 			const unsignedData = await checkMultiFramesData(parsedData);
+
 			if (unsignedData === null) return;
 			const qrInfo = await scannerStore.setData(accountsStore,
 				unsignedData,
 				networksContextState);
+
 			await unlockAndNavigationToSignedQR(qrInfo);
 			scannerStore.clearMultipartProgress();
 		} catch (e) {

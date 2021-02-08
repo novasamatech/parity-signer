@@ -23,20 +23,16 @@ import { isLegacyFoundAccount } from 'utils/identitiesUtils';
 import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 
-const CompatibleCard = ({
-	account,
-	accountsStore,
-	titlePrefix
-}: {
+const CompatibleCard = ({ account, accountsStore, titlePrefix }: {
 	account: FoundAccount;
 	accountsStore: AccountsContextState;
 	titlePrefix?: string;
 }): React.ReactElement => {
 	const renderLegacyAccountCard = (legacyAccount: FoundLegacyAccount): React.ReactElement => (
 		<AccountCard
-			title={legacyAccount.name}
 			address={legacyAccount.address}
 			networkKey={legacyAccount.networkKey || ''}
+			title={legacyAccount.name}
 		/>
 	);
 

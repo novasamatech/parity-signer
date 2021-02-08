@@ -29,14 +29,12 @@ import { launchWithScanRequest,
 	testUnlockPin,
 	testVisible } from 'e2e/utils';
 
-const {
-	Main,
+const { Main,
 	PathDetail,
 	PathsList,
 	SecurityHeader,
 	SignedMessage,
-	SignedTx
-} = testIDs;
+	SignedTx } = testIDs;
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
@@ -104,6 +102,7 @@ describe('Signing ane exporting test', () => {
 			const PolkadotNetworkButtonIndex =
 				Main.networkButton +
 				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.POLKADOT].pathId;
+
 			await testTap(testIDs.Main.addNewNetworkButton);
 			await testScrollAndTap(PolkadotNetworkButtonIndex,
 				testIDs.Main.chooserScreen);
@@ -132,6 +131,7 @@ describe('Signing ane exporting test', () => {
 			await tapBack();
 			const kovanNetworkButtonIndex =
 				Main.networkButton + EthereumNetworkKeys.KOVAN;
+
 			await testTap(testIDs.Main.addNewNetworkButton);
 			await testScrollAndTap(kovanNetworkButtonIndex,
 				testIDs.Main.chooserScreen);

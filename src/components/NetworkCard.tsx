@@ -42,7 +42,9 @@ export function NetworkCard({ isAdd, networkColor, networkKey, onPress, testID, 
 	const isDisabled = onPress === undefined;
 
 	return (
-		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
+		<TouchableItem disabled={isDisabled}
+			onPress={onPress}
+			testID={testID}>
 			<CardSeparator />
 			<View style={styles.content}>
 				{isAdd ? (
@@ -54,7 +56,9 @@ export function NetworkCard({ isAdd, networkColor, networkKey, onPress, testID, 
 							width: 40
 						}}
 					>
-						<Icon name="add" color={colors.text.main} size={30} />
+						<Icon color={colors.text.main}
+							name="add"
+							size={30} />
 					</View>
 				) : (
 					<AccountIcon

@@ -33,13 +33,11 @@ import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
-function LegacyAccountBackup({
-	navigation,
-	route
-}: NavigationProps<'LegacyAccountBackup'>): React.ReactElement {
+function LegacyAccountBackup({ navigation, route }: NavigationProps<'LegacyAccountBackup'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const { selectedKey, newAccount } = accountsStore.state;
+	const { newAccount, selectedKey } = accountsStore.state;
+
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
 			if (nextAppState === 'inactive') {
@@ -61,26 +59,26 @@ function LegacyAccountBackup({
 	const { navigate } = navigation;
 	const { setAlert } = useContext(AlertStateContext);
 	const isNew = route.params?.isNew ?? false;
-	const {
-		address,
+	const { address,
 		derivationPassword = '',
 		derivationPath = '',
 		name,
 		networkKey,
 		seed = '',
-		seedPhrase = ''
-	} = isNew ? newAccount : (accountsStore.getSelected() as UnlockedAccount);
+		seedPhrase = '' } = isNew ? newAccount : (accountsStore.getSelected() as UnlockedAccount);
 	const protocol = getNetwork(networkKey).protocol;
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>
 			<ScreenHeading
-				title="Recovery Phrase"
 				subtitle="Write these words down on paper. Keep the backup paper safe. These
 				words allow anyone to recover this account and access its funds."
+				title="Recovery Phrase"
 			/>
 
-			<AccountCard address={address} networkKey={networkKey} title={name} />
+			<AccountCard address={address}
+				networkKey={networkKey}
+				title={name} />
 			<View style={styles.bodyContent}>
 				<TouchableItem
 					onPress={(): void => {
@@ -108,12 +106,12 @@ function LegacyAccountBackup({
 				)}
 				{isNew && (
 					<Button
-						title="Backup Done"
 						onPress={(): void => {
 							alertBackupDone(setAlert, () => {
 								navigate('AccountPin', { isNew });
 							});
 						}}
+						title="Backup Done"
 					/>
 				)}
 			</View>

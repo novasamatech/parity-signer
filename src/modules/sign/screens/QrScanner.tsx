@@ -46,6 +46,7 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 		missingFramesMessage: '',
 		totalFramesCount: 0
 	});
+
 	function showAlertMessage(title: string,
 		message: string,
 		isAddNetworkSuccess?: boolean): void {
@@ -55,7 +56,9 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 			setLastFrame(null);
 			setEnableScan(true);
 		};
+
 		setEnableScan(false);
+
 		if (isAddNetworkSuccess) {
 			setAlert(title, message, [
 				{
@@ -79,6 +82,7 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 
 	const processBarCode = useProcessBarCode(showAlertMessage,
 		networksContextState);
+
 	// useEffect((): (() => void) => {
 	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
 	// 		setLastFrame(null);
@@ -94,11 +98,10 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 	// 	};
 	// }, [navigation, scannerStore.setReady, scannerStore.setBusy]);
 	useEffect(() => {
-		const {
+		const { completedFramesCount,
 			missedFrames,
-			completedFramesCount,
-			totalFrameCount
-		} = scannerStore.state;
+			totalFrameCount } = scannerStore.state;
+
 		setMultiFrames({
 			completedFramesCount,
 			isMultipart: totalFrameCount > 1,
@@ -110,12 +113,15 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 
 	const onBarCodeRead = async (event: any): Promise<void> => {
 		if (event.type !== RNCamera.Constants.BarCodeType.qr) return;
+
 		if (!enableScan) {
 			return;
 		}
+
 		if (event.rawData === lastFrame) {
 			return;
 		}
+
 		setLastFrame(event.rawData);
 		await processBarCode(event as TxRequestData);
 	};
@@ -131,13 +137,11 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 		/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	}, [mockIndex]);
 
-	const {
-		completedFramesCount,
+	const { completedFramesCount,
 		isMultipart,
 		missedFrames,
-		totalFramesCount,
-		missingFramesMessage
-	} = multiFrames;
+		missingFramesMessage,
+		totalFramesCount } = multiFrames;
 
 	return (
 		<SafeAreaViewContainer>
@@ -165,8 +169,8 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 							</Text>
 							<Button
 								onPress={(): void => scannerStore.clearMultipartProgress()}
-								title="Start Over"
 								small
+								title="Start Over"
 							/>
 						</View>
 					) : (

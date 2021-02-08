@@ -11,14 +11,12 @@ import { launchWithScanRequest,
 	testVisible,
 	waitAlert } from 'e2e/utils';
 
-const {
-	IdentityPin,
+const { IdentityPin,
 	PathDerivation,
 	PathDetail,
 	PathsList,
 	SecurityHeader,
-	SignedTx
-} = testIDs;
+	SignedTx } = testIDs;
 
 const passwordedPath = '//passworded';
 const password = 'random';

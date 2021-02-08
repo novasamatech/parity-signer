@@ -23,7 +23,7 @@ export default class Security extends React.PureComponent {
 		return (
 			<SafeAreaScrollViewContainer>
 				<ScreenHeading
-					title="NOT SECURE"
+					error={true}
 					iconName="shield-off"
 					iconType="feather"
 					subtitle="A device is considered not secure if it has access to the internet or
@@ -31,8 +31,8 @@ export default class Security extends React.PureComponent {
 					used on a device that will be kept offline at any time. Enabling any
 					connectivity such as wifi, cellular network, bluetooth, NFC, usb is a
 					threat to the safety of the private keys stored on the device."
-					error={true}
 					subtitleL={true}
+					title="NOT SECURE"
 				/>
 			</SafeAreaScrollViewContainer>
 		);

@@ -60,7 +60,7 @@ function toHex(x: string): string {
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	const taggedAddress = await EthkeyBridge.brainWalletAddress(seed);
-	const { bip39, address } = untagAddress(taggedAddress);
+	const { address, bip39 } = untagAddress(taggedAddress);
 	const hash = await keccak(toHex(address));
 
 	return {
@@ -71,7 +71,7 @@ export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 
 export async function brainWalletAddressWithRef(createBrainWalletFn: TryBrainWalletAddress): Promise<AddressObject> {
 	const taggedAddress = await createBrainWalletFn();
-	const { bip39, address } = untagAddress(taggedAddress);
+	const { address, bip39 } = untagAddress(taggedAddress);
 	const hash = await keccak(toHex(address));
 
 	return {
@@ -83,7 +83,7 @@ export async function brainWalletAddressWithRef(createBrainWalletFn: TryBrainWal
 export async function brainWalletBIP39Address(seed: string): Promise<AddressObject | null> {
 	try {
 		const taggedAddress = await EthkeyBridge.brainWalletBIP(seed);
-		const { bip39, address } = untagAddress(taggedAddress);
+		const { address, bip39 } = untagAddress(taggedAddress);
 
 		const hash = await keccak(toHex(address));
 
@@ -185,8 +185,10 @@ export class SeedRefClass {
 			// Seed reference was already created.
 			return this.dataRef;
 		}
+
 		const dataRef: number = await EthkeyBridge.decryptDataRef(encryptedSeed,
 			password);
+
 		this.dataRef = dataRef;
 		this.valid = true;
 

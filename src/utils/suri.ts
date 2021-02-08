@@ -71,6 +71,7 @@ export function parseSURI(suri: string): SURIObject {
 
 	if (matches) {
 		[, phrase, derivationPath = ''] = matches;
+
 		try {
 			parsedDerivationPath = parseDerivationPath(derivationPath);
 		} catch {
@@ -97,11 +98,7 @@ export function parseSURI(suri: string): SURIObject {
  * @returns {string}
  */
 
-export function constructSURI({
-	derivePath = '',
-	password = '',
-	phrase
-}: {
+export function constructSURI({ derivePath = '', password = '', phrase }: {
 	derivePath?: string;
 	password?: string;
 	phrase: string;
@@ -113,10 +110,7 @@ export function constructSURI({
 	return `${phrase}${derivePath}///${password}`;
 }
 
-export function constructSuriSuffix({
-	derivePath = '',
-	password = ''
-}: {
+export function constructSuriSuffix({ derivePath = '', password = '' }: {
 	derivePath?: string;
 	password?: string;
 }): string {

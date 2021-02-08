@@ -34,10 +34,12 @@ export interface AppProps {
 
 export const getLaunchArgs = (props: AppProps): void => {
 	const { launchArgs } = props;
+
 	if (Platform.OS === 'ios') {
 		if (Array.isArray(launchArgs) && launchArgs.includes('-detoxServer')) {
 			global.inTest = true;
 			const argsIndex = launchArgs.indexOf('-scanRequest');
+
 			if (argsIndex !== -1)
 				global.scanRequest = parseInt(launchArgs[argsIndex + 1], 10);
 
@@ -51,6 +53,7 @@ export const getLaunchArgs = (props: AppProps): void => {
 			return;
 		}
 	}
+
 	global.inTest = false;
 };
 
@@ -81,11 +84,13 @@ export function useInjectionQR(): [
 	const onMockBarCodeRead = async (txRequest: ScanTestRequest,
 		onBarCodeRead: (tx: TxRequestData) => void): Promise<void> => {
 		const scanRequest = scanRequestDataMap[txRequest];
+
 		if (typeof scanRequest === 'string') {
 			await timeout(200);
 			await onBarCodeRead(buildSignRequest(scanRequest));
 		} else if (Array.isArray(scanRequest)) {
 			await timeout(200);
+
 			if (mockIndex < scanRequest.length) {
 				await onBarCodeRead(buildSignRequest(scanRequest[mockIndex]));
 				setMockIndex(mockIndex + 1);

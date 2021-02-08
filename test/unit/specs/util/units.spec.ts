@@ -19,7 +19,9 @@ import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
 import { kusamaMetadata } from 'constants/networkMetadata';
 import { fromWei } from 'utils/units';
+
 const registry = new TypeRegistry();
+
 registry.setMetadata(new Metadata(registry, kusamaMetadata));
 
 describe('units', () => {
@@ -27,6 +29,7 @@ describe('units', () => {
 		it('should properly convert units from wei', () => {
 			const wei = '5208';
 			const ether = fromWei(wei);
+
 			expect(ether).toEqual('0.000000000000021');
 		});
 
@@ -48,8 +51,10 @@ describe('units', () => {
 			const { args, meta } = method;
 
 			const result = {} as any;
+
 			for (let i = 0; i < meta.args.length; i++) {
 				let value;
+
 				if (
 					args[i].toRawType() === 'Balance' ||
 					args[i].toRawType() === 'Compact<Balance>'
@@ -58,6 +63,7 @@ describe('units', () => {
 				} else {
 					value = args[i].toString();
 				}
+
 				result[meta.args[i].name.toString()] = value;
 			}
 
@@ -80,6 +86,7 @@ describe('units', () => {
 
 		it('should format KSM', () => {
 			const result = getResultFromMethod(method_1);
+
 			expect(result.dest).toBe('5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc');
 			expect(result.value).toBe('123.000 KSM');
 		});

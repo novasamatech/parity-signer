@@ -40,6 +40,7 @@ import { AppNavigator, ScreenStack, TocAndPrivacyPolicyNavigator } from './scree
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
 	NavigationBar.setColor(colors.background.os);
+
 	if (__DEV__) {
 		LogBox.ignoreLogs([
 			'Warning: componentWillReceiveProps',
@@ -71,7 +72,8 @@ export default function App(props: AppProps): React.ReactElement {
 				<ScreenStack.Navigator>
 					<ScreenStack.Screen name="Empty">
 						{(navigationProps: any): React.ReactElement => (
-							<View style={emptyScreenStyles} {...navigationProps} />
+							<View style={emptyScreenStyles}
+								{...navigationProps} />
 						)}
 					</ScreenStack.Screen>
 				</ScreenStack.Navigator>
@@ -90,8 +92,8 @@ export default function App(props: AppProps): React.ReactElement {
 									<SeedRefsContext.Provider value={seedRefContext}>
 										<MenuProvider backHandler={true}>
 											<StatusBar
-												barStyle="light-content"
 												backgroundColor={colors.background.app}
+												barStyle="light-content"
 											/>
 											<CustomAlert />
 											<NavigationContainer>

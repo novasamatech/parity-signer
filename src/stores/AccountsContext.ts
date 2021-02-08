@@ -85,6 +85,7 @@ export function useAccountContext(): AccountsContextState {
 			const accounts = await loadAccounts();
 			const identities = await loadIdentities();
 			const currentIdentity = identities.length > 0 ? identities[0] : null;
+
 			setState({
 				accounts,
 				currentIdentity,
@@ -92,6 +93,7 @@ export function useAccountContext(): AccountsContextState {
 				loaded: true
 			});
 		};
+
 		loadInitialContext();
 	}, []);
 
@@ -121,6 +123,7 @@ export function useAccountContext(): AccountsContextState {
 		try {
 			// for account creation
 			let accountToSave = account;
+
 			if (pin && isUnlockedAccount(account)) {
 				account.encryptedSeed = await encryptData(account.seed, pin);
 				accountToSave = _deleteSensitiveData(account);
@@ -134,11 +137,13 @@ export function useAccountContext(): AccountsContextState {
 
 	async function submitNew(pin: string, allNetworks: Map<string, NetworkParams>): Promise<void> {
 		const account = state.newAccount;
+
 		if (!account.seed) return;
 
 		const accountKey = generateAccountId(account.address,
 			account.networkKey,
 			allNetworks);
+
 		await save(accountKey, account, pin);
 
 		setState({
@@ -150,9 +155,11 @@ export function useAccountContext(): AccountsContextState {
 	function _updateIdentitiesWithCurrentIdentity(updatedCurrentIdentity: Identity): void {
 		setState({ currentIdentity: updatedCurrentIdentity });
 		const newIdentities = deepCopyIdentities(state.identities);
+
 		if (state.currentIdentity === null) return;
 		const identityIndex = newIdentities.findIndex((identity: Identity) =>
 			identity.encryptedSeed === state.currentIdentity!.encryptedSeed);
+
 		newIdentities.splice(identityIndex, 1, updatedCurrentIdentity);
 		setState({ identities: newIdentities });
 		saveIdentities(newIdentities);
@@ -168,6 +175,7 @@ export function useAccountContext(): AccountsContextState {
 
 	function updateIdentityName(name: string): void {
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
+
 		updatedCurrentIdentity.name = name;
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
@@ -175,6 +183,7 @@ export function useAccountContext(): AccountsContextState {
 	async function deriveEthereumAccount(createBrainWalletAddress: TryBrainWalletAddress, networkKey: string, allNetworks: Map<string, NetworkParams>): Promise<void> {
 		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
 		const ethereumAddress = await brainWalletAddressWithRef(createBrainWalletAddress);
+
 		if (ethereumAddress.address === '') throw new Error(addressGenerateError);
 		const { ethereumChainId, pathId } = networkParams;
 		const accountId = generateAccountId(ethereumAddress.address,
@@ -229,13 +238,15 @@ export function useAccountContext(): AccountsContextState {
 		pin: string): Promise<boolean> {
 		const { accounts } = state;
 		const account = accounts.get(accountKey);
+
 		if (!accountKey || !account || !account.encryptedSeed) {
 			return false;
 		}
 
 		try {
 			const decryptedSeed = await decryptData(account.encryptedSeed, pin);
-			const { phrase, derivePath, password } = parseSURI(decryptedSeed);
+			const { derivePath, password, phrase } = parseSURI(decryptedSeed);
+
 			setState({
 				accounts: state.accounts.set(accountKey, {
 					derivationPassword: password || '',
@@ -258,12 +269,14 @@ export function useAccountContext(): AccountsContextState {
 
 		if (account && isUnlockedAccount(account)) {
 			const lockedAccount = _deleteSensitiveData(account);
+
 			setState({ accounts: state.accounts.set(accountKey, lockedAccount) });
 		}
 	}
 
 	function _getAccountWithoutCaseSensitive(accountId: string): Account | null {
 		let findLegacyAccount = null;
+
 		for (const [key, value] of state.accounts) {
 			if (isEthereumAccountId(accountId)) {
 				if (key.toLowerCase() === accountId.toLowerCase()) {
@@ -294,11 +307,14 @@ export function useAccountContext(): AccountsContextState {
 		let targetIdentity = null;
 		let targetNetworkKey = null;
 		let targetPath = null;
+
 		for (const identity of state.identities) {
 			const searchList = Array.from(identity.addresses.entries());
+
 			for (const [addressKey, path] of searchList) {
 				const networkKey = getNetworkKey(path, identity, networkContext);
 				let accountId, address;
+
 				if (isEthereumAccountId(addressKey)) {
 					accountId = addressKey;
 					address = extractAddressFromAccountId(addressKey);
@@ -306,11 +322,13 @@ export function useAccountContext(): AccountsContextState {
 					accountId = generateAccountId(addressKey, networkKey, allNetworks);
 					address = addressKey;
 				}
+
 				const searchAccountIdOrAddress = isAccountId ? accountId : address;
 				const found = isEthereumAccountId(accountId)
 					? searchAccountIdOrAddress.toLowerCase() ===
 					  accountIdOrAddress.toLowerCase()
 					: searchAccountIdOrAddress === accountIdOrAddress;
+
 				if (found) {
 					targetPath = path;
 					targetIdentity = identity;
@@ -330,6 +348,7 @@ export function useAccountContext(): AccountsContextState {
 		setState({ currentIdentity: targetIdentity });
 
 		const metaData = targetIdentity.meta.get(targetPath);
+
 		if (metaData === undefined) return false;
 
 		return {
@@ -350,12 +369,15 @@ export function useAccountContext(): AccountsContextState {
 		const { allNetworks } = networkContext;
 		const accountId = generateAccountId(address, networkKey, allNetworks);
 		const legacyAccount = _getAccountWithoutCaseSensitive(accountId);
+
 		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
 		let derivedAccount;
+
 		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = _getAccountFromIdentity(accountId, networkContext);
 		}
+
 		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
 		derivedAccount =
 			derivedAccount || _getAccountFromIdentity(address, networkContext);
@@ -406,18 +428,21 @@ export function useAccountContext(): AccountsContextState {
 		name: string,
 		networkParams: SubstrateNetworkParams,
 		password: string): Promise<Identity> {
-		const { prefix, pathId } = networkParams;
+		const { pathId, prefix } = networkParams;
 		const suriSuffix = constructSuriSuffix({
 			derivePath: newPath,
 			password
 		});
+
 		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
+
 		try {
 			address = await createSubstrateAddress(suriSuffix, prefix);
 		} catch (e) {
 			throw new Error(addressGenerateError);
 		}
+
 		if (address === '') throw new Error(addressGenerateError);
 		const pathMeta = {
 			address,
@@ -427,6 +452,7 @@ export function useAccountContext(): AccountsContextState {
 			networkPathId: pathId,
 			updatedAt: new Date().getTime()
 		};
+
 		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
 
@@ -447,6 +473,7 @@ export function useAccountContext(): AccountsContextState {
 			throw new Error(duplicatedIdentityError);
 		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
 		const newIdentities = state.identities.concat(updatedIdentity);
+
 		setState({
 			currentIdentity: updatedIdentity,
 			identities: newIdentities,
@@ -472,6 +499,7 @@ export function useAccountContext(): AccountsContextState {
 		const updatedPathMeta = Object.assign({},
 			updatedCurrentIdentity.meta.get(path),
 			{ name });
+
 		updatedCurrentIdentity.meta.set(path, updatedPathMeta);
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
@@ -482,6 +510,7 @@ export function useAccountContext(): AccountsContextState {
 		name: string,
 		password: string): Promise<void> {
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
+
 		await _addPathToIdentity(newPath,
 			createSubstrateAddress,
 			updatedCurrentIdentity,
@@ -496,6 +525,7 @@ export function useAccountContext(): AccountsContextState {
 		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
 		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
+
 		updatedCurrentIdentity.meta.delete(path);
 		updatedCurrentIdentity.addresses.delete(getAddressKeyByPath(path, pathMeta, networkContext));
 		_updateCurrentIdentity(updatedCurrentIdentity);
@@ -505,6 +535,7 @@ export function useAccountContext(): AccountsContextState {
 		const newIdentities = deepCopyIdentities(state.identities);
 		const identityIndex = newIdentities.findIndex((identity: Identity) =>
 			identity.encryptedSeed === state.currentIdentity!.encryptedSeed);
+
 		newIdentities.splice(identityIndex, 1);
 		setState({
 			currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,

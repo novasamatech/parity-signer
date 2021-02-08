@@ -30,7 +30,8 @@ export function withRegistriesStore<T extends RegistriesInjectedProps>(WrappedCo
 	return (props): React.ReactElement => {
 		const registriesStore = useContext(RegistriesContext);
 
-		return <WrappedComponent {...props} registriesStore={registriesStore} />;
+		return <WrappedComponent {...props}
+			registriesStore={registriesStore} />;
 	};
 }
 
@@ -38,9 +39,11 @@ export function withCurrentIdentity<T extends { accountsStore: AccountsStoreStat
 	return (props): React.ReactElement => {
 		const accountsStore = useContext(AccountsContext);
 		const { currentIdentity } = accountsStore.state;
+
 		if (currentIdentity === null) return <View />;
 
-		return <WrappedComponent {...props} accountsStore={accountsStore} />;
+		return <WrappedComponent {...props}
+			accountsStore={accountsStore} />;
 	};
 }
 
@@ -56,8 +59,10 @@ export function withTargetIdentity<T extends UnlockScreenProps>(WrappedComponent
 		const accountsStore = useContext(AccountsContext);
 		const targetIdentity =
 			props.route.params.identity ?? accountsStore.state.currentIdentity;
+
 		if (!targetIdentity) return <View />;
 
-		return <WrappedComponent {...props} targetIdentity={targetIdentity} />;
+		return <WrappedComponent {...props}
+			targetIdentity={targetIdentity} />;
 	};
 }

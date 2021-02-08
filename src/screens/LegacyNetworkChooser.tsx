@@ -49,6 +49,10 @@ export default function LegacyNetworkChooserView({ navigation }: NavigationProps
 					]): React.ReactElement => (
 					<TouchableItem
 						key={networkKey}
+						onPress={(): void => {
+							accountsStore.updateNew(emptyAccount('', networkKey));
+							navigation.goBack();
+						}}
 						style={[
 							styles.card,
 							{
@@ -56,10 +60,6 @@ export default function LegacyNetworkChooserView({ navigation }: NavigationProps
 								marginTop: 20
 							}
 						]}
-						onPress={(): void => {
-							accountsStore.updateNew(emptyAccount('', networkKey));
-							navigation.goBack();
-						}}
 					>
 						<Text
 							style={[

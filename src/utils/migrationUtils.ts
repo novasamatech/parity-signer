@@ -46,18 +46,24 @@ export const migrateIdentity = async (): Promise<void> => {
 		if (identity.hasOwnProperty('addresses')) {
 			return identity;
 		}
+
 		const addressMap = new Map();
+
 		identity.accountIds.forEach((path: string, accountId: string): void => {
 			addressMap.set(getAddressKey(accountId), path);
 		});
 		identity.addresses = addressMap;
+		// @ts-ignore
 		delete identity.accountIds;
 
 		const metaMap = new Map();
+
 		identity.meta.forEach((metaData: LegacyMeta, path: string): void => {
 			if (metaData.hasOwnProperty('accountId')) {
 				const { accountId } = metaData;
+
 				metaData.address = extractAddressFromAccountId(accountId);
+				// @ts-ignore
 				delete metaData.accountId;
 				metaMap.set(path, metaData);
 			} else {
@@ -68,6 +74,7 @@ export const migrateIdentity = async (): Promise<void> => {
 
 		return identity;
 	};
+
 	saveIdentities((identities as LegacyIdentity[]).map(migrationIdentityFunction));
 };
 
@@ -81,6 +88,7 @@ export const migrateAccounts = async (): Promise<void> => {
 	const oldAccounts = [...oldAccounts_v1, ...oldAccounts_v2];
 	const accounts = oldAccounts.map(([_, value]: [any, LegacyAccount]): Account => {
 		let result = {} as LegacyAccount;
+
 		if (value.chainId) {
 			// The networkKey for Ethereum accounts is the chain id
 			result = {
@@ -88,7 +96,9 @@ export const migrateAccounts = async (): Promise<void> => {
 				networkKey: value.chainId,
 				recovered: true
 			};
+			// @ts-ignore
 			delete result.chainId;
+			// @ts-ignore
 			delete result.networkType;
 		}
 
@@ -97,6 +107,7 @@ export const migrateAccounts = async (): Promise<void> => {
 
 	accounts.forEach((account: Account): void => {
 		const allNetworks = new Map(Object.entries(NETWORK_LIST));
+
 		try {
 			saveAccount(generateAccountId(account.address, account.networkKey, allNetworks),
 				account);

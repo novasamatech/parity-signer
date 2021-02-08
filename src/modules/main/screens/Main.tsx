@@ -27,7 +27,7 @@ import NetworkSelector from '../components/NetworkSelector';
 export default function Main(props: NavigationProps<'Main'>): React.ReactElement {
 	const isNew = props.route.params?.isNew ?? false;
 	const accountsStore = useContext(AccountsContext);
-	const { identities, currentIdentity, loaded, accounts } = accountsStore.state;
+	const { accounts, currentIdentity, identities, loaded } = accountsStore.state;
 	const hasLegacyAccount = accounts.size !== 0;
 
 	if (!loaded) return <SafeAreaViewContainer />;

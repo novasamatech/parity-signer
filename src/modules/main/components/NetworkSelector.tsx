@@ -37,13 +37,14 @@ import { useSeedRef } from 'utils/seedRefHooks';
 function NetworkSelector({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const { identities, currentIdentity } = accountsStore.state;
+	const { currentIdentity, identities } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
 	const { allNetworks } = networkContextState;
 	const { brainWalletAddress, isSeedRefValid, substrateAddress } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 
 	const { setAlert } = useContext(AlertStateContext);
+
 	// catch android back button and prevent exiting the app
 	useFocusEffect(useCallback((): any => {
 		const handleBackButton = (): boolean => {
@@ -55,6 +56,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 				return false;
 			}
 		};
+
 		const backHandler = BackHandler.addEventListener('hardwareBackPress',
 			handleBackButton);
 
@@ -70,8 +72,10 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 	const deriveSubstrateNetworkRootPath = async (networkKey: string,
 		networkParams: SubstrateNetworkParams): Promise<void> => {
 		const { pathId } = networkParams;
+
 		await unlockSeedPhrase(navigation, isSeedRefValid);
 		const fullPath = `//${pathId}`;
+
 		try {
 			await accountsStore.deriveNewPath(fullPath,
 				substrateAddress,
@@ -86,6 +90,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
 		await unlockSeedPhrase(navigation, isSeedRefValid);
+
 		try {
 			await accountsStore.deriveEthereumAccount(brainWalletAddress,
 				networkKey,
@@ -103,10 +108,10 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 			ListHeaderComponent: (
 				<NetworkCard
 					isAdd={true}
+					networkColor={colors.background.app}
 					onPress={onAddCustomPath}
 					testID={testIDs.Main.addCustomNetworkButton}
 					title="Create Custom Path"
-					networkColor={colors.background.app}
 				/>
 			)
 		};
@@ -132,8 +137,8 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 		} else if (shouldShowMoreNetworks) {
 			return (
 				<IdentityHeading
-					title={'Choose Network'}
 					onPressBack={(): void => setShouldShowMoreNetworks(false)}
+					title={'Choose Network'}
 				/>
 			);
 		} else {
@@ -188,9 +193,9 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 		return (
 			<NetworkCard
 				key={networkKey}
-				testID={testIDs.Main.networkButton + networkIndexSuffix}
 				networkKey={networkKey}
 				onPress={(): Promise<void> => onNetworkChosen(networkKey, networkParams) }
+				testID={testIDs.Main.networkButton + networkIndexSuffix}
 				title={networkParams.title}
 			/>
 		);

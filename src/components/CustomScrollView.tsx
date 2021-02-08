@@ -53,16 +53,16 @@ export default class CustomScrollView extends React.PureComponent<
 			<SafeAreaViewContainer>
 				<ScrollView
 					bounces={false}
-					showsVerticalScrollIndicator={false}
 					onContentSizeChange={(width: number, height: number): void => {
 						this.setState({ wholeHeight: height });
 					}}
 					onLayout={({ nativeEvent: { layout: { height } } }: LayoutChangeEvent): void =>
 						this.setState({ visibleHeight: height })
 					}
-					scrollEventThrottle={16}
 					onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.indicator } } }],
 						{ useNativeDriver: false })}
+					scrollEventThrottle={16}
+					showsVerticalScrollIndicator={false}
 					{...this.props}
 				>
 					{this.props.children}

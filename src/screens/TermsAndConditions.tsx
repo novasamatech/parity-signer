@@ -35,15 +35,17 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
 	const [tocAgreement, setTocAgreement] = useState<boolean>(false);
 
-	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(GlobalStateContext);
+	const { policyConfirmed, setPolicyConfirmed } = useContext<GlobalState>(GlobalStateContext);
 	const { navigation } = props;
+
 	const onConfirm = async (): Promise<void> => {
 		await saveToCAndPPConfirmation();
 		setPolicyConfirmed(true);
 	};
 
 	return (
-		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
+		<View style={containerStyles.background}
+			testID={testIDs.TacScreen.tacView}>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>
@@ -51,14 +53,14 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 			{!policyConfirmed && (
 				<View>
 					<TouchableItem
-						testID={testIDs.TacScreen.agreeTacButton}
+						onPress={(): void => setTocAgreement(!tocAgreement)}
 						style={{
 							alignItems: 'center',
 							flexDirection: 'row',
 							paddingHorizontal: 16,
 							paddingVertical: 10
 						}}
-						onPress={(): void => setTocAgreement(!tocAgreement)}
+						testID={testIDs.TacScreen.agreeTacButton}
 					>
 						<Icon
 							name={tocAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
@@ -70,26 +72,26 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						</Text>
 					</TouchableItem>
 					<TouchableItem
+						onPress={(): void => setPpAgreement(!ppAgreement)}
 						style={{
 							alignItems: 'center',
 							flexDirection: 'row',
 							paddingHorizontal: 16
 						}}
-						onPress={(): void => setPpAgreement(!ppAgreement)}
 					>
 						<Icon
-							testID={testIDs.TacScreen.agreePrivacyButton}
 							name={ppAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
 							style={styles.icon}
+							testID={testIDs.TacScreen.agreePrivacyButton}
 						/>
 
 						<Text style={fontStyles.t_big}>
 							<Text>{'  I agree to the '}</Text>
 							<Text
-								style={{ textDecorationLine: 'underline' }}
 								onPress={(): void => {
 									navigation.navigate('PrivacyPolicy');
 								}}
+								style={{ textDecorationLine: 'underline' }}
 							>
 								privacy policy
 							</Text>
@@ -97,11 +99,11 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 					</TouchableItem>
 
 					<Button
-						testID={testIDs.TacScreen.nextButton}
-						title="Next"
 						disabled={!ppAgreement || !tocAgreement}
 						onPress={onConfirm}
 						style={{ marginBottom: 24, marginTop: 16 }}
+						testID={testIDs.TacScreen.nextButton}
+						title="Next"
 					/>
 				</View>
 			)}

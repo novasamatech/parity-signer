@@ -29,7 +29,7 @@ export default function AccountIcon(props: {
 	network: NetworkParams;
 	style?: ViewStyle | ImageStyle;
 }): ReactElement {
-	const { address, style, network } = props;
+	const { address, network, style } = props;
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 	const protocol = network.protocol;
 
@@ -39,9 +39,11 @@ export default function AccountIcon(props: {
 		if (protocol === NetworkProtocols.ETHEREUM && address !== '') {
 			const setEthereumIcon = async (): Promise<void> => {
 				const generatedIconUri = await blockiesIcon('0x' + address);
+
 				if (promiseDisabled) return;
 				setEthereumIconUri(generatedIconUri);
 			};
+
 			setEthereumIcon();
 		}
 
@@ -60,29 +62,38 @@ export default function AccountIcon(props: {
 					/>
 				) : (
 					<View style={styles.logo}>
-						<FontAwesome name="question" color={colors.text.main} size={28} />
+						<FontAwesome color={colors.text.main}
+							name="question"
+							size={28} />
 					</View>
 				)}
 			</View>
 		);
 	}
+
 	if (protocol === NetworkProtocols.ETHEREUM) {
 		return (
-			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
+			<Image source={{ uri: ethereumIconUri }}
+				style={style as ImageStyle} />
 		);
 	} else if (address !== '') {
 		let iconSize;
+
 		if (typeof style?.width === 'string') {
 			const parseIconSize = parseInt(style.width, 10);
+
 			iconSize = isNaN(parseIconSize) ? undefined : parseIconSize;
 		} else {
 			iconSize = style?.width;
 		}
 
-		return <Identicon value={address} size={iconSize || 40} />;
+		return <Identicon size={iconSize || 40}
+			value={address} />;
 	} else {
 		return (
-			<MaterialIcon color={colors.signal.error} name={'error'} size={44} />
+			<MaterialIcon color={colors.signal.error}
+				name={'error'}
+				size={44} />
 		);
 	}
 }

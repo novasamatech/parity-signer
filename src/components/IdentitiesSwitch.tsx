@@ -36,14 +36,15 @@ function ButtonWithArrow(props: {
 	testID?: string;
 	title: string;
 }): React.ReactElement {
-	return <ButtonIcon {...props} {...i_arrowOptions} />;
+	return <ButtonIcon {...props}
+		{...i_arrowOptions} />;
 }
 
 function IdentitiesSwitch(): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
-	const { currentIdentity, identities, accounts } = accountsStore.state;
+	const { accounts, currentIdentity, identities } = accountsStore.state;
 	// useEffect(() => {
 	// 	const firstLogin: boolean = identities.length === 0;
 	// 	if (currentIdentity === null && !firstLogin) {
@@ -69,10 +70,12 @@ function IdentitiesSwitch(): React.ReactElement {
 	): Promise<void> => {
 		await accountsStore.selectIdentity(identity);
 		setVisible(false);
+
 		if (screenName === 'Main') {
 			resetNavigationTo(navigation, screenName, params);
 		} else if (screenName === 'IdentityBackup') {
 			const seedPhrase = await unlockAndReturnSeed(navigation);
+
 			resetNavigationWithNetworkChooser(navigation, screenName, {
 				isNew: false,
 				seedPhrase
@@ -92,17 +95,17 @@ function IdentitiesSwitch(): React.ReactElement {
 		return (
 			<>
 				<ButtonWithArrow
-					title="Manage Identity"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
 					}
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
+					title="Manage Identity"
 				/>
 				<ButtonWithArrow
-					title="Show Recovery Phrase"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
 					}
+					title="Show Recovery Phrase"
 				/>
 			</>
 		);
@@ -116,15 +119,15 @@ function IdentitiesSwitch(): React.ReactElement {
 		return (
 			<>
 				<ButtonIcon
-					title={currentIdentityTitle}
+					iconName="user"
+					iconSize={40}
+					iconType="antdesign"
 					onPress={(): Promise<void> =>
 						onIdentitySelectedAndNavigate(currentIdentity, 'Main')
 					}
-					iconType="antdesign"
-					iconName="user"
-					iconSize={40}
 					style={{ paddingLeft: 16 }}
 					textStyle={fontStyles.h1}
+					title={currentIdentityTitle}
 				/>
 				{renderIdentityOptions(currentIdentity)}
 				<Separator style={{ marginBottom: 0 }} />
@@ -136,25 +139,25 @@ function IdentitiesSwitch(): React.ReactElement {
 		return (
 			<>
 				<ButtonIcon
-					title="About"
-					onPress={(): void => closeModalAndNavigate('About')}
-					iconType="antdesign"
 					iconName="info"
 					iconSize={24}
-					textStyle={fontStyles.t_big}
+					iconType="antdesign"
+					onPress={(): void => closeModalAndNavigate('About')}
 					style={styles.indentedButton}
+					textStyle={fontStyles.t_big}
+					title="About"
 				/>
 				<ButtonWithArrow
-					title="Network Settings"
 					onPress={(): void => closeModalAndNavigate('NetworkSettings')}
+					title="Network Settings"
 				/>
 				<ButtonWithArrow
-					title="Terms and Conditions"
 					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
+					title="Terms and Conditions"
 				/>
 				<ButtonWithArrow
-					title="Privacy Policy"
 					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
+					title="Privacy Policy"
 				/>
 			</>
 		);
@@ -165,16 +168,16 @@ function IdentitiesSwitch(): React.ReactElement {
 
 		return (
 			<ButtonIcon
-				title={title}
+				iconName="user"
+				iconSize={24}
+				iconType="antdesign"
+				key={identity.encryptedSeed}
 				onPress={(): Promise<void> =>
 					onIdentitySelectedAndNavigate(identity, 'Main')
 				}
-				key={identity.encryptedSeed}
-				iconType="antdesign"
-				iconName="user"
-				iconSize={24}
 				style={styles.indentedButton}
 				textStyle={fontStyles.h2}
+				title={title}
 			/>
 		);
 	};
@@ -200,7 +203,8 @@ function IdentitiesSwitch(): React.ReactElement {
 					</View>
 				</ScrollView>
 				{identities.length > 5 && (
-					<Separator shadow={true} style={{ marginTop: 0 }} />
+					<Separator shadow={true}
+						style={{ marginTop: 0 }} />
 				)}
 			</>
 		);
@@ -209,21 +213,21 @@ function IdentitiesSwitch(): React.ReactElement {
 	return (
 		<View>
 			<ButtonIcon
-				onPress={(): void => setVisible(!visible)}
-				iconName="user"
-				iconType="antdesign"
 				iconBgStyle={{ backgroundColor: 'transparent' }}
-				testID={testIDs.IdentitiesSwitch.toggleButton}
-				style={{ paddingHorizontal: 6 }}
+				iconName="user"
 				iconSize={26}
+				iconType="antdesign"
+				onPress={(): void => setVisible(!visible)}
+				style={{ paddingHorizontal: 6 }}
+				testID={testIDs.IdentitiesSwitch.toggleButton}
 			/>
 
 			<TransparentBackground
-				testID={testIDs.IdentitiesSwitch.modal}
-				visible={visible}
+				animationType="none"
 				setVisible={setVisible}
 				style={styles.container}
-				animationType="none"
+				testID={testIDs.IdentitiesSwitch.modal}
+				visible={visible}
 			>
 				<View style={styles.card}>
 					{renderCurrentIdentityCard()}
@@ -231,40 +235,40 @@ function IdentitiesSwitch(): React.ReactElement {
 					{accounts.size > 0 && (
 						<>
 							<ButtonIcon
-								title="Legacy Accounts"
-								onPress={onLegacyListClicked}
 								iconName="solution1"
-								iconType="antdesign"
 								iconSize={24}
-								textStyle={fontStyles.t_big}
+								iconType="antdesign"
+								onPress={onLegacyListClicked}
 								style={styles.indentedButton}
+								textStyle={fontStyles.t_big}
+								title="Legacy Accounts"
 							/>
 							<Separator />
 						</>
 					)}
 
 					<ButtonIcon
-						title="Add Identity"
-						testID={testIDs.IdentitiesSwitch.addIdentityButton}
-						onPress={(): void => closeModalAndNavigate('IdentityNew')}
 						iconName="plus"
-						iconType="antdesign"
 						iconSize={24}
-						textStyle={fontStyles.t_big}
+						iconType="antdesign"
+						onPress={(): void => closeModalAndNavigate('IdentityNew')}
 						style={styles.indentedButton}
+						testID={testIDs.IdentitiesSwitch.addIdentityButton}
+						textStyle={fontStyles.t_big}
+						title="Add Identity"
 					/>
 
 					<Separator />
 					{__DEV__ && (
 						<View>
 							<ButtonIcon
-								title="Add legacy account"
-								onPress={(): void => closeModalAndNavigate('AccountNew')}
 								iconName="plus"
-								iconType="antdesign"
 								iconSize={24}
-								textStyle={fontStyles.t_big}
+								iconType="antdesign"
+								onPress={(): void => closeModalAndNavigate('AccountNew')}
 								style={styles.indentedButton}
+								textStyle={fontStyles.t_big}
+								title="Add legacy account"
 							/>
 							<Separator />
 						</View>

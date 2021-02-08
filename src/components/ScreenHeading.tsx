@@ -40,10 +40,12 @@ const renderSubtitle = (subtitle?: string,
 			fontStyles.t_codeS,
 			{ color: colors.text.faded }
 		];
+
 	if (isAlignLeft) {
 		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
 		subtitleTextStyle.push({ textAlign: 'left' });
 	}
+
 	if (isError) {
 		subtitleTextStyle.push(baseStyles.t_error);
 	}
@@ -52,19 +54,22 @@ const renderSubtitle = (subtitle?: string,
 		<View style={subtitleBodyStyle}>
 			{renderSubtitleIcon(hasSubtitleIcon)}
 			<Text
-				style={subtitleTextStyle}
-				numberOfLines={multiline ? undefined : 1}
 				ellipsizeMode="middle"
+				numberOfLines={multiline ? undefined : 1}
+				style={subtitleTextStyle}
 			>
 				{subtitle}
 			</Text>
 		</View>
 	);
 };
+
 const renderSubtitleIcon = (hasSubtitleIcon?: boolean): ReactNode => {
 	if (!hasSubtitleIcon) return;
 
-	return <AntIcon name="user" size={10} color={colors.text.faded} />;
+	return <AntIcon color={colors.text.faded}
+		name="user"
+		size={10} />;
 };
 
 const renderBack = (onPress?: ButtonListener): ReactNode => {
@@ -72,33 +77,29 @@ const renderBack = (onPress?: ButtonListener): ReactNode => {
 
 	return (
 		<ButtonIcon
+			iconBgStyle={{ backgroundColor: 'transparent' }}
 			iconName="arrowleft"
 			iconType="antdesign"
 			onPress={onPress}
-			testID={testIDs.Main.backButton}
 			style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
-			iconBgStyle={{ backgroundColor: 'transparent' }}
+			testID={testIDs.Main.backButton}
 		/>
 	);
 };
+
 const renderIcon = (iconName?: string, iconType?: string): ReactNode => {
 	if (!iconName) return;
 
 	return (
 		<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
-			<Icon name={iconName} type={iconType} color={colors.text.main} />
+			<Icon color={colors.text.main}
+				name={iconName}
+				type={iconType} />
 		</View>
 	);
 };
 
-export function LeftScreenHeading({
-	title,
-	subtitle,
-	hasSubtitleIcon,
-	headMenu,
-	networkKey,
-	onPress
-}: {
+export function LeftScreenHeading({ hasSubtitleIcon, headMenu, networkKey, onPress, subtitle, title }: {
 	title: string;
 	subtitle?: string;
 	hasSubtitleIcon?: boolean;
@@ -120,9 +121,9 @@ export function LeftScreenHeading({
 
 	return (
 		<TouchableItem
-			style={baseStyles.bodyWithIcon}
-			onPress={onPress}
 			disabled={isDisabled}
+			onPress={onPress}
+			style={baseStyles.bodyWithIcon}
 		>
 			<View style={{ alignItems: 'center', flexDirection: 'row' }}>
 				<AccountIcon
@@ -142,12 +143,7 @@ export function LeftScreenHeading({
 	);
 }
 
-export function IdentityHeading({
-	title,
-	subtitle,
-	hasSubtitleIcon,
-	onPressBack
-}: {
+export function IdentityHeading({ hasSubtitleIcon, onPressBack, subtitle, title }: {
 	title: string;
 	subtitle?: string;
 	hasSubtitleIcon?: boolean;
@@ -157,9 +153,9 @@ export function IdentityHeading({
 		<View style={baseStyles.bodyWithIdentity}>
 			<View style={baseStyles.identityName}>
 				<Text
-					style={[baseStyles.text, baseStyles.t_left]}
-					numberOfLines={1}
 					ellipsizeMode="middle"
+					numberOfLines={1}
+					style={[baseStyles.text, baseStyles.t_left]}
 				>
 					{title}
 				</Text>
@@ -182,16 +178,7 @@ export default class ScreenHeading extends React.PureComponent<{
 	iconType?: string;
 }> {
 	render(): ReactElement {
-		const {
-			title,
-			subtitle,
-			subtitleL,
-			hasSubtitleIcon,
-			headMenu,
-			error,
-			iconName,
-			iconType
-		} = this.props;
+		const { error, hasSubtitleIcon, headMenu, iconName, iconType, subtitle, subtitleL, title } = this.props;
 
 		return (
 			<View style={{ ...baseStyles.body, flexDirection: 'row' }}>

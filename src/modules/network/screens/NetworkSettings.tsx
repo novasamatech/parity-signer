@@ -32,6 +32,7 @@ export default function NetworkSettings({ navigation }: NavigationProps<'Network
 	const networkParams = filterNetworks(networks) as Array<
 		[string, SubstrateNetworkParams]
 	>;
+
 	const renderNetwork = ({ item }: {
 		item: [string, SubstrateNetworkParams];
 	}): ReactElement => {
@@ -39,12 +40,12 @@ export default function NetworkSettings({ navigation }: NavigationProps<'Network
 
 		return (
 			<NetworkCard
-				testID={testIDs.NetworkSettings.networkCard + networkSpec.genesisHash}
 				key={networkSpec.genesisHash + networkSpec.pathId}
 				networkKey={networkSpec.genesisHash}
 				onPress={(): void =>
 					navigation.navigate('NetworkDetails', { pathId: networkSpec.pathId })
 				}
+				testID={testIDs.NetworkSettings.networkCard + networkSpec.genesisHash}
 				title={networkSpec.title}
 			/>
 		);
@@ -55,8 +56,8 @@ export default function NetworkSettings({ navigation }: NavigationProps<'Network
 			<ScreenHeading title="Supported Networks" />
 			<FlatList
 				data={networkParams}
-				renderItem={renderNetwork}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
+				renderItem={renderNetwork}
 			/>
 		</SafeAreaViewContainer>
 	);

@@ -28,9 +28,11 @@ export default function PinNew({ route }: NavigationProps<'PinNew'>): React.Reac
 	const [state, updateState, resetState] = usePinState();
 
 	function submit(): void {
-		const { pin, confirmation } = state;
+		const { confirmation, pin } = state;
+
 		if (pin.length >= 6 && pin === confirmation) {
 			const resolve = route.params.resolve;
+
 			resetState();
 			resolve(pin);
 		} else {
@@ -45,36 +47,36 @@ export default function PinNew({ route }: NavigationProps<'PinNew'>): React.Reac
 			contentContainerStyle={{ flexGrow: 1 }}
 		>
 			<ScreenHeading
-				title={t.title.pinCreation}
-				subtitle={getSubtitle(state, false)}
 				error={state.pinMismatch || state.pinTooShort}
+				subtitle={getSubtitle(state, false)}
+				title={t.title.pinCreation}
 			/>
 			<PinInput
-				label={t.pinLabel}
 				autoFocus
-				testID={testIDs.IdentityPin.setPin}
-				returnKeyType="next"
+				label={t.pinLabel}
+				onChangeText={onPinInputChange('pin', updateState)}
 				onFocus={(): void => updateState({ focusConfirmation: false })}
 				onSubmitEditing={(): void => {
 					updateState({ focusConfirmation: true });
 				}}
-				onChangeText={onPinInputChange('pin', updateState)}
+				returnKeyType="next"
+				testID={testIDs.IdentityPin.setPin}
 				value={state.pin}
 			/>
 			<PinInput
+				focus={state.focusConfirmation}
 				label={t.pinConfirmLabel}
+				onChangeText={onPinInputChange('confirmation', updateState)}
+				onSubmitEditing={submit}
 				returnKeyType="done"
 				testID={testIDs.IdentityPin.confirmPin}
-				focus={state.focusConfirmation}
-				onChangeText={onPinInputChange('confirmation', updateState)}
 				value={state.confirmation}
-				onSubmitEditing={submit}
 			/>
 			<Button
-				title={t.doneButton.pinCreation}
+				aboveKeyboard
 				onPress={submit}
 				testID={testIDs.IdentityPin.submitButton}
-				aboveKeyboard
+				title={t.doneButton.pinCreation}
 			/>
 		</KeyboardAwareContainer>
 	);

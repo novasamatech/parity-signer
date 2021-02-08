@@ -25,12 +25,15 @@ export function useGlobalStateContext(): GlobalState {
 	useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
 			const tocPP = await loadToCAndPPConfirmation();
+
 			setPolicyConfirmed(tocPP);
+
 			if (!tocPP) {
 				await migrateAccounts();
 				await migrateIdentity();
 			}
 		};
+
 		setDataLoaded(true);
 		loadPolicyConfirmationAndMigrateData();
 	}, []);

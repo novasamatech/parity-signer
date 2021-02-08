@@ -36,14 +36,14 @@ interface AccountUnlockViewProps {
 function PinInput(props: any): React.ReactElement {
 	return (
 		<TextInput
+			autoCorrect={false}
 			autoFocus
-			keyboardAppearance="dark"
 			clearTextOnFocus
 			editable
 			fontSize={24}
+			keyboardAppearance="dark"
 			keyboardType="numeric"
 			multiline={false}
-			autoCorrect={false}
 			numberOfLines={1}
 			returnKeyType="next"
 			secureTextEntry
@@ -65,17 +65,19 @@ function AccountUnlockView(props: AccountUnlockViewProps): React.ReactElement {
 	return (
 		<SafeAreaViewContainer style={styles.body}>
 			<ScreenHeading
-				title={'Unlock Account'}
-				subtitle={showErrorMessage()}
 				error={hasWrongPin}
+				subtitle={showErrorMessage()}
+				title={'Unlock Account'}
 			/>
 			<PinInput
 				label="PIN"
 				onChangeText={async (inputPin: string): Promise<void> => {
 					setPin(inputPin);
+
 					if (inputPin.length < 4) {
 						return;
 					}
+
 					if (await checkPin(inputPin)) {
 						navigate();
 					} else if (inputPin.length > 5) {
@@ -114,16 +116,14 @@ export function AccountUnlockAndSign(props: NavigationProps<'AccountUnlockAndSig
 						{ name: next }
 					]
 				});
+
 				navigation.dispatch(resetAction);
 			}}
 		/>
 	);
 }
 
-export function AccountUnlock({
-	navigation,
-	route
-}: NavigationProps<'AccountUnlock'>): React.ReactElement {
+export function AccountUnlock({ navigation, route }: NavigationProps<'AccountUnlock'>): React.ReactElement {
 	const next = route.params.next ?? 'LegacyAccountList';
 	const onDelete = route.params.onDelete ?? ((): any => null);
 	const accountsStore = useContext(AccountsContext);
@@ -147,6 +147,7 @@ export function AccountUnlock({
 							{ name: next }
 						]
 					});
+
 					navigation.dispatch(resetAction);
 				}
 			}}

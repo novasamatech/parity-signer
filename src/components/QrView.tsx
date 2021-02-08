@@ -32,11 +32,13 @@ export default function QrView(props: Props): React.ReactElement {
 
 	useEffect((): (() => void) => {
 		let promiseDisabled = false;
+
 		async function displayQrCode(data: string): Promise<void> {
 			try {
 				const generatedQr = isHex(data)
 					? await qrCodeHex(data)
 					: await qrCode(data);
+
 				if (promiseDisabled) return;
 				setQr(generatedQr);
 			} catch (e) {
@@ -73,7 +75,8 @@ export default function QrView(props: Props): React.ReactElement {
 			testID={props.testID}
 		>
 			{qr !== '' && (
-				<Image source={{ uri: qr }} style={{ height: size, width: size }} />
+				<Image source={{ uri: qr }}
+					style={{ height: size, width: size }} />
 			)}
 		</View>
 	);

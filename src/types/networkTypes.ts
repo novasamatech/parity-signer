@@ -90,7 +90,7 @@ export function isSubstrateNetworkParams(networkParams:
 		| SubstrateNetworkParams
 		| UnknownNetworkParams
 		| EthereumNetworkParams): networkParams is SubstrateNetworkParams {
-	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
+	const { pathId, protocol } = networkParams as SubstrateNetworkParams;
 
 	return (
 		protocol === NetworkProtocols.SUBSTRATE && pathId !== unknownNetworkPathId
@@ -111,7 +111,7 @@ export function isUnknownNetworkParams(networkParams:
 		| SubstrateNetworkParams
 		| UnknownNetworkParams
 		| EthereumNetworkParams): networkParams is UnknownNetworkParams {
-	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
+	const { pathId, protocol } = networkParams as SubstrateNetworkParams;
 
 	return (
 		(protocol === NetworkProtocols.SUBSTRATE &&

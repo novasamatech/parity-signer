@@ -35,16 +35,13 @@ interface Props extends TextInputProps {
 	valid: boolean;
 }
 
-export default function AccountSeed({
-	valid,
-	onChangeText,
-	...props
-}: Props): React.ReactElement {
+export default function AccountSeed({ onChangeText, valid, ...props }: Props): React.ReactElement {
 	const [cursorPosition, setCursorPosition] = useState({
 		end: 0,
 		start: 0
 	});
 	const [value, setValue] = useState('');
+
 	function handleCursorPosition(event: NativeSyntheticEvent<TextInputSelectionChangeEventData>): void {
 		setCursorPosition(event.nativeEvent.selection);
 	}
@@ -87,7 +84,8 @@ export default function AccountSeed({
 	}
 
 	function renderSuggestions(): ReactElement {
-		const { start, end } = cursorPosition;
+		const { end, start } = cursorPosition;
+
 		if (start !== end) return <View style={styles.suggestions} />;
 		const currentPosition = end;
 		let left = value.substring(0, currentPosition).split(' ');
@@ -123,11 +121,13 @@ export default function AccountSeed({
 							onPress={(): void => {
 								let phrase = left.concat(suggestion, right).join(' ').trimEnd();
 								const is24words = phrase.split(' ').length === 24;
+
 								if (!is24words) phrase += ' ';
 								onNativeChangeText(phrase);
 							}}
 						>
-							<View key={suggestion} style={[styles.suggestion, sepStyle]}>
+							<View key={suggestion}
+								style={[styles.suggestion, sepStyle]}>
 								<Text style={styles.suggestionText}>{suggestion}</Text>
 							</View>
 						</TouchableItem>
@@ -142,21 +142,21 @@ export default function AccountSeed({
 	return (
 		<View>
 			<TextInput
+				autoCapitalize="none"
+				autoCompleteType="off"
+				autoCorrect={false}
+				blurOnSubmit={true}
+				multiline
+				onChangeText={onNativeChangeText}
+				onSelectionChange={handleCursorPosition}
+				returnKeyType="done"
 				style={StyleSheet.flatten([
 					fontStyles.t_seed,
 					styles.input,
 					validStyles
 				])}
-				multiline
-				autoCorrect={false}
-				autoCompleteType="off"
-				autoCapitalize="none"
-				returnKeyType="done"
-				blurOnSubmit={true}
 				textAlignVertical="top"
-				onSelectionChange={handleCursorPosition}
 				value={value}
-				onChangeText={onNativeChangeText}
 				{...props}
 			/>
 			{value.length > 0 && renderSuggestions()}

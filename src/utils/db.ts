@@ -53,8 +53,10 @@ export async function loadAccounts(version = 3): Promise<Map<string, any>> {
 
 	return SecureStorage.getAllItems(accountsStore).then((accounts: { [key: string]: string }) => {
 		const accountMap = new Map();
+
 		for (const [key, value] of Object.entries(accounts)) {
 			const account = JSON.parse(value);
+
 			accountMap.set(key, { ...account });
 		}
 
@@ -84,9 +86,11 @@ const currentIdentityStorageLabel = 'identities_v4';
 
 export async function loadIdentities(version = 4): Promise<Identity[]> {
 	const identityStorageLabel = `identities_v${version}`;
+
 	try {
 		const identities = await SecureStorage.getItem(identityStorageLabel,
 			identitiesStore);
+
 		if (!identities) return [];
 
 		return deserializeIdentities(identities);
@@ -135,6 +139,7 @@ export async function saveNetworks(newNetwork: SubstrateNetworkParams): Promise<
 		let addedNetworks = new Map();
 		const addedNetworkJson = await SecureStorage.getItem(currentNetworkStorageLabel,
 			networkStorage);
+
 		if (addedNetworkJson) addedNetworks = new Map(JSON.parse(addedNetworkJson));
 
 		addedNetworks.set(newNetwork.genesisHash, newNetwork);

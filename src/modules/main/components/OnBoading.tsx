@@ -28,20 +28,17 @@ import { RootStackParamList } from 'types/routes';
 export default function OnBoardingView({ hasLegacyAccount }: {hasLegacyAccount: boolean}): React.ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 
-	function TextButton({
-		text,
-		isRecover
-	}: {
+	function TextButton({ isRecover, text }: {
 		text: string;
 		isRecover: boolean;
 	}): React.ReactElement {
 		return (
 			<Text
+				onPress={(): void => navigation.navigate('IdentityNew', { isRecover })}
 				style={[fontStyles.quote, { textDecorationLine: 'underline' }]}
 				testID={
 					isRecover ? testIDs.Main.recoverButton : testIDs.Main.createButton
 				}
-				onPress={(): void => navigation.navigate('IdentityNew', { isRecover })}
 			>
 				{text}
 			</Text>
@@ -50,21 +47,23 @@ export default function OnBoardingView({ hasLegacyAccount }: {hasLegacyAccount: 
 
 	return (
 		<SafeAreaScrollViewContainer
-			testID={testIDs.Main.noAccountScreen}
 			contentContainerStyle={styles.scrollContent}
+			testID={testIDs.Main.noAccountScreen}
 		>
 			<View style={styles.onboardingWrapper}>
-				<TextButton text="Create" isRecover={false} />
+				<TextButton isRecover={false}
+					text="Create" />
 				<Text style={fontStyles.quote}> or </Text>
-				<TextButton text="recover" isRecover={true} />
+				<TextButton isRecover={true}
+					text="recover" />
 				<Text style={fontStyles.quote}>your identity to get started.</Text>
 				{hasLegacyAccount && (
 					<Button
-						title="Show Legacy Accounts"
 						onPress={(): void => navigation.navigate('LegacyAccountList')}
-						small={true}
 						onlyText={true}
+						small={true}
 						style={{ marginLeft: 0 }}
+						title="Show Legacy Accounts"
 					/>
 				)}
 			</View>

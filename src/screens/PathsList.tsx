@@ -35,14 +35,10 @@ import { useSeedRef } from 'utils/seedRefHooks';
 
 import { PathDetailsView } from './PathDetails';
 
-function PathsList({
-	accountsStore,
-	navigation,
-	route
-}: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
+function PathsList({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
 	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
 	const networkContextState = useContext(NetworksContext);
-	const { networks, getNetwork } = networkContextState;
+	const { getNetwork, networks } = networkContextState;
 	const networkParams = getNetwork(networkKey);
 
 	const { currentIdentity } = accountsStore.state;
@@ -68,10 +64,10 @@ function PathsList({
 	if (isEthereumNetworkParams(networkParams)) {
 		return (
 			<PathDetailsView
+				accountsStore={accountsStore}
+				navigation={navigation}
 				networkKey={networkKey}
 				path={networkKey}
-				navigation={navigation}
-				accountsStore={accountsStore}
 			/>
 		);
 	}
@@ -90,11 +86,11 @@ function PathsList({
 
 		return (
 			<PathCard
-				key={path}
-				testID={testIDs.PathsList.pathCard + path}
 				identity={currentIdentity}
-				path={path}
+				key={path}
 				onPress={(): void => {console.log('PathDetails', path); navigate('PathDetails', { path })}}
+				path={path}
+				testID={testIDs.PathsList.pathCard + path}
 			/>
 		);
 	};
@@ -103,28 +99,28 @@ function PathsList({
 		<SafeAreaViewContainer>
 			<ScrollView testID={testIDs.PathsList.screen}>
 				<LeftScreenHeading
-					title={networkParams.title}
 					hasSubtitleIcon={true}
 					networkKey={networkKey}
+					title={networkParams.title}
 				/>
 				{(pathsGroups as PathGroup[]).map(pathsGroup =>
 					pathsGroup.paths.length === 1 ? (
 						renderSinglePath(pathsGroup)
 					) : (
 						<PathGroupCard
-							currentIdentity={currentIdentity}
-							pathGroup={pathsGroup}
-							networkParams={networkParams}
 							accountsStore={accountsStore}
+							currentIdentity={currentIdentity}
 							key={pathsGroup.title}
+							networkParams={networkParams}
+							pathGroup={pathsGroup}
 						/>
 					))}
 				<Separator style={{ backgroundColor: 'transparent' }} />
 			</ScrollView>
 			<QRScannerAndDerivationTab
 				derivationTestID={testIDs.PathsList.deriveButton}
-				title="Derive New Account"
 				onPress={onTapDeriveButton}
+				title="Derive New Account"
 			/>
 		</SafeAreaViewContainer>
 	);

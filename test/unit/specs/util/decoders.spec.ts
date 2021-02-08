@@ -40,6 +40,7 @@ const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 const registry = new TypeRegistry();
+
 registry.setMetadata(new Metadata(registry, kusamaMetadata));
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
@@ -88,6 +89,7 @@ describe('sanity check', () => {
 
 	it('sanity check payload encodes as expected', () => {
 		const payload = new GenericExtrinsicPayload(registry, SIGNER_PAYLOAD_TEST, { version: 4 });
+
 		// const fromBytes = new GenericExtrinsicPayload(registry, payload.toU8a(), {
 		// 	version: 4
 		// });
@@ -100,6 +102,7 @@ describe('type registry should get override types', () => {
 	it('get network latest override types', () => {
 		const testRegistry = new TypeRegistry();
 		const westendOverrideTypes = getOverrideTypes(testRegistry, 'westend');
+
 		expect(westendOverrideTypes).not.toEqual({});
 	});
 });
@@ -143,6 +146,7 @@ describe('decoders', () => {
 	describe('rawDataToU8a', () => {
 		it('should properly extract only UOS relevant data from RNCamera txRequest.rawData', () => {
 			const strippedU8a = rawDataToU8A(RN_TX_REQUEST_RAW_DATA);
+
 			expect(strippedU8a).not.toBeNull();
 			const frameInfo = strippedU8a!.slice(0, 5);
 			const uos = strippedU8a!.slice(5);
@@ -158,6 +162,7 @@ describe('decoders', () => {
 			const rawData =
 				'49900000100005301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a00400225902984d595e48ebbca3de30494bbe3d55f04cdf5253b9ce87dc6cfd6d65640700e40b5402750304001f040000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafef90e9edaecc40f894b72133df7072e6ab98080ac7f153295072f4295817e736b0ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec';
 			const strippedU8a = rawDataToU8A(rawData);
+
 			expect([].slice.call(strippedU8a)).toEqual(receiveSigner);
 		});
 	});

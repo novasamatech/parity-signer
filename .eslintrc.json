@@ -24,7 +24,8 @@
 		"promise",
 		"react",
 		"react-hooks",
-		"simple-import-sort"
+		"simple-import-sort",
+		"sort-destructure-keys"
 	],
 	"rules": {
 			"comma-dangle": ["error", "never"],
@@ -38,16 +39,49 @@
 			"no-unused-vars": ["error", { "args": "none" }],
 			"object-curly-spacing": ["error", "always"],
 			"object-curly-newline": ["error", {
-				"ObjectExpression": { "multiline": true, "minProperties": 8 },
-				"ObjectPattern": { "multiline": true },
 				"ImportDeclaration": "never",
-				"ExportDeclaration": { "multiline": true, "minProperties": 8 }
-			}],
-			"react-hooks/exhaustive-deps": "warn",
-			"react-hooks/rules-of-hooks": "error",
+				"ObjectPattern": "never"
+			  }],
+			  "padding-line-between-statements": [
+				"error",
+				{ "blankLine": "always", "prev": ["const", "let", "var"], "next": "*" },
+				{ "blankLine": "any", "prev": ["const", "let", "var"], "next": ["const", "let", "var"] },
+				{ "blankLine": "always", "prev": "*", "next": "block-like" },
+				{ "blankLine": "always", "prev": "block-like", "next": "*" },
+				{ "blankLine": "always", "prev": "*", "next": "function" },
+				{ "blankLine": "always", "prev": "function", "next": "*" },
+				{ "blankLine": "always", "prev": "*", "next": "try" },
+				{ "blankLine": "always", "prev": "try", "next": "*" },
+				{ "blankLine": "always", "prev": "*", "next": "return" },
+				{ "blankLine": "always", "prev": "*", "next": "import" },
+				{ "blankLine": "always", "prev": "import", "next": "*" },
+				{ "blankLine": "any", "prev": "import", "next": "import" }
+			  ],
+			  "react-hooks/rules-of-hooks": "error",
+			  "react-hooks/exhaustive-deps": "error",
+			  "react/jsx-fragments": "error",
+			  "react/jsx-max-props-per-line": [2, {
+				"maximum": 1,
+				"when": "always"
+			  }],
+			  "react/jsx-sort-props": [2, {
+				"noSortAlphabetically": false
+			  }],
+			  "sort-destructure-keys/sort-destructure-keys": [2, {
+				"caseSensitive": true
+			  }],
+			  "simple-import-sort/imports": [2, {
+				"groups": [
+					["^\u0000"], // all side-effects (0 at start)
+					["\u0000$", "^@polkadot.*\u0000$", "^\\..*\u0000$"], // types (0 at end)
+					["\u0000$", "^@.*\u0000$", "^\\..*\u0000$"], // types (0 at end)
+					["^[^/\\.]"], // non-polkadot
+					["^@polkadot"], // polkadot
+					["^\\.\\.(?!/?$)", "^\\.\\./?$", "^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"] // local (. last)
+				  ]
+			  }],
+			  "sort-keys": "error",
 			"semi": "off",
-			"simple-import-sort/imports": "error",
-			"sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}],
 			"space-in-parens": ["error", "never"],
 			"switch-colon-spacing": ["error", {"after": true, "before": false}]
 	},
@@ -62,7 +96,8 @@
 			}
 		},
 		"react": {
-			"pragma": "React" // Pragma to use, default to "React"
+			"pragma": "React",
+			"version": "detect"
 		}
 	}
 }

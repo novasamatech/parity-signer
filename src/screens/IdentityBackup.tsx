@@ -31,18 +31,17 @@ import { words } from 'utils/native';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
-function IdentityBackup({
-	navigation,
-	route
-}: NavigationProps<'IdentityBackup'>): React.ReactElement {
+function IdentityBackup({ navigation, route }: NavigationProps<'IdentityBackup'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
 	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
+
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
+
 		try {
 			await accountsStore.saveNewIdentity(seedPhrase,
 				pin,
@@ -59,14 +58,15 @@ function IdentityBackup({
 
 		return (
 			<Button
-				title={`${buttonWordsNumber} words`}
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
 				onlyText
 				small
 				textStyles={{ ...textStyles }}
+				title={`${buttonWordsNumber} words`}
 			/>
 		);
 	};
+
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
 			if (route.params.isNew) {
@@ -86,10 +86,10 @@ function IdentityBackup({
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading
-				title={'Recovery Phrase'}
 				subtitle={
 					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
 				}
+				title={'Recovery Phrase'}
 			/>
 			{isNew && (
 				<View style={styles.mnemonicSelectionRow}>
@@ -114,10 +114,10 @@ function IdentityBackup({
 			</TouchableItem>
 			{isNew && (
 				<Button
-					title={'Next'}
-					testID={testIDs.IdentityBackup.nextButton}
-					onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
 					aboveKeyboard
+					onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
+					testID={testIDs.IdentityBackup.nextButton}
+					title={'Next'}
 				/>
 			)}
 		</SafeAreaViewContainer>

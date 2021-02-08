@@ -40,17 +40,13 @@ interface Props extends NavigationScannerProps<'SignedTx'> {
 	recipient: FoundAccount;
 }
 
-function SignedTxView({
-	sender,
-	recipient,
-	scannerStore
-}: Props): React.ReactElement {
+function SignedTxView({ recipient, scannerStore, sender }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const { signedData, tx, rawPayload } = scannerStore.state;
+	const { rawPayload, signedData, tx } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
-	const { value, gas, gasPrice } = tx as Transaction;
+	const { gas, gasPrice, value } = tx as Transaction;
 	const [isProcessing, payload] = usePayloadDetails(rawPayload,
 		sender.networkKey);
 
@@ -59,14 +55,15 @@ function SignedTxView({
 			return (
 				<View style={[styles.bodyContent, { marginTop: 16 }]}>
 					<TxDetailsCard
-						style={{ marginBottom: 20 }}
 						description={strings.INFO_ETH_TX}
-						value={value}
 						gas={gas}
 						gasPrice={gasPrice}
+						style={{ marginBottom: 20 }}
+						value={value}
 					/>
 					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient} accountsStore={accountsStore} />
+					<CompatibleCard account={recipient}
+						accountsStore={accountsStore} />
 				</View>
 			);
 		} else {
@@ -101,7 +98,8 @@ function SignedTxView({
 			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
 				{'Scan to publish'}
 			</Text>
-			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+			<View style={styles.qr}
+				testID={testIDs.SignedTx.qrView}>
 				<QrView data={signedData} />
 			</View>
 		</SafeAreaScrollViewContainer>
@@ -119,9 +117,9 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 
 	return (
 		<SignedTxView
-			sender={sender}
 			recipient={recipient}
 			scannerStore={scannerStore}
+			sender={sender}
 			{...props}
 		/>
 	);

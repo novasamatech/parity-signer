@@ -22,6 +22,7 @@ export const mergeNetworks = (defaultNetworks: Record<string, SubstrateNetworkPa
 	const mergedNetworksObject = newNetworksEntries.reduce((acc,
 		[networkKey, networkParams]): Record<string, SubstrateNetworkParams> => {
 		const newNetworksList = Object.assign({}, acc);
+
 		if (!defaultNetworks.hasOwnProperty(networkKey)) {
 			// const newAcc = Object.assign({}, acc);
 			newNetworksList[networkKey] = {
@@ -33,6 +34,7 @@ export const mergeNetworks = (defaultNetworks: Record<string, SubstrateNetworkPa
 		}
 
 		const defaultParams = defaultNetworks[networkKey];
+
 		newNetworksList[networkKey] = {
 			...networkParams,
 			logo: defaultParams.logo

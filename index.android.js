@@ -23,6 +23,7 @@
 import { AppRegistry, LogBox } from 'react-native';
 
 import App from './src/App';
+
 LogBox.ignoreLogs([
 	'Warning: isMounted(...) is deprecated',
 	'Module RCTImageLoader'

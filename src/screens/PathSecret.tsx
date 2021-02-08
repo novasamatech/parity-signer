@@ -28,15 +28,11 @@ import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey, getPathName } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
-function PathSecret({
-	accountsStore,
-	route,
-	navigation
-}: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
+function PathSecret({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
 	const networksContextState = useContext(NetworksContext);
 	const { currentIdentity } = accountsStore.state;
 	const [secret, setSecret] = useState<string>('');
-	const { substrateSecret, isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
+	const { isSeedRefValid, substrateSecret } = useSeedRef(currentIdentity.encryptedSeed);
 	const path = route.params.path;
 	const pathMeta = currentIdentity.meta.get(path)!;
 
@@ -48,6 +44,7 @@ function PathSecret({
 			const password = route.params.password ?? '';
 			const accountName = getPathName(path, currentIdentity);
 			const generatedSecret = await substrateSecret(`${path}///${password}`);
+
 			setSecret(`secret:0x${generatedSecret}:${networkKey}:${accountName}`);
 		};
 
@@ -66,14 +63,17 @@ function PathSecret({
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading
-				title={'Export Account'}
 				subtitle={
 					'Export this account to an hot machine, keep this QR safe, the QR allows any one to recover the account and access its fund'
 				}
+				title={'Export Account'}
 			/>
-			<ScrollView testID={testIDs.PathSecret.screen} bounces={false}>
-				<PathCard identity={currentIdentity} path={path} />
-				<QrView data={secret} testID={secret} />
+			<ScrollView bounces={false}
+				testID={testIDs.PathSecret.screen}>
+				<PathCard identity={currentIdentity}
+					path={path} />
+				<QrView data={secret}
+					testID={secret} />
 				{pathMeta.hasPassword && <PasswordedAccountExportWarning />}
 			</ScrollView>
 		</SafeAreaViewContainer>

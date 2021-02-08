@@ -29,15 +29,13 @@ const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
 const excludedNetworks: string[] = [];
+
 if (!__DEV__) {
 	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
 }
 
-export function DerivationNetworkSelector({
-	networkKey,
-	setVisible
-}: {
+export function DerivationNetworkSelector({ networkKey, setVisible }: {
 	networkKey: string;
 	setVisible: (shouldVisible: boolean) => void;
 }): React.ReactElement {
@@ -50,23 +48,22 @@ export function DerivationNetworkSelector({
 			<Touchable onPress={(): void => setVisible(true)}>
 				<View style={styles.triggerWrapper}>
 					<Text style={styles.triggerLabel}>{network.title}</Text>
-					<Icon name="more-vert" size={25} color={colors.text.main} />
+					<Icon color={colors.text.main}
+						name="more-vert"
+						size={25} />
 				</View>
 			</Touchable>
 		</View>
 	);
 }
 
-export function NetworkOptions({
-	setNetworkKey,
-	visible,
-	setVisible
-}: {
+export function NetworkOptions({ setNetworkKey, setVisible, visible }: {
 	setNetworkKey: (networkKey: string) => void;
 	visible: boolean;
 	setVisible: (shouldVisible: boolean) => void;
 }): React.ReactElement {
 	const { networks } = useContext(NetworksContext);
+
 	const onNetworkSelected = (networkKey: string): void => {
 		setNetworkKey(networkKey);
 		setVisible(false);
@@ -81,7 +78,8 @@ export function NetworkOptions({
 					onPress={(): void => onNetworkSelected(networkKey)}
 				>
 					<View style={styles.optionWrapper}>
-						<Image source={networkParams.logo} style={styles.optionLogo} />
+						<Image source={networkParams.logo}
+							style={styles.optionLogo} />
 						<Text style={styles.optionText}>{networkParams.title}</Text>
 					</View>
 				</Touchable>
@@ -90,10 +88,10 @@ export function NetworkOptions({
 
 	return (
 		<TransparentBackground
+			animationType="fade"
+			setVisible={setVisible}
 			style={styles.optionsWrapper}
 			visible={visible}
-			setVisible={setVisible}
-			animationType="fade"
 		>
 			<View style={styles.optionsBackground}>
 				<View style={{ ...styles.optionWrapper, borderTopWidth: 0 }}>

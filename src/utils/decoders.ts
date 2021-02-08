@@ -97,6 +97,7 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
 	const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
+
 	if (frameCount > 50) throw new Error(strings.ERROR_WRONG_RAW);
 	const currentFrame = parseInt(frameInfo.substr(6, 4), 16);
 	const uosAfterFrames = hexStripPrefix(u8aToHex(bytes.slice(5)));
@@ -126,6 +127,7 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 			// Ethereum UOS payload
 			// for consistency with legacy data format.
 			const data = { data: {} } as EthereumParsedData;
+
 			action =
 					firstByte === '00' || firstByte === '01'
 						? 'signData'
@@ -136,6 +138,7 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 
 			data.action = action;
 			data.data.account = address;
+
 			if (action === 'signData') {
 				data.data.rlp = uosAfterFrames[13];
 			} else if (action === 'signTransaction') {
@@ -146,10 +149,12 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 
 			return data;
 		}
+
 		case '53': {
 			// Substrate UOS payload
 			// for consistency with legacy data format.
 			const data = { data: {} } as SubstrateCompletedParsedData;
+
 			try {
 				data.data.crypto =
 						firstByte === '00'
@@ -163,9 +168,11 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 				const hexPayload = hexEncodedData.slice(0, -64);
 				const genesisHash = `0x${hexEncodedData.substr(-64)}`;
 				const rawPayload = hexToU8a(hexPayload);
+
 				data.data.genesisHash = genesisHash;
 				const isOversized = rawPayload.length > 256;
 				const network = networks.get(genesisHash);
+
 				if (!network) {
 					throw new Error(strings.ERROR_NO_NETWORK);
 				}
@@ -178,6 +185,7 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 					data.isHash = isOversized;
 					const [offset] = compactFromU8a(rawPayload);
 					const payload = rawPayload.subarray(offset);
+
 					data.data.data = isOversized
 						? await blake2b(u8aToHex(payload, -1, false))
 						: rawPayload;
@@ -197,12 +205,12 @@ export async function constructDataFromBytes(bytes: Uint8Array,
 					break;
 				}
 			} catch (e) {
-				throw new Error('Error: something went wrong decoding the Substrate UOS payload: ' +
-							uosAfterFrames);
+				throw new Error('Error: something went wrong decoding the Substrate UOS payload: ' + uosAfterFrames);
 			}
 
 			return data;
 		}
+
 		default:
 			throw new Error('Error: Payload is not formatted correctly: ' + bytes);
 		}
@@ -219,8 +227,10 @@ export function decodeToString(message: Uint8Array): string {
 
 export function asciiToHex(message: string): string {
 	const result = [];
+
 	for (let i = 0; i < message.length; i++) {
 		const hex = Number(message.charCodeAt(i)).toString(16);
+
 		result.push(hex);
 	}
 
@@ -230,6 +240,7 @@ export function asciiToHex(message: string): string {
 export function hexToAscii(hexBytes: string): string {
 	const hex = hexBytes.toString();
 	let str = '';
+
 	for (let n = 0; n < hex.length; n += 2) {
 		str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
 	}

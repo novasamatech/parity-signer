@@ -30,9 +30,9 @@ export default function Address(props: {
 
 	return (
 		<Text
+			ellipsizeMode="middle"
 			numberOfLines={1}
 			style={[style, fontStyles.t_codeS]}
-			ellipsizeMode="middle"
 		>
 			{prefix}
 			{address}

@@ -38,9 +38,12 @@ export default function DerivationPasswordVerify(props: {
 		<>
 			<TouchableOpacity onPress={toggleVerifyField}>
 				<Text style={styles.passwordText}>
-					<Icon name={'info'} size={14} color={colors.text.faded} /> This
+					<Icon color={colors.text.faded}
+						name={'info'}
+						size={14} /> This
 					account countains a derivation password.{' '}
-					<Text style={styles.link} onPress={toggleVerifyField}>
+					<Text onPress={toggleVerifyField}
+						style={styles.link}>
 						Verify it here
 					</Text>
 					<Icon

@@ -152,6 +152,7 @@ const metaMap = raw.reduce((acc, v) => {
 		networkPathId: v.networkPathId,
 		updatedAt: 1573142786972
 	};
+
 	acc.set(v.path, meta);
 
 	return acc;
@@ -183,11 +184,13 @@ describe('IdentitiesUtils', () => {
 	it('works with serialize and deserialize', () => {
 		const serializedJson = serializeIdentities(testIdentities);
 		const originItem = deserializeIdentities(serializedJson);
+
 		expect(originItem).toEqual(testIdentities);
 	});
 
 	it('regroup the kusama paths', () => {
 		const groupResult = groupPaths(kusamaPaths, networks);
+
 		expect(groupResult).toEqual([
 			{
 				paths: ['//kusama'],
@@ -222,6 +225,7 @@ describe('IdentitiesUtils', () => {
 			'/polkadot_test/1'
 		];
 		const groupResult = groupPaths(unKnownPaths, networks);
+
 		expect(groupResult).toEqual([
 			{
 				paths: [''],
@@ -249,6 +253,7 @@ describe('IdentitiesUtils', () => {
 	it('get the path name', () => {
 		paths.forEach((path, index) => {
 			const name = getPathName(path, testIdentities[0]);
+
 			expect(name).toEqual(expectNames[index]);
 		});
 	});
@@ -256,6 +261,7 @@ describe('IdentitiesUtils', () => {
 	it('get the correspond networkKeys', () => {
 		const networkKeys = getExistedNetworkKeys(testIdentities[0],
 			dummyNetworkContext);
+
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
@@ -271,6 +277,7 @@ describe('IdentitiesUtils', () => {
 				testIdentities[0].meta.get(path),
 				dummyNetworkContext);
 		};
+
 		expect(getNetworkKeyByPathTest('')).toEqual(UnknownNetworkKeys.UNKNOWN);
 		expect(getNetworkKeyByPathTest('//kusama')).toEqual(SubstrateNetworkKeys.KUSAMA);
 		expect(getNetworkKeyByPathTest('//kusama//funding/1')).toEqual(SubstrateNetworkKeys.KUSAMA);
@@ -288,6 +295,7 @@ describe('IdentitiesUtils', () => {
 			if (Object.values(EthereumNetworkKeys).includes(networkKey)) {
 				//Get ethereum account into list
 				const accountMeta = mockIdentity.meta.get(networkKey);
+
 				if (accountMeta === undefined) return acc;
 				acc.push(networkKey);
 
@@ -301,21 +309,28 @@ describe('IdentitiesUtils', () => {
 			}
 		},
 		[]);
+
 		expect(existedAccountsSize).toEqual(allListedAccounts.length);
 	});
 
 	it('decides account is only with hard derivation', () => {
 		const testPath1 = '//only//hard//derivation//1';
+
 		expect(isSubstrateHardDerivedPath(testPath1)).toBe(true);
 		const testPath2 = '//soft/in//the//middle';
+
 		expect(isSubstrateHardDerivedPath(testPath2)).toBe(false);
 		const testPath3 = '//soft//in//the/end';
+
 		expect(isSubstrateHardDerivedPath(testPath3)).toBe(false);
 		const testPath4 = '/soft//in//the//start';
+
 		expect(isSubstrateHardDerivedPath(testPath4)).toBe(false);
 		const testEthereumPath = '1';
+
 		expect(isSubstrateHardDerivedPath(testEthereumPath)).toBe(false);
 		const testRootPath = '';
+
 		expect(isSubstrateHardDerivedPath(testRootPath)).toBe(false);
 	});
 });

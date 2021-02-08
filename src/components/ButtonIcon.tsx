@@ -34,18 +34,7 @@ interface Props {
 	style?: ViewStyle;
 }
 
-const ButtonIcon: FunctionComponent<Props> = ({
-	iconName,
-	iconType,
-	iconColor,
-	onPress,
-	iconBgStyle,
-	iconSize,
-	testID,
-	textStyle,
-	title,
-	style = {}
-}) => {
+const ButtonIcon: FunctionComponent<Props> = ({ iconName, iconType, iconColor, onPress, iconBgStyle, iconSize, testID, textStyle, title, style = {} }) => {
 	const size = iconSize || 28;
 
 	const styles = StyleSheet.create({
@@ -73,8 +62,8 @@ const ButtonIcon: FunctionComponent<Props> = ({
 			return (
 				<AntIcon
 					color={iconColor || colors.text.main}
-					size={size - 6}
 					name={iconName}
+					size={size - 6}
 				/>
 			);
 		}
@@ -82,8 +71,8 @@ const ButtonIcon: FunctionComponent<Props> = ({
 		return (
 			<Icon
 				color={iconColor || colors.text.main}
-				size={size - 6}
 				name={iconName}
+				size={size - 6}
 				type={iconType}
 			/>
 		);
@@ -91,8 +80,8 @@ const ButtonIcon: FunctionComponent<Props> = ({
 
 	return (
 		<TouchableOpacity
-			onPress={onPress}
 			activeOpacity={0.5}
+			onPress={onPress}
 			style={{ ...styles.generalView, ...style }}
 			testID={testID}
 		>

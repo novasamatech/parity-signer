@@ -26,17 +26,15 @@ import { NavigationTargetIdentityProps } from 'types/props';
 import { withTargetIdentity } from 'utils/HOC';
 import { useSeedRef } from 'utils/seedRefHooks';
 
-function PinUnlockWithPassword({
-	targetIdentity,
-	route
-}: NavigationTargetIdentityProps<'PinUnlockWithPassword'>): React.ReactElement {
+function PinUnlockWithPassword({ route, targetIdentity }: NavigationTargetIdentityProps<'PinUnlockWithPassword'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
 	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
-		const { pin, password } = state;
+		const { password, pin } = state;
 		const resolvePassword = route.params.resolve;
+
 		if (!route.params.isSeedRefValid) {
 			if (pin.length >= 6 && targetIdentity) {
 				try {
@@ -68,35 +66,35 @@ function PinUnlockWithPassword({
 			contentContainerStyle={{ flexGrow: 1 }}
 		>
 			<ScreenHeading
-				title={t.title.pinUnlock}
 				error={state.pinMismatch || state.pinTooShort}
 				subtitle={getSubtitle(state, true)}
+				title={t.title.pinUnlock}
 			/>
 			{!route.params.isSeedRefValid && (
 				<PinInput
-					label={t.pinLabel}
 					autoFocus
-					testID={testIDs.IdentityPin.unlockPinInput}
-					returnKeyType="done"
+					label={t.pinLabel}
 					onChangeText={onPinInputChange('pin', updateState)}
 					onSubmitEditing={(): void => setFocusPassword(true)}
+					returnKeyType="done"
+					testID={testIDs.IdentityPin.unlockPinInput}
 					value={state.pin}
 				/>
 			)}
 			<PinInput
-				label={t.passwordLabel}
-				testID={testIDs.IdentityPin.passwordInput}
-				returnKeyType="done"
-				keyboardType="default"
 				focus={focusPassword}
+				keyboardType="default"
+				label={t.passwordLabel}
 				onChangeText={onPasswordInputChange}
 				onSubmitEditing={submit}
+				returnKeyType="done"
+				testID={testIDs.IdentityPin.passwordInput}
 				value={state.password}
 			/>
 			<Button
-				title={t.doneButton.pinUnlock}
 				onPress={submit}
 				testID={testIDs.IdentityPin.unlockPinButton}
+				title={t.doneButton.pinUnlock}
 			/>
 		</KeyboardAwareContainer>
 	);

@@ -51,9 +51,11 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 			account.name || account.address || 'this account',
 			async () => {
 				await accountsStore.deleteAccount(selectedKey);
+
 				if (accounts.size === 0) {
 					return navigateToLandingPage(navigation);
 				}
+
 				navigateToLegacyAccountList(navigation);
 			});
 	};
@@ -71,14 +73,15 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 
 	return (
 		<SafeAreaViewContainer>
-			<ScrollView style={styles.scrollBody} bounces={false}>
+			<ScrollView bounces={false}
+				style={styles.scrollBody}>
 				<View style={styles.header}>
-					<AccountIcon address={''} network={network} style={styles.icon} />
+					<AccountIcon address={''}
+						network={network}
+						style={styles.icon} />
 					<Text style={fontStyles.h2}>Public Address</Text>
 					<View style={styles.menuView}>
 						<PopupMenu
-							onSelect={onOptionSelect}
-							menuTriggerIconName={'more-vert'}
 							menuItems={[
 								{ text: 'Edit', value: 'AccountEdit' },
 								{ text: 'Change Pin', value: 'AccountPin' },
@@ -92,6 +95,8 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 									value: 'AccountDelete'
 								}
 							]}
+							menuTriggerIconName={'more-vert'}
+							onSelect={onOptionSelect}
 						/>
 					</View>
 				</View>

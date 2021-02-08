@@ -33,7 +33,8 @@ export default class HeaderLeftHome extends React.PureComponent<{
 					paddingLeft: 15
 				}}
 			>
-				<Image source={iconLogo} style={styles.logo} />
+				<Image source={iconLogo}
+					style={styles.logo} />
 				<Text style={[styles.headerTextLeft, styles.t_bold]}>parity</Text>
 				<Text style={styles.headerTextLeft}>signer</Text>
 			</View>

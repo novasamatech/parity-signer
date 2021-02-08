@@ -21,12 +21,7 @@ import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { hexToAscii, isAscii } from 'utils/strings';
 
-export default function MessageDetailsCard({
-	isHash,
-	message,
-	data,
-	style
-}: {
+export default function MessageDetailsCard({ data, isHash, message, style }: {
 	isHash: boolean;
 	message: string;
 	data: string;

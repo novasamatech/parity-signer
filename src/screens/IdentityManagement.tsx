@@ -31,13 +31,11 @@ import { useSeedRef } from 'utils/seedRefHooks';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
-function IdentityManagement({
-	accountsStore,
-	navigation
-}: Props): React.ReactElement {
+function IdentityManagement({ accountsStore, navigation }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
 	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
+
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
@@ -53,6 +51,7 @@ function IdentityManagement({
 			alertDeleteIdentity(setAlert,
 				async (): Promise<void> => {
 					await unlockSeedPhrase(navigation, false);
+
 					try {
 						await destroySeedRef();
 						await accountsStore.deleteCurrentIdentity();
@@ -63,6 +62,7 @@ function IdentityManagement({
 				});
 		} else if (value === 'IdentityBackup') {
 			const seedPhrase = await unlockAndReturnSeed(navigation);
+
 			navigation.pop();
 			navigation.navigate(value, { isNew: false, seedPhrase });
 		}
@@ -71,12 +71,8 @@ function IdentityManagement({
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading
-				title="Manage Identity"
 				headMenu={
 					<PopupMenu
-						testID={testIDs.IdentityManagement.popupMenuButton}
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
 						menuItems={[
 							{ text: 'Backup', value: 'IdentityBackup' },
 							{
@@ -86,15 +82,19 @@ function IdentityManagement({
 								value: 'IdentityDelete'
 							}
 						]}
+						menuTriggerIconName={'more-vert'}
+						onSelect={onOptionSelect}
+						testID={testIDs.IdentityManagement.popupMenuButton}
 					/>
 				}
+				title="Manage Identity"
 			/>
 			<TextInput
+				focus
 				label="Display Name"
 				onChangeText={onRenameIdentity}
-				value={currentIdentity.name}
 				placeholder="Enter a new identity name"
-				focus
+				value={currentIdentity.name}
 			/>
 		</SafeAreaViewContainer>
 	);

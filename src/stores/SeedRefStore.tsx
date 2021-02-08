@@ -24,11 +24,14 @@ export function useSeedRefStore(): SeedRefsState {
 
 					return Promise.resolve();
 				});
+
 				await Promise.all(promises);
 				setSeedRefs(new Map());
 			}
+
 			setAppState(nextAppState);
 		};
+
 		AppState.addEventListener('change', _handleAppStateChange);
 
 		return (): void => {

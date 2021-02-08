@@ -63,6 +63,7 @@ async function asyncTransaction(rlp: string,
 			value,
 			data,
 			ethereumChainId);
+
 		resolve(tx);
 	} catch (e) {
 		reject(e);

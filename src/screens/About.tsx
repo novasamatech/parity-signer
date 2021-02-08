@@ -57,10 +57,10 @@ export default class About extends React.PureComponent {
 					<Text style={styles.text}>
 						The code of this application is available on Github (
 						<Text
-							style={[styles.text, { textDecorationLine: 'underline' }]}
 							onPress={(): Promise<any> =>
 								Linking.openURL('https://github.com/paritytech/parity-signer')
 							}
+							style={[styles.text, { textDecorationLine: 'underline' }]}
 						>
 							{'https://github.com/paritytech/parity-signer'}
 						</Text>
@@ -70,10 +70,10 @@ export default class About extends React.PureComponent {
 						Find on the Parity Signer wiki more information about this
 						application as well as some tutorials:
 						<Text
-							style={[styles.text, { textDecorationLine: 'underline' }]}
 							onPress={(): Promise<any> =>
 								Linking.openURL('https://wiki.parity.io/Parity-Signer-Mobile-App')
 							}
+							style={[styles.text, { textDecorationLine: 'underline' }]}
 						>
 							{' https://wiki.parity.io/Parity-Signer-Mobile-App'}
 						</Text>

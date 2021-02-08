@@ -26,28 +26,21 @@ interface Props {
 	children: any;
 }
 
-export default function TransparentBackground({
-	children,
-	visible,
-	setVisible,
-	testID,
-	style,
-	animationType
-}: Props): React.ReactElement {
+export default function TransparentBackground({ animationType, children, setVisible, style, testID, visible }: Props): React.ReactElement {
 	return (
 		<Modal
 			animationType={animationType}
-			visible={visible}
-			transparent={true}
 			onRequestClose={(): void => setVisible(false)}
+			transparent={true}
+			visible={visible}
 		>
 			<TouchableWithoutFeedback
-				style={{ flex: 1 }}
 				onPressIn={(): void => setVisible(false)}
+				style={{ flex: 1 }}
 			>
 				<View
-					testID={testID}
 					style={StyleSheet.flatten([styles.container, style])}
+					testID={testID}
 				>
 					{children}
 				</View>

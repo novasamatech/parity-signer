@@ -34,10 +34,7 @@ import { brainWalletAddress } from 'utils/native';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
-function IdentityNew({
-	navigation,
-	route
-}: NavigationProps<'IdentityNew'>): React.ReactElement {
+function IdentityNew({ navigation, route }: NavigationProps<'IdentityNew'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
@@ -70,11 +67,13 @@ function IdentityNew({
 				})
 				.catch(() => setIsSeedValid(defaultSeedValidObject));
 		const debouncedAddressGeneration = debounce(addressGeneration, 200);
+
 		debouncedAddressGeneration();
 	};
 
 	const onRecoverIdentity = async (): Promise<void> => {
 		const pin = await setPin(navigation);
+
 		try {
 			if (isSeedValid.bip39) {
 				await accountsStore.saveNewIdentity(seedPhrase.trimEnd(),
@@ -85,6 +84,7 @@ function IdentityNew({
 					pin,
 					createSeedRefWithNewSeed);
 			}
+
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
@@ -112,26 +112,26 @@ function IdentityNew({
 	const renderRecoverView = (): React.ReactElement => (
 		<>
 			<AccountSeed
-				testID={testIDs.IdentityNew.seedInput}
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
+				testID={testIDs.IdentityNew.seedInput}
 				valid={isValidBIP39}
 			/>
 			<View style={styles.btnBox}>
 				<Button
-					title="Recover"
-					testID={testIDs.IdentityNew.recoverButton}
 					onPress={onRecoverConfirm}
 					small={true}
+					testID={testIDs.IdentityNew.recoverButton}
+					title="Recover"
 				/>
 				<Button
-					title="or create new identity"
 					onPress={(): void => {
 						setIsRecover(false);
 					}}
-					small={true}
 					onlyText={true}
+					small={true}
+					title="or create new identity"
 				/>
 			</View>
 		</>
@@ -140,16 +140,16 @@ function IdentityNew({
 	const renderCreateView = (): React.ReactElement => (
 		<View style={styles.btnBox}>
 			<Button
-				title="Create"
-				testID={testIDs.IdentityNew.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
+				testID={testIDs.IdentityNew.createButton}
+				title="Create"
 			/>
 			<Button
-				title="or recover existing identity"
 				onPress={(): void => setIsRecover(true)}
-				small={true}
 				onlyText={true}
+				small={true}
+				title="or recover existing identity"
 			/>
 		</View>
 	);
@@ -159,9 +159,9 @@ function IdentityNew({
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
+				placeholder="Identity Name"
 				testID={testIDs.IdentityNew.nameInput}
 				value={accountsStore.state.newIdentity.name}
-				placeholder="Identity Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
 		</KeyboardAwareContainer>

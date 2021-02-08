@@ -41,13 +41,7 @@ type ExtrinsicPartProps = {
 	value: AnyJson | AnyU8a | IMethod | IExtrinsicEra;
 };
 
-const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
-	fallback,
-	label,
-	networkKey,
-	registriesStore,
-	value
-}: ExtrinsicPartProps): React.ReactElement => {
+const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({ fallback, label, networkKey, registriesStore, value }: ExtrinsicPartProps): React.ReactElement => {
 	const [period, setPeriod] = useState<string>();
 	const [phase, setPhase] = useState<string>();
 	const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
@@ -55,7 +49,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 	const [useFallback, setUseFallBack] = useState(false);
 	const { getTypeRegistry } = useContext(RegistriesContext);
 	const { setAlert } = useContext(AlertStateContext);
-	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+	const { getSubstrateNetwork, networks } = useContext(NetworksContext);
 	const networkParams = getSubstrateNetwork(networkKey);
 	const prefix = networkParams.prefix;
 	const typeRegistry = getTypeRegistry(networks, networkKey)!;
@@ -71,8 +65,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 					depth: number): void {
 					const { args, meta } = callInstance;
 					const paramArgKvArray = [];
+
 					if (!meta.args.length) {
 						const sectionMethod = `${call.method}.${call.section}`;
+
 						callMethodArgs[sectionMethod] = null;
 
 						return;
@@ -80,6 +76,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 
 					for (let i = 0; i < meta.args.length; i++) {
 						let argument;
+
 						if (
 							args[i].toRawType() === 'Balance' ||
 								args[i].toRawType() === 'Compact<Balance>'
@@ -102,8 +99,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 						} else {
 							argument = args[i].toString();
 						}
+
 						const param = meta.args[i].name.toString();
 						const sectionMethod = `${call.method}.${call.section}`;
+
 						paramArgKvArray.push([param, argument]);
 						callMethodArgs[sectionMethod] = paramArgKvArray;
 					}
@@ -183,6 +182,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 				for (let i = 1; i < formattedArgs.length; i++) {
 					if (formattedArgs[i][0].includes('sudo')) {
 						const tmp = formattedArgs[i];
+
 						formattedArgs.splice(i, 1);
 						formattedArgs.unshift(tmp);
 						break;
@@ -194,14 +194,16 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
 					const paramArgs: Array<[any, any]> = entry[1];
 
 					return (
-						<View key={index} style={styles.callDetails}>
+						<View key={index}
+							style={styles.callDetails}>
 							<Text style={styles.secondaryText}>
 								Call <Text style={styles.titleText}>{sectionMethod}</Text> with
 								the following arguments:
 							</Text>
 							{paramArgs ? (
 								paramArgs.map(([param, arg]) => (
-									<View key={param} style={styles.callDetails}>
+									<View key={param}
+										style={styles.callDetails}>
 										<Text style={styles.titleText}>
 											{' { '}
 											{param}:{' '}
@@ -262,8 +264,8 @@ interface PayloadDetailsCardProps {
 }
 
 export default function PayloadDetailsCard(props: PayloadDetailsCardProps): React.ReactElement {
-	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
-	const { networkKey, description, payload, signature, style } = props;
+	const { getSubstrateNetwork, networks } = useContext(NetworksContext);
+	const { description, networkKey, payload, signature, style } = props;
 	const isKnownNetworkKey = networks.has(networkKey);
 	const fallback = !isKnownNetworkKey;
 	const networkParams = getSubstrateNetwork(networkKey);

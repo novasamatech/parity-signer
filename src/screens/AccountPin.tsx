@@ -40,12 +40,12 @@ interface State {
 function PinInput(props: any): React.ReactElement {
 	return (
 		<TextInput
-			keyboardAppearance="dark"
+			autoCorrect={false}
 			clearTextOnFocus
 			editable
+			keyboardAppearance="dark"
 			keyboardType="numeric"
 			multiline={false}
-			autoCorrect={false}
 			numberOfLines={1}
 			returnKeyType="next"
 			secureTextEntry
@@ -55,10 +55,7 @@ function PinInput(props: any): React.ReactElement {
 	);
 }
 
-function AccountPin({
-	navigation,
-	route
-}: NavigationProps<'AccountPin'>): React.ReactElement {
+function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { allNetworks } = useContext(NetworksContext);
 	const initialState: State = {
@@ -76,10 +73,11 @@ function AccountPin({
 	const [state, setState] = useReducer(reducer, initialState);
 
 	const submit = async (): Promise<void> => {
-		const { selectedKey, newAccount } = accountsStore.state;
-		const { pin, confirmation } = state;
+		const { newAccount, selectedKey } = accountsStore.state;
+		const { confirmation, pin } = state;
 		const accountCreation: boolean = route.params?.isNew ?? false;
 		const account = accountCreation ? newAccount : accountsStore.getSelected()!;
+
 		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
 				await accountsStore.submitNew(pin, allNetworks);
@@ -91,6 +89,7 @@ function AccountPin({
 					index: 1,
 					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
 				});
+
 				navigation.dispatch(resetAction);
 			}
 		} else {
@@ -131,30 +130,32 @@ function AccountPin({
 	const title = 'ACCOUNT PIN';
 
 	return (
-		<KeyboardScrollView style={styles.body} extraHeight={120}>
+		<KeyboardScrollView extraHeight={120}
+			style={styles.body}>
 			<Text style={styles.titleTop}>{title}</Text>
 			{showHintOrError()}
 			<Text style={styles.title}>PIN</Text>
 			<PinInput
 				autoFocus
-				returnKeyType="next"
+				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
 				onFocus={(): void => setState({ focusConfirmation: false })}
 				onSubmitEditing={(): void => {
 					setState({ focusConfirmation: true });
 				}}
-				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
+				returnKeyType="next"
 				value={state.pin}
 			/>
 			<Text style={styles.title}>CONFIRM PIN</Text>
 			<PinInput
-				returnKeyType="done"
 				focus={state.focusConfirmation}
 				onChangeText={(confirmation: string): void =>
 					onPinInputChange('confirmation', confirmation)
 				}
+				returnKeyType="done"
 				value={state.confirmation}
 			/>
-			<Button onPress={submit} title="Done" />
+			<Button onPress={submit}
+				title="Done" />
 		</KeyboardScrollView>
 	);
 }

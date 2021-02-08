@@ -61,8 +61,10 @@ export function useNetworksContext(): NetworksContextState {
 	useEffect(() => {
 		const refreshList = async function (): Promise<void> {
 			const initNetworkSpecs = await loadNetworks();
+
 			setSubstrateNetworks(initNetworkSpecs);
 		};
+
 		refreshList();
 	}, []);
 
@@ -80,6 +82,7 @@ export function useNetworksContext(): NetworksContextState {
 		const newNetworkParams = generateNetworkParamsFromParsedData(networkParsedData);
 		const networkKey = newNetworkParams.genesisHash;
 		const newNetworksList = deepCopyNetworks(substrateNetworks);
+
 		newNetworksList.set(networkKey, newNetworkParams);
 		setSubstrateNetworks(newNetworksList);
 		saveNetworks(newNetworkParams);

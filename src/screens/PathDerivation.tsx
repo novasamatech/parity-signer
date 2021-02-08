@@ -70,6 +70,7 @@ function PathDerivation({ accountsStore, navigation, route }: NavigationAccountI
 
 	const onPathDerivation = async (): Promise<void> => {
 		await unlockSeedPhrase(navigation, isSeedRefValid);
+
 		try {
 			await accountsStore.deriveNewPath(completePath,
 				substrateAddress,
@@ -86,9 +87,9 @@ function PathDerivation({ accountsStore, navigation, route }: NavigationAccountI
 	return (
 		<KeyboardAwareContainer>
 			<ScreenHeading
-				title="Derive Account"
-				subtitle={parentPath}
 				hasSubtitleIcon={true}
+				subtitle={parentPath}
+				title="Derive Account"
 			/>
 			<TextInput
 				autoCompleteType="off"
@@ -124,28 +125,28 @@ function PathDerivation({ accountsStore, navigation, route }: NavigationAccountI
 			)}
 			<Separator style={{ height: 0 }} />
 			<PasswordInput
+				onSubmitEditing={onPathDerivation}
 				password={password}
 				setPassword={setPassword}
-				onSubmitEditing={onPathDerivation}
 			/>
 			<PathCard
 				identity={accountsStore.state.currentIdentity!}
 				isPathValid={isPathValid}
 				name={keyPairsName}
-				path={password === '' ? completePath : `${completePath}///${password}`}
 				networkKey={currentNetworkKey}
+				path={password === '' ? completePath : `${completePath}///${password}`}
 			/>
 			<Button
 				disabled={!isPathValid}
-				title="Next"
-				testID={testIDs.PathDerivation.deriveButton}
 				onPress={onPathDerivation}
+				testID={testIDs.PathDerivation.deriveButton}
+				title="Next"
 			/>
 			{enableCustomNetwork && (
 				<NetworkOptions
 					setNetworkKey={setCustomNetworkKey}
-					visible={modalVisible}
 					setVisible={setModalVisible}
+					visible={modalVisible}
 				/>
 			)}
 		</KeyboardAwareContainer>

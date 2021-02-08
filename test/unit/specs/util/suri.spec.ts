@@ -67,6 +67,7 @@ describe('suri', () => {
 
 		it('should parse string with extra spaces as brain wallet', () => {
 			const extraSpaces = '  great  sparta  ';
+
 			expect(parseSURI(extraSpaces)).toEqual({
 				derivePath: '',
 				password: '',
@@ -74,6 +75,7 @@ describe('suri', () => {
 			});
 
 			const extraSpacesWithPath = '  great  sparta  //hard/soft///password';
+
 			expect(parseSURI(extraSpacesWithPath)).toEqual({
 				derivePath: '//hard/soft',
 				password: 'password',

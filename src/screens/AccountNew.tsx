@@ -68,19 +68,19 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 	useEffect((): void => {
 		const selectedAccount = accountsStore.state.newAccount;
 		const selectedNetwork = getNetwork(selectedAccount.networkKey);
+
 		updateState({
 			selectedAccount,
 			selectedNetwork
 		});
 	}, [accountsStore.state.newAccount, getNetwork]);
 
-	const {
-		derivationPassword,
+	const { derivationPassword,
 		derivationPath,
 		isDerivationPathValid,
 		selectedAccount,
-		selectedNetwork
-	} = state;
+		selectedNetwork } = state;
+
 	if (!selectedAccount) return <View />;
 
 	const { address, name, validBip39Seed } = selectedAccount;
@@ -95,16 +95,17 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 			</View>
 			<AccountCard
 				address={''}
-				title={selectedNetwork!.title}
 				networkKey={selectedAccount.networkKey}
 				onPress={(): void => navigation.navigate('LegacyNetworkChooser')}
+				title={selectedNetwork!.title}
 			/>
 			<View style={styles.body}>
 				<Text style={styles.title}>ICON & ADDRESS</Text>
 				<AccountIconChooser
 					derivationPassword={derivationPassword}
 					derivationPath={derivationPath}
-					onSelect={({ newAddress, isBip39, newSeed }): void => {
+					network={selectedNetwork!}
+					onSelect={({ isBip39, newAddress, newSeed }): void => {
 						if (newAddress && isBip39 && newSeed) {
 							if (isSubstrate) {
 								try {
@@ -141,7 +142,6 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 							});
 						}
 					}}
-					network={selectedNetwork!}
 					value={address && address}
 				/>
 				<Text style={styles.title}>NAME</Text>
@@ -149,8 +149,8 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 					onChangeText={(input: string): void =>
 						accountsStore.updateNew({ name: input })
 					}
-					value={name}
 					placeholder="Enter a new account name"
+					value={name}
 				/>
 				{isSubstrate && (
 					<DerivationPathField
@@ -174,7 +174,6 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 						paper.
 					</Text>
 					<Button
-						title="Next Step"
 						disabled={
 							!validateSeed(seed, validBip39Seed).valid ||
 							!isDerivationPathValid
@@ -182,6 +181,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 						onPress={(): void => {
 							navigation.navigate('LegacyAccountBackup', { isNew: true });
 						}}
+						title="Next Step"
 					/>
 				</View>
 			</View>

@@ -29,11 +29,11 @@ interface PinInputProps extends TextInputProps {
 export default function PinInput(props: PinInputProps): React.ReactElement {
 	return (
 		<TextInput
-			keyboardAppearance="dark"
+			autoCorrect={false}
 			editable
+			keyboardAppearance="dark"
 			keyboardType={props.keyboardType ?? 'numeric'}
 			multiline={false}
-			autoCorrect={false}
 			numberOfLines={1}
 			returnKeyType="next"
 			secureTextEntry

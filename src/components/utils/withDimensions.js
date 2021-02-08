@@ -4,10 +4,10 @@ import hoistNonReactStatic from 'hoist-non-react-statics';
 import * as React from 'react';
 import { Dimensions } from 'react-native';
 
-export const isOrientationLandscape = ({ width, height }) => width > height;
+export const isOrientationLandscape = ({ height, width }) => width > height;
 
 export default function withDimensions(WrappedComponent) {
-	const { width, height } = Dimensions.get('window');
+	const { height, width } = Dimensions.get('window');
 
 	class EnhancedComponent extends React.Component {
 		static displayName = `withDimensions(${WrappedComponent.displayName})`;
@@ -27,11 +27,13 @@ export default function withDimensions(WrappedComponent) {
 
 		handleOrientationChange = ({ window }) => {
 			const isLandscape = isOrientationLandscape(window);
+
 			this.setState({ isLandscape });
 		};
 
 		render() {
-			return <WrappedComponent {...this.props} {...this.state} />;
+			return <WrappedComponent {...this.props}
+				{...this.state} />;
 		}
 	}
 

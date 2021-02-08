@@ -31,17 +31,15 @@ import { pinCode,
 	testVisible,
 	waitAlert } from 'e2e/utils';
 
-const {
-	Alert,
-	Main,
+const { Alert,
 	IdentitiesSwitch,
+	IdentityBackup,
 	IdentityManagement,
 	IdentityNew,
-	IdentityBackup,
+	Main,
 	PathDerivation,
 	PathDetail,
-	PathsList
-} = testIDs;
+	PathsList } = testIDs;
 
 const defaultPath = '//default';
 const childPath = '/funding';
@@ -81,6 +79,7 @@ describe('Load test', () => {
 	it('derive new account with quick derivation button', async () => {
 		await tapBack();
 		const deriveButtonId = `${PathsList.pathsGroup}${defaultPath}`;
+
 		await testExist(deriveButtonId);
 		await testTap(deriveButtonId);
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}//0`);
@@ -121,6 +120,7 @@ describe('Load test', () => {
 		await tapBack();
 		const ethereumNetworkButtonIndex =
 			Main.networkButton + EthereumNetworkKeys.FRONTIER;
+
 		await testTap(testIDs.Main.addNewNetworkButton);
 		await testScrollAndTap(ethereumNetworkButtonIndex,
 			testIDs.Main.chooserScreen);

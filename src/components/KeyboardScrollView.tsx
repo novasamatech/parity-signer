@@ -32,10 +32,10 @@ class KeyboardScrollView extends React.PureComponent<Props> {
 			android: (
 				<SafeAreaViewContainer>
 					<KeyboardAwareScrollView
-						keyboardDismissMode="on-drag"
-						onScrollEndDrag={Keyboard.dismiss}
-						keyboardShouldPersistTaps="handled"
 						enableOnAndroid
+						keyboardDismissMode="on-drag"
+						keyboardShouldPersistTaps="handled"
+						onScrollEndDrag={Keyboard.dismiss}
 						{...defaultProps}
 						{...this.props}
 					>

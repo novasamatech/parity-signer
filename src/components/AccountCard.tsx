@@ -48,13 +48,15 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 
 	return (
 		<TouchableItem
-			testID={testID}
 			disabled={false}
 			onPress={onPress}
+			testID={testID}
 		>
 			<CardSeparator />
 			<View style={[styles.content, style]}>
-				<AccountIcon address={address} network={network} style={styles.icon} />
+				<AccountIcon address={address}
+					network={network}
+					style={styles.icon} />
 				<View style={styles.desc}>
 					<View>
 						<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
@@ -66,7 +68,8 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 						titlePrefix={titlePrefix}
 					/>
 					{address !== '' && (
-						<Address address={address} protocol={network.protocol} />
+						<Address address={address}
+							protocol={network.protocol} />
 					)}
 				</View>
 				<NetworkFooter color={network.color} />

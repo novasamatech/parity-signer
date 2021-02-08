@@ -28,6 +28,7 @@ import ButtonIcon from './ButtonIcon';
 function SecurityHeader(): React.ReactElement {
 	const [isConnected, setIsConnected] = useState(false);
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
 	useEffect(() =>
 		NetInfo.addEventListener(state => {
 			setIsConnected(state.isConnected);
@@ -38,11 +39,11 @@ function SecurityHeader(): React.ReactElement {
 		<View style={styles.body}>
 			{isConnected && (
 				<ButtonIcon
-					onPress={(): void => navigation.navigate('Security')}
-					iconName="shield-off"
-					iconType="feather"
 					iconColor={colors.signal.error}
+					iconName="shield-off"
 					iconSize={26}
+					iconType="feather"
+					onPress={(): void => navigation.navigate('Security')}
 				/>
 			)}
 			<IdentitiesSwitch />

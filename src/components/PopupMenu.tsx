@@ -38,12 +38,12 @@ interface Props {
 
 export default class PopupMenu extends React.PureComponent<Props> {
 	render(): React.ReactElement {
-		const { onSelect, menuTriggerIconName, menuItems, testID } = this.props;
+		const { menuItems, menuTriggerIconName, onSelect, testID } = this.props;
 		const menuTriggerIcon = (
 			<Icon
+				color={colors.text.main}
 				name={menuTriggerIconName}
 				size={25}
-				color={colors.text.main}
 				testID={testID}
 			/>
 		);
@@ -58,7 +58,8 @@ export default class PopupMenu extends React.PureComponent<Props> {
 						}
 
 						return (
-							<MenuOption key={index} value={menuItem.value}>
+							<MenuOption key={index}
+								value={menuItem.value}>
 								<Text
 									style={[menuOptionsStyles.optionText, menuItem.textStyle]}
 									testID={menuItem.testID}

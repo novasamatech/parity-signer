@@ -19,21 +19,20 @@ import { StyleSheet, Text, View } from 'react-native';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 
-export default function AccountPrefixedTitle({
-	titlePrefix,
-	title
-}: {
+export default function AccountPrefixedTitle({ title, titlePrefix }: {
 	title: string;
 	titlePrefix?: string;
 }): ReactElement {
 	return (
 		<View style={{ flexDirection: 'column' }}>
 			{titlePrefix && (
-				<Text numberOfLines={1} style={[fontStyles.t_codeS, styles.text]}>
+				<Text numberOfLines={1}
+					style={[fontStyles.t_codeS, styles.text]}>
 					{titlePrefix}
 				</Text>
 			)}
-			<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+			<Text numberOfLines={1}
+				style={[fontStyles.h2, { marginTop: -2 }]}>
 				{title}
 			</Text>
 		</View>

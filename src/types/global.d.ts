@@ -16,6 +16,7 @@
 
 /* eslint-disable no-unused-vars */
 import { ScanTestRequest } from 'e2e/mockScanRequests';
+
 export {};
 
 /*~ If the app has properties exposed on a global variable,

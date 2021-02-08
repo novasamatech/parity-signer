@@ -27,15 +27,13 @@ import { launchWithScanRequest,
 	testUnlockPin,
 	testVisible } from 'e2e/utils';
 
-const {
-	Main,
+const { Main,
+	NetworkSettings,
 	PathDetail,
 	PathsList,
 	QrScanner,
-	NetworkSettings,
 	SecurityHeader,
-	SignedTx
-} = testIDs;
+	SignedTx } = testIDs;
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
@@ -56,6 +54,7 @@ describe('Signing ane exporting test', () => {
 	it('derive a new account from the path list', async () => {
 		await tapBack();
 		const addedNetworkButtonIndex = Main.networkButton + addNetworkPathId;
+
 		await testTap(testIDs.Main.addNewNetworkButton);
 		await testTap(addedNetworkButtonIndex);
 		await testUnlockPin(pinCode);

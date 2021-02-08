@@ -20,6 +20,7 @@ import { NetworkParams, SubstrateNetworkBasics, SubstrateNetworkParams } from 't
 export const filterNetworks = (networkList: Map<string, NetworkParams>,
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean): Array<[string, NetworkParams]> => {
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
+
 	if (!__DEV__) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
 		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
@@ -27,6 +28,7 @@ export const filterNetworks = (networkList: Map<string, NetworkParams>,
 
 	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
 		const shouldExclude = excludedNetworks.includes(networkKey);
+
 		if (extraFilter !== undefined)
 			return extraFilter(networkKey, shouldExclude);
 
@@ -53,6 +55,7 @@ export const checkNewNetworkSpecs = (newNetworkSpec: SubstrateNetworkBasics): vo
 function generateRandomColor(): string {
 	const letters = '0123456789ABCDEF';
 	let color = '#';
+
 	for (let i = 0; i < 6; i++) {
 		color += letters[Math.floor(Math.random() * 16)];
 	}

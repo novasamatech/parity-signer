@@ -26,10 +26,12 @@ import { NavigationProps } from 'types/props';
 
 function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
+
 	const onAccountSelected = async (key: string): Promise<void> => {
 		await accountsStore.select(key);
 		navigation.navigate('AccountDetails');
 	};
+
 	const accountsMap = accountsStore.state.accounts;
 
 	const renderAccountCard = ([accountKey, account]: [
@@ -38,19 +40,19 @@ function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>)
 	]): React.ReactElement => (
 		<AccountCard
 			address={account.address}
+			key={accountKey}
 			networkKey={account.networkKey}
 			onPress={(): Promise<void> => onAccountSelected(accountKey)}
 			style={{ paddingBottom: 0 }}
 			title={account.name}
-			key={accountKey}
 		/>
 	);
 
 	return (
 		<SafeAreaViewContainer>
 			<ScrollView
-				testID={testIDs.AccountListScreen.accountList}
 				style={styles.content}
+				testID={testIDs.AccountListScreen.accountList}
 			>
 				{Array.from(accountsMap.entries()).map(renderAccountCard)}
 			</ScrollView>

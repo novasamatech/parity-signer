@@ -24,7 +24,7 @@ import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 
 export default function NetworkDetails({ route }: NavigationProps<'NetworkDetails'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
-	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+	const { getSubstrateNetwork, networks } = useContext(NetworksContext);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
 
@@ -34,21 +34,24 @@ export default function NetworkDetails({ route }: NavigationProps<'NetworkDetail
 				networkKey={networkParams.genesisHash}
 				title={networkParams.title}
 			/>
-			<NetworkInfoCard text={networkParams.title} label="Title" />
-			<NetworkInfoCard text={networkParams.pathId} label="Path ID" />
+			<NetworkInfoCard label="Title"
+				text={networkParams.title} />
+			<NetworkInfoCard label="Path ID"
+				text={networkParams.pathId} />
 			<NetworkInfoCard
-				text={networkParams.genesisHash}
 				label="Genesis Hash"
 				small
+				text={networkParams.genesisHash}
 			/>
-			<NetworkInfoCard text={networkParams.unit} label="Unit" />
+			<NetworkInfoCard label="Unit"
+				text={networkParams.unit} />
 			<NetworkInfoCard
-				text={networkParams.decimals.toString()}
 				label="Decimals"
+				text={networkParams.decimals.toString()}
 			/>
 			<NetworkInfoCard
-				text={networkParams.prefix.toString()}
 				label="Address prefix"
+				text={networkParams.prefix.toString()}
 			/>
 		</SafeAreaScrollViewContainer>
 	);

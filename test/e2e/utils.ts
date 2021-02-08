@@ -20,7 +20,7 @@ import { by, device,element, expect } from 'detox';
 
 import testIDs from './testIDs';
 
-const { IdentityPin, IdentityNew, Main, PathDetail, PathsList } = testIDs;
+const { IdentityNew, IdentityPin, Main, PathDetail, PathsList } = testIDs;
 
 export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
@@ -62,6 +62,7 @@ export const testInput = async (inputId: string,
 export const testInputWithDone = async (inputId: string,
 	inputText: string): Promise<void> => {
 	await element(by.id(inputId)).typeText(inputText);
+
 	if (device.getPlatform() === 'ios') {
 		await element(by.label('Done')).atIndex(0).tap();
 	} else {

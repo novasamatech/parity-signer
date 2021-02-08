@@ -30,14 +30,14 @@ export default class QRScannerAndDerivationTab extends React.PureComponent<{
 	derivationTestID?: string;
 }> {
 	render(): React.ReactElement {
-		const { onPress, title, derivationTestID } = this.props;
+		const { derivationTestID, onPress, title } = this.props;
 
 		return (
 			<View style={styles.body}>
 				<Separator
 					shadow={true}
-					style={{ backgroundColor: 'transparent', marginVertical: 0 }}
 					shadowStyle={{ height: 16, marginTop: -16 }}
+					style={{ backgroundColor: 'transparent', marginVertical: 0 }}
 				/>
 				<View style={styles.tab}>
 					<QrScannerTab />

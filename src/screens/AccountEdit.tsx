@@ -26,31 +26,34 @@ const onNameInput = async (accountsStore: AccountsContextState,
 	await accountsStore.updateSelectedAccount({ name });
 	const { selectedKey } = accountsStore.state;
 	const selectedAccount = accountsStore.getSelected()!;
+
 	await accountsStore.save(selectedKey, selectedAccount);
 };
 
 export default function AccountEdit(): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const selectedAccount = accountsStore.getSelected()!;
+
 	if (!selectedAccount) {
-		return <ScrollView bounces={false} style={styles.body} />;
+		return <ScrollView bounces={false}
+			style={styles.body} />;
 	}
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>
 			<AccountCard
 				address={selectedAccount.address}
-				title={selectedAccount.name}
 				networkKey={selectedAccount.networkKey}
+				title={selectedAccount.name}
 			/>
 			<TextInput
 				label="Account Name"
-				style={{ marginBottom: 40 }}
 				onChangeText={(name: string): Promise<any> =>
 					onNameInput(accountsStore, name)
 				}
-				value={selectedAccount.name}
 				placeholder="New name"
+				style={{ marginBottom: 40 }}
+				value={selectedAccount.name}
 			/>
 		</SafeAreaScrollViewContainer>
 	);

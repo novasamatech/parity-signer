@@ -27,10 +27,12 @@ export function generateAccountId(address: string,
 	}
 
 	const networkParams = allNetworks.get(networkKey);
+
 	if (networkParams === undefined)
 		return `substrate:${address}:${networkKey ?? ''}`;
 
 	const { protocol } = networkParams;
+
 	if (isSubstrateNetworkParams(networkParams)) {
 		const { genesisHash } = networkParams;
 

@@ -22,11 +22,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import fontStyles from 'styles/fontStyles';
 import { passwordRegex } from 'utils/regex';
 
-export default function PasswordInput({
-	password,
-	setPassword,
-	onSubmitEditing
-}: {
+export default function PasswordInput({ onSubmitEditing, password, setPassword }: {
 	password: string;
 	setPassword: (newPassword: string) => void;
 	onSubmitEditing: () => void;
@@ -34,6 +30,7 @@ export default function PasswordInput({
 	const onPasswordChange = (newPassword: string): void => {
 		if (passwordRegex.test(newPassword)) setPassword(newPassword);
 	};
+
 	const [isShow, setShow] = useState<boolean>(false);
 	const togglePasswordInput = (): void => setShow(!isShow);
 
@@ -54,10 +51,10 @@ export default function PasswordInput({
 				<>
 					<TextInput
 						onChangeText={onPasswordChange}
-						testID={testIDs.PathDerivation.passwordInput}
-						returnKeyType="done"
 						onSubmitEditing={onSubmitEditing}
 						placeholder="Optional password"
+						returnKeyType="done"
+						testID={testIDs.PathDerivation.passwordInput}
 						value={password}
 					/>
 					<Text style={styles.hintText}>

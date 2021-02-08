@@ -28,6 +28,7 @@ export function isAscii(data: string | number): boolean {
 export function hexToAscii(hexx: string): string {
 	const hex = hexx.toString();
 	let str = '';
+
 	for (let i = 0; i < hex.length; i += 2) {
 		str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
 	}

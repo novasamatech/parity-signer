@@ -19,6 +19,7 @@ import { Clipboard } from 'react-native';
 import { Action, SetAlert } from 'stores/alertContext';
 
 const alertTestIDs = testIDs.Alert;
+
 export const alertError = (setAlert: SetAlert, message: string): void =>
 	setAlert('Error', message);
 

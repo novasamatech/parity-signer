@@ -33,16 +33,14 @@ import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
-export default function PathCard({
-	onPress,
-	identity,
+export default function PathCard({ identity,
 	isPathValid = true,
-	path,
 	name,
 	networkKey,
+	onPress,
+	path,
 	testID,
-	titlePrefix
-}: {
+	titlePrefix }: {
 	onPress?: ButtonListener;
 	identity: Identity;
 	isPathValid?: boolean;
@@ -53,7 +51,7 @@ export default function PathCard({
 	titlePrefix?: string;
 }): React.ReactElement {
 	const networksContext = useContext(NetworksContext);
-	const { networks, allNetworks } = networksContext;
+	const { allNetworks, networks } = networksContext;
 	const isNotEmptyName = name && name !== '';
 	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const { isSeedRefValid, substrateAddress } = useSeedRef(identity.encryptedSeed);
@@ -61,18 +59,23 @@ export default function PathCard({
 	const computedNetworkKey =
 		networkKey ||
 		getNetworkKeyByPath(path, identity.meta.get(path)!, networksContext);
+
 	useEffect(() => {
 		const getAddress = async (): Promise<void> => {
 			const existedAddress = getAddressWithPath(path, identity);
+
 			if (existedAddress !== '') return setAddress(existedAddress);
+
 			if (isSeedRefValid && isPathValid && networks.has(computedNetworkKey)) {
 				const prefix = networks.get(computedNetworkKey)!.prefix;
 				const generatedAddress = await substrateAddress(path, prefix);
 
 				return setAddress(generatedAddress);
 			}
+
 			setAddress('');
 		};
+
 		getAddress();
 	}, [
 		path,
@@ -105,11 +108,11 @@ export default function PathCard({
 				}}
 			/>
 			<View
-				testID={testID}
 				style={[
 					styles.content,
 					{ backgroundColor: 'transparent', paddingVertical: 0 }
 				]}
+				testID={testID}
 			>
 				<AccountIcon
 					address={address}
@@ -120,8 +123,10 @@ export default function PathCard({
 					<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
 						{networkParams.title}
 					</Text>
-					<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
-					<Address address={address} protocol={networkParams.protocol} />
+					<AccountPrefixedTitle title={pathName!}
+						titlePrefix={titlePrefix} />
+					<Address address={address}
+						protocol={networkParams.protocol} />
 				</View>
 				<View
 					style={[
@@ -139,7 +144,8 @@ export default function PathCard({
 			onPress={onPress}
 			style={styles.body}
 		>
-			<View style={styles.content} testID={testID}>
+			<View style={styles.content}
+				testID={testID}>
 				<AccountIcon
 					address={address}
 					network={networkParams}
@@ -147,8 +153,10 @@ export default function PathCard({
 				/>
 				<View style={styles.desc}>
 					<View style={styles.row}>
-						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
-						{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
+						<AccountPrefixedTitle title={pathName!}
+							titlePrefix={titlePrefix} />
+						{hasPassword && <AntIcon name="lock"
+							style={styles.iconLock} />}
 					</View>
 					<View
 						style={{
@@ -157,9 +165,9 @@ export default function PathCard({
 						}}
 					>
 						<AntIcon
+							color={colors.signal.main}
 							name="user"
 							size={fontStyles.i_small.fontSize}
-							color={colors.signal.main}
 						/>
 
 						{hasPassword ? (
@@ -171,9 +179,9 @@ export default function PathCard({
 								</Text>
 
 								<AntIcon
+									color={colors.signal.main}
 									name="lock"
 									size={fontStyles.i_small.fontSize}
-									color={colors.signal.main}
 									style={{ alignSelf: 'center' }}
 								/>
 							</View>
@@ -185,9 +193,9 @@ export default function PathCard({
 					</View>
 					{address !== '' && (
 						<Text
-							style={[fontStyles.t_codeS, { color: colors.text.faded }]}
 							ellipsizeMode="middle"
 							numberOfLines={1}
+							style={[fontStyles.t_codeS, { color: colors.text.faded }]}
 						>
 							{address}
 						</Text>

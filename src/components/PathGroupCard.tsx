@@ -41,12 +41,7 @@ type Props = {
 	networkParams: SubstrateNetworkParams | UnknownNetworkParams;
 };
 
-export default function PathGroupCard({
-	currentIdentity,
-	pathGroup,
-	networkParams,
-	accountsStore
-}: Props): React.ReactElement {
+export default function PathGroupCard({ accountsStore, currentIdentity, networkParams, pathGroup }: Props): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 	const { setAlert } = useContext(AlertStateContext);
 	const paths = pathGroup.paths;
@@ -55,8 +50,10 @@ export default function PathGroupCard({
 		`//${networkParams.pathId}${pathGroup.title}${
 			isHardDerivation ? '//' : '/'
 		}${index}`;
+
 	const _getNextIndex = (isHardDerivation: boolean): number => {
 		let index = 0;
+
 		while (paths.includes(_getFullPath(index, isHardDerivation))) {
 			index++;
 		}
@@ -69,9 +66,11 @@ export default function PathGroupCard({
 			await unlockSeedPhrase(navigation, isSeedRefValid);
 			navigation.goBack();
 		}
+
 		const nextIndex = _getNextIndex(isHardDerivation);
 		const nextPath = _getFullPath(nextIndex, isHardDerivation);
 		const name = removeSlash(`${pathGroup.title}${nextIndex}`);
+
 		try {
 			await accountsStore.deriveNewPath(nextPath,
 				substrateAddress,
@@ -90,8 +89,10 @@ export default function PathGroupCard({
 		: `//${networkParams.pathId}${pathGroup.title}`;
 
 	return (
-		<View key={`group${pathGroup.title}`} style={{ marginTop: 24 }}>
-			<Separator shadow={true} style={styles.separator} />
+		<View key={`group${pathGroup.title}`}
+			style={{ marginTop: 24 }}>
+			<Separator shadow={true}
+				style={styles.separator} />
 			<View style={styles.header}>
 				<View style={styles.headerText}>
 					<View>
@@ -112,11 +113,11 @@ export default function PathGroupCard({
 			</View>
 			{paths.map(path => (
 				<PathCard
-					key={path}
-					testID={testIDs.PathsList.pathCard + path}
 					identity={currentIdentity}
-					path={path}
+					key={path}
 					onPress={(): void => navigation.navigate('PathDetails', { path })}
+					path={path}
+					testID={testIDs.PathsList.pathCard + path}
 				/>
 			))}
 		</View>

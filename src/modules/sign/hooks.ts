@@ -15,6 +15,7 @@ export function usePayloadDetails(rawPayload: Uint8Array | string | null,
 		setIsProcessing(true);
 		if (getTypeRegistry === null) return;
 		const typeRegistry = getTypeRegistry(networks, networkKey);
+
 		if (typeRegistry === null || typeof rawPayload === 'string') {
 			setIsProcessing(false);
 
@@ -24,6 +25,7 @@ export function usePayloadDetails(rawPayload: Uint8Array | string | null,
 				const extrinsicPayload = typeRegistry.createType('ExtrinsicPayload',
 					rawPayload,
 					{ version: ExtrinsicPayloadLatestVersion });
+
 				setPayload(extrinsicPayload);
 				setIsProcessing(false);
 			} catch (e) {

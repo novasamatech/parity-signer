@@ -32,7 +32,7 @@ export default class Button extends React.PureComponent<{
 	style?: ViewStyle;
 }> {
 	render(): React.ReactElement {
-		const { onPress, title, aboveKeyboard, disabled, small, textStyles, onlyText, testID, style } = this.props;
+		const { aboveKeyboard, disabled, onPress, onlyText, small, style, testID, textStyles, title } = this.props;
 
 		const finalTextStyles = [styles.buttonText, {}];
 		const finalButtonStyles = [styles.button, {}];
@@ -41,13 +41,16 @@ export default class Button extends React.PureComponent<{
 			finalTextStyles.push({ fontSize: 14 });
 			finalButtonStyles.push(styles.buttonSmall);
 		}
+
 		if (onlyText) {
 			finalTextStyles.push({ color: colors.text.main });
 			finalButtonStyles.push(styles.buttonOnlyText);
 		}
+
 		if (disabled) {
 			finalButtonStyles.push(styles.buttonDisabled);
 		}
+
 		if (aboveKeyboard) {
 			finalButtonStyles.push(styles.buttonAboveKeyboard);
 		}
@@ -75,8 +78,8 @@ export default class Button extends React.PureComponent<{
 			<TouchableOpacity
 				disabled={disabled}
 				onPress={onPress}
-				testID={testID}
 				style={[finalButtonStyles, style]}
+				testID={testID}
 			>
 				<Text
 					style={[

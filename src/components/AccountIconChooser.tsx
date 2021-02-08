@@ -57,15 +57,14 @@ export default class AccountIconChooser extends React.PureComponent<
 	}
 
 	refreshIcons = async (): Promise<void> => {
-		const {
-			derivationPassword,
+		const { derivationPassword,
 			derivationPath,
 			network,
-			onSelect
-		} = this.props;
+			onSelect } = this.props;
 
 		// clean previous selection
 		onSelect({ isBip39: false, newAddress: '', newSeed: '' });
+
 		try {
 			const icons = await Promise.all(Array(4)
 				.join(' ')
@@ -76,6 +75,7 @@ export default class AccountIconChooser extends React.PureComponent<
 						bip39: false,
 						seed: ''
 					};
+
 					result.seed = await words(24);
 
 					if (network.protocol === NetworkProtocols.ETHEREUM) {
@@ -100,6 +100,7 @@ export default class AccountIconChooser extends React.PureComponent<
 
 					return result;
 				}));
+
 			this.setState({ icons });
 		} catch (e) {
 			console.error(e);
@@ -107,10 +108,8 @@ export default class AccountIconChooser extends React.PureComponent<
 	};
 
 	renderAddress = (): ReactElement => {
-		const {
-			network: { protocol },
-			value
-		} = this.props;
+		const { network: { protocol },
+			value } = this.props;
 
 		if (value) {
 			return (
@@ -125,14 +124,11 @@ export default class AccountIconChooser extends React.PureComponent<
 		}
 	};
 
-	renderIcon = ({
-		item,
-		index
-	}: {
+	renderIcon = ({ index, item }: {
 		item: IconType;
 		index: number;
 	}): ReactElement => {
-		const { onSelect, network, value } = this.props;
+		const { network, onSelect, value } = this.props;
 		const { address, bip39, seed } = item;
 		const isSelected = address.toLowerCase() === value.toLowerCase();
 
@@ -144,12 +140,14 @@ export default class AccountIconChooser extends React.PureComponent<
 		return (
 			<TouchableOpacity
 				key={index}
-				style={[styles.iconBorder, isSelected ? styles.selected : {}]}
 				onPress={(): void =>
 					onSelect({ isBip39: bip39, newAddress: address, newSeed: seed })
 				}
+				style={[styles.iconBorder, isSelected ? styles.selected : {}]}
 			>
-				<AccountIcon address={address} network={network} style={styles.icon} />
+				<AccountIcon address={address}
+					network={network}
+					style={styles.icon} />
 			</TouchableOpacity>
 		);
 	};
@@ -187,7 +185,9 @@ export default class AccountIconChooser extends React.PureComponent<
 						renderItem={this.renderIcon}
 					/>
 					<TouchableOpacity onPress={this.refreshIcons}>
-						<Icon name={'refresh'} size={35} style={styles.refreshIcon} />
+						<Icon name={'refresh'}
+							size={35}
+							style={styles.refreshIcon} />
 					</TouchableOpacity>
 				</View>
 				{this.renderAddress()}

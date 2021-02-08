@@ -22,6 +22,7 @@ describe('checksum', () => {
 		const hash =
 			'7c9802b5bbbec094f42a2e0bdb4c1b1cbf54e334fd7c7be5cad65936fa0e3d74';
 		const result = checksummedAddress(address, hash);
+
 		expect(result).toEqual('006E27B6A72E1f34C626762F3C4761547Aff1421');
 	});
 
@@ -30,6 +31,7 @@ describe('checksum', () => {
 		const hash =
 			'666f32afc164ae61524198c5f336aefdcfba967990a5a948a22aba96f41b5286';
 		const result = checksummedAddress(address, hash);
+
 		expect(result).toEqual('007A3fA1D163F66eed8f8DDdB9346610D603C7a1');
 	});
 });

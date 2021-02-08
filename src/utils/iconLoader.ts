@@ -13,4 +13,5 @@ async function loadFonts(): Promise<void> {
 		FontAwesome.loadFont()
 	]);
 }
+
 loadFonts();
