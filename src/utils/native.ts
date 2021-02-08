@@ -165,8 +165,7 @@ export function substrateAddress(
 			break;
 		}
 		case 'Ed25519': {
-			throw new Error();
-			return '';
+			return SubstrateSign.substrateAddressEd25519(seed, prefix);
 			break;
 		}
 		case 'Ecdsa': {
@@ -194,8 +193,7 @@ export function substrateSign(
 			break;
 		}
 		case 'Ed25519': {
-			throw new Error();
-			return '';
+			return SubstrateSign.substrateSignEd25519(seed, message);
 			break;
 		}
 		case 'Ecdsa': {
@@ -265,8 +263,11 @@ export class SeedRefClass {
 				break;
 			}
 			case 'Ed25519': {	
-				throw new Error();
-				return '';
+				return SubstrateSign.substrateAddressWithRefEd25519(
+					this.dataRef,
+					suriSuffix,
+					prefix
+				);
 				break;
 			}
 			case 'Ecdsa': {
@@ -332,8 +333,11 @@ export class SeedRefClass {
 				break;
 			}
 			case 'Ed25519': {	
-				throw new Error();
-				return '';
+				return SubstrateSign.substrateSignWithRefEd25519(
+					this.dataRef,
+					suriSuffix,
+					message
+				);
 				break;
 			}
 			case 'Ecdsa': {

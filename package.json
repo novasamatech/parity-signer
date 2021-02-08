@@ -62,7 +62,7 @@
     "react-native-randombytes": "^3.5.3",
     "react-native-screens": "^2.0.0-alpha.32",
     "react-native-secure-storage": "git+https://github.com/paritytech/react-native-secure-storage.git#master",
-    "react-native-substrate-sign": "1.1.1",
+    "react-native-substrate-sign": "git+https://github.com/Slesarew/react-native-substrate-sign.git#signer-issue614",
     "react-native-svg": "12.1.0",
     "react-native-tabs": "^1.0.9",
     "react-native-vector-icons": "^7.0.0",
