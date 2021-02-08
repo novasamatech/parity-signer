@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Parity Technologies (UK) Ltd.
+// Copyright 2015-2021 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
 // Parity is free software: you can redistribute it and/or modify
@@ -14,11 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GenericExtrinsicPayload } from '@polkadot/types';
 import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
-import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
-import { formatBalance } from '@polkadot/util';
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
@@ -29,6 +26,11 @@ import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';
+
+import { GenericExtrinsicPayload } from '@polkadot/types';
+import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
+import { formatBalance } from '@polkadot/util';
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 
 const recodeAddress = (encodedAddress: string, prefix: number): string =>
 	encodeAddress(decodeAddress(encodedAddress), prefix);
