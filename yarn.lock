@@ -7426,7 +7426,7 @@ react-native-status-bar-height@^2.2.0:
 
 "react-native-substrate-sign@git+https://github.com/Slesarew/react-native-substrate-sign.git#signer-issue614":
   version "1.1.1"
-  resolved "git+https://github.com/Slesarew/react-native-substrate-sign.git#e2a81d0327611df62cb6ab671acde0e483bb0fdd"
+  resolved "git+https://github.com/Slesarew/react-native-substrate-sign.git#5e5d7a7a52ef9025e08e132e9c89d26d39d5e0a3"
 
 react-native-svg@12.1.0, react-native-svg@^12.1.0:
   version "12.1.0"
