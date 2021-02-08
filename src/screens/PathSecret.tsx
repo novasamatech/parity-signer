@@ -36,19 +36,15 @@ function PathSecret({
 	const networksContextState = useContext(NetworksContext);
 	const { currentIdentity } = accountsStore.state;
 	const [secret, setSecret] = useState<string>('');
-	const { substrateSecret, isSeedRefValid } = useSeedRef(
-		currentIdentity.encryptedSeed
-	);
+	const { substrateSecret, isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const path = route.params.path;
 	const pathMeta = currentIdentity.meta.get(path)!;
 
 	useEffect(() => {
 		const getAndSetSecret = async (): Promise<void> => {
-			const networkKey = getNetworkKey(
-				path,
+			const networkKey = getNetworkKey(path,
 				currentIdentity,
-				networksContextState
-			);
+				networksContextState);
 			const password = route.params.password ?? '';
 			const accountName = getPathName(path, currentIdentity);
 			const generatedSecret = await substrateSecret(`${path}///${password}`);

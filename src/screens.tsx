@@ -14,16 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	useNavigation,
+import { useNavigation,
 	useNavigationState,
-	useRoute
-} from '@react-navigation/native';
-import {
-	CardStyleInterpolators,
+	useRoute } from '@react-navigation/native';
+import { CardStyleInterpolators,
 	createStackNavigator,
-	HeaderBackButton
-} from '@react-navigation/stack';
+	HeaderBackButton } from '@react-navigation/stack';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
@@ -66,9 +62,8 @@ export const ScreenStack = createStackNavigator<RootStackParamList>();
 
 const HeaderLeft = (): React.ReactElement => {
 	const route = useRoute();
-	const isFirstRouteInParent = useNavigationState(
-		state => state.routes[0].key === route.key
-	);
+	const isFirstRouteInParent = useNavigationState(state => state.routes[0].key === route.key);
+
 	return isFirstRouteInParent ? <HeaderLeftHome /> : <HeaderLeftWithBack />;
 };
 
@@ -103,6 +98,7 @@ const globalStackNavigationOptions = {
 
 const HeaderLeftWithBack = (): React.ReactElement => {
 	const navigation = useNavigation();
+
 	return (
 		<View testID={testIDs.Header.headerBackButton}>
 			<HeaderBackButton

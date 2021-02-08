@@ -41,13 +41,13 @@ function defaultCompare(a: any, b: any): number {
  * @return {{ hit: bool, index: number }} if `hit` is `true` -> index at which the item was found
  *                                        if `hit` is `false` -> index at which the item can be inserted
  */
-export function binarySearch(
-	array: Array<any>,
+export function binarySearch(array: Array<any>,
 	item: any,
-	compare: (a: any, b: any) => number = defaultCompare
-): { hit: boolean; index: number } {
+	compare: (a: any, b: any) => number = defaultCompare): { hit: boolean; index: number } {
 	if (array.length === 0) {
-		return { hit: false, index: 0 };
+		return {
+			hit: false, index: 0
+		};
 	}
 
 	let min = 0;
@@ -63,11 +63,15 @@ export function binarySearch(
 		} else if (result > 0) {
 			min = guess + 1;
 		} else {
-			return { hit: true, index: guess };
+			return {
+				hit: true, index: guess
+			};
 		}
 	}
 
-	return { hit: false, index: min };
+	return {
+		hit: false, index: min
+	};
 }
 
 export function zip(left: any[], right: any[]): any[] {

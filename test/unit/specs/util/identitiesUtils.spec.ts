@@ -14,29 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	EthereumNetworkKeys,
+import { EthereumNetworkKeys,
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys,
-	unknownNetworkPathId
-} from 'constants/networkSpecs';
-import {
-	GetNetwork,
+	unknownNetworkPathId } from 'constants/networkSpecs';
+import { GetNetwork,
 	GetSubstrateNetwork,
-	NetworksContextState
-} from 'stores/NetworkContext';
-import {
-	deserializeIdentities,
+	NetworksContextState } from 'stores/NetworkContext';
+import { deserializeIdentities,
 	getExistedNetworkKeys,
 	getNetworkKeyByPath,
 	getPathName,
 	getPathsWithSubstrateNetworkKey,
 	groupPaths,
 	isSubstrateHardDerivedPath,
-	serializeIdentities
-} from 'utils/identitiesUtils';
+	serializeIdentities } from 'utils/identitiesUtils';
 
 const networks = new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
 const allNetworks = new Map(Object.entries(NETWORK_LIST));
@@ -159,10 +153,12 @@ const metaMap = raw.reduce((acc, v) => {
 		updatedAt: 1573142786972
 	};
 	acc.set(v.path, meta);
+
 	return acc;
 }, new Map());
 const addressesMap = raw.reduce((acc, v) => {
 	acc.set(v.address, v.path);
+
 	return acc;
 }, new Map());
 
@@ -258,10 +254,8 @@ describe('IdentitiesUtils', () => {
 	});
 
 	it('get the correspond networkKeys', () => {
-		const networkKeys = getExistedNetworkKeys(
-			testIdentities[0],
-			dummyNetworkContext
-		);
+		const networkKeys = getExistedNetworkKeys(testIdentities[0],
+			dummyNetworkContext);
 		expect(networkKeys).toEqual([
 			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
@@ -273,52 +267,40 @@ describe('IdentitiesUtils', () => {
 
 	it('get networkKey correctly by path', () => {
 		const getNetworkKeyByPathTest = (path: string): string => {
-			return getNetworkKeyByPath(
-				path,
+			return getNetworkKeyByPath(path,
 				testIdentities[0].meta.get(path),
-				dummyNetworkContext
-			);
+				dummyNetworkContext);
 		};
 		expect(getNetworkKeyByPathTest('')).toEqual(UnknownNetworkKeys.UNKNOWN);
-		expect(getNetworkKeyByPathTest('//kusama')).toEqual(
-			SubstrateNetworkKeys.KUSAMA
-		);
-		expect(getNetworkKeyByPathTest('//kusama//funding/1')).toEqual(
-			SubstrateNetworkKeys.KUSAMA
-		);
-		expect(getNetworkKeyByPathTest('//kusama//funding/2')).toEqual(
-			SubstrateNetworkKeys.WESTEND
-		);
+		expect(getNetworkKeyByPathTest('//kusama')).toEqual(SubstrateNetworkKeys.KUSAMA);
+		expect(getNetworkKeyByPathTest('//kusama//funding/1')).toEqual(SubstrateNetworkKeys.KUSAMA);
+		expect(getNetworkKeyByPathTest('//kusama//funding/2')).toEqual(SubstrateNetworkKeys.WESTEND);
 		expect(getNetworkKeyByPathTest('1')).toEqual(EthereumNetworkKeys.FRONTIER);
 	});
 
 	it('group path under their network correctly, has no missing accounts', () => {
 		const mockIdentity = testIdentities[0];
-		const existedNetworks = getExistedNetworkKeys(
-			mockIdentity,
-			dummyNetworkContext
-		);
+		const existedNetworks = getExistedNetworkKeys(mockIdentity,
+			dummyNetworkContext);
 		const existedAccountsSize = mockIdentity.meta.size;
 
-		const allListedAccounts = existedNetworks.reduce(
-			(acc: string[], networkKey: string) => {
-				if (Object.values(EthereumNetworkKeys).includes(networkKey)) {
-					//Get ethereum account into list
-					const accountMeta = mockIdentity.meta.get(networkKey);
-					if (accountMeta === undefined) return acc;
-					acc.push(networkKey);
-					return acc;
-				} else {
-					const networkAccounts = getPathsWithSubstrateNetworkKey(
-						mockIdentity,
-						networkKey,
-						dummyNetworkContext
-					);
-					return acc.concat(networkAccounts);
-				}
-			},
-			[]
-		);
+		const allListedAccounts = existedNetworks.reduce((acc: string[], networkKey: string) => {
+			if (Object.values(EthereumNetworkKeys).includes(networkKey)) {
+				//Get ethereum account into list
+				const accountMeta = mockIdentity.meta.get(networkKey);
+				if (accountMeta === undefined) return acc;
+				acc.push(networkKey);
+
+				return acc;
+			} else {
+				const networkAccounts = getPathsWithSubstrateNetworkKey(mockIdentity,
+					networkKey,
+					dummyNetworkContext);
+
+				return acc.concat(networkAccounts);
+			}
+		},
+		[]);
 		expect(existedAccountsSize).toEqual(allListedAccounts.length);
 	});
 

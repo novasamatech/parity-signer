@@ -14,31 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NetworkProtocols } from 'constants/networkSpecs';
-import React, { ReactElement } from 'react';
-import { Text, TextStyle } from 'react-native';
-import fontStyles from 'styles/fontStyles';
-import { NetworkProtocol } from 'types/networkTypes';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
-export default function Address(props: {
-	address: string;
-	protocol?: NetworkProtocol;
-	style?: TextStyle;
-}): ReactElement {
-	const {
-		address, protocol = NetworkProtocols.SUBSTRATE, style = {
-		}
-	} = props;
-	const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
+export const NetworkFooter = ({ color }: { color: string }): React.ReactElement => (
+	<View
+		style={[
+			styles.footer,
+			{
+				backgroundColor: color
+			}
+		]}
+	/>
+);
 
-	return (
-		<Text
-			numberOfLines={1}
-			style={[style, fontStyles.t_codeS]}
-			ellipsizeMode="middle"
-		>
-			{prefix}
-			{address}
-		</Text>
-	);
-}
+const styles = StyleSheet.create({
+	footer: {
+		alignSelf: 'stretch',
+		height: 80,
+		marginLeft: 8,
+		width: 4
+	}
+});

@@ -66,7 +66,9 @@ export default function CustomAlert(): React.ReactElement {
 
 	if (alertDisplay) {
 		return (
-			<Animated.View style={{ ...styles.background, opacity: animatedValue }}>
+			<Animated.View style={{
+				...styles.background, opacity: animatedValue
+			}}>
 				<View style={styles.body}>
 					{title !== '' && <Text style={styles.textTitle}>{title}</Text>}
 					<Text style={styles.textMessage}>{message}</Text>

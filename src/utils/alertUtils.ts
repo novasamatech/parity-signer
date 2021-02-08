@@ -22,23 +22,17 @@ const alertTestIDs = testIDs.Alert;
 export const alertError = (setAlert: SetAlert, message: string): void =>
 	setAlert('Error', message);
 
-export const alertIdentityCreationError = (
-	setAlert: SetAlert,
-	errorMessage: string
-): void =>
+export const alertIdentityCreationError = (setAlert: SetAlert,
+	errorMessage: string): void =>
 	alertError(setAlert, "Can't create Identity from the seed: " + errorMessage);
 
-export const alertPathDerivationError = (
-	setAlert: SetAlert,
-	errorMessage: string
-): void =>
+export const alertPathDerivationError = (setAlert: SetAlert,
+	errorMessage: string): void =>
 	alertError(setAlert, "Can't derive account from the seed: " + errorMessage);
 
-const buildAlertButtons = (
-	onConfirm: () => any,
+const buildAlertButtons = (onConfirm: () => any,
 	confirmText: string,
-	testID?: string
-): Action[] => [
+	testID?: string): Action[] => [
 	{
 		onPress: (): void => {
 			onConfirm();
@@ -51,54 +45,37 @@ const buildAlertButtons = (
 	}
 ];
 
-const buildAlertDeleteButtons = (
-	onDelete: () => any,
-	testID?: string
-): Action[] => buildAlertButtons(onDelete, 'Delete', testID);
+const buildAlertDeleteButtons = (onDelete: () => any,
+	testID?: string): Action[] => buildAlertButtons(onDelete, 'Delete', testID);
 
-export const alertDeleteAccount = (
-	setAlert: SetAlert,
+export const alertDeleteAccount = (setAlert: SetAlert,
 	accountName: string,
-	onDelete: () => any
-): void => {
-	setAlert(
-		'Delete Account',
+	onDelete: () => any): void => {
+	setAlert('Delete Account',
 		`Do you really want to delete ${accountName}?`,
-		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteAccount)
-	);
+		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteAccount));
 };
 
-export const alertDeleteLegacyAccount = (
-	setAlert: SetAlert,
+export const alertDeleteLegacyAccount = (setAlert: SetAlert,
 	accountName: string,
-	onDelete: () => any
-): void => {
-	setAlert(
-		'Delete Account',
+	onDelete: () => any): void => {
+	setAlert('Delete Account',
 		`Do you really want to delete ${accountName}?
 The account can only be recovered with its associated recovery phrase.`,
-		buildAlertDeleteButtons(onDelete)
-	);
+		buildAlertDeleteButtons(onDelete));
 };
 
-export const alertDeleteIdentity = (
-	setAlert: SetAlert,
-	onDelete: () => any
-): void => {
-	setAlert(
-		'Delete Identity',
+export const alertDeleteIdentity = (setAlert: SetAlert,
+	onDelete: () => any): void => {
+	setAlert('Delete Identity',
 		`Do you really want to delete this Identity and all the related accounts?
 This identity can only be recovered with its associated recovery phrase.`,
-		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteIdentity)
-	);
+		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteIdentity));
 };
 
-export const alertCopyBackupPhrase = (
-	setAlert: SetAlert,
-	seedPhrase: string
-): void =>
-	setAlert(
-		'Write this recovery phrase on paper',
+export const alertCopyBackupPhrase = (setAlert: SetAlert,
+	seedPhrase: string): void =>
+	setAlert('Write this recovery phrase on paper',
 		'It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.',
 		[
 			{
@@ -110,14 +87,11 @@ export const alertCopyBackupPhrase = (
 			{
 				text: 'Cancel'
 			}
-		]
-	);
+		]);
 
-export const alertRisks = (
-	setAlert: SetAlert,
+export const alertRisks = (setAlert: SetAlert,
 	message: string,
-	onPress: () => any
-): void =>
+	onPress: () => any): void =>
 	setAlert('Warning', message, [
 		{
 			onPress,
@@ -129,14 +103,11 @@ export const alertRisks = (
 	]);
 
 export const alertDecodeError = (setAlert: SetAlert): void =>
-	setAlert(
-		'Could not decode method with available metadata.',
-		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.'
-	);
+	setAlert('Could not decode method with available metadata.',
+		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.');
 
 export const alertBackupDone = (setAlert: SetAlert, onPress: () => any): void =>
-	setAlert(
-		'Important',
+	setAlert('Important',
 		"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",
 		[
 			{
@@ -147,5 +118,4 @@ export const alertBackupDone = (setAlert: SetAlert, onPress: () => any): void =>
 			{
 				text: 'Cancel'
 			}
-		]
-	);
+		]);

@@ -48,6 +48,7 @@ function LegacyAccountBackup({
 		};
 
 		AppState.addEventListener('change', handleAppStateChange);
+
 		return (): void => {
 			if (selectedKey) {
 				accountsStore.lockAccount(selectedKey);
@@ -86,15 +87,11 @@ function LegacyAccountBackup({
 						// only allow the copy of the recovery phrase in dev environment
 						if (__DEV__) {
 							if (protocol === NetworkProtocols.SUBSTRATE) {
-								alertCopyBackupPhrase(
-									setAlert,
-									`${seedPhrase}${derivationPath}`
-								);
+								alertCopyBackupPhrase(setAlert,
+									`${seedPhrase}${derivationPath}`);
 							} else {
-								alertCopyBackupPhrase(
-									setAlert,
-									seedPhrase === '' ? seed : seedPhrase
-								);
+								alertCopyBackupPhrase(setAlert,
+									seedPhrase === '' ? seed : seedPhrase);
 							}
 						}
 					}}
@@ -114,7 +111,9 @@ function LegacyAccountBackup({
 						title="Backup Done"
 						onPress={(): void => {
 							alertBackupDone(setAlert, () => {
-								navigate('AccountPin', { isNew });
+								navigate('AccountPin', {
+									isNew
+								});
 							});
 						}}
 					/>

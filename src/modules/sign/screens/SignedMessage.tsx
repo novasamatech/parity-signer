@@ -60,7 +60,9 @@ function SignedMessageView({
 					marginVertical: 20
 				}}
 			/>
-			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+			<Text style={[fontStyles.h_subheading, {
+				paddingHorizontal: 16
+			}]}>
 				{'Scan to publish'}
 			</Text>
 			<View testID={testIDs.SignedMessage.qrView}>
@@ -88,9 +90,7 @@ function SignedMessageView({
 	);
 }
 
-export default function SignedMessage(
-	props: NavigationProps<'SignedMessage'>
-): React.ReactElement {
+export default function SignedMessage(props: NavigationProps<'SignedMessage'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const { sender, message } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
@@ -98,6 +98,7 @@ export default function SignedMessage(
 	useEffect(() => cleanup.current, [cleanup]);
 
 	if (sender === null || message === null) return <View />;
+
 	return (
 		<SignedMessageView
 			sender={sender}

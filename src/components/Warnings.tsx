@@ -19,9 +19,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 
-export function UnknownAccountWarning({
-	isPath
-}: {
+export function UnknownAccountWarning({ isPath }: {
 	isPath?: boolean;
 }): React.ReactElement {
 	return (

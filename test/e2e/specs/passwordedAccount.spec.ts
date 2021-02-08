@@ -1,7 +1,6 @@
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
-import {
-	launchWithScanRequest,
+import { launchWithScanRequest,
 	pinCode,
 	tapBack,
 	testExist,
@@ -10,8 +9,7 @@ import {
 	testRecoverIdentity,
 	testTap,
 	testVisible,
-	waitAlert
-} from 'e2e/utils';
+	waitAlert } from 'e2e/utils';
 
 const {
 	IdentityPin,
@@ -43,9 +41,7 @@ describe('passworded account test', () => {
 			await testTap(PathDetail.popupMenuButton);
 			await testTap(PathDetail.exportButton);
 			await testInput(IdentityPin.passwordInput, password);
-			await testExist(
-				'secret:0xffa534554346807099dfbf034157798cf94541b357a3fe27f37c2175594f4bf5:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:passworded'
-			);
+			await testExist('secret:0xffa534554346807099dfbf034157798cf94541b357a3fe27f37c2175594f4bf5:0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe:passworded');
 		});
 	});
 

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NetworkCard } from 'components/AccountCard';
+import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
 import React, { useContext } from 'react';
@@ -22,13 +22,12 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 
-export default function NetworkDetails({
-	route
-}: NavigationProps<'NetworkDetails'>): React.ReactElement {
+export default function NetworkDetails({ route }: NavigationProps<'NetworkDetails'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
 	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
+
 	return (
 		<SafeAreaScrollViewContainer>
 			<NetworkCard

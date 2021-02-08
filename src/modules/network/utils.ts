@@ -14,23 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	defaultNetworkKey,
+import { defaultNetworkKey,
 	NETWORK_LIST,
 	NetworkProtocols,
 	SubstrateNetworkKeys,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
-import {
-	NetworkParams,
+	UnknownNetworkKeys } from 'constants/networkSpecs';
+import { NetworkParams,
 	SubstrateNetworkBasics,
-	SubstrateNetworkParams
-} from 'types/networkTypes';
+	SubstrateNetworkParams } from 'types/networkTypes';
 
-export const filterNetworks = (
-	networkList: Map<string, NetworkParams>,
-	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
-): Array<[string, NetworkParams]> => {
+export const filterNetworks = (networkList: Map<string, NetworkParams>,
+	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean): Array<[string, NetworkParams]> => {
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
 	if (!__DEV__) {
 		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
@@ -41,16 +35,16 @@ export const filterNetworks = (
 		const shouldExclude = excludedNetworks.includes(networkKey);
 		if (extraFilter !== undefined)
 			return extraFilter(networkKey, shouldExclude);
+
 		return !shouldExclude;
 	};
+
 	return Array.from(networkList.entries())
 		.filter(filterNetworkKeys)
 		.sort((a, b) => a[1].order - b[1].order);
 };
 
-export const checkNewNetworkSpecs = (
-	newNetworkSpec: SubstrateNetworkBasics
-): void => {
+export const checkNewNetworkSpecs = (newNetworkSpec: SubstrateNetworkBasics): void => {
 	//TODO give feedback to UI, check unique of pathId
 	if (
 		!newNetworkSpec.genesisHash ||
@@ -68,12 +62,11 @@ function generateRandomColor(): string {
 	for (let i = 0; i < 6; i++) {
 		color += letters[Math.floor(Math.random() * 16)];
 	}
+
 	return color;
 }
 
-export function getCompleteSubstrateNetworkSpec(
-	newNetworkParams: SubstrateNetworkBasics
-): SubstrateNetworkParams {
+export function getCompleteSubstrateNetworkSpec(newNetworkParams: SubstrateNetworkBasics): SubstrateNetworkParams {
 	const defaultNetworkSpec = NETWORK_LIST[
 		defaultNetworkKey
 	] as SubstrateNetworkParams;
@@ -87,5 +80,8 @@ export function getCompleteSubstrateNetworkSpec(
 		protocol: NetworkProtocols.SUBSTRATE,
 		secondaryColor: generateRandomColor()
 	};
-	return { ...defaultNewNetworkSpecParams, ...newNetworkParams };
+
+	return {
+		...defaultNewNetworkSpecParams, ...newNetworkParams
+	};
 }

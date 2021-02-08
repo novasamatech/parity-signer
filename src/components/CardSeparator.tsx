@@ -14,31 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NetworkProtocols } from 'constants/networkSpecs';
+import Separator from 'components/Separator';
 import React, { ReactElement } from 'react';
-import { Text, TextStyle } from 'react-native';
-import fontStyles from 'styles/fontStyles';
-import { NetworkProtocol } from 'types/networkTypes';
 
-export default function Address(props: {
-	address: string;
-	protocol?: NetworkProtocol;
-	style?: TextStyle;
-}): ReactElement {
-	const {
-		address, protocol = NetworkProtocols.SUBSTRATE, style = {
-		}
-	} = props;
-	const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
-
-	return (
-		<Text
-			numberOfLines={1}
-			style={[style, fontStyles.t_codeS]}
-			ellipsizeMode="middle"
-		>
-			{prefix}
-			{address}
-		</Text>
-	);
-}
+export const CardSeparator = (): ReactElement => (
+	<Separator
+		shadow={true}
+		style={{
+			backgroundColor: 'transparent',
+			height: 0,
+			marginVertical: 0
+		}}
+	/>
+);

@@ -23,10 +23,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import {
-	RegistriesContext,
-	RegistriesStoreState
-} from 'stores/RegistriesContext';
+import { RegistriesContext,
+	RegistriesStoreState } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
@@ -44,138 +42,144 @@ type ExtrinsicPartProps = {
 	value: AnyJson | AnyU8a | IMethod | IExtrinsicEra;
 };
 
-const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
-	({
-		fallback,
-		label,
-		networkKey,
-		registriesStore,
-		value
-	}: ExtrinsicPartProps): React.ReactElement => {
-		const [period, setPeriod] = useState<string>();
-		const [phase, setPhase] = useState<string>();
-		const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
-		const [tip, setTip] = useState<string>();
-		const [useFallback, setUseFallBack] = useState(false);
-		const { getTypeRegistry } = useContext(RegistriesContext);
-		const { setAlert } = useContext(AlertStateContext);
-		const { networks, getSubstrateNetwork } = useContext(NetworksContext);
-		const networkParams = getSubstrateNetwork(networkKey);
-		const prefix = networkParams.prefix;
-		const typeRegistry = getTypeRegistry(networks, networkKey)!;
+const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({
+	fallback,
+	label,
+	networkKey,
+	registriesStore,
+	value
+}: ExtrinsicPartProps): React.ReactElement => {
+	const [period, setPeriod] = useState<string>();
+	const [phase, setPhase] = useState<string>();
+	const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
+	const [tip, setTip] = useState<string>();
+	const [useFallback, setUseFallBack] = useState(false);
+	const { getTypeRegistry } = useContext(RegistriesContext);
+	const { setAlert } = useContext(AlertStateContext);
+	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+	const networkParams = getSubstrateNetwork(networkKey);
+	const prefix = networkParams.prefix;
+	const typeRegistry = getTypeRegistry(networks, networkKey)!;
 
-		useEffect(() => {
-			if (label === 'Method' && !fallback) {
-				try {
-					const call = typeRegistry.createType('Call', value);
-					const methodArgs = {};
+	useEffect(() => {
+		if (label === 'Method' && !fallback) {
+			try {
+				const call = typeRegistry.createType('Call', value);
+				const methodArgs = {
+				};
 
-					function formatArgs(
-						callInstance: Call,
-						callMethodArgs: any,
-						depth: number
-					): void {
-						const { args, meta } = callInstance;
-						const paramArgKvArray = [];
-						if (!meta.args.length) {
-							const sectionMethod = `${call.method}.${call.section}`;
-							callMethodArgs[sectionMethod] = null;
-							return;
-						}
+				function formatArgs(callInstance: Call,
+					callMethodArgs: any,
+					depth: number): void {
+					const { args, meta } = callInstance;
+					const paramArgKvArray = [];
+					if (!meta.args.length) {
+						const sectionMethod = `${call.method}.${call.section}`;
+						callMethodArgs[sectionMethod] = null;
 
-						for (let i = 0; i < meta.args.length; i++) {
-							let argument;
-							if (
-								args[i].toRawType() === 'Balance' ||
-								args[i].toRawType() === 'Compact<Balance>'
-							) {
-								argument = formatBalance(args[i].toString());
-							} else if (
-								args[i].toRawType() === 'Address' ||
-								args[i].toRawType() === 'AccountId'
-							) {
-								// encode Address and AccountId to the appropriate prefix
-								argument = recodeAddress(args[i].toString(), prefix);
-							} else if ((args[i] as Call).section) {
-								argument = formatArgs(args[i] as Call, callMethodArgs, depth++); // go deeper into the nested calls
-							} else if (
-								args[i].toRawType() === 'Vec<AccountId>' ||
-								args[i].toRawType() === 'Vec<Address>'
-							) {
-								argument = (args[i] as any).map((v: any) =>
-									recodeAddress(v.toString(), prefix)
-								);
-							} else {
-								argument = args[i].toString();
-							}
-							const param = meta.args[i].name.toString();
-							const sectionMethod = `${call.method}.${call.section}`;
-							paramArgKvArray.push([param, argument]);
-							callMethodArgs[sectionMethod] = paramArgKvArray;
-						}
+						return;
 					}
 
-					formatArgs(call, methodArgs, 0);
-					setFormattedCallArgs(methodArgs);
-				} catch (e) {
-					alertDecodeError(setAlert);
-					setUseFallBack(true);
+					for (let i = 0; i < meta.args.length; i++) {
+						let argument;
+						if (
+							args[i].toRawType() === 'Balance' ||
+								args[i].toRawType() === 'Compact<Balance>'
+						) {
+							argument = formatBalance(args[i].toString());
+						} else if (
+							args[i].toRawType() === 'Address' ||
+								args[i].toRawType() === 'AccountId'
+						) {
+							// encode Address and AccountId to the appropriate prefix
+							argument = recodeAddress(args[i].toString(), prefix);
+						} else if ((args[i] as Call).section) {
+							argument = formatArgs(args[i] as Call, callMethodArgs, depth++); // go deeper into the nested calls
+						} else if (
+							args[i].toRawType() === 'Vec<AccountId>' ||
+								args[i].toRawType() === 'Vec<Address>'
+						) {
+							argument = (args[i] as any).map((v: any) =>
+								recodeAddress(v.toString(), prefix));
+						} else {
+							argument = args[i].toString();
+						}
+						const param = meta.args[i].name.toString();
+						const sectionMethod = `${call.method}.${call.section}`;
+						paramArgKvArray.push([param, argument]);
+						callMethodArgs[sectionMethod] = paramArgKvArray;
+					}
 				}
-			}
 
-			if (label === 'Era' && !fallback) {
-				if ((value as ExtrinsicEra).isMortalEra) {
-					setPeriod((value as ExtrinsicEra).asMortalEra.period.toString());
-					setPhase((value as ExtrinsicEra).asMortalEra.phase.toString());
-				}
+				formatArgs(call, methodArgs, 0);
+				setFormattedCallArgs(methodArgs);
+			} catch (e) {
+				alertDecodeError(setAlert);
+				setUseFallBack(true);
 			}
+		}
 
-			if (label === 'Tip' && !fallback) {
-				setTip(formatBalance(value as any));
+		if (label === 'Era' && !fallback) {
+			if ((value as ExtrinsicEra).isMortalEra) {
+				setPeriod((value as ExtrinsicEra).asMortalEra.period.toString());
+				setPhase((value as ExtrinsicEra).asMortalEra.phase.toString());
 			}
-		}, [
-			fallback,
-			label,
-			prefix,
-			value,
-			networkKey,
-			registriesStore,
-			setAlert,
-			typeRegistry,
-			networks
-		]);
+		}
 
-		const renderEraDetails = (): React.ReactElement => {
-			if (period && phase) {
-				return (
-					<View style={styles.era}>
-						<Text style={{ ...styles.secondaryText, flex: 1 }}>
+		if (label === 'Tip' && !fallback) {
+			setTip(formatBalance(value as any));
+		}
+	}, [
+		fallback,
+		label,
+		prefix,
+		value,
+		networkKey,
+		registriesStore,
+		setAlert,
+		typeRegistry,
+		networks
+	]);
+
+	const renderEraDetails = (): React.ReactElement => {
+		if (period && phase) {
+			return (
+				<View style={styles.era}>
+					<Text style={{
+						...styles.secondaryText, flex: 1
+					}}>
 							phase: {phase}{' '}
-						</Text>
-						<Text style={{ ...styles.secondaryText, flex: 1 }}>
+					</Text>
+					<Text style={{
+						...styles.secondaryText, flex: 1
+					}}>
 							period: {period}
-						</Text>
-					</View>
-				);
-			} else {
-				return (
-					<View
-						style={{
-							display: 'flex',
-							flexDirection: 'row',
-							flexWrap: 'wrap'
-						}}
-					>
-						<Text style={{ ...styles.secondaryText, flex: 1 }}>
+					</Text>
+				</View>
+			);
+		} else {
+			return (
+				<View
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+						flexWrap: 'wrap'
+					}}
+				>
+					<Text style={{
+						...styles.secondaryText, flex: 1
+					}}>
 							Immortal Era
-						</Text>
-						<Text style={{ ...styles.secondaryText, flex: 3 }}>
-							{value?.toString()}
-						</Text>
-					</View>
-				);
-			}
-		};
+					</Text>
+					<Text style={{
+						...styles.secondaryText, flex: 3
+					}}>
+						{value?.toString()}
+					</Text>
+				</View>
+			);
+		}
+	};
 
 		type ArgsList = Array<[string, any]>;
 		type MethodCall = [string, ArgsList];
@@ -233,15 +237,21 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 
 		const renderTipDetails = (): React.ReactElement => {
 			return (
-				<View style={{ display: 'flex', flexDirection: 'column' }}>
+				<View style={{
+					display: 'flex', flexDirection: 'column'
+				}}>
 					<Text style={styles.secondaryText}>{tip}</Text>
 				</View>
 			);
 		};
 
 		return (
-			<View style={[{ alignItems: 'baseline', justifyContent: 'flex-start' }]}>
-				<View style={{ marginBottom: 12, width: '100%' }}>
+			<View style={[{
+				alignItems: 'baseline', justifyContent: 'flex-start'
+			}]}>
+				<View style={{
+					marginBottom: 12, width: '100%'
+				}}>
 					<Text style={styles.label}>{label}</Text>
 					{label === 'Method' && !useFallback ? (
 						renderMethodDetails()
@@ -257,8 +267,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 				</View>
 			</View>
 		);
-	}
-);
+});
 
 interface PayloadDetailsCardProps {
 	description?: string;
@@ -268,9 +277,7 @@ interface PayloadDetailsCardProps {
 	networkKey: string;
 }
 
-export default function PayloadDetailsCard(
-	props: PayloadDetailsCardProps
-): React.ReactElement {
+export default function PayloadDetailsCard(props: PayloadDetailsCardProps): React.ReactElement {
 	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 	const { networkKey, description, payload, signature, style } = props;
 	const isKnownNetworkKey = networks.has(networkKey);

@@ -24,9 +24,7 @@ import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import React from 'react';
 import { NavigationProps } from 'types/props';
 
-export default function PinNew({
-	route
-}: NavigationProps<'PinNew'>): React.ReactElement {
+export default function PinNew({ route }: NavigationProps<'PinNew'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
 
 	function submit(): void {
@@ -37,8 +35,12 @@ export default function PinNew({
 			resolve(pin);
 		} else {
 			if (pin.length < 6) {
-				updateState({ pinTooShort: true });
-			} else if (pin !== confirmation) updateState({ pinMismatch: true });
+				updateState({
+					pinTooShort: true
+				});
+			} else if (pin !== confirmation) updateState({
+				pinMismatch: true
+			});
 		}
 	}
 
@@ -58,9 +60,13 @@ export default function PinNew({
 				autoFocus
 				testID={testIDs.IdentityPin.setPin}
 				returnKeyType="next"
-				onFocus={(): void => updateState({ focusConfirmation: false })}
+				onFocus={(): void => updateState({
+					focusConfirmation: false
+				})}
 				onSubmitEditing={(): void => {
-					updateState({ focusConfirmation: true });
+					updateState({
+						focusConfirmation: true
+					});
 				}}
 				onChangeText={onPinInputChange('pin', updateState)}
 				value={state.pin}

@@ -47,7 +47,8 @@ describe('units', () => {
 		const getResultFromMethod = (method: Call): any => {
 			const { args, meta } = method;
 
-			const result = {} as any;
+			const result = {
+			} as any;
 			for (let i = 0; i < meta.args.length; i++) {
 				let value;
 				if (
@@ -60,6 +61,7 @@ describe('units', () => {
 				}
 				result[meta.args[i].name.toString()] = value;
 			}
+
 			return result;
 		};
 
@@ -69,43 +71,31 @@ describe('units', () => {
 				unit: 'KSM'
 			});
 
-			method_1 = new Call(
-				registry,
-				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f'
-			);
-			method_2 = new Call(
-				registry,
-				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110ae2d45a1d'
-			);
-			method_3 = new Call(
-				registry,
-				'0x0400ffd9d249ea49e9ae53fc0df3df40d3b070c88e387c265841fe2f3362970d864fdf1f0000606b82534ae05e4508'
-			);
+			method_1 = new Call(registry,
+				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f');
+			method_2 = new Call(registry,
+				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110ae2d45a1d');
+			method_3 = new Call(registry,
+				'0x0400ffd9d249ea49e9ae53fc0df3df40d3b070c88e387c265841fe2f3362970d864fdf1f0000606b82534ae05e4508');
 		});
 
 		it('should format KSM', () => {
 			const result = getResultFromMethod(method_1);
-			expect(result.dest).toBe(
-				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
-			);
+			expect(result.dest).toBe('5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc');
 			expect(result.value).toBe('123.000 KSM');
 		});
 
 		it('should format decimals for less than one KSM', () => {
 			const result = getResultFromMethod(method_2);
 
-			expect(result.dest).toBe(
-				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
-			);
+			expect(result.dest).toBe('5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc');
 			expect(result.value).toBe('123.123µ KSM');
 		});
 
 		it('should format absurdly large KSM', () => {
 			const result = getResultFromMethod(method_3);
 
-			expect(result.dest).toBe(
-				'5GzJiY3oG9LcyDiJbEJ6UF8jDF1AGeE2MgeXgSwgGCPopWsb'
-			);
+			expect(result.dest).toBe('5GzJiY3oG9LcyDiJbEJ6UF8jDF1AGeE2MgeXgSwgGCPopWsb');
 			expect(result.value).toBe('9.999T KSM');
 		});
 	});

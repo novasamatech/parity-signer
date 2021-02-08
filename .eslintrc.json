@@ -28,18 +28,27 @@
 	],
 	"rules": {
 			"comma-dangle": ["error", "never"],
+			"function-paren-newline": ["error", { "minItems": 8 }],
 			"indent": ["error", "tab"],
 			"quotes": ["error", "single", { "avoidEscape": true }],
+			"newline-before-return": "error",
 			"no-bitwise": "off",
 			"no-multiple-empty-lines": ["error", {"max": 1}],
 			"no-trailing-spaces": ["warn"],
 			"no-unused-vars": ["error", { "args": "none" }],
 			"object-curly-spacing": ["error", "always"],
+			"object-curly-newline": ["error", {
+				"ObjectExpression": "always",
+				"ObjectPattern": { "multiline": true },
+				"ImportDeclaration": "never",
+				"ExportDeclaration": { "multiline": true, "minProperties": 8 }
+			}],
 			"react-hooks/exhaustive-deps": "warn",
 			"react-hooks/rules-of-hooks": "error",
 			"semi": "off",
 			"simple-import-sort/imports": "error",
 			"sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}],
+			"space-in-parens": ["error", "never"],
 			"switch-colon-spacing": ["error", {"after": true, "before": false}]
 	},
 	"settings": {

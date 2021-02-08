@@ -16,13 +16,11 @@
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import React from 'react';
-import {
-	Animated,
+import { Animated,
 	LayoutChangeEvent,
 	ScrollView,
 	StyleSheet,
-	ViewStyle
-} from 'react-native';
+	ViewStyle } from 'react-native';
 import colors from 'styles/colors';
 
 export default class CustomScrollView extends React.PureComponent<
@@ -61,22 +59,26 @@ export default class CustomScrollView extends React.PureComponent<
 					bounces={false}
 					showsVerticalScrollIndicator={false}
 					onContentSizeChange={(width: number, height: number): void => {
-						this.setState({ wholeHeight: height });
+						this.setState({
+							wholeHeight: height
+						});
 					}}
-					onLayout={({
-						nativeEvent: {
-							layout: { height }
-						}
-					}: LayoutChangeEvent): void =>
-						this.setState({ visibleHeight: height })
+					onLayout={({ nativeEvent: { layout: { height } } }: LayoutChangeEvent): void =>
+						this.setState({
+							visibleHeight: height
+						})
 					}
 					scrollEventThrottle={16}
-					onScroll={Animated.event(
-						[{ nativeEvent: { contentOffset: { y: this.state.indicator } } }],
-						{
-							useNativeDriver: false
+					onScroll={Animated.event([{
+						nativeEvent: {
+							contentOffset: {
+								y: this.state.indicator
+							}
 						}
-					)}
+					}],
+					{
+						useNativeDriver: false
+					})}
 					{...this.props}
 				>
 					{this.props.children}
@@ -88,10 +90,8 @@ export default class CustomScrollView extends React.PureComponent<
 							height: indicatorSize,
 							transform: [
 								{
-									translateY: Animated.multiply(
-										this.state.indicator,
-										this.state.visibleHeight / this.state.wholeHeight
-									).interpolate({
+									translateY: Animated.multiply(this.state.indicator,
+										this.state.visibleHeight / this.state.wholeHeight).interpolate({
 										extrapolate: 'clamp',
 										inputRange: [0, difference],
 										outputRange: [0, difference]

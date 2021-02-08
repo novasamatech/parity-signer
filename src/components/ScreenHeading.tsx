@@ -29,22 +29,26 @@ import { ButtonListener } from 'types/props';
 import AccountIcon from './AccountIcon';
 import ButtonIcon from './ButtonIcon';
 
-const renderSubtitle = (
-	subtitle?: string,
+const renderSubtitle = (subtitle?: string,
 	hasSubtitleIcon?: boolean,
 	isAlignLeft?: boolean,
 	isError?: boolean,
-	multiline?: boolean
-): ReactNode => {
+	multiline?: boolean): ReactNode => {
 	if (!subtitle || subtitle === '') return;
 	const subtitleBodyStyle: ViewStyle[] = [baseStyles.subtitleBody],
 		subtitleTextStyle: TextStyle[] = [
 			fontStyles.t_codeS,
-			{ color: colors.text.faded }
+			{
+				color: colors.text.faded
+			}
 		];
 	if (isAlignLeft) {
-		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
-		subtitleTextStyle.push({ textAlign: 'left' });
+		subtitleBodyStyle.push({
+			justifyContent: 'flex-start'
+		});
+		subtitleTextStyle.push({
+			textAlign: 'left'
+		});
 	}
 	if (isError) {
 		subtitleTextStyle.push(baseStyles.t_error);
@@ -65,26 +69,35 @@ const renderSubtitle = (
 };
 const renderSubtitleIcon = (hasSubtitleIcon?: boolean): ReactNode => {
 	if (!hasSubtitleIcon) return;
+
 	return <AntIcon name="user" size={10} color={colors.text.faded} />;
 };
 
 const renderBack = (onPress?: ButtonListener): ReactNode => {
 	if (!onPress) return;
+
 	return (
 		<ButtonIcon
 			iconName="arrowleft"
 			iconType="antdesign"
 			onPress={onPress}
 			testID={testIDs.Main.backButton}
-			style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
-			iconBgStyle={{ backgroundColor: 'transparent' }}
+			style={StyleSheet.flatten([baseStyles.icon, {
+				left: 0
+			}])}
+			iconBgStyle={{
+				backgroundColor: 'transparent'
+			}}
 		/>
 	);
 };
 const renderIcon = (iconName?: string, iconType?: string): ReactNode => {
 	if (!iconName) return;
+
 	return (
-		<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
+		<View style={[baseStyles.icon, {
+			paddingLeft: 16
+		}]}>
 			<Icon name={iconName} type={iconType} color={colors.text.main} />
 		</View>
 	);
@@ -116,13 +129,16 @@ export function LeftScreenHeading({
 	};
 	const { getNetwork } = useContext(NetworksContext);
 	const isDisabled = onPress === undefined;
+
 	return (
 		<TouchableItem
 			style={baseStyles.bodyWithIcon}
 			onPress={onPress}
 			disabled={isDisabled}
 		>
-			<View style={{ alignItems: 'center', flexDirection: 'row' }}>
+			<View style={{
+				alignItems: 'center', flexDirection: 'row'
+			}}>
 				<AccountIcon
 					address={''}
 					network={getNetwork(networkKey)}
@@ -192,7 +208,9 @@ export default class ScreenHeading extends React.PureComponent<{
 		} = this.props;
 
 		return (
-			<View style={{ ...baseStyles.body, flexDirection: 'row' }}>
+			<View style={{
+				...baseStyles.body, flexDirection: 'row'
+			}}>
 				{renderIcon(iconName, iconType)}
 				<View style={baseStyles.titles}>
 					<Text style={baseStyles.text}>{title}</Text>

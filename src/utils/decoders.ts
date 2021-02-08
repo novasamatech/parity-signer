@@ -14,21 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	compactFromU8a,
+import { compactFromU8a,
 	hexStripPrefix,
 	hexToU8a,
-	u8aToHex
-} from '@polkadot/util';
+	u8aToHex } from '@polkadot/util';
 import { encodeAddress } from '@polkadot/util-crypto';
 import strings from 'modules/sign/strings';
 import { SubstrateNetworkParams } from 'types/networkTypes';
-import {
-	EthereumParsedData,
+import { EthereumParsedData,
 	ParsedData,
 	SubstrateCompletedParsedData,
-	SubstrateMultiParsedData
-} from 'types/scannerTypes';
+	SubstrateMultiParsedData } from 'types/scannerTypes';
 import { blake2b } from 'utils/native';
 
 /*
@@ -101,11 +97,9 @@ export function rawDataToU8A(rawData: string): Uint8Array | null {
   ec11ec11ec11ec // SQRC filler bytes
   */
 
-export async function constructDataFromBytes(
-	bytes: Uint8Array,
+export async function constructDataFromBytes(bytes: Uint8Array,
 	multipartComplete = false,
-	networks: Map<string, SubstrateNetworkParams>
-): Promise<ParsedData> {
+	networks: Map<string, SubstrateNetworkParams>): Promise<ParsedData> {
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
 	const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
@@ -121,6 +115,7 @@ export async function constructDataFromBytes(
 			isMultipart,
 			partData: uosAfterFrames
 		};
+
 		return partData;
 	}
 
@@ -136,7 +131,8 @@ export async function constructDataFromBytes(
 		case '45': {
 			// Ethereum UOS payload
 			const data = {
-				data: {} // for consistency with legacy data format.
+				data: {
+				} // for consistency with legacy data format.
 			} as EthereumParsedData;
 			action =
 					firstByte === '00' || firstByte === '01'
@@ -155,12 +151,14 @@ export async function constructDataFromBytes(
 			} else {
 				throw new Error('Could not determine action type.');
 			}
+
 			return data;
 		}
 		case '53': {
 			// Substrate UOS payload
 			const data = {
-				data: {} // for consistency with legacy data format.
+				data: {
+				} // for consistency with legacy data format.
 			} as SubstrateCompletedParsedData;
 			try {
 				data.data.crypto =
@@ -193,10 +191,8 @@ export async function constructDataFromBytes(
 					data.data.data = isOversized
 						? await blake2b(u8aToHex(payload, -1, false))
 						: rawPayload;
-					data.data.account = encodeAddress(
-						publicKeyAsBytes,
-						network.prefix
-					); // encode to the prefix;
+					data.data.account = encodeAddress(publicKeyAsBytes,
+						network.prefix); // encode to the prefix;
 
 					break;
 				case '01': // data is a hash
@@ -204,20 +200,17 @@ export async function constructDataFromBytes(
 					data.oversized = false;
 					data.isHash = true;
 					data.data.data = hexPayload;
-					data.data.account = encodeAddress(
-						publicKeyAsBytes,
-						network.prefix
-					); // default to Kusama
+					data.data.account = encodeAddress(publicKeyAsBytes,
+						network.prefix); // default to Kusama
 					break;
 				default:
 					break;
 				}
 			} catch (e) {
-				throw new Error(
-					'Error: something went wrong decoding the Substrate UOS payload: ' +
-							uosAfterFrames
-				);
+				throw new Error('Error: something went wrong decoding the Substrate UOS payload: ' +
+							uosAfterFrames);
 			}
+
 			return data;
 		}
 		default:
@@ -230,6 +223,7 @@ export async function constructDataFromBytes(
 
 export function decodeToString(message: Uint8Array): string {
 	const encodedString = String.fromCharCode.apply(null, Array.from(message));
+
 	return decodeURIComponent(escape(encodedString));
 }
 
@@ -239,6 +233,7 @@ export function asciiToHex(message: string): string {
 		const hex = Number(message.charCodeAt(i)).toString(16);
 		result.push(hex);
 	}
+
 	return result.join('');
 }
 
@@ -262,6 +257,7 @@ export function isJsonString(str: any): boolean {
 	} catch (e) {
 		return false;
 	}
+
 	return true;
 }
 

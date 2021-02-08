@@ -41,9 +41,7 @@ import { SURIObject } from 'types/scannerTypes';
  * @returns {DerivationPathObject}
  */
 
-export function parseDerivationPath(
-	input: string
-): {
+export function parseDerivationPath(input: string): {
 	derivePath: string;
 	password: string;
 } {

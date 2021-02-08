@@ -15,15 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import colors from 'styles/colors';
-import {
-	EthereumNetworkDefaultConstants,
+import { EthereumNetworkDefaultConstants,
 	EthereumNetworkParams,
 	NetworkParams,
 	NetworkProtocol,
 	SubstrateNetworkDefaultConstant,
 	SubstrateNetworkParams,
-	UnknownNetworkParams
-} from 'types/networkTypes';
+	UnknownNetworkParams } from 'types/networkTypes';
 
 export const unknownNetworkPathId = '';
 
@@ -53,21 +51,15 @@ export const EthereumNetworkKeys: Record<string, string> = Object.freeze({
 
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
-	CENTRIFUGE:
-		'0x67dddf2673b69e5f875f6f25277495834398eafd67f492e09f3f3345e003d1b5', // https://portal.chain.centrifuge.io/#/explorer/query/0
-	CENTRIFUGE_AMBER:
-		'0x092af6e7d25178ebab1677d15f66e37b30392b44ef442f728a53dd1bf48ec110', // https://portal.chain.centrifuge.io/#/explorer/query/0
-	EDGEWARE:
-		'0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
+	CENTRIFUGE: '0x67dddf2673b69e5f875f6f25277495834398eafd67f492e09f3f3345e003d1b5', // https://portal.chain.centrifuge.io/#/explorer/query/0
+	CENTRIFUGE_AMBER: '0x092af6e7d25178ebab1677d15f66e37b30392b44ef442f728a53dd1bf48ec110', // https://portal.chain.centrifuge.io/#/explorer/query/0
+	EDGEWARE: '0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
 	KULUPU: '0xf7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba',
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
-	KUSAMA_DEV:
-		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
-	POLKADOT:
-		'0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+	KUSAMA_DEV: '0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
+	POLKADOT: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
 	ROCOCO: '0x78ae7dc7e64637e01fa6a6b6e4fa252c486f62af7aa71c471ad17f015bd375ce',
-	SUBSTRATE_DEV:
-		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
+	SUBSTRATE_DEV: '0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
 });
 
@@ -210,6 +202,7 @@ const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
 		color: '#8B94B3',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
 		order: 101,
+		pathId: 'frontier',
 		secondaryColor: colors.background.card,
 		title: 'Ethereum'
 	},
@@ -218,22 +211,26 @@ const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
 		ethereumChainId: EthereumNetworkKeys.CLASSIC,
 		logo: require('res/img/logos/Ethereum_Classic.png'),
 		order: 102,
+		pathId: 'classic',
 		secondaryColor: colors.background.card,
 		title: 'Ethereum Classic'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
 		ethereumChainId: EthereumNetworkKeys.ROPSTEN,
 		order: 104,
+		pathId: 'ropsten',
 		title: 'Ropsten Testnet'
 	},
 	[EthereumNetworkKeys.GOERLI]: {
 		ethereumChainId: EthereumNetworkKeys.GOERLI,
 		order: 105,
+		pathId: 'goerli',
 		title: 'Görli Testnet'
 	},
 	[EthereumNetworkKeys.KOVAN]: {
 		ethereumChainId: EthereumNetworkKeys.KOVAN,
 		order: 103,
+		pathId: 'kovan',
 		title: 'Kovan Testnet'
 	}
 };
@@ -262,7 +259,8 @@ function setEthereumNetworkDefault(): Record<string, EthereumNetworkParams> {
 				...ethereumNetworkBase[networkKey]
 			}
 		};
-	}, {});
+	}, {
+	});
 }
 
 function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
@@ -274,29 +272,18 @@ function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
 				...substrateNetworkBase[networkKey]
 			}
 		};
-	}, {});
+	}, {
+	});
 }
 
-export const ETHEREUM_NETWORK_LIST: Record<
-	string,
-	EthereumNetworkParams
-> = Object.freeze(setEthereumNetworkDefault());
-export const SUBSTRATE_NETWORK_LIST: Record<
-	string,
-	SubstrateNetworkParams
-> = Object.freeze(setSubstrateNetworkDefault());
-export const UNKNOWN_NETWORK: Record<
-	string,
-	UnknownNetworkParams
-> = Object.freeze(unknownNetworkBase);
+export const ETHEREUM_NETWORK_LIST: Record< string, EthereumNetworkParams> = Object.freeze(setEthereumNetworkDefault());
+export const SUBSTRATE_NETWORK_LIST: Record< string, SubstrateNetworkParams> = Object.freeze(setSubstrateNetworkDefault());
+export const UNKNOWN_NETWORK: Record< string, UnknownNetworkParams> = Object.freeze(unknownNetworkBase);
 
-export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(
-	Object.assign(
-		{},
-		SUBSTRATE_NETWORK_LIST,
-		ETHEREUM_NETWORK_LIST,
-		UNKNOWN_NETWORK
-	)
-);
+export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(Object.assign({
+},
+SUBSTRATE_NETWORK_LIST,
+ETHEREUM_NETWORK_LIST,
+UNKNOWN_NETWORK));
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;

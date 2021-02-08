@@ -51,17 +51,19 @@ function SignedTxView({
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
-	const [isProcessing, payload] = usePayloadDetails(
-		rawPayload,
-		sender.networkKey
-	);
+	const [isProcessing, payload] = usePayloadDetails(rawPayload,
+		sender.networkKey);
 
 	function renderPayloadDetails(): React.ReactNode {
 		if (isEthereum) {
 			return (
-				<View style={[styles.bodyContent, { marginTop: 16 }]}>
+				<View style={[styles.bodyContent, {
+					marginTop: 16
+				}]}>
 					<TxDetailsCard
-						style={{ marginBottom: 20 }}
+						style={{
+							marginBottom: 20
+						}}
 						description={strings.INFO_ETH_TX}
 						value={value}
 						gas={gas}
@@ -100,7 +102,9 @@ function SignedTxView({
 					marginVertical: 20
 				}}
 			/>
-			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+			<Text style={[fontStyles.h_subheading, {
+				paddingHorizontal: 16
+			}]}>
 				{'Scan to publish'}
 			</Text>
 			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
@@ -118,6 +122,7 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 	useEffect(() => cleanup.current, [cleanup]);
 
 	if (sender === null || recipient === null) return <View />;
+
 	return (
 		<SignedTxView
 			sender={sender}

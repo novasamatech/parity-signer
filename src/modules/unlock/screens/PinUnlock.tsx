@@ -39,11 +39,9 @@ function PinUnlock({
 			try {
 				if (route.params.shouldReturnSeed) {
 					const resolveSeedPhrase = route.params.resolve;
-					const seedPhrase = await unlockIdentitySeedWithReturn(
-						pin,
+					const seedPhrase = await unlockIdentitySeedWithReturn(pin,
 						targetIdentity,
-						createSeedRef
-					);
+						createSeedRef);
 					resetState();
 					resolveSeedPhrase(seedPhrase);
 				} else {
@@ -53,10 +51,14 @@ function PinUnlock({
 					resolve();
 				}
 			} catch (e) {
-				updateState({ pin, pinMismatch: true });
+				updateState({
+					pin, pinMismatch: true
+				});
 			}
 		} else {
-			updateState({ pin, pinTooShort: true });
+			updateState({
+				pin, pinTooShort: true
+			});
 		}
 	}
 

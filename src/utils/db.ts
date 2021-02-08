@@ -25,6 +25,7 @@ import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
+
 	return [];
 }
 
@@ -50,31 +51,27 @@ export async function loadAccounts(version = 3): Promise<Map<string, any>> {
 		sharedPreferencesName: accountsStoreVersion
 	};
 
-	return SecureStorage.getAllItems(accountsStore).then(
-		(accounts: { [key: string]: string }) => {
-			const accountMap = new Map();
-			for (const [key, value] of Object.entries(accounts)) {
-				const account = JSON.parse(value);
-				accountMap.set(key, { ...account });
-			}
-
-			return accountMap;
+	return SecureStorage.getAllItems(accountsStore).then((accounts: { [key: string]: string }) => {
+		const accountMap = new Map();
+		for (const [key, value] of Object.entries(accounts)) {
+			const account = JSON.parse(value);
+			accountMap.set(key, {
+				...account
+			});
 		}
-	);
+
+		return accountMap;
+	});
 }
 
 export const deleteAccount = (accountKey: string): Promise<void> =>
 	SecureStorage.deleteItem(accountKey, currentAccountsStore);
 
-export const saveAccount = (
-	accountKey: string,
-	account: Account
-): Promise<void> =>
-	SecureStorage.setItem(
-		accountKey,
+export const saveAccount = (accountKey: string,
+	account: Account): Promise<void> =>
+	SecureStorage.setItem(accountKey,
 		JSON.stringify(account, null, 0),
-		currentAccountsStore
-	);
+		currentAccountsStore);
 
 /*
  * ========================================
@@ -90,11 +87,10 @@ const currentIdentityStorageLabel = 'identities_v4';
 export async function loadIdentities(version = 4): Promise<Identity[]> {
 	const identityStorageLabel = `identities_v${version}`;
 	try {
-		const identities = await SecureStorage.getItem(
-			identityStorageLabel,
-			identitiesStore
-		);
+		const identities = await SecureStorage.getItem(identityStorageLabel,
+			identitiesStore);
 		if (!identities) return [];
+
 		return deserializeIdentities(identities);
 	} catch (e) {
 		return handleError(e, 'identity');
@@ -102,11 +98,9 @@ export async function loadIdentities(version = 4): Promise<Identity[]> {
 }
 
 export const saveIdentities = (identities: Identity[]): void => {
-	SecureStorage.setItem(
-		currentIdentityStorageLabel,
+	SecureStorage.setItem(currentIdentityStorageLabel,
 		serializeIdentities(identities),
-		identitiesStore
-	);
+		identitiesStore);
 };
 
 /*
@@ -124,37 +118,31 @@ export async function loadNetworks(): Promise<
 	Map<string, SubstrateNetworkParams>
 	> {
 	try {
-		const networksJson = await SecureStorage.getItem(
-			currentNetworkStorageLabel,
-			networkStorage
-		);
+		const networksJson = await SecureStorage.getItem(currentNetworkStorageLabel,
+			networkStorage);
 
 		if (!networksJson) return new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
 		const networksEntries = JSON.parse(networksJson);
+
 		return mergeNetworks(SUBSTRATE_NETWORK_LIST, networksEntries);
 	} catch (e) {
 		handleError(e, 'networks');
+
 		return new Map();
 	}
 }
 
-export async function saveNetworks(
-	newNetwork: SubstrateNetworkParams
-): Promise<void> {
+export async function saveNetworks(newNetwork: SubstrateNetworkParams): Promise<void> {
 	try {
 		let addedNetworks = new Map();
-		const addedNetworkJson = await SecureStorage.getItem(
-			currentNetworkStorageLabel,
-			networkStorage
-		);
+		const addedNetworkJson = await SecureStorage.getItem(currentNetworkStorageLabel,
+			networkStorage);
 		if (addedNetworkJson) addedNetworks = new Map(JSON.parse(addedNetworkJson));
 
 		addedNetworks.set(newNetwork.genesisHash, newNetwork);
-		SecureStorage.setItem(
-			currentNetworkStorageLabel,
+		SecureStorage.setItem(currentNetworkStorageLabel,
 			serializeNetworks(addedNetworks),
-			networkStorage
-		);
+			networkStorage);
 	} catch (e) {
 		handleError(e, 'networks');
 	}

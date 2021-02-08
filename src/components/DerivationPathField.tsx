@@ -15,13 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from 'react';
-import {
-	StyleSheet,
+import { StyleSheet,
 	Text,
 	TextStyle,
 	TouchableOpacity,
-	View
-} from 'react-native';
+	View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -50,7 +48,9 @@ export default function DerivationPathField(props: {
 	return (
 		<>
 			<TouchableOpacity onPress={toggleShowAdvancedField}>
-				<View style={{ justifyContent: 'center' }}>
+				<View style={{
+					justifyContent: 'center'
+				}}>
 					<Text
 						style={StyleSheet.flatten([styles.title, ownStyles.advancedText])}
 					>
@@ -87,7 +87,8 @@ export default function DerivationPathField(props: {
 					placeholder="optional derivation path"
 					style={StyleSheet.flatten([
 						fontStyles.h2,
-						isValidPath ? {} : ownStyles.invalidInput
+						isValidPath ? {
+						} : ownStyles.invalidInput
 					])}
 				/>
 			)}

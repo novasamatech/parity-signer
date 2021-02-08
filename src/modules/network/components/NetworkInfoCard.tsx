@@ -25,6 +25,7 @@ export default function NetworkInfoCard(props: {
 	small?: boolean;
 }): React.ReactElement {
 	const { label, small, text } = props;
+
 	return (
 		<View style={styles.body}>
 			<View style={styles.label}>

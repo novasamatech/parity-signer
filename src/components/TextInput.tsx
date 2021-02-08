@@ -15,8 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import {
-	StyleSheet,
+import { StyleSheet,
 	Text,
 	TextInput as TextInputOrigin,
 	TextInputProps,
@@ -51,6 +50,7 @@ export default class TextInput extends React.PureComponent<Props> {
 	renderLabel(): React.ReactNode {
 		const { label } = this.props;
 		if (!label) return;
+
 		return <Text style={styles.label}>{label}</Text>;
 	}
 

@@ -16,13 +16,11 @@
 
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { ReactElement } from 'react';
-import {
-	FlatList,
+import { FlatList,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
-	View
-} from 'react-native';
+	View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -73,45 +71,46 @@ export default class AccountIconChooser extends React.PureComponent<
 		} = this.props;
 
 		// clean previous selection
-		onSelect({ isBip39: false, newAddress: '', newSeed: '' });
+		onSelect({
+			isBip39: false, newAddress: '', newSeed: ''
+		});
 		try {
-			const icons = await Promise.all(
-				Array(4)
-					.join(' ')
-					.split(' ')
-					.map(async () => {
-						const result = {
-							address: '',
-							bip39: false,
-							seed: ''
-						};
-						result.seed = await words(24);
+			const icons = await Promise.all(Array(4)
+				.join(' ')
+				.split(' ')
+				.map(async () => {
+					const result = {
+						address: '',
+						bip39: false,
+						seed: ''
+					};
+					result.seed = await words(24);
 
-						if (network.protocol === NetworkProtocols.ETHEREUM) {
-							Object.assign(result, await brainWalletAddress(result.seed));
-						} else {
-							// Substrate
-							try {
-								const suri = constructSURI({
-									derivePath: derivationPath,
-									password: derivationPassword,
-									phrase: result.seed
-								});
+					if (network.protocol === NetworkProtocols.ETHEREUM) {
+						Object.assign(result, await brainWalletAddress(result.seed));
+					} else {
+						// Substrate
+						try {
+							const suri = constructSURI({
+								derivePath: derivationPath,
+								password: derivationPassword,
+								phrase: result.seed
+							});
 
-								result.address = await substrateAddress(
-									suri,
-									(network as SubstrateNetworkParams).prefix
-								);
-								result.bip39 = true;
-							} catch (e) {
-								// invalid seed or derivation path
-								console.error(e);
-							}
+							result.address = await substrateAddress(suri,
+								(network as SubstrateNetworkParams).prefix);
+							result.bip39 = true;
+						} catch (e) {
+							// invalid seed or derivation path
+							console.error(e);
 						}
-						return result;
-					})
-			);
-			this.setState({ icons });
+					}
+
+					return result;
+				}));
+			this.setState({
+				icons
+			});
 		} catch (e) {
 			console.error(e);
 		}
@@ -155,9 +154,12 @@ export default class AccountIconChooser extends React.PureComponent<
 		return (
 			<TouchableOpacity
 				key={index}
-				style={[styles.iconBorder, isSelected ? styles.selected : {}]}
+				style={[styles.iconBorder, isSelected ? styles.selected : {
+				}]}
 				onPress={(): void =>
-					onSelect({ isBip39: bip39, newAddress: address, newSeed: seed })
+					onSelect({
+						isBip39: bip39, newAddress: address, newSeed: seed
+					})
 				}
 			>
 				<AccountIcon address={address} network={network} style={styles.icon} />

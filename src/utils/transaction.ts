@@ -27,15 +27,13 @@ export class Transaction {
 	readonly ethereumChainId: string;
 	readonly isSafe: boolean;
 
-	constructor(
-		nonce: string,
+	constructor(nonce: string,
 		gasPrice: string,
 		gas: string,
 		action: string,
 		value: string,
 		data: string,
-		ethereumChainId: string
-	) {
+		ethereumChainId: string) {
 		this.nonce = nonce || '0';
 		this.gasPrice = parseInt(gasPrice, 16).toString();
 		this.gas = parseInt(gas, 16).toString();
@@ -47,11 +45,9 @@ export class Transaction {
 	}
 }
 
-async function asyncTransaction(
-	rlp: string,
+async function asyncTransaction(rlp: string,
 	resolve: (value?: Transaction) => void,
-	reject: any
-): Promise<void> {
+	reject: any): Promise<void> {
 	try {
 		const nonce = await rlpItem(rlp, 0);
 		const gasPrice = await rlpItem(rlp, 1);
@@ -60,15 +56,13 @@ async function asyncTransaction(
 		const value = await rlpItem(rlp, 4);
 		const data = await rlpItem(rlp, 5);
 		const ethereumChainId = await rlpItem(rlp, 6);
-		const tx = new Transaction(
-			nonce,
+		const tx = new Transaction(nonce,
 			gasPrice,
 			gas,
 			action,
 			value,
 			data,
-			ethereumChainId
-		);
+			ethereumChainId);
 		resolve(tx);
 	} catch (e) {
 		reject(e);
@@ -77,6 +71,5 @@ async function asyncTransaction(
 
 export default function transaction(rlp: string): Promise<Transaction> {
 	return new Promise((resolve, reject) =>
-		asyncTransaction(rlp, resolve, reject)
-	);
+		asyncTransaction(rlp, resolve, reject));
 }

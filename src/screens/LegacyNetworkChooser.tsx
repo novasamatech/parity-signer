@@ -16,8 +16,7 @@
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import TouchableItem from 'components/TouchableItem';
-import {
-	SubstrateNetworkKeys,
+import { SubstrateNetworkKeys,
 	UnknownNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import { StyleSheet, Text } from 'react-native';
@@ -29,9 +28,7 @@ import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { emptyAccount } from 'utils/account';
 
-export default function LegacyNetworkChooserView({
-	navigation
-}: NavigationProps<'LegacyNetworkChooser'>): React.ReactElement {
+export default function LegacyNetworkChooserView({ navigation }: NavigationProps<'LegacyNetworkChooser'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { allNetworks } = useContext(NetworksContext);
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
@@ -42,45 +39,43 @@ export default function LegacyNetworkChooserView({
 	}
 
 	return (
-		<SafeAreaScrollViewContainer contentContainerStyle={{ padding: 20 }}>
+		<SafeAreaScrollViewContainer contentContainerStyle={{
+			padding: 20
+		}}>
 			<Text style={styles.title}>CHOOSE NETWORK</Text>
 			{Array.from(allNetworks.entries())
-				.filter(
-					([networkKey]: [string, any]): boolean =>
-						!excludedNetworks.includes(networkKey)
-				)
-				.map(
-					([networkKey, networkParams]: [
+				.filter(([networkKey]: [string, any]): boolean =>
+					!excludedNetworks.includes(networkKey))
+				.map(([networkKey, networkParams]: [
 						string,
 						NetworkParams
 					]): React.ReactElement => (
-						<TouchableItem
-							key={networkKey}
+					<TouchableItem
+						key={networkKey}
+						style={[
+							styles.card,
+							{
+								backgroundColor: networkParams.color,
+								marginTop: 20
+							}
+						]}
+						onPress={(): void => {
+							accountsStore.updateNew(emptyAccount('', networkKey));
+							navigation.goBack();
+						}}
+					>
+						<Text
 							style={[
-								styles.card,
+								styles.cardText,
 								{
-									backgroundColor: networkParams.color,
-									marginTop: 20
+									color: networkParams.secondaryColor
 								}
 							]}
-							onPress={(): void => {
-								accountsStore.updateNew(emptyAccount('', networkKey));
-								navigation.goBack();
-							}}
 						>
-							<Text
-								style={[
-									styles.cardText,
-									{
-										color: networkParams.secondaryColor
-									}
-								]}
-							>
-								{networkParams.title}
-							</Text>
-						</TouchableItem>
-					)
-				)}
+							{networkParams.title}
+						</Text>
+					</TouchableItem>
+				))}
 		</SafeAreaScrollViewContainer>
 	);
 }

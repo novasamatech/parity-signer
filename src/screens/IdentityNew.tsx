@@ -27,11 +27,9 @@ import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import { NavigationProps } from 'types/props';
 import { validateSeed } from 'utils/account';
-import {
-	alertError,
+import { alertError,
 	alertIdentityCreationError,
-	alertRisks
-} from 'utils/alertUtils';
+	alertRisks } from 'utils/alertUtils';
 import { debounce } from 'utils/debounce';
 import { emptyIdentity } from 'utils/identitiesUtils';
 import { brainWalletAddress } from 'utils/native';
@@ -51,17 +49,19 @@ function IdentityNew({
 	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const clearIdentity = useRef(() =>
-		accountsStore.updateNewIdentity(emptyIdentity())
-	);
+		accountsStore.updateNewIdentity(emptyIdentity()));
 	const [isValidBIP39, setIsBIP39Valid] = useState(false);
 
 	useEffect((): (() => void) => {
 		clearIdentity.current();
+
 		return clearIdentity.current;
 	}, [clearIdentity]);
 
 	const updateName = (name: string): void => {
-		accountsStore.updateNewIdentity({ name });
+		accountsStore.updateNewIdentity({
+			name
+		});
 	};
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
@@ -81,17 +81,13 @@ function IdentityNew({
 		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
-				await accountsStore.saveNewIdentity(
-					seedPhrase.trimEnd(),
+				await accountsStore.saveNewIdentity(seedPhrase.trimEnd(),
 					pin,
-					createSeedRefWithNewSeed
-				);
+					createSeedRefWithNewSeed);
 			} else {
-				await accountsStore.saveNewIdentity(
-					seedPhrase,
+				await accountsStore.saveNewIdentity(seedPhrase,
 					pin,
-					createSeedRefWithNewSeed
-				);
+					createSeedRefWithNewSeed);
 			}
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
@@ -108,6 +104,7 @@ function IdentityNew({
 				return alertError(setAlert, `${isSeedValid.reason}`);
 			}
 		}
+
 		return onRecoverIdentity();
 	};
 

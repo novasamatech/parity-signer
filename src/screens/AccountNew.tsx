@@ -43,9 +43,7 @@ interface State {
 	newAccount?: Account;
 }
 
-export default function AccountNew({
-	navigation
-}: NavigationProps<'AccountNew'>): React.ReactElement {
+export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
 
@@ -149,7 +147,9 @@ export default function AccountNew({
 				<Text style={styles.title}>NAME</Text>
 				<TextInput
 					onChangeText={(input: string): void =>
-						accountsStore.updateNew({ name: input })
+						accountsStore.updateNew({
+							name: input
+						})
 					}
 					value={name}
 					placeholder="Enter a new account name"

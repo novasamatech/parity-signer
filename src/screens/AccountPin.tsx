@@ -49,7 +49,9 @@ function PinInput(props: any): React.ReactElement {
 			numberOfLines={1}
 			returnKeyType="next"
 			secureTextEntry
-			style={StyleSheet.flatten([styles.pinInput, { fontSize: 24 }])}
+			style={StyleSheet.flatten([styles.pinInput, {
+				fontSize: 24
+			}])}
 			{...props}
 		/>
 	);
@@ -83,19 +85,28 @@ function AccountPin({
 		if (pin.length >= 6 && pin === confirmation) {
 			if (accountCreation) {
 				await accountsStore.submitNew(pin, allNetworks);
+
 				return navigateToLegacyAccountList(navigation);
 			} else {
 				await accountsStore.save(selectedKey, account, pin);
 				const resetAction = CommonActions.reset({
 					index: 1,
-					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
+					routes: [{
+						name: 'LegacyAccountList'
+					}, {
+						name: 'AccountDetails'
+					}]
 				});
 				navigation.dispatch(resetAction);
 			}
 		} else {
 			if (pin.length < 6) {
-				setState({ pinTooShort: true });
-			} else if (pin !== confirmation) setState({ pinMismatch: true });
+				setState({
+					pinTooShort: true
+				});
+			} else if (pin !== confirmation) setState({
+				pinMismatch: true
+			});
 		}
 	};
 
@@ -109,6 +120,7 @@ function AccountPin({
 		} else if (state.pinMismatch) {
 			return <Text style={styles.errorText}>Pin codes don't match!</Text>;
 		}
+
 		return (
 			<Text style={styles.hintText}>
 				Choose a PIN code with 6 or more digits
@@ -127,6 +139,7 @@ function AccountPin({
 	};
 
 	const title = 'ACCOUNT PIN';
+
 	return (
 		<KeyboardScrollView style={styles.body} extraHeight={120}>
 			<Text style={styles.titleTop}>{title}</Text>
@@ -135,9 +148,13 @@ function AccountPin({
 			<PinInput
 				autoFocus
 				returnKeyType="next"
-				onFocus={(): void => setState({ focusConfirmation: false })}
+				onFocus={(): void => setState({
+					focusConfirmation: false
+				})}
 				onSubmitEditing={(): void => {
-					setState({ focusConfirmation: true });
+					setState({
+						focusConfirmation: true
+					});
 				}}
 				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
 				value={state.pin}

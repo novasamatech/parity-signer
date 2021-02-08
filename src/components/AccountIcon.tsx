@@ -44,6 +44,7 @@ export default function AccountIcon(props: {
 			};
 			setEthereumIcon();
 		}
+
 		return (): void => {
 			promiseDisabled = true;
 		};
@@ -67,7 +68,9 @@ export default function AccountIcon(props: {
 	}
 	if (protocol === NetworkProtocols.ETHEREUM) {
 		return (
-			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
+			<Image source={{
+				uri: ethereumIconUri
+			}} style={style as ImageStyle} />
 		);
 	} else if (address !== '') {
 		let iconSize;
@@ -77,6 +80,7 @@ export default function AccountIcon(props: {
 		} else {
 			iconSize = style?.width;
 		}
+
 		return <Identicon value={address} size={iconSize || 40} />;
 	} else {
 		return (

@@ -15,14 +15,12 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useState } from 'react';
-import {
-	NativeSyntheticEvent,
+import { NativeSyntheticEvent,
 	StyleSheet,
 	Text,
 	TextInputProps,
 	TextInputSelectionChangeEventData,
-	View
-} from 'react-native';
+	View } from 'react-native';
 import BIP39_WORDS from 'res/bip39_wordlist.json';
 import PARITY_WORDS from 'res/parity_wordlist.json';
 import colors from 'styles/colors';
@@ -52,9 +50,7 @@ export default function AccountSeed({
 		start: 0
 	});
 	const [value, setValue] = useState('');
-	function handleCursorPosition(
-		event: NativeSyntheticEvent<TextInputSelectionChangeEventData>
-	): void {
+	function handleCursorPosition(event: NativeSyntheticEvent<TextInputSelectionChangeEventData>): void {
 		setCursorPosition(event.nativeEvent.selection);
 	}
 
@@ -66,9 +62,7 @@ export default function AccountSeed({
 
 		let suggestions = wordList.slice(fromIndex, fromIndex + SUGGESTIONS_COUNT);
 
-		const lastValidIndex = suggestions.findIndex(
-			word => !word.startsWith(input)
-		);
+		const lastValidIndex = suggestions.findIndex(word => !word.startsWith(input));
 
 		if (lastValidIndex !== -1) {
 			suggestions = suggestions.slice(0, lastValidIndex);
@@ -125,8 +119,12 @@ export default function AccountSeed({
 				{suggestions.map((suggestion, i) => {
 					const sepStyle =
 						i !== suggestions.length - 1
-							? { borderColor: colors.border.light, borderRightWidth: 0.3 }
-							: {};
+							? {
+								borderColor: colors.border.light, borderRightWidth: 0.3
+							}
+							: {
+							};
+
 					return (
 						<TouchableItem
 							key={i}
@@ -148,6 +146,7 @@ export default function AccountSeed({
 	}
 
 	const validStyles = valid ? styles.validInput : styles.invalidInput;
+
 	return (
 		<View>
 			<TextInput

@@ -39,9 +39,7 @@ export type LockedAccount = Omit<
 
 export type Account = UnlockedAccount | LockedAccount;
 
-export function isUnlockedAccount(
-	account: UnlockedAccount | LockedAccount
-): account is UnlockedAccount {
+export function isUnlockedAccount(account: UnlockedAccount | LockedAccount): account is UnlockedAccount {
 	return 'seed' in account || 'seedPhrase' in account;
 }
 

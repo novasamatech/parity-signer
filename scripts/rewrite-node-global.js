@@ -8,11 +8,7 @@ module.exports = function ({ types: t }) {
 				if (path.node.name === '__dirname') {
 					const fallbackPath = `${state.cwd}/node_modules/@polkadot`;
 					const fileName = state.file.opts.filename;
-					path.replaceWith(
-						t.stringLiteral(
-							fileName !== undefined ? pathLib.dirname(fileName) : fallbackPath
-						)
-					);
+					path.replaceWith(t.stringLiteral(fileName !== undefined ? pathLib.dirname(fileName) : fallbackPath));
 				}
 			}
 		}

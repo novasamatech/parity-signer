@@ -15,63 +15,58 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useContext } from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
 
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
-import Address from './Address';
 import { CardSeparator } from './CardSeparator';
 import { NetworkFooter } from './NetworkFooter';
 import TouchableItem from './TouchableItem';
 
-interface AccountCardProps{
-	address: string;
+interface NetworkCardProps {
+	isAdd?: boolean;
+	networkColor?: string;
 	networkKey?: string;
 	onPress?: ButtonListener;
-	seedType?: string;
-	style?: ViewStyle;
 	testID?: string;
 	title: string;
-	titlePrefix?: string;
-};
+}
 
-export default function AccountCard({ address, networkKey, onPress, seedType, style, testID, title, titlePrefix }: AccountCardProps): ReactElement {
+export function NetworkCard({ isAdd, networkColor, networkKey, onPress, testID, title }: NetworkCardProps): ReactElement {
 	const { getNetwork } = useContext(NetworksContext);
-	const defaultTitle = 'No name';
-	const displayTitle = title.length > 0 ? title : defaultTitle;
-	const seedTypeDisplay = seedType || '';
-	const network = getNetwork(networkKey ?? '');
+	const networkParams = getNetwork(networkKey ?? '');
+	const isDisabled = onPress === undefined;
 
 	return (
-		<TouchableItem
-			testID={testID}
-			disabled={false}
-			onPress={onPress}
-		>
+		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
 			<CardSeparator />
-			<View style={[styles.content, style]}>
-				<AccountIcon address={address} network={network} style={styles.icon} />
-				<View style={styles.desc}>
-					<View>
-						<Text style={[fontStyles.t_regular, {
-							color: colors.text.faded
-						}]}>
-							{`${network.title}${seedTypeDisplay} `}
-						</Text>
+			<View style={styles.content}>
+				{isAdd ? (
+					<View
+						style={{
+							alignItems: 'center',
+							height: 40,
+							justifyContent: 'center',
+							width: 40
+						}}
+					>
+						<Icon name="add" color={colors.text.main} size={30} />
 					</View>
-					<AccountPrefixedTitle
-						title={displayTitle}
-						titlePrefix={titlePrefix}
+				) : (
+					<AccountIcon
+						address={''}
+						network={networkParams}
+						style={styles.icon}
 					/>
-					{address !== '' && (
-						<Address address={address} protocol={network.protocol} />
-					)}
+				)}
+				<View style={styles.desc}>
+					<AccountPrefixedTitle title={title} />
 				</View>
-				<NetworkFooter color={network.color} />
+				<NetworkFooter color={networkColor ?? networkParams.color} />
 			</View>
 		</TouchableItem>
 	);

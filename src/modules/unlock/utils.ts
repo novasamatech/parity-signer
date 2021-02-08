@@ -19,10 +19,8 @@ import { onlyNumberRegex } from 'utils/regex';
 
 type InputListener = (v: string) => void;
 
-export const onPinInputChange = (
-	stateName: 'pin' | 'confirmation',
-	updateState: UpdateStateFunc
-): InputListener => (pinInput: string): void => {
+export const onPinInputChange = (stateName: 'pin' | 'confirmation',
+	updateState: UpdateStateFunc): InputListener => (pinInput: string): void => {
 	if (onlyNumberRegex.test(pinInput)) {
 		updateState({
 			pinMismatch: false,
@@ -40,5 +38,6 @@ export const getSubtitle = (state: State, isUnlock: boolean): string => {
 			? t.pinMisMatchHint.pinUnlock
 			: t.pinMisMatchHint.pinCreation;
 	}
+
 	return isUnlock ? t.subtitle.pinUnlock : t.subtitle.pinCreation;
 };

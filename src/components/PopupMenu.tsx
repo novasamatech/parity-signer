@@ -16,12 +16,10 @@
 
 import React from 'react';
 import { Text, TextStyle } from 'react-native';
-import {
-	Menu,
+import { Menu,
 	MenuOption,
 	MenuOptions,
-	MenuTrigger
-} from 'react-native-popup-menu';
+	MenuTrigger } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
@@ -57,23 +55,22 @@ export default class PopupMenu extends React.PureComponent<Props> {
 			<Menu onSelect={onSelect}>
 				<MenuTrigger children={menuTriggerIcon} />
 				<MenuOptions customStyles={menuOptionsStyles}>
-					{menuItems.map(
-						(menuItem: MenuItem, index: number): React.ReactNode => {
-							if (menuItem.hide === true) {
-								return null;
-							}
-							return (
-								<MenuOption key={index} value={menuItem.value}>
-									<Text
-										style={[menuOptionsStyles.optionText, menuItem.textStyle]}
-										testID={menuItem.testID}
-									>
-										{menuItem.text}
-									</Text>
-								</MenuOption>
-							);
+					{menuItems.map((menuItem: MenuItem, index: number): React.ReactNode => {
+						if (menuItem.hide === true) {
+							return null;
 						}
-					)}
+
+						return (
+							<MenuOption key={index} value={menuItem.value}>
+								<Text
+									style={[menuOptionsStyles.optionText, menuItem.textStyle]}
+									testID={menuItem.testID}
+								>
+									{menuItem.text}
+								</Text>
+							</MenuOption>
+						);
+					})}
 				</MenuOptions>
 			</Menu>
 		);

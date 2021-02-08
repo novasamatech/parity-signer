@@ -23,7 +23,9 @@ import privacyPolicy from '../../docs/privacy-policy.md';
 export default class PrivacyPolicy extends React.PureComponent {
 	render(): React.ReactElement {
 		return (
-			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
+			<CustomScrollView contentContainerStyle={{
+				paddingHorizontal: 16
+			}}>
 				<Markdown>{privacyPolicy}</Markdown>
 			</CustomScrollView>
 		);

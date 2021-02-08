@@ -21,11 +21,11 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
 
-const onNameInput = async (
-	accountsStore: AccountsContextState,
-	name: string
-): Promise<void> => {
-	await accountsStore.updateSelectedAccount({ name });
+const onNameInput = async (accountsStore: AccountsContextState,
+	name: string): Promise<void> => {
+	await accountsStore.updateSelectedAccount({
+		name
+	});
 	const { selectedKey } = accountsStore.state;
 	const selectedAccount = accountsStore.getSelected()!;
 	await accountsStore.save(selectedKey, selectedAccount);
@@ -47,7 +47,9 @@ export default function AccountEdit(): React.ReactElement {
 			/>
 			<TextInput
 				label="Account Name"
-				style={{ marginBottom: 40 }}
+				style={{
+					marginBottom: 40
+				}}
 				onChangeText={(name: string): Promise<any> =>
 					onNameInput(accountsStore, name)
 				}

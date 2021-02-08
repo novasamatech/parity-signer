@@ -26,11 +26,9 @@ import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
-import {
-	alertBackupDone,
+import { alertBackupDone,
 	alertCopyBackupPhrase,
-	alertIdentityCreationError
-} from 'utils/alertUtils';
+	alertIdentityCreationError } from 'utils/alertUtils';
 import { words } from 'utils/native';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
@@ -48,11 +46,9 @@ function IdentityBackup({
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);
 		try {
-			await accountsStore.saveNewIdentity(
-				seedPhrase,
+			await accountsStore.saveNewIdentity(seedPhrase,
 				pin,
-				createSeedRefWithNewSeed
-			);
+				createSeedRefWithNewSeed);
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {
@@ -64,13 +60,16 @@ function IdentityBackup({
 		const textStyles = wordsNumber === buttonWordsNumber && {
 			color: colors.signal.main
 		};
+
 		return (
 			<Button
 				title={`${buttonWordsNumber} words`}
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
 				onlyText
 				small
-				textStyles={{ ...textStyles }}
+				textStyles={{
+					...textStyles
+				}}
 			/>
 		);
 	};
@@ -84,6 +83,7 @@ function IdentityBackup({
 		};
 
 		setSeedPhraseAsync();
+
 		return (): void => {
 			setSeedPhrase('');
 		};
@@ -112,7 +112,9 @@ function IdentityBackup({
 				}}
 			>
 				<Text
-					style={[fontStyles.t_seed, { marginHorizontal: 16 }]}
+					style={[fontStyles.t_seed, {
+						marginHorizontal: 16
+					}]}
 					testID={testIDs.IdentityBackup.seedText}
 				>
 					{seedPhrase}

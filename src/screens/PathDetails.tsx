@@ -35,14 +35,12 @@ import { RootStackParamList } from 'types/routes';
 import { generateAccountId } from 'utils/account';
 import { alertDeleteAccount, alertError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
-import {
-	getAddressWithPath,
+import { getAddressWithPath,
 	getNetworkKey,
 	getPathName,
 	getPathsWithSubstrateNetworkKey,
 	isSubstrateHardDerivedPath,
-	isSubstratePath
-} from 'utils/identitiesUtils';
+	isSubstratePath } from 'utils/identitiesUtils';
 import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
@@ -66,9 +64,7 @@ export function PathDetailsView({
 	const accountName = getPathName(path, currentIdentity);
 	const { setAlert } = useContext(AlertStateContext);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed(
-		isSeedRefValid
-	);
+	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed(isSeedRefValid);
 	const networksContextState = useContext(NetworksContext);
 	const { allNetworks } = networksContextState;
 	if (!address) {
@@ -76,16 +72,16 @@ export function PathDetailsView({
 	}
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
-	const accountId = generateAccountId(
-		address,
+	const accountId = generateAccountId(address,
 		formattedNetworkKey,
-		allNetworks
-	);
+		allNetworks);
 
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
-			params: { parentPath: path }
+			params: {
+				parentPath: path
+			}
 		});
 
 	const onOptionSelect = async (value: string): Promise<void> => {
@@ -95,11 +91,9 @@ export function PathDetailsView({
 				try {
 					await accountsStore.deletePath(path, networksContextState);
 					if (isSubstratePath(path)) {
-						const listedPaths = getPathsWithSubstrateNetworkKey(
-								accountsStore.state.currentIdentity!,
-								networkKey,
-								networksContextState
-						);
+						const listedPaths = getPathsWithSubstrateNetworkKey(accountsStore.state.currentIdentity!,
+							networkKey,
+							networksContextState);
 						const hasOtherPaths = listedPaths.length > 0;
 						hasOtherPaths
 							? navigateToPathsList(navigation, networkKey)
@@ -108,10 +102,8 @@ export function PathDetailsView({
 						navigation.navigate('Main');
 					}
 				} catch (err) {
-					alertError(
-						setAlert,
-						`Can't delete this account: ${err.toString()}`
-					);
+					alertError(setAlert,
+						`Can't delete this account: ${err.toString()}`);
 				}
 			});
 			break;
@@ -126,12 +118,18 @@ export function PathDetailsView({
 					}
 				}));
 			} else {
-				await unlockWithoutPassword({ name: 'PathSecret', params: { path } });
+				await unlockWithoutPassword({
+					name: 'PathSecret', params: {
+						path
+					}
+				});
 			}
 			break;
 		}
 		case 'PathManagement':
-			navigation.navigate('PathManagement', { path });
+			navigation.navigate('PathManagement', {
+				path
+			});
 			break;
 		}
 	};
@@ -148,7 +146,9 @@ export function PathDetailsView({
 							onSelect={onOptionSelect}
 							menuTriggerIconName={'more-vert'}
 							menuItems={[
-								{ text: 'Edit', value: 'PathManagement' },
+								{
+									text: 'Edit', value: 'PathManagement'
+								},
 								{
 									hide: !isSubstrateHardDerivedPath(path),
 									testID: testIDs.PathDetail.exportButton,
@@ -187,11 +187,10 @@ function PathDetails({
 }: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
 	const path = route.params.path;
 	const networksContextState = useContext(NetworksContext);
-	const networkKey = getNetworkKey(
-		path,
+	const networkKey = getNetworkKey(path,
 		accountsStore.state.currentIdentity,
-		networksContextState
-	);
+		networksContextState);
+
 	return (
 		<PathDetailsView
 			accountsStore={accountsStore}

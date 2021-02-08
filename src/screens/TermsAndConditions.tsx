@@ -31,15 +31,11 @@ import { saveToCAndPPConfirmation } from 'utils/db';
 
 import toc from '../../docs/terms-and-conditions.md';
 
-export default function TermsAndConditions(
-	props: NavigationProps<'TermsAndConditions'>
-): React.ReactElement {
+export default function TermsAndConditions(props: NavigationProps<'TermsAndConditions'>): React.ReactElement {
 	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
 	const [tocAgreement, setTocAgreement] = useState<boolean>(false);
 
-	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(
-		GlobalStateContext
-	);
+	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(GlobalStateContext);
 	const { navigation } = props;
 	const onConfirm = async (): Promise<void> => {
 		await saveToCAndPPConfirmation();
@@ -48,7 +44,9 @@ export default function TermsAndConditions(
 
 	return (
 		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
-			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
+			<CustomScrollView contentContainerStyle={{
+				paddingHorizontal: 16
+			}}>
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>
 
@@ -90,7 +88,9 @@ export default function TermsAndConditions(
 						<Text style={fontStyles.t_big}>
 							<Text>{'  I agree to the '}</Text>
 							<Text
-								style={{ textDecorationLine: 'underline' }}
+								style={{
+									textDecorationLine: 'underline'
+								}}
 								onPress={(): void => {
 									navigation.navigate('PrivacyPolicy');
 								}}
@@ -105,7 +105,9 @@ export default function TermsAndConditions(
 						title="Next"
 						disabled={!ppAgreement || !tocAgreement}
 						onPress={onConfirm}
-						style={{ marginBottom: 24, marginTop: 16 }}
+						style={{
+							marginBottom: 24, marginTop: 16
+						}}
 					/>
 				</View>
 			)}

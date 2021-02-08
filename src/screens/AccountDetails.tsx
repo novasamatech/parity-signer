@@ -31,14 +31,10 @@ import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
-import {
-	navigateToLandingPage,
-	navigateToLegacyAccountList
-} from 'utils/navigationHelpers';
+import { navigateToLandingPage,
+	navigateToLegacyAccountList } from 'utils/navigationHelpers';
 
-export default function AccountDetails({
-	navigation
-}: NavigationProps<'AccountDetails'>): React.ReactElement {
+export default function AccountDetails({ navigation }: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const account = accountsStore.getSelected();
 	const { getNetwork } = useContext(NetworksContext);
@@ -52,8 +48,7 @@ export default function AccountDetails({
 	const protocol = network.protocol;
 
 	const onDelete = (): void => {
-		alertDeleteLegacyAccount(
-			setAlert,
+		alertDeleteLegacyAccount(setAlert,
 			account.name || account.address || 'this account',
 			async () => {
 				await accountsStore.deleteAccount(selectedKey);
@@ -61,8 +56,7 @@ export default function AccountDetails({
 					return navigateToLandingPage(navigation);
 				}
 				navigateToLegacyAccountList(navigation);
-			}
-		);
+			});
 	};
 
 	const onOptionSelect = (value: string): void => {
@@ -87,8 +81,12 @@ export default function AccountDetails({
 							onSelect={onOptionSelect}
 							menuTriggerIconName={'more-vert'}
 							menuItems={[
-								{ text: 'Edit', value: 'AccountEdit' },
-								{ text: 'Change Pin', value: 'AccountPin' },
+								{
+									text: 'Edit', value: 'AccountEdit'
+								},
+								{
+									text: 'Change Pin', value: 'AccountPin'
+								},
 								{
 									text: 'View Recovery Phrase',
 									value: 'LegacyAccountBackup'

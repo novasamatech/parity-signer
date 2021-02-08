@@ -39,35 +39,39 @@ const networkTypesMap: NetworkTypesMap = {
 			centrifuge_amber: 'centrifuge-chain-amber'
 		}
 	},
-	kusama: { chains: {} },
+	kusama: {
+		chains: {
+		}
+	},
 	polkadot: {
 		chains: {
 			westend: 'Westend'
 		}
 	},
-	rococo: { chains: {} }
+	rococo: {
+		chains: {
+		}
+	}
 };
 
-export const getOverrideTypes = (
-	registry: TypeRegistry,
-	pathId: string
-): any => {
+export const getOverrideTypes = (registry: TypeRegistry,
+	pathId: string): any => {
 	let specName = '',
 		chainName = '';
-	Object.entries(networkTypesMap).find(
-		([networkName, networkTypes]: [string, NetworkTypes]) => {
-			if (networkName === pathId) {
-				specName = networkTypes.alias ?? networkName;
-			} else if (networkTypes.chains.hasOwnProperty(pathId)) {
-				const chainAlias = networkTypes.chains[pathId];
-				specName = networkTypes.alias ?? networkName;
-				chainName = chainAlias ?? pathId;
-			} else {
-				return false;
-			}
-			return true;
+	Object.entries(networkTypesMap).find(([networkName, networkTypes]: [string, NetworkTypes]) => {
+		if (networkName === pathId) {
+			specName = networkTypes.alias ?? networkName;
+		} else if (networkTypes.chains.hasOwnProperty(pathId)) {
+			const chainAlias = networkTypes.chains[pathId];
+			specName = networkTypes.alias ?? networkName;
+			chainName = chainAlias ?? pathId;
+		} else {
+			return false;
 		}
-	);
+
+		return true;
+	});
+
 	return getSpecTypes(registry, chainName, specName, Number.MAX_SAFE_INTEGER);
 };
 
@@ -82,10 +86,8 @@ export type RegistriesStoreState = {
 export function useRegistriesStore(): RegistriesStoreState {
 	const [registries, setRegistries] = useState(new Map());
 
-	function getTypeRegistry(
-		networks: Map<string, SubstrateNetworkParams>,
-		networkKey: string
-	): TypeRegistry | null {
+	function getTypeRegistry(networks: Map<string, SubstrateNetworkParams>,
+		networkKey: string): TypeRegistry | null {
 		try {
 			const networkMetadataRaw = getMetadata(networkKey);
 
@@ -102,16 +104,19 @@ export function useRegistriesStore(): RegistriesStoreState {
 			const newRegistries = deepCopyMap(registries);
 			newRegistries.set(networkKey, newRegistry);
 			setRegistries(newRegistries);
+
 			return newRegistry;
 		} catch (e) {
 			console.log('oops', e);
+
 			return null;
 		}
 	}
 
-	return { getTypeRegistry, registries };
+	return {
+		getTypeRegistry, registries
+	};
 }
 
-export const RegistriesContext = React.createContext(
-	{} as RegistriesStoreState
-);
+export const RegistriesContext = React.createContext({
+} as RegistriesStoreState);

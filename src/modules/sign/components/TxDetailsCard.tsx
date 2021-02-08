@@ -43,13 +43,20 @@ function Amount({
 	gasPrice
 }: AmountProps): React.ReactElement<AmountProps> {
 	const fee = (parseInt(gas, 10) * parseInt(gasPrice, 10)) / WEI_IN_ETH;
+
 	return (
 		<View style={[styles.amountContainer, style]}>
 			<Text style={styles.amountTextContainer}>
-				<Text style={{ color: colors.text.main }}>{value}</Text>
-				<Text style={{ color: colors.text.faded }}> ETH</Text>
+				<Text style={{
+					color: colors.text.main
+				}}>{value}</Text>
+				<Text style={{
+					color: colors.text.faded
+				}}> ETH</Text>
 			</Text>
-			<View style={{ marginTop: 5 }}>
+			<View style={{
+				marginTop: 5
+			}}>
 				<Text style={styles.amountText}>fee: {fee} ETH</Text>
 			</View>
 		</View>
@@ -64,7 +71,9 @@ export default class TxDetailsCard extends React.PureComponent<Props> {
 			<View style={[styles.body, style]}>
 				<Text style={styles.titleText}>{description}</Text>
 				<Amount
-					style={{ marginTop: 10 }}
+					style={{
+						marginTop: 10
+					}}
 					value={value}
 					gas={gas}
 					gasPrice={gasPrice}

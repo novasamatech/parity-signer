@@ -89,9 +89,7 @@ function AccountUnlockView(props: AccountUnlockViewProps): React.ReactElement {
 }
 
 /* Used for unlock and sign tx and messages for legacy accounts */
-export function AccountUnlockAndSign(
-	props: NavigationProps<'AccountUnlockAndSign'>
-): React.ReactElement {
+export function AccountUnlockAndSign(props: NavigationProps<'AccountUnlockAndSign'>): React.ReactElement {
 	const { navigation, route } = props;
 	const next = route.params.next ?? 'SignedTx';
 	const scannerStore = useContext(ScannerContext);
@@ -102,6 +100,7 @@ export function AccountUnlockAndSign(
 			checkPin={async (pin: string): Promise<boolean> => {
 				try {
 					await scannerStore.signDataLegacy(pin, getNetwork);
+
 					return true;
 				} catch (e) {
 					return false;
@@ -114,7 +113,9 @@ export function AccountUnlockAndSign(
 						{
 							name: 'LegacyAccountList'
 						},
-						{ name: next }
+						{
+							name: next
+						}
 					]
 				});
 				navigation.dispatch(resetAction);
@@ -148,8 +149,12 @@ export function AccountUnlock({
 							{
 								name: 'LegacyAccountList'
 							},
-							{ name: 'AccountDetails' },
-							{ name: next }
+							{
+								name: 'AccountDetails'
+							},
+							{
+								name: next
+							}
 						]
 					});
 					navigation.dispatch(resetAction);

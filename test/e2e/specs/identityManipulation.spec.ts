@@ -14,14 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	ETHEREUM_NETWORK_LIST,
-	EthereumNetworkKeys
-} from 'constants/networkSpecs';
+import { ETHEREUM_NETWORK_LIST,
+	EthereumNetworkKeys } from 'constants/networkSpecs';
 import { by, element } from 'detox';
 import testIDs from 'e2e/testIDs';
-import {
-	pinCode,
+import { pinCode,
 	tapBack,
 	testExist,
 	testInput,
@@ -32,8 +29,7 @@ import {
 	testTap,
 	testUnlockPin,
 	testVisible,
-	waitAlert
-} from 'e2e/utils';
+	waitAlert } from 'e2e/utils';
 
 const {
 	Alert,
@@ -92,7 +88,9 @@ describe('Load test', () => {
 
 	it('need pin after application go to the background', async () => {
 		await device.sendToHome();
-		await device.launchApp({ newInstance: false });
+		await device.launchApp({
+			newInstance: false
+		});
 		await testTap(PathsList.deriveButton);
 		await testUnlockPin(pinCode);
 		await testInput(PathDerivation.pathInput, secondPath);
@@ -126,10 +124,8 @@ describe('Load test', () => {
 		const ethereumNetworkButtonIndex =
 			Main.networkButton + EthereumNetworkKeys.FRONTIER;
 		await testTap(testIDs.Main.addNewNetworkButton);
-		await testScrollAndTap(
-			ethereumNetworkButtonIndex,
-			testIDs.Main.chooserScreen
-		);
+		await testScrollAndTap(ethereumNetworkButtonIndex,
+			testIDs.Main.chooserScreen);
 		await testVisible(PathDetail.screen);
 		await tapBack();
 		await testExist(Main.chooserScreen);

@@ -14,21 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	dummySubstrateNetworkParams,
-	ETHEREUM_NETWORK_LIST,
-	UnknownNetworkKeys,
-	unknownNetworkParams,
-	unknownNetworkPathId
-} from 'constants/networkSpecs';
+import { dummySubstrateNetworkParams, ETHEREUM_NETWORK_LIST, UnknownNetworkKeys, unknownNetworkParams, unknownNetworkPathId } from 'constants/networkSpecs';
 import { default as React, useEffect, useMemo, useState } from 'react';
 import { NetworkParams,SubstrateNetworkParams } from 'types/networkTypes';
 import { NetworkParsedData } from 'types/scannerTypes';
 import { loadNetworks, saveNetworks } from 'utils/db';
-import {
-	deepCopyNetworks,
-	generateNetworkParamsFromParsedData
-} from 'utils/networksUtils';
+import { deepCopyNetworks, generateNetworkParamsFromParsedData } from 'utils/networksUtils';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
@@ -48,13 +39,10 @@ export type NetworksContextState = {
 };
 
 export function useNetworksContext(): NetworksContextState {
-	const [substrateNetworks, setSubstrateNetworks] = useState<
-		Map<string, SubstrateNetworkParams>
-	>(new Map());
+	const [substrateNetworks, setSubstrateNetworks] = useState<Map<string, SubstrateNetworkParams>>(new Map());
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
-		const ethereumNetworks: Map<string, NetworkParams> = new Map(
-			Object.entries(ETHEREUM_NETWORK_LIST)
-		);
+		const ethereumNetworks: Map<string, NetworkParams> = new Map(Object.entries(ETHEREUM_NETWORK_LIST));
+
 		return new Map([
 			...ethereumNetworks,
 			...substrateNetworks,
@@ -66,6 +54,7 @@ export function useNetworksContext(): NetworksContextState {
 		const result = Array.from(substrateNetworks.values())
 			.map(n => n.pathId)
 			.concat([unknownNetworkPathId]);
+
 		return result;
 	}, [substrateNetworks]);
 
@@ -77,20 +66,18 @@ export function useNetworksContext(): NetworksContextState {
 		refreshList();
 	}, []);
 
-	function getSubstrateNetworkParams(
-		networkKey: string
-	): SubstrateNetworkParams {
+	function getSubstrateNetworkParams(networkKey: string): SubstrateNetworkParams {
+
 		return substrateNetworks.get(networkKey) || dummySubstrateNetworkParams;
 	}
 
 	function getNetwork(networkKey: string): NetworkParams {
+
 		return allNetworks.get(networkKey) || dummySubstrateNetworkParams;
 	}
 
 	function addNetwork(networkParsedData: NetworkParsedData): void {
-		const newNetworkParams = generateNetworkParamsFromParsedData(
-			networkParsedData
-		);
+		const newNetworkParams = generateNetworkParamsFromParsedData(networkParsedData);
 		const networkKey = newNetworkParams.genesisHash;
 		const newNetworksList = deepCopyNetworks(substrateNetworks);
 		newNetworksList.set(networkKey, newNetworkParams);
@@ -108,4 +95,5 @@ export function useNetworksContext(): NetworksContextState {
 	};
 }
 
-export const NetworksContext = React.createContext({} as NetworksContextState);
+export const NetworksContext = React.createContext({
+} as NetworksContextState);

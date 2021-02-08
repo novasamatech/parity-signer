@@ -19,7 +19,8 @@ import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 
 import { checksummedAddress } from './checksum';
 
-const { EthkeyBridge } = NativeModules || {};
+const { EthkeyBridge } = NativeModules || {
+};
 
 interface AddressObject {
 	address: string;
@@ -69,9 +70,7 @@ export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	};
 }
 
-export async function brainWalletAddressWithRef(
-	createBrainWalletFn: TryBrainWalletAddress
-): Promise<AddressObject> {
+export async function brainWalletAddressWithRef(createBrainWalletFn: TryBrainWalletAddress): Promise<AddressObject> {
 	const taggedAddress = await createBrainWalletFn();
 	const { bip39, address } = untagAddress(taggedAddress);
 	const hash = await keccak(toHex(address));
@@ -82,9 +81,7 @@ export async function brainWalletAddressWithRef(
 	};
 }
 
-export async function brainWalletBIP39Address(
-	seed: string
-): Promise<AddressObject | null> {
+export async function brainWalletBIP39Address(seed: string): Promise<AddressObject | null> {
 	try {
 		const taggedAddress = await EthkeyBridge.brainWalletBIP(seed);
 		const { bip39, address } = untagAddress(taggedAddress);
@@ -100,10 +97,8 @@ export async function brainWalletBIP39Address(
 	}
 }
 
-export function brainWalletSign(
-	seed: string,
-	message: string
-): Promise<string> {
+export function brainWalletSign(seed: string,
+	message: string): Promise<string> {
 	return EthkeyBridge.brainWalletSign(seed, message);
 }
 
@@ -155,10 +150,8 @@ export function substrateSecret(suri: string): Promise<string> {
 //   Polkadot proper = 0
 //   Kusama = 2
 //   Default (testnets) = 42
-export function substrateAddress(
-	seed: string,
-	prefix: number
-): Promise<string> {
+export function substrateAddress(seed: string,
+	prefix: number): Promise<string> {
 	return EthkeyBridge.substrateAddress(seed, prefix);
 }
 
@@ -168,11 +161,9 @@ export function substrateSign(seed: string, message: string): Promise<string> {
 }
 
 // Verify a sr25519 signature is valid
-export function schnorrkelVerify(
-	seed: string,
+export function schnorrkelVerify(seed: string,
 	message: string,
-	signature: string
-): Promise<boolean> {
+	signature: string): Promise<boolean> {
 	return EthkeyBridge.schnorrkelVerify(seed, message, signature);
 }
 
@@ -195,12 +186,11 @@ export class SeedRefClass {
 			// Seed reference was already created.
 			return this.dataRef;
 		}
-		const dataRef: number = await EthkeyBridge.decryptDataRef(
-			encryptedSeed,
-			password
-		);
+		const dataRef: number = await EthkeyBridge.decryptDataRef(encryptedSeed,
+			password);
 		this.dataRef = dataRef;
 		this.valid = true;
+
 		return this.dataRef;
 	}
 
@@ -208,22 +198,20 @@ export class SeedRefClass {
 		if (!this.valid) {
 			throw new Error('a seed reference has not been created');
 		}
-		return EthkeyBridge.substrateAddressWithRef(
-			this.dataRef,
+
+		return EthkeyBridge.substrateAddressWithRef(this.dataRef,
 			suriSuffix,
-			prefix
-		);
+			prefix);
 	}
 
 	tryBrainWalletAddress(): Promise<string> {
 		if (!this.valid) {
 			throw new Error('a seed reference has not been created');
 		}
-		return EthkeyBridge.brainWalletAddressWithRef(this.dataRef).then(
-			(address: string) => {
-				return address;
-			}
-		);
+
+		return EthkeyBridge.brainWalletAddressWithRef(this.dataRef).then((address: string) => {
+			return address;
+		});
 	}
 
 	// Destroy the decrypted seed. Must be called before this leaves scope or
@@ -233,6 +221,7 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot destroy an invalid seed reference');
 		}
+
 		return EthkeyBridge.destroyDataRef(this.dataRef).then(() => {
 			this.valid = false;
 		});
@@ -245,6 +234,7 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
+
 		return EthkeyBridge.brainWalletSignWithRef(this.dataRef, message);
 	}
 
@@ -254,6 +244,7 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
+
 		return EthkeyBridge.substrateSignWithRef(this.dataRef, suriSuffix, message);
 	}
 
@@ -262,6 +253,7 @@ export class SeedRefClass {
 			// Seed reference was never created or was already destroyed.
 			throw new Error('cannot sign with an invalid seed reference');
 		}
+
 		return EthkeyBridge.substrateSecretWithRef(this.dataRef, suriSuffix);
 	}
 }

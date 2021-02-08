@@ -16,23 +16,17 @@
 
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
-import {
-	EthereumNetworkParams,
+import { EthereumNetworkParams,
 	isSubstrateNetworkParams,
 	isUnknownNetworkParams,
-	NetworkParams
-} from 'types/networkTypes';
+	NetworkParams } from 'types/networkTypes';
 import { ValidSeed } from 'types/utilTypes';
 
-export function generateAccountId(
-	address: string,
+export function generateAccountId(address: string,
 	networkKey: string,
-	allNetworks: Map<string, NetworkParams>
-): string {
+	allNetworks: Map<string, NetworkParams>): string {
 	if (typeof address !== 'string' || address.length === 0 || !networkKey) {
-		throw new Error(
-			"Couldn't create an accountId. Address or networkKey missing, or network key was invalid."
-		);
+		throw new Error("Couldn't create an accountId. Address or networkKey missing, or network key was invalid.");
 	}
 
 	const networkParams = allNetworks.get(networkKey);
@@ -42,19 +36,19 @@ export function generateAccountId(
 	const { protocol } = networkParams;
 	if (isSubstrateNetworkParams(networkParams)) {
 		const { genesisHash } = networkParams;
+
 		return `${protocol}:${address}:${genesisHash ?? ''}`;
 	} else if (isUnknownNetworkParams(networkParams)) {
 		return `substrate:${address}:${networkKey ?? ''}`;
 	} else {
 		const { ethereumChainId } = networkParams as EthereumNetworkParams;
+
 		return `${protocol}:0x${address}@${ethereumChainId}`;
 	}
 }
 
-export function emptyAccount(
-	address = '',
-	networkKey: string = SubstrateNetworkKeys.KUSAMA
-): UnlockedAccount {
+export function emptyAccount(address = '',
+	networkKey: string = SubstrateNetworkKeys.KUSAMA): UnlockedAccount {
 	return {
 		address: address,
 		createdAt: new Date().getTime(),

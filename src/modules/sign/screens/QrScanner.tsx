@@ -32,9 +32,7 @@ import { NavigationProps } from 'types/props';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 
-export default function Scanner({
-	navigation
-}: NavigationProps<'QrScanner'>): React.ReactElement {
+export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const networksContextState = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertStateContext);
@@ -48,11 +46,9 @@ export default function Scanner({
 		missingFramesMessage: '',
 		totalFramesCount: 0
 	});
-	function showAlertMessage(
-		title: string,
+	function showAlertMessage(title: string,
 		message: string,
-		isAddNetworkSuccess?: boolean
-	): void {
+		isAddNetworkSuccess?: boolean): void {
 		const clearByTap = async (): Promise<void> => {
 			scannerStore.cleanup();
 			scannerStore.setReady();
@@ -81,10 +77,8 @@ export default function Scanner({
 		}
 	}
 
-	const processBarCode = useProcessBarCode(
-		showAlertMessage,
-		networksContextState
-	);
+	const processBarCode = useProcessBarCode(showAlertMessage,
+		networksContextState);
 	// useEffect((): (() => void) => {
 	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
 	// 		setLastFrame(null);
@@ -129,12 +123,10 @@ export default function Scanner({
 	useEffect(() => {
 		/** E2E Test Injection Code **/
 		if (global.inTest && global.scanRequest !== undefined) {
-			onMockBarCodeRead(
-				global.scanRequest,
+			onMockBarCodeRead(global.scanRequest,
 				async (tx: TxRequestData): Promise<void> => {
 					await processBarCode(tx);
-				}
-			);
+				});
 		}
 		/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	}, [mockIndex]);
@@ -146,6 +138,7 @@ export default function Scanner({
 		totalFramesCount,
 		missingFramesMessage
 	} = multiFrames;
+
 	return (
 		<SafeAreaViewContainer>
 			<RNCamera

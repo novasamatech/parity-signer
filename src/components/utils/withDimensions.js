@@ -13,8 +13,12 @@ export default function withDimensions(WrappedComponent) {
 		static displayName = `withDimensions(${WrappedComponent.displayName})`;
 
 		state = {
-			dimensions: { height, width },
-			isLandscape: isOrientationLandscape({ height, width })
+			dimensions: {
+				height, width
+			},
+			isLandscape: isOrientationLandscape({
+				height, width
+			})
 		};
 
 		componentDidMount() {
@@ -27,7 +31,9 @@ export default function withDimensions(WrappedComponent) {
 
 		handleOrientationChange = ({ window }) => {
 			const isLandscape = isOrientationLandscape(window);
-			this.setState({ isLandscape });
+			this.setState({
+				isLandscape
+			});
 		};
 
 		render() {

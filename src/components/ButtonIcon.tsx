@@ -15,8 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { FunctionComponent } from 'react';
-import {
-	StyleSheet,
+import { StyleSheet,
 	Text,
 	TextStyle,
 	TouchableOpacity,
@@ -50,7 +49,8 @@ const ButtonIcon: FunctionComponent<Props> = ({
 	testID,
 	textStyle,
 	title,
-	style = {}
+	style = {
+	}
 }) => {
 	const size = iconSize || 28;
 
@@ -86,6 +86,7 @@ const ButtonIcon: FunctionComponent<Props> = ({
 				/>
 			);
 		}
+
 		return (
 			<Icon
 				color={iconColor || colors.text.main}
@@ -101,7 +102,9 @@ const ButtonIcon: FunctionComponent<Props> = ({
 			accessibilityComponentType="button"
 			onPress={onPress}
 			activeOpacity={0.5}
-			style={{ ...styles.generalView, ...style }}
+			style={{
+				...styles.generalView, ...style
+			}}
 			testID={testID}
 		>
 			<View style={styles.iconTitleView}>

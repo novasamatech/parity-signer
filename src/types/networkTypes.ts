@@ -56,6 +56,7 @@ export type EthereumNetworkDefaultConstants = {
 	ethereumChainId: string;
 	logo?: number;
 	order: number;
+	pathId: string;
 	protocol?: NetworkProtocol;
 	secondaryColor?: string;
 	title: string;
@@ -66,6 +67,7 @@ export type EthereumNetworkParams = {
 	ethereumChainId: string;
 	logo: number;
 	order: number;
+	pathId: string;
 	protocol: NetworkProtocol;
 	secondaryColor: string;
 	title: string;
@@ -84,37 +86,33 @@ export type UnknownNetworkParams = {
 export type Networks = Map<string, NetworkParams>;
 export type SubstrateNetworks = Map<string, SubstrateNetworkParams>;
 
-export function isSubstrateNetworkParams(
-	networkParams:
+export function isSubstrateNetworkParams(networkParams:
 		| SubstrateNetworkParams
 		| UnknownNetworkParams
-		| EthereumNetworkParams
-): networkParams is SubstrateNetworkParams {
+		| EthereumNetworkParams): networkParams is SubstrateNetworkParams {
 	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
+
 	return (
 		protocol === NetworkProtocols.SUBSTRATE && pathId !== unknownNetworkPathId
 	);
 }
 
-export function isEthereumNetworkParams(
-	networkParams:
+export function isEthereumNetworkParams(networkParams:
 		| SubstrateNetworkParams
 		| UnknownNetworkParams
-		| EthereumNetworkParams
-): networkParams is EthereumNetworkParams {
+		| EthereumNetworkParams): networkParams is EthereumNetworkParams {
 	return (
 		(networkParams as EthereumNetworkParams).protocol ===
 		NetworkProtocols.ETHEREUM
 	);
 }
 
-export function isUnknownNetworkParams(
-	networkParams:
+export function isUnknownNetworkParams(networkParams:
 		| SubstrateNetworkParams
 		| UnknownNetworkParams
-		| EthereumNetworkParams
-): networkParams is UnknownNetworkParams {
+		| EthereumNetworkParams): networkParams is UnknownNetworkParams {
 	const { protocol, pathId } = networkParams as SubstrateNetworkParams;
+
 	return (
 		(protocol === NetworkProtocols.SUBSTRATE &&
 			pathId === unknownNetworkPathId) ||

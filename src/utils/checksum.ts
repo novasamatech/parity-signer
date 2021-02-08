@@ -21,5 +21,6 @@ export const checksummedAddress = (address: string, hash: string): string => {
 			parseInt(hash[n], 16) > 7 ? address[n].toUpperCase() : address[n]
 		}`;
 	}
+
 	return result;
 };

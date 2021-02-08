@@ -52,6 +52,7 @@ const unitMap: {
 function getValueOfUnit(unit?: string): BigNumber {
 	unit = unit ? unit.toLowerCase() : 'ether';
 	const unitValue = unitMap[unit] || 0;
+
 	return new BigNumber(unitValue, 10);
 }
 

@@ -25,13 +25,11 @@
  */
 
 import React, { ReactElement } from 'react';
-import {
-	Platform,
+import { Platform,
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	TouchableOpacityProps,
-	View
-} from 'react-native';
+	View } from 'react-native';
 
 const ANDROID_VERSION_LOLLIPOP = 21;
 
@@ -60,14 +58,13 @@ export default class TouchableItem extends React.PureComponent<Props> {
 			Platform.Version >= ANDROID_VERSION_LOLLIPOP
 		) {
 			const { style, ...rest } = this.props;
+
 			return (
 				<TouchableNativeFeedback
 					{...rest}
 					style={null}
-					background={TouchableNativeFeedback.Ripple(
-						this.props.pressColor,
-						this.props.borderless
-					)}
+					background={TouchableNativeFeedback.Ripple(this.props.pressColor,
+						this.props.borderless)}
 				>
 					<View style={style}>{this.props.children}</View>
 				</TouchableNativeFeedback>

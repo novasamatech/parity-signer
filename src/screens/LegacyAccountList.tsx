@@ -24,9 +24,7 @@ import { AccountsContext } from 'stores/AccountsContext';
 import { Account } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 
-function LegacyAccountList({
-	navigation
-}: NavigationProps<'LegacyAccountList'>): React.ReactElement {
+function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const onAccountSelected = async (key: string): Promise<void> => {
 		await accountsStore.select(key);
@@ -42,7 +40,9 @@ function LegacyAccountList({
 			address={account.address}
 			networkKey={account.networkKey}
 			onPress={(): Promise<void> => onAccountSelected(accountKey)}
-			style={{ paddingBottom: 0 }}
+			style={{
+				paddingBottom: 0
+			}}
 			title={account.name}
 			key={accountKey}
 		/>

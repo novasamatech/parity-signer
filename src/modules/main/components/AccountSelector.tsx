@@ -21,37 +21,31 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
 import { filterNetworks } from 'modules/network/utils';
-import React, { ReactElement, useCallback, useContext, useMemo, useState } from 'react';
+import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
-import { isEthereumNetworkParams,
-	isSubstrateNetworkParams,
-	NetworkParams,
-	SubstrateNetworkParams } from 'types/networkTypes';
+import { isEthereumNetworkParams, isSubstrateNetworkParams, NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import { navigateToPathDetails,
-	navigateToPathsList,
-	unlockSeedPhrase,
-	useUnlockSeed } from 'utils/navigationHelpers';
+import { navigateToPathDetails, navigateToPathsList, unlockSeedPhrase, useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
-function NetworkSelector({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
+function AccountSelector({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
 	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
 	const { identities, currentIdentity } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
-	const { allNetworks } = networkContextState;
+	const { getSubstrateNetwork, allNetworks } = networkContextState;
 	const { brainWalletAddress, isSeedRefValid, substrateAddress } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 
 	const { setAlert } = useContext(AlertStateContext);
 	// catch android back button and prevent exiting the app
-	useFocusEffect(useCallback((): any => {
+	useFocusEffect(React.useCallback((): any => {
 		const handleBackButton = (): boolean => {
 			if (shouldShowMoreNetworks) {
 				setShouldShowMoreNetworks(false);
@@ -83,7 +77,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 		try {
 			await accountsStore.deriveNewPath(fullPath,
 				substrateAddress,
-				networkParams,
+				getSubstrateNetwork(networkKey),
 				`${networkParams.title} root`,
 				'');
 			navigateToPathDetails(navigation, networkKey, fullPath);
@@ -187,9 +181,32 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 		}),
 	[availableNetworks, isNew, shouldShowMoreNetworks, allNetworks]);
 
-	const renderNetwork = ({ item }: {
-		item: [string, NetworkParams];
-	}): ReactElement => {
+	interface AccountInfo {
+			address: string;
+			network?: string;
+	}
+
+	const accountList = useMemo(()=> {
+		return identities.map((id): AccountInfo | null => {
+			const addresses = Array.from(id.addresses);
+
+			if (!addresses.length){
+				return null;
+			}
+
+			const address = Array.from(id.addresses)[0][0];
+			const network = Array.from(id.meta)[0][1].networkPathId;
+
+			return {
+				address,
+				network
+			}
+		});
+	}, [identities])
+
+	console.log('accountList', accountList)
+
+	const renderNetwork = ({ item }: { item: [string, NetworkParams] }): ReactElement => {
 		const [networkKey, networkParams] = item;
 		const networkIndexSuffix = isEthereumNetworkParams(networkParams)
 			? networkParams.ethereumChainId
@@ -200,7 +217,9 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 				key={networkKey}
 				testID={testIDs.Main.networkButton + networkIndexSuffix}
 				networkKey={networkKey}
-				onPress={(): Promise<void> => onNetworkChosen(networkKey, networkParams) }
+				onPress={(): Promise<void> =>
+					onNetworkChosen(networkKey, networkParams)
+				}
 				title={networkParams.title}
 			/>
 		);
@@ -222,4 +241,4 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 	);
 }
 
-export default withCurrentIdentity(NetworkSelector);
+export default withCurrentIdentity(AccountSelector);

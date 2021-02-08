@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NetworkCard } from 'components/AccountCard';
+import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
@@ -27,19 +27,16 @@ import fonts from 'styles/fonts';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 
-export default function NetworkSettings({
-	navigation
-}: NavigationProps<'NetworkSettings'>): React.ReactElement {
+export default function NetworkSettings({ navigation }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	const { networks } = useContext(NetworksContext);
 	const networkParams = filterNetworks(networks) as Array<
 		[string, SubstrateNetworkParams]
 	>;
-	const renderNetwork = ({
-		item
-	}: {
+	const renderNetwork = ({ item }: {
 		item: [string, SubstrateNetworkParams];
 	}): ReactElement => {
 		const networkSpec = item[1];
+
 		return (
 			<NetworkCard
 				testID={testIDs.NetworkSettings.networkCard + networkSpec.genesisHash}

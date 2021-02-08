@@ -28,13 +28,11 @@ import ButtonIcon from './ButtonIcon';
 function SecurityHeader(): React.ReactElement {
 	const [isConnected, setIsConnected] = useState(false);
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	useEffect(
-		() =>
-			NetInfo.addEventListener(state => {
-				setIsConnected(state.isConnected);
-			}),
-		[]
-	);
+	useEffect(() =>
+		NetInfo.addEventListener(state => {
+			setIsConnected(state.isConnected);
+		}),
+	[]);
 
 	return (
 		<View style={styles.body}>

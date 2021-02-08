@@ -26,11 +26,9 @@ import colors from 'styles/colors';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
-import {
-	navigateToLandingPage,
+import { navigateToLandingPage,
 	unlockAndReturnSeed,
-	unlockSeedPhrase
-} from 'utils/navigationHelpers';
+	unlockSeedPhrase } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
@@ -54,8 +52,7 @@ function IdentityManagement({
 
 	const onOptionSelect = async (value: string): Promise<void> => {
 		if (value === 'IdentityDelete') {
-			alertDeleteIdentity(
-				setAlert,
+			alertDeleteIdentity(setAlert,
 				async (): Promise<void> => {
 					await unlockSeedPhrase(navigation, false);
 					try {
@@ -65,12 +62,13 @@ function IdentityManagement({
 					} catch (err) {
 						alertError(setAlert, "Can't delete Identity.");
 					}
-				}
-			);
+				});
 		} else if (value === 'IdentityBackup') {
 			const seedPhrase = await unlockAndReturnSeed(navigation);
 			navigation.pop();
-			navigation.navigate(value, { isNew: false, seedPhrase });
+			navigation.navigate(value, {
+				isNew: false, seedPhrase
+			});
 		}
 	};
 
@@ -84,7 +82,9 @@ function IdentityManagement({
 						onSelect={onOptionSelect}
 						menuTriggerIconName={'more-vert'}
 						menuItems={[
-							{ text: 'Backup', value: 'IdentityBackup' },
+							{
+								text: 'Backup', value: 'IdentityBackup'
+							},
 							{
 								testID: testIDs.IdentityManagement.deleteButton,
 								text: 'Delete',

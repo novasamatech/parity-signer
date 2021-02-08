@@ -41,7 +41,9 @@ export default function PinInput(props: PinInputProps): React.ReactElement {
 			style={StyleSheet.flatten([
 				fontStyles.t_seed,
 				styles.pinInput,
-				{ fontSize: 18 },
+				{
+					fontSize: 18
+				},
 				props.style
 			])}
 		/>

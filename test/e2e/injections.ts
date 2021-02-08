@@ -40,12 +40,14 @@ export const getLaunchArgs = (props: AppProps): void => {
 			const argsIndex = launchArgs.indexOf('-scanRequest');
 			if (argsIndex !== -1)
 				global.scanRequest = parseInt(launchArgs[argsIndex + 1], 10);
+
 			return;
 		}
 	} else {
 		if (launchArgs && launchArgs.hasOwnProperty('detoxServer')) {
 			global.inTest = true;
 			global.scanRequest = (launchArgs as AndroidAppArgs)?.scanRequest;
+
 			return;
 		}
 	}
@@ -55,8 +57,12 @@ export const getLaunchArgs = (props: AppProps): void => {
 const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	bounds: {
 		bounds: [
-			{ x: '50', y: '50' },
-			{ x: '100', y: '100' }
+			{
+				x: '50', y: '50'
+			},
+			{
+				x: '100', y: '100'
+			}
 		],
 		height: 1440,
 		width: 1920
@@ -76,10 +82,8 @@ export function useInjectionQR(): [
 	] {
 	const [mockIndex, setMockIndex] = useState(0);
 
-	const onMockBarCodeRead = async (
-		txRequest: ScanTestRequest,
-		onBarCodeRead: (tx: TxRequestData) => void
-	): Promise<void> => {
+	const onMockBarCodeRead = async (txRequest: ScanTestRequest,
+		onBarCodeRead: (tx: TxRequestData) => void): Promise<void> => {
 		const scanRequest = scanRequestDataMap[txRequest];
 		if (typeof scanRequest === 'string') {
 			await timeout(200);
@@ -92,9 +96,7 @@ export function useInjectionQR(): [
 			}
 		} else if (typeof scanRequest === 'object') {
 			await timeout(200);
-			await onBarCodeRead(
-				buildSignRequest(scanRequest.rawData, scanRequest.data)
-			);
+			await onBarCodeRead(buildSignRequest(scanRequest.rawData, scanRequest.data));
 		}
 	};
 

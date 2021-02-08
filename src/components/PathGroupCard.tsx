@@ -22,16 +22,12 @@ import { StyleSheet, Text, View } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import {
-	AccountsStoreStateWithIdentity,
+import { AccountsStoreStateWithIdentity,
 	Identity,
-	PathGroup
-} from 'types/identityTypes';
-import {
-	isUnknownNetworkParams,
+	PathGroup } from 'types/identityTypes';
+import { isUnknownNetworkParams,
 	SubstrateNetworkParams,
-	UnknownNetworkParams
-} from 'types/networkTypes';
+	UnknownNetworkParams } from 'types/networkTypes';
 import { RootStackParamList } from 'types/routes';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { removeSlash } from 'utils/identitiesUtils';
@@ -58,9 +54,7 @@ export default function PathGroupCard({
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 	const { setAlert } = useContext(AlertStateContext);
 	const paths = pathGroup.paths;
-	const { isSeedRefValid, substrateAddress } = useSeedRef(
-		currentIdentity.encryptedSeed
-	);
+	const { isSeedRefValid, substrateAddress } = useSeedRef(currentIdentity.encryptedSeed);
 	const _getFullPath = (index: number, isHardDerivation: boolean): string =>
 		`//${networkParams.pathId}${pathGroup.title}${
 			isHardDerivation ? '//' : '/'
@@ -70,12 +64,11 @@ export default function PathGroupCard({
 		while (paths.includes(_getFullPath(index, isHardDerivation))) {
 			index++;
 		}
+
 		return index;
 	};
 
-	const addDerivationPath = async (
-		isHardDerivation: boolean
-	): Promise<void> => {
+	const addDerivationPath = async (isHardDerivation: boolean): Promise<void> => {
 		if (!isSeedRefValid) {
 			await unlockSeedPhrase(navigation, isSeedRefValid);
 			navigation.goBack();
@@ -84,13 +77,11 @@ export default function PathGroupCard({
 		const nextPath = _getFullPath(nextIndex, isHardDerivation);
 		const name = removeSlash(`${pathGroup.title}${nextIndex}`);
 		try {
-			await accountsStore.deriveNewPath(
-				nextPath,
+			await accountsStore.deriveNewPath(nextPath,
 				substrateAddress,
 				networkParams as SubstrateNetworkParams,
 				name,
-				''
-			);
+				'');
 		} catch (error) {
 			alertPathDerivationError(setAlert, error.message);
 		}
@@ -101,8 +92,11 @@ export default function PathGroupCard({
 	const headerCode = isUnknownNetwork
 		? pathGroup.title
 		: `//${networkParams.pathId}${pathGroup.title}`;
+
 	return (
-		<View key={`group${pathGroup.title}`} style={{ marginTop: 24 }}>
+		<View key={`group${pathGroup.title}`} style={{
+			marginTop: 24
+		}}>
 			<Separator shadow={true} style={styles.separator} />
 			<View style={styles.header}>
 				<View style={styles.headerText}>
@@ -128,7 +122,9 @@ export default function PathGroupCard({
 					testID={testIDs.PathsList.pathCard + path}
 					identity={currentIdentity}
 					path={path}
-					onPress={(): void => navigation.navigate('PathDetails', { path })}
+					onPress={(): void => navigation.navigate('PathDetails', {
+						path
+					})}
 				/>
 			))}
 		</View>

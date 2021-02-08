@@ -14,22 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	addNetworkGenesisHash,
+import { addNetworkGenesisHash,
 	addNetworkPathId,
-	ScanTestRequest
-} from 'e2e/mockScanRequests';
+	ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
-import {
-	launchWithScanRequest,
+import { launchWithScanRequest,
 	pinCode,
 	tapBack,
 	testExist,
 	testRecoverIdentity,
 	testTap,
 	testUnlockPin,
-	testVisible
-} from 'e2e/utils';
+	testVisible } from 'e2e/utils';
 
 const {
 	Main,

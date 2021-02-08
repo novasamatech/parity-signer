@@ -14,10 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
+import { SUBSTRATE_NETWORK_LIST,
+	SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { by, device,element, expect } from 'detox';
 
 import testIDs from './testIDs';
@@ -55,18 +53,14 @@ export const tapBack = async (): Promise<void> => {
 	}
 };
 
-export const testInput = async (
-	inputId: string,
-	inputText: string
-): Promise<void> => {
+export const testInput = async (inputId: string,
+	inputText: string): Promise<void> => {
 	await element(by.id(inputId)).typeText(inputText);
 	await element(by.id(inputId)).tapReturnKey();
 };
 
-export const testInputWithDone = async (
-	inputId: string,
-	inputText: string
-): Promise<void> => {
+export const testInputWithDone = async (inputId: string,
+	inputText: string): Promise<void> => {
 	await element(by.id(inputId)).typeText(inputText);
 	if (device.getPlatform() === 'ios') {
 		await element(by.label('Done')).atIndex(0).tap();
@@ -75,10 +69,8 @@ export const testInputWithDone = async (
 	}
 };
 
-export const testScrollAndTap = async (
-	buttonId: string,
-	screenId: string
-): Promise<void> => {
+export const testScrollAndTap = async (buttonId: string,
+	screenId: string): Promise<void> => {
 	await waitFor(element(by.id(buttonId)))
 		.toBeVisible()
 		.whileElement(by.id(screenId))
@@ -95,10 +87,8 @@ export const testSetUpDefaultPath = async (): Promise<void> => {
 	await testInput(IdentityPin.setPin, pinCode);
 	await testInputWithDone(IdentityPin.confirmPin, pinCode);
 	await testVisible(Main.chooserScreen);
-	await testScrollAndTap(
-		substrateNetworkButtonIndex,
-		testIDs.Main.chooserScreen
-	);
+	await testScrollAndTap(substrateNetworkButtonIndex,
+		testIDs.Main.chooserScreen);
 	await testVisible(PathDetail.screen);
 	await tapBack();
 	await testExist(PathsList.screen);
@@ -107,13 +97,15 @@ export const testSetUpDefaultPath = async (): Promise<void> => {
 export const waitAlert = (ms?: number): Promise<void> =>
 	new Promise(resolve => setTimeout(resolve, ms || 1000));
 
-export const launchWithScanRequest = async (
-	txRequest: number
-): Promise<void> => {
+export const launchWithScanRequest = async (txRequest: number): Promise<void> => {
 	await device.launchApp({
-		launchArgs: { scanRequest: txRequest.toString() },
+		launchArgs: {
+			scanRequest: txRequest.toString()
+		},
 		newInstance: true,
-		permissions: { camera: 'YES' }
+		permissions: {
+			camera: 'YES'
+		}
 	});
 };
 

@@ -16,16 +16,14 @@
 
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
-import {
-	Image,
+import { Image,
 	Platform,
 	StyleSheet,
 	Text,
 	TouchableNativeFeedback,
 	TouchableNativeFeedbackProps,
 	TouchableOpacity,
-	View
-} from 'react-native';
+	View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
@@ -52,6 +50,7 @@ export function DerivationNetworkSelector({
 }): React.ReactElement {
 	const { getSubstrateNetwork } = useContext(NetworksContext);
 	const network = getSubstrateNetwork(networkKey);
+
 	return (
 		<View style={styles.body}>
 			<Text style={styles.label}>{ACCOUNT_NETWORK}</Text>
@@ -104,7 +103,9 @@ export function NetworkOptions({
 			animationType="fade"
 		>
 			<View style={styles.optionsBackground}>
-				<View style={{ ...styles.optionWrapper, borderTopWidth: 0 }}>
+				<View style={{
+					...styles.optionWrapper, borderTopWidth: 0
+				}}>
 					<Text style={styles.optionHeadingText}>
 						{ACCOUNT_NETWORK.toUpperCase()}
 					</Text>
