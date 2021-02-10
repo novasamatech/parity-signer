@@ -18,7 +18,7 @@ import { centrifugeAmberMetadata, centrifugeMetadata, edgewareMetadata, kulupuMe
 import { ETHEREUM_NETWORK_LIST, SubstrateNetworkKeys, UnknownNetworkKeys, unknownNetworkPathId } from 'constants/networkSpecs';
 import strings from 'modules/sign/strings';
 import { NetworksContextState } from 'stores/NetworkContext';
-import { Account, AccountMeta, FoundAccount, FoundLegacyAccount, Identity, PathGroup, SerializedIdentity, UnlockedAccount } from 'types/identityTypes';
+import { Account, AccountMeta, FoundAccount, Identity, LegacyAccount, PathGroup, SerializedIdentity, UnlockedAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 
@@ -30,7 +30,7 @@ import { constructSURI, parseSURI } from './suri';
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = (str: string): string => str.replace(/\//g, '');
 
-export function isLegacyFoundAccount(foundAccount: FoundAccount): foundAccount is FoundLegacyAccount {
+export function isLegacyFoundAccount(foundAccount: FoundAccount): foundAccount is LegacyAccount {
 	return foundAccount.isLegacy;
 }
 
@@ -226,8 +226,8 @@ export const getNetworkKeyByPath = (path: string, pathMeta: AccountMeta, network
 	return getSubstrateNetworkKeyByPathId(pathId, networks);
 };
 
-export const parseFoundLegacyAccount = (legacyAccount: Account, accountId: string): FoundLegacyAccount => {
-	const returnAccount: FoundLegacyAccount = {
+export const parseFoundLegacyAccount = (legacyAccount: Account, accountId: string): LegacyAccount => {
+	const returnAccount: LegacyAccount = {
 		accountId,
 		address: legacyAccount.address,
 		createdAt: legacyAccount.createdAt,

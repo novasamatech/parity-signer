@@ -23,7 +23,6 @@ import { ButtonListener } from 'types/props';
 
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
-import { CardSeparator } from './CardSeparator';
 import { NetworkFooter } from './NetworkFooter';
 import TouchableItem from './TouchableItem';
 
@@ -36,16 +35,16 @@ interface NetworkCardProps {
 	title: string;
 }
 
-export function NetworkCard({ isAdd, networkColor, networkKey, onPress, testID, title }: NetworkCardProps): ReactElement {
+export function NetworkCard({ isAdd, networkKey, onPress, testID, title }: NetworkCardProps): ReactElement {
 	const { getNetwork } = useContext(NetworksContext);
-	const networkParams = getNetwork(networkKey ?? '');
+	const networkParams = getNetwork(networkKey);
+	const networkColor = networkParams?.color || colors.background.app;
 	const isDisabled = onPress === undefined;
 
 	return (
 		<TouchableItem disabled={isDisabled}
 			onPress={onPress}
 			testID={testID}>
-			<CardSeparator />
 			<View style={styles.content}>
 				{isAdd ? (
 					<View
@@ -60,17 +59,17 @@ export function NetworkCard({ isAdd, networkColor, networkKey, onPress, testID, 
 							name="add"
 							size={30} />
 					</View>
-				) : (
+				) : (networkParams && (
 					<AccountIcon
 						address={''}
 						network={networkParams}
 						style={styles.icon}
 					/>
-				)}
+				))}
 				<View style={styles.desc}>
 					<AccountPrefixedTitle title={title} />
 				</View>
-				<NetworkFooter color={networkColor ?? networkParams.color} />
+				<NetworkFooter color={networkColor} />
 			</View>
 		</TouchableItem>
 	);

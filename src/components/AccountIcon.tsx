@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import Identicon from '@polkadot/reactnative-identicon';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
@@ -24,11 +23,15 @@ import colors from 'styles/colors';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { blockiesIcon } from 'utils/native';
 
-export default function AccountIcon(props: {
+import Identicon from '@polkadot/reactnative-identicon';
+
+interface Props {
 	address: string;
 	network: NetworkParams;
 	style?: ViewStyle | ImageStyle;
-}): ReactElement {
+}
+
+export default function AccountIcon(props: Props): ReactElement {
 	const { address, network, style } = props;
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 	const protocol = network.protocol;

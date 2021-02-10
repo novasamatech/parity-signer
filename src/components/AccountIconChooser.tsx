@@ -38,18 +38,11 @@ interface Props {
 	derivationPassword: string;
 	derivationPath: string;
 	network: NetworkParams;
-	onSelect: (icon: {
-		isBip39: boolean;
-		newAddress: string;
-		newSeed: string;
-	}) => void;
+	onSelect: (icon: { isBip39: boolean; newAddress: string; newSeed: string; }) => void;
 	value: string;
 }
 
-export default class AccountIconChooser extends React.PureComponent<
-	Props,
-	{ icons: IconType[] }
-> {
+export default class AccountIconChooser extends React.PureComponent<Props, { icons: IconType[] }> {
 	constructor(props: any) {
 		super(props);
 
@@ -57,10 +50,7 @@ export default class AccountIconChooser extends React.PureComponent<
 	}
 
 	refreshIcons = async (): Promise<void> => {
-		const { derivationPassword,
-			derivationPath,
-			network,
-			onSelect } = this.props;
+		const { derivationPassword, derivationPath, network, onSelect } = this.props;
 
 		// clean previous selection
 		onSelect({ isBip39: false, newAddress: '', newSeed: '' });
@@ -76,7 +66,7 @@ export default class AccountIconChooser extends React.PureComponent<
 						seed: ''
 					};
 
-					result.seed = await words(24);
+					result.seed = await words(12);
 
 					if (network.protocol === NetworkProtocols.ETHEREUM) {
 						Object.assign(result, await brainWalletAddress(result.seed));
@@ -108,8 +98,7 @@ export default class AccountIconChooser extends React.PureComponent<
 	};
 
 	renderAddress = (): ReactElement => {
-		const { network: { protocol },
-			value } = this.props;
+		const { network: { protocol }, value } = this.props;
 
 		if (value) {
 			return (
@@ -124,10 +113,7 @@ export default class AccountIconChooser extends React.PureComponent<
 		}
 	};
 
-	renderIcon = ({ index, item }: {
-		item: IconType;
-		index: number;
-	}): ReactElement => {
+	renderIcon = ({ index, item }: { item: IconType; index: number; }): ReactElement => {
 		const { network, onSelect, value } = this.props;
 		const { address, bip39, seed } = item;
 		const isSelected = address.toLowerCase() === value.toLowerCase();
@@ -145,7 +131,8 @@ export default class AccountIconChooser extends React.PureComponent<
 				}
 				style={[styles.iconBorder, isSelected ? styles.selected : {}]}
 			>
-				<AccountIcon address={address}
+				<AccountIcon
+					address={address}
 					network={network}
 					style={styles.icon} />
 			</TouchableOpacity>
@@ -185,7 +172,8 @@ export default class AccountIconChooser extends React.PureComponent<
 						renderItem={this.renderIcon}
 					/>
 					<TouchableOpacity onPress={this.refreshIcons}>
-						<Icon name={'refresh'}
+						<Icon
+							name={'refresh'}
 							size={35}
 							style={styles.refreshIcon} />
 					</TouchableOpacity>

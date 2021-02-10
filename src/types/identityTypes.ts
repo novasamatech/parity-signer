@@ -37,7 +37,7 @@ export type LockedAccount = Omit<
 	'seedPhrase' | 'seed' | 'derivationPassword' | 'derivationPath'
 >;
 
-export type Account = UnlockedAccount | LockedAccount;
+export type Account = UnlockedAccount | LockedAccount | LegacyAccount;
 
 export function isUnlockedAccount(account: UnlockedAccount | LockedAccount): account is UnlockedAccount {
 	return 'seed' in account || 'seedPhrase' in account;
@@ -57,25 +57,24 @@ export interface FoundIdentityAccount extends AccountMeta {
 	encryptedSeed: string;
 	hasPassword: boolean;
 	validBip39Seed: true;
-	isLegacy: false;
+	isLegacy?: boolean;
 	networkKey: string;
 	path: string;
 }
 
-export interface FoundLegacyAccount {
+export interface LegacyAccount {
 	address: string;
-	accountId: string;
 	createdAt: number;
 	name: string;
 	updatedAt: number;
 	encryptedSeed: string;
 	validBip39Seed: boolean;
-	isLegacy: true;
+	isLegacy?: boolean;
 	networkKey: string;
 	path?: string;
 }
 
-export type FoundAccount = FoundIdentityAccount | FoundLegacyAccount;
+export type FoundAccount = FoundIdentityAccount | LegacyAccount;
 
 export type Identity = {
 	// encrypted seed include seedPhrase and password
@@ -94,9 +93,22 @@ export type SerializedIdentity = {
 	name: string;
 };
 
+export interface AccountInfo {
+	address: string;
+	accountId: string;
+	createdAt: number;
+	name: string;
+	updatedAt: number;
+	encryptedSeed: string;
+	validBip39Seed: boolean;
+	isLegacy?: boolean;
+	networkKey: string;
+	path?: string;
+};
+
 export type AccountsStoreState = {
+	accounts: LegacyAccount[];
 	identities: Identity[];
-	accounts: Map<string, Account>;
 	currentIdentity: Identity | null;
 	loaded: boolean;
 	newAccount: UnlockedAccount;

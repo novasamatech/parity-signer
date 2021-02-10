@@ -14,21 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import { AccountsContextState } from 'stores/AccountsContext';
-import { FoundAccount, FoundIdentityAccount, FoundLegacyAccount } from 'types/identityTypes';
+import { FoundAccount, FoundIdentityAccount, LegacyAccount } from 'types/identityTypes';
 import { isLegacyFoundAccount } from 'utils/identitiesUtils';
 
 import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 
-const CompatibleCard = ({ account, accountsStore, titlePrefix }: {
+interface Props {
 	account: FoundAccount;
 	accountsStore: AccountsContextState;
 	titlePrefix?: string;
-}): React.ReactElement => {
-	const renderLegacyAccountCard = (legacyAccount: FoundLegacyAccount): React.ReactElement => (
+}
+
+const CompatibleCard = ({ account, accountsStore, titlePrefix }: Props): React.ReactElement => {
+	const renderLegacyAccountCard = (legacyAccount: LegacyAccount): React.ReactElement => (
 		<AccountCard
 			address={legacyAccount.address}
 			networkKey={legacyAccount.networkKey || ''}
@@ -51,12 +52,6 @@ const CompatibleCard = ({ account, accountsStore, titlePrefix }: {
 	return isLegacyFoundAccount(account) || account.isLegacy === undefined
 		? renderLegacyAccountCard(account)
 		: renderIdentityPathCard(account);
-};
-
-CompatibleCard.propTypes = {
-	account: PropTypes.object.isRequired,
-	accountsStore: PropTypes.object.isRequired,
-	titlePrefix: PropTypes.string
 };
 
 export default CompatibleCard;

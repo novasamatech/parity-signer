@@ -14,12 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GenericExtrinsicPayload } from '@polkadot/types';
-import { compactFromU8a, hexStripPrefix, hexToU8a, isU8a, u8aConcat, u8aToHex } from '@polkadot/util';
 import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
 import React, { useReducer } from 'react';
 import { AccountsContextState } from 'stores/AccountsContext';
-import { GetNetwork, NetworksContextState } from 'stores/NetworkContext';
+import { NetworksContextState } from 'stores/NetworkContext';
 import { Account, FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { CompletedParsedData, EthereumParsedData, isEthereumCompletedParsedData, isSubstrateMessageParsedData, MessageQRInfo, MultiFramesInfo, QrInfo, SubstrateCompletedParsedData, SubstrateMessageParsedData, SubstrateTransactionParsedData, TxQRInfo } from 'types/scannerTypes';
@@ -29,6 +27,9 @@ import { brainWalletSign, decryptData, ethSign, keccak, substrateSign } from 'ut
 import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
 import { isAscii } from 'utils/strings';
 import transaction, { Transaction } from 'utils/transaction';
+
+import { GenericExtrinsicPayload } from '@polkadot/types';
+import { compactFromU8a, hexStripPrefix, hexToU8a, isU8a, u8aConcat, u8aToHex } from '@polkadot/util';
 
 type TXRequest = Record<string, any>;
 
@@ -86,7 +87,7 @@ export type ScannerContextState = {
 		qrInfo: QrInfo,
 		networks: Map<string, SubstrateNetworkParams>
 	) => Promise<void>;
-	signDataLegacy: (pin: string, getNetwork: GetNetwork) => Promise<void>;
+	signDataLegacy: (pin: string, getNetwork: NetworksContextState['getNetwork']) => Promise<void>;
 };
 
 const DEFAULT_STATE: ScannerStoreState = {
@@ -426,8 +427,7 @@ export function useScannerContext(): ScannerContextState {
 	}
 
 	// signing data with legacy account.
-	async function signDataLegacy(pin = '1',
-		getNetwork: GetNetwork): Promise<void> {
+	async function signDataLegacy(pin = '1', getNetwork: NetworksContextState['getNetwork']): Promise<void> {
 		const { dataToSign, isHash, sender } = state;
 
 		if (!sender || !sender.encryptedSeed)

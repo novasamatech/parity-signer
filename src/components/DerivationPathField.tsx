@@ -23,18 +23,13 @@ import { parseDerivationPath } from 'utils/suri';
 
 import TextInput from './TextInput';
 
-export default function DerivationPathField(props: {
-	onChange: (derivationEvent: {
-		derivationPassword: string;
-		derivationPath: string;
-		isDerivationPathValid: boolean;
-	}) => void;
-	styles: {
-		title: TextStyle;
-	};
-}): React.ReactElement {
-	const { onChange, styles } = props;
-	const [showAdvancedField, setShowAdvancedField] = useState(true);
+interface Props {
+	onChange: (derivationEvent: { derivationPassword: string; derivationPath: string; isDerivationPathValid: boolean; }) => void;
+	styles: { title: TextStyle; };
+}
+
+export default function DerivationPathField({ onChange, styles }: Props): React.ReactElement {
+	const [showAdvancedField, setShowAdvancedField] = useState(false);
 	const [isValidPath, setIsValidPath] = useState(true);
 
 	const toggleShowAdvancedField = (): void => {

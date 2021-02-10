@@ -17,9 +17,11 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import SecureStorage from 'react-native-secure-storage';
-import { Account, Identity } from 'types/identityTypes';
+import { Identity, LegacyAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
+
+import { decodeAddress } from '@polkadot/util-crypto';
 
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
@@ -35,43 +37,38 @@ function handleError(e: Error, label: string): any[] {
  * ========================================
  */
 const currentAccountsStore = {
-	keychainService: 'accounts_v3',
-	sharedPreferencesName: 'accounts_v3'
+	keychainService: 'keychainService_v1',
+	sharedPreferencesName: 'sharedPreferencesName_v1'
 };
 
-export async function loadAccounts(version = 3): Promise<Map<string, any>> {
+export async function loadAccounts(version = 1): Promise<LegacyAccount[]> {
 	if (!SecureStorage) {
-		return Promise.resolve(new Map());
+		return Promise.resolve([]);
 	}
 
-	const accountsStoreVersion =
-		version === 1 ? 'accounts' : `accounts_v${version}`;
+	const accountsStoreVersion = `accounts_v${version}`;
 	const accountsStore = {
 		keychainService: accountsStoreVersion,
 		sharedPreferencesName: accountsStoreVersion
 	};
 
-	return SecureStorage.getAllItems(accountsStore).then((accounts: { [key: string]: string }) => {
-		const accountMap = new Map();
+	return SecureStorage.getAllItems(accountsStore)
+		.then((storedAccounts: { [key: string]: string }) => {
 
-		for (const [key, value] of Object.entries(accounts)) {
-			const account = JSON.parse(value);
+			const accounts = Object.entries(storedAccounts).map(([_, value]) => JSON.parse(value) as LegacyAccount)
 
-			accountMap.set(key, { ...account });
-		}
-
-		return accountMap;
-	});
+			return accounts;
+		});
 }
 
 export const deleteAccount = (accountKey: string): Promise<void> =>
 	SecureStorage.deleteItem(accountKey, currentAccountsStore);
 
-export const saveAccount = (accountKey: string,
-	account: Account): Promise<void> =>
-	SecureStorage.setItem(accountKey,
-		JSON.stringify(account, null, 0),
-		currentAccountsStore);
+export const saveAccount = (account: LegacyAccount): Promise<void> => {
+	const publicKey = decodeAddress(account.address).toString();
+
+	return SecureStorage.setItem(publicKey, JSON.stringify(account, null, 0), currentAccountsStore);
+}
 
 /*
  * ========================================
@@ -88,8 +85,7 @@ export async function loadIdentities(version = 4): Promise<Identity[]> {
 	const identityStorageLabel = `identities_v${version}`;
 
 	try {
-		const identities = await SecureStorage.getItem(identityStorageLabel,
-			identitiesStore);
+		const identities = await SecureStorage.getItem(identityStorageLabel, identitiesStore);
 
 		if (!identities) return [];
 
@@ -137,8 +133,7 @@ export async function loadNetworks(): Promise<
 export async function saveNetworks(newNetwork: SubstrateNetworkParams): Promise<void> {
 	try {
 		let addedNetworks = new Map();
-		const addedNetworkJson = await SecureStorage.getItem(currentNetworkStorageLabel,
-			networkStorage);
+		const addedNetworkJson = await SecureStorage.getItem(currentNetworkStorageLabel, networkStorage);
 
 		if (addedNetworkJson) addedNetworks = new Map(JSON.parse(addedNetworkJson));
 

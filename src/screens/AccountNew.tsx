@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import AccountCard from 'components/AccountCard';
 import AccountIconChooser from 'components/AccountIconChooser';
 import Button from 'components/Button';
 import DerivationPathField from 'components/DerivationPathField';
 import KeyboardScrollView from 'components/KeyboardScrollView';
+import { NetworkCard } from 'components/NetworkCard';
 import TextInput from 'components/TextInput';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { useContext, useEffect, useReducer } from 'react';
@@ -38,8 +38,8 @@ interface State {
 	derivationPassword: string;
 	derivationPath: string;
 	isDerivationPathValid: boolean;
-	selectedAccount: undefined | Account;
-	selectedNetwork: undefined | NetworkParams;
+	selectedAccount?: Account;
+	selectedNetwork?:NetworkParams | null;
 	newAccount?: Account;
 }
 
@@ -62,8 +62,10 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 	const [state, updateState] = useReducer(reducer, initialState);
 
 	useEffect((): void => {
-		accountsStore.updateNew(emptyAccount());
-	}, [accountsStore]);
+		accountsStore.updateNew(emptyAccount('', ''));
+	// we get an infinite loop if we add anything here.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	useEffect((): void => {
 		const selectedAccount = accountsStore.state.newAccount;
@@ -75,122 +77,116 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 		});
 	}, [accountsStore.state.newAccount, getNetwork]);
 
-	const { derivationPassword,
-		derivationPath,
-		isDerivationPathValid,
-		selectedAccount,
-		selectedNetwork } = state;
+	const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork } = state;
 
 	if (!selectedAccount) return <View />;
 
 	const { address, name, validBip39Seed } = selectedAccount;
 	const seed = (selectedAccount as UnlockedAccount)?.seed;
-	const isSubstrate = selectedNetwork!.protocol === NetworkProtocols.SUBSTRATE;
+	const isSubstrate = selectedNetwork?.protocol === NetworkProtocols.SUBSTRATE;
 
 	return (
 		<KeyboardScrollView>
-			<View style={styles.body}>
+			<View style={styles.bodyContainer}>
 				<Text style={styles.titleTop}>CREATE ACCOUNT</Text>
-				<Text style={styles.title}>NETWORK</Text>
-			</View>
-			<AccountCard
-				address={''}
-				networkKey={selectedAccount.networkKey}
-				onPress={(): void => navigation.navigate('LegacyNetworkChooser')}
-				title={selectedNetwork!.title}
-			/>
-			<View style={styles.body}>
-				<Text style={styles.title}>ICON & ADDRESS</Text>
-				<AccountIconChooser
-					derivationPassword={derivationPassword}
-					derivationPath={derivationPath}
-					network={selectedNetwork!}
-					onSelect={({ isBip39, newAddress, newSeed }): void => {
-						if (newAddress && isBip39 && newSeed) {
-							if (isSubstrate) {
-								try {
-									const suri = constructSURI({
-										derivePath: derivationPath,
-										password: derivationPassword,
-										phrase: newSeed
-									});
-
-									accountsStore.updateNew({
-										address: newAddress,
-										derivationPassword,
-										derivationPath,
-										seed: suri,
-										seedPhrase: newSeed,
-										validBip39Seed: isBip39
-									});
-								} catch (e) {
-									console.error(e);
-								}
-							} else {
-								// Ethereum account
-								accountsStore.updateNew({
-									address: newAddress,
-									seed: newSeed,
-									validBip39Seed: isBip39
-								});
-							}
-						} else {
-							accountsStore.updateNew({
-								address: '',
-								seed: '',
-								validBip39Seed: false
-							});
+				<View style={styles.step}>
+					<Text style={styles.title}>NAME</Text>
+					<TextInput
+						onChangeText={(input: string): void =>
+							accountsStore.updateNew({ name: input })
 						}
-					}}
-					value={address && address}
-				/>
-				<Text style={styles.title}>NAME</Text>
-				<TextInput
-					onChangeText={(input: string): void =>
-						accountsStore.updateNew({ name: input })
-					}
-					placeholder="Enter a new account name"
-					value={name}
-				/>
-				{isSubstrate && (
-					<DerivationPathField
-						onChange={(newDerivationPath: {
-							derivationPassword: string;
-							derivationPath: string;
-							isDerivationPathValid: boolean;
-						}): void => {
-							updateState({
-								derivationPassword: newDerivationPath.derivationPassword,
-								derivationPath: newDerivationPath.derivationPath,
-								isDerivationPathValid: newDerivationPath.isDerivationPathValid
-							});
-						}}
-						styles={styles}
-					/>
-				)}
-				<View style={styles.bottom}>
-					<Text style={styles.hintText}>
-						Next, you will be asked to backup your account, get a pen and some
-						paper.
-					</Text>
-					<Button
-						disabled={
-							!validateSeed(seed, validBip39Seed).valid ||
-							!isDerivationPathValid
-						}
-						onPress={(): void => {
-							navigation.navigate('LegacyAccountBackup', { isNew: true });
-						}}
-						title="Next Step"
+						placeholder="new name"
+						value={name}
 					/>
 				</View>
+				<View style={styles.step}>
+					<Text style={styles.title}>NETWORK</Text>
+					<NetworkCard
+						networkKey={selectedAccount.networkKey}
+						onPress={(): void => navigation.navigate('LegacyNetworkChooser')}
+						title={selectedNetwork?.title || 'Select Network'}
+					/>
+				</View>
+				{ selectedNetwork && (
+					<View style={styles.step}>
+						<Text style={styles.title}>ICON & ADDRESS</Text>
+						<AccountIconChooser
+							derivationPassword={derivationPassword}
+							derivationPath={derivationPath}
+							network={selectedNetwork!}
+							onSelect={({ isBip39, newAddress, newSeed }): void => {
+								if (newAddress && isBip39 && newSeed) {
+									if (isSubstrate) {
+										try {
+											const suri = constructSURI({
+												derivePath: derivationPath,
+												password: derivationPassword,
+												phrase: newSeed
+											});
+
+											accountsStore.updateNew({
+												address: newAddress,
+												derivationPassword,
+												derivationPath,
+												seed: suri,
+												seedPhrase: newSeed,
+												validBip39Seed: isBip39
+											});
+										} catch (e) {
+											console.error(e);
+										}
+									} else {
+										// Ethereum account
+										accountsStore.updateNew({
+											address: newAddress,
+											seed: newSeed,
+											validBip39Seed: isBip39
+										});
+									}
+								} else {
+									accountsStore.updateNew({
+										address: '',
+										seed: '',
+										validBip39Seed: false
+									});
+								}
+							}}
+							value={address && address}
+						/>
+						{isSubstrate && (
+							<View style={styles.step}>
+								<DerivationPathField
+									onChange={(newDerivationPath: { derivationPassword: string; derivationPath: string; isDerivationPathValid: boolean; }): void => {
+										updateState({
+											derivationPassword: newDerivationPath.derivationPassword,
+											derivationPath: newDerivationPath.derivationPath,
+											isDerivationPathValid: newDerivationPath.isDerivationPathValid
+										});
+									}}
+									styles={styles}
+								/>
+							</View>
+						)}
+						<View style={styles.bottom}>
+							<Button
+								disabled={
+									!validateSeed(seed, validBip39Seed).valid ||
+							!isDerivationPathValid
+								}
+								onPress={(): void => {
+									navigation.navigate('LegacyAccountBackup', { isNew: true });
+								}}
+								title="Next Step"
+							/>
+						</View>
+					</View>
+				)}
 			</View>
 		</KeyboardScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
-	body: { padding: 16 },
 	bodyContainer: {
 		flex: 1,
 		flexDirection: 'column',
@@ -200,12 +196,8 @@ const styles = StyleSheet.create({
 		flexBasis: 50,
 		paddingBottom: 15
 	},
-	hintText: {
-		color: colors.text.faded,
-		fontFamily: fonts.bold,
-		fontSize: 12,
-		paddingTop: 20,
-		textAlign: 'center'
+	step: {
+		padding: 16
 	},
 	title: {
 		...fontStyles.h_subheading,

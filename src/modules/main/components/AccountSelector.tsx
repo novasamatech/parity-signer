@@ -57,17 +57,13 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 			}
 		};
 
-		const backHandler = BackHandler.addEventListener('hardwareBackPress',
-			handleBackButton);
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
 
 		return (): void => backHandler.remove();
 	}, [shouldShowMoreNetworks]));
 
 	const onAddCustomPath = (): Promise<void> =>
-		unlockWithoutPassword({
-			name: 'PathDerivation',
-			params: { parentPath: '' }
-		});
+		unlockWithoutPassword({ name: 'PathDerivation', params: { parentPath: '' } });
 
 	const deriveSubstrateNetworkRootPath = async (networkKey: string,
 		networkParams: SubstrateNetworkParams): Promise<void> => {
@@ -108,7 +104,6 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 			ListHeaderComponent: (
 				<NetworkCard
 					isAdd={true}
-					networkColor={colors.background.app}
 					onPress={onAddCustomPath}
 					testID={testIDs.Main.addCustomNetworkButton}
 					title="Create Custom Path"
@@ -124,7 +119,6 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 		// 				onPress={(): void => setShouldShowMoreNetworks(true)}
 		// 				testID={testIDs.Main.addNewNetworkButton}
 		// 				title="Add Network Account"
-		// 				networkColor={colors.background.app}
 		// 			/>
 		// 		)
 		// 	};
@@ -187,6 +181,35 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 			network?: string;
 	}
 
+	// Identity
+	// {
+	// 	"addresses": Map {
+	// 		"GiFE7t56Dc4cWZoitYkFaJ6pKSVr36EATztX5LX45X7jSHy" => "",
+	// 		"15XpV4xc3aFFVgsfMSQsUszWdkVjdjs7AzG94ygVmX32whhg" => "//some/1"
+	// 	},
+	// 	"derivationPassword": "",
+	// 	"encryptedSeed": "{\"cipher\":\"aes-128-ctr\",\"cipherparams\":{\"iv\":\"7039494bdca0c839c58d538a554d705e\"},\"ciphertext\":\"6ad656d7cd094893ca27e01ed80cc4c85784dd43ed4639555af5fbcc979465fe178dfc43e3ffd9a39ed55f3f9d385026e63841a91bcf0d83246bd0eaddf709a032fde35b9ecbf2\",\"kdf\":\"pbkdf2\",\"kdfparams\":{\"c\":10240,\"dklen\":32,\"prf\":\"hmac-sha256\",\"salt\":\"aea3b3cc027a08877a70200f79fcc560e7d2f748da7dfd934475e5aaf9841b02\"},\"mac\":\"459152615d894a1ef68572323dea992d66c80758ce6fe89ab01a34d65d05d8cc\"}",
+	// 	"meta": Map {
+	// 		"" => {
+	// 			"address": "GiFE7t56Dc4cWZoitYkFaJ6pKSVr36EATztX5LX45X7jSHy",
+	// 			"createdAt": 1612624676279,
+	// 			"hasPassword": false,
+	// 			"name": "",
+	// 			"networkPathId": "kusama",
+	// 			"updatedAt": 1612624676279
+	// 		},
+	//      "//some/1" => {
+	// 			"address": "15XpV4xc3aFFVgsfMSQsUszWdkVjdjs7AzG94ygVmX32whhg",
+	// 			"createdAt": 1612627886130,
+	// 			"hasPassword": false,
+	// 			"name": "",
+	// 			"networkPathId": "polkadot",
+	// 			"updatedAt": 1612627886130
+	// 		}
+	// 	},
+	// 	"name": "bla"
+	// }
+
 	const accountList = useMemo(()=> {
 		return identities.map((id): AccountInfo | null => {
 			const addresses = Array.from(id.addresses);
@@ -195,7 +218,9 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 				return null;
 			}
 
+			// select the first account from the identity.address, the key from the map is the address
 			const address = Array.from(id.addresses)[0][0];
+			// select the first account from the identity.map, the value from the map has a networkPathId
 			const network = Array.from(id.meta)[0][1].networkPathId;
 
 			return {
@@ -206,6 +231,25 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 	}, [identities])
 
 	console.log('accountList', accountList)
+
+	// const renderAccount = ({ item }: { item: [string, NetworkParams] }): ReactElement => {
+	// 	const [networkKey, networkParams] = item;
+	// 	const networkIndexSuffix = isEthereumNetworkParams(networkParams)
+	// 		? networkParams.ethereumChainId
+	// 		: networkParams.pathId;
+
+	// 	return (
+	// 		<CompatibleCard
+	// 			key={networkKey}
+	// 			networkKey={networkKey}
+	// 			onPress={(): Promise<void> =>
+	// 				onNetworkChosen(networkKey, networkParams)
+	// 			}
+	// 			testID={testIDs.Main.networkButton + networkIndexSuffix}
+	// 			title={networkParams.title}
+	// 		/>
+	// 	);
+	// };
 
 	const renderNetwork = ({ item }: { item: [string, NetworkParams] }): ReactElement => {
 		const [networkKey, networkParams] = item;

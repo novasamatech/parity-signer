@@ -14,29 +14,46 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { useNavigation } from '@react-navigation/native';
 import AccountCard from 'components/AccountCard';
+import Button from 'components/Button';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import TextInput from 'components/TextInput';
-import React, { useContext } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
+import t from 'modules/unlock/strings';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { AccountsContext } from 'stores/AccountsContext';
 
-const onNameInput = async (accountsStore: AccountsContextState,
-	name: string): Promise<void> => {
-	await accountsStore.updateSelectedAccount({ name });
-	const { selectedKey } = accountsStore.state;
-	const selectedAccount = accountsStore.getSelected()!;
-
-	await accountsStore.save(selectedKey, selectedAccount);
-};
-
+// TODO FIXME test this
 export default function AccountEdit(): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const selectedAccount = accountsStore.getSelected()!;
+	const selectedAccount = accountsStore.getSelected();
+	const [name, setName] = useState(selectedAccount?.name || '')
+	const navigation = useNavigation();
+
+	useEffect(() => {
+		if (!selectedAccount){
+			console.error('no selected account')
+
+			return;
+		}
+	}, [selectedAccount])
+
+	const onSubmit = useCallback(() => {
+		if (!selectedAccount) {
+			return;
+		}
+
+		accountsStore.save({ ...selectedAccount, name })
+			.then(() => {
+				navigation.goBack()
+			})
+			.catch(console.error);
+
+	}, [accountsStore, name, navigation, selectedAccount])
 
 	if (!selectedAccount) {
-		return <ScrollView bounces={false}
-			style={styles.body} />;
+		return <SafeAreaScrollViewContainer/>
 	}
 
 	return (
@@ -44,16 +61,18 @@ export default function AccountEdit(): React.ReactElement {
 			<AccountCard
 				address={selectedAccount.address}
 				networkKey={selectedAccount.networkKey}
-				title={selectedAccount.name}
+				title={name}
 			/>
 			<TextInput
 				label="Account Name"
-				onChangeText={(name: string): Promise<any> =>
-					onNameInput(accountsStore, name)
-				}
+				onChangeText={setName}
 				placeholder="New name"
 				style={{ marginBottom: 40 }}
-				value={selectedAccount.name}
+				value={name}
+			/>
+			<Button
+				onPress={onSubmit}
+				title={t.doneButton.pinUnlock}
 			/>
 		</SafeAreaScrollViewContainer>
 	);
