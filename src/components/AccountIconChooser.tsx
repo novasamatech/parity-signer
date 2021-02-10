@@ -197,7 +197,6 @@ const styles = StyleSheet.create({
 		paddingLeft: 6
 	},
 	body: {
-		backgroundColor: colors.background.card,
 		display: 'flex',
 		flexDirection: 'column',
 		marginBottom: 20,
@@ -211,16 +210,18 @@ const styles = StyleSheet.create({
 		marginBottom: 10
 	},
 	icon: {
-		backgroundColor: colors.background.card,
+
 		height: 50,
 		padding: 5,
 		width: 50
 	},
 	iconBorder: {
-		borderColor: colors.background.card,
 		borderWidth: 6,
-		height: 62 // height = icon height + borderWidth * 2
+		height: 62 // height = icon height (50) + borderWidth (6) * 2
 	},
 	refreshIcon: { color: colors.text.faded },
-	selected: { borderColor: colors.border.light }
+	selected: {
+		borderColor: colors.border.light,
+		borderRadius: 50
+	}
 });

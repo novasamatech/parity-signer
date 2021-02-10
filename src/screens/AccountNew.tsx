@@ -21,7 +21,7 @@ import KeyboardScrollView from 'components/KeyboardScrollView';
 import { NetworkCard } from 'components/NetworkCard';
 import TextInput from 'components/TextInput';
 import { NetworkProtocols } from 'constants/networkSpecs';
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useCallback, useContext, useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
@@ -44,9 +44,6 @@ interface State {
 }
 
 export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
-	const { getNetwork } = useContext(NetworksContext);
-
 	const initialState = {
 		derivationPassword: '',
 		derivationPath: '',
@@ -54,16 +51,20 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 		selectedAccount: undefined,
 		selectedNetwork: undefined
 	};
-
 	const reducer = (state: State, delta: Partial<State>): State => ({
 		...state,
 		...delta
 	});
 	const [state, updateState] = useReducer(reducer, initialState);
+	const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork } = state;
+	const accountsStore = useContext(AccountsContext);
+	const { getNetwork } = useContext(NetworksContext);
+	const seed = (selectedAccount as UnlockedAccount)?.seed;
+	const isSubstrate = selectedNetwork?.protocol === NetworkProtocols.SUBSTRATE;
 
 	useEffect((): void => {
 		accountsStore.updateNew(emptyAccount('', ''));
-	// we get an infinite loop if we add anything here.
+		// we get an infinite loop if we add anything here.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -77,13 +78,49 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 		});
 	}, [accountsStore.state.newAccount, getNetwork]);
 
-	const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork } = state;
+	const onAccountSelect = useCallback(({ isBip39, newAddress, newSeed }): void => {
+		if (newAddress && isBip39 && newSeed) {
+			if (isSubstrate) {
+				try {
+					const suri = constructSURI({
+						derivePath: derivationPath,
+						password: derivationPassword,
+						phrase: newSeed
+					});
 
-	if (!selectedAccount) return <View />;
+					accountsStore.updateNew({
+						address: newAddress,
+						derivationPassword,
+						derivationPath,
+						seed: suri,
+						seedPhrase: newSeed,
+						validBip39Seed: isBip39
+					});
+				} catch (e) {
+					console.error(e);
+				}
+			} else {
+				// Ethereum account
+				accountsStore.updateNew({
+					address: newAddress,
+					seed: newSeed,
+					validBip39Seed: isBip39
+				});
+			}
+		} else {
+			accountsStore.updateNew({
+				address: '',
+				seed: '',
+				validBip39Seed: false
+			});
+		}
+	},[accountsStore, derivationPassword, derivationPath, isSubstrate])
+
+	if (!selectedAccount) {
+		return <View />;
+	}
 
 	const { address, name, validBip39Seed } = selectedAccount;
-	const seed = (selectedAccount as UnlockedAccount)?.seed;
-	const isSubstrate = selectedNetwork?.protocol === NetworkProtocols.SUBSTRATE;
 
 	return (
 		<KeyboardScrollView>
@@ -108,53 +145,19 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 					/>
 				</View>
 				{ selectedNetwork && (
-					<View style={styles.step}>
-						<Text style={styles.title}>ICON & ADDRESS</Text>
-						<AccountIconChooser
-							derivationPassword={derivationPassword}
-							derivationPath={derivationPath}
-							network={selectedNetwork!}
-							onSelect={({ isBip39, newAddress, newSeed }): void => {
-								if (newAddress && isBip39 && newSeed) {
-									if (isSubstrate) {
-										try {
-											const suri = constructSURI({
-												derivePath: derivationPath,
-												password: derivationPassword,
-												phrase: newSeed
-											});
-
-											accountsStore.updateNew({
-												address: newAddress,
-												derivationPassword,
-												derivationPath,
-												seed: suri,
-												seedPhrase: newSeed,
-												validBip39Seed: isBip39
-											});
-										} catch (e) {
-											console.error(e);
-										}
-									} else {
-										// Ethereum account
-										accountsStore.updateNew({
-											address: newAddress,
-											seed: newSeed,
-											validBip39Seed: isBip39
-										});
-									}
-								} else {
-									accountsStore.updateNew({
-										address: '',
-										seed: '',
-										validBip39Seed: false
-									});
-								}
-							}}
-							value={address && address}
-						/>
+					<View>
+						<View style={styles.step}>
+							<Text style={styles.title}>ICON & ADDRESS</Text>
+							<AccountIconChooser
+								derivationPassword={derivationPassword}
+								derivationPath={derivationPath}
+								network={selectedNetwork!}
+								onSelect={onAccountSelect}
+								value={address && address}
+							/>
+						</View>
 						{isSubstrate && (
-							<View style={styles.step}>
+							<View style={StyleSheet.flatten([styles.step, styles.lastStep])}>
 								<DerivationPathField
 									onChange={(newDerivationPath: { derivationPassword: string; derivationPath: string; isDerivationPathValid: boolean; }): void => {
 										updateState({
@@ -195,6 +198,9 @@ const styles = StyleSheet.create({
 	bottom: {
 		flexBasis: 50,
 		paddingBottom: 15
+	},
+	lastStep: {
+		paddingTop: 0
 	},
 	step: {
 		padding: 16

@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, Text, TextStyle, TouchableWithoutFeedback,View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -36,43 +36,46 @@ export default function DerivationPathField({ onChange, styles }: Props): React.
 		setShowAdvancedField(!showAdvancedField);
 	};
 
+	const onChangeText = useCallback((text: string): void => {
+		try {
+			const derivationPath = parseDerivationPath(text);
+
+			onChange({
+				derivationPassword: derivationPath.password || '',
+				derivationPath: derivationPath.derivePath || '',
+				isDerivationPathValid: true
+			});
+			setIsValidPath(true);
+		} catch (e) {
+			// wrong derivationPath
+			onChange({
+				derivationPassword: '',
+				derivationPath: '',
+				isDerivationPathValid: false
+			});
+			setIsValidPath(false);
+		}
+	}, [onChange])
+
 	return (
 		<>
-			<TouchableOpacity onPress={toggleShowAdvancedField}>
-				<View style={{ justifyContent: 'center' }}>
+			<TouchableWithoutFeedback onPress={toggleShowAdvancedField}>
+				<View style={ownStyles.container}>
 					<Text
 						style={StyleSheet.flatten([styles.title, ownStyles.advancedText])}
 					>
 						ADVANCED
-						<Icon
-							name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
-							size={20}
-						/>
 					</Text>
+					<Icon
+						color={colors.text.main}
+						name={showAdvancedField ? 'arrow-drop-up' : 'arrow-drop-down'}
+						size={20}
+					/>
 				</View>
-			</TouchableOpacity>
+			</TouchableWithoutFeedback>
 			{showAdvancedField && (
 				<TextInput
-					onChangeText={(text: string): void => {
-						try {
-							const derivationPath = parseDerivationPath(text);
-
-							onChange({
-								derivationPassword: derivationPath.password || '',
-								derivationPath: derivationPath.derivePath || '',
-								isDerivationPathValid: true
-							});
-							setIsValidPath(true);
-						} catch (e) {
-							// wrong derivationPath
-							onChange({
-								derivationPassword: '',
-								derivationPath: '',
-								isDerivationPathValid: false
-							});
-							setIsValidPath(false);
-						}
-					}}
+					onChangeText={onChangeText}
 					placeholder="optional derivation path"
 					style={StyleSheet.flatten([
 						fontStyles.h2,
@@ -86,8 +89,14 @@ export default function DerivationPathField({ onChange, styles }: Props): React.
 
 const ownStyles = StyleSheet.create({
 	advancedText: {
-		paddingBottom: 0,
-		paddingTop: 20
+		paddingBottom: 0
 	},
-	invalidInput: { borderBottomColor: colors.signal.error }
+	container: {
+		flexDirection: 'row',
+		alignItems: 'center'
+
+	},
+	invalidInput: {
+		borderBottomColor: colors.signal.error
+	}
 });

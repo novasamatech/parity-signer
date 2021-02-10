@@ -14,15 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import TouchableItem from 'components/TouchableItem';
 import { SubstrateNetworkKeys, UnknownNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
-import { StyleSheet, Text } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { emptyAccount } from 'utils/account';
@@ -39,7 +36,6 @@ export default function LegacyNetworkChooserView({ navigation }: NavigationProps
 
 	return (
 		<SafeAreaScrollViewContainer contentContainerStyle={{ padding: 20 }}>
-			<Text style={styles.title}>CHOOSE NETWORK</Text>
 			{Array.from(allNetworks.entries())
 				.filter(([networkKey]: [string, any]): boolean =>
 					!excludedNetworks.includes(networkKey))
@@ -47,60 +43,16 @@ export default function LegacyNetworkChooserView({ navigation }: NavigationProps
 						string,
 						NetworkParams
 					]): React.ReactElement => (
-					<TouchableItem
+					<NetworkCard
 						key={networkKey}
-						onPress={(): void => {
+						networkKey={networkKey}
+						onPress={(): void =>{
 							accountsStore.updateNew(emptyAccount('', networkKey));
 							navigation.goBack();
 						}}
-						style={[
-							styles.card,
-							{
-								backgroundColor: networkParams.color,
-								marginTop: 20
-							}
-						]}
-					>
-						<Text
-							style={[
-								styles.cardText,
-								{ color: networkParams.secondaryColor }
-							]}
-						>
-							{networkParams.title}
-						</Text>
-					</TouchableItem>
+						title={networkParams.title}
+					/>
 				))}
 		</SafeAreaScrollViewContainer>
 	);
 }
-
-const styles = StyleSheet.create({
-	bottom: {
-		flexBasis: 50,
-		paddingBottom: 15
-	},
-	card: {
-		backgroundColor: colors.background.card,
-		padding: 20
-	},
-	cardText: {
-		color: colors.background.app,
-		fontFamily: fonts.bold,
-		fontSize: 20
-	},
-	title: {
-		color: colors.text.main,
-		fontFamily: fonts.bold,
-		fontSize: 18,
-		paddingBottom: 20
-	},
-	titleTop: {
-		color: colors.text.main,
-		fontFamily: fonts.bold,
-		fontSize: 24,
-		paddingBottom: 20,
-		textAlign: 'center'
-	},
-	top: { flex: 1 }
-});
