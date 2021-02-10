@@ -1,13 +1,13 @@
 export default `
 **PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**
 
-**Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at Ignition Law, Moray House, 23-31 Great Titchfield Street, London WC1W 7PA ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
+**Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
 
 In this document, when we refer to "**we**", "**us**" or "**our**", we mean Parity; and when we refer to "**you**" or "**your**" we mean you, the person downloading, accessing and/or using the App.
 
 **1.  Understanding these terms**
 
-  1.1  This end user licence agreement together with appendix 1 to it and our instructions referred to in it (this "**EULA**") describes how you may download the App and access and/or use the App. By downloading, accessing and/or using the App, this EULA will apply to you and you agree to the terms of this EULA. You should therefore read the terms carefully before downloading, accessing and/or using the App. If any written instruction we have given you is inconsistent with the terms set out in this document, you should comply with our instructions and in doing so you will not be in breach of the inconsistent term of this document.
+  1.1  This end user license agreement together with appendix 1 to it and our instructions referred to in it (this "**EULA**") describes how you may download the App and access and/or use the App. By downloading, accessing and/or using the App, this EULA will apply to you and you agree to the terms of this EULA. You should therefore read the terms carefully before downloading, accessing and/or using the App. If any written instruction we have given you is inconsistent with the terms set out in this document, you should comply with our instructions and in doing so you will not be in breach of the inconsistent term of this document.
 
   1.2  When certain words and phrases are used in this EULA, they have specific meanings (these are known as "**defined terms**"). You can identify these defined terms because they start with capital letters (even if they are not at the start of a sentence). Where a defined term is used, it has the meaning given to it in the section of this EULA where it was defined (you can find these meanings by looking at the sentence where the defined term is included in brackets and speech marks).
 
@@ -164,12 +164,12 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 **11.  Contacting us**
 
 Should you have any reasons for a complaint, we will endeavour to resolve the issue and avoid any re-occurrence in the future. You can always contact us by using the following details:
-Address: Parity Technologies Limited, Ignition Law, Moray House, 23-31 Great Titchfield Street, London WC1W 7PA
+Address: Parity Technologies Limited, c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT
 Email address: admin@parity.io and legal@parity.io
 
 Thank you.
 
-**Terms last updated 10 December 2019**
+**Terms last updated 09 Februray 2021**
 
 **APPENDIX 1**
 
