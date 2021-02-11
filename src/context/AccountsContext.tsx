@@ -12,7 +12,7 @@ import { constructSuriSuffix, parseSURI } from 'utils/suri';
 
 import { NetworksContext, NetworksContextType } from './NetworkContext';
 
-export type AccountsContextType = {
+export interface AccountsContextType {
 	clearIdentity: () => void;
 	deleteAccount: (accountKey: string) => Promise<void>;
 	deleteCurrentIdentity: () => Promise<void>;
@@ -48,7 +48,13 @@ const defaultAccountState = {
 	selectedKey: ''
 };
 
-export function useAccountContext(): AccountsContextType {
+interface AccountContextProviderProps {
+	children?: React.ReactElement;
+}
+
+export const AccountsContext = React.createContext({} as AccountsContextType);
+
+export function AccountsContextProvider({ children }: AccountContextProviderProps): React.ReactElement {
 	const initialState: AccountsStoreState = defaultAccountState;
 
 	const reducer = (state: AccountsStoreState,
@@ -549,31 +555,33 @@ export function useAccountContext(): AccountsContextType {
 		await saveIdentities(newIdentities);
 	}
 
-	return {
-		clearIdentity,
-		deleteAccount,
-		deleteCurrentIdentity,
-		deletePath,
-		deriveEthereumAccount,
-		deriveNewPath,
-		getAccountByAddress,
-		getIdentityByAccountId,
-		getSelected,
-		lockAccount,
-		resetCurrentIdentity,
-		save,
-		saveNewIdentity,
-		select,
-		selectIdentity,
-		state,
-		submitNew,
-		unlockAccount,
-		updateAccountName,
-		updateIdentityName,
-		updateNew,
-		updateNewIdentity,
-		updatePathName
-	};
+	return (
+		<AccountsContext.Provider value={{
+			clearIdentity,
+			deleteAccount,
+			deleteCurrentIdentity,
+			deletePath,
+			deriveEthereumAccount,
+			deriveNewPath,
+			getAccountByAddress,
+			getIdentityByAccountId,
+			getSelected,
+			lockAccount,
+			resetCurrentIdentity,
+			save,
+			saveNewIdentity,
+			select,
+			selectIdentity,
+			state,
+			submitNew,
+			unlockAccount,
+			updateAccountName,
+			updateIdentityName,
+			updateNew,
+			updateNewIdentity,
+			updatePathName
+		}}>
+			{children}
+		</AccountsContext.Provider>
+	);
 }
-
-export const AccountsContext = React.createContext({} as AccountsContextType);

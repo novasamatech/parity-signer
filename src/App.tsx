@@ -33,8 +33,7 @@ import { ScannerContext,useScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 
-import { useAccountContext } from './context/AccountsContext';
-import { AccountsContext, NetworksContextProvider } from './context';
+import { AccountContextProvider, NetworksContextProvider } from './context';
 import { AppNavigator, ScreenStack, TocAndPrivacyPolicyNavigator } from './screens';
 
 export default function App(props: AppProps): React.ReactElement {
@@ -56,7 +55,7 @@ export default function App(props: AppProps): React.ReactElement {
 	const globalContext: GlobalState = useGlobalStateContext();
 	const seedRefContext = useSeedRefStore();
 	// const networkContext = useNetworksContext();
-	const accountsContext = useAccountContext();
+	// const accountsContext = useAccountContext();
 	const scannerContext = useScannerContext();
 	const registriesContext = useRegistriesStore();
 
@@ -84,7 +83,7 @@ export default function App(props: AppProps): React.ReactElement {
 	return (
 		<SafeAreaProvider>
 			<NetworksContextProvider>
-				<AccountsContext.Provider value={accountsContext}>
+				<AccountContextProvider>
 					<ScannerContext.Provider value={scannerContext}>
 						<RegistriesContext.Provider value={registriesContext}>
 							<GlobalStateContext.Provider value={globalContext}>
@@ -105,7 +104,7 @@ export default function App(props: AppProps): React.ReactElement {
 							</GlobalStateContext.Provider>
 						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
-				</AccountsContext.Provider>
+				</AccountContextProvider>
 			</NetworksContextProvider>
 		</SafeAreaProvider>
 	);

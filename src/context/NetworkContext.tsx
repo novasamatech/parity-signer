@@ -25,17 +25,16 @@ import { deepCopyNetworks, generateNetworkParamsFromParsedData } from 'utils/net
 
 // we will need the generate function to be standardized to take an ss58 check address and isSixPoint boolean flag and returns a Circle https://github.com/polkadot-js/ui/blob/ff351a0f3160552f38e393b87fdf6e85051270de/packages/ui-shared/src/polkadotIcon.ts#L12.
 
-export type GetSubstrateNetwork = (networkKey: string) => SubstrateNetworkParams;
 export interface NetworksContextType {
 	addNetwork(networkParsedData: NetworkParsedData): void;
 	networks: Map<string, SubstrateNetworkParams>;
 	allNetworks: Map<string, NetworkParams>;
-	getSubstrateNetwork: GetSubstrateNetwork;
+	getSubstrateNetwork: (networkKey: string) => SubstrateNetworkParams;
 	getNetwork: (networkKey?: string) => NetworkParams | null;
 	pathIds: string[];
 };
 
-export interface NetworkContextProviderProps {
+interface NetworkContextProviderProps {
 	children?: React.ReactElement;
 }
 
