@@ -39,8 +39,8 @@ import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
 import IdentityNew from 'screens/IdentityNew';
-import LegacyAccountBackup from 'screens/LegacyAccountBackup';
 import LegacyAccountList from 'screens/LegacyAccountList';
+import LegacyMnemonic from 'screens/LegacyMnemonic';
 import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
 import PathDerivation from 'screens/PathDerivation';
 import PathDetails from 'screens/PathDetails';
@@ -129,8 +129,8 @@ export const AppNavigator = (): React.ReactElement => (
 			name="AccountUnlockAndSign"
 		/>
 		<ScreenStack.Screen
-			component={LegacyAccountBackup}
-			name="LegacyAccountBackup"
+			component={LegacyMnemonic}
+			name="LegacyMnemonic"
 		/>
 		<ScreenStack.Screen
 			component={LegacyAccountList}

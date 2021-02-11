@@ -17,8 +17,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import strings from 'modules/sign/strings';
 import { useContext } from 'react';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContextState } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { FoundIdentityAccount } from 'types/identityTypes';
@@ -31,6 +29,8 @@ import { SeedRefClass } from 'utils/native';
 import { unlockSeedPhrase, unlockSeedPhraseWithPassword } from 'utils/navigationHelpers';
 import { constructSuriSuffix } from 'utils/suri';
 
+import { AccountsContext, NetworksContextType } from '../../context';
+
 function getSeedRef(encryptedSeed: string,
 	seedRefs: Map<string, SeedRefClass>): SeedRefClass | undefined {
 	if (seedRefs.has(encryptedSeed)) {
@@ -39,7 +39,7 @@ function getSeedRef(encryptedSeed: string,
 }
 
 export function useProcessBarCode(showAlertMessage: (title: string, message: string, isSuccess?: boolean) => void,
-	networksContextState: NetworksContextState): (txRequestData: TxRequestData) => Promise<void> {
+	networksContextState: NetworksContextType): (txRequestData: TxRequestData) => Promise<void> {
 	const { allNetworks, networks } = networksContextState;
 	const accountsStore = useContext(AccountsContext);
 	const scannerStore = useContext(ScannerContext);

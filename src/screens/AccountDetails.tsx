@@ -24,14 +24,14 @@ import { UnknownAccountWarning } from 'components/Warnings';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
 import { navigateToLandingPage, navigateToLegacyAccountList } from 'utils/navigationHelpers';
+
+import { AccountsContext, NetworksContext } from '../context';
 
 export default function AccountDetails({ navigation }: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
@@ -44,7 +44,7 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 
 	const network = getNetwork(account.networkKey);
 
-	const protocol = network.protocol;
+	const protocol = network?.protocol;
 
 	const onDelete = (): void => {
 		alertDeleteLegacyAccount(setAlert,
@@ -52,7 +52,7 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 			async () => {
 				await accountsStore.deleteAccount(selectedKey);
 
-				if (accounts.size === 0) {
+				if (accounts.length === 0) {
 					return navigateToLandingPage(navigation);
 				}
 
@@ -87,7 +87,7 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 								{ text: 'Change Pin', value: 'AccountPin' },
 								{
 									text: 'View Recovery Phrase',
-									value: 'LegacyAccountBackup'
+									value: 'LegacyMnemonic'
 								},
 								{
 									text: 'Delete',

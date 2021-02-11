@@ -24,7 +24,6 @@ import { filterNetworks } from 'modules/network/utils';
 import React, { ReactElement, useCallback, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import { isEthereumNetworkParams, isSubstrateNetworkParams, NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -33,6 +32,8 @@ import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import { navigateToPathDetails, navigateToPathsList, unlockSeedPhrase, useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
+
+import { NetworksContext } from '../../../context';
 
 function NetworkSelector({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
@@ -92,9 +93,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 		await unlockSeedPhrase(navigation, isSeedRefValid);
 
 		try {
-			await accountsStore.deriveEthereumAccount(brainWalletAddress,
-				networkKey,
-				allNetworks);
+			await accountsStore.deriveEthereumAccount(brainWalletAddress, networkKey);
 			navigateToPathsList(navigation, networkKey);
 		} catch (e) {
 			alertPathDerivationError(setAlert, e.message);

@@ -26,7 +26,7 @@ import { deepCopyNetworks, generateNetworkParamsFromParsedData } from 'utils/net
 // we will need the generate function to be standardized to take an ss58 check address and isSixPoint boolean flag and returns a Circle https://github.com/polkadot-js/ui/blob/ff351a0f3160552f38e393b87fdf6e85051270de/packages/ui-shared/src/polkadotIcon.ts#L12.
 
 export type GetSubstrateNetwork = (networkKey: string) => SubstrateNetworkParams;
-export type NetworksContextState = {
+export interface NetworksContextType {
 	addNetwork(networkParsedData: NetworkParsedData): void;
 	networks: Map<string, SubstrateNetworkParams>;
 	allNetworks: Map<string, NetworkParams>;
@@ -35,7 +35,13 @@ export type NetworksContextState = {
 	pathIds: string[];
 };
 
-export function useNetworksContext(): NetworksContextState {
+export interface NetworkContextProviderProps {
+	children?: React.ReactElement;
+}
+
+export const NetworksContext = React.createContext({} as NetworksContextType);
+
+export function NetworksContextProvider({ children }: NetworkContextProviderProps): React.ReactElement {
 	const [substrateNetworks, setSubstrateNetworks] = useState<Map<string, SubstrateNetworkParams>>(new Map());
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
 		const ethereumNetworks: Map<string, NetworkParams> = new Map(Object.entries(ETHEREUM_NETWORK_LIST));
@@ -88,14 +94,9 @@ export function useNetworksContext(): NetworksContextState {
 		saveNetworks(newNetworkParams);
 	}
 
-	return {
-		addNetwork,
-		allNetworks,
-		getNetwork,
-		getSubstrateNetwork: getSubstrateNetworkParams,
-		networks: substrateNetworks,
-		pathIds
-	};
+	return (
+		<NetworksContext.Provider value={{ addNetwork, allNetworks, getNetwork, getSubstrateNetwork: getSubstrateNetworkParams, networks: substrateNetworks, pathIds }}>
+			{children}
+		</NetworksContext.Provider>
+	);
 }
-
-export const NetworksContext = React.createContext({} as NetworksContextState);

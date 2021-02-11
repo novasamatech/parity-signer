@@ -17,10 +17,10 @@
 import React, { ReactElement, useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import { ButtonListener } from 'types/props';
 
+import { NetworksContext } from '../context';
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 import { NetworkFooter } from './NetworkFooter';

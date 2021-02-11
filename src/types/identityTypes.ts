@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { AccountsContextState } from 'stores/AccountsContext';
+import { AccountsContextType } from '../context';
 
 export type UnlockedAccount = {
 	address: string;
@@ -65,13 +65,13 @@ export interface FoundIdentityAccount extends AccountMeta {
 export interface LegacyAccount {
 	address: string;
 	createdAt: number;
-	name: string;
-	updatedAt: number;
 	encryptedSeed: string;
-	validBip39Seed: boolean;
 	isLegacy?: boolean;
+	name: string;
 	networkKey: string;
 	path?: string;
+	updatedAt: number;
+	validBip39Seed: boolean;
 }
 
 export type FoundAccount = FoundIdentityAccount | LegacyAccount;
@@ -118,7 +118,7 @@ export type AccountsStoreState = {
 
 type LensSet<T, R> = Omit<T, keyof R> & R;
 export type AccountsStoreStateWithIdentity = LensSet<
-	AccountsContextState,
+	AccountsContextType,
 	{ state: LensSet<AccountsStoreState, { currentIdentity: Identity }> }
 >;
 

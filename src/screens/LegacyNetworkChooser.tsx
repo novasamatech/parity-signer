@@ -18,11 +18,11 @@ import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { SubstrateNetworkKeys, UnknownNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { emptyAccount } from 'utils/account';
+
+import { AccountsContext, NetworksContext } from '../context';
 
 export default function LegacyNetworkChooserView({ navigation }: NavigationProps<'LegacyNetworkChooser'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);

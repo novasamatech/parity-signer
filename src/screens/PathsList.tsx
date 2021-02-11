@@ -24,7 +24,7 @@ import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import React, { useContext, useMemo } from 'react';
 import { ScrollView } from 'react-native';
-import { NetworksContext } from 'stores/NetworkContext';
+import { NetworksContext } from '../context';
 import { PathGroup } from 'types/identityTypes';
 import { isEthereumNetworkParams, isUnknownNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';

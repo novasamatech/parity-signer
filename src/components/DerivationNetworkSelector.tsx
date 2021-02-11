@@ -18,10 +18,10 @@ import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableNativeFeedback, TouchableNativeFeedbackProps, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 
+import { NetworksContext } from '../context';
 import TransparentBackground from './TransparentBackground';
 
 const ACCOUNT_NETWORK = 'Account Network';

@@ -20,12 +20,12 @@ import React, { ReactElement, ReactNode, useContext } from 'react';
 import { StyleSheet, Text, TextStyle,View, ViewStyle } from 'react-native';
 import { Icon } from 'react-native-elements';
 import AntIcon from 'react-native-vector-icons/AntDesign';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
 
+import { NetworksContext } from '../context';
 import AccountIcon from './AccountIcon';
 import ButtonIcon from './ButtonIcon';
 

@@ -21,9 +21,11 @@ import { Identity, LegacyAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 
-import { decodeAddress } from '@polkadot/util-crypto';
+import { encodeAddress } from '@polkadot/util-crypto';
 
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
+
+const SUSTRATE_SS58_PREFIX = 42;
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
@@ -61,13 +63,18 @@ export async function loadAccounts(version = 1): Promise<LegacyAccount[]> {
 		});
 }
 
-export const deleteAccount = (accountKey: string): Promise<void> =>
-	SecureStorage.deleteItem(accountKey, currentAccountsStore);
+export const deleteAccount = (accountAddress: string): Promise<void> => {
+	const address = encodeAddress(accountAddress, SUSTRATE_SS58_PREFIX);
 
-export const saveAccount = (account: LegacyAccount): Promise<void> => {
-	const publicKey = decodeAddress(account.address).toString();
+	return	SecureStorage.deleteItem(address, currentAccountsStore);
+}
 
-	return SecureStorage.setItem(publicKey, JSON.stringify(account, null, 0), currentAccountsStore);
+export const saveAccount = (account: LegacyAccount, isEthereum: boolean): Promise<void> => {
+	const address = isEthereum
+		? account.address
+		: encodeAddress(account.address, SUSTRATE_SS58_PREFIX);
+
+	return SecureStorage.setItem(address, JSON.stringify(account, null, 0), currentAccountsStore);
 }
 
 /*

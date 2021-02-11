@@ -14,7 +14,7 @@ export type RootStackParamList = {
 	IdentityNew: { isRecover: boolean } | undefined;
 	MessageDetails: undefined;
 	Empty: undefined;
-	LegacyAccountBackup:
+	LegacyMnemonic:
 		| {
 				isNew: boolean;
 		  }

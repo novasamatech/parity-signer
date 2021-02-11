@@ -17,7 +17,11 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export const NetworkFooter = ({ color }: { color: string }): React.ReactElement => (
+interface Props {
+	color?: string;
+}
+
+export const NetworkFooter = ({ color }: Props): React.ReactElement => (
 	<View
 		style={[
 			styles.footer,

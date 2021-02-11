@@ -1,10 +1,11 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { GestureResponderEvent, NativeSyntheticEvent, TextInputChangeEventData, TextInputFocusEventData } from 'react-native';
-import { AccountsContextState } from 'stores/AccountsContext';
 import { ScannerContextState } from 'stores/ScannerContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
+
+import { AccountsContextType } from '../context';
 
 export interface NavigationProps<ScreenName extends keyof RootStackParamList> {
 	route: RouteProp<RootStackParamList, ScreenName>;
@@ -35,7 +36,7 @@ export interface NavigationAccountScannerProps<
 	ScreenName extends keyof RootStackParamList
 > extends NavigationProps<ScreenName> {
 	scannerStore: ScannerContextState;
-	accountsStore: AccountsContextState;
+	accountsStore: AccountsContextType;
 }
 
 export interface NavigationScannerProps<

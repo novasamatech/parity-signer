@@ -15,16 +15,16 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { AccountsContextState } from 'stores/AccountsContext';
 import { FoundAccount, FoundIdentityAccount, LegacyAccount } from 'types/identityTypes';
 import { isLegacyFoundAccount } from 'utils/identitiesUtils';
 
+import { AccountsContextType } from '../context';
 import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 
 interface Props {
 	account: FoundAccount;
-	accountsStore: AccountsContextState;
+	accountsStore: AccountsContextType;
 	titlePrefix?: string;
 }
 
@@ -49,7 +49,7 @@ const CompatibleCard = ({ account, accountsStore, titlePrefix }: Props): React.R
 		);
 	};
 
-	return isLegacyFoundAccount(account) || account.isLegacy === undefined
+	return isLegacyFoundAccount(account)
 		? renderLegacyAccountCard(account)
 		: renderIdentityPathCard(account);
 };

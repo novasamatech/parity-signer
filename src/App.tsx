@@ -26,15 +26,15 @@ import { LogBox,StatusBar, StyleSheet, View } from 'react-native';
 import NavigationBar from 'react-native-navbar-color';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AccountsContext, useAccountContext } from 'stores/AccountsContext';
 import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 import { GlobalState, GlobalStateContext, useGlobalStateContext } from 'stores/globalStateContext';
-import { NetworksContext,useNetworksContext } from 'stores/NetworkContext';
 import { RegistriesContext, useRegistriesStore } from 'stores/RegistriesContext';
 import { ScannerContext,useScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 
+import { useAccountContext } from './context/AccountsContext';
+import { AccountsContext, NetworksContextProvider } from './context';
 import { AppNavigator, ScreenStack, TocAndPrivacyPolicyNavigator } from './screens';
 
 export default function App(props: AppProps): React.ReactElement {
@@ -55,7 +55,7 @@ export default function App(props: AppProps): React.ReactElement {
 	const alertContext = useAlertContext();
 	const globalContext: GlobalState = useGlobalStateContext();
 	const seedRefContext = useSeedRefStore();
-	const networkContext = useNetworksContext();
+	// const networkContext = useNetworksContext();
 	const accountsContext = useAccountContext();
 	const scannerContext = useScannerContext();
 	const registriesContext = useRegistriesStore();
@@ -83,7 +83,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<NetworksContext.Provider value={networkContext}>
+			<NetworksContextProvider>
 				<AccountsContext.Provider value={accountsContext}>
 					<ScannerContext.Provider value={scannerContext}>
 						<RegistriesContext.Provider value={registriesContext}>
@@ -106,7 +106,7 @@ export default function App(props: AppProps): React.ReactElement {
 						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
 				</AccountsContext.Provider>
-			</NetworksContext.Provider>
+			</NetworksContextProvider>
 		</SafeAreaProvider>
 	);
 }

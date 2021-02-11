@@ -20,12 +20,12 @@ import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
 import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
+
+import { AccountsContext, NetworksContext } from '../context';
 
 interface AccountUnlockViewProps {
 	checkPin: (pin: string) => Promise<boolean>;

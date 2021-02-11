@@ -18,9 +18,9 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
 import OnBoardingView from 'modules/main/components/OnBoading';
 import React, { useContext } from 'react';
-import { AccountsContext } from 'stores/AccountsContext';
 import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 
+import { AccountsContext } from '../../../context';
 import AccountSelector from '../components/AccountSelector';
 import NetworkSelector from '../components/NetworkSelector';
 
@@ -28,7 +28,7 @@ export default function Main(props: NavigationProps<'Main'>): React.ReactElement
 	const isNew = props.route.params?.isNew ?? false;
 	const accountsStore = useContext(AccountsContext);
 	const { accounts, currentIdentity, identities, loaded } = accountsStore.state;
-	const hasLegacyAccount = accounts.size !== 0;
+	const hasLegacyAccount = accounts.length !== 0;
 
 	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0)

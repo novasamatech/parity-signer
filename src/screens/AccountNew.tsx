@@ -23,8 +23,6 @@ import TextInput from 'components/TextInput';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { useCallback, useContext, useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
@@ -33,6 +31,8 @@ import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { emptyAccount, validateSeed } from 'utils/account';
 import { constructSURI } from 'utils/suri';
+
+import { AccountsContext, NetworksContext } from '../context';
 
 interface State {
 	derivationPassword: string;
@@ -116,6 +116,18 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 		}
 	},[accountsStore, derivationPassword, derivationPath, isSubstrate])
 
+	const onCreate = useCallback(() => {
+		navigation.navigate('LegacyMnemonic', { isNew: true })
+	}, [navigation])
+
+	const onDerivationChange = useCallback((newDerivationPath: { derivationPassword: string; derivationPath: string; isDerivationPathValid: boolean; }): void => {
+		updateState({
+			derivationPassword: newDerivationPath.derivationPassword,
+			derivationPath: newDerivationPath.derivationPath,
+			isDerivationPathValid: newDerivationPath.isDerivationPathValid
+		});
+	}, []);
+
 	if (!selectedAccount) {
 		return <View />;
 	}
@@ -144,7 +156,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 						title={selectedNetwork?.title || 'Select Network'}
 					/>
 				</View>
-				{ selectedNetwork && (
+				{selectedNetwork && (
 					<View>
 						<View style={styles.step}>
 							<Text style={styles.title}>ICON & ADDRESS</Text>
@@ -159,26 +171,15 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 						{isSubstrate && (
 							<View style={StyleSheet.flatten([styles.step, styles.lastStep])}>
 								<DerivationPathField
-									onChange={(newDerivationPath: { derivationPassword: string; derivationPath: string; isDerivationPathValid: boolean; }): void => {
-										updateState({
-											derivationPassword: newDerivationPath.derivationPassword,
-											derivationPath: newDerivationPath.derivationPath,
-											isDerivationPathValid: newDerivationPath.isDerivationPathValid
-										});
-									}}
+									onChange={onDerivationChange}
 									styles={styles}
 								/>
 							</View>
 						)}
 						<View style={styles.bottom}>
 							<Button
-								disabled={
-									!validateSeed(seed, validBip39Seed).valid ||
-							!isDerivationPathValid
-								}
-								onPress={(): void => {
-									navigation.navigate('LegacyAccountBackup', { isNew: true });
-								}}
+								disabled={!validateSeed(seed, validBip39Seed).valid || !isDerivationPathValid}
+								onPress={onCreate}
 								title="Next Step"
 							/>
 						</View>

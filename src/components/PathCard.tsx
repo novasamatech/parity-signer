@@ -19,7 +19,6 @@ import { defaultNetworkKey, NETWORK_LIST, UnknownNetworkKeys } from 'constants/n
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
@@ -28,6 +27,7 @@ import { ButtonListener } from 'types/props';
 import { getAddressWithPath, getNetworkKeyByPath, getPathName } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
+import { NetworksContext } from '../context';
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';

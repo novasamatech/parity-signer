@@ -16,11 +16,11 @@
 
 import React, { ReactElement, useContext } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
 
+import { NetworksContext } from '../context';
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
@@ -44,7 +44,7 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 	const defaultTitle = 'No name';
 	const displayTitle = title.length > 0 ? title : defaultTitle;
 	const seedTypeDisplay = seedType || '';
-	const network = getNetwork(networkKey ?? '');
+	const network = getNetwork(networkKey);
 
 	return (
 		<TouchableItem
@@ -54,13 +54,14 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 		>
 			<CardSeparator />
 			<View style={[styles.content, style]}>
-				<AccountIcon address={address}
+				<AccountIcon
+					address={address}
 					network={network}
 					style={styles.icon} />
 				<View style={styles.desc}>
 					<View>
 						<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
-							{`${network.title}${seedTypeDisplay} `}
+							{`${network?.title}${seedTypeDisplay} `}
 						</Text>
 					</View>
 					<AccountPrefixedTitle
@@ -68,11 +69,13 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 						titlePrefix={titlePrefix}
 					/>
 					{address !== '' && (
-						<Address address={address}
-							protocol={network.protocol} />
+						<Address
+							address={address}
+							protocol={network?.protocol}
+						/>
 					)}
 				</View>
-				<NetworkFooter color={network.color} />
+				<NetworkFooter color={network?.color} />
 			</View>
 		</TouchableItem>
 	);

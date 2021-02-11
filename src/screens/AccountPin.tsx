@@ -14,20 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-//Deprecated
 import { CommonActions } from '@react-navigation/native';
 import Button from 'components/Button';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import TextInput from 'components/TextInput';
 import React, { useContext, useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 import { navigateToLegacyAccountList } from 'utils/navigationHelpers';
+
+import { AccountsContext } from '../context';
 
 interface State {
 	confirmation: string;
@@ -55,16 +54,16 @@ function PinInput(props: any): React.ReactElement {
 	);
 }
 
+const initialState: State = {
+	confirmation: '',
+	focusConfirmation: false,
+	pin: '',
+	pinMismatch: false,
+	pinTooShort: false
+};
+
 function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { allNetworks } = useContext(NetworksContext);
-	const initialState: State = {
-		confirmation: '',
-		focusConfirmation: false,
-		pin: '',
-		pinMismatch: false,
-		pinTooShort: false
-	};
 
 	const reducer = (state: State, delta: Partial<State>): State => ({
 		...state,
@@ -73,30 +72,43 @@ function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React
 	const [state, setState] = useReducer(reducer, initialState);
 
 	const submit = async (): Promise<void> => {
-		const { newAccount, selectedKey } = accountsStore.state;
+		const { newAccount } = accountsStore.state;
 		const { confirmation, pin } = state;
-		const accountCreation: boolean = route.params?.isNew ?? false;
-		const account = accountCreation ? newAccount : accountsStore.getSelected()!;
+		const accountCreation = route.params?.isNew;
+		const account = accountCreation ? newAccount : accountsStore.getSelected();
 
-		if (pin.length >= 6 && pin === confirmation) {
-			if (accountCreation) {
-				await accountsStore.submitNew(pin, allNetworks);
+		if (pin.length < 6) {
+			setState({ pinTooShort: true });
 
-				return navigateToLegacyAccountList(navigation);
-			} else {
-				await accountsStore.save(selectedKey, account, pin);
-				const resetAction = CommonActions.reset({
-					index: 1,
-					routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
-				});
-
-				navigation.dispatch(resetAction);
-			}
-		} else {
-			if (pin.length < 6) {
-				setState({ pinTooShort: true });
-			} else if (pin !== confirmation) setState({ pinMismatch: true });
+			return
 		}
+
+		if (pin !== confirmation) {
+			setState({ pinMismatch: true });
+
+			return
+		}
+
+		if (!account) {
+			console.error('No account provided');
+
+			return
+		}
+
+		if (accountCreation) {
+			await accountsStore.submitNew(pin);
+
+			return navigateToLegacyAccountList(navigation);
+		} else {
+			await accountsStore.save(account, pin);
+			const resetAction = CommonActions.reset({
+				index: 1,
+				routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
+			});
+
+			navigation.dispatch(resetAction);
+		}
+
 	};
 
 	const showHintOrError = (): React.ReactElement => {
@@ -127,35 +139,33 @@ function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React
 		}
 	};
 
-	const title = 'ACCOUNT PIN';
-
 	return (
-		<KeyboardScrollView extraHeight={120}
-			style={styles.body}>
-			<Text style={styles.titleTop}>{title}</Text>
+		<KeyboardScrollView
+			extraHeight={120}
+			style={styles.body}
+		>
+			<Text style={styles.titleTop}>{'ACCOUNT PIN'}</Text>
 			{showHintOrError()}
 			<Text style={styles.title}>PIN</Text>
 			<PinInput
 				autoFocus
 				onChangeText={(pin: string): void => onPinInputChange('pin', pin)}
 				onFocus={(): void => setState({ focusConfirmation: false })}
-				onSubmitEditing={(): void => {
-					setState({ focusConfirmation: true });
-				}}
+				onSubmitEditing={(): void => { setState({ focusConfirmation: true }); }}
 				returnKeyType="next"
 				value={state.pin}
 			/>
 			<Text style={styles.title}>CONFIRM PIN</Text>
 			<PinInput
 				focus={state.focusConfirmation}
-				onChangeText={(confirmation: string): void =>
-					onPinInputChange('confirmation', confirmation)
-				}
+				onChangeText={(confirmation: string): void => onPinInputChange('confirmation', confirmation) }
 				returnKeyType="done"
 				value={state.confirmation}
 			/>
-			<Button onPress={submit}
-				title="Done" />
+			<Button
+				onPress={submit}
+				title="Done"
+			/>
 		</KeyboardScrollView>
 	);
 }
@@ -163,7 +173,9 @@ function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React
 export default AccountPin;
 
 const styles = StyleSheet.create({
-	body: { padding: 20 },
+	body: {
+		padding: 20
+	},
 	errorText: {
 		color: colors.signal.error,
 		fontFamily: fonts.bold,
@@ -178,7 +190,9 @@ const styles = StyleSheet.create({
 		paddingBottom: 20,
 		textAlign: 'center'
 	},
-	pinInput: { marginBottom: 20 },
+	pinInput: {
+		marginBottom: 20
+	},
 	title: {
 		...fontStyles.h_subheading,
 		color: colors.text.main

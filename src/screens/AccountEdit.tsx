@@ -22,7 +22,8 @@ import TextInput from 'components/TextInput';
 import t from 'modules/unlock/strings';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
+
+import { AccountsContext } from '../context';
 
 // TODO FIXME test this
 export default function AccountEdit(): React.ReactElement {

@@ -16,8 +16,6 @@
 
 import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
 import React, { useReducer } from 'react';
-import { AccountsContextState } from 'stores/AccountsContext';
-import { NetworksContextState } from 'stores/NetworkContext';
 import { Account, FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { CompletedParsedData, EthereumParsedData, isEthereumCompletedParsedData, isSubstrateMessageParsedData, MessageQRInfo, MultiFramesInfo, QrInfo, SubstrateCompletedParsedData, SubstrateMessageParsedData, SubstrateTransactionParsedData, TxQRInfo } from 'types/scannerTypes';
@@ -30,6 +28,8 @@ import transaction, { Transaction } from 'utils/transaction';
 
 import { GenericExtrinsicPayload } from '@polkadot/types';
 import { compactFromU8a, hexStripPrefix, hexToU8a, isU8a, u8aConcat, u8aToHex } from '@polkadot/util';
+
+import { AccountsContextType , NetworksContextType } from '../context';
 
 type TXRequest = Record<string, any>;
 
@@ -70,12 +70,12 @@ export type ScannerContextState = {
 		currentFrame: number,
 		frameCount: number,
 		partData: string,
-		networkContext: NetworksContextState
+		networkContext: NetworksContextType
 	) => Promise<MultiFramesInfo | SubstrateCompletedParsedData>;
 	setData: (
-		accountsStore: AccountsContextState,
+		accountsStore: AccountsContextType,
 		unsignedData: CompletedParsedData,
-		networkContext: NetworksContextState
+		networkContext: NetworksContextType
 	) => Promise<QrInfo>;
 	signEthereumData: (
 		signFunction: TryBrainWalletSignFunc,
@@ -87,7 +87,7 @@ export type ScannerContextState = {
 		qrInfo: QrInfo,
 		networks: Map<string, SubstrateNetworkParams>
 	) => Promise<void>;
-	signDataLegacy: (pin: string, getNetwork: NetworksContextState['getNetwork']) => Promise<void>;
+	signDataLegacy: (pin: string, getNetwork: NetworksContextType['getNetwork']) => Promise<void>;
 };
 
 const DEFAULT_STATE: ScannerStoreState = {
@@ -137,7 +137,7 @@ export function useScannerContext(): ScannerContextState {
 
 	async function _integrateMultiPartData(multipartData: Array<Uint8Array | null>,
 		totalFrameCount: number,
-		networkContext: NetworksContextState): Promise<SubstrateCompletedParsedData> {
+		networkContext: NetworksContextType): Promise<SubstrateCompletedParsedData> {
 		// concatenate all the parts into one binary blob
 		let concatMultipartData = multipartData!.reduce((acc: Uint8Array, part: Uint8Array | null): Uint8Array => {
 			if (part === null) throw new Error('part data is not completed');
@@ -167,7 +167,7 @@ export function useScannerContext(): ScannerContextState {
 	async function setPartData(currentFrame: number,
 		frameCount: number,
 		partData: string,
-		networkContext: NetworksContextState): Promise<MultiFramesInfo | SubstrateCompletedParsedData> {
+		networkContext: NetworksContextType): Promise<MultiFramesInfo | SubstrateCompletedParsedData> {
 		const newArray = new Array(frameCount).fill(null);
 		const totalFrameCount = frameCount;
 		// set it once only
@@ -246,8 +246,8 @@ export function useScannerContext(): ScannerContextState {
 	}
 
 	async function _setTXRequest(txRequest: EthereumParsedData | SubstrateTransactionParsedData,
-		accountsStore: AccountsContextState,
-		networkContext: NetworksContextState): Promise<TxQRInfo> {
+		accountsStore: AccountsContextType,
+		networkContext: NetworksContextType): Promise<TxQRInfo> {
 		setBusy();
 
 		const { getNetwork } = networkContext;
@@ -317,8 +317,8 @@ export function useScannerContext(): ScannerContextState {
 	}
 
 	async function _setDataToSign(signRequest: SubstrateMessageParsedData | EthereumParsedData,
-		accountsStore: AccountsContextState,
-		networkContext: NetworksContextState): Promise<MessageQRInfo> {
+		accountsStore: AccountsContextType,
+		networkContext: NetworksContextType): Promise<MessageQRInfo> {
 		setBusy();
 
 		const address = signRequest.data.account;
@@ -359,9 +359,9 @@ export function useScannerContext(): ScannerContextState {
 		return qrInfo;
 	}
 
-	async function setData(accountsStore: AccountsContextState,
+	async function setData(accountsStore: AccountsContextType,
 		unsignedData: CompletedParsedData,
-		networkContext: NetworksContextState): Promise<QrInfo> {
+		networkContext: NetworksContextType): Promise<QrInfo> {
 		if (unsignedData !== null) {
 			switch (unsignedData.action) {
 			case 'signTransaction':
@@ -427,7 +427,7 @@ export function useScannerContext(): ScannerContextState {
 	}
 
 	// signing data with legacy account.
-	async function signDataLegacy(pin = '1', getNetwork: NetworksContextState['getNetwork']): Promise<void> {
+	async function signDataLegacy(pin = '1', getNetwork: NetworksContextType['getNetwork']): Promise<void> {
 		const { dataToSign, isHash, sender } = state;
 
 		if (!sender || !sender.encryptedSeed)

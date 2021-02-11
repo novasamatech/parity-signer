@@ -1,25 +1,25 @@
-import { ETHEREUM_NETWORK_LIST, NetworkProtocols, UnknownNetworkKeys } from 'constants/networkSpecs';
-import { default as React, useEffect, useReducer } from 'react';
-import { NetworksContextState } from 'stores/NetworkContext';
-import { Account, AccountsStoreState, FoundAccount, FoundIdentityAccount, Identity, isUnlockedAccount, LegacyAccount, LockedAccount, UnlockedAccount } from 'types/identityTypes';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+import { ETHEREUM_NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
+import { default as React, useContext, useEffect, useReducer } from 'react';
+import { Account, AccountsStoreState, Identity, isUnlockedAccount, LegacyAccount, LockedAccount, UnlockedAccount } from 'types/identityTypes';
+import { SubstrateNetworkParams } from 'types/networkTypes';
 import { emptyAccount, generateAccountId } from 'utils/account';
 import { deleteAccount as deleteDbAccount, loadAccounts, loadIdentities, saveAccount, saveIdentities } from 'utils/db';
 import { accountExistedError, addressGenerateError, duplicatedIdentityError, emptyIdentityError, identityUpdateError } from 'utils/errors';
-import { deepCopyIdentities, deepCopyIdentity, emptyIdentity, extractAddressFromAccountId, getAddressKeyByPath, getNetworkKey, isEthereumAccountId, parseFoundLegacyAccount } from 'utils/identitiesUtils';
+import { deepCopyIdentities, deepCopyIdentity, emptyIdentity, extractAddressFromAccountId, getAddressKeyByPath } from 'utils/identitiesUtils';
 import { brainWalletAddressWithRef, decryptData, encryptData } from 'utils/native';
 import { CreateSeedRefWithNewSeed, TryBrainWalletAddress, TrySubstrateAddress } from 'utils/seedRefHooks';
 import { constructSuriSuffix, parseSURI } from 'utils/suri';
 
-export type AccountsContextState = {
+import { NetworksContext, NetworksContextType } from './NetworkContext';
+
+export type AccountsContextType = {
 	clearIdentity: () => void;
 	deleteAccount: (accountKey: string) => Promise<void>;
 	deleteCurrentIdentity: () => Promise<void>;
-	deletePath: (path: string, networkContext: NetworksContextState) => void;
+	deletePath: (path: string, networkContext: NetworksContextType) => void;
 	deriveNewPath: (newPath: string, createSubstrateAddress: TrySubstrateAddress, networkParams: SubstrateNetworkParams, name: string, password: string) => Promise<void>;
-	deriveEthereumAccount: (createBrainWalletAddress: TryBrainWalletAddress, networkKey: string, allNetworks: Map<string, NetworkParams>) => Promise<void>;
-	getAccountByAddress: (address: string, networkContext: NetworksContextState) => false | FoundAccount;
-	getById: (address: string, networkKey: string, networkContext: NetworksContextState) => null | FoundAccount;
+	deriveEthereumAccount: (createBrainWalletAddress: TryBrainWalletAddress, networkKey: string) => Promise<void>;
+	getAccountByAddress: (address: string) => LegacyAccount | undefined;
 	getIdentityByAccountId: (accountId: string) => Identity | undefined;
 	getSelected: () => Account | undefined;
 	lockAccount: (accountKey: string) => void;
@@ -28,7 +28,7 @@ export type AccountsContextState = {
 	saveNewIdentity: (seedPhrase: string, pin: string, generateSeedRef: CreateSeedRefWithNewSeed) => Promise<void>;
 	select: (accountKey: string) => void;
 	state: AccountsStoreState;
-	submitNew: (pin: string, allNetworks: Map<string, NetworkParams>) => Promise<void>;
+	submitNew: (pin: string) => Promise<void>;
 	selectIdentity: (identity: Identity) => void;
 	unlockAccount: (accountKey: string, pin: string) => Promise<boolean>;
 	updateIdentityName: (name: string) => void;
@@ -48,7 +48,7 @@ const defaultAccountState = {
 	selectedKey: ''
 };
 
-export function useAccountContext(): AccountsContextState {
+export function useAccountContext(): AccountsContextType {
 	const initialState: AccountsStoreState = defaultAccountState;
 
 	const reducer = (state: AccountsStoreState,
@@ -57,8 +57,8 @@ export function useAccountContext(): AccountsContextState {
 		...delta
 	});
 	const [state, setState] = useReducer(reducer, initialState)
+	const { allNetworks, getNetwork } = useContext(NetworksContext);
 
-	console.log(state.currentIdentity)
 	console.log('accounts', state.accounts)
 
 	useEffect(() => {
@@ -105,27 +105,31 @@ export function useAccountContext(): AccountsContextState {
 			// for account creation
 			let accountToSave = account;
 
+			console.log('getNewtork', getNetwork);
+			getNetwork('bla');
+			const isEthereum = getNetwork(account.networkKey)?.protocol === NetworkProtocols.ETHEREUM;
+
 			if (pin && isUnlockedAccount(account)) {
 				account.encryptedSeed = await encryptData(account.seed, pin);
 				accountToSave = _deleteSensitiveData(account);
 			}
 
-			await saveAccount(accountToSave);
+			await saveAccount(accountToSave, isEthereum);
 		} catch (e) {
 			console.error(e);
 		}
 	}
 
-	async function submitNew(pin: string, allNetworks: Map<string, NetworkParams>): Promise<void> {
+	async function submitNew(pin: string): Promise<void> {
 		const account = state.newAccount;
 
-		if (!account.seed) return;
+		if (!account.seed) {
+			console.error('Account seed is empty')
 
-		const accountKey = generateAccountId(account.address,
-			account.networkKey,
-			allNetworks);
+			return
+		}
 
-		await save(accountKey, account, pin);
+		await save(account, pin);
 
 		setState({
 			accounts: [...state.accounts, account],
@@ -161,15 +165,13 @@ export function useAccountContext(): AccountsContextState {
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async function deriveEthereumAccount(createBrainWalletAddress: TryBrainWalletAddress, networkKey: string, allNetworks: Map<string, NetworkParams>): Promise<void> {
+	async function deriveEthereumAccount(createBrainWalletAddress: TryBrainWalletAddress, networkKey: string): Promise<void> {
 		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
 		const ethereumAddress = await brainWalletAddressWithRef(createBrainWalletAddress);
 
 		if (ethereumAddress.address === '') throw new Error(addressGenerateError);
 		const { ethereumChainId, pathId } = networkParams;
-		const accountId = generateAccountId(ethereumAddress.address,
-			networkKey,
-			allNetworks);
+		const accountId = generateAccountId(ethereumAddress.address, networkKey, allNetworks);
 
 		if (state.currentIdentity === null) {
 			throw new Error(emptyIdentityError);
@@ -210,35 +212,55 @@ export function useAccountContext(): AccountsContextState {
 		_updateAccount({ ... updatedAccount });
 	}
 
-	async function deleteAccount(accountKey: string): Promise<void> {
+	async function deleteAccount(address: string): Promise<void> {
 		const { accounts } = state;
 
-		accounts.delete(accountKey);
-		setState({ accounts, selectedKey: '' });
-		await deleteDbAccount(accountKey);
+		const newAccounts = accounts.filter((account) => {
+			// TODO make sure this works with substrate addresses and that we store ss58 substrate encoding
+			return account.address !== address
+		})
+
+		setState({ accounts: newAccounts, selectedKey: '' });
+		await deleteDbAccount(address);
 	}
 
-	async function unlockAccount(accountKey: string,
-		pin: string): Promise<boolean> {
+	const accountStateWithoutAccount = (address: string) => {
 		const { accounts } = state;
-		const account = accounts.get(accountKey);
 
-		if (!accountKey || !account || !account.encryptedSeed) {
+		return accounts.filter((account) => account.address !== address)
+	}
+
+	const getAccountByAddress = (address: string) => {
+		const { accounts } = state;
+
+		return accounts.find((account) => account.address === address)
+	}
+
+	async function unlockAccount(address: string, pin: string): Promise<boolean> {
+		const account = getAccountByAddress(address) ;
+
+		if (!account || !account.encryptedSeed) {
+			console.error('No account found for the address', address)
+
 			return false;
 		}
 
 		try {
 			const decryptedSeed = await decryptData(account.encryptedSeed, pin);
 			const { derivePath, password, phrase } = parseSURI(decryptedSeed);
+			const unlockedAccount = {
+				derivationPassword: password || '',
+				derivationPath: derivePath || '',
+				seed: decryptedSeed,
+				seedPhrase: phrase || '',
+				...account
+			}
 
 			setState({
-				accounts: state.accounts.set(accountKey, {
-					derivationPassword: password || '',
-					derivationPath: derivePath || '',
-					seed: decryptedSeed,
-					seedPhrase: phrase || '',
-					...account
-				})
+				accounts: [
+					...accountStateWithoutAccount(address),
+					unlockedAccount
+				]
 			});
 		} catch (e) {
 			return false;
@@ -247,145 +269,148 @@ export function useAccountContext(): AccountsContextState {
 		return true;
 	}
 
-	function lockAccount(accountKey: string): void {
-		const { accounts } = state;
-		const account = accounts.get(accountKey);
+	function lockAccount(address: string): void {
+		const account = getAccountByAddress(address);
 
 		if (account && isUnlockedAccount(account)) {
 			const lockedAccount = _deleteSensitiveData(account);
 
-			setState({ accounts: state.accounts.set(accountKey, lockedAccount) });
+			setState({
+				accounts: [
+					...accountStateWithoutAccount(address),
+					lockedAccount
+				]
+			});
 		}
 	}
 
-	function _getAccountWithoutCaseSensitive(accountId: string): Account | null {
-		let findLegacyAccount = null;
+	// function _getAccountWithoutCaseSensitive(accountId: string): Account | null {
+	// 	let findLegacyAccount = null;
 
-		for (const [key, value] of state.accounts) {
-			if (isEthereumAccountId(accountId)) {
-				if (key.toLowerCase() === accountId.toLowerCase()) {
-					findLegacyAccount = value;
-					break;
-				}
-			} else if (key === accountId) {
-				findLegacyAccount = value;
-				break;
-			} else if (
-				//backward compatible with hard spoon substrate key pairs
-				extractAddressFromAccountId(key) ===
-				extractAddressFromAccountId(accountId)
-			) {
-				findLegacyAccount = value;
-				break;
-			}
-		}
+	// 	for (const [key, value] of state.accounts) {
+	// 		if (isEthereumAccountId(accountId)) {
+	// 			if (key.toLowerCase() === accountId.toLowerCase()) {
+	// 				findLegacyAccount = value;
+	// 				break;
+	// 			}
+	// 		} else if (key === accountId) {
+	// 			findLegacyAccount = value;
+	// 			break;
+	// 		} else if (
+	// 			//backward compatible with hard spoon substrate key pairs
+	// 			extractAddressFromAccountId(key) ===
+	// 			extractAddressFromAccountId(accountId)
+	// 		) {
+	// 			findLegacyAccount = value;
+	// 			break;
+	// 		}
+	// 	}
 
-		return findLegacyAccount;
-	}
+	// 	return findLegacyAccount;
+	// }
 
-	function _getAccountFromIdentity(accountIdOrAddress: string,
-		networkContext: NetworksContextState): false | FoundIdentityAccount {
-		const { allNetworks } = networkContext;
-		const isAccountId = accountIdOrAddress.split(':').length > 1;
-		let targetAccountId = null;
-		let targetIdentity = null;
-		let targetNetworkKey = null;
-		let targetPath = null;
+	// function _getAccountFromIdentity(accountIdOrAddress: string, networkContext: NetworksContextState): false | FoundIdentityAccount {
+	// 	const { allNetworks } = networkContext;
+	// 	const isAccountId = accountIdOrAddress.split(':').length > 1;
+	// 	let targetAccountId = null;
+	// 	let targetIdentity = null;
+	// 	let targetNetworkKey = null;
+	// 	let targetPath = null;
 
-		for (const identity of state.identities) {
-			const searchList = Array.from(identity.addresses.entries());
+	// 	for (const identity of state.identities) {
+	// 		const searchList = Array.from(identity.addresses.entries());
 
-			for (const [addressKey, path] of searchList) {
-				const networkKey = getNetworkKey(path, identity, networkContext);
-				let accountId, address;
+	// 		for (const [addressKey, path] of searchList) {
+	// 			const networkKey = getNetworkKey(path, identity, networkContext);
+	// 			let accountId, address;
 
-				if (isEthereumAccountId(addressKey)) {
-					accountId = addressKey;
-					address = extractAddressFromAccountId(addressKey);
-				} else {
-					accountId = generateAccountId(addressKey, networkKey, allNetworks);
-					address = addressKey;
-				}
+	// 			if (isEthereumAccountId(addressKey)) {
+	// 				accountId = addressKey;
+	// 				address = extractAddressFromAccountId(addressKey);
+	// 			} else {
+	// 				accountId = generateAccountId(addressKey, networkKey, allNetworks);
+	// 				address = addressKey;
+	// 			}
 
-				const searchAccountIdOrAddress = isAccountId ? accountId : address;
-				const found = isEthereumAccountId(accountId)
-					? searchAccountIdOrAddress.toLowerCase() ===
-					  accountIdOrAddress.toLowerCase()
-					: searchAccountIdOrAddress === accountIdOrAddress;
+	// 			const searchAccountIdOrAddress = isAccountId ? accountId : address;
+	// 			const found = isEthereumAccountId(accountId)
+	// 				? searchAccountIdOrAddress.toLowerCase() ===
+	// 				  accountIdOrAddress.toLowerCase()
+	// 				: searchAccountIdOrAddress === accountIdOrAddress;
 
-				if (found) {
-					targetPath = path;
-					targetIdentity = identity;
-					targetAccountId = accountId;
-					targetNetworkKey = networkKey;
-					break;
-				}
-			}
-		}
+	// 			if (found) {
+	// 				targetPath = path;
+	// 				targetIdentity = identity;
+	// 				targetAccountId = accountId;
+	// 				targetNetworkKey = networkKey;
+	// 				break;
+	// 			}
+	// 		}
+	// 	}
 
-		if (
-			targetPath === null ||
-			targetIdentity === null ||
-			targetAccountId === null
-		)
-			return false;
-		setState({ currentIdentity: targetIdentity });
+	// 	if (
+	// 		targetPath === null ||
+	// 		targetIdentity === null ||
+	// 		targetAccountId === null
+	// 	)
+	// 		return false;
+	// 	setState({ currentIdentity: targetIdentity });
 
-		const metaData = targetIdentity.meta.get(targetPath);
+	// 	const metaData = targetIdentity.meta.get(targetPath);
 
-		if (metaData === undefined) return false;
+	// 	if (metaData === undefined) return false;
 
-		return {
-			accountId: targetAccountId,
-			encryptedSeed: targetIdentity.encryptedSeed,
-			hasPassword: !!metaData.hasPassword,
-			isLegacy: false,
-			networkKey: targetNetworkKey!,
-			path: targetPath,
-			validBip39Seed: true,
-			...metaData
-		};
-	}
+	// 	return {
+	// 		accountId: targetAccountId,
+	// 		encryptedSeed: targetIdentity.encryptedSeed,
+	// 		hasPassword: !!metaData.hasPassword,
+	// 		isLegacy: false,
+	// 		networkKey: targetNetworkKey!,
+	// 		path: targetPath,
+	// 		validBip39Seed: true,
+	// 		...metaData
+	// 	};
+	// }
 
-	function getById(address: string, networkKey: string, networkContext: NetworksContextState): null | FoundAccount {
-		const { allNetworks } = networkContext;
-		const accountId = generateAccountId(address, networkKey, allNetworks);
-		const legacyAccount = _getAccountWithoutCaseSensitive(accountId);
+	// function getById(address: string, networkKey: string, networkContext: NetworksContextState): null | FoundAccount {
+	// 	const { allNetworks } = networkContext;
+	// 	const accountId = generateAccountId(address, networkKey, allNetworks);
+	// 	const legacyAccount = _getAccountWithoutCaseSensitive(accountId);
 
-		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
-		let derivedAccount;
+	// 	if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
+	// 	let derivedAccount;
 
-		//assume it is an accountId
-		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
-			derivedAccount = _getAccountFromIdentity(accountId, networkContext);
-		}
+	// 	//assume it is an accountId
+	// 	if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
+	// 		derivedAccount = _getAccountFromIdentity(accountId, networkContext);
+	// 	}
 
-		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
-		derivedAccount =
-			derivedAccount || _getAccountFromIdentity(address, networkContext);
+	// 	//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
+	// 	derivedAccount =
+	// 		derivedAccount || _getAccountFromIdentity(address, networkContext);
 
-		if (derivedAccount instanceof Object)
-			return { ...derivedAccount, isLegacy: false };
+	// 	if (derivedAccount instanceof Object)
+	// 		return { ...derivedAccount, isLegacy: false };
 
-		return null;
-	}
+	// 	return null;
+	// }
 
-	function getAccountByAddress(address: string, networkContext: NetworksContextState): false | FoundAccount {
-		if (!address) {
-			return false;
-		}
+	// function getAccountByAddress(address: string, networkContext: NetworksContextState): false | FoundAccount {
+	// 	if (!address) {
+	// 		return false;
+	// 	}
 
-		for (const [k, v] of state.accounts.entries()) {
-			if (v.address.toLowerCase() === address.toLowerCase()) {
-				return { ...v, accountId: k, isLegacy: true };
-			}
-		}
+	// 	for (const [k, v] of state.accounts.entries()) {
+	// 		if (v.address.toLowerCase() === address.toLowerCase()) {
+	// 			return { ...v, accountId: k, isLegacy: true };
+	// 		}
+	// 	}
 
-		return _getAccountFromIdentity(address, networkContext);
-	}
+	// 	return _getAccountFromIdentity(address, networkContext);
+	// }
 
 	function getSelected(): Account | undefined {
-		return state.accounts.get(state.selectedKey);
+		return getAccountByAddress(state.selectedKey);
 	}
 
 	function getIdentityByAccountId(accountId: string): Identity | undefined {
@@ -501,8 +526,7 @@ export function useAccountContext(): AccountsContextState {
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	function deletePath(path: string,
-		networkContext: NetworksContextState): void {
+	function deletePath(path: string, networkContext: NetworksContextType): void {
 		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
 		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
@@ -533,7 +557,6 @@ export function useAccountContext(): AccountsContextState {
 		deriveEthereumAccount,
 		deriveNewPath,
 		getAccountByAddress,
-		getById,
 		getIdentityByAccountId,
 		getSelected,
 		lockAccount,
@@ -553,4 +576,4 @@ export function useAccountContext(): AccountsContextState {
 	};
 }
 
-export const AccountsContext = React.createContext({} as AccountsContextState);
+export const AccountsContext = React.createContext({} as AccountsContextType);

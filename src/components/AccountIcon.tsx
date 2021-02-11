@@ -27,14 +27,14 @@ import Identicon from '@polkadot/reactnative-identicon';
 
 interface Props {
 	address: string;
-	network: NetworkParams;
-	style?: ViewStyle | ImageStyle;
+	network: NetworkParams | null;
+	style?: ViewStyle;
 }
 
 export default function AccountIcon(props: Props): ReactElement {
 	const { address, network, style } = props;
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
-	const protocol = network.protocol;
+	const protocol = network?.protocol;
 
 	useEffect((): (() => void) => {
 		let promiseDisabled = false;
@@ -57,7 +57,7 @@ export default function AccountIcon(props: Props): ReactElement {
 
 	if (address === '') {
 		return (
-			<View style={style as ViewStyle}>
+			<View style={style}>
 				{(network as SubstrateNetworkParams).logo ? (
 					<Image
 						source={(network as SubstrateNetworkParams).logo}
@@ -76,8 +76,10 @@ export default function AccountIcon(props: Props): ReactElement {
 
 	if (protocol === NetworkProtocols.ETHEREUM) {
 		return (
-			<Image source={{ uri: ethereumIconUri }}
-				style={style as ImageStyle} />
+			<Image
+				source={{ uri: ethereumIconUri }}
+				style={StyleSheet.flatten([style, styles.ethereumIdenticon]) as ImageStyle}
+			/>
 		);
 	} else if (address !== '') {
 		let iconSize;
@@ -102,6 +104,11 @@ export default function AccountIcon(props: Props): ReactElement {
 }
 
 const styles = StyleSheet.create({
+	ethereumIdenticon:{
+		borderRadius: 50,
+		height: 50,
+		width: 50
+	},
 	logo: {
 		alignItems: 'center',
 		height: 36,

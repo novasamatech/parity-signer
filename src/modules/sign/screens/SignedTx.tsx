@@ -26,14 +26,14 @@ import strings from 'modules/sign/strings';
 import styles from 'modules/sign/styles';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import fontStyles from 'styles/fontStyles';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import { Transaction } from 'utils/transaction';
+
+import { AccountsContext, NetworksContext } from '../../../context';
 
 interface Props extends NavigationScannerProps<'SignedTx'> {
 	sender: FoundAccount;

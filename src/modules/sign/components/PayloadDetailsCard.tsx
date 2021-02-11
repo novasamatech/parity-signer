@@ -18,8 +18,8 @@ import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { NetworksContext } from '../../../context';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { RegistriesContext, RegistriesStoreState } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';

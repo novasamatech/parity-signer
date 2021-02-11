@@ -18,9 +18,10 @@ import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
 import React, { useContext } from 'react';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
+
+import { NetworksContext } from '../../../context';
 
 export default function NetworkDetails({ route }: NavigationProps<'NetworkDetails'>): React.ReactElement {
 	const networkPathId = route.params.pathId;

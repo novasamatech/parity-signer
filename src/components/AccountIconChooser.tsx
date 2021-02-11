@@ -210,7 +210,6 @@ const styles = StyleSheet.create({
 		marginBottom: 10
 	},
 	icon: {
-
 		height: 50,
 		padding: 5,
 		width: 50
@@ -219,7 +218,9 @@ const styles = StyleSheet.create({
 		borderWidth: 6,
 		height: 62 // height = icon height (50) + borderWidth (6) * 2
 	},
-	refreshIcon: { color: colors.text.faded },
+	refreshIcon: {
+		color: colors.text.faded
+	},
 	selected: {
 		borderColor: colors.border.light,
 		borderRadius: 50

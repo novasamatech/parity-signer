@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { isU8a, u8aToHex } from '@polkadot/util';
 import CompatibleCard from 'components/CompatibleCard';
 import QrView from 'components/QrView';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
@@ -26,13 +25,15 @@ import strings from 'modules/sign/strings';
 import styles from 'modules/sign/styles';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import fontStyles from 'styles/fontStyles';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
+
+import { isU8a, u8aToHex } from '@polkadot/util';
+
+import { AccountsContext, NetworksContext } from '../../../context';
 
 interface Props extends NavigationScannerProps<'SignedMessage'> {
 	sender: FoundAccount;

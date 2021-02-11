@@ -20,9 +20,10 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
 import { Account } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
+
+import { AccountsContext } from '../context';
 
 function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
@@ -34,10 +35,7 @@ function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>)
 
 	const accountsMap = accountsStore.state.accounts;
 
-	const renderAccountCard = ([accountKey, account]: [
-		string,
-		Account
-	]): React.ReactElement => (
+	const renderAccountCard = ([accountKey, account]: [ string, Account ]): React.ReactElement => (
 		<AccountCard
 			address={account.address}
 			key={accountKey}

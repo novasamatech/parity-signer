@@ -21,11 +21,9 @@ import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
 import TouchableItem from 'components/TouchableItem';
 import { NetworkProtocols } from 'constants/networkSpecs';
-import React, { useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
@@ -33,10 +31,19 @@ import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
-function LegacyAccountBackup({ navigation, route }: NavigationProps<'LegacyAccountBackup'>): React.ReactElement {
+import { AccountsContext, NetworksContext } from '../context';
+
+function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
 	const { newAccount, selectedKey } = accountsStore.state;
+	const { navigate } = navigation;
+	const { setAlert } = useContext(AlertStateContext);
+	const isNew = route.params?.isNew ?? false;
+	const { address, derivationPassword = '', derivationPath = '', name, networkKey, seed = '', seedPhrase = '' } = isNew
+		? newAccount
+		: (accountsStore.getSelected() as UnlockedAccount);
+	const protocol = getNetwork(networkKey)?.protocol;
 
 	useEffect(() => {
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
@@ -56,17 +63,11 @@ function LegacyAccountBackup({ navigation, route }: NavigationProps<'LegacyAccou
 		};
 	}, [navigation, accountsStore, selectedKey]);
 
-	const { navigate } = navigation;
-	const { setAlert } = useContext(AlertStateContext);
-	const isNew = route.params?.isNew ?? false;
-	const { address,
-		derivationPassword = '',
-		derivationPath = '',
-		name,
-		networkKey,
-		seed = '',
-		seedPhrase = '' } = isNew ? newAccount : (accountsStore.getSelected() as UnlockedAccount);
-	const protocol = getNetwork(networkKey).protocol;
+	const goToPin = useCallback(() => {
+		alertBackupDone(setAlert, () => {
+			navigate('AccountPin', { isNew });
+		});
+	}, [isNew, navigate, setAlert])
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>
@@ -76,9 +77,11 @@ function LegacyAccountBackup({ navigation, route }: NavigationProps<'LegacyAccou
 				title="Recovery Phrase"
 			/>
 
-			<AccountCard address={address}
+			<AccountCard
+				address={address}
 				networkKey={networkKey}
-				title={name} />
+				title={name}
+			/>
 			<View style={styles.bodyContent}>
 				<TouchableItem
 					onPress={(): void => {
@@ -106,12 +109,8 @@ function LegacyAccountBackup({ navigation, route }: NavigationProps<'LegacyAccou
 				)}
 				{isNew && (
 					<Button
-						onPress={(): void => {
-							alertBackupDone(setAlert, () => {
-								navigate('AccountPin', { isNew });
-							});
-						}}
-						title="Backup Done"
+						onPress={goToPin}
+						title="Done"
 					/>
 				)}
 			</View>
@@ -119,7 +118,7 @@ function LegacyAccountBackup({ navigation, route }: NavigationProps<'LegacyAccou
 	);
 }
 
-export default LegacyAccountBackup;
+export default LegacyMnemonic;
 
 const styles = StyleSheet.create({
 	body: {

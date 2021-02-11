@@ -21,7 +21,6 @@ import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -30,6 +29,8 @@ import { alertBackupDone, alertCopyBackupPhrase, alertIdentityCreationError } fr
 import { words } from 'utils/native';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
+
+import { AccountsContext } from '../context';
 
 function IdentityBackup({ navigation, route }: NavigationProps<'IdentityBackup'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);

@@ -19,7 +19,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import testIDs from 'e2e/testIDs';
 import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { AccountsContext } from 'stores/AccountsContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
@@ -27,6 +26,7 @@ import { RootStackParamList } from 'types/routes';
 import { getIdentityName } from 'utils/identitiesUtils';
 import { navigateToLegacyAccountList, resetNavigationTo, resetNavigationWithNetworkChooser, unlockAndReturnSeed } from 'utils/navigationHelpers';
 
+import { AccountsContext } from '../context';
 import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';

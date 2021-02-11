@@ -17,7 +17,7 @@
 import { centrifugeAmberMetadata, centrifugeMetadata, edgewareMetadata, kulupuMetadata, kusamaMetadata, polkadotMetaData, rococoMetadata, westendMetadata } from 'constants/networkMetadata';
 import { ETHEREUM_NETWORK_LIST, SubstrateNetworkKeys, UnknownNetworkKeys, unknownNetworkPathId } from 'constants/networkSpecs';
 import strings from 'modules/sign/strings';
-import { NetworksContextState } from 'stores/NetworkContext';
+import { NetworksContext } from '../context';
 import { Account, AccountMeta, FoundAccount, Identity, LegacyAccount, PathGroup, SerializedIdentity, UnlockedAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
@@ -88,7 +88,7 @@ export const extractAddressFromAccountId = (id: string): string => {
 
 export const getAddressKeyByPath = (path: string,
 	pathMeta: AccountMeta,
-	networkContext: NetworksContextState): string => {
+	networkContext: NetworksContextType): string => {
 	const { allNetworks } = networkContext;
 	const address = pathMeta.address;
 
@@ -155,7 +155,7 @@ export const deepCopyIdentities = (identities: Identity[]): Identity[] =>
 export const deepCopyIdentity = (identity: Identity): Identity =>
 	deserializeIdentity(serializeIdentity(identity));
 
-export const getPathsWithSubstrateNetworkKey = (identity: Identity, networkKey: string, networkContextState: NetworksContextState): string[] => {
+export const getPathsWithSubstrateNetworkKey = (identity: Identity, networkKey: string, networkContextState: NetworksContextType): string[] => {
 	const { networks, pathIds } = networkContextState;
 	const pathEntries = Array.from(identity.meta.entries());
 	const targetPathId = networks.has(networkKey)
@@ -201,7 +201,7 @@ export const getSubstrateNetworkKeyByPathId = (pathId: string,
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
-export const getNetworkKey = (path: string, identity: Identity, networkContextState: NetworksContextState): string => {
+export const getNetworkKey = (path: string, identity: Identity, networkContextState: NetworksContextType): string => {
 	if (identity.meta.has(path)) {
 
 		return getNetworkKeyByPath(path,
@@ -212,7 +212,7 @@ export const getNetworkKey = (path: string, identity: Identity, networkContextSt
 	return UnknownNetworkKeys.UNKNOWN;
 };
 
-export const getNetworkKeyByPath = (path: string, pathMeta: AccountMeta, networkContextState: NetworksContextState): string => {
+export const getNetworkKeyByPath = (path: string, pathMeta: AccountMeta, networkContextState: NetworksContextType): string => {
 	const { networks, pathIds } = networkContextState;
 
 	if (!isSubstratePath(path) && ETHEREUM_NETWORK_LIST.hasOwnProperty(path)) {
@@ -271,7 +271,7 @@ export const unlockIdentitySeedWithReturn = async (pin: string, identity: Identi
 	return phrase;
 };
 
-export const verifyPassword = async (password: string, seedPhrase: string, identity: Identity, path: string, networkContextState: NetworksContextState): Promise<boolean> => {
+export const verifyPassword = async (password: string, seedPhrase: string, identity: Identity, path: string, networkContextState: NetworksContextType): Promise<boolean> => {
 	const { networks } = networkContextState;
 	const suri = constructSURI({
 		derivePath: path,
@@ -288,7 +288,7 @@ export const verifyPassword = async (password: string, seedPhrase: string, ident
 	return address === accountMeta?.address;
 };
 
-export const getExistedNetworkKeys = (identity: Identity, networkContextState: NetworksContextState): string[] => {
+export const getExistedNetworkKeys = (identity: Identity, networkContextState: NetworksContextType): string[] => {
 	const pathEntries = Array.from(identity.meta.entries());
 
 	console.log('pathEntries', pathEntries)

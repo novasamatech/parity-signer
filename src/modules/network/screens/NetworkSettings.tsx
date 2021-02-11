@@ -21,11 +21,12 @@ import testIDs from 'e2e/testIDs';
 import { filterNetworks } from 'modules/network/utils';
 import React, { ReactElement, useContext } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
+
+import { NetworksContext } from '../../../context';
 
 export default function NetworkSettings({ navigation }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	const { networks } = useContext(NetworksContext);
