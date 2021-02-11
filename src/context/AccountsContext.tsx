@@ -10,7 +10,7 @@ import { brainWalletAddressWithRef, decryptData, encryptData } from 'utils/nativ
 import { CreateSeedRefWithNewSeed, TryBrainWalletAddress, TrySubstrateAddress } from 'utils/seedRefHooks';
 import { constructSuriSuffix, parseSURI } from 'utils/suri';
 
-import { NetworksContext, NetworksContextType } from './NetworkContext';
+import { NetworksContext, NetworksContextType } from './NetworksContext';
 
 export interface AccountsContextType {
 	clearIdentity: () => void;
@@ -48,13 +48,13 @@ const defaultAccountState = {
 	selectedKey: ''
 };
 
-interface AccountContextProviderProps {
+interface AccountsContextProviderProps {
 	children?: React.ReactElement;
 }
 
 export const AccountsContext = React.createContext({} as AccountsContextType);
 
-export function AccountsContextProvider({ children }: AccountContextProviderProps): React.ReactElement {
+export function AccountsContextProvider({ children }: AccountsContextProviderProps): React.ReactElement {
 	const initialState: AccountsStoreState = defaultAccountState;
 
 	const reducer = (state: AccountsStoreState,

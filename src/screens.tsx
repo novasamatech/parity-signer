@@ -187,7 +187,7 @@ export const AppNavigator = (): React.ReactElement => (
 	</ScreenStack.Navigator>
 );
 
-export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
+export const TacAndPrivacyPolicyNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
 		initialRouteName="TermsAndConditions"
 		screenOptions={{

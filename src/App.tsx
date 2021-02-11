@@ -27,14 +27,14 @@ import NavigationBar from 'react-native-navbar-color';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AlertStateContext, useAlertContext } from 'stores/alertContext';
-import { GlobalState, GlobalStateContext, useGlobalStateContext } from 'stores/globalStateContext';
 import { RegistriesContext, useRegistriesStore } from 'stores/RegistriesContext';
 import { ScannerContext,useScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 
+import { useTac } from './hooks/useTac';
 import { AccountContextProvider, NetworksContextProvider } from './context';
-import { AppNavigator, ScreenStack, TocAndPrivacyPolicyNavigator } from './screens';
+import { AppNavigator, ScreenStack, TacAndPrivacyPolicyNavigator } from './screens';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
@@ -52,20 +52,16 @@ export default function App(props: AppProps): React.ReactElement {
 	}
 
 	const alertContext = useAlertContext();
-	const globalContext: GlobalState = useGlobalStateContext();
+	const { dataLoaded, policyConfirmed } = useTac();
 	const seedRefContext = useSeedRefStore();
-	// const networkContext = useNetworksContext();
-	// const accountsContext = useAccountContext();
 	const scannerContext = useScannerContext();
 	const registriesContext = useRegistriesStore();
 
 	const renderStacks = (): React.ReactElement => {
-		if (globalContext.dataLoaded) {
-			return globalContext.policyConfirmed ? (
-				<AppNavigator />
-			) : (
-				<TocAndPrivacyPolicyNavigator />
-			);
+		if (dataLoaded) {
+			return policyConfirmed
+				? <AppNavigator />
+			 	: <TacAndPrivacyPolicyNavigator />;
 		} else {
 			return (
 				<ScreenStack.Navigator>
@@ -86,22 +82,20 @@ export default function App(props: AppProps): React.ReactElement {
 				<AccountContextProvider>
 					<ScannerContext.Provider value={scannerContext}>
 						<RegistriesContext.Provider value={registriesContext}>
-							<GlobalStateContext.Provider value={globalContext}>
-								<AlertStateContext.Provider value={alertContext}>
-									<SeedRefsContext.Provider value={seedRefContext}>
-										<MenuProvider backHandler={true}>
-											<StatusBar
-												backgroundColor={colors.background.app}
-												barStyle="light-content"
-											/>
-											<CustomAlert />
-											<NavigationContainer>
-												{renderStacks()}
-											</NavigationContainer>
-										</MenuProvider>
-									</SeedRefsContext.Provider>
-								</AlertStateContext.Provider>
-							</GlobalStateContext.Provider>
+							<AlertStateContext.Provider value={alertContext}>
+								<SeedRefsContext.Provider value={seedRefContext}>
+									<MenuProvider backHandler={true}>
+										<StatusBar
+											backgroundColor={colors.background.app}
+											barStyle="light-content"
+										/>
+										<CustomAlert />
+										<NavigationContainer>
+											{renderStacks()}
+										</NavigationContainer>
+									</MenuProvider>
+								</SeedRefsContext.Provider>
+							</AlertStateContext.Provider>
 						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
 				</AccountContextProvider>

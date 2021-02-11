@@ -1,2 +1,2 @@
 export { AccountsContext, AccountsContextType, AccountsContextProvider as AccountContextProvider } from './AccountsContext';
-export { NetworksContext, NetworksContextType, NetworksContextProvider } from './NetworkContext';
+export { NetworksContext, NetworksContextType, NetworksContextProvider } from './NetworksContext';

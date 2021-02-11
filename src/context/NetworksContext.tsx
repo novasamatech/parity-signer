@@ -34,13 +34,13 @@ export interface NetworksContextType {
 	pathIds: string[];
 };
 
-interface NetworkContextProviderProps {
+interface NetworksContextProviderProps {
 	children?: React.ReactElement;
 }
 
 export const NetworksContext = React.createContext({} as NetworksContextType);
 
-export function NetworksContextProvider({ children }: NetworkContextProviderProps): React.ReactElement {
+export function NetworksContextProvider({ children }: NetworksContextProviderProps): React.ReactElement {
 	const [substrateNetworks, setSubstrateNetworks] = useState<Map<string, SubstrateNetworkParams>>(new Map());
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
 		const ethereumNetworks: Map<string, NetworkParams> = new Map(Object.entries(ETHEREUM_NETWORK_LIST));

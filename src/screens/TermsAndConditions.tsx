@@ -19,23 +19,23 @@ import CustomScrollView from 'components/CustomScrollView';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
 import colors from 'styles/colors';
 import containerStyles from 'styles/containerStyles';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 import { saveToCAndPPConfirmation } from 'utils/db';
 
-import toc from '../../docs/terms-and-conditions.md';
+import tac from '../../docs/terms-and-conditions.md';
+import { useTac } from '../hooks/useTac';
 
 export default function TermsAndConditions(props: NavigationProps<'TermsAndConditions'>): React.ReactElement {
 	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
-	const [tocAgreement, setTocAgreement] = useState<boolean>(false);
+	const [tacAgreement, setTacAgreement] = useState<boolean>(false);
 
-	const { policyConfirmed, setPolicyConfirmed } = useContext<GlobalState>(GlobalStateContext);
+	const { policyConfirmed, setPolicyConfirmed } = useTac();
 	const { navigation } = props;
 
 	const onConfirm = async (): Promise<void> => {
@@ -47,13 +47,13 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 		<View style={containerStyles.background}
 			testID={testIDs.TacScreen.tacView}>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
-				<Markdown>{toc}</Markdown>
+				<Markdown>{tac}</Markdown>
 			</CustomScrollView>
 
 			{!policyConfirmed && (
 				<View>
 					<TouchableItem
-						onPress={(): void => setTocAgreement(!tocAgreement)}
+						onPress={(): void => setTacAgreement(!tacAgreement)}
 						style={{
 							alignItems: 'center',
 							flexDirection: 'row',
@@ -63,7 +63,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						testID={testIDs.TacScreen.agreeTacButton}
 					>
 						<Icon
-							name={tocAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
+							name={tacAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
 							style={styles.icon}
 						/>
 
@@ -99,7 +99,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 					</TouchableItem>
 
 					<Button
-						disabled={!ppAgreement || !tocAgreement}
+						disabled={!ppAgreement || !tacAgreement}
 						onPress={onConfirm}
 						style={{ marginBottom: 24, marginTop: 16 }}
 						testID={testIDs.TacScreen.nextButton}

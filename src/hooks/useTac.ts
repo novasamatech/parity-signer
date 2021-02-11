@@ -3,22 +3,23 @@ import * as React from 'react';
 import { loadToCAndPPConfirmation } from 'utils/db';
 import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
-/* eslint-disable @typescript-eslint/no-empty-function */
-export type GlobalState = {
+export interface TacHookType {
 	dataLoaded: boolean;
 	policyConfirmed: boolean;
 	setDataLoaded: (setValue: boolean) => void;
 	setPolicyConfirmed: (setValue: boolean) => void;
 };
 
-export const defaultGlobalState: GlobalState = {
+export const defaultGlobalState: TacHookType = {
 	dataLoaded: false,
 	policyConfirmed: false,
 	setDataLoaded: (): void => {},
 	setPolicyConfirmed: (): void => {}
 };
 
-export function useGlobalStateContext(): GlobalState {
+export const TacContext = React.createContext(defaultGlobalState);
+
+export function useTac(): TacHookType {
 	const [policyConfirmed, setPolicyConfirmed] = useState<boolean>(false);
 	const [dataLoaded, setDataLoaded] = useState<boolean>(false);
 
@@ -38,12 +39,5 @@ export function useGlobalStateContext(): GlobalState {
 		loadPolicyConfirmationAndMigrateData();
 	}, []);
 
-	return {
-		dataLoaded,
-		policyConfirmed,
-		setDataLoaded,
-		setPolicyConfirmed
-	};
+	return { dataLoaded, policyConfirmed, setDataLoaded, setPolicyConfirmed }
 }
-
-export const GlobalStateContext = React.createContext(defaultGlobalState);
