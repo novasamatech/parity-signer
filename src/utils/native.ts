@@ -175,7 +175,7 @@ export function substrateAddress(
 		}
 		default:
 		{
-			throw new Error();
+			return SubstrateSign.substrateAddress(seed, prefix);
 			break;
 		}
 	}
@@ -203,7 +203,7 @@ export function substrateSign(
 		}
 		default:
 		{
-			throw new Error();
+			return SubstrateSign.substrateSign(seed, message);
 			break;
 		}
 	}
@@ -277,7 +277,11 @@ export class SeedRefClass {
 			}
 			default:
 			{
-				throw new Error();
+				return SubstrateSign.substrateAddressWithRef(
+					this.dataRef,
+					suriSuffix,
+					prefix
+				);
 				break;
 			}
 		}
@@ -347,7 +351,11 @@ export class SeedRefClass {
 			}
 			default:
 			{
-				throw new Error();
+				return SubstrateSign.substrateSignWithRef(
+					this.dataRef,
+					suriSuffix,
+					message
+				);
 				break;
 			}
 		}
