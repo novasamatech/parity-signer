@@ -15,14 +15,14 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { 
+import {
 	StyleSheet,
 	View,
 	Text,
 	TouchableHighlight,
 	TouchableNativeFeedback,
 	TouchableNativeFeedbackProps,
-	TouchableOpacity,
+	TouchableOpacity
 } from 'react-native';
 
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
@@ -76,9 +76,11 @@ function IdentityNew({
 		accountsStore.updateNewIdentity({ name });
 	};
 
-	const setMultisignatureAlgorithm = (multisignatureType: MultiSignatureIdentityType): void => {
+	const setMultisignatureAlgorithm = (
+		multisignatureType: MultiSignatureIdentityType
+	): void => {
 		accountsStore.updateNewIdentity({ multisignatureType });
-	}
+	};
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
 		setSeedPhrase(inputSeedPhrase);
@@ -188,8 +190,10 @@ function IdentityNew({
 				placeholder="Identity Name"
 			/>
 			<View style={styles.button}>
-				<Text style={styles.optionText}>Signature algorithm: {accountsStore.state.newIdentity.multisignatureType}</Text>
-			</View>
+				<Text style={styles.optionText}>
+					Signature algorithm: {' '}
+					{accountsStore.state.newIdentity.multisignatureType}</Text>
+				</View>
 			<TouchableHighlight onPress={() => setMultisignatureAlgorithm('Sr25519')}>
 				<View style={styles.button}>
 					<Text style={styles.optionText}>sr25519</Text>
@@ -222,13 +226,13 @@ const styles = StyleSheet.create({
 		alignContent: 'center',
 		marginTop: 32
 	},
-	optionText: {
-		...fontStyles.h2,
-		color: colors.text.main
-	},
 	button: {
 		alignItems: 'center',
 		color: colors.text.main,
 		padding: 10
+	},
+	optionText: {
+		...fontStyles.h2,
+		color: colors.text.main
 	}
 });

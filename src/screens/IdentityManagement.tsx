@@ -104,7 +104,9 @@ function IdentityManagement({
 				focus
 			/>
 			<View>
-				<Text style={styles.infoText}>Substrate encription algorithm: {currentIdentity.multisignatureType}</Text>
+				<Text style={styles.infoText}>
+					Substrate encription algorithm: {currentIdentity.multisignatureType}
+				</Text>
 			</View>
 		</SafeAreaViewContainer>
 	);

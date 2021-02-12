@@ -81,7 +81,11 @@ export default function PathCard({
 			if (existedAddress !== '') return setAddress(existedAddress);
 			if (isSeedRefValid && isPathValid && networks.has(computedNetworkKey)) {
 				const prefix = networks.get(computedNetworkKey)!.prefix;
-				const generatedAddress = await substrateAddress(path, prefix, identity.multisignatureType);
+				const generatedAddress = await substrateAddress(
+					path,
+					prefix,
+					identity.multisignatureType
+				);
 				return setAddress(generatedAddress);
 			}
 			setAddress('');
