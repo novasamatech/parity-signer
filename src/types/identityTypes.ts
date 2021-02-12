@@ -39,7 +39,7 @@ export type LockedAccount = Omit<
 
 // Multisignature support on identity level
 // conforming to https://substrate.dev/rustdocs/v2.0.0/sp_runtime/enum.MultiSignature.html
-export type MultiSignatureIdentityType =   "Ed25519" | "Sr25519" | "Ecdsa";
+export type MultiSignatureIdentityType = 'Ed25519' | 'Sr25519' | 'Ecdsa';
 
 export type Account = UnlockedAccount | LockedAccount;
 

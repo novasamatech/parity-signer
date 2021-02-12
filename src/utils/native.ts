@@ -173,8 +173,7 @@ export function substrateAddress(
 			return '';
 			break;
 		}
-		default:
-		{
+		default: {
 			return SubstrateSign.substrateAddress(seed, prefix);
 			break;
 		}
@@ -201,8 +200,7 @@ export function substrateSign(
 			return '';
 			break;
 		}
-		default:
-		{
+		default: {
 			return SubstrateSign.substrateSign(seed, message);
 			break;
 		}
@@ -219,7 +217,6 @@ export function schnorrkelVerify(
 ): Promise<boolean> {
 	return SubstrateSign.schnorrkelVerify(seed, message, signature);
 }
-
 
 export class SeedRefClass {
 	private dataRef: number;
@@ -262,7 +259,7 @@ export class SeedRefClass {
 				);
 				break;
 			}
-			case 'Ed25519': {	
+			case 'Ed25519': {
 				return SubstrateSign.substrateAddressWithRefEd25519(
 					this.dataRef,
 					suriSuffix,
@@ -336,7 +333,7 @@ export class SeedRefClass {
 				);
 				break;
 			}
-			case 'Ed25519': {	
+			case 'Ed25519': {
 				return SubstrateSign.substrateSignWithRefEd25519(
 					this.dataRef,
 					suriSuffix,

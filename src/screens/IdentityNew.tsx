@@ -48,8 +48,8 @@ import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
-const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
-	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+//const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
+//	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
 function IdentityNew({
 	navigation,
@@ -191,9 +191,10 @@ function IdentityNew({
 			/>
 			<View style={styles.button}>
 				<Text style={styles.optionText}>
-					Signature algorithm: {' '}
-					{accountsStore.state.newIdentity.multisignatureType}</Text>
-				</View>
+					Signature algorithm:{' '}
+					{accountsStore.state.newIdentity.multisignatureType}
+				</Text>
+			</View>
 			<TouchableHighlight onPress={() => setMultisignatureAlgorithm('Sr25519')}>
 				<View style={styles.button}>
 					<Text style={styles.optionText}>sr25519</Text>
