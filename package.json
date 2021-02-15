@@ -51,7 +51,7 @@
     "hoist-non-react-statics": "^3.3.0",
     "node-libs-react-native": "^1.0.3",
     "react": "^16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.63.2",
     "react-native-camera": "^3.21.0",
     "react-native-elements": "^1.2.6",
     "react-native-gesture-handler": "^1.6.0",
