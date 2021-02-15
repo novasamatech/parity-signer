@@ -77,7 +77,8 @@
   },
   "include": [
     "test/**/*",
-    "src/**/*"
+    "src/**/*", 
+    "jest.config.js"  
   ],
   "exclude": [
     "./node_modules",
