@@ -88,7 +88,6 @@ target 'NativeSigner' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga', :modular_headers => true
-  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   target 'NativeSignerTests' do
     inherit! :complete

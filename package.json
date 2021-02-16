@@ -65,7 +65,7 @@
     "react-native-substrate-sign": "1.1.1",
     "react-native-svg": "12.1.0",
     "react-native-tabs": "^1.0.9",
-    "react-native-vector-icons": "^7.0.0",
+    "react-native-vector-icons": "^8.0.0",
     "readable-stream": "^3.4.0",
     "vm-browserify": "1.1.0"
   },
