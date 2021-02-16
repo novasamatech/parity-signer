@@ -40,6 +40,9 @@ def flipper_post_install(installer)
       end
     end
   end
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+  end
   file_name = Dir.glob("*.xcodeproj")[0]
   app_project = Xcodeproj::Project.open(file_name)
   app_project.native_targets.each do |target|
