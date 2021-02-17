@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { loadToCAndPPConfirmation } from 'utils/db';
+import { loadTaCAndPPConfirmation } from 'utils/db';
 import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 export interface TacHookType {
@@ -25,11 +25,11 @@ export function useTac(): TacHookType {
 
 	useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
-			const tocPP = await loadToCAndPPConfirmation();
+			const tacPP = await loadTaCAndPPConfirmation();
 
-			setPolicyConfirmed(tocPP);
+			setPolicyConfirmed(tacPP);
 
-			if (!tocPP) {
+			if (!tacPP) {
 				await migrateAccounts();
 				await migrateIdentity();
 			}

@@ -117,12 +117,12 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 			// for account creation
 			let accountToSave = account;
 
-			const isEthereum = getNetwork(account.networkKey)?.protocol === NetworkProtocols.ETHEREUM;
-
 			if (pin && isUnlockedAccount(account)) {
 				account.encryptedSeed = await encryptData(account.seed, pin);
 				accountToSave = _deleteSensitiveData(account);
 			}
+
+			const isEthereum = getNetwork(account.networkKey)?.protocol === NetworkProtocols.ETHEREUM;
 
 			await saveAccount(accountToSave, isEthereum);
 		} catch (e) {
@@ -131,22 +131,26 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	}
 
 	async function submitNew(pin: string): Promise<void> {
-		const account = state.newAccount;
+		try{
+			const account = state.newAccount;
 
-		console.log('submit new', pin, account);
+			console.log('submit new', pin, account);
 
-		if (!account.seed) {
-			console.error('Account seed is empty')
+			if (!account.seed) {
+				console.error('Account seed is empty')
 
-			return
+				return
+			}
+
+			await save(account, pin);
+
+			setState({
+				accounts: [...state.accounts, account],
+				newAccount: emptyAccount()
+			});
+		} catch (e) {
+			console.error('error when saving new account', e)
 		}
-
-		await save(account, pin);
-
-		setState({
-			accounts: [...state.accounts, account],
-			newAccount: emptyAccount()
-		});
 	}
 
 	function _updateIdentitiesWithCurrentIdentity(updatedCurrentIdentity: Identity): void {

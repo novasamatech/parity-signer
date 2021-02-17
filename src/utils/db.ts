@@ -39,8 +39,8 @@ function handleError(e: Error, label: string): any[] {
  * ========================================
  */
 const currentAccountsStore = {
-	keychainService: 'keychainService_v1',
-	sharedPreferencesName: 'sharedPreferencesName_v1'
+	keychainService: 'accounts_v1',
+	sharedPreferencesName: 'accounts_v1'
 };
 
 export async function loadAccounts(version = 1): Promise<LegacyAccount[]> {
@@ -159,12 +159,12 @@ export async function saveNetworks(newNetwork: SubstrateNetworkParams): Promise<
  * ========================================
  */
 
-export async function loadToCAndPPConfirmation(): Promise<boolean> {
-	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v4');
+export async function loadTaCAndPPConfirmation(): Promise<boolean> {
+	const result = await AsyncStorage.getItem('TaCAndPPConfirmation_v1');
 
 	return !!result;
 }
 
-export async function saveToCAndPPConfirmation(): Promise<void> {
-	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
+export async function saveTaCAndPPConfirmation(): Promise<void> {
+	await AsyncStorage.setItem('TaCAndPPConfirmation_v1', 'yes');
 }

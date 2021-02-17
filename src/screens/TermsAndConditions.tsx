@@ -26,7 +26,7 @@ import colors from 'styles/colors';
 import containerStyles from 'styles/containerStyles';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
-import { saveToCAndPPConfirmation } from 'utils/db';
+import { saveTaCAndPPConfirmation } from 'utils/db';
 
 import tac from '../../docs/terms-and-conditions.md';
 import { useTac } from '../hooks/useTac';
@@ -39,7 +39,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 	const { navigation } = props;
 
 	const onConfirm = async (): Promise<void> => {
-		await saveToCAndPPConfirmation();
+		await saveTaCAndPPConfirmation();
 		setPolicyConfirmed(true);
 	};
 
