@@ -24,20 +24,19 @@ import { UnknownAccountWarning } from 'components/Warnings';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
 import { navigateToLandingPage, navigateToLegacyAccountList } from 'utils/navigationHelpers';
 
-import { AccountsContext, NetworksContext } from '../context';
+import { AccountsContext, AlertContext, NetworksContext } from '../context';
 
 export default function AccountDetails({ navigation }: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const account = accountsStore.getSelected();
 	const { getNetwork } = useContext(NetworksContext);
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const { accounts, selectedKey } = accountsStore.state;
 
 	if (!account) return <View />;

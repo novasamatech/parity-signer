@@ -22,7 +22,6 @@ import testIDs from 'e2e/testIDs';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import { NavigationProps } from 'types/props';
 import { validateSeed } from 'utils/account';
@@ -33,7 +32,7 @@ import { brainWalletAddress } from 'utils/native';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
-import { AccountsContext } from '../context';
+import { AccountsContext, AlertContext } from '../context';
 
 function IdentityNew({ navigation, route }: NavigationProps<'IdentityNew'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
@@ -42,7 +41,7 @@ function IdentityNew({ navigation, route }: NavigationProps<'IdentityNew'>): Rea
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const clearIdentity = useRef(() =>
 		accountsStore.updateNewIdentity(emptyIdentity()));

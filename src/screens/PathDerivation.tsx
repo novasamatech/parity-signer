@@ -25,14 +25,14 @@ import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import React, { useContext,useMemo, useRef, useState } from 'react';
-import { NetworksContext } from '../context';
-import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import { extractPathId, getNetworkKey, getSubstrateNetworkKeyByPathId, validateDerivedPath } from 'utils/identitiesUtils';
 import { navigateToPathDetails, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
+
+import { AlertContext, NetworksContext } from '../context';
 
 function PathDerivation({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'PathDerivation'>): React.ReactElement {
 	const [derivationPath, setDerivationPath] = useState<string>('');
@@ -41,7 +41,7 @@ function PathDerivation({ accountsStore, navigation, route }: NavigationAccountI
 	const [password, setPassword] = useState<string>('');
 	const networkContextState = useContext(NetworksContext);
 	const pathNameInput = useRef<TextInput>(null);
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const currentIdentity = accountsStore.state.currentIdentity;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(currentIdentity.encryptedSeed);
 	const parentPath = route.params.parentPath;

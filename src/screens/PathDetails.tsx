@@ -26,8 +26,6 @@ import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { NetworksContext } from '../context';
-import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -38,6 +36,8 @@ import { withCurrentIdentity } from 'utils/HOC';
 import { getAddressWithPath, getNetworkKey, getPathName, getPathsWithSubstrateNetworkKey, isSubstrateHardDerivedPath, isSubstratePath } from 'utils/identitiesUtils';
 import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
+
+import { AlertContext, NetworksContext } from '../context';
 
 interface Props {
 	path: string;
@@ -52,7 +52,7 @@ export function PathDetailsView({ accountsStore, navigation, networkKey, path }:
 	const { currentIdentity } = accountsStore.state;
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithPassword, unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 	const networksContextState = useContext(NetworksContext);

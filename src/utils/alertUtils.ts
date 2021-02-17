@@ -16,7 +16,8 @@
 
 import testIDs from 'e2e/testIDs';
 import { Clipboard } from 'react-native';
-import { Action, SetAlert } from 'stores/alertContext';
+
+import { Action, SetAlert } from '../context/AlertContext';
 
 const alertTestIDs = testIDs.Alert;
 
@@ -101,3 +102,14 @@ export const alertDecodeError = (setAlert: SetAlert): void =>
 	setAlert('Could not decode method with available metadata.',
 		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.');
 
+export const alertBackupDone = (setAlert: SetAlert, onPress: () => any): void =>
+	setAlert('Important',
+		"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/loss.",
+		[
+			{
+				onPress,
+				testID: alertTestIDs.backupDoneButton,
+				text: 'Proceed'
+			},
+			{ text: 'Cancel' }
+		]);

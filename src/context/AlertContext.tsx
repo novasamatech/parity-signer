@@ -1,4 +1,4 @@
-import { createContext, useCallback, useState } from 'react';
+import { createContext, default as React, useCallback, useState } from 'react';
 
 export type SetAlert = (
 	title: string,
@@ -11,7 +11,8 @@ export interface Action {
 	testID?: string;
 	onPress?: () => any;
 };
-export interface AlertState extends AlertBase {
+
+export interface AlertContextType extends AlertBase {
 	setAlert: SetAlert;
 };
 
@@ -29,14 +30,18 @@ const defaultAlertBase: AlertBase = {
 	title: ''
 }
 
-export const defaultAlertState: AlertState = {
+export const defaultAlertContext: AlertContextType = {
 	...defaultAlertBase,
 	setAlert: (): any => 0
 };
 
-export const AlertStateContext = createContext(defaultAlertState);
+interface AlertContextProviderProps {
+	children?: React.ReactElement;
+}
 
-export function useAlertContext(): AlertState {
+export const AlertContext = createContext(defaultAlertContext);
+
+export function AlertContextProvider({ children }: AlertContextProviderProps): React.ReactElement  {
 	const [alertState, setAlertState] = useState<AlertBase>(defaultAlertBase);
 
 	const setAlert = useCallback((title, message, actions = []): void => {
@@ -48,8 +53,10 @@ export function useAlertContext(): AlertState {
 		})
 	}, [alertState.alertIndex])
 
-	return {
-		...alertState,
-		setAlert
-	}
+	return (
+		<AlertContext.Provider value={{ ...alertState, setAlert }}>
+			{children}
+		</AlertContext.Provider>
+	);
+
 }

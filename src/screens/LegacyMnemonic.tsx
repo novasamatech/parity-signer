@@ -23,7 +23,6 @@ import TouchableItem from 'components/TouchableItem';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import React, { useCallback, useContext, useEffect } from 'react';
 import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
-import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
@@ -31,14 +30,14 @@ import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
-import { AccountsContext, NetworksContext } from '../context';
+import { AccountsContext, AlertContext, NetworksContext } from '../context';
 
 function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
 	const { newAccount, selectedKey } = accountsStore.state;
 	const { navigate } = navigation;
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const isNew = !!route.params?.isNew;
 	const { address, derivationPassword = '', derivationPath = '', name, networkKey, seed = '', seedPhrase = '' } = isNew
 		? newAccount
@@ -65,8 +64,10 @@ function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>
 	}, [navigation, accountsStore, selectedKey]);
 
 	const goToPin = useCallback(() => {
-		navigate('AccountPin', { isNew });
-	}, [isNew, navigate])
+		alertBackupDone(setAlert, () => {
+			navigate('AccountPin', { isNew });
+		});
+	}, [isNew, navigate, setAlert])
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>

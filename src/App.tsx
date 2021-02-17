@@ -26,14 +26,13 @@ import { LogBox,StatusBar, StyleSheet, View } from 'react-native';
 import NavigationBar from 'react-native-navbar-color';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 import { RegistriesContext, useRegistriesStore } from 'stores/RegistriesContext';
 import { ScannerContext,useScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 
 import { useTac } from './hooks/useTac';
-import { AccountContextProvider, NetworksContextProvider } from './context';
+import { AccountContextProvider, AlertContextProvider, NetworksContextProvider } from './context';
 import { AppNavigator, ScreenStack, TacAndPrivacyPolicyNavigator } from './screens';
 
 export default function App(props: AppProps): React.ReactElement {
@@ -51,7 +50,6 @@ export default function App(props: AppProps): React.ReactElement {
 		]);
 	}
 
-	const alertContext = useAlertContext();
 	const { dataLoaded, policyConfirmed } = useTac();
 	const seedRefContext = useSeedRefStore();
 	const scannerContext = useScannerContext();
@@ -82,7 +80,7 @@ export default function App(props: AppProps): React.ReactElement {
 				<AccountContextProvider>
 					<ScannerContext.Provider value={scannerContext}>
 						<RegistriesContext.Provider value={registriesContext}>
-							<AlertStateContext.Provider value={alertContext}>
+							<AlertContextProvider>
 								<SeedRefsContext.Provider value={seedRefContext}>
 									<MenuProvider backHandler={true}>
 										<StatusBar
@@ -95,7 +93,7 @@ export default function App(props: AppProps): React.ReactElement {
 										</NavigationContainer>
 									</MenuProvider>
 								</SeedRefsContext.Provider>
-							</AlertStateContext.Provider>
+							</AlertContextProvider>
 						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
 				</AccountContextProvider>

@@ -21,7 +21,6 @@ import TextInput from 'components/TextInput';
 import testIDs from 'e2e/testIDs';
 import React, { useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
@@ -29,11 +28,13 @@ import { withCurrentIdentity } from 'utils/HOC';
 import { navigateToLandingPage, unlockAndReturnSeed, unlockSeedPhrase } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
+import { AlertContext } from '../context';
+
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
 function IdentityManagement({ accountsStore, navigation }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 
 	if (!currentIdentity) return <View />;

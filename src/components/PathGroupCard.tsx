@@ -19,7 +19,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import TouchableItem from 'components/TouchableItem';
 import React, { useContext } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { AccountsStoreStateWithIdentity, Identity, PathGroup } from 'types/identityTypes';
@@ -31,6 +30,7 @@ import { unlockSeedPhrase } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 import testIDs from '../../test/e2e/testIDs';
+import { AlertContext } from '../context/AlertContext';
 import PathCard from './PathCard';
 import Separator from './Separator';
 
@@ -43,7 +43,7 @@ type Props = {
 
 export default function PathGroupCard({ accountsStore, currentIdentity, networkParams, pathGroup }: Props): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const paths = pathGroup.paths;
 	const { isSeedRefValid, substrateAddress } = useSeedRef(currentIdentity.encryptedSeed);
 	const _getFullPath = (index: number, isHardDerivation: boolean): string =>

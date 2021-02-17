@@ -18,8 +18,6 @@ import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { NetworksContext } from '../../../context';
-import { AlertStateContext } from 'stores/alertContext';
 import { RegistriesContext, RegistriesStoreState } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -31,6 +29,8 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+
+import { AlertContext, NetworksContext } from '../../../context';
 
 const recodeAddress = (encodedAddress: string, prefix: number): string =>
 	encodeAddress(decodeAddress(encodedAddress), prefix);
@@ -50,7 +50,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({ fallback, label
 	const [tip, setTip] = useState<string>();
 	const [useFallback, setUseFallBack] = useState(false);
 	const { getTypeRegistry } = useContext(RegistriesContext);
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 	const { getSubstrateNetwork, networks } = useContext(NetworksContext);
 	const networkParams = getSubstrateNetwork(networkKey);
 	const prefix = networkParams.prefix;

@@ -23,7 +23,6 @@ import testIDs from 'e2e/testIDs';
 import { filterNetworks } from 'modules/network/utils';
 import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
-import { AlertStateContext } from 'stores/alertContext';
 import { isEthereumNetworkParams, isSubstrateNetworkParams, NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
@@ -32,7 +31,7 @@ import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import { navigateToPathDetails, navigateToPathsList, unlockSeedPhrase, useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
-import { NetworksContext } from '../../../context';
+import { AlertContext, NetworksContext } from '../../../context';
 
 function AccountSelector({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
@@ -43,7 +42,7 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 	const { brainWalletAddress, isSeedRefValid, substrateAddress } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 
-	const { setAlert } = useContext(AlertStateContext);
+	const { setAlert } = useContext(AlertContext);
 
 	// catch android back button and prevent exiting the app
 	useFocusEffect(React.useCallback((): any => {

@@ -17,13 +17,14 @@
 import Button from 'components/Button';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Animated, Easing,StyleSheet, Text, View } from 'react-native';
-import { Action, AlertStateContext } from 'stores/alertContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 
+import { Action, AlertContext } from '../context';
+
 export default function CustomAlert(): React.ReactElement {
-	const { actions, alertIndex, message, title } = useContext(AlertStateContext);
+	const { actions, alertIndex, message, title } = useContext(AlertContext);
 	/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	const animatedValue = useMemo(() => new Animated.Value(1), [alertIndex]);
 	const [alertDisplay, setAlertDisplay] = useState<boolean>(false);
