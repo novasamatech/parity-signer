@@ -57,28 +57,29 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 	});
 	const [state, updateState] = useReducer(reducer, initialState);
 	const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork } = state;
-	const accountsStore = useContext(AccountsContext);
+	const { state: { newAccount }, updateNew } = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
 	const seed = (selectedAccount as UnlockedAccount)?.seed;
 	const isSubstrate = selectedNetwork?.protocol === NetworkProtocols.SUBSTRATE;
 
 	useEffect((): void => {
-		accountsStore.updateNew(emptyAccount('', ''));
-		// we get an infinite loop if we add anything here.
+		console.log('----------> empty it')
+		updateNew(emptyAccount('', ''));
+	// we get an infinite loop if we add anything here.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect((): void => {
-		const selectedAccount = accountsStore.state.newAccount;
+		const selectedAccount = newAccount;
 		const selectedNetwork = getNetwork(selectedAccount.networkKey);
 
 		updateState({
 			selectedAccount,
 			selectedNetwork
 		});
-	}, [accountsStore.state.newAccount, getNetwork]);
+	}, [newAccount, getNetwork]);
 
-	const onAccountSelect = useCallback(({ isBip39, newAddress, newSeed }): void => {
+	const onSelectIcon = useCallback(({ isBip39, newAddress, newSeed }): void => {
 		if (newAddress && isBip39 && newSeed) {
 			if (isSubstrate) {
 				try {
@@ -88,7 +89,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 						phrase: newSeed
 					});
 
-					accountsStore.updateNew({
+					updateNew({
 						address: newAddress,
 						derivationPassword,
 						derivationPath,
@@ -101,20 +102,22 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 				}
 			} else {
 				// Ethereum account
-				accountsStore.updateNew({
+				updateNew({
 					address: newAddress,
 					seed: newSeed,
 					validBip39Seed: isBip39
 				});
 			}
-		} else {
-			accountsStore.updateNew({
-				address: '',
-				seed: '',
-				validBip39Seed: false
-			});
 		}
-	},[accountsStore, derivationPassword, derivationPath, isSubstrate])
+		// else {
+		// 	console.log('-----------> ooooooops')
+		// 	accountsStore.updateNew({
+		// 		address: '',
+		// 		seed: '',
+		// 		validBip39Seed: false
+		// 	});
+		// }
+	},[derivationPassword, derivationPath, isSubstrate, updateNew])
 
 	const onCreate = useCallback(() => {
 		navigation.navigate('LegacyMnemonic', { isNew: true })
@@ -142,7 +145,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 					<Text style={styles.title}>NAME</Text>
 					<TextInput
 						onChangeText={(input: string): void =>
-							accountsStore.updateNew({ name: input })
+							updateNew({ name: input })
 						}
 						placeholder="new name"
 						value={name}
@@ -164,7 +167,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 								derivationPassword={derivationPassword}
 								derivationPath={derivationPath}
 								network={selectedNetwork!}
-								onSelect={onAccountSelect}
+								onSelect={onSelectIcon}
 								value={address && address}
 							/>
 						</View>

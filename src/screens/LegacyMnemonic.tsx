@@ -39,7 +39,7 @@ function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>
 	const { newAccount, selectedKey } = accountsStore.state;
 	const { navigate } = navigation;
 	const { setAlert } = useContext(AlertStateContext);
-	const isNew = route.params?.isNew ?? false;
+	const isNew = !!route.params?.isNew;
 	const { address, derivationPassword = '', derivationPath = '', name, networkKey, seed = '', seedPhrase = '' } = isNew
 		? newAccount
 		: (accountsStore.getSelected() as UnlockedAccount);
@@ -56,6 +56,7 @@ function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>
 
 		return (): void => {
 			if (selectedKey) {
+				console.log('got selected key locking', selectedKey)
 				accountsStore.lockAccount(selectedKey);
 			}
 
@@ -64,10 +65,8 @@ function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>
 	}, [navigation, accountsStore, selectedKey]);
 
 	const goToPin = useCallback(() => {
-		alertBackupDone(setAlert, () => {
-			navigate('AccountPin', { isNew });
-		});
-	}, [isNew, navigate, setAlert])
+		navigate('AccountPin', { isNew });
+	}, [isNew, navigate])
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>

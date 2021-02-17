@@ -32,8 +32,8 @@ import tac from '../../docs/terms-and-conditions.md';
 import { useTac } from '../hooks/useTac';
 
 export default function TermsAndConditions(props: NavigationProps<'TermsAndConditions'>): React.ReactElement {
-	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
-	const [tacAgreement, setTacAgreement] = useState<boolean>(false);
+	const [isPPAgreed, setPpAgreement] = useState(false);
+	const [isTacAgreed, setTacAgreement] = useState(false);
 
 	const { policyConfirmed, setPolicyConfirmed } = useTac();
 	const { navigation } = props;
@@ -44,8 +44,10 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 	};
 
 	return (
-		<View style={containerStyles.background}
-			testID={testIDs.TacScreen.tacView}>
+		<View
+			style={containerStyles.background}
+			testID={testIDs.TacScreen.tacView}
+		>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{tac}</Markdown>
 			</CustomScrollView>
@@ -53,7 +55,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 			{!policyConfirmed && (
 				<View>
 					<TouchableItem
-						onPress={(): void => setTacAgreement(!tacAgreement)}
+						onPress={(): void => setTacAgreement(!isTacAgreed)}
 						style={{
 							alignItems: 'center',
 							flexDirection: 'row',
@@ -63,7 +65,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						testID={testIDs.TacScreen.agreeTacButton}
 					>
 						<Icon
-							name={tacAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
+							name={isTacAgreed ? 'checkbox-marked' : 'checkbox-blank-outline'}
 							style={styles.icon}
 						/>
 
@@ -72,7 +74,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						</Text>
 					</TouchableItem>
 					<TouchableItem
-						onPress={(): void => setPpAgreement(!ppAgreement)}
+						onPress={(): void => setPpAgreement(!isPPAgreed)}
 						style={{
 							alignItems: 'center',
 							flexDirection: 'row',
@@ -80,7 +82,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						}}
 					>
 						<Icon
-							name={ppAgreement ? 'checkbox-marked' : 'checkbox-blank-outline'}
+							name={isPPAgreed ? 'checkbox-marked' : 'checkbox-blank-outline'}
 							style={styles.icon}
 							testID={testIDs.TacScreen.agreePrivacyButton}
 						/>
@@ -99,7 +101,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 					</TouchableItem>
 
 					<Button
-						disabled={!ppAgreement || !tacAgreement}
+						disabled={!isPPAgreed || !isTacAgreed}
 						onPress={onConfirm}
 						style={{ marginBottom: 24, marginTop: 16 }}
 						testID={testIDs.TacScreen.nextButton}

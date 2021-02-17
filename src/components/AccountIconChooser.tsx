@@ -134,7 +134,8 @@ export default class AccountIconChooser extends React.PureComponent<Props, { ico
 				<AccountIcon
 					address={address}
 					network={network}
-					style={styles.icon} />
+					style={styles.icon}
+				/>
 			</TouchableOpacity>
 		);
 	};

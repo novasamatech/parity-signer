@@ -60,7 +60,9 @@ const HeaderLeft = (): React.ReactElement => {
 	const route = useRoute();
 	const isFirstRouteInParent = useNavigationState(state => state.routes[0].key === route.key);
 
-	return isFirstRouteInParent ? <HeaderLeftHome /> : <HeaderLeftWithBack />;
+	return isFirstRouteInParent ? <HeaderLeftHome
+	/> : <HeaderLeftWithBack
+	/>;
 };
 
 const globalStackNavigationOptions = {
@@ -68,12 +70,14 @@ const globalStackNavigationOptions = {
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: { color: colors.text.main },
 	headerBackTitleVisible: false,
-	headerLeft: (): React.ReactElement => <HeaderLeft />,
+	headerLeft: (): React.ReactElement => <HeaderLeft
+	/>,
 	headerLeftContainerStyle: {
 		height: headerHeight,
 		paddingLeft: 8
 	},
-	headerRight: (): React.ReactElement => <SecurityHeader />,
+	headerRight: (): React.ReactElement => <SecurityHeader
+	/>,
 	headerRightContainerStyle: {
 		height: headerHeight,
 		paddingRight: horizontalPadding
@@ -110,20 +114,34 @@ export const AppNavigator = (): React.ReactElement => (
 		initialRouteName="Main"
 		screenOptions={globalStackNavigationOptions}
 	>
-		<ScreenStack.Screen component={Main}
-			name="Main" />
-		<ScreenStack.Screen component={About}
-			name="About" />
-		<ScreenStack.Screen component={AccountDetails}
-			name="AccountDetails" />
-		<ScreenStack.Screen component={AccountEdit}
-			name="AccountEdit" />
-		<ScreenStack.Screen component={AccountPin}
-			name="AccountPin" />
-		<ScreenStack.Screen component={AccountUnlock}
-			name="AccountUnlock" />
-		<ScreenStack.Screen component={AccountNew}
-			name="AccountNew" />
+		<ScreenStack.Screen
+			component={Main}
+			name="Main"
+		/>
+		<ScreenStack.Screen
+			component={About}
+			name="About"
+		/>
+		<ScreenStack.Screen
+			component={AccountDetails}
+			name="AccountDetails"
+		/>
+		<ScreenStack.Screen
+			component={AccountEdit}
+			name="AccountEdit"
+		/>
+		<ScreenStack.Screen
+			component={AccountPin}
+			name="AccountPin"
+		/>
+		<ScreenStack.Screen
+			component={AccountUnlock}
+			name="AccountUnlock"
+		/>
+		<ScreenStack.Screen
+			component={AccountNew}
+			name="AccountNew"
+		/>
 		<ScreenStack.Screen
 			component={AccountUnlockAndSign}
 			name="AccountUnlockAndSign"
@@ -140,50 +158,82 @@ export const AppNavigator = (): React.ReactElement => (
 			component={LegacyNetworkChooser}
 			name="LegacyNetworkChooser"
 		/>
-		<ScreenStack.Screen component={IdentityBackup}
-			name="IdentityBackup" />
+		<ScreenStack.Screen
+			component={IdentityBackup}
+			name="IdentityBackup"
+		/>
 		<ScreenStack.Screen
 			component={IdentityManagement}
 			name="IdentityManagement"
 		/>
-		<ScreenStack.Screen component={IdentityNew}
-			name="IdentityNew" />
-		<ScreenStack.Screen component={NetworkDetails}
-			name="NetworkDetails" />
-		<ScreenStack.Screen component={NetworkSettings}
-			name="NetworkSettings" />
-		<ScreenStack.Screen component={PathDerivation}
-			name="PathDerivation" />
-		<ScreenStack.Screen component={PathDetails}
-			name="PathDetails" />
-		<ScreenStack.Screen component={PathsList}
-			name="PathsList" />
-		<ScreenStack.Screen component={PathSecret}
-			name="PathSecret" />
-		<ScreenStack.Screen component={PathManagement}
-			name="PathManagement" />
-		<ScreenStack.Screen component={PinNew}
-			name="PinNew" />
-		<ScreenStack.Screen component={PinUnlock}
-			name="PinUnlock" />
+		<ScreenStack.Screen
+			component={IdentityNew}
+			name="IdentityNew"
+		/>
+		<ScreenStack.Screen
+			component={NetworkDetails}
+			name="NetworkDetails"
+		/>
+		<ScreenStack.Screen
+			component={NetworkSettings}
+			name="NetworkSettings"
+		/>
+		<ScreenStack.Screen
+			component={PathDerivation}
+			name="PathDerivation"
+		/>
+		<ScreenStack.Screen
+			component={PathDetails}
+			name="PathDetails"
+		/>
+		<ScreenStack.Screen
+			component={PathsList}
+			name="PathsList"
+		/>
+		<ScreenStack.Screen
+			component={PathSecret}
+			name="PathSecret"
+		/>
+		<ScreenStack.Screen
+			component={PathManagement}
+			name="PathManagement"
+		/>
+		<ScreenStack.Screen
+			component={PinNew}
+			name="PinNew"
+		/>
+		<ScreenStack.Screen
+			component={PinUnlock}
+			name="PinUnlock"
+		/>
 		<ScreenStack.Screen
 			component={PinUnlockWithPassword}
 			name="PinUnlockWithPassword"
 		/>
-		<ScreenStack.Screen component={QrScanner}
-			name="QrScanner" />
-		<ScreenStack.Screen component={Security}
-			name="Security" />
-		<ScreenStack.Screen component={SignedMessage}
-			name="SignedMessage" />
-		<ScreenStack.Screen component={SignedTx}
-			name="SignedTx" />
+		<ScreenStack.Screen
+			component={QrScanner}
+			name="QrScanner"
+		/>
+		<ScreenStack.Screen
+			component={Security}
+			name="Security"
+		/>
+		<ScreenStack.Screen
+			component={SignedMessage}
+			name="SignedMessage"
+		/>
+		<ScreenStack.Screen
+			component={SignedTx}
+			name="SignedTx"
+		/>
 		<ScreenStack.Screen
 			component={TermsAndConditions}
 			name="TermsAndConditions"
 		/>
-		<ScreenStack.Screen component={PrivacyPolicy}
-			name="PrivacyPolicy" />
+		<ScreenStack.Screen
+			component={PrivacyPolicy}
+			name="PrivacyPolicy"
+		/>
 	</ScreenStack.Navigator>
 );
 
@@ -199,7 +249,9 @@ export const TacAndPrivacyPolicyNavigator = (): React.ReactElement => (
 			component={TermsAndConditions}
 			name="TermsAndConditions"
 		/>
-		<ScreenStack.Screen component={PrivacyPolicy}
-			name="PrivacyPolicy" />
+		<ScreenStack.Screen
+			component={PrivacyPolicy}
+			name="PrivacyPolicy"
+		/>
 	</ScreenStack.Navigator>
 );

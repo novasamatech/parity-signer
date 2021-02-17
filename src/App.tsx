@@ -57,12 +57,8 @@ export default function App(props: AppProps): React.ReactElement {
 	const scannerContext = useScannerContext();
 	const registriesContext = useRegistriesStore();
 
-	const renderStacks = (): React.ReactElement => {
-		if (dataLoaded) {
-			return policyConfirmed
-				? <AppNavigator />
-			 	: <TacAndPrivacyPolicyNavigator />;
-		} else {
+	const MainStack = (): React.ReactElement => {
+		if (!dataLoaded) {
 			return (
 				<ScreenStack.Navigator>
 					<ScreenStack.Screen name="Empty">
@@ -74,6 +70,10 @@ export default function App(props: AppProps): React.ReactElement {
 				</ScreenStack.Navigator>
 			);
 		}
+
+		return policyConfirmed
+			? <AppNavigator />
+		 	: <TacAndPrivacyPolicyNavigator />;
 	};
 
 	return (
@@ -91,7 +91,7 @@ export default function App(props: AppProps): React.ReactElement {
 										/>
 										<CustomAlert />
 										<NavigationContainer>
-											{renderStacks()}
+											<MainStack/>
 										</NavigationContainer>
 									</MenuProvider>
 								</SeedRefsContext.Provider>

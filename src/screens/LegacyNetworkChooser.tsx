@@ -20,7 +20,6 @@ import { SubstrateNetworkKeys, UnknownNetworkKeys } from 'constants/networkSpecs
 import React, { useContext } from 'react';
 import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
-import { emptyAccount } from 'utils/account';
 
 import { AccountsContext, NetworksContext } from '../context';
 
@@ -47,7 +46,7 @@ export default function LegacyNetworkChooserView({ navigation }: NavigationProps
 						key={networkKey}
 						networkKey={networkKey}
 						onPress={(): void =>{
-							accountsStore.updateNew(emptyAccount('', networkKey));
+							accountsStore.updateNew({ networkKey });
 							navigation.goBack();
 						}}
 						title={networkParams.title}

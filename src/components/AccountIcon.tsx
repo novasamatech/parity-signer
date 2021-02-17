@@ -31,8 +31,7 @@ interface Props {
 	style?: ViewStyle;
 }
 
-export default function AccountIcon(props: Props): ReactElement {
-	const { address, network, style } = props;
+export default function AccountIcon({ address, network, style }: Props): ReactElement {
 	const [ethereumIconUri, setEthereumIconUri] = useState('');
 	const protocol = network?.protocol;
 
@@ -55,7 +54,7 @@ export default function AccountIcon(props: Props): ReactElement {
 		};
 	}, [address, protocol]);
 
-	if (address === '') {
+	if (address === '' && !!network) {
 		return (
 			<View style={style}>
 				{(network as SubstrateNetworkParams).logo ? (
@@ -74,7 +73,7 @@ export default function AccountIcon(props: Props): ReactElement {
 		);
 	}
 
-	if (protocol === NetworkProtocols.ETHEREUM) {
+	if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
 			<Image
 				source={{ uri: ethereumIconUri }}
@@ -92,13 +91,19 @@ export default function AccountIcon(props: Props): ReactElement {
 			iconSize = style?.width;
 		}
 
-		return <Identicon size={iconSize || 40}
-			value={address} />;
+		return (
+			<Identicon
+				size={iconSize || 40}
+				value={address}
+			/>
+		);
 	} else {
 		return (
-			<MaterialIcon color={colors.signal.error}
+			<MaterialIcon
+				color={colors.signal.error}
 				name={'error'}
-				size={44} />
+				size={44}
+			/>
 		);
 	}
 }

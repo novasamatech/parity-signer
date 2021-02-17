@@ -65,7 +65,8 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	const [state, setState] = useReducer(reducer, initialState)
 	const { allNetworks, getNetwork } = useContext(NetworksContext);
 
-	console.log('accounts', state.accounts)
+	// console.log('accounts', state.accounts)
+	// console.log('account new', state.newAccount)
 
 	useEffect(() => {
 		const loadInitialContext = async (): Promise<void> => {
@@ -89,7 +90,12 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	}
 
 	function updateNew(accountUpdate: Partial<UnlockedAccount>): void {
-		setState({ newAccount: { ...state.newAccount, ...accountUpdate } });
+		console.log('accountUpdate', accountUpdate)
+		const newAccount = { ...state.newAccount, ...accountUpdate }
+
+		console.log('resulting -->', newAccount)
+
+		setState({ newAccount });
 	}
 
 	function _deleteSensitiveData({ address, createdAt, encryptedSeed, isLegacy, name, networkKey, recovered, updatedAt, validBip39Seed }: UnlockedAccount): LockedAccount {
@@ -111,8 +117,6 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 			// for account creation
 			let accountToSave = account;
 
-			console.log('getNewtork', getNetwork);
-			getNetwork('bla');
 			const isEthereum = getNetwork(account.networkKey)?.protocol === NetworkProtocols.ETHEREUM;
 
 			if (pin && isUnlockedAccount(account)) {
@@ -128,6 +132,8 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 
 	async function submitNew(pin: string): Promise<void> {
 		const account = state.newAccount;
+
+		console.log('submit new', pin, account);
 
 		if (!account.seed) {
 			console.error('Account seed is empty')

@@ -14,18 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import AccountCard from 'components/AccountCard';
 import QrScannerTab from 'components/QrScannerTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Account } from 'types/identityTypes';
-import { NavigationProps } from 'types/props';
+import { LegacyAccount } from 'types/identityTypes';
+import { RootStackParamList } from 'types/routes';
 
 import { AccountsContext } from '../context';
 
-function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>): React.ReactElement {
+function LegacyAccountList(): React.ReactElement {
+	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const accountsStore = useContext(AccountsContext);
 
 	const onAccountSelected = async (key: string): Promise<void> => {
@@ -33,16 +36,18 @@ function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>)
 		navigation.navigate('AccountDetails');
 	};
 
-	const accountsMap = accountsStore.state.accounts;
+	const { accounts } = accountsStore.state;
 
-	const renderAccountCard = ([accountKey, account]: [ string, Account ]): React.ReactElement => (
+	// console.log('legacy', accounts)
+
+	const renderAccountCard = ({ address, name, networkKey }: LegacyAccount): React.ReactElement => (
 		<AccountCard
-			address={account.address}
-			key={accountKey}
-			networkKey={account.networkKey}
-			onPress={(): Promise<void> => onAccountSelected(accountKey)}
+			address={address}
+			key={address}
+			networkKey={networkKey}
+			onPress={(): Promise<void> => onAccountSelected(address)}
 			style={{ paddingBottom: 0 }}
-			title={account.name}
+			title={name}
 		/>
 	);
 
@@ -52,7 +57,7 @@ function LegacyAccountList({ navigation }: NavigationProps<'LegacyAccountList'>)
 				style={styles.content}
 				testID={testIDs.AccountListScreen.accountList}
 			>
-				{Array.from(accountsMap.entries()).map(renderAccountCard)}
+				{accounts.map(renderAccountCard)}
 			</ScrollView>
 			<QrScannerTab />
 		</SafeAreaViewContainer>
