@@ -15,23 +15,31 @@
 - `$JAVA_HOME` envarionment variable set to java home directory (eg. `/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home`)
 - `$ANDROID_HOME` environment variable set to Android SDK directory (eg. `/home/your_username/Android/Sdk`)*.
 
-\* It's recommended to install **Android Studio** and use that to install the necessary build tools and SDKs for the Android version you want to test on. It's also the best way to test in the emulator. 
+\* It's recommended to install **Android Studio** and use that to install the necessary build tools and SDKs for the Android version you want to test on. It's also the best way to test in the emulator.
 
 ### Setup
 
+#### iOS
 - Install Dependencies
 
     ```
-    yarn build
-    ```   
+    yarn install:ios
+    ```
+#### Android
+- Install Dependencies
 
+    ```
+    yarn install
+    ```
+
+#### Any system
 - Generate an Android Debug Key if it is first time.
 
     ```
     ./scripts/gen_key.sh
     ```
 
-### Develop 
+### Develop
 
 - Start React Native server
 
@@ -40,7 +48,7 @@
     ```
 
 Then:
- 
+
 - iOS
 
     ```

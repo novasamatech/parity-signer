@@ -23,6 +23,6 @@ export const pathsRegex: {
 	validateDerivedPath: /^(\/\/?[\w-.]+)*$/
 };
 
-export const passwordRegex = /^[\w-]{0,1024}$/;
+export const passwordRegex = /^[^\s/]{0,1024}$/;
 
 export const onlyNumberRegex = /^\d+$|^$/;
