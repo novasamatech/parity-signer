@@ -51,7 +51,7 @@
     "hoist-non-react-statics": "^3.3.0",
     "node-libs-react-native": "^1.0.3",
     "react": "^16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.63.4",
     "react-native-camera": "^3.21.0",
     "react-native-elements": "^1.2.6",
     "react-native-gesture-handler": "^1.6.0",
@@ -65,7 +65,7 @@
     "react-native-substrate-sign": "1.1.1",
     "react-native-svg": "12.1.0",
     "react-native-tabs": "^1.0.9",
-    "react-native-vector-icons": "^7.0.0",
+    "react-native-vector-icons": "^8.0.0",
     "readable-stream": "^3.4.0",
     "vm-browserify": "1.1.0"
   },
@@ -81,7 +81,7 @@
     "@types/jasmine": "^3.5.12",
     "@types/jest": "^25.2.3",
     "@types/react": "^16.9.34",
-    "@types/react-native": "^0.62.2",
+    "@types/react-native": "0.63.35",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.28.0",
     "babel-eslint": "10.1.0",
@@ -89,7 +89,7 @@
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-rewrite-require": "^1.14.5",
     "babel-plugin-tester": "^9.0.1",
-    "detox": "^16.8.2",
+    "detox": "18.6.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-import-resolver-typescript": "^2.0.0",
@@ -147,5 +147,10 @@
     },
     "runner-config": "test/e2e/jest.config.js",
     "test-runner": "jest"
+  },
+  "jest": {
+    "projects": [
+      "test/unit/jest.config.js"
+    ]
   }
 }
