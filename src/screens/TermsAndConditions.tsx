@@ -14,34 +14,37 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { useNavigation } from '@react-navigation/native';
 import Button from 'components/Button';
 import CustomScrollView from 'components/CustomScrollView';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import colors from 'styles/colors';
 import containerStyles from 'styles/containerStyles';
 import fontStyles from 'styles/fontStyles';
-import { NavigationProps } from 'types/props';
 import { saveTaCAndPPConfirmation } from 'utils/db';
 
 import tac from '../../docs/terms-and-conditions.md';
 import { useTac } from '../hooks/useTac';
 
-export default function TermsAndConditions(props: NavigationProps<'TermsAndConditions'>): React.ReactElement {
+export default function TermsAndConditions(): React.ReactElement {
 	const [isPPAgreed, setPpAgreement] = useState(false);
 	const [isTacAgreed, setTacAgreement] = useState(false);
-
+	const { navigate } = useNavigation();
 	const { policyConfirmed, setPolicyConfirmed } = useTac();
-	const { navigation } = props;
 
-	const onConfirm = async (): Promise<void> => {
-		await saveTaCAndPPConfirmation();
-		setPolicyConfirmed(true);
-	};
+	const onConfirm = useCallback(() => {
+		saveTaCAndPPConfirmation()
+			.then(() => {
+				setPolicyConfirmed(true);
+			}).catch((e)=> {
+				console.error(e)
+			});
+	}, [setPolicyConfirmed]);
 
 	return (
 		<View
@@ -90,9 +93,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 						<Text style={fontStyles.t_big}>
 							<Text>{'  I agree to the '}</Text>
 							<Text
-								onPress={(): void => {
-									navigation.navigate('PrivacyPolicy');
-								}}
+								onPress={(): void => { navigate('PrivacyPolicy'); }}
 								style={{ textDecorationLine: 'underline' }}
 							>
 								privacy policy
@@ -103,7 +104,7 @@ export default function TermsAndConditions(props: NavigationProps<'TermsAndCondi
 					<Button
 						disabled={!isPPAgreed || !isTacAgreed}
 						onPress={onConfirm}
-						style={{ marginBottom: 24, marginTop: 16 }}
+						style={styles.nextButton}
 						testID={testIDs.TacScreen.nextButton}
 						title="Next"
 					/>
@@ -117,5 +118,9 @@ const styles = StyleSheet.create({
 	icon: {
 		color: colors.text.faded,
 		fontSize: 30
+	},
+	nextButton: {
+		marginBottom: 24,
+		marginTop: 16
 	}
 });

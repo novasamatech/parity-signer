@@ -67,9 +67,13 @@ const renderSubtitle = (subtitle?: string,
 const renderSubtitleIcon = (hasSubtitleIcon?: boolean): ReactNode => {
 	if (!hasSubtitleIcon) return;
 
-	return <AntIcon color={colors.text.faded}
-		name="user"
-		size={10} />;
+	return (
+		<AntIcon
+			color={colors.text.faded}
+			name="user"
+			size={10}
+		/>
+	);
 };
 
 const renderBack = (onPress?: ButtonListener): ReactNode => {
@@ -104,7 +108,7 @@ export function LeftScreenHeading({ hasSubtitleIcon, headMenu, networkKey, onPre
 	subtitle?: string;
 	hasSubtitleIcon?: boolean;
 	headMenu?: React.ReactElement;
-	networkKey: string;
+	networkKey?: string;
 	onPress?: () => any;
 }): ReactElement {
 	const titleStyle: TextStyle = {
@@ -126,11 +130,13 @@ export function LeftScreenHeading({ hasSubtitleIcon, headMenu, networkKey, onPre
 			style={baseStyles.bodyWithIcon}
 		>
 			<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-				<AccountIcon
-					address={''}
-					network={getNetwork(networkKey)}
-					style={baseStyles.networkIcon}
-				/>
+				{ networkKey && (
+					<AccountIcon
+						address={''}
+						network={getNetwork(networkKey)}
+						style={baseStyles.networkIcon}
+					/>
+				)}
 				<View>
 					<Text style={subtitle ? titleStyleWithSubtitle : titleStyle}>
 						{title}

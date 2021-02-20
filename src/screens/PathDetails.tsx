@@ -126,8 +126,10 @@ export function PathDetailsView({ accountsStore, navigation, networkKey, path }:
 
 	return (
 		<SafeAreaViewContainer>
-			<ScrollView bounces={false}
-				testID={testIDs.PathDetail.screen}>
+			<ScrollView
+				bounces={false}
+				testID={testIDs.PathDetail.screen}
+			>
 				<LeftScreenHeading
 					headMenu={
 						<PopupMenu
@@ -154,8 +156,10 @@ export function PathDetailsView({ accountsStore, navigation, networkKey, path }:
 					networkKey={formattedNetworkKey}
 					title="Public Address"
 				/>
-				<PathCard identity={currentIdentity}
-					path={path} />
+				<PathCard
+					identity={currentIdentity}
+					path={path}
+				/>
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>

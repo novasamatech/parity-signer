@@ -43,7 +43,7 @@ export default class PopupMenu extends React.PureComponent<Props> {
 			<Icon
 				color={colors.text.main}
 				name={menuTriggerIconName}
-				size={25}
+				size={35}
 				testID={testID}
 			/>
 		);
@@ -80,5 +80,7 @@ const menuOptionsStyles = {
 		fontFamily: fonts.regular,
 		fontSize: 16
 	},
-	optionWrapper: { padding: 15 }
+	optionWrapper: {
+		padding: 15
+	}
 };

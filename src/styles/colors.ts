@@ -34,6 +34,7 @@ export default {
 	},
 	text: {
 		faded: '#9A9A9A',
-		main: '#C0C0C0'
+		main: '#C0C0C0',
+		white: 'white'
 	}
 };

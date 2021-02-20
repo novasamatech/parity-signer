@@ -22,10 +22,11 @@ import QrView from 'components/QrView';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { UnknownAccountWarning } from 'components/Warnings';
 import { NetworkProtocols } from 'constants/networkSpecs';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
+import { EthereumNetworkParams, isSubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
 import { navigateToLandingPage, navigateToLegacyAccountList } from 'utils/navigationHelpers';
@@ -34,20 +35,40 @@ import { AccountsContext, AlertContext, NetworksContext } from '../context';
 
 export default function AccountDetails({ navigation }: NavigationProps<'AccountDetails'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const account = accountsStore.getSelected();
+	const { address, name, networkKey } = accountsStore.getSelected() || { address: '', name: '', networkKey: '' };
 	const { getNetwork } = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertContext);
 	const { accounts, selectedKey } = accountsStore.state;
+	const network = getNetwork(networkKey);
 
-	if (!account) return <View />;
+	const accountId = useMemo((): string => {
 
-	const network = getNetwork(account.networkKey);
+		if (!network){
+			console.error('Account without network')
+
+			return '';
+		}
+
+		const { protocol } = network;
+
+		if (isSubstrateNetworkParams(network)) {
+			const { genesisHash } = network;
+
+			return `${protocol}:${address}:${genesisHash ?? ''}`;
+		} else {
+			const { ethereumChainId } = network as EthereumNetworkParams;
+
+			return `${protocol}:0x${address}@${ethereumChainId}`;
+		}
+	}, [address, network])
+
+	if (!address || !network) return <View />;
 
 	const protocol = network?.protocol;
 
 	const onDelete = (): void => {
 		alertDeleteLegacyAccount(setAlert,
-			account.name || account.address || 'this account',
+			name || address || 'this account',
 			async () => {
 				await accountsStore.deleteAccount(selectedKey);
 
@@ -82,17 +103,10 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 					<View style={styles.menuView}>
 						<PopupMenu
 							menuItems={[
-								{ text: 'Edit', value: 'AccountEdit' },
-								{ text: 'Change Pin', value: 'AccountPin' },
-								{
-									text: 'View Recovery Phrase',
-									value: 'LegacyMnemonic'
-								},
-								{
-									text: 'Delete',
-									textStyle: styles.deleteText,
-									value: 'AccountDelete'
-								}
+								{ text: 'Change name', value: 'AccountEdit' },
+								{ text: 'Change pin', value: 'AccountPin' },
+								{ text: 'View recovery phrase', value: 'LegacyMnemonic' },
+								{ text: 'Delete', textStyle: styles.deleteText, value: 'AccountDelete' }
 							]}
 							menuTriggerIconName={'more-vert'}
 							onSelect={onOptionSelect}
@@ -100,13 +114,17 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 					</View>
 				</View>
 				<AccountCard
-					address={account.address}
-					networkKey={account.networkKey}
-					title={account.name}
+					address={address}
+					networkKey={networkKey}
+					title={name}
 				/>
 				<View>
 					<QrView
-						data={account.name ? `${selectedKey}:${account.name}` : selectedKey}
+						data={
+							name
+								? `${accountId}:${name}`
+								: accountId
+						}
 					/>
 					{protocol === NetworkProtocols.UNKNOWN && <UnknownAccountWarning />}
 				</View>
@@ -121,14 +139,18 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.background.app,
 		flex: 1
 	},
-	deleteText: { color: colors.signal.error },
+	deleteText: {
+		color: colors.signal.error
+	},
 	header: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		paddingBottom: 24,
 		paddingRight: 19
 	},
-	icon: { paddingHorizontal: 16 },
+	icon: {
+		paddingHorizontal: 16
+	},
 	menuView: {
 		alignItems: 'flex-end',
 		flex: 1

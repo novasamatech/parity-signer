@@ -3,7 +3,7 @@ import { default as React, useContext, useEffect, useReducer } from 'react';
 import { Account, AccountsStoreState, Identity, isUnlockedAccount, LegacyAccount, LockedAccount, UnlockedAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { emptyAccount, generateAccountId } from 'utils/account';
-import { deleteAccount as deleteDbAccount, loadAccounts, loadIdentities, saveAccount, saveIdentities } from 'utils/db';
+import { deleteAccount as deleteDbAccount, loadAccounts, saveAccount, saveIdentities } from 'utils/db';
 import { accountExistedError, addressGenerateError, duplicatedIdentityError, emptyIdentityError, identityUpdateError } from 'utils/errors';
 import { deepCopyIdentities, deepCopyIdentity, emptyIdentity, extractAddressFromAccountId, getAddressKeyByPath } from 'utils/identitiesUtils';
 import { brainWalletAddressWithRef, decryptData, encryptData } from 'utils/native';
@@ -71,13 +71,11 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	useEffect(() => {
 		const loadInitialContext = async (): Promise<void> => {
 			const accounts = await loadAccounts();
-			const identities = await loadIdentities();
-			const currentIdentity = identities.length > 0 ? identities[0] : null;
+			// const identities = await loadIdentities();
+			// const currentIdentity = identities.length > 0 ? identities[0] : null;
 
 			setState({
 				accounts,
-				currentIdentity,
-				identities,
 				loaded: true
 			});
 		};

@@ -15,32 +15,18 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
-import OnBoardingView from 'modules/main/components/OnBoading';
 import React, { useContext } from 'react';
 import LegacyAccountList from 'screens/LegacyAccountList';
-import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 
 import { AccountsContext } from '../../../context';
-import AccountSelector from '../components/AccountSelector';
-import NetworkSelector from '../components/NetworkSelector';
 
 export default function Main(props: NavigationProps<'Main'>): React.ReactElement {
-	// const isNew = !!props.route.params?.isNew;
+
 	const accountsStore = useContext(AccountsContext);
-	const { accounts, currentIdentity, identities, loaded } = accountsStore.state;
-	// const hasLegacyAccount = accounts.length !== 0;
+	const { loaded } = accountsStore.state;
 
 	if (!loaded) return <SafeAreaViewContainer />;
-	// if (identities.length === 0)
-
-	// 	return <OnBoardingView hasLegacyAccount={hasLegacyAccount} />;
-	// if (currentIdentity === null) return <NoCurrentIdentity />;
 
 	return <LegacyAccountList />
-	// (
-	// 	isNew
-	// 		? <NetworkSelector {...(props as NavigationAccountIdentityProps<'Main'>)} />
-	// 		: <LegacyAccountList />
-	// );
 }

@@ -63,7 +63,6 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 	const isSubstrate = selectedNetwork?.protocol === NetworkProtocols.SUBSTRATE;
 
 	useEffect((): void => {
-		console.log('----------> empty it')
 		updateNew(emptyAccount('', ''));
 	// we get an infinite loop if we add anything here.
 	// eslint-disable-next-line react-hooks/exhaustive-deps

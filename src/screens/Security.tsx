@@ -32,7 +32,7 @@ export default class Security extends React.PureComponent {
 					connectivity such as wifi, cellular network, bluetooth, NFC, usb is a
 					threat to the safety of the private keys stored on the device."
 					subtitleL={true}
-					title="NOT SECURE"
+					title="Insecure device"
 				/>
 			</SafeAreaScrollViewContainer>
 		);

@@ -14,22 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import NetInfo from '@react-native-community/netinfo';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import AccountCard from 'components/AccountCard';
 import QrScannerTab from 'components/QrScannerTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import React, { useContext } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text,TouchableWithoutFeedback, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
+import colors from 'styles/colors';
 import { LegacyAccount } from 'types/identityTypes';
-import { RootStackParamList } from 'types/routes';
 
 import { AccountsContext } from '../context';
 
 function LegacyAccountList(): React.ReactElement {
-	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const accountsStore = useContext(AccountsContext);
+	const [isConnected, setIsConnected] = useState(false);
+	const navigation = useNavigation();
+
+	useEffect(() =>
+		NetInfo.addEventListener(state => {
+			setIsConnected(state.isConnected);
+		}),
+	[]);
 
 	const onAccountSelected = async (key: string): Promise<void> => {
 		await accountsStore.select(key);
@@ -37,8 +45,6 @@ function LegacyAccountList(): React.ReactElement {
 	};
 
 	const { accounts } = accountsStore.state;
-
-	// console.log('legacy', accounts)
 
 	const renderAccountCard = ({ address, name, networkKey }: LegacyAccount): React.ReactElement => (
 		<AccountCard
@@ -53,6 +59,20 @@ function LegacyAccountList(): React.ReactElement {
 
 	return (
 		<SafeAreaViewContainer>
+			{isConnected && (
+				<TouchableWithoutFeedback
+					onPress={(): void => navigation.navigate('Security')}
+				>
+					<View style={styles.insecureDeviceBanner}>
+						<Icon
+							color={colors.text.white}
+							name="shield-off"
+							size={22}
+						/>
+						<Text style={styles.warningText}>Insecure device</Text>
+					</View>
+				</TouchableWithoutFeedback>
+			)}
 			<ScrollView
 				style={styles.content}
 				testID={testIDs.AccountListScreen.accountList}
@@ -70,5 +90,17 @@ const styles = StyleSheet.create({
 	content: {
 		flex: 1,
 		paddingBottom: 40
+	},
+	insecureDeviceBanner: {
+		alignItems: 'center',
+		backgroundColor: colors.signal.error,
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		padding: 5
+	},
+	warningText: {
+		color: colors.text.white,
+		marginLeft: 5
 	}
 });

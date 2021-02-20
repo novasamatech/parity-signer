@@ -17,7 +17,7 @@
 import { useNavigation, useNavigationState, useRoute } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator, HeaderBackButton } from '@react-navigation/stack';
 import HeaderLeftHome from 'components/HeaderLeftHome';
-import SecurityHeader from 'components/SecurityHeader';
+import HeaderMenus from 'components/HeaderMenus';
 import testIDs from 'e2e/testIDs';
 import Main from 'modules/main/screens/Main';
 import NetworkDetails from 'modules/network/screens/NetworkDetails';
@@ -60,9 +60,9 @@ const HeaderLeft = (): React.ReactElement => {
 	const route = useRoute();
 	const isFirstRouteInParent = useNavigationState(state => state.routes[0].key === route.key);
 
-	return isFirstRouteInParent ? <HeaderLeftHome
-	/> : <HeaderLeftWithBack
-	/>;
+	return isFirstRouteInParent
+		? <HeaderLeftHome/>
+		: <HeaderLeftWithBack/>;
 };
 
 const globalStackNavigationOptions = {
@@ -70,14 +70,12 @@ const globalStackNavigationOptions = {
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: { color: colors.text.main },
 	headerBackTitleVisible: false,
-	headerLeft: (): React.ReactElement => <HeaderLeft
-	/>,
+	headerLeft: (): React.ReactElement => <HeaderLeft/>,
 	headerLeftContainerStyle: {
 		height: headerHeight,
 		paddingLeft: 8
 	},
-	headerRight: (): React.ReactElement => <SecurityHeader
-	/>,
+	headerRight: (): React.ReactElement => <HeaderMenus/>,
 	headerRightContainerStyle: {
 		height: headerHeight,
 		paddingRight: horizontalPadding
