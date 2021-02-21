@@ -21,6 +21,7 @@ import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { RegistriesContext, RegistriesStoreState } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
+import { isSubstrateNetwork } from 'types/networkTypes';
 import { alertDecodeError } from 'utils/alertUtils';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';
@@ -57,6 +58,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({ fallback, label
 	const typeRegistry = getTypeRegistry(networks, networkKey)!;
 
 	useEffect(() => {
+
 		if (label === 'Method' && !fallback) {
 			try {
 				const call = typeRegistry.createType('Call', value);
@@ -128,17 +130,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(({ fallback, label
 		if (label === 'Tip' && !fallback) {
 			setTip(formatBalance(value as any));
 		}
-	}, [
-		fallback,
-		label,
-		prefix,
-		value,
-		networkKey,
-		registriesStore,
-		setAlert,
-		typeRegistry,
-		networks
-	]);
+	}, [fallback, label, prefix, setAlert, typeRegistry, value]);
 
 	const renderEraDetails = (): React.ReactElement => {
 		if (period && phase) {
@@ -265,17 +257,15 @@ interface PayloadDetailsCardProps {
 	networkKey: string;
 }
 
-export default function PayloadDetailsCard(props: PayloadDetailsCardProps): React.ReactElement {
-	const { getSubstrateNetwork, networks } = useContext(NetworksContext);
-	const { description, networkKey, payload, signature, style } = props;
-	const isKnownNetworkKey = networks.has(networkKey);
-	const fallback = !isKnownNetworkKey;
-	const networkParams = getSubstrateNetwork(networkKey);
+const PayloadDetailsCard = ({ description, networkKey, payload, signature, style }: PayloadDetailsCardProps): React.ReactElement =>  {
+	const { getNetwork } = useContext(NetworksContext);
+	const network = getNetwork(networkKey);
+	const fallback = !network;
 
-	if (isKnownNetworkKey) {
+	if (isSubstrateNetwork(network)) {
 		formatBalance.setDefaults({
-			decimals: networkParams.decimals,
-			unit: networkParams.unit
+			decimals: network.decimals,
+			unit: network.unit
 		});
 	}
 
@@ -327,10 +317,16 @@ export default function PayloadDetailsCard(props: PayloadDetailsCardProps): Reac
 }
 
 const styles = StyleSheet.create({
-	body: { marginTop: 8 },
-	callDetails: { marginBottom: 4 },
+	body: {
+		marginTop: 8
+	},
+	callDetails: {
+		marginBottom: 4
+	},
 	era: { flexDirection: 'row' },
-	extrinsicContainer: { paddingTop: 16 },
+	extrinsicContainer: {
+		paddingTop: 16
+	},
 	label: {
 		...fontStyles.t_label,
 		backgroundColor: colors.signal.main,
@@ -350,3 +346,5 @@ const styles = StyleSheet.create({
 		color: colors.text.main
 	}
 });
+
+export default PayloadDetailsCard;

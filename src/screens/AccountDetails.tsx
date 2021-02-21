@@ -26,7 +26,7 @@ import React, { useContext, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { EthereumNetworkParams, isSubstrateNetworkParams } from 'types/networkTypes';
+import { EthereumNetwork, isSubstrateNetwork } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
 import { navigateToLandingPage, navigateToLegacyAccountList } from 'utils/navigationHelpers';
@@ -51,12 +51,12 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 
 		const { protocol } = network;
 
-		if (isSubstrateNetworkParams(network)) {
+		if (isSubstrateNetwork(network)) {
 			const { genesisHash } = network;
 
 			return `${protocol}:${address}:${genesisHash ?? ''}`;
 		} else {
-			const { ethereumChainId } = network as EthereumNetworkParams;
+			const { ethereumChainId } = network as EthereumNetwork;
 
 			return `${protocol}:0x${address}@${ethereumChainId}`;
 		}

@@ -20,11 +20,10 @@ import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
 
-import { NetworksContext } from '../context';
+import { AccountsContext, NetworksContext } from '../context';
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
-import { CardSeparator } from './CardSeparator';
 import { NetworkFooter } from './NetworkFooter';
 import TouchableItem from './TouchableItem';
 
@@ -35,16 +34,18 @@ interface AccountCardProps{
 	seedType?: string;
 	style?: ViewStyle;
 	testID?: string;
-	title: string;
+	title?: string;
 	titlePrefix?: string;
 };
 
 export default function AccountCard({ address, networkKey, onPress, seedType, style, testID, title, titlePrefix }: AccountCardProps): ReactElement {
 	const { getNetwork } = useContext(NetworksContext);
-	const defaultTitle = 'No name';
-	const displayTitle = title.length > 0 ? title : defaultTitle;
+	const { getAccountByAddress } = useContext(AccountsContext);
+	const account = getAccountByAddress(address)
+
+	const displayTitle = account?.name || title || 'Unknown';
 	const seedTypeDisplay = seedType || '';
-	const network = getNetwork(networkKey);
+	const network = account?.networkKey ? getNetwork(account.networkKey) : getNetwork(networkKey);
 
 	return (
 		<TouchableItem
@@ -52,10 +53,9 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 			onPress={onPress}
 			testID={testID}
 		>
-			<CardSeparator />
 			<View style={[styles.content, style]}>
 				<AccountIcon
-					address={address}
+					address={account?.address || address}
 					network={network}
 					style={styles.icon} />
 				<View style={styles.desc}>

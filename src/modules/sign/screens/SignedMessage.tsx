@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import CompatibleCard from 'components/CompatibleCard';
+import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import Separator from 'components/Separator';
@@ -26,8 +26,7 @@ import styles from 'modules/sign/styles';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 import fontStyles from 'styles/fontStyles';
-import { FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkTypes';
+import { isEthereumNetwork } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 
 import { isU8a, u8aToHex } from '@polkadot/util';
@@ -35,16 +34,24 @@ import { isU8a, u8aToHex } from '@polkadot/util';
 import { AccountsContext, NetworksContext, ScannerContext } from '../../../context';
 
 interface Props extends NavigationScannerProps<'SignedMessage'> {
-	sender: FoundAccount;
+	sender: string;
 	message: string;
 }
 
-function SignedMessageView({ message, sender }: Props): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
+function SignedMessageView({ message, sender: senderAddress }: Props): React.ReactElement {
+	const { getAccountByAddress } = useContext(AccountsContext);
+	const sender = getAccountByAddress(senderAddress);
 	const { state: { dataToSign, isHash, signedData } } = useContext(ScannerContext);
 	const { getNetwork } = useContext(NetworksContext);
+
+	if (!sender) {
+		console.error('no sender')
+
+		return<View/>;
+	}
+
 	const senderNetworkParams = getNetwork(sender.networkKey);
-	const isEthereum = !!senderNetworkParams && isEthereumNetworkParams(senderNetworkParams);
+	const isEthereum = !!senderNetworkParams && isEthereumNetwork(senderNetworkParams);
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -62,9 +69,8 @@ function SignedMessageView({ message, sender }: Props): React.ReactElement {
 			<View testID={testIDs.SignedMessage.qrView}>
 				<QrView data={signedData} />
 			</View>
-			<CompatibleCard
-				account={sender}
-				accountsStore={accountsStore}
+			<AccountCard
+				address={senderAddress}
 				titlePrefix={'from:'}
 			/>
 			{!isEthereum && dataToSign ? (
@@ -86,7 +92,7 @@ function SignedMessageView({ message, sender }: Props): React.ReactElement {
 
 export default function SignedMessage(props: NavigationProps<'SignedMessage'>): React.ReactElement {
 	const { cleanup, state } = useContext(ScannerContext);
-	const { message, sender } = state;
+	const { message, senderAddress: sender } = state;
 	const clean = useRef(cleanup);
 
 	useEffect(() => clean.current, [clean]);

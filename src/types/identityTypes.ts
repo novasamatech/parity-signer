@@ -66,6 +66,7 @@ export interface LegacyAccount {
 	address: string;
 	createdAt: number;
 	encryptedSeed: string;
+	hasPassword? : boolean;
 	isLegacy?: boolean;
 	name: string;
 	networkKey: string;

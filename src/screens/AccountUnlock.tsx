@@ -89,10 +89,10 @@ function AccountUnlockView(props: AccountUnlockViewProps): React.ReactElement {
 	);
 }
 
-/* Used for unlock and sign tx and messages for legacy accounts */
+/* Used for unlock and sign tx and messages */
 export function AccountUnlockAndSign(props: NavigationProps<'AccountUnlockAndSign'>): React.ReactElement {
 	const { navigation, route } = props;
-	const next = route.params.next ?? 'SignedTx';
+	const next = route.params.next;
 	const scannerStore = useContext(ScannerContext);
 
 	return (
@@ -122,7 +122,7 @@ export function AccountUnlockAndSign(props: NavigationProps<'AccountUnlockAndSig
 }
 
 export function AccountUnlock({ navigation, route }: NavigationProps<'AccountUnlock'>): React.ReactElement {
-	const next = route.params.next ?? 'LegacyAccountList';
+	const next = route.params.next || 'LegacyAccountList';
 	const onDelete = route.params.onDelete ?? ((): any => null);
 	const accountsStore = useContext(AccountsContext);
 	const { selectedKey } = accountsStore.state;

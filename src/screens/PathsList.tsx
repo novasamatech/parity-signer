@@ -24,15 +24,15 @@ import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import React, { useContext, useMemo } from 'react';
 import { ScrollView } from 'react-native';
-import { NetworksContext } from '../context';
 import { PathGroup } from 'types/identityTypes';
-import { isEthereumNetworkParams, isUnknownNetworkParams } from 'types/networkTypes';
+import { isEthereumNetwork, isUnknownNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getPathsWithSubstrateNetworkKey, groupPaths } from 'utils/identitiesUtils';
 import { useUnlockSeed } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
+import { NetworksContext } from '../context';
 import { PathDetailsView } from './PathDetails';
 
 function PathsList({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
@@ -42,7 +42,7 @@ function PathsList({ accountsStore, navigation, route }: NavigationAccountIdenti
 	const networkParams = getNetwork(networkKey);
 
 	const { currentIdentity } = accountsStore.state;
-	const isEthereumPath = isEthereumNetworkParams(networkParams);
+	const isEthereumPath = isEthereumNetwork(networkParams);
 	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
 	const pathsGroups = useMemo((): PathGroup[] | null => {
 		if (!currentIdentity || isEthereumPath) return null;
@@ -61,7 +61,7 @@ function PathsList({ accountsStore, navigation, route }: NavigationAccountIdenti
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 
-	if (isEthereumNetworkParams(networkParams)) {
+	if (isEthereumNetwork(networkParams)) {
 		return (
 			<PathDetailsView
 				accountsStore={accountsStore}

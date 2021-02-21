@@ -4,7 +4,7 @@ export type NetworkProtocol = 'ethereum' | 'substrate' | 'unknown';
 
 export type NetworkParams =
 	| SubstrateNetworkParams
-	| EthereumNetworkParams
+	| EthereumNetwork
 	| UnknownNetworkParams;
 
 export type SubstrateNetworkDefaultConstant = {
@@ -62,7 +62,7 @@ export type EthereumNetworkDefaultConstants = {
 	title: string;
 };
 
-export type EthereumNetworkParams = {
+export type EthereumNetwork = {
 	color: string;
 	ethereumChainId: string;
 	logo: number;
@@ -86,31 +86,30 @@ export type UnknownNetworkParams = {
 export type Networks = Map<string, NetworkParams>;
 export type SubstrateNetworks = Map<string, SubstrateNetworkParams>;
 
-export function isSubstrateNetworkParams(networkParams:
-		| SubstrateNetworkParams
-		| UnknownNetworkParams
-		| EthereumNetworkParams): networkParams is SubstrateNetworkParams {
-	const { pathId, protocol } = networkParams as SubstrateNetworkParams;
+export function isSubstrateNetwork(network?: SubstrateNetworkParams | UnknownNetworkParams | EthereumNetwork | null): network is SubstrateNetworkParams {
+
+	if (!network) {
+
+		return false;
+	}
+
+	const { pathId, protocol } = network;
 
 	return (
 		protocol === NetworkProtocols.SUBSTRATE && pathId !== unknownNetworkPathId
 	);
 }
 
-export function isEthereumNetworkParams(networkParams:
-		| SubstrateNetworkParams
-		| UnknownNetworkParams
-		| EthereumNetworkParams): networkParams is EthereumNetworkParams {
+export function isEthereumNetwork(network: | SubstrateNetworkParams | UnknownNetworkParams | EthereumNetwork): network is EthereumNetwork {
 	return (
-		(networkParams as EthereumNetworkParams).protocol ===
-		NetworkProtocols.ETHEREUM
+		(network as EthereumNetwork).protocol === NetworkProtocols.ETHEREUM
 	);
 }
 
 export function isUnknownNetworkParams(networkParams:
 		| SubstrateNetworkParams
 		| UnknownNetworkParams
-		| EthereumNetworkParams): networkParams is UnknownNetworkParams {
+		| EthereumNetwork): networkParams is UnknownNetworkParams {
 	const { pathId, protocol } = networkParams as SubstrateNetworkParams;
 
 	return (

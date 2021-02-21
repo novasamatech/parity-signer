@@ -29,11 +29,10 @@ import { NavigationProps } from 'types/props';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 
-import { AlertContext, NetworksContext, ScannerContext } from '../../../context';
+import { AlertContext, ScannerContext } from '../../../context';
 
 export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
-	const networksContextState = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
@@ -79,8 +78,7 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 		}
 	}
 
-	const processBarCode = useProcessBarCode(showAlertMessage,
-		networksContextState);
+	const processBarCode = useProcessBarCode(showAlertMessage);
 
 	// useEffect((): (() => void) => {
 	// 	const unsubscribeFocus = navigation.addListener('focus', () => {
@@ -97,9 +95,7 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 	// 	};
 	// }, [navigation, scannerStore.setReady, scannerStore.setBusy]);
 	useEffect(() => {
-		const { completedFramesCount,
-			missedFrames,
-			totalFrameCount } = scannerStore.state;
+		const { completedFramesCount, missedFrames, totalFrameCount } = scannerStore.state;
 
 		setMultiFrames({
 			completedFramesCount,
@@ -161,10 +157,10 @@ export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): R
 					{isMultipart ? (
 						<View style={styles.bottom}>
 							<Text style={styles.descTitle}>
-								Scanning Multipart Data, Please Hold Still...
+								Scanning multipart data, Please hold still...
 							</Text>
 							<Text style={styles.descSecondary}>
-								{completedFramesCount} / {totalFramesCount} Completed.
+								{completedFramesCount} / {totalFramesCount} completed.
 							</Text>
 							<Button
 								onPress={(): void => scannerStore.clearMultipartProgress()}

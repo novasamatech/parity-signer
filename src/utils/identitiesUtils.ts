@@ -17,11 +17,11 @@
 import { centrifugeAmberMetadata, centrifugeMetadata, edgewareMetadata, kulupuMetadata, kusamaMetadata, polkadotMetaData, rococoMetadata, westendMetadata } from 'constants/networkMetadata';
 import { ETHEREUM_NETWORK_LIST, SubstrateNetworkKeys, UnknownNetworkKeys, unknownNetworkPathId } from 'constants/networkSpecs';
 import strings from 'modules/sign/strings';
-import { NetworksContext } from '../context';
 import { Account, AccountMeta, FoundAccount, Identity, LegacyAccount, PathGroup, SerializedIdentity, UnlockedAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 
+import { NetworksContext } from '../context';
 import { generateAccountId } from './account';
 import { decryptData, substrateAddress } from './native';
 import { pathsRegex } from './regex';
@@ -261,11 +261,11 @@ export const getAddressWithPath = (path: string, identity: Identity | null): str
 		: address;
 };
 
-export const unlockIdentitySeedWithReturn = async (pin: string, identity: Identity, createSeedRef: TryCreateFunc): Promise<string> => {
+export const unlockIdentitySeedWithReturn = async (pin: string, identity: LegacyAccount): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, pin);
 
-	await createSeedRef(pin);
+	// await createSeedRef(pin);
 	const { phrase } = parseSURI(seed);
 
 	return phrase;

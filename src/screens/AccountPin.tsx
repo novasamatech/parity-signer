@@ -77,9 +77,6 @@ function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React
 		const accountCreation = route.params?.isNew;
 		const account = accountCreation ? newAccount : accountsStore.getSelected();
 
-		console.log('accountCreation', accountCreation);
-		console.log('newAccount',newAccount);
-
 		if (pin.length < 6) {
 			setState({ pinTooShort: true });
 

@@ -25,27 +25,25 @@ import { NavigationTargetIdentityProps } from 'types/props';
 import { debounce } from 'utils/debounce';
 import { withTargetIdentity } from 'utils/HOC';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
-import { useSeedRef } from 'utils/seedRefHooks';
+// import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlock({ route, targetIdentity }: NavigationTargetIdentityProps<'PinUnlock'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
-	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
+	// const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(pin: string): Promise<void> {
 		if (pin.length >= 6 && targetIdentity) {
 			try {
 				if (route.params.shouldReturnSeed) {
 					const resolveSeedPhrase = route.params.resolve;
-					const seedPhrase = await unlockIdentitySeedWithReturn(pin,
-						targetIdentity,
-						createSeedRef);
+					const seedPhrase = await unlockIdentitySeedWithReturn(pin, targetIdentity);
 
 					resetState();
 					resolveSeedPhrase(seedPhrase);
 				} else {
 					const resolve = route.params.resolve;
 
-					await createSeedRef(pin);
+					// await createSeedRef(pin);
 					resetState();
 					resolve();
 				}

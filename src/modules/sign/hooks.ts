@@ -6,8 +6,7 @@ import { GenericExtrinsicPayload } from '@polkadot/types';
 
 import { NetworksContext } from '../../context';
 
-export function usePayloadDetails(rawPayload: Uint8Array | string | null,
-	networkKey: string): [boolean, GenericExtrinsicPayload | null] {
+export function usePayloadDetails(rawPayload: Uint8Array | string | null, networkKey?: string): [boolean, GenericExtrinsicPayload | null] {
 	const [payload, setPayload] = useState<GenericExtrinsicPayload | null>(null);
 	const [isProcessing, setIsProcessing] = useState<boolean>(false);
 	const { networks } = useContext(NetworksContext);
@@ -15,7 +14,7 @@ export function usePayloadDetails(rawPayload: Uint8Array | string | null,
 
 	useEffect(() => {
 		setIsProcessing(true);
-		if (getTypeRegistry === null) return;
+		if (getTypeRegistry === null || !networkKey) return;
 		const typeRegistry = getTypeRegistry(networks, networkKey);
 
 		if (typeRegistry === null || typeof rawPayload === 'string') {

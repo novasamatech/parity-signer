@@ -16,7 +16,7 @@
 
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
-import { EthereumNetworkParams, isSubstrateNetworkParams, isUnknownNetworkParams, NetworkParams } from 'types/networkTypes';
+import { EthereumNetwork, isSubstrateNetwork, isUnknownNetworkParams, NetworkParams } from 'types/networkTypes';
 import { ValidSeed } from 'types/utilTypes';
 
 export function generateAccountId(address: string,
@@ -33,14 +33,14 @@ export function generateAccountId(address: string,
 
 	const { protocol } = networkParams;
 
-	if (isSubstrateNetworkParams(networkParams)) {
+	if (isSubstrateNetwork(networkParams)) {
 		const { genesisHash } = networkParams;
 
 		return `${protocol}:${address}:${genesisHash ?? ''}`;
 	} else if (isUnknownNetworkParams(networkParams)) {
 		return `substrate:${address}:${networkKey ?? ''}`;
 	} else {
-		const { ethereumChainId } = networkParams as EthereumNetworkParams;
+		const { ethereumChainId } = networkParams as EthereumNetwork;
 
 		return `${protocol}:0x${address}@${ethereumChainId}`;
 	}

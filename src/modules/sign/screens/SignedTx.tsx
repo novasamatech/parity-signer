@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import CompatibleCard from 'components/CompatibleCard';
+import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import Separator from 'components/Separator';
@@ -24,32 +24,38 @@ import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import { usePayloadDetails } from 'modules/sign/hooks';
 import strings from 'modules/sign/strings';
 import styles from 'modules/sign/styles';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext } from 'react';
 import { Text, View } from 'react-native';
 import fontStyles from 'styles/fontStyles';
-import { FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkTypes';
+import { isEthereumNetwork } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import { Transaction } from 'utils/transaction';
 
 import { AccountsContext, NetworksContext, ScannerContext } from '../../../context';
 
 interface Props extends NavigationScannerProps<'SignedTx'> {
-	sender: FoundAccount;
-	recipient: FoundAccount;
+	senderAddress: string;
+	recipientAddress: string;
 }
 
-function SignedTxView({ recipient, sender }: Props): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
+const SignedTxView = ({ recipientAddress, senderAddress }: Props): React.ReactElement => {
+	const { getAccountByAddress } = useContext(AccountsContext);
+	const sender = getAccountByAddress(senderAddress);
+
 	const { getNetwork } = useContext(NetworksContext);
 	const { state: { rawPayload, signedData, tx } } = useContext(ScannerContext)
-	const senderNetworkParams = getNetwork(sender.networkKey);
-	const isEthereum = !!senderNetworkParams && isEthereumNetworkParams(senderNetworkParams);
 	const { gas, gasPrice, value } = tx as Transaction;
-	const [isProcessing, payload] = usePayloadDetails(rawPayload,
-		sender.networkKey);
+	const [isProcessing, payload] = usePayloadDetails(rawPayload, sender?.networkKey);
+	const senderNetworkParams = getNetwork(sender?.networkKey);
+	const isEthereum = !!senderNetworkParams && isEthereumNetwork(senderNetworkParams);
 
-	function renderPayloadDetails(): React.ReactNode {
+	if (!sender) {
+		console.error('no sender');
+
+		return <View/>;
+	}
+
+	const PayloadDetails = () => {
 		if (isEthereum) {
 			return (
 				<View style={[styles.bodyContent, { marginTop: 16 }]}>
@@ -61,32 +67,35 @@ function SignedTxView({ recipient, sender }: Props): React.ReactElement {
 						value={value}
 					/>
 					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient}
-						accountsStore={accountsStore} />
+					<AccountCard
+						address={recipientAddress}
+					/>
 				</View>
 			);
-		} else {
-			if (!isProcessing && payload !== null) {
-				return (
-					<PayloadDetailsCard
-						networkKey={sender.networkKey}
-						payload={payload}
-						signature={signedData}
-					/>
-				);
-			}
 		}
+
+		if (isProcessing || payload === null) {
+
+			return null;
+		}
+
+		return (
+			<PayloadDetailsCard
+				networkKey={sender.networkKey}
+				payload={payload}
+				signature={signedData}
+			/>
+		);
 	}
 
 	return (
 		<SafeAreaScrollViewContainer>
 			<Text style={styles.topTitle}>Signed extrinsic</Text>
-			<CompatibleCard
-				account={sender}
-				accountsStore={accountsStore}
+			<AccountCard
+				address={sender.address}
 				titlePrefix={'from:'}
 			/>
-			{renderPayloadDetails()}
+			<PayloadDetails />
 			<Separator
 				shadow={true}
 				style={{
@@ -106,18 +115,14 @@ function SignedTxView({ recipient, sender }: Props): React.ReactElement {
 }
 
 function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
-	const scannerStore = useContext(ScannerContext);
-	const { recipient, sender } = scannerStore.state;
-	const cleanup = useRef(scannerStore.cleanup);
+	const { state: { recipientAddress, senderAddress } } = useContext(ScannerContext);
 
-	useEffect(() => cleanup.current, [cleanup]);
-
-	if (sender === null || recipient === null) return <View />;
+	if (senderAddress === null || recipientAddress === null) return <View />;
 
 	return (
 		<SignedTxView
-			recipient={recipient}
-			sender={sender}
+			recipientAddress={recipientAddress}
+			senderAddress={senderAddress}
 			{...props}
 		/>
 	);

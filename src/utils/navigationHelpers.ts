@@ -16,7 +16,7 @@
 
 import { CommonActions, useNavigation, useNavigationState } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Identity } from 'types/identityTypes';
+import { Identity, LegacyAccount } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
 type Route = {
@@ -94,23 +94,13 @@ export const useUnlockSeed = (isSeedRefValid: boolean): {
 	return { unlockWithPassword, unlockWithoutPassword };
 };
 
-export const unlockSeedPhrase = async <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>,
-	isSeedRefValid: boolean,
-	identity?: Identity
-): Promise<void> =>
+export const unlockSeedPhrase = async <RouteName extends keyof RootStackParamList>(navigation: GenericNavigationProps<RouteName>, address: LegacyAccount['address']): Promise<void> =>
 	new Promise((resolve) => {
-		if (isSeedRefValid) {
-			resolve();
-		} else {
-			navigation.navigate('PinUnlock', {
-				identity,
-				resolve,
-				shouldReturnSeed: false
-			});
-		}
+		navigation.navigate('PinUnlock', {
+			identity: account,
+			resolve,
+			shouldReturnSeed: false
+		});
 	});
 
 export const unlockSeedPhraseWithPassword = async <

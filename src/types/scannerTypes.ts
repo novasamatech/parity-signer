@@ -1,7 +1,7 @@
-import { GenericExtrinsicPayload } from '@polkadot/types';
 import { Point, Size } from 'react-native-camera/types';
-import { FoundAccount } from 'types/identityTypes';
 import { Transaction } from 'utils/transaction';
+
+import { GenericExtrinsicPayload } from '@polkadot/types';
 
 export type Frames = {
 	completedFramesCount: number;
@@ -109,13 +109,13 @@ export type MessageQRInfo = {
 	isHash: boolean;
 	isOversized: boolean;
 	message: string;
-	sender: FoundAccount;
+	senderAddress: string;
 	type: 'message';
 };
 
 export type TxQRInfo = {
-	sender: FoundAccount;
-	recipient: FoundAccount;
+	senderAddress: string;
+	recipientAddress: string;
 	type: 'transaction';
 	dataToSign: string | Uint8Array;
 	isHash: boolean;

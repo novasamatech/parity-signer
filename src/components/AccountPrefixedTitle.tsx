@@ -27,12 +27,14 @@ export default function AccountPrefixedTitle({ title, titlePrefix }: {
 		<View style={{ flexDirection: 'column' }}>
 			{titlePrefix && (
 				<Text numberOfLines={1}
-					style={[fontStyles.t_codeS, styles.text]}>
+					style={[fontStyles.t_codeS, styles.text]}
+				>
 					{titlePrefix}
 				</Text>
 			)}
 			<Text numberOfLines={1}
-				style={[fontStyles.h2, { marginTop: -2 }]}>
+				style={[fontStyles.h2, { marginTop: -2 }]}
+			>
 				{title}
 			</Text>
 		</View>

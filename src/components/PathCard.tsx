@@ -22,7 +22,7 @@ import AntIcon from 'react-native-vector-icons/AntDesign';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
-import { isSubstrateNetworkParams, isUnknownNetworkParams } from 'types/networkTypes';
+import { isSubstrateNetwork, isUnknownNetworkParams } from 'types/networkTypes';
 import { ButtonListener } from 'types/props';
 import { getAddressWithPath, getNetworkKeyByPath, getPathName } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
@@ -200,7 +200,7 @@ export default function PathCard({ identity, isPathValid = true, name, networkKe
 		</TouchableItem>
 	);
 
-	return isSubstrateNetworkParams(networkParams) ||
+	return isSubstrateNetwork(networkParams) ||
 		isUnknownNetworkParams(networkParams)
 		? substrateDerivationCard
 		: nonSubstrateCard;

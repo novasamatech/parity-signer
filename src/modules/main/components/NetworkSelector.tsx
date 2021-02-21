@@ -24,7 +24,7 @@ import { filterNetworks } from 'modules/network/utils';
 import React, { ReactElement, useCallback, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import colors from 'styles/colors';
-import { isEthereumNetworkParams, isSubstrateNetworkParams, NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
+import { isEthereumNetwork, isSubstrateNetwork, NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
@@ -149,7 +149,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 	const onNetworkChosen = async (networkKey: string,
 		networkParams: NetworkParams): Promise<void> => {
 		if (isNew || shouldShowMoreNetworks) {
-			if (isSubstrateNetworkParams(networkParams)) {
+			if (isSubstrateNetwork(networkParams)) {
 				await deriveSubstrateNetworkRootPath(networkKey, networkParams);
 			} else {
 				await deriveEthereumAccount(networkKey);
@@ -184,7 +184,7 @@ function NetworkSelector({ accountsStore, navigation, route }: NavigationAccount
 		item: [string, NetworkParams];
 	}): ReactElement => {
 		const [networkKey, networkParams] = item;
-		const networkIndexSuffix = isEthereumNetworkParams(networkParams)
+		const networkIndexSuffix = isEthereumNetwork(networkParams)
 			? networkParams.ethereumChainId
 			: networkParams.pathId;
 

@@ -88,10 +88,7 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	}
 
 	function updateNew(accountUpdate: Partial<UnlockedAccount>): void {
-		console.log('accountUpdate', accountUpdate)
 		const newAccount = { ...state.newAccount, ...accountUpdate }
-
-		console.log('resulting -->', newAccount)
 
 		setState({ newAccount });
 	}

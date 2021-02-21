@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import colors from 'styles/colors';
-import { EthereumNetworkDefaultConstants, EthereumNetworkParams, NetworkParams, NetworkProtocol, SubstrateNetworkDefaultConstant, SubstrateNetworkParams, UnknownNetworkParams } from 'types/networkTypes';
+import { EthereumNetwork, EthereumNetworkDefaultConstants, NetworkParams, NetworkProtocol, SubstrateNetworkDefaultConstant, SubstrateNetworkParams, UnknownNetworkParams } from 'types/networkTypes';
 
 export const unknownNetworkPathId = '';
 
@@ -240,7 +240,7 @@ const substrateDefaultValues = {
 	secondaryColor: colors.background.card
 };
 
-function setEthereumNetworkDefault(): Record<string, EthereumNetworkParams> {
+function setEthereumNetworkDefault(): Record<string, EthereumNetwork> {
 	return Object.keys(ethereumNetworkBase).reduce((acc, networkKey) => {
 		return {
 			...acc,
@@ -264,7 +264,7 @@ function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
 	}, {});
 }
 
-export const ETHEREUM_NETWORK_LIST: Record< string, EthereumNetworkParams> = Object.freeze(setEthereumNetworkDefault());
+export const ETHEREUM_NETWORK_LIST: Record< string, EthereumNetwork> = Object.freeze(setEthereumNetworkDefault());
 export const SUBSTRATE_NETWORK_LIST: Record< string, SubstrateNetworkParams> = Object.freeze(setSubstrateNetworkDefault());
 export const UNKNOWN_NETWORK: Record< string, UnknownNetworkParams> = Object.freeze(unknownNetworkBase);
 

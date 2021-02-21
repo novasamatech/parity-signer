@@ -16,10 +16,9 @@
 
 import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
 import React, { useContext, useReducer } from 'react';
-import { Account, FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkTypes';
+import { Account } from 'types/identityTypes';
+import { isEthereumNetwork } from 'types/networkTypes';
 import { CompletedParsedData, EthereumParsedData, isEthereumCompletedParsedData, isSubstrateMessageParsedData, MessageQRInfo, MultiFramesInfo, QrInfo, SubstrateCompletedParsedData, SubstrateMessageParsedData, SubstrateTransactionParsedData, TxQRInfo } from 'types/scannerTypes';
-import { emptyAccount } from 'utils/account';
 import { asciiToHex, constructDataFromBytes, encodeNumber } from 'utils/decoders';
 import { brainWalletSign, decryptData, ethSign, keccak, substrateSign } from 'utils/native';
 import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
@@ -52,8 +51,8 @@ type ScannerStoreState = {
 	multipartData: null | Array<Uint8Array | null>;
 	multipartComplete: boolean;
 	rawPayload: Uint8Array | string | null;
-	recipient: FoundAccount | null;
-	sender: FoundAccount | null;
+	recipientAddress: string | null;
+	senderAddress: string | null;
 	signedData: string;
 	signedTxList: SignedTX[];
 	totalFrameCount: number;
@@ -86,8 +85,8 @@ const DEFAULT_STATE: ScannerStoreState = {
 	multipartComplete: false,
 	multipartData: null,
 	rawPayload: null,
-	recipient: null,
-	sender: null,
+	recipientAddress: null,
+	senderAddress: null,
 	signedData: '',
 	signedTxList: [],
 	totalFrameCount: 0,
@@ -236,8 +235,7 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 
 		const isEthereum = isEthereumCompletedParsedData(txRequest);
 
-		if (
-			isEthereum &&
+		if (isEthereum &&
 			!(
 				txRequest.data &&
 				(txRequest as EthereumParsedData).data!.rlp &&
@@ -247,11 +245,10 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 			throw new Error('Scanned QR contains no valid extrinsic');
 		}
 
-		let tx, networkKey, recipientAddress, dataToSign;
+		let tx, recipientAddress, dataToSign;
 
 		if (isEthereumCompletedParsedData(txRequest)) {
 			tx = await transaction(txRequest.data.rlp);
-			networkKey = tx.ethereumChainId;
 			recipientAddress = tx.action;
 			// For Eth, always sign the keccak hash.
 			// For Substrate, only sign the blake2 hash if payload bytes length > 256 bytes (handled in decoder.js).
@@ -261,27 +258,22 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 			const [offset] = compactFromU8a(payloadU8a);
 
 			tx = payloadU8a;
-			networkKey = txRequest.data.genesisHash;
 			recipientAddress = txRequest.data.account;
 			dataToSign = payloadU8a.subarray(offset);
 		}
 
 		const sender = getAccountByAddress(txRequest.data.account);
 
-		const networkTitle = getNetwork(networkKey)?.title;
-
 		if (!sender) {
-			throw new Error(`No private key found for account ${txRequest.data.account} found in your signer key storage for the ${networkTitle} chain.`);
+			throw new Error(`No private key found for account ${txRequest.data.account}.`);
 		}
-
-		const recipient = (getAccountByAddress(recipientAddress) || emptyAccount(recipientAddress, networkKey));
 
 		const qrInfo: TxQRInfo = {
 			dataToSign: dataToSign,
 			isHash: false,
 			isOversized,
-			recipient: recipient as FoundAccount,
-			sender,
+			recipientAddress,
+			senderAddress: sender.address,
 			tx,
 			type: 'transaction'
 		};
@@ -302,7 +294,7 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 
 		if (isSubstrateMessageParsedData(signRequest)) {
 			if (signRequest.data.crypto !== 'sr25519')
-				throw new Error('currently Parity Signer only support sr25519');
+				throw new Error('Stylo only supports accounts using sr25519 crypto');
 			isHash = signRequest.isHash;
 			isOversized = signRequest.oversized;
 			dataToSign = signRequest.data.data;
@@ -315,15 +307,15 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 		const sender = getAccountByAddress(address);
 
 		if (!sender) {
-			throw new Error(`No private key found for ${address} in your signer key storage.`);
+			throw new Error(`No private key found for address: ${address}.`);
 		}
 
 		const qrInfo: MessageQRInfo = {
 			dataToSign,
-			isHash: isHash,
-			isOversized: isOversized,
-			message: message!.toString(),
-			sender: sender!,
+			isHash,
+			isOversized,
+			message: message.toString(),
+			senderAddress: sender.address,
 			type: 'message'
 		};
 
@@ -349,7 +341,8 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 
 	// signing ethereum data with seed reference
 	async function signEthereumData(signFunction: TryBrainWalletSignFunc, qrInfo: QrInfo): Promise<void> {
-		const { dataToSign, sender } = qrInfo;
+		const { dataToSign, senderAddress } = qrInfo;
+		const sender = getAccountByAddress(senderAddress);
 
 		if (!sender || !ETHEREUM_NETWORK_LIST.hasOwnProperty(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
@@ -360,7 +353,8 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 
 	// signing substrate data with seed reference
 	async function signSubstrateData(signFunction: TrySignFunc, suriSuffix: string, qrInfo: QrInfo): Promise<void> {
-		const { dataToSign, isHash, sender } = qrInfo;
+		const { dataToSign, isHash, senderAddress } = qrInfo;
+		const sender = getAccountByAddress(senderAddress);
 
 		if (!sender || !networks.has(sender.networkKey))
 			throw new Error('Signing Error: sender could not be found.');
@@ -391,13 +385,15 @@ export function ScannerContextProvider({ children }: ScannerContextProviderProps
 
 	// signing data with legacy account.
 	async function signDataLegacy(pin = '1'): Promise<void> {
-		const { dataToSign, isHash, sender } = state;
+		const { dataToSign, isHash, senderAddress } = state;
+		const sender = !!senderAddress && getAccountByAddress(senderAddress);
 
 		if (!sender || !sender.encryptedSeed)
 			throw new Error('Signing Error: sender could not be found.');
-		const networkParams = getNetwork(sender.networkKey);
-		const isEthereum = networkParams && isEthereumNetworkParams(networkParams);
+		const senderNetwork = getNetwork(sender.networkKey);
+		const isEthereum = senderNetwork && isEthereumNetwork(senderNetwork);
 		const seed = await decryptData(sender.encryptedSeed, pin);
+
 		let signedData;
 
 		if (isEthereum) {
