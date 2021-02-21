@@ -49,15 +49,19 @@ export default function App(props: AppProps): React.ReactElement {
 		]);
 	}
 
-	const { dataLoaded, policyConfirmed } = useTac();
+	const { dataLoaded, ppAndTaCAccepted } = useTac();
 	const seedRefContext = useSeedRefStore();
 	const registriesContext = useRegistriesStore();
 
+	console.log('Main stack', ppAndTaCAccepted)
+
 	const MainStack = (): React.ReactElement => {
+
 		if (!dataLoaded) {
+
 			return (
 				<ScreenStack.Navigator>
-					<ScreenStack.Screen name="Empty">
+					<ScreenStack.Screen name="Loading">
 						{(navigationProps: any): React.ReactElement => (
 							<View style={emptyScreenStyles}
 								{...navigationProps} />
@@ -67,7 +71,7 @@ export default function App(props: AppProps): React.ReactElement {
 			);
 		}
 
-		return policyConfirmed
+		return ppAndTaCAccepted
 			? <AppNavigator />
 		 	: <TacAndPrivacyPolicyNavigator />;
 	};

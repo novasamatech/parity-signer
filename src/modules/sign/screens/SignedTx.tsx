@@ -46,8 +46,8 @@ const SignedTxView = ({ recipientAddress, senderAddress }: Props): React.ReactEl
 	const { state: { rawPayload, signedData, tx } } = useContext(ScannerContext)
 	const { gas, gasPrice, value } = tx as Transaction;
 	const [isProcessing, payload] = usePayloadDetails(rawPayload, sender?.networkKey);
-	const senderNetworkParams = getNetwork(sender?.networkKey);
-	const isEthereum = !!senderNetworkParams && isEthereumNetwork(senderNetworkParams);
+	const senderNetwork = getNetwork(sender?.networkKey);
+	const isEthereum = !!senderNetwork && isEthereumNetwork(senderNetwork);
 
 	if (!sender) {
 		console.error('no sender');
@@ -58,7 +58,7 @@ const SignedTxView = ({ recipientAddress, senderAddress }: Props): React.ReactEl
 	const PayloadDetails = () => {
 		if (isEthereum) {
 			return (
-				<View style={[styles.bodyContent, { marginTop: 16 }]}>
+				<View style={{ marginTop: 16 }}>
 					<TxDetailsCard
 						description={strings.INFO_ETH_TX}
 						gas={gas}

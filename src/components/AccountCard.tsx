@@ -41,6 +41,7 @@ interface AccountCardProps{
 export default function AccountCard({ address, networkKey, onPress, seedType, style, testID, title, titlePrefix }: AccountCardProps): ReactElement {
 	const { getNetwork } = useContext(NetworksContext);
 	const { getAccountByAddress } = useContext(AccountsContext);
+
 	const account = getAccountByAddress(address)
 
 	const displayTitle = account?.name || title || 'Unknown';

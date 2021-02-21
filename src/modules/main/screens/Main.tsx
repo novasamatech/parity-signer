@@ -17,11 +17,10 @@
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import React, { useContext } from 'react';
 import LegacyAccountList from 'screens/LegacyAccountList';
-import { NavigationProps } from 'types/props';
 
 import { AccountsContext } from '../../../context';
 
-export default function Main(props: NavigationProps<'Main'>): React.ReactElement {
+export default function Main(): React.ReactElement {
 
 	const accountsStore = useContext(AccountsContext);
 	const { loaded } = accountsStore.state;

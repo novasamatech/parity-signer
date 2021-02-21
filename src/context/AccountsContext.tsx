@@ -129,8 +129,6 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 		try{
 			const account = state.newAccount;
 
-			console.log('submit new', pin, account);
-
 			if (!account.seed) {
 				console.error('Account seed is empty')
 
@@ -244,7 +242,7 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	const getAccountByAddress = (address: string): LegacyAccount | undefined => {
 		const { accounts } = state;
 
-		return accounts.find((account) => account.address === address)
+		return accounts.find((account) => account.address.toLowerCase() === address.toLowerCase())
 	}
 
 	async function unlockAccount(address: string, pin: string): Promise<boolean> {

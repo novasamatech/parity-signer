@@ -1,43 +1,35 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 import { loadTaCAndPPConfirmation } from 'utils/db';
-import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 export interface TacHookType {
 	dataLoaded: boolean;
-	policyConfirmed: boolean;
-	setDataLoaded: (setValue: boolean) => void;
-	setPolicyConfirmed: (setValue: boolean) => void;
+	ppAndTaCAccepted: boolean;
+	setPpAndTaCAccepted: (setValue: boolean) => void;
 };
 
 export const defaultGlobalState: TacHookType = {
 	dataLoaded: false,
-	policyConfirmed: false,
-	setDataLoaded: (): void => {},
-	setPolicyConfirmed: (): void => {}
+	ppAndTaCAccepted: false,
+	setPpAndTaCAccepted: (): void => {}
 };
 
 export const TacContext = React.createContext(defaultGlobalState);
 
 export function useTac(): TacHookType {
-	const [policyConfirmed, setPolicyConfirmed] = useState<boolean>(false);
-	const [dataLoaded, setDataLoaded] = useState<boolean>(false);
+	const [ppAndTaCAccepted, setPpAndTaCAccepted] = useState(false);
+	const [dataLoaded, setDataLoaded] = useState(false);
 
+	console.log('loading', ppAndTaCAccepted)
 	useEffect(() => {
-		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
-			const tacPP = await loadTaCAndPPConfirmation();
-
-			setPolicyConfirmed(tacPP);
-
-			if (!tacPP) {
-				await migrateAccounts();
-				await migrateIdentity();
-			}
-		};
-
-		setDataLoaded(true);
-		loadPolicyConfirmationAndMigrateData();
+		loadTaCAndPPConfirmation()
+			.then((tacPP) => {
+				setPpAndTaCAccepted(tacPP);
+				setDataLoaded(true);
+			}).catch((e) => {
+				console.error('Error 1 in useTac', e)
+			});
 	}, []);
 
-	return { dataLoaded, policyConfirmed, setDataLoaded, setPolicyConfirmed }
+	return { dataLoaded, ppAndTaCAccepted, setPpAndTaCAccepted }
 }

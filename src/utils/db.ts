@@ -117,7 +117,7 @@ const networkStorage = {
 	keychainService: 'parity_signer_updated_networks',
 	sharedPreferencesName: 'parity_signer_updated_networks'
 };
-const currentNetworkStorageLabel = 'networks_v4';
+const currentNetworkStorageLabel = 'networks_v1';
 
 export async function loadNetworks(): Promise<
 	Map<string, SubstrateNetworkParams>
@@ -159,12 +159,14 @@ export async function saveNetworks(newNetwork: SubstrateNetworkParams): Promise<
  * ========================================
  */
 
+const version = 874589;
+
 export async function loadTaCAndPPConfirmation(): Promise<boolean> {
-	const result = await AsyncStorage.getItem('TaCAndPPConfirmation_v1');
+	const result = await AsyncStorage.getItem(`TaCAndPPConfirmation_v${version}`);
 
 	return !!result;
 }
 
 export async function saveTaCAndPPConfirmation(): Promise<void> {
-	await AsyncStorage.setItem('TaCAndPPConfirmation_v1', 'yes');
+	await AsyncStorage.setItem(`TaCAndPPConfirmation_v${version}`, 'yes');
 }

@@ -27,6 +27,7 @@ import colors from 'styles/colors';
 import containerStyles from 'styles/containerStyles';
 import fontStyles from 'styles/fontStyles';
 import { saveTaCAndPPConfirmation } from 'utils/db';
+import { migrateAccounts } from 'utils/migrationUtils';
 
 import tac from '../../docs/terms-and-conditions.md';
 import { useTac } from '../hooks/useTac';
@@ -35,16 +36,31 @@ export default function TermsAndConditions(): React.ReactElement {
 	const [isPPAgreed, setPpAgreement] = useState(false);
 	const [isTacAgreed, setTacAgreement] = useState(false);
 	const { navigate } = useNavigation();
-	const { policyConfirmed, setPolicyConfirmed } = useTac();
+	const { ppAndTaCAccepted, setPpAndTaCAccepted } = useTac();
 
-	const onConfirm = useCallback(() => {
+	const onConfirm = useCallback(async () => {
 		saveTaCAndPPConfirmation()
 			.then(() => {
-				setPolicyConfirmed(true);
+				console.log('done saving YES')
+				migrateAccounts()
+					.then(() => {
+						console.log('done migration')
+						setPpAndTaCAccepted(true);
+						// const resetAction = CommonActions.reset({
+						// 	index: 0,
+						// 	routes: [{ name: 'LegacyAccountList' }]
+						// });
+
+						// dispatch(resetAction);
+					// 	setDataLoaded(true);
+					})
+					.catch((e) => {
+						console.error('migrateAccounts error', e);
+					})
 			}).catch((e)=> {
-				console.error(e)
+				console.error('saveTaCAndPPConfirmation error', e)
 			});
-	}, [setPolicyConfirmed]);
+	}, [setPpAndTaCAccepted]);
 
 	return (
 		<View
@@ -55,7 +71,7 @@ export default function TermsAndConditions(): React.ReactElement {
 				<Markdown>{tac}</Markdown>
 			</CustomScrollView>
 
-			{!policyConfirmed && (
+			{!ppAndTaCAccepted && (
 				<View>
 					<TouchableItem
 						onPress={(): void => setTacAgreement(!isTacAgreed)}

@@ -173,10 +173,10 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 		}),
 	[availableNetworks, isNew, shouldShowMoreNetworks, allNetworks]);
 
-	interface AccountInfo {
-			address: string;
-			network?: string;
-	}
+	// interface AccountInfo {
+	// 		address: string;
+	// 		network?: string;
+	// }
 
 	// Identity
 	// {
@@ -207,27 +207,25 @@ function AccountSelector({ accountsStore, navigation, route }: NavigationAccount
 	// 	"name": "bla"
 	// }
 
-	const accountList = useMemo(()=> {
-		return identities.map((id): AccountInfo | null => {
-			const addresses = Array.from(id.addresses);
+	// const accountList = useMemo(()=> {
+	// 	return identities.map((id): AccountInfo | null => {
+	// 		const addresses = Array.from(id.addresses);
 
-			if (!addresses.length){
-				return null;
-			}
+	// 		if (!addresses.length){
+	// 			return null;
+	// 		}
 
-			// select the first account from the identity.address, the key from the map is the address
-			const address = Array.from(id.addresses)[0][0];
-			// select the first account from the identity.map, the value from the map has a networkPathId
-			const network = Array.from(id.meta)[0][1].networkPathId;
+	// 		// select the first account from the identity.address, the key from the map is the address
+	// 		const address = Array.from(id.addresses)[0][0];
+	// 		// select the first account from the identity.map, the value from the map has a networkPathId
+	// 		const network = Array.from(id.meta)[0][1].networkPathId;
 
-			return {
-				address,
-				network
-			}
-		});
-	}, [identities])
-
-	console.log('accountList', accountList)
+	// 		return {
+	// 			address,
+	// 			network
+	// 		}
+	// 	});
+	// }, [identities])
 
 	// const renderAccount = ({ item }: { item: [string, NetworkParams] }): ReactElement => {
 	// 	const [networkKey, networkParams] = item;
