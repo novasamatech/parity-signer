@@ -26,26 +26,25 @@ import strings from 'modules/sign/strings';
 import styles from 'modules/sign/styles';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
-import { ScannerContext } from 'stores/ScannerContext';
 import fontStyles from 'styles/fontStyles';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import { Transaction } from 'utils/transaction';
 
-import { AccountsContext, NetworksContext } from '../../../context';
+import { AccountsContext, NetworksContext, ScannerContext } from '../../../context';
 
 interface Props extends NavigationScannerProps<'SignedTx'> {
 	sender: FoundAccount;
 	recipient: FoundAccount;
 }
 
-function SignedTxView({ recipient, scannerStore, sender }: Props): React.ReactElement {
+function SignedTxView({ recipient, sender }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const { rawPayload, signedData, tx } = scannerStore.state;
+	const { state: { rawPayload, signedData, tx } } = useContext(ScannerContext)
 	const senderNetworkParams = getNetwork(sender.networkKey);
-	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
+	const isEthereum = !!senderNetworkParams && isEthereumNetworkParams(senderNetworkParams);
 	const { gas, gasPrice, value } = tx as Transaction;
 	const [isProcessing, payload] = usePayloadDetails(rawPayload,
 		sender.networkKey);
@@ -118,7 +117,6 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 	return (
 		<SignedTxView
 			recipient={recipient}
-			scannerStore={scannerStore}
 			sender={sender}
 			{...props}
 		/>

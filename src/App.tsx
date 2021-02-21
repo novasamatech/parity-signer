@@ -27,12 +27,11 @@ import NavigationBar from 'react-native-navbar-color';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RegistriesContext, useRegistriesStore } from 'stores/RegistriesContext';
-import { ScannerContext,useScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 
 import { useTac } from './hooks/useTac';
-import { AccountContextProvider, AlertContextProvider, NetworksContextProvider } from './context';
+import { AccountsContextProvider, AlertContextProvider, NetworksContextProvider, ScannerContextProvider } from './context';
 import { AppNavigator, ScreenStack, TacAndPrivacyPolicyNavigator } from './screens';
 
 export default function App(props: AppProps): React.ReactElement {
@@ -52,7 +51,6 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const { dataLoaded, policyConfirmed } = useTac();
 	const seedRefContext = useSeedRefStore();
-	const scannerContext = useScannerContext();
 	const registriesContext = useRegistriesStore();
 
 	const MainStack = (): React.ReactElement => {
@@ -77,8 +75,8 @@ export default function App(props: AppProps): React.ReactElement {
 	return (
 		<SafeAreaProvider>
 			<NetworksContextProvider>
-				<AccountContextProvider>
-					<ScannerContext.Provider value={scannerContext}>
+				<AccountsContextProvider>
+					<ScannerContextProvider>
 						<RegistriesContext.Provider value={registriesContext}>
 							<AlertContextProvider>
 								<SeedRefsContext.Provider value={seedRefContext}>
@@ -95,8 +93,8 @@ export default function App(props: AppProps): React.ReactElement {
 								</SeedRefsContext.Provider>
 							</AlertContextProvider>
 						</RegistriesContext.Provider>
-					</ScannerContext.Provider>
-				</AccountContextProvider>
+					</ScannerContextProvider>
+				</AccountsContextProvider>
 			</NetworksContextProvider>
 		</SafeAreaProvider>
 	);

@@ -25,7 +25,6 @@ import strings from 'modules/sign/strings';
 import styles from 'modules/sign/styles';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
-import { ScannerContext } from 'stores/ScannerContext';
 import fontStyles from 'styles/fontStyles';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
@@ -33,19 +32,19 @@ import { NavigationProps, NavigationScannerProps } from 'types/props';
 
 import { isU8a, u8aToHex } from '@polkadot/util';
 
-import { AccountsContext, NetworksContext } from '../../../context';
+import { AccountsContext, NetworksContext, ScannerContext } from '../../../context';
 
 interface Props extends NavigationScannerProps<'SignedMessage'> {
 	sender: FoundAccount;
 	message: string;
 }
 
-function SignedMessageView({ message, scannerStore, sender }: Props): React.ReactElement {
+function SignedMessageView({ message, sender }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { dataToSign, isHash, signedData } = scannerStore.state;
+	const { state: { dataToSign, isHash, signedData } } = useContext(ScannerContext);
 	const { getNetwork } = useContext(NetworksContext);
 	const senderNetworkParams = getNetwork(sender.networkKey);
-	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
+	const isEthereum = !!senderNetworkParams && isEthereumNetworkParams(senderNetworkParams);
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -86,18 +85,17 @@ function SignedMessageView({ message, scannerStore, sender }: Props): React.Reac
 }
 
 export default function SignedMessage(props: NavigationProps<'SignedMessage'>): React.ReactElement {
-	const scannerStore = useContext(ScannerContext);
-	const { message, sender } = scannerStore.state;
-	const cleanup = useRef(scannerStore.cleanup);
+	const { cleanup, state } = useContext(ScannerContext);
+	const { message, sender } = state;
+	const clean = useRef(cleanup);
 
-	useEffect(() => cleanup.current, [cleanup]);
+	useEffect(() => clean.current, [clean]);
 
 	if (sender === null || message === null) return <View />;
 
 	return (
 		<SignedMessageView
 			message={message}
-			scannerStore={scannerStore}
 			sender={sender}
 			{...props}
 		/>

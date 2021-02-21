@@ -1,5 +1,5 @@
 import { ETHEREUM_NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
-import { default as React, useContext, useEffect, useReducer } from 'react';
+import { createContext, default as React, useContext, useEffect, useReducer } from 'react';
 import { Account, AccountsStoreState, Identity, isUnlockedAccount, LegacyAccount, LockedAccount, UnlockedAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { emptyAccount, generateAccountId } from 'utils/account';
@@ -52,7 +52,7 @@ interface AccountsContextProviderProps {
 	children?: React.ReactElement;
 }
 
-export const AccountsContext = React.createContext({} as AccountsContextType);
+export const AccountsContext = createContext({} as AccountsContextType);
 
 export function AccountsContextProvider({ children }: AccountsContextProviderProps): React.ReactElement {
 	const initialState: AccountsStoreState = defaultAccountState;
@@ -244,7 +244,7 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 		return accounts.filter((account) => account.address !== address)
 	}
 
-	const getAccountByAddress = (address: string) => {
+	const getAccountByAddress = (address: string): LegacyAccount | undefined => {
 		const { accounts } = state;
 
 		return accounts.find((account) => account.address === address)

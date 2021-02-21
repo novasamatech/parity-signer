@@ -20,12 +20,11 @@ import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
 import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { ScannerContext } from 'stores/ScannerContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
 
-import { AccountsContext, NetworksContext } from '../context';
+import { AccountsContext, ScannerContext } from '../context';
 
 interface AccountUnlockViewProps {
 	checkPin: (pin: string) => Promise<boolean>;
@@ -95,13 +94,12 @@ export function AccountUnlockAndSign(props: NavigationProps<'AccountUnlockAndSig
 	const { navigation, route } = props;
 	const next = route.params.next ?? 'SignedTx';
 	const scannerStore = useContext(ScannerContext);
-	const { getNetwork } = useContext(NetworksContext);
 
 	return (
 		<AccountUnlockView
 			checkPin={async (pin: string): Promise<boolean> => {
 				try {
-					await scannerStore.signDataLegacy(pin, getNetwork);
+					await scannerStore.signDataLegacy(pin);
 
 					return true;
 				} catch (e) {

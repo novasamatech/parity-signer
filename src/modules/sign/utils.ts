@@ -17,7 +17,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import strings from 'modules/sign/strings';
 import { useContext } from 'react';
-import { ScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { FoundIdentityAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
@@ -29,7 +28,7 @@ import { SeedRefClass } from 'utils/native';
 import { unlockSeedPhrase, unlockSeedPhraseWithPassword } from 'utils/navigationHelpers';
 import { constructSuriSuffix } from 'utils/suri';
 
-import { AccountsContext, NetworksContextType } from '../../context';
+import { AccountsContext, NetworksContextType, ScannerContext } from '../../context';
 
 function getSeedRef(encryptedSeed: string,
 	seedRefs: Map<string, SeedRefClass>): SeedRefClass | undefined {
@@ -38,8 +37,8 @@ function getSeedRef(encryptedSeed: string,
 	}
 }
 
-export function useProcessBarCode(showAlertMessage: (title: string, message: string, isSuccess?: boolean) => void,
-	networksContextState: NetworksContextType): (txRequestData: TxRequestData) => Promise<void> {
+export function useProcessBarCode(showAlertMessage: (title: string, message: string, isSuccess?: boolean) => void, networksContextState: NetworksContextType): (txRequestData: TxRequestData) => Promise<void> {
+	// TODO remove this networksContextState param and use context directly
 	const { allNetworks, networks } = networksContextState;
 	const accountsStore = useContext(AccountsContext);
 	const scannerStore = useContext(ScannerContext);
@@ -81,10 +80,7 @@ export function useProcessBarCode(showAlertMessage: (title: string, message: str
 
 	async function checkMultiFramesData(parsedData: SubstrateParsedData | EthereumParsedData): Promise<null | CompletedParsedData> {
 		if (isMultipartData(parsedData)) {
-			const multiFramesResult = await scannerStore.setPartData(parsedData.currentFrame,
-				parsedData.frameCount,
-				parsedData.partData,
-				networksContextState);
+			const multiFramesResult = await scannerStore.setPartData(parsedData.currentFrame, parsedData.frameCount, parsedData.partData);
 
 			if (isMultiFramesInfo(multiFramesResult)) {
 				return null;
@@ -97,8 +93,7 @@ export function useProcessBarCode(showAlertMessage: (title: string, message: str
 		}
 	}
 
-	async function _unlockSeedAndSign(sender: FoundIdentityAccount,
-		qrInfo: QrInfo): Promise<void> {
+	async function _unlockSeedAndSign(sender: FoundIdentityAccount, qrInfo: QrInfo): Promise<void> {
 		const senderNetworkParams = allNetworks.get(sender.networkKey);
 
 		if (!senderNetworkParams) throw new Error(strings.ERROR_NO_NETWORK);
@@ -127,26 +122,17 @@ export function useProcessBarCode(showAlertMessage: (title: string, message: str
 			seedRef = getSeedRef(sender.encryptedSeed, seedRefs)!;
 		} else {
 			if (sender.hasPassword) {
-				password = await unlockSeedPhraseWithPassword(navigation,
-					true,
-					senderIdentity);
+				password = await unlockSeedPhraseWithPassword(navigation, true, senderIdentity);
 			}
 		}
 
 		// 3. sign data
 		if (isEthereum) {
-			await scannerStore.signEthereumData(seedRef.tryBrainWalletSign.bind(seedRef),
-				qrInfo);
+			await scannerStore.signEthereumData(seedRef.tryBrainWalletSign.bind(seedRef),qrInfo);
 		} else {
-			const suriSuffix = constructSuriSuffix({
-				derivePath: sender.path,
-				password
-			});
+			const suriSuffix = constructSuriSuffix({ derivePath: sender.path,password });
 
-			await scannerStore.signSubstrateData(seedRef.trySubstrateSign.bind(seedRef),
-				suriSuffix,
-				qrInfo,
-				networks);
+			await scannerStore.signSubstrateData(seedRef.trySubstrateSign.bind(seedRef), suriSuffix, qrInfo);
 		}
 	}
 
@@ -197,9 +183,7 @@ export function useProcessBarCode(showAlertMessage: (title: string, message: str
 			const unsignedData = await checkMultiFramesData(parsedData);
 
 			if (unsignedData === null) return;
-			const qrInfo = await scannerStore.setData(accountsStore,
-				unsignedData,
-				networksContextState);
+			const qrInfo = await scannerStore.setData(unsignedData);
 
 			await unlockAndNavigationToSignedQR(qrInfo);
 			scannerStore.clearMultipartProgress();

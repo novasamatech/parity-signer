@@ -23,14 +23,13 @@ import { useProcessBarCode } from 'modules/sign/utils';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
-import { ScannerContext } from 'stores/ScannerContext';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import { NavigationProps } from 'types/props';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 
-import { AlertContext, NetworksContext } from '../../../context';
+import { AlertContext, NetworksContext, ScannerContext } from '../../../context';
 
 export default function Scanner({ navigation }: NavigationProps<'QrScanner'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);

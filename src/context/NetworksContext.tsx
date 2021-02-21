@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { dummySubstrateNetworkParams, ETHEREUM_NETWORK_LIST, UnknownNetworkKeys, unknownNetworkParams, unknownNetworkPathId } from 'constants/networkSpecs';
-import { default as React, useEffect, useMemo, useState } from 'react';
+import { createContext, default as React, useEffect, useMemo, useState } from 'react';
 import { NetworkParams,SubstrateNetworkParams } from 'types/networkTypes';
 import { NetworkParsedData } from 'types/scannerTypes';
 import { loadNetworks, saveNetworks } from 'utils/db';
@@ -38,7 +38,7 @@ interface NetworksContextProviderProps {
 	children?: React.ReactElement;
 }
 
-export const NetworksContext = React.createContext({} as NetworksContextType);
+export const NetworksContext = createContext({} as NetworksContextType);
 
 export function NetworksContextProvider({ children }: NetworksContextProviderProps): React.ReactElement {
 	const [substrateNetworks, setSubstrateNetworks] = useState<Map<string, SubstrateNetworkParams>>(new Map());

@@ -14,13 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Metadata } from '@polkadot/metadata';
-import { TypeRegistry } from '@polkadot/types';
-import { getSpecTypes } from '@polkadot/types-known';
 import React, { useState } from 'react';
 import { deepCopyMap } from 'stores/utils';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { getMetadata } from 'utils/identitiesUtils';
+
+import { Metadata } from '@polkadot/metadata';
+import { TypeRegistry } from '@polkadot/types';
+import { getSpecTypes } from '@polkadot/types-known';
 
 //Map PathId to Polkadot.js/api spec names and chain names
 type NetworkTypes = {
@@ -29,9 +30,7 @@ type NetworkTypes = {
 		[key: string]: string;
 	};
 };
-type NetworkTypesMap = {
-	[key: string]: NetworkTypes;
-};
+type NetworkTypesMap = { [key: string]: NetworkTypes };
 const networkTypesMap: NetworkTypesMap = {
 	centrifuge: {
 		alias: 'centrifuge-chain',
@@ -65,12 +64,9 @@ export const getOverrideTypes = (registry: TypeRegistry,
 	return getSpecTypes(registry, chainName, specName, Number.MAX_SAFE_INTEGER);
 };
 
-export type RegistriesStoreState = {
+export interface RegistriesStoreState {
 	registries: Map<string, TypeRegistry>;
-	getTypeRegistry: (
-		networks: Map<string, SubstrateNetworkParams>,
-		networkKey: string
-	) => TypeRegistry | null;
+	getTypeRegistry: (networks: Map<string, SubstrateNetworkParams>, networkKey: string) => TypeRegistry | null;
 };
 
 export function useRegistriesStore(): RegistriesStoreState {

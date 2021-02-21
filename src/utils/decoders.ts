@@ -92,9 +92,7 @@ export function rawDataToU8A(rawData: string): Uint8Array | null {
   ec11ec11ec11ec // SQRC filler bytes
   */
 
-export async function constructDataFromBytes(bytes: Uint8Array,
-	multipartComplete = false,
-	networks: Map<string, SubstrateNetworkParams>): Promise<ParsedData> {
+export async function constructDataFromBytes(bytes: Uint8Array, multipartComplete = false, networks: Map<string, SubstrateNetworkParams>): Promise<ParsedData> {
 	const frameInfo = hexStripPrefix(u8aToHex(bytes.slice(0, 5)));
 	const frameCount = parseInt(frameInfo.substr(2, 4), 16);
 	const isMultipart = frameCount > 1; // for simplicity, even single frame payloads are marked as multipart.
