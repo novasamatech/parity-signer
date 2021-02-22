@@ -21,6 +21,7 @@ import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
@@ -214,17 +215,17 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 											{arg && arg.length > 50
 												? shortString(arg)
 												: arg instanceof Array
-													? arg.join(', ')
-													: arg}{' '}
+												? arg.join(', ')
+												: arg}{' '}
 											{'}'}
 										</Text>
 									</View>
 								))
 							) : (
-									<Text style={styles.secondaryText}>
-										This method takes 0 arguments.
-									</Text>
-								)}
+								<Text style={styles.secondaryText}>
+									This method takes 0 arguments.
+								</Text>
+							)}
 						</View>
 					);
 				});
@@ -250,10 +251,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 					) : label === 'Tip' ? (
 						renderTipDetails()
 					) : (
-									<Text style={styles.secondaryText}>
-										{useFallback ? value?.toString() : value}
-									</Text>
-								)}
+						<Text style={styles.secondaryText}>
+							{useFallback ? value?.toString() : value}
+						</Text>
+					)}
 				</View>
 			</View>
 		);
