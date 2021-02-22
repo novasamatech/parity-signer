@@ -36,10 +36,11 @@
     "e2e": "yarn e2e:ios && yarn e2e:android"
   },
   "dependencies": {
-    "@polkadot/api": "1.31.2",
+    "@polkadot/api": "3.9.3",
+    "@polkadot/metadata": "^3.9.3",
     "@polkadot/reactnative-identicon": "0.53.1",
-    "@polkadot/util": "2.18.1",
-    "@polkadot/util-crypto": "2.18.1",
+    "@polkadot/util": "5.4.4",
+    "@polkadot/util-crypto": "5.4.4",
     "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-native-community/netinfo": "^5.9.3",
