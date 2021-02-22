@@ -56,7 +56,7 @@ describe('units', () => {
 					args[i].toRawType() === 'Balance' ||
 					args[i].toRawType() === 'Compact<Balance>'
 				) {
-					value = formatBalance(args[i].toString(), undefined, 12);
+					value = formatBalance(args[i].toString(), undefined, 10);
 				} else {
 					value = args[i].toString();
 				}
@@ -73,44 +73,43 @@ describe('units', () => {
 
 			method_1 = new Call(
 				registry,
-				'0x03000000002fac081000000000b48f6ee79343db082e913f105f7c6086cc1a60dbe4b9ff67ec9fe8c19526d471d8ed5886051198052a57ec34bcb5a458398bc3d93d7353f51cbd39f07000f80789c1e6b7a591bf461cf0b6e116dea135539578ecd3eb19764ae0f0b04cabac0e'
+				'0x0503008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b008cb6611e01'
 			);
 			method_2 = new Call(
 				registry,
-				'0x03000000002fac081000000000b48f6ee79343db082e913f105f7c6086cc1a60dbe4b9ff67ec9fe8c19526d471d8ed5886051198052a57ec34bcb5a458398bc3d93d7353f51cbd39f07000f80789c1e6b7a591bf461cf0b6e116dea135539578ecd3eb19764ae0f0b04cabac0e'
+				'0x0503008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48ce830700'
 			);
 			method_3 = new Call(
 				registry,
-				'0x03000000002fac081000000000b48f6ee79343db082e913f105f7c6086cc1a60dbe4b9ff67ec9fe8c19526d471d8ed5886051198052a57ec34bcb5a458398bc3d93d7353f51cbd39f07000f80789c1e6b7a591bf461cf0b6e116dea135539578ecd3eb19764ae0f0b04cabac0e'
+				'0x0503008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4833ffffffff9f36f400d946dad510ee8507'
 			);
 		});
 
-		it('should format KSM', () => {
+		it('should format DOT', () => {
 			const result = getResultFromMethod(method_1);
 
-			console.log(method_1)
 			expect(result.dest).toBe(
-				'1egYCubF1U5CGWiXjQnsXduiJYP49KTs8eX1jn1JrTqCYyQ'
+				'5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 			);
-			expect(result.value).toBe('123.000 KSM');
+			expect(result.value).toBe('123.0000 DOT');
 		});
 
-		it('should format decimals for less than one KSM', () => {
+		it('should format decimals for less than one DOT', () => {
 			const result = getResultFromMethod(method_2);
 
 			expect(result.dest).toBe(
-				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
+				'5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 			);
-			expect(result.value).toBe('123.123µ KSM');
+			expect(result.value).toBe('12.3123 µDOT');
 		});
 
 		it('should format absurdly large KSM', () => {
 			const result = getResultFromMethod(method_3);
 
 			expect(result.dest).toBe(
-				'5GzJiY3oG9LcyDiJbEJ6UF8jDF1AGeE2MgeXgSwgGCPopWsb'
+				'5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 			);
-			expect(result.value).toBe('9.999T KSM');
+			expect(result.value).toBe('999.9999 YDOT');
 		});
 	});
 });
