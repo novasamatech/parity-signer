@@ -15,14 +15,12 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import Call from '@polkadot/types/generic/Call';
+import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
+import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
-import { ExtrinsicEra } from '@polkadot/types/interfaces';
-
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
@@ -30,10 +28,10 @@ import {
 	RegistriesStoreState
 } from 'stores/RegistriesContext';
 import colors from 'styles/colors';
-import { withRegistriesStore } from 'utils/HOC';
-import { shortString } from 'utils/strings';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
+import { withRegistriesStore } from 'utils/HOC';
+import { shortString } from 'utils/strings';
 
 const recodeAddress = (encodedAddress: string, prefix: number): string =>
 	encodeAddress(decodeAddress(encodedAddress), prefix);
@@ -43,7 +41,7 @@ type ExtrinsicPartProps = {
 	label: string;
 	networkKey: string;
 	registriesStore: RegistriesStoreState;
-	value: AnyU8a | IMethod | IExtrinsicEra;
+	value: AnyJson | AnyU8a | IMethod | IExtrinsicEra;
 };
 
 const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
@@ -77,10 +75,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 						callMethodArgs: any,
 						depth: number
 					): void {
-						const { args, meta, methodName, sectionName } = callInstance;
+						const { args, meta } = callInstance;
 						const paramArgKvArray = [];
 						if (!meta.args.length) {
-							const sectionMethod = `${sectionName}.${methodName}`;
+							const sectionMethod = `${call.method}.${call.section}`;
 							callMethodArgs[sectionMethod] = null;
 							return;
 						}
@@ -98,7 +96,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 							) {
 								// encode Address and AccountId to the appropriate prefix
 								argument = recodeAddress(args[i].toString(), prefix);
-							} else if (args[i] instanceof Call) {
+							} else if ((args[i] as Call).section) {
 								argument = formatArgs(args[i] as Call, callMethodArgs, depth++); // go deeper into the nested calls
 							} else if (
 								args[i].toRawType() === 'Vec<AccountId>' ||
@@ -111,7 +109,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 								argument = args[i].toString();
 							}
 							const param = meta.args[i].name.toString();
-							const sectionMethod = `${sectionName}.${methodName}`;
+							const sectionMethod = `${call.method}.${call.section}`;
 							paramArgKvArray.push([param, argument]);
 							callMethodArgs[sectionMethod] = paramArgKvArray;
 						}
@@ -172,7 +170,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 							Immortal Era
 						</Text>
 						<Text style={{ ...styles.secondaryText, flex: 3 }}>
-							{value.toString()}
+							{value?.toString()}
 						</Text>
 					</View>
 				);
@@ -216,17 +214,17 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 											{arg && arg.length > 50
 												? shortString(arg)
 												: arg instanceof Array
-												? arg.join(', ')
-												: arg}{' '}
+													? arg.join(', ')
+													: arg}{' '}
 											{'}'}
 										</Text>
 									</View>
 								))
 							) : (
-								<Text style={styles.secondaryText}>
-									This method takes 0 arguments.
-								</Text>
-							)}
+									<Text style={styles.secondaryText}>
+										This method takes 0 arguments.
+									</Text>
+								)}
 						</View>
 					);
 				});
@@ -252,10 +250,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 					) : label === 'Tip' ? (
 						renderTipDetails()
 					) : (
-						<Text style={styles.secondaryText}>
-							{useFallback ? value.toString() : value}
-						</Text>
-					)}
+									<Text style={styles.secondaryText}>
+										{useFallback ? value?.toString() : value}
+									</Text>
+								)}
 				</View>
 			</View>
 		);
@@ -294,7 +292,7 @@ export default function PayloadDetailsCard(
 					<ExtrinsicPart
 						label="Method"
 						networkKey={networkKey}
-						value={fallback ? payload.method.toString() : payload.method}
+						value={fallback ? payload.method.toHuman() : payload.method}
 					/>
 					<ExtrinsicPart
 						label="Block Hash"

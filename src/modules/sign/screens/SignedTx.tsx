@@ -106,6 +106,12 @@ function SignedTxView({
 	return (
 		<SafeAreaScrollViewContainer>
 			<Text style={styles.topTitle}>Signed extrinsic</Text>
+			<CompatibleCard
+				account={sender}
+				accountsStore={accountsStore}
+				titlePrefix={'from:'}
+			/>
+			{renderPayloadDetails()}
 			<Separator
 				shadow={true}
 				style={{
@@ -119,12 +125,6 @@ function SignedTxView({
 			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
 				<QrView data={signedData} />
 			</View>
-			<CompatibleCard
-				account={sender}
-				accountsStore={accountsStore}
-				titlePrefix={'from:'}
-			/>
-			{renderPayloadDetails()}
 		</SafeAreaScrollViewContainer>
 	);
 }

@@ -34,6 +34,7 @@ export function usePayloadDetails(
 				setIsProcessing(false);
 			} catch (e) {
 				//can't generate extrinsic payload, don't display.
+				console.log('error', e);
 			}
 		}
 	}, [rawPayload, networkKey, getTypeRegistry, networks]);
