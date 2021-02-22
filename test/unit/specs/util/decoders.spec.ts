@@ -17,10 +17,10 @@
 import {
 	createType,
 	GenericExtrinsicPayload,
-	Metadata,
 	TypeRegistry
 } from '@polkadot/types';
-import Call from '@polkadot/types/generic/Call';
+import { Metadata } from '@polkadot/metadata';
+import { GenericCall as Call } from '@polkadot/types/generic';
 import { hexToU8a, u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { describe, expect, it } from '@jest/globals';

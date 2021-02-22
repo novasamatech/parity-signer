@@ -14,14 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Metadata, TypeRegistry } from '@polkadot/types';
-import Call from '@polkadot/types/generic/Call';
+import { Metadata } from '@polkadot/metadata';
+import { TypeRegistry } from '@polkadot/types';
+import { GenericCall as Call } from '@polkadot/types/generic';
 import { formatBalance } from '@polkadot/util';
 
-import { kusamaMetadata } from 'constants/networkMetadata';
+import { polkadotMetaData } from 'constants/networkMetadata';
 import { fromWei } from 'utils/units';
 const registry = new TypeRegistry();
-registry.setMetadata(new Metadata(registry, kusamaMetadata));
+registry.setMetadata(new Metadata(registry, polkadotMetaData));
 
 describe('units', () => {
 	describe('ethereum', () => {
@@ -40,7 +41,7 @@ describe('units', () => {
 		});
 	});
 
-	describe('kusama', () => {
+	describe('polkadot', () => {
 		let method_1: Call;
 		let method_2: Call;
 		let method_3: Call;
@@ -66,28 +67,30 @@ describe('units', () => {
 
 		beforeAll(() => {
 			formatBalance.setDefaults({
-				decimals: 12,
-				unit: 'KSM'
+				decimals: 10,
+				unit: 'DOT'
 			});
 
 			method_1 = new Call(
 				registry,
-				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f'
+				'0x03000000002fac081000000000b48f6ee79343db082e913f105f7c6086cc1a60dbe4b9ff67ec9fe8c19526d471d8ed5886051198052a57ec34bcb5a458398bc3d93d7353f51cbd39f07000f80789c1e6b7a591bf461cf0b6e116dea135539578ecd3eb19764ae0f0b04cabac0e'
 			);
 			method_2 = new Call(
 				registry,
-				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110ae2d45a1d'
+				'0x03000000002fac081000000000b48f6ee79343db082e913f105f7c6086cc1a60dbe4b9ff67ec9fe8c19526d471d8ed5886051198052a57ec34bcb5a458398bc3d93d7353f51cbd39f07000f80789c1e6b7a591bf461cf0b6e116dea135539578ecd3eb19764ae0f0b04cabac0e'
 			);
 			method_3 = new Call(
 				registry,
-				'0x0400ffd9d249ea49e9ae53fc0df3df40d3b070c88e387c265841fe2f3362970d864fdf1f0000606b82534ae05e4508'
+				'0x03000000002fac081000000000b48f6ee79343db082e913f105f7c6086cc1a60dbe4b9ff67ec9fe8c19526d471d8ed5886051198052a57ec34bcb5a458398bc3d93d7353f51cbd39f07000f80789c1e6b7a591bf461cf0b6e116dea135539578ecd3eb19764ae0f0b04cabac0e'
 			);
 		});
 
 		it('should format KSM', () => {
 			const result = getResultFromMethod(method_1);
+
+			console.log(method_1)
 			expect(result.dest).toBe(
-				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
+				'1egYCubF1U5CGWiXjQnsXduiJYP49KTs8eX1jn1JrTqCYyQ'
 			);
 			expect(result.value).toBe('123.000 KSM');
 		});
