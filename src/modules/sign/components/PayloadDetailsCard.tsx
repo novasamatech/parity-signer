@@ -296,11 +296,6 @@ export default function PayloadDetailsCard(
 						value={fallback ? payload.method.toHuman() : payload.method}
 					/>
 					<ExtrinsicPart
-						label="Block Hash"
-						networkKey={networkKey}
-						value={payload.blockHash.toString()}
-					/>
-					<ExtrinsicPart
 						label="Era"
 						networkKey={networkKey}
 						value={fallback ? payload.era.toString() : payload.era}
@@ -314,11 +309,6 @@ export default function PayloadDetailsCard(
 						label="Tip"
 						networkKey={networkKey}
 						value={payload.tip.toString()}
-					/>
-					<ExtrinsicPart
-						label="Genesis Hash"
-						networkKey={networkKey}
-						value={payload.genesisHash.toString()}
 					/>
 				</View>
 			)}
