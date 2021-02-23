@@ -55,7 +55,7 @@ describe('passworded account test', () => {
 			await testTap(SecurityHeader.scanButton);
 			await testInputWithDone(IdentityPin.unlockPinInput, pinCode);
 			await testInput(IdentityPin.passwordInput, password);
-			await testVisible(SignedTx.qrView);
+			await testExist(SignedTx.qrView);
 		});
 
 		it('does only need password again in the second try', async () => {
@@ -63,7 +63,7 @@ describe('passworded account test', () => {
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
 			await testInput(IdentityPin.passwordInput, password);
-			await testVisible(SignedTx.qrView);
+			await testExist(SignedTx.qrView);
 		});
 	});
 });

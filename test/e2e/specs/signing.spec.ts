@@ -45,7 +45,7 @@ const {
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
 	await testUnlockPin(pinCode);
-	await testVisible(SignedTx.qrView);
+	await testExist(SignedTx.qrView);
 };
 
 const testSignedMessage = async (): Promise<void> => {
@@ -84,13 +84,13 @@ describe('Signing ane exporting test', () => {
 			await tapBack();
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
-			await testVisible(SignedTx.qrView);
+			await testExist(SignedTx.qrView);
 		});
 
-		it('should sign transfer request', async () => {
-			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
-			await testSignedTx();
-		});
+		// it('should sign transfer request', async () => {
+		// 	await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
+		// 	await testSignedTx();
+		// });
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
@@ -123,10 +123,10 @@ describe('Signing ane exporting test', () => {
 			await testSignedTx();
 		});
 
-		it('should sign transfer request', async () => {
-			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
-			await testSignedTx();
-		});
+		// it('should sign transfer request', async () => {
+		// 	await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
+		// 	await testSignedTx();
+		// });
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
