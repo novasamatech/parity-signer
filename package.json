@@ -95,7 +95,7 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react-hooks": "^3.0.0",
-    "jest": "^25.4.0",
+    "jest": "26.6.3",
     "jetifier": "^1.6.5",
     "metro-react-native-babel-preset": "^0.59.0",
     "prettier": "2.0.2",
@@ -103,7 +103,7 @@
     "react-native-typescript-transformer": "^1.2.13",
     "react-test-renderer": "16.13.1",
     "reactotron-react-native": "5.0.0",
-    "ts-jest": "^25.4.0",
+    "ts-jest": "^26.5.1",
     "typescript": "^3.9.7"
   },
   "resolutions": {
@@ -132,7 +132,7 @@
         "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Nexus_5_API_28"
+          "avdName": "Pixel_3a_API_30_x86"
         }
       },
       "android.emu.release": {
@@ -140,7 +140,7 @@
         "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Nexus_5_API_28"
+          "avdName": "Pixel_3a_API_30_x86"
         }
       }
     },

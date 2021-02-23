@@ -45,7 +45,7 @@ const {
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
 	await testUnlockPin(pinCode);
-	// await testVisible(SignedTx.qrView);
+	await testVisible(SignedTx.qrView);
 };
 
 const testSignedMessage = async (): Promise<void> => {
