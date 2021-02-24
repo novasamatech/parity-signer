@@ -72,10 +72,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 		const selectedAccount = newAccount;
 		const selectedNetwork = getNetwork(selectedAccount.networkKey);
 
-		updateState({
-			selectedAccount,
-			selectedNetwork
-		});
+		updateState({ selectedAccount, selectedNetwork });
 	}, [newAccount, getNetwork]);
 
 	const onSelectIcon = useCallback(({ isBip39, newAddress, newSeed }): void => {

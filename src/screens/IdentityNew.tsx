@@ -14,62 +14,134 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import AccountCard from 'components/AccountCard';
 import AccountSeed from 'components/AccountSeed';
 import Button from 'components/Button';
+import { NetworkCard } from 'components/NetworkCard';
 import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
+import { NetworkProtocols } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import colors from 'styles/colors';
+import fontStyles from 'styles/fontStyles';
+import { isEthereumNetwork, NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
-import { validateSeed } from 'utils/account';
+import { emptyAccount, validateSeed } from 'utils/account';
 import { alertError, alertIdentityCreationError, alertRisks } from 'utils/alertUtils';
 import { debounce } from 'utils/debounce';
-import { emptyIdentity } from 'utils/identitiesUtils';
-import { brainWalletAddress } from 'utils/native';
+import { brainWalletAddress, substrateAddress } from 'utils/native';
 import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
-import { useNewSeedRef } from 'utils/seedRefHooks';
+import { constructSURI } from 'utils/suri';
 
-import { AccountsContext, AlertContext } from '../context';
+import { AccountsContext, AlertContext, NetworksContext } from '../context';
+
+interface State {
+	derivationPassword: string;
+	derivationPath: string;
+	isDerivationPathValid: boolean;
+	selectedNetwork?:NetworkParams | null;
+	newAccount?: Account;
+}
 
 function IdentityNew({ navigation, route }: NavigationProps<'IdentityNew'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
+	const initialState = {
+		derivationPassword: '',
+		derivationPath: '',
+		isDerivationPathValid: true,
+		selectedNetwork: undefined
+	};
+
+	const [derivationPath, setDerivationPath] = useState('');
+	const [derivationPassword, setDerivationPassword] = useState('');
+	const { state: { newAccount }, updateNew } = useContext(AccountsContext);
 	const defaultSeedValidObject = validateSeed('', false);
-	const isRecoverDefaultValue = route.params?.isRecover ?? false;
-	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const { setAlert } = useContext(AlertContext);
-	const createSeedRefWithNewSeed = useNewSeedRef();
-	const clearIdentity = useRef(() =>
-		accountsStore.updateNewIdentity(emptyIdentity()));
-	const [isValidBIP39, setIsBIP39Valid] = useState(false);
+	const { getNetwork } = useContext(NetworksContext)
+	const selecteNetwork = useMemo(() => getNetwork(newAccount.networkKey), [getNetwork, newAccount.networkKey])
 
-	useEffect((): (() => void) => {
-		clearIdentity.current();
+	useEffect((): void => {
+		updateNew(emptyAccount('', ''));
+	// we get an infinite loop if we add anything here.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
-		return clearIdentity.current;
-	}, [clearIdentity]);
+	// useEffect((): void => {
+	// 	const selectedNetwork = getNetwork(newAccount.networkKey);
 
-	const updateName = (name: string): void => {
-		accountsStore.updateNewIdentity({ name });
-	};
+	// 	updateState({ selectedNetwork });
+	// }, [newAccount, getNetwork]);
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
 		setSeedPhrase(inputSeedPhrase);
 		const addressGeneration = (): Promise<void> =>
 			brainWalletAddress(inputSeedPhrase.trimEnd())
 				.then(({ bip39 }) => {
-					setIsBIP39Valid(bip39)
 					setIsSeedValid(validateSeed(inputSeedPhrase, bip39));
+					generateAddress()
 				})
 				.catch(() => setIsSeedValid(defaultSeedValidObject));
 		const debouncedAddressGeneration = debounce(addressGeneration, 200);
 
 		debouncedAddressGeneration();
 	};
+
+	const generateAddress = useCallback(() => {
+		if (!selecteNetwork) {
+			console.error('No network selected')
+
+			return null
+		}
+
+		if (isEthereumNetwork(selecteNetwork)) {
+			brainWalletAddress(seedPhrase)
+				.then(({ address, bip39 }) =>
+					updateNew({
+						address,
+						seed: seedPhrase,
+						seedPhrase,
+						validBip39Seed: bip39
+					}))
+				.catch(console.error);
+		} else {
+			// Substrate
+			try {
+				const { prefix } = selecteNetwork as SubstrateNetworkParams
+				const suri = constructSURI({
+					derivePath: derivationPath,
+					password: derivationPassword,
+					phrase: seedPhrase
+				});
+
+				substrateAddress(suri, prefix)
+					.then(address => {
+						updateNew({
+							address,
+							derivationPassword,
+							derivationPath,
+							seed: suri,
+							seedPhrase,
+							validBip39Seed: true
+						});
+					})
+					.catch((e) => {
+						//invalid phrase
+						console.error(e)
+					});
+			} catch (e) {
+				// invalid phrase or derivation path
+				console.error(e)
+			}
+		}
+	}, [derivationPassword, derivationPath, seedPhrase, selecteNetwork, updateNew]);
+
+	useEffect(() => {
+		isSeedValid.bip39 && generateAddress()
+	}, [generateAddress, isSeedValid.bip39])
 
 	const onRecoverIdentity = async (): Promise<void> => {
 		const pin = await setPin(navigation);
@@ -104,20 +176,64 @@ function IdentityNew({ navigation, route }: NavigationProps<'IdentityNew'>): Rea
 		return onRecoverIdentity();
 	};
 
-	const onCreateNewIdentity = (): void => {
-		setSeedPhrase('');
-		navigation.navigate('IdentityBackup', { isNew: true });
-	};
+	// const onCreateNewIdentity = (): void => {
+	// 	setSeedPhrase('');
+	// 	navigation.navigate('IdentityBackup', { isNew: true });
+	// };
+	const { address, name, networkKey } = newAccount;
 
-	const renderRecoverView = (): React.ReactElement => (
-		<>
-			<AccountSeed
-				onChangeText={onSeedTextInput}
-				onSubmitEditing={onRecoverConfirm}
-				returnKeyType="done"
-				testID={testIDs.IdentityNew.seedInput}
-				valid={isValidBIP39}
-			/>
+	return (
+		<KeyboardAwareContainer>
+			<ScreenHeading title={'New Account'} />
+			<View style={styles.step}>
+				<Text style={styles.title}>Name</Text>
+				<TextInput
+					onChangeText={(input: string): void =>
+						updateNew({ name: input })
+					}
+					placeholder="new name"
+					value={name}
+				/>
+			</View>
+			<View style={styles.step}>
+				<Text style={styles.title}>NETWORK</Text>
+				<NetworkCard
+					networkKey={networkKey}
+					onPress={(): void => navigation.navigate('LegacyNetworkChooser')}
+					title={selecteNetwork?.title || 'Select Network'}
+				/>
+			</View>
+			<View style={styles.step}>
+				<Text style={styles.title}>Mnemonic</Text>
+				<AccountSeed
+					onChangeText={onSeedTextInput}
+					returnKeyType="done"
+					testID={testIDs.IdentityNew.seedInput}
+					valid={isSeedValid.bip39}
+				/>
+			</View>
+			{/* {isSubstrate && (
+				<DerivationPathField
+					onChange={newDerivationPath => {
+						this.debouncedAddressGeneration(seedPhrase,
+							newDerivationPath.derivationPath,
+							newDerivationPath.derivationPassword);
+						this.setState({
+							derivationPassword: newDerivationPath.derivationPassword,
+							derivationPath: newDerivationPath.derivationPath,
+							isDerivationPathValid: newDerivationPath.isDerivationPathValid
+						});
+					}}
+					styles={styles}
+				/>
+			)} */}
+			{ isSeedValid.bip39 &&
+				(<AccountCard
+					address={address}
+					networkKey={networkKey}
+					title={name}
+				/>)
+			}
 			<View style={styles.btnBox}>
 				<Button
 					onPress={onRecoverConfirm}
@@ -125,45 +241,7 @@ function IdentityNew({ navigation, route }: NavigationProps<'IdentityNew'>): Rea
 					testID={testIDs.IdentityNew.recoverButton}
 					title="Recover"
 				/>
-				<Button
-					onPress={(): void => {
-						setIsRecover(false);
-					}}
-					onlyText={true}
-					small={true}
-					title="or create new identity"
-				/>
 			</View>
-		</>
-	);
-
-	const renderCreateView = (): React.ReactElement => (
-		<View style={styles.btnBox}>
-			<Button
-				onPress={onCreateNewIdentity}
-				small={true}
-				testID={testIDs.IdentityNew.createButton}
-				title="Create"
-			/>
-			<Button
-				onPress={(): void => setIsRecover(true)}
-				onlyText={true}
-				small={true}
-				title="or recover existing identity"
-			/>
-		</View>
-	);
-
-	return (
-		<KeyboardAwareContainer>
-			<ScreenHeading title={'New Identity'} />
-			<TextInput
-				onChangeText={updateName}
-				placeholder="Identity Name"
-				testID={testIDs.IdentityNew.nameInput}
-				value={accountsStore.state.newIdentity.name}
-			/>
-			{isRecover ? renderRecoverView() : renderCreateView()}
 		</KeyboardAwareContainer>
 	);
 }
@@ -179,5 +257,12 @@ const styles = StyleSheet.create({
 	btnBox: {
 		alignContent: 'center',
 		marginTop: 32
+	},
+	step: {
+		padding: 16
+	},
+	title: {
+		...fontStyles.h_subheading,
+		color: colors.text.main
 	}
 });

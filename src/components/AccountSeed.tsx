@@ -30,10 +30,7 @@ import TouchableItem from './TouchableItem';
 const ALL_WORDS = Array.from(new Set(PARITY_WORDS.concat(BIP39_WORDS))).sort();
 const SUGGESTIONS_COUNT = 5;
 
-interface Props extends TextInputProps {
-	onChangeText: (text: string) => void;
-	valid: boolean;
-}
+interface Props extends TextInputProps { onChangeText: (text: string) => void; valid: boolean;}
 
 export default function AccountSeed({ onChangeText, valid, ...props }: Props): React.ReactElement {
 	const [cursorPosition, setCursorPosition] = useState({
@@ -150,23 +147,23 @@ export default function AccountSeed({ onChangeText, valid, ...props }: Props): R
 				onChangeText={onNativeChangeText}
 				onSelectionChange={handleCursorPosition}
 				returnKeyType="done"
-				style={StyleSheet.flatten([
-					fontStyles.t_seed,
-					styles.input,
-					validStyles
-				])}
+				style={StyleSheet.flatten([ fontStyles.t_seed, styles.input, validStyles ])}
 				textAlignVertical="top"
 				value={value}
 				{...props}
 			/>
-			{value.length > 0 && renderSuggestions()}
+			{value.length > 0 && !valid && renderSuggestions()}
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	body: { flexDirection: 'column' },
-	input: { borderBottomColor: colors.border.light },
+	body: {
+		flexDirection: 'column'
+	},
+	input: {
+		borderBottomColor: colors.border.light
+	},
 	invalidInput: {
 		borderBottomColor: colors.border.signal,
 		borderColor: colors.border.signal
@@ -191,5 +188,9 @@ const styles = StyleSheet.create({
 		marginTop: -8,
 		overflow: 'hidden'
 	},
-	validInput: { borderColor: colors.border.valid }
+	validInput: {
+		borderBottomColor: colors.border.valid,
+		borderColor: colors.border.valid,
+		color: colors.text.faded
+	}
 });
