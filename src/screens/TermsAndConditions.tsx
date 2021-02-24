@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import Button from 'components/Button';
 import CustomScrollView from 'components/CustomScrollView';
 import Markdown from 'components/Markdown';
@@ -35,7 +35,7 @@ import { useTac } from '../hooks/useTac';
 export default function TermsAndConditions(): React.ReactElement {
 	const [isPPAgreed, setPpAgreement] = useState(false);
 	const [isTacAgreed, setTacAgreement] = useState(false);
-	const { navigate } = useNavigation();
+	const { dispatch, navigate } = useNavigation();
 	const { ppAndTaCAccepted, setPpAndTaCAccepted } = useTac();
 
 	const onConfirm = useCallback(async () => {
@@ -46,12 +46,12 @@ export default function TermsAndConditions(): React.ReactElement {
 					.then(() => {
 						console.log('done migration')
 						setPpAndTaCAccepted(true);
-						// const resetAction = CommonActions.reset({
-						// 	index: 0,
-						// 	routes: [{ name: 'LegacyAccountList' }]
-						// });
+						const resetAction = CommonActions.reset({
+							index: 0,
+							routes: [{ name: 'LegacyAccountList' }]
+						});
 
-						// dispatch(resetAction);
+						dispatch(resetAction);
 					// 	setDataLoaded(true);
 					})
 					.catch((e) => {
@@ -60,7 +60,7 @@ export default function TermsAndConditions(): React.ReactElement {
 			}).catch((e)=> {
 				console.error('saveTaCAndPPConfirmation error', e)
 			});
-	}, [setPpAndTaCAccepted]);
+	}, [dispatch, setPpAndTaCAccepted]);
 
 	return (
 		<View

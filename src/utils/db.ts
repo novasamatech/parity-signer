@@ -159,7 +159,7 @@ export async function saveNetworks(newNetwork: SubstrateNetworkParams): Promise<
  * ========================================
  */
 
-const version = 874589;
+const version = 1;
 
 export async function loadTaCAndPPConfirmation(): Promise<boolean> {
 	const result = await AsyncStorage.getItem(`TaCAndPPConfirmation_v${version}`);

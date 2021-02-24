@@ -22,7 +22,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import CustomAlert from 'components/CustomAlert';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
 import * as React from 'react';
-import { LogBox,StatusBar, StyleSheet, View } from 'react-native';
+import { LogBox,StatusBar } from 'react-native';
 import NavigationBar from 'react-native-navbar-color';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -30,9 +30,8 @@ import { RegistriesContext, useRegistriesStore } from 'stores/RegistriesContext'
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 
-import { useTac } from './hooks/useTac';
 import { AccountsContextProvider, AlertContextProvider, NetworksContextProvider, ScannerContextProvider } from './context';
-import { AppNavigator, ScreenStack, TacAndPrivacyPolicyNavigator } from './screens';
+import { AppNavigator } from './screens';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
@@ -49,32 +48,8 @@ export default function App(props: AppProps): React.ReactElement {
 		]);
 	}
 
-	const { dataLoaded, ppAndTaCAccepted } = useTac();
 	const seedRefContext = useSeedRefStore();
 	const registriesContext = useRegistriesStore();
-
-	console.log('Main stack', ppAndTaCAccepted)
-
-	const MainStack = (): React.ReactElement => {
-
-		if (!dataLoaded) {
-
-			return (
-				<ScreenStack.Navigator>
-					<ScreenStack.Screen name="Loading">
-						{(navigationProps: any): React.ReactElement => (
-							<View style={emptyScreenStyles}
-								{...navigationProps} />
-						)}
-					</ScreenStack.Screen>
-				</ScreenStack.Navigator>
-			);
-		}
-
-		return ppAndTaCAccepted
-			? <AppNavigator />
-		 	: <TacAndPrivacyPolicyNavigator />;
-	};
 
 	return (
 		<SafeAreaProvider>
@@ -91,7 +66,7 @@ export default function App(props: AppProps): React.ReactElement {
 										/>
 										<CustomAlert />
 										<NavigationContainer>
-											<MainStack/>
+											<AppNavigator />
 										</NavigationContainer>
 									</MenuProvider>
 								</SeedRefsContext.Provider>
@@ -103,12 +78,3 @@ export default function App(props: AppProps): React.ReactElement {
 		</SafeAreaProvider>
 	);
 }
-
-const emptyScreenStyles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		flexDirection: 'column',
-		padding: 20
-	}
-});

@@ -13,7 +13,7 @@
     "install:ios": "yarn install && npx pod-install",
     "archive": "xcodebuild -scheme NativeSigner -workspace ios/NativeSigner.xcworkspace -configuration Release clean archive -archivePath \"ios/build/NativeSigner.xcarchive\" \n    CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO",
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force",
-    "clean:android": "(cd android && ./gradlew clean) && yarn clean && rm -rf ./android/app/build",
+    "clean:android": "(cd android && rm -rf .gradle && ./gradlew clean) && yarn clean && rm -rf ./android/app/build",
     "clean:ios": "yarn clean && rm -rf ./ios/build && (cd ios && pod deintegrate)",
     "build-rust:ios": "(cd rust/signer && make ios)",
     "build-rust:android": "(cd rust/signer && make android)",

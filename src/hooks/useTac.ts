@@ -20,7 +20,6 @@ export function useTac(): TacHookType {
 	const [ppAndTaCAccepted, setPpAndTaCAccepted] = useState(false);
 	const [dataLoaded, setDataLoaded] = useState(false);
 
-	console.log('loading', ppAndTaCAccepted)
 	useEffect(() => {
 		loadTaCAndPPConfirmation()
 			.then((tacPP) => {

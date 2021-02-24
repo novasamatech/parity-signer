@@ -15,17 +15,18 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import React, { useContext } from 'react';
+import React from 'react';
 import LegacyAccountList from 'screens/LegacyAccountList';
+import TermsAndConditions from 'screens/TermsAndConditions';
 
-import { AccountsContext } from '../../../context';
+import { useTac } from '../../../hooks/useTac';
 
 export default function Main(): React.ReactElement {
+	const { dataLoaded, ppAndTaCAccepted } = useTac();
 
-	const accountsStore = useContext(AccountsContext);
-	const { loaded } = accountsStore.state;
+	if (!dataLoaded) return <SafeAreaViewContainer />;
 
-	if (!loaded) return <SafeAreaViewContainer />;
-
-	return <LegacyAccountList />
+	return ppAndTaCAccepted
+		? <LegacyAccountList />
+		: <TermsAndConditions />
 }

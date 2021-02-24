@@ -234,22 +234,3 @@ export const AppNavigator = (): React.ReactElement => (
 		/>
 	</ScreenStack.Navigator>
 );
-
-export const TacAndPrivacyPolicyNavigator = (): React.ReactElement => (
-	<ScreenStack.Navigator
-		initialRouteName="TermsAndConditions"
-		screenOptions={{
-			...globalStackNavigationOptions,
-			headerRight: (): React.ReactNode => null
-		}}
-	>
-		<ScreenStack.Screen
-			component={TermsAndConditions}
-			name="TermsAndConditions"
-		/>
-		<ScreenStack.Screen
-			component={PrivacyPolicy}
-			name="PrivacyPolicy"
-		/>
-	</ScreenStack.Navigator>
-);
