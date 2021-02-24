@@ -153,5 +153,10 @@
     },
     "runner-config": "test/e2e/jest.config.js",
     "test-runner": "jest"
+  },
+  "jest": {
+    "projects": [
+      "test/unit/jest.config.js"
+    ]
   }
 }
