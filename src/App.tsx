@@ -52,7 +52,7 @@ export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
 	NavigationBar.setColor(colors.background.os);
 	if (global.inTest) {
-		console.disableYellowBox = true;
+		LogBox.ignoreAllLogs(true);
 	} else if (__DEV__) {
 		LogBox.ignoreLogs([
 			'Warning: componentWillReceiveProps',
