@@ -57,7 +57,7 @@
     "react-native-camera": "^3.21.0",
     "react-native-elements": "^1.2.6",
     "react-native-gesture-handler": "^1.6.0",
-    "react-native-keyboard-aware-scroll-view": "^0.9.1",
+    "react-native-keyboard-aware-scroll-view": "0.9.3",
     "react-native-markdown-renderer": "^3.2.8",
     "react-native-navbar-color": "^1.0.3",
     "react-native-popup-menu": "^0.15.6",
