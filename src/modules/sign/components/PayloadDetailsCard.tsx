@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
 	label: {
 		...fontStyles.t_label,
 		backgroundColor: colors.signal.main,
-		color: colors.text.main,
+		color: colors.background.app,
 		marginBottom: 10,
 		paddingLeft: 8,
 		textAlign: 'left'
@@ -351,6 +351,7 @@ const styles = StyleSheet.create({
 	},
 	titleText: {
 		...fontStyles.t_codeS,
-		color: colors.text.main
+		color: colors.text.main,
+		paddingHorizontal: 16
 	}
 });
