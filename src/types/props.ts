@@ -1,7 +1,7 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { GestureResponderEvent, NativeSyntheticEvent, TextInputChangeEventData, TextInputFocusEventData } from 'react-native';
-import { AccountsStoreStateWithIdentity, Identity, LegacyAccount } from 'types/identityTypes';
+import { AccountsStoreStateWithIdentity, LegacyAccount } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 
 import { AccountsContextType, ScannerContextType } from '../context';

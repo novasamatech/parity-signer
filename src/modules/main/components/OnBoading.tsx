@@ -34,7 +34,7 @@ export default function OnBoardingView({ hasLegacyAccount }: {hasLegacyAccount: 
 	}): React.ReactElement {
 		return (
 			<Text
-				onPress={(): void => navigation.navigate('IdentityNew', { isRecover })}
+				onPress={(): void => navigation.navigate('RecoverAccount', { isRecover })}
 				style={[fontStyles.quote, { textDecorationLine: 'underline' }]}
 				testID={
 					isRecover ? testIDs.Main.recoverButton : testIDs.Main.createButton

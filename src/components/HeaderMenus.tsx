@@ -38,7 +38,7 @@ function HeaderMenus(): React.ReactElement {
 				<PopupMenu
 					menuItems={[
 						{ text: 'Create account', value: 'AccountNew' },
-						{ text: 'Recover account', value: 'IdentityNew' },
+						{ text: 'Recover account', value: 'RecoverAccount' },
 						{ text: 'Manage networks', value: 'NetworkSettings' }
 					]}
 					menuTriggerIconName={'add'}

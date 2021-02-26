@@ -146,18 +146,18 @@ export const navigateToPathDetails = <
 	navigation.dispatch(resetAction);
 };
 
-export const navigateToLandingPage = <
-	RouteName extends keyof RootStackParamList
->(
-		navigation: GenericNavigationProps<RouteName>
-	): void => {
-	const resetAction = CommonActions.reset({
-		index: 0,
-		routes: [{ name: 'Main' }]
-	});
+// export const navigateToLandingPage = <
+// 	RouteName extends keyof RootStackParamList
+// >(
+// 		navigation: GenericNavigationProps<RouteName>
+// 	): void => {
+// 	const resetAction = CommonActions.reset({
+// 		index: 0,
+// 		routes: [{ name: 'Main' }]
+// 	});
 
-	navigation.dispatch(resetAction);
-};
+// 	navigation.dispatch(resetAction);
+// };
 
 export const navigateToNewIdentityNetwork = <RouteName extends keyof RootStackParamList>(navigation: GenericNavigationProps<RouteName>): void => {
 	const resetAction = CommonActions.reset({

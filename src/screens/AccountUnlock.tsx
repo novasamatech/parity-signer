@@ -19,7 +19,7 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
 import React, { useContext, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
@@ -124,13 +124,19 @@ export function AccountUnlockAndSign(props: NavigationProps<'AccountUnlockAndSig
 export function AccountUnlock({ navigation, route }: NavigationProps<'AccountUnlock'>): React.ReactElement {
 	const next = route.params.next || 'LegacyAccountList';
 	const onDelete = route.params.onDelete ?? ((): any => null);
-	const accountsStore = useContext(AccountsContext);
-	const { selectedKey } = accountsStore.state;
+	const { getSelectedAccount, unlockAccount } = useContext(AccountsContext);
+	const selectedAccount = getSelectedAccount();
+
+	if (!selectedAccount?.address){
+		console.error('no selected account')
+
+		return <View/>;
+	}
 
 	return (
 		<AccountUnlockView
 			checkPin={async (pin: string): Promise<boolean> => {
-				return await accountsStore.unlockAccount(selectedKey, pin);
+				return await unlockAccount(selectedAccount.address, pin);
 			}}
 			navigate={(): void => {
 				if (next === 'AccountDelete') {

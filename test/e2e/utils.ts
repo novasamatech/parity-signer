@@ -20,7 +20,7 @@ import { by, device,element, expect } from 'detox';
 
 import testIDs from './testIDs';
 
-const { IdentityNew, IdentityPin, Main, PathDetail, PathsList } = testIDs;
+const { IdentityPin, Main, PathDetail, PathsList, RecoverAccount } = testIDs;
 
 export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
@@ -109,10 +109,10 @@ export const launchWithScanRequest = async (txRequest: number): Promise<void> =>
 export const testRecoverIdentity = (): void => {
 	it('recover a identity with seed phrase', async () => {
 		await testTap(Main.recoverButton);
-		await testVisible(IdentityNew.seedInput);
-		await testInput(IdentityNew.nameInput, mockIdentityName);
-		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
-		await element(by.id(IdentityNew.seedInput)).tapReturnKey();
+		await testVisible(RecoverAccount.seedInput);
+		await testInput(RecoverAccount.nameInput, mockIdentityName);
+		await element(by.id(RecoverAccount.seedInput)).typeText(mockSeedPhrase);
+		await element(by.id(RecoverAccount.seedInput)).tapReturnKey();
 		await testSetUpDefaultPath();
 	});
 };

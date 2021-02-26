@@ -83,7 +83,7 @@ const identities = [
   {
     encryptedSeed: '{"cipher":"aes-128-ctr","cipherparams":{"iv":f872394210984322432423,"cipherText":"sad12343fdcdxa..."}}',
     derivationPassword: '',
-    name: 'identityNew'
+    name: 'RecoverAccount'
     //NOTICE: meta is a Map Object
     meta: {
       '//kusma//funding/1': {

@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 // Copyright 2015-2020 Parity Technologies (UK) Ltd.
 // This file is part of Parity.
 
@@ -23,28 +24,21 @@ const testIDs = {
 		deleteIdentity: 'alert_delete_identity'
 	},
 	Header: { headerBackButton: 'header_back_button' },
-	IdentitiesSwitch: {
-		addIdentityButton: 'identities_switch_add_identity',
-		manageIdentityButton: 'identities_switch_manager_button',
-		modal: 'identity_switch_modal',
-		toggleButton: 'identities_switch_toggle_button'
-	},
+	// IdentitiesSwitch: {
+	// 	addIdentityButton: 'identities_switch_add_identity',
+	// 	manageIdentityButton: 'identities_switch_manager_button',
+	// 	modal: 'identity_switch_modal',
+	// 	toggleButton: 'identities_switch_toggle_button'
+	// },
 	IdentityBackup: {
 		nextButton: 'identity_backup_next',
 		passwordInput: 'identity_backup_password_input',
 		seedText: 'identity_backup_seed'
 	},
-	IdentityManagement: {
-		deleteButton: 'identity_management_delete_button',
-		popupMenuButton: 'identity_management_popup_menu'
-	},
-	IdentityNew: {
-		createButton: 'identity_new_create_button',
-		nameInput: 'identity_new_name_input',
-		passwordInput: 'identity_new_password_input',
-		recoverButton: 'identity_new_recover_button',
-		seedInput: 'identity_new_seed_input'
-	},
+	// IdentityManagement: {
+	// 	deleteButton: 'identity_management_delete_button',
+	// 	popupMenuButton: 'identity_management_popup_menu'
+	// },
 	IdentityPin: {
 		confirmPin: 'identity_pin_confirm',
 		passwordInput: 'identity_pin_password_input',
@@ -87,6 +81,13 @@ const testIDs = {
 		pathsGroup: 'path_list_paths_group',
 		scanButton: 'path_list_scan_button',
 		screen: 'path_list_screen'
+	},
+	RecoverAccount: {
+		createButton: 'identity_new_create_button',
+		nameInput: 'identity_new_name_input',
+		passwordInput: 'identity_new_password_input',
+		recoverButton: 'identity_new_recover_button',
+		seedInput: 'identity_new_seed_input'
 	},
 	QrScanner: { networkAddSuccessButton: 'qr_scanner_add_network_button' },
 	SecurityHeader: { scanButton: 'security_header_scan_button' },

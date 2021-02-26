@@ -22,11 +22,12 @@ import { PasswordedAccountExportWarning } from 'components/Warnings';
 import testIDs from 'e2e/testIDs';
 import React, { useContext, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
-import { NetworksContext } from '../context';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey, getPathName } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
+
+import { NetworksContext } from '../context';
 
 function PathSecret({ accountsStore, navigation, route }: NavigationAccountIdentityProps<'PathSecret'>): React.ReactElement {
 	const networksContextState = useContext(NetworksContext);

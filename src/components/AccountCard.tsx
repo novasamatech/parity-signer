@@ -44,9 +44,9 @@ export default function AccountCard({ address, networkKey, onPress, seedType, st
 
 	const account = getAccountByAddress(address)
 
-	const displayTitle = account?.name || title || 'Unknown';
+	const displayTitle = title ||account?.name || 'Unknown';
 	const seedTypeDisplay = seedType || '';
-	const network = account?.networkKey ? getNetwork(account.networkKey) : getNetwork(networkKey);
+	const network = getNetwork(networkKey) || getNetwork(account?.networkKey);
 
 	return (
 		<TouchableItem

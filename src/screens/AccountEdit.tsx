@@ -27,9 +27,9 @@ import { AccountsContext } from '../context';
 
 // TODO FIXME test this
 export default function AccountEdit(): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
-	const selectedAccount = accountsStore.getSelected();
-	const [name, setName] = useState(selectedAccount?.name || '')
+	const { getSelectedAccount, saveAccount } = useContext(AccountsContext);
+	const selectedAccount = getSelectedAccount();
+	const [newName, setNewName] = useState(selectedAccount?.name || '')
 	const navigation = useNavigation();
 
 	useEffect(() => {
@@ -45,13 +45,13 @@ export default function AccountEdit(): React.ReactElement {
 			return;
 		}
 
-		accountsStore.save({ ...selectedAccount, name })
+		saveAccount({ ...selectedAccount, name: newName })
 			.then(() => {
 				navigation.goBack()
 			})
 			.catch(console.error);
 
-	}, [accountsStore, name, navigation, selectedAccount])
+	}, [newName, navigation, saveAccount, selectedAccount])
 
 	if (!selectedAccount) {
 		return <SafeAreaScrollViewContainer/>
@@ -62,18 +62,18 @@ export default function AccountEdit(): React.ReactElement {
 			<AccountCard
 				address={selectedAccount.address}
 				networkKey={selectedAccount.networkKey}
-				title={name}
+				title={newName}
 			/>
 			<TextInput
 				label="Account Name"
-				onChangeText={setName}
+				onChangeText={setNewName}
 				placeholder="New name"
 				style={{ marginBottom: 40 }}
-				value={name}
+				value={newName}
 			/>
 			<Button
 				onPress={onSubmit}
-				title={t.doneButton.pinUnlock}
+				title={t.doneButton.nameChange}
 			/>
 		</SafeAreaScrollViewContainer>
 	);

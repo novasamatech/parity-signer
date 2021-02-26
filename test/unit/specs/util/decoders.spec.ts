@@ -15,13 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { describe, expect, it } from '@jest/globals';
-import { createType,
-	GenericExtrinsicPayload,
-	Metadata,
-	TypeRegistry } from '@polkadot/types';
-import Call from '@polkadot/types/generic/Call';
-import { hexToU8a, u8aConcat } from '@polkadot/util';
-import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { kusamaMetadata } from 'constants/networkMetadata';
 import { SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys } from 'constants/networkSpecs';
@@ -34,6 +27,14 @@ import { asciiToHex,
 	isJsonString,
 	rawDataToU8A } from 'utils/decoders';
 import { isAscii } from 'utils/strings';
+
+import { createType,
+	GenericExtrinsicPayload,
+	Metadata,
+	TypeRegistry } from '@polkadot/types';
+import Call from '@polkadot/types/generic/Call';
+import { hexToU8a, u8aConcat } from '@polkadot/util';
+import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);

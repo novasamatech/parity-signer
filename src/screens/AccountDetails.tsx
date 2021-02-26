@@ -29,22 +29,21 @@ import fontStyles from 'styles/fontStyles';
 import { EthereumNetwork, isSubstrateNetwork } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { alertDeleteLegacyAccount } from 'utils/alertUtils';
-import { navigateToLandingPage, navigateToLegacyAccountList } from 'utils/navigationHelpers';
+import { navigateToLegacyAccountList } from 'utils/navigationHelpers';
 
 import { AccountsContext, AlertContext, NetworksContext } from '../context';
 
 export default function AccountDetails({ navigation }: NavigationProps<'AccountDetails'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
-	const { address, name, networkKey } = accountsStore.getSelected() || { address: '', name: '', networkKey: '' };
+	const { deleteAccount, getSelectedAccount } = useContext(AccountsContext);
+	const selectedAccount = getSelectedAccount();
+	const { address, name, networkKey } = selectedAccount || { address: '', name: '', networkKey: '' };
 	const { getNetwork } = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertContext);
-	const { accounts, selectedKey } = accountsStore.state;
 	const network = getNetwork(networkKey);
 
 	const accountId = useMemo((): string => {
-
 		if (!network){
-			console.error('Account without network')
+			console.log('Account without network')
 
 			return '';
 		}
@@ -70,11 +69,7 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 		alertDeleteLegacyAccount(setAlert,
 			name || address || 'this account',
 			async () => {
-				await accountsStore.deleteAccount(selectedKey);
-
-				if (accounts.length === 0) {
-					return navigateToLandingPage(navigation);
-				}
+				await deleteAccount(address);
 
 				navigateToLegacyAccountList(navigation);
 			});
@@ -113,11 +108,7 @@ export default function AccountDetails({ navigation }: NavigationProps<'AccountD
 						/>
 					</View>
 				</View>
-				<AccountCard
-					address={address}
-					networkKey={networkKey}
-					title={name}
-				/>
+				<AccountCard address={address} />
 				<View>
 					<QrView
 						data={

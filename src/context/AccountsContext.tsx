@@ -1,9 +1,9 @@
 import { ETHEREUM_NETWORK_LIST, NetworkProtocols } from 'constants/networkSpecs';
-import { createContext, default as React, useContext, useEffect, useReducer } from 'react';
+import { createContext, default as React, useCallback, useContext, useEffect, useReducer, useState } from 'react';
 import { Account, AccountsStoreState, Identity, isUnlockedAccount, LegacyAccount, LockedAccount, UnlockedAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { emptyAccount, generateAccountId } from 'utils/account';
-import { deleteAccount as deleteDbAccount, loadAccounts, saveAccount, saveIdentities } from 'utils/db';
+import { deleteAccount as deleteDbAccount, loadAccounts, saveAccount as saveDbAccount, saveIdentities } from 'utils/db';
 import { accountExistedError, addressGenerateError, duplicatedIdentityError, emptyIdentityError, identityUpdateError } from 'utils/errors';
 import { deepCopyIdentities, deepCopyIdentity, emptyIdentity, extractAddressFromAccountId, getAddressKeyByPath } from 'utils/identitiesUtils';
 import { brainWalletAddressWithRef, decryptData, encryptData } from 'utils/native';
@@ -13,39 +13,38 @@ import { constructSuriSuffix, parseSURI } from 'utils/suri';
 import { NetworksContext, NetworksContextType } from './NetworksContext';
 
 export interface AccountsContextType {
+	accounts: LegacyAccount[];
+	accountsLoaded: boolean;
+	newAccount: LegacyAccount;
 	clearIdentity: () => void;
-	deleteAccount: (accountKey: string) => Promise<void>;
+	deleteAccount: (accountAddress: string) => Promise<void>;
 	deleteCurrentIdentity: () => Promise<void>;
 	deletePath: (path: string, networkContext: NetworksContextType) => void;
 	deriveNewPath: (newPath: string, createSubstrateAddress: TrySubstrateAddress, networkParams: SubstrateNetworkParams, name: string, password: string) => Promise<void>;
 	deriveEthereumAccount: (createBrainWalletAddress: TryBrainWalletAddress, networkKey: string) => Promise<void>;
 	getAccountByAddress: (address: string) => LegacyAccount | undefined;
 	getIdentityByAccountId: (accountId: string) => Identity | undefined;
-	getSelected: () => Account | undefined;
+	getSelectedAccount: () => LegacyAccount | undefined;
 	lockAccount: (accountKey: string) => void;
 	resetCurrentIdentity: () => void;
-	save: (account: Account, pin?: string) => Promise<void>;
+	saveAccount: (account: Account, pin?: string) => Promise<void>;
 	saveNewIdentity: (seedPhrase: string, pin: string, generateSeedRef: CreateSeedRefWithNewSeed) => Promise<void>;
-	select: (accountKey: string) => void;
+	selectAccount: (accountAddress: string) => void;
 	state: AccountsStoreState;
 	submitNew: (pin: string) => Promise<void>;
 	selectIdentity: (identity: Identity) => void;
 	unlockAccount: (accountKey: string, pin: string) => Promise<boolean>;
 	updateIdentityName: (name: string) => void;
-	updateNew: (accountUpdate: Partial<UnlockedAccount>) => void;
+	updateNew: (accountUpdate: Partial<LegacyAccount>) => void;
 	updateNewIdentity: (identityUpdate: Partial<Identity>) => void;
 	updatePathName: (path: string, name: string) => void;
 	updateAccountName: (updatedAccount: Partial<LockedAccount>) => void;
 };
 
 const defaultAccountState = {
-	accounts: [],
 	currentIdentity: null,
 	identities: [],
-	loaded: false,
-	newAccount: emptyAccount(),
-	newIdentity: emptyIdentity(),
-	selectedKey: ''
+	newIdentity: emptyIdentity()
 };
 
 interface AccountsContextProviderProps {
@@ -56,6 +55,10 @@ export const AccountsContext = createContext({} as AccountsContextType);
 
 export function AccountsContextProvider({ children }: AccountsContextProviderProps): React.ReactElement {
 	const initialState: AccountsStoreState = defaultAccountState;
+	const [selectedAccountAddress, setSelectedAccountAddress] = useState('');
+	const [accounts, setAccounts] = useState<LegacyAccount[]>([]);
+	const [newAccount, setNewAccount] = useState<LegacyAccount>(emptyAccount());
+	const [accountsLoaded, setAccountLoaded] = useState(false);
 
 	const reducer = (state: AccountsStoreState,
 		delta: Partial<AccountsStoreState>): AccountsStoreState => ({
@@ -65,33 +68,30 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	const [state, setState] = useReducer(reducer, initialState)
 	const { allNetworks, getNetwork } = useContext(NetworksContext);
 
-	// console.log('accounts', state.accounts)
-	// console.log('account new', state.newAccount)
+	// console.log('accounts', accounts)
+	// console.log('account new', newAccount)
+
+	const loadAccountsFromDb = async (): Promise<void> => {
+		const loadedAccounts = await loadAccounts();
+		// const identities = await loadIdentities();
+		// const currentIdentity = identities.length > 0 ? identities[0] : null;
+
+		setAccounts(loadedAccounts);
+		setAccountLoaded(true);
+	};
 
 	useEffect(() => {
-		const loadInitialContext = async (): Promise<void> => {
-			const accounts = await loadAccounts();
-			// const identities = await loadIdentities();
-			// const currentIdentity = identities.length > 0 ? identities[0] : null;
-
-			setState({
-				accounts,
-				loaded: true
-			});
-		};
-
-		loadInitialContext();
+		loadAccountsFromDb();
 	}, []);
 
-	function select(accountKey: string): void {
-		setState({ selectedKey: accountKey });
-	}
+	const updateNew = useCallback((accountUpdate: Partial<LegacyAccount>): void => {
+		// const newConstrustedAccount = { ...newAccount, ...accountUpdate }
 
-	function updateNew(accountUpdate: Partial<UnlockedAccount>): void {
-		const newAccount = { ...state.newAccount, ...accountUpdate }
-
-		setState({ newAccount });
-	}
+		setNewAccount((previous: LegacyAccount | undefined) => ({
+			...previous,
+			...accountUpdate
+		} as LegacyAccount))
+	}, [])
 
 	function _deleteSensitiveData({ address, createdAt, encryptedSeed, isLegacy, name, networkKey, recovered, updatedAt, validBip39Seed }: UnlockedAccount): LockedAccount {
 		return {
@@ -107,7 +107,7 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 		} as LockedAccount;
 	}
 
-	async function save(account: LegacyAccount, pin?: string): Promise<void> {
+	async function saveAccount(account: LegacyAccount, pin?: string): Promise<void> {
 		try {
 			// for account creation
 			let accountToSave = account;
@@ -119,7 +119,8 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 
 			const isEthereum = getNetwork(account.networkKey)?.protocol === NetworkProtocols.ETHEREUM;
 
-			await saveAccount(accountToSave, isEthereum);
+			await saveDbAccount(accountToSave, isEthereum);
+			loadAccountsFromDb();
 		} catch (e) {
 			console.error(e);
 		}
@@ -127,20 +128,17 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 
 	async function submitNew(pin: string): Promise<void> {
 		try{
-			const account = state.newAccount;
-
-			if (!account.seed) {
+			if (!newAccount.seed) {
 				console.error('Account seed is empty')
 
 				return
 			}
 
-			await save(account, pin);
+			await saveAccount(newAccount, pin);
 
-			setState({
-				accounts: [...state.accounts, account],
-				newAccount: emptyAccount()
-			});
+			// setAccounts((prev) => [...prev, newAccount]);
+			setNewAccount(emptyAccount());
+			loadAccountsFromDb();
 		} catch (e) {
 			console.error('error when saving new account', e)
 		}
@@ -205,7 +203,6 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	}
 
 	function _updateAccount(updatedAccount: Partial<LockedAccount>): void {
-		const accounts = state.accounts;
 		const account = accounts.find((stored) => stored.address === updatedAccount.address);
 
 		if (!account){
@@ -214,7 +211,7 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 			return;
 		}
 
-		setState({ accounts: [...accounts, { ...account, ...updatedAccount }] });
+		setAccounts([...accounts, { ...account, ...updatedAccount }]);
 	}
 
 	function updateAccountName(updatedAccount: Partial<LockedAccount>): void {
@@ -222,25 +219,23 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	}
 
 	async function deleteAccount(address: string): Promise<void> {
-		const { accounts } = state;
-
 		const newAccounts = accounts.filter((account) => {
 			// TODO make sure this works with substrate addresses and that we store ss58 substrate encoding
 			return account.address !== address
 		})
 
-		setState({ accounts: newAccounts, selectedKey: '' });
 		await deleteDbAccount(address);
+		setAccounts(newAccounts)
+		setSelectedAccountAddress('');
+
 	}
 
 	const accountStateWithoutAccount = (address: string) => {
-		const { accounts } = state;
 
 		return accounts.filter((account) => account.address !== address)
 	}
 
 	const getAccountByAddress = (address: string): LegacyAccount | undefined => {
-		const { accounts } = state;
 
 		return accounts.find((account) => account.address.toLowerCase() === address.toLowerCase())
 	}
@@ -265,12 +260,10 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 				...account
 			}
 
-			setState({
-				accounts: [
-					...accountStateWithoutAccount(address),
-					unlockedAccount
-				]
-			});
+			setAccounts([
+				...accountStateWithoutAccount(address),
+				unlockedAccount
+			]);
 		} catch (e) {
 			return false;
 		}
@@ -284,12 +277,10 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 		if (account && isUnlockedAccount(account)) {
 			const lockedAccount = _deleteSensitiveData(account);
 
-			setState({
-				accounts: [
-					...accountStateWithoutAccount(address),
-					lockedAccount
-				]
-			});
+			setAccounts([
+				...accountStateWithoutAccount(address),
+				lockedAccount
+			]);
 		}
 	}
 
@@ -418,9 +409,12 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 	// 	return _getAccountFromIdentity(address, networkContext);
 	// }
 
-	function getSelected(): Account | undefined {
-		return getAccountByAddress(state.selectedKey);
+	function selectAccount(address: string): void {
+
+		setSelectedAccountAddress(address);
 	}
+
+	const getSelectedAccount = () => getAccountByAddress(selectedAccountAddress);
 
 	function getIdentityByAccountId(accountId: string): Identity | undefined {
 		const networkProtocol = accountId.split(':')[0];
@@ -560,6 +554,8 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 
 	return (
 		<AccountsContext.Provider value={{
+			accounts,
+			accountsLoaded,
 			clearIdentity,
 			deleteAccount,
 			deleteCurrentIdentity,
@@ -568,12 +564,13 @@ export function AccountsContextProvider({ children }: AccountsContextProviderPro
 			deriveNewPath,
 			getAccountByAddress,
 			getIdentityByAccountId,
-			getSelected,
+			getSelectedAccount,
 			lockAccount,
+			newAccount,
 			resetCurrentIdentity,
-			save,
+			saveAccount,
 			saveNewIdentity,
-			select,
+			selectAccount,
 			selectIdentity,
 			state,
 			submitNew,

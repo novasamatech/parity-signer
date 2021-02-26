@@ -72,10 +72,11 @@ function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React
 	const [state, setState] = useReducer(reducer, initialState);
 
 	const submit = async (): Promise<void> => {
-		const { newAccount } = accountsStore.state;
+		const { getSelectedAccount, lockAccount, newAccount } = accountsStore;
+		const selectedAccount = getSelectedAccount();
 		const { confirmation, pin } = state;
 		const accountCreation = route.params?.isNew;
-		const account = accountCreation ? newAccount : accountsStore.getSelected();
+		const account = accountCreation ? newAccount : selectedAccount;
 
 		if (pin.length < 6) {
 			setState({ pinTooShort: true });
@@ -96,11 +97,14 @@ function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React
 		}
 
 		if (accountCreation) {
+			// this is the first time a pin is created
 			await accountsStore.submitNew(pin);
 
 			return navigateToLegacyAccountList(navigation);
 		} else {
-			await accountsStore.save(account, pin);
+			// this is a pin change
+			await accountsStore.saveAccount(account, pin);
+			lockAccount(account.address);
 			const resetAction = CommonActions.reset({
 				index: 1,
 				routes: [{ name: 'LegacyAccountList' }, { name: 'AccountDetails' }]
@@ -108,7 +112,6 @@ function AccountPin({ navigation, route }: NavigationProps<'AccountPin'>): React
 
 			navigation.dispatch(resetAction);
 		}
-
 	};
 
 	const showHintOrError = (): React.ReactElement => {

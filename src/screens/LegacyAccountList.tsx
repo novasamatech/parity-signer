@@ -29,7 +29,7 @@ import { LegacyAccount } from 'types/identityTypes';
 import { AccountsContext } from '../context';
 
 function LegacyAccountList(): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
+	const { accounts, selectAccount } = useContext(AccountsContext);
 	const [isConnected, setIsConnected] = useState(false);
 	const navigation = useNavigation();
 
@@ -39,12 +39,10 @@ function LegacyAccountList(): React.ReactElement {
 		}),
 	[]);
 
-	const onAccountSelected = async (key: string): Promise<void> => {
-		await accountsStore.select(key);
+	const onAccountSelected = async (accountAddress: string): Promise<void> => {
+		selectAccount(accountAddress);
 		navigation.navigate('AccountDetails');
 	};
-
-	const { accounts } = accountsStore.state;
 
 	const renderAccountCard = ({ address, name, networkKey }: LegacyAccount): React.ReactElement => (
 		<AccountCard

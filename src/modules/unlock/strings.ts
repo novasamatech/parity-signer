@@ -15,6 +15,7 @@
 
 const t = {
 	doneButton: {
+		nameChange: 'Done',
 		pinCreation: 'Done',
 		pinUnlock: 'Unlock'
 	},

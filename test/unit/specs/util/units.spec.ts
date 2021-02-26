@@ -14,11 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { kusamaMetadata } from 'constants/networkMetadata';
+import { fromWei } from 'utils/units';
+
 import { Metadata, TypeRegistry } from '@polkadot/types';
 import Call from '@polkadot/types/generic/Call';
 import { formatBalance } from '@polkadot/util';
-import { kusamaMetadata } from 'constants/networkMetadata';
-import { fromWei } from 'utils/units';
 
 const registry = new TypeRegistry();
 

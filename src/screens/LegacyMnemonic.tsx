@@ -26,25 +26,26 @@ import { AppState, AppStateStatus, StyleSheet, Text, View } from 'react-native';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
-import { UnlockedAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 import { AccountsContext, AlertContext, NetworksContext } from '../context';
 
 function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
+	const { getSelectedAccount, lockAccount,newAccount } = useContext(AccountsContext);
+	const selectedAccount = getSelectedAccount();
 	const { getNetwork } = useContext(NetworksContext);
-	const { newAccount, selectedKey } = accountsStore.state;
 	const { navigate } = navigation;
 	const { setAlert } = useContext(AlertContext);
 	const isNew = !!route.params?.isNew;
-	const { address, derivationPassword = '', derivationPath = '', name, networkKey, seed = '', seedPhrase = '' } = isNew
+
+	const { address = '', derivationPassword = '', derivationPath = '', name, networkKey, seed = '', seedPhrase = '' } = isNew
 		? newAccount
-		: (accountsStore.getSelected() as UnlockedAccount);
+		: selectedAccount || {};
 	const protocol = getNetwork(networkKey)?.protocol;
 
 	useEffect(() => {
+
 		const handleAppStateChange = (nextAppState: AppStateStatus): void => {
 			if (nextAppState === 'inactive') {
 				navigation.goBack();
@@ -54,14 +55,14 @@ function LegacyMnemonic({ navigation, route }: NavigationProps<'LegacyMnemonic'>
 		AppState.addEventListener('change', handleAppStateChange);
 
 		return (): void => {
-			if (selectedKey) {
-				console.log('got selected key locking', selectedKey)
-				accountsStore.lockAccount(selectedKey);
+			if (address) {
+				console.log('got selected key locking', address)
+				lockAccount(address);
 			}
 
 			AppState.removeEventListener('change', handleAppStateChange);
 		};
-	}, [navigation, accountsStore, selectedKey]);
+	}, [address, lockAccount, navigation]);
 
 	const goToPin = useCallback(() => {
 		alertBackupDone(setAlert, () => {

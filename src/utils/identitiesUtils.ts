@@ -19,9 +19,7 @@ import { ETHEREUM_NETWORK_LIST, SubstrateNetworkKeys, UnknownNetworkKeys, unknow
 import strings from 'modules/sign/strings';
 import { Account, AccountMeta, FoundAccount, Identity, LegacyAccount, PathGroup, SerializedIdentity, UnlockedAccount } from 'types/identityTypes';
 import { SubstrateNetworkParams } from 'types/networkTypes';
-import { TryCreateFunc } from 'utils/seedRefHooks';
 
-import { NetworksContext } from '../context';
 import { generateAccountId } from './account';
 import { decryptData, substrateAddress } from './native';
 import { pathsRegex } from './regex';

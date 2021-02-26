@@ -38,17 +38,16 @@ interface State {
 	derivationPassword: string;
 	derivationPath: string;
 	isDerivationPathValid: boolean;
-	selectedAccount?: Account;
+	chosenAccount?: Account;
 	selectedNetwork?:NetworkParams | null;
-	newAccount?: Account;
 }
 
 export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>): React.ReactElement {
 	const initialState = {
+		chosenAccount: undefined,
 		derivationPassword: '',
 		derivationPath: '',
 		isDerivationPathValid: true,
-		selectedAccount: undefined,
 		selectedNetwork: undefined
 	};
 	const reducer = (state: State, delta: Partial<State>): State => ({
@@ -56,10 +55,10 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 		...delta
 	});
 	const [state, updateState] = useReducer(reducer, initialState);
-	const { derivationPassword, derivationPath, isDerivationPathValid, selectedAccount, selectedNetwork } = state;
-	const { state: { newAccount }, updateNew } = useContext(AccountsContext);
+	const { chosenAccount, derivationPassword, derivationPath, isDerivationPathValid, selectedNetwork } = state;
+	const { newAccount, updateNew } = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const seed = (selectedAccount as UnlockedAccount)?.seed;
+	const seed = (chosenAccount as UnlockedAccount)?.seed;
 	const isSubstrate = selectedNetwork?.protocol === NetworkProtocols.SUBSTRATE;
 
 	useEffect((): void => {
@@ -69,10 +68,9 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 	}, []);
 
 	useEffect((): void => {
-		const selectedAccount = newAccount;
-		const selectedNetwork = getNetwork(selectedAccount.networkKey);
+		const selectedNetwork = getNetwork(newAccount.networkKey);
 
-		updateState({ selectedAccount, selectedNetwork });
+		updateState({ chosenAccount: newAccount, selectedNetwork });
 	}, [newAccount, getNetwork]);
 
 	const onSelectIcon = useCallback(({ isBip39, newAddress, newSeed }): void => {
@@ -127,11 +125,11 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 		});
 	}, []);
 
-	if (!selectedAccount) {
+	if (!chosenAccount) {
 		return <View />;
 	}
 
-	const { address, name, validBip39Seed } = selectedAccount;
+	const { address, name, validBip39Seed } = chosenAccount;
 
 	return (
 		<KeyboardScrollView>
@@ -150,7 +148,7 @@ export default function AccountNew({ navigation }: NavigationProps<'AccountNew'>
 				<View style={styles.step}>
 					<Text style={styles.title}>NETWORK</Text>
 					<NetworkCard
-						networkKey={selectedAccount.networkKey}
+						networkKey={chosenAccount.networkKey}
 						onPress={(): void => navigation.navigate('LegacyNetworkChooser')}
 						title={selectedNetwork?.title || 'Select Network'}
 					/>

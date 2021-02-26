@@ -65,12 +65,16 @@ export interface FoundIdentityAccount extends AccountMeta {
 export interface LegacyAccount {
 	address: string;
 	createdAt: number;
+	derivationPassword?: string;
+	derivationPath?: string; // doesn't contain the ///password
 	encryptedSeed: string;
 	hasPassword? : boolean;
 	isLegacy?: boolean;
 	name: string;
 	networkKey: string;
 	path?: string;
+	seed?: string; //this is the SURI (seedPhrase + /soft//hard///password derivation)
+	seedPhrase?: string; //contains only the BIP39 words, no derivation path
 	updatedAt: number;
 	validBip39Seed: boolean;
 }
@@ -108,13 +112,9 @@ export interface AccountInfo {
 };
 
 export type AccountsStoreState = {
-	accounts: LegacyAccount[];
 	identities: Identity[];
 	currentIdentity: Identity | null;
-	loaded: boolean;
-	newAccount: UnlockedAccount;
 	newIdentity: Identity;
-	selectedKey: string;
 };
 
 type LensSet<T, R> = Omit<T, keyof R> & R;

@@ -92,8 +92,8 @@ const ownStyles = StyleSheet.create({
 		paddingBottom: 0
 	},
 	container: {
-		flexDirection: 'row',
-		alignItems: 'center'
+		alignItems: 'center',
+		flexDirection: 'row'
 
 	},
 	invalidInput: {
