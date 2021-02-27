@@ -1,4 +1,4 @@
-package io.parity.signer;
+package com.stylo-app;
 
 import com.wix.detox.Detox;
 

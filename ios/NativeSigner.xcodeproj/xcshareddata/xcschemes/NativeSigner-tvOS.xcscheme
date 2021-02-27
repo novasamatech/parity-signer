@@ -29,9 +29,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "NativeSigner-tvOS.app"
-               BlueprintName = "NativeSigner-tvOS"
-               ReferencedContainer = "container:NativeSigner.xcodeproj">
+               BuildableName = "stylo-app-tvOS.app"
+               BlueprintName = "stylo-app-tvOS"
+               ReferencedContainer = "container:stylo-app.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -43,9 +43,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "NativeSigner-tvOSTests.xctest"
-               BlueprintName = "NativeSigner-tvOSTests"
-               ReferencedContainer = "container:NativeSigner.xcodeproj">
+               BuildableName = "stylo-app-tvOSTests.xctest"
+               BlueprintName = "stylo-app-tvOSTests"
+               ReferencedContainer = "container:stylo-app.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -59,9 +59,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "NativeSigner-tvOS.app"
-            BlueprintName = "NativeSigner-tvOS"
-            ReferencedContainer = "container:NativeSigner.xcodeproj">
+            BuildableName = "stylo-app-tvOS.app"
+            BlueprintName = "stylo-app-tvOS"
+            ReferencedContainer = "container:stylo-app.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -70,9 +70,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "NativeSigner-tvOSTests.xctest"
-               BlueprintName = "NativeSigner-tvOSTests"
-               ReferencedContainer = "container:NativeSigner.xcodeproj">
+               BuildableName = "stylo-app-tvOSTests.xctest"
+               BlueprintName = "stylo-app-tvOSTests"
+               ReferencedContainer = "container:stylo-app.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -92,9 +92,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "NativeSigner-tvOS.app"
-            BlueprintName = "NativeSigner-tvOS"
-            ReferencedContainer = "container:NativeSigner.xcodeproj">
+            BuildableName = "stylo-app-tvOS.app"
+            BlueprintName = "stylo-app-tvOS"
+            ReferencedContainer = "container:stylo-app.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -109,9 +109,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "NativeSigner-tvOS.app"
-            BlueprintName = "NativeSigner-tvOS"
-            ReferencedContainer = "container:NativeSigner.xcodeproj">
+            BuildableName = "stylo-app-tvOS.app"
+            BlueprintName = "stylo-app-tvOS"
+            ReferencedContainer = "container:stylo-app.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -1,4 +1,4 @@
-package io.parity.signer;
+package com.stylo-app;
 
 import android.app.Application;
 
@@ -62,7 +62,7 @@ public class MainApplication extends Application implements ReactApplication {
         We use reflection here to pick up the class that initializes Flipper,
       since Flipper library is not available in release mode
       */
-        Class<?> aClass = Class.forName("io.parity.signer.ReactNativeFlipper");
+        Class<?> aClass = Class.forName("com.stylo-app.ReactNativeFlipper");
         aClass
                 .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
                 .invoke(null, context, reactInstanceManager);

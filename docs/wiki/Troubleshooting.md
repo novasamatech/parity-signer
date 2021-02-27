@@ -25,7 +25,7 @@ Please switch rustup toolchains to version `1.41.1` with `rustup default 1.41.1`
 
 ## Changes from 4.3.1
 
-From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b176795b9386af640b3e73aff3) we use the latest prebuild NDK (r21) toolchains for building rust libraries for android, so that we do not need to build the standalone NDK toolchains manually. If you have built or develop Parity Signer before 4.3.1, please download the NDK r19 or newer [here](https://developer.android.com/ndk/downloads) and point the `NKD_HOME` environment variable to it with e.g. `export NDK_HOME=/path/to/latest/ndk`
+From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b176795b9386af640b3e73aff3) we use the latest prebuild NDK (r21) toolchains for building rust libraries for android, so that we do not need to build the standalone NDK toolchains manually. If you have built or develop Stylo before 4.3.1, please download the NDK r19 or newer [here](https://developer.android.com/ndk/downloads) and point the `NKD_HOME` environment variable to it with e.g. `export NDK_HOME=/path/to/latest/ndk`
 
 ## Cannot run after upgrade to latest codebase
 
@@ -36,7 +36,7 @@ From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b1
 5. `yarn start --reset-cache`
 
 #### build on iOS
-6. in Xcode (be sure to open with `./ios/NativeSigner.xcodeworkspace` file), clean build with `shift + command + K`
+6. in Xcode (be sure to open with `./ios/stylo-app.xcodeworkspace` file), clean build with `shift + command + K`
 7. `yarn run ios`
 
 #### build on Android

@@ -2,7 +2,7 @@
 
 ### Test Signing
 
-For a super quick test and to avoid the hurdle of creating an account, sending funds to it and finally create a transaction as described in the [tutorial using Parity Fether](https://wiki.parity.io/Parity-Signer-Mobile-App-Fether-tutorial) or the [tutorial using MyCrypto](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial), you can use a pre-funded account on Kovan Network and the following workflow. To get access to this account, you need to:
+For a super quick test and to avoid the hurdle of creating an account, sending funds to it and finally create a transaction as described in the [tutorial using MyCrypto](./docs/tutorials/MyCrypto-tutorial.md), you can use a pre-funded account on Kovan Network and the following workflow. To get access to this account, you need to:
 
 - Recover an account
 - Select `Kovan` network and choose a name
@@ -41,7 +41,7 @@ If debugging is needed:
 
 ### Integration Test
 
-Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
+Stylo is integrated with [Detox](https://github.com/wix/Detox) E2E testing. Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
 
 First make sure `detox-cli` is installed as global dependency with
 

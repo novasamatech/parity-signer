@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* NativeSignerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NativeSignerTests.m */; };
+		00E356F31AD99517003FC87E /* stylo-appTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* stylo-appTests.m */; };
 		0A5DA78AED2F468C8025AF7C /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA252ACE6F044BD88BDCD173 /* Roboto-Black.ttf */; };
-		0AFBC3BB8546096CDD30DFC3 /* libPods-NativeSigner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4063FD557805DBD8D7AD8A31 /* libPods-NativeSigner.a */; };
+		0AFBC3BB8546096CDD30DFC3 /* libPods-stylo-app.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4063FD557805DBD8D7AD8A31 /* libPods-stylo-app.a */; };
 		0CFC8839F5B54F888E6C01DE /* Roboto-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
@@ -21,7 +21,7 @@
 		3C31DDCB4CD0465084344D5F /* Manifold-CF-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 624E6C0FF4A64A97A7D51BEF /* Manifold-CF-Bold.otf */; };
 		3D7A98D07DE443E381067D3A /* Roboto-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */; };
 		423E02567C044AF6832B2388 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53880E8FF84C419EB11ACA5C /* Roboto-Light.ttf */; };
-		517E139B8D3CC72F2CB73B04 /* libPods-NativeSigner-NativeSignerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B880385BFE176DAE361ABCA /* libPods-NativeSigner-NativeSignerTests.a */; };
+		517E139B8D3CC72F2CB73B04 /* libPods-stylo-app-stylo-appTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B880385BFE176DAE361ABCA /* libPods-stylo-app-stylo-appTests.a */; };
 		5DC40D98E51D492C8FF692B5 /* Manifold-CF-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */; };
 		6701864923270B1100A14061 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 6701864823270B1100A14061 /* assets */; };
 		6779B94524741C7F00DFEFA9 /* RobotoMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6779B93E24741C7F00DFEFA9 /* RobotoMono-Medium.ttf */; };
@@ -45,7 +45,7 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = NativeSigner;
+			remoteInfo = stylo-app;
 		};
 		3955110822F4547F00078B17 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -92,33 +92,33 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* NativeSignerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NativeSignerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E356EE1AD99517003FC87E /* stylo-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = stylo-appTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* NativeSignerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeSignerTests.m; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* stylo-appTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = stylo-appTests.m; sourceTree = "<group>"; };
 		020454D0D3C74A398EC7F440 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Thin.ttf"; path = "../res/fonts/Roboto-Thin.ttf"; sourceTree = "<group>"; };
 		0A3530DA239B43579EF02112 /* Roboto-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BoldItalic.ttf"; path = "../res/fonts/Roboto-BoldItalic.ttf"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* NativeSigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeSigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = NativeSigner/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = NativeSigner/AppDelegate.m; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* stylo-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = stylo-app.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = stylo-app/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = stylo-app/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = NativeSigner/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = NativeSigner/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NativeSigner/main.m; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = stylo-app/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = stylo-app/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = stylo-app/main.m; sourceTree = "<group>"; };
 		15BC2D6C3FC64019985638C1 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		183C9D1307934735A4129705 /* Roboto-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BlackItalic.ttf"; path = "../res/fonts/Roboto-BlackItalic.ttf"; sourceTree = "<group>"; };
 		1F426F39208B7CC000CA43DB /* libsigner.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsigner.a; path = ../rust/signer/libsigner.a; sourceTree = "<group>"; };
 		1F426F90208D31D200CA43DB /* signer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = signer.h; path = ../rust/signer/signer.h; sourceTree = "<group>"; };
-		1F426F9B208D358500CA43DB /* NativeSigner-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NativeSigner-Bridging-Header.h"; path = "NativeSigner/NativeSigner-Bridging-Header.h"; sourceTree = "<group>"; };
+		1F426F9B208D358500CA43DB /* stylo-app-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "stylo-app-Bridging-Header.h"; path = "stylo-app/stylo-app-Bridging-Header.h"; sourceTree = "<group>"; };
 		1F7FFA3B208B691700FF717A /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		219882399973ABEF0DA2CDDB /* Pods-NativeSigner.githubactions.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.githubactions.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.githubactions.xcconfig"; sourceTree = "<group>"; };
+		219882399973ABEF0DA2CDDB /* Pods-stylo-app.githubactions.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stylo-app.githubactions.xcconfig"; path = "Target Support Files/Pods-stylo-app/Pods-stylo-app.githubactions.xcconfig"; sourceTree = "<group>"; };
 		2D0EA96B71FC4AFF8C35B80E /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		2EC5DDFE054D4A68B1B7D900 /* Manifold-CF.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF.otf"; path = "../res/fonts/Manifold-CF.otf"; sourceTree = "<group>"; };
 		31AAF2CB51C04377BFC79634 /* Manifold-CF-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Light.otf"; path = "../res/fonts/Manifold-CF-Light.otf"; sourceTree = "<group>"; };
-		345EC926C2A917951CE70275 /* Pods-NativeSigner-NativeSignerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner-NativeSignerTests.debug.xcconfig"; path = "Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests.debug.xcconfig"; sourceTree = "<group>"; };
+		345EC926C2A917951CE70275 /* Pods-stylo-app-stylo-appTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stylo-app-stylo-appTests.debug.xcconfig"; path = "Target Support Files/Pods-stylo-app-stylo-appTests/Pods-stylo-app-stylo-appTests.debug.xcconfig"; sourceTree = "<group>"; };
 		399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		39B6F6102315B550009C3C05 /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		3DB51A3702D94B6BA025DDE6 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
-		4063FD557805DBD8D7AD8A31 /* libPods-NativeSigner.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeSigner.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4063FD557805DBD8D7AD8A31 /* libPods-stylo-app.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-stylo-app.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		42D126E4D4D84C4784E2377B /* Roboto-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Italic.ttf"; path = "../res/fonts/Roboto-Italic.ttf"; sourceTree = "<group>"; };
 		431C560691184DF8B5347066 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		4BF2B8970DC245F4BA0574F9 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -136,20 +136,20 @@
 		6A7AB3BD3C1A4E0EB3C4B3B6 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		6C53A63D96B24FDD95AF1C97 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		7733AB637FF54DE5B174F42C /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
-		78C125DFDEABB4A0F4B1F8A3 /* Pods-NativeSigner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.release.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.release.xcconfig"; sourceTree = "<group>"; };
+		78C125DFDEABB4A0F4B1F8A3 /* Pods-stylo-app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stylo-app.release.xcconfig"; path = "Target Support Files/Pods-stylo-app/Pods-stylo-app.release.xcconfig"; sourceTree = "<group>"; };
 		84D1117E71B04C839F00F619 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		894E2A1A52DC44C28E9F9A71 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		8C99AB759A004CEB88AC4455 /* Roboto-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-LightItalic.ttf"; path = "../res/fonts/Roboto-LightItalic.ttf"; sourceTree = "<group>"; };
 		91D53BBCAE6D418EA362A703 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		99AC61BF1E3C4FE8B07077D3 /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
-		9B880385BFE176DAE361ABCA /* libPods-NativeSigner-NativeSignerTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NativeSigner-NativeSignerTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B880385BFE176DAE361ABCA /* libPods-stylo-app-stylo-appTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-stylo-app-stylo-appTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0882DC34AE448DAA1E2320 /* RNCNetInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNCNetInfo.xcodeproj; path = "../node_modules/@react-native-community/netinfo/ios/RNCNetInfo.xcodeproj"; sourceTree = "<group>"; };
 		C0205550495341279B513024 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		CB5C4A7F0E8B4E4E98E06EFD /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
-		D4367484BA6039DBBA1BFA34 /* Pods-NativeSigner-NativeSignerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner-NativeSignerTests.release.xcconfig"; path = "Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests.release.xcconfig"; sourceTree = "<group>"; };
+		D4367484BA6039DBBA1BFA34 /* Pods-stylo-app-stylo-appTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stylo-app-stylo-appTests.release.xcconfig"; path = "Target Support Files/Pods-stylo-app-stylo-appTests/Pods-stylo-app-stylo-appTests.release.xcconfig"; sourceTree = "<group>"; };
 		D44E3C511D404074AF5AFDB9 /* libRNSVG.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSVG.a; sourceTree = "<group>"; };
 		D592A5F1000548E09C637958 /* Roboto-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Bold.ttf"; path = "../res/fonts/Roboto-Bold.ttf"; sourceTree = "<group>"; };
-		D744ECFF41E1A177C984157F /* Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig"; path = "Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig"; sourceTree = "<group>"; };
+		D744ECFF41E1A177C984157F /* Pods-stylo-app-stylo-appTests.githubactions.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stylo-app-stylo-appTests.githubactions.xcconfig"; path = "Target Support Files/Pods-stylo-app-stylo-appTests/Pods-stylo-app-stylo-appTests.githubactions.xcconfig"; sourceTree = "<group>"; };
 		DDFA123E816A46BBB8DF60B6 /* libRCTCamera.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTCamera.a; sourceTree = "<group>"; };
 		E2C73A1D48444F90B25AB1C9 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		E3DA81F74A0847378E71E280 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Medium.ttf"; path = "../res/fonts/Roboto-Medium.ttf"; sourceTree = "<group>"; };
@@ -158,7 +158,7 @@
 		EA252ACE6F044BD88BDCD173 /* Roboto-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Black.ttf"; path = "../res/fonts/Roboto-Black.ttf"; sourceTree = "<group>"; };
 		F198D2DE15BC4461B2308E3C /* Manifold-CF-Extra-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manifold-CF-Extra-Bold.otf"; path = "../res/fonts/Manifold-CF-Extra-Bold.otf"; sourceTree = "<group>"; };
 		F2FB2DDD90964B3BB1FC813C /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
-		FA5D97F6AC98064A42CCB9AB /* Pods-NativeSigner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NativeSigner.debug.xcconfig"; path = "Target Support Files/Pods-NativeSigner/Pods-NativeSigner.debug.xcconfig"; sourceTree = "<group>"; };
+		FA5D97F6AC98064A42CCB9AB /* Pods-stylo-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-stylo-app.debug.xcconfig"; path = "Target Support Files/Pods-stylo-app/Pods-stylo-app.debug.xcconfig"; sourceTree = "<group>"; };
 		FAE70C1AAEEA45159C8CB0EA /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ThinItalic.ttf"; path = "../res/fonts/Roboto-ThinItalic.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -167,7 +167,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				517E139B8D3CC72F2CB73B04 /* libPods-NativeSigner-NativeSignerTests.a in Frameworks */,
+				517E139B8D3CC72F2CB73B04 /* libPods-stylo-app-stylo-appTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,20 +176,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				399D1B0E22DDDE1B00A815EB /* JavaScriptCore.framework in Frameworks */,
-				0AFBC3BB8546096CDD30DFC3 /* libPods-NativeSigner.a in Frameworks */,
+				0AFBC3BB8546096CDD30DFC3 /* libPods-stylo-app.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* NativeSignerTests */ = {
+		00E356EF1AD99517003FC87E /* stylo-appTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* NativeSignerTests.m */,
+				00E356F21AD99517003FC87E /* stylo-appTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = NativeSignerTests;
+			path = stylo-appTests;
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -200,10 +200,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* NativeSigner */ = {
+		13B07FAE1A68108700A75B9A /* stylo-app */ = {
 			isa = PBXGroup;
 			children = (
-				1F426F9B208D358500CA43DB /* NativeSigner-Bridging-Header.h */,
+				1F426F9B208D358500CA43DB /* stylo-app-Bridging-Header.h */,
 				1F426F90208D31D200CA43DB /* signer.h */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -213,7 +213,7 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				6784634824ACE7D0000990D6 /* Bridging.swift */,
 			);
-			name = NativeSigner;
+			name = stylo-app;
 			sourceTree = "<group>";
 		};
 		1F3559852089081300E8521D /* Recovered References */ = {
@@ -233,8 +233,8 @@
 				399D1B0D22DDDE1B00A815EB /* JavaScriptCore.framework */,
 				1F426F39208B7CC000CA43DB /* libsigner.a */,
 				1F7FFA3B208B691700FF717A /* libresolv.tbd */,
-				4063FD557805DBD8D7AD8A31 /* libPods-NativeSigner.a */,
-				9B880385BFE176DAE361ABCA /* libPods-NativeSigner-NativeSignerTests.a */,
+				4063FD557805DBD8D7AD8A31 /* libPods-stylo-app.a */,
+				9B880385BFE176DAE361ABCA /* libPods-stylo-app-stylo-appTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -311,9 +311,9 @@
 			children = (
 				6701864823270B1100A14061 /* assets */,
 				39B6F6102315B550009C3C05 /* main.jsbundle */,
-				13B07FAE1A68108700A75B9A /* NativeSigner */,
+				13B07FAE1A68108700A75B9A /* stylo-app */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* NativeSignerTests */,
+				00E356EF1AD99517003FC87E /* stylo-appTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				1F3559852089081300E8521D /* Recovered References */,
 				1F7FFA15208B691700FF717A /* Frameworks */,
@@ -327,8 +327,8 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* NativeSigner.app */,
-				00E356EE1AD99517003FC87E /* NativeSignerTests.xctest */,
+				13B07F961A680F5B00A75B9A /* stylo-app.app */,
+				00E356EE1AD99517003FC87E /* stylo-appTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -345,12 +345,12 @@
 		99E67DDEA1C0A1F7EACC69CB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FA5D97F6AC98064A42CCB9AB /* Pods-NativeSigner.debug.xcconfig */,
-				78C125DFDEABB4A0F4B1F8A3 /* Pods-NativeSigner.release.xcconfig */,
-				219882399973ABEF0DA2CDDB /* Pods-NativeSigner.githubactions.xcconfig */,
-				345EC926C2A917951CE70275 /* Pods-NativeSigner-NativeSignerTests.debug.xcconfig */,
-				D4367484BA6039DBBA1BFA34 /* Pods-NativeSigner-NativeSignerTests.release.xcconfig */,
-				D744ECFF41E1A177C984157F /* Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig */,
+				FA5D97F6AC98064A42CCB9AB /* Pods-stylo-app.debug.xcconfig */,
+				78C125DFDEABB4A0F4B1F8A3 /* Pods-stylo-app.release.xcconfig */,
+				219882399973ABEF0DA2CDDB /* Pods-stylo-app.githubactions.xcconfig */,
+				345EC926C2A917951CE70275 /* Pods-stylo-app-stylo-appTests.debug.xcconfig */,
+				D4367484BA6039DBBA1BFA34 /* Pods-stylo-app-stylo-appTests.release.xcconfig */,
+				D744ECFF41E1A177C984157F /* Pods-stylo-app-stylo-appTests.githubactions.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -358,9 +358,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* NativeSignerTests */ = {
+		00E356ED1AD99517003FC87E /* stylo-appTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NativeSignerTests" */;
+			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "stylo-appTests" */;
 			buildPhases = (
 				D90CB0937E0B8702D530FB53 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
@@ -373,14 +373,14 @@
 			dependencies = (
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
-			name = NativeSignerTests;
-			productName = NativeSignerTests;
-			productReference = 00E356EE1AD99517003FC87E /* NativeSignerTests.xctest */;
+			name = stylo-appTests;
+			productName = stylo-appTests;
+			productReference = 00E356EE1AD99517003FC87E /* stylo-appTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		13B07F861A680F5B00A75B9A /* NativeSigner */ = {
+		13B07F861A680F5B00A75B9A /* stylo-app */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NativeSigner" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "stylo-app" */;
 			buildPhases = (
 				94534A6B977CACAB0F2A0A29 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -393,9 +393,9 @@
 			);
 			dependencies = (
 			);
-			name = NativeSigner;
+			name = stylo-app;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* NativeSigner.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* stylo-app.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -420,7 +420,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "NativeSigner" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "stylo-app" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -448,8 +448,8 @@
 			);
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* NativeSigner */,
-				00E356ED1AD99517003FC87E /* NativeSignerTests */,
+				13B07F861A680F5B00A75B9A /* stylo-app */,
+				00E356ED1AD99517003FC87E /* stylo-appTests */,
 			);
 		};
 /* End PBXProject section */
@@ -560,7 +560,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-stylo-app-stylo-appTests/Pods-stylo-app-stylo-appTests-resources.sh",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -601,7 +601,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NativeSigner-NativeSignerTests/Pods-NativeSigner-NativeSignerTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-stylo-app-stylo-appTests/Pods-stylo-app-stylo-appTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		94534A6B977CACAB0F2A0A29 /* [CP] Check Pods Manifest.lock */ = {
@@ -619,7 +619,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NativeSigner-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-stylo-app-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -632,7 +632,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NativeSigner/Pods-NativeSigner-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-stylo-app/Pods-stylo-app-resources.sh",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -673,7 +673,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NativeSigner/Pods-NativeSigner-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-stylo-app/Pods-stylo-app-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		D90CB0937E0B8702D530FB53 /* [CP] Check Pods Manifest.lock */ = {
@@ -691,7 +691,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NativeSigner-NativeSignerTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-stylo-app-stylo-appTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -705,7 +705,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* NativeSignerTests.m in Sources */,
+				00E356F31AD99517003FC87E /* stylo-appTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -724,7 +724,7 @@
 /* Begin PBXTargetDependency section */
 		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* NativeSigner */;
+			target = 13B07F861A680F5B00A75B9A /* stylo-app */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -736,7 +736,7 @@
 				13B07FB21A68108700A75B9A /* Base */,
 			);
 			name = LaunchScreen.xib;
-			path = NativeSigner;
+			path = stylo-app;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -744,7 +744,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 345EC926C2A917951CE70275 /* Pods-NativeSigner-NativeSignerTests.debug.xcconfig */;
+			baseConfigurationReference = 345EC926C2A917951CE70275 /* Pods-stylo-app-stylo-appTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -756,7 +756,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = NativeSignerTests/Info.plist;
+				INFOPLIST_FILE = stylo-appTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -768,16 +768,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSignerTests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "stylo-appTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/stylo-app.app/stylo-app";
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D4367484BA6039DBBA1BFA34 /* Pods-NativeSigner-NativeSignerTests.release.xcconfig */;
+			baseConfigurationReference = D4367484BA6039DBBA1BFA34 /* Pods-stylo-app-stylo-appTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -786,7 +786,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = P2PX3JU8FT;
-				INFOPLIST_FILE = NativeSignerTests/Info.plist;
+				INFOPLIST_FILE = stylo-appTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -798,15 +798,15 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSignerTests-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "stylo-appTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/stylo-app.app/stylo-app";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA5D97F6AC98064A42CCB9AB /* Pods-NativeSigner.debug.xcconfig */;
+			baseConfigurationReference = FA5D97F6AC98064A42CCB9AB /* Pods-stylo-app.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -821,7 +821,7 @@
 					"${PODS_ROOT}/",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = NativeSigner/Info.plist;
+				INFOPLIST_FILE = stylo-app/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -837,9 +837,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = NativeSigner;
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner/NativeSigner-Bridging-Header.h";
+				PRODUCT_BUNDLE_IDENTIFIER = com.stylo-app;
+				PRODUCT_NAME = stylo-app;
+				SWIFT_OBJC_BRIDGING_HEADER = "stylo-app/stylo-app-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -850,7 +850,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 78C125DFDEABB4A0F4B1F8A3 /* Pods-NativeSigner.release.xcconfig */;
+			baseConfigurationReference = 78C125DFDEABB4A0F4B1F8A3 /* Pods-stylo-app.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -863,7 +863,7 @@
 					"${PODS_ROOT}/",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = NativeSigner/Info.plist;
+				INFOPLIST_FILE = stylo-app/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -880,9 +880,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = NativeSigner;
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner/NativeSigner-Bridging-Header.h";
+				PRODUCT_BUNDLE_IDENTIFIER = com.stylo-app;
+				PRODUCT_NAME = stylo-app;
+				SWIFT_OBJC_BRIDGING_HEADER = "stylo-app/stylo-app-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64";
@@ -944,7 +944,7 @@
 		};
 		678810082450B99B00838601 /* GithubActions */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 219882399973ABEF0DA2CDDB /* Pods-NativeSigner.githubactions.xcconfig */;
+			baseConfigurationReference = 219882399973ABEF0DA2CDDB /* Pods-stylo-app.githubactions.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -957,7 +957,7 @@
 					"${PODS_ROOT}/",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = NativeSigner/Info.plist;
+				INFOPLIST_FILE = stylo-app/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -974,9 +974,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.parity.NativeSigner;
-				PRODUCT_NAME = NativeSigner;
-				SWIFT_OBJC_BRIDGING_HEADER = "NativeSigner/NativeSigner-Bridging-Header.h";
+				PRODUCT_BUNDLE_IDENTIFIER = com.stylo-app;
+				PRODUCT_NAME = stylo-app;
+				SWIFT_OBJC_BRIDGING_HEADER = "stylo-app/stylo-app-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALID_ARCHS = x86_64;
@@ -986,7 +986,7 @@
 		};
 		678810092450B99B00838601 /* GithubActions */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D744ECFF41E1A177C984157F /* Pods-NativeSigner-NativeSignerTests.githubactions.xcconfig */;
+			baseConfigurationReference = D744ECFF41E1A177C984157F /* Pods-stylo-app-stylo-appTests.githubactions.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -994,7 +994,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = P2PX3JU8FT;
-				INFOPLIST_FILE = NativeSignerTests/Info.plist;
+				INFOPLIST_FILE = stylo-appTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -1006,7 +1006,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NativeSigner.app/NativeSigner";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/stylo-app.app/stylo-app";
 			};
 			name = GithubActions;
 		};
@@ -1127,7 +1127,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NativeSignerTests" */ = {
+		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "stylo-appTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00E356F61AD99517003FC87E /* Debug */,
@@ -1137,7 +1137,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NativeSigner" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "stylo-app" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -1147,7 +1147,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "NativeSigner" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "stylo-app" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

@@ -150,11 +150,11 @@ workflows:
             # yarn archive
             git status
             ls $BITRISE_SOURCE_DIR/ios/build || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator || true
-            # ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner.xarchive || true
+            ls $BITRISE_SOURCE_DIR/ios/build/stylo-app || true
+            ls $BITRISE_SOURCE_DIR/ios/build/stylo-app/Build || true
+            ls $BITRISE_SOURCE_DIR/ios/build/stylo-app/Build/Products || true
+            ls $BITRISE_SOURCE_DIR/ios/build/stylo-app/Build/Products/GithubActions-iphonesimulator || true
+            # ls $BITRISE_SOURCE_DIR/ios/build/stylo-app.xarchive || true
     - cache-push@2:
         inputs:
         - compress_archive: 'true'
@@ -167,7 +167,7 @@ workflows:
         inputs:
         - is_compress: 'true'
         - deploy_path: >-
-            $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app
+            $BITRISE_SOURCE_DIR/ios/build/stylo-app/Build/Products/GithubActions-iphonesimulator/stylo-app.app
     - amazon-s3-uploader@1:
         inputs:
         - aws_access_key: ${AWS_ACC_KEY}
@@ -176,7 +176,7 @@ workflows:
         - bucket_region: eu-central-1
         - path_in_bucket: '$test_unsigned_build_${BITRISE_BUILD_SLUG}'
         - file_path: >-
-            $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app
+            $BITRISE_SOURCE_DIR/ios/build/stylo-app/Build/Products/GithubActions-iphonesimulator/stylo-app.app
 app:
   envs:
   - opts:
@@ -190,10 +190,10 @@ app:
     VARIANT: ''
   - opts:
       is_expand: false
-    BITRISE_PROJECT_PATH: ios/NativeSigner.xcworkspace
+    BITRISE_PROJECT_PATH: ios/stylo-app.xcworkspace
   - opts:
       is_expand: false
-    BITRISE_SCHEME: NativeSigner
+    BITRISE_SCHEME: stylo-app
   - opts:
       is_expand: false
     BITRISE_EXPORT_METHOD: development

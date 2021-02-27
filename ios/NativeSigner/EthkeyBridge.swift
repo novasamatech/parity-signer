@@ -1,6 +1,6 @@
 //
 //  EthkeyBridge.swift
-//  NativeSigner
+//  stylo-app
 //
 //  Created by Marek Kotewicz on 19/02/2017.
 //  Copyright © 2019 Facebook. All rights reserved.

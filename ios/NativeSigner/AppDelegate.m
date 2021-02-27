@@ -42,7 +42,7 @@ static void InitializeFlipper(UIApplication *application) {
   NSDictionary *initialProps = [NSDictionary dictionaryWithObject: arguments forKey: @"launchArgs"];
 
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
-                                                   moduleName:@"NativeSigner"
+                                                   moduleName:@"stylo-app"
                                             initialProperties:initialProps];
 
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "NativeSigner.app"
-               BlueprintName = "NativeSigner"
-               ReferencedContainer = "container:NativeSigner.xcodeproj">
+               BuildableName = "stylo-app.app"
+               BlueprintName = "stylo-app"
+               ReferencedContainer = "container:stylo-app.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "NativeSignerTests.xctest"
-               BlueprintName = "NativeSignerTests"
-               ReferencedContainer = "container:NativeSigner.xcodeproj">
+               BuildableName = "stylo-appTests.xctest"
+               BlueprintName = "stylo-appTests"
+               ReferencedContainer = "container:stylo-app.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "NativeSigner.app"
-            BlueprintName = "NativeSigner"
-            ReferencedContainer = "container:NativeSigner.xcodeproj">
+            BuildableName = "stylo-app.app"
+            BlueprintName = "stylo-app"
+            ReferencedContainer = "container:stylo-app.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "NativeSigner.app"
-            BlueprintName = "NativeSigner"
-            ReferencedContainer = "container:NativeSigner.xcodeproj">
+            BuildableName = "stylo-app.app"
+            BlueprintName = "stylo-app"
+            ReferencedContainer = "container:stylo-app.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

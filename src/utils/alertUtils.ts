@@ -1,18 +1,18 @@
-// Copyright 2015-2021 Parity Technologies (UK) Ltd.
-// This file is part of Parity.
+// Copyright 2015-2020 Parity Technologies (UK) Ltd.
+// Modifications Copyright (c) 2021 Thibaut Sardan
 
-// Parity is free software: you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-// Parity is distributed in the hope that it will be useful,
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Parity.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import testIDs from 'e2e/testIDs';
 import { Clipboard } from 'react-native';
@@ -100,7 +100,7 @@ export const alertRisks = (setAlert: SetAlert,
 
 export const alertDecodeError = (setAlert: SetAlert): void =>
 	setAlert('Could not decode method with available metadata.',
-		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.');
+		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Stylo to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.');
 
 export const alertBackupDone = (setAlert: SetAlert, onPress: () => any): void =>
 	setAlert('Important',
