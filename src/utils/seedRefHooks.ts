@@ -54,7 +54,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 			const newSeedRef = new SeedRefClass();
 			setTimeout(() => {
 				setSeedRefs(seedRefs.set(encryptedSeed, newSeedRef));
-			}, 100)
+			}, 100);
 			return newSeedRef;
 		}
 	}, [seedRefs, setSeedRefs, encryptedSeed]);

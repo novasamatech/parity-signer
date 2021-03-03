@@ -87,10 +87,10 @@ describe('Signing ane exporting test', () => {
 			await testExist(SignedTx.qrView);
 		});
 
-		// it('should sign transfer request', async () => {
-		// 	await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
-		// 	await testSignedTx();
-		// });
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
+			await testSignedTx();
+		});
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
@@ -123,10 +123,10 @@ describe('Signing ane exporting test', () => {
 			await testSignedTx();
 		});
 
-		// it('should sign transfer request', async () => {
-		// 	await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
-		// 	await testSignedTx();
-		// });
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
+			await testSignedTx();
+		});
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
