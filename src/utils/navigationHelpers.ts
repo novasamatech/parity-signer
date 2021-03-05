@@ -105,14 +105,13 @@ export const useUnlockSeed = (
 export const previewTransactionAndApprove = async <
 	RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>,
+	navigation: GenericNavigationProps<RouteName>
 ): Promise<void> =>
 	new Promise(resolve => {
-		navigation.navigate('DetailsTx', {
+		navigation.replace('DetailsTx', {
 			resolve
 		});
 	});
-
 
 export const unlockSeedPhrase = async <
 	RouteName extends keyof RootStackParamList

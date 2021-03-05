@@ -9,11 +9,11 @@ import {
 	testInputWithDone,
 	testRecoverIdentity,
 	testTap,
-	testVisible,
 	waitAlert
 } from 'e2e/utils';
 
 const {
+	DetailsTx,
 	IdentityPin,
 	PathDerivation,
 	PathDetail,
@@ -53,6 +53,7 @@ describe('passworded account test', () => {
 		it('should sign the set remarks request', async () => {
 			await launchWithScanRequest(ScanTestRequest.PasswordedAccountExtrinsic);
 			await testTap(SecurityHeader.scanButton);
+			await testTap(DetailsTx.signButton);
 			await testInputWithDone(IdentityPin.unlockPinInput, pinCode);
 			await testInput(IdentityPin.passwordInput, password);
 			await testExist(SignedTx.qrView);
@@ -62,6 +63,7 @@ describe('passworded account test', () => {
 			await tapBack();
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
+			await testTap(DetailsTx.signButton);
 			await testInput(IdentityPin.passwordInput, password);
 			await testExist(SignedTx.qrView);
 		});

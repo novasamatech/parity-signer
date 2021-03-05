@@ -31,15 +31,16 @@ import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
-import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 import Button from 'components/Button';
-import { useProcessBarCode } from 'modules/sign/utils';
 
-function DetailsTx({route, props}: NavigationProps<'DetailsTx'>): React.ReactElement {
+function DetailsTx({
+	route,
+	props
+}: NavigationProps<'DetailsTx'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const { recipient, sender } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
@@ -67,11 +68,11 @@ function UnsignedTxView({
 	sender,
 	recipient,
 	scannerStore,
-	route,
+	route
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const { signedData, tx, rawPayload, } = scannerStore.state;
+	const { tx, rawPayload } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
@@ -103,6 +104,8 @@ function UnsignedTxView({
 						payload={payload}
 					/>
 				);
+			} else {
+				return <View />;
 			}
 		}
 	}
@@ -110,7 +113,7 @@ function UnsignedTxView({
 	const approveTransaction = (): void => {
 		const resolve = route.params.resolve;
 		resolve();
-	} 
+	};
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -128,10 +131,13 @@ function UnsignedTxView({
 					marginVertical: 20
 				}}
 			/>
-			<Text style={styles.topTitle}>You are about to sign this transaction, please verify with care</Text>
+			<Text style={styles.topTitle}>
+				You are about to sign this transaction, please verify with care
+			</Text>
 			<Button
 				onPress={approveTransaction}
 				title="SIGN"
+				testID={testIDs.DetailsTx.signButton}
 			/>
 		</SafeAreaScrollViewContainer>
 	);

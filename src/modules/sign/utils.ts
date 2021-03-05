@@ -187,7 +187,7 @@ export function useProcessBarCode(
 		}
 	}
 
-	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {	
+	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
 		const { sender, type } = qrInfo;
 		if (type === 'transaction') await previewTransactionAndApprove(navigation);
 		if (!sender)

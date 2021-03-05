@@ -17,22 +17,15 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
-import { usePayloadDetails } from 'modules/sign/hooks';
-import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
-import strings from 'modules/sign/strings';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
-import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
-import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 
@@ -45,12 +38,7 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 
 	if (sender === null || recipient === null) return <View />;
 	return (
-		<SignedTxView
-			sender={sender}
-			recipient={recipient}
-			scannerStore={scannerStore}
-			{...props}
-		/>
+		<SignedTxView sender={sender} scannerStore={scannerStore} {...props} />
 	);
 }
 
@@ -59,49 +47,9 @@ interface Props extends NavigationScannerProps<'SignedTx'> {
 	recipient: FoundAccount;
 }
 
-function SignedTxView({
-	sender,
-	recipient,
-	scannerStore
-}: Props): React.ReactElement {
+function SignedTxView({ sender, scannerStore }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { getNetwork } = useContext(NetworksContext);
-	const { signedData, tx, rawPayload } = scannerStore.state;
-	const senderNetworkParams = getNetwork(sender.networkKey);
-	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
-	const { value, gas, gasPrice } = tx as Transaction;
-	const [isProcessing, payload] = usePayloadDetails(
-		rawPayload,
-		sender.networkKey
-	);
-
-	function renderPayloadDetails(): React.ReactNode {
-		if (isEthereum) {
-			return (
-				<View style={[styles.bodyContent, { marginTop: 16 }]}>
-					<TxDetailsCard
-						style={{ marginBottom: 20 }}
-						description={strings.INFO_ETH_TX}
-						value={value}
-						gas={gas}
-						gasPrice={gasPrice}
-					/>
-					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient} accountsStore={accountsStore} />
-				</View>
-			);
-		} else {
-			if (!isProcessing && payload !== null) {
-				return (
-					<PayloadDetailsCard
-						networkKey={sender.networkKey}
-						payload={payload}
-						signature={signedData}
-					/>
-				);
-			}
-		}
-	}
+	const { signedData } = scannerStore.state;
 
 	return (
 		<SafeAreaScrollViewContainer>
