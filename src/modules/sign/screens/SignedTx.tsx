@@ -44,7 +44,6 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 
 interface Props extends NavigationScannerProps<'SignedTx'> {
 	sender: FoundAccount;
-	recipient: FoundAccount;
 }
 
 function SignedTxView({ sender, scannerStore }: Props): React.ReactElement {

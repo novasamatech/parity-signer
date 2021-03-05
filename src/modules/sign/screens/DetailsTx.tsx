@@ -39,7 +39,7 @@ import Button from 'components/Button';
 
 function DetailsTx({
 	route,
-	props
+	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const { recipient, sender } = scannerStore.state;
@@ -54,7 +54,7 @@ function DetailsTx({
 			recipient={recipient}
 			scannerStore={scannerStore}
 			route={route}
-			{...props}
+			navigation={navigation}
 		/>
 	);
 }
