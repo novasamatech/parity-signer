@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+// This screen shows Tx-type payload details and asks for signing confirmation
+
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
@@ -29,14 +31,15 @@ import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
-import QrView from 'components/QrView';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
+import Button from 'components/Button';
+import { useProcessBarCode } from 'modules/sign/utils';
 
-function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
+function DetailsTx({route, props}: NavigationProps<'DetailsTx'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const { recipient, sender } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
@@ -45,28 +48,30 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 
 	if (sender === null || recipient === null) return <View />;
 	return (
-		<SignedTxView
+		<UnsignedTxView
 			sender={sender}
 			recipient={recipient}
 			scannerStore={scannerStore}
+			route={route}
 			{...props}
 		/>
 	);
 }
 
-interface Props extends NavigationScannerProps<'SignedTx'> {
+interface Props extends NavigationScannerProps<'DetailsTx'> {
 	sender: FoundAccount;
 	recipient: FoundAccount;
 }
 
-function SignedTxView({
+function UnsignedTxView({
 	sender,
 	recipient,
-	scannerStore
+	scannerStore,
+	route,
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { getNetwork } = useContext(NetworksContext);
-	const { signedData, tx, rawPayload } = scannerStore.state;
+	const { signedData, tx, rawPayload, } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
@@ -96,12 +101,16 @@ function SignedTxView({
 					<PayloadDetailsCard
 						networkKey={sender.networkKey}
 						payload={payload}
-						signature={signedData}
 					/>
 				);
 			}
 		}
 	}
+
+	const approveTransaction = (): void => {
+		const resolve = route.params.resolve;
+		resolve();
+	} 
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -111,6 +120,7 @@ function SignedTxView({
 				accountsStore={accountsStore}
 				titlePrefix={'from:'}
 			/>
+			{renderPayloadDetails()}
 			<Separator
 				shadow={true}
 				style={{
@@ -118,14 +128,13 @@ function SignedTxView({
 					marginVertical: 20
 				}}
 			/>
-			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
-				{'Scan to publish'}
-			</Text>
-			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
-				<QrView data={signedData} />
-			</View>
+			<Text style={styles.topTitle}>You are about to sign this transaction, please verify with care</Text>
+			<Button
+				onPress={approveTransaction}
+				title="SIGN"
+			/>
 		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default SignedTx;
+export default DetailsTx;

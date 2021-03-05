@@ -14,12 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
+import { isU8a, u8aToHex } from '@polkadot/util';
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
-import { usePayloadDetails } from 'modules/sign/hooks';
 import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import strings from 'modules/sign/strings';
+import CompatibleCard from 'components/CompatibleCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -28,89 +29,51 @@ import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
-import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import QrView from 'components/QrView';
-import fontStyles from 'styles/fontStyles';
-import CompatibleCard from 'components/CompatibleCard';
-import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
+import MessageDetailsCard from 'modules/sign/components/MessageDetailsCard';
 import Separator from 'components/Separator';
+import fontStyles from 'styles/fontStyles';
 
-function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
+interface Props extends NavigationScannerProps<'SignedMessage'> {
+	sender: FoundAccount;
+	message: string;
+}
+
+export default function SignedMessage(
+	props: NavigationProps<'SignedMessage'>
+): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
-	const { recipient, sender } = scannerStore.state;
+	const { sender, message } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
 
 	useEffect(() => cleanup.current, [cleanup]);
 
-	if (sender === null || recipient === null) return <View />;
+	if (sender === null || message === null) return <View />;
 	return (
-		<SignedTxView
+		<SignedMessageView
 			sender={sender}
-			recipient={recipient}
+			message={message}
 			scannerStore={scannerStore}
 			{...props}
 		/>
 	);
 }
 
-interface Props extends NavigationScannerProps<'SignedTx'> {
-	sender: FoundAccount;
-	recipient: FoundAccount;
-}
-
-function SignedTxView({
+function SignedMessageView({
 	sender,
-	recipient,
+	message,
 	scannerStore
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
+	const { signedData, isHash, dataToSign } = scannerStore.state;
 	const { getNetwork } = useContext(NetworksContext);
-	const { signedData, tx, rawPayload } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
-	const { value, gas, gasPrice } = tx as Transaction;
-	const [isProcessing, payload] = usePayloadDetails(
-		rawPayload,
-		sender.networkKey
-	);
-
-	function renderPayloadDetails(): React.ReactNode {
-		if (isEthereum) {
-			return (
-				<View style={[styles.bodyContent, { marginTop: 16 }]}>
-					<TxDetailsCard
-						style={{ marginBottom: 20 }}
-						description={strings.INFO_ETH_TX}
-						value={value}
-						gas={gas}
-						gasPrice={gasPrice}
-					/>
-					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient} accountsStore={accountsStore} />
-				</View>
-			);
-		} else {
-			if (!isProcessing && payload !== null) {
-				return (
-					<PayloadDetailsCard
-						networkKey={sender.networkKey}
-						payload={payload}
-						signature={signedData}
-					/>
-				);
-			}
-		}
-	}
 
 	return (
 		<SafeAreaScrollViewContainer>
-			<Text style={styles.topTitle}>Signed extrinsic</Text>
-			<CompatibleCard
-				account={sender}
-				accountsStore={accountsStore}
-				titlePrefix={'from:'}
-			/>
+			<Text style={styles.topTitle}>Signed Message</Text>
 			<Separator
 				shadow={true}
 				style={{
@@ -121,11 +84,27 @@ function SignedTxView({
 			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
 				{'Scan to publish'}
 			</Text>
-			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+			<View testID={testIDs.SignedMessage.qrView}>
 				<QrView data={signedData} />
 			</View>
+			<CompatibleCard
+				titlePrefix={'from:'}
+				account={sender}
+				accountsStore={accountsStore}
+			/>
+			{!isEthereum && dataToSign ? (
+				<PayloadDetailsCard
+					description={strings.INFO_MULTI_PART}
+					signature={signedData.toString()}
+					networkKey={sender.networkKey}
+				/>
+			) : null}
+			<MessageDetailsCard
+				isHash={isHash ?? false}
+				message={message}
+				data={isU8a(dataToSign) ? u8aToHex(dataToSign) : dataToSign.toString()}
+				style={styles.bodyContent}
+			/>
 		</SafeAreaScrollViewContainer>
 	);
 }
-
-export default SignedTx;

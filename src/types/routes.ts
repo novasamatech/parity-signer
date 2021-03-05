@@ -52,7 +52,9 @@ export type RootStackParamList = {
 				isScanningNetworkSpec: true;
 		  };
 	Security: undefined;
+	DetailsMessage: undefined;
 	SignedMessage: undefined;
+	DetailsTx: undefined;
 	SignedTx: undefined;
 	TermsAndConditions: undefined;
 	TxDetails: undefined;
