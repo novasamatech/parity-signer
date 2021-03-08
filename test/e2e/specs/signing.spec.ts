@@ -34,6 +34,7 @@ import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
 const {
+	DetailsTx,
 	Main,
 	PathDetail,
 	PathsList,
@@ -44,6 +45,7 @@ const {
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
+	await testTap(DetailsTx.signButton);
 	await testUnlockPin(pinCode);
 	await testExist(SignedTx.qrView);
 };
@@ -84,13 +86,14 @@ describe('Signing ane exporting test', () => {
 			await tapBack();
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
+			await testTap(DetailsTx.signButton);
 			await testExist(SignedTx.qrView);
 		});
 
-		// it('should sign transfer request', async () => {
-		// 	await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
-		// 	await testSignedTx();
-		// });
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
+			await testSignedTx();
+		});
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
@@ -123,10 +126,10 @@ describe('Signing ane exporting test', () => {
 			await testSignedTx();
 		});
 
-		// it('should sign transfer request', async () => {
-		// 	await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
-		// 	await testSignedTx();
-		// });
+		it('should sign transfer request', async () => {
+			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
+			await testSignedTx();
+		});
 
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
