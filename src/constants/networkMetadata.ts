@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-// This file is supposed to have default built-in metadata and should 
+// This file is supposed to have default built-in metadata and should
 // be upgraded in a timely manner regardless from metadata importing
 // tools.
 // TODO: automate updates: issue #736
