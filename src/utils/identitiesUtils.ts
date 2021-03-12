@@ -468,7 +468,11 @@ export const groupPaths = (
 	return groupedPaths.sort(_comparePathGroups);
 };
 
-export const getMetadata = (networkKey: string): string | null => {
+export const getMetadata = (metadataHandle: MetadataHandle): string | null => {
+	
+};
+
+/* This should be a set-hook function runned once from getMetadata
 	switch (networkKey) {
 		case SubstrateNetworkKeys.CENTRIFUGE:
 			return centrifugeMetadata;
@@ -490,4 +494,4 @@ export const getMetadata = (networkKey: string): string | null => {
 		default:
 			return null;
 	}
-};
+};*/

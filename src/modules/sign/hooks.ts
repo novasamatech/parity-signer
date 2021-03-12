@@ -16,8 +16,9 @@ export function usePayloadDetails(
 
 	useEffect(() => {
 		setIsProcessing(true);
-		if (getTypeRegistry === null) return;
-		const typeRegistry = getTypeRegistry(networks, networkKey);
+		// was this line useful for anything?
+		//if (getTypeRegistry === null) return;
+		const typeRegistry = getTypeRegistry(networks, networkKey, networks.get(networkKey).metadataHandle);
 		if (typeRegistry === null || typeof rawPayload === 'string') {
 			setIsProcessing(false);
 			return;

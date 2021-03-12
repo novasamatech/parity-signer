@@ -23,6 +23,8 @@ import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
+import { MetadataHandle, MetadataRecord } from 'types/metadata';
+import { metadataHandleToKey } from 'utils/metadataUtils';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
@@ -158,6 +160,45 @@ export async function saveNetworks(
 		);
 	} catch (e) {
 		handleError(e, 'networks');
+	}
+}
+
+/*
+ * ========================================
+ *	Metadata Store
+ * ========================================
+ */
+const metadataStorage = {
+	keychainService: 'parity_signer_metadata',
+	sharedPreferencesName: 'parity_signer_metadata'
+};
+
+export async function getMetadata(metadataHandle: MetadataHandle): Promise<string> {
+	try {
+		const metadataKey = metadataHandleToKey(metadataHandle);
+		const metadataRecord = await SecureStorage.getItem(
+			metadataKey,
+			metadataStore
+		);
+		return metadataRecord;
+	} catch (e) {
+		handleError(e, 'metadata');
+		return '';
+	}
+}
+
+export async function saveMetadata(
+	newMetadata: MetadataRecord,
+	newMetadataKey: string
+): Promise<void> {
+	try {
+		SecureStorage.setItem(
+			newMetadataKey,
+			newMetadata.serialized,
+			metadataStorage
+		);
+	} catch (e) {
+		handleError(e, 'metadata');
 	}
 }
 

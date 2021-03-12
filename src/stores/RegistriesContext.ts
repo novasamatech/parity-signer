@@ -21,7 +21,8 @@ import React, { useState } from 'react';
 
 import { deepCopyMap } from 'stores/utils';
 import { SubstrateNetworkParams } from 'types/networkTypes';
-import { getMetadata } from 'utils/identitiesUtils';
+import { getMetadata } from 'utils/db';
+import { MetadataHandle } from 'tupes/metadata';
 
 //Map PathId to Polkadot.js/api spec names and chain names
 type NetworkTypes = {
@@ -85,13 +86,15 @@ export function useRegistriesStore(): RegistriesStoreState {
 
 	function getTypeRegistry(
 		networks: Map<string, SubstrateNetworkParams>,
-		networkKey: string
+		networkKey: string,
+		metadataHandle: MetadataHandle
 	): TypeRegistry | null {
 		try {
-			const networkMetadataRaw = getMetadata(networkKey);
-			if (networkMetadataRaw === null) return null;
+			const networkMetadataRaw = getMetadata(metadataHandle);
+			if (networkMetadataRaw === '') return null;
 
-			if (registries.has(networkKey)) return registries.get(networkKey)!;
+			// Just update metadata no matter what.
+			if (registries.has(networkKey)) return registries.delete(networkKey)!;
 
 			const networkParams = networks.get(networkKey)!;
 			const newRegistry = new TypeRegistry();
