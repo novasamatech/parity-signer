@@ -138,34 +138,6 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 		);
 	};
 
-	const renderSettings = (): React.ReactElement => {
-		return (
-			<>
-				<ButtonIcon
-					title="About"
-					onPress={(): void => closeModalAndNavigate('About')}
-					iconType="antdesign"
-					iconName="info"
-					iconSize={24}
-					textStyle={fontStyles.t_big}
-					style={styles.indentedButton}
-				/>
-				<ButtonWithArrow
-					title="Network Settings"
-					onPress={(): void => closeModalAndNavigate('NetworkSettings')}
-				/>
-				<ButtonWithArrow
-					title="Terms and Conditions"
-					onPress={(): void => closeModalAndNavigate('TermsAndConditions')}
-				/>
-				<ButtonWithArrow
-					title="Privacy Policy"
-					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
-				/>
-			</>
-		);
-	};
-
 	const renderNonSelectedIdentity = (
 		identity: Identity
 	): React.ReactElement => {
@@ -265,8 +237,6 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 						textStyle={fontStyles.t_big}
 						style={styles.indentedButton}
 					/>
-
-					{renderSettings()}
 				</View>
 			</TransparentBackground>
 		</View>

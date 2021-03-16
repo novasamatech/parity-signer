@@ -160,19 +160,3 @@ export async function saveNetworks(
 		handleError(e, 'networks');
 	}
 }
-
-/*
- * ========================================
- *	Privacy Policy and Terms Conditions Store
- * ========================================
- */
-
-export async function loadToCAndPPConfirmation(): Promise<boolean> {
-	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v4');
-
-	return !!result;
-}
-
-export async function saveToCAndPPConfirmation(): Promise<void> {
-	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
-}

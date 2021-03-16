@@ -52,14 +52,12 @@ import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
 import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
-import PrivacyPolicy from 'screens/PrivacyPolicy';
 import QrScanner from 'modules/sign/screens/QrScanner';
 import Security from 'screens/Security';
 import DetailsMessage from 'modules/sign/screens/DetailsMessage';
 import SignedMessage from 'modules/sign/screens/SignedMessage';
 import DetailsTx from 'modules/sign/screens/DetailsTx';
 import SignedTx from 'modules/sign/screens/SignedTx';
-import TermsAndConditions from 'screens/TermsAndConditions';
 import colors from 'styles/colors';
 import { headerHeight, horizontalPadding } from 'styles/containerStyles';
 import { RootStackParamList } from 'types/routes';
@@ -169,26 +167,5 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="DetailsTx" component={DetailsTx} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
-		<ScreenStack.Screen
-			name="TermsAndConditions"
-			component={TermsAndConditions}
-		/>
-		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-	</ScreenStack.Navigator>
-);
-
-export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
-	<ScreenStack.Navigator
-		initialRouteName="TermsAndConditions"
-		screenOptions={{
-			...globalStackNavigationOptions,
-			headerRight: (): React.ReactNode => null
-		}}
-	>
-		<ScreenStack.Screen
-			name="TermsAndConditions"
-			component={TermsAndConditions}
-		/>
-		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
 	</ScreenStack.Navigator>
 );

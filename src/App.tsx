@@ -25,7 +25,6 @@ import NavigationBar from 'react-native-navbar-color';
 
 import {
 	AppNavigator,
-	TocAndPrivacyPolicyNavigator,
 	ScreenStack
 } from './screens';
 
@@ -74,11 +73,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
-			return globalContext.policyConfirmed ? (
-				<AppNavigator />
-			) : (
-				<TocAndPrivacyPolicyNavigator />
-			);
+			<AppNavigator />
 		} else {
 			return (
 				<ScreenStack.Navigator>

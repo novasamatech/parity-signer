@@ -44,7 +44,6 @@ export type RootStackParamList = {
 		isSeedRefValid: boolean;
 		resolve: (password: string) => void;
 	};
-	PrivacyPolicy: undefined;
 	QrScanner:
 		| undefined
 		| {
@@ -55,6 +54,5 @@ export type RootStackParamList = {
 	SignedMessage: undefined;
 	DetailsTx: { resolve: () => void };
 	SignedTx: undefined;
-	TermsAndConditions: undefined;
 	TxDetails: undefined;
 };
