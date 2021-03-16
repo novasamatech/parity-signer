@@ -39,6 +39,39 @@ export default function NetworkDetails({
 	const { getTypeRegistry, getMetadata } = useContext(RegistriesContext);
 	const metadataHandle = networks.get(networkKey).metadata
 
+	const metadataValid = (): React.ReactElement => (
+		<> 
+			<MetadataCard
+				spec_name={metadataHandle.spec_name}
+				spec_version={metadataHandle.spec_version}
+				onPress={(): void =>
+					navigation.navigate('FullMetadata')
+				}
+			/>
+			<Button
+				onPress={(): void => navigation.navigate('MetadataManagement')}
+				title="Manage metadata"
+			/>
+		</>
+	)
+
+	const metadataInvalid = (): React.ReactElement => (
+		<>
+			<MetadataCard
+				spec_name="invalid"
+				spec_version="invalid"
+				onPress={(): void =>
+					navigation.navigate('FullMetadata')
+				}
+			/>
+
+			<Button
+				onPress={(): void => navigation.navigate('MetadataManagement')}
+				title="Please add metadata!"
+			/>
+		</>
+	)
+	
 	return (
 		<SafeAreaScrollViewContainer>
 			<NetworkCard
@@ -61,17 +94,7 @@ export default function NetworkDetails({
 				text={networkParams.prefix.toString()}
 				label="Address prefix"
 			/>
-			<MetadataCard
-				spec_name={metadataHandle.spec_name}
-				spec_version={metadataHandle.spec_version}
-				onPress={(): void =>
-					navigation.navigate('FullMetadata')
-				}
-			/>
-			<Button
-				onPress={(): void => navigation.navigate('MetadataManagement')}
-				title="Manage metadata"
-			/>
+			{metadataHandle? metadataValid() : metadataInvalid()}
 		</SafeAreaScrollViewContainer>
 	);
 }
