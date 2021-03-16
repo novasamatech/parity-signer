@@ -106,7 +106,7 @@ export type SURIObject = {
 };
 
 export type MessageQRInfo = {
-	dataToSign: string | GenericExtrinsicPayload;
+	dataToSign: string;
 	isHash: boolean;
 	isOversized: boolean;
 	message: string;
@@ -118,7 +118,7 @@ export type TxQRInfo = {
 	sender: FoundAccount;
 	recipient: FoundAccount;
 	type: 'transaction';
-	dataToSign: string | GenericExtrinsicPayload;
+	dataToSign: string | Uint8Array;
 	isHash: boolean;
 	isOversized: boolean;
 	tx: Transaction | GenericExtrinsicPayload | string | Uint8Array;

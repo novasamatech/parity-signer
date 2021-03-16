@@ -34,6 +34,7 @@ import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
 const {
+	DetailsTx,
 	Main,
 	PathDetail,
 	PathsList,
@@ -44,8 +45,9 @@ const {
 
 const testSignedTx = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
+	await testTap(DetailsTx.signButton);
 	await testUnlockPin(pinCode);
-	await testVisible(SignedTx.qrView);
+	await testExist(SignedTx.qrView);
 };
 
 const testSignedMessage = async (): Promise<void> => {
@@ -84,7 +86,8 @@ describe('Signing ane exporting test', () => {
 			await tapBack();
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
-			await testVisible(SignedTx.qrView);
+			await testTap(DetailsTx.signButton);
+			await testExist(SignedTx.qrView);
 		});
 
 		it('should sign transfer request', async () => {
