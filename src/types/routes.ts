@@ -1,7 +1,6 @@
 import { Identity } from 'types/identityTypes';
 
 export type RootStackParamList = {
-	About: undefined;
 	AccountDetails: undefined;
 	AccountEdit: undefined;
 	AccountPin: { isNew: boolean } | undefined;

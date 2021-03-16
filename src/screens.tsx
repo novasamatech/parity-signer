@@ -35,7 +35,6 @@ import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword'
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
-import About from 'screens/About';
 import AccountDetails from 'screens/AccountDetails';
 import AccountEdit from 'screens/AccountEdit';
 import Main from 'modules/main/screens/Main';
@@ -121,7 +120,6 @@ export const AppNavigator = (): React.ReactElement => (
 		screenOptions={globalStackNavigationOptions}
 	>
 		<ScreenStack.Screen name="Main" component={Main} />
-		<ScreenStack.Screen name="About" component={About} />
 		<ScreenStack.Screen name="AccountDetails" component={AccountDetails} />
 		<ScreenStack.Screen name="AccountEdit" component={AccountEdit} />
 		<ScreenStack.Screen name="AccountPin" component={AccountPin} />
