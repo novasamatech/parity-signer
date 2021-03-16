@@ -266,22 +266,6 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 						style={styles.indentedButton}
 					/>
 
-					<Separator />
-					{__DEV__ && (
-						<View>
-							<ButtonIcon
-								title="Add legacy account"
-								onPress={(): void => closeModalAndNavigate('AccountNew')}
-								iconName="plus"
-								iconType="antdesign"
-								iconSize={24}
-								textStyle={fontStyles.t_big}
-								style={styles.indentedButton}
-							/>
-							<Separator />
-						</View>
-					)}
-
 					{renderSettings()}
 				</View>
 			</TransparentBackground>

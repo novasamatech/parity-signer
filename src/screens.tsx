@@ -39,7 +39,6 @@ import About from 'screens/About';
 import AccountDetails from 'screens/AccountDetails';
 import AccountEdit from 'screens/AccountEdit';
 import Main from 'modules/main/screens/Main';
-import AccountNew from 'screens/AccountNew';
 import AccountPin from 'screens/AccountPin';
 import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
@@ -129,7 +128,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="AccountEdit" component={AccountEdit} />
 		<ScreenStack.Screen name="AccountPin" component={AccountPin} />
 		<ScreenStack.Screen name="AccountUnlock" component={AccountUnlock} />
-		<ScreenStack.Screen name="AccountNew" component={AccountNew} />
 		<ScreenStack.Screen
 			name="AccountUnlockAndSign"
 			component={AccountUnlockAndSign}

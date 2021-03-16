@@ -5,7 +5,6 @@ export type RootStackParamList = {
 	AccountDetails: undefined;
 	AccountEdit: undefined;
 	AccountPin: { isNew: boolean } | undefined;
-	AccountNew: undefined;
 	Main: { isNew: boolean } | undefined;
 	AccountUnlockAndSign: { next: string };
 	AccountUnlock: { next: string; onDelete: () => any };
