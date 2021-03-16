@@ -14,6 +14,7 @@ Parity Signer is [GPL 3.0 licensed](LICENSE).
 #### iOS
 - `cocoapods` (`$ sudo gem install cocoapods`)
 - `Xcode` (only for iOS, tested on `Version 11.3.1 (9F2000)`)
+- `brew install watchman` (if on Mac, will make React Native simulator errors less likely)
 
 #### Android
 - `Android Studio` (only for Android, tested on `Version 3.3`)
