@@ -18,8 +18,6 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import toc from '../../docs/terms-and-conditions.md';
-
 import containerStyles from 'styles/containerStyles';
 import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
 import testIDs from 'e2e/testIDs';
@@ -50,7 +48,7 @@ export default function TermsAndConditions(
 	return (
 		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
-				<Markdown>{toc}</Markdown>
+				<Markdown>None at this time.</Markdown>
 			</CustomScrollView>
 
 			{!policyConfirmed && (

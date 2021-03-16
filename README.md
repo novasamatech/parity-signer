@@ -29,7 +29,10 @@ Parity Signer is [GPL 3.0 licensed](LICENSE).
 
     ```
     yarn install:ios
+    cd ios
+    pod setup
     ```
+
 #### Android
 - Install Dependencies
 
@@ -161,7 +164,7 @@ From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b1
 4. build & run as above
 
 
-# Update Network Tutorial
+# Updating Networks
 
 Parity Signer support adding a new Substrate based network or update the existing network via QR code.
 
@@ -183,4 +186,4 @@ Now on the Parity Signer app, click the QR scanner Button anywhere on the app, a
 
 ![Network Metadata Added on Parity Signer](images/Network-Metadata-Added.png)
 
-Notice since the metadata is generally very big data, and currently, it is hard to sync with Parity Signer, so when signing the transactions on added networks, we cannot interpreter the extrinsic details at the moment. Please check on this [issue](https://github.com/paritytech/parity-signer/issues/457) for the update.
+Notice since the metadata is generally very big data, and currently, it is hard to sync with Parity Signer, so when signing the transactions on added networks, we cannot interpret extrinsic details at the moment. Please check on this [issue](https://github.com/paritytech/parity-signer/issues/457) for the update.
