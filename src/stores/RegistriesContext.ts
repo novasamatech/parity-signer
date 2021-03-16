@@ -94,7 +94,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 			if (networkMetadataRaw === '') return null;
 
 			// Just update metadata no matter what.
-			if (registries.has(networkKey)) return registries.delete(networkKey)!;
+			if (registries.has(networkKey)) registries.delete(networkKey)!;
 
 			const networkParams = networks.get(networkKey)!;
 			const newRegistry = new TypeRegistry();
@@ -112,7 +112,23 @@ export function useRegistriesStore(): RegistriesStoreState {
 		}
 	}
 
-	return { getTypeRegistry, registries };
+	function getMetadata(
+		registry: TypeRegistry,
+		metadataHandle?: MetadataHandle
+	): Metadata | null {
+		try {
+			if(!metadataHandle) return null;
+			const networkMetadataRaw = getMetadata(metadataHandle);
+			if (networkMetadataRaw === '') return null;
+			const metadata = new Metadata(registry, networkMetadataRaw);
+			return metadata;
+		} catch (e) {
+			console.log('error', e);
+			return null;
+		}
+	}
+
+	return { getTypeRegistry, getMetadata, registries };
 }
 
 export const RegistriesContext = React.createContext(

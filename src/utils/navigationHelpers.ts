@@ -61,6 +61,7 @@ type UnlockWithoutPassword = (
 	nextRoute: Route,
 	identity?: Identity
 ) => Promise<void>;
+
 export const useUnlockSeed = (
 	isSeedRefValid: boolean
 ): {

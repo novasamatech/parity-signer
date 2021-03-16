@@ -48,6 +48,8 @@ import IdentityNew from 'screens/IdentityNew';
 import LegacyAccountBackup from 'screens/LegacyAccountBackup';
 import LegacyAccountList from 'screens/LegacyAccountList';
 import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
+import MetadataManagement from 'modules/network/screens/MetadataManagement';
+import FullMetadata from 'modules/network/screens/FullMetadata';
 import PathDerivation from 'screens/PathDerivation';
 import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
@@ -154,6 +156,8 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
 		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
 		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
+		<ScreenStack.Screen name="MetadataManagement" component={MetadataManagement} />
+		<ScreenStack.Screen name="FullMetadata" component={FullMetadata} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />

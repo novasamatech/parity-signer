@@ -37,7 +37,7 @@ import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths
 } from 'utils/identitiesUtils';
-import MetadataAndDerivationTab from 'components/MetadataAndDerivationTab';
+import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
@@ -129,7 +129,7 @@ function PathsList({
 				)}
 				<Separator style={{ backgroundColor: 'transparent' }} />
 			</ScrollView>
-			<MetadataAndDerivationTab
+			<QRScannerAndDerivationTab
 				derivationTestID={testIDs.PathsList.deriveButton}
 				title="Derive New Account"
 				onPress={onTapDeriveButton}

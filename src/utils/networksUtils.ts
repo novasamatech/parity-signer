@@ -63,6 +63,7 @@ export const generateNetworkParamsFromParsedData = (
 		order: 0,
 		pathId: pathId.replace(/ /g, '_'),
 		protocol: 'substrate',
-		secondaryColor: colors.background.card
+		secondaryColor: colors.background.card,
+		metadata: null
 	};
 };

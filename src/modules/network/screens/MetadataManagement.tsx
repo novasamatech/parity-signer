@@ -18,27 +18,18 @@ import React, { useContext } from 'react';
 
 import { NetworkCard } from 'components/AccountCard';
 import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
-import { MetadataCard } from 'modules/network/components/MetadataCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
-import Button from 'components/Button';
-import { RegistriesContext } from 'stores/RegistriesContext';
-import { expandMetadata } from '@polkadot/metadata/decorate';
-import { metadata } from '@polkadot/metadata';
 
 export default function NetworkDetails({
-	navigation,
 	route
 }: NavigationProps<'NetworkDetails'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
 	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
-	const { getTypeRegistry, getMetadata } = useContext(RegistriesContext);
-	const metadataHandle = networks.get(networkKey).metadata
-
 	return (
 		<SafeAreaScrollViewContainer>
 			<NetworkCard
@@ -60,17 +51,6 @@ export default function NetworkDetails({
 			<NetworkInfoCard
 				text={networkParams.prefix.toString()}
 				label="Address prefix"
-			/>
-			<MetadataCard
-				spec_name={metadataHandle.spec_name}
-				spec_version={metadataHandle.spec_version}
-				onPress={(): void =>
-					navigation.navigate('FullMetadata')
-				}
-			/>
-			<Button
-				onPress={(): void => navigation.navigate('MetadataManagement')}
-				title="Manage metadata"
 			/>
 		</SafeAreaScrollViewContainer>
 	);

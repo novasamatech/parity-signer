@@ -28,6 +28,7 @@ export type MetadataContextState = {
 export function useMetadataContext(): MetadataContextState {
 	const [metadataCollection, setMetadataCollection] = useState<Map<string, MetadataRecord>>(new Map());
 
+	
 
 	return {};
 }

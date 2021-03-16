@@ -20,19 +20,18 @@ import { StyleSheet, Text, View } from 'react-native';
 import TouchableItem from './TouchableItem';
 import Separator from './Separator';
 
+import QrScannerTab from 'components/QrScannerTab';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
 
-export default class MetadataAndDerivationTab extends React.PureComponent<{
-	onPressMetadata: ButtonListener;
-	onPressDerivation: ButtonListener;
-	title: string;
-	metadataInfo?: string
+export default class QRScannerAndMetadataTab extends React.PureComponent<{
+	onPress: ButtonListener;
+	metadataInfo: string;
 	derivationTestID?: string;
 }> {
 	render(): React.ReactElement {
-		const { onPress, title, derivationTestID } = this.props;
+		const { onPress, metadataInfo, derivationTestID } = this.props;
 		return (
 			<View style={styles.body}>
 				<Separator
@@ -41,14 +40,7 @@ export default class MetadataAndDerivationTab extends React.PureComponent<{
 					shadowStyle={{ height: 16, marginTop: -16 }}
 				/>
 				<View style={styles.tab}>
-					<TouchableItem
-						onPress={onPress}
-						style={styles.derivationButton}
-						//testID={meta}
-					>
-						<Text style={styles.icon}>{metadataInfo}</Text>
-						<Text style={styles.textLabel}>Manage metadata</Text>
-					</TouchableItem>
+					<QrScannerTab />
 				</View>
 				<View style={styles.tab}>
 					<TouchableItem
@@ -56,8 +48,8 @@ export default class MetadataAndDerivationTab extends React.PureComponent<{
 						style={styles.derivationButton}
 						testID={derivationTestID}
 					>
-						<Text style={styles.icon}>+</Text>
-						<Text style={styles.textLabel}>{title}</Text>
+						<Text style={styles.icon}>{metadataInfo}</Text>
+						<Text style={styles.textLabel}>Manage metadata</Text>
 					</TouchableItem>
 				</View>
 			</View>
