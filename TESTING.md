@@ -88,3 +88,61 @@ yarn test-e2e:android --device-name Pixel_2_API_28
 ```
 
 On Android please replace `ios` with `android`, currently Detox's Android 0.60.x support is in progress, if there is an error, try to build it again with `yarn build-e2e:android`
+
+### Additional Tests
+Basically any method in `src/util` should be unit tested via Jest.
+
+### E2E Testing (Ethereum Legacy)
+
+1. Recover an account on Kovan with the phrase "this is sparta"
+2. Go to MyCrypto and generate a transaction
+3. Scan transaction QR
+4. Scan the signature back to MyCrypto
+5. Make sure the transaction actually succeeds
+6. Go to Sign a Message tab in MyCrypto now
+7. Type in a message, any message
+8. Repeat steps 3, 4
+9. Expect the message is readable just as you typed it in
+10. Scan the signature back to MyCrypto
+11. Verify the message
+
+### E2E Testing (UOS)
+There is currently no testnet so we just check that the signature is formatted correctly.
+
+1. Clone  https://github.com/polkadot-js/apps
+2. Disable the balance validation in apps so you can construct an extrinsic with 0 balance
+3. Choose Kusama network in Settings Tab
+4. Do any extrinsic of your choice
+5. Scan QR
+5. Go to Settings, and change to Substrate (either the hosted Flaming Fir or a custom chain)
+6. Run the same transaction
+7. Expect the message: "Signer does not currently support a chain with the genesis hash: 0x....."
+8. Go to `constants.js`
+9. Add the appropriate genesis hash
+10. Uncomment the checks for `isSubstrateDev` in `PayloadDetailsCard.js`
+11. Repeat steps 4, 5
+12. Expect the method decoding to be raw bytes.
+
+# QA Checking List
+
+## Identity Manipulation
+
+* Identity could be generated with 12 words recovery phrase
+* Identity could be generated with 24 words recovery phrase
+* Identity could be successfully recovered
+* Substrate account could be generated and derivated
+* Ethereum account could be generated within Identity
+* An Root account could be derived by the custom (Add Network Account -> Create Custom Path -> Use empty string as path)
+* An Passworded account could be derived by the custom (Add Network Account -> Create Custom Path -> Add additional password -> input any path)
+
+## Signing
+* Legacy Kusama Account Extrinsic Signning with Single QR code
+* Legacy Kusama Account Extrinsic Signning with Multiple QR code
+* Legacy Ethereum Account Tx Signinng with MyCrypto
+* Legacy Ethereum Account Message Signinng with MyCrypto
+* Identity Kusama Account Extrinsic Signning with Single QR code
+* Identity Polkadot Account Extrinsic Signning with Single QR code
+* Identity Kusama Account Extrinsic Signning with Multiple QR code
+* Identity Polkadot Account Extrinsic Signning with Multiple QR code
+* After move the app into background and back to app, Signing will need pin input again.
+* Identity Substrate Account with Password Signing should also works, which should always need password input
