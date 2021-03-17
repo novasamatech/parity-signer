@@ -1,7 +1,6 @@
 {
   "name": "NativeSigner",
   "version": "4.5.3-beta",
-  "private": true,
   "license": "GPL-3.0",
   "engines": {
     "node": ">=8.3",
@@ -18,7 +17,6 @@
     "clean": "watchman watch-del-all && rm -rf /tmp/metro-bundler-cache-* && rm -rf /tmp/haste-map-react-native-packager-* && rm -rf node_modules/ && yarn cache clean --force",
     "clean:android": "yarn clean && rm -rf ./android/app/build",
     "clean:ios": "yarn clean && rm -rf ./ios/build && (cd ios && pod deintegrate)",
-    "commit": "commit-wizard",
     "ios": "npx react-native run-ios",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
     "lint:fix": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
@@ -39,8 +37,8 @@
     "@polkadot/api": "3.9.3",
     "@polkadot/metadata": "^3.9.3",
     "@polkadot/reactnative-identicon": "0.53.1",
-    "@polkadot/util": "5.4.4",
-    "@polkadot/util-crypto": "5.4.4",
+    "@polkadot/util": "5.7.1",
+    "@polkadot/util-crypto": "5.7.1",
     "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-native-community/netinfo": "^5.9.3",

@@ -73,7 +73,7 @@ export default function App(props: AppProps): React.ReactElement {
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
-			<AppNavigator />
+			return <AppNavigator />
 		} else {
 			return (
 				<ScreenStack.Navigator>
