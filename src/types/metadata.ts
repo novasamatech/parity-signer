@@ -3,7 +3,7 @@
 export type MetadataHandle = {
 	spec_name: string;
 	spec_version: string;
-	timestamp: number;
+	hash: string;
 };
 
 // Type to store serialized metadata. Should be accessed only

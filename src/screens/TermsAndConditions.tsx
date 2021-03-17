@@ -29,20 +29,42 @@ import fontStyles from 'styles/fontStyles';
 import Button from 'components/Button';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
-import { saveToCAndPPConfirmation } from 'utils/db';
+import { saveToCAndPPConfirmation, saveMetadata } from 'utils/db';
 import CustomScrollView from 'components/CustomScrollView';
+import { metadataHandleToKey } from 'utils/metadataUtils';
+import { NetworksContext } from 'stores/NetworkContext';
+import {
+	centrifugeAmberMetadata,
+	centrifugeMetadata,
+	edgewareMetadata,
+	kulupuMetadata,
+	kusamaMetadata,
+	polkadotMetaData,
+	rococoMetadata,
+	westendMetadata
+} from 'constants/networkMetadata';
+import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 
 export default function TermsAndConditions(
 	props: NavigationProps<'TermsAndConditions'>
 ): React.ReactElement {
 	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
 	const [tocAgreement, setTocAgreement] = useState<boolean>(false);
-
+	const { getNetwork } = useContext(NetworksContext);
+	
 	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(
 		GlobalStateContext
 	);
 	const { navigation } = props;
 	const onConfirm = async (): Promise<void> => {
+		await saveMetadata(centrifugeMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.CENTRIFUGE)));
+		await saveMetadata(centrifugeAmberMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.CENTRIFUGE_AMBER)));
+		await saveMetadata(kusamaMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.KUSAMA)));
+		await saveMetadata(westendMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.WESTEND)));
+		await saveMetadata(edgewareMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.EDGEWARE)));
+		await saveMetadata(kulupuMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.KULUPU)));
+		await saveMetadata(polkadotMetaData, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.POLKADOT)));
+		await saveMetadata(rococoMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.ROCOCO)));
 		await saveToCAndPPConfirmation();
 		setPolicyConfirmed(true);
 	};

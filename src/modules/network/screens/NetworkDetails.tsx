@@ -27,6 +27,7 @@ import Button from 'components/Button';
 import { RegistriesContext } from 'stores/RegistriesContext';
 import { expandMetadata } from '@polkadot/metadata/decorate';
 import { metadata } from '@polkadot/metadata';
+import { RuntimeVersion } from '@polkadot/types/interfaces';
 
 export default function NetworkDetails({
 	navigation,
@@ -36,14 +37,13 @@ export default function NetworkDetails({
 	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
-	const { getTypeRegistry, getMetadata } = useContext(RegistriesContext);
-	const metadataHandle = networks.get(networkKey).metadata
+	const metadataHandle = networks.get(networkKey).metadata;
 
 	const metadataValid = (): React.ReactElement => (
 		<> 
 			<MetadataCard
-				spec_name={metadataHandle.spec_name}
-				spec_version={metadataHandle.spec_version}
+				spec_name={metadataHandle.specName}
+				spec_version={metadataHandle.specVersion}
 				onPress={(): void =>
 					navigation.navigate('FullMetadata')
 				}

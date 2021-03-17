@@ -192,9 +192,9 @@ export async function saveMetadata(
 	newMetadataKey: string
 ): Promise<void> {
 	try {
-		SecureStorage.setItem(
+		await SecureStorage.setItem(
 			newMetadataKey,
-			newMetadata.serialized,
+			newMetadata,
 			metadataStorage
 		);
 	} catch (e) {
