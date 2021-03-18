@@ -72,6 +72,10 @@ const testIDs = {
 		recoverButton: 'anc_recover_button',
 		showExistedButton: 'anc_show_existed'
 	},
+	NavigationTab: {
+		settings: 'navigation_tab_settings',
+		wallet: 'navigation_tab_wallet'
+	},
 	NetworkSettings: {
 		networkCard: 'network_settings_network_card'
 	},

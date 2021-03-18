@@ -20,7 +20,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import TouchableItem from './TouchableItem';
 import Separator from './Separator';
 
-import QrScannerTab from 'components/QrScannerTab';
+import NavigationTab from 'components/NavigationTab';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
@@ -40,7 +40,7 @@ export default class QRScannerAndDerivationTab extends React.PureComponent<{
 					shadowStyle={{ height: 16, marginTop: -16 }}
 				/>
 				<View style={styles.tab}>
-					<QrScannerTab />
+					<NavigationTab />
 				</View>
 				<View style={styles.tab}>
 					<TouchableItem

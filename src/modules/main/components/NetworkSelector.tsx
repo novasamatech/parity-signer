@@ -43,7 +43,7 @@ import {
 	useUnlockSeed
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
-import QrScannerTab from 'components/QrScannerTab';
+import NavigationTab from 'components/NavigationTab';
 
 function NetworkSelector({
 	accountsStore,
@@ -231,7 +231,7 @@ function NetworkSelector({
 				testID={testIDs.Main.chooserScreen}
 				{...getListOptions()}
 			/>
-			{!shouldShowMoreNetworks && !isNew && <QrScannerTab />}
+			{!shouldShowMoreNetworks && !isNew && <NavigationTab />}
 		</SafeAreaViewContainer>
 	);
 }

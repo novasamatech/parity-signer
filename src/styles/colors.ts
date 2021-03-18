@@ -32,6 +32,7 @@ export default {
 		main: '#FF4077'
 	},
 	text: {
+		disabled: '#2F2F2F',
 		faded: '#9A9A9A',
 		main: '#C0C0C0'
 	}

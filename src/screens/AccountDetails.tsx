@@ -35,7 +35,7 @@ import fontStyles from 'styles/fontStyles';
 import { UnknownAccountWarning } from 'components/Warnings';
 import AccountIcon from 'components/AccountIcon';
 import { NavigationProps } from 'types/props';
-import QrScannerTab from 'components/QrScannerTab';
+import NavigationTab from 'components/NavigationTab';
 
 export default function AccountDetails({
 	navigation
@@ -115,7 +115,7 @@ export default function AccountDetails({
 					{protocol === NetworkProtocols.UNKNOWN && <UnknownAccountWarning />}
 				</View>
 			</ScrollView>
-			<QrScannerTab />
+			<NavigationTab />
 		</SafeAreaViewContainer>
 	);
 }
