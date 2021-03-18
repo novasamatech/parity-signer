@@ -20,6 +20,7 @@ import { FlatList, StyleSheet } from 'react-native';
 import testIDs from 'e2e/testIDs';
 import { NetworkCard } from 'components/AccountCard';
 import { filterNetworks } from 'modules/network/utils';
+import NavigationTab from 'components/NavigationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
@@ -64,6 +65,7 @@ export default function NetworkSettings({
 				renderItem={renderNetwork}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 			/>
+			<NavigationTab />
 		</SafeAreaViewContainer>
 	);
 }
