@@ -89,7 +89,8 @@ describe('units', () => {
 			const result = getResultFromMethod(method_1);
 
 			expect(result.dest).toBe(
-				'5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				//substrate address '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				'14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3'
 			);
 			expect(result.value).toBe('123.0000 DOT');
 		});
@@ -98,7 +99,8 @@ describe('units', () => {
 			const result = getResultFromMethod(method_2);
 
 			expect(result.dest).toBe(
-				'5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				//substrate address '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				'14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3'
 			);
 			expect(result.value).toBe('12.3123 µDOT');
 		});
@@ -107,7 +109,8 @@ describe('units', () => {
 			const result = getResultFromMethod(method_3);
 
 			expect(result.dest).toBe(
-				'5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				//substrate address '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				'14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3'
 			);
 			expect(result.value).toBe('999.9999 YDOT');
 		});
