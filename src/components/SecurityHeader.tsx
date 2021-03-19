@@ -16,13 +16,33 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-import IdentitiesSwitch from 'components/IdentitiesSwitch';
+import ButtonIcon from './ButtonIcon';
+
+import { RootStackParamList } from 'types/routes';
+import { navigateToIdentitySwitch } from 'utils/navigationHelpers';
+import testIDs from 'e2e/testIDs';
 
 function SecurityHeader(): React.ReactElement {
+	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+	const routes = navigation.dangerouslyGetState().routes;
+	const route = routes[routes.length - 1].name;
+
 	return (
 		<View style={styles.body}>
-			<IdentitiesSwitch />
+			<ButtonIcon
+				onPress={(): void => {
+					if (route !== 'IdentitySwitch') navigateToIdentitySwitch(navigation);
+				}}
+				iconName="user"
+				iconType="antdesign"
+				iconBgStyle={{ backgroundColor: 'transparent' }}
+				testID={testIDs.IdentitiesSwitch.toggleButton}
+				style={{ paddingHorizontal: 6 }}
+				iconSize={26}
+			/>
 		</View>
 	);
 }

@@ -43,6 +43,7 @@ import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
 import IdentityNew from 'screens/IdentityNew';
+import IdentitySwitch from 'screens/IdentitySwitch';
 import LegacyAccountBackup from 'screens/LegacyAccountBackup';
 import LegacyAccountList from 'screens/LegacyAccountList';
 import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
@@ -145,6 +146,7 @@ export const AppNavigator = (): React.ReactElement => (
 			component={IdentityManagement}
 		/>
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
+		<ScreenStack.Screen name="IdentitySwitch" component={IdentitySwitch} />
 		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
 		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />

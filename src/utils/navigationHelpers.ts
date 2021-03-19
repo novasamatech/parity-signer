@@ -288,3 +288,9 @@ export const navigateToLegacyAccountList = <
 export const navigateToMain = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationTo(navigation, 'Main');
+
+export const navigateToIdentitySwitch = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
+): void => resetNavigationTo(navigation, 'IdentitySwitch');

@@ -8,21 +8,21 @@
 
 // Parity is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Parity.  If not, see <http://www.gnu.org/licenses/>.
+// along with Parity.	If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import ButtonIcon from './ButtonIcon';
-import Separator from './Separator';
-import TransparentBackground from './TransparentBackground';
-
+import ButtonIcon from 'components/ButtonIcon';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import ScreenHeading from 'components/ScreenHeading';
+import Separator from 'components/Separator';
 import { AccountsContext } from 'stores/AccountsContext';
 import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
@@ -36,6 +36,7 @@ import {
 	resetNavigationWithNetworkChooser
 } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
+import { NavigationProps } from 'types/props';
 
 function ButtonWithArrow(props: {
 	onPress: () => void;
@@ -45,26 +46,12 @@ function ButtonWithArrow(props: {
 	return <ButtonIcon {...props} {...i_arrowOptions} />;
 }
 
-function IdentitiesSwitch({}: {}): React.ReactElement {
+function IdentitySwitch({}: NavigationProps<
+	'IdentitySwitch'
+>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
-	const [visible, setVisible] = useState(false);
 	const { currentIdentity, identities, accounts } = accountsStore.state;
-	// useEffect(() => {
-	// 	const firstLogin: boolean = identities.length === 0;
-	// 	if (currentIdentity === null && !firstLogin) {
-	// 		setVisible(true);
-	// 	}
-	// }, [currentIdentity, identities]);
-
-	const closeModalAndNavigate = <RouteName extends keyof RootStackParamList>(
-		screenName: RouteName,
-		params?: RootStackParamList[RouteName]
-	): void => {
-		setVisible(false);
-		// @ts-ignore
-		navigation.navigate(screenName, params);
-	};
 
 	const onIdentitySelectedAndNavigate = async <
 		RouteName extends keyof RootStackParamList
@@ -73,8 +60,7 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 		screenName: RouteName,
 		params?: RootStackParamList[RouteName]
 	): Promise<void> => {
-		await accountsStore.selectIdentity(identity);
-		setVisible(false);
+		accountsStore.selectIdentity(identity);
 		if (screenName === 'Main') {
 			resetNavigationTo(navigation, screenName, params);
 		} else if (screenName === 'IdentityBackup') {
@@ -89,7 +75,6 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 	};
 
 	const onLegacyListClicked = (): void => {
-		setVisible(false);
 		navigateToLegacyAccountList(navigation);
 		accountsStore.resetCurrentIdentity();
 	};
@@ -191,55 +176,38 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 	};
 
 	return (
-		<View>
-			<ButtonIcon
-				onPress={(): void => setVisible(!visible)}
-				iconName="user"
-				iconType="antdesign"
-				iconBgStyle={{ backgroundColor: 'transparent' }}
-				testID={testIDs.IdentitiesSwitch.toggleButton}
-				style={{ paddingHorizontal: 6 }}
-				iconSize={26}
-			/>
+		<SafeAreaViewContainer>
+			<ScreenHeading title={'Identity Switch'} />
+			<View style={styles.card}>
+				{renderCurrentIdentityCard()}
+				{renderIdentities()}
+				{accounts.size > 0 && (
+					<>
+						<ButtonIcon
+							title="Legacy Accounts"
+							onPress={onLegacyListClicked}
+							iconName="solution1"
+							iconType="antdesign"
+							iconSize={24}
+							textStyle={fontStyles.t_big}
+							style={styles.indentedButton}
+						/>
+						<Separator />
+					</>
+				)}
 
-			<TransparentBackground
-				testID={testIDs.IdentitiesSwitch.modal}
-				visible={visible}
-				setVisible={setVisible}
-				style={styles.container}
-				animationType="none"
-			>
-				<View style={styles.card}>
-					{renderCurrentIdentityCard()}
-					{renderIdentities()}
-					{accounts.size > 0 && (
-						<>
-							<ButtonIcon
-								title="Legacy Accounts"
-								onPress={onLegacyListClicked}
-								iconName="solution1"
-								iconType="antdesign"
-								iconSize={24}
-								textStyle={fontStyles.t_big}
-								style={styles.indentedButton}
-							/>
-							<Separator />
-						</>
-					)}
-
-					<ButtonIcon
-						title="Add Identity"
-						testID={testIDs.IdentitiesSwitch.addIdentityButton}
-						onPress={(): void => closeModalAndNavigate('IdentityNew')}
-						iconName="plus"
-						iconType="antdesign"
-						iconSize={24}
-						textStyle={fontStyles.t_big}
-						style={styles.indentedButton}
-					/>
-				</View>
-			</TransparentBackground>
-		</View>
+				<ButtonIcon
+					title="Add Identity"
+					testID={testIDs.IdentitiesSwitch.addIdentityButton}
+					onPress={(): void => navigation.navigate('IdentityNew')}
+					iconName="plus"
+					iconType="antdesign"
+					iconSize={24}
+					textStyle={fontStyles.t_big}
+					style={styles.indentedButton}
+				/>
+			</View>
+		</SafeAreaViewContainer>
 	);
 }
 
@@ -272,4 +240,4 @@ const i_arrowOptions = {
 	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
 };
 
-export default IdentitiesSwitch;
+export default IdentitySwitch;
