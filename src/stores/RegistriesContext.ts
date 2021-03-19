@@ -84,6 +84,7 @@ export type RegistriesStoreState = {
 export function useRegistriesStore(): RegistriesStoreState {
 	const [registries, setRegistries] = useState(new Map());
 
+
 	function getTypeRegistry(
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string,
@@ -99,6 +100,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 			const networkParams = networks.get(networkKey)!;
 			const newRegistry = new TypeRegistry();
 			const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+			console.log(overrideTypes);
 			newRegistry.register(overrideTypes);
 			const metadata = new Metadata(newRegistry, networkMetadataRaw);
 			newRegistry.setMetadata(metadata);
@@ -112,23 +114,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 		}
 	}
 
-	function getMetadata(
-		registry: TypeRegistry,
-		metadataHandle?: MetadataHandle
-	): Metadata | null {
-		try {
-			if(!metadataHandle) return null;
-			const networkMetadataRaw = getMetadata(metadataHandle);
-			if (networkMetadataRaw === '') return null;
-			const metadata = new Metadata(registry, networkMetadataRaw);
-			return metadata;
-		} catch (e) {
-			console.log('error', e);
-			return null;
-		}
-	}
-
-	return { getTypeRegistry, getMetadata, registries };
+	return { getTypeRegistry, registries };
 }
 
 export const RegistriesContext = React.createContext(

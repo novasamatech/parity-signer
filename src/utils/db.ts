@@ -25,6 +25,11 @@ import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
 import { MetadataHandle, MetadataRecord } from 'types/metadata';
 import { metadataHandleToKey } from 'utils/metadataUtils';
+import { expandMetadata } from '@polkadot/metadata/decorate';
+import { Metadata } from '@polkadot/metadata';
+import { TypeRegistry } from '@polkadot/types';
+import { getSpecTypes } from '@polkadot/types-known';
+import type { RuntimeVersion } from '@polkadot/types/interfaces';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
@@ -178,7 +183,7 @@ export async function getMetadata(metadataHandle: MetadataHandle): Promise<strin
 		const metadataKey = metadataHandleToKey(metadataHandle);
 		const metadataRecord = await SecureStorage.getItem(
 			metadataKey,
-			metadataStore
+			metadataStorage
 		);
 		return metadataRecord;
 	} catch (e) {
@@ -189,14 +194,41 @@ export async function getMetadata(metadataHandle: MetadataHandle): Promise<strin
 
 export async function saveMetadata(
 	newMetadata: MetadataRecord,
-	newMetadataKey: string
 ): Promise<void> {
 	try {
+		const registry = new TypeRegistry();
+		//registry.register(RuntimeVersion);
+		//const overrideTypes = getSpecTypes(registry, 'polkadot', 'polkadot', 29);
+		//console.log('override: ');
+	       	//console.log(overrideTypes);
+		//registry.register(overrideTypes);
+		const metadata = new Metadata(registry, newMetadata);
+		registry.setMetadata(metadata);
+		//console.log('registered: ');
+	       	//console.log(registry.knownTypes);
+		//console.log(metadata.asLatest.modules[0].constants);
+		const decorated = expandMetadata(registry, metadata);
+//		console.warn(decorated);
+/*		var rtVersion='';
+		for(const moduleRecord of metadata.asLatest.modules)
+			if(moduleRecord.name == "System")
+				for(const constantRecord of moduleRecord.constants)
+					if(constantRecord.name == "Version")
+						rtVersion = constantRecord.value;
+		console.log('version: ' + rtVersion);*/
+		const metadataHandle: MetadataHandle = {
+			specName:    decorated.consts.system.version.get('specName'),
+			specVersion: decorated.consts.system.version.get('specVersion'),
+			hash: 'stub'
+		};
+		console.log(metadataHandle);
+		const newMetadataKey = metadataHandleToKey(metadataHandle);
 		await SecureStorage.setItem(
 			newMetadataKey,
 			newMetadata,
 			metadataStorage
 		);
+		console.log(newMetadataKey);
 	} catch (e) {
 		handleError(e, 'metadata');
 	}

@@ -2,13 +2,13 @@ import { useContext } from 'react';
 
 import { TypeRegistry } from '@polkadot/types';
 import { Metadata } from '@polkadot/metadata';
-import { SubstrateNetworkKeys } from 'constants/networkSpecs';
-import { NetworksContext } from 'stores/NetworkContext';
+import { allBuiltInMetadata } from 'constants/networkMetadata';
+import { saveMetadata } from 'utils/db';
 
 export const metadataHandleToKey = (
 	metadataHandle: MetadataHandle
 ): string => {
-	const metadataKey = metadataHandle.spec_name + '_v' + metadataHandle.spec_version;
+	const metadataKey = metadataHandle.specName + '_v' + metadataHandle.specVersion;
 	return metadataKey;
 };
 
@@ -26,9 +26,14 @@ export const getRuntimeVersionFromRaw = (
 	return runtimeVersion;
 }
 
+export async function populateMetadata(): Promise<void> {
+	for(const metadataString of allBuiltInMetadata) {
+		await saveMetadata(metadataString);
+	}
+}
+
 //TODO: more elegance and auto-generation of this junk, as per issue #736
-export async function initBuiltInNetworks(): Promise<void> {
-	const { getNetwork } = useContext(NetworksContext);
+//export async function initBuiltInNetworks(): Promise<void> {
 /*	await saveMetadata(centrifugeMetadata, metadataHandleToKey(allNetworks.get(SubstrateNetworkKeys.CENTRIFUGE)));
 	await saveMetadata(centrifugeAmberMetadata, metadataHandleToKey(allNetworks.get(SubstrateNetworkKeys.CENTRIFUGE_AMBER)));
 	await saveMetadata(kusamaMetadata, metadataHandleToKey(allNetworks.get(SubstrateNetworkKeys.KUSAMA)));
@@ -37,7 +42,7 @@ export async function initBuiltInNetworks(): Promise<void> {
 	await saveMetadata(kulupuMetadata, metadataHandleToKey(allNetworks.get(SubstrateNetworkKeys.KULUPU)));
 	await saveMetadata(polkadotMetaData, metadataHandleToKey(allNetworks.get(SubstrateNetworkKeys.POLKADOT)));
 	await saveMetadata(rococoMetadata, metadataHandleToKey(allNetworks.get(SubstrateNetworkKeys.ROCOCO)));*/
-}
+//}
 
 /*
 //const metadata = await api.rpc.state.getMetadata();

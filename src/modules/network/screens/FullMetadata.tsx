@@ -18,52 +18,42 @@ import React, { ReactElement, useContext } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 
 import testIDs from 'e2e/testIDs';
-import { NetworkCard } from 'components/AccountCard';
+import { NetworkInfoCard } from 'components/AccountCard';
 import { filterNetworks } from 'modules/network/utils';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
+import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
+import { RegistriesContext } from 'stores/RegistriesContext';
+import { getMetadata } from 'utils/db';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 
 export default function FullMetadata({
-	navigation
+	navigation,
+	route
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
-	const { networks } = useContext(NetworksContext);
-	const networkParams = filterNetworks(networks) as Array<
-		[string, SubstrateNetworkParams]
-	>;
-	const renderNetwork = ({
-		item
-	}: {
-		item: [string, SubstrateNetworkParams];
-	}): ReactElement => {
-		const networkSpec = item[1];
-		return (
-			<NetworkCard
-				testID={testIDs.NetworkSettings.networkCard + networkSpec.genesisHash}
-				key={networkSpec.genesisHash + networkSpec.pathId}
-				networkKey={networkSpec.genesisHash}
-				onPress={(): void =>
-					navigation.navigate('NetworkDetails', {
-						pathId: networkSpec.pathId
-					})
-				}
-				title={networkSpec.title}
-			/>
-		);
-	};
+	const networkPathId = route.params.pathId;
+	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+	const { getTypeRegistry, getRegisteredMetadata } = useContext(RegistriesContext);
+	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
+	const networkParams = getSubstrateNetwork(networkKey);
+	const metadataHandle = networks.get(networkKey).metadata;
+	const typeRegistry = getTypeRegistry(networks, networkKey, metadataHandle);
+	//const registeredMetadata = getRegisteredMetadata(typeRegistry, metadataHandle);
+	const savedMetadata = await getMetadata(metadataHandle);
 
 	return (
 		<SafeAreaViewContainer style={styles.body}>
-			<ScreenHeading title="Supported Networks" />
-			<FlatList
-				data={networkParams}
-				renderItem={renderNetwork}
-				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
+			<ScreenHeading title="Metadata" />
+			<NetworkInfoCard
+				text={savedMetadata}
+				label="registered metadata"
+				small
 			/>
+
 		</SafeAreaViewContainer>
 	);
 }

@@ -33,16 +33,6 @@ import { saveToCAndPPConfirmation, saveMetadata } from 'utils/db';
 import CustomScrollView from 'components/CustomScrollView';
 import { metadataHandleToKey } from 'utils/metadataUtils';
 import { NetworksContext } from 'stores/NetworkContext';
-import {
-	centrifugeAmberMetadata,
-	centrifugeMetadata,
-	edgewareMetadata,
-	kulupuMetadata,
-	kusamaMetadata,
-	polkadotMetaData,
-	rococoMetadata,
-	westendMetadata
-} from 'constants/networkMetadata';
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 
 export default function TermsAndConditions(
@@ -57,15 +47,7 @@ export default function TermsAndConditions(
 	);
 	const { navigation } = props;
 	const onConfirm = async (): Promise<void> => {
-		await saveMetadata(centrifugeMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.CENTRIFUGE)));
-		await saveMetadata(centrifugeAmberMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.CENTRIFUGE_AMBER)));
-		await saveMetadata(kusamaMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.KUSAMA)));
-		await saveMetadata(westendMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.WESTEND)));
-		await saveMetadata(edgewareMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.EDGEWARE)));
-		await saveMetadata(kulupuMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.KULUPU)));
-		await saveMetadata(polkadotMetaData, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.POLKADOT)));
-		await saveMetadata(rococoMetadata, metadataHandleToKey(getNetwork(SubstrateNetworkKeys.ROCOCO)));
-		await saveToCAndPPConfirmation();
+				await saveToCAndPPConfirmation();
 		setPolicyConfirmed(true);
 	};
 

@@ -45,7 +45,9 @@ export default function NetworkDetails({
 				spec_name={metadataHandle.specName}
 				spec_version={metadataHandle.specVersion}
 				onPress={(): void =>
-					navigation.navigate('FullMetadata')
+					navigation.navigate('FullMetadata', {
+						pathId: networkPathId
+					})
 				}
 			/>
 			<Button

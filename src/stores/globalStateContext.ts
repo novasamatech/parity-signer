@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { loadToCAndPPConfirmation } from 'utils/db';
 import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
+import { populateMetadata } from 'utils/metadataUtils';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 export type GlobalState = {
@@ -25,6 +26,8 @@ export function useGlobalStateContext(): GlobalState {
 
 	useEffect(() => {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
+			console.log('loading built-in metadata...');
+			await populateMetadata();
 			const tocPP = await loadToCAndPPConfirmation();
 			setPolicyConfirmed(tocPP);
 			if (!tocPP) {
