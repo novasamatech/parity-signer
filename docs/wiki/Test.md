@@ -71,6 +71,16 @@ Re-run tests without re-installing the app
 yarn test-e2e:ios --reuse
 ```
 
+In order to clear the detox cache run:
+```
+detox clean-framework-cache && detox build-framework-cache
+```
+
+In order to clear the ios simulator run:
+```
+xcrun simctl erase all
+```
+
 If you want to use another specific emulator/simulator than those defined in the configuration, add `--device-name` flag (on Android API version is needed), for example:
 ```
 yarn test-e2e:ios --device-name iPhone X
