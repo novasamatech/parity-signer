@@ -37,6 +37,7 @@ import {
 } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
+import NavigationTab from 'components/NavigationTab';
 
 function ButtonWithArrow(props: {
 	onPress: () => void;
@@ -207,6 +208,10 @@ function IdentitySwitch({}: NavigationProps<
 					style={styles.indentedButton}
 				/>
 			</View>
+			{/* TODO: get this footer on every page */}
+			<View style={styles.tab}>
+				<NavigationTab />
+			</View>
 		</SafeAreaViewContainer>
 	);
 }
@@ -228,6 +233,10 @@ const styles = StyleSheet.create({
 	},
 	indentedButton: {
 		paddingLeft: 32
+	},
+	tab: {
+		flex: 1,
+		justifyContent: 'flex-end'
 	}
 });
 
