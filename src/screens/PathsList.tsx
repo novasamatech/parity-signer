@@ -22,22 +22,16 @@ import { PathDetailsView } from './PathDetails';
 import { NetworksContext } from 'stores/NetworkContext';
 import { PathGroup } from 'types/identityTypes';
 import PathGroupCard from 'components/PathGroupCard';
-import { useUnlockSeed } from 'utils/navigationHelpers';
-import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
-import {
-	isEthereumNetworkParams,
-	isUnknownNetworkParams
-} from 'types/networkTypes';
+import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths
 } from 'utils/identitiesUtils';
-import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
@@ -54,7 +48,6 @@ function PathsList({
 
 	const { currentIdentity } = accountsStore.state;
 	const isEthereumPath = isEthereumNetworkParams(networkParams);
-	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
 	const pathsGroups = useMemo((): PathGroup[] | null => {
 		if (!currentIdentity || isEthereumPath) return null;
 		const listedPaths = getPathsWithSubstrateNetworkKey(
@@ -70,8 +63,6 @@ function PathsList({
 		networkContextState,
 		networks
 	]);
-	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
 
 	if (isEthereumNetworkParams(networkParams)) {
 		return (
@@ -85,14 +76,6 @@ function PathsList({
 	}
 
 	const { navigate } = navigation;
-	const rootPath = `//${networkParams.pathId}`;
-
-	const onTapDeriveButton = (): Promise<void> =>
-		unlockWithoutPassword({
-			name: 'PathDerivation',
-			params: { parentPath: isUnknownNetworkPath ? '' : rootPath }
-		});
-
 	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
 		const path = pathsGroup.paths[0];
 		return (
@@ -129,11 +112,6 @@ function PathsList({
 				)}
 				<Separator style={{ backgroundColor: 'transparent' }} />
 			</ScrollView>
-			<QRScannerAndDerivationTab
-				derivationTestID={testIDs.PathsList.deriveButton}
-				title="Derive New Account"
-				onPress={onTapDeriveButton}
-			/>
 		</SafeAreaViewContainer>
 	);
 }

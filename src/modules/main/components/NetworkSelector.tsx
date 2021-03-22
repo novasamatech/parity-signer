@@ -39,8 +39,7 @@ import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToPathDetails,
 	navigateToPathsList,
-	unlockSeedPhrase,
-	useUnlockSeed
+	unlockSeedPhrase
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import NavigationTab from 'components/NavigationTab';
@@ -56,7 +55,6 @@ function NetworkSelector({
 	const networkContextState = useContext(NetworksContext);
 	const { getSubstrateNetwork, allNetworks } = networkContextState;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
 
 	const { setAlert } = useContext(AlertStateContext);
 	// catch android back button and prevent exiting the app
@@ -77,12 +75,6 @@ function NetworkSelector({
 			return (): void => backHandler.remove();
 		}, [shouldShowMoreNetworks])
 	);
-
-	const onAddCustomPath = (): Promise<void> =>
-		unlockWithoutPassword({
-			name: 'PathDerivation',
-			params: { parentPath: '' }
-		});
 
 	const deriveSubstrateNetworkRootPath = async (
 		networkKey: string,
@@ -121,31 +113,17 @@ function NetworkSelector({
 
 	const getListOptions = (): Partial<FlatListProps<any>> => {
 		if (isNew) return {};
-		if (shouldShowMoreNetworks) {
-			return {
-				ListHeaderComponent: (
-					<NetworkCard
-						isAdd={true}
-						onPress={onAddCustomPath}
-						testID={testIDs.Main.addCustomNetworkButton}
-						title="Create Custom Path"
-						networkColor={colors.background.app}
-					/>
-				)
-			};
-		} else {
-			return {
-				ListFooterComponent: (
-					<NetworkCard
-						isAdd={true}
-						onPress={(): void => setShouldShowMoreNetworks(true)}
-						testID={testIDs.Main.addNewNetworkButton}
-						title="Add Network Account"
-						networkColor={colors.background.app}
-					/>
-				)
-			};
-		}
+		return {
+			ListFooterComponent: (
+				<NetworkCard
+					isAdd={true}
+					onPress={(): void => setShouldShowMoreNetworks(true)}
+					testID={testIDs.Main.addNewNetworkButton}
+					title="Add Network Account"
+					networkColor={colors.background.app}
+				/>
+			)
+		};
 	};
 
 	const renderScreenHeading = (): React.ReactElement => {

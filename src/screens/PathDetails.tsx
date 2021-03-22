@@ -18,7 +18,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
@@ -81,12 +80,6 @@ export function PathDetailsView({
 		formattedNetworkKey,
 		allNetworks
 	);
-
-	const onTapDeriveButton = (): Promise<void> =>
-		unlockWithoutPassword({
-			name: 'PathDerivation',
-			params: { parentPath: path }
-		});
 
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
@@ -169,13 +162,6 @@ export function PathDetailsView({
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
-			{isSubstratePath(path) && (
-				<QRScannerAndDerivationTab
-					derivationTestID={testIDs.PathDetail.deriveButton}
-					title="Derive New Account"
-					onPress={onTapDeriveButton}
-				/>
-			)}
 		</SafeAreaViewContainer>
 	);
 }
