@@ -18,7 +18,11 @@ export function usePayloadDetails(
 		setIsProcessing(true);
 		// was this line useful for anything?
 		//if (getTypeRegistry === null) return;
-		const typeRegistry = getTypeRegistry(networks, networkKey, networks.get(networkKey).metadataHandle);
+		console.log('generating payload card...');
+		console.log(networkKey);
+		console.log(networks.get(networkKey));
+		console.log(networks.get(networkKey).metadata);
+		const typeRegistry = getTypeRegistry(networks, networkKey, networks.get(networkKey).metadata);
 		if (typeRegistry === null || typeof rawPayload === 'string') {
 			setIsProcessing(false);
 			return;
@@ -35,7 +39,7 @@ export function usePayloadDetails(
 				setIsProcessing(false);
 			} catch (e) {
 				//can't generate extrinsic payload, don't display.
-				console.log('error', e);
+				console.log('Payload details error', e);
 			}
 		}
 	}, [rawPayload, networkKey, getTypeRegistry, networks]);

@@ -108,7 +108,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
 			specName: "centrifuge-chain",
-			specVersion: "240",
+			specVersion: 240,
 			hash: "dummy"
 		},
 		order: 7,
@@ -124,7 +124,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
 			specName: "centrifuge-chain",
-			specVersion: "240",
+			specVersion: 240,
 			hash: "dummy"
 		},
 		order: 8,
@@ -140,7 +140,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Edgeware.png'),
 		metadata: {
 			specName: "edgeware",
-			specVersion: "41",
+			specVersion: 41,
 			hash: "dummy"
 		},
 		order: 6,
@@ -155,7 +155,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.KULUPU,
 		metadata: {
 			specName: "kulupu",
-			specVersion: "17",
+			specVersion: 17,
 			hash: "dummy"
 		},
 		order: 5,
@@ -171,7 +171,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Kusama.png'),
 		metadata: {
 			specName: "kusama",
-			specVersion: "2029",
+			specVersion: 2029,
 			hash: "dummy"
 		},
 		order: 2,
@@ -186,7 +186,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		metadata: {
 			specName: "kusama",
-			specVersion: "2029",
+			specVersion: 2029,
 			hash: "dummy"
 		},
 		order: 99,
@@ -202,7 +202,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
 			specName: "polkadot",
-			specVersion: "28",
+			specVersion: 28,
 			hash: "dummy"
 		},
 		order: 1,
@@ -218,7 +218,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Rococo.png'),
 		metadata: {
 			specName: "rococo",
-			specVersion: "214",
+			specVersion: 214,
 			hash: "dummy"
 		},
 		order: 4,
@@ -233,7 +233,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
 		metadata: {
 			specName: "polkadot",
-			specVersion: "28",
+			specVersion: 28,
 			hash: "dummy"
 		},
 		order: 100,
@@ -249,7 +249,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
 			specName: "westend",
-			specVersion: "49",
+			specVersion: 49,
 			hash: "dummy"
 		},
 		order: 3,

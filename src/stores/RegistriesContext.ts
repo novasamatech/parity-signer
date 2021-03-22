@@ -17,12 +17,13 @@
 import { Metadata } from '@polkadot/metadata';
 import { TypeRegistry } from '@polkadot/types';
 import { getSpecTypes } from '@polkadot/types-known';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { deepCopyMap } from 'stores/utils';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { getMetadata } from 'utils/db';
 import { MetadataHandle } from 'tupes/metadata';
+import { NetworksContext } from 'stores/NetworkContext';
 
 //Map PathId to Polkadot.js/api spec names and chain names
 type NetworkTypes = {
@@ -83,31 +84,56 @@ export type RegistriesStoreState = {
 
 export function useRegistriesStore(): RegistriesStoreState {
 	const [registries, setRegistries] = useState(new Map());
+	const [ registriesReady, setRegistriesReady ] = useState(true);
+	const { networks } = useContext(NetworksContext);
 
-
-	function getTypeRegistry(
-		networks: Map<string, SubstrateNetworkParams>,
-		networkKey: string,
-		metadataHandle: MetadataHandle
+	async function initTypeRegistry(
+		networkKey: string
 	): TypeRegistry | null {
 		try {
-			const networkMetadataRaw = getMetadata(metadataHandle);
-			if (networkMetadataRaw === '') return null;
+			console.log('getTypeRegistry invoked');
+			const networkParams = networks.get(networkKey)!;
+			const metadataHandle = networkParams.metadata;
+			console.log(metadataHandle);
 
-			// Just update metadata no matter what.
+			networkMetadataRaw = await getMetadata(metadataHandle);
+			console.log(networkMetadataRaw);
+			
 			if (registries.has(networkKey)) registries.delete(networkKey)!;
 
-			const networkParams = networks.get(networkKey)!;
 			const newRegistry = new TypeRegistry();
-			const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
-			console.log(overrideTypes);
-			newRegistry.register(overrideTypes);
+			//const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+			//console.log(overrideTypes);
+			//newRegistry.register(overrideTypes);
 			const metadata = new Metadata(newRegistry, networkMetadataRaw);
 			newRegistry.setMetadata(metadata);
 			const newRegistries = deepCopyMap(registries);
 			newRegistries.set(networkKey, newRegistry);
 			setRegistries(newRegistries);
-			return newRegistry;
+		} catch (e) {
+			console.log('error', e);
+			return null;
+		}
+	}
+
+	async function updateRegistries(): Promise<void> {
+		if (registriesReady) {
+			setRegistriesReady(false);
+			for(network of networks.keys()) {
+				await initTypeRegistry(network);
+			}
+			setRegistriesReady(true);
+		}
+	}
+
+	function getTypeRegistry(
+		//networks: Map<string, SubstrateNetworkParams>,
+		networkKey: string
+	): TypeRegistry | null {
+		try {
+			console.log('getTypeRegistry invoked');
+			if (registries.has(networkKey)) return registries.get(networkKey)!;
+			return null;
 		} catch (e) {
 			console.log('error', e);
 			return null;

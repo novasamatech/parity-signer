@@ -2,7 +2,7 @@ import { useContext } from 'react';
 
 import { TypeRegistry } from '@polkadot/types';
 import { Metadata } from '@polkadot/metadata';
-import { allBuiltInMetadata } from 'constants/networkMetadata';
+import { allBuiltInMetadata } from 'constants/networkMetadataList';
 import { saveMetadata } from 'utils/db';
 
 export const metadataHandleToKey = (

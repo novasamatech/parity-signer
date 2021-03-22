@@ -14,19 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import React, { ReactElement, useContext, useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text } from 'react-native';
 
 import testIDs from 'e2e/testIDs';
-import { NetworkInfoCard } from 'components/AccountCard';
+import { NetworkInfoCard } from 'modules/network/components/NetworkInfoCard';
 import { filterNetworks } from 'modules/network/utils';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { RegistriesContext } from 'stores/RegistriesContext';
 import { getMetadata } from 'utils/db';
+//import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
@@ -37,24 +38,42 @@ export default function FullMetadata({
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
 	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
-	const { getTypeRegistry, getRegisteredMetadata } = useContext(RegistriesContext);
+	const { getTypeRegistry, registry } = useContext(RegistriesContext);
+	const [ savedMetadata, setSavedMetadata ] = useState<string>('');
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
 	const metadataHandle = networks.get(networkKey).metadata;
 	const typeRegistry = getTypeRegistry(networks, networkKey, metadataHandle);
 	//const registeredMetadata = getRegisteredMetadata(typeRegistry, metadataHandle);
-	const savedMetadata = await getMetadata(metadataHandle);
+	//const [ metadataReady, savedMetadata ] = useFullMetadataHook(metadataHandle);
+	const [ metadataReady, setMetadataReady ] = useState<bool>(false);
+
+	useEffect(() => {
+		const getSavedMetadata = async function (): Promise<void> {
+			const getSavedMetadata = await getMetadata(metadataHandle);
+			setSavedMetadata(getSavedMetadata);
+			setMetadataReady(true);
+		};
+		getSavedMetadata();
+	}, [setSavedMetadata, setMetadataReady, metadataHandle]);
+	console.log(typeof savedMetadata);
+	console.log(metadataReady);
+
+	
+	function showFullMetadata(): React.ReactNode{
+		if(metadataReady) {
+			return (
+				<Text>{savedMetadata}</Text>
+			);
+		} else {
+			return;
+		}
+	}
 
 	return (
-		<SafeAreaViewContainer style={styles.body}>
-			<ScreenHeading title="Metadata" />
-			<NetworkInfoCard
-				text={savedMetadata}
-				label="registered metadata"
-				small
-			/>
-
-		</SafeAreaViewContainer>
+		<SafeAreaScrollViewContainer style={styles.body}>
+				{showFullMetadata()}
+		</SafeAreaScrollViewContainer>
 	);
 }
 

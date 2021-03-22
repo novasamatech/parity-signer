@@ -178,14 +178,16 @@ const metadataStorage = {
 	sharedPreferencesName: 'parity_signer_metadata'
 };
 
-export async function getMetadata(metadataHandle: MetadataHandle): Promise<string> {
+export function getMetadata(metadataHandle: MetadataHandle): Promise<string> {
 	try {
 		const metadataKey = metadataHandleToKey(metadataHandle);
-		const metadataRecord = await SecureStorage.getItem(
+		console.log(metadataKey);
+		const metadataRecord = SecureStorage.getItem(
 			metadataKey,
 			metadataStorage
-		);
-		return metadataRecord;
+		).then(() => {
+			return metadataRecord;
+		});
 	} catch (e) {
 		handleError(e, 'metadata');
 		return '';
