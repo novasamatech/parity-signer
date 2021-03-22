@@ -47,10 +47,8 @@ import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
 	previewTransactionAndApprove,
-	unlockSeedPhrase,
-	unlockSeedPhraseWithPassword
+	unlockSeedPhrase
 } from 'utils/navigationHelpers';
-import { constructSuriSuffix } from 'utils/suri';
 
 function getSeedRef(
 	encryptedSeed: string,
@@ -144,28 +142,10 @@ export function useProcessBarCode(
 		if (!senderIdentity) throw new Error(strings.ERROR_NO_SENDER_IDENTITY);
 
 		let seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
-		let password = '';
 		// 2. unlock and get Seed reference
 		if (seedRef === undefined || !seedRef.isValid()) {
-			if (sender.hasPassword) {
-				//need unlock with password
-				password = await unlockSeedPhraseWithPassword(
-					navigation,
-					false,
-					senderIdentity
-				);
-			} else {
-				await unlockSeedPhrase(navigation, false, senderIdentity);
-			}
+			await unlockSeedPhrase(navigation, false, senderIdentity);
 			seedRef = getSeedRef(sender.encryptedSeed, seedRefs)!;
-		} else {
-			if (sender.hasPassword) {
-				password = await unlockSeedPhraseWithPassword(
-					navigation,
-					true,
-					senderIdentity
-				);
-			}
 		}
 		// 3. sign data
 		if (isEthereum) {
@@ -174,12 +154,9 @@ export function useProcessBarCode(
 				qrInfo
 			);
 		} else {
-			const suriSuffix = constructSuriSuffix({
-				password
-			});
 			await scannerStore.signSubstrateData(
 				seedRef.trySubstrateSign.bind(seedRef),
-				suriSuffix,
+				'',
 				qrInfo,
 				networks
 			);

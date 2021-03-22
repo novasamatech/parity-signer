@@ -32,7 +32,6 @@ import { NetworkProtocols } from 'constants/networkSpecs';
 import fonts from 'styles/fonts';
 import { debounce } from 'utils/debounce';
 import { brainWalletAddress, substrateAddress, words } from 'utils/native';
-import { constructSURI } from 'utils/suri';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 
 interface IconType {
@@ -42,7 +41,6 @@ interface IconType {
 }
 
 interface Props {
-	derivationPassword: string;
 	derivationPath: string;
 	network: NetworkParams;
 	onSelect: (icon: {
@@ -66,12 +64,7 @@ export default class AccountIconChooser extends React.PureComponent<
 	}
 
 	refreshIcons = async (): Promise<void> => {
-		const {
-			derivationPassword,
-			derivationPath,
-			network,
-			onSelect
-		} = this.props;
+		const { derivationPath, network, onSelect } = this.props;
 
 		// clean previous selection
 		onSelect({ isBip39: false, newAddress: '', newSeed: '' });
@@ -93,13 +86,8 @@ export default class AccountIconChooser extends React.PureComponent<
 						} else {
 							// Substrate
 							try {
-								const suri = constructSURI({
-									password: derivationPassword,
-									phrase: result.seed
-								});
-
 								result.address = await substrateAddress(
-									suri,
+									result.seed,
 									(network as SubstrateNetworkParams).prefix
 								);
 								result.bip39 = true;
@@ -172,11 +160,10 @@ export default class AccountIconChooser extends React.PureComponent<
 	debouncedRefreshIcons = debounce(this.refreshIcons, 200);
 
 	componentDidUpdate(prevProps: any): void {
-		const { derivationPassword, derivationPath, network } = this.props;
+		const { derivationPath, network } = this.props;
 
 		if (
 			prevProps.network !== network ||
-			prevProps.derivationPassword !== derivationPassword ||
 			prevProps.derivationPath !== derivationPath
 		) {
 			this.debouncedRefreshIcons();

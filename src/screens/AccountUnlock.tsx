@@ -105,11 +105,6 @@ interface AccountUnlockViewProps {
 	navigate: () => void;
 }
 
-interface AccountUnlockViewState {
-	hasWrongPin: boolean;
-	pin: string;
-}
-
 function AccountUnlockView(props: AccountUnlockViewProps): React.ReactElement {
 	const [hasWrongPin, setHasWrongPin] = useState(false);
 	const [pin, setPin] = useState('');

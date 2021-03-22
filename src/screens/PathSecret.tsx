@@ -21,7 +21,6 @@ import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
 import QrView from 'components/QrView';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { PasswordedAccountExportWarning } from 'components/Warnings';
 import testIDs from 'e2e/testIDs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -50,9 +49,8 @@ function PathSecret({
 				currentIdentity,
 				networksContextState
 			);
-			const password = route.params.password ?? '';
 			const accountName = getPathName(path, currentIdentity);
-			const generatedSecret = await substrateSecret(`${path}///${password}`);
+			const generatedSecret = await substrateSecret(`${path}`);
 			setSecret(`secret:0x${generatedSecret}:${networkKey}:${accountName}`);
 		};
 
@@ -60,7 +58,6 @@ function PathSecret({
 	}, [
 		path,
 		pathMeta,
-		route.params.password,
 		navigation,
 		currentIdentity,
 		isSeedRefValid,
@@ -79,7 +76,6 @@ function PathSecret({
 			<ScrollView testID={testIDs.PathSecret.screen} bounces={false}>
 				<PathCard identity={currentIdentity} path={path} />
 				<QrView data={secret} testID={secret} />
-				{pathMeta.hasPassword && <PasswordedAccountExportWarning />}
 			</ScrollView>
 		</SafeAreaViewContainer>
 	);

@@ -31,7 +31,6 @@ import AccountCard from 'components/AccountCard';
 import Button from 'components/Button';
 import ScreenHeading from 'components/ScreenHeading';
 import TouchableItem from 'components/TouchableItem';
-import DerivationPasswordVerify from 'components/DerivationPasswordVerify';
 import { alertBackupDone, alertCopyBackupPhrase } from 'utils/alertUtils';
 
 function LegacyAccountBackup({
@@ -63,7 +62,6 @@ function LegacyAccountBackup({
 	const isNew = route.params?.isNew ?? false;
 	const {
 		address,
-		derivationPassword = '',
 		derivationPath = '',
 		name,
 		networkKey,
@@ -106,9 +104,6 @@ function LegacyAccountBackup({
 				</TouchableItem>
 				{derivationPath !== '' && (
 					<Text style={styles.derivationText}>{derivationPath || ''}</Text>
-				)}
-				{derivationPassword !== '' && (
-					<DerivationPasswordVerify password={derivationPassword} />
 				)}
 				{isNew && (
 					<Button

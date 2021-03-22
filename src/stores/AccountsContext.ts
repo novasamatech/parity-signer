@@ -52,7 +52,7 @@ import {
 	TryBrainWalletAddress,
 	TrySubstrateAddress
 } from 'utils/seedRefHooks';
-import { constructSuriSuffix, parseSURI } from 'utils/suri';
+import { parseSURI } from 'utils/suri';
 
 export type AccountsContextState = {
 	clearIdentity: () => void;
@@ -98,8 +98,7 @@ export type AccountsContextState = {
 		newPath: string,
 		createSubstrateAddress: TrySubstrateAddress,
 		networkParams: SubstrateNetworkParams,
-		name: string,
-		password: string
+		name: string
 	) => Promise<void>;
 	deletePath: (path: string, networkContext: NetworksContextState) => void;
 	deleteCurrentIdentity: () => Promise<void>;
@@ -154,7 +153,6 @@ export function useAccountContext(): AccountsContextState {
 	function _deleteSensitiveData(account: UnlockedAccount): LockedAccount {
 		delete account.seed;
 		delete account.seedPhrase;
-		delete account.derivationPassword;
 		delete account.derivationPath;
 
 		return account;
@@ -298,10 +296,9 @@ export function useAccountContext(): AccountsContextState {
 
 		try {
 			const decryptedSeed = await decryptData(account.encryptedSeed, pin);
-			const { phrase, derivePath, password } = parseSURI(decryptedSeed);
+			const { phrase, derivePath } = parseSURI(decryptedSeed);
 			setState({
 				accounts: state.accounts.set(accountKey, {
-					derivationPassword: password || '',
 					derivationPath: derivePath || '',
 					seed: decryptedSeed,
 					seedPhrase: phrase || '',
@@ -399,7 +396,6 @@ export function useAccountContext(): AccountsContextState {
 		return {
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
-			hasPassword: !!metaData.hasPassword,
 			isLegacy: false,
 			networkKey: targetNetworkKey!,
 			path: targetPath,
@@ -471,17 +467,13 @@ export function useAccountContext(): AccountsContextState {
 		createSubstrateAddress: TrySubstrateAddress,
 		updatedIdentity: Identity,
 		name: string,
-		networkParams: SubstrateNetworkParams,
-		password: string
+		networkParams: SubstrateNetworkParams
 	): Promise<Identity> {
 		const { prefix, pathId } = networkParams;
-		const suriSuffix = constructSuriSuffix({
-			password
-		});
 		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
 		let address = '';
 		try {
-			address = await createSubstrateAddress(suriSuffix, prefix);
+			address = await createSubstrateAddress('', prefix);
 		} catch (e) {
 			throw new Error(addressGenerateError);
 		}
@@ -489,7 +481,6 @@ export function useAccountContext(): AccountsContextState {
 		const pathMeta = {
 			address,
 			createdAt: new Date().getTime(),
-			hasPassword: password !== '',
 			name,
 			networkPathId: pathId,
 			updatedAt: new Date().getTime()
@@ -554,8 +545,7 @@ export function useAccountContext(): AccountsContextState {
 		newPath: string,
 		createSubstrateAddress: TrySubstrateAddress,
 		networkParams: SubstrateNetworkParams,
-		name: string,
-		password: string
+		name: string
 	): Promise<void> {
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
 		await _addPathToIdentity(
@@ -563,8 +553,7 @@ export function useAccountContext(): AccountsContextState {
 			createSubstrateAddress,
 			updatedCurrentIdentity,
 			name,
-			networkParams,
-			password
+			networkParams
 		);
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}

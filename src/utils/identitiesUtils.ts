@@ -16,7 +16,7 @@
 
 import { pathsRegex } from './regex';
 import { decryptData, substrateAddress } from './native';
-import { constructSURI, parseSURI } from './suri';
+import { parseSURI } from './suri';
 import { generateAccountId } from './account';
 
 import { NetworksContextState } from 'stores/NetworkContext';
@@ -120,7 +120,6 @@ export const getAddressKeyByPath = (
 export function emptyIdentity(): Identity {
 	return {
 		addresses: new Map(),
-		derivationPassword: '',
 		encryptedSeed: '',
 		meta: new Map(),
 		name: ''
@@ -308,14 +307,10 @@ export const verifyPassword = async (
 	networkContextState: NetworksContextState
 ): Promise<boolean> => {
 	const { networks } = networkContextState;
-	const suri = constructSURI({
-		password: password,
-		phrase: seedPhrase
-	});
 	const networkKey = getNetworkKey(path, identity, networkContextState);
 	const networkParams = networks.get(networkKey);
 	if (!networkParams) throw new Error(strings.ERROR_NO_NETWORK);
-	const address = await substrateAddress(suri, networkParams.prefix);
+	const address = await substrateAddress(seedPhrase, networkParams.prefix);
 	const accountMeta = identity.meta.get(path);
 	return address === accountMeta?.address;
 };

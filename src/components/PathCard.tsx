@@ -99,7 +99,6 @@ export default function PathCard({
 	]);
 
 	const isUnknownAddress = address === '';
-	const hasPassword = identity.meta.get(path)?.hasPassword ?? false;
 	const networkParams =
 		computedNetworkKey === UnknownNetworkKeys.UNKNOWN &&
 		!isUnknownAddress &&
@@ -164,7 +163,6 @@ export default function PathCard({
 				<View style={styles.desc}>
 					<View style={styles.row}>
 						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
-						{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
 					</View>
 					{address !== '' && (
 						<Text

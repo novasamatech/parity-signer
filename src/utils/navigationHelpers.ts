@@ -52,21 +52,8 @@ export const unlockAndReturnSeed = async <
 		});
 	});
 
-type UnlockWithPassword = (
-	nextRoute: (password: string) => Route,
-	identity?: Identity
-) => Promise<void>;
-
-type UnlockWithoutPassword = (
-	nextRoute: Route,
-	identity?: Identity
-) => Promise<void>;
-export const useUnlockSeed = (
-	isSeedRefValid: boolean
-): {
-	unlockWithPassword: UnlockWithPassword;
-	unlockWithoutPassword: UnlockWithoutPassword;
-} => {
+type Unlock = (nextRoute: Route, identity?: Identity) => Promise<void>;
+export const useUnlockSeed = (isSeedRefValid: boolean): Unlock => {
 	const currentRoutes = useNavigationState(state => state.routes) as Route[];
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 	const resetRoutes = (routes: Route[]): void => {
@@ -77,29 +64,11 @@ export const useUnlockSeed = (
 		navigation.dispatch(resetAction);
 	};
 
-	const unlockWithPassword: UnlockWithPassword = async (
-		nextRoute,
-		identity
-	) => {
-		const password = await unlockSeedPhraseWithPassword(
-			navigation,
-			isSeedRefValid,
-			identity
-		);
-		const newRoutes = currentRoutes.concat(nextRoute(password));
-		resetRoutes(newRoutes);
-	};
-
-	const unlockWithoutPassword: UnlockWithoutPassword = async (
-		nextRoute,
-		identity
-	) => {
+	return async (nextRoute, identity): Promise<void> => {
 		await unlockSeedPhrase(navigation, isSeedRefValid, identity);
 		const newRoutes = currentRoutes.concat(nextRoute);
 		resetRoutes(newRoutes);
 	};
-
-	return { unlockWithPassword, unlockWithoutPassword };
 };
 
 export const previewTransactionAndApprove = async <

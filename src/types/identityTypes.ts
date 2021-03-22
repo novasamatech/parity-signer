@@ -19,7 +19,6 @@ import { AccountsContextState } from 'stores/AccountsContext';
 export type UnlockedAccount = {
 	address: string;
 	createdAt: number;
-	derivationPassword: string;
 	derivationPath: string; // doesn't contain the ///password
 	encryptedSeed: string;
 	isLegacy?: boolean;
@@ -34,7 +33,7 @@ export type UnlockedAccount = {
 
 export type LockedAccount = Omit<
 	UnlockedAccount,
-	'seedPhrase' | 'seed' | 'derivationPassword' | 'derivationPath'
+	'seedPhrase' | 'seed' | 'derivationPath'
 >;
 
 export type Account = UnlockedAccount | LockedAccount;
@@ -48,7 +47,6 @@ export function isUnlockedAccount(
 export type AccountMeta = {
 	address: string;
 	createdAt: number;
-	hasPassword?: boolean;
 	name: string;
 	updatedAt: number;
 	networkPathId?: string;
@@ -57,7 +55,6 @@ export type AccountMeta = {
 export interface FoundIdentityAccount extends AccountMeta {
 	accountId: string;
 	encryptedSeed: string;
-	hasPassword: boolean;
 	validBip39Seed: true;
 	isLegacy: false;
 	networkKey: string;
@@ -82,7 +79,6 @@ export type FoundAccount = FoundIdentityAccount | FoundLegacyAccount;
 export type Identity = {
 	// encrypted seed include seedPhrase and password
 	encryptedSeed: string;
-	derivationPassword: string;
 	meta: Map<string, AccountMeta>;
 	addresses: Map<string, string>;
 	name: string;
@@ -90,7 +86,6 @@ export type Identity = {
 
 export type SerializedIdentity = {
 	encryptedSeed: string;
-	derivationPassword: string;
 	meta: Array<[string, AccountMeta]>;
 	addresses: Array<[string, string]>;
 	name: string;

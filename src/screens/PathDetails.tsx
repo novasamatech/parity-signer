@@ -67,9 +67,7 @@ export function PathDetailsView({
 	const accountName = getPathName(path, currentIdentity);
 	const { setAlert } = useContext(AlertStateContext);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword, unlockWithPassword } = useUnlockSeed(
-		isSeedRefValid
-	);
+	const unlock = useUnlockSeed(isSeedRefValid);
 	const networksContextState = useContext(NetworksContext);
 	const { allNetworks } = networksContextState;
 	if (!address) return <View />;
@@ -109,18 +107,7 @@ export function PathDetailsView({
 				});
 				break;
 			case 'PathExport': {
-				const pathMeta = currentIdentity.meta.get(path)!;
-				if (pathMeta.hasPassword) {
-					await unlockWithPassword(password => ({
-						name: 'PathSecret',
-						params: {
-							password,
-							path
-						}
-					}));
-				} else {
-					await unlockWithoutPassword({ name: 'PathSecret', params: { path } });
-				}
+				await unlock({ name: 'PathSecret', params: { path } });
 				break;
 			}
 			case 'PathManagement':

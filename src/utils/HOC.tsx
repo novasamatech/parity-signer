@@ -51,9 +51,7 @@ export function withCurrentIdentity<
 }
 
 interface UnlockScreenProps {
-	route:
-		| RouteProp<RootStackParamList, 'PinUnlock'>
-		| RouteProp<RootStackParamList, 'PinUnlockWithPassword'>;
+	route: RouteProp<RootStackParamList, 'PinUnlock'>;
 	targetIdentity: Identity;
 }
 

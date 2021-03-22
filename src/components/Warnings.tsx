@@ -62,21 +62,6 @@ export function UnknownAccountWarning({
 	);
 }
 
-export function PasswordedAccountExportWarning(): React.ReactElement {
-	return (
-		<View style={styles.warningView}>
-			<Text style={styles.warningTitle}>Warning</Text>
-			<Text style={styles.warningText}>
-				The secret is generated with the input password.
-				{'\n'}
-				{'\n'}
-				Please make sure you have input the correct password, a wrong password
-				will lead to a different QR code.
-			</Text>
-		</View>
-	);
-}
-
 const styles = StyleSheet.create({
 	warningText: {
 		color: colors.text.main,

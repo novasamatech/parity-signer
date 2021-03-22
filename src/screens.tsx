@@ -31,7 +31,6 @@ import NetworkDetails from 'modules/network/screens/NetworkDetails';
 import NetworkSettings from 'modules/network/screens/NetworkSettings';
 import PinNew from 'modules/unlock/screens/PinNew';
 import PinUnlock from 'modules/unlock/screens/PinUnlock';
-import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
@@ -154,10 +153,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="PathManagement" component={PathManagement} />
 		<ScreenStack.Screen name="PinNew" component={PinNew} />
 		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
-		<ScreenStack.Screen
-			name="PinUnlockWithPassword"
-			component={PinUnlockWithPassword}
-		/>
 		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
 		<ScreenStack.Screen name="DetailsMessage" component={DetailsMessage} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
