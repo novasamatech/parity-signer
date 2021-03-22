@@ -166,39 +166,6 @@ export default function PathCard({
 						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
 						{hasPassword && <AntIcon name="lock" style={styles.iconLock} />}
 					</View>
-					<View
-						style={{
-							alignItems: 'center',
-							flexDirection: 'row'
-						}}
-					>
-						<AntIcon
-							name="user"
-							size={fontStyles.i_small.fontSize}
-							color={colors.signal.main}
-						/>
-
-						{hasPassword ? (
-							<View style={styles.row}>
-								<Text
-									style={[fontStyles.t_codeS, { color: colors.signal.main }]}
-								>
-									{path}///
-								</Text>
-
-								<AntIcon
-									name="lock"
-									size={fontStyles.i_small.fontSize}
-									color={colors.signal.main}
-									style={{ alignSelf: 'center' }}
-								/>
-							</View>
-						) : (
-							<Text style={[fontStyles.t_codeS, { color: colors.signal.main }]}>
-								{path}
-							</Text>
-						)}
-					</View>
 					{address !== '' && (
 						<Text
 							style={[fontStyles.t_codeS, { color: colors.text.faded }]}

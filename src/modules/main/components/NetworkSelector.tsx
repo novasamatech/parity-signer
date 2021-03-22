@@ -207,7 +207,7 @@ function NetworkSelector({
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 				testID={testIDs.Main.chooserScreen}
-				{...getListOptions()}
+				{...(!shouldShowMoreNetworks && !isNew && getListOptions())}
 			/>
 			{!shouldShowMoreNetworks && !isNew && <NavigationTab />}
 		</SafeAreaViewContainer>

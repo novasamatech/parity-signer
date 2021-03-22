@@ -100,11 +100,9 @@ export function parseSURI(suri: string): SURIObject {
  */
 
 export function constructSURI({
-	derivePath = '',
 	password = '',
 	phrase
 }: {
-	derivePath?: string;
 	password?: string;
 	phrase: string;
 }): string {
@@ -112,15 +110,13 @@ export function constructSURI({
 		throw new Error('Cannot construct an SURI from emtpy phrase.');
 	}
 
-	return `${phrase}${derivePath}///${password}`;
+	return `${phrase}///${password}`;
 }
 
 export function constructSuriSuffix({
-	derivePath = '',
 	password = ''
 }: {
-	derivePath?: string;
 	password?: string;
 }): string {
-	return `${derivePath}///${password}`;
+	return `///${password}`;
 }

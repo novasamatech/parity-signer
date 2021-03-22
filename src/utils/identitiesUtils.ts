@@ -309,7 +309,6 @@ export const verifyPassword = async (
 ): Promise<boolean> => {
 	const { networks } = networkContextState;
 	const suri = constructSURI({
-		derivePath: path,
 		password: password,
 		phrase: seedPhrase
 	});

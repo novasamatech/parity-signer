@@ -175,7 +175,6 @@ export function useProcessBarCode(
 			);
 		} else {
 			const suriSuffix = constructSuriSuffix({
-				derivePath: sender.path,
 				password
 			});
 			await scannerStore.signSubstrateData(

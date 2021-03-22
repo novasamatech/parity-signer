@@ -94,7 +94,6 @@ export default class AccountIconChooser extends React.PureComponent<
 							// Substrate
 							try {
 								const suri = constructSURI({
-									derivePath: derivationPath,
 									password: derivationPassword,
 									phrase: result.seed
 								});

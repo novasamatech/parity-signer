@@ -476,7 +476,6 @@ export function useAccountContext(): AccountsContextState {
 	): Promise<Identity> {
 		const { prefix, pathId } = networkParams;
 		const suriSuffix = constructSuriSuffix({
-			derivePath: newPath,
 			password
 		});
 		if (updatedIdentity.meta.has(newPath)) throw new Error(accountExistedError);
