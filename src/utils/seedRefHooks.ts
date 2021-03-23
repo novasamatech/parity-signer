@@ -48,10 +48,10 @@ export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 	const [seedRefs, setSeedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	const seedRef = useMemo(() => {
-		const newSeedRef = new SeedRefClass();
 		if (seedRefs.has(encryptedSeed)) {
 			return seedRefs.get(encryptedSeed)!;
 		}
+		const newSeedRef = new SeedRefClass();
 		setSeedRefs(seedRefs.set(encryptedSeed, newSeedRef));
 		return newSeedRef;
 	}, [seedRefs, setSeedRefs, encryptedSeed]);

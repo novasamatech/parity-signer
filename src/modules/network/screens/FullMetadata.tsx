@@ -25,7 +25,6 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
-import { RegistriesContext } from 'stores/RegistriesContext';
 import { getMetadata } from 'utils/db';
 //import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
@@ -37,8 +36,7 @@ export default function FullMetadata({
 	route
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
-	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
-	const { getTypeRegistry, registry } = useContext(RegistriesContext);
+	const { networks, getSubstrateNetwork, getTypeRegistry, registries } = useContext(NetworksContext);
 	const [ savedMetadata, setSavedMetadata ] = useState<string>('');
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);

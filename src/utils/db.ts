@@ -178,16 +178,15 @@ const metadataStorage = {
 	sharedPreferencesName: 'parity_signer_metadata'
 };
 
-export function getMetadata(metadataHandle: MetadataHandle): Promise<string> {
+export async function getMetadata(metadataHandle: MetadataHandle): Promise<string> {
 	try {
 		const metadataKey = metadataHandleToKey(metadataHandle);
 		console.log(metadataKey);
-		const metadataRecord = SecureStorage.getItem(
+		const metadataRecord = await SecureStorage.getItem(
 			metadataKey,
 			metadataStorage
-		).then(() => {
-			return metadataRecord;
-		});
+		)
+		return metadataRecord;
 	} catch (e) {
 		handleError(e, 'metadata');
 		return '';
@@ -199,16 +198,8 @@ export async function saveMetadata(
 ): Promise<void> {
 	try {
 		const registry = new TypeRegistry();
-		//registry.register(RuntimeVersion);
-		//const overrideTypes = getSpecTypes(registry, 'polkadot', 'polkadot', 29);
-		//console.log('override: ');
-	       	//console.log(overrideTypes);
-		//registry.register(overrideTypes);
 		const metadata = new Metadata(registry, newMetadata);
 		registry.setMetadata(metadata);
-		//console.log('registered: ');
-	       	//console.log(registry.knownTypes);
-		//console.log(metadata.asLatest.modules[0].constants);
 		const decorated = expandMetadata(registry, metadata);
 //		console.warn(decorated);
 /*		var rtVersion='';
@@ -223,14 +214,14 @@ export async function saveMetadata(
 			specVersion: decorated.consts.system.version.get('specVersion'),
 			hash: 'stub'
 		};
-		console.log(metadataHandle);
+		//console.log(metadataHandle);
 		const newMetadataKey = metadataHandleToKey(metadataHandle);
 		await SecureStorage.setItem(
 			newMetadataKey,
 			newMetadata,
 			metadataStorage
 		);
-		console.log(newMetadataKey);
+		console.log('Loaded: ' + newMetadataKey);
 	} catch (e) {
 		handleError(e, 'metadata');
 	}

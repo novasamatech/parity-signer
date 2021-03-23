@@ -27,6 +27,7 @@ export const getRuntimeVersionFromRaw = (
 }
 
 export async function populateMetadata(): Promise<void> {
+	console.log('loading built-in metadata...');
 	for(const metadataString of allBuiltInMetadata) {
 		await saveMetadata(metadataString);
 	}

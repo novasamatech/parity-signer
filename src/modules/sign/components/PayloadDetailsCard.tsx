@@ -24,10 +24,6 @@ import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import {
-	RegistriesContext,
-	RegistriesStoreState
-} from 'stores/RegistriesContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
@@ -58,9 +54,8 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
 		const [tip, setTip] = useState<string>();
 		const [useFallback, setUseFallBack] = useState(false);
-		const { getTypeRegistry } = useContext(RegistriesContext);
 		const { setAlert } = useContext(AlertStateContext);
-		const { networks, getSubstrateNetwork } = useContext(NetworksContext);
+		const { networks, getSubstrateNetwork, getTypeRegistry } = useContext(NetworksContext);
 		const networkParams = getSubstrateNetwork(networkKey);
 		const prefix = networkParams.prefix;
 		const typeRegistry = getTypeRegistry(networks, networkKey)!;
