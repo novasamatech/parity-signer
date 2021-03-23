@@ -66,7 +66,7 @@ export default function AccountIcon(props: {
 			</View>
 		);
 	}
-	if (protocol === NetworkProtocols.ETHEREUM) {
+	if (protocol === NetworkProtocols.ETHEREUM && ethereumIconUri) {
 		return (
 			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
 		);
