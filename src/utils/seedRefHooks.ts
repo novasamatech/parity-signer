@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { SeedRefClass } from 'utils/native';
@@ -52,10 +52,15 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 			return seedRefs.get(encryptedSeed)!;
 		} else {
 			const newSeedRef = new SeedRefClass();
-			setSeedRefs(seedRefs.set(encryptedSeed, newSeedRef));
 			return newSeedRef;
 		}
-	}, [seedRefs, setSeedRefs, encryptedSeed]);
+	}, [seedRefs, encryptedSeed]);
+
+	useEffect(() => {
+		if (!seedRefs.has(encryptedSeed)) {
+			setSeedRefs(seedRefs.set(encryptedSeed, seedRef));
+		}
+	});
 
 	const isSeedRefValid: boolean = seedRef.isValid();
 

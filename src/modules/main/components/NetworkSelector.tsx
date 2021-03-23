@@ -88,8 +88,7 @@ function NetworkSelector({
 				fullPath,
 				seedRefHooks.substrateAddress,
 				getSubstrateNetwork(networkKey),
-				`${networkParams.title} root`,
-				''
+				`${networkParams.title} root`
 			);
 			navigateToPathDetails(navigation, networkKey, fullPath);
 		} catch (error) {
