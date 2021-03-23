@@ -28,7 +28,7 @@ import React, { useReducer } from 'react';
 import { AccountsContextState } from 'stores/AccountsContext';
 import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
 import { GetNetwork, NetworksContextState } from 'stores/NetworkContext';
-import { Account, FoundAccount } from 'types/identityTypes';
+import { FoundAccount } from 'types/identityTypes';
 import {
 	isEthereumNetworkParams,
 	SubstrateNetworkParams
@@ -66,8 +66,8 @@ import transaction, { Transaction } from 'utils/transaction';
 type TXRequest = Record<string, any>;
 
 type SignedTX = {
-	recipient: Account;
-	sender: Account;
+	recipient: FoundAccount;
+	sender: FoundAccount;
 	txRequest: TXRequest;
 };
 
@@ -352,7 +352,7 @@ export function useScannerContext(): ScannerContextState {
 			dataToSign: dataToSign,
 			isHash: false,
 			isOversized,
-			recipient: recipient as FoundAccount,
+			recipient: recipient,
 			sender,
 			tx,
 			type: 'transaction'

@@ -17,16 +17,13 @@
 import '../shim';
 import 'utils/iconLoader';
 import * as React from 'react';
-import { StatusBar, StyleSheet, View, LogBox } from 'react-native';
+import { StatusBar, LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
 
-import {
-	AppNavigator,
-	ScreenStack
-} from './screens';
+import { AppNavigator } from './screens';
 
 import {
 	useRegistriesStore,
@@ -40,11 +37,6 @@ import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
-import {
-	GlobalState,
-	GlobalStateContext,
-	useGlobalStateContext
-} from 'stores/globalStateContext';
 import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 
 export default function App(props: AppProps): React.ReactElement {
@@ -64,7 +56,6 @@ export default function App(props: AppProps): React.ReactElement {
 	}
 
 	const alertContext = useAlertContext();
-	const globalContext: GlobalState = useGlobalStateContext();
 	const seedRefContext = useSeedRefStore();
 	const networkContext = useNetworksContext();
 	const accountsContext = useAccountContext();
@@ -72,19 +63,7 @@ export default function App(props: AppProps): React.ReactElement {
 	const registriesContext = useRegistriesStore();
 
 	const renderStacks = (): React.ReactElement => {
-		if (globalContext.dataLoaded) {
-			return <AppNavigator />
-		} else {
-			return (
-				<ScreenStack.Navigator>
-					<ScreenStack.Screen name="Empty">
-						{(navigationProps: any): React.ReactElement => (
-							<View style={emptyScreenStyles} {...navigationProps} />
-						)}
-					</ScreenStack.Screen>
-				</ScreenStack.Navigator>
-			);
-		}
+		return <AppNavigator />;
 	};
 
 	return (
@@ -93,22 +72,18 @@ export default function App(props: AppProps): React.ReactElement {
 				<AccountsContext.Provider value={accountsContext}>
 					<ScannerContext.Provider value={scannerContext}>
 						<RegistriesContext.Provider value={registriesContext}>
-							<GlobalStateContext.Provider value={globalContext}>
-								<AlertStateContext.Provider value={alertContext}>
-									<SeedRefsContext.Provider value={seedRefContext}>
-										<MenuProvider backHandler={true}>
-											<StatusBar
-												barStyle="light-content"
-												backgroundColor={colors.background.app}
-											/>
-											<CustomAlert />
-											<NavigationContainer>
-												{renderStacks()}
-											</NavigationContainer>
-										</MenuProvider>
-									</SeedRefsContext.Provider>
-								</AlertStateContext.Provider>
-							</GlobalStateContext.Provider>
+							<AlertStateContext.Provider value={alertContext}>
+								<SeedRefsContext.Provider value={seedRefContext}>
+									<MenuProvider backHandler={true}>
+										<StatusBar
+											barStyle="light-content"
+											backgroundColor={colors.background.app}
+										/>
+										<CustomAlert />
+										<NavigationContainer>{renderStacks()}</NavigationContainer>
+									</MenuProvider>
+								</SeedRefsContext.Provider>
+							</AlertStateContext.Provider>
 						</RegistriesContext.Provider>
 					</ScannerContext.Provider>
 				</AccountsContext.Provider>
@@ -116,12 +91,3 @@ export default function App(props: AppProps): React.ReactElement {
 		</SafeAreaProvider>
 	);
 }
-
-const emptyScreenStyles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		flexDirection: 'column',
-		padding: 20
-	}
-});

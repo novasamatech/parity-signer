@@ -84,7 +84,7 @@ export function PathDetailsView({
 			case 'PathDelete':
 				alertDeleteAccount(setAlert, 'this account', async () => {
 					try {
-						await accountsStore.deletePath(path, networksContextState);
+						accountsStore.deletePath(path, networksContextState);
 						if (isSubstratePath(path)) {
 							const listedPaths = getPathsWithSubstrateNetworkKey(
 								accountsStore.state.currentIdentity!,

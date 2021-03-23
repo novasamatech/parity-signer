@@ -31,7 +31,6 @@ import fontStyles from 'styles/fontStyles';
 import { getIdentityName } from 'utils/identitiesUtils';
 import {
 	unlockAndReturnSeed,
-	navigateToLegacyAccountList,
 	resetNavigationTo,
 	resetNavigationWithNetworkChooser
 } from 'utils/navigationHelpers';
@@ -52,7 +51,7 @@ function IdentitySwitch({}: NavigationProps<
 >): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
-	const { currentIdentity, identities, accounts } = accountsStore.state;
+	const { currentIdentity, identities } = accountsStore.state;
 
 	const onIdentitySelectedAndNavigate = async <
 		RouteName extends keyof RootStackParamList
@@ -73,11 +72,6 @@ function IdentitySwitch({}: NavigationProps<
 		} else {
 			resetNavigationWithNetworkChooser(navigation, screenName, params);
 		}
-	};
-
-	const onLegacyListClicked = (): void => {
-		navigateToLegacyAccountList(navigation);
-		accountsStore.resetCurrentIdentity();
 	};
 
 	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
@@ -182,20 +176,6 @@ function IdentitySwitch({}: NavigationProps<
 			<View style={styles.card}>
 				{renderCurrentIdentityCard()}
 				{renderIdentities()}
-				{accounts.size > 0 && (
-					<>
-						<ButtonIcon
-							title="Legacy Accounts"
-							onPress={onLegacyListClicked}
-							iconName="solution1"
-							iconType="antdesign"
-							iconSize={24}
-							textStyle={fontStyles.t_big}
-							style={styles.indentedButton}
-						/>
-						<Separator />
-					</>
-				)}
 
 				<ButtonIcon
 					title="Add Identity"

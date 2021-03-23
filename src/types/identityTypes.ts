@@ -16,34 +16,6 @@
 
 import { AccountsContextState } from 'stores/AccountsContext';
 
-export type UnlockedAccount = {
-	address: string;
-	createdAt: number;
-	derivationPath: string; // doesn't contain the ///password
-	encryptedSeed: string;
-	isLegacy?: boolean;
-	name: string;
-	networkKey: string;
-	recovered?: boolean;
-	seed: string; //this is the SURI (seedPhrase + /soft//hard///password derivation)
-	seedPhrase: string; //contains only the BIP39 words, no derivation path
-	updatedAt: number;
-	validBip39Seed: boolean;
-};
-
-export type LockedAccount = Omit<
-	UnlockedAccount,
-	'seedPhrase' | 'seed' | 'derivationPath'
->;
-
-export type Account = UnlockedAccount | LockedAccount;
-
-export function isUnlockedAccount(
-	account: UnlockedAccount | LockedAccount
-): account is UnlockedAccount {
-	return 'seed' in account || 'seedPhrase' in account;
-}
-
 export type AccountMeta = {
 	address: string;
 	createdAt: number;
@@ -52,29 +24,13 @@ export type AccountMeta = {
 	networkPathId?: string;
 };
 
-export interface FoundIdentityAccount extends AccountMeta {
+export interface FoundAccount extends AccountMeta {
 	accountId: string;
 	encryptedSeed: string;
 	validBip39Seed: true;
-	isLegacy: false;
 	networkKey: string;
 	path: string;
 }
-
-export interface FoundLegacyAccount {
-	address: string;
-	accountId: string;
-	createdAt: number;
-	name: string;
-	updatedAt: number;
-	encryptedSeed: string;
-	validBip39Seed: boolean;
-	isLegacy: true;
-	networkKey: string;
-	path?: string;
-}
-
-export type FoundAccount = FoundIdentityAccount | FoundLegacyAccount;
 
 export type Identity = {
 	// encrypted seed include seedPhrase and password
@@ -93,10 +49,8 @@ export type SerializedIdentity = {
 
 export type AccountsStoreState = {
 	identities: Identity[];
-	accounts: Map<string, Account>;
 	currentIdentity: Identity | null;
 	loaded: boolean;
-	newAccount: UnlockedAccount;
 	newIdentity: Identity;
 	selectedKey: string;
 };

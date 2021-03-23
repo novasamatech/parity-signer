@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
-import { UnlockedAccount } from 'types/identityTypes';
+import { FoundAccount } from 'types/identityTypes';
 import {
 	EthereumNetworkParams,
 	isSubstrateNetworkParams,
@@ -54,20 +54,17 @@ export function generateAccountId(
 export function emptyAccount(
 	address = '',
 	networkKey: string = SubstrateNetworkKeys.KUSAMA
-): UnlockedAccount {
+): FoundAccount {
 	return {
+		accountId: '',
 		address: address,
 		createdAt: new Date().getTime(),
-		derivationPassword: '',
-		derivationPath: '',
 		encryptedSeed: '',
-		isLegacy: true,
 		name: '',
 		networkKey: networkKey,
-		seed: '',
-		seedPhrase: '',
+		path: '',
 		updatedAt: new Date().getTime(),
-		validBip39Seed: false
+		validBip39Seed: true
 	};
 }
 

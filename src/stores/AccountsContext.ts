@@ -7,24 +7,13 @@ import {
 } from 'constants/networkSpecs';
 import { NetworksContextState } from 'stores/NetworkContext';
 import {
-	Account,
 	AccountsStoreState,
 	FoundAccount,
-	FoundIdentityAccount,
-	Identity,
-	isUnlockedAccount,
-	LockedAccount,
-	UnlockedAccount
+	Identity
 } from 'types/identityTypes';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
-import { emptyAccount, generateAccountId } from 'utils/account';
-import {
-	deleteAccount as deleteDbAccount,
-	loadAccounts,
-	loadIdentities,
-	saveAccount,
-	saveIdentities
-} from 'utils/db';
+import { generateAccountId } from 'utils/account';
+import { loadIdentities, saveIdentities } from 'utils/db';
 import {
 	accountExistedError,
 	addressGenerateError,
@@ -39,40 +28,24 @@ import {
 	extractAddressFromAccountId,
 	getAddressKeyByPath,
 	getNetworkKey,
-	isEthereumAccountId,
-	parseFoundLegacyAccount
+	isEthereumAccountId
 } from 'utils/identitiesUtils';
-import {
-	brainWalletAddressWithRef,
-	decryptData,
-	encryptData
-} from 'utils/native';
+import { brainWalletAddressWithRef, encryptData } from 'utils/native';
 import {
 	CreateSeedRefWithNewSeed,
 	TryBrainWalletAddress,
 	TrySubstrateAddress
 } from 'utils/seedRefHooks';
-import { parseSURI } from 'utils/suri';
 
 export type AccountsContextState = {
 	clearIdentity: () => void;
 	state: AccountsStoreState;
 	select: (accountKey: string) => void;
-	updateNew: (accountUpdate: Partial<UnlockedAccount>) => void;
-	submitNew: (
-		pin: string,
-		allNetworks: Map<string, NetworkParams>
-	) => Promise<void>;
 	deriveEthereumAccount: (
 		createBrainWalletAddress: TryBrainWalletAddress,
 		networkKey: string,
 		allNetworks: Map<string, NetworkParams>
 	) => Promise<void>;
-	updateSelectedAccount: (updatedAccount: Partial<LockedAccount>) => void;
-	save: (accountKey: string, account: Account, pin?: string) => Promise<void>;
-	deleteAccount: (accountKey: string) => Promise<void>;
-	unlockAccount: (accountKey: string, pin: string) => Promise<boolean>;
-	lockAccount: (accountKey: string) => void;
 	getById: (
 		address: string,
 		networkKey: string,
@@ -82,7 +55,6 @@ export type AccountsContextState = {
 		address: string,
 		networkContext: NetworksContextState
 	) => false | FoundAccount;
-	getSelected: () => Account | undefined;
 	getIdentityByAccountId: (accountId: string) => Identity | undefined;
 	resetCurrentIdentity: () => void;
 	saveNewIdentity: (
@@ -105,11 +77,9 @@ export type AccountsContextState = {
 };
 
 const defaultAccountState = {
-	accounts: new Map(),
 	currentIdentity: null,
 	identities: [],
 	loaded: false,
-	newAccount: emptyAccount(),
 	newIdentity: emptyIdentity(),
 	selectedKey: ''
 };
@@ -127,11 +97,9 @@ export function useAccountContext(): AccountsContextState {
 	const [state, setState] = useReducer(reducer, initialState);
 	useEffect(() => {
 		const loadInitialContext = async (): Promise<void> => {
-			const accounts = await loadAccounts();
 			const identities = await loadIdentities();
 			const currentIdentity = identities.length > 0 ? identities[0] : null;
 			setState({
-				accounts,
 				currentIdentity,
 				identities,
 				loaded: true
@@ -142,59 +110,6 @@ export function useAccountContext(): AccountsContextState {
 
 	function select(accountKey: string): void {
 		setState({ selectedKey: accountKey });
-	}
-
-	function updateNew(accountUpdate: Partial<UnlockedAccount>): void {
-		setState({
-			newAccount: { ...state.newAccount, ...accountUpdate }
-		});
-	}
-
-	function _deleteSensitiveData(account: UnlockedAccount): LockedAccount {
-		delete account.seed;
-		delete account.seedPhrase;
-		delete account.derivationPath;
-
-		return account;
-	}
-
-	async function save(
-		accountKey: string,
-		account: Account,
-		pin?: string
-	): Promise<void> {
-		try {
-			// for account creation
-			let accountToSave = account;
-			if (pin && isUnlockedAccount(account)) {
-				account.encryptedSeed = await encryptData(account.seed, pin);
-				accountToSave = _deleteSensitiveData(account);
-			}
-
-			await saveAccount(accountKey, accountToSave);
-		} catch (e) {
-			console.error(e);
-		}
-	}
-
-	async function submitNew(
-		pin: string,
-		allNetworks: Map<string, NetworkParams>
-	): Promise<void> {
-		const account = state.newAccount;
-		if (!account.seed) return;
-
-		const accountKey = generateAccountId(
-			account.address,
-			account.networkKey,
-			allNetworks
-		);
-		await save(accountKey, account, pin);
-
-		setState({
-			accounts: state.accounts.set(accountKey, account),
-			newAccount: emptyAccount()
-		});
 	}
 
 	function _updateIdentitiesWithCurrentIdentity(
@@ -258,98 +173,10 @@ export function useAccountContext(): AccountsContextState {
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	function _updateAccount(
-		accountKey: string,
-		updatedAccount: Partial<LockedAccount>
-	): void {
-		const accounts = state.accounts;
-		const account = accounts.get(accountKey);
-
-		if (account && updatedAccount) {
-			setState({
-				accounts: accounts.set(accountKey, { ...account, ...updatedAccount })
-			});
-		}
-	}
-
-	function updateSelectedAccount(updatedAccount: Partial<LockedAccount>): void {
-		_updateAccount(state.selectedKey, updatedAccount);
-	}
-
-	async function deleteAccount(accountKey: string): Promise<void> {
-		const { accounts } = state;
-
-		accounts.delete(accountKey);
-		setState({ accounts, selectedKey: '' });
-		await deleteDbAccount(accountKey);
-	}
-
-	async function unlockAccount(
-		accountKey: string,
-		pin: string
-	): Promise<boolean> {
-		const { accounts } = state;
-		const account = accounts.get(accountKey);
-		if (!accountKey || !account || !account.encryptedSeed) {
-			return false;
-		}
-
-		try {
-			const decryptedSeed = await decryptData(account.encryptedSeed, pin);
-			const { phrase, derivePath } = parseSURI(decryptedSeed);
-			setState({
-				accounts: state.accounts.set(accountKey, {
-					derivationPath: derivePath || '',
-					seed: decryptedSeed,
-					seedPhrase: phrase || '',
-					...account
-				})
-			});
-		} catch (e) {
-			return false;
-		}
-		return true;
-	}
-
-	function lockAccount(accountKey: string): void {
-		const { accounts } = state;
-		const account = accounts.get(accountKey);
-
-		if (account && isUnlockedAccount(account)) {
-			const lockedAccount = _deleteSensitiveData(account);
-			setState({
-				accounts: state.accounts.set(accountKey, lockedAccount)
-			});
-		}
-	}
-
-	function _getAccountWithoutCaseSensitive(accountId: string): Account | null {
-		let findLegacyAccount = null;
-		for (const [key, value] of state.accounts) {
-			if (isEthereumAccountId(accountId)) {
-				if (key.toLowerCase() === accountId.toLowerCase()) {
-					findLegacyAccount = value;
-					break;
-				}
-			} else if (key === accountId) {
-				findLegacyAccount = value;
-				break;
-			} else if (
-				//backward compatible with hard spoon substrate key pairs
-				extractAddressFromAccountId(key) ===
-				extractAddressFromAccountId(accountId)
-			) {
-				findLegacyAccount = value;
-				break;
-			}
-		}
-		return findLegacyAccount;
-	}
-
 	function _getAccountFromIdentity(
 		accountIdOrAddress: string,
 		networkContext: NetworksContextState
-	): false | FoundIdentityAccount {
+	): false | FoundAccount {
 		const { allNetworks } = networkContext;
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetAccountId = null;
@@ -396,7 +223,6 @@ export function useAccountContext(): AccountsContextState {
 		return {
 			accountId: targetAccountId,
 			encryptedSeed: targetIdentity.encryptedSeed,
-			isLegacy: false,
 			networkKey: targetNetworkKey!,
 			path: targetPath,
 			validBip39Seed: true,
@@ -411,8 +237,6 @@ export function useAccountContext(): AccountsContextState {
 	): null | FoundAccount {
 		const { allNetworks } = networkContext;
 		const accountId = generateAccountId(address, networkKey, allNetworks);
-		const legacyAccount = _getAccountWithoutCaseSensitive(accountId);
-		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
 		let derivedAccount;
 		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
@@ -422,8 +246,7 @@ export function useAccountContext(): AccountsContextState {
 		derivedAccount =
 			derivedAccount || _getAccountFromIdentity(address, networkContext);
 
-		if (derivedAccount instanceof Object)
-			return { ...derivedAccount, isLegacy: false };
+		if (derivedAccount instanceof Object) return { ...derivedAccount };
 		return null;
 	}
 
@@ -435,16 +258,7 @@ export function useAccountContext(): AccountsContextState {
 			return false;
 		}
 
-		for (const [k, v] of state.accounts.entries()) {
-			if (v.address.toLowerCase() === address.toLowerCase()) {
-				return { ...v, accountId: k, isLegacy: true };
-			}
-		}
 		return _getAccountFromIdentity(address, networkContext);
-	}
-
-	function getSelected(): Account | undefined {
-		return state.accounts.get(state.selectedKey);
 	}
 
 	function getIdentityByAccountId(accountId: string): Identity | undefined {
@@ -588,7 +402,6 @@ export function useAccountContext(): AccountsContextState {
 
 	return {
 		clearIdentity,
-		deleteAccount,
 		deleteCurrentIdentity,
 		deletePath,
 		deriveEthereumAccount,
@@ -596,21 +409,14 @@ export function useAccountContext(): AccountsContextState {
 		getAccountByAddress,
 		getById,
 		getIdentityByAccountId,
-		getSelected,
-		lockAccount,
 		resetCurrentIdentity,
-		save,
 		saveNewIdentity,
 		select,
 		selectIdentity,
 		state,
-		submitNew,
-		unlockAccount,
 		updateIdentityName,
-		updateNew,
 		updateNewIdentity,
-		updatePathName,
-		updateSelectedAccount
+		updatePathName
 	};
 }
 

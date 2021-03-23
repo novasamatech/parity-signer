@@ -15,12 +15,11 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { pathsRegex } from './regex';
-import { decryptData, substrateAddress } from './native';
+import { decryptData } from './native';
 import { parseSURI } from './suri';
 import { generateAccountId } from './account';
 
 import { NetworksContextState } from 'stores/NetworkContext';
-import strings from 'modules/sign/strings';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
@@ -30,14 +29,11 @@ import {
 	unknownNetworkPathId
 } from 'constants/networkSpecs';
 import {
-	Account,
 	AccountMeta,
 	FoundAccount,
-	FoundLegacyAccount,
 	Identity,
 	PathGroup,
-	SerializedIdentity,
-	UnlockedAccount
+	SerializedIdentity
 } from 'types/identityTypes';
 import {
 	centrifugeAmberMetadata,
@@ -52,12 +48,6 @@ import {
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = (str: string): string => str.replace(/\//g, '');
-
-export function isLegacyFoundAccount(
-	foundAccount: FoundAccount
-): foundAccount is FoundLegacyAccount {
-	return foundAccount.isLegacy;
-}
 
 export const extractPathId = (path: string, pathIds: string[]): string => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);
@@ -247,27 +237,6 @@ export const getNetworkKeyByPath = (
 	return getSubstrateNetworkKeyByPathId(pathId, networks);
 };
 
-export const parseFoundLegacyAccount = (
-	legacyAccount: Account,
-	accountId: string
-): FoundLegacyAccount => {
-	const returnAccount: FoundLegacyAccount = {
-		accountId,
-		address: legacyAccount.address,
-		createdAt: legacyAccount.createdAt,
-		encryptedSeed: legacyAccount.encryptedSeed,
-		isLegacy: true,
-		name: legacyAccount.name,
-		networkKey: legacyAccount.networkKey,
-		updatedAt: legacyAccount.updatedAt,
-		validBip39Seed: legacyAccount.validBip39Seed
-	};
-	if (legacyAccount.hasOwnProperty('derivationPath')) {
-		returnAccount.path = (legacyAccount as UnlockedAccount).derivationPath;
-	}
-	return returnAccount;
-};
-
 export const getIdentityFromSender = (
 	sender: FoundAccount,
 	identities: Identity[]
@@ -297,22 +266,6 @@ export const unlockIdentitySeedWithReturn = async (
 	await createSeedRef(pin);
 	const { phrase } = parseSURI(seed);
 	return phrase;
-};
-
-export const verifyPassword = async (
-	password: string,
-	seedPhrase: string,
-	identity: Identity,
-	path: string,
-	networkContextState: NetworksContextState
-): Promise<boolean> => {
-	const { networks } = networkContextState;
-	const networkKey = getNetworkKey(path, identity, networkContextState);
-	const networkParams = networks.get(networkKey);
-	if (!networkParams) throw new Error(strings.ERROR_NO_NETWORK);
-	const address = await substrateAddress(seedPhrase, networkParams.prefix);
-	const accountMeta = identity.meta.get(path);
-	return address === accountMeta?.address;
 };
 
 export const getExistedNetworkKeys = (

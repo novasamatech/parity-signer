@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import AsyncStorage from '@react-native-community/async-storage';
 import SecureStorage from 'react-native-secure-storage';
 
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
@@ -22,60 +21,12 @@ import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { SubstrateNetworkParams } from 'types/networkTypes';
-import { Account, Identity } from 'types/identityTypes';
+import { Identity } from 'types/identityTypes';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
 	return [];
 }
-
-/*
- * ========================================
- *	Accounts Store
- * ========================================
- */
-const currentAccountsStore = {
-	keychainService: 'accounts_v3',
-	sharedPreferencesName: 'accounts_v3'
-};
-
-export async function loadAccounts(version = 3): Promise<Map<string, any>> {
-	if (!SecureStorage) {
-		return Promise.resolve(new Map());
-	}
-
-	const accountsStoreVersion =
-		version === 1 ? 'accounts' : `accounts_v${version}`;
-	const accountsStore = {
-		keychainService: accountsStoreVersion,
-		sharedPreferencesName: accountsStoreVersion
-	};
-
-	return SecureStorage.getAllItems(accountsStore).then(
-		(accounts: { [key: string]: string }) => {
-			const accountMap = new Map();
-			for (const [key, value] of Object.entries(accounts)) {
-				const account = JSON.parse(value);
-				accountMap.set(key, { ...account });
-			}
-
-			return accountMap;
-		}
-	);
-}
-
-export const deleteAccount = (accountKey: string): Promise<void> =>
-	SecureStorage.deleteItem(accountKey, currentAccountsStore);
-
-export const saveAccount = (
-	accountKey: string,
-	account: Account
-): Promise<void> =>
-	SecureStorage.setItem(
-		accountKey,
-		JSON.stringify(account, null, 0),
-		currentAccountsStore
-	);
 
 /*
  * ========================================

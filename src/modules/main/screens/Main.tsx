@@ -27,12 +27,10 @@ export default function Main(
 	props: NavigationProps<'Main'>
 ): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { identities, currentIdentity, loaded, accounts } = accountsStore.state;
-	const hasLegacyAccount = accounts.size !== 0;
+	const { identities, currentIdentity, loaded } = accountsStore.state;
 
 	if (!loaded) return <SafeAreaViewContainer />;
-	if (identities.length === 0)
-		return <OnBoardingView hasLegacyAccount={hasLegacyAccount} />;
+	if (identities.length === 0) return <OnBoardingView />;
 	if (currentIdentity === null) return <NoCurrentIdentity />;
 	return (
 		<NetworkSelector {...(props as NavigationAccountIdentityProps<'Main'>)} />

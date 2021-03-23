@@ -32,20 +32,12 @@ import NetworkSettings from 'modules/network/screens/NetworkSettings';
 import PinNew from 'modules/unlock/screens/PinNew';
 import PinUnlock from 'modules/unlock/screens/PinUnlock';
 import HeaderLeftHome from 'components/HeaderLeftHome';
-import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
-import AccountDetails from 'screens/AccountDetails';
-import AccountEdit from 'screens/AccountEdit';
 import Main from 'modules/main/screens/Main';
-import AccountPin from 'screens/AccountPin';
-import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
 import IdentityNew from 'screens/IdentityNew';
 import IdentitySwitch from 'screens/IdentitySwitch';
-import LegacyAccountBackup from 'screens/LegacyAccountBackup';
-import LegacyAccountList from 'screens/LegacyAccountList';
-import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
 import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
 import PathSecret from 'screens/PathSecret';
@@ -56,7 +48,7 @@ import SignedMessage from 'modules/sign/screens/SignedMessage';
 import DetailsTx from 'modules/sign/screens/DetailsTx';
 import SignedTx from 'modules/sign/screens/SignedTx';
 import colors from 'styles/colors';
-import { headerHeight, horizontalPadding } from 'styles/containerStyles';
+import { headerHeight } from 'styles/containerStyles';
 import { RootStackParamList } from 'types/routes';
 
 export const ScreenStack = createStackNavigator<RootStackParamList>();
@@ -81,11 +73,6 @@ const globalStackNavigationOptions = {
 		height: headerHeight,
 		paddingLeft: 8
 	},
-	// headerRight: (): React.ReactElement => <SecurityHeader />,
-	// headerRightContainerStyle: {
-	// 	height: headerHeight,
-	// 	paddingRight: horizontalPadding
-	// },
 	headerStyle: {
 		backgroundColor: colors.background.app,
 		borderBottomColor: colors.background.app,
@@ -118,26 +105,6 @@ export const AppNavigator = (): React.ReactElement => (
 		screenOptions={globalStackNavigationOptions}
 	>
 		<ScreenStack.Screen name="Main" component={Main} />
-		<ScreenStack.Screen name="AccountDetails" component={AccountDetails} />
-		<ScreenStack.Screen name="AccountEdit" component={AccountEdit} />
-		<ScreenStack.Screen name="AccountPin" component={AccountPin} />
-		<ScreenStack.Screen name="AccountUnlock" component={AccountUnlock} />
-		<ScreenStack.Screen
-			name="AccountUnlockAndSign"
-			component={AccountUnlockAndSign}
-		/>
-		<ScreenStack.Screen
-			name="LegacyAccountBackup"
-			component={LegacyAccountBackup}
-		/>
-		<ScreenStack.Screen
-			name="LegacyAccountList"
-			component={LegacyAccountList}
-		/>
-		<ScreenStack.Screen
-			name="LegacyNetworkChooser"
-			component={LegacyNetworkChooser}
-		/>
 		<ScreenStack.Screen name="IdentityBackup" component={IdentityBackup} />
 		<ScreenStack.Screen
 			name="IdentityManagement"

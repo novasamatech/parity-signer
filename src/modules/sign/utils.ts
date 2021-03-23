@@ -171,17 +171,6 @@ export function useProcessBarCode(
 				strings.ERROR_TITLE,
 				strings.ERROR_NO_SENDER_FOUND
 			);
-		if (sender.isLegacy) {
-			if (type === 'transaction') {
-				return navigation.navigate('AccountUnlockAndSign', {
-					next: 'SignedTx'
-				});
-			} else {
-				return navigation.navigate('AccountUnlockAndSign', {
-					next: 'SignedMessage'
-				});
-			}
-		}
 		const seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
 		const isSeedRefInvalid = seedRef && seedRef.isValid();
 
