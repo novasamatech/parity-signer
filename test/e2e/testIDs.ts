@@ -106,9 +106,6 @@ const testIDs = {
 	QrScanner: {
 		networkAddSuccessButton: 'qr_scanner_add_network_button'
 	},
-	SecurityHeader: {
-		scanButton: 'security_header_scan_button'
-	},
 	SignedMessage: {
 		qrView: 'signed_message_qr_view'
 	},

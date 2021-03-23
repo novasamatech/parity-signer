@@ -22,7 +22,7 @@ import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContextState } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
-import { FoundIdentityAccount } from 'types/identityTypes';
+import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { RootStackParamList } from 'types/routes';
 import {
@@ -127,7 +127,7 @@ export function useProcessBarCode(
 	}
 
 	async function _unlockSeedAndSign(
-		sender: FoundIdentityAccount,
+		sender: FoundAccount,
 		qrInfo: QrInfo
 	): Promise<void> {
 		const senderNetworkParams = allNetworks.get(sender.networkKey);

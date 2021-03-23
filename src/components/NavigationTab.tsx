@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Icon } from 'react-native-elements';
 
@@ -33,8 +33,7 @@ import { RootStackParamList } from 'types/routes';
 
 export default function NavigationTab(): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	const routes = navigation.dangerouslyGetState().routes;
-	const route = routes[routes.length - 1].name;
+	const route = useRoute();
 
 	return (
 		<View style={styles.row}>
@@ -42,16 +41,20 @@ export default function NavigationTab(): React.ReactElement {
 				onPress={(): void => navigateToMain(navigation)}
 				testID={testIDs.NavigationTab.wallet}
 				style={styles.item}
-				disabled={route === 'Main'}
+				disabled={route.name === 'Main'}
 			>
 				<Icon
-					color={route === 'Main' ? colors.text.disabled : colors.text.main}
+					color={
+						route.name === 'Main' ? colors.text.disabled : colors.text.main
+					}
 					size={fontStyles.i_large.fontSize}
 					name="account-balance-wallet"
 					type="material"
 				/>
 				<Text
-					style={route === 'Main' ? styles.disabledTextLabel : styles.textLabel}
+					style={
+						route.name === 'Main' ? styles.disabledTextLabel : styles.textLabel
+					}
 				>
 					Wallet
 				</Text>
@@ -60,11 +63,13 @@ export default function NavigationTab(): React.ReactElement {
 				onPress={(): void => navigateToIdentitySwitch(navigation)}
 				testID={testIDs.NavigationTab.settings}
 				style={styles.item}
-				disabled={route === 'IdentitySwitch'}
+				disabled={route.name === 'IdentitySwitch'}
 			>
 				<Icon
 					color={
-						route === 'IdentitySwitch' ? colors.text.disabled : colors.text.main
+						route.name === 'IdentitySwitch'
+							? colors.text.disabled
+							: colors.text.main
 					}
 					size={fontStyles.i_large.fontSize}
 					name="settings"
@@ -72,7 +77,7 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route === 'IdentitySwitch'
+						route.name === 'IdentitySwitch'
 							? styles.disabledTextLabel
 							: styles.textLabel
 					}
