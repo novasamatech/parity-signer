@@ -81,11 +81,11 @@ const globalStackNavigationOptions = {
 		height: headerHeight,
 		paddingLeft: 8
 	},
-	headerRight: (): React.ReactElement => <SecurityHeader />,
-	headerRightContainerStyle: {
-		height: headerHeight,
-		paddingRight: horizontalPadding
-	},
+	// headerRight: (): React.ReactElement => <SecurityHeader />,
+	// headerRightContainerStyle: {
+	// 	height: headerHeight,
+	// 	paddingRight: horizontalPadding
+	// },
 	headerStyle: {
 		backgroundColor: colors.background.app,
 		borderBottomColor: colors.background.app,

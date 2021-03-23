@@ -25,7 +25,7 @@ import TouchableItem from './TouchableItem';
 import colors from 'styles/colors';
 import {
 	navigateToMain,
-	navigateToNetworkSettings
+	navigateToIdentitySwitch
 } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
 import fontStyles from 'styles/fontStyles';
@@ -57,16 +57,14 @@ export default function NavigationTab(): React.ReactElement {
 				</Text>
 			</TouchableItem>
 			<TouchableItem
-				onPress={(): void => navigateToNetworkSettings(navigation)}
+				onPress={(): void => navigateToIdentitySwitch(navigation)}
 				testID={testIDs.NavigationTab.settings}
 				style={styles.item}
-				disabled={route === 'NetworkSettings'}
+				disabled={route === 'IdentitySwitch'}
 			>
 				<Icon
 					color={
-						route === 'NetworkSettings'
-							? colors.text.disabled
-							: colors.text.main
+						route === 'IdentitySwitch' ? colors.text.disabled : colors.text.main
 					}
 					size={fontStyles.i_large.fontSize}
 					name="settings"
@@ -74,7 +72,7 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route === 'NetworkSettings'
+						route === 'IdentitySwitch'
 							? styles.disabledTextLabel
 							: styles.textLabel
 					}
