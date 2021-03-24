@@ -130,10 +130,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 				setTip(formatBalance(value as any));
 			}
 		}, [
-			fallback,
-			label,
-			prefix,
-			value,
+			//fallback,
+			//label,
+			//prefix,
+			//value,
 			networkKey,
 			registriesStore,
 			setAlert,

@@ -16,7 +16,6 @@ export function usePayloadDetails(
 		setIsProcessing(true);
 		// was this line useful for anything?
 		//if (getTypeRegistry === null) return;
-		console.log('generating payload card...');
 		const typeRegistry = getTypeRegistry(networkKey);
 		if (typeRegistry === null || typeof rawPayload === 'string') {
 			setIsProcessing(false);

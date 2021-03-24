@@ -1,23 +1,25 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 
 import { SeedRefClass } from 'utils/native';
 
-export type SeedRefsState = [
-	Map<string, SeedRefClass>,
-	Dispatch<SetStateAction<Map<string, SeedRefClass>>>
-];
+export type SeedRefsState = {
+	seedRefs: Map<string, SeedRefClass>;
+	setSeedRefs: (newSeedRefs: Map<string, SeedRefClass>) => void ;
+};
 
-export const SeedRefsContext = React.createContext(
-	([] as unknown) as SeedRefsState
-);
+export const SeedRefsContext = React.createContext({} as SeedRefsState);
 
 export function useSeedRefStore(): SeedRefsState {
-	const [seedRefs, setSeedRefs] = useState(new Map());
+	const [seedRefs, setSeedRefsInternal] = useState(new Map());
 
 	const [appState, setAppState] = React.useState<AppStateStatus>(
 		AppState.currentState
 	);
+
+	function setSeedRefs(newSeedRefs: Map<string, SeedRefClass>): void {
+		setSeedRefsInternal(newSeedRefs);
+	}
 
 	React.useEffect(() => {
 		const _handleAppStateChange = async (
@@ -44,5 +46,5 @@ export function useSeedRefStore(): SeedRefsState {
 		};
 	}, [appState, seedRefs]);
 
-	return [seedRefs, setSeedRefs];
+	return {seedRefs, setSeedRefs};
 }

@@ -137,14 +137,38 @@ export function useNetworksContext(): NetworksContextState {
 		return result;
 	}, [substrateNetworks]);
 
+	//all initialization of built-in and saved networks in a single place to eliminate races
 	useEffect(() => {
 		const initNetworksAndRegistries = async function (): Promise<void> {
+			console.log('=====SIGNER STARTING=====');
 			console.log("Loading metadata...");
 			await populateMetadata();
 			console.log("Loading networks...");
-			await populateNetworks();
+			const initNetworkSpecs = await loadNetworks();
 			console.log("Populating registries...");
-			await updateTypeRegistries();
+			var initRegistries = new Map();
+			for(let networkKey of Array.from(initNetworkSpecs.keys())) {
+				console.log('Registering network:')
+				console.log(networkKey);
+				try {
+					const networkParams = initNetworkSpecs.get(networkKey)!;
+					const metadataHandle = networkParams.metadata;
+					const networkMetadataRaw = await getMetadata(metadataHandle);
+					const newRegistry = new TypeRegistry();
+					//const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+					//console.log(overrideTypes);
+					//newRegistry.register(overrideTypes);
+					const metadata = new Metadata(newRegistry, networkMetadataRaw);
+					newRegistry.setMetadata(metadata);
+					initRegistries.set(networkKey, newRegistry);
+				} catch (e) {
+					console.log('Init network registration error', e);
+				};
+			}
+			setSubstrateNetworks(initNetworkSpecs);
+			setRegistries(initRegistries);
+			setRegistriesReady(true);
+			console.log('====INITIALIZATION COMPLETE=====');
 		};
 		initNetworksAndRegistries();
 	}, []);
@@ -153,8 +177,25 @@ export function useNetworksContext(): NetworksContextState {
 		const initNetworkSpecs = await loadNetworks();
 		console.log(initNetworkSpecs);
 		setSubstrateNetworks(initNetworkSpecs);
+		console.log(substrateNetworks);
 		console.log('networks loaded');
 	};
+
+	async function updateTypeRegistries(): Promise<void> {
+		console.log('Registries update invoked');
+		console.log(substrateNetworks);
+//		if (registriesReady) {
+			setRegistriesReady(false);
+			for(let networkKey of Array.from(substrateNetworks.keys())) {
+				console.log('initializing network:')
+				console.log(networkKey);
+				await initTypeRegistry(networkKey);
+				console.log(registries);
+			}
+			setRegistriesReady(true);
+//		}
+		return;
+	}
 
 	function getSubstrateNetworkParams(
 		networkKey: string
@@ -184,13 +225,11 @@ export function useNetworksContext(): NetworksContextState {
 			console.log('initTypeRegistry invoked');
 			const networkParams = substrateNetworks.get(networkKey)!;
 			const metadataHandle = networkParams.metadata;
-			console.log('initregistry: metadataHandle');
-			console.log(metadataHandle);
 
 			const networkMetadataRaw = await getMetadata(metadataHandle);
-			console.log('initregistry: raw metadata');
 			
-			if (registries.has(networkKey)) registries.delete(networkKey)!;
+			var newRegistries = deepCopyMap(registries);
+			if (newRegistries.has(networkKey)) newRegistries.delete(networkKey)!;
 
 			const newRegistry = new TypeRegistry();
 			//const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
@@ -198,7 +237,6 @@ export function useNetworksContext(): NetworksContextState {
 			//newRegistry.register(overrideTypes);
 			const metadata = new Metadata(newRegistry, networkMetadataRaw);
 			newRegistry.setMetadata(metadata);
-			const newRegistries = deepCopyMap(registries);
 			newRegistries.set(networkKey, newRegistry);
 			setRegistries(newRegistries);
 		} catch (e) {
@@ -207,27 +245,13 @@ export function useNetworksContext(): NetworksContextState {
 		}
 	}
 
-	async function updateTypeRegistries(): Promise<void> {
-		console.log('Registries update invoked');
-		console.log(substrateNetworks);
-//		if (registriesReady) {
-			setRegistriesReady(false);
-			for(let networkKey of Array.from(substrateNetworks.keys())) {
-				console.log('initializing network:')
-				console.log(networkKey);
-				await initTypeRegistry(networkKey);
-			}
-			setRegistriesReady(true);
-//		}
-		return;
-	}
-
 	function getTypeRegistry(
 		networkKey: string
 	): TypeRegistry | null {
 		try {
-			console.log('getTypeRegistry invoked');
-			if (registries.has(networkKey)) return registries.get(networkKey)!;
+			if (registries.has(networkKey)) {
+				return registries.get(networkKey)!;
+			}
 			return null;
 		} catch (e) {
 			console.log('error', e);

@@ -21,6 +21,7 @@ import { View } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
+import { NetworksContext } from 'stores/NetworkContext';
 
 interface RegistriesInjectedProps {
 	registriesStore: NetworksContextState;
@@ -30,7 +31,7 @@ export function withRegistriesStore<T extends RegistriesInjectedProps>(
 	WrappedComponent: React.ComponentType<any>
 ): React.ComponentType<Omit<T, keyof RegistriesInjectedProps>> {
 	return (props): React.ReactElement => {
-		const registriesStore = useContext(NetworkContext);
+		const registriesStore = useContext(NetworksContext);
 		return <WrappedComponent {...props} registriesStore={registriesStore} />;
 	};
 }
