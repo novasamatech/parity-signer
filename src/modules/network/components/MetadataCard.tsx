@@ -45,10 +45,10 @@ const CardSeparator = (): ReactElement => (
 export function MetadataCard({
 	spec_name,
 	spec_version,
-	onPress,
+	onPress
 }: MetadataCardProps): React.ReactElement {
-//	const { getNetwork } = useContext();
-	
+	//	const { getNetwork } = useContext();
+
 	return (
 		<TouchableItem
 			accessibilityComponentType="button"
@@ -58,18 +58,14 @@ export function MetadataCard({
 			<CardSeparator />
 			<View style={styles.body}>
 				<View style={styles.label}>
-					<Text style={fontStyles.t_important}>	
-						Metadata version
-					</Text>
+					<Text style={fontStyles.t_important}>Metadata version</Text>
 				</View>
 				<View style={styles.content}>
-						<Text style={fontStyles.t_code}>	
+					<Text style={fontStyles.t_code}>
 						{`spec_name: ${spec_name} spec_version: ${spec_version}`}
 					</Text>
 				</View>
-				<View>
-					
-				</View>
+				<View />
 			</View>
 		</TouchableItem>
 	);

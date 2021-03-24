@@ -66,7 +66,7 @@ describe('Signing ane exporting test', () => {
 	testRecoverIdentity();
 
 	describe('Kusama Signing Test', () => {
-/*		it('is able to export the signing account', async () => {
+		it('is able to export the signing account', async () => {
 			await testTap(PathsList.pathCard + '//kusama');
 			await testTap(PathDetail.popupMenuButton);
 			await testTap(PathDetail.exportButton);
@@ -89,12 +89,12 @@ describe('Signing ane exporting test', () => {
 			await testTap(DetailsTx.signButton);
 			await testExist(SignedTx.qrView);
 		});
-*/
+
 		it('should sign transfer request', async () => {
 			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
 			await testSignedTx();
 		});
-/*
+
 		it('should sign multipart request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
 			await testSignedMessage();
@@ -104,8 +104,8 @@ describe('Signing ane exporting test', () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkHashKusama);
 			await testSignedMessage();
 		});
-*/	});
-/*
+	});
+
 	describe('Polkadot Signing Test', () => {
 		it('generate Polkadot account', async () => {
 			await tapBack();
@@ -162,5 +162,5 @@ describe('Signing ane exporting test', () => {
 			await launchWithScanRequest(ScanTestRequest.EthereumMessage);
 			await testEthereumMessage();
 		});
-	});*/
+	});
 });

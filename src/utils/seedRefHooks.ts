@@ -35,12 +35,12 @@ export type CreateSeedRefWithNewSeed = (
 ) => Promise<void>;
 
 export function useNewSeedRef(): CreateSeedRefWithNewSeed {
-	const {seedRefs, setSeedRefs} = useContext<SeedRefsState>(SeedRefsContext);
+	const { seedRefs, setSeedRefs } = useContext<SeedRefsState>(SeedRefsContext);
 	return async (encryptedSeed, password): Promise<void> => {
 		if (!seedRefs.has(encryptedSeed)) {
 			const seedRef = new SeedRefClass();
 			await seedRef.tryCreate(encryptedSeed, password);
-			var newSeedRefs = deepCopyMap(seedRefs);
+			const newSeedRefs = deepCopyMap(seedRefs);
 			newSeedRefs.set(encryptedSeed, seedRef);
 			setSeedRefs(newSeedRefs);
 		}
@@ -48,18 +48,16 @@ export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 }
 
 export function useSeedRef(encryptedSeed: string): SeedRefHooks {
-	const {seedRefs, setSeedRefs} = useContext<SeedRefsState>(SeedRefsContext);
-	var seedRef = new SeedRefClass();
-	useEffect (() => {
+	const { seedRefs, setSeedRefs } = useContext<SeedRefsState>(SeedRefsContext);
+	const seedRef = useMemo(() => {
 		if (seedRefs.has(encryptedSeed)) {
-			 seedRef = seedRefs.get(encryptedSeed)!;
-			 return;
+			return seedRefs.get(encryptedSeed)!;
 		}
 		const newSeedRef = new SeedRefClass();
-		var newSeedRefs = deepCopyMap(seedRefs);
+		const newSeedRefs = deepCopyMap(seedRefs);
 		newSeedRefs.set(encryptedSeed, newSeedRef);
 		setSeedRefs(newSeedRefs);
-		seedRef = newSeedRef;
+		return newSeedRef;
 	}, [seedRefs, setSeedRefs, encryptedSeed]);
 
 	const isSeedRefValid: boolean = seedRef.isValid();
@@ -67,7 +65,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 	// Decrypt a seed and store the reference. Must be called before signing.
 	const createSeedRef: TryCreateFunc = async function (password) {
 		await seedRef.tryCreate(encryptedSeed, password);
-		var newSeedRefs = deepCopyMap(seedRefs);
+		const newSeedRefs = deepCopyMap(seedRefs);
 		newSeedRefs.set(encryptedSeed, seedRef);
 		setSeedRefs(newSeedRefs);
 	};
@@ -76,8 +74,9 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 	// memory will leak.
 	const destroySeedRef: TryDestroyFunc = function () {
 		return seedRef.tryDestroy().then(() => {
-			var newSeedRefs = new Map();
-			for (let [key, value] of seedRefs.entries()) if (key != encryptedSeed) newSeedRefs.set(key, value);
+			const newSeedRefs = new Map();
+			for (const [key, value] of seedRefs.entries())
+				if (key != encryptedSeed) newSeedRefs.set(key, value);
 			setSeedRefs(newSeedRefs);
 		});
 	};

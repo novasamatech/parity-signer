@@ -5,7 +5,7 @@ import { SeedRefClass } from 'utils/native';
 
 export type SeedRefsState = {
 	seedRefs: Map<string, SeedRefClass>;
-	setSeedRefs: (newSeedRefs: Map<string, SeedRefClass>) => void ;
+	setSeedRefs: (newSeedRefs: Map<string, SeedRefClass>) => void;
 };
 
 export const SeedRefsContext = React.createContext({} as SeedRefsState);
@@ -46,5 +46,5 @@ export function useSeedRefStore(): SeedRefsState {
 		};
 	}, [appState, seedRefs]);
 
-	return {seedRefs, setSeedRefs};
+	return { seedRefs, setSeedRefs };
 }

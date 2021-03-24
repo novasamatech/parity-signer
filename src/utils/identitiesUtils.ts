@@ -468,9 +468,9 @@ export const groupPaths = (
 	return groupedPaths.sort(_comparePathGroups);
 };
 
-export const getMetadata = (metadataHandle: MetadataHandle): string | null => {
-	
-};
+export const getMetadata = (
+	metadataHandle: MetadataHandle
+): string | null => {};
 
 /* This should be a set-hook function runned once from getMetadata
 	switch (networkKey) {

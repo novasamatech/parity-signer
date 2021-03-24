@@ -24,12 +24,12 @@ import { GenericCall as Call } from '@polkadot/types/generic';
 import { hexToU8a, u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { describe, expect, it } from '@jest/globals';
+import { getOverrideTypes } from 'stores/RegistriesContext';
 
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
-import { getOverrideTypes } from 'stores/RegistriesContext';
 import { SubstrateCompletedParsedData } from 'types/scannerTypes';
 import {
 	constructDataFromBytes,

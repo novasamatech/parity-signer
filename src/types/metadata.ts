@@ -13,4 +13,3 @@ export type MetadataHandle = {
 export type MetadataRecord = {
 	serialized: string;
 };
-

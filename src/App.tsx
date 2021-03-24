@@ -101,9 +101,7 @@ export default function App(props: AppProps): React.ReactElement {
 											backgroundColor={colors.background.app}
 										/>
 										<CustomAlert />
-										<NavigationContainer>
-											{renderStacks()}
-										</NavigationContainer>
+										<NavigationContainer>{renderStacks()}</NavigationContainer>
 									</MenuProvider>
 								</SeedRefsContext.Provider>
 							</AlertStateContext.Provider>

@@ -15,6 +15,10 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext } from 'react';
+import { RegistriesContext } from 'stores/RegistriesContext';
+import { expandMetadata } from '@polkadot/metadata/decorate';
+import { metadata } from '@polkadot/metadata';
+import { RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { NetworkCard } from 'components/AccountCard';
 import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
@@ -24,10 +28,6 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import Button from 'components/Button';
-import { RegistriesContext } from 'stores/RegistriesContext';
-import { expandMetadata } from '@polkadot/metadata/decorate';
-import { metadata } from '@polkadot/metadata';
-import { RuntimeVersion } from '@polkadot/types/interfaces';
 
 export default function NetworkDetails({
 	navigation,
@@ -40,7 +40,7 @@ export default function NetworkDetails({
 	const metadataHandle = networks.get(networkKey).metadata;
 
 	const metadataValid = (): React.ReactElement => (
-		<> 
+		<>
 			<MetadataCard
 				spec_name={metadataHandle.specName}
 				spec_version={metadataHandle.specVersion}
@@ -55,16 +55,14 @@ export default function NetworkDetails({
 				title="Manage metadata"
 			/>
 		</>
-	)
+	);
 
 	const metadataInvalid = (): React.ReactElement => (
 		<>
 			<MetadataCard
 				spec_name="invalid"
 				spec_version="invalid"
-				onPress={(): void =>
-					navigation.navigate('FullMetadata')
-				}
+				onPress={(): void => navigation.navigate('FullMetadata')}
 			/>
 
 			<Button
@@ -72,8 +70,8 @@ export default function NetworkDetails({
 				title="Please add metadata!"
 			/>
 		</>
-	)
-	
+	);
+
 	return (
 		<SafeAreaScrollViewContainer>
 			<NetworkCard
@@ -96,7 +94,7 @@ export default function NetworkDetails({
 				text={networkParams.prefix.toString()}
 				label="Address prefix"
 			/>
-			{metadataHandle? metadataValid() : metadataInvalid()}
+			{metadataHandle ? metadataValid() : metadataInvalid()}
 		</SafeAreaScrollViewContainer>
 	);
 }

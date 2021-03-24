@@ -16,6 +16,11 @@
 
 import AsyncStorage from '@react-native-community/async-storage';
 import SecureStorage from 'react-native-secure-storage';
+import { expandMetadata } from '@polkadot/metadata/decorate';
+import { Metadata } from '@polkadot/metadata';
+import { TypeRegistry } from '@polkadot/types';
+import { getSpecTypes } from '@polkadot/types-known';
+import type { RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
@@ -25,11 +30,6 @@ import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
 import { MetadataHandle, MetadataRecord } from 'types/metadata';
 import { metadataHandleToKey } from 'utils/metadataUtils';
-import { expandMetadata } from '@polkadot/metadata/decorate';
-import { Metadata } from '@polkadot/metadata';
-import { TypeRegistry } from '@polkadot/types';
-import { getSpecTypes } from '@polkadot/types-known';
-import type { RuntimeVersion } from '@polkadot/types/interfaces';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
@@ -178,14 +178,16 @@ const metadataStorage = {
 	sharedPreferencesName: 'parity_signer_metadata'
 };
 
-export async function getMetadata(metadataHandle: MetadataHandle): Promise<string> {
+export async function getMetadata(
+	metadataHandle: MetadataHandle
+): Promise<string> {
 	try {
 		const metadataKey = metadataHandleToKey(metadataHandle);
 		console.log(metadataKey);
 		const metadataRecord = await SecureStorage.getItem(
 			metadataKey,
 			metadataStorage
-		)
+		);
 		return metadataRecord;
 	} catch (e) {
 		handleError(e, 'metadata');
@@ -193,16 +195,14 @@ export async function getMetadata(metadataHandle: MetadataHandle): Promise<strin
 	}
 }
 
-export async function saveMetadata(
-	newMetadata: MetadataRecord,
-): Promise<void> {
+export async function saveMetadata(newMetadata: MetadataRecord): Promise<void> {
 	try {
 		const registry = new TypeRegistry();
 		const metadata = new Metadata(registry, newMetadata);
 		registry.setMetadata(metadata);
 		const decorated = expandMetadata(registry, metadata);
-//		console.warn(decorated);
-/*		var rtVersion='';
+		//		console.warn(decorated);
+		/*		var rtVersion='';
 		for(const moduleRecord of metadata.asLatest.modules)
 			if(moduleRecord.name == "System")
 				for(const constantRecord of moduleRecord.constants)
@@ -210,17 +210,13 @@ export async function saveMetadata(
 						rtVersion = constantRecord.value;
 		console.log('version: ' + rtVersion);*/
 		const metadataHandle: MetadataHandle = {
-			specName:    decorated.consts.system.version.get('specName'),
+			specName: decorated.consts.system.version.get('specName'),
 			specVersion: decorated.consts.system.version.get('specVersion'),
 			hash: 'stub'
 		};
 		//console.log(metadataHandle);
 		const newMetadataKey = metadataHandleToKey(metadataHandle);
-		await SecureStorage.setItem(
-			newMetadataKey,
-			newMetadata,
-			metadataStorage
-		);
+		await SecureStorage.setItem(newMetadataKey, newMetadata, metadataStorage);
 		console.log('Loaded: ' + newMetadataKey);
 	} catch (e) {
 		handleError(e, 'metadata');

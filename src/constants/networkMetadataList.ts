@@ -1,4 +1,4 @@
-import * as metadata from 'constants/networkMetadata'
+import * as metadata from 'constants/networkMetadata';
 
 export const defaultMetaData = metadata.kusamaMetadata;
 

@@ -156,7 +156,10 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
 		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
 		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
-		<ScreenStack.Screen name="MetadataManagement" component={MetadataManagement} />
+		<ScreenStack.Screen
+			name="MetadataManagement"
+			component={MetadataManagement}
+		/>
 		<ScreenStack.Screen name="FullMetadata" component={FullMetadata} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />

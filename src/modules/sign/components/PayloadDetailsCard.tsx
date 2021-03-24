@@ -55,7 +55,9 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const [tip, setTip] = useState<string>();
 		const [useFallback, setUseFallBack] = useState(false);
 		const { setAlert } = useContext(AlertStateContext);
-		const { networks, getSubstrateNetwork, getTypeRegistry } = useContext(NetworksContext);
+		const { networks, getSubstrateNetwork, getTypeRegistry } = useContext(
+			NetworksContext
+		);
 		const networkParams = getSubstrateNetwork(networkKey);
 		const prefix = networkParams.prefix;
 		const typeRegistry = getTypeRegistry(networks, networkKey)!;
@@ -130,15 +132,15 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 				setTip(formatBalance(value as any));
 			}
 		}, [
-			//fallback,
-			//label,
-			//prefix,
-			//value,
-			networkKey,
-			registriesStore,
-			setAlert,
-			typeRegistry,
-			networks
+			fallback, //good
+			label, //good
+			prefix, //good
+			//value,	//bad
+			networkKey, //good
+			//registriesStore,	//bad
+			//setAlert,	//bad
+			typeRegistry, //good
+			networks //good
 		]);
 
 		const renderEraDetails = (): React.ReactElement => {

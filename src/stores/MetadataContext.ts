@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-// This context should store all known metadata (serialized) and provide 
+// This context should store all known metadata (serialized) and provide
 // tools to handle it (generate, add, select, view).
 
 import {} from 'react';
@@ -23,15 +23,14 @@ import { MetadataRecord, MetadataHandle } from 'types/metadata';
 
 export type MetadataContextState = {
 	metadataStorage: Map<string, MetadataRecord>;
-}
+};
 
 export function useMetadataContext(): MetadataContextState {
-	const [metadataCollection, setMetadataCollection] = useState<Map<string, MetadataRecord>>(new Map());
-
-	
+	const [metadataCollection, setMetadataCollection] = useState<
+		Map<string, MetadataRecord>
+	>(new Map());
 
 	return {};
 }
 
 export const MetadataContext = React.createContext({} as MetadataContextState);
-

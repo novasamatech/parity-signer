@@ -72,7 +72,7 @@ export function useProcessBarCode(
 	const { allNetworks, networks } = networksContextState;
 	const accountsStore = useContext(AccountsContext);
 	const scannerStore = useContext(ScannerContext);
-	const {seedRefs} = useContext<SeedRefsState>(SeedRefsContext);
+	const { seedRefs } = useContext<SeedRefsState>(SeedRefsContext);
 	const navigation: StackNavigationProp<
 		RootStackParamList,
 		'QrScanner'

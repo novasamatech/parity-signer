@@ -28,7 +28,7 @@ export default class MetadataAndDerivationTab extends React.PureComponent<{
 	onPressMetadata: ButtonListener;
 	onPressDerivation: ButtonListener;
 	title: string;
-	metadataInfo?: string
+	metadataInfo?: string;
 	derivationTestID?: string;
 }> {
 	render(): React.ReactElement {

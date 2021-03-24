@@ -41,13 +41,13 @@ export default function TermsAndConditions(
 	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
 	const [tocAgreement, setTocAgreement] = useState<boolean>(false);
 	const { getNetwork } = useContext(NetworksContext);
-	
+
 	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(
 		GlobalStateContext
 	);
 	const { navigation } = props;
 	const onConfirm = async (): Promise<void> => {
-				await saveToCAndPPConfirmation();
+		await saveToCAndPPConfirmation();
 		setPolicyConfirmed(true);
 	};
 

@@ -1,34 +1,31 @@
 import { useContext } from 'react';
-
 import { TypeRegistry } from '@polkadot/types';
 import { Metadata } from '@polkadot/metadata';
+
 import { allBuiltInMetadata } from 'constants/networkMetadataList';
 import { saveMetadata } from 'utils/db';
 
-export const metadataHandleToKey = (
-	metadataHandle: MetadataHandle
-): string => {
-	const metadataKey = metadataHandle.specName + '_v' + metadataHandle.specVersion;
+export const metadataHandleToKey = (metadataHandle: MetadataHandle): string => {
+	const metadataKey =
+		metadataHandle.specName + '_v' + metadataHandle.specVersion;
 	return metadataKey;
 };
 
-export const getRuntimeVersionFromRaw = (
-	metadataRaw: string
-): string => {
+export const getRuntimeVersionFromRaw = (metadataRaw: string): string => {
 	const tempRegistry = new TypeRegistry();
 	const metadata = new Metadata(tempRegistry, metadataRaw);
 
-	for(const moduleRecord of metadata.asLatest.modules)
-		if(moduleRecord.name == "System")
-			for(constantRecord of moduleRecord.constants)
-				if(constantRecord.name == "Version")
+	for (const moduleRecord of metadata.asLatest.modules)
+		if (moduleRecord.name == 'System')
+			for (constantRecord of moduleRecord.constants)
+				if (constantRecord.name == 'Version')
 					runtimeVersion = constantRecord.value;
 	return runtimeVersion;
-}
+};
 
 export async function populateMetadata(): Promise<void> {
 	console.log('loading built-in metadata...');
-	for(const metadataString of allBuiltInMetadata) {
+	for (const metadataString of allBuiltInMetadata) {
 		await saveMetadata(metadataString);
 	}
 }

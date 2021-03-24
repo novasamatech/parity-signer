@@ -116,8 +116,8 @@ export function useNetworksContext(): NetworksContextState {
 	const [substrateNetworks, setSubstrateNetworks] = useState<
 		Map<string, SubstrateNetworkParams>
 	>(new Map());
-	const [ registries, setRegistries ] = useState(new Map());
-	const [ registriesReady, setRegistriesReady ] = useState<bool>(true);
+	const [registries, setRegistries] = useState(new Map());
+	const [registriesReady, setRegistriesReady] = useState<bool>(true);
 
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
 		const ethereumNetworks: Map<string, NetworkParams> = new Map(
@@ -141,14 +141,14 @@ export function useNetworksContext(): NetworksContextState {
 	useEffect(() => {
 		const initNetworksAndRegistries = async function (): Promise<void> {
 			console.log('=====SIGNER STARTING=====');
-			console.log("Loading metadata...");
+			console.log('Loading metadata...');
 			await populateMetadata();
-			console.log("Loading networks...");
+			console.log('Loading networks...');
 			const initNetworkSpecs = await loadNetworks();
-			console.log("Populating registries...");
-			var initRegistries = new Map();
-			for(let networkKey of Array.from(initNetworkSpecs.keys())) {
-				console.log('Registering network:')
+			console.log('Populating registries...');
+			const initRegistries = new Map();
+			for (const networkKey of Array.from(initNetworkSpecs.keys())) {
+				console.log('Registering network:');
 				console.log(networkKey);
 				try {
 					const networkParams = initNetworkSpecs.get(networkKey)!;
@@ -163,7 +163,7 @@ export function useNetworksContext(): NetworksContextState {
 					initRegistries.set(networkKey, newRegistry);
 				} catch (e) {
 					console.log('Init network registration error', e);
-				};
+				}
 			}
 			setSubstrateNetworks(initNetworkSpecs);
 			setRegistries(initRegistries);
@@ -179,21 +179,21 @@ export function useNetworksContext(): NetworksContextState {
 		setSubstrateNetworks(initNetworkSpecs);
 		console.log(substrateNetworks);
 		console.log('networks loaded');
-	};
+	}
 
 	async function updateTypeRegistries(): Promise<void> {
 		console.log('Registries update invoked');
 		console.log(substrateNetworks);
-//		if (registriesReady) {
-			setRegistriesReady(false);
-			for(let networkKey of Array.from(substrateNetworks.keys())) {
-				console.log('initializing network:')
-				console.log(networkKey);
-				await initTypeRegistry(networkKey);
-				console.log(registries);
-			}
-			setRegistriesReady(true);
-//		}
+		//		if (registriesReady) {
+		setRegistriesReady(false);
+		for (const networkKey of Array.from(substrateNetworks.keys())) {
+			console.log('initializing network:');
+			console.log(networkKey);
+			await initTypeRegistry(networkKey);
+			console.log(registries);
+		}
+		setRegistriesReady(true);
+		//		}
 		return;
 	}
 
@@ -227,8 +227,8 @@ export function useNetworksContext(): NetworksContextState {
 			const metadataHandle = networkParams.metadata;
 
 			const networkMetadataRaw = await getMetadata(metadataHandle);
-			
-			var newRegistries = deepCopyMap(registries);
+
+			const newRegistries = deepCopyMap(registries);
 			if (newRegistries.has(networkKey)) newRegistries.delete(networkKey)!;
 
 			const newRegistry = new TypeRegistry();
@@ -245,9 +245,7 @@ export function useNetworksContext(): NetworksContextState {
 		}
 	}
 
-	function getTypeRegistry(
-		networkKey: string
-	): TypeRegistry | null {
+	function getTypeRegistry(networkKey: string): TypeRegistry | null {
 		try {
 			if (registries.has(networkKey)) {
 				return registries.get(networkKey)!;

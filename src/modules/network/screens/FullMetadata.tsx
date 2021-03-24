@@ -36,15 +36,20 @@ export default function FullMetadata({
 	route
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
-	const { networks, getSubstrateNetwork, getTypeRegistry, registries } = useContext(NetworksContext);
-	const [ savedMetadata, setSavedMetadata ] = useState<string>('');
+	const {
+		networks,
+		getSubstrateNetwork,
+		getTypeRegistry,
+		registries
+	} = useContext(NetworksContext);
+	const [savedMetadata, setSavedMetadata] = useState<string>('');
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
 	const metadataHandle = networks.get(networkKey).metadata;
 	const typeRegistry = getTypeRegistry(networks, networkKey, metadataHandle);
 	//const registeredMetadata = getRegisteredMetadata(typeRegistry, metadataHandle);
 	//const [ metadataReady, savedMetadata ] = useFullMetadataHook(metadataHandle);
-	const [ metadataReady, setMetadataReady ] = useState<bool>(false);
+	const [metadataReady, setMetadataReady] = useState<bool>(false);
 
 	useEffect(() => {
 		const getSavedMetadata = async function (): Promise<void> {
@@ -57,12 +62,9 @@ export default function FullMetadata({
 	console.log(typeof savedMetadata);
 	console.log(metadataReady);
 
-	
-	function showFullMetadata(): React.ReactNode{
-		if(metadataReady) {
-			return (
-				<Text>{savedMetadata}</Text>
-			);
+	function showFullMetadata(): React.ReactNode {
+		if (metadataReady) {
+			return <Text>{savedMetadata}</Text>;
 		} else {
 			return;
 		}
@@ -70,7 +72,7 @@ export default function FullMetadata({
 
 	return (
 		<SafeAreaScrollViewContainer style={styles.body}>
-				{showFullMetadata()}
+			{showFullMetadata()}
 		</SafeAreaScrollViewContainer>
 	);
 }
