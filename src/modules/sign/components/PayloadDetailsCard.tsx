@@ -46,7 +46,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		fallback,
 		label,
 		networkKey,
-		registriesStore,
+		_registriesStore,
 		value
 	}: ExtrinsicPartProps): React.ReactElement => {
 		const [period, setPeriod] = useState<string>();

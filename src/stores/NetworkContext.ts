@@ -117,7 +117,7 @@ export function useNetworksContext(): NetworksContextState {
 		Map<string, SubstrateNetworkParams>
 	>(new Map());
 	const [registries, setRegistries] = useState(new Map());
-	const [registriesReady, setRegistriesReady] = useState<bool>(true);
+	//const [registriesReady, setRegistriesReady] = useState<bool>(true);
 
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
 		const ethereumNetworks: Map<string, NetworkParams> = new Map(
@@ -167,7 +167,6 @@ export function useNetworksContext(): NetworksContextState {
 			}
 			setSubstrateNetworks(initNetworkSpecs);
 			setRegistries(initRegistries);
-			setRegistriesReady(true);
 			console.log('====INITIALIZATION COMPLETE=====');
 		};
 		initNetworksAndRegistries();
@@ -181,19 +180,43 @@ export function useNetworksContext(): NetworksContextState {
 		console.log('networks loaded');
 	}
 
+	async function initTypeRegistry(
+		networkKey: string
+	): Promise<null> {
+		try {
+			console.log('initTypeRegistry invoked');
+			const networkParams = substrateNetworks.get(networkKey)!;
+			const metadataHandle = networkParams.metadata;
+
+			const networkMetadataRaw = await getMetadata(metadataHandle);
+
+			const newRegistries = deepCopyMap(registries);
+			if (newRegistries.has(networkKey)) newRegistries.delete(networkKey)!;
+
+			const newRegistry = new TypeRegistry();
+			//const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+			//console.log(overrideTypes);
+			//newRegistry.register(overrideTypes);
+			const metadata = new Metadata(newRegistry, networkMetadataRaw);
+			newRegistry.setMetadata(metadata);
+			newRegistries.set(networkKey, newRegistry);
+			setRegistries(newRegistries);
+			return null;
+		} catch (e) {
+			console.log('error', e);
+			return null;
+		}
+	}
+
 	async function updateTypeRegistries(): Promise<void> {
 		console.log('Registries update invoked');
 		console.log(substrateNetworks);
-		//		if (registriesReady) {
-		setRegistriesReady(false);
 		for (const networkKey of Array.from(substrateNetworks.keys())) {
 			console.log('initializing network:');
 			console.log(networkKey);
 			await initTypeRegistry(networkKey);
 			console.log(registries);
 		}
-		setRegistriesReady(true);
-		//		}
 		return;
 	}
 
@@ -218,33 +241,6 @@ export function useNetworksContext(): NetworksContextState {
 		saveNetworks(newNetworkParams);
 	}
 
-	async function initTypeRegistry(
-		networkKey: string
-	): Promise<TypeRegistry | null> {
-		try {
-			console.log('initTypeRegistry invoked');
-			const networkParams = substrateNetworks.get(networkKey)!;
-			const metadataHandle = networkParams.metadata;
-
-			const networkMetadataRaw = await getMetadata(metadataHandle);
-
-			const newRegistries = deepCopyMap(registries);
-			if (newRegistries.has(networkKey)) newRegistries.delete(networkKey)!;
-
-			const newRegistry = new TypeRegistry();
-			//const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
-			//console.log(overrideTypes);
-			//newRegistry.register(overrideTypes);
-			const metadata = new Metadata(newRegistry, networkMetadataRaw);
-			newRegistry.setMetadata(metadata);
-			newRegistries.set(networkKey, newRegistry);
-			setRegistries(newRegistries);
-		} catch (e) {
-			console.log('error', e);
-			return null;
-		}
-	}
-
 	function getTypeRegistry(networkKey: string): TypeRegistry | null {
 		try {
 			if (registries.has(networkKey)) {
@@ -258,17 +254,17 @@ export function useNetworksContext(): NetworksContextState {
 	}
 
 	return {
-		populateNetworks,
 		addNetwork,
 		allNetworks,
 		getNetwork,
 		getSubstrateNetwork: getSubstrateNetworkParams,
+		getTypeRegistry,
+		initTypeRegistry,
 		networks: substrateNetworks,
 		pathIds,
+		populateNetworks,
 		registries,
-		getTypeRegistry,
-		updateTypeRegistries,
-		initTypeRegistry
+		updateTypeRegistries
 	};
 }
 

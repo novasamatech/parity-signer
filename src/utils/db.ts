@@ -16,11 +16,8 @@
 
 import AsyncStorage from '@react-native-community/async-storage';
 import SecureStorage from 'react-native-secure-storage';
-import { expandMetadata } from '@polkadot/metadata/decorate';
 import { Metadata } from '@polkadot/metadata';
 import { TypeRegistry } from '@polkadot/types';
-import { getSpecTypes } from '@polkadot/types-known';
-import type { RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
@@ -29,7 +26,7 @@ import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
 import { MetadataHandle, MetadataRecord } from 'types/metadata';
-import { metadataHandleToKey } from 'utils/metadataUtils';
+import { metadataHandleToKey, getMetadataHandleFromRaw } from 'utils/metadataUtils';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
@@ -179,7 +176,7 @@ const metadataStorage = {
 };
 
 export async function getMetadata(
-	metadataHandle: MetadataHandle
+	metadataHandle: MetadataHandle | null
 ): Promise<string> {
 	try {
 		const metadataKey = metadataHandleToKey(metadataHandle);
@@ -190,36 +187,35 @@ export async function getMetadata(
 		);
 		return metadataRecord;
 	} catch (e) {
-		handleError(e, 'metadata');
+		handleError(e, 'load metadata');
 		return '';
 	}
 }
 
-export async function saveMetadata(newMetadata: MetadataRecord): Promise<void> {
+function isRelevant(element: MetadataHandle, index, array): bool {
+	return (String(element.specName) == this);
+}
+
+export async function getRelevantMetadata(specName: string): Promise<Array<MetadataMandle>> {
 	try {
-		const registry = new TypeRegistry();
-		const metadata = new Metadata(registry, newMetadata);
-		registry.setMetadata(metadata);
-		const decorated = expandMetadata(registry, metadata);
-		//		console.warn(decorated);
-		/*		var rtVersion='';
-		for(const moduleRecord of metadata.asLatest.modules)
-			if(moduleRecord.name == "System")
-				for(const constantRecord of moduleRecord.constants)
-					if(constantRecord.name == "Version")
-						rtVersion = constantRecord.value;
-		console.log('version: ' + rtVersion);*/
-		const metadataHandle: MetadataHandle = {
-			specName: decorated.consts.system.version.get('specName'),
-			specVersion: decorated.consts.system.version.get('specVersion'),
-			hash: 'stub'
-		};
-		//console.log(metadataHandle);
+		const allMetadataMap = await SecureStorage.getAllItems(metadataStorage);
+		const metadataKeys = Object.getOwnPropertyNames(allMetadataMap);
+		return metadataKeys.map(function (keyValue: string): MetadataHandle {
+			return getMetadataHandleFromRaw(allMetadataMap[keyValue]);
+		}).filter(isRelevant, specName);
+	} catch (e) {
+		handleError(e, 'getRelevantMetadata');
+	}
+}
+
+export async function saveMetadata(newMetadata: string): Promise<void> {
+	try {
+		const metadataHandle = getMetadataHandleFromRaw(newMetadata);
 		const newMetadataKey = metadataHandleToKey(metadataHandle);
 		await SecureStorage.setItem(newMetadataKey, newMetadata, metadataStorage);
 		console.log('Loaded: ' + newMetadataKey);
 	} catch (e) {
-		handleError(e, 'metadata');
+		handleError(e, 'save metadata');
 	}
 }
 

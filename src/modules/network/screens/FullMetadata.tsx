@@ -15,46 +15,32 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
-import testIDs from 'e2e/testIDs';
-import { NetworkInfoCard } from 'modules/network/components/NetworkInfoCard';
-import { filterNetworks } from 'modules/network/utils';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { getMetadata } from 'utils/db';
 //import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
-import ScreenHeading from 'components/ScreenHeading';
 
 export default function FullMetadata({
-	navigation,
+	_navigation,
 	route
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
-	const {
-		networks,
-		getSubstrateNetwork,
-		getTypeRegistry,
-		registries
-	} = useContext(NetworksContext);
+	const { networks } = useContext(NetworksContext);
 	const [savedMetadata, setSavedMetadata] = useState<string>('');
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
-	const networkParams = getSubstrateNetwork(networkKey);
 	const metadataHandle = networks.get(networkKey).metadata;
-	const typeRegistry = getTypeRegistry(networks, networkKey, metadataHandle);
-	//const registeredMetadata = getRegisteredMetadata(typeRegistry, metadataHandle);
-	//const [ metadataReady, savedMetadata ] = useFullMetadataHook(metadataHandle);
 	const [metadataReady, setMetadataReady] = useState<bool>(false);
 
 	useEffect(() => {
 		const getSavedMetadata = async function (): Promise<void> {
-			const getSavedMetadata = await getMetadata(metadataHandle);
-			setSavedMetadata(getSavedMetadata);
+			const newSavedMetadata = await getMetadata(metadataHandle);
+			setSavedMetadata(newSavedMetadata);
 			setMetadataReady(true);
 		};
 		getSavedMetadata();

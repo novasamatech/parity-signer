@@ -25,7 +25,6 @@ import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	ETHEREUM_NETWORK_LIST,
-	SubstrateNetworkKeys,
 	UnknownNetworkKeys,
 	unknownNetworkPathId
 } from 'constants/networkSpecs';
@@ -39,16 +38,6 @@ import {
 	SerializedIdentity,
 	UnlockedAccount
 } from 'types/identityTypes';
-import {
-	centrifugeAmberMetadata,
-	centrifugeMetadata,
-	edgewareMetadata,
-	kulupuMetadata,
-	kusamaMetadata,
-	polkadotMetaData,
-	rococoMetadata,
-	westendMetadata
-} from 'constants/networkMetadata';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = (str: string): string => str.replace(/\//g, '');
@@ -467,10 +456,6 @@ export const groupPaths = (
 	);
 	return groupedPaths.sort(_comparePathGroups);
 };
-
-export const getMetadata = (
-	metadataHandle: MetadataHandle
-): string | null => {};
 
 /* This should be a set-hook function runned once from getMetadata
 	switch (networkKey) {

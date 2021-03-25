@@ -29,18 +29,14 @@ import fontStyles from 'styles/fontStyles';
 import Button from 'components/Button';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
-import { saveToCAndPPConfirmation, saveMetadata } from 'utils/db';
+import { saveToCAndPPConfirmation } from 'utils/db';
 import CustomScrollView from 'components/CustomScrollView';
-import { metadataHandleToKey } from 'utils/metadataUtils';
-import { NetworksContext } from 'stores/NetworkContext';
-import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 
 export default function TermsAndConditions(
 	props: NavigationProps<'TermsAndConditions'>
 ): React.ReactElement {
 	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
 	const [tocAgreement, setTocAgreement] = useState<boolean>(false);
-	const { getNetwork } = useContext(NetworksContext);
 
 	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(
 		GlobalStateContext

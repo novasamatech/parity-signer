@@ -1,9 +1,9 @@
 // Type for all operations on metadata not involving metadata itself
 
 export type MetadataHandle = {
-	spec_name: string;
-	spec_version: string;
 	hash: string;
+	specName: string;
+	specVersion: number;
 };
 
 // Type to store serialized metadata. Should be accessed only

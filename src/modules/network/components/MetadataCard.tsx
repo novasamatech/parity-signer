@@ -14,20 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext } from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import React, { ReactElement } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 import TouchableItem from 'components/TouchableItem';
 //import CardSeparator from 'components/CardSeparator';
-
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import Separator from 'components/Separator';
 import { ButtonListener } from 'types/props';
 
 type MetadataCardProps = {
-	spec_name: string;
-	spec_version: string;
+	specName: string;
+	specVersion: string;
 	onPress: ButtonListener;
 };
 
@@ -43,8 +42,8 @@ const CardSeparator = (): ReactElement => (
 );
 
 export function MetadataCard({
-	spec_name,
-	spec_version,
+	specName,
+	specVersion,
 	onPress
 }: MetadataCardProps): React.ReactElement {
 	//	const { getNetwork } = useContext();
@@ -62,7 +61,7 @@ export function MetadataCard({
 				</View>
 				<View style={styles.content}>
 					<Text style={fontStyles.t_code}>
-						{`spec_name: ${spec_name} spec_version: ${spec_version}`}
+						{`spec_name: ${specName} spec_version: ${specVersion}`}
 					</Text>
 				</View>
 				<View />

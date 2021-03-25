@@ -15,10 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext } from 'react';
-import { RegistriesContext } from 'stores/RegistriesContext';
-import { expandMetadata } from '@polkadot/metadata/decorate';
-import { metadata } from '@polkadot/metadata';
-import { RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { NetworkCard } from 'components/AccountCard';
 import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
@@ -42,8 +38,8 @@ export default function NetworkDetails({
 	const metadataValid = (): React.ReactElement => (
 		<>
 			<MetadataCard
-				spec_name={metadataHandle.specName}
-				spec_version={metadataHandle.specVersion}
+				specName={metadataHandle.specName}
+				specVersion={metadataHandle.specVersion}
 				onPress={(): void =>
 					navigation.navigate('FullMetadata', {
 						pathId: networkPathId
@@ -51,7 +47,11 @@ export default function NetworkDetails({
 				}
 			/>
 			<Button
-				onPress={(): void => navigation.navigate('MetadataManagement')}
+				onPress={(): void => 
+					navigation.navigate('MetadataManagement', {
+						pathId: networkPathId
+					})
+				}
 				title="Manage metadata"
 			/>
 		</>
@@ -60,13 +60,16 @@ export default function NetworkDetails({
 	const metadataInvalid = (): React.ReactElement => (
 		<>
 			<MetadataCard
-				spec_name="invalid"
-				spec_version="invalid"
-				onPress={(): void => navigation.navigate('FullMetadata')}
+				specName="invalid"
+				specVersion="invalid"
 			/>
 
 			<Button
-				onPress={(): void => navigation.navigate('MetadataManagement')}
+				onPress={(): void => 
+					navigation.navigate('MetadataManagement', {
+						pathId: networkPathId
+					})
+				}
 				title="Please add metadata!"
 			/>
 		</>

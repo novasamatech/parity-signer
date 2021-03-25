@@ -1,4 +1,4 @@
-import { useContext, useMemo, useEffect } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { SeedRefsContext, SeedRefsState } from 'stores/SeedRefStore';
 import { SeedRefClass } from 'utils/native';
@@ -76,7 +76,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 		return seedRef.tryDestroy().then(() => {
 			const newSeedRefs = new Map();
 			for (const [key, value] of seedRefs.entries())
-				if (key != encryptedSeed) newSeedRefs.set(key, value);
+				if (key !== encryptedSeed) newSeedRefs.set(key, value);
 			setSeedRefs(newSeedRefs);
 		});
 	};

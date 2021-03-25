@@ -1,6 +1,6 @@
-import { useContext } from 'react';
 import { TypeRegistry } from '@polkadot/types';
 import { Metadata } from '@polkadot/metadata';
+import { expandMetadata } from '@polkadot/metadata/decorate';
 
 import { allBuiltInMetadata } from 'constants/networkMetadataList';
 import { saveMetadata } from 'utils/db';
@@ -11,16 +11,28 @@ export const metadataHandleToKey = (metadataHandle: MetadataHandle): string => {
 	return metadataKey;
 };
 
-export const getRuntimeVersionFromRaw = (metadataRaw: string): string => {
-	const tempRegistry = new TypeRegistry();
-	const metadata = new Metadata(tempRegistry, metadataRaw);
-
+export const getMetadataHandleFromRaw = (metadataRaw: string): string => {
+	const registry = new TypeRegistry();
+	const metadata = new Metadata(registry, metadataRaw);
+	registry.setMetadata(metadata);
+	const decorated = expandMetadata(registry, metadata);
+	const metadataVersion = decorated.consts.system.version;
+	((metadataVersion as unknown) as Map);
+	const metadataHandle: MetadataHandle = {
+		hash: metadataVersion.toString(),
+		specName: metadataVersion.get('specName'),
+		specVersion: metadataVersion.get('specVersion')
+	};
+	return metadataHandle;
+	//this would be the proper way to do it
+	/*
 	for (const moduleRecord of metadata.asLatest.modules)
-		if (moduleRecord.name == 'System')
+		if (moduleRecord.name === 'System')
 			for (constantRecord of moduleRecord.constants)
-				if (constantRecord.name == 'Version')
+				if (constantRecord.name === 'Version')
 					runtimeVersion = constantRecord.value;
-	return runtimeVersion;
+	//decode runtimeVersion;
+      	*/
 };
 
 export async function populateMetadata(): Promise<void> {

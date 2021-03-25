@@ -23,7 +23,7 @@ export type RootStackParamList = {
 	LegacyNetworkChooser: undefined;
 	NetworkDetails: { pathId: string };
 	NetworkSettings: undefined;
-	MetadataManagement: undefined;
+	MetadataManagement: { pathId: string };
 	FullMetadata: undefined;
 	PathDerivation: { parentPath: string };
 	PathDetails: { path: string };
