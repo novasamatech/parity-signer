@@ -29,6 +29,7 @@ import ScreenHeading from 'components/ScreenHeading';
 import { getRelevantMetadata } from 'utils/db';
 
 export default function MetadataManagement({
+	navigation,
 	route
 }: NavigationProps<'MetadataManagement'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
@@ -50,7 +51,7 @@ export default function MetadataManagement({
 
 	function setMetadata(metadataHandle: MetadataHandle): null {
 		setMetadataVersion(networkKey, metadataHandle);
-		navination.goBack();
+		navigation.goBack();
 	}
 	
 	const renderMetadata = ({ item }): ReactElement => {

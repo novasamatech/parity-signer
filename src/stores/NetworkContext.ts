@@ -110,6 +110,10 @@ export type NetworksContextState = {
 	) => TypeRegistry | null;
 	updateTypeRegistries: () => Promise<void>;
 	initTypeRegistry: (networkKey: string) => Promise<TypeRegistry | null>;
+	setMetadataVersion: (
+		networkKey: string,
+		metadataHandle: MetadataHandle
+	) => Promise<void>;
 };
 
 export function useNetworksContext(): NetworksContextState {
@@ -253,6 +257,29 @@ export function useNetworksContext(): NetworksContextState {
 		}
 	}
 
+	async function setMetadataVersion(
+		networkKey: string,
+		metadataHandle: MetadataHandle
+	): Promise<void> {
+		var newNetworkParams = substrateNetworks.get(networkKey);
+		newNetworkParams.metadata = metadataHandle;
+		const newNetworksList = deepCopyNetworks(substrateNetworks);
+		newNetworksList.set(networkKey, newNetworkParams);
+		setSubstrateNetworks(newNetworksList);
+		saveNetworks(newNetworkParams);
+		try {
+			const networkMetadataRaw = await getMetadata(metadataHandle);
+			const newRegistry = new TypeRegistry();
+			const metadata = new Metadata(newRegistry, networkMetadataRaw);
+			newRegistry.setMetadata(metadata);
+			newRegistries = deepCopyMap(registries);
+			newRegistries.set(networkKey, newRegistry);
+			setRegistries(newRegistries);
+		} catch (e) {
+			console.log('Init network registration error', e);
+		}
+	}
+
 	return {
 		addNetwork,
 		allNetworks,
@@ -264,6 +291,7 @@ export function useNetworksContext(): NetworksContextState {
 		pathIds,
 		populateNetworks,
 		registries,
+		setMetadataVersion,
 		updateTypeRegistries
 	};
 }
