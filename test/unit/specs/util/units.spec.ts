@@ -19,10 +19,10 @@ import { TypeRegistry } from '@polkadot/types';
 import { GenericCall as Call } from '@polkadot/types/generic';
 import { formatBalance } from '@polkadot/util';
 
-import { polkadotMetaData } from 'constants/networkMetadata';
+import { polkadotMetadata } from 'constants/networkMetadata';
 import { fromWei } from 'utils/units';
 const registry = new TypeRegistry();
-registry.setMetadata(new Metadata(registry, polkadotMetaData));
+registry.setMetadata(new Metadata(registry, polkadotMetadata));
 
 describe('units', () => {
 	describe('ethereum', () => {

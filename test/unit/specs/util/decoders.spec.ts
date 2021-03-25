@@ -24,8 +24,8 @@ import { GenericCall as Call } from '@polkadot/types/generic';
 import { hexToU8a, u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { describe, expect, it } from '@jest/globals';
-import { getOverrideTypes } from 'stores/RegistriesContext';
 
+import { getOverrideTypes } from 'stores/NetworkContext';
 import {
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys
