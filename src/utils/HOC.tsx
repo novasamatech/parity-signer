@@ -21,7 +21,7 @@ import { View } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
-import { NetworksContext } from 'stores/NetworkContext';
+import { NetworksContext, NetworksContextState } from 'stores/NetworkContext';
 
 interface RegistriesInjectedProps {
 	registriesStore: NetworksContextState;

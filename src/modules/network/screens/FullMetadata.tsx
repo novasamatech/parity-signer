@@ -14,23 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+// This screen is not functional yet
+
+import React, {
+	ReactElement /*, useContext, useEffect, useState*/
+} from 'react';
+import { StyleSheet } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NetworksContext } from 'stores/NetworkContext';
+//import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
-import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
-import { getMetadata } from 'utils/db';
+//import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
+//import { getMetadata } from 'utils/db';
 //import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 
-export default function FullMetadata({
-	_navigation,
-	route
-}: NavigationProps<'NetworkSettings'>): React.ReactElement {
-	const networkPathId = route.params.pathId;
+export default function FullMetadata({}: //	navigation,
+//	route
+NavigationProps<'NetworkSettings'>): React.ReactElement {
+	/*const networkPathId = route.params.pathId;
 	const { networks } = useContext(NetworksContext);
 	const [savedMetadata, setSavedMetadata] = useState<string>('');
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
@@ -55,12 +58,9 @@ export default function FullMetadata({
 			return;
 		}
 	}
-
-	return (
-		<SafeAreaScrollViewContainer style={styles.body}>
-			{showFullMetadata()}
-		</SafeAreaScrollViewContainer>
-	);
+			{showFullMetadata()} //call it below
+*/
+	return <SafeAreaScrollViewContainer style={styles.body} />;
 }
 
 const styles = StyleSheet.create({

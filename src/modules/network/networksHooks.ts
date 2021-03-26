@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-
-import { getMetadata, getAllMetadata } from 'utils/db';
+/*import { getAllMetadata } from 'utils/db';
 import { MetadataHandle } from 'types/metadata';
 
 /*
@@ -12,21 +10,15 @@ export function useFullMetadataHook(
 	setMetadataReady(true);
 	return [metadataReady, metadata];
 }
-*/
 
-function isSpecName (
-	metadataHandle: MetadataHandle,
-	_index,
-	_array
-): bool {
-	return (metadataHandle.specName === this);
+
+function isSpecName(metadataHandle: MetadataHandle, _index, _array): bool {
+	return metadataHandle.specName === this;
 }
 
 export function useKnownMetadataHook(
 	networkName: string
 ): Array<MetadataHandle> {
-	useEffect(() => {
-		const allMetadata = getAllMetadata();
-	}, [networkName])
+	const allMetadata = getAllMetadata();
 	return allMetadata.filter(isSpecName, networkName);
-}
+}*/

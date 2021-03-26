@@ -15,10 +15,8 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FlatList } from 'react-native';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, ReactElement } from 'react';
 
-import { NetworkCard } from 'components/AccountCard';
-import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
 import { MetadataCard } from 'modules/network/components/MetadataCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
@@ -33,36 +31,37 @@ export default function MetadataManagement({
 	route
 }: NavigationProps<'MetadataManagement'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
-	const { networks, getSubstrateNetwork, setMetadataVersion } = useContext(NetworksContext);
+	const { networks, getSubstrateNetwork, setMetadataVersion } = useContext(
+		NetworksContext
+	);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
 
-	const [knownMetadata, setKnownMetadata] = useState<Array<MetadataHandle>>(new Array());
+	const [knownMetadata, setKnownMetadata] = useState<Array<MetadataHandle>>([]);
 
 	useEffect(() => {
-		const getKnownMetadata = async function (
-			specName: string
-		): Promise<void> {
+		const getKnownMetadata = async function (specName: string): Promise<void> {
 			const newKnownMetadata = await getRelevantMetadata(specName);
 			setKnownMetadata(newKnownMetadata);
-		}
-		getKnownMetadata(networkParams.metadata.specName);
-	}, [networkPathId]);
+		};
+		if (networkParams.metadata)
+			getKnownMetadata(networkParams.metadata.specName);
+	}, [networkParams]);
 
-	function setMetadata(metadataHandle: MetadataHandle): null {
+	function setMetadata(metadataHandle: MetadataHandle): void {
 		setMetadataVersion(networkKey, metadataHandle);
 		navigation.goBack();
 	}
-	
-	const renderMetadata = ({ item }): ReactElement => {
+
+	const renderMetadata = ({ item }: { item: MetadataHandle }): ReactElement => {
 		return (
 			<MetadataCard
 				specName={item.specName}
-				specVersion={item.specVersion}
-				onPress={() => setMetadata(item)}
+				specVersion={String(item.specVersion)}
+				onPress={(): void => setMetadata(item)}
 			/>
-		)
-	}
+		);
+	};
 
 	return (
 		<SafeAreaViewContainer>
@@ -70,7 +69,7 @@ export default function MetadataManagement({
 			<FlatList
 				data={knownMetadata}
 				renderItem={renderMetadata}
-				keyExtractor={(item) => item.hash}
+				keyExtractor={(item: MetadataHandle): string => item.hash}
 			/>
 		</SafeAreaViewContainer>
 	);

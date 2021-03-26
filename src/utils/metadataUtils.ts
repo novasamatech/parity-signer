@@ -4,6 +4,7 @@ import { expandMetadata } from '@polkadot/metadata/decorate';
 
 import { allBuiltInMetadata } from 'constants/networkMetadataList';
 import { saveMetadata } from 'utils/db';
+import { MetadataHandle } from 'types/metadata';
 
 export const metadataHandleToKey = (metadataHandle: MetadataHandle): string => {
 	const metadataKey =
@@ -11,13 +12,18 @@ export const metadataHandleToKey = (metadataHandle: MetadataHandle): string => {
 	return metadataKey;
 };
 
-export const getMetadataHandleFromRaw = (metadataRaw: string): string => {
+export const getMetadataHandleFromRaw = (
+	metadataRaw: string
+): MetadataHandle => {
 	const registry = new TypeRegistry();
 	const metadata = new Metadata(registry, metadataRaw);
 	registry.setMetadata(metadata);
 	const decorated = expandMetadata(registry, metadata);
-	const metadataVersion = decorated.consts.system.version;
-	((metadataVersion as unknown) as Map);
+	const metadataVersion = (decorated.consts.system.version as unknown) as Map<
+		string,
+		any
+	>;
+	(metadataVersion as unknown) as Map<string, any>;
 	const metadataHandle: MetadataHandle = {
 		hash: metadataVersion.toString(),
 		specName: metadataVersion.get('specName'),

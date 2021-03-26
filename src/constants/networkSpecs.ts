@@ -101,7 +101,7 @@ const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
 };
 
 const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
-/*	[SubstrateNetworkKeys.CENTRIFUGE]: {
+	[SubstrateNetworkKeys.CENTRIFUGE]: {
 		color: '#FCC367',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
@@ -195,7 +195,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Kusama Development',
 		unit: 'KSM'
 	},
-*/	[SubstrateNetworkKeys.POLKADOT]: {
+	[SubstrateNetworkKeys.POLKADOT]: {
 		color: '#E6027A',
 		decimals: 10,
 		genesisHash: SubstrateNetworkKeys.POLKADOT,
@@ -210,8 +210,22 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		prefix: 0,
 		title: 'Polkadot',
 		unit: 'DOT'
-	},
-/*	[SubstrateNetworkKeys.ROCOCO]: {
+	} /*	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
+		color: '#18FFB2',
+		decimals: 12,
+		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
+		metadata: {
+			hash: "dummy",
+			specName: "polkadot",
+			specVersion: 28
+		},
+		order: 100,
+		pathId: 'substrate_dev',
+		prefix: 42,
+		title: 'Substrate Development',
+		unit: 'UNIT'
+	},*/,
+	[SubstrateNetworkKeys.ROCOCO]: {
 		color: '#6f36dc',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
@@ -227,21 +241,6 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Rococo',
 		unit: 'ROC'
 	},
-*/	/*	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#18FFB2',
-		decimals: 12,
-		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
-		metadata: {
-			hash: "dummy",
-			specName: "polkadot",
-			specVersion: 28
-		},
-		order: 100,
-		pathId: 'substrate_dev',
-		prefix: 42,
-		title: 'Substrate Development',
-		unit: 'UNIT'
-	},*/
 	[SubstrateNetworkKeys.WESTEND]: {
 		color: '#660D35',
 		decimals: 12,

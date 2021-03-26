@@ -35,6 +35,7 @@ import {
 	generateNetworkParamsFromParsedData
 } from 'utils/networksUtils';
 import { populateMetadata } from 'utils/metadataUtils';
+import { MetadataHandle } from 'types/metadata';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
@@ -184,9 +185,7 @@ export function useNetworksContext(): NetworksContextState {
 		console.log('networks loaded');
 	}
 
-	async function initTypeRegistry(
-		networkKey: string
-	): Promise<null> {
+	async function initTypeRegistry(networkKey: string): Promise<null> {
 		try {
 			console.log('initTypeRegistry invoked');
 			const networkParams = substrateNetworks.get(networkKey)!;
@@ -261,23 +260,25 @@ export function useNetworksContext(): NetworksContextState {
 		networkKey: string,
 		metadataHandle: MetadataHandle
 	): Promise<void> {
-		var newNetworkParams = substrateNetworks.get(networkKey);
+		const newNetworkParams = substrateNetworks.get(networkKey);
+		if (!newNetworkParams) return;
 		newNetworkParams.metadata = metadataHandle;
 		const newNetworksList = deepCopyNetworks(substrateNetworks);
 		newNetworksList.set(networkKey, newNetworkParams);
-		setSubstrateNetworks(newNetworksList);
-		saveNetworks(newNetworkParams);
+		const newRegistries = deepCopyMap(registries);
 		try {
 			const networkMetadataRaw = await getMetadata(metadataHandle);
 			const newRegistry = new TypeRegistry();
 			const metadata = new Metadata(newRegistry, networkMetadataRaw);
 			newRegistry.setMetadata(metadata);
-			newRegistries = deepCopyMap(registries);
 			newRegistries.set(networkKey, newRegistry);
-			setRegistries(newRegistries);
 		} catch (e) {
 			console.log('Init network registration error', e);
+			return;
 		}
+		setSubstrateNetworks(newNetworksList);
+		saveNetworks(newNetworkParams);
+		setRegistries(newRegistries);
 	}
 
 	return {

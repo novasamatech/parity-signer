@@ -23,7 +23,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
+import { NetworksContext, NetworksContextState } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
@@ -37,7 +37,7 @@ type ExtrinsicPartProps = {
 	fallback?: string;
 	label: string;
 	networkKey: string;
-	registriesStore: RegistriesStoreState;
+	registriesStore: NetworksContextState;
 	value: AnyJson | AnyU8a | IMethod | IExtrinsicEra;
 };
 
@@ -46,7 +46,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		fallback,
 		label,
 		networkKey,
-		_registriesStore,
+		registriesStore,
 		value
 	}: ExtrinsicPartProps): React.ReactElement => {
 		const [period, setPeriod] = useState<string>();
@@ -60,7 +60,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		);
 		const networkParams = getSubstrateNetwork(networkKey);
 		const prefix = networkParams.prefix;
-		const typeRegistry = getTypeRegistry(networks, networkKey)!;
+		const typeRegistry = getTypeRegistry(networkKey)!;
 
 		useEffect(() => {
 			if (label === 'Method' && !fallback) {

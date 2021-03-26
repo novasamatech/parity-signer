@@ -29,17 +29,17 @@ export default function NetworkDetails({
 	navigation,
 	route
 }: NavigationProps<'NetworkDetails'>): React.ReactElement {
-	const networkPathId = route.params.pathId;
+	const networkPathId = route.params.pathId as string;
 	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
-	const metadataHandle = networks.get(networkKey).metadata;
+	const metadataHandle = networkParams.metadata;
 
 	const metadataValid = (): React.ReactElement => (
 		<>
 			<MetadataCard
-				specName={metadataHandle.specName}
-				specVersion={metadataHandle.specVersion}
+				specName={metadataHandle ? metadataHandle.specName : ''}
+				specVersion={metadataHandle ? String(metadataHandle.specVersion) : ''}
 				onPress={(): void =>
 					navigation.navigate('FullMetadata', {
 						pathId: networkPathId
@@ -47,7 +47,7 @@ export default function NetworkDetails({
 				}
 			/>
 			<Button
-				onPress={(): void => 
+				onPress={(): void =>
 					navigation.navigate('MetadataManagement', {
 						pathId: networkPathId
 					})
@@ -62,10 +62,14 @@ export default function NetworkDetails({
 			<MetadataCard
 				specName="invalid"
 				specVersion="invalid"
+				onPress={(): void =>
+					navigation.navigate('FullMetadata', {
+						pathId: networkPathId
+					})
+				}
 			/>
-
 			<Button
-				onPress={(): void => 
+				onPress={(): void =>
 					navigation.navigate('MetadataManagement', {
 						pathId: networkPathId
 					})

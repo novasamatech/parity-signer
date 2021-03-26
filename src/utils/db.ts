@@ -16,8 +16,6 @@
 
 import AsyncStorage from '@react-native-community/async-storage';
 import SecureStorage from 'react-native-secure-storage';
-import { Metadata } from '@polkadot/metadata';
-import { TypeRegistry } from '@polkadot/types';
 
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
@@ -25,8 +23,11 @@ import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
-import { MetadataHandle, MetadataRecord } from 'types/metadata';
-import { metadataHandleToKey, getMetadataHandleFromRaw } from 'utils/metadataUtils';
+import { MetadataHandle } from 'types/metadata';
+import {
+	metadataHandleToKey,
+	getMetadataHandleFromRaw
+} from 'utils/metadataUtils';
 
 function handleError(e: Error, label: string): any[] {
 	console.warn(`loading ${label} error`, e);
@@ -179,6 +180,7 @@ export async function getMetadata(
 	metadataHandle: MetadataHandle | null
 ): Promise<string> {
 	try {
+		if (!metadataHandle) return '';
 		const metadataKey = metadataHandleToKey(metadataHandle);
 		console.log(metadataKey);
 		const metadataRecord = await SecureStorage.getItem(
@@ -192,19 +194,24 @@ export async function getMetadata(
 	}
 }
 
-function isRelevant(element: MetadataHandle, index, array): bool {
-	return (String(element.specName) == this);
+function isRelevant(this: string, element: MetadataHandle): boolean {
+	return String(element.specName) === this;
 }
 
-export async function getRelevantMetadata(specName: string): Promise<Array<MetadataMandle>> {
+export async function getRelevantMetadata(
+	specName: string
+): Promise<Array<MetadataHandle>> {
 	try {
 		const allMetadataMap = await SecureStorage.getAllItems(metadataStorage);
 		const metadataKeys = Object.getOwnPropertyNames(allMetadataMap);
-		return metadataKeys.map(function (keyValue: string): MetadataHandle {
-			return getMetadataHandleFromRaw(allMetadataMap[keyValue]);
-		}).filter(isRelevant, specName);
+		return metadataKeys
+			.map(function (keyValue: string): MetadataHandle {
+				return getMetadataHandleFromRaw(allMetadataMap[keyValue]);
+			})
+			.filter(isRelevant, specName);
 	} catch (e) {
 		handleError(e, 'getRelevantMetadata');
+		return [];
 	}
 }
 
