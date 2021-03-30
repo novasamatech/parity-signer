@@ -53,6 +53,7 @@ export type RootStackParamList = {
 		| {
 				isScanningNetworkSpec: true;
 		  };
+	FastQrScanner: undefined;
 	Security: undefined;
 	DetailsMessage: undefined;
 	SignedMessage: undefined;

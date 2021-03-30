@@ -57,6 +57,7 @@ import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
 import QrScanner from 'modules/sign/screens/QrScanner';
+import FastQrScanner from 'screens/FastQrScanner';
 import Security from 'screens/Security';
 import DetailsMessage from 'modules/sign/screens/DetailsMessage';
 import SignedMessage from 'modules/sign/screens/SignedMessage';
@@ -173,6 +174,7 @@ export const AppNavigator = (): React.ReactElement => (
 			component={PinUnlockWithPassword}
 		/>
 		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
+		<ScreenStack.Screen name="FastQrScanner" component={FastQrScanner} />
 		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="DetailsMessage" component={DetailsMessage} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />

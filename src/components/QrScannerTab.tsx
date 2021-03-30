@@ -43,7 +43,7 @@ export default function QrScannerTab(): React.ReactElement {
 				name="qrcode-scan"
 				type="material-community"
 			/>
-			<Text style={styles.textLabel}>QR Scanner</Text>
+			<Text style={styles.textLabel}>Fast QR Scanner</Text>
 		</TouchableItem>
 	);
 }
