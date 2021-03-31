@@ -23,7 +23,7 @@ import {
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
 
-const { IdentityPin, IdentityNew, Main, PathDetail, PathsList } = testIDs;
+const { IdentityPin, IdentityNew, Main, PathDetail } = testIDs;
 
 export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
@@ -102,7 +102,6 @@ export const testSetUpDefaultPath = async (): Promise<void> => {
 	);
 	await testVisible(PathDetail.screen);
 	await tapBack();
-	await testExist(PathsList.screen);
 };
 
 export const waitAlert = (ms?: number): Promise<void> =>

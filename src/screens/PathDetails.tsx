@@ -36,23 +36,16 @@ import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getAddressWithPath,
 	getNetworkKey,
-	getPathName,
-	getPathsWithSubstrateNetworkKey,
-	isSubstrateHardDerivedPath,
-	isSubstratePath
+	getPathName
 } from 'utils/identitiesUtils';
 import { alertDeleteAccount, alertError } from 'utils/alertUtils';
-import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation:
-		| StackNavigationProp<RootStackParamList, 'PathDetails'>
-		| StackNavigationProp<RootStackParamList, 'PathsList'>;
+	navigation: StackNavigationProp<RootStackParamList, 'PathDetails'>;
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
@@ -66,8 +59,6 @@ export function PathDetailsView({
 	const address = getAddressWithPath(path, currentIdentity);
 	const accountName = getPathName(path, currentIdentity);
 	const { setAlert } = useContext(AlertStateContext);
-	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const unlock = useUnlockSeed(isSeedRefValid);
 	const networksContextState = useContext(NetworksContext);
 	const { allNetworks } = networksContextState;
 	if (!address) return <View />;
@@ -85,19 +76,7 @@ export function PathDetailsView({
 				alertDeleteAccount(setAlert, 'this account', async () => {
 					try {
 						accountsStore.deletePath(path, networksContextState);
-						if (isSubstratePath(path)) {
-							const listedPaths = getPathsWithSubstrateNetworkKey(
-								accountsStore.state.currentIdentity!,
-								networkKey,
-								networksContextState
-							);
-							const hasOtherPaths = listedPaths.length > 0;
-							hasOtherPaths
-								? navigateToPathsList(navigation, networkKey)
-								: navigation.navigate('Main');
-						} else {
-							navigation.navigate('Main');
-						}
+						navigation.navigate('Main');
 					} catch (err) {
 						alertError(
 							setAlert,
@@ -105,13 +84,6 @@ export function PathDetailsView({
 						);
 					}
 				});
-				break;
-			case 'PathExport': {
-				await unlock({ name: 'PathSecret', params: { path } });
-				break;
-			}
-			case 'PathManagement':
-				navigation.navigate('PathManagement', { path });
 				break;
 		}
 	};
@@ -128,13 +100,6 @@ export function PathDetailsView({
 							onSelect={onOptionSelect}
 							menuTriggerIconName={'more-vert'}
 							menuItems={[
-								{ text: 'Edit', value: 'PathManagement' },
-								{
-									hide: !isSubstrateHardDerivedPath(path),
-									testID: testIDs.PathDetail.exportButton,
-									text: 'Export Account',
-									value: 'PathExport'
-								},
 								{
 									testID: testIDs.PathDetail.deleteButton,
 									text: 'Delete',

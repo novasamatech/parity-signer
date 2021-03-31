@@ -113,15 +113,11 @@ export const navigateToPathDetails = <
 	path: string
 ): void => {
 	const resetAction = CommonActions.reset({
-		index: 2,
+		index: 1,
 		routes: [
 			{
 				name: 'Main',
 				params: { isNew: false }
-			},
-			{
-				name: 'PathsList',
-				params: { networkKey }
 			},
 			{
 				name: 'PathDetails',
@@ -220,12 +216,6 @@ export const resetNavigationWithScanner = <
 	});
 	navigation.dispatch(resetAction);
 };
-
-export const navigateToPathsList = <RouteName extends keyof RootStackParamList>(
-	navigation: GenericNavigationProps<RouteName>,
-	networkKey: string
-): void =>
-	resetNavigationWithNetworkChooser(navigation, 'PathsList', { networkKey });
 
 export const navigateToQrScanner = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>

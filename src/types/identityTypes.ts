@@ -60,8 +60,3 @@ export type AccountsStoreStateWithIdentity = LensSet<
 	AccountsContextState,
 	{ state: LensSet<AccountsStoreState, { currentIdentity: Identity }> }
 >;
-
-export type PathGroup = {
-	paths: string[];
-	title: string;
-};

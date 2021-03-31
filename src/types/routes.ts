@@ -9,9 +9,6 @@ export type RootStackParamList = {
 	MessageDetails: undefined;
 	Empty: undefined;
 	PathDetails: { path: string };
-	PathManagement: { path: string };
-	PathSecret: { path: string; password?: string };
-	PathsList: { networkKey: string };
 	PinNew: { resolve: (pin: string) => void };
 	PinUnlock:
 		| {

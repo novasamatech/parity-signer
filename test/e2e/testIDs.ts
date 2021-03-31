@@ -73,29 +73,12 @@ const testIDs = {
 		settings: 'navigation_tab_settings',
 		wallet: 'navigation_tab_wallet'
 	},
-	PathDerivation: {
-		deriveButton: 'path_derivation_derive_button',
-		nameInput: 'path_derivation_name_input',
-		passwordInput: 'path_derivation_password_input',
-		pathInput: 'path_derivation_path_input',
-		togglePasswordButton: 'path_derivation_toggle_password'
-	},
 	PathDetail: {
 		deleteButton: 'path_detail_delete_button',
 		deriveButton: 'path_detail_derive_button',
 		exportButton: 'path_detail_export_button',
 		popupMenuButton: 'path_detail_popup_menu_button',
 		screen: 'path_detail_screen'
-	},
-	PathSecret: {
-		screen: 'path_secret_screen'
-	},
-	PathsList: {
-		deriveButton: 'path_list_derive_button',
-		pathCard: 'path_list_path_card',
-		pathsGroup: 'path_list_paths_group',
-		scanButton: 'path_list_scan_button',
-		screen: 'path_list_screen'
 	},
 	QrScanner: {
 		networkAddSuccessButton: 'qr_scanner_add_network_button'

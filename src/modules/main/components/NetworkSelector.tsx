@@ -41,7 +41,6 @@ import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToPathDetails,
-	navigateToPathsList,
 	unlockSeedPhrase
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
@@ -128,7 +127,7 @@ function NetworkSelector({
 				networkKey,
 				allNetworks
 			);
-			navigateToPathsList(navigation, networkKey);
+			navigateToPathDetails(navigation, networkKey, networkKey);
 		} catch (e) {
 			alertPathDerivationError(setAlert, e.message);
 		}
@@ -176,7 +175,12 @@ function NetworkSelector({
 				await deriveEthereumAccount(networkKey);
 			}
 		} else {
-			navigation.navigate('PathsList', { networkKey });
+			if (isSubstrateNetworkParams(networkParams)) {
+				const { pathId } = networkParams;
+				navigateToPathDetails(navigation, networkKey, pathId);
+			} else {
+				navigateToPathDetails(navigation, networkKey, networkKey);
+			}
 		}
 	};
 

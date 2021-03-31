@@ -37,9 +37,6 @@ import IdentityManagement from 'screens/IdentityManagement';
 import IdentityNew from 'screens/IdentityNew';
 import IdentitySwitch from 'screens/IdentitySwitch';
 import PathDetails from 'screens/PathDetails';
-import PathManagement from 'screens/PathManagement';
-import PathSecret from 'screens/PathSecret';
-import PathsList from 'screens/PathsList';
 import QrScanner from 'modules/sign/screens/QrScanner';
 import SignedMessage from 'modules/sign/screens/SignedMessage';
 import SignedTx from 'modules/sign/screens/SignedTx';
@@ -109,9 +106,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
 		<ScreenStack.Screen name="IdentitySwitch" component={IdentitySwitch} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
-		<ScreenStack.Screen name="PathsList" component={PathsList} />
-		<ScreenStack.Screen name="PathSecret" component={PathSecret} />
-		<ScreenStack.Screen name="PathManagement" component={PathManagement} />
 		<ScreenStack.Screen name="PinNew" component={PinNew} />
 		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
 		<ScreenStack.Screen name="QrScanner" component={QrScanner} />

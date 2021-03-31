@@ -32,7 +32,6 @@ import {
 	AccountMeta,
 	FoundAccount,
 	Identity,
-	PathGroup,
 	SerializedIdentity
 } from 'types/identityTypes';
 import {
@@ -316,103 +315,6 @@ export const getPathName = (
 	if (!isSubstratePath(path)) return 'No name';
 	if (path === '') return 'Identity root';
 	return extractSubPathName(path);
-};
-
-const _comparePathGroups = (a: PathGroup, b: PathGroup): number => {
-	const isSingleGroupA = a.paths.length === 1;
-	const isSingleGroupB = b.paths.length === 1;
-	if (isSingleGroupA && isSingleGroupB) {
-		return a.paths[0].length - b.paths[0].length;
-	}
-	if (isSingleGroupA !== isSingleGroupB) {
-		return isSingleGroupA ? -1 : 1;
-	}
-	return a.title.localeCompare(b.title);
-};
-
-const _comparePathsInGroup = (a: string, b: string): number => {
-	const pathFragmentsA = a.match(pathsRegex.allPath)!;
-	const pathFragmentsB = b.match(pathsRegex.allPath)!;
-	if (pathFragmentsA.length !== pathFragmentsB.length) {
-		return pathFragmentsA.length - pathFragmentsB.length;
-	}
-	const lastFragmentA = pathFragmentsA[pathFragmentsA.length - 1];
-	const lastFragmentB = pathFragmentsB[pathFragmentsB.length - 1];
-	const numberA = parseInt(removeSlash(lastFragmentA), 10);
-	const numberB = parseInt(removeSlash(lastFragmentB), 10);
-	const isNumberA = !isNaN(numberA);
-	const isNumberB = !isNaN(numberB);
-	if (isNumberA && isNumberB) {
-		return numberA - numberB;
-	}
-	if (isNumberA !== isNumberB) {
-		return isNumberA ? -1 : 1;
-	}
-	return lastFragmentA.localeCompare(lastFragmentB);
-};
-
-/**
- * This function decides how to group the list of derivation paths in the display based on the following rules.
- * If the network is unknown: group by the first subpath, e.g. '/random' of '/random//derivation/1'
- * If the network is known: group by the second subpath, e.g. '//staking' of '//kusama//staking/0'
- * Please refer to identitiesUtils.spec.js for more examples.
- **/
-export const groupPaths = (
-	paths: string[],
-	networks: Map<string, SubstrateNetworkParams>
-): PathGroup[] => {
-	const insertPathIntoGroup = (
-		matchingPath: string,
-		fullPath: string,
-		pathGroup: PathGroup[]
-	): void => {
-		const matchResult = matchingPath.match(pathsRegex.firstPath);
-		const groupName = matchResult ? matchResult[0] : '-';
-
-		const existedItem = pathGroup.find(p => p.title === groupName);
-		if (existedItem) {
-			existedItem.paths.push(fullPath);
-			existedItem.paths.sort(_comparePathsInGroup);
-		} else {
-			pathGroup.push({ paths: [fullPath], title: groupName });
-		}
-	};
-
-	const groupedPaths = paths.reduce(
-		(groupedPath: PathGroup[], path: string) => {
-			if (path === '') {
-				groupedPath.push({ paths: [''], title: 'Identity root' });
-				return groupedPath;
-			}
-
-			const rootPath = path.match(pathsRegex.firstPath)?.[0];
-			if (rootPath === undefined) return groupedPath;
-
-			const networkEntry = Array.from(networks.entries()).find(
-				([, v]) => `//${v.pathId}` === rootPath
-			);
-			if (networkEntry === undefined) {
-				insertPathIntoGroup(path, path, groupedPath);
-				return groupedPath;
-			}
-
-			const isRootPath = path === rootPath;
-			if (isRootPath) {
-				groupedPath.push({
-					paths: [path],
-					title: `${networkEntry[1].title} root`
-				});
-				return groupedPath;
-			}
-
-			const subPath = path.slice(rootPath.length);
-			insertPathIntoGroup(subPath, path, groupedPath);
-
-			return groupedPath;
-		},
-		[]
-	);
-	return groupedPaths.sort(_comparePathGroups);
 };
 
 export const getMetadata = (networkKey: string): string | null => {
