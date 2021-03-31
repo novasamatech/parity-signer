@@ -72,9 +72,7 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route.name === 'Settings'
-							? styles.textLabel
-							: styles.disabledTextLabel
+						route.name === 'Settings' ? styles.textLabel : styles.disabledTextLabel
 					}
 				>
 					Settings

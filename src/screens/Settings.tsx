@@ -47,98 +47,47 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { currentIdentity, identities } = accountsStore.state;
 
-	const renderIdentityOptions = (): React.ReactElement => {
-		return (
-			<>
-				<ButtonWithArrow
-					title="Manage Identity"
-					onPress={(): void => navigation.navigate('RenameWallet')}
-					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
-				/>
-			</>
-		);
-	};
-
-	const renderCurrentIdentityCard = (): React.ReactNode => {
-		if (!currentIdentity) return;
-
-		const currentIdentityTitle = getIdentityName(currentIdentity, identities);
-
-		return (
-			<>
-				<ButtonIcon
-					title={currentIdentityTitle}
-					onPress={(): void => resetNavigationTo(navigation, 'Main')}
-					iconType="antdesign"
-					iconName="user"
-					iconSize={40}
-					style={{ paddingLeft: 16 }}
-					textStyle={fontStyles.h1}
-				/>
-				{renderIdentityOptions()}
-				<Separator style={{ marginBottom: 0 }} />
-			</>
-		);
-	};
-
 	const renderNonSelectedIdentity = (
 		identity: Identity
 	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
 
 		return (
-			<ButtonIcon
-				title={title}
-				onPress={(): void => accountsStore.selectIdentity(identity)}
-				key={identity.encryptedSeed}
-				iconType="antdesign"
-				iconName="user"
-				iconSize={24}
-				style={styles.indentedButton}
-				textStyle={fontStyles.h2}
-			/>
+			<View key={identity.encryptedSeed}>
+				<ButtonIcon
+					title={title}
+					onPress={(): void => accountsStore.selectIdentity(identity)}
+					iconType="antdesign"
+					iconName="user"
+					iconSize={24}
+					style={styles.indentedButton}
+					textStyle={fontStyles.h2}
+				/>
+				<ButtonWithArrow
+					title="Rename"
+					onPress={(): void => navigation.navigate('RenameWallet')}
+					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
+				/>
+				<Separator style={{ marginBottom: 0 }} />
+			</View>
 		);
 	};
 
-	const renderIdentities = (): React.ReactNode => {
-		// if no identity or the only one we have is the selected one
-
-		if (!identities.length || (identities.length === 1 && currentIdentity))
-			return <Separator style={{ height: 0, marginVertical: 4 }} />;
-
-		const identitiesToShow = currentIdentity
-			? identities.filter(
-					identity => identity.encryptedSeed !== currentIdentity.encryptedSeed
-			  )
-			: identities;
-
-		return (
-			<>
+	return (
+		<SafeAreaViewContainer>
+			<View style={styles.card}>
 				<ScrollView
 					style={{
 						maxHeight: 160
 					}}
 				>
 					<View style={{ paddingVertical: 8 }}>
-						{identitiesToShow.map(renderNonSelectedIdentity)}
+						{identities.map(renderNonSelectedIdentity)}
 					</View>
 				</ScrollView>
-				{identities.length > 5 && (
-					<Separator shadow={true} style={{ marginTop: 0 }} />
-				)}
-			</>
-		);
-	};
-
-	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title={'Identity Switch'} />
-			<View style={styles.card}>
-				{renderCurrentIdentityCard()}
-				{renderIdentities()}
 
 				<ButtonIcon
-					title="Add Identity"
+					title="Add wallet"
 					testID={testIDs.IdentitiesSwitch.addIdentityButton}
 					onPress={(): void => navigation.navigate('CreateWallet')}
 					iconName="plus"
