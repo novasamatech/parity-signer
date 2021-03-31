@@ -23,7 +23,7 @@ import {
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
 
-const { IdentityPin, IdentityNew, Main, PathDetail } = testIDs;
+const { IdentityPin, CreateWallet, Main, PathDetail } = testIDs;
 
 export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
@@ -119,10 +119,10 @@ export const launchWithScanRequest = async (
 export const testRecoverIdentity = (): void => {
 	it('recover a identity with seed phrase', async () => {
 		await testTap(Main.recoverButton);
-		await testVisible(IdentityNew.seedInput);
-		await testInput(IdentityNew.nameInput, mockIdentityName);
-		await element(by.id(IdentityNew.seedInput)).typeText(mockSeedPhrase);
-		await element(by.id(IdentityNew.seedInput)).tapReturnKey();
+		await testVisible(CreateWallet.seedInput);
+		await testInput(CreateWallet.nameInput, mockIdentityName);
+		await element(by.id(CreateWallet.seedInput)).typeText(mockSeedPhrase);
+		await element(by.id(CreateWallet.seedInput)).tapReturnKey();
 		await testSetUpDefaultPath();
 	});
 };

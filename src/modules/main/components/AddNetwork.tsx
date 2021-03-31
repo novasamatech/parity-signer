@@ -39,7 +39,7 @@ import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import { navigateToPathDetails } from 'utils/navigationHelpers';
+import { navigateToAddToPolkadotJs } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import NavigationTab from 'components/NavigationTab';
 
@@ -64,7 +64,7 @@ const filterNetworks = (
 		.sort((a, b) => a[1].order - b[1].order);
 };
 
-function NetworkSelector({
+function AddNetwork({
 	accountsStore,
 	navigation,
 	route
@@ -109,7 +109,7 @@ function NetworkSelector({
 				getSubstrateNetwork(networkKey),
 				`${networkParams.title} root`
 			);
-			navigateToPathDetails(navigation, networkKey, fullPath);
+			navigateToAddToPolkadotJs(navigation, networkKey, fullPath);
 		} catch (error) {
 			alertPathDerivationError(setAlert, error.message);
 		}
@@ -122,7 +122,7 @@ function NetworkSelector({
 				networkKey,
 				allNetworks
 			);
-			navigateToPathDetails(navigation, networkKey, networkKey);
+			navigateToAddToPolkadotJs(navigation, networkKey, networkKey);
 		} catch (e) {
 			alertPathDerivationError(setAlert, e.message);
 		}
@@ -173,9 +173,9 @@ function NetworkSelector({
 			if (isSubstrateNetworkParams(networkParams)) {
 				const { pathId } = networkParams;
 				const fullPath = `//${pathId}`;
-				navigateToPathDetails(navigation, networkKey, fullPath);
+				navigateToAddToPolkadotJs(navigation, networkKey, fullPath);
 			} else {
-				navigateToPathDetails(navigation, networkKey, networkKey);
+				navigateToAddToPolkadotJs(navigation, networkKey, networkKey);
 			}
 		}
 	};
@@ -237,4 +237,4 @@ function NetworkSelector({
 	);
 }
 
-export default withCurrentIdentity(NetworkSelector);
+export default withCurrentIdentity(AddNetwork);

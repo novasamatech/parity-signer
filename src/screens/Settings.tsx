@@ -42,9 +42,7 @@ function ButtonWithArrow(props: {
 	return <ButtonIcon {...props} {...i_arrowOptions} />;
 }
 
-function IdentitySwitch({}: NavigationProps<
-	'IdentitySwitch'
->): React.ReactElement {
+function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { currentIdentity, identities } = accountsStore.state;
@@ -54,7 +52,7 @@ function IdentitySwitch({}: NavigationProps<
 			<>
 				<ButtonWithArrow
 					title="Manage Identity"
-					onPress={(): void => navigation.navigate('IdentityManagement')}
+					onPress={(): void => navigation.navigate('RenameWallet')}
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
 				/>
 			</>
@@ -143,7 +141,7 @@ function IdentitySwitch({}: NavigationProps<
 				<ButtonIcon
 					title="Add Identity"
 					testID={testIDs.IdentitiesSwitch.addIdentityButton}
-					onPress={(): void => navigation.navigate('IdentityNew')}
+					onPress={(): void => navigation.navigate('CreateWallet')}
 					iconName="plus"
 					iconType="antdesign"
 					iconSize={24}
@@ -192,4 +190,4 @@ const i_arrowOptions = {
 	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
 };
 
-export default IdentitySwitch;
+export default Settings;

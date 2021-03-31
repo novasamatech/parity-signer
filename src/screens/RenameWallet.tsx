@@ -31,9 +31,9 @@ import PopupMenu from 'components/PopupMenu';
 import { useSeedRef } from 'utils/seedRefHooks';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
 
-type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
+type Props = NavigationAccountIdentityProps<'RenameWallet'>;
 
-function IdentityManagement({
+function RenameWallet({
 	accountsStore,
 	navigation
 }: Props): React.ReactElement {
@@ -66,7 +66,7 @@ function IdentityManagement({
 					}
 				}
 			);
-		} else if (value === 'IdentityBackup') {
+		} else if (value === 'ShowRecoveryPhrase') {
 			const seedPhrase = await unlockIdentitySeedWithReturn(
 				currentIdentity,
 				createSeedRef
@@ -81,13 +81,13 @@ function IdentityManagement({
 				title="Manage Identity"
 				headMenu={
 					<PopupMenu
-						testID={testIDs.IdentityManagement.popupMenuButton}
+						testID={testIDs.RenameWallet.popupMenuButton}
 						onSelect={onOptionSelect}
 						menuTriggerIconName={'more-vert'}
 						menuItems={[
-							{ text: 'Backup', value: 'IdentityBackup' },
+							{ text: 'Backup', value: 'ShowRecoveryPhrase' },
 							{
-								testID: testIDs.IdentityManagement.deleteButton,
+								testID: testIDs.RenameWallet.deleteButton,
 								text: 'Delete',
 								textStyle: styles.deleteText,
 								value: 'IdentityDelete'
@@ -107,7 +107,7 @@ function IdentityManagement({
 	);
 }
 
-export default withCurrentIdentity(IdentityManagement);
+export default withCurrentIdentity(RenameWallet);
 
 const styles = StyleSheet.create({
 	deleteText: {

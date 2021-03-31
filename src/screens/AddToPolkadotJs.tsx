@@ -45,7 +45,7 @@ import { UnknownAccountWarning } from 'components/Warnings';
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation: StackNavigationProp<RootStackParamList, 'PathDetails'>;
+	navigation: StackNavigationProp<RootStackParamList, 'AddToPolkadotJs'>;
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
@@ -118,11 +118,11 @@ export function PathDetailsView({
 	);
 }
 
-function PathDetails({
+function AddToPolkadotJs({
 	accountsStore,
 	navigation,
 	route
-}: NavigationAccountIdentityProps<'PathDetails'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'AddToPolkadotJs'>): React.ReactElement {
 	const path = route.params.path;
 	const networksContextState = useContext(NetworksContext);
 	const networkKey = getNetworkKey(
@@ -146,4 +146,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withCurrentIdentity(PathDetails);
+export default withCurrentIdentity(AddToPolkadotJs);

@@ -39,10 +39,10 @@ import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 
-function IdentityNew({
+function CreateWallet({
 	navigation,
 	route
-}: NavigationProps<'IdentityNew'>): React.ReactElement {
+}: NavigationProps<'CreateWallet'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
@@ -109,7 +109,7 @@ function IdentityNew({
 
 	const onCreateNewIdentity = (): void => {
 		setSeedPhrase('');
-		navigation.navigate('IdentityBackup', {
+		navigation.navigate('ShowRecoveryPhrase', {
 			isNew: true
 		});
 	};
@@ -117,7 +117,7 @@ function IdentityNew({
 	const renderRecoverView = (): React.ReactElement => (
 		<>
 			<AccountSeed
-				testID={testIDs.IdentityNew.seedInput}
+				testID={testIDs.CreateWallet.seedInput}
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
@@ -126,7 +126,7 @@ function IdentityNew({
 			<View style={styles.btnBox}>
 				<Button
 					title="Recover"
-					testID={testIDs.IdentityNew.recoverButton}
+					testID={testIDs.CreateWallet.recoverButton}
 					onPress={onRecoverConfirm}
 					small={true}
 				/>
@@ -146,7 +146,7 @@ function IdentityNew({
 		<View style={styles.btnBox}>
 			<Button
 				title="Create"
-				testID={testIDs.IdentityNew.createButton}
+				testID={testIDs.CreateWallet.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
 			/>
@@ -163,12 +163,12 @@ function IdentityNew({
 		<KeyboardScrollView
 			bounces={false}
 			style={styles.body}
-			testID={testIDs.IdentityNew.scrollScreen}
+			testID={testIDs.CreateWallet.scrollScreen}
 		>
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
-				testID={testIDs.IdentityNew.nameInput}
+				testID={testIDs.CreateWallet.nameInput}
 				value={accountsStore.state.newIdentity.name}
 				placeholder="Identity Name"
 			/>
@@ -177,7 +177,7 @@ function IdentityNew({
 	);
 }
 
-export default IdentityNew;
+export default CreateWallet;
 
 const styles = StyleSheet.create({
 	body: {

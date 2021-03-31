@@ -69,7 +69,7 @@ export function useProcessBarCode(
 	const [seedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	const navigation: StackNavigationProp<
 		RootStackParamList,
-		'QrScanner'
+		'SignTx'
 	> = useNavigation();
 
 	async function parseQrData(

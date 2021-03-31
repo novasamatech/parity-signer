@@ -19,7 +19,7 @@ import React, { useContext } from 'react';
 import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import OnBoardingView from 'modules/main/components/OnBoading';
-import NetworkSelector from 'modules/main/components/NetworkSelector';
+import AddNetwork from 'modules/main/components/AddNetwork';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 
@@ -33,6 +33,6 @@ export default function Main(
 	if (identities.length === 0) return <OnBoardingView />;
 	if (currentIdentity === null) return <NoCurrentIdentity />;
 	return (
-		<NetworkSelector {...(props as NavigationAccountIdentityProps<'Main'>)} />
+		<AddNetwork {...(props as NavigationAccountIdentityProps<'Main'>)} />
 	);
 }

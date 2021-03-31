@@ -1,15 +1,13 @@
-import { Identity } from 'types/identityTypes';
-
 export type RootStackParamList = {
 	Main: { isNew: boolean } | undefined;
-	IdentityBackup: { isNew: true } | { isNew: false; seedPhrase: string };
-	IdentityManagement: undefined;
-	IdentityNew: { isRecover: boolean } | undefined;
-	IdentitySwitch: undefined;
+	ShowRecoveryPhrase: { isNew: true } | { isNew: false; seedPhrase: string };
+	RenameWallet: undefined;
+	CreateWallet: { isRecover: boolean } | undefined;
+	Settings: undefined;
 	MessageDetails: undefined;
 	Empty: undefined;
-	PathDetails: { path: string };
-	QrScanner:
+	AddToPolkadotJs: { path: string };
+	SignTx:
 		| undefined
 		| {
 				isScanningNetworkSpec: true;

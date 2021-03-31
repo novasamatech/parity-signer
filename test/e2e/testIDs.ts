@@ -33,16 +33,16 @@ const testIDs = {
 		modal: 'identity_switch_modal',
 		toggleButton: 'identities_switch_toggle_button'
 	},
-	IdentityBackup: {
+	ShowRecoveryPhrase: {
 		nextButton: 'identity_backup_next',
 		passwordInput: 'identity_backup_password_input',
 		seedText: 'identity_backup_seed'
 	},
-	IdentityManagement: {
+	RenameWallet: {
 		deleteButton: 'identity_management_delete_button',
 		popupMenuButton: 'identity_management_popup_menu'
 	},
-	IdentityNew: {
+	CreateWallet: {
 		createButton: 'identity_new_create_button',
 		nameInput: 'identity_new_name_input',
 		passwordInput: 'identity_new_password_input',
@@ -72,7 +72,7 @@ const testIDs = {
 		popupMenuButton: 'path_detail_popup_menu_button',
 		screen: 'path_detail_screen'
 	},
-	QrScanner: {
+	SignTx: {
 		networkAddSuccessButton: 'qr_scanner_add_network_button'
 	},
 	SignedMessage: {

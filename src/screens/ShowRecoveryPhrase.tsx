@@ -36,10 +36,10 @@ import {
 import Button from 'components/Button';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 
-function IdentityBackup({
+function ShowRecoveryPhrase({
 	navigation,
 	route
-}: NavigationProps<'IdentityBackup'>): React.ReactElement {
+}: NavigationProps<'ShowRecoveryPhrase'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
@@ -109,7 +109,7 @@ function IdentityBackup({
 			>
 				<Text
 					style={[fontStyles.t_seed, { marginHorizontal: 16 }]}
-					testID={testIDs.IdentityBackup.seedText}
+					testID={testIDs.ShowRecoveryPhrase.seedText}
 				>
 					{seedPhrase}
 				</Text>
@@ -117,7 +117,7 @@ function IdentityBackup({
 			{isNew && (
 				<Button
 					title={'Next'}
-					testID={testIDs.IdentityBackup.nextButton}
+					testID={testIDs.ShowRecoveryPhrase.nextButton}
 					onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
 					aboveKeyboard
 				/>
@@ -126,7 +126,7 @@ function IdentityBackup({
 	);
 }
 
-export default IdentityBackup;
+export default ShowRecoveryPhrase;
 
 const styles = StyleSheet.create({
 	body: {

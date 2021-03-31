@@ -41,7 +41,7 @@ export default function OnBoardingView({}: {}): React.ReactElement {
 				testID={
 					isRecover ? testIDs.Main.recoverButton : testIDs.Main.createButton
 				}
-				onPress={(): void => navigation.navigate('IdentityNew', { isRecover })}
+				onPress={(): void => navigation.navigate('CreateWallet', { isRecover })}
 			>
 				{text}
 			</Text>

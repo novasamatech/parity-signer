@@ -30,12 +30,12 @@ import { View } from 'react-native';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import testIDs from 'e2e/testIDs';
 import Main from 'modules/main/screens/Main';
-import IdentityBackup from 'screens/IdentityBackup';
-import IdentityManagement from 'screens/IdentityManagement';
-import IdentityNew from 'screens/IdentityNew';
-import IdentitySwitch from 'screens/IdentitySwitch';
-import PathDetails from 'screens/PathDetails';
-import QrScanner from 'modules/sign/screens/QrScanner';
+import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
+import RenameWallet from 'screens/RenameWallet';
+import CreateWallet from 'screens/CreateWallet';
+import Settings from 'screens/Settings';
+import AddToPolkadotJs from 'screens/AddToPolkadotJs';
+import SignTx from 'modules/sign/screens/SignTx';
 import SignedMessage from 'modules/sign/screens/SignedMessage';
 import SignedTx from 'modules/sign/screens/SignedTx';
 import colors from 'styles/colors';
@@ -96,15 +96,15 @@ export const AppNavigator = (): React.ReactElement => (
 		screenOptions={globalStackNavigationOptions}
 	>
 		<ScreenStack.Screen name="Main" component={Main} />
-		<ScreenStack.Screen name="IdentityBackup" component={IdentityBackup} />
+		<ScreenStack.Screen name="ShowRecoveryPhrase" component={ShowRecoveryPhrase} />
 		<ScreenStack.Screen
-			name="IdentityManagement"
-			component={IdentityManagement}
+			name="RenameWallet"
+			component={RenameWallet}
 		/>
-		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
-		<ScreenStack.Screen name="IdentitySwitch" component={IdentitySwitch} />
-		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
-		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
+		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
+		<ScreenStack.Screen name="Settings" component={Settings} />
+		<ScreenStack.Screen name="AddToPolkadotJs" component={AddToPolkadotJs} />
+		<ScreenStack.Screen name="SignTx" component={SignTx} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
 	</ScreenStack.Navigator>

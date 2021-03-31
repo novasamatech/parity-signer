@@ -23,7 +23,7 @@ export type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
 > = StackNavigationProp<RootStackParamList, RouteName>;
 
-export const navigateToPathDetails = <
+export const navigateToAddToPolkadotJs = <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
@@ -38,7 +38,7 @@ export const navigateToPathDetails = <
 				params: { isNew: false }
 			},
 			{
-				name: 'PathDetails',
+				name: 'AddToPolkadotJs',
 				params: { networkKey, path }
 			}
 		]
@@ -101,7 +101,7 @@ export const resetNavigationWithScanner = <
 				params: { isNew: false }
 			},
 			{
-				name: 'QrScanner'
+				name: 'SignTx'
 			},
 			{
 				name: screenName
@@ -115,8 +115,6 @@ export const navigateToMain = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationTo(navigation, 'Main');
 
-export const navigateToIdentitySwitch = <
-	RouteName extends keyof RootStackParamList
->(
+export const navigateToSettings = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
-): void => resetNavigationTo(navigation, 'IdentitySwitch');
+): void => resetNavigationTo(navigation, 'Settings');
