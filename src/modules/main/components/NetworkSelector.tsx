@@ -18,10 +18,13 @@ import React, { ReactElement, useContext, useMemo, useState } from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
-import { filterNetworks } from 'modules/network/utils';
 import { NetworkCard } from 'components/AccountCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
+import {
+	SubstrateNetworkKeys,
+	UnknownNetworkKeys
+} from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
@@ -43,6 +46,27 @@ import {
 } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import NavigationTab from 'components/NavigationTab';
+
+const filterNetworks = (
+	networkList: Map<string, NetworkParams>,
+	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
+): Array<[string, NetworkParams]> => {
+	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
+	if (!__DEV__) {
+		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
+		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
+	}
+
+	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
+		const shouldExclude = excludedNetworks.includes(networkKey);
+		if (extraFilter !== undefined)
+			return extraFilter(networkKey, shouldExclude);
+		return !shouldExclude;
+	};
+	return Array.from(networkList.entries())
+		.filter(filterNetworkKeys)
+		.sort((a, b) => a[1].order - b[1].order);
+};
 
 function NetworkSelector({
 	accountsStore,

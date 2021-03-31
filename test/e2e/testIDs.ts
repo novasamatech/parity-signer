@@ -24,9 +24,6 @@ const testIDs = {
 		deleteConfirmation: 'alert_delete_confirmation',
 		deleteIdentity: 'alert_delete_identity'
 	},
-	DetailsTx: {
-		signButton: 'sign_button'
-	},
 	Header: {
 		headerBackButton: 'header_back_button'
 	},
@@ -75,9 +72,6 @@ const testIDs = {
 	NavigationTab: {
 		settings: 'navigation_tab_settings',
 		wallet: 'navigation_tab_wallet'
-	},
-	NetworkSettings: {
-		networkCard: 'network_settings_network_card'
 	},
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',

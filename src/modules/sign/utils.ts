@@ -45,10 +45,7 @@ import {
 } from 'utils/decoders';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
-import {
-	previewTransactionAndApprove,
-	unlockSeedPhrase
-} from 'utils/navigationHelpers';
+import { unlockSeedPhrase } from 'utils/navigationHelpers';
 
 function getSeedRef(
 	encryptedSeed: string,
@@ -165,7 +162,6 @@ export function useProcessBarCode(
 
 	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
 		const { sender, type } = qrInfo;
-		if (type === 'transaction') await previewTransactionAndApprove(navigation);
 		if (!sender)
 			return showAlertMessage(
 				strings.ERROR_TITLE,

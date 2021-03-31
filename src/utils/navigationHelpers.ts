@@ -71,17 +71,6 @@ export const useUnlockSeed = (isSeedRefValid: boolean): Unlock => {
 	};
 };
 
-export const previewTransactionAndApprove = async <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>
-): Promise<void> =>
-	new Promise(resolve => {
-		navigation.replace('DetailsTx', {
-			resolve
-		});
-	});
-
 export const unlockSeedPhrase = async <
 	RouteName extends keyof RootStackParamList
 >(
@@ -231,12 +220,6 @@ export const resetNavigationWithScanner = <
 	});
 	navigation.dispatch(resetAction);
 };
-
-export const navigateToNetworkSettings = <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>
-): void => resetNavigationWithNetworkChooser(navigation, 'NetworkSettings');
 
 export const navigateToPathsList = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>,

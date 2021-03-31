@@ -8,8 +8,6 @@ export type RootStackParamList = {
 	IdentitySwitch: undefined;
 	MessageDetails: undefined;
 	Empty: undefined;
-	NetworkDetails: { pathId: string };
-	NetworkSettings: undefined;
 	PathDetails: { path: string };
 	PathManagement: { path: string };
 	PathSecret: { path: string; password?: string };
@@ -37,9 +35,7 @@ export type RootStackParamList = {
 				isScanningNetworkSpec: true;
 		  };
 	Security: undefined;
-	DetailsMessage: undefined;
 	SignedMessage: undefined;
-	DetailsTx: { resolve: () => void };
 	SignedTx: undefined;
 	TxDetails: undefined;
 };

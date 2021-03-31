@@ -31,7 +31,6 @@ import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
-import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 
 export default function Scanner({
 	navigation
@@ -64,10 +63,6 @@ export default function Scanner({
 		if (isAddNetworkSuccess) {
 			setAlert(title, message, [
 				{
-					onPress: async (): Promise<void> => {
-						await clearByTap();
-						navigateToNetworkSettings(navigation);
-					},
 					testID: testIDs.QrScanner.networkAddSuccessButton,
 					text: 'Done'
 				}

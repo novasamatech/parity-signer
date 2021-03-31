@@ -27,8 +27,6 @@ import {
 import * as React from 'react';
 import { View } from 'react-native';
 
-import NetworkDetails from 'modules/network/screens/NetworkDetails';
-import NetworkSettings from 'modules/network/screens/NetworkSettings';
 import PinNew from 'modules/unlock/screens/PinNew';
 import PinUnlock from 'modules/unlock/screens/PinUnlock';
 import HeaderLeftHome from 'components/HeaderLeftHome';
@@ -43,9 +41,7 @@ import PathManagement from 'screens/PathManagement';
 import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import QrScanner from 'modules/sign/screens/QrScanner';
-import DetailsMessage from 'modules/sign/screens/DetailsMessage';
 import SignedMessage from 'modules/sign/screens/SignedMessage';
-import DetailsTx from 'modules/sign/screens/DetailsTx';
 import SignedTx from 'modules/sign/screens/SignedTx';
 import colors from 'styles/colors';
 import { headerHeight } from 'styles/containerStyles';
@@ -112,8 +108,6 @@ export const AppNavigator = (): React.ReactElement => (
 		/>
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
 		<ScreenStack.Screen name="IdentitySwitch" component={IdentitySwitch} />
-		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
-		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
 		<ScreenStack.Screen name="PathSecret" component={PathSecret} />
@@ -121,9 +115,7 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="PinNew" component={PinNew} />
 		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
 		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
-		<ScreenStack.Screen name="DetailsMessage" component={DetailsMessage} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
-		<ScreenStack.Screen name="DetailsTx" component={DetailsTx} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
 	</ScreenStack.Navigator>
 );
