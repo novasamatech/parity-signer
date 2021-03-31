@@ -225,7 +225,6 @@ function AddNetwork({
 		<SafeAreaViewContainer>
 			{renderScreenHeading()}
 			<FlatList
-				bounces={false}
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}

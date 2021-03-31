@@ -59,7 +59,6 @@ export default class CustomScrollView extends React.PureComponent<
 		return (
 			<SafeAreaViewContainer>
 				<ScrollView
-					bounces={false}
 					showsVerticalScrollIndicator={false}
 					onContentSizeChange={(width: number, height: number): void => {
 						this.setState({ wholeHeight: height });

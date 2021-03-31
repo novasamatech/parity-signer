@@ -115,7 +115,6 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 		return (
 			<>
 				<ScrollView
-					bounces={false}
 					style={{
 						maxHeight: 160
 					}}
