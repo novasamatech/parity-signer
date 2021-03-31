@@ -96,9 +96,9 @@ const styles = StyleSheet.create({
 		borderBottomColor: colors.background.app,
 		borderBottomWidth: 1,
 		flexGrow: 1,
-		height: 72,
 		justifyContent: 'center',
-		paddingVertical: 9
+		paddingTop: 20,
+		paddingBottom: 30
 	},
 	row: {
 		flexDirection: 'row',
