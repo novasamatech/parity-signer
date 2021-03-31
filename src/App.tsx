@@ -22,6 +22,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
+import { ApplicationProvider, Layout, Text } from '@ui-kitten/components';
+import * as eva from '@eva-design/eva';
 
 import { AppNavigator } from './screens';
 
@@ -68,26 +70,28 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<NetworksContext.Provider value={networkContext}>
-				<AccountsContext.Provider value={accountsContext}>
-					<ScannerContext.Provider value={scannerContext}>
-						<RegistriesContext.Provider value={registriesContext}>
-							<AlertStateContext.Provider value={alertContext}>
-								<SeedRefsContext.Provider value={seedRefContext}>
-									<MenuProvider backHandler={true}>
-										<StatusBar
-											barStyle="light-content"
-											backgroundColor={colors.background.app}
-										/>
-										<CustomAlert />
-										<NavigationContainer>{renderStacks()}</NavigationContainer>
-									</MenuProvider>
-								</SeedRefsContext.Provider>
-							</AlertStateContext.Provider>
-						</RegistriesContext.Provider>
-					</ScannerContext.Provider>
-				</AccountsContext.Provider>
-			</NetworksContext.Provider>
-		</SafeAreaProvider>
+			<ApplicationProvider {...eva} theme={eva.light}>
+				<NetworksContext.Provider value={networkContext}>
+					<AccountsContext.Provider value={accountsContext}>
+						<ScannerContext.Provider value={scannerContext}>
+							<RegistriesContext.Provider value={registriesContext}>
+								<AlertStateContext.Provider value={alertContext}>
+									<SeedRefsContext.Provider value={seedRefContext}>
+										<MenuProvider backHandler={true}>
+											<StatusBar
+												barStyle="light-content"
+												backgroundColor={colors.background.app}
+											/>
+											<CustomAlert />
+											<NavigationContainer>{renderStacks()}</NavigationContainer>
+										</MenuProvider>
+									</SeedRefsContext.Provider>
+								</AlertStateContext.Provider>
+							</RegistriesContext.Provider>
+						</ScannerContext.Provider>
+					</AccountsContext.Provider>
+				</NetworksContext.Provider>
+			</ApplicationProvider>
+			</SafeAreaProvider>
 	);
 }
