@@ -23,7 +23,7 @@ import { Icon } from 'react-native-elements';
 import TouchableItem from './TouchableItem';
 
 import colors from 'styles/colors';
-import { navigateToMain, navigateToSettings } from 'utils/navigationHelpers';
+import { resetNavigationTo } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
@@ -35,7 +35,7 @@ export default function NavigationTab(): React.ReactElement {
 	return (
 		<View style={styles.row}>
 			<TouchableItem
-				onPress={(): void => navigateToMain(navigation)}
+				onPress={(): void => resetNavigationTo(navigation, 'Main')}
 				testID={testIDs.NavigationTab.wallet}
 				style={styles.item}
 				disabled={route.name === 'Main'}
@@ -57,7 +57,7 @@ export default function NavigationTab(): React.ReactElement {
 				</Text>
 			</TouchableItem>
 			<TouchableItem
-				onPress={(): void => navigateToSettings(navigation)}
+				onPress={(): void => resetNavigationTo(navigation, 'Settings')}
 				testID={testIDs.NavigationTab.settings}
 				style={styles.item}
 				disabled={route.name === 'Settings'}

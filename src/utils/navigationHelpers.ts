@@ -19,60 +19,30 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RootStackParamList } from 'types/routes';
 
-export type GenericNavigationProps<
-	RouteName extends keyof RootStackParamList
-> = StackNavigationProp<RootStackParamList, RouteName>;
+export type GenericNavigationProps<RouteName extends keyof RootStackParamList> =
+  StackNavigationProp<RootStackParamList, RouteName>;
 
 export const navigateToAddToPolkadotJs = <
-	RouteName extends keyof RootStackParamList
+       RouteName extends keyof RootStackParamList
 >(
-	navigation: GenericNavigationProps<RouteName>,
-	networkKey: string,
-	path: string
+       navigation: GenericNavigationProps<RouteName>,
+       networkKey: string,
+       path: string
 ): void => {
-	const resetAction = CommonActions.reset({
-		index: 1,
-		routes: [
-			{
-				name: 'Main',
-				params: { isNew: false }
-			},
-			{
-				name: 'AddToPolkadotJs',
-				params: { networkKey, path }
-			}
-		]
-	});
-	navigation.dispatch(resetAction);
-};
-
-export const navigateToLandingPage = <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>
-): void => {
-	const resetAction = CommonActions.reset({
-		index: 0,
-		routes: [{ name: 'Main' }]
-	});
-	navigation.dispatch(resetAction);
-};
-
-export const navigateToNewIdentityNetwork = <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>
-): void => {
-	const resetAction = CommonActions.reset({
-		index: 0,
-		routes: [
-			{
-				name: 'Main',
-				params: { isNew: true }
-			}
-		]
-	});
-	navigation.dispatch(resetAction);
+       const resetAction = CommonActions.reset({
+               index: 1,
+               routes: [
+                       {
+                               name: 'Main',
+                               params: { isNew: false }
+                       },
+                       {
+                               name: 'AddToPolkadotJs',
+                               params: { networkKey, path }
+                       }
+               ]
+       });
+       navigation.dispatch(resetAction);
 };
 
 export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(
@@ -86,35 +56,3 @@ export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(
 	});
 	navigation.dispatch(resetAction);
 };
-
-export const resetNavigationWithScanner = <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>,
-	screenName: string
-): void => {
-	const resetAction = CommonActions.reset({
-		index: 1,
-		routes: [
-			{
-				name: 'Main',
-				params: { isNew: false }
-			},
-			{
-				name: 'SignTx'
-			},
-			{
-				name: screenName
-			}
-		]
-	});
-	navigation.dispatch(resetAction);
-};
-
-export const navigateToMain = <RouteName extends keyof RootStackParamList>(
-	navigation: GenericNavigationProps<RouteName>
-): void => resetNavigationTo(navigation, 'Main');
-
-export const navigateToSettings = <RouteName extends keyof RootStackParamList>(
-	navigation: GenericNavigationProps<RouteName>
-): void => resetNavigationTo(navigation, 'Settings');

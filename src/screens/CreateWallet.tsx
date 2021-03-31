@@ -27,7 +27,7 @@ import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
-import { navigateToNewIdentityNetwork } from 'utils/navigationHelpers';
+import { resetNavigationTo } from 'utils/navigationHelpers';
 import {
 	alertError,
 	alertIdentityCreationError,
@@ -90,7 +90,7 @@ function CreateWallet({
 				);
 			}
 			setSeedPhrase('');
-			navigateToNewIdentityNetwork(navigation);
+			resetNavigationTo(navigation, 'Main', { isNew: true });
 		} catch (e) {
 			alertIdentityCreationError(setAlert, e.message);
 		}

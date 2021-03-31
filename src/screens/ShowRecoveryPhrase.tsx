@@ -26,7 +26,7 @@ import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { navigateToNewIdentityNetwork } from 'utils/navigationHelpers';
+import { resetNavigationTo } from 'utils/navigationHelpers';
 import ScreenHeading from 'components/ScreenHeading';
 import {
 	alertBackupDone,
@@ -50,7 +50,7 @@ function ShowRecoveryPhrase({
 		try {
 			await accountsStore.saveNewIdentity(seedPhrase, createSeedRefWithNewSeed);
 			setSeedPhrase('');
-			navigateToNewIdentityNetwork(navigation);
+			resetNavigationTo(navigation, 'Main', { isNew: true });
 		} catch (e) {
 			alertIdentityCreationError(setAlert, e.message);
 		}

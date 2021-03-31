@@ -67,7 +67,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 					try {
 						await destroySeedRef();
 						await accountsStore.deleteCurrentIdentity(); // TODO XXX: delete this identity, not current identity
-						navigateToLandingPage(navigation);
+						resetNavigationTo(navigation, 'Main');
 					} catch (err) {
 						alertError(setAlert, "Can't delete wallet");
 					}

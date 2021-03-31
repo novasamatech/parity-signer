@@ -15,11 +15,13 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useContext, useMemo, useState } from 'react';
-import { BackHandler, FlatList, FlatListProps } from 'react-native';
+import { BackHandler, FlatList, FlatListProps, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useFocusEffect } from '@react-navigation/native';
 
-import { NetworkCard } from 'components/NetworkCard';
+import TouchableItem from 'components/TouchableItem';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import {
 	SubstrateNetworkKeys,
@@ -39,9 +41,11 @@ import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import { navigateToAddToPolkadotJs } from 'utils/navigationHelpers';
+import { resetNavigationTo, navigateToAddToPolkadotJs } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import NavigationTab from 'components/NavigationTab';
+
+import { NetworkCard } from './NetworkCard';
 
 const filterNetworks = (
 	networkList: Map<string, NetworkParams>,
@@ -70,7 +74,7 @@ function AddNetwork({
 	route
 }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
-	const [shouldExcludeCurrentNetworks, setShouldExcludeCurrentNetworks] = useState(false);
+	const [isAddingNetwork, setIsAddingNetwork] = useState(false);
 	const { identities, currentIdentity } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
 	const { getSubstrateNetwork, allNetworks } = networkContextState;
@@ -81,8 +85,8 @@ function AddNetwork({
 	useFocusEffect(
 		React.useCallback((): any => {
 			const handleBackButton = (): boolean => {
-				if (shouldExcludeCurrentNetworks) {
-					setShouldExcludeCurrentNetworks(false);
+				if (isAddingNetwork) {
+					setIsAddingNetwork(false);
 					return true;
 				} else {
 					return false;
@@ -93,53 +97,34 @@ function AddNetwork({
 				handleBackButton
 			);
 			return (): void => backHandler.remove();
-		}, [shouldExcludeCurrentNetworks])
+		}, [isAddingNetwork])
 	);
-
-	const deriveSubstrateNetworkRootPath = async (
-		networkKey: string,
-		networkParams: SubstrateNetworkParams
-	): Promise<void> => {
-		const { pathId } = networkParams;
-		const fullPath = `//${pathId}`;
-		try {
-			await accountsStore.deriveNewPath(
-				fullPath,
-				seedRefHooks.substrateAddress,
-				getSubstrateNetwork(networkKey),
-				`${networkParams.title} root`
-			);
-			navigateToAddToPolkadotJs(navigation, networkKey, fullPath);
-		} catch (error) {
-			alertPathDerivationError(setAlert, error.message);
-		}
-	};
-
-	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
-		try {
-			await accountsStore.deriveEthereumAccount(
-				seedRefHooks.brainWalletAddress,
-				networkKey,
-				allNetworks
-			);
-			navigateToAddToPolkadotJs(navigation, networkKey, networkKey);
-		} catch (e) {
-			alertPathDerivationError(setAlert, e.message);
-		}
-	};
 
 	const getListOptions = (): Partial<FlatListProps<any>> => {
 		if (isNew) return {};
 		return {
-			ListFooterComponent: (
-				<NetworkCard
-					isAdd={true}
-					onPress={(): void => setShouldExcludeCurrentNetworks(true)}
-					testID={testIDs.Main.addNewNetworkButton}
-					title="Add a network"
-					networkColor={colors.background.app}
-				/>
-			)
+			ListFooterComponent: (<>
+                                <TouchableItem
+					onPress={(): void => resetNavigationTo('SignTx')}
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+					}}
+				>
+					<Icon name="add" color={colors.text.main} size={30} />
+					<AccountPrefixedTitle title="Sign a polkadot-js transaction" />
+                                </TouchableItem>
+                                <TouchableItem
+					onPress={(): void => setIsAddingNetwork(true)}
+					style={{
+						display: 'flex',
+						flexDirection: 'row',
+					}}
+				>
+					<Icon name="add" color={colors.text.main} size={30} />
+					<AccountPrefixedTitle title="Add a network" />
+				</TouchableItem>
+                       </>)
 		};
 	};
 
@@ -148,18 +133,43 @@ function AddNetwork({
 		networkKey: string,
 		networkParams: NetworkParams
 	): Promise<void> => {
-		if (isNew || shouldExcludeCurrentNetworks) {
+		if (isNew || isAddingNetwork) {
 			if (isSubstrateNetworkParams(networkParams)) {
-				await deriveSubstrateNetworkRootPath(networkKey, networkParams);
+                                // derive substrate account
+                                const { pathId } = networkParams;
+                                const fullPath = `//${pathId}`;
+                                try {
+                                        await accountsStore.deriveNewPath(
+                                                fullPath,
+                                                seedRefHooks.substrateAddress,
+                                                getSubstrateNetwork(networkKey),
+                                                `${networkParams.title} root`
+                                        );
+                                } catch (error) {
+                                        alertPathDerivationError(setAlert, error.message);
+                                }
+				resetNavigationTo(navigation, 'Main');
 			} else {
-				await deriveEthereumAccount(networkKey);
+                                // derive ethereum account
+                                try {
+                                        await accountsStore.deriveEthereumAccount(
+                                                seedRefHooks.brainWalletAddress,
+                                                networkKey,
+                                                allNetworks
+                                        );
+                                } catch (e) {
+                                        alertPathDerivationError(setAlert, e.message);
+                                }
+				resetNavigationTo(navigation, 'Main');
 			}
 		} else {
 			if (isSubstrateNetworkParams(networkParams)) {
+				// navigate to substrate account
 				const { pathId } = networkParams;
 				const fullPath = `//${pathId}`;
 				navigateToAddToPolkadotJs(navigation, networkKey, fullPath);
 			} else {
+				// navigate to ethereum account
 				navigateToAddToPolkadotJs(navigation, networkKey, networkKey);
 			}
 		}
@@ -175,13 +185,13 @@ function AddNetwork({
 			filterNetworks(allNetworks, (networkKey, shouldExclude) => {
 				if (isNew && !shouldExclude) return true;
 
-				if (shouldExcludeCurrentNetworks) {
+				if (isAddingNetwork) {
 					if (shouldExclude) return false;
 					return !availableNetworks.includes(networkKey);
 				}
 				return availableNetworks.includes(networkKey);
 			}),
-		[availableNetworks, isNew, shouldExcludeCurrentNetworks, allNetworks]
+		[availableNetworks, isNew, isAddingNetwork, allNetworks]
 	);
 
 	const renderNetwork = ({
@@ -210,17 +220,17 @@ function AddNetwork({
 		<SafeAreaViewContainer>
 			{isNew
                          ? (<ScreenHeading title={'Select a network'} />)
-                         : shouldExcludeCurrentNetworks
-                         ? (<IdentityHeading title={'Add a network'} onPressBack={(): void => setShouldExcludeCurrentNetworks(false)} />)
+                         : isAddingNetwork
+                         ? (<IdentityHeading title={'Add a network'} onPressBack={(): void => setIsAddingNetwork(false)} />)
                          : (<IdentityHeading title={getIdentityName(currentIdentity, identities)} />)}
 			<FlatList
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 				testID={testIDs.Main.chooserScreen}
-				{...(!shouldExcludeCurrentNetworks && !isNew && getListOptions())}
+				{...(!isAddingNetwork && !isNew && getListOptions())}
 			/>
-			{!shouldExcludeCurrentNetworks && !isNew && <NavigationTab />}
+			{!isAddingNetwork && !isNew && <NavigationTab />}
 		</SafeAreaViewContainer>
 	);
 }
