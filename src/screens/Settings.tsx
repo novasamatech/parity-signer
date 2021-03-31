@@ -56,7 +56,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 			<View key={identity.encryptedSeed}>
 				<ButtonIcon
 					title={title}
-					onPress={(): void => accountsStore.selectIdentity(identity)}
+					onPress={(): void => { accountsStore.selectIdentity(identity); resetNavigationTo(navigation, 'Main'); }}
 					iconType="antdesign"
 					iconName="user"
 					iconSize={24}

@@ -125,13 +125,13 @@ function CreateWallet({
 			/>
 			<View style={styles.btnBox}>
 				<Button
-					title="Recover"
+					title="Import Wallet"
 					testID={testIDs.CreateWallet.recoverButton}
 					onPress={onRecoverConfirm}
 					small={true}
 				/>
 				<Button
-					title="or create new identity"
+					title="or create new wallet"
 					onPress={(): void => {
 						setIsRecover(false);
 					}}
@@ -145,16 +145,15 @@ function CreateWallet({
 	const renderCreateView = (): React.ReactElement => (
 		<View style={styles.btnBox}>
 			<Button
-				title="Create"
+				title="Create New"
 				testID={testIDs.CreateWallet.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
 			/>
 			<Button
-				title="or recover existing identity"
+				title="Import Wallet"
 				onPress={(): void => setIsRecover(true)}
 				small={true}
-				onlyText={true}
 			/>
 		</View>
 	);
@@ -165,12 +164,12 @@ function CreateWallet({
 			style={styles.body}
 			testID={testIDs.CreateWallet.scrollScreen}
 		>
-			<ScreenHeading title={'New Identity'} />
+			<ScreenHeading title={'New Wallet'} />
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.CreateWallet.nameInput}
 				value={accountsStore.state.newIdentity.name}
-				placeholder="Identity Name"
+				placeholder="Wallet name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
 		</KeyboardScrollView>

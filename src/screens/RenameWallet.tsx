@@ -62,7 +62,7 @@ function RenameWallet({
 						await accountsStore.deleteCurrentIdentity();
 						navigateToLandingPage(navigation);
 					} catch (err) {
-						alertError(setAlert, "Can't delete Identity.");
+						alertError(setAlert, "Can't delete wallet");
 					}
 				}
 			);
@@ -78,7 +78,7 @@ function RenameWallet({
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading
-				title="Manage Identity"
+				title="Rename Wallet"
 				headMenu={
 					<PopupMenu
 						testID={testIDs.RenameWallet.popupMenuButton}
@@ -100,7 +100,7 @@ function RenameWallet({
 				label="Display Name"
 				onChangeText={onRenameIdentity}
 				value={currentIdentity.name}
-				placeholder="Enter a new identity name"
+				placeholder="Enter a new wallet name"
 				focus
 			/>
 		</SafeAreaViewContainer>
