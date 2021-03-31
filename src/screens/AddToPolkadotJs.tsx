@@ -41,6 +41,7 @@ import {
 import { alertDeleteAccount, alertError } from 'utils/alertUtils';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
+import { resetNavigationTo } from 'utils/navigationHelpers';
 
 interface Props {
 	path: string;
@@ -76,7 +77,7 @@ function PathDetailsView({
 				alertDeleteAccount(setAlert, 'this account', async () => {
 					try {
 						accountsStore.deletePath(path, networksContextState);
-						navigation.navigate('Main');
+						resetNavigationTo(navigation, 'Main');
 					} catch (err) {
 						alertError(
 							setAlert,
