@@ -89,25 +89,21 @@ export default function Scanner({
 	);
 	useEffect(() => {
 		const parseTheScan = async function (): Promise<void> {
+			console.log('Stuck marker 2');
 			const readResult = await startQrProcess();
 			console.log(readResult);
 			await stopQrProcess();
 			navigation.goBack();
 		}
+		console.log('Stuck marker 1');
 		parseTheScan();
 	}, []);
 
 	const onBarCodeRead = (event: any): Promise<void> => {
 		getQrFrame(event.rawData);
+		
 	};
 
-	const {
-		completedFramesCount,
-		isMultipart,
-		missedFrames,
-		totalFramesCount,
-		missingFramesMessage
-	} = multiFrames;
 	return (
 		<SafeAreaViewContainer>
 			<RNCamera

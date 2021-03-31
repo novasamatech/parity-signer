@@ -60,12 +60,16 @@ function toHex(x: string): string {
 //This function sends a read frame to asynchronous processing runtime
 //corresponding event handler should be started before
 export async function getQrFrame(frame: string): Promise<void> {
+	await SubstrateSign.getQrFrame(frame);
 	return;
 }
 
 //start QR code event handler
 export async function startQrProcess(): Promise<String> {
-	return new Promise((resolve) => setTimeout( () => { resolve('blem')}, 5000));
+	console.log("Stuck marker 3");
+	decoded = SubstrateSign.startQrParser();
+	console.log("Stuck marker 4");
+	return new Promise(decoded);
 }
 
 //terminate QR code event handler
