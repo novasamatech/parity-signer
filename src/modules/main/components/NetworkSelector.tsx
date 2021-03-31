@@ -39,10 +39,7 @@ import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import {
-	navigateToPathDetails,
-	unlockSeedPhrase
-} from 'utils/navigationHelpers';
+import { navigateToPathDetails } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 import NavigationTab from 'components/NavigationTab';
 
@@ -104,7 +101,6 @@ function NetworkSelector({
 		networkParams: SubstrateNetworkParams
 	): Promise<void> => {
 		const { pathId } = networkParams;
-		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		const fullPath = `//${pathId}`;
 		try {
 			await accountsStore.deriveNewPath(
@@ -120,7 +116,6 @@ function NetworkSelector({
 	};
 
 	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
-		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
 		try {
 			await accountsStore.deriveEthereumAccount(
 				seedRefHooks.brainWalletAddress,

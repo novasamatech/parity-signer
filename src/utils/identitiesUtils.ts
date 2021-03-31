@@ -44,6 +44,7 @@ import {
 	rococoMetadata,
 	westendMetadata
 } from 'constants/networkMetadata';
+import { PIN } from 'constants/pin';
 
 //walk around to fix the regular expression support for positive look behind;
 export const removeSlash = (str: string): string => str.replace(/\//g, '');
@@ -256,13 +257,12 @@ export const getAddressWithPath = (
 };
 
 export const unlockIdentitySeedWithReturn = async (
-	pin: string,
 	identity: Identity,
 	createSeedRef: TryCreateFunc
 ): Promise<string> => {
 	const { encryptedSeed } = identity;
-	const seed = await decryptData(encryptedSeed, pin);
-	await createSeedRef(pin);
+	const seed = await decryptData(encryptedSeed, PIN);
+	await createSeedRef(PIN);
 	const { phrase } = parseSURI(seed);
 	return phrase;
 };

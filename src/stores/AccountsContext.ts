@@ -36,11 +36,11 @@ import {
 	TryBrainWalletAddress,
 	TrySubstrateAddress
 } from 'utils/seedRefHooks';
+import { PIN } from 'constants/pin';
 
 export type AccountsContextState = {
 	clearIdentity: () => void;
 	state: AccountsStoreState;
-	select: (accountKey: string) => void;
 	deriveEthereumAccount: (
 		createBrainWalletAddress: TryBrainWalletAddress,
 		networkKey: string,
@@ -59,7 +59,6 @@ export type AccountsContextState = {
 	resetCurrentIdentity: () => void;
 	saveNewIdentity: (
 		seedPhrase: string,
-		pin: string,
 		generateSeedRef: CreateSeedRefWithNewSeed
 	) => Promise<void>;
 	selectIdentity: (identity: Identity) => void;
@@ -80,8 +79,7 @@ const defaultAccountState = {
 	currentIdentity: null,
 	identities: [],
 	loaded: false,
-	newIdentity: emptyIdentity(),
-	selectedKey: ''
+	newIdentity: emptyIdentity()
 };
 
 export function useAccountContext(): AccountsContextState {
@@ -107,10 +105,6 @@ export function useAccountContext(): AccountsContextState {
 		};
 		loadInitialContext();
 	}, []);
-
-	function select(accountKey: string): void {
-		setState({ selectedKey: accountKey });
-	}
 
 	function _updateIdentitiesWithCurrentIdentity(
 		updatedCurrentIdentity: Identity
@@ -306,13 +300,12 @@ export function useAccountContext(): AccountsContextState {
 
 	async function saveNewIdentity(
 		seedPhrase: string,
-		pin: string,
 		generateSeedRef: CreateSeedRefWithNewSeed
 	): Promise<void> {
 		const updatedIdentity = deepCopyIdentity(state.newIdentity);
 		const suri = seedPhrase;
 
-		updatedIdentity.encryptedSeed = await encryptData(suri, pin);
+		updatedIdentity.encryptedSeed = await encryptData(suri, PIN);
 		//prevent duplication
 		if (
 			state.identities.find(
@@ -320,7 +313,7 @@ export function useAccountContext(): AccountsContextState {
 			)
 		)
 			throw new Error(duplicatedIdentityError);
-		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
+		await generateSeedRef(updatedIdentity.encryptedSeed, PIN);
 		const newIdentities = state.identities.concat(updatedIdentity);
 		setState({
 			currentIdentity: updatedIdentity,
@@ -411,7 +404,6 @@ export function useAccountContext(): AccountsContextState {
 		getIdentityByAccountId,
 		resetCurrentIdentity,
 		saveNewIdentity,
-		select,
 		selectIdentity,
 		state,
 		updateIdentityName,

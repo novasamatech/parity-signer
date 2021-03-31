@@ -14,96 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import {
-	CommonActions,
-	useNavigation,
-	useNavigationState
-} from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
-
-type Route = {
-	name: keyof RootStackParamList;
-	params?: RootStackParamList[keyof RootStackParamList];
-};
 
 export type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
 > = StackNavigationProp<RootStackParamList, RouteName>;
-
-export const setPin = async <RouteName extends keyof RootStackParamList>(
-	navigation: GenericNavigationProps<RouteName>
-): Promise<string> =>
-	new Promise(resolve => {
-		navigation.navigate('PinNew', { resolve });
-	});
-
-export const unlockAndReturnSeed = async <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>
-): Promise<string> =>
-	new Promise(resolve => {
-		navigation.navigate('PinUnlock', {
-			resolve,
-			shouldReturnSeed: true
-		});
-	});
-
-type Unlock = (nextRoute: Route, identity?: Identity) => Promise<void>;
-export const useUnlockSeed = (isSeedRefValid: boolean): Unlock => {
-	const currentRoutes = useNavigationState(state => state.routes) as Route[];
-	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-	const resetRoutes = (routes: Route[]): void => {
-		const resetAction = CommonActions.reset({
-			index: routes.length,
-			routes: routes
-		});
-		navigation.dispatch(resetAction);
-	};
-
-	return async (nextRoute, identity): Promise<void> => {
-		await unlockSeedPhrase(navigation, isSeedRefValid, identity);
-		const newRoutes = currentRoutes.concat(nextRoute);
-		resetRoutes(newRoutes);
-	};
-};
-
-export const unlockSeedPhrase = async <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>,
-	isSeedRefValid: boolean,
-	identity?: Identity
-): Promise<void> =>
-	new Promise(resolve => {
-		if (isSeedRefValid) {
-			resolve();
-		} else {
-			navigation.navigate('PinUnlock', {
-				identity,
-				resolve,
-				shouldReturnSeed: false
-			});
-		}
-	});
-
-export const unlockSeedPhraseWithPassword = async <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>,
-	isSeedRefValid: boolean,
-	identity?: Identity
-): Promise<string> =>
-	new Promise(resolve => {
-		navigation.navigate('PinUnlockWithPassword', {
-			identity,
-			isSeedRefValid,
-			resolve
-		});
-	});
 
 export const navigateToPathDetails = <
 	RouteName extends keyof RootStackParamList
@@ -169,30 +87,6 @@ export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(
 	navigation.dispatch(resetAction);
 };
 
-export const resetNavigationWithNetworkChooser = <
-	RouteName extends keyof RootStackParamList
->(
-	navigation: GenericNavigationProps<RouteName>,
-	screenName: string,
-	params: object = {},
-	isNew = false
-): void => {
-	const resetAction = CommonActions.reset({
-		index: 1,
-		routes: [
-			{
-				name: 'Main',
-				params: { isNew }
-			},
-			{
-				name: screenName,
-				params: params
-			}
-		]
-	});
-	navigation.dispatch(resetAction);
-};
-
 export const resetNavigationWithScanner = <
 	RouteName extends keyof RootStackParamList
 >(
@@ -216,10 +110,6 @@ export const resetNavigationWithScanner = <
 	});
 	navigation.dispatch(resetAction);
 };
-
-export const navigateToQrScanner = <RouteName extends keyof RootStackParamList>(
-	navigation: GenericNavigationProps<RouteName>
-): void => resetNavigationWithNetworkChooser(navigation, 'QrScanner');
 
 export const navigateToMain = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>

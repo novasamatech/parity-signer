@@ -47,16 +47,8 @@ const testIDs = {
 		nameInput: 'identity_new_name_input',
 		passwordInput: 'identity_new_password_input',
 		recoverButton: 'identity_new_recover_button',
+		scrollScreen: 'identity_new_scroll_screen',
 		seedInput: 'identity_new_seed_input'
-	},
-	IdentityPin: {
-		confirmPin: 'identity_pin_confirm',
-		passwordInput: 'identity_pin_password_input',
-		scrollScreen: 'identity_pin_scroll',
-		setPin: 'identity_pin_set',
-		submitButton: 'identity_submit_button',
-		unlockPinButton: 'identity_unlock_pin_button',
-		unlockPinInput: 'identity_unlock_pin_input'
 	},
 	Main: {
 		addCustomNetworkButton: 'anc_add_custom_button',

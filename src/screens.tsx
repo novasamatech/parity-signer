@@ -27,8 +27,6 @@ import {
 import * as React from 'react';
 import { View } from 'react-native';
 
-import PinNew from 'modules/unlock/screens/PinNew';
-import PinUnlock from 'modules/unlock/screens/PinUnlock';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import testIDs from 'e2e/testIDs';
 import Main from 'modules/main/screens/Main';
@@ -106,8 +104,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
 		<ScreenStack.Screen name="IdentitySwitch" component={IdentitySwitch} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
-		<ScreenStack.Screen name="PinNew" component={PinNew} />
-		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
 		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />

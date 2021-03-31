@@ -26,7 +26,7 @@ import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
+import { navigateToNewIdentityNetwork } from 'utils/navigationHelpers';
 import ScreenHeading from 'components/ScreenHeading';
 import {
 	alertBackupDone,
@@ -47,13 +47,8 @@ function IdentityBackup({
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
-		const pin = await setPin(navigation);
 		try {
-			await accountsStore.saveNewIdentity(
-				seedPhrase,
-				pin,
-				createSeedRefWithNewSeed
-			);
+			await accountsStore.saveNewIdentity(seedPhrase, createSeedRefWithNewSeed);
 			setSeedPhrase('');
 			navigateToNewIdentityNetwork(navigation);
 		} catch (e) {

@@ -51,7 +51,6 @@ export function withCurrentIdentity<
 }
 
 interface UnlockScreenProps {
-	route: RouteProp<RootStackParamList, 'PinUnlock'>;
 	targetIdentity: Identity;
 }
 
@@ -60,8 +59,7 @@ export function withTargetIdentity<T extends UnlockScreenProps>(
 ): React.ComponentType<T> {
 	return (props): React.ReactElement => {
 		const accountsStore = useContext(AccountsContext);
-		const targetIdentity =
-			props.route.params.identity ?? accountsStore.state.currentIdentity;
+		const targetIdentity = accountsStore.state.currentIdentity;
 		if (!targetIdentity) return <View />;
 		return <WrappedComponent {...props} targetIdentity={targetIdentity} />;
 	};

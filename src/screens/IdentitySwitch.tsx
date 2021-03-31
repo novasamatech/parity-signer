@@ -15,7 +15,7 @@
 // along with Parity.	If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -29,11 +29,7 @@ import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { getIdentityName } from 'utils/identitiesUtils';
-import {
-	unlockAndReturnSeed,
-	resetNavigationTo,
-	resetNavigationWithNetworkChooser
-} from 'utils/navigationHelpers';
+import { resetNavigationTo } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import NavigationTab from 'components/NavigationTab';
@@ -53,42 +49,13 @@ function IdentitySwitch({}: NavigationProps<
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { currentIdentity, identities } = accountsStore.state;
 
-	const onIdentitySelectedAndNavigate = async <
-		RouteName extends keyof RootStackParamList
-	>(
-		identity: Identity,
-		screenName: RouteName,
-		params?: RootStackParamList[RouteName]
-	): Promise<void> => {
-		accountsStore.selectIdentity(identity);
-		if (screenName === 'Main') {
-			resetNavigationTo(navigation, screenName, params);
-		} else if (screenName === 'IdentityBackup') {
-			const seedPhrase = await unlockAndReturnSeed(navigation);
-			resetNavigationWithNetworkChooser(navigation, screenName, {
-				isNew: false,
-				seedPhrase
-			});
-		} else {
-			resetNavigationWithNetworkChooser(navigation, screenName, params);
-		}
-	};
-
-	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
+	const renderIdentityOptions = (): React.ReactElement => {
 		return (
 			<>
 				<ButtonWithArrow
 					title="Manage Identity"
-					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
-					}
+					onPress={(): void => navigation.navigate('IdentityManagement')}
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
-				/>
-				<ButtonWithArrow
-					title="Show Recovery Phrase"
-					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
-					}
 				/>
 			</>
 		);
@@ -103,16 +70,14 @@ function IdentitySwitch({}: NavigationProps<
 			<>
 				<ButtonIcon
 					title={currentIdentityTitle}
-					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(currentIdentity, 'Main')
-					}
+					onPress={(): void => resetNavigationTo(navigation, 'Main')}
 					iconType="antdesign"
 					iconName="user"
 					iconSize={40}
 					style={{ paddingLeft: 16 }}
 					textStyle={fontStyles.h1}
 				/>
-				{renderIdentityOptions(currentIdentity)}
+				{renderIdentityOptions()}
 				<Separator style={{ marginBottom: 0 }} />
 			</>
 		);
@@ -126,9 +91,7 @@ function IdentitySwitch({}: NavigationProps<
 		return (
 			<ButtonIcon
 				title={title}
-				onPress={(): Promise<void> =>
-					onIdentitySelectedAndNavigate(identity, 'Main')
-				}
+				onPress={(): void => accountsStore.selectIdentity(identity)}
 				key={identity.encryptedSeed}
 				iconType="antdesign"
 				iconName="user"

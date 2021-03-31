@@ -17,7 +17,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
@@ -28,7 +27,7 @@ import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
-import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
+import { navigateToNewIdentityNetwork } from 'utils/navigationHelpers';
 import {
 	alertError,
 	alertIdentityCreationError,
@@ -38,6 +37,7 @@ import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
+import KeyboardScrollView from 'components/KeyboardScrollView';
 
 function IdentityNew({
 	navigation,
@@ -77,18 +77,15 @@ function IdentityNew({
 	};
 
 	const onRecoverIdentity = async (): Promise<void> => {
-		const pin = await setPin(navigation);
 		try {
 			if (isSeedValid.bip39) {
 				await accountsStore.saveNewIdentity(
 					seedPhrase.trimEnd(),
-					pin,
 					createSeedRefWithNewSeed
 				);
 			} else {
 				await accountsStore.saveNewIdentity(
 					seedPhrase,
-					pin,
 					createSeedRefWithNewSeed
 				);
 			}
@@ -163,7 +160,11 @@ function IdentityNew({
 	);
 
 	return (
-		<KeyboardAwareContainer>
+		<KeyboardScrollView
+			bounces={false}
+			style={styles.body}
+			testID={testIDs.IdentityNew.scrollScreen}
+		>
 			<ScreenHeading title={'New Identity'} />
 			<TextInput
 				onChangeText={updateName}
@@ -172,7 +173,7 @@ function IdentityNew({
 				placeholder="Identity Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
-		</KeyboardAwareContainer>
+		</KeyboardScrollView>
 	);
 }
 

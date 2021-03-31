@@ -52,7 +52,6 @@ export type AccountsStoreState = {
 	currentIdentity: Identity | null;
 	loaded: boolean;
 	newIdentity: Identity;
-	selectedKey: string;
 };
 
 type LensSet<T, R> = Omit<T, keyof R> & R;

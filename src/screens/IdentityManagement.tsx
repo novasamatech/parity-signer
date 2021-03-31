@@ -23,16 +23,13 @@ import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
-import {
-	unlockAndReturnSeed,
-	navigateToLandingPage,
-	unlockSeedPhrase
-} from 'utils/navigationHelpers';
+import { navigateToLandingPage } from 'utils/navigationHelpers';
 import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
 import { useSeedRef } from 'utils/seedRefHooks';
+import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
@@ -42,7 +39,9 @@ function IdentityManagement({
 }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
-	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
+	const { createSeedRef, destroySeedRef } = useSeedRef(
+		currentIdentity.encryptedSeed
+	);
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
@@ -58,7 +57,6 @@ function IdentityManagement({
 			alertDeleteIdentity(
 				setAlert,
 				async (): Promise<void> => {
-					await unlockSeedPhrase(navigation, false);
 					try {
 						await destroySeedRef();
 						await accountsStore.deleteCurrentIdentity();
@@ -69,8 +67,10 @@ function IdentityManagement({
 				}
 			);
 		} else if (value === 'IdentityBackup') {
-			const seedPhrase = await unlockAndReturnSeed(navigation);
-			navigation.pop();
+			const seedPhrase = await unlockIdentitySeedWithReturn(
+				currentIdentity,
+				createSeedRef
+			);
 			navigation.navigate(value, { isNew: false, seedPhrase });
 		}
 	};

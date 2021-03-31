@@ -93,7 +93,6 @@ export const testUnlockPin = async (inputPin: string): Promise<void> => {
 };
 
 export const testSetUpDefaultPath = async (): Promise<void> => {
-	await testInput(IdentityPin.setPin, pinCode);
 	await testInputWithDone(IdentityPin.confirmPin, pinCode);
 	await testVisible(Main.chooserScreen);
 	await testScrollAndTap(

@@ -119,7 +119,6 @@ export type ScannerContextState = {
 		qrInfo: QrInfo,
 		networks: Map<string, SubstrateNetworkParams>
 	) => Promise<void>;
-	signDataLegacy: (pin: string, getNetwork: GetNetwork) => Promise<void>;
 };
 
 const DEFAULT_STATE: ScannerStoreState = {
@@ -483,44 +482,6 @@ export function useScannerContext(): ScannerContextState {
 		setState({ signedData });
 	}
 
-	// signing data with legacy account.
-	async function signDataLegacy(
-		pin = '1',
-		getNetwork: GetNetwork
-	): Promise<void> {
-		const { sender, dataToSign, isHash } = state;
-		if (!sender || !sender.encryptedSeed)
-			throw new Error('Signing Error: sender could not be found.');
-		const networkParams = getNetwork(sender.networkKey);
-		const isEthereum = isEthereumNetworkParams(networkParams);
-		const seed = await decryptData(sender.encryptedSeed, pin);
-		let signedData;
-		if (isEthereum) {
-			signedData = await brainWalletSign(seed, dataToSign as string);
-		} else {
-			let signable;
-
-			if (dataToSign instanceof GenericExtrinsicPayload) {
-				signable = u8aToHex(dataToSign.toU8a(true), -1, false);
-			} else if (isHash) {
-				console.log('sign legacy data type is', typeof dataToSign);
-				signable = hexStripPrefix(dataToSign.toString());
-			} else if (isU8a(dataToSign)) {
-				signable = hexStripPrefix(u8aToHex(dataToSign));
-			} else if (isAscii(dataToSign)) {
-				signable = hexStripPrefix(asciiToHex(dataToSign));
-			} else {
-				throw new Error('Signing Error: cannot signing message');
-			}
-			let signed = await substrateSign(seed, signable);
-			signed = '0x' + signed;
-			// TODO: tweak the first byte if and when sig type is not sr25519
-			const sig = u8aConcat(SIG_TYPE_SR25519, hexToU8a(signed));
-			signedData = u8aToHex(sig, -1, false); // the false doesn't add 0x
-		}
-		setState({ signedData });
-	}
-
 	function clearMultipartProgress(): void {
 		setState({
 			completedFramesCount: DEFAULT_STATE.completedFramesCount,
@@ -545,7 +506,6 @@ export function useScannerContext(): ScannerContextState {
 		setData,
 		setPartData,
 		setReady,
-		signDataLegacy,
 		signEthereumData,
 		signSubstrateData,
 		state

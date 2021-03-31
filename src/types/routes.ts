@@ -9,23 +9,6 @@ export type RootStackParamList = {
 	MessageDetails: undefined;
 	Empty: undefined;
 	PathDetails: { path: string };
-	PinNew: { resolve: (pin: string) => void };
-	PinUnlock:
-		| {
-				identity?: Identity;
-				resolve: (seedPhrase: string) => void;
-				shouldReturnSeed: true;
-		  }
-		| {
-				identity?: Identity;
-				resolve: () => void;
-				shouldReturnSeed: false;
-		  };
-	PinUnlockWithPassword: {
-		identity?: Identity;
-		isSeedRefValid: boolean;
-		resolve: (password: string) => void;
-	};
 	QrScanner:
 		| undefined
 		| {

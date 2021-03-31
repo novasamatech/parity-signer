@@ -45,7 +45,6 @@ import {
 } from 'utils/decoders';
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
-import { unlockSeedPhrase } from 'utils/navigationHelpers';
 
 function getSeedRef(
 	encryptedSeed: string,
@@ -141,7 +140,6 @@ export function useProcessBarCode(
 		let seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
 		// 2. unlock and get Seed reference
 		if (seedRef === undefined || !seedRef.isValid()) {
-			await unlockSeedPhrase(navigation, false, senderIdentity);
 			seedRef = getSeedRef(sender.encryptedSeed, seedRefs)!;
 		}
 		// 3. sign data
