@@ -23,10 +23,7 @@ import { Icon } from 'react-native-elements';
 import TouchableItem from './TouchableItem';
 
 import colors from 'styles/colors';
-import {
-	navigateToMain,
-	navigateToSettings
-} from 'utils/navigationHelpers';
+import { navigateToMain, navigateToSettings } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
@@ -67,7 +64,7 @@ export default function NavigationTab(): React.ReactElement {
 			>
 				<Icon
 					color={
-						route.name === 'IdentitySwitch' ? colors.text.main : colors.text.disabled
+						route.name === 'Settings' ? colors.text.main : colors.text.disabled
 					}
 					size={fontStyles.i_large.fontSize}
 					name="settings"
@@ -75,7 +72,9 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route.name === 'IdentitySwitch' ? styles.textLabel : styles.disabledTextLabel
+						route.name === 'Settings'
+							? styles.textLabel
+							: styles.disabledTextLabel
 					}
 				>
 					Settings
