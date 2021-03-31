@@ -42,7 +42,7 @@ import colors from 'styles/colors';
 import { headerHeight } from 'styles/containerStyles';
 import { RootStackParamList } from 'types/routes';
 
-export const ScreenStack = createStackNavigator<RootStackParamList>();
+const ScreenStack = createStackNavigator<RootStackParamList>();
 
 const HeaderLeft = (): React.ReactElement => {
 	const route = useRoute();

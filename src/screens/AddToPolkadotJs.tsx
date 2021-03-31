@@ -49,7 +49,7 @@ interface Props {
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
-export function PathDetailsView({
+function PathDetailsView({
 	accountsStore,
 	navigation,
 	path,

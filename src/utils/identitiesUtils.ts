@@ -47,9 +47,9 @@ import {
 import { PIN } from 'constants/pin';
 
 //walk around to fix the regular expression support for positive look behind;
-export const removeSlash = (str: string): string => str.replace(/\//g, '');
+const removeSlash = (str: string): string => str.replace(/\//g, '');
 
-export const extractPathId = (path: string, pathIds: string[]): string => {
+const extractPathId = (path: string, pathIds: string[]): string => {
 	const matchNetworkPath = path.match(pathsRegex.networkPath);
 	if (matchNetworkPath && matchNetworkPath[0]) {
 		const targetPathId = removeSlash(matchNetworkPath[0]);
@@ -60,7 +60,7 @@ export const extractPathId = (path: string, pathIds: string[]): string => {
 	return unknownNetworkPathId;
 };
 
-export const extractSubPathName = (path: string): string => {
+const extractSubPathName = (path: string): string => {
 	const pathFragments = path.match(pathsRegex.allPath);
 	if (!pathFragments || pathFragments.length === 0) return '';
 	if (pathFragments.length === 1) return removeSlash(pathFragments[0]);
@@ -72,15 +72,6 @@ export const isSubstratePath = (path: string): boolean =>
 
 export const isEthereumAccountId = (v: string): boolean =>
 	v.indexOf('ethereum:') === 0;
-
-export const isSubstrateHardDerivedPath = (path: string): boolean => {
-	if (!isSubstratePath(path)) return false;
-	const pathFragments = path.match(pathsRegex.allPath);
-	if (!pathFragments || pathFragments.length === 0) return false;
-	return pathFragments.every((pathFragment: string) => {
-		return pathFragment.substring(0, 2) === '//';
-	});
-};
 
 export const extractAddressFromAccountId = (id: string): string => {
 	const withoutNetwork = id.split(':')[1];
@@ -116,7 +107,7 @@ export function emptyIdentity(): Identity {
 	};
 }
 
-export const serializeIdentity = (identity: Identity): SerializedIdentity =>
+const serializeIdentity = (identity: Identity): SerializedIdentity =>
 	Object.entries(identity).reduce((newIdentity: any, entry: [string, any]) => {
 		const [key, value] = entry;
 		if (value instanceof Map) {
@@ -127,9 +118,7 @@ export const serializeIdentity = (identity: Identity): SerializedIdentity =>
 		return newIdentity;
 	}, {});
 
-export const deserializeIdentity = (
-	identityJSON: SerializedIdentity
-): Identity =>
+const deserializeIdentity = (identityJSON: SerializedIdentity): Identity =>
 	Object.entries(identityJSON).reduce(
 		(newIdentity: any, entry: [string, any]) => {
 			const [key, value] = entry;
@@ -158,38 +147,6 @@ export const deepCopyIdentities = (identities: Identity[]): Identity[] =>
 
 export const deepCopyIdentity = (identity: Identity): Identity =>
 	deserializeIdentity(serializeIdentity(identity));
-
-export const getPathsWithSubstrateNetworkKey = (
-	identity: Identity,
-	networkKey: string,
-	networkContextState: NetworksContextState
-): string[] => {
-	const { networks, pathIds } = networkContextState;
-	const pathEntries = Array.from(identity.meta.entries());
-	const targetPathId = networks.has(networkKey)
-		? networks.get(networkKey)!.pathId
-		: unknownNetworkPathId;
-	const pathReducer = (
-		groupedPaths: string[],
-		[path, pathMeta]: [string, AccountMeta]
-	): string[] => {
-		let pathId;
-		if (!isSubstratePath(path)) return groupedPaths;
-		if (pathMeta.networkPathId !== undefined) {
-			pathId = pathIds.includes(pathMeta.networkPathId)
-				? pathMeta.networkPathId
-				: unknownNetworkPathId;
-		} else {
-			pathId = extractPathId(path, pathIds);
-		}
-		if (pathId === targetPathId) {
-			groupedPaths.push(path);
-			return groupedPaths;
-		}
-		return groupedPaths;
-	};
-	return pathEntries.reduce(pathReducer, []);
-};
 
 export const getSubstrateNetworkKeyByPathId = (
 	pathId: string,
