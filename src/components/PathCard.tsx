@@ -18,6 +18,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
+import Clipboard from '@react-native-community/clipboard';
 
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
@@ -152,7 +153,7 @@ export default function PathCard({
 		<TouchableItem
 			accessibilityComponentType="button"
 			disabled={false}
-			onPress={onPress}
+			onPress={() => Clipboard.setString(address)}
 			style={styles.body}
 		>
 			<View style={styles.content} testID={testID}>

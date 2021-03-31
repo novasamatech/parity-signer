@@ -94,7 +94,7 @@ function PathDetailsView({
 		<SafeAreaViewContainer>
 			<ScrollView testID={testIDs.PathDetail.screen} bounces={false}>
 				<LeftScreenHeading
-					title="Public Address"
+					title="Add to polkadot-js"
 					networkKey={formattedNetworkKey}
 					headMenu={
 						<PopupMenu
@@ -112,7 +112,10 @@ function PathDetailsView({
 						/>
 					}
 				/>
-				<PathCard identity={currentIdentity} path={path} />
+				<PathCard
+					identity={currentIdentity}
+					path={path}
+				/>
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>
