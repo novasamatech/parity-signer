@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Clipboard } from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 
 import testIDs from 'e2e/testIDs';
 import { Action, SetAlert } from 'stores/alertContext';

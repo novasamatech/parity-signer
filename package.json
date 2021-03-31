@@ -41,6 +41,7 @@
     "@polkadot/util": "5.7.1",
     "@polkadot/util-crypto": "5.7.1",
     "@react-native-community/async-storage": "^1.11.0",
+    "@react-native-community/clipboard": "^1.5.1",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-native-community/netinfo": "^5.9.3",
     "@react-navigation/native": "^5.7.1",
