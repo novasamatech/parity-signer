@@ -177,7 +177,8 @@ function NetworkSelector({
 		} else {
 			if (isSubstrateNetworkParams(networkParams)) {
 				const { pathId } = networkParams;
-				navigateToPathDetails(navigation, networkKey, pathId);
+				const fullPath = `//${pathId}`;
+				navigateToPathDetails(navigation, networkKey, fullPath);
 			} else {
 				navigateToPathDetails(navigation, networkKey, networkKey);
 			}

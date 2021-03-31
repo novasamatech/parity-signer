@@ -121,7 +121,7 @@ export const navigateToPathDetails = <
 			},
 			{
 				name: 'PathDetails',
-				params: { path }
+				params: { networkKey, path }
 			}
 		]
 	});
