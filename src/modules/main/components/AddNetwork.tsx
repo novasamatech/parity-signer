@@ -70,7 +70,7 @@ function AddNetwork({
 	route
 }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
-	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
+	const [shouldExcludeCurrentNetworks, setShouldExcludeCurrentNetworks] = useState(false);
 	const { identities, currentIdentity } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
 	const { getSubstrateNetwork, allNetworks } = networkContextState;
@@ -81,8 +81,8 @@ function AddNetwork({
 	useFocusEffect(
 		React.useCallback((): any => {
 			const handleBackButton = (): boolean => {
-				if (shouldShowMoreNetworks) {
-					setShouldShowMoreNetworks(false);
+				if (shouldExcludeCurrentNetworks) {
+					setShouldExcludeCurrentNetworks(false);
 					return true;
 				} else {
 					return false;
@@ -93,7 +93,7 @@ function AddNetwork({
 				handleBackButton
 			);
 			return (): void => backHandler.remove();
-		}, [shouldShowMoreNetworks])
+		}, [shouldExcludeCurrentNetworks])
 	);
 
 	const deriveSubstrateNetworkRootPath = async (
@@ -134,7 +134,7 @@ function AddNetwork({
 			ListFooterComponent: (
 				<NetworkCard
 					isAdd={true}
-					onPress={(): void => setShouldShowMoreNetworks(true)}
+					onPress={(): void => setShouldExcludeCurrentNetworks(true)}
 					testID={testIDs.Main.addNewNetworkButton}
 					title="Add a network"
 					networkColor={colors.background.app}
@@ -148,7 +148,7 @@ function AddNetwork({
 		networkKey: string,
 		networkParams: NetworkParams
 	): Promise<void> => {
-		if (isNew || shouldShowMoreNetworks) {
+		if (isNew || shouldExcludeCurrentNetworks) {
 			if (isSubstrateNetworkParams(networkParams)) {
 				await deriveSubstrateNetworkRootPath(networkKey, networkParams);
 			} else {
@@ -175,13 +175,13 @@ function AddNetwork({
 			filterNetworks(allNetworks, (networkKey, shouldExclude) => {
 				if (isNew && !shouldExclude) return true;
 
-				if (shouldShowMoreNetworks) {
+				if (shouldExcludeCurrentNetworks) {
 					if (shouldExclude) return false;
 					return !availableNetworks.includes(networkKey);
 				}
 				return availableNetworks.includes(networkKey);
 			}),
-		[availableNetworks, isNew, shouldShowMoreNetworks, allNetworks]
+		[availableNetworks, isNew, shouldExcludeCurrentNetworks, allNetworks]
 	);
 
 	const renderNetwork = ({
@@ -210,17 +210,17 @@ function AddNetwork({
 		<SafeAreaViewContainer>
 			{isNew
                          ? (<ScreenHeading title={'Select a network'} />)
-                         : shouldShowMoreNetworks
-                         ? (<IdentityHeading title={'Choose Network'} onPressBack={(): void => setShouldShowMoreNetworks(false)} />)
+                         : shouldExcludeCurrentNetworks
+                         ? (<IdentityHeading title={'Add a network'} onPressBack={(): void => setShouldExcludeCurrentNetworks(false)} />)
                          : (<IdentityHeading title={getIdentityName(currentIdentity, identities)} />)}
 			<FlatList
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 				testID={testIDs.Main.chooserScreen}
-				{...(!shouldShowMoreNetworks && !isNew && getListOptions())}
+				{...(!shouldExcludeCurrentNetworks && !isNew && getListOptions())}
 			/>
-			{!shouldShowMoreNetworks && !isNew && <NavigationTab />}
+			{!shouldExcludeCurrentNetworks && !isNew && <NavigationTab />}
 		</SafeAreaViewContainer>
 	);
 }
