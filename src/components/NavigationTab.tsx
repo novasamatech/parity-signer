@@ -45,7 +45,7 @@ export default function NavigationTab(): React.ReactElement {
 			>
 				<Icon
 					color={
-						route.name === 'Main' ? colors.text.disabled : colors.text.main
+						route.name === 'Main' ? colors.text.main : colors.text.disabled
 					}
 					size={fontStyles.i_large.fontSize}
 					name="account-balance-wallet"
@@ -53,7 +53,7 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route.name === 'Main' ? styles.disabledTextLabel : styles.textLabel
+						route.name === 'Main' ? styles.textLabel : styles.disabledTextLabel
 					}
 				>
 					Wallet
@@ -67,9 +67,7 @@ export default function NavigationTab(): React.ReactElement {
 			>
 				<Icon
 					color={
-						route.name === 'Settings'
-							? colors.text.disabled
-							: colors.text.main
+						route.name === 'IdentitySwitch' ? colors.text.main : colors.text.disabled
 					}
 					size={fontStyles.i_large.fontSize}
 					name="settings"
@@ -77,9 +75,7 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route.name === 'Settings'
-							? styles.disabledTextLabel
-							: styles.textLabel
+						route.name === 'IdentitySwitch' ? styles.textLabel : styles.disabledTextLabel
 					}
 				>
 					Settings

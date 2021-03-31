@@ -95,14 +95,14 @@ export const AppNavigator = (): React.ReactElement => (
 		initialRouteName="Main"
 		screenOptions={globalStackNavigationOptions}
 	>
-		<ScreenStack.Screen name="Main" component={Main} />
+		<ScreenStack.Screen name="Main" component={Main} options={{animationEnabled: false}} />
 		<ScreenStack.Screen name="ShowRecoveryPhrase" component={ShowRecoveryPhrase} />
 		<ScreenStack.Screen
 			name="RenameWallet"
 			component={RenameWallet}
 		/>
 		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
-		<ScreenStack.Screen name="Settings" component={Settings} />
+		<ScreenStack.Screen name="Settings" component={Settings} options={{animationEnabled: false}} />
 		<ScreenStack.Screen name="AddToPolkadotJs" component={AddToPolkadotJs} />
 		<ScreenStack.Screen name="SignTx" component={SignTx} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
