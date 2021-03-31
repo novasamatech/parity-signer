@@ -136,28 +136,13 @@ function AddNetwork({
 					isAdd={true}
 					onPress={(): void => setShouldShowMoreNetworks(true)}
 					testID={testIDs.Main.addNewNetworkButton}
-					title="Add Network Account"
+					title="Add a network"
 					networkColor={colors.background.app}
 				/>
 			)
 		};
 	};
 
-	const renderScreenHeading = (): React.ReactElement => {
-		if (isNew) {
-			return <ScreenHeading title={'Create your first Keypair'} />;
-		} else if (shouldShowMoreNetworks) {
-			return (
-				<IdentityHeading
-					title={'Choose Network'}
-					onPressBack={(): void => setShouldShowMoreNetworks(false)}
-				/>
-			);
-		} else {
-			const identityName = getIdentityName(currentIdentity, identities);
-			return <IdentityHeading title={identityName} />;
-		}
-	};
 
 	const onNetworkChosen = async (
 		networkKey: string,
@@ -223,7 +208,11 @@ function AddNetwork({
 
 	return (
 		<SafeAreaViewContainer>
-			{renderScreenHeading()}
+			{isNew
+                         ? (<ScreenHeading title={'Select a network'} />)
+                         : shouldShowMoreNetworks
+                         ? (<IdentityHeading title={'Choose Network'} onPressBack={(): void => setShouldShowMoreNetworks(false)} />)
+                         : (<IdentityHeading title={getIdentityName(currentIdentity, identities)} />)}
 			<FlatList
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}

@@ -56,8 +56,8 @@ export default function OnBoardingView({}: {}): React.ReactElement {
 			<View style={styles.onboardingWrapper}>
 				<TextButton text="Create" isRecover={false} />
 				<Text style={fontStyles.quote}> or </Text>
-				<TextButton text="recover" isRecover={true} />
-				<Text style={fontStyles.quote}>your identity to get started.</Text>
+				<TextButton text="import" isRecover={true} />
+				<Text style={fontStyles.quote}>a wallet to get started.</Text>
 			</View>
 		</SafeAreaScrollViewContainer>
 	);

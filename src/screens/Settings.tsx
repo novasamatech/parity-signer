@@ -37,6 +37,7 @@ import fontStyles from 'styles/fontStyles';
 import { getIdentityName } from 'utils/identitiesUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
+import { alertError } from 'utils/alertUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function ButtonWithArrow(props: {
@@ -52,12 +53,12 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { setAlert } = useContext(AlertStateContext);
 	const { currentIdentity, identities } = accountsStore.state;
+	const { createSeedRef, destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 
 	const renderNonSelectedIdentity = (
 		identity: Identity
 	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
-		const { createSeedRef, destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 
 		const deleteIdentity = async (value: string): Promise<void> => {
 			alertDeleteIdentity(
@@ -65,7 +66,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 				async (): Promise<void> => {
 					try {
 						await destroySeedRef();
-						  await accountsStore.deleteCurrentIdentity(); // TODO XXX: delete this identity, not current identity
+						await accountsStore.deleteCurrentIdentity(); // TODO XXX: delete this identity, not current identity
 						navigateToLandingPage(navigation);
 					} catch (err) {
 						alertError(setAlert, "Can't delete wallet");

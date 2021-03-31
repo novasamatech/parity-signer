@@ -18,7 +18,7 @@ import React, { useContext } from 'react';
 
 import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import OnBoardingView from 'modules/main/components/OnBoading';
+import OnBoardingView from 'modules/main/components/OnBoarding';
 import AddNetwork from 'modules/main/components/AddNetwork';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
