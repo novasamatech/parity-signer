@@ -19,20 +19,25 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import { alertDeleteIdentity } from 'utils/alertUtils';
+
 import ButtonIcon from 'components/ButtonIcon';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
 import Separator from 'components/Separator';
+import NavigationTab from 'components/NavigationTab';
 import { AccountsContext } from 'stores/AccountsContext';
+import { AlertStateContext } from 'stores/alertContext';
+import { Identity } from 'types/identityTypes';
+import { NavigationProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { getIdentityName } from 'utils/identitiesUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
-import { Identity } from 'types/identityTypes';
-import { NavigationProps } from 'types/props';
-import NavigationTab from 'components/NavigationTab';
+import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
+import { useSeedRef } from 'utils/seedRefHooks';
 
 function ButtonWithArrow(props: {
 	onPress: () => void;
@@ -45,12 +50,33 @@ function ButtonWithArrow(props: {
 function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
+	const { setAlert } = useContext(AlertStateContext);
 	const { currentIdentity, identities } = accountsStore.state;
 
 	const renderNonSelectedIdentity = (
 		identity: Identity
 	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
+		const { createSeedRef, destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
+
+		const deleteIdentity = async (value: string): Promise<void> => {
+			alertDeleteIdentity(
+				setAlert,
+				async (): Promise<void> => {
+					try {
+						await destroySeedRef();
+						  await accountsStore.deleteCurrentIdentity(); // TODO XXX: delete this identity, not current identity
+						navigateToLandingPage(navigation);
+					} catch (err) {
+						alertError(setAlert, "Can't delete wallet");
+					}
+				}
+			);
+                };
+		const showRecoveryPhrase = async (identity): Promise<void> => {
+			const seedPhrase = await unlockIdentitySeedWithReturn(identity, createSeedRef);
+			navigation.navigate('ShowRecoveryPhrase', { isNew: false, seedPhrase });
+                };
 
 		return (
 			<View key={identity.encryptedSeed}>
@@ -65,8 +91,16 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 				/>
 				<ButtonWithArrow
 					title="Rename"
-					onPress={(): void => navigation.navigate('RenameWallet')}
+					onPress={(): void => navigation.navigate('RenameWallet')} // TODO XXX: rename selected identity
 					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
+				/>
+				<ButtonWithArrow
+					title="Delete"
+					onPress={(): void => deleteIdentity(identity)}
+				/>
+				<ButtonWithArrow
+					title="Show Recovery Phrase"
+					onPress={(): void => showRecoveryPhrase(identity)}
 				/>
 				<Separator style={{ marginBottom: 0 }} />
 			</View>
@@ -76,11 +110,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	return (
 		<SafeAreaViewContainer>
 			<View style={styles.card}>
-				<ScrollView
-					style={{
-						maxHeight: 160
-					}}
-				>
+	                        <ScrollView bounces={false}>
 					<View style={{ paddingVertical: 8 }}>
 						{identities.map(renderNonSelectedIdentity)}
 					</View>

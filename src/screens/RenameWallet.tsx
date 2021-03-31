@@ -28,8 +28,6 @@ import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
-import { useSeedRef } from 'utils/seedRefHooks';
-import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
 
 type Props = NavigationAccountIdentityProps<'RenameWallet'>;
 
@@ -39,9 +37,6 @@ function RenameWallet({
 }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
-	const { createSeedRef, destroySeedRef } = useSeedRef(
-		currentIdentity.encryptedSeed
-	);
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
@@ -52,49 +47,10 @@ function RenameWallet({
 		}
 	};
 
-	const onOptionSelect = async (value: string): Promise<void> => {
-		if (value === 'IdentityDelete') {
-			alertDeleteIdentity(
-				setAlert,
-				async (): Promise<void> => {
-					try {
-						await destroySeedRef();
-						await accountsStore.deleteCurrentIdentity();
-						navigateToLandingPage(navigation);
-					} catch (err) {
-						alertError(setAlert, "Can't delete wallet");
-					}
-				}
-			);
-		} else if (value === 'ShowRecoveryPhrase') {
-			const seedPhrase = await unlockIdentitySeedWithReturn(
-				currentIdentity,
-				createSeedRef
-			);
-			navigation.navigate(value, { isNew: false, seedPhrase });
-		}
-	};
-
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading
 				title="Rename Wallet"
-				headMenu={
-					<PopupMenu
-						testID={testIDs.RenameWallet.popupMenuButton}
-						onSelect={onOptionSelect}
-						menuTriggerIconName={'more-vert'}
-						menuItems={[
-							{ text: 'Backup', value: 'ShowRecoveryPhrase' },
-							{
-								testID: testIDs.RenameWallet.deleteButton,
-								text: 'Delete',
-								textStyle: styles.deleteText,
-								value: 'IdentityDelete'
-							}
-						]}
-					/>
-				}
 			/>
 			<TextInput
 				label="Display Name"

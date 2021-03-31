@@ -69,27 +69,13 @@ export const alertDeleteAccount = (
 	);
 };
 
-export const alertDeleteLegacyAccount = (
-	setAlert: SetAlert,
-	accountName: string,
-	onDelete: () => any
-): void => {
-	setAlert(
-		'Delete Account',
-		`Do you really want to delete ${accountName}?
-The account can only be recovered with its associated recovery phrase.`,
-		buildAlertDeleteButtons(onDelete)
-	);
-};
-
 export const alertDeleteIdentity = (
 	setAlert: SetAlert,
 	onDelete: () => any
 ): void => {
 	setAlert(
 		'Delete Identity',
-		`Do you really want to delete this Identity and all the related accounts?
-This identity can only be recovered with its associated recovery phrase.`,
+		`Do you really want to delete this wallet? It can only be recovered with its secret phrase.`,
 		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteIdentity)
 	);
 };
