@@ -15,9 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 
+import Button from 'components/Button';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -28,14 +29,25 @@ import ScreenHeading from 'components/ScreenHeading';
 
 type Props = NavigationAccountIdentityProps<'RenameWallet'>;
 
-function RenameWallet({ accountsStore }: Props): React.ReactElement {
+function RenameWallet({
+	navigation,
+	accountsStore
+}: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
+	const [newIdentityName, setNewIdentityName] = useState(
+		currentIdentity?.name || ''
+	);
 	if (!currentIdentity) return <View />;
 
-	const onRenameIdentity = async (name: string): Promise<void> => {
+	const onChangeIdentity = async (name: string): Promise<void> => {
+		setNewIdentityName(name);
+	};
+
+	const onSaveIdentity = async (): Promise<void> => {
 		try {
-			accountsStore.updateIdentityName(name);
+			accountsStore.updateIdentityName(newIdentityName);
+			navigation.goBack();
 		} catch (err) {
 			alertError(setAlert, `Can't rename: ${err.message}`);
 		}
@@ -46,11 +58,17 @@ function RenameWallet({ accountsStore }: Props): React.ReactElement {
 			<ScreenHeading title="Rename Wallet" />
 			<TextInput
 				label="Display Name"
-				onChangeText={onRenameIdentity}
-				value={currentIdentity.name}
+				onChangeText={onChangeIdentity}
+				value={newIdentityName}
 				placeholder="Enter a new wallet name"
 				focus
 			/>
+			<Button
+				title="Save"
+				disabled={!newIdentityName || newIdentityName === currentIdentity.name}
+				onPress={onSaveIdentity}
+			/>
+			<Button title="Back" onPress={(): void => navigation.goBack()} />
 		</SafeAreaViewContainer>
 	);
 }

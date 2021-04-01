@@ -128,43 +128,47 @@ function CreateWallet({
 				value={accountsStore.state.newIdentity.name}
 				placeholder="Wallet name"
 			/>
-			{isRecover ? (<>
-				<AccountSeed
-					testID={testIDs.CreateWallet.seedInput}
-					onChangeText={onSeedTextInput}
-					onSubmitEditing={onRecoverConfirm}
-					returnKeyType="done"
-					valid={isSeedValid.valid}
-				/>
+			{isRecover ? (
+				<>
+					<AccountSeed
+						testID={testIDs.CreateWallet.seedInput}
+						onChangeText={onSeedTextInput}
+						onSubmitEditing={onRecoverConfirm}
+						returnKeyType="done"
+						valid={isSeedValid.valid}
+					/>
+					<View style={styles.btnBox}>
+						<Button
+							title="Import Wallet"
+							testID={testIDs.CreateWallet.recoverButton}
+							onPress={onRecoverConfirm}
+							small={true}
+						/>
+						<Button
+							title="or create new wallet"
+							onPress={(): void => {
+								setIsRecover(false);
+							}}
+							small={true}
+							onlyText={true}
+						/>
+					</View>
+				</>
+			) : (
 				<View style={styles.btnBox}>
 					<Button
-						title="Import Wallet"
-						testID={testIDs.CreateWallet.recoverButton}
-						onPress={onRecoverConfirm}
+						title="Create New"
+						testID={testIDs.CreateWallet.createButton}
+						onPress={onCreateNewIdentity}
 						small={true}
 					/>
 					<Button
-						title="or create new wallet"
-						onPress={(): void => {
-							setIsRecover(false);
-						}}
+						title="Import Wallet"
+						onPress={(): void => setIsRecover(true)}
 						small={true}
-						onlyText={true}
 					/>
 				</View>
-			</>) : (<View style={styles.btnBox}>
-				<Button
-					title="Create New"
-					testID={testIDs.CreateWallet.createButton}
-					onPress={onCreateNewIdentity}
-					small={true}
-				/>
-				<Button
-					title="Import Wallet"
-					onPress={(): void => setIsRecover(true)}
-					small={true}
-				/>
-			</View>)}
+			)}
 		</KeyboardScrollView>
 	);
 }
