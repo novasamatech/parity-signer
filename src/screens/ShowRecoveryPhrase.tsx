@@ -17,6 +17,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Clipboard from '@react-native-community/clipboard';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
@@ -30,8 +31,6 @@ import fontStyles from 'styles/fontStyles';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import ScreenHeading from 'components/ScreenHeading';
 import {
-	alertBackupDone,
-	alertCopyBackupPhrase,
 	alertIdentityCreationError
 } from 'utils/alertUtils';
 import Button from 'components/Button';
@@ -47,7 +46,7 @@ function ShowRecoveryPhrase({
 	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
-	const onBackupDone = async (): Promise<void> => {
+	const createWallet = async (): Promise<void> => {
 		try {
 			await accountsStore.saveNewIdentity(seedPhrase, createSeedRefWithNewSeed);
 			setSeedPhrase('');
@@ -104,7 +103,7 @@ function ShowRecoveryPhrase({
 				onPress={(): void => {
 					// only allow the copy of the recovery phrase in dev environment
 					if (__DEV__) {
-						alertCopyBackupPhrase(setAlert, seedPhrase);
+						Clipboard.setString(seedPhrase);
 					}
 				}}
 			>
@@ -119,7 +118,7 @@ function ShowRecoveryPhrase({
 				<Button
 					title={'Next'}
 					testID={testIDs.ShowRecoveryPhrase.nextButton}
-					onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
+					onPress={createWallet}
 					aboveKeyboard
 				/>
 			)}

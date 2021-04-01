@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import Clipboard from '@react-native-community/clipboard';
-
 import testIDs from 'e2e/testIDs';
 import { Action, SetAlert } from 'stores/alertContext';
 
@@ -81,26 +79,6 @@ export const alertDeleteIdentity = (
 	);
 };
 
-export const alertCopyBackupPhrase = (
-	setAlert: SetAlert,
-	seedPhrase: string
-): void =>
-	setAlert(
-		'Write this recovery phrase on paper',
-		'It is not recommended to transfer or store a recovery phrase digitally and unencrypted. Anyone in possession of this recovery phrase is able to spend funds from this account.',
-		[
-			{
-				onPress: (): void => {
-					Clipboard.setString(seedPhrase);
-				},
-				text: 'Copy'
-			},
-			{
-				text: 'Cancel'
-			}
-		]
-	);
-
 export const alertRisks = (
 	setAlert: SetAlert,
 	message: string,
@@ -120,20 +98,4 @@ export const alertDecodeError = (setAlert: SetAlert): void =>
 	setAlert(
 		'Could not decode method with available metadata.',
 		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.'
-	);
-
-export const alertBackupDone = (setAlert: SetAlert, onPress: () => any): void =>
-	setAlert(
-		'Important',
-		"Make sure you've backed up this recovery phrase. It is the only way to restore your account in case of device failure/lost.",
-		[
-			{
-				onPress,
-				testID: alertTestIDs.backupDoneButton,
-				text: 'Proceed'
-			},
-			{
-				text: 'Cancel'
-			}
-		]
 	);
