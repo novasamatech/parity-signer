@@ -72,7 +72,7 @@ export type AccountsContextState = {
 		name: string
 	) => Promise<void>;
 	deletePath: (path: string, networkContext: NetworksContextState) => void;
-	deleteCurrentIdentity: () => Promise<void>;
+	deleteIdentity: (identity: Identity) => Promise<void>;
 };
 
 const defaultAccountState = {
@@ -379,12 +379,9 @@ export function useAccountContext(): AccountsContextState {
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async function deleteCurrentIdentity(): Promise<void> {
+	function deleteIdentity(identity: Identity): Promise<void> {
 		const newIdentities = deepCopyIdentities(state.identities);
-		const identityIndex = newIdentities.findIndex(
-			(identity: Identity) =>
-				identity.encryptedSeed === state.currentIdentity!.encryptedSeed
-		);
+		const identityIndex = newIdentities.findIndex((i: Identity) => identity.encryptedSeed === i.encryptedSeed);
 		newIdentities.splice(identityIndex, 1);
 		setState({
 			currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
@@ -395,7 +392,7 @@ export function useAccountContext(): AccountsContextState {
 
 	return {
 		clearIdentity,
-		deleteCurrentIdentity,
+		deleteIdentity,
 		deletePath,
 		deriveEthereumAccount,
 		deriveNewPath,

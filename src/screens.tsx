@@ -34,6 +34,7 @@ import Main from 'modules/main/screens/Main';
 import AddNetwork from 'modules/main/screens/AddNetwork';
 import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
 import RenameWallet from 'screens/RenameWallet';
+import DeleteWallet from 'screens/DeleteWallet';
 import CreateWallet from 'screens/CreateWallet';
 import Settings from 'screens/Settings';
 import AddToPolkadotJs from 'screens/AddToPolkadotJs';
@@ -112,6 +113,7 @@ export const AppNavigator = (): React.ReactElement => (
 			component={ShowRecoveryPhrase}
 		/>
 		<ScreenStack.Screen name="RenameWallet" component={RenameWallet} />
+		<ScreenStack.Screen name="DeleteWallet" component={DeleteWallet} />
 		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
 		<ScreenStack.Screen
 			name="Settings"

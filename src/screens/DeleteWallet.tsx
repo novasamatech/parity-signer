@@ -28,46 +28,30 @@ import ScreenHeading from 'components/ScreenHeading';
 
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertError } from 'utils/alertUtils';
+import { resetNavigationTo } from 'utils/navigationHelpers';
 
-type Props = NavigationAccountIdentityProps<'RenameWallet'>;
+type Props = NavigationAccountIdentityProps<'DeleteWallet'>;
 
-function RenameWallet({ navigation, route }: Props): React.ReactElement {
+function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { setAlert } = useContext(AlertStateContext);
 	const { identity } = route.params;
-	const [newIdentityName, setNewIdentityName] = useState(identity?.name || '');
-	if (!identity) return <View />;
 
-	const onChangeIdentity = async (name: string): Promise<void> => {
-		setNewIdentityName(name);
-	};
-
-	const onSaveIdentity = async (): Promise<void> => {
+	const deleteIdentity = async (targetIdentity: Identity): Promise<void> => {
 		try {
-			accountsStore.updateIdentityName(newIdentityName);
-			navigation.goBack();
+			resetNavigationTo(navigation, 'Main');
+			await accountsStore.deleteIdentity(identity);
 		} catch (err) {
-			alertError(setAlert, `Can't rename: ${err.message}`);
+			console.error(err);
+			alertError(setAlert, "Can't delete wallet");
 		}
 	};
 
-	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title="Rename Wallet" />
-			<TextInput
-				label="Display Name"
-				onChangeText={onChangeIdentity}
-				value={newIdentityName}
-				placeholder="Enter a new wallet name"
-				focus
-			/>
-			<Button
-				title="Save"
-				onPress={onSaveIdentity}
-			/>
-			<Button title="Back" onPress={(): void => navigation.goBack()} />
-		</SafeAreaViewContainer>
-	);
+	return (<SafeAreaViewContainer>
+		<ScreenHeading title="Delete Wallet" />
+		<Button title="Delete" onPress={() => deleteIdentity()} />
+		<Button title="Back" onPress={(): void => navigation.goBack()} />
+	</SafeAreaViewContainer>);
 }
 
-export default RenameWallet;
+export default DeleteWallet;

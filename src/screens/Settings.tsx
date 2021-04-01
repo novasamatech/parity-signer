@@ -33,11 +33,8 @@ import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { resetNavigationTo } from 'utils/navigationHelpers';
-import {
-	unlockIdentitySeedWithReturn,
-	getIdentityName
-} from 'utils/identitiesUtils';
-import { alertError, alertDeleteIdentity } from 'utils/alertUtils';
+import { getIdentitySeed, getIdentityName } from 'utils/identitiesUtils';
+import { alertError } from 'utils/alertUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function ButtonWithArrow(props: {
@@ -54,40 +51,12 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const { setAlert } = useContext(AlertStateContext);
 	const { currentIdentity, identities } = accountsStore.state;
 
-	// XXX: in theory we should use the seedRef calls from the target identity
-	//   rather than the current identity. But this still seems to work?
-	const { createSeedRef, destroySeedRef } = useSeedRef(
-		// TODO: null check
-		currentIdentity.encryptedSeed
-	);
-
 	const renderNonSelectedIdentity = (
 		identity: Identity
 	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
-
-		const deleteIdentity = async (targetIdentity: Identity): Promise<void> => {
-			alertDeleteIdentity(
-				setAlert,
-				async (): Promise<void> => {
-					try {
-						resetNavigationTo(navigation, 'Main');
-						await destroySeedRef();
-						await accountsStore.deleteCurrentIdentity(); // TODO XXX: delete this identity, not current identity
-					} catch (err) {
-						console.error(err);
-						alertError(setAlert, "Can't delete wallet");
-					}
-				}
-			);
-		};
-		const showRecoveryPhrase = async (
-			targetIdentity: Identity
-		): Promise<void> => {
-			const seedPhrase = await unlockIdentitySeedWithReturn(
-				targetIdentity,
-				createSeedRef
-			);
+		const showRecoveryPhrase = async (targetIdentity: Identity): Promise<void> => {
+			const seedPhrase = await getIdentitySeed(targetIdentity);
 			navigation.navigate('ShowRecoveryPhrase', { isNew: false, seedPhrase });
 		};
 
@@ -107,12 +76,11 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 				/>
 				<ButtonWithArrow
 					title="Rename"
-					onPress={(): void => navigation.navigate('RenameWallet')} // TODO XXX: rename selected identity
-					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
+					onPress={(): void => navigation.navigate('RenameWallet', { navigation, accountsStore, identity })}
 				/>
 				<ButtonWithArrow
 					title="Delete"
-					onPress={(): Promise<void> => deleteIdentity(identity)}
+					onPress={(): void => navigation.navigate('DeleteWallet', { navigation, accountsStore, identity })}
 				/>
 				<ButtonWithArrow
 					title="Show Recovery Phrase"

@@ -218,16 +218,15 @@ export const unlockIdentitySeed = async (
 	identity: Identity,
 	createSeedRef: TryCreateFunc
 ): Promise<void> => {
-	await unlockIdentitySeedWithReturn(identity, createSeedRef);
+	await unlockIdentitySeedWithReturn(identity);
+	await createSeedRef(PIN);
 };
 
-export const unlockIdentitySeedWithReturn = async (
+export const getIdentitySeed = async (
 	identity: Identity,
-	createSeedRef: TryCreateFunc
 ): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, PIN);
-	await createSeedRef(PIN);
 	const { phrase } = parseSURI(seed);
 	return phrase;
 };
@@ -263,7 +262,7 @@ export const getIdentityName = (
 	const identityIndex = identities.findIndex(
 		i => i.encryptedSeed === identity.encryptedSeed
 	);
-	return `Identity_${identityIndex}`;
+	return `Wallet #${identityIndex + 1}`;
 };
 
 export const getPathName = (
