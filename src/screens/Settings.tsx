@@ -20,11 +20,8 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { alertDeleteIdentity } from 'utils/alertUtils';
-
 import ButtonIcon from 'components/ButtonIcon';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import ScreenHeading from 'components/ScreenHeading';
 import Separator from 'components/Separator';
 import NavigationTab from 'components/NavigationTab';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -35,10 +32,12 @@ import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { getIdentityName } from 'utils/identitiesUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
-import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
-import { alertError } from 'utils/alertUtils';
+import {
+	unlockIdentitySeedWithReturn,
+	getIdentityName
+} from 'utils/identitiesUtils';
+import { alertError, alertDeleteIdentity } from 'utils/alertUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function ButtonWithArrow(props: {
@@ -54,14 +53,20 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { setAlert } = useContext(AlertStateContext);
 	const { currentIdentity, identities } = accountsStore.state;
-	const { createSeedRef, destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
+
+	// XXX: in theory we should use the seedRef calls from the target identity
+	//   rather than the current identity. But this still seems to work?
+	const { createSeedRef, destroySeedRef } = useSeedRef(
+		// TODO: null check
+		currentIdentity.encryptedSeed
+	);
 
 	const renderNonSelectedIdentity = (
 		identity: Identity
 	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
 
-		const deleteIdentity = async (value: string): Promise<void> => {
+		const deleteIdentity = async (targetIdentity: Identity): Promise<void> => {
 			alertDeleteIdentity(
 				setAlert,
 				async (): Promise<void> => {
@@ -74,17 +79,25 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 					}
 				}
 			);
-                };
-		const showRecoveryPhrase = async (identity): Promise<void> => {
-			const seedPhrase = await unlockIdentitySeedWithReturn(identity, createSeedRef);
+		};
+		const showRecoveryPhrase = async (
+			targetIdentity: Identity
+		): Promise<void> => {
+			const seedPhrase = await unlockIdentitySeedWithReturn(
+				targetIdentity,
+				createSeedRef
+			);
 			navigation.navigate('ShowRecoveryPhrase', { isNew: false, seedPhrase });
-                };
+		};
 
 		return (
 			<View key={identity.encryptedSeed}>
 				<ButtonIcon
 					title={title}
-					onPress={(): void => { accountsStore.selectIdentity(identity); resetNavigationTo(navigation, 'Main'); }}
+					onPress={(): void => {
+						accountsStore.selectIdentity(identity);
+						resetNavigationTo(navigation, 'Main');
+					}}
 					iconType="antdesign"
 					iconName="user"
 					iconSize={24}
@@ -98,11 +111,11 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 				/>
 				<ButtonWithArrow
 					title="Delete"
-					onPress={(): void => deleteIdentity(identity)}
+					onPress={(): Promise<void> => deleteIdentity(identity)}
 				/>
 				<ButtonWithArrow
 					title="Show Recovery Phrase"
-					onPress={(): void => showRecoveryPhrase(identity)}
+					onPress={(): Promise<void> => showRecoveryPhrase(identity)}
 				/>
 				<Separator style={{ marginBottom: 0 }} />
 			</View>
@@ -112,7 +125,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	return (
 		<SafeAreaViewContainer>
 			<View style={styles.card}>
-	                        <ScrollView bounces={false}>
+				<ScrollView bounces={false}>
 					<View style={{ paddingVertical: 8 }}>
 						{identities.map(renderNonSelectedIdentity)}
 					</View>
