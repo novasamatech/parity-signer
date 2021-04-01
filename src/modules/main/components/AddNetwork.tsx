@@ -109,7 +109,7 @@ function AddNetwork({
 			ListFooterComponent: (
 				<>
 					<TouchableItem
-						onPress={(): void => resetNavigationTo(navigation, 'SignTx')}
+						onPress={(): void => navigation.navigate('SignTx')}
 						style={{
 							display: 'flex',
 							flexDirection: 'row'
