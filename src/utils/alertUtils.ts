@@ -79,21 +79,6 @@ export const alertDeleteIdentity = (
 	);
 };
 
-export const alertRisks = (
-	setAlert: SetAlert,
-	message: string,
-	onPress: () => any
-): void =>
-	setAlert('Warning', message, [
-		{
-			onPress,
-			text: 'Proceed'
-		},
-		{
-			text: 'Back'
-		}
-	]);
-
 export const alertDecodeError = (setAlert: SetAlert): void =>
 	setAlert(
 		'Could not decode method with available metadata.',

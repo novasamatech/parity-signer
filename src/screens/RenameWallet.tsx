@@ -65,7 +65,6 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 				title="Save"
 				onPress={onSaveIdentity}
 			/>
-			<Button title="Back" onPress={(): void => navigation.goBack()} />
 		</SafeAreaViewContainer>
 	);
 }

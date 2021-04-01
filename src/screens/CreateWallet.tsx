@@ -32,7 +32,6 @@ import { resetNavigationTo } from 'utils/navigationHelpers';
 import {
 	alertError,
 	alertIdentityCreationError,
-	alertRisks
 } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
@@ -99,11 +98,7 @@ function CreateWallet({
 
 	const onRecoverConfirm = (): void | Promise<void> => {
 		if (!isSeedValid.valid) {
-			if (isSeedValid.accountRecoveryAllowed) {
-				return alertRisks(setAlert, `${isSeedValid.reason}`, onRecoverIdentity);
-			} else {
-				return alertError(setAlert, `${isSeedValid.reason}`);
-			}
+			return alertError(setAlert, `${isSeedValid.reason}`);
 		}
 		return onRecoverIdentity();
 	};

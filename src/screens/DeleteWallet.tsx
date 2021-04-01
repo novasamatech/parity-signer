@@ -50,7 +50,6 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 	return (<SafeAreaViewContainer>
 		<ScreenHeading title="Delete Wallet" />
 		<Button title="Delete" onPress={() => deleteIdentity()} />
-		<Button title="Back" onPress={(): void => navigation.goBack()} />
 	</SafeAreaViewContainer>);
 }
 
