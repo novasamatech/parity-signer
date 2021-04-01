@@ -16,33 +16,26 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
-import { navigateToLandingPage } from 'utils/navigationHelpers';
-import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
+import { alertError } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
-import colors from 'styles/colors';
-import PopupMenu from 'components/PopupMenu';
 
 type Props = NavigationAccountIdentityProps<'RenameWallet'>;
 
-function RenameWallet({
-	accountsStore,
-	navigation
-}: Props): React.ReactElement {
+function RenameWallet({ accountsStore }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
 		try {
-			await accountsStore.updateIdentityName(name);
+			accountsStore.updateIdentityName(name);
 		} catch (err) {
 			alertError(setAlert, `Can't rename: ${err.message}`);
 		}
@@ -50,9 +43,7 @@ function RenameWallet({
 
 	return (
 		<SafeAreaViewContainer>
-			<ScreenHeading
-				title="Rename Wallet"
-			/>
+			<ScreenHeading title="Rename Wallet" />
 			<TextInput
 				label="Display Name"
 				onChangeText={onRenameIdentity}
@@ -65,15 +56,3 @@ function RenameWallet({
 }
 
 export default withCurrentIdentity(RenameWallet);
-
-const styles = StyleSheet.create({
-	deleteText: {
-		color: colors.signal.error
-	},
-	header: {
-		flexDirection: 'row',
-		paddingBottom: 24,
-		paddingLeft: 16,
-		paddingRight: 16
-	}
-});
