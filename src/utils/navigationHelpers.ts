@@ -20,30 +20,31 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RootStackParamList } from 'types/routes';
 
-export type GenericNavigationProps<RouteName extends keyof RootStackParamList> =
-  StackNavigationProp<RootStackParamList, RouteName>;
+export type GenericNavigationProps<
+	RouteName extends keyof RootStackParamList
+> = StackNavigationProp<RootStackParamList, RouteName>;
 
 export const navigateToAddToPolkadotJs = <
-       RouteName extends keyof RootStackParamList
+	RouteName extends keyof RootStackParamList
 >(
-       navigation: GenericNavigationProps<RouteName>,
-       networkKey: string,
-       path: string
+	navigation: GenericNavigationProps<RouteName>,
+	networkKey: string,
+	path: string
 ): void => {
-       const resetAction = CommonActions.reset({
-               index: 1,
-               routes: [
-                       {
-                               name: 'Main',
-                               params: { isNew: false }
-                       },
-                       {
-                               name: 'AddToPolkadotJs',
-                               params: { networkKey, path }
-                       }
-               ]
-       });
-       navigation.dispatch(resetAction);
+	const resetAction = CommonActions.reset({
+		index: 1,
+		routes: [
+			{
+				name: 'Main',
+				params: { isNew: false }
+			},
+			{
+				name: 'AddToPolkadotJs',
+				params: { networkKey, path }
+			}
+		]
+	});
+	navigation.dispatch(resetAction);
 };
 
 export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(

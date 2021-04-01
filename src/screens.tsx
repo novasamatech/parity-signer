@@ -31,6 +31,7 @@ import { View } from 'react-native';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import testIDs from 'e2e/testIDs';
 import Main from 'modules/main/screens/Main';
+import AddNetwork from 'modules/main/screens/AddNetwork';
 import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
 import RenameWallet from 'screens/RenameWallet';
 import CreateWallet from 'screens/CreateWallet';
@@ -96,14 +97,27 @@ export const AppNavigator = (): React.ReactElement => (
 		initialRouteName="Main"
 		screenOptions={globalStackNavigationOptions}
 	>
-		<ScreenStack.Screen name="Main" component={Main} options={{animationEnabled: false}} />
-		<ScreenStack.Screen name="ShowRecoveryPhrase" component={ShowRecoveryPhrase} />
 		<ScreenStack.Screen
-			name="RenameWallet"
-			component={RenameWallet}
+			name="Main"
+			component={Main}
+			options={{ animationEnabled: false }}
 		/>
+		<ScreenStack.Screen
+			name="AddNetwork"
+			component={AddNetwork}
+			options={{ animationEnabled: false }}
+		/>
+		<ScreenStack.Screen
+			name="ShowRecoveryPhrase"
+			component={ShowRecoveryPhrase}
+		/>
+		<ScreenStack.Screen name="RenameWallet" component={RenameWallet} />
 		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
-		<ScreenStack.Screen name="Settings" component={Settings} options={{animationEnabled: false}} />
+		<ScreenStack.Screen
+			name="Settings"
+			component={Settings}
+			options={{ animationEnabled: false }}
+		/>
 		<ScreenStack.Screen name="AddToPolkadotJs" component={AddToPolkadotJs} />
 		<ScreenStack.Screen name="SignTx" component={SignTx} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />

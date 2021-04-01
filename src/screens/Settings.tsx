@@ -71,10 +71,11 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 				setAlert,
 				async (): Promise<void> => {
 					try {
+						resetNavigationTo(navigation, 'Main');
 						await destroySeedRef();
 						await accountsStore.deleteCurrentIdentity(); // TODO XXX: delete this identity, not current identity
-						resetNavigationTo(navigation, 'Main');
 					} catch (err) {
+						console.error(err);
 						alertError(setAlert, "Can't delete wallet");
 					}
 				}

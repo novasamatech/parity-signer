@@ -20,7 +20,7 @@ import React, { useContext } from 'react';
 import NoCurrentIdentity from 'modules/main/components/NoCurrentIdentity';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import OnBoardingView from 'modules/main/components/OnBoarding';
-import AddNetwork from 'modules/main/components/AddNetwork';
+import Wallet from 'modules/main/components/Wallet';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 
@@ -33,7 +33,5 @@ export default function Main(
 	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0) return <OnBoardingView />;
 	if (currentIdentity === null) return <NoCurrentIdentity />;
-	return (
-		<AddNetwork {...(props as NavigationAccountIdentityProps<'Main'>)} />
-	);
+	return <Wallet {...(props as NavigationAccountIdentityProps<'Main'>)} />;
 }

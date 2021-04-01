@@ -390,7 +390,7 @@ export function useAccountContext(): AccountsContextState {
 			currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,
 			identities: newIdentities
 		});
-		await saveIdentities(newIdentities);
+		saveIdentities(newIdentities);
 	}
 
 	return {

@@ -15,16 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext, useMemo, useState } from 'react';
-import { BackHandler, FlatList, FlatListProps } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { ReactElement, useContext, useMemo } from 'react';
+import { FlatList } from 'react-native';
 
-import { NetworkCard } from './NetworkCard';
+import { NetworkCard } from '../components/NetworkCard';
 
-import TouchableItem from 'components/TouchableItem';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import {
 	SubstrateNetworkKeys,
@@ -33,7 +29,6 @@ import {
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import colors from 'styles/colors';
 import {
 	isEthereumNetworkParams,
 	isSubstrateNetworkParams,
@@ -42,13 +37,9 @@ import {
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
-import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import {
-	resetNavigationTo,
-	navigateToAddToPolkadotJs
-} from 'utils/navigationHelpers';
+import { getExistedNetworkKeys, unlockIdentitySeed } from 'utils/identitiesUtils';
+import { resetNavigationTo } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
-import NavigationTab from 'components/NavigationTab';
 
 const filterNetworks = (
 	networkList: Map<string, NetworkParams>,
@@ -75,107 +66,46 @@ function AddNetwork({
 	accountsStore,
 	navigation,
 	route
-}: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'AddNetwork'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
-	const [isAddingNetwork, setIsAddingNetwork] = useState(false);
-	const { identities, currentIdentity } = accountsStore.state;
+	const { currentIdentity } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
 	const { getSubstrateNetwork, allNetworks } = networkContextState;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 
 	const { setAlert } = useContext(AlertStateContext);
-	// catch android back button and prevent exiting the app
-	useFocusEffect(
-		React.useCallback((): any => {
-			const handleBackButton = (): boolean => {
-				if (isAddingNetwork) {
-					setIsAddingNetwork(false);
-					return true;
-				} else {
-					return false;
-				}
-			};
-			const backHandler = BackHandler.addEventListener(
-				'hardwareBackPress',
-				handleBackButton
-			);
-			return (): void => backHandler.remove();
-		}, [isAddingNetwork])
-	);
-
-	const getListOptions = (): Partial<FlatListProps<any>> => {
-		if (isNew) return {};
-		return {
-			ListFooterComponent: (
-				<>
-					<TouchableItem
-						onPress={(): void => navigation.navigate('SignTx')}
-						style={{
-							display: 'flex',
-							flexDirection: 'row'
-						}}
-					>
-						<Icon name="add" color={colors.text.main} size={30} />
-						<AccountPrefixedTitle title="Sign a polkadot-js transaction" />
-					</TouchableItem>
-					<TouchableItem
-						onPress={(): void => setIsAddingNetwork(true)}
-						style={{
-							display: 'flex',
-							flexDirection: 'row'
-						}}
-					>
-						<Icon name="add" color={colors.text.main} size={30} />
-						<AccountPrefixedTitle title="Add a network" />
-					</TouchableItem>
-				</>
-			)
-		};
-	};
-
 	const onNetworkChosen = async (
 		networkKey: string,
 		networkParams: NetworkParams
 	): Promise<void> => {
-		if (isNew || isAddingNetwork) {
-			if (isSubstrateNetworkParams(networkParams)) {
-				// derive substrate account
-				const { pathId } = networkParams;
-				const fullPath = `//${pathId}`;
-				try {
-					await accountsStore.deriveNewPath(
-						fullPath,
-						seedRefHooks.substrateAddress,
-						getSubstrateNetwork(networkKey),
-						`${networkParams.title} root`
-					);
-				} catch (error) {
-					alertPathDerivationError(setAlert, error.message);
-				}
-				resetNavigationTo(navigation, 'Main');
-			} else {
-				// derive ethereum account
-				try {
-					await accountsStore.deriveEthereumAccount(
-						seedRefHooks.brainWalletAddress,
-						networkKey,
-						allNetworks
-					);
-				} catch (e) {
-					alertPathDerivationError(setAlert, e.message);
-				}
-				resetNavigationTo(navigation, 'Main');
+		await unlockIdentitySeed(currentIdentity, seedRefHooks.createSeedRef);
+		if (isSubstrateNetworkParams(networkParams)) {
+			// derive substrate account
+			const { pathId } = networkParams;
+			const fullPath = `//${pathId}`;
+			try {
+				await accountsStore.deriveNewPath(
+					fullPath,
+					seedRefHooks.substrateAddress,
+					getSubstrateNetwork(networkKey),
+					`${networkParams.title} root`
+				);
+			} catch (error) {
+				alertPathDerivationError(setAlert, error.message);
 			}
+			resetNavigationTo(navigation, 'Main');
 		} else {
-			if (isSubstrateNetworkParams(networkParams)) {
-				// navigate to substrate account
-				const { pathId } = networkParams;
-				const fullPath = `//${pathId}`;
-				navigateToAddToPolkadotJs(navigation, networkKey, fullPath);
-			} else {
-				// navigate to ethereum account
-				navigateToAddToPolkadotJs(navigation, networkKey, networkKey);
+			// derive ethereum account
+			try {
+				await accountsStore.deriveEthereumAccount(
+					seedRefHooks.brainWalletAddress,
+					networkKey,
+					allNetworks
+				);
+			} catch (e) {
+				alertPathDerivationError(setAlert, e.message);
 			}
+			resetNavigationTo(navigation, 'Main');
 		}
 	};
 
@@ -188,14 +118,10 @@ function AddNetwork({
 		() =>
 			filterNetworks(allNetworks, (networkKey, shouldExclude) => {
 				if (isNew && !shouldExclude) return true;
-
-				if (isAddingNetwork) {
-					if (shouldExclude) return false;
-					return !availableNetworks.includes(networkKey);
-				}
-				return availableNetworks.includes(networkKey);
+				if (shouldExclude) return false;
+				return !availableNetworks.includes(networkKey);
 			}),
-		[availableNetworks, isNew, isAddingNetwork, allNetworks]
+		[availableNetworks, isNew, allNetworks]
 	);
 
 	const renderNetwork = ({
@@ -224,22 +150,15 @@ function AddNetwork({
 		<SafeAreaViewContainer>
 			{isNew ? (
 				<ScreenHeading title={'Select a network'} />
-			) : isAddingNetwork ? (
-				<IdentityHeading
-					title={'Add a network'}
-					onPressBack={(): void => setIsAddingNetwork(false)}
-				/>
 			) : (
-				<IdentityHeading title={getIdentityName(currentIdentity, identities)} />
+				<IdentityHeading title={'Add a network'} />
 			)}
 			<FlatList
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 				testID={testIDs.Main.chooserScreen}
-				{...(!isAddingNetwork && !isNew && getListOptions())}
 			/>
-			{!isAddingNetwork && !isNew && <NavigationTab />}
 		</SafeAreaViewContainer>
 	);
 }
