@@ -214,14 +214,6 @@ export const getAddressWithPath = (
 		: address;
 };
 
-export const unlockIdentitySeed = async (
-	identity: Identity,
-	createSeedRef: TryCreateFunc
-): Promise<void> => {
-	await unlockIdentitySeedWithReturn(identity);
-	await createSeedRef(PIN);
-};
-
 export const getIdentitySeed = async (
 	identity: Identity,
 ): Promise<string> => {

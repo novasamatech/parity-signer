@@ -37,7 +37,7 @@ import {
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
-import { getExistedNetworkKeys, unlockIdentitySeed } from 'utils/identitiesUtils';
+import { getExistedNetworkKeys } from 'utils/identitiesUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
 
@@ -78,7 +78,6 @@ function AddNetwork({
 		networkKey: string,
 		networkParams: NetworkParams
 	): Promise<void> => {
-		await unlockIdentitySeed(currentIdentity, seedRefHooks.createSeedRef);
 		if (isSubstrateNetworkParams(networkParams)) {
 			// derive substrate account
 			const { pathId } = networkParams;
