@@ -170,12 +170,10 @@ export function useProcessBarCode(
 		const isSeedRefInvalid = seedRef && seedRef.isValid();
 
 		await _unlockSeedAndSign(sender, qrInfo);
-		const nextRoute = type === 'transaction' ? 'SignedTx' : 'SignedMessage';
-
 		if (isSeedRefInvalid) {
-			navigation.navigate(nextRoute);
+			navigation.navigate('SignedTx');
 		} else {
-			navigation.replace(nextRoute);
+			navigation.replace('SignedTx');
 		}
 	}
 

@@ -40,7 +40,6 @@ const {
 	PathDetail,
 	PathsList,
 	SecurityHeader,
-	SignedMessage,
 	SignedTx
 } = testIDs;
 
@@ -49,18 +48,6 @@ const testSignedTx = async (): Promise<void> => {
 	await testTap(DetailsTx.signButton);
 	await testUnlockPin(pinCode);
 	await testExist(SignedTx.qrView);
-};
-
-const testSignedMessage = async (): Promise<void> => {
-	await testTap(SecurityHeader.scanButton);
-	await testUnlockPin(pinCode);
-	await testVisible(SignedMessage.qrView);
-};
-
-const testEthereumMessage = async (): Promise<void> => {
-	await testTap(SecurityHeader.scanButton);
-	await testUnlockPin(pinCode);
-	await testVisible(SignedMessage.qrView);
 };
 
 describe('Signing ane exporting test', () => {
@@ -95,16 +82,6 @@ describe('Signing ane exporting test', () => {
 			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
 			await testSignedTx();
 		});
-
-		it('should sign multipart request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartKusama);
-			await testSignedMessage();
-		});
-
-		it('should sign extrinsic hashes', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkHashKusama);
-			await testSignedMessage();
-		});
 	});
 
 	describe('Polkadot Signing Test', () => {
@@ -131,11 +108,6 @@ describe('Signing ane exporting test', () => {
 			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
 			await testSignedTx();
 		});
-
-		it('should sign multipart request', async () => {
-			await launchWithScanRequest(ScanTestRequest.SetRemarkMultiPartPolkadot);
-			await testSignedMessage();
-		});
 	});
 
 	describe('Ethereum Signing Test', () => {
@@ -157,11 +129,6 @@ describe('Signing ane exporting test', () => {
 		it('should sign transactions', async () => {
 			await launchWithScanRequest(ScanTestRequest.EthereumTransaction);
 			await testSignedTx();
-		});
-
-		it('should sign message', async () => {
-			await launchWithScanRequest(ScanTestRequest.EthereumMessage);
-			await testEthereumMessage();
 		});
 	});
 });

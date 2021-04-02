@@ -76,9 +76,6 @@ const testIDs = {
 	SignTx: {
 		networkAddSuccessButton: 'qr_scanner_add_network_button'
 	},
-	SignedMessage: {
-		qrView: 'signed_message_qr_view'
-	},
 	SignedTx: {
 		qrView: 'signed_tx_qr_view'
 	},
