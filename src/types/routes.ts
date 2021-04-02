@@ -10,12 +10,8 @@ export type RootStackParamList = {
 	Empty: undefined;
 	ReceiveBalance: { path: string };
 	SendBalance: { path: string };
-	SignTx:
-		| undefined
-		| {
-				isScanningNetworkSpec: true;
-		  };
 	Security: undefined;
-	SignedTx: undefined;
+	SignTransaction: { isScanningNetworkSpec: true } | undefined;
+	SignTransactionFinish: undefined;
 	TxDetails: undefined;
 };

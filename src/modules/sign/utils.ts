@@ -70,7 +70,7 @@ export function useProcessBarCode(
 	const [seedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	const navigation: StackNavigationProp<
 		RootStackParamList,
-		'SignTx'
+		'SignTransaction'
 	> = useNavigation();
 
 	async function parseQrData(
@@ -171,9 +171,9 @@ export function useProcessBarCode(
 
 		await _unlockSeedAndSign(sender, qrInfo);
 		if (isSeedRefInvalid) {
-			navigation.navigate('SignedTx');
+			navigation.navigate('SignTransactionFinish');
 		} else {
-			navigation.replace('SignedTx');
+			navigation.replace('SignTransactionFinish');
 		}
 	}
 

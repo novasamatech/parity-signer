@@ -40,14 +40,14 @@ const {
 	PathDetail,
 	PathsList,
 	SecurityHeader,
-	SignedTx
+	SignTransactionFinish
 } = testIDs;
 
-const testSignedTx = async (): Promise<void> => {
+const testSignTransactionFinish = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
 	await testTap(DetailsTx.signButton);
 	await testUnlockPin(pinCode);
-	await testExist(SignedTx.qrView);
+	await testExist(SignTransactionFinish.qrView);
 };
 
 describe('Signing ane exporting test', () => {
@@ -67,7 +67,7 @@ describe('Signing ane exporting test', () => {
 
 		it('should sign the set remarks request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicKusama);
-			await testSignedTx();
+			await testSignTransactionFinish();
 		});
 
 		it('does not need sign again after pin input', async () => {
@@ -75,12 +75,12 @@ describe('Signing ane exporting test', () => {
 			await tapBack();
 			await testTap(SecurityHeader.scanButton);
 			await testTap(DetailsTx.signButton);
-			await testExist(SignedTx.qrView);
+			await testExist(SignTransactionFinish.qrView);
 		});
 
 		it('should sign transfer request', async () => {
 			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicKusama);
-			await testSignedTx();
+			await testSignTransactionFinish();
 		});
 	});
 
@@ -101,12 +101,12 @@ describe('Signing ane exporting test', () => {
 
 		it('should sign the set remarks request', async () => {
 			await launchWithScanRequest(ScanTestRequest.SetRemarkExtrinsicPolkadot);
-			await testSignedTx();
+			await testSignTransactionFinish();
 		});
 
 		it('should sign transfer request', async () => {
 			await launchWithScanRequest(ScanTestRequest.TransferExtrinsicPolkadot);
-			await testSignedTx();
+			await testSignTransactionFinish();
 		});
 	});
 
@@ -128,7 +128,7 @@ describe('Signing ane exporting test', () => {
 
 		it('should sign transactions', async () => {
 			await launchWithScanRequest(ScanTestRequest.EthereumTransaction);
-			await testSignedTx();
+			await testSignTransactionFinish();
 		});
 	});
 });

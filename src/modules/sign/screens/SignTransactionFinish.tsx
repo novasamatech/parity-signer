@@ -30,7 +30,7 @@ import CompatibleCard from 'components/CompatibleCard';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 
-function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
+function SignTransactionFinish(props: NavigationProps<'SignTransactionFinish'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const { recipient, sender } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
@@ -39,15 +39,15 @@ function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
 
 	if (sender === null || recipient === null) return <View />;
 	return (
-		<SignedTxView sender={sender} scannerStore={scannerStore} {...props} />
+		<SignTransactionFinishView sender={sender} scannerStore={scannerStore} {...props} />
 	);
 }
 
-interface Props extends NavigationScannerProps<'SignedTx'> {
+interface Props extends NavigationScannerProps<'SignTransactionFinish'> {
 	sender: FoundAccount;
 }
 
-function SignedTxView({ sender, scannerStore }: Props): React.ReactElement {
+function SignTransactionFinishView({ sender, scannerStore }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { signedData } = scannerStore.state;
 
@@ -69,11 +69,11 @@ function SignedTxView({ sender, scannerStore }: Props): React.ReactElement {
 			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
 				{'Scan to publish'}
 			</Text>
-			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+			<View style={styles.qr} testID={testIDs.SignTransactionFinish.qrView}>
 				<QrView data={signedData} />
 			</View>
 		</SafeAreaScrollViewContainer>
 	);
 }
 
-export default SignedTx;
+export default SignTransactionFinish;

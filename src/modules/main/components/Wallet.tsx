@@ -89,7 +89,7 @@ function Wallet({
 			ListFooterComponent: (
 				<>
 					<TouchableItem
-						onPress={(): void => navigation.navigate('SignTx')}
+						onPress={(): void => navigation.navigate('SignTransaction')}
 						style={{
 							display: 'flex',
 							flexDirection: 'row'

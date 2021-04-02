@@ -19,7 +19,7 @@ const {
 	PathDetail,
 	PathsList,
 	SecurityHeader,
-	SignedTx
+	SignTransactionFinish
 } = testIDs;
 
 const passwordedPath = '//passworded';
@@ -56,7 +56,7 @@ describe('passworded account test', () => {
 			await testTap(DetailsTx.signButton);
 			await testInputWithDone(IdentityPin.unlockPinInput, pinCode);
 			await testInput(IdentityPin.passwordInput, password);
-			await testExist(SignedTx.qrView);
+			await testExist(SignTransactionFinish.qrView);
 		});
 
 		it('does only need password again in the second try', async () => {
@@ -65,7 +65,7 @@ describe('passworded account test', () => {
 			await testTap(SecurityHeader.scanButton);
 			await testTap(DetailsTx.signButton);
 			await testInput(IdentityPin.passwordInput, password);
-			await testExist(SignedTx.qrView);
+			await testExist(SignTransactionFinish.qrView);
 		});
 	});
 });

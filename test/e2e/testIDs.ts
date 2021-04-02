@@ -73,10 +73,10 @@ const testIDs = {
 		popupMenuButton: 'path_detail_popup_menu_button',
 		screen: 'path_detail_screen'
 	},
-	SignTx: {
+	SignTransaction: {
 		networkAddSuccessButton: 'qr_scanner_add_network_button'
 	},
-	SignedTx: {
+	SignTransactionFinish: {
 		qrView: 'signed_tx_qr_view'
 	},
 	TacScreen: {

@@ -39,8 +39,8 @@ import CreateWallet from 'screens/CreateWallet';
 import Settings from 'screens/Settings';
 import ReceiveBalance from 'screens/ReceiveBalance';
 import SendBalance from 'screens/SendBalance';
-import SignTx from 'modules/sign/screens/SignTx';
-import SignedTx from 'modules/sign/screens/SignedTx';
+import SignTransaction from 'modules/sign/screens/SignTransaction';
+import SignTransactionFinish from 'modules/sign/screens/SignTransactionFinish';
 import colors from 'styles/colors';
 import { headerHeight } from 'styles/containerStyles';
 import { RootStackParamList } from 'types/routes';
@@ -107,7 +107,7 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="Settings" component={Settings} options={{ animationEnabled: false }} />
 		<ScreenStack.Screen name="ReceiveBalance" component={ReceiveBalance} />
 		<ScreenStack.Screen name="SendBalance" component={SendBalance} />
-		<ScreenStack.Screen name="SignTx" component={SignTx} />
-		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
+		<ScreenStack.Screen name="SignTransaction" component={SignTransaction} />
+		<ScreenStack.Screen name="SignTransactionFinish" component={SignTransactionFinish} />
 	</ScreenStack.Navigator>
 );

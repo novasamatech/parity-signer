@@ -40,14 +40,14 @@ const {
 	QrScanner,
 	NetworkSettings,
 	SecurityHeader,
-	SignedTx
+	SignTransactionFinish
 } = testIDs;
 
-const testSignedTx = async (): Promise<void> => {
+const testSignTransactionFinish = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
 	await testTap(DetailsTx.signButton);
 	await testUnlockPin(pinCode);
-	await testVisible(SignedTx.qrView);
+	await testVisible(SignTransactionFinish.qrView);
 };
 
 describe('Signing ane exporting test', () => {
@@ -73,6 +73,6 @@ describe('Signing ane exporting test', () => {
 
 	it('is able to sign a signing request', async () => {
 		await launchWithScanRequest(ScanTestRequest.AddedNetworkRemarkExtrinsic);
-		await testSignedTx();
+		await testSignTransactionFinish();
 	});
 });

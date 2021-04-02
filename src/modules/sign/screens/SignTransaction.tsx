@@ -35,7 +35,7 @@ import { Frames, TxRequestData } from 'types/scannerTypes';
 
 export default function Scanner({
 	navigation
-}: NavigationProps<'SignTx'>): React.ReactElement {
+}: NavigationProps<'SignTransaction'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const networksContextState = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertStateContext);
@@ -64,7 +64,7 @@ export default function Scanner({
 		if (isAddNetworkSuccess) {
 			setAlert(title, message, [
 				{
-					testID: testIDs.SignTx.networkAddSuccessButton,
+					testID: testIDs.SignTransaction.networkAddSuccessButton,
 					text: 'Done'
 				}
 			]);
