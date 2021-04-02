@@ -31,7 +31,7 @@ import { View } from 'react-native';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import testIDs from 'e2e/testIDs';
 import Wallet from 'modules/main/screens/Wallet';
-import AddNetwork from 'modules/main/screens/AddNetwork';
+import AddNetwork from 'screens/AddNetwork';
 import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
 import RenameWallet from 'screens/RenameWallet';
 import DeleteWallet from 'screens/DeleteWallet';

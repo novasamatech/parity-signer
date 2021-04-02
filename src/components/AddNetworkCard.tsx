@@ -36,7 +36,7 @@ export const CardSeparator = (): ReactElement => (
 	/>
 );
 
-export function NetworkCard({
+export function AddNetworkCard({
 	networkKey,
 	onPress,
 	testID,

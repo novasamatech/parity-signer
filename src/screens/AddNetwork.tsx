@@ -18,8 +18,7 @@
 import React, { ReactElement, useContext, useMemo } from 'react';
 import { FlatList } from 'react-native';
 
-import { NetworkCard } from '../components/NetworkCard';
-
+import { AddNetworkCard } from 'components/AddNetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import {
@@ -135,7 +134,7 @@ function AddNetwork({
 			? networkParams.ethereumChainId
 			: networkParams.pathId;
 		return (
-			<NetworkCard
+			<AddNetworkCard
 				key={networkKey}
 				testID={testIDs.Wallet.networkButton + networkIndexSuffix}
 				networkKey={networkKey}
