@@ -37,7 +37,8 @@ import RenameWallet from 'screens/RenameWallet';
 import DeleteWallet from 'screens/DeleteWallet';
 import CreateWallet from 'screens/CreateWallet';
 import Settings from 'screens/Settings';
-import AddToPolkadotJs from 'screens/AddToPolkadotJs';
+import ReceiveBalance from 'screens/ReceiveBalance';
+import SendBalance from 'screens/SendBalance';
 import SignTx from 'modules/sign/screens/SignTx';
 import SignedMessage from 'modules/sign/screens/SignedMessage';
 import SignedTx from 'modules/sign/screens/SignedTx';
@@ -105,7 +106,8 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="DeleteWallet" component={DeleteWallet} options={{ animationEnabled: false }} />
 		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
 		<ScreenStack.Screen name="Settings" component={Settings} options={{ animationEnabled: false }} />
-		<ScreenStack.Screen name="AddToPolkadotJs" component={AddToPolkadotJs} />
+		<ScreenStack.Screen name="ReceiveBalance" component={ReceiveBalance} />
+		<ScreenStack.Screen name="SendBalance" component={SendBalance} />
 		<ScreenStack.Screen name="SignTx" component={SignTx} />
 		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />

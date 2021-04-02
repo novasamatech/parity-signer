@@ -41,7 +41,7 @@ import {
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import { navigateToAddToPolkadotJs } from 'utils/navigationHelpers';
+import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import NavigationTab from 'components/NavigationTab';
 
 const filterNetworks = (
@@ -121,10 +121,10 @@ function Wallet({
 			// navigate to substrate account
 			const { pathId } = networkParams;
 			const fullPath = `//${pathId}`;
-			navigateToAddToPolkadotJs(navigation, networkKey, fullPath);
+			navigateToReceiveBalance(navigation, networkKey, fullPath);
 		} else {
 			// navigate to ethereum account
-			navigateToAddToPolkadotJs(navigation, networkKey, networkKey);
+			navigateToReceiveBalance(navigation, networkKey, networkKey);
 		}
 	};
 

@@ -24,7 +24,7 @@ export type GenericNavigationProps<
 	RouteName extends keyof RootStackParamList
 > = StackNavigationProp<RootStackParamList, RouteName>;
 
-export const navigateToAddToPolkadotJs = <
+export const navigateToReceiveBalance = <
 	RouteName extends keyof RootStackParamList
 >(
 	navigation: GenericNavigationProps<RouteName>,
@@ -39,7 +39,7 @@ export const navigateToAddToPolkadotJs = <
 				params: { isNew: false }
 			},
 			{
-				name: 'AddToPolkadotJs',
+				name: 'ReceiveBalance',
 				params: { networkKey, path }
 			}
 		]

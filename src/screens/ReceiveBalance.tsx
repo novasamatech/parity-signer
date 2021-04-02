@@ -47,7 +47,7 @@ import { resetNavigationTo } from 'utils/navigationHelpers';
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation: StackNavigationProp<RootStackParamList, 'AddToPolkadotJs'>;
+	navigation: StackNavigationProp<RootStackParamList, 'ReceiveBalance'>;
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
@@ -94,7 +94,7 @@ function PathDetailsView({
 		<SafeAreaViewContainer>
 			<ScrollView testID={testIDs.PathDetail.screen} bounces={false}>
 				<LeftScreenHeading
-					title="Add to polkadot-js"
+					title="Receive Balance"
 					networkKey={formattedNetworkKey}
 					headMenu={
 						<PopupMenu
@@ -123,11 +123,11 @@ function PathDetailsView({
 	);
 }
 
-function AddToPolkadotJs({
+function ReceiveBalance({
 	accountsStore,
 	navigation,
 	route
-}: NavigationAccountIdentityProps<'AddToPolkadotJs'>): React.ReactElement {
+}: NavigationAccountIdentityProps<'ReceiveBalance'>): React.ReactElement {
 	const path = route.params.path;
 	const networksContextState = useContext(NetworksContext);
 	const networkKey = getNetworkKey(
@@ -151,4 +151,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default withCurrentIdentity(AddToPolkadotJs);
+export default withCurrentIdentity(ReceiveBalance);

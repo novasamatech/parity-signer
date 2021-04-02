@@ -8,7 +8,8 @@ export type RootStackParamList = {
 	Settings: undefined;
 	MessageDetails: undefined;
 	Empty: undefined;
-	AddToPolkadotJs: { path: string };
+	ReceiveBalance: { path: string };
+	SendBalance: { path: string };
 	SignTx:
 		| undefined
 		| {
