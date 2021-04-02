@@ -47,6 +47,29 @@ export const navigateToReceiveBalance = <
 	navigation.dispatch(resetAction);
 };
 
+export const navigateToSendBalance = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>,
+	networkKey: string,
+	path: string
+): void => {
+	const resetAction = CommonActions.reset({
+		index: 1,
+		routes: [
+			{
+				name: 'Wallet',
+				params: { isNew: false }
+			},
+			{
+				name: 'SendBalance',
+				params: { networkKey, path }
+			}
+		]
+	});
+	navigation.dispatch(resetAction);
+};
+
 export const resetNavigationTo = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>,
 	screenName: string,

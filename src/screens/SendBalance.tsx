@@ -16,33 +16,14 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useContext } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { View, Text } from 'react-native';
 
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
-import testIDs from 'e2e/testIDs';
-import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 // TODO use typescript 3.8's type import, Wait for prettier update.
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import PathCard from 'components/PathCard';
-import PopupMenu from 'components/PopupMenu';
-import { LeftScreenHeading } from 'components/ScreenHeading';
-import colors from 'styles/colors';
-import QrView from 'components/QrView';
 import { withCurrentIdentity } from 'utils/HOC';
-import {
-	getAddressWithPath,
-	getNetworkKey,
-	getPathName
-} from 'utils/identitiesUtils';
-import { alertDeleteAccount, alertError } from 'utils/alertUtils';
-import { generateAccountId } from 'utils/account';
-import { UnknownAccountWarning } from 'components/Warnings';
-import { resetNavigationTo } from 'utils/navigationHelpers';
 
 interface Props {
 	path: string;
@@ -51,20 +32,13 @@ interface Props {
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
-function SendBalance({
-	accountsStore,
-	navigation,
-	route
-}: NavigationAccountIdentityProps<'SendBalance'>): React.ReactElement {
-	const path = route.params.path;
-	const networksContextState = useContext(NetworksContext);
-	const networkKey = getNetworkKey(
-		path,
-		accountsStore.state.currentIdentity,
-		networksContextState
-	);
+function SendBalance({}: NavigationAccountIdentityProps<
+	'SendBalance'
+>): React.ReactElement {
 	return (
-		<View>To be implemented</View>
+		<View>
+			<Text>To be implemented</Text>
+		</View>
 		// <PathDetailsView
 		// 	accountsStore={accountsStore}
 		// 	navigation={navigation}

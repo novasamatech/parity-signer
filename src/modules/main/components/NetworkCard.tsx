@@ -15,15 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/core';
 import React, { ReactElement, useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import AccountIcon from 'components/AccountIcon';
+import Button from 'components/Button';
 import TouchableItem from 'components/TouchableItem';
 import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
 import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import { ButtonListener } from 'types/props';
+import { RootStackParamList } from 'types/routes';
+import { isSubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
+import {
+	navigateToReceiveBalance,
+	navigateToSendBalance
+} from 'utils/navigationHelpers';
 
 export const CardSeparator = (): ReactElement => (
 	<Separator
@@ -47,8 +56,34 @@ export function NetworkCard({
 	testID?: string;
 	title: string;
 }): ReactElement {
+	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { getNetwork } = useContext(NetworksContext);
 	const networkParams = getNetwork(networkKey ?? '');
+
+	const onPressed = async (isSend: boolean): Promise<void> => {
+		if (isSubstrateNetworkParams(networkParams)) {
+			// navigate to substrate account
+			const { pathId } = networkParams;
+			const fullPath = `//${pathId}`;
+			if (isSend) {
+				navigateToSendBalance(navigation, networkKey ?? '', fullPath);
+			} else {
+				navigateToReceiveBalance(navigation, networkKey ?? '', fullPath);
+			}
+		} else {
+			// navigate to ethereum account
+			if (isSend) {
+				navigateToSendBalance(navigation, networkKey ?? '', networkKey ?? '');
+			} else {
+				navigateToReceiveBalance(
+					navigation,
+					networkKey ?? '',
+					networkKey ?? ''
+				);
+			}
+		}
+	};
+
 	const isDisabled = onPress === undefined;
 	return (
 		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
@@ -58,6 +93,19 @@ export function NetworkCard({
 				<View style={styles.desc}>
 					<AccountPrefixedTitle title={title} />
 				</View>
+			</View>
+			<View style={styles.content}>
+				<Button
+					title="Send"
+					onPress={(): Promise<void> => onPressed(true)}
+					small={true}
+				/>
+				<Button
+					title="Receive"
+					onPress={(): Promise<void> => onPressed(false)}
+					small={true}
+				/>
+				<Button title="Add" small={true} />
 			</View>
 		</TouchableItem>
 	);
