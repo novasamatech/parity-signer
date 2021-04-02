@@ -37,8 +37,7 @@ export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 	const [seedRefs, setSeedRefs] = useContext<SeedRefsState>(SeedRefsContext);
 	return async (encryptedSeed, password): Promise<void> => {
 		if (!seedRefs.has(encryptedSeed)) {
-			const seedRef = new SeedRefClass();
-			await seedRef.tryCreate(encryptedSeed, password);
+			const seedRef = new SeedRefClass(encryptedSeed);
 			const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
 			setSeedRefs(newSeedRefs);
 		}
@@ -51,8 +50,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 		if (seedRefs.has(encryptedSeed)) {
 			return seedRefs.get(encryptedSeed)!;
 		} else {
-			const newSeedRef = new SeedRefClass();
-			return newSeedRef;
+			return new SeedRefClass(encryptedSeed);
 		}
 	}, [seedRefs, encryptedSeed]);
 
@@ -66,7 +64,6 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 
 	// Decrypt a seed and store the reference. Must be called before signing.
 	const createSeedRef: TryCreateFunc = async function (password) {
-		await seedRef.tryCreate(encryptedSeed, password);
 		const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
 		setSeedRefs(newSeedRefs);
 	};
@@ -81,13 +78,13 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 	};
 
 	// Use the seed reference to sign a message. Will throw an error if
-	// `tryDestroy` has already been called or if `tryCreate` failed.
+	// `tryDestroy` has already been called
 	const brainWalletSign: TryBrainWalletSignFunc = seedRef.tryBrainWalletSign.bind(
 		seedRef
 	);
 
 	// Use the seed reference to sign a message. Will throw an error if
-	// `tryDestroy` has already been called or if `tryCreate` failed.
+	// `tryDestroy` has already been called
 	const substrateSign: TrySignFunc = seedRef.trySubstrateSign.bind(seedRef);
 
 	const substrateAddress: TrySubstrateAddress = seedRef.trySubstrateAddress.bind(

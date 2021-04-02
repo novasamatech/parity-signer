@@ -91,6 +91,7 @@ function AddNetwork({
 				);
 			} catch (error) {
 				alertPathDerivationError(setAlert, error.message);
+				console.log(error.message);
 			}
 			resetNavigationTo(navigation, 'Main');
 		} else {
@@ -101,8 +102,9 @@ function AddNetwork({
 					networkKey,
 					allNetworks
 				);
-			} catch (e) {
-				alertPathDerivationError(setAlert, e.message);
+			} catch (error) {
+				alertPathDerivationError(setAlert, error.message);
+				console.log(error.message);
 			}
 			resetNavigationTo(navigation, 'Main');
 		}

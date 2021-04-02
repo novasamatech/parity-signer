@@ -20,6 +20,7 @@ import SubstrateSign from 'react-native-substrate-sign';
 import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
+import { PIN } from 'constants/pin';
 
 interface AddressObject {
 	address: string;
@@ -180,33 +181,20 @@ export class SeedRefClass {
 	private dataRef: number;
 	private valid: boolean;
 
-	constructor() {
-		this.dataRef = 0;
-		this.valid = false;
+	constructor(encryptedSeed) {
+		SubstrateSign.decryptDataRef(encryptedSeed, PIN).then((dataRef) => {
+			this.dataRef = dataRef;
+			this.valid = true;
+		});
 	}
 
 	isValid(): boolean {
 		return this.valid;
 	}
 
-	// Decrypt a seed and store the reference. Must be called before signing.
-	async tryCreate(encryptedSeed: string, password: string): Promise<number> {
-		if (this.valid) {
-			// Seed reference was already created.
-			return this.dataRef;
-		}
-		const dataRef: number = await SubstrateSign.decryptDataRef(
-			encryptedSeed,
-			password
-		);
-		this.dataRef = dataRef;
-		this.valid = true;
-		return this.dataRef;
-	}
-
 	trySubstrateAddress(suriSuffix: string, prefix: number): Promise<string> {
 		if (!this.valid) {
-			throw new Error('a seed reference has not been created');
+			throw new Error('this key has already been destroyed');
 		}
 		return SubstrateSign.substrateAddressWithRef(
 			this.dataRef,
@@ -217,7 +205,7 @@ export class SeedRefClass {
 
 	tryBrainWalletAddress(): Promise<string> {
 		if (!this.valid) {
-			throw new Error('a seed reference has not been created');
+			throw new Error('this key has already been destroyed');
 		}
 		return SubstrateSign.brainWalletAddressWithRef(this.dataRef).then(
 			(address: string) => {

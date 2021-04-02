@@ -27,9 +27,10 @@ export function useSeedRefStore(): SeedRefsState {
 				const promises: Promise<SeedRefClass>[] = Array.from(
 					seedRefs.entries()
 				).map(([, seedRef]) => {
-					if (seedRef.isValid()) {
-						return seedRef.tryDestroy();
-					}
+					// TODO: require the user to unlock the app with a PIN here
+					// if (seedRef.isValid()) {
+					// 	return seedRef.tryDestroy();
+					// }
 					return Promise.resolve();
 				});
 				await Promise.all(promises);
