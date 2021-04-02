@@ -30,7 +30,7 @@ import { View } from 'react-native';
 
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import testIDs from 'e2e/testIDs';
-import Main from 'modules/main/screens/Main';
+import Wallet from 'modules/main/screens/Wallet';
 import AddNetwork from 'modules/main/screens/AddNetwork';
 import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
 import RenameWallet from 'screens/RenameWallet';
@@ -95,10 +95,10 @@ const HeaderLeftWithBack = (): React.ReactElement => {
 
 export const AppNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
-		initialRouteName="Main"
+		initialRouteName="Wallet"
 		screenOptions={globalStackNavigationOptions}
 	>
-		<ScreenStack.Screen name="Main" component={Main} options={{ animationEnabled: false }} />
+		<ScreenStack.Screen name="Wallet" component={Wallet} options={{ animationEnabled: false }} />
 		<ScreenStack.Screen name="AddNetwork" component={AddNetwork} />
 		<ScreenStack.Screen name="ShowRecoveryPhrase" component={ShowRecoveryPhrase} />
 		<ScreenStack.Screen name="RenameWallet" component={RenameWallet} options={{ animationEnabled: false }} />

@@ -36,14 +36,14 @@ export default function NavigationTab(): React.ReactElement {
 	return (
 		<View style={styles.row}>
 			<TouchableItem
-				onPress={(): void => resetNavigationTo(navigation, 'Main')}
+				onPress={(): void => resetNavigationTo(navigation, 'Wallet')}
 				testID={testIDs.NavigationTab.wallet}
 				style={styles.item}
-				disabled={route.name === 'Main'}
+				disabled={route.name === 'Wallet'}
 			>
 				<Icon
 					color={
-						route.name === 'Main' ? colors.text.main : colors.text.disabled
+						route.name === 'Wallet' ? colors.text.main : colors.text.disabled
 					}
 					size={fontStyles.i_large.fontSize}
 					name="account-balance-wallet"
@@ -51,7 +51,9 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route.name === 'Main' ? styles.textLabel : styles.disabledTextLabel
+						route.name === 'Wallet'
+							? styles.textLabel
+							: styles.disabledTextLabel
 					}
 				>
 					Wallet
@@ -73,7 +75,9 @@ export default function NavigationTab(): React.ReactElement {
 				/>
 				<Text
 					style={
-						route.name === 'Settings' ? styles.textLabel : styles.disabledTextLabel
+						route.name === 'Settings'
+							? styles.textLabel
+							: styles.disabledTextLabel
 					}
 				>
 					Settings
@@ -97,8 +101,8 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		flexGrow: 1,
 		justifyContent: 'center',
-		paddingTop: 20,
-		paddingBottom: 30
+		paddingBottom: 30,
+		paddingTop: 20
 	},
 	row: {
 		flexDirection: 'row',

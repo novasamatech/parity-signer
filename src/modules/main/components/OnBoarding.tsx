@@ -40,7 +40,7 @@ export default function OnBoardingView({}: {}): React.ReactElement {
 			<Text
 				style={[fontStyles.quote, { textDecorationLine: 'underline' }]}
 				testID={
-					isRecover ? testIDs.Main.recoverButton : testIDs.Main.createButton
+					isRecover ? testIDs.Wallet.recoverButton : testIDs.Wallet.createButton
 				}
 				onPress={(): void => navigation.navigate('CreateWallet', { isRecover })}
 			>
@@ -51,7 +51,7 @@ export default function OnBoardingView({}: {}): React.ReactElement {
 
 	return (
 		<SafeAreaScrollViewContainer
-			testID={testIDs.Main.noAccountScreen}
+			testID={testIDs.Wallet.noAccountScreen}
 			contentContainerStyle={styles.scrollContent}
 		>
 			<View style={styles.onboardingWrapper}>

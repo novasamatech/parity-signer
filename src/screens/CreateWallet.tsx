@@ -90,7 +90,7 @@ function CreateWallet({
 				);
 			}
 			setSeedPhrase('');
-			resetNavigationTo(navigation, 'Main', { isNew: true });
+			resetNavigationTo(navigation, 'Wallet', { isNew: true });
 		} catch (e) {
 			alertIdentityCreationError(setAlert, e.message);
 		}

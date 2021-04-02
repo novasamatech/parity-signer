@@ -93,7 +93,7 @@ function AddNetwork({
 				alertPathDerivationError(setAlert, error.message);
 				console.log(error.message);
 			}
-			resetNavigationTo(navigation, 'Main');
+			resetNavigationTo(navigation, 'Wallet');
 		} else {
 			// derive ethereum account
 			try {
@@ -106,7 +106,7 @@ function AddNetwork({
 				alertPathDerivationError(setAlert, error.message);
 				console.log(error.message);
 			}
-			resetNavigationTo(navigation, 'Main');
+			resetNavigationTo(navigation, 'Wallet');
 		}
 	};
 
@@ -137,7 +137,7 @@ function AddNetwork({
 		return (
 			<NetworkCard
 				key={networkKey}
-				testID={testIDs.Main.networkButton + networkIndexSuffix}
+				testID={testIDs.Wallet.networkButton + networkIndexSuffix}
 				networkKey={networkKey}
 				onPress={(): Promise<void> =>
 					onNetworkChosen(networkKey, networkParams)
@@ -158,7 +158,7 @@ function AddNetwork({
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
-				testID={testIDs.Main.chooserScreen}
+				testID={testIDs.Wallet.chooserScreen}
 			/>
 		</SafeAreaViewContainer>
 	);

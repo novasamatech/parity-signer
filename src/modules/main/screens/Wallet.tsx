@@ -20,7 +20,9 @@ import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useFocusEffect } from '@react-navigation/native';
 
-import { NetworkCard } from './NetworkCard';
+import { NetworkCard } from '../components/NetworkCard';
+import OnBoardingView from '../components/OnBoarding';
+import NoCurrentIdentity from '../components/NoCurrentIdentity';
 
 import TouchableItem from 'components/TouchableItem';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -38,11 +40,11 @@ import {
 	isSubstrateNetworkParams,
 	NetworkParams
 } from 'types/networkTypes';
-import { NavigationAccountIdentityProps } from 'types/props';
-import { withCurrentIdentity } from 'utils/HOC';
+import { NavigationProps } from 'types/props';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import NavigationTab from 'components/NavigationTab';
+import { AccountsContext } from 'stores/AccountsContext';
 
 const filterNetworks = (
 	networkList: Map<string, NetworkParams>,
@@ -65,11 +67,9 @@ const filterNetworks = (
 		.sort((a, b) => a[1].order - b[1].order);
 };
 
-function Wallet({
-	accountsStore,
-	navigation
-}: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
-	const { identities, currentIdentity } = accountsStore.state;
+function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
+	const accountsStore = useContext(AccountsContext);
+	const { identities, currentIdentity, loaded } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
 	const { allNetworks } = networkContextState;
 	// catch android back button and prevent exiting the app
@@ -83,6 +83,26 @@ function Wallet({
 			return (): void => backHandler.remove();
 		}, [])
 	);
+
+	const availableNetworks = useMemo(
+		() =>
+			currentIdentity
+				? getExistedNetworkKeys(currentIdentity, networkContextState)
+				: [],
+		[currentIdentity, networkContextState]
+	);
+
+	const networkList = useMemo(
+		() =>
+			filterNetworks(allNetworks, networkKey => {
+				return availableNetworks.includes(networkKey);
+			}),
+		[availableNetworks, allNetworks]
+	);
+
+	if (!loaded) return <SafeAreaViewContainer />;
+	if (identities.length === 0) return <OnBoardingView />;
+	if (currentIdentity === null) return <NoCurrentIdentity />;
 
 	const getListOptions = (): Partial<FlatListProps<any>> => {
 		return {
@@ -128,19 +148,6 @@ function Wallet({
 		}
 	};
 
-	const availableNetworks = useMemo(
-		() => getExistedNetworkKeys(currentIdentity, networkContextState),
-		[currentIdentity, networkContextState]
-	);
-
-	const networkList = useMemo(
-		() =>
-			filterNetworks(allNetworks, networkKey => {
-				return availableNetworks.includes(networkKey);
-			}),
-		[availableNetworks, allNetworks]
-	);
-
 	const renderNetwork = ({
 		item
 	}: {
@@ -153,7 +160,7 @@ function Wallet({
 		return (
 			<NetworkCard
 				key={networkKey}
-				testID={testIDs.Main.networkButton + networkIndexSuffix}
+				testID={testIDs.Wallet.networkButton + networkIndexSuffix}
 				networkKey={networkKey}
 				onPress={(): Promise<void> =>
 					onNetworkChosen(networkKey, networkParams)
@@ -170,7 +177,7 @@ function Wallet({
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
-				testID={testIDs.Main.chooserScreen}
+				testID={testIDs.Wallet.chooserScreen}
 				{...getListOptions()}
 			/>
 			<NavigationTab />
@@ -178,4 +185,4 @@ function Wallet({
 	);
 }
 
-export default withCurrentIdentity(Wallet);
+export default Wallet;

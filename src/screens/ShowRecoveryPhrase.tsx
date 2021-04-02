@@ -50,7 +50,7 @@ function ShowRecoveryPhrase({
 		try {
 			await accountsStore.saveNewIdentity(seedPhrase, createSeedRefWithNewSeed);
 			setSeedPhrase('');
-			resetNavigationTo(navigation, 'Main', { isNew: true });
+			resetNavigationTo(navigation, 'Wallet', { isNew: true });
 		} catch (e) {
 			alertIdentityCreationError(setAlert, e.message);
 		}

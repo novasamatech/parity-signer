@@ -35,7 +35,7 @@ export const navigateToReceiveBalance = <
 		index: 1,
 		routes: [
 			{
-				name: 'Main',
+				name: 'Wallet',
 				params: { isNew: false }
 			},
 			{

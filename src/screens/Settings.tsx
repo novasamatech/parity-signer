@@ -66,7 +66,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 					title={title}
 					onPress={(): void => {
 						accountsStore.selectIdentity(identity);
-						resetNavigationTo(navigation, 'Main');
+						resetNavigationTo(navigation, 'Wallet');
 					}}
 					iconType="antdesign"
 					iconName="user"

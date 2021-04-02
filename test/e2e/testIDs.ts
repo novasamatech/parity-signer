@@ -51,7 +51,7 @@ const testIDs = {
 		scrollScreen: 'identity_new_scroll_screen',
 		seedInput: 'identity_new_seed_input'
 	},
-	Main: {
+	Wallet: {
 		addCustomNetworkButton: 'anc_add_custom_button',
 		addNewNetworkButton: 'anc_add_new_button',
 		backButton: 'anc_back_button',

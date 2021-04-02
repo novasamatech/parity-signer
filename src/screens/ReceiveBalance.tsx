@@ -78,7 +78,7 @@ function PathDetailsView({
 				alertDeleteAccount(setAlert, 'this account', async () => {
 					try {
 						accountsStore.deletePath(path, networksContextState);
-						resetNavigationTo(navigation, 'Main');
+						resetNavigationTo(navigation, 'Wallet');
 					} catch (err) {
 						alertError(
 							setAlert,

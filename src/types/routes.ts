@@ -1,5 +1,5 @@
 export type RootStackParamList = {
-	Main: undefined;
+	Wallet: undefined;
 	AddNetwork: { isNew: boolean } | undefined;
 	ShowRecoveryPhrase: { isNew: true } | { isNew: false; seedPhrase: string };
 	RenameWallet: { identity };

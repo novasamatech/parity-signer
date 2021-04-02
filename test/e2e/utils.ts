@@ -24,14 +24,14 @@ import {
 	SubstrateNetworkKeys
 } from 'constants/networkSpecs';
 
-const { IdentityPin, CreateWallet, Main, PathDetail } = testIDs;
+const { IdentityPin, CreateWallet, Wallet, PathDetail } = testIDs;
 
 export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
 	'ability cave solid soccer gloom thought response hard around minor want welcome';
 export const pinCode = '000000';
 const substrateNetworkButtonIndex =
-	Main.networkButton +
+	Wallet.networkButton +
 	SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathId;
 
 export const testTap = async (buttonId: string): Promise<Detox.Actions<any>> =>
@@ -95,10 +95,10 @@ export const testUnlockPin = async (inputPin: string): Promise<void> => {
 
 export const testSetUpDefaultPath = async (): Promise<void> => {
 	await testInputWithDone(IdentityPin.confirmPin, pinCode);
-	await testVisible(Main.chooserScreen);
+	await testVisible(Wallet.chooserScreen);
 	await testScrollAndTap(
 		substrateNetworkButtonIndex,
-		testIDs.Main.chooserScreen
+		testIDs.Wallet.chooserScreen
 	);
 	await testVisible(PathDetail.screen);
 	await tapBack();
@@ -119,7 +119,7 @@ export const launchWithScanRequest = async (
 
 export const testRecoverIdentity = (): void => {
 	it('recover a identity with seed phrase', async () => {
-		await testTap(Main.recoverButton);
+		await testTap(Wallet.recoverButton);
 		await testVisible(CreateWallet.seedInput);
 		await testInput(CreateWallet.nameInput, mockIdentityName);
 		await element(by.id(CreateWallet.seedInput)).typeText(mockSeedPhrase);

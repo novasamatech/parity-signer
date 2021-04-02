@@ -77,7 +77,7 @@ const renderBack = (onPress?: ButtonListener): ReactNode => {
 			iconName="arrowleft"
 			iconType="antdesign"
 			onPress={onPress}
-			testID={testIDs.Main.backButton}
+			testID={testIDs.Wallet.backButton}
 			style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
 			iconBgStyle={{ backgroundColor: 'transparent' }}
 		/>
