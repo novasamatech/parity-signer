@@ -16,14 +16,21 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useContext } from 'react';
+import { ScrollView, View, Text } from 'react-native';
 
-// TODO use typescript 3.8's type import, Wait for prettier update.
+import { NetworksContext } from 'stores/NetworkContext';
+
+import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
+
 import { withCurrentIdentity } from 'utils/HOC';
+import { getNetworkKey } from 'utils/identitiesUtils';
+
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { LeftScreenHeading } from 'components/ScreenHeading';
 
 interface Props {
 	path: string;
@@ -32,19 +39,33 @@ interface Props {
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
-function SendBalance({}: NavigationAccountIdentityProps<
-	'SendBalance'
->): React.ReactElement {
+function SendBalance({
+  accountsStore,
+  navigation,
+  route,
+}: NavigationAccountIdentityProps<'SendBalance'>): React.ReactElement {
+	const path = route.params.path;
+	const networksContextState = useContext(NetworksContext);
+	const networkKey = getNetworkKey(
+		path,
+		accountsStore.state.currentIdentity,
+		networksContextState
+	);
+	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
+	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
+
 	return (
-		<View>
-			<Text>To be implemented</Text>
-		</View>
-		// <PathDetailsView
-		// 	accountsStore={accountsStore}
-		// 	navigation={navigation}
-		// 	path={path}
-		// 	networkKey={networkKey}
-		// />
+		<SafeAreaViewContainer>
+			<ScrollView bounces={false}>
+				<LeftScreenHeading
+					title="Send Balance"
+					networkKey={formattedNetworkKey}
+				/>
+				<View>
+					<Text>To be implemented</Text>
+				</View>
+			</ScrollView>
+		</SafeAreaViewContainer>
 	);
 }
 

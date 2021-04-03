@@ -19,26 +19,24 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
-// TODO use typescript 3.8's type import, Wait for prettier update.
+
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import PathCard from 'components/PathCard';
-import { LeftScreenHeading } from 'components/ScreenHeading';
 import colors from 'styles/colors';
-import QrView from 'components/QrView';
+
 import { withCurrentIdentity } from 'utils/HOC';
-import {
-	getAddressWithPath,
-	getNetworkKey,
-	getPathName
-} from 'utils/identitiesUtils';
+import { getAddressWithPath, getNetworkKey, getPathName } from 'utils/identitiesUtils';
 import { generateAccountId } from 'utils/account';
-import { UnknownAccountWarning } from 'components/Warnings';
 import { resetNavigationTo } from 'utils/navigationHelpers';
+
+import { UnknownAccountWarning } from 'components/Warnings';
+import PathCard from 'components/PathCard';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { LeftScreenHeading } from 'components/ScreenHeading';
+import QrView from 'components/QrView';
 
 interface Props {
 	path: string;
