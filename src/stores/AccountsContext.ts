@@ -71,7 +71,8 @@ export type AccountsContextState = {
 		networkParams: SubstrateNetworkParams,
 		name: string
 	) => Promise<void>;
-	deletePath: (path: string, networkContext: NetworksContextState) => void;
+	deleteEthereumAddress: (networkParams) => void;
+	deleteSubstratePath: (path: string, networkContext: NetworksContextState) => void;
 	deleteWallet: (identity: Identity) => Promise<void>;
 };
 
@@ -365,17 +366,40 @@ export function useAccountContext(): AccountsContextState {
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	function deletePath(
+	function deleteEthereumAddress(
+		networkKey
+	): void {
+		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
+		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
+
+		updatedCurrentIdentity.meta.delete(networkKey);
+
+		let key;
+		updatedCurrentIdentity.addresses.forEach((k, v) => {
+			if (k === networkKey) key = v;
+		});
+		if (key) {
+			updatedCurrentIdentity.addresses.delete(key);
+		}
+
+		_updateCurrentIdentity(updatedCurrentIdentity);
+        }
+
+	function deleteSubstratePath(
 		path: string,
 		networkContext: NetworksContextState
 	): void {
 		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
 		const pathMeta = updatedCurrentIdentity.meta.get(path);
-		updatedCurrentIdentity.meta.delete(path);
-		updatedCurrentIdentity.addresses.delete(
-			getAddressKeyByPath(path, pathMeta, networkContext)
-		);
+		if (pathMeta) {
+			updatedCurrentIdentity.meta.delete(path);
+			updatedCurrentIdentity.addresses.delete(
+				getAddressKeyByPath(path, pathMeta, networkContext)
+			);
+                } else {
+			updatedCurrentIdentity.addresses.delete(path);
+                }
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
@@ -393,7 +417,8 @@ export function useAccountContext(): AccountsContextState {
 	return {
 		clearIdentity,
 		deleteWallet,
-		deletePath,
+		deleteSubstratePath,
+		deleteEthereumAddress,
 		deriveEthereumAccount,
 		deriveNewPath,
 		getAccountByAddress,

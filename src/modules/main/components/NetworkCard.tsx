@@ -84,9 +84,9 @@ export function NetworkCard({
 			case 'PathDelete':
 				const { pathId } = networkParams;
 				if (pathId) {
-					accountsStore.deletePath(`//${pathId}`, networksContextState);
+					accountsStore.deleteSubstratePath(`//${pathId}`, networksContextState);
                                 } else {
-                                	//
+					accountsStore.deleteEthereumAddress(networkKey);
                                 }
 				resetNavigationTo(navigation, 'Wallet');
 				break;
