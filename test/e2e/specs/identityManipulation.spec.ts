@@ -151,7 +151,7 @@ describe('Load test', () => {
 		await testTap(IdentitiesSwitch.manageIdentityButton);
 		await testTap(IdentityManagement.popupMenuButton);
 		await testTap(IdentityManagement.deleteButton);
-		await testTap(Alert.deleteIdentity);
+		await testTap(Alert.deleteWallet);
 		await testUnlockPin(pinCode);
 		await testVisible(Main.noAccountScreen);
 	});

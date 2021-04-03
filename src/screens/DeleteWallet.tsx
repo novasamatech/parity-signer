@@ -37,10 +37,10 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 	const { setAlert } = useContext(AlertStateContext);
 	const { identity } = route.params;
 
-	const deleteIdentity = async (targetIdentity: Identity): Promise<void> => {
+	const deleteWallet = async (targetIdentity: Identity): Promise<void> => {
 		try {
 			resetNavigationTo(navigation, 'Wallet');
-			await accountsStore.deleteIdentity(identity);
+			await accountsStore.deleteWallet(identity);
 		} catch (err) {
 			console.error(err);
 			alertError(setAlert, "Can't delete wallet");
@@ -49,7 +49,7 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 
 	return (<SafeAreaViewContainer>
 		<ScreenHeading title="Delete Wallet" />
-		<Button title="Delete" onPress={() => deleteIdentity()} />
+		<Button title="Delete" onPress={() => deleteWallet()} />
 	</SafeAreaViewContainer>);
 }
 
