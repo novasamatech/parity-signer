@@ -18,7 +18,7 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/core';
 import React, { ReactElement, useContext } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
 import { NetworksContext } from 'stores/NetworkContext';
 import { AlertStateContext } from 'stores/alertContext';
@@ -110,6 +110,9 @@ export function NetworkCard({
 				</View>
 			</View>
 			<View style={styles.content}>
+				<Text style={styles.text}>0</Text>
+			</View>
+			<View style={styles.content}>
 				<Button
 					title="Send"
 					onPress={(): Promise<void> => onPressed(true)}
@@ -141,7 +144,11 @@ const styles = StyleSheet.create({
 	content: {
 		alignItems: 'center',
 		flexDirection: 'row',
+		display: 'flex',
 		paddingLeft: 16
+	},
+	text: {
+		color: '#fff',
 	},
 	desc: {
 		flex: 1,
