@@ -101,8 +101,8 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="Wallet" component={Wallet} options={{ animationEnabled: false }} />
 		<ScreenStack.Screen name="AddNetwork" component={AddNetwork} />
 		<ScreenStack.Screen name="ShowRecoveryPhrase" component={ShowRecoveryPhrase} />
-		<ScreenStack.Screen name="RenameWallet" component={RenameWallet} options={{ animationEnabled: false }} />
-		<ScreenStack.Screen name="DeleteWallet" component={DeleteWallet} options={{ animationEnabled: false }} />
+		<ScreenStack.Screen name="RenameWallet" component={RenameWallet} />
+		<ScreenStack.Screen name="DeleteWallet" component={DeleteWallet} />
 		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
 		<ScreenStack.Screen name="Settings" component={Settings} options={{ animationEnabled: false }} />
 		<ScreenStack.Screen name="ReceiveBalance" component={ReceiveBalance} />

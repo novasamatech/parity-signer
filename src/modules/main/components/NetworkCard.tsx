@@ -20,30 +20,24 @@ import { useNavigation } from '@react-navigation/core';
 import React, { ReactElement, useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { NetworksContext } from 'stores/NetworkContext';
+import { AlertStateContext } from 'stores/alertContext';
+import { AccountsContext } from 'stores/AccountsContext';
+
 import AccountIcon from 'components/AccountIcon';
 import Button from 'components/Button';
 import TouchableItem from 'components/TouchableItem';
 import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
-import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
+import PopupMenu from 'components/PopupMenu';
+
+import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { ButtonListener } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import { isSubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
-import {
-	navigateToReceiveBalance,
-	navigateToSendBalance
-} from 'utils/navigationHelpers';
 
-export const CardSeparator = (): ReactElement => (
-	<Separator
-		shadow={true}
-		style={{
-			backgroundColor: 'transparent',
-			height: 0,
-			marginVertical: 0
-		}}
-	/>
-);
+import { alertDeleteAccount, alertError } from 'utils/alertUtils';
+import { resetNavigationTo, navigateToReceiveBalance, navigateToSendBalance } from 'utils/navigationHelpers';
 
 export function NetworkCard({
 	networkKey,
@@ -57,8 +51,10 @@ export function NetworkCard({
 	title: string;
 }): ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
-	const { getNetwork } = useContext(NetworksContext);
-	const networkParams = getNetwork(networkKey ?? '');
+	const networksContextState = useContext(NetworksContext);
+	const networkParams = networksContextState.getNetwork(networkKey ?? '');
+	const { setAlert } = useContext(AlertStateContext);
+	const accountsStore = useContext(AccountsContext);
 
 	const onPressed = async (isSend: boolean): Promise<void> => {
 		if (isSubstrateNetworkParams(networkParams)) {
@@ -83,11 +79,30 @@ export function NetworkCard({
 			}
 		}
 	};
+	const onOptionSelect = async (value: string): Promise<void> => {
+		switch (value) {
+			case 'PathDelete':
+				const { pathId } = networkParams;
+				if (pathId) {
+					accountsStore.deletePath(`//${pathId}`, networksContextState);
+                                } else {
+                                	//
+                                }
+				resetNavigationTo(navigation, 'Wallet');
+				break;
+		}
+	};
 
 	const isDisabled = onPress === undefined;
 	return (
-		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
-			<CardSeparator />
+		<View>
+                        <Separator
+                                style={{
+                                        backgroundColor: 'transparent',
+                                        height: 0,
+                                        marginVertical: 0
+                                }}
+                        />
 			<View style={styles.content}>
 				<AccountIcon address={''} network={networkParams} style={styles.icon} />
 				<View style={styles.desc}>
@@ -106,8 +121,19 @@ export function NetworkCard({
 					small={true}
 				/>
 				<Button title="Add" small={true} />
+				<PopupMenu
+					onSelect={onOptionSelect}
+					menuTriggerIconName={'more-vert'}
+					menuItems={[
+						{
+							text: `Remove ${title}`,
+							textStyle: styles.deleteText,
+							value: 'PathDelete'
+						}
+					]}
+				/>
 			</View>
-		</TouchableItem>
+		</View>
 	);
 }
 

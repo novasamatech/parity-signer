@@ -371,7 +371,7 @@ export function useAccountContext(): AccountsContextState {
 	): void {
 		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
-		const pathMeta = updatedCurrentIdentity.meta.get(path)!;
+		const pathMeta = updatedCurrentIdentity.meta.get(path);
 		updatedCurrentIdentity.meta.delete(path);
 		updatedCurrentIdentity.addresses.delete(
 			getAddressKeyByPath(path, pathMeta, networkContext)

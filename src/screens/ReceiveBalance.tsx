@@ -21,15 +21,12 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
-import testIDs from 'e2e/testIDs';
-import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 // TODO use typescript 3.8's type import, Wait for prettier update.
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import PathCard from 'components/PathCard';
-import PopupMenu from 'components/PopupMenu';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import QrView from 'components/QrView';
@@ -39,7 +36,6 @@ import {
 	getNetworkKey,
 	getPathName
 } from 'utils/identitiesUtils';
-import { alertDeleteAccount, alertError } from 'utils/alertUtils';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
 import { resetNavigationTo } from 'utils/navigationHelpers';
@@ -49,78 +45,6 @@ interface Props {
 	networkKey: string;
 	navigation: StackNavigationProp<RootStackParamList, 'ReceiveBalance'>;
 	accountsStore: AccountsStoreStateWithIdentity;
-}
-
-function PathDetailsView({
-	accountsStore,
-	navigation,
-	path,
-	networkKey
-}: Props): React.ReactElement {
-	const { currentIdentity } = accountsStore.state;
-	const address = getAddressWithPath(path, currentIdentity);
-	const accountName = getPathName(path, currentIdentity);
-	const { setAlert } = useContext(AlertStateContext);
-	const networksContextState = useContext(NetworksContext);
-	const { allNetworks } = networksContextState;
-	if (!address) return <View />;
-	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
-	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
-	const accountId = generateAccountId(
-		address,
-		formattedNetworkKey,
-		allNetworks
-	);
-
-	const onOptionSelect = async (value: string): Promise<void> => {
-		switch (value) {
-			case 'PathDelete':
-				alertDeleteAccount(setAlert, 'this account', async () => {
-					try {
-						accountsStore.deletePath(path, networksContextState);
-						resetNavigationTo(navigation, 'Wallet');
-					} catch (err) {
-						alertError(
-							setAlert,
-							`Can't delete this account: ${err.toString()}`
-						);
-					}
-				});
-				break;
-		}
-	};
-
-	return (
-		<SafeAreaViewContainer>
-			<ScrollView testID={testIDs.PathDetail.screen} bounces={false}>
-				<LeftScreenHeading
-					title="Receive Balance"
-					networkKey={formattedNetworkKey}
-					headMenu={
-						<PopupMenu
-							testID={testIDs.PathDetail.popupMenuButton}
-							onSelect={onOptionSelect}
-							menuTriggerIconName={'more-vert'}
-							menuItems={[
-								{
-									testID: testIDs.PathDetail.deleteButton,
-									text: 'Delete',
-									textStyle: styles.deleteText,
-									value: 'PathDelete'
-								}
-							]}
-						/>
-					}
-				/>
-				<PathCard
-					identity={currentIdentity}
-					path={path}
-				/>
-				<QrView data={`${accountId}:${accountName}`} />
-				{isUnknownNetwork && <UnknownAccountWarning isPath />}
-			</ScrollView>
-		</SafeAreaViewContainer>
-	);
 }
 
 function ReceiveBalance({
@@ -135,13 +59,34 @@ function ReceiveBalance({
 		accountsStore.state.currentIdentity,
 		networksContextState
 	);
+	const { currentIdentity } = accountsStore.state;
+	const address = getAddressWithPath(path, currentIdentity);
+	const accountName = getPathName(path, currentIdentity);
+	const { allNetworks } = networksContextState;
+	if (!address) return <View />;
+	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
+	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
+	const accountId = generateAccountId(
+		address,
+		formattedNetworkKey,
+		allNetworks
+	);
+
 	return (
-		<PathDetailsView
-			accountsStore={accountsStore}
-			navigation={navigation}
-			path={path}
-			networkKey={networkKey}
-		/>
+		<SafeAreaViewContainer>
+			<ScrollView bounces={false}>
+				<LeftScreenHeading
+					title="Receive Balance"
+					networkKey={formattedNetworkKey}
+				/>
+				<PathCard
+					identity={currentIdentity}
+					path={path}
+				/>
+				<QrView data={`${accountId}:${accountName}`} />
+				{isUnknownNetwork && <UnknownAccountWarning isPath />}
+			</ScrollView>
+		</SafeAreaViewContainer>
 	);
 }
 

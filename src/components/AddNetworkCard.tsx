@@ -25,17 +25,6 @@ import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import { ButtonListener } from 'types/props';
 
-export const CardSeparator = (): ReactElement => (
-	<Separator
-		shadow={true}
-		style={{
-			backgroundColor: 'transparent',
-			height: 0,
-			marginVertical: 0
-		}}
-	/>
-);
-
 export function AddNetworkCard({
 	networkKey,
 	onPress,
@@ -52,7 +41,13 @@ export function AddNetworkCard({
 	const isDisabled = onPress === undefined;
 	return (
 		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
-			<CardSeparator />
+                        <Separator
+                                style={{
+                                        backgroundColor: 'transparent',
+                                        height: 0,
+                                        marginVertical: 0
+                                }}
+                        />
 			<View style={styles.content}>
 				<AccountIcon address={''} network={networkParams} style={styles.icon} />
 				<View style={styles.desc}>
