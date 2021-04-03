@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { ScrollView, View, Text } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { NetworksContext } from 'stores/NetworkContext';
 
@@ -29,6 +29,8 @@ import { RootStackParamList } from 'types/routes';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey } from 'utils/identitiesUtils';
 
+import Button from 'components/Button';
+import TextInput from 'components/TextInput';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 
@@ -54,17 +56,58 @@ function SendBalance({
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
+	const [amount, setAmount] = useState('');
+	const onChangeAmount = async (name: string): Promise<void> => {
+		setAmount(name);
+	};
+
+	const [recipient, setRecipient] = useState('');
+	const onChangeRecipient = async (name: string): Promise<void> => {
+		setRecipient(name);
+	};
+
+	const [newAddressBookEntry, setNewAddressBookEntry] = useState('');
+	const onChangeNewAddressBookEntry = async (name: string): Promise<void> => {
+		setNewAddressBookEntry(name);
+	};
+
 	return (
 		<SafeAreaViewContainer>
-			<ScrollView bounces={false}>
-				<LeftScreenHeading
-					title="Send Balance"
-					networkKey={formattedNetworkKey}
-				/>
-				<View>
-					<Text>To be implemented</Text>
-				</View>
-			</ScrollView>
+			<LeftScreenHeading
+				title="Send Balance"
+				networkKey={formattedNetworkKey}
+			/>
+			<TextInput
+				label="Amount"
+				onChangeText={onChangeAmount}
+				value={amount}
+				placeholder="0"
+				autoCorrect={false}
+				clearButtonMode="unless-editing"
+				keyboardType="numeric"
+			/>
+			<TextInput
+				label="Recipient"
+				onChangeText={onChangeRecipient}
+				value={recipient}
+				placeholder="(address)"
+				autoCorrect={false}
+			/>
+			<Button
+				title="Send"
+				onPress={() => {}}
+			/>
+			<TextInput
+				label="Add to Address Book"
+				onChangeText={onChangeNewAddressBookEntry}
+				value={newAddressBookEntry}
+				placeholder="(address)"
+				autoCorrect={false}
+			/>
+			<Button
+				title="Add"
+				onPress={() => {}}
+			/>
 		</SafeAreaViewContainer>
 	);
 }

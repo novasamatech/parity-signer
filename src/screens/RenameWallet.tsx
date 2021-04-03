@@ -20,14 +20,17 @@ import { View } from 'react-native';
 
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
+import { NetworksContext } from 'stores/NetworkContext';
 
 import Button from 'components/Button';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import TextInput from 'components/TextInput';
-import ScreenHeading from 'components/ScreenHeading';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { LeftScreenHeading } from 'components/ScreenHeading';
 
+import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertError } from 'utils/alertUtils';
+import { getNetworkKey } from 'utils/identitiesUtils';
 
 type Props = NavigationAccountIdentityProps<'RenameWallet'>;
 
@@ -37,6 +40,16 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 	const { identity } = route.params;
 	const [newIdentityName, setNewIdentityName] = useState(identity?.name || '');
 	if (!identity) return <View />;
+
+	const path = route.params.path;
+	const networksContextState = useContext(NetworksContext);
+	const networkKey = getNetworkKey(
+		path,
+		accountsStore.state.currentIdentity,
+		networksContextState
+	);
+	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
+	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const onChangeIdentity = async (name: string): Promise<void> => {
 		setNewIdentityName(name);
@@ -53,7 +66,10 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 
 	return (
 		<SafeAreaViewContainer>
-			<ScreenHeading title="Rename Wallet" />
+			<LeftScreenHeading
+				title="Send Balance"
+				networkKey={formattedNetworkKey}
+			/>
 			<TextInput
 				label="Display Name"
 				onChangeText={onChangeIdentity}
