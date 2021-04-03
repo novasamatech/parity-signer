@@ -64,16 +64,19 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 			<View key={identity.encryptedSeed}>
 				<ButtonIcon
 					title={title}
-					onPress={(): void => {
-						accountsStore.selectIdentity(identity);
-						resetNavigationTo(navigation, 'Wallet');
-					}}
 					iconType="antdesign"
 					iconName="user"
 					iconSize={24}
 					style={styles.indentedButton}
 					textStyle={fontStyles.h2}
 				/>
+				{currentIdentity.encryptedSeed !== identity.encryptedSeed ? (<ButtonWithArrow
+					title="Select this wallet"
+					onPress={(): void => {
+						accountsStore.selectIdentity(identity);
+						resetNavigationTo(navigation, 'Wallet');
+					}}
+				/>) : null}
 				<ButtonWithArrow
 					title="Rename"
 					onPress={(): void => navigation.navigate('RenameWallet', { navigation, accountsStore, identity })}
