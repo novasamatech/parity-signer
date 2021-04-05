@@ -25,7 +25,6 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Separator from 'components/Separator';
 import NavigationTab from 'components/NavigationTab';
 import { AccountsContext } from 'stores/AccountsContext';
-import { AlertStateContext } from 'stores/alertContext';
 import { Identity } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
@@ -34,8 +33,6 @@ import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import { getIdentitySeed, getIdentityName } from 'utils/identitiesUtils';
-import { alertError } from 'utils/alertUtils';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 function ButtonWithArrow(props: {
 	onPress: () => void;
@@ -48,16 +45,18 @@ function ButtonWithArrow(props: {
 function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
-	const { setAlert } = useContext(AlertStateContext);
 	const { currentIdentity, identities } = accountsStore.state;
+	if (!currentIdentity) return <View />;
 
 	const renderNonSelectedIdentity = (
 		identity: Identity
 	): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
-		const showRecoveryPhrase = async (targetIdentity: Identity): Promise<void> => {
+		const showRecoveryPhrase = async (
+			targetIdentity: Identity
+		): Promise<void> => {
 			const seedPhrase = await getIdentitySeed(targetIdentity);
-			navigation.navigate('ShowRecoveryPhrase', { isNew: false, seedPhrase });
+			navigation.navigate('ShowRecoveryPhrase', { seedPhrase });
 		};
 
 		return (
@@ -70,20 +69,34 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 					style={styles.indentedButton}
 					textStyle={fontStyles.h2}
 				/>
-				{currentIdentity.encryptedSeed !== identity.encryptedSeed ? (<ButtonWithArrow
-					title="Select this wallet"
-					onPress={(): void => {
-						accountsStore.selectIdentity(identity);
-						resetNavigationTo(navigation, 'Wallet');
-					}}
-				/>) : null}
+				{currentIdentity.encryptedSeed !== identity.encryptedSeed ? (
+					<ButtonWithArrow
+						title="Select this wallet"
+						onPress={(): void => {
+							accountsStore.selectIdentity(identity);
+							resetNavigationTo(navigation, 'Wallet');
+						}}
+					/>
+				) : null}
 				<ButtonWithArrow
 					title="Rename"
-					onPress={(): void => navigation.navigate('RenameWallet', { navigation, accountsStore, identity })}
+					onPress={(): void =>
+						navigation.navigate('RenameWallet', {
+							accountsStore,
+							identity,
+							navigation
+						})
+					}
 				/>
 				<ButtonWithArrow
 					title="Delete"
-					onPress={(): void => navigation.navigate('DeleteWallet', { navigation, accountsStore, identity })}
+					onPress={(): void =>
+						navigation.navigate('DeleteWallet', {
+							accountsStore,
+							identity,
+							navigation
+						})
+					}
 				/>
 				<ButtonWithArrow
 					title="Show Recovery Phrase"

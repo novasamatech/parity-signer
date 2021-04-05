@@ -36,6 +36,9 @@ import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
 import RenameWallet from 'screens/RenameWallet';
 import DeleteWallet from 'screens/DeleteWallet';
 import CreateWallet from 'screens/CreateWallet';
+import CreateWallet2 from 'screens/CreateWallet2';
+import CreateWallet3 from 'screens/CreateWallet3';
+import CreateWalletImport from 'screens/CreateWalletImport';
 import Settings from 'screens/Settings';
 import ReceiveBalance from 'screens/ReceiveBalance';
 import SendBalance from 'screens/SendBalance';
@@ -104,6 +107,9 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="RenameWallet" component={RenameWallet} />
 		<ScreenStack.Screen name="DeleteWallet" component={DeleteWallet} />
 		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
+		<ScreenStack.Screen name="CreateWallet2" component={CreateWallet2} />
+		<ScreenStack.Screen name="CreateWallet3" component={CreateWallet3} />
+		<ScreenStack.Screen name="CreateWalletImport" component={CreateWalletImport} />
 		<ScreenStack.Screen name="Settings" component={Settings} options={{ animationEnabled: false }} />
 		<ScreenStack.Screen name="ReceiveBalance" component={ReceiveBalance} />
 		<ScreenStack.Screen name="SendBalance" component={SendBalance} />
