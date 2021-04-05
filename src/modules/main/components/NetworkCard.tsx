@@ -21,28 +21,23 @@ import React, { ReactElement, useContext } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 import { NetworksContext } from 'stores/NetworkContext';
-import { AlertStateContext } from 'stores/alertContext';
 import { AccountsContext } from 'stores/AccountsContext';
-
 import AccountIcon from 'components/AccountIcon';
 import Button from 'components/Button';
-import TouchableItem from 'components/TouchableItem';
 import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
 import Separator from 'components/Separator';
 import PopupMenu from 'components/PopupMenu';
-
-import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { ButtonListener } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import { isSubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
-
-import { alertDeleteAccount, alertError } from 'utils/alertUtils';
-import { resetNavigationTo, navigateToReceiveBalance, navigateToSendBalance } from 'utils/navigationHelpers';
+import { isSubstrateNetworkParams } from 'types/networkTypes';
+import {
+	resetNavigationTo,
+	navigateToReceiveBalance,
+	navigateToSendBalance
+} from 'utils/navigationHelpers';
 
 export function NetworkCard({
 	networkKey,
-	onPress,
-	testID,
 	title
 }: {
 	networkKey?: string;
@@ -53,7 +48,6 @@ export function NetworkCard({
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const networksContextState = useContext(NetworksContext);
 	const networkParams = networksContextState.getNetwork(networkKey ?? '');
-	const { setAlert } = useContext(AlertStateContext);
 	const accountsStore = useContext(AccountsContext);
 
 	const onPressed = async (isSend: boolean): Promise<void> => {
@@ -82,27 +76,29 @@ export function NetworkCard({
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
 			case 'PathDelete':
-				const { pathId } = networkParams;
-				if (pathId) {
-					accountsStore.deleteSubstratePath(`//${pathId}`, networksContextState);
-                                } else {
+				if (isSubstrateNetworkParams(networkParams)) {
+					const { pathId } = networkParams;
+					accountsStore.deleteSubstratePath(
+						`//${pathId}`,
+						networksContextState
+					);
+				} else {
 					accountsStore.deleteEthereumAddress(networkKey);
-                                }
+				}
 				resetNavigationTo(navigation, 'Wallet');
 				break;
 		}
 	};
 
-	const isDisabled = onPress === undefined;
 	return (
 		<View>
-                        <Separator
-                                style={{
-                                        backgroundColor: 'transparent',
-                                        height: 0,
-                                        marginVertical: 0
-                                }}
-                        />
+			<Separator
+				style={{
+					backgroundColor: 'transparent',
+					height: 0,
+					marginVertical: 0
+				}}
+			/>
 			<View style={styles.content}>
 				<AccountIcon address={''} network={networkParams} style={styles.icon} />
 				<View style={styles.desc}>
@@ -123,14 +119,13 @@ export function NetworkCard({
 					onPress={(): Promise<void> => onPressed(false)}
 					small={true}
 				/>
-				<Button title="Add" small={true} />
+				<Button title="Add" small={true} onPress={(): void => void 0} />
 				<PopupMenu
 					onSelect={onOptionSelect}
 					menuTriggerIconName={'more-vert'}
 					menuItems={[
 						{
 							text: `Remove ${title}`,
-							textStyle: styles.deleteText,
 							value: 'PathDelete'
 						}
 					]}
@@ -143,12 +138,9 @@ export function NetworkCard({
 const styles = StyleSheet.create({
 	content: {
 		alignItems: 'center',
-		flexDirection: 'row',
 		display: 'flex',
+		flexDirection: 'row',
 		paddingLeft: 16
-	},
-	text: {
-		color: '#fff',
 	},
 	desc: {
 		flex: 1,
@@ -165,5 +157,8 @@ const styles = StyleSheet.create({
 	icon: {
 		height: 40,
 		width: 40
+	},
+	text: {
+		color: '#fff'
 	}
 });

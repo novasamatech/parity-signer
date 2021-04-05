@@ -20,6 +20,10 @@ import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useFocusEffect } from '@react-navigation/native';
 
+import { NetworkCard } from '../components/NetworkCard';
+import OnBoardingView from '../components/OnBoarding';
+import NoCurrentIdentity from '../components/NoCurrentIdentity';
+
 import {
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys
@@ -28,21 +32,14 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsContext } from 'stores/AccountsContext';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
-
 import {
 	isEthereumNetworkParams,
 	isSubstrateNetworkParams,
 	NetworkParams
 } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
-
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
-
-import { NetworkCard } from '../components/NetworkCard';
-import OnBoardingView from '../components/OnBoarding';
-import NoCurrentIdentity from '../components/NoCurrentIdentity';
-
 import TouchableItem from 'components/TouchableItem';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import AccountPrefixedTitle from 'components/AccountPrefixedTitle';

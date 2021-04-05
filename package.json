@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@eva-design/eva": "^2.0.0",
-    "@polkadot/api": "3.9.3",
+    "@polkadot/api": "^4.4.1",
     "@polkadot/metadata": "^3.9.3",
     "@polkadot/reactnative-identicon": "0.53.1",
     "@polkadot/util": "5.7.1",
