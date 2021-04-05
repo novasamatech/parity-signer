@@ -89,7 +89,8 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	protocol: NetworkProtocols.SUBSTRATE,
-	unit: 'UNIT'
+	unit: 'UNIT',
+	url: ''
 };
 
 const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
@@ -106,7 +107,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'centrifuge',
 		prefix: 36,
 		title: 'Centrifuge Mainnet',
-		unit: 'RAD'
+		unit: 'RAD',
+		url: 'wss://fullnode.centrifuge.io'
 	},
 	[SubstrateNetworkKeys.CENTRIFUGE_AMBER]: {
 		color: '#7C6136',
@@ -117,7 +119,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'centrifuge_amber',
 		prefix: 42,
 		title: 'Centrifuge Testnet Amber',
-		unit: 'ARAD'
+		unit: 'ARAD',
+		url: 'wss://fullnode.amber.centrifuge.io'
 	},
 	[SubstrateNetworkKeys.EDGEWARE]: {
 		color: '#0B95E0',
@@ -128,7 +131,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'edgeware',
 		prefix: 7,
 		title: 'Edgeware',
-		unit: 'EDG'
+		unit: 'EDG',
+		url: 'wss://mainnet1.edgewa.re'
 	},
 	[SubstrateNetworkKeys.KULUPU]: {
 		color: '#003366',
@@ -138,7 +142,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'kulupu',
 		prefix: 16,
 		title: 'Kulupu',
-		unit: 'KULU'
+		unit: 'KULU',
+		url: 'wss://rpc.kulupu.corepaper.org/ws'
 	},
 	[SubstrateNetworkKeys.KUSAMA]: {
 		color: '#000',
@@ -149,7 +154,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'kusama',
 		prefix: 2,
 		title: 'Kusama',
-		unit: 'KSM'
+		unit: 'KSM',
+		url: 'wss://kusama-rpc.polkadot.io'
 	},
 	[SubstrateNetworkKeys.KUSAMA_DEV]: {
 		color: '#000',
@@ -159,7 +165,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'kusama_dev',
 		prefix: 2,
 		title: 'Kusama Development',
-		unit: 'KSM'
+		unit: 'KSM',
+		// TODO: replace this with a testnet url
+		url: 'wss://kusama-rpc.polkadot.io'
 	},
 	[SubstrateNetworkKeys.POLKADOT]: {
 		color: '#E6027A',
@@ -170,7 +178,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'polkadot',
 		prefix: 0,
 		title: 'Polkadot',
-		unit: 'DOT'
+		unit: 'DOT',
+		url: 'wss://rpc.polkadot.io'
 	},
 	[SubstrateNetworkKeys.ROCOCO]: {
 		color: '#6f36dc',
@@ -181,7 +190,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'rococo',
 		prefix: 0,
 		title: 'Rococo',
-		unit: 'ROC'
+		unit: 'ROC',
+		url: 'wss://rococo-rpc.polkadot.io'
 	},
 	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
 		color: '#18FFB2',
@@ -191,7 +201,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'substrate_dev',
 		prefix: 42,
 		title: 'Substrate Development',
-		unit: 'UNIT'
+		unit: 'UNIT',
+		// TODO: how to handle this?
+		url: ''
 	},
 	[SubstrateNetworkKeys.WESTEND]: {
 		color: '#660D35',
@@ -202,7 +214,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		pathId: 'westend',
 		prefix: 42,
 		title: 'Westend',
-		unit: 'WND'
+		unit: 'WND',
+		url: 'wss://westend-rpc.polkadot.io'
 	}
 };
 

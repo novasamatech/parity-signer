@@ -17,7 +17,7 @@
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/core';
-import React, { ReactElement, useContext } from 'react';
+import React, { ReactElement, useContext, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 import { NetworksContext } from 'stores/NetworkContext';
@@ -49,6 +49,7 @@ export function NetworkCard({
 	const networksContextState = useContext(NetworksContext);
 	const networkParams = networksContextState.getNetwork(networkKey ?? '');
 	const accountsStore = useContext(AccountsContext);
+	const [balance, setBalance] = useState(0);
 
 	const onPressed = async (isSend: boolean): Promise<void> => {
 		if (isSubstrateNetworkParams(networkParams)) {
@@ -106,7 +107,7 @@ export function NetworkCard({
 				</View>
 			</View>
 			<View style={styles.content}>
-				<Text style={styles.text}>0</Text>
+				<Text style={styles.text}>{balance}</Text>
 			</View>
 			<View style={styles.content}>
 				<Button

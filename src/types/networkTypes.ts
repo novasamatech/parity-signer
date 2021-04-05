@@ -20,6 +20,7 @@ export type SubstrateNetworkDefaultConstant = {
 	secondaryColor?: string;
 	title: string;
 	unit: string;
+	url: string;
 };
 
 export type SubstrateNetworkBasics = {
@@ -49,6 +50,7 @@ export type SubstrateNetworkParams = {
 	secondaryColor: string;
 	title: string;
 	unit: string;
+	url: string;
 };
 
 export type EthereumNetworkDefaultConstants = {
@@ -59,6 +61,7 @@ export type EthereumNetworkDefaultConstants = {
 	protocol?: NetworkProtocol;
 	secondaryColor?: string;
 	title: string;
+	// TODO: add url
 };
 
 export type EthereumNetworkParams = {
