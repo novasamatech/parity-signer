@@ -17,8 +17,10 @@
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/core';
-import React, { ReactElement, useContext, useState } from 'react';
+import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import BN from 'bn.js';
 
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -35,21 +37,56 @@ import {
 	navigateToReceiveBalance,
 	navigateToSendBalance
 } from 'utils/navigationHelpers';
+import { getAddressWithPath } from 'utils/identitiesUtils';
 
 export function NetworkCard({
 	networkKey,
-	title
+	title,
+	path
 }: {
 	networkKey?: string;
 	onPress?: ButtonListener;
 	testID?: string;
 	title: string;
+	path: string;
 }): ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const networksContextState = useContext(NetworksContext);
 	const networkParams = networksContextState.getNetwork(networkKey ?? '');
 	const accountsStore = useContext(AccountsContext);
-	const [balance, setBalance] = useState(0);
+	const { currentIdentity } = accountsStore.state;
+	const address = getAddressWithPath(path, currentIdentity);
+	const [balance, setBalance] = useState('LOADING...');
+
+	useEffect(() => {
+		let api: ApiPromise | null = null;
+		const fetchBalance = async (): Promise<void> => {
+			if (isSubstrateNetworkParams(networkParams)) {
+				const provider = new WsProvider(networkParams.url);
+				// TODO: get types for each network
+				// TODO: load metadata at startup
+				// TODO: handle errors
+				api = await ApiPromise.create({ provider });
+				const balances = await api.query.balances.account(address);
+				const base = new BN(10).pow(new BN(networkParams.decimals));
+				const div = balances.free.div(base);
+				const mod = balances.free.mod(base);
+				setBalance(div + '.' + mod.toString(10, networkParams.decimals));
+			} else {
+				// TODO
+				setBalance('0');
+			}
+		};
+
+		fetchBalance();
+
+		// cleanup
+		return (): void => {
+			if (api) {
+				api.disconnect();
+			}
+		};
+	});
 
 	const onPressed = async (isSend: boolean): Promise<void> => {
 		if (isSubstrateNetworkParams(networkParams)) {
