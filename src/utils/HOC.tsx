@@ -15,13 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import { RouteProp } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { View } from 'react-native';
 
 import { AccountsContext } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
-import { RootStackParamList } from 'types/routes';
 import {
 	RegistriesContext,
 	RegistriesStoreState

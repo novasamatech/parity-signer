@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import React, { useContext } from 'react';
 
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import TextInput from 'components/TextInput';
 import ScreenHeading from 'components/ScreenHeading';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertError } from 'utils/alertUtils';
@@ -35,7 +33,7 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 	const { setAlert } = useContext(AlertStateContext);
 	const { identity } = route.params;
 
-	const deleteWallet = async (targetIdentity: Identity): Promise<void> => {
+	const deleteWallet = async (): Promise<void> => {
 		try {
 			resetNavigationTo(navigation, 'Wallet');
 			await accountsStore.deleteWallet(identity);
@@ -48,7 +46,7 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading title="Delete Wallet" />
-			<Button title="Delete" onPress={() => deleteWallet()} />
+			<Button title="Delete" onPress={deleteWallet} />
 		</SafeAreaViewContainer>
 	);
 }

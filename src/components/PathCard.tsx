@@ -17,7 +17,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import AntIcon from 'react-native-vector-icons/AntDesign';
 import Clipboard from '@react-native-community/clipboard';
 
 import AccountIcon from './AccountIcon';
@@ -40,7 +39,6 @@ import {
 	isSubstrateNetworkParams,
 	isUnknownNetworkParams
 } from 'types/networkTypes';
-import { ButtonListener } from 'types/props';
 import {
 	getAddressWithPath,
 	getNetworkKeyByPath,
@@ -49,7 +47,6 @@ import {
 import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
-	onPress,
 	identity,
 	isPathValid = true,
 	path,
@@ -58,7 +55,6 @@ export default function PathCard({
 	testID,
 	titlePrefix
 }: {
-	onPress?: ButtonListener;
 	identity: Identity;
 	isPathValid?: boolean;
 	path: string;

@@ -16,7 +16,6 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
-import { ScrollView, View, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { NetworksContext } from 'stores/NetworkContext';
@@ -90,7 +89,12 @@ function SendBalance({
 				placeholder="(address)"
 				autoCorrect={false}
 			/>
-			<Button title="Send" onPress={() => {}} />
+			<Button
+				title="Send"
+				onPress={() => {
+					return;
+				}}
+			/>
 			<TextInput
 				label="Add to Address Book"
 				onChangeText={onChangeNewAddressBookEntry}
@@ -98,7 +102,12 @@ function SendBalance({
 				placeholder="(address)"
 				autoCorrect={false}
 			/>
-			<Button title="Add" onPress={() => {}} />
+			<Button
+				title="Add"
+				onPress={() => {
+					return;
+				}}
+			/>
 		</SafeAreaViewContainer>
 	);
 }

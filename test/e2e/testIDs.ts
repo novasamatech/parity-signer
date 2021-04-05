@@ -25,24 +25,6 @@ const testIDs = {
 		deleteConfirmation: 'alert_delete_confirmation',
 		deleteWallet: 'alert_delete_identity'
 	},
-	Header: {
-		headerBackButton: 'header_back_button'
-	},
-	IdentitiesSwitch: {
-		addIdentityButton: 'identities_switch_add_identity',
-		manageIdentityButton: 'identities_switch_manager_button',
-		modal: 'identity_switch_modal',
-		toggleButton: 'identities_switch_toggle_button'
-	},
-	ShowRecoveryPhrase: {
-		nextButton: 'identity_backup_next',
-		passwordInput: 'identity_backup_password_input',
-		seedText: 'identity_backup_seed'
-	},
-	RenameWallet: {
-		deleteButton: 'identity_management_delete_button',
-		popupMenuButton: 'identity_management_popup_menu'
-	},
 	CreateWallet: {
 		createButton: 'identity_new_create_button',
 		nameInput: 'identity_new_name_input',
@@ -51,16 +33,14 @@ const testIDs = {
 		scrollScreen: 'identity_new_scroll_screen',
 		seedInput: 'identity_new_seed_input'
 	},
-	Wallet: {
-		addCustomNetworkButton: 'anc_add_custom_button',
-		addNewNetworkButton: 'anc_add_new_button',
-		backButton: 'anc_back_button',
-		chooserScreen: 'anc_chooser_screen',
-		createButton: 'anc_create_button',
-		networkButton: 'anc_network_button',
-		noAccountScreen: 'anc_no_account_screen',
-		recoverButton: 'anc_recover_button',
-		showExistedButton: 'anc_show_existed'
+	Header: {
+		headerBackButton: 'header_back_button'
+	},
+	IdentitiesSwitch: {
+		addIdentityButton: 'identities_switch_add_identity',
+		manageIdentityButton: 'identities_switch_manager_button',
+		modal: 'identity_switch_modal',
+		toggleButton: 'identities_switch_toggle_button'
 	},
 	NavigationTab: {
 		settings: 'navigation_tab_settings',
@@ -73,6 +53,15 @@ const testIDs = {
 		popupMenuButton: 'path_detail_popup_menu_button',
 		screen: 'path_detail_screen'
 	},
+	RenameWallet: {
+		deleteButton: 'identity_management_delete_button',
+		popupMenuButton: 'identity_management_popup_menu'
+	},
+	ShowRecoveryPhrase: {
+		nextButton: 'identity_backup_next',
+		passwordInput: 'identity_backup_password_input',
+		seedText: 'identity_backup_seed'
+	},
 	SignTransaction: {
 		networkAddSuccessButton: 'qr_scanner_add_network_button'
 	},
@@ -84,6 +73,17 @@ const testIDs = {
 		agreeTacButton: 'tac_agree',
 		nextButton: 'tac_next',
 		tacView: 'tac_view'
+	},
+	Wallet: {
+		addCustomNetworkButton: 'anc_add_custom_button',
+		addNewNetworkButton: 'anc_add_new_button',
+		backButton: 'anc_back_button',
+		chooserScreen: 'anc_chooser_screen',
+		createButton: 'anc_create_button',
+		networkButton: 'anc_network_button',
+		noAccountScreen: 'anc_no_account_screen',
+		recoverButton: 'anc_recover_button',
+		showExistedButton: 'anc_show_existed'
 	}
 };
 

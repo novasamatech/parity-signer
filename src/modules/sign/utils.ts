@@ -160,7 +160,7 @@ export function useProcessBarCode(
 	}
 
 	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
-		const { sender, type } = qrInfo;
+		const { sender } = qrInfo;
 		if (!sender)
 			return showAlertMessage(
 				strings.ERROR_TITLE,

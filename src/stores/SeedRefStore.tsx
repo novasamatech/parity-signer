@@ -26,7 +26,7 @@ export function useSeedRefStore(): SeedRefsState {
 			if (nextAppState.match(/inactive|background/) && appState === 'active') {
 				const promises: Promise<SeedRefClass>[] = Array.from(
 					seedRefs.entries()
-				).map(([, seedRef]) => {
+				).map(([, _seedRef]) => {
 					// TODO: require the user to unlock the app with a PIN here
 					// if (seedRef.isValid()) {
 					// 	return seedRef.tryDestroy();

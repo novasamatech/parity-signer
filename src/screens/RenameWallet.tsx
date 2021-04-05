@@ -37,7 +37,6 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 	const { setAlert } = useContext(AlertStateContext);
 	const { identity } = route.params;
 	const [newIdentityName, setNewIdentityName] = useState(identity?.name || '');
-	if (!identity) return <View />;
 
 	const path = route.params.path;
 	const networksContextState = useContext(NetworksContext);
@@ -48,6 +47,8 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 	);
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
+
+	if (!identity) return <View />;
 
 	const onChangeIdentity = async (name: string): Promise<void> => {
 		setNewIdentityName(name);

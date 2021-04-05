@@ -22,7 +22,6 @@ import { generateAccountId } from './account';
 
 import { NetworksContextState } from 'stores/NetworkContext';
 import { SubstrateNetworkParams } from 'types/networkTypes';
-import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
 	ETHEREUM_NETWORK_LIST,
 	SubstrateNetworkKeys,

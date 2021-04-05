@@ -32,7 +32,6 @@ import {
 	getPathName
 } from 'utils/identitiesUtils';
 import { generateAccountId } from 'utils/account';
-import { resetNavigationTo } from 'utils/navigationHelpers';
 import { UnknownAccountWarning } from 'components/Warnings';
 import PathCard from 'components/PathCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';

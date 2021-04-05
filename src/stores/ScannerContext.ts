@@ -28,12 +28,9 @@ import React, { useReducer } from 'react';
 
 import { AccountsContextState } from 'stores/AccountsContext';
 import { ETHEREUM_NETWORK_LIST } from 'constants/networkSpecs';
-import { GetNetwork, NetworksContextState } from 'stores/NetworkContext';
+import { NetworksContextState } from 'stores/NetworkContext';
 import { FoundAccount } from 'types/identityTypes';
-import {
-	isEthereumNetworkParams,
-	SubstrateNetworkParams
-} from 'types/networkTypes';
+import { SubstrateNetworkParams } from 'types/networkTypes';
 import {
 	CompletedParsedData,
 	EthereumParsedData,
@@ -53,13 +50,7 @@ import {
 	constructDataFromBytes,
 	encodeNumber
 } from 'utils/decoders';
-import {
-	brainWalletSign,
-	decryptData,
-	ethSign,
-	keccak,
-	substrateSign
-} from 'utils/native';
+import { ethSign, keccak } from 'utils/native';
 import { TryBrainWalletSignFunc, TrySignFunc } from 'utils/seedRefHooks';
 import { isAscii } from 'utils/strings';
 import transaction, { Transaction } from 'utils/transaction';

@@ -35,7 +35,7 @@ export type CreateSeedRefWithNewSeed = (
 
 export function useNewSeedRef(): CreateSeedRefWithNewSeed {
 	const [seedRefs, setSeedRefs] = useContext<SeedRefsState>(SeedRefsContext);
-	return async (encryptedSeed, password): Promise<void> => {
+	return async (encryptedSeed, _password): Promise<void> => {
 		if (!seedRefs.has(encryptedSeed)) {
 			const seedRef = new SeedRefClass(encryptedSeed);
 			const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
@@ -63,7 +63,7 @@ export function useSeedRef(encryptedSeed: string): SeedRefHooks {
 	const isSeedRefValid: boolean = seedRef.isValid();
 
 	// Decrypt a seed and store the reference. Must be called before signing.
-	const createSeedRef: TryCreateFunc = async function (password) {
+	const createSeedRef: TryCreateFunc = async function (_password) {
 		const newSeedRefs = seedRefs.set(encryptedSeed, seedRef);
 		setSeedRefs(newSeedRefs);
 	};

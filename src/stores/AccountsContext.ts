@@ -419,9 +419,9 @@ export function useAccountContext(): AccountsContextState {
 
 	return {
 		clearIdentity,
-		deleteWallet,
-		deleteSubstratePath,
 		deleteEthereumAddress,
+		deleteSubstratePath,
+		deleteWallet,
 		deriveEthereumAccount,
 		deriveNewPath,
 		getAccountByAddress,
