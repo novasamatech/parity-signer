@@ -34,7 +34,6 @@ function CreateWallet({
 	const clearIdentity = useRef(() =>
 		accountsStore.updateNewIdentity(emptyIdentity())
 	);
-	console.log(accountsStore.state.newIdentity);
 
 	useEffect((): (() => void) => {
 		clearIdentity.current();
