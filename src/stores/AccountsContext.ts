@@ -72,7 +72,10 @@ export type AccountsContextState = {
 		name: string
 	) => Promise<void>;
 	deleteEthereumAddress: (networkParams) => void;
-	deleteSubstratePath: (path: string, networkContext: NetworksContextState) => void;
+	deleteSubstratePath: (
+		path: string,
+		networkContext: NetworksContextState
+	) => void;
 	deleteWallet: (identity: Identity) => Promise<void>;
 };
 
@@ -366,9 +369,7 @@ export function useAccountContext(): AccountsContextState {
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	function deleteEthereumAddress(
-		networkKey
-	): void {
+	function deleteEthereumAddress(networkKey): void {
 		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
 
@@ -383,7 +384,7 @@ export function useAccountContext(): AccountsContextState {
 		}
 
 		_updateCurrentIdentity(updatedCurrentIdentity);
-        }
+	}
 
 	function deleteSubstratePath(
 		path: string,
@@ -397,15 +398,17 @@ export function useAccountContext(): AccountsContextState {
 			updatedCurrentIdentity.addresses.delete(
 				getAddressKeyByPath(path, pathMeta, networkContext)
 			);
-                } else {
+		} else {
 			updatedCurrentIdentity.addresses.delete(path);
-                }
+		}
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
 	function deleteWallet(identity: Identity): Promise<void> {
 		const newIdentities = deepCopyIdentities(state.identities);
-		const identityIndex = newIdentities.findIndex((i: Identity) => identity.encryptedSeed === i.encryptedSeed);
+		const identityIndex = newIdentities.findIndex(
+			(i: Identity) => identity.encryptedSeed === i.encryptedSeed
+		);
 		newIdentities.splice(identityIndex, 1);
 		setState({
 			currentIdentity: newIdentities.length >= 1 ? newIdentities[0] : null,

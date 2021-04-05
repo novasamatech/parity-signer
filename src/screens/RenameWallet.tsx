@@ -21,12 +21,10 @@ import { View } from 'react-native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
-
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { LeftScreenHeading } from 'components/ScreenHeading';
-
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertError } from 'utils/alertUtils';
@@ -77,10 +75,7 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 				placeholder="Enter a new wallet name"
 				focus
 			/>
-			<Button
-				title="Save"
-				onPress={onSaveIdentity}
-			/>
+			<Button title="Save" onPress={onSaveIdentity} />
 		</SafeAreaViewContainer>
 	);
 }

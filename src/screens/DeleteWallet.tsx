@@ -20,12 +20,10 @@ import { View } from 'react-native';
 
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-
 import Button from 'components/Button';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import TextInput from 'components/TextInput';
 import ScreenHeading from 'components/ScreenHeading';
-
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertError } from 'utils/alertUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
@@ -47,10 +45,12 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 		}
 	};
 
-	return (<SafeAreaViewContainer>
-		<ScreenHeading title="Delete Wallet" />
-		<Button title="Delete" onPress={() => deleteWallet()} />
-	</SafeAreaViewContainer>);
+	return (
+		<SafeAreaViewContainer>
+			<ScreenHeading title="Delete Wallet" />
+			<Button title="Delete" onPress={() => deleteWallet()} />
+		</SafeAreaViewContainer>
+	);
 }
 
 export default DeleteWallet;

@@ -27,7 +27,12 @@ import TouchableItem from './TouchableItem';
 
 import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
-import { defaultNetworkKey, NETWORK_LIST, UnknownNetworkKeys, NetworkProtocols } from 'constants/networkSpecs';
+import {
+	defaultNetworkKey,
+	NETWORK_LIST,
+	UnknownNetworkKeys,
+	NetworkProtocols
+} from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
@@ -120,7 +125,12 @@ export default function PathCard({
 					styles.content,
 					{ backgroundColor: 'transparent', paddingVertical: 0 }
 				]}
-				onPress={() => Clipboard.setString((networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') + address)}
+				onPress={() =>
+					Clipboard.setString(
+						(networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') +
+							address
+					)
+				}
 			>
 				<AccountIcon
 					address={address}

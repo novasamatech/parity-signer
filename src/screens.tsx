@@ -101,19 +101,36 @@ export const AppNavigator = (): React.ReactElement => (
 		initialRouteName="Wallet"
 		screenOptions={globalStackNavigationOptions}
 	>
-		<ScreenStack.Screen name="Wallet" component={Wallet} options={{ animationEnabled: false }} />
+		<ScreenStack.Screen
+			name="Wallet"
+			component={Wallet}
+			options={{ animationEnabled: false }}
+		/>
 		<ScreenStack.Screen name="AddNetwork" component={AddNetwork} />
-		<ScreenStack.Screen name="ShowRecoveryPhrase" component={ShowRecoveryPhrase} />
+		<ScreenStack.Screen
+			name="ShowRecoveryPhrase"
+			component={ShowRecoveryPhrase}
+		/>
 		<ScreenStack.Screen name="RenameWallet" component={RenameWallet} />
 		<ScreenStack.Screen name="DeleteWallet" component={DeleteWallet} />
 		<ScreenStack.Screen name="CreateWallet" component={CreateWallet} />
 		<ScreenStack.Screen name="CreateWallet2" component={CreateWallet2} />
 		<ScreenStack.Screen name="CreateWallet3" component={CreateWallet3} />
-		<ScreenStack.Screen name="CreateWalletImport" component={CreateWalletImport} />
-		<ScreenStack.Screen name="Settings" component={Settings} options={{ animationEnabled: false }} />
+		<ScreenStack.Screen
+			name="CreateWalletImport"
+			component={CreateWalletImport}
+		/>
+		<ScreenStack.Screen
+			name="Settings"
+			component={Settings}
+			options={{ animationEnabled: false }}
+		/>
 		<ScreenStack.Screen name="ReceiveBalance" component={ReceiveBalance} />
 		<ScreenStack.Screen name="SendBalance" component={SendBalance} />
 		<ScreenStack.Screen name="SignTransaction" component={SignTransaction} />
-		<ScreenStack.Screen name="SignTransactionFinish" component={SignTransactionFinish} />
+		<ScreenStack.Screen
+			name="SignTransactionFinish"
+			component={SignTransactionFinish}
+		/>
 	</ScreenStack.Navigator>
 );

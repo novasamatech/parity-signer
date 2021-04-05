@@ -182,7 +182,7 @@ export class SeedRefClass {
 	private valid: boolean;
 
 	constructor(encryptedSeed) {
-		SubstrateSign.decryptDataRef(encryptedSeed, PIN).then((dataRef) => {
+		SubstrateSign.decryptDataRef(encryptedSeed, PIN).then(dataRef => {
 			this.dataRef = dataRef;
 			this.valid = true;
 		});

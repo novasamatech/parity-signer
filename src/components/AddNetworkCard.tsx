@@ -41,13 +41,13 @@ export function AddNetworkCard({
 	const isDisabled = onPress === undefined;
 	return (
 		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
-                        <Separator
-                                style={{
-                                        backgroundColor: 'transparent',
-                                        height: 0,
-                                        marginVertical: 0
-                                }}
-                        />
+			<Separator
+				style={{
+					backgroundColor: 'transparent',
+					height: 0,
+					marginVertical: 0
+				}}
+			/>
 			<View style={styles.content}>
 				<AccountIcon address={''} network={networkParams} style={styles.icon} />
 				<View style={styles.desc}>

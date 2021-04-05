@@ -21,17 +21,18 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
-
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import colors from 'styles/colors';
-
 import { withCurrentIdentity } from 'utils/HOC';
-import { getAddressWithPath, getNetworkKey, getPathName } from 'utils/identitiesUtils';
+import {
+	getAddressWithPath,
+	getNetworkKey,
+	getPathName
+} from 'utils/identitiesUtils';
 import { generateAccountId } from 'utils/account';
 import { resetNavigationTo } from 'utils/navigationHelpers';
-
 import { UnknownAccountWarning } from 'components/Warnings';
 import PathCard from 'components/PathCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -77,10 +78,7 @@ function ReceiveBalance({
 					title="Receive Balance"
 					networkKey={formattedNetworkKey}
 				/>
-				<PathCard
-					identity={currentIdentity}
-					path={path}
-				/>
+				<PathCard identity={currentIdentity} path={path} />
 				<QrView data={`${accountId}:${accountName}`} />
 				{isUnknownNetwork && <UnknownAccountWarning isPath />}
 			</ScrollView>

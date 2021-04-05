@@ -214,9 +214,7 @@ export const getAddressWithPath = (
 		: address;
 };
 
-export const getIdentitySeed = async (
-	identity: Identity,
-): Promise<string> => {
+export const getIdentitySeed = async (identity: Identity): Promise<string> => {
 	const { encryptedSeed } = identity;
 	const seed = await decryptData(encryptedSeed, PIN);
 	const { phrase } = parseSURI(seed);

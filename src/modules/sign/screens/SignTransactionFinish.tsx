@@ -30,7 +30,9 @@ import CompatibleCard from 'components/CompatibleCard';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 
-function SignTransactionFinish(props: NavigationProps<'SignTransactionFinish'>): React.ReactElement {
+function SignTransactionFinish(
+	props: NavigationProps<'SignTransactionFinish'>
+): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const { recipient, sender } = scannerStore.state;
 	const cleanup = useRef(scannerStore.cleanup);
@@ -39,7 +41,11 @@ function SignTransactionFinish(props: NavigationProps<'SignTransactionFinish'>):
 
 	if (sender === null || recipient === null) return <View />;
 	return (
-		<SignTransactionFinishView sender={sender} scannerStore={scannerStore} {...props} />
+		<SignTransactionFinishView
+			sender={sender}
+			scannerStore={scannerStore}
+			{...props}
+		/>
 	);
 }
 
@@ -47,7 +53,10 @@ interface Props extends NavigationScannerProps<'SignTransactionFinish'> {
 	sender: FoundAccount;
 }
 
-function SignTransactionFinishView({ sender, scannerStore }: Props): React.ReactElement {
+function SignTransactionFinishView({
+	sender,
+	scannerStore
+}: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { signedData } = scannerStore.state;
 

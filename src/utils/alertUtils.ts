@@ -74,7 +74,7 @@ export const alertDeleteIdentity = (
 ): void => {
 	setAlert(
 		'Delete Identity',
-		`Do you really want to delete this wallet? It can only be recovered with its secret phrase.`,
+		'Do you really want to delete this wallet? It can only be recovered with its secret phrase.',
 		buildAlertDeleteButtons(onDelete, alertTestIDs.deleteWallet)
 	);
 };

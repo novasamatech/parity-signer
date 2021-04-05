@@ -20,15 +20,12 @@ import { ScrollView, View, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { NetworksContext } from 'stores/NetworkContext';
-
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-
 import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey } from 'utils/identitiesUtils';
-
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -42,9 +39,9 @@ interface Props {
 }
 
 function SendBalance({
-  accountsStore,
-  navigation,
-  route,
+	accountsStore,
+	navigation,
+	route
 }: NavigationAccountIdentityProps<'SendBalance'>): React.ReactElement {
 	const path = route.params.path;
 	const networksContextState = useContext(NetworksContext);
@@ -93,10 +90,7 @@ function SendBalance({
 				placeholder="(address)"
 				autoCorrect={false}
 			/>
-			<Button
-				title="Send"
-				onPress={() => {}}
-			/>
+			<Button title="Send" onPress={() => {}} />
 			<TextInput
 				label="Add to Address Book"
 				onChangeText={onChangeNewAddressBookEntry}
@@ -104,10 +98,7 @@ function SendBalance({
 				placeholder="(address)"
 				autoCorrect={false}
 			/>
-			<Button
-				title="Add"
-				onPress={() => {}}
-			/>
+			<Button title="Add" onPress={() => {}} />
 		</SafeAreaViewContainer>
 	);
 }
