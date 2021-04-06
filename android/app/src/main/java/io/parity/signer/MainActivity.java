@@ -1,4 +1,4 @@
-package io.parity.signer;
+package app.layer.wallet;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -14,7 +14,7 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-        return "NativeSigner";
+        return "LayerWallet";
     }
 
     @Override

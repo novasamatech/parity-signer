@@ -1,10 +1,10 @@
-# Parity Signer - Turn your smartphone into a hardware wallet
+# Layer Wallet - Turn your smartphone into a hardware wallet
 
-Parity Signer is a mobile crypto wallet. You can create Substrate and
+Layer Wallet is a mobile crypto wallet. You can create Substrate and
 Ethereum accounts, sign messages/transactions, and transfer funds to
 and from these accounts.
 
-Parity Signer is [GPL 3.0 licensed](LICENSE).
+Layer Wallet is [GPL 3.0 licensed](LICENSE).
 
 ### Requirements
 
@@ -106,11 +106,11 @@ In this page we will list the steps to publish the app on iOS App Store / Androi
 
 ### Changes from 4.4.0
 
-We extract the Rust part of Parity Signer to an independent npm library called [react-native-substrate-sign](https://github.com/paritytech/react-native-substrate-sign). The npm library includes prebuild ios static library (*.a) and android dynamic library (*.so), so that Parity Signer does not need to manually build Rust code anymore. Related to [#649](https://github.com/paritytech/parity-signer/issues/649)
+We extract the Rust part of Layer Wallet to an independent npm library called [react-native-substrate-sign](https://github.com/paritytech/react-native-substrate-sign). The npm library includes prebuild ios static library (*.a) and android dynamic library (*.so), so that Layer Wallet does not need to manually build Rust code anymore. Related to [#649](https://github.com/paritytech/parity-signer/issues/649)
 
 ### Changes from 4.3.1
 
-From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b176795b9386af640b3e73aff3) we use the latest prebuild NDK (r21) toolchains for building rust libraries for android, so that we do not need to build the standalone NDK toolchains manually. If you have built or develop Parity Signer before 4.3.1, please download the NDK r19 or newer[here](https://developer.android.com/ndk/downloads) and point the `NKD_HOME` environment variable to it with e.g. `export NDK_HOME=/path/to/latest/ndk`
+From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b176795b9386af640b3e73aff3) we use the latest prebuild NDK (r21) toolchains for building rust libraries for android, so that we do not need to build the standalone NDK toolchains manually. If you have built or develop Layer Wallet before 4.3.1, please download the NDK r19 or newer[here](https://developer.android.com/ndk/downloads) and point the `NKD_HOME` environment variable to it with e.g. `export NDK_HOME=/path/to/latest/ndk`
 
 
 # Troubleshooting
@@ -140,7 +140,7 @@ Please switch rustup toolchains to version `1.41.1` with `rustup default 1.41.1`
 
 ## Changes from 4.3.1
 
-From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b176795b9386af640b3e73aff3) we use the latest prebuild NDK (r21) toolchains for building rust libraries for android, so that we do not need to build the standalone NDK toolchains manually. If you have built or develop Parity Signer before 4.3.1, please download the NDK r19 or newer [here](https://developer.android.com/ndk/downloads) and point the `NKD_HOME` environment variable to it with e.g. `export NDK_HOME=/path/to/latest/ndk`
+From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b176795b9386af640b3e73aff3) we use the latest prebuild NDK (r21) toolchains for building rust libraries for android, so that we do not need to build the standalone NDK toolchains manually. If you have built or develop Layer Wallet before 4.3.1, please download the NDK r19 or newer [here](https://developer.android.com/ndk/downloads) and point the `NKD_HOME` environment variable to it with e.g. `export NDK_HOME=/path/to/latest/ndk`
 
 ## Cannot run after upgrade to latest codebase
 
@@ -151,7 +151,7 @@ From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b1
 5. `yarn start --reset-cache`
 
 #### build on iOS
-6. in Xcode (be sure to open with `./ios/NativeSigner.xcodeworkspace` file), clean build with `shift + command + K`
+6. in Xcode (be sure to open with `./ios/LayerWallet.xcodeworkspace` file), clean build with `shift + command + K`
 7. `yarn run ios`
 
 #### build on Android
@@ -167,7 +167,7 @@ From [4.3.1](https://github.com/paritytech/parity-signer/commit/ea5786c85661d9b1
 
 # Updating Networks
 
-Parity Signer support adding a new Substrate based network or update the existing network via QR code.
+Layer Wallet support adding a new Substrate based network or update the existing network via QR code.
 
 This tutorial will walk through how to add a new Rococo Network with Polkadot.js App.
 
@@ -177,14 +177,14 @@ Switch to the network you want to play with on Polkadot.js app. Click `Settings`
 
 ![Network Metadata QR Code](images/Network-Metadata-QR.png)
 
-Here we can see the chain specifications like `Network Name`, `Address Prefix`, and `Genesis Hash` etc. They are all the metaData of the network which is required by Parity Signer. The only item we could change is network color, it is used on Parity Signer to distinguish other networks.
+Here we can see the chain specifications like `Network Name`, `Address Prefix`, and `Genesis Hash` etc. They are all the metaData of the network which is required by Layer Wallet. The only item we could change is network color, it is used on Layer Wallet to distinguish other networks.
 
 On the right side is the QR Code we need.
 
-## 2. Scan metadata QR code with Parity Signer
+## 2. Scan metadata QR code with Layer Wallet
 
-Now on the Parity Signer app, click the QR scanner Button anywhere on the app, and scan this QR code, you will have the new Network added to Parity Signer. You can now create accounts under it and sign extrinsic with this network.
+Now on the Layer Wallet app, click the QR scanner Button anywhere on the app, and scan this QR code, you will have the new Network added to Layer Wallet. You can now create accounts under it and sign extrinsic with this network.
 
-![Network Metadata Added on Parity Signer](images/Network-Metadata-Added.png)
+![Network Metadata Added on Layer Wallet](images/Network-Metadata-Added.png)
 
-Notice since the metadata is generally very big data, and currently, it is hard to sync with Parity Signer, so when signing the transactions on added networks, we cannot interpret extrinsic details at the moment. Please check on this [issue](https://github.com/paritytech/parity-signer/issues/457) for the update.
+Notice since the metadata is generally very big data, and currently, it is hard to sync with Layer Wallet, so when signing the transactions on added networks, we cannot interpret extrinsic details at the moment. Please check on this [issue](https://github.com/paritytech/parity-signer/issues/457) for the update.

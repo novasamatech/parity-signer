@@ -328,7 +328,7 @@ export function useScannerContext(): ScannerContextState {
 
 		if (!sender) {
 			throw new Error(
-				`No private key found for account ${txRequest.data.account} found in your signer key storage for the ${networkTitle} chain.`
+				`No private key found for account ${txRequest.data.account} found in your key storage for the ${networkTitle} chain.`
 			);
 		}
 
@@ -368,7 +368,7 @@ export function useScannerContext(): ScannerContextState {
 
 		if (isSubstrateMessageParsedData(signRequest)) {
 			if (signRequest.data.crypto !== 'sr25519')
-				throw new Error('currently Parity Signer only support sr25519');
+				throw new Error('currently Layer Wallet only support sr25519');
 			isHash = signRequest.isHash;
 			isOversized = signRequest.oversized;
 			dataToSign = signRequest.data.data;
@@ -381,7 +381,7 @@ export function useScannerContext(): ScannerContextState {
 		const sender = accountsStore.getAccountByAddress(address, networkContext);
 		if (!sender) {
 			throw new Error(
-				`No private key found for ${address} in your signer key storage.`
+				`No private key found for ${address} in your key storage.`
 			);
 		}
 

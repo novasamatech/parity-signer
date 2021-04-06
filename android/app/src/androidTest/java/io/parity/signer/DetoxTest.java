@@ -1,4 +1,4 @@
-package io.parity.signer;
+package app.layer.wallet;
 
 import com.wix.detox.Detox;
 

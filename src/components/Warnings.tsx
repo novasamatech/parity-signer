@@ -48,7 +48,7 @@ export function UnknownAccountWarning({
 			) : (
 				<Text style={styles.warningText}>
 					This account wasn't retrieved successfully. This could be because
-					network's genesisHash is changed, or you upgraded Parity Signer
+					network's genesisHash is changed, or you upgraded Layer Wallet
 					without wiping your device and this account couldn't be migrated.
 					{'\n'}
 					{'\n'}

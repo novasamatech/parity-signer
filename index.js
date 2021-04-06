@@ -29,4 +29,4 @@ YellowBox.ignoreWarnings([
 	'Module RCTImageLoader'
 ]);
 
-AppRegistry.registerComponent('NativeSigner', () => App);
+AppRegistry.registerComponent('LayerWallet', () => App);

@@ -59,8 +59,8 @@ def flipper_post_install(installer)
   installer.pods_project.save
 end
 
-target 'NativeSigner' do
-  # Pods for NativeSigner
+target 'LayerWallet' do
+  # Pods for LayerWallet
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
@@ -92,7 +92,7 @@ target 'NativeSigner' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga', :modular_headers => true
 
-  target 'NativeSignerTests' do
+  target 'LayerWalletTests' do
     inherit! :complete
     # Pods for testing
   end

@@ -41,7 +41,7 @@ If debugging is needed:
 
 ### Integration Test
 
-Parity Signer is integrated with [Detox](https://github.com/wix/Detox) E2E testing. Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
+Layer Wallet is integrated with [Detox](https://github.com/wix/Detox) E2E testing. Detox has very detailed [documentation](https://github.com/wix/Detox/blob/master/docs/README.md).
 
 First make sure `detox-cli` is installed as global dependency with
 

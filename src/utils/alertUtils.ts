@@ -82,5 +82,5 @@ export const alertDeleteIdentity = (
 export const alertDecodeError = (setAlert: SetAlert): void =>
 	setAlert(
 		'Could not decode method with available metadata.',
-		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Parity Signer to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.'
+		'Signing something you do not understand is inherently unsafe. Do not sign this extrinsic unless you know what you are doing, or update Layer Wallet to be able to decode this message. If you are not sure, or you are using the latest version, please open an issue on github.com/paritytech/parity-signer.'
 	);

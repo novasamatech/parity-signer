@@ -1,12 +1,12 @@
-# HDKD on Parity Signer
+# HDKD on Layer Wallet
 
-## HDKD data schema on Parity Signer v4
+## HDKD data schema on Layer Wallet v4
 
 In the v4 version, the data schema is significantly refactored in order to support HDKD feature.
 
 ### Highlights of the new schema
 
-* With the same BIP32 seed users could create accounts under different networks. But if a user has a brain wallet seed, it can only create Ethereum accounts. 
+* With the same BIP32 seed users could create accounts under different networks. But if a user has a brain wallet seed, it can only create Ethereum accounts.
 * Pin is now bound to the identity instead of the keypair.
 * Additional derivation password could be set for identity in the future version, it will bind to identity.
 * Users are able to create any combination of hard derivation with `//` or soft derivation with `/`, the path will be the index of the key pair/ account within a same seed.
@@ -127,8 +127,8 @@ Both hard and soft derivation will create new keypair, and the following three w
 * Private parent key -> public child key (for hard keys, it can only by the way that firstly derives child private key, and then derive child public key, for soften keys, there is an additional way is to first derive parent public key, and then derive the public key)
 
 The key difference is that:
-hard - Public key does not has a corresponding derivation, derived public key is not linked with parent public key, it can not be proved. 
-soft - Public key has a corresponding derivation, derived public key is linked with parent public key, it can be proved. 
+hard - Public key does not has a corresponding derivation, derived public key is not linked with parent public key, it can not be proved.
+soft - Public key has a corresponding derivation, derived public key is linked with parent public key, it can be proved.
 
 The soft derivation method has a pro here is that one could derive child public keys of a given parent key without knowing any private key.
 
@@ -163,4 +163,3 @@ NOTICE: If a derived soft child private key is compromised, and parent public ke
 1. https://github.com/w3f/schnorrkel
 2. https://wiki.polkadot.network/docs/en/learn-keys
 3. https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki/
-
