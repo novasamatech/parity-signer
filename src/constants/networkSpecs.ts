@@ -46,29 +46,18 @@ export const EthereumNetworkKeys: Record<string, string> = Object.freeze({
 	ROPSTEN: '3',
 	RINKEBY: '4',
 	GOERLI: '5',
-	KOVAN: '42',
-	CLASSIC: '61'
 });
 
 /* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
-	CENTRIFUGE:
-		'0x67dddf2673b69e5f875f6f25277495834398eafd67f492e09f3f3345e003d1b5', // https://portal.chain.centrifuge.io/#/explorer/query/0
-	CENTRIFUGE_AMBER:
-		'0x092af6e7d25178ebab1677d15f66e37b30392b44ef442f728a53dd1bf48ec110', // https://portal.chain.centrifuge.io/#/explorer/query/0
-	EDGEWARE:
-		'0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b', // https://polkascan.io/pre/edgeware/block/0
+	// genesis hashes can be found at e.g. https://edgeware.subscan.io/block/0
+	EDGEWARE: '0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b',
 	KULUPU: '0xf7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba',
-	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe', // https://polkascan.io/pre/kusama-cc3/block/0
-	KUSAMA_DEV:
-		'0x5e9679182f658e148f33d3f760f11179977398bb3da8d1f0bf7b267fe6b3ebb0',
-	POLKADOT:
-		'0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
+	POLKADOT: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
 	ROCOCO: '0x78ae7dc7e64637e01fa6a6b6e4fa252c486f62af7aa71c471ad17f015bd375ce',
-	SUBSTRATE_DEV:
-		'0x0d667fd278ec412cd9fccdb066f09ed5b4cfd9c9afa9eb747213acb02b1e70bc', // substrate --dev commit ac6a2a783f0e1f4a814cf2add40275730cd41be1 hosted on wss://dev-node.substrate.dev .
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
 });
 
@@ -98,30 +87,6 @@ const unknownNetworkBase: Record<string, UnknownNetworkParams> = {
 };
 
 const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
-	[SubstrateNetworkKeys.CENTRIFUGE]: {
-		color: '#FCC367',
-		decimals: 18,
-		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
-		logo: require('res/img/logos/Centrifuge.png'),
-		order: 7,
-		pathId: 'centrifuge',
-		prefix: 36,
-		title: 'Centrifuge Mainnet',
-		unit: 'RAD',
-		url: 'wss://fullnode.centrifuge.io'
-	},
-	[SubstrateNetworkKeys.CENTRIFUGE_AMBER]: {
-		color: '#7C6136',
-		decimals: 18,
-		genesisHash: SubstrateNetworkKeys.CENTRIFUGE_AMBER,
-		logo: require('res/img/logos/Centrifuge.png'),
-		order: 8,
-		pathId: 'centrifuge_amber',
-		prefix: 42,
-		title: 'Centrifuge Testnet Amber',
-		unit: 'ARAD',
-		url: 'wss://fullnode.amber.centrifuge.io'
-	},
 	[SubstrateNetworkKeys.EDGEWARE]: {
 		color: '#0B95E0',
 		decimals: 18,
@@ -130,6 +95,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		order: 6,
 		pathId: 'edgeware',
 		prefix: 7,
+		isTestnet: false,
 		title: 'Edgeware',
 		unit: 'EDG',
 		url: 'wss://mainnet1.edgewa.re'
@@ -141,6 +107,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		order: 5,
 		pathId: 'kulupu',
 		prefix: 16,
+		isTestnet: false,
 		title: 'Kulupu',
 		unit: 'KULU',
 		url: 'wss://rpc.kulupu.corepaper.org/ws'
@@ -153,20 +120,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		order: 2,
 		pathId: 'kusama',
 		prefix: 2,
+		isTestnet: true,
 		title: 'Kusama',
 		unit: 'KSM',
-		url: 'wss://kusama-rpc.polkadot.io'
-	},
-	[SubstrateNetworkKeys.KUSAMA_DEV]: {
-		color: '#000',
-		decimals: 12,
-		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
-		order: 99,
-		pathId: 'kusama_dev',
-		prefix: 2,
-		title: 'Kusama Development',
-		unit: 'KSM',
-		// TODO: replace this with a testnet url
 		url: 'wss://kusama-rpc.polkadot.io'
 	},
 	[SubstrateNetworkKeys.POLKADOT]: {
@@ -177,6 +133,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		order: 1,
 		pathId: 'polkadot',
 		prefix: 0,
+		isTestnet: false,
 		title: 'Polkadot',
 		unit: 'DOT',
 		url: 'wss://rpc.polkadot.io'
@@ -189,21 +146,10 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		order: 4,
 		pathId: 'rococo',
 		prefix: 0,
+		isTestnet: true,
 		title: 'Rococo',
 		unit: 'ROC',
 		url: 'wss://rococo-rpc.polkadot.io'
-	},
-	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#18FFB2',
-		decimals: 12,
-		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
-		order: 100,
-		pathId: 'substrate_dev',
-		prefix: 42,
-		title: 'Substrate Development',
-		unit: 'UNIT',
-		// TODO: how to handle this?
-		url: ''
 	},
 	[SubstrateNetworkKeys.WESTEND]: {
 		color: '#660D35',
@@ -213,6 +159,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		order: 3,
 		pathId: 'westend',
 		prefix: 42,
+		isTestnet: true,
 		title: 'Westend',
 		unit: 'WND',
 		url: 'wss://westend-rpc.polkadot.io'
@@ -225,31 +172,21 @@ const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
 		order: 101,
 		secondaryColor: colors.background.card,
+		isTestnet: true,
 		title: 'Ethereum'
-	},
-	[EthereumNetworkKeys.CLASSIC]: {
-		color: '#1a4d33',
-		ethereumChainId: EthereumNetworkKeys.CLASSIC,
-		logo: require('res/img/logos/Ethereum_Classic.png'),
-		order: 102,
-		secondaryColor: colors.background.card,
-		title: 'Ethereum Classic'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
 		ethereumChainId: EthereumNetworkKeys.ROPSTEN,
 		order: 104,
+		isTestnet: true,
 		title: 'Ropsten Testnet'
 	},
 	[EthereumNetworkKeys.GOERLI]: {
 		ethereumChainId: EthereumNetworkKeys.GOERLI,
 		order: 105,
+		isTestnet: true,
 		title: 'Görli Testnet'
 	},
-	[EthereumNetworkKeys.KOVAN]: {
-		ethereumChainId: EthereumNetworkKeys.KOVAN,
-		order: 103,
-		title: 'Kovan Testnet'
-	}
 };
 
 const ethereumDefaultValues = {

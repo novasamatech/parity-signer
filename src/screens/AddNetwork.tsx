@@ -45,11 +45,6 @@ const filterNetworks = (
 	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
 ): Array<[string, NetworkParams]> => {
 	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
-	if (!__DEV__) {
-		excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-		excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-	}
-
 	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
 		const shouldExclude = excludedNetworks.includes(networkKey);
 		if (extraFilter !== undefined)

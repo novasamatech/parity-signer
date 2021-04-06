@@ -35,19 +35,10 @@ type NetworkTypesMap = {
 	[key: string]: NetworkTypes;
 };
 const networkTypesMap: NetworkTypesMap = {
-	centrifuge: {
-		alias: 'centrifuge-chain',
-		chains: {
-			centrifuge_amber: 'centrifuge-chain-amber'
-		}
-	},
 	kusama: { chains: {} },
-	polkadot: {
-		chains: {
-			westend: 'Westend'
-		}
-	},
-	rococo: { chains: {} }
+	polkadot: { chains: {} },
+	// polkadot: { westend: 'Westend' } },
+	rococo: { chains: {} },
 };
 
 export const getOverrideTypes = (

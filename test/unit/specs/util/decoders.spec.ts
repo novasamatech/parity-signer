@@ -206,12 +206,8 @@ describe('decoders', () => {
 
 	describe('Type injection from metadata', () => {
 		it('can fetch the prefix matching to a hash', () => {
-			const kusamaPrefix =
-				SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
-			// const substratePrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.SUBSTRATE_DEV].prefix;
-
+			const kusamaPrefix = SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].prefix;
 			expect(kusamaPrefix).toBe(2);
-			// expect(substrate).toBe(42);
 		});
 
 		it('decodes Payload Method to something human readable with Kusama metadata', () => {

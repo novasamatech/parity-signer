@@ -35,8 +35,6 @@ import {
 	SerializedIdentity
 } from 'types/identityTypes';
 import {
-	centrifugeAmberMetadata,
-	centrifugeMetadata,
 	edgewareMetadata,
 	kulupuMetadata,
 	kusamaMetadata,
@@ -272,12 +270,7 @@ export const getPathName = (
 
 export const getMetadata = (networkKey: string): string | null => {
 	switch (networkKey) {
-		case SubstrateNetworkKeys.CENTRIFUGE:
-			return centrifugeMetadata;
-		case SubstrateNetworkKeys.CENTRIFUGE_AMBER:
-			return centrifugeAmberMetadata;
 		case SubstrateNetworkKeys.KUSAMA:
-		case SubstrateNetworkKeys.KUSAMA_DEV:
 			return kusamaMetadata;
 		case SubstrateNetworkKeys.WESTEND:
 			return westendMetadata;

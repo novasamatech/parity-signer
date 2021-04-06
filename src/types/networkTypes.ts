@@ -61,6 +61,7 @@ export type EthereumNetworkDefaultConstants = {
 	protocol?: NetworkProtocol;
 	secondaryColor?: string;
 	title: string;
+	isTestnet: boolean;
 	// TODO: add url
 };
 
