@@ -17,10 +17,46 @@
 
 import { StyleSheet } from 'react-native';
 
-import fonts from './fonts';
-import colors from './colors';
+export const headerHeight = 40;
 
-export default StyleSheet.create({
+export const colors = {
+	background: {
+		alert: '#444444',
+		app: '#151515',
+		button: 'C0C0C0',
+		card: '#262626',
+		os: '#000000'
+	},
+	border: {
+		dark: '#000000',
+		light: '#666666',
+		signal: '#8E1F40'
+	},
+	signal: {
+		error: '#D73400',
+		main: '#FF4077'
+	},
+	text: {
+		disabled: '#2F2F2F',
+		faded: '#9A9A9A',
+		main: '#C0C0C0'
+	}
+};
+
+export const fonts = {
+	bold: 'ManifoldCF-Bold',
+	light: 'ManifoldCF-Light',
+	regular: 'Manifold CF',
+	roboto: 'Roboto-regular',
+	robotoBold: 'Roboto-Bold',
+	robotoLight: 'Roboto-Light',
+	robotoMedium: 'Roboto-Medium',
+	robotoMono: 'RobotoMono-Regular',
+	robotoMonoMedium: 'RobotoMono-Medium',
+	semiBold: 'ManifoldCF-DemiBold'
+};
+
+export const fontStyles = StyleSheet.create({
 	a_button: {
 		color: colors.background.app,
 		fontFamily: fonts.robotoMonoMedium,
@@ -30,6 +66,7 @@ export default StyleSheet.create({
 		color: colors.text.main,
 		fontFamily: fonts.robotoMono,
 		fontSize: 12,
+		textTransform: 'uppercase',
 		letterSpacing: 0.4
 	},
 	h1: {
@@ -111,5 +148,15 @@ export default StyleSheet.create({
 		minHeight: 100,
 		paddingHorizontal: 16,
 		paddingVertical: 10
+	}
+});
+
+export const containerStyles = StyleSheet.create({
+	background: {
+		backgroundColor: colors.background.app,
+		flex: 1,
+		flexDirection: 'column',
+		overflow: 'hidden',
+		paddingBottom: 0
 	}
 });

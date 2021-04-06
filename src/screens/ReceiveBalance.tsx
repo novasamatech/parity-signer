@@ -24,7 +24,7 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import colors from 'styles/colors';
+import { colors } from 'styles';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getAddressWithPath,

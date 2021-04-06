@@ -37,7 +37,7 @@ import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
 import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import CustomAlert from 'components/CustomAlert';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
-import colors from 'styles/colors';
+import { colors } from 'styles';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
 import { AlertStateContext, useAlertContext } from 'stores/alertContext';

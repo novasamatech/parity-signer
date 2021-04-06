@@ -23,8 +23,7 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
+import { colors, fontStyles } from 'styles';
 import ScreenHeading from 'components/ScreenHeading';
 import Button from 'components/Button';
 

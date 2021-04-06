@@ -23,10 +23,10 @@ import { Icon } from 'react-native-elements';
 
 import TouchableItem from './TouchableItem';
 
-import colors from 'styles/colors';
+import { colors } from 'styles';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
-import fontStyles from 'styles/fontStyles';
+import { fontStyles } from 'styles';
 import { RootStackParamList } from 'types/routes';
 
 export default function NavigationTab(): React.ReactElement {
@@ -40,6 +40,7 @@ export default function NavigationTab(): React.ReactElement {
 				testID={testIDs.NavigationTab.wallet}
 				style={styles.item}
 				disabled={route.name === 'Wallet'}
+				activeOpacity={1}
 			>
 				<Icon
 					color={
@@ -64,6 +65,7 @@ export default function NavigationTab(): React.ReactElement {
 				testID={testIDs.NavigationTab.settings}
 				style={styles.item}
 				disabled={route.name === 'Settings'}
+				activeOpacity={1}
 			>
 				<Icon
 					color={

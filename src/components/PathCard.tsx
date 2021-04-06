@@ -32,8 +32,7 @@ import {
 	UnknownNetworkKeys,
 	NetworkProtocols
 } from 'constants/networkSpecs';
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
+import { colors, fontStyles } from 'styles';
 import { Identity } from 'types/identityTypes';
 import {
 	isSubstrateNetworkParams,

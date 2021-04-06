@@ -31,7 +31,7 @@ import {
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsContext } from 'stores/AccountsContext';
 import testIDs from 'e2e/testIDs';
-import colors from 'styles/colors';
+import { colors } from 'styles';
 import {
 	isEthereumNetworkParams,
 	isSubstrateNetworkParams,

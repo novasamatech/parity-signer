@@ -29,8 +29,7 @@ import {
 	RegistriesContext,
 	RegistriesStoreState
 } from 'stores/RegistriesContext';
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
+import { colors, fontStyles } from 'styles';
 import { alertDecodeError } from 'utils/alertUtils';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';

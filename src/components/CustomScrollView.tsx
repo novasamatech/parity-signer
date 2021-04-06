@@ -25,7 +25,7 @@ import {
 } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import colors from 'styles/colors';
+import { colors } from 'styles';
 
 export default class CustomScrollView extends React.PureComponent<
 	{

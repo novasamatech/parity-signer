@@ -25,7 +25,7 @@ import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import QrView from 'components/QrView';
-import fontStyles from 'styles/fontStyles';
+import { fontStyles } from 'styles';
 import CompatibleCard from 'components/CompatibleCard';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';

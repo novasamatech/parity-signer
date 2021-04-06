@@ -18,8 +18,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import colors from 'styles/colors';
-import fonts from 'styles/fonts';
+import { colors, fonts } from 'styles';
 
 export function UnknownAccountWarning({
 	isPath

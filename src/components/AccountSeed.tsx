@@ -28,9 +28,8 @@ import {
 import TextInput from './TextInput';
 import TouchableItem from './TouchableItem';
 
-import colors from 'styles/colors';
-import fonts from 'styles/fonts';
-import fontStyles from 'styles/fontStyles';
+import { colors } from 'styles';
+import { fonts, fontStyles } from 'styles';
 import PARITY_WORDS from 'res/parity_wordlist.json';
 import BIP39_WORDS from 'res/bip39_wordlist.json';
 import { binarySearch } from 'utils/array';

@@ -28,8 +28,7 @@ import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
-import colors from 'styles/colors';
-import fonts from 'styles/fonts';
+import { colors, fonts } from 'styles';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 

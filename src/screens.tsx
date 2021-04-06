@@ -44,8 +44,7 @@ import ReceiveBalance from 'screens/ReceiveBalance';
 import SendBalance from 'screens/SendBalance';
 import SignTransaction from 'modules/sign/screens/SignTransaction';
 import SignTransactionFinish from 'modules/sign/screens/SignTransactionFinish';
-import colors from 'styles/colors';
-import { headerHeight } from 'styles/containerStyles';
+import { colors, headerHeight } from 'styles';
 import { RootStackParamList } from 'types/routes';
 
 const ScreenStack = createStackNavigator<RootStackParamList>();

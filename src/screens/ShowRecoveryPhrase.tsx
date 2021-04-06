@@ -22,7 +22,7 @@ import Clipboard from '@react-native-community/clipboard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import TouchableItem from 'components/TouchableItem';
-import fontStyles from 'styles/fontStyles';
+import { fontStyles } from 'styles';
 import ScreenHeading from 'components/ScreenHeading';
 
 function ShowRecoveryPhrase({

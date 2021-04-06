@@ -22,7 +22,7 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationProps } from 'types/props';
-import fontStyles from 'styles/fontStyles';
+import { fontStyles } from 'styles';
 import ScreenHeading from 'components/ScreenHeading';
 import { alertIdentityCreationError } from 'utils/alertUtils';
 import Button from 'components/Button';

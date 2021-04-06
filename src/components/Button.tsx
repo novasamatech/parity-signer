@@ -27,8 +27,7 @@ import {
 	View
 } from 'react-native';
 
-import colors from 'styles/colors';
-import fontStyles from 'styles/fontStyles';
+import { colors, fontStyles } from 'styles';
 import { ButtonListener } from 'types/props';
 
 export default class Button extends React.PureComponent<{

@@ -21,7 +21,7 @@ import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import colors from 'styles/colors';
+import { colors } from 'styles';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import { blockiesIcon } from 'utils/native';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';

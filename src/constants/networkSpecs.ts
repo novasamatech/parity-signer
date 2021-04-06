@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import colors from 'styles/colors';
+import { colors } from 'styles';
 import {
 	EthereumNetworkDefaultConstants,
 	EthereumNetworkParams,
