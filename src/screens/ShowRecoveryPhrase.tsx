@@ -30,12 +30,8 @@ function ShowRecoveryPhrase({
 }: NavigationProps<'ShowRecoveryPhrase'>): React.ReactElement {
 	return (
 		<SafeAreaViewContainer>
-			<ScreenHeading
-				title={'Show Key Phrase'}
-				subtitle={
-					'Write these words down on paper and keep them somewhere secure. These words allow anyone to recover this account and access its funds.'
-				}
-			/>
+			<ScreenHeading title={'Show Key Phrase'} />
+			<Text>Write these words down on paper and keep them somewhere secure. These words allow anyone to recover this account and access its funds.</Text>
 			<TouchableItem
 				onPress={(): void => {
 					// only allow the copy of the key phrase in dev environment

@@ -29,67 +29,6 @@ import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
 import { ButtonListener } from 'types/props';
 
-const renderSubtitle = (
-	subtitle?: string,
-	hasSubtitleIcon?: boolean,
-	isAlignLeft?: boolean,
-	isError?: boolean,
-	multiline?: boolean
-): ReactNode => {
-	if (!subtitle || subtitle === '') return;
-	const subtitleBodyStyle: ViewStyle[] = [baseStyles.subtitleBody],
-		subtitleTextStyle: TextStyle[] = [
-			fontStyles.t_codeS,
-			{ color: colors.text.faded }
-		];
-	if (isAlignLeft) {
-		subtitleBodyStyle.push({ justifyContent: 'flex-start' });
-		subtitleTextStyle.push({ textAlign: 'left' });
-	}
-	if (isError) {
-		subtitleTextStyle.push(baseStyles.t_error);
-	}
-
-	return (
-		<View style={subtitleBodyStyle}>
-			{renderSubtitleIcon(hasSubtitleIcon)}
-			<Text
-				style={subtitleTextStyle}
-				numberOfLines={multiline ? undefined : 1}
-				ellipsizeMode="middle"
-			>
-				{subtitle}
-			</Text>
-		</View>
-	);
-};
-const renderSubtitleIcon = (hasSubtitleIcon?: boolean): ReactNode => {
-	if (!hasSubtitleIcon) return;
-	return <AntIcon name="user" size={10} color={colors.text.faded} />;
-};
-
-const renderBack = (onPress?: ButtonListener): ReactNode => {
-	if (!onPress) return;
-	return (
-		<ButtonIcon
-			iconName="arrowleft"
-			iconType="antdesign"
-			onPress={onPress}
-			testID={testIDs.Wallet.backButton}
-			style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
-			iconBgStyle={{ backgroundColor: 'transparent' }}
-		/>
-	);
-};
-const renderIcon = (iconName?: string, iconType?: string): ReactNode => {
-	if (!iconName) return;
-	return (
-		<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
-			<Icon name={iconName} type={iconType} color={colors.text.main} />
-		</View>
-	);
-};
-
 export function ScreenHeadingWithNetworkIcon({
 	title,
 	subtitle,
@@ -110,10 +49,6 @@ export function ScreenHeadingWithNetworkIcon({
 		...baseStyles.t_left,
 		...baseStyles.t_normal
 	};
-	const titleStyleWithSubtitle: TextStyle = {
-		...baseStyles.text,
-		...baseStyles.t_left
-	};
 	const { getNetwork } = useContext(NetworksContext);
 	const isDisabled = onPress === undefined;
 	return (
@@ -129,10 +64,7 @@ export function ScreenHeadingWithNetworkIcon({
 					style={baseStyles.networkIcon}
 				/>
 				<View>
-					<Text style={subtitle ? titleStyleWithSubtitle : titleStyle}>
-						{title}
-					</Text>
-					{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+					<Text style={titleStyle}>{title}</Text>
 				</View>
 			</View>
 			{headMenu}
@@ -162,8 +94,16 @@ export function IdentityHeading({
 					{title}
 				</Text>
 			</View>
-			{onPressBack && renderBack(onPressBack)}
-			{renderSubtitle(subtitle, hasSubtitleIcon, true, false, false)}
+			{onPressBack &&
+				(<ButtonIcon
+					iconName="arrowleft"
+					iconType="antdesign"
+					onPress={onPress}
+					testID={testIDs.Wallet.backButton}
+					style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
+					iconBgStyle={{ backgroundColor: 'transparent' }}
+				/>)
+			}
 		</View>
 	);
 }
@@ -193,11 +133,10 @@ export default class ScreenHeading extends React.PureComponent<{
 
 		return (
 			<View style={{ ...baseStyles.body, flexDirection: 'row' }}>
-				{renderIcon(iconName, iconType)}
-				<View style={baseStyles.titles}>
-					<Text style={baseStyles.text}>{title}</Text>
-					{renderSubtitle(subtitle, hasSubtitleIcon, subtitleL, error, true)}
+				<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
+					<Icon name={iconName} type={iconType} color={colors.text.main} />
 				</View>
+				<View style={baseStyles.titles}><Text style={baseStyles.text}>{title}</Text></View>
 				{headMenu}
 			</View>
 		);

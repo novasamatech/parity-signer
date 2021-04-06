@@ -54,10 +54,8 @@ function CreateWallet3({
 
 	return (
 		<SafeAreaViewContainer>
-			<ScreenHeading
-				title={'Verify Key Phrase'}
-				subtitle={'Retype the key phrase as shown on the prior screen.'}
-			/>
+			<ScreenHeading title={'Verify Key Phrase'} />
+			<Text>Retype the key phrase as shown on the prior screen.</Text>
 			<AccountSeed
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={createWallet}
