@@ -255,7 +255,7 @@ const baseStyles = StyleSheet.create({
 		textAlign: 'left'
 	},
 	t_normal: {
-		fontFamily: fonts.roboto
+		fontFamily: fonts.montserrat
 	},
 	text: {
 		...fontStyles.h1,

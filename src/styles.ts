@@ -44,44 +44,37 @@ export const colors = {
 };
 
 export const fonts = {
-	bold: 'ManifoldCF-Bold',
-	light: 'ManifoldCF-Light',
-	regular: 'Manifold CF',
-	roboto: 'Roboto-regular',
-	robotoBold: 'Roboto-Bold',
-	robotoLight: 'Roboto-Light',
-	robotoMedium: 'Roboto-Medium',
-	robotoMono: 'RobotoMono-Regular',
-	robotoMonoMedium: 'RobotoMono-Medium',
-	semiBold: 'ManifoldCF-DemiBold'
+	bold: 'Montserrat-Bold',
+	light: 'Montserrat-Light',
+	regular: 'Montserrat',
 };
 
 export const fontStyles = StyleSheet.create({
 	a_button: {
 		color: colors.background.app,
-		fontFamily: fonts.robotoMonoMedium,
+		fontFamily: fonts.regular,
 		fontSize: 20
 	},
 	a_text: {
 		color: colors.text.main,
-		fontFamily: fonts.robotoMono,
+		fontFamily: fonts.regular,
 		fontSize: 12,
 		textTransform: 'uppercase',
 		letterSpacing: 0.4
 	},
 	h1: {
 		color: colors.text.main,
-		fontFamily: fonts.robotoBold,
+		fontFamily: fonts.bold,
 		fontSize: 22
 	},
 	h2: {
 		color: colors.text.main,
-		fontFamily: fonts.robotoMedium,
+		fontFamily: fonts.regular,
 		fontSize: 18
 	},
 	h_subheading: {
 		color: colors.text.main,
-		fontFamily: fonts.roboto,
+		fontFamily: fonts.regular,
 		fontSize: 14,
 		textTransform: 'uppercase'
 	},
@@ -96,45 +89,45 @@ export const fontStyles = StyleSheet.create({
 	},
 	quote: {
 		color: colors.text.main,
-		fontFamily: fonts.robotoLight,
+		fontFamily: fonts.light,
 		fontSize: 28
 	},
 	t_big: {
 		color: colors.text.main,
-		fontFamily: fonts.roboto,
+		fontFamily: fonts.regular,
 		fontSize: 16
 	},
 	t_code: {
 		color: colors.text.main,
-		fontFamily: fonts.robotoMono,
+		fontFamily: fonts.regular,
 		fontSize: 15
 	},
 	t_codeS: {
 		color: colors.text.main,
-		fontFamily: fonts.robotoMono,
+		fontFamily: fonts.regular,
 		fontSize: 11,
 		letterSpacing: 0.2
 	},
 	t_important: {
 		color: colors.text.main,
-		fontFamily: fonts.robotoBold,
+		fontFamily: fonts.bold,
 		fontSize: 13
 	},
 	t_label: {
 		backgroundColor: colors.signal.main,
 		color: colors.signal.main,
-		fontFamily: fonts.robotoMedium,
+		fontFamily: fonts.regular,
 		fontSize: 13
 	},
 	t_prefix: {
 		color: colors.text.main,
-		fontFamily: fonts.roboto,
+		fontFamily: fonts.regular,
 		fontSize: 14,
 		textTransform: 'uppercase'
 	},
 	t_regular: {
 		color: colors.text.main,
-		fontFamily: fonts.roboto,
+		fontFamily: fonts.regular,
 		fontSize: 12
 	},
 	t_seed: {
