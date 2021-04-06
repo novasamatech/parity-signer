@@ -38,12 +38,14 @@ import {
 
 export function NetworkCard({
 	networkKey,
-	title
+	title,
+	balance
 }: {
 	networkKey?: string;
 	onPress?: ButtonListener;
 	testID?: string;
 	title: string;
+	balance?: string;
 }): ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const networksContextState = useContext(NetworksContext);
@@ -106,7 +108,7 @@ export function NetworkCard({
 				</View>
 			</View>
 			<View style={styles.content}>
-				<Text style={styles.text}>0</Text>
+				<Text style={styles.text}>{balance ?? 'Loading...'}</Text>
 			</View>
 			<View style={styles.content}>
 				<Button

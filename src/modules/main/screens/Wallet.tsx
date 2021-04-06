@@ -15,10 +15,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext, useMemo } from 'react';
+import React, {
+	ReactElement,
+	useContext,
+	useEffect,
+	useMemo,
+	useState
+} from 'react';
 import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useFocusEffect } from '@react-navigation/native';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import BN from 'bn.js';
 
 import { NetworkCard } from '../components/NetworkCard';
 import OnBoardingView from '../components/OnBoarding';
@@ -38,13 +46,18 @@ import {
 	NetworkParams
 } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
-import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
+import {
+	getAddressWithPath,
+	getExistedNetworkKeys,
+	getIdentityName
+} from 'utils/identitiesUtils';
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import TouchableItem from 'components/TouchableItem';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
 import ScreenHeading from 'components/ScreenHeading';
 import NavigationTab from 'components/NavigationTab';
+import { RegistriesContext } from 'stores/RegistriesContext';
 
 const filterNetworks = (
 	networkList: Map<string, NetworkParams>,
@@ -66,6 +79,8 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { identities, currentIdentity, loaded } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
+	const { getTypeRegistry } = useContext(RegistriesContext);
+	const [balances, setBalances] = useState({} as { [key: string]: string });
 	const { allNetworks } = networkContextState;
 	// catch android back button and prevent exiting the app
 	useFocusEffect(
@@ -94,6 +109,61 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 			}),
 		[availableNetworks, allNetworks]
 	);
+
+	const fetchBalances = async (
+		networks: [string, NetworkParams][]
+	): Promise<void> => {
+		const fetchedBalances = await Promise.all(
+			networks.map(
+				async ([networkKey, networkParams]): Promise<[string, string]> => {
+					if (balances[networkKey]) return [networkKey, balances[networkKey]];
+					if (isSubstrateNetworkParams(networkParams)) {
+						const registry = getTypeRegistry(
+							networkContextState.networks,
+							networkKey
+						)!;
+						const path = `//${networkParams.pathId}`;
+						const address = getAddressWithPath(path, currentIdentity);
+						// fetchedBalances[networkKey] = 'TODO';
+						// continue;
+						// TODO: get types for each network
+						// TODO: load metadata at startup
+						// TODO: handle errors
+						// TODO: make this stateful so we don't have to reload every time we come here
+						console.log(`CREATING API: ${networkParams.url}`);
+						const api = await ApiPromise.create({
+							provider: new WsProvider(networkParams.url),
+							registry
+						});
+						const fetchedBal = await api.query.balances.account(address);
+						console.log('DISCONNECTING API');
+						await api.disconnect();
+						const base = new BN(10).pow(new BN(networkParams.decimals));
+						const div = fetchedBal.free.div(base);
+						const mod = fetchedBal.free.mod(base);
+						return [
+							networkKey,
+							div + '.' + mod.toString(10, networkParams.decimals)
+						];
+					} else {
+						// TODO
+						return [networkKey, 'unknown'];
+					}
+				}
+			)
+		);
+
+		// populate finished object
+		const balancesObj: { [key: string]: string } = {};
+		for (const [key, bal] of fetchedBalances) {
+			balancesObj[key] = bal;
+		}
+		setBalances(balancesObj);
+	};
+
+	useEffect(() => {
+		fetchBalances(networkList);
+	}, []);
 
 	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0) return <OnBoardingView />;
@@ -160,6 +230,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 				onPress={(): Promise<void> =>
 					onNetworkChosen(networkKey, networkParams)
 				}
+				balance={balances[networkKey]}
 				title={networkParams.title}
 			/>
 		);
