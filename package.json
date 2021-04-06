@@ -35,6 +35,7 @@
     "e2e": "yarn e2e:ios && yarn e2e:android"
   },
   "dependencies": {
+    "@edgeware/node-types": "^3.3.3",
     "@eva-design/eva": "^2.0.0",
     "@polkadot/api": "4.4.1",
     "@polkadot/metadata": "4.4.1",

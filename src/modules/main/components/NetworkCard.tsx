@@ -20,6 +20,8 @@ import { useNavigation } from '@react-navigation/core';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { TypeRegistry } from '@polkadot/types';
+import { spec } from '@edgeware/node-types';
 import BN from 'bn.js';
 
 import { NetworksContext } from 'stores/NetworkContext';
@@ -66,8 +68,13 @@ export function NetworkCard({
 				// TODO: get types for each network
 				// TODO: load metadata at startup
 				// TODO: handle errors
-				api = await ApiPromise.create({ provider });
+				// TODO: make this stateful so we don't have to reload every time we come here
+				const registry = new TypeRegistry();
+				console.log(`CREATING API: ${networkParams.url}`);
+				api = await ApiPromise.create({ provider, registry, ...spec });
 				const balances = await api.query.balances.account(address);
+				console.log('DISCONNECTING API');
+				await api.disconnect();
 				const base = new BN(10).pow(new BN(networkParams.decimals));
 				const div = balances.free.div(base);
 				const mod = balances.free.mod(base);
@@ -81,11 +88,11 @@ export function NetworkCard({
 		fetchBalance();
 
 		// cleanup
-		return (): void => {
-			if (api) {
-				api.disconnect();
-			}
-		};
+		// return (): void => {
+		// 	if (api?.isConnected) {
+		// 		api.disconnect();
+		// 	}
+		// };
 	});
 
 	const onPressed = async (isSend: boolean): Promise<void> => {
