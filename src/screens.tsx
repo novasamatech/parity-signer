@@ -26,9 +26,8 @@ import {
 	HeaderBackButton
 } from '@react-navigation/stack';
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 
-import HeaderLeftHome from 'components/HeaderLeftHome';
 import testIDs from 'e2e/testIDs';
 import Wallet from 'modules/main/screens/Wallet';
 import AddNetwork from 'screens/AddNetwork';
@@ -44,7 +43,7 @@ import ReceiveBalance from 'screens/ReceiveBalance';
 import SendBalance from 'screens/SendBalance';
 import SignTransaction from 'modules/sign/screens/SignTransaction';
 import SignTransactionFinish from 'modules/sign/screens/SignTransactionFinish';
-import { colors, headerHeight } from 'styles';
+import { colors, fonts, headerHeight } from 'styles';
 import { RootStackParamList } from 'types/routes';
 
 const ScreenStack = createStackNavigator<RootStackParamList>();
@@ -79,6 +78,25 @@ const globalStackNavigationOptions = {
 	},
 	headerTintColor: colors.text.main,
 	headerTitle: (): React.ReactNode => null
+};
+
+const HeaderLeftHome = (): React.ReactElement => {
+	return (
+		<View style={{
+			alignItems: 'center',
+			flexDirection: 'row',
+			height: 48,
+			paddingLeft: 15
+		}}>
+			<Text style={{
+				color: colors.text.main,
+				fontFamily: fonts.light,
+				fontSize: 14,
+				marginRight: 2,
+				marginTop: 15
+			}}>Layer Wallet</Text>
+		</View>
+	);
 };
 
 const HeaderLeftWithBack = (): React.ReactElement => {
