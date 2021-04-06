@@ -21,10 +21,10 @@
  * @flow
  */
 
-import { AppRegistry, YellowBox } from 'react-native';
+import { AppRegistry, LogBox } from 'react-native';
 
 import App from './src/App';
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
 	'Warning: isMounted(...) is deprecated',
 	'Module RCTImageLoader'
 ]);
