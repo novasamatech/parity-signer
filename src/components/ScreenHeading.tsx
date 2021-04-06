@@ -23,10 +23,10 @@ import { Icon } from 'react-native-elements';
 import ButtonIcon from './ButtonIcon';
 import AccountIcon from './AccountIcon';
 
+import { colors, fonts, fontStyles } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
 import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
-import { colors, fonts, fontStyles } from 'styles';
 import { ButtonListener } from 'types/props';
 
 const renderSubtitle = (

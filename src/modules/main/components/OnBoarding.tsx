@@ -20,10 +20,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { Text, View } from 'react-native';
 
+import { fontStyles } from 'styles';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import styles from 'modules/main/styles';
-import { fontStyles } from 'styles';
 import { RootStackParamList } from 'types/routes';
 
 export default function OnBoardingView({}: {}): React.ReactElement {

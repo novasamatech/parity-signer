@@ -20,6 +20,7 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import { colors, fontStyles } from 'styles';
 import ButtonIcon from 'components/ButtonIcon';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Separator from 'components/Separator';
@@ -29,7 +30,6 @@ import { Identity } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
-import { colors, fontStyles } from 'styles';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import { getIdentitySeed, getIdentityName } from 'utils/identitiesUtils';
 

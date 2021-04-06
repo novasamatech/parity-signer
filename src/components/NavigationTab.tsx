@@ -23,10 +23,9 @@ import { Icon } from 'react-native-elements';
 
 import TouchableItem from './TouchableItem';
 
-import { colors } from 'styles';
+import { colors, fontStyles } from 'styles';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
-import { fontStyles } from 'styles';
 import { RootStackParamList } from 'types/routes';
 
 export default function NavigationTab(): React.ReactElement {

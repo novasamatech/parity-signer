@@ -18,11 +18,11 @@
 import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
 
+import { colors } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
 import { NavigationProps } from 'types/props';
-import { colors } from 'styles';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
 import { resetNavigationTo } from 'utils/navigationHelpers';

@@ -18,9 +18,8 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
-import { fontStyles } from 'styles';
+import { fontStyles, colors } from 'styles';
 import { hexToAscii, isAscii } from 'utils/strings';
-import { colors } from 'styles';
 import Separator from 'components/Separator';
 
 export default function MessageDetailsCard({

@@ -18,8 +18,7 @@
 import React, { ReactElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { fontStyles } from 'styles';
-import { colors } from 'styles';
+import { fontStyles, colors } from 'styles';
 
 export default function AccountPrefixedTitle({
 	titlePrefix,

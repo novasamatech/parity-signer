@@ -19,6 +19,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
+import { colors, fonts } from 'styles';
 import testIDs from 'e2e/testIDs';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
@@ -28,7 +29,6 @@ import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
-import { colors, fonts } from 'styles';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 

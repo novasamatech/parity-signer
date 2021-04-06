@@ -24,6 +24,7 @@ import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
+import { colors, fontStyles } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import {
@@ -32,7 +33,6 @@ import {
 	UnknownNetworkKeys,
 	NetworkProtocols
 } from 'constants/networkSpecs';
-import { colors, fontStyles } from 'styles';
 import { Identity } from 'types/identityTypes';
 import {
 	isSubstrateNetworkParams,

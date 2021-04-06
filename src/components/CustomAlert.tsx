@@ -18,9 +18,9 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View, Animated, Text } from 'react-native';
 
+import { colors, fonts, fontStyles } from 'styles';
 import Button from 'components/Button';
 import { Action, AlertStateContext } from 'stores/alertContext';
-import { colors, fonts, fontStyles } from 'styles';
 
 export default function CustomAlert(): React.ReactElement {
 	const { title, alertIndex, message, actions } = useContext(AlertStateContext);

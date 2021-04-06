@@ -23,13 +23,13 @@ import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
+import { colors, fontStyles } from 'styles';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
 	RegistriesContext,
 	RegistriesStoreState
 } from 'stores/RegistriesContext';
-import { colors, fontStyles } from 'styles';
 import { alertDecodeError } from 'utils/alertUtils';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';

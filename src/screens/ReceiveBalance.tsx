@@ -19,12 +19,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { colors } from 'styles';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import { colors } from 'styles';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getAddressWithPath,

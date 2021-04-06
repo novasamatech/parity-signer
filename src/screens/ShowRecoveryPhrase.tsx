@@ -19,10 +19,10 @@ import React from 'react';
 import { Text } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 
+import { fontStyles } from 'styles';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import TouchableItem from 'components/TouchableItem';
-import { fontStyles } from 'styles';
 import ScreenHeading from 'components/ScreenHeading';
 
 function ShowRecoveryPhrase({

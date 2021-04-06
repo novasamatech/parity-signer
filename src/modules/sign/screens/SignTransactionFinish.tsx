@@ -18,6 +18,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
+import { fontStyles } from 'styles';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -25,7 +26,6 @@ import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import QrView from 'components/QrView';
-import { fontStyles } from 'styles';
 import CompatibleCard from 'components/CompatibleCard';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';

@@ -24,6 +24,7 @@ import { NetworkCard } from '../components/NetworkCard';
 import OnBoardingView from '../components/OnBoarding';
 import NoCurrentIdentity from '../components/NoCurrentIdentity';
 
+import { colors } from 'styles';
 import {
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys
@@ -31,7 +32,6 @@ import {
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsContext } from 'stores/AccountsContext';
 import testIDs from 'e2e/testIDs';
-import { colors } from 'styles';
 import {
 	isEthereumNetworkParams,
 	isSubstrateNetworkParams,

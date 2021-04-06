@@ -28,6 +28,7 @@ import {
 import * as React from 'react';
 import { View, Text } from 'react-native';
 
+import { colors, fonts, headerHeight } from 'styles';
 import testIDs from 'e2e/testIDs';
 import Wallet from 'modules/main/screens/Wallet';
 import AddNetwork from 'screens/AddNetwork';
@@ -43,7 +44,6 @@ import ReceiveBalance from 'screens/ReceiveBalance';
 import SendBalance from 'screens/SendBalance';
 import SignTransaction from 'modules/sign/screens/SignTransaction';
 import SignTransactionFinish from 'modules/sign/screens/SignTransactionFinish';
-import { colors, fonts, headerHeight } from 'styles';
 import { RootStackParamList } from 'types/routes';
 
 const ScreenStack = createStackNavigator<RootStackParamList>();
@@ -82,19 +82,25 @@ const globalStackNavigationOptions = {
 
 const HeaderLeftHome = (): React.ReactElement => {
 	return (
-		<View style={{
-			alignItems: 'center',
-			flexDirection: 'row',
-			height: 48,
-			paddingLeft: 15
-		}}>
-			<Text style={{
-				color: colors.text.main,
-				fontFamily: fonts.light,
-				fontSize: 14,
-				marginRight: 2,
-				marginTop: 15
-			}}>Layer Wallet</Text>
+		<View
+			style={{
+				alignItems: 'center',
+				flexDirection: 'row',
+				height: 48,
+				paddingLeft: 15
+			}}
+		>
+			<Text
+				style={{
+					color: colors.text.main,
+					fontFamily: fonts.light,
+					fontSize: 14,
+					marginRight: 2,
+					marginTop: 15
+				}}
+			>
+				Layer Wallet
+			</Text>
 		</View>
 	);
 };

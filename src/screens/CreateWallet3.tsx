@@ -18,11 +18,11 @@
 import React, { useContext, useState } from 'react';
 import { Text } from 'react-native';
 
+import { fontStyles } from 'styles';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationProps } from 'types/props';
-import { fontStyles } from 'styles';
 import ScreenHeading from 'components/ScreenHeading';
 import { alertIdentityCreationError } from 'utils/alertUtils';
 import Button from 'components/Button';
@@ -60,9 +60,6 @@ function CreateWallet3({
 				title={'Verify Recovery Phrase'}
 				subtitle={'Retype the recovery phrase as shown on the prior screen.'}
 			/>
-			<Text style={[fontStyles.t_seed, { marginHorizontal: 16 }]}>
-				{route.params.seedPhrase}
-			</Text>
 			<AccountSeed
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={createWallet}
