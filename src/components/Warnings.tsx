@@ -52,7 +52,7 @@ export function UnknownAccountWarning({
 					{'\n'}
 					{'\n'}
 					To be able to use this account you need to:
-					{'\n'}- write down its recovery phrase
+					{'\n'}- write down its key phrase
 					{'\n'}- delete it
 					{'\n'}- recover/derive it
 					{'\n'}

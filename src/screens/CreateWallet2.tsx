@@ -62,7 +62,7 @@ function CreateWallet2({
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading
-				title={'Recovery Phrase'}
+				title={'Key Phrase'}
 				subtitle={
 					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
 				}
@@ -73,7 +73,7 @@ function CreateWallet2({
 			</View>
 			<TouchableItem
 				onPress={(): void => {
-					// only allow the copy of the recovery phrase in dev environment
+					// only allow the copy of the key phrase in dev environment
 					if (__DEV__) {
 						Clipboard.setString(seedPhrase);
 					}

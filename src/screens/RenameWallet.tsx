@@ -24,7 +24,7 @@ import { NetworksContext } from 'stores/NetworkContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { ScreenHeadingWithNetworkIcon } from 'components/ScreenHeading';
+import ScreenHeading from 'components/ScreenHeading';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertError } from 'utils/alertUtils';
@@ -65,10 +65,7 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 
 	return (
 		<SafeAreaViewContainer>
-			<ScreenHeadingWithNetworkIcon
-				title="Send Balance"
-				networkKey={formattedNetworkKey}
-			/>
+			<ScreenHeading title="Rename Wallet" />
 			<TextInput
 				label="Display Name"
 				onChangeText={onChangeIdentity}

@@ -105,7 +105,7 @@ const identities = [
 
 ### Keypair generation process Substrate
 
-1. The recovery phrase goes into the `tiny-bip39` crate to produce entropy: https://docs.rs/tiny-bip39/0.6.2/bip39/struct.Mnemonic.html#method.entropy
+1. The key phrase goes into the `tiny-bip39` crate to produce entropy: https://docs.rs/tiny-bip39/0.6.2/bip39/struct.Mnemonic.html#method.entropy
 2. Generate the "mini secret key" from entropy: https://docs.rs/substrate-bip39/0.3.1/substrate_bip39/fn.mini_secret_from_entropy.html
 3. "mini secret key" can be used with `schnorrkel` to create the MiniSecretKey that can be expanded into a full keypair: https://docs.rs/schnorrkel/0.8.5/schnorrkel/keys/struct.MiniSecretKey.html
 4. MiniSecretKey can be used for signing, or we can derive new secrets from it. https://github.com/paritytech/parity-signer/blob/0cb137a2a3717c178be6981f9d47129ef3067e5e/rust/signer/src/sr25519.rs#L48-L51
@@ -134,7 +134,7 @@ The soft derivation method has a pro here is that one could derive child public 
 
 ### Use cases
 
-Basically, the HDKD ease the management & storing of variant keys / recovery phrases. In addition to that it enables:
+Basically, the HDKD ease the management & storing of variant keys / key phrases. In addition to that it enables:
 
 * distributing the keypairs in an organization.
 * track different transactions by auditor / seller.

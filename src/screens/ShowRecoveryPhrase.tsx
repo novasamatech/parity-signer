@@ -31,14 +31,14 @@ function ShowRecoveryPhrase({
 	return (
 		<SafeAreaViewContainer>
 			<ScreenHeading
-				title={'Recovery Phrase'}
+				title={'Show Key Phrase'}
 				subtitle={
-					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
+					'Write these words down on paper and keep them somewhere secure. These words allow anyone to recover this account and access its funds.'
 				}
 			/>
 			<TouchableItem
 				onPress={(): void => {
-					// only allow the copy of the recovery phrase in dev environment
+					// only allow the copy of the key phrase in dev environment
 					if (__DEV__) {
 						Clipboard.setString(route.params.seedPhrase);
 					}

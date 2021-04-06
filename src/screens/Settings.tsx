@@ -73,7 +73,6 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 						title="Select this wallet"
 						onPress={(): void => {
 							accountsStore.selectIdentity(identity);
-							resetNavigationTo(navigation, 'Wallet');
 						}}
 					/>
 				) : null}
@@ -98,7 +97,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 					}
 				/>
 				<ButtonWithArrow
-					title="Show Recovery Phrase"
+					title="Show Key Phrase"
 					onPress={(): Promise<void> => showRecoveryPhrase(identity)}
 				/>
 				<Separator style={{ marginBottom: 0 }} />

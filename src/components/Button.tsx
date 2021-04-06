@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
 		borderRadius: 60,
 		height: 48,
 		justifyContent: 'center',
-		marginVertical: 40,
+		marginVertical: 12,
 		paddingHorizontal: 40
 	},
 	buttonAboveKeyboard: {

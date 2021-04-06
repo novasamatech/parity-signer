@@ -54,11 +54,11 @@ function CreateWallet({
 			/>
 			<View style={styles.btnBox}>
 				<Button
-					title="Create New"
+					title="Generate a key phrase"
 					onPress={(): void => navigation.navigate('CreateWallet2')}
 				/>
 				<Button
-					title="Import Wallet"
+					title="Import a key phrase"
 					onPress={(): void => navigation.navigate('CreateWalletImport')}
 				/>
 			</View>
