@@ -59,8 +59,8 @@ export const fontStyles = StyleSheet.create({
 		color: colors.text.main,
 		fontFamily: fonts.regular,
 		fontSize: 12,
-		textTransform: 'uppercase',
-		letterSpacing: 0.4
+		letterSpacing: 0.4,
+		textTransform: 'uppercase'
 	},
 	h1: {
 		color: colors.text.main,

@@ -17,9 +17,8 @@
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
-import { colors } from 'styles';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
@@ -84,11 +83,5 @@ function ReceiveBalance({
 		</SafeAreaViewContainer>
 	);
 }
-
-const styles = StyleSheet.create({
-	deleteText: {
-		color: colors.signal.error
-	}
-});
 
 export default withCurrentIdentity(ReceiveBalance);
