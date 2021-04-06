@@ -865,11 +865,6 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@edgeware/node-types@^3.3.3":
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.3.3.tgz#0a1f11698203c8056722e4c1b218f04f6eec55ed"
-  integrity sha512-RDdTjLRZD36MOQGA9g1MXvJpogg08J/0PwJXCEe8tZGlwoHXHw0PT8ieIQMTe2DCKegafHtDYufX36iePngzng==
-
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"
