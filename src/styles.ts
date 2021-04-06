@@ -46,7 +46,7 @@ export const colors = {
 export const fonts = {
 	bold: 'Montserrat-Bold',
 	light: 'Montserrat-Light',
-	regular: 'Montserrat',
+	regular: 'Montserrat-Regular',
 };
 
 export const fontStyles = StyleSheet.create({

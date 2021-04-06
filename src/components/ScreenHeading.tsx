@@ -90,7 +90,7 @@ const renderIcon = (iconName?: string, iconType?: string): ReactNode => {
 	);
 };
 
-export function LeftScreenHeading({
+export function ScreenHeadingWithNetworkIcon({
 	title,
 	subtitle,
 	hasSubtitleIcon,

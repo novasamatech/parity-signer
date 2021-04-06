@@ -35,7 +35,7 @@ import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
 import PathCard from 'components/PathCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { LeftScreenHeading } from 'components/ScreenHeading';
+import { ScreenHeadingWithNetworkIcon } from 'components/ScreenHeading';
 import QrView from 'components/QrView';
 
 interface Props {
@@ -73,7 +73,7 @@ function ReceiveBalance({
 	return (
 		<SafeAreaViewContainer>
 			<ScrollView bounces={false}>
-				<LeftScreenHeading
+				<ScreenHeadingWithNetworkIcon
 					title="Receive Balance"
 					networkKey={formattedNetworkKey}
 				/>

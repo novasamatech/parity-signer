@@ -28,7 +28,7 @@ import { getNetworkKey } from 'utils/identitiesUtils';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { LeftScreenHeading } from 'components/ScreenHeading';
+import { ScreenHeadingWithNetworkIcon } from 'components/ScreenHeading';
 
 interface Props {
 	path: string;
@@ -69,7 +69,7 @@ function SendBalance({
 
 	return (
 		<SafeAreaViewContainer>
-			<LeftScreenHeading
+			<ScreenHeadingWithNetworkIcon
 				title="Send Balance"
 				networkKey={formattedNetworkKey}
 			/>
