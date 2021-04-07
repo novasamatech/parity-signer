@@ -15,16 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
+import Clipboard from '@react-native-community/clipboard';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import { showMessage } from 'react-native-flash-message';
 
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
 	defaultNetworkKey,
@@ -33,18 +34,13 @@ import {
 	NetworkProtocols
 } from 'constants/networkSpecs';
 import { Identity } from 'types/identityTypes';
-import {
-	getAddressWithPath,
-	getNetworkKeyByPath,
-	getPathName
-} from 'utils/identitiesUtils';
+import { getAddressWithPath, getNetworkKeyByPath } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
 	identity,
 	isPathValid = true,
 	path,
-	name,
 	networkKey,
 	testID,
 	titlePrefix
@@ -52,15 +48,12 @@ export default function PathCard({
 	identity: Identity;
 	isPathValid?: boolean;
 	path: string;
-	name?: string;
 	networkKey?: string;
 	testID?: string;
 	titlePrefix?: string;
 }): React.ReactElement {
 	const networksContext = useContext(NetworksContext);
 	const { networks, allNetworks } = networksContext;
-	const isNotEmptyName = name && name !== '';
-	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		identity.encryptedSeed
 	);
@@ -102,12 +95,13 @@ export default function PathCard({
 	return (nonSubstrateCard = (
 		<TouchableItem
 			accessibilityComponentType="button"
-			onPress={() =>
+			onPress={(): void => {
+				showMessage('Address copied.');
 				Clipboard.setString(
 					(networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') +
 						address
-				)
-			}
+				);
+			}}
 			style={styles.body}
 		>
 			<View style={styles.content} testID={testID}>

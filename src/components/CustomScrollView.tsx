@@ -24,8 +24,7 @@ import {
 	ViewStyle
 } from 'react-native';
 
-import { colors } from 'styles';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { colors } from 'styles/index';
 
 export default class CustomScrollView extends React.PureComponent<
 	{
@@ -58,7 +57,7 @@ export default class CustomScrollView extends React.PureComponent<
 				: 1;
 
 		return (
-			<SafeAreaViewContainer>
+			<>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					onContentSizeChange={(width: number, height: number): void => {
@@ -102,14 +101,14 @@ export default class CustomScrollView extends React.PureComponent<
 						}
 					]}
 				/>
-			</SafeAreaViewContainer>
+			</>
 		);
 	}
 }
 
 const styles = StyleSheet.create({
 	indicator: {
-		backgroundColor: colors.text.main,
+		backgroundColor: colors.background.accent,
 		borderRadius: 5,
 		position: 'absolute',
 		right: 0,

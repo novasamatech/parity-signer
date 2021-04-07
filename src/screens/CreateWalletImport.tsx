@@ -17,17 +17,15 @@
 
 import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import { AccountsContext } from 'stores/AccountsContext';
-import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
 import { NavigationProps } from 'types/props';
 import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
 import { resetNavigationTo } from 'utils/navigationHelpers';
-import { alertError, alertIdentityCreationError } from 'utils/alertUtils';
-import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
@@ -40,7 +38,6 @@ function CreateWalletImport({
 	const defaultSeedValidObject = validateSeed('', false);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
@@ -71,31 +68,26 @@ function CreateWalletImport({
 			setSeedPhrase('');
 			resetNavigationTo(navigation, 'Wallet', { isNew: true });
 		} catch (e) {
-			alertIdentityCreationError(setAlert, e.message);
+			showMessage('Could not find a valid wallet for the seed: ' + e.message);
 		}
 	};
 
 	const onRecoverConfirm = (): void | Promise<void> => {
 		if (!isSeedValid.valid) {
-			return alertError(setAlert, `${isSeedValid.reason}`);
+			return showMessage(isSeedValid.reason);
 		}
 		return onRecoverIdentity();
 	};
 
 	return (
 		<KeyboardScrollView bounces={false} style={styles.body}>
-			<ScreenHeading title={'Import Wallet'} />
 			<AccountSeed
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
 				valid={isSeedValid.valid}
 			/>
-			<Button
-				title={'Import'}
-				onPress={onRecoverConfirm}
-				disabled={!isSeedValid.valid}
-			/>
+			<Button title={'Import'} onPress={onRecoverConfirm} />
 			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
 		</KeyboardScrollView>
 	);

@@ -1,4 +1,4 @@
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { NetworkParsedData } from 'types/scannerTypes';
 

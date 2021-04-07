@@ -21,14 +21,12 @@ import * as React from 'react';
 import { StatusBar, LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
-import { ApplicationProvider } from '@ui-kitten/components';
-import * as eva from '@eva-design/eva';
+import FlashMessage from 'react-native-flash-message';
 
 import { AppNavigator } from './screens';
 
-import { colors } from 'styles';
+import { colors, fonts } from 'styles/index';
 import {
 	useRegistriesStore,
 	RegistriesContext
@@ -36,15 +34,13 @@ import {
 import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
 import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
 import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
-import CustomAlert from 'components/CustomAlert';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
-import { AlertStateContext, useAlertContext } from 'stores/alertContext';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
-	NavigationBar.setColor(colors.background.os);
+	NavigationBar.setColor(colors.background.dark);
 	if (global.inTest) {
 		LogBox.ignoreAllLogs(true);
 	} else if (__DEV__) {
@@ -58,7 +54,6 @@ export default function App(props: AppProps): React.ReactElement {
 		]);
 	}
 
-	const alertContext = useAlertContext();
 	const seedRefContext = useSeedRefStore();
 	const networkContext = useNetworksContext();
 	const accountsContext = useAccountContext();
@@ -70,31 +65,29 @@ export default function App(props: AppProps): React.ReactElement {
 	};
 
 	return (
-		<SafeAreaProvider>
-			<ApplicationProvider {...eva} theme={eva.light}>
-				<NetworksContext.Provider value={networkContext}>
-					<AccountsContext.Provider value={accountsContext}>
-						<ScannerContext.Provider value={scannerContext}>
-							<RegistriesContext.Provider value={registriesContext}>
-								<AlertStateContext.Provider value={alertContext}>
-									<SeedRefsContext.Provider value={seedRefContext}>
-										<MenuProvider backHandler={true}>
-											<StatusBar
-												barStyle="light-content"
-												backgroundColor={colors.background.app}
-											/>
-											<CustomAlert />
-											<NavigationContainer>
-												{renderStacks()}
-											</NavigationContainer>
-										</MenuProvider>
-									</SeedRefsContext.Provider>
-								</AlertStateContext.Provider>
-							</RegistriesContext.Provider>
-						</ScannerContext.Provider>
-					</AccountsContext.Provider>
-				</NetworksContext.Provider>
-			</ApplicationProvider>
-		</SafeAreaProvider>
+		<NetworksContext.Provider value={networkContext}>
+			<AccountsContext.Provider value={accountsContext}>
+				<ScannerContext.Provider value={scannerContext}>
+					<RegistriesContext.Provider value={registriesContext}>
+						<SeedRefsContext.Provider value={seedRefContext}>
+							<MenuProvider backHandler={true}>
+								<StatusBar
+									barStyle="light-content"
+									backgroundColor={colors.background.app}
+								/>
+								<NavigationContainer>{renderStacks()}</NavigationContainer>
+								<FlashMessage
+									position="top"
+									style={{ backgroundColor: colors.background.accentDark }}
+									textStyle={{ fontFamily: fonts.regular }}
+									titleStyle={{ fontFamily: fonts.regular }}
+									duration={3000}
+								/>
+							</MenuProvider>
+						</SeedRefsContext.Provider>
+					</RegistriesContext.Provider>
+				</ScannerContext.Provider>
+			</AccountsContext.Provider>
+		</NetworksContext.Provider>
 	);
 }

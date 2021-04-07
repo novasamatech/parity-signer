@@ -17,13 +17,10 @@
 
 import React, { useContext, useState } from 'react';
 import { Text } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { AccountsContext } from 'stores/AccountsContext';
-import { AlertStateContext } from 'stores/alertContext';
 import { NavigationProps } from 'types/props';
-import ScreenHeading from 'components/ScreenHeading';
-import { alertIdentityCreationError } from 'utils/alertUtils';
 import Button from 'components/Button';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 import { resetNavigationTo } from 'utils/navigationHelpers';
@@ -35,17 +32,20 @@ function CreateWallet3({
 }: NavigationProps<'CreateWallet3'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const [isSeedMatching, setIsSeedMatching] = useState(false);
-	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const createWallet = async (): Promise<void> => {
+		if (!isSeedMatching) {
+			return showMessage('This key phrase does not match the original seed.');
+		}
 		try {
 			await accountsStore.saveNewIdentity(
 				route.params.seedPhrase,
 				createSeedRefWithNewSeed
 			);
 			resetNavigationTo(navigation, 'Wallet');
+			navigation.navigate('AddNetwork');
 		} catch (e) {
-			alertIdentityCreationError(setAlert, e.message);
+			showMessage(e.message);
 		}
 	};
 
@@ -54,8 +54,7 @@ function CreateWallet3({
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title={'Verify Key Phrase'} />
+		<>
 			<Text>Retype the key phrase as shown on the prior screen.</Text>
 			<AccountSeed
 				onChangeText={onSeedTextInput}
@@ -69,7 +68,7 @@ function CreateWallet3({
 				disabled={!isSeedMatching}
 			/>
 			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 

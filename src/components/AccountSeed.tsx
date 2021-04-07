@@ -28,7 +28,7 @@ import {
 import TextInput from './TextInput';
 import TouchableItem from './TouchableItem';
 
-import { colors, fonts, fontStyles } from 'styles';
+import { colors, fonts, fontStyles } from 'styles/index';
 import PARITY_WORDS from 'res/parity_wordlist.json';
 import BIP39_WORDS from 'res/bip39_wordlist.json';
 import { binarySearch } from 'utils/array';
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 4
 	},
 	suggestionText: {
-		color: colors.signal.main,
+		color: colors.text.accent,
 		fontFamily: fonts.regular,
 		letterSpacing: fontStyles.t_seed.letterSpacing
 	},

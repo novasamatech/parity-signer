@@ -18,7 +18,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, fonts } from 'styles';
+import { colors, fonts } from 'styles/index';
 
 export function UnknownAccountWarning({
 	isPath
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
 		fontFamily: fonts.regular
 	},
 	warningTitle: {
-		color: colors.signal.error,
+		color: colors.text.error,
 		fontFamily: fonts.bold,
 		fontSize: 20,
 		marginBottom: 10

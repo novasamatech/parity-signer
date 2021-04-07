@@ -8,7 +8,7 @@
   },
   "scripts": {
     "android": "npx react-native run-android",
-    "build:android": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res/",
+    "build:android": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native bundle --platform android --dev true --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res/",
     "build-prod:ios": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native bundle --dev false --entry-file index.js --bundle-output ios/main.jsbundle --platform ios --assets-dest='./ios'",
     "install:ios": "yarn install && npx pod-install",
     "xcbuild:debug": "xcodebuild -workspace ios/LayerWallet.xcworkspace -scheme LayerWallet -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build/LayerWallet",
@@ -62,6 +62,7 @@
     "react-native": "0.63.4",
     "react-native-camera": "^3.21.0",
     "react-native-elements": "^1.2.6",
+    "react-native-flash-message": "^0.1.23",
     "react-native-gesture-handler": "^1.6.0",
     "react-native-keyboard-aware-scroll-view": "0.9.3",
     "react-native-markdown-renderer": "^3.2.8",

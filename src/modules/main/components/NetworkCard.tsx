@@ -25,11 +25,11 @@ import { AccountsContext } from 'stores/AccountsContext';
 import AccountIcon from 'components/AccountIcon';
 import Button from 'components/Button';
 import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
-import Separator from 'components/Separator';
 import PopupMenu from 'components/PopupMenu';
 import { ButtonListener } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import { isSubstrateNetworkParams } from 'types/networkTypes';
+import { colors, fonts } from 'styles/index';
 import {
 	resetNavigationTo,
 	navigateToReceiveBalance,
@@ -93,46 +93,49 @@ export function NetworkCard({
 	};
 
 	return (
-		<View>
-			<Separator
-				style={{
-					backgroundColor: 'transparent',
-					height: 0,
-					marginVertical: 0
-				}}
-			/>
+		<View style={styles.wrapper}>
 			<View style={styles.content}>
-				<AccountIcon address={''} network={networkParams} style={styles.icon} />
-				<View style={styles.desc}>
-					<AccountPrefixedTitle title={title} />
+				<View style={styles.contentRow}>
+					<AccountIcon
+						address={''}
+						network={networkParams}
+						style={styles.icon}
+					/>
+					<View style={styles.desc}>
+						<AccountPrefixedTitle title={title} />
+					</View>
+					{isSubstrateNetworkParams(networkParams) && (
+						<View style={styles.contentRow}>
+							<Text style={styles.text}>{balance ?? '...'} {networkParams.unit}</Text>
+						</View>)
+                                        }
+					<PopupMenu
+						onSelect={onOptionSelect}
+						menuTriggerIconName={'more-vert'}
+						menuItems={[
+							{
+								text: `Remove ${title}`,
+								value: 'PathDelete'
+							}
+						]}
+					/>
 				</View>
-			</View>
-			{isSubstrateNetworkParams(networkParams) && (
-				<View style={styles.content}>
-					<Text style={styles.text}>{balance ?? 'Loading...'}</Text>
+				<View style={styles.contentRow}>
+					<View style={styles.contentColumn}>
+						<Button
+							title="Send"
+							fluid={true}
+							onPress={(): Promise<void> => onPressed(true)}
+						/>
+					</View>
+					<View style={styles.contentColumn}>
+						<Button
+							title="Receive"
+							fluid={true}
+							onPress={(): Promise<void> => onPressed(false)}
+						/>
+					</View>
 				</View>
-			)}
-			<View style={styles.content}>
-				<Button
-					title="Send"
-					onPress={(): Promise<void> => onPressed(true)}
-					small={true}
-				/>
-				<Button
-					title="Receive"
-					onPress={(): Promise<void> => onPressed(false)}
-					small={true}
-				/>
-				<PopupMenu
-					onSelect={onOptionSelect}
-					menuTriggerIconName={'more-vert'}
-					menuItems={[
-						{
-							text: `Remove ${title}`,
-							value: 'PathDelete'
-						}
-					]}
-				/>
 			</View>
 		</View>
 	);
@@ -140,10 +143,20 @@ export function NetworkCard({
 
 const styles = StyleSheet.create({
 	content: {
+		backgroundColor: colors.background.accentLight,
+		borderRadius: 16,
+		marginBottom: 12,
+		paddingBottom: 12,
+		paddingHorizontal: 24,
+		paddingTop: 20
+	},
+	contentColumn: {
+		flex: 1
+	},
+	contentRow: {
 		alignItems: 'center',
 		display: 'flex',
-		flexDirection: 'row',
-		paddingLeft: 16
+		flexDirection: 'row'
 	},
 	desc: {
 		flex: 1,
@@ -162,6 +175,11 @@ const styles = StyleSheet.create({
 		width: 40
 	},
 	text: {
-		color: '#fff'
+		color: colors.text.main,
+		fontFamily: fonts.regular,
+		fontSize: 17
+	},
+	wrapper: {
+		marginHorizontal: 16
 	}
 });

@@ -16,13 +16,14 @@
 // along with Parity.	If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
+import OnBoardingView from 'modules/main/components/OnBoarding';
 import ButtonIcon from 'components/ButtonIcon';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Separator from 'components/Separator';
 import NavigationTab from 'components/NavigationTab';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -44,11 +45,10 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { currentIdentity, identities } = accountsStore.state;
+	if (identities.length === 0) return <OnBoardingView />;
 	if (!currentIdentity) return <View />;
 
-	const renderNonSelectedIdentity = (
-		identity: Identity
-	): React.ReactElement => {
+	const renderIdentity = (identity: Identity): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
 		const showRecoveryPhrase = async (
 			targetIdentity: Identity
@@ -72,6 +72,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 						title="Select this wallet"
 						onPress={(): void => {
 							accountsStore.selectIdentity(identity);
+							showMessage('Wallet switched.');
 						}}
 					/>
 				) : null}
@@ -105,12 +106,10 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	};
 
 	return (
-		<SafeAreaViewContainer>
+		<>
 			<View style={styles.card}>
 				<ScrollView bounces={false}>
-					<View style={{ paddingVertical: 8 }}>
-						{identities.map(renderNonSelectedIdentity)}
-					</View>
+					{identities.map(renderIdentity)}
 				</ScrollView>
 
 				<ButtonIcon
@@ -124,11 +123,10 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 					style={styles.indentedButton}
 				/>
 			</View>
-			{/* TODO: get this footer on every page */}
 			<View style={styles.tab}>
 				<NavigationTab />
 			</View>
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 
@@ -137,7 +135,7 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.background.app,
 		borderRadius: 4,
 		paddingBottom: 16,
-		paddingTop: 8
+		paddingTop: 16
 	},
 	container: {
 		justifyContent: 'center',
@@ -157,12 +155,12 @@ const styles = StyleSheet.create({
 });
 
 const i_arrowOptions = {
-	iconColor: colors.signal.main,
+	iconColor: colors.text.accent,
 	iconName: 'arrowright',
-	iconSize: fontStyles.i_medium.fontSize,
+	iconSize: 18,
 	iconType: 'antdesign',
 	style: styles.i_arrowStyle,
-	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
+	textStyle: { ...fontStyles.a_text, color: colors.text.accent }
 };
 
 export default Settings;

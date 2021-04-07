@@ -25,7 +25,7 @@ import {
 	TextInputProps
 } from 'react-native';
 
-import { fontStyles, colors } from 'styles';
+import { fontStyles, colors } from 'styles/index';
 
 interface Props extends TextInputProps {
 	fixedPrefix?: string;
@@ -107,11 +107,10 @@ const styles = StyleSheet.create({
 		paddingTop: 11.5
 	},
 	input_error: {
-		borderBottomColor: colors.signal.error
+		borderBottomColor: colors.text.error
 	},
 	label: {
-		marginBottom: 3,
-		...fontStyles.t_regular
+		marginBottom: 3
 	},
 	viewStyle: {
 		flexDirection: 'row'

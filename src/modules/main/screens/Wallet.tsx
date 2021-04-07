@@ -22,8 +22,8 @@ import React, {
 	useMemo,
 	useState
 } from 'react';
-import { BackHandler, FlatList, FlatListProps } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { View, BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import BN from 'bn.js';
@@ -49,10 +49,7 @@ import {
 	getIdentityName
 } from 'utils/identitiesUtils';
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
-import TouchableItem from 'components/TouchableItem';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
-import ScreenHeading from 'components/ScreenHeading';
+import Button from 'components/Button';
 import NavigationTab from 'components/NavigationTab';
 import { RegistriesContext } from 'stores/RegistriesContext';
 
@@ -161,35 +158,27 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 		fetchBalances(networkList);
 	}, []);
 
-	if (!loaded) return <SafeAreaViewContainer />;
+	if (!loaded) return <View />;
 	if (identities.length === 0) return <OnBoardingView />;
 	if (currentIdentity === null) return <NoCurrentIdentity />;
 
 	const getListOptions = (): Partial<FlatListProps<any>> => {
 		return {
 			ListFooterComponent: (
-				<>
-					<TouchableItem
-						onPress={(): void => navigation.navigate('SignTransaction')}
-						style={{
-							display: 'flex',
-							flexDirection: 'row'
-						}}
-					>
-						<Icon name="add" color={colors.text.main} size={30} />
-						<AccountPrefixedTitle title="Sign a polkadot-js transaction" />
-					</TouchableItem>
-					<TouchableItem
+				<View style={{ marginBottom: 12, paddingHorizontal: 15 }}>
+					{availableNetworks.length !== 0 ? (
+						<Button
+							title="Sign a polkadot-js transaction"
+							onPress={(): void => navigation.navigate('SignTransaction')}
+							fluid={true}
+						/>
+					) : null}
+					<Button
+						title="Add a network"
 						onPress={(): void => navigation.navigate('AddNetwork')}
-						style={{
-							display: 'flex',
-							flexDirection: 'row'
-						}}
-					>
-						<Icon name="add" color={colors.text.main} size={30} />
-						<AccountPrefixedTitle title="Add a network" />
-					</TouchableItem>
-				</>
+						fluid={true}
+					/>
+				</View>
 			)
 		};
 	};
@@ -233,8 +222,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title={getIdentityName(currentIdentity, identities)} />
+		<>
 			<FlatList
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
@@ -243,7 +231,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 				{...getListOptions()}
 			/>
 			<NavigationTab />
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 

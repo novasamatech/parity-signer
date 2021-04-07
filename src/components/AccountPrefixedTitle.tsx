@@ -18,7 +18,7 @@
 import React, { ReactElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { fontStyles, colors } from 'styles';
+import { fontStyles, colors } from 'styles/index';
 
 export default function AccountPrefixedTitle({
 	titlePrefix,
@@ -43,7 +43,7 @@ export default function AccountPrefixedTitle({
 
 const styles = StyleSheet.create({
 	text: {
-		color: colors.signal.main,
+		color: colors.text.accent,
 		marginBottom: 1,
 		marginRight: 4
 	}

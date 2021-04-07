@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { fontStyles } from 'styles';
+import { fontStyles } from 'styles/index';
 
 const styles = StyleSheet.create({
 	body: {
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 20
 	},
 	topTitle: {
-		...fontStyles.h1,
+		...fontStyles.h2,
 		textAlign: 'center'
 	}
 });

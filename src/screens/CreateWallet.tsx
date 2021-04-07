@@ -18,13 +18,12 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { NavigationProps } from 'types/props';
 import { emptyIdentity } from 'utils/identitiesUtils';
-import ScreenHeading from 'components/ScreenHeading';
 import KeyboardScrollView from 'components/KeyboardScrollView';
 
 function CreateWallet({
@@ -46,7 +45,6 @@ function CreateWallet({
 
 	return (
 		<KeyboardScrollView bounces={false} style={styles.body}>
-			<ScreenHeading title={'New Wallet'} />
 			<TextInput
 				onChangeText={updateName}
 				value={accountsStore.state.newIdentity.name}
