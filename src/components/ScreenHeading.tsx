@@ -45,9 +45,9 @@ export function ScreenHeadingWithNetworkIcon({
 	onPress?: () => any;
 }): ReactElement {
 	const titleStyle: TextStyle = {
+		fontFamily: fonts.bold,
 		...fontStyles.h2,
 		...baseStyles.t_left,
-		...baseStyles.t_normal
 	};
 	const { getNetwork } = useContext(NetworksContext);
 	const isDisabled = onPress === undefined;
@@ -192,9 +192,6 @@ const baseStyles = StyleSheet.create({
 	},
 	t_left: {
 		textAlign: 'left'
-	},
-	t_normal: {
-		fontFamily: fonts.montserrat
 	},
 	text: {
 		...fontStyles.h1,

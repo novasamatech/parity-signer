@@ -69,7 +69,7 @@ export const fontStyles = StyleSheet.create({
 	},
 	h2: {
 		color: colors.text.main,
-		fontFamily: fonts.regular,
+		fontFamily: fonts.bold,
 		fontSize: 18
 	},
 	h_subheading: {
