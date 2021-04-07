@@ -20,7 +20,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles/index';
+import { components, colors, fontStyles } from 'styles';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
@@ -54,7 +54,7 @@ function CreateWallet2({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<>
+	    <View style={components.page}>
 			<Text>
 				Write these words down on paper. Keep the backup paper safe. These words
 				allow anyone to recover this account and access its funds.
@@ -81,9 +81,10 @@ function CreateWallet2({
 				onPress={(): void =>
 					navigation.navigate('CreateWallet3', { seedPhrase })
 				}
+fluid={true}
 			/>
-			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
-		</>
+	    <Button title={'Go back'} onPress={(): void => navigation.goBack()} fluid={true} />
+		</View>
 	);
 }
 

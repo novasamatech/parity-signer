@@ -19,11 +19,11 @@ import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
-import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { getNetworkKey } from 'utils/identitiesUtils';
 
@@ -36,11 +36,6 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 
 	const path = route.params.path;
 	const networksContextState = useContext(NetworksContext);
-	const networkKey = getNetworkKey(
-		path,
-		accountsStore.state.currentIdentity,
-		networksContextState
-	);
 
 	if (!identity) return <View />;
 
@@ -59,16 +54,16 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 	};
 
 	return (
-		<>
+		<View style={components.page}>
 			<TextInput
 				label="Display Name"
 				onChangeText={onChangeIdentity}
 				value={newIdentityName}
 				placeholder="Enter a new wallet name"
-				focus
+				autofocus
 			/>
-			<Button title="Save" onPress={onSaveIdentity} />
-		</>
+	    <Button title="Save" onPress={onSaveIdentity} fluid={true} />
+		</View>
 	);
 }
 

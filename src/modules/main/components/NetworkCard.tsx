@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
 		width: 40
 	},
 	text: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 17
 	},

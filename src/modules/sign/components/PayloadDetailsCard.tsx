@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
 	},
 	titleText: {
 		...fontStyles.t_codeS,
-		color: colors.text.main,
+		color: colors.text.dark,
 		paddingHorizontal: 16
 	}
 });

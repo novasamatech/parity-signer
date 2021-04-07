@@ -18,13 +18,12 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { colors } from 'styles/index';
+import { colors, components } from 'styles/index';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { NavigationProps } from 'types/props';
 import { emptyIdentity } from 'utils/identitiesUtils';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 
 function CreateWallet({
 	navigation
@@ -44,36 +43,24 @@ function CreateWallet({
 	};
 
 	return (
-		<KeyboardScrollView bounces={false} style={styles.body}>
+		<View style={components.page}>
 			<TextInput
 				onChangeText={updateName}
 				value={accountsStore.state.newIdentity.name}
 				placeholder="Wallet name"
 			/>
-			<View style={styles.btnBox}>
 				<Button
-					title="Generate a key phrase"
-					onPress={(): void => navigation.navigate('CreateWallet2')}
+					title="New wallet"
+	  onPress={(): void => navigation.navigate('CreateWallet2')}
+          fluid={true}
 				/>
 				<Button
-					title="Import a key phrase"
+					title="Import wallet"
 					onPress={(): void => navigation.navigate('CreateWalletImport')}
+          fluid={true}
 				/>
-			</View>
-		</KeyboardScrollView>
+		</View>
 	);
 }
 
 export default CreateWallet;
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		overflow: 'hidden'
-	},
-	btnBox: {
-		alignContent: 'center',
-		marginTop: 32
-	}
-});

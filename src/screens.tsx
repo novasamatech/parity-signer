@@ -52,7 +52,7 @@ const globalStackNavigationOptions = {
 	// more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: {
-	  color: colors.navText.main
+		color: colors.navText.main
 	},
 	headerBackTitleVisible: false,
 	headerStyle: {
@@ -79,16 +79,16 @@ const globalStackNavigationOptions = {
 				title = 'Delete Wallet';
 				break;
 			case 'CreateWallet':
-				title = 'New Wallet';
+				title = 'Create Wallet';
 				break;
 			case 'CreateWallet2':
-				title = 'Key Phrase';
+				title = 'Create Wallet';
 				break;
 			case 'CreateWallet3':
 				title = 'Verify Key Phrase';
 				break;
 			case 'CreateWalletImport':
-				title = 'Import Wallet';
+				title = 'Create Wallet';
 				break;
 			case 'Settings':
 				title = 'Settings';

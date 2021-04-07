@@ -30,7 +30,7 @@ export const colors = {
 	},
 	border: {
 		dark: '#000000',
-		light: '#666666',
+		light: '#ccc',
 		signal: '#8E1F40'
 	},
 	navText: {
@@ -40,11 +40,12 @@ export const colors = {
 		main: '#fff'
 	},
 	text: {
-		accent: '#7535d4',
+		accent: '#5d7ff3',
+		cursor: '#1d99f1',
+		dark: '#111',
 		disabled: '#aaa',
 		error: '#D73400',
-		faded: '#9A9A9A',
-		main: '#111',
+		light: '#ccc',
 		white: '#fff'
 	}
 };
@@ -60,7 +61,7 @@ export const components = {
 		alignSelf: 'center',
 		backgroundColor: colors.background.accent,
 		borderRadius: 60,
-		height: 40,
+		height: 42,
 		justifyContent: 'center',
 		marginVertical: 8,
 		paddingHorizontal: 28
@@ -75,52 +76,86 @@ export const components = {
 	buttonText: {
 		color: colors.text.white,
 		fontFamily: fonts.regular,
-		fontSize: 16
-	}
+		fontSize: 17
+	},
+  page: {
+    paddingHorizontal: 20,
+    paddingTop: 34,
+  },
+  textInput: {
+    marginVertical: 12
+  },
+  textInputLabel: {
+		fontFamily: fonts.regular,
+		marginBottom: 8
+  },
+  textInputSuffix: {
+		borderWidth: 0,
+		color: colors.text.dark,
+		flex: 0,
+		paddingRight: 2,
+		paddingTop: 13,
+		position: 'absolute',
+		right: 14
+  },
+  textInputText: {
+		fontFamily: fonts.regular,
+		fontSize: 18,
+		borderColor: colors.border.light,
+		borderWidth: 0.8,
+		borderRadius: 10,
+		flex: 1,
+		paddingHorizontal: 14,
+		paddingTop: 12,
+		paddingBottom: 10
+  },
+  textInputTextError: {
+		borderBottomColor: colors.text.error
+  },
 };
 
 export const fontStyles = StyleSheet.create({
 	a_text: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 12,
 		letterSpacing: 0.4,
 		textTransform: 'uppercase'
 	},
 	h2: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.bold,
 		fontSize: 18
 	},
 	h_subheading: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 14,
 		textTransform: 'uppercase'
 	},
 	quote: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.light,
 		fontSize: 28
 	},
 	t_big: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 16
 	},
 	t_code: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 15
 	},
 	t_codeS: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 11,
 		letterSpacing: 0.2
 	},
 	t_important: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.bold,
 		fontSize: 13
 	},
@@ -131,7 +166,7 @@ export const fontStyles = StyleSheet.create({
 		fontSize: 13
 	},
 	t_prefix: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 14,
 		textTransform: 'uppercase'

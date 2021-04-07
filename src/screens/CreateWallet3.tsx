@@ -16,9 +16,10 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NavigationProps } from 'types/props';
 import Button from 'components/Button';
@@ -54,7 +55,7 @@ function CreateWallet3({
 	};
 
 	return (
-		<>
+	    <View style={components.page}>
 			<Text>Retype the key phrase as shown on the prior screen.</Text>
 			<AccountSeed
 				onChangeText={onSeedTextInput}
@@ -65,10 +66,11 @@ function CreateWallet3({
 			<Button
 				title={'Confirm'}
 				onPress={createWallet}
-				disabled={!isSeedMatching}
+	  disabled={!isSeedMatching}
+          fluid={true}
 			/>
-			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
-		</>
+	    <Button title={'Go back'} onPress={(): void => navigation.goBack()} fluid={true} />
+		</View>
 	);
 }
 

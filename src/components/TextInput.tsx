@@ -25,94 +25,65 @@ import {
 	TextInputProps
 } from 'react-native';
 
-import { fontStyles, colors } from 'styles/index';
+import { fonts, fontStyles, components, styles, colors } from 'styles/index';
 
-interface Props extends TextInputProps {
-	fixedPrefix?: string;
-	focus?: boolean;
-	label?: string;
-	error?: boolean;
-}
-
-export default class TextInput extends React.PureComponent<Props, {}> {
+export default class TextInput extends React.PureComponent<
+	{
+		suffix?: string;
+		autofocus?: boolean;
+		label?: string;
+		error?: boolean;
+	},
+	{}
+> {
+	// props
 	static defaultProps = {
-		focus: false
+		autofocus: false
 	};
 	input: TextInputOrigin | null = null;
 
-	// Methods:
+	// methods
 	focus(): void {
 		this.input?.focus();
 	}
 
 	componentDidUpdate(): void {
-		const { focus } = this.props;
-		focus && this.focus();
+		const { autofocus } = this.props;
+		autofocus && this.focus();
 	}
 
 	renderLabel(): React.ReactNode {
 		const { label } = this.props;
 		if (!label) return;
-		return <Text style={styles.label}>{label}</Text>;
+		return <Text style={components.textInputLabel}>{label}</Text>;
 	}
 
 	render(): React.ReactElement {
-		const { fixedPrefix, style, error } = this.props;
-		const finalInputStyles: TextStyle[] = [styles.input];
+		const { suffix, style, error } = this.props;
+		const finalInputStyles: TextStyle[] = [components.textInputText];
 		if (error) {
-			finalInputStyles.push(styles.input_error);
+			finalInputStyles.push(components.textInputTextError);
 		}
 
 		return (
-			<View style={styles.body}>
+			<View style={components.textInput}>
 				{this.renderLabel()}
-				<View style={styles.viewStyle}>
-					{fixedPrefix && (
-						<Text style={[fontStyles.h2, finalInputStyles, styles.inputFixed]}>
-							{fixedPrefix}
-						</Text>
-					)}
+				<View style={{ flexDirection: 'row' }}>
 					<TextInputOrigin
 						ref={(input: TextInputOrigin): any => (this.input = input)}
 						autoCapitalize="none"
 						keyboardAppearance="dark"
 						underlineColorAndroid="transparent"
 						{...this.props}
-						style={[fontStyles.h2, finalInputStyles, style]}
+						style={[finalInputStyles, style]}
 						placeholderTextColor={colors.text.faded}
-						selectionColor={colors.border.light}
+						selectionColor={colors.text.cursor}
 					/>
+					{suffix && (
+						<Text style={[finalInputStyles, components.textInputSuffix]}>{suffix}</Text>
+					)}
 				</View>
 			</View>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	body: {
-		marginVertical: 8,
-		paddingHorizontal: 16
-	},
-	input: {
-		borderBottomColor: colors.border.light,
-		borderBottomWidth: 0.8,
-		flex: 1,
-		height: 40,
-		padding: 0,
-		paddingTop: 8
-	},
-	inputFixed: {
-		color: '#888',
-		flex: 0,
-		paddingTop: 11.5
-	},
-	input_error: {
-		borderBottomColor: colors.text.error
-	},
-	label: {
-		marginBottom: 3
-	},
-	viewStyle: {
-		flexDirection: 'row'
-	}
-});

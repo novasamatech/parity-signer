@@ -64,7 +64,7 @@ export function UnknownAccountWarning({
 
 const styles = StyleSheet.create({
 	warningText: {
-		color: colors.text.main,
+		color: colors.text.dark,
 		fontFamily: fonts.regular
 	},
 	warningTitle: {

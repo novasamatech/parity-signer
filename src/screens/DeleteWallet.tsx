@@ -15,9 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
+import { View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -41,9 +43,9 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 	};
 
 	return (
-		<>
-			<Button title="Delete" onPress={deleteWallet} />
-		</>
+		<View style={components.page}>
+	    <Button title="Delete" onPress={deleteWallet} fluid={true} />
+		</View>
 	);
 }
 

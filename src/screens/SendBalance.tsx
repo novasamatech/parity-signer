@@ -16,6 +16,7 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
+import { View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { NetworksContext } from 'stores/NetworkContext';
@@ -47,6 +48,7 @@ function SendBalance({
 		accountsStore.state.currentIdentity,
 		networksContextState
 	);
+	const networkParams = networksContextState.getNetwork(networkKey ?? '');
 	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
 	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
@@ -66,8 +68,9 @@ function SendBalance({
 	};
 
 	return (
-		<>
+		<View style={components.page}>
 			<TextInput
+				suffix={networkParams.unit}
 				label="Amount"
 				onChangeText={onChangeAmount}
 				value={amount}
@@ -80,11 +83,12 @@ function SendBalance({
 				label="Recipient"
 				onChangeText={onChangeRecipient}
 				value={recipient}
-				placeholder="(address)"
+				placeholder="Address"
 				autoCorrect={false}
 			/>
 			<Button
 				title="Send"
+          fluid={true}
 				onPress={(): void => {
 					return;
 				}}
@@ -93,16 +97,18 @@ function SendBalance({
 				label="Add to Address Book"
 				onChangeText={onChangeNewAddressBookEntry}
 				value={newAddressBookEntry}
-				placeholder="(address)"
+				placeholder="Address"
+          fluid={true}
 				autoCorrect={false}
 			/>
 			<Button
 				title="Add"
+          fluid={true}
 				onPress={(): void => {
 					return;
 				}}
 			/>
-		</>
+		</View>
 	);
 }
 

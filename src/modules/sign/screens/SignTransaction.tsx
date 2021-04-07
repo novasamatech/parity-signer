@@ -20,7 +20,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
 import { colors, fonts } from 'styles/index';
-import testIDs from 'e2e/testIDs';
 import Button from 'components/Button';
 import { useProcessBarCode } from 'modules/sign/utils';
 import { useInjectionQR } from 'e2e/injections';
