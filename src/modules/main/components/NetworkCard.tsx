@@ -119,7 +119,6 @@ export function NetworkCard({
 					onPress={(): Promise<void> => onPressed(false)}
 					small={true}
 				/>
-				<Button title="Add" small={true} onPress={(): void => void 0} />
 				<PopupMenu
 					onSelect={onOptionSelect}
 					menuTriggerIconName={'more-vert'}
