@@ -26,7 +26,7 @@ import FlashMessage from 'react-native-flash-message';
 
 import { AppNavigator } from './screens';
 
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import {
 	useRegistriesStore,
 	RegistriesContext
@@ -40,7 +40,7 @@ import { AppProps, getLaunchArgs } from 'e2e/injections';
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
-	NavigationBar.setColor(colors.background.os);
+	NavigationBar.setColor(colors.background.dark);
 	if (global.inTest) {
 		LogBox.ignoreAllLogs(true);
 	} else if (__DEV__) {

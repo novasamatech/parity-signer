@@ -20,7 +20,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { fontStyles } from 'styles';
+import { fontStyles } from 'styles/index';
 import { NavigationProps } from 'types/props';
 import TouchableItem from 'components/TouchableItem';
 

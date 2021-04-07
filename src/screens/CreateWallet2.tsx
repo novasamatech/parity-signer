@@ -20,7 +20,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';

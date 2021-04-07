@@ -20,7 +20,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import { fontStyles } from 'styles';
+import { fontStyles } from 'styles/index';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import styles from 'modules/main/styles';

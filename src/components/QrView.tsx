@@ -20,7 +20,7 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, View, ViewStyle } from 'react-native';
 
 import { qrCode, qrCodeHex } from 'utils/native';
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 
 interface Props {
 	data: string;

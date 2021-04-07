@@ -24,7 +24,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
 	RegistriesContext,

@@ -23,7 +23,7 @@ import { Icon } from 'react-native-elements';
 
 import TouchableItem from './TouchableItem';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
 import { RootStackParamList } from 'types/routes';

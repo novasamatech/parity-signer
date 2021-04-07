@@ -29,7 +29,7 @@ import PopupMenu from 'components/PopupMenu';
 import { ButtonListener } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import { isSubstrateNetworkParams } from 'types/networkTypes';
-import { colors, fonts } from 'styles';
+import { colors, fonts } from 'styles/index';
 import {
 	resetNavigationTo,
 	navigateToReceiveBalance,

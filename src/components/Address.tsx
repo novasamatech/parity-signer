@@ -18,7 +18,7 @@
 import React, { ReactElement } from 'react';
 import { Text, TextStyle } from 'react-native';
 
-import { fontStyles } from 'styles';
+import { fontStyles } from 'styles/index';
 import { NetworkProtocols } from 'constants/networkSpecs';
 import { NetworkProtocol } from 'types/networkTypes';
 

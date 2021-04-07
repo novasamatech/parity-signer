@@ -19,7 +19,7 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import { NavigationProps } from 'types/props';

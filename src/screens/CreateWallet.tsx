@@ -18,7 +18,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';

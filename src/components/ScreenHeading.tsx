@@ -20,7 +20,7 @@ import { View, StyleSheet, Text, TextStyle } from 'react-native';
 
 import AccountIcon from './AccountIcon';
 
-import { fonts, fontStyles } from 'styles';
+import { fonts, fontStyles } from 'styles/index';
 import { NetworksContext } from 'stores/NetworkContext';
 import TouchableItem from 'components/TouchableItem';
 import { ButtonListener } from 'types/props';

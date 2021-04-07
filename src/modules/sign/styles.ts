@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { fontStyles } from 'styles';
+import { fontStyles } from 'styles/index';
 
 const styles = StyleSheet.create({
 	body: {

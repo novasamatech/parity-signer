@@ -18,7 +18,7 @@
 import React from 'react';
 import { Text, View, ViewStyle } from 'react-native';
 
-import { fontStyles } from 'styles';
+import { fontStyles } from 'styles/index';
 import { hexToAscii, isAscii } from 'utils/strings';
 import Separator from 'components/Separator';
 

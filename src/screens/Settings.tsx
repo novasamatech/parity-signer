@@ -21,7 +21,7 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import OnBoardingView from 'modules/main/components/OnBoarding';
 import ButtonIcon from 'components/ButtonIcon';
 import Separator from 'components/Separator';

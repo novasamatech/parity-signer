@@ -25,7 +25,7 @@ import {
 } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import { colors, fonts } from 'styles';
+import { colors, fonts } from 'styles/index';
 
 type MenuItem = {
 	text: string;

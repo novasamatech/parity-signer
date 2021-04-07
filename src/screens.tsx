@@ -28,7 +28,7 @@ import {
 import * as React from 'react';
 import { View, Text } from 'react-native';
 
-import { colors, fonts } from 'styles';
+import { colors, fonts } from 'styles/index';
 import testIDs from 'e2e/testIDs';
 import Wallet from 'modules/main/screens/Wallet';
 import AddNetwork from 'screens/AddNetwork';

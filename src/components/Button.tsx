@@ -25,7 +25,7 @@ import {
 	View
 } from 'react-native';
 
-import { components } from 'styles';
+import { components } from 'styles/index';
 import { ButtonListener } from 'types/props';
 
 export default class Button extends React.PureComponent<{

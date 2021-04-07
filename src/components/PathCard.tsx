@@ -25,7 +25,7 @@ import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
 	defaultNetworkKey,
