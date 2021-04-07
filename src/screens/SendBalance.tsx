@@ -91,7 +91,7 @@ function SendBalance({
 			/>
 			<Button
 				title="Send"
-				onPress={() => {
+				onPress={(): void => {
 					return;
 				}}
 			/>
@@ -104,7 +104,7 @@ function SendBalance({
 			/>
 			<Button
 				title="Add"
-				onPress={() => {
+				onPress={(): void => {
 					return;
 				}}
 			/>

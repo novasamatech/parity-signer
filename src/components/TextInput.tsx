@@ -107,11 +107,10 @@ const styles = StyleSheet.create({
 		paddingTop: 11.5
 	},
 	input_error: {
-		borderBottomColor: colors.signal.error
+		borderBottomColor: colors.text.error
 	},
 	label: {
-		marginBottom: 3,
-		...fontStyles.t_regular
+		marginBottom: 3
 	},
 	viewStyle: {
 		flexDirection: 'row'

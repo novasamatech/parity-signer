@@ -39,8 +39,6 @@ export default function CustomAlert(): React.ReactElement {
 
 	const renderActions = (action: Action, index: number): React.ReactElement => (
 		<Button
-			onlyText={true}
-			small={true}
 			key={'alert' + index}
 			testID={action.testID}
 			title={action.text}
@@ -51,9 +49,7 @@ export default function CustomAlert(): React.ReactElement {
 				setAlertDisplay(false);
 			}}
 			style={styles.button}
-			textStyles={
-				action.onPress ? styles.buttonBoldText : styles.buttonLightText
-			}
+			active={action.onPress}
 		/>
 	);
 
@@ -91,7 +87,7 @@ const styles = StyleSheet.create({
 		zIndex: 100
 	},
 	body: {
-		backgroundColor: colors.background.alert,
+		backgroundColor: colors.background.accentLight,
 		paddingHorizontal: 20,
 		paddingVertical: 20,
 		width: '90%'
@@ -117,6 +113,6 @@ const styles = StyleSheet.create({
 	},
 	textTitle: {
 		paddingVertical: 10,
-		...fontStyles.h1
+		...fontStyles.h2
 	}
 });

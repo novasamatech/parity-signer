@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 20
 	},
 	topTitle: {
-		...fontStyles.h1,
+		...fontStyles.h2,
 		textAlign: 'center'
 	}
 });

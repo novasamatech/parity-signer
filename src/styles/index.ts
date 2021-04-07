@@ -17,29 +17,34 @@
 
 import { StyleSheet } from 'react-native';
 
-export const headerHeight = 40;
-
 export const colors = {
 	background: {
-		alert: '#444444',
-		app: '#151515',
-		button: 'C0C0C0',
-		card: '#262626',
-		os: '#000000'
+		accent: '#5d7ff3',
+		accentLight: '#eff2fe',
+		app: '#fff',
+		button: '#f7f9ff',
+		card: '#eee',
+		dark: '#000000',
+		light: '#ddd'
 	},
 	border: {
 		dark: '#000000',
 		light: '#666666',
 		signal: '#8E1F40'
 	},
-	signal: {
-		error: '#D73400',
-		main: '#FF4077'
+	navText: {
+		// used for bottom navbar
+		disabled: '#777',
+		faded: '#9A9A9A',
+		main: '#fff'
 	},
 	text: {
-		disabled: '#2F2F2F',
+		accent: '#7535d4',
+		disabled: '#aaa',
+		error: '#D73400',
 		faded: '#9A9A9A',
-		main: '#C0C0C0'
+		main: '#111',
+		white: '#fff'
 	}
 };
 
@@ -49,23 +54,37 @@ export const fonts = {
 	regular: 'Montserrat-Regular'
 };
 
-export const fontStyles = StyleSheet.create({
-	a_button: {
-		color: colors.background.app,
-		fontFamily: fonts.regular,
-		fontSize: 20
+export const components = {
+	button: {
+		alignSelf: 'center',
+		backgroundColor: colors.background.accent,
+		borderRadius: 60,
+		height: 40,
+		justifyContent: 'center',
+		marginVertical: 8,
+		paddingHorizontal: 28
 	},
+	buttonDisabled: {
+		backgroundColor: colors.background.card
+	},
+	buttonFluid: {
+		textAlign: 'center',
+		width: '100%'
+	},
+	buttonText: {
+		color: colors.text.white,
+		fontFamily: fonts.regular,
+		fontSize: 16
+	}
+};
+
+export const fontStyles = StyleSheet.create({
 	a_text: {
 		color: colors.text.main,
 		fontFamily: fonts.regular,
 		fontSize: 12,
 		letterSpacing: 0.4,
 		textTransform: 'uppercase'
-	},
-	h1: {
-		color: colors.text.main,
-		fontFamily: fonts.bold,
-		fontSize: 22
 	},
 	h2: {
 		color: colors.text.main,
@@ -77,15 +96,6 @@ export const fontStyles = StyleSheet.create({
 		fontFamily: fonts.regular,
 		fontSize: 14,
 		textTransform: 'uppercase'
-	},
-	i_large: {
-		fontSize: 22
-	},
-	i_medium: {
-		fontSize: 18
-	},
-	i_small: {
-		fontSize: 10
 	},
 	quote: {
 		color: colors.text.main,
@@ -114,8 +124,8 @@ export const fontStyles = StyleSheet.create({
 		fontSize: 13
 	},
 	t_label: {
-		backgroundColor: colors.signal.main,
-		color: colors.signal.main,
+		backgroundColor: colors.text.accent,
+		color: colors.text.accent,
 		fontFamily: fonts.regular,
 		fontSize: 13
 	},
@@ -125,15 +135,10 @@ export const fontStyles = StyleSheet.create({
 		fontSize: 14,
 		textTransform: 'uppercase'
 	},
-	t_regular: {
-		color: colors.text.main,
-		fontFamily: fonts.regular,
-		fontSize: 12
-	},
 	t_seed: {
 		borderColor: colors.background.card,
 		borderWidth: 0.8,
-		color: colors.signal.main,
+		color: colors.text.accent,
 		fontFamily: fonts.light,
 		fontSize: 18,
 		letterSpacing: 0.7,
@@ -141,15 +146,5 @@ export const fontStyles = StyleSheet.create({
 		minHeight: 100,
 		paddingHorizontal: 16,
 		paddingVertical: 10
-	}
-});
-
-export const containerStyles = StyleSheet.create({
-	background: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		flexDirection: 'column',
-		overflow: 'hidden',
-		paddingBottom: 0
 	}
 });

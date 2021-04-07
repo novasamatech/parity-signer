@@ -33,18 +33,13 @@ import {
 	NetworkProtocols
 } from 'constants/networkSpecs';
 import { Identity } from 'types/identityTypes';
-import {
-	getAddressWithPath,
-	getNetworkKeyByPath,
-	getPathName
-} from 'utils/identitiesUtils';
+import { getAddressWithPath, getNetworkKeyByPath } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
 	identity,
 	isPathValid = true,
 	path,
-	name,
 	networkKey,
 	testID,
 	titlePrefix
@@ -52,15 +47,12 @@ export default function PathCard({
 	identity: Identity;
 	isPathValid?: boolean;
 	path: string;
-	name?: string;
 	networkKey?: string;
 	testID?: string;
 	titlePrefix?: string;
 }): React.ReactElement {
 	const networksContext = useContext(NetworksContext);
 	const { networks, allNetworks } = networksContext;
-	const isNotEmptyName = name && name !== '';
-	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		identity.encryptedSeed
 	);

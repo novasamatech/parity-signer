@@ -16,9 +16,9 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Text, View, ViewStyle } from 'react-native';
 
-import { fontStyles, colors } from 'styles';
+import { fontStyles } from 'styles';
 import { hexToAscii, isAscii } from 'utils/strings';
 import Separator from 'components/Separator';
 
@@ -42,14 +42,12 @@ export default function MessageDetailsCard({
 					marginTop: 16
 				}}
 			/>
-			<View style={[styles.messageContainer, style]}>
-				<Text style={styles.titleText}>
-					{isHash ? 'Message Hash' : 'Message'}
-				</Text>
+			<View style={[style]}>
+				<Text>{isHash ? 'Message Hash' : 'Message'}</Text>
 				{isHash ? (
-					<Text style={styles.messageText}>{message}</Text>
+					<Text style={fontStyles.t_code}>{message}</Text>
 				) : (
-					<Text style={styles.messageText}>
+					<Text style={fontStyles.t_code}>
 						{isAscii(message) ? hexToAscii(message) : data}
 					</Text>
 				)}
@@ -57,17 +55,3 @@ export default function MessageDetailsCard({
 		</>
 	);
 }
-
-const styles = StyleSheet.create({
-	messageContainer: {
-		marginTop: 16
-	},
-	messageText: {
-		...fontStyles.t_code,
-		color: colors.signal.main
-	},
-	titleText: {
-		...fontStyles.h_subheading,
-		marginBottom: 8
-	}
-});

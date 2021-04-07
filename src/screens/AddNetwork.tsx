@@ -22,10 +22,7 @@ import Separator from 'components/Separator';
 import { AddNetworkCard } from 'components/AddNetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
-import {
-	SubstrateNetworkKeys,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
+import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';

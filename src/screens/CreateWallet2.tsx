@@ -35,16 +35,11 @@ function CreateWallet2({
 	const [wordsNumber, setWordsNumber] = useState(12);
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
-		const textStyles = wordsNumber === buttonWordsNumber && {
-			color: colors.signal.main
-		};
 		return (
 			<Button
 				title={`${buttonWordsNumber} words`}
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
-				onlyText
-				small
-				textStyles={{ ...textStyles }}
+				active={wordsNumber === buttonWordsNumber}
 			/>
 		);
 	};

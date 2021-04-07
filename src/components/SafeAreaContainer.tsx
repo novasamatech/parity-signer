@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { containerStyles } from 'styles';
+import { colors } from 'styles';
 
 interface SafeAreaContainerProps extends ViewProps {
 	children?: ReactNode | ReactNode[];
@@ -22,7 +22,7 @@ export const SafeAreaViewContainer = (
 ): React.ReactElement => (
 	<SafeAreaView
 		{...props}
-		style={StyleSheet.flatten([containerStyles.background, props.style])}
+		style={StyleSheet.flatten([styles.background, props.style])}
 		children={props.children}
 	/>
 );
@@ -30,12 +30,22 @@ export const SafeAreaViewContainer = (
 export const SafeAreaScrollViewContainer = (
 	props: SafeAreaScrollViewProps
 ): React.ReactElement => (
-	<SafeAreaView style={containerStyles.background}>
+	<SafeAreaView style={styles.background}>
 		<ScrollView
 			{...props}
 			bounces={false}
-			style={StyleSheet.flatten([containerStyles.background, props.style])}
+			style={StyleSheet.flatten([styles.background, props.style])}
 			children={props.children}
 		/>
 	</SafeAreaView>
 );
+
+const styles = StyleSheet.create({
+	background: {
+		backgroundColor: colors.background.app,
+		flex: 1,
+		flexDirection: 'column',
+		overflow: 'hidden',
+		paddingBottom: 0
+	}
+});

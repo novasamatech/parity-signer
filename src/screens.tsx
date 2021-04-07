@@ -28,7 +28,7 @@ import {
 import * as React from 'react';
 import { View, Text } from 'react-native';
 
-import { colors, fonts, headerHeight } from 'styles';
+import { colors, fonts } from 'styles';
 import testIDs from 'e2e/testIDs';
 import Wallet from 'modules/main/screens/Wallet';
 import AddNetwork from 'screens/AddNetwork';
@@ -48,71 +48,57 @@ import { RootStackParamList } from 'types/routes';
 
 const ScreenStack = createStackNavigator<RootStackParamList>();
 
-const HeaderLeft = (): React.ReactElement => {
-	const route = useRoute();
-	const isFirstRouteInParent = useNavigationState(
-		state => state.routes[0].key === route.key
-	);
-	return isFirstRouteInParent ? <HeaderLeftHome /> : <HeaderLeftWithBack />;
-};
-
 const globalStackNavigationOptions = {
 	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: {
-		color: colors.text.main
+		color: colors.navText.main
 	},
 	headerBackTitleVisible: false,
 	headerLeft: (): React.ReactElement => <HeaderLeft />,
 	headerLeftContainerStyle: {
-		height: headerHeight,
+		height: 96,
+		paddingBottom: 24,
 		paddingLeft: 8
 	},
 	headerStyle: {
-		backgroundColor: colors.background.app,
-		borderBottomColor: colors.background.app,
+		backgroundColor: colors.background.accent,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: headerHeight,
+		height: 112,
 		shadowColor: 'transparent'
 	},
-	headerTintColor: colors.text.main,
-	headerTitle: (): React.ReactNode => null
+	headerTintColor: colors.text.white,
+	headerTitle: (): React.ReactNode => null,
+	headerTitleStyle: {
+		// customize other title properties here
+	}
 };
 
-const HeaderLeftHome = (): React.ReactElement => {
-	return (
-		<View
-			style={{
-				alignItems: 'center',
-				flexDirection: 'row',
-				height: 48,
-				paddingLeft: 15
-			}}
-		>
+const HeaderLeft = (): React.ReactElement => {
+	const route = useRoute();
+	const navigation = useNavigation();
+	const isFirstRouteInParent = useNavigationState(
+		state => state.routes[0].key === route.key
+	);
+	return isFirstRouteInParent ? (
+		<View style={{ paddingLeft: 10 }}>
 			<Text
 				style={{
-					color: colors.text.main,
-					fontFamily: fonts.light,
-					fontSize: 14,
-					marginRight: 2,
-					marginTop: 15
+					color: colors.text.white,
+					fontFamily: fonts.bold,
+					fontSize: 26
 				}}
 			>
 				Layer Wallet
 			</Text>
 		</View>
-	);
-};
-
-const HeaderLeftWithBack = (): React.ReactElement => {
-	const navigation = useNavigation();
-	return (
+	) : (
 		<View testID={testIDs.Header.headerBackButton}>
 			<HeaderBackButton
 				labelStyle={globalStackNavigationOptions.headerBackTitleStyle}
 				labelVisible={false}
-				tintColor={colors.text.main}
+				tintColor={colors.text.white}
 				onPress={(): void => navigation.goBack()}
 			/>
 		</View>

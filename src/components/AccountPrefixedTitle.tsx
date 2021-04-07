@@ -43,7 +43,7 @@ export default function AccountPrefixedTitle({
 
 const styles = StyleSheet.create({
 	text: {
-		color: colors.signal.main,
+		color: colors.text.accent,
 		marginBottom: 1,
 		marginRight: 4
 	}

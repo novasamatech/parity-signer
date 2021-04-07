@@ -44,6 +44,7 @@ function CreateWallet3({
 				createSeedRefWithNewSeed
 			);
 			resetNavigationTo(navigation, 'Wallet');
+			navigation.navigate('AddNetwork');
 		} catch (e) {
 			alertIdentityCreationError(setAlert, e.message);
 		}

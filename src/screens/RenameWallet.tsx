@@ -25,7 +25,7 @@ import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading from 'components/ScreenHeading';
-import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertError } from 'utils/alertUtils';
 import { getNetworkKey } from 'utils/identitiesUtils';
@@ -45,8 +45,6 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 		accountsStore.state.currentIdentity,
 		networksContextState
 	);
-	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
-	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	if (!identity) return <View />;
 

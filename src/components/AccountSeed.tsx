@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 4
 	},
 	suggestionText: {
-		color: colors.signal.main,
+		color: colors.text.accent,
 		fontFamily: fonts.regular,
 		letterSpacing: fontStyles.t_seed.letterSpacing
 	},

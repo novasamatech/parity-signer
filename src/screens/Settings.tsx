@@ -21,6 +21,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { colors, fontStyles } from 'styles';
+import OnBoardingView from 'modules/main/components/OnBoarding';
 import ButtonIcon from 'components/ButtonIcon';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Separator from 'components/Separator';
@@ -44,6 +45,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { currentIdentity, identities } = accountsStore.state;
+	if (identities.length === 0) return <OnBoardingView />;
 	if (!currentIdentity) return <View />;
 
 	const renderNonSelectedIdentity = (
@@ -124,7 +126,6 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 					style={styles.indentedButton}
 				/>
 			</View>
-			{/* TODO: get this footer on every page */}
 			<View style={styles.tab}>
 				<NavigationTab />
 			</View>
@@ -157,12 +158,12 @@ const styles = StyleSheet.create({
 });
 
 const i_arrowOptions = {
-	iconColor: colors.signal.main,
+	iconColor: colors.text.accent,
 	iconName: 'arrowright',
-	iconSize: fontStyles.i_medium.fontSize,
+	iconSize: 18,
 	iconType: 'antdesign',
 	style: styles.i_arrowStyle,
-	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
+	textStyle: { ...fontStyles.a_text, color: colors.text.accent }
 };
 
 export default Settings;

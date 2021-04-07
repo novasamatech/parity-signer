@@ -31,7 +31,7 @@ export default class Separator extends React.PureComponent<Props> {
 				style={[
 					{
 						alignSelf: 'stretch',
-						backgroundColor: 'black',
+						backgroundColor: '#ddd',
 						height: 1,
 						marginVertical: 8
 					},

@@ -61,7 +61,7 @@ export default function AccountIcon(props: {
 					/>
 				) : (
 					<View style={styles.logo}>
-						<FontAwesome name="question" color={colors.text.main} size={28} />
+						<FontAwesome name="question" color={colors.text.white} size={28} />
 					</View>
 				)}
 			</View>
@@ -81,19 +81,17 @@ export default function AccountIcon(props: {
 		}
 		return <Identicon value={address} size={iconSize || 40} />;
 	} else {
-		return (
-			<MaterialIcon color={colors.signal.error} name={'error'} size={44} />
-		);
+		return <MaterialIcon color={colors.text.error} name={'error'} size={44} />;
 	}
 }
 
 const styles = StyleSheet.create({
 	logo: {
 		alignItems: 'center',
+		backgroundColor: '#111',
+		borderRadius: 18,
 		height: 36,
 		justifyContent: 'center',
-		marginHorizontal: 2,
-		opacity: 0.7,
 		width: 36
 	}
 });

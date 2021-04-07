@@ -18,7 +18,6 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
-import { fontStyles } from 'styles';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -75,9 +74,7 @@ function SignTransactionFinishView({
 					marginVertical: 20
 				}}
 			/>
-			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
-				{'Scan to publish'}
-			</Text>
+			<Text style={[{ paddingHorizontal: 16 }]}>{'Scan to publish'}</Text>
 			<View style={styles.qr} testID={testIDs.SignTransactionFinish.qrView}>
 				<QrView data={signedData} />
 			</View>

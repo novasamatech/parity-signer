@@ -35,7 +35,7 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 
 	const deleteWallet = async (): Promise<void> => {
 		try {
-			resetNavigationTo(navigation, 'Wallet');
+			resetNavigationTo(navigation, 'Settings');
 			await accountsStore.deleteWallet(identity);
 		} catch (err) {
 			console.error(err);

@@ -32,7 +32,7 @@ import { NavigationProps } from 'types/props';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 
-export default function Scanner({
+export default function SignTransaction({
 	navigation
 }: NavigationProps<'SignTransaction'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
@@ -169,7 +169,6 @@ export default function Scanner({
 							<Button
 								onPress={(): void => scannerStore.clearMultipartProgress()}
 								title="Start Over"
-								small
 							/>
 						</View>
 					) : (
@@ -198,19 +197,19 @@ const styles = StyleSheet.create({
 	},
 	bottom: {
 		alignItems: 'center',
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: colors.background.light,
 		flex: 1,
 		justifyContent: 'center',
 		paddingHorizontal: 15
 	},
 	descSecondary: {
-		color: colors.text.main,
+		color: colors.text.white,
 		fontFamily: fonts.bold,
 		fontSize: 14,
 		paddingBottom: 20
 	},
 	descTitle: {
-		color: colors.text.main,
+		color: colors.text.app,
 		fontFamily: fonts.bold,
 		fontSize: 18,
 		paddingBottom: 10,
@@ -233,11 +232,11 @@ const styles = StyleSheet.create({
 		flexBasis: 280
 	},
 	middleLeft: {
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: colors.background.light,
 		flex: 1
 	},
 	middleRight: {
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: colors.background.light,
 		flex: 1
 	},
 	progress: {
@@ -246,13 +245,12 @@ const styles = StyleSheet.create({
 	},
 	top: {
 		alignItems: 'center',
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: colors.background.light,
 		flexBasis: 80,
 		flexDirection: 'row',
 		justifyContent: 'center'
 	},
 	view: {
-		backgroundColor: 'black',
 		flex: 1
 	}
 });
