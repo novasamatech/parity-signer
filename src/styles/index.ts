@@ -20,6 +20,7 @@ import { StyleSheet } from 'react-native';
 export const colors = {
 	background: {
 		accent: '#5d7ff3',
+		accentDark: '#4d6fe3',
 		accentLight: '#eff2fe',
 		app: '#fff',
 		button: '#f7f9ff',

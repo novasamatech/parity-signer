@@ -26,7 +26,7 @@ import FlashMessage from 'react-native-flash-message';
 
 import { AppNavigator } from './screens';
 
-import { colors } from 'styles/index';
+import { colors, fonts } from 'styles/index';
 import {
 	useRegistriesStore,
 	RegistriesContext
@@ -76,7 +76,13 @@ export default function App(props: AppProps): React.ReactElement {
 									backgroundColor={colors.background.app}
 								/>
 								<NavigationContainer>{renderStacks()}</NavigationContainer>
-								<FlashMessage position="top" />
+								<FlashMessage
+									position="top"
+									style={{ backgroundColor: colors.background.accentDark }}
+									textStyle={{ fontFamily: fonts.regular }}
+									titleStyle={{ fontFamily: fonts.regular }}
+									duration={3000}
+								/>
 							</MenuProvider>
 						</SeedRefsContext.Provider>
 					</RegistriesContext.Provider>
