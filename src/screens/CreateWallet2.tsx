@@ -18,13 +18,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
+import { showMessage } from 'react-native-flash-message';
 
 import { colors, fontStyles } from 'styles';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
-import ScreenHeading from 'components/ScreenHeading';
 import Button from 'components/Button';
 
 function CreateWallet2({
@@ -55,8 +54,7 @@ function CreateWallet2({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title={'Key Phrase'} />
+		<>
 			<Text>
 				Write these words down on paper. Keep the backup paper safe. These words
 				allow anyone to recover this account and access its funds.
@@ -69,6 +67,7 @@ function CreateWallet2({
 				onPress={(): void => {
 					// only allow the copy of the key phrase in dev environment
 					if (__DEV__) {
+						showMessage('Key phrase copied.');
 						Clipboard.setString(seedPhrase);
 					}
 				}}
@@ -84,7 +83,7 @@ function CreateWallet2({
 				}
 			/>
 			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 

@@ -17,24 +17,20 @@
 
 import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
 import { AccountsContext } from 'stores/AccountsContext';
-import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import ScreenHeading from 'components/ScreenHeading';
 import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { alertError } from 'utils/alertUtils';
 import { getNetworkKey } from 'utils/identitiesUtils';
 
 type Props = NavigationAccountIdentityProps<'RenameWallet'>;
 
 function RenameWallet({ navigation, route }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { setAlert } = useContext(AlertStateContext);
 	const { identity } = route.params;
 	const [newIdentityName, setNewIdentityName] = useState(identity?.name || '');
 
@@ -55,15 +51,15 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 	const onSaveIdentity = async (): Promise<void> => {
 		try {
 			accountsStore.updateIdentityName(newIdentityName);
+			showMessage('Wallet renamed.');
 			navigation.goBack();
 		} catch (err) {
-			alertError(setAlert, `Can't rename: ${err.message}`);
+			showMessage(`Could not rename: ${err.message}`);
 		}
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title="Rename Wallet" />
+		<>
 			<TextInput
 				label="Display Name"
 				onChangeText={onChangeIdentity}
@@ -72,7 +68,7 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 				focus
 			/>
 			<Button title="Save" onPress={onSaveIdentity} />
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 

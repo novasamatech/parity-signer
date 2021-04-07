@@ -15,9 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
+import Clipboard from '@react-native-community/clipboard';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import { showMessage } from 'react-native-flash-message';
 
 import AccountIcon from './AccountIcon';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
@@ -94,12 +95,13 @@ export default function PathCard({
 	return (nonSubstrateCard = (
 		<TouchableItem
 			accessibilityComponentType="button"
-			onPress={() =>
+			onPress={(): void => {
+				showMessage('Address copied.');
 				Clipboard.setString(
 					(networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') +
 						address
-				)
-			}
+				);
+			}}
 			style={styles.body}
 		>
 			<View style={styles.content} testID={testID}>

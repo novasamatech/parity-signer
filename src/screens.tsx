@@ -49,18 +49,12 @@ import { RootStackParamList } from 'types/routes';
 const ScreenStack = createStackNavigator<RootStackParamList>();
 
 const globalStackNavigationOptions = {
-	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
+	// more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: {
-		color: colors.navText.main
+	  color: colors.navText.main
 	},
 	headerBackTitleVisible: false,
-	headerLeft: (): React.ReactElement => <HeaderLeft />,
-	headerLeftContainerStyle: {
-		height: 96,
-		paddingBottom: 24,
-		paddingLeft: 8
-	},
 	headerStyle: {
 		backgroundColor: colors.background.accent,
 		borderBottomWidth: 0,
@@ -69,10 +63,65 @@ const globalStackNavigationOptions = {
 		shadowColor: 'transparent'
 	},
 	headerTintColor: colors.text.white,
-	headerTitle: (): React.ReactNode => null,
-	headerTitleStyle: {
-		// customize other title properties here
-	}
+	headerTitle: (t): React.ReactNode => {
+		let title;
+		switch (t.children) {
+			case 'AddNetwork':
+				title = 'Add Network';
+				break;
+			case 'ShowRecoveryPhrase':
+				title = 'Show Key Phrase';
+				break;
+			case 'RenameWallet':
+				title = 'Rename Wallet';
+				break;
+			case 'DeleteWallet':
+				title = 'Delete Wallet';
+				break;
+			case 'CreateWallet':
+				title = 'New Wallet';
+				break;
+			case 'CreateWallet2':
+				title = 'Key Phrase';
+				break;
+			case 'CreateWallet3':
+				title = 'Verify Key Phrase';
+				break;
+			case 'CreateWalletImport':
+				title = 'Import Wallet';
+				break;
+			case 'Settings':
+				title = 'Settings';
+				break;
+			case 'ReceiveBalance':
+				title = 'Receive Balance';
+				break;
+			case 'SendBalance':
+				title = 'Send Balance';
+				break;
+			case 'SignTransaction':
+				title = 'Sign Transaction';
+				break;
+			case 'SignTransactionFinish':
+				title = 'Sign Transaction';
+				break;
+			default:
+				title = t.children;
+		}
+		return (
+			<Text
+				style={{
+					color: colors.text.white,
+					fontFamily: fonts.bold,
+					fontSize: 24,
+					textAlign: 'left'
+				}}
+			>
+				{title}
+			</Text>
+		);
+	},
+	headerTitleAlign: 'left'
 };
 
 const HeaderLeft = (): React.ReactElement => {

@@ -27,8 +27,6 @@ import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey } from 'utils/identitiesUtils';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { ScreenHeadingWithNetworkIcon } from 'components/ScreenHeading';
 
 interface Props {
 	path: string;
@@ -68,11 +66,7 @@ function SendBalance({
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeadingWithNetworkIcon
-				title="Send Balance"
-				networkKey={formattedNetworkKey}
-			/>
+		<>
 			<TextInput
 				label="Amount"
 				onChangeText={onChangeAmount}
@@ -108,7 +102,7 @@ function SendBalance({
 					return;
 				}}
 			/>
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 

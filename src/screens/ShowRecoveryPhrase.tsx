@@ -15,22 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
+import Clipboard from '@react-native-community/clipboard';
 import React from 'react';
 import { Text } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
+import { showMessage } from 'react-native-flash-message';
 
 import { fontStyles } from 'styles';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import TouchableItem from 'components/TouchableItem';
-import ScreenHeading from 'components/ScreenHeading';
 
 function ShowRecoveryPhrase({
 	route
 }: NavigationProps<'ShowRecoveryPhrase'>): React.ReactElement {
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title={'Show Key Phrase'} />
+		<>
 			<Text>
 				Write these words down on paper and keep them somewhere secure. These
 				words allow anyone to recover this account and access its funds.
@@ -39,6 +37,7 @@ function ShowRecoveryPhrase({
 				onPress={(): void => {
 					// only allow the copy of the key phrase in dev environment
 					if (__DEV__) {
+						showMessage('Key phrase copied.');
 						Clipboard.setString(route.params.seedPhrase);
 					}
 				}}
@@ -47,7 +46,7 @@ function ShowRecoveryPhrase({
 					{route.params.seedPhrase}
 				</Text>
 			</TouchableItem>
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 

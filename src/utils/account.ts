@@ -96,8 +96,7 @@ export function validateSeed(seed: string, validBip39Seed: boolean): ValidSeed {
 		return {
 			accountRecoveryAllowed: true,
 			bip39: false,
-			reason:
-				'This key phrase is not a valid BIP39 seed, will be treated as a legacy Parity brain wallet. Make sure you understand the risks.',
+			reason: 'This key phrase is not a valid BIP39 seed.',
 			valid: false
 		};
 	}

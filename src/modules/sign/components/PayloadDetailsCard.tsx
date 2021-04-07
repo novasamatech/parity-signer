@@ -22,15 +22,14 @@ import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
 import { colors, fontStyles } from 'styles';
-import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
 	RegistriesContext,
 	RegistriesStoreState
 } from 'stores/RegistriesContext';
-import { alertDecodeError } from 'utils/alertUtils';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';
 
@@ -59,7 +58,6 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const [tip, setTip] = useState<string>();
 		const [useFallback, setUseFallBack] = useState(false);
 		const { getTypeRegistry } = useContext(RegistriesContext);
-		const { setAlert } = useContext(AlertStateContext);
 		const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 		const networkParams = getSubstrateNetwork(networkKey);
 		const prefix = networkParams.prefix;
@@ -119,7 +117,9 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 					formatArgs(call, methodArgs, 0);
 					setFormattedCallArgs(methodArgs);
 				} catch (e) {
-					alertDecodeError(setAlert);
+					showMessage(
+						'Could not decode method with available metadata. Only sign this if you know exactly what you are doing.'
+					);
 					setUseFallBack(true);
 				}
 			}
@@ -141,7 +141,6 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			value,
 			networkKey,
 			registriesStore,
-			setAlert,
 			typeRegistry,
 			networks
 		]);

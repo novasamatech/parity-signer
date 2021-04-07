@@ -21,15 +21,12 @@ import { RNCamera } from 'react-native-camera';
 
 import { colors, fonts } from 'styles';
 import testIDs from 'e2e/testIDs';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Button from 'components/Button';
 import { useProcessBarCode } from 'modules/sign/utils';
 import { useInjectionQR } from 'e2e/injections';
-import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
-import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 
 export default function SignTransaction({
@@ -37,7 +34,6 @@ export default function SignTransaction({
 }: NavigationProps<'SignTransaction'>): React.ReactElement {
 	const scannerStore = useContext(ScannerContext);
 	const networksContextState = useContext(NetworksContext);
-	const { setAlert } = useContext(AlertStateContext);
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
 	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
@@ -60,21 +56,23 @@ export default function SignTransaction({
 			setEnableScan(true);
 		};
 		setEnableScan(false);
-		if (isAddNetworkSuccess) {
-			setAlert(title, message, [
-				{
-					testID: testIDs.SignTransaction.networkAddSuccessButton,
-					text: 'Done'
-				}
-			]);
-		} else {
-			setAlert(title, message, [
-				{
-					onPress: clearByTap,
-					text: 'Try again'
-				}
-			]);
-		}
+		showMessage('Not yet implemented');
+
+		// if (isAddNetworkSuccess) {
+		// 	setAlert(title, message, [
+		// 		{
+		// 			testID: testIDs.SignTransaction.networkAddSuccessButton,
+		// 			text: 'Done'
+		// 		}
+		// 	]);
+		// } else {
+		// 	setAlert(title, message, [
+		// 		{
+		// 			onPress: clearByTap,
+		// 			text: 'Try again'
+		// 		}
+		// 	]);
+		// }
 	}
 
 	const processBarCode = useProcessBarCode(
@@ -143,16 +141,13 @@ export default function SignTransaction({
 		missingFramesMessage
 	} = multiFrames;
 	return (
-		<SafeAreaViewContainer>
+		<>
 			<RNCamera
 				captureAudio={false}
 				onBarCodeRead={onBarCodeRead}
 				style={styles.view}
 			>
 				<View style={styles.body}>
-					<View style={styles.top}>
-						<ScreenHeading title="Scanner" />
-					</View>
 					<View style={styles.middle}>
 						<View style={styles.middleLeft} />
 						<View style={styles.middleCenter} />
@@ -185,7 +180,7 @@ export default function SignTransaction({
 					)}
 				</View>
 			</RNCamera>
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 
@@ -241,13 +236,6 @@ const styles = StyleSheet.create({
 	},
 	progress: {
 		alignItems: 'center',
-		justifyContent: 'center'
-	},
-	top: {
-		alignItems: 'center',
-		backgroundColor: colors.background.light,
-		flexBasis: 80,
-		flexDirection: 'row',
 		justifyContent: 'center'
 	},
 	view: {

@@ -36,7 +36,6 @@ import { NavigationProps } from 'types/props';
 import { getExistedNetworkKeys } from 'utils/identitiesUtils';
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import Button from 'components/Button';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import NavigationTab from 'components/NavigationTab';
 
 const filterNetworks = (
@@ -88,7 +87,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 		[availableNetworks, allNetworks]
 	);
 
-	if (!loaded) return <SafeAreaViewContainer />;
+	if (!loaded) return <View />;
 	if (identities.length === 0) return <OnBoardingView />;
 	if (currentIdentity === null) return <NoCurrentIdentity />;
 
@@ -151,7 +150,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	};
 
 	return (
-		<SafeAreaViewContainer>
+		<>
 			<FlatList
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
@@ -160,7 +159,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 				{...getListOptions()}
 			/>
 			<NavigationTab />
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 
