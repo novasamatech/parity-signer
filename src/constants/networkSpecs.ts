@@ -106,6 +106,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
+		logo: require('res/img/logos/Kulupu.png'),
 		isTestnet: false,
 		order: 5,
 		pathId: 'kulupu',
