@@ -120,7 +120,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		order: 2,
 		pathId: 'kusama',
 		prefix: 2,
-		isTestnet: true,
+		isTestnet: false,
 		title: 'Kusama',
 		unit: 'KSM',
 		url: 'wss://kusama-rpc.polkadot.io'
@@ -172,7 +172,7 @@ const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
 		order: 101,
 		secondaryColor: colors.background.card,
-		isTestnet: true,
+		isTestnet: false,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {

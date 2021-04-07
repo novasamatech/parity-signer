@@ -18,6 +18,7 @@
 import React, { ReactElement, useContext, useMemo } from 'react';
 import { FlatList } from 'react-native';
 
+import Separator from 'components/Separator';
 import { AddNetworkCard } from 'components/AddNetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
@@ -39,22 +40,6 @@ import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys } from 'utils/identitiesUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import { useSeedRef } from 'utils/seedRefHooks';
-
-const filterNetworks = (
-	networkList: Map<string, NetworkParams>,
-	extraFilter?: (networkKey: string, shouldExclude: boolean) => boolean
-): Array<[string, NetworkParams]> => {
-	const excludedNetworks = [UnknownNetworkKeys.UNKNOWN];
-	const filterNetworkKeys = ([networkKey]: [string, any]): boolean => {
-		const shouldExclude = excludedNetworks.includes(networkKey);
-		if (extraFilter !== undefined)
-			return extraFilter(networkKey, shouldExclude);
-		return !shouldExclude;
-	};
-	return Array.from(networkList.entries())
-		.filter(filterNetworkKeys)
-		.sort((a, b) => a[1].order - b[1].order);
-};
 
 function AddNetwork({
 	accountsStore,
@@ -109,21 +94,18 @@ function AddNetwork({
 		[currentIdentity, networkContextState]
 	);
 
-	const networkList = useMemo(
-		() =>
-			filterNetworks(allNetworks, (networkKey, shouldExclude) => {
-				if (isNew && !shouldExclude) return true;
-				if (shouldExclude) return false;
-				return !availableNetworks.includes(networkKey);
-			}),
-		[availableNetworks, isNew, allNetworks]
-	);
+	const networkList = Array.from(allNetworks.entries())
+		.filter(([networkKey, network]) => {
+			if (networkKey === UnknownNetworkKeys.UNKNOWN) return false;
+			if (isNew) return true;
+			if (availableNetworks.includes(networkKey)) return false;
+			return true;
+		})
+		.sort((a, b) => a[1].order - b[1].order);
+	const networkListMainnets = networkList.filter((n) => !n[1].isTestnet);
+	const networkListTestnets = networkList.filter((n) => n[1].isTestnet);
 
-	const renderNetwork = ({
-		item
-	}: {
-		item: [string, NetworkParams];
-	}): ReactElement => {
+	const renderNetwork = ({ item }: { item: [string, NetworkParams]; }): ReactElement => {
 		const [networkKey, networkParams] = item;
 		const networkIndexSuffix = isEthereumNetworkParams(networkParams)
 			? networkParams.ethereumChainId
@@ -149,10 +131,15 @@ function AddNetwork({
 				<IdentityHeading title={'Add a network'} />
 			)}
 			<FlatList
-				data={networkList}
+				data={networkListMainnets}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
-				testID={testIDs.Wallet.chooserScreen}
+			/>
+			{networkListMainnets.length > 0 && networkListTestnets.length > 0 && <Separator/>}
+			<FlatList
+				data={networkListTestnets}
+				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
+				renderItem={renderNetwork}
 			/>
 		</SafeAreaViewContainer>
 	);
