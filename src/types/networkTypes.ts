@@ -49,6 +49,7 @@ export type SubstrateNetworkParams = {
 	prefix: number;
 	secondaryColor: string;
 	title: string;
+	isTestnet: boolean;
 	unit: string;
 	url: string;
 };

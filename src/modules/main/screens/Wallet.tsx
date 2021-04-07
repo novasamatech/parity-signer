@@ -123,9 +123,6 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 						)!;
 						const path = `//${networkParams.pathId}`;
 						const address = getAddressWithPath(path, currentIdentity);
-						// fetchedBalances[networkKey] = 'TODO';
-						// continue;
-						// TODO: get types for each network
 						// TODO: load metadata at startup
 						// TODO: handle errors
 						// TODO: make this stateful so we don't have to reload every time we come here
