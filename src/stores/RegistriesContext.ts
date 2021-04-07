@@ -17,7 +17,9 @@
 
 import { Metadata } from '@polkadot/metadata';
 import { TypeRegistry } from '@polkadot/types';
+import { RegisteredTypes } from '@polkadot/types/types';
 import { getSpecTypes } from '@polkadot/types-known';
+import { spec } from '@edgeware/node-types';
 import React, { useState } from 'react';
 
 import { deepCopyMap } from 'stores/utils';
@@ -25,21 +27,20 @@ import { SubstrateNetworkParams } from 'types/networkTypes';
 import { getMetadata } from 'utils/identitiesUtils';
 
 //Map PathId to Polkadot.js/api spec names and chain names
-type NetworkTypes = {
-	alias?: string;
-	chains: {
-		[key: string]: string;
-	};
-};
 type NetworkTypesMap = {
-	[key: string]: NetworkTypes;
+	[key: string]: RegisteredTypes;
 };
 const networkTypesMap: NetworkTypesMap = {
-	edgeware: { chains: {} },
-	kusama: { chains: {} },
-	polkadot: { chains: {} },
-	// polkadot: { westend: 'Westend' } },
-	rococo: { chains: {} }
+	edgeware: { ...spec },
+	kulupu: {
+		types: {
+			CampaignIdentifier: '[u8; 4]'
+		}
+	},
+	kusama: {},
+	polkadot: {},
+	rococo: {},
+	westend: {}
 };
 
 export const getOverrideTypes = (
@@ -49,17 +50,15 @@ export const getOverrideTypes = (
 	let specName = '',
 		chainName = '';
 	Object.entries(networkTypesMap).find(
-		([networkName, networkTypes]: [string, NetworkTypes]) => {
+		([networkName, networkTypes]: [string, RegisteredTypes]) => {
 			if (networkName === pathId) {
-				specName = networkTypes.alias ?? networkName;
-			} else if (networkTypes.chains.hasOwnProperty(pathId)) {
-				const chainAlias = networkTypes.chains[pathId];
-				specName = networkTypes.alias ?? networkName;
-				chainName = chainAlias ?? pathId;
+				specName = networkName;
+				chainName = specName;
+				registry.setKnownTypes(networkTypes);
+				return true;
 			} else {
 				return false;
 			}
-			return true;
 		}
 	);
 	return getSpecTypes(registry, chainName, specName, Number.MAX_SAFE_INTEGER);

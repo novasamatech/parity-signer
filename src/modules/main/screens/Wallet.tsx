@@ -33,10 +33,7 @@ import OnBoardingView from '../components/OnBoarding';
 import NoCurrentIdentity from '../components/NoCurrentIdentity';
 
 import { colors } from 'styles';
-import {
-	SubstrateNetworkKeys,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
+import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsContext } from 'stores/AccountsContext';
 import testIDs from 'e2e/testIDs';
