@@ -104,58 +104,15 @@ export default function PathCard({
 			? NETWORK_LIST[defaultNetworkKey]
 			: allNetworks.get(computedNetworkKey)!;
 
-	const nonSubstrateCard = (
-		<>
-			<Separator
-				shadow={true}
-				style={{
-					backgroundColor: 'transparent',
-					height: 0,
-					marginVertical: 0
-				}}
-			/>
-			<TouchableItem
-				testID={testID}
-				style={[
-					styles.content,
-					{ backgroundColor: 'transparent', paddingVertical: 0 }
-				]}
-				onPress={() =>
-					Clipboard.setString(
-						(networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') +
-							address
-					)
-				}
-			>
-				<AccountIcon
-					address={address}
-					network={networkParams}
-					style={styles.identicon}
-				/>
-				<View style={styles.desc}>
-					<Text style={[fontStyles.t_regular, { color: colors.text.faded }]}>
-						{networkParams.title}
-					</Text>
-					<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
-					<Address address={address} protocol={networkParams.protocol} />
-				</View>
-				<View
-					style={[
-						styles.footer,
-						{
-							backgroundColor: networkParams.color
-						}
-					]}
-				/>
-			</TouchableItem>
-		</>
-	);
-
-	const substrateDerivationCard = (
+	return nonSubstrateCard = (
 		<TouchableItem
 			accessibilityComponentType="button"
-			disabled={false}
-			onPress={() => Clipboard.setString(address)}
+			onPress={() =>
+				Clipboard.setString(
+					(networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') +
+					address
+				)
+			}
 			style={styles.body}
 		>
 			<View style={styles.content} testID={testID}>
@@ -165,27 +122,12 @@ export default function PathCard({
 					style={styles.identicon}
 				/>
 				<View style={styles.desc}>
-					<View style={styles.row}>
-						<AccountPrefixedTitle title={pathName!} titlePrefix={titlePrefix} />
-					</View>
-					{address !== '' && (
-						<Text
-							style={[fontStyles.t_codeS, { color: colors.text.faded }]}
-							ellipsizeMode="middle"
-							numberOfLines={1}
-						>
-							{address}
-						</Text>
-					)}
+					<AccountPrefixedTitle title={networkParams.title} />
+					<Address address={address} protocol={networkParams.protocol} />
 				</View>
 			</View>
 		</TouchableItem>
 	);
-
-	return isSubstrateNetworkParams(networkParams) ||
-		isUnknownNetworkParams(networkParams)
-		? substrateDerivationCard
-		: nonSubstrateCard;
 }
 
 const styles = StyleSheet.create({
