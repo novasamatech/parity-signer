@@ -16,7 +16,7 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import { View, Image, ViewStyle, StyleSheet, ImageStyle } from 'react-native';
+import { View, ViewStyle } from 'react-native';
 
 interface Props {
 	style?: ViewStyle;
@@ -24,7 +24,7 @@ interface Props {
 
 export default class Separator extends React.PureComponent<Props> {
 	render(): React.ReactElement {
-		const { shadow, shadowStyle, style } = this.props;
+		const { style } = this.props;
 
 		return (
 			<View
@@ -37,8 +37,7 @@ export default class Separator extends React.PureComponent<Props> {
 					},
 					style
 				]}
-			>
-			</View>
+			/>
 		);
 	}
 }

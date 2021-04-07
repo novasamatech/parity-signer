@@ -63,9 +63,8 @@ function CreateWallet2({
 		<SafeAreaViewContainer>
 			<ScreenHeading title={'Key Phrase'} />
 			<Text>
-				Write these words down on paper.
-				Keep the backup paper safe.
-				These words allow anyone to recover this account and access its funds.
+				Write these words down on paper. Keep the backup paper safe. These words
+				allow anyone to recover this account and access its funds.
 			</Text>
 			<View style={styles.mnemonicSelectionRow}>
 				{renderTextButton(12)}

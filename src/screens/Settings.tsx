@@ -30,7 +30,6 @@ import { Identity } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
-import { resetNavigationTo } from 'utils/navigationHelpers';
 import { getIdentitySeed, getIdentityName } from 'utils/identitiesUtils';
 
 function ButtonWithArrow(props: {

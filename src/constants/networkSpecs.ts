@@ -45,7 +45,7 @@ export const EthereumNetworkKeys: Record<string, string> = Object.freeze({
 	FRONTIER: '1',
 	ROPSTEN: '3',
 	RINKEBY: '4',
-	GOERLI: '5',
+	GOERLI: '5'
 });
 
 /* eslint-enable sort-keys */
@@ -53,10 +53,12 @@ export const EthereumNetworkKeys: Record<string, string> = Object.freeze({
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 	// genesis hashes can be found at e.g. https://edgeware.subscan.io/block/0
-	EDGEWARE: '0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b',
+	EDGEWARE:
+		'0x742a2ca70c2fda6cee4f8df98d64c4c670a052d9568058982dad9d5a7a135c5b',
 	KULUPU: '0xf7a99d3cb92853d00d5275c971c132c074636256583fee53b3bbe60d7b8769ba',
 	KUSAMA: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
-	POLKADOT: '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+	POLKADOT:
+		'0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
 	ROCOCO: '0x78ae7dc7e64637e01fa6a6b6e4fa252c486f62af7aa71c471ad17f015bd375ce',
 	WESTEND: '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e'
 });
@@ -91,11 +93,11 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#0B95E0',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.EDGEWARE,
+		isTestnet: false,
 		logo: require('res/img/logos/Edgeware.png'),
 		order: 6,
 		pathId: 'edgeware',
 		prefix: 7,
-		isTestnet: false,
 		title: 'Edgeware',
 		unit: 'EDG',
 		url: 'wss://mainnet1.edgewa.re'
@@ -104,10 +106,10 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
+		isTestnet: false,
 		order: 5,
 		pathId: 'kulupu',
 		prefix: 16,
-		isTestnet: false,
 		title: 'Kulupu',
 		unit: 'KULU',
 		url: 'wss://rpc.kulupu.corepaper.org/ws'
@@ -116,11 +118,11 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
+		isTestnet: false,
 		logo: require('res/img/logos/Kusama.png'),
 		order: 2,
 		pathId: 'kusama',
 		prefix: 2,
-		isTestnet: false,
 		title: 'Kusama',
 		unit: 'KSM',
 		url: 'wss://kusama-rpc.polkadot.io'
@@ -129,11 +131,11 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#E6027A',
 		decimals: 10,
 		genesisHash: SubstrateNetworkKeys.POLKADOT,
+		isTestnet: false,
 		logo: require('res/img/logos/Polkadot.png'),
 		order: 1,
 		pathId: 'polkadot',
 		prefix: 0,
-		isTestnet: false,
 		title: 'Polkadot',
 		unit: 'DOT',
 		url: 'wss://rpc.polkadot.io'
@@ -142,11 +144,11 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#6f36dc',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
+		isTestnet: true,
 		logo: require('res/img/logos/Rococo.png'),
 		order: 4,
 		pathId: 'rococo',
 		prefix: 0,
-		isTestnet: true,
 		title: 'Rococo',
 		unit: 'ROC',
 		url: 'wss://rococo-rpc.polkadot.io'
@@ -155,11 +157,11 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#660D35',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.WESTEND,
+		isTestnet: true,
 		logo: require('res/img/logos/Polkadot.png'),
 		order: 3,
 		pathId: 'westend',
 		prefix: 42,
-		isTestnet: true,
 		title: 'Westend',
 		unit: 'WND',
 		url: 'wss://westend-rpc.polkadot.io'
@@ -170,23 +172,23 @@ const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
 	[EthereumNetworkKeys.FRONTIER]: {
 		color: '#8B94B3',
 		ethereumChainId: EthereumNetworkKeys.FRONTIER,
+		isTestnet: false,
 		order: 101,
 		secondaryColor: colors.background.card,
-		isTestnet: false,
 		title: 'Ethereum'
 	},
 	[EthereumNetworkKeys.ROPSTEN]: {
 		ethereumChainId: EthereumNetworkKeys.ROPSTEN,
-		order: 104,
 		isTestnet: true,
+		order: 104,
 		title: 'Ropsten Testnet'
 	},
 	[EthereumNetworkKeys.GOERLI]: {
 		ethereumChainId: EthereumNetworkKeys.GOERLI,
-		order: 105,
 		isTestnet: true,
+		order: 105,
 		title: 'Görli Testnet'
-	},
+	}
 };
 
 const ethereumDefaultValues = {

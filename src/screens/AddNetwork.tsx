@@ -21,7 +21,7 @@ import { FlatList } from 'react-native';
 import Separator from 'components/Separator';
 import { AddNetworkCard } from 'components/AddNetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
+import ScreenHeading from 'components/ScreenHeading';
 import {
 	SubstrateNetworkKeys,
 	UnknownNetworkKeys
@@ -102,10 +102,14 @@ function AddNetwork({
 			return true;
 		})
 		.sort((a, b) => a[1].order - b[1].order);
-	const networkListMainnets = networkList.filter((n) => !n[1].isTestnet);
-	const networkListTestnets = networkList.filter((n) => n[1].isTestnet);
+	const networkListMainnets = networkList.filter(n => !n[1].isTestnet);
+	const networkListTestnets = networkList.filter(n => n[1].isTestnet);
 
-	const renderNetwork = ({ item }: { item: [string, NetworkParams]; }): ReactElement => {
+	const renderNetwork = ({
+		item
+	}: {
+		item: [string, NetworkParams];
+	}): ReactElement => {
 		const [networkKey, networkParams] = item;
 		const networkIndexSuffix = isEthereumNetworkParams(networkParams)
 			? networkParams.ethereumChainId
@@ -128,14 +132,16 @@ function AddNetwork({
 			{isNew ? (
 				<ScreenHeading title={'Select a network'} />
 			) : (
-				<IdentityHeading title={'Add a network'} />
+				<ScreenHeading title={'Add a network'} />
 			)}
 			<FlatList
 				data={networkListMainnets}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 			/>
-			{networkListMainnets.length > 0 && networkListTestnets.length > 0 && <Separator/>}
+			{networkListMainnets.length > 0 && networkListTestnets.length > 0 && (
+				<Separator />
+			)}
 			<FlatList
 				data={networkListTestnets}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}

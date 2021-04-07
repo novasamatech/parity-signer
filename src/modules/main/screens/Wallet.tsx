@@ -43,7 +43,7 @@ import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import TouchableItem from 'components/TouchableItem';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
-import { IdentityHeading } from 'components/ScreenHeading';
+import ScreenHeading from 'components/ScreenHeading';
 import NavigationTab from 'components/NavigationTab';
 
 const filterNetworks = (
@@ -167,7 +167,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 
 	return (
 		<SafeAreaViewContainer>
-			<IdentityHeading title={getIdentityName(currentIdentity, identities)} />
+			<ScreenHeading title={getIdentityName(currentIdentity, identities)} />
 			<FlatList
 				data={networkList}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}

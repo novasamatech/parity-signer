@@ -16,6 +16,7 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
+import { Text } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { AccountsContext } from 'stores/AccountsContext';

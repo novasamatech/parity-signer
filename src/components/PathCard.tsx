@@ -16,7 +16,7 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 
 import AccountIcon from './AccountIcon';
@@ -26,7 +26,6 @@ import TouchableItem from './TouchableItem';
 
 import { colors, fontStyles } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
-import Separator from 'components/Separator';
 import {
 	defaultNetworkKey,
 	NETWORK_LIST,
@@ -34,10 +33,6 @@ import {
 	NetworkProtocols
 } from 'constants/networkSpecs';
 import { Identity } from 'types/identityTypes';
-import {
-	isSubstrateNetworkParams,
-	isUnknownNetworkParams
-} from 'types/networkTypes';
 import {
 	getAddressWithPath,
 	getNetworkKeyByPath,
@@ -104,13 +99,13 @@ export default function PathCard({
 			? NETWORK_LIST[defaultNetworkKey]
 			: allNetworks.get(computedNetworkKey)!;
 
-	return nonSubstrateCard = (
+	return (nonSubstrateCard = (
 		<TouchableItem
 			accessibilityComponentType="button"
 			onPress={() =>
 				Clipboard.setString(
 					(networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') +
-					address
+						address
 				)
 			}
 			style={styles.body}
@@ -127,7 +122,7 @@ export default function PathCard({
 				</View>
 			</View>
 		</TouchableItem>
-	);
+	));
 }
 
 const styles = StyleSheet.create({

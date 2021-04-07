@@ -15,18 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, ReactNode, useContext } from 'react';
-import { View, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
-import AntIcon from 'react-native-vector-icons/AntDesign';
+import React, { ReactElement, useContext } from 'react';
+import { View, StyleSheet, Text, TextStyle } from 'react-native';
 import { Icon } from 'react-native-elements';
 
-import ButtonIcon from './ButtonIcon';
 import AccountIcon from './AccountIcon';
 
 import { colors, fonts, fontStyles } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
 import TouchableItem from 'components/TouchableItem';
-import testIDs from 'e2e/testIDs';
 import { ButtonListener } from 'types/props';
 
 export function ScreenHeadingWithNetworkIcon({
@@ -46,8 +43,7 @@ export function ScreenHeadingWithNetworkIcon({
 }): ReactElement {
 	const titleStyle: TextStyle = {
 		fontFamily: fonts.bold,
-		...fontStyles.h2,
-		...baseStyles.t_left,
+		...fontStyles.h2
 	};
 	const { getNetwork } = useContext(NetworksContext);
 	const isDisabled = onPress === undefined;
@@ -69,42 +65,6 @@ export function ScreenHeadingWithNetworkIcon({
 			</View>
 			{headMenu}
 		</TouchableItem>
-	);
-}
-
-export function IdentityHeading({
-	title,
-	subtitle,
-	hasSubtitleIcon,
-	onPressBack
-}: {
-	title: string;
-	subtitle?: string;
-	hasSubtitleIcon?: boolean;
-	onPressBack?: ButtonListener;
-}): ReactElement {
-	return (
-		<View style={baseStyles.bodyWithIdentity}>
-			<View style={baseStyles.identityName}>
-				<Text
-					style={[baseStyles.text, baseStyles.t_left]}
-					numberOfLines={1}
-					ellipsizeMode="middle"
-				>
-					{title}
-				</Text>
-			</View>
-			{onPressBack &&
-				(<ButtonIcon
-					iconName="arrowleft"
-					iconType="antdesign"
-					onPress={onPress}
-					testID={testIDs.Wallet.backButton}
-					style={StyleSheet.flatten([baseStyles.icon, { left: 0 }])}
-					iconBgStyle={{ backgroundColor: 'transparent' }}
-				/>)
-			}
-		</View>
 	);
 }
 
@@ -136,7 +96,9 @@ export default class ScreenHeading extends React.PureComponent<{
 				<View style={[baseStyles.icon, { paddingLeft: 16 }]}>
 					<Icon name={iconName} type={iconType} color={colors.text.main} />
 				</View>
-				<View style={baseStyles.titles}><Text style={baseStyles.text}>{title}</Text></View>
+				<View style={baseStyles.titles}>
+					<Text style={baseStyles.text}>{title}</Text>
+				</View>
 				{headMenu}
 			</View>
 		);
@@ -184,21 +146,10 @@ const baseStyles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center'
 	},
-	t_center: {
-		textAlign: 'center'
-	},
-	t_error: {
-		color: colors.signal.error
-	},
-	t_left: {
-		textAlign: 'left'
-	},
 	text: {
-		...fontStyles.h1,
-		textAlign: 'center'
+		...fontStyles.h1
 	},
 	titles: {
-		alignItems: 'center',
 		flex: 1
 	}
 });

@@ -38,7 +38,7 @@ const networkTypesMap: NetworkTypesMap = {
 	kusama: { chains: {} },
 	polkadot: { chains: {} },
 	// polkadot: { westend: 'Westend' } },
-	rococo: { chains: {} },
+	rococo: { chains: {} }
 };
 
 export const getOverrideTypes = (
