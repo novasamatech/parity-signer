@@ -112,7 +112,9 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	): Promise<void> => {
 		const fetchedBalances = await Promise.all(
 			networks.map(
-				async ([networkKey, networkParams]): Promise<[string, string]> => {
+				async ([networkKey, networkParams]): Promise<
+					[string, string | undefined]
+				> => {
 					if (balances[networkKey]) return [networkKey, balances[networkKey]];
 					if (isSubstrateNetworkParams(networkParams)) {
 						const registry = getTypeRegistry(
@@ -143,8 +145,8 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 							div + '.' + mod.toString(10, networkParams.decimals)
 						];
 					} else {
-						// TODO
-						return [networkKey, 'unknown'];
+						// TODO: decide whether to support ETH -- for now it's disabled in NetworkCard
+						return [networkKey, undefined];
 					}
 				}
 			)
@@ -153,7 +155,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 		// populate finished object
 		const balancesObj: { [key: string]: string } = {};
 		for (const [key, bal] of fetchedBalances) {
-			balancesObj[key] = bal;
+			if (bal) balancesObj[key] = bal;
 		}
 		setBalances(balancesObj);
 	};

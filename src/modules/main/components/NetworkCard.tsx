@@ -107,9 +107,11 @@ export function NetworkCard({
 					<AccountPrefixedTitle title={title} />
 				</View>
 			</View>
-			<View style={styles.content}>
-				<Text style={styles.text}>{balance ?? 'Loading...'}</Text>
-			</View>
+			{isSubstrateNetworkParams(networkParams) && (
+				<View style={styles.content}>
+					<Text style={styles.text}>{balance ?? 'Loading...'}</Text>
+				</View>
+			)}
 			<View style={styles.content}>
 				<Button
 					title="Send"
