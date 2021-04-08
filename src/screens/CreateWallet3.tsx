@@ -33,6 +33,7 @@ function CreateWallet3({
 }: NavigationProps<'CreateWallet3'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const [isSeedMatching, setIsSeedMatching] = useState(false);
+	const [isSeedEmpty, setIsSeedEmpty] = useState(true);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 	const createWallet = async (): Promise<void> => {
 		if (!isSeedMatching) {
@@ -52,6 +53,7 @@ function CreateWallet3({
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
 		setIsSeedMatching(inputSeedPhrase === route.params.seedPhrase);
+		setIsSeedEmpty(inputSeedPhrase === '');
 	};
 
 	return (
@@ -61,7 +63,7 @@ function CreateWallet3({
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={createWallet}
 				returnKeyType="done"
-				valid={isSeedMatching}
+				invalid={!isSeedMatching && !isSeedEmpty}
 			/>
 			<Button
 				title={'Confirm'}

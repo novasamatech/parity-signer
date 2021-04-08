@@ -17,6 +17,7 @@
 
 import {
 	CardStyleInterpolators,
+	HeaderStyleInterpolators,
 	createStackNavigator
 } from '@react-navigation/stack';
 import * as React from 'react';
@@ -51,7 +52,7 @@ const stackNavigationOptions = {
 			<View
 				style={{
 					height: 46,
-					marginTop: 30,
+					marginTop: 45,
 					padding: 6,
 					width: 46
 					// backgroundColor: '#ccc'
@@ -71,12 +72,13 @@ const stackNavigationOptions = {
 		backgroundColor: colors.background.accent,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: 140,
+		height: 154,
 		shadowColor: 'transparent'
 	},
+	headerStyleInterpolator: HeaderStyleInterpolators.forStatic,
 	headerTintColor: colors.text.white,
 	headerTitle: (t): React.ReactNode => {
-		let title;
+		let title, isRoot;
 		switch (t.children) {
 			case 'AddNetwork':
 				title = 'Select Network';
@@ -104,6 +106,11 @@ const stackNavigationOptions = {
 				break;
 			case 'Settings':
 				title = 'Settings';
+				isRoot = true;
+				break;
+			case 'Wallet':
+				title = 'Wallet';
+				isRoot = true;
 				break;
 			case 'ReceiveBalance':
 				title = 'Receive Balance';
@@ -126,7 +133,8 @@ const stackNavigationOptions = {
 					color: colors.text.white,
 					fontFamily: fonts.bold,
 					fontSize: 24,
-					paddingTop: 28,
+					marginHorizontal: isRoot ? 0 : 28,
+					paddingTop: 42,
 					textAlign: 'left'
 				}}
 			>
@@ -134,7 +142,10 @@ const stackNavigationOptions = {
 			</Text>
 		);
 	},
-	headerTitleAlign: 'left'
+	headerTitleAlign: 'left',
+	headerTitleContainerStyle: {
+		left: 20
+	}
 };
 
 export const AppNavigator = (): React.ReactElement => (

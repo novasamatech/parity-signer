@@ -78,6 +78,16 @@ export const components = {
 		textAlign: 'center',
 		width: '100%'
 	},
+	buttonFluidLeft: {
+		marginRight: 10,
+		textAlign: 'center',
+		width: '100%'
+	},
+	buttonFluidRight: {
+		marginLeft: 10,
+		textAlign: 'center',
+		width: '100%'
+	},
 	buttonText: {
 		color: colors.text.white,
 		fontFamily: fonts.regular,
@@ -107,7 +117,8 @@ export const components = {
 	},
 	pageWideFullBleed: {
 		backgroundColor: colors.text.white,
-		flex: 1
+		flex: 1,
+		minHeight: 100 // Unsure why but this prevents "Add Wallet" from breaking after first use
 	},
 	textBlock: {
 		fontFamily: fonts.regular,
@@ -116,15 +127,17 @@ export const components = {
 		marginBottom: 8
 	},
 	textBlockPreformatted: {
-		backgroundColor: colors.background.accentDark,
+		backgroundColor: colors.background.white,
+		borderColor: colors.border.light,
 		borderRadius: 10,
+		borderWidth: 0.8,
 		marginVertical: 16,
 		minHeight: 100,
 		paddingHorizontal: 18,
 		paddingVertical: 12
 	},
 	textBlockPreformattedText: {
-		color: colors.text.white,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 18,
 		minHeight: 140

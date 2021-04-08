@@ -15,14 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import Clipboard from '@react-native-community/clipboard';
 import React from 'react';
 import { Text, View } from 'react-native';
-import { showMessage } from 'react-native-flash-message';
 
 import { components } from 'styles';
 import { NavigationProps } from 'types/props';
-import TouchableItem from 'components/TouchableItem';
+import AccountSeedCopyable from 'components/AccountSeedCopyable';
 
 function ShowRecoveryPhrase({
 	route
@@ -36,20 +34,7 @@ function ShowRecoveryPhrase({
 				Do not screenshot or save it on your computer, or anyone with access
 				could compromise your account.
 			</Text>
-			<TouchableItem
-				onPress={(): void => {
-					// only allow the copy of the key phrase in dev environment
-					if (__DEV__) {
-						showMessage('Recovery phrase copied.');
-						Clipboard.setString(route.params.seedPhrase);
-					}
-				}}
-				style={components.textBlockPreformatted}
-			>
-				<Text style={components.textBlockPreformattedText}>
-					{route.params.seedPhrase}
-				</Text>
-			</TouchableItem>
+			<AccountSeedCopyable seed={route.params.seedPhrase} />
 		</View>
 	);
 }

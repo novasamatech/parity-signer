@@ -84,7 +84,7 @@ function CreateWalletImport({
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
-				valid={isSeedValid.valid}
+				invalid={!isSeedValid.valid && seedPhrase !== ''}
 			/>
 			<Button
 				title={'Import'}

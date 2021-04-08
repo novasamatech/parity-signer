@@ -134,14 +134,14 @@ export function NetworkCard({
 					<View style={styles.contentColumn}>
 						<Button
 							title="Send"
-							fluid={true}
+							fluid={'left'}
 							onPress={(): Promise<void> => onPressed(true)}
 						/>
 					</View>
 					<View style={styles.contentColumn}>
 						<Button
 							title="Receive"
-							fluid={true}
+							fluid={'right'}
 							onPress={(): Promise<void> => onPressed(false)}
 						/>
 					</View>

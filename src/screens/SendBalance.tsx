@@ -82,7 +82,13 @@ function SendBalance({
 					</TouchableOpacity>
 				}
 				labelRight={
-					<View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+					<View
+						style={{
+							display: 'flex',
+							flexDirection: 'row',
+							justifyContent: 'flex-end'
+						}}
+					>
 						<TouchableOpacity
 							onPress={(): void => {
 								showMessage('Unimplemented');
@@ -117,7 +123,13 @@ function SendBalance({
 			<TextInput
 				label="Add to Address Book"
 				labelRight={
-					<View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+					<View
+						style={{
+							display: 'flex',
+							flexDirection: 'row',
+							justifyContent: 'flex-end'
+						}}
+					>
 						<TouchableOpacity
 							onPress={(): void => {
 								showMessage('Unimplemented');

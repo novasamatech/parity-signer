@@ -16,14 +16,12 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
-import { showMessage } from 'react-native-flash-message';
+import { Text, View } from 'react-native';
 
 import { components } from 'styles';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
-import TouchableItem from 'components/TouchableItem';
+import AccountSeedCopyable from 'components/AccountSeedCopyable';
 import Button from 'components/Button';
 
 function CreateWallet2({
@@ -33,17 +31,6 @@ function CreateWallet2({
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
 
-	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
-		return (
-			<Button
-				title={`${buttonWordsNumber} words`}
-				onPress={(): void => setWordsNumber(buttonWordsNumber)}
-				fluid={true}
-				inactive={wordsNumber !== buttonWordsNumber}
-				secondary={wordsNumber === buttonWordsNumber}
-			/>
-		);
-	};
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
 			setSeedPhrase(await words(wordsNumber));
@@ -64,21 +51,26 @@ function CreateWallet2({
 				Do not screenshot or save it on your computer, or anyone with access
 				could compromise your account.
 			</Text>
-			<TouchableItem
-				onPress={(): void => {
-					// only allow the copy of the key phrase in dev environment
-					if (__DEV__) {
-						showMessage('Recovery phrase copied.');
-						Clipboard.setString(seedPhrase);
-					}
-				}}
-				style={components.textBlockPreformatted}
-			>
-				<Text style={components.textBlockPreformattedText}>{seedPhrase}</Text>
-			</TouchableItem>
-			<View style={styles.mnemonicSelectionRow}>
-				<View style={styles.mnemonicSelectionCol}>{renderTextButton(12)}</View>
-				<View style={styles.mnemonicSelectionCol}>{renderTextButton(24)}</View>
+			<AccountSeedCopyable seed={seedPhrase} />
+			<View style={{ flexDirection: 'row', paddingBottom: 20 }}>
+				<View style={{ flex: 1, flexDirection: 'row' }}>
+					<Button
+						title={'12 words'}
+						onPress={(): void => setWordsNumber(12)}
+						fluid={'left'}
+						inactive={wordsNumber !== 12}
+						secondary={wordsNumber === 12}
+					/>
+				</View>
+				<View style={{ flex: 1, flexDirection: 'row', paddingRight: 10 }}>
+					<Button
+						title={'24 words'}
+						onPress={(): void => setWordsNumber(24)}
+						fluid={'right'}
+						inactive={wordsNumber !== 24}
+						secondary={wordsNumber === 24}
+					/>
+				</View>
 			</View>
 			<Button
 				title={'Continue'}
@@ -97,14 +89,3 @@ function CreateWallet2({
 }
 
 export default CreateWallet2;
-
-const styles = StyleSheet.create({
-	mnemonicSelectionCol: {
-		flex: 1,
-		flexDirection: 'row',
-		paddingBottom: 20
-	},
-	mnemonicSelectionRow: {
-		flexDirection: 'row'
-	}
-});
