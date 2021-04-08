@@ -40,8 +40,8 @@ function Api({
 	);
 
 	// initial initialization when given a network key
-	useEffect((): void => {
-		if (!isSubstrateNetworkParams(networkParams)) return;
+	useEffect(() => {
+		if (!isSubstrateNetworkParams(networkParams)) return (): void => void 0;
 		const [registry, metadata] = getTypeRegistry(
 			networkContextState.networks,
 			networkKey
@@ -65,6 +65,15 @@ function Api({
 		});
 
 		setIsApiInitialized(true);
+
+		// TODO: ensure this cleanup works as expected
+		return (): void => {
+			api.disconnect();
+			setIsApiConnected(false);
+			setIsApiInitialized(false);
+			setIsApiReady(false);
+			api = (undefined as unknown) as ApiPromise;
+		};
 	}, [networkKey]);
 
 	return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
