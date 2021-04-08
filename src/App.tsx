@@ -35,12 +35,12 @@ import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
 import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
 import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
-import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
 import Api from 'components/Api';
 
 const navTheme = DefaultTheme;
 navTheme.colors.background = colors.white;
+navTheme.colors.card = colors.accent;
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);

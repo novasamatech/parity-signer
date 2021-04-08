@@ -16,7 +16,9 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
+import Clipboard from '@react-native-community/clipboard';
 
 import { components } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
@@ -74,7 +76,32 @@ function SendBalance({
 				keyboardType="numeric"
 			/>
 			<TextInput
-				label="Recipient"
+				label={
+					<TouchableOpacity>
+						<Text style={components.textInputLabelLeft}>Recipient</Text>
+					</TouchableOpacity>
+				}
+				labelRight={
+					<View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+						<TouchableOpacity
+							onPress={(): void => {
+								showMessage('Unimplemented');
+								// TODO: Go to scanner
+							}}
+							style={{ marginRight: 10 }}
+						>
+							<Text style={components.linkSmall}>Scan QR</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							onPress={async (): void => {
+								onChangeRecipient(await Clipboard.getString());
+								// TODO: Set focus
+							}}
+						>
+							<Text style={components.linkSmall}>Paste</Text>
+						</TouchableOpacity>
+					</View>
+				}
 				onChangeText={onChangeRecipient}
 				value={recipient}
 				placeholder="Address"
@@ -89,6 +116,27 @@ function SendBalance({
 			/>
 			<TextInput
 				label="Add to Address Book"
+				labelRight={
+					<View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+						<TouchableOpacity
+							onPress={(): void => {
+								showMessage('Unimplemented');
+								// TODO: Go to scanner
+							}}
+							style={{ marginRight: 10 }}
+						>
+							<Text style={components.linkSmall}>Scan QR</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							onPress={async (): void => {
+								onChangeNewAddressBookEntry(await Clipboard.getString());
+								// TODO: Set focus
+							}}
+						>
+							<Text style={components.linkSmall}>Paste</Text>
+						</TouchableOpacity>
+					</View>
+				}
 				onChangeText={onChangeNewAddressBookEntry}
 				value={newAddressBookEntry}
 				placeholder="Address"
