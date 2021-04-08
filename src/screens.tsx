@@ -17,11 +17,11 @@
 
 import {
 	CardStyleInterpolators,
+	HeaderStyleInterpolators,
 	createStackNavigator
 } from '@react-navigation/stack';
 import * as React from 'react';
-import { Text, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Text } from 'react-native';
 
 import { colors, fonts } from 'styles/index';
 import Wallet from 'modules/main/screens/Wallet';
@@ -42,38 +42,21 @@ import { RootStackParamList } from 'types/routes';
 
 const ScreenStack = createStackNavigator<RootStackParamList>();
 
-const stackNavigationOptions = {
+const globalStackNavigationOptions = {
 	// more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
-	cardStyle: { backgroundColor: 'transparent' },
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-	headerBackImage: (_tintColor): React.ReactNode => {
-		return (
-			<View
-				style={{
-					height: 46,
-					marginTop: 30,
-					padding: 6,
-					width: 46
-					// backgroundColor: '#ccc'
-				}}
-			>
-				<Icon
-					name={'arrow-left'}
-					size={32}
-					color={colors.text.white}
-					style={{ position: 'relative' }}
-				/>
-			</View>
-		);
+	headerBackTitleStyle: {
+		color: colors.navText.main
 	},
 	headerBackTitleVisible: false,
 	headerStyle: {
 		backgroundColor: colors.background.accent,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: 140,
+		height: 112,
 		shadowColor: 'transparent'
 	},
+	headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
 	headerTintColor: colors.text.white,
 	headerTitle: (t): React.ReactNode => {
 		let title;
@@ -126,7 +109,6 @@ const stackNavigationOptions = {
 					color: colors.text.white,
 					fontFamily: fonts.bold,
 					fontSize: 24,
-					paddingTop: 28,
 					textAlign: 'left'
 				}}
 			>
@@ -140,7 +122,7 @@ const stackNavigationOptions = {
 export const AppNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
 		initialRouteName="Wallet"
-		screenOptions={stackNavigationOptions}
+		screenOptions={globalStackNavigationOptions}
 	>
 		<ScreenStack.Screen
 			name="Wallet"
