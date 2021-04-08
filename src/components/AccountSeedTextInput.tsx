@@ -28,7 +28,7 @@ import {
 import TextInput from './TextInput';
 import TouchableItem from './TouchableItem';
 
-import { colors, fonts, fontStyles, components } from 'styles/index';
+import { colors, fonts } from 'styles/index';
 import PARITY_WORDS from 'res/parity_wordlist.json';
 import BIP39_WORDS from 'res/bip39_wordlist.json';
 import { binarySearch } from 'utils/array';

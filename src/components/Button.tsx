@@ -72,7 +72,9 @@ export default class Button extends React.PureComponent<{
 			finalButtonStyles.push({ backgroundColor: colors.background.negative });
 		}
 		if (secondary) {
-			finalButtonStyles.push({ backgroundColor: colors.background.accentMedium });
+			finalButtonStyles.push({
+				backgroundColor: colors.background.accentMedium
+			});
 			finalTextStyles.push({ color: colors.text.dark });
 		}
 		if (active) {

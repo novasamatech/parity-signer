@@ -60,7 +60,7 @@ const globalStackNavigationOptions = {
 		let title;
 		switch (t.children) {
 			case 'AddNetwork':
-				title = 'Switch Network';
+				title = 'Select Network';
 				break;
 			case 'ShowRecoveryPhrase':
 				title = 'Show Recovery Phrase';

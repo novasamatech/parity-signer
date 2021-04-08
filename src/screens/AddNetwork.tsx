@@ -101,7 +101,7 @@ function AddNetwork({
 	);
 
 	const networkList = Array.from(allNetworks.entries())
-		.filter(([networkKey, network]) => {
+		.filter(([networkKey, _network]) => {
 			if (networkKey === UnknownNetworkKeys.UNKNOWN) return false;
 			if (isNew) return true;
 			if (availableNetworks.includes(networkKey)) return false;

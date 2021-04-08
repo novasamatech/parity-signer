@@ -17,13 +17,11 @@
 
 import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { components } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { RootStackParamList } from 'types/routes';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey } from 'utils/identitiesUtils';
 import Button from 'components/Button';
@@ -32,13 +30,11 @@ import TextInput from 'components/TextInput';
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation: StackNavigationProp<RootStackParamList, 'SendBalance'>;
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
 function SendBalance({
 	accountsStore,
-	navigation,
 	route
 }: NavigationAccountIdentityProps<'SendBalance'>): React.ReactElement {
 	const path = route.params.path;

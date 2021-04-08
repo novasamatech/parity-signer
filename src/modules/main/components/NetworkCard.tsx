@@ -24,12 +24,11 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsContext } from 'stores/AccountsContext';
 import AccountIcon from 'components/AccountIcon';
 import Button from 'components/Button';
-import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
 import PopupMenu from 'components/PopupMenu';
 import { ButtonListener } from 'types/props';
 import { RootStackParamList } from 'types/routes';
 import { isSubstrateNetworkParams } from 'types/networkTypes';
-import { colors, fonts } from 'styles/index';
+import { colors, fonts, fontStyles } from 'styles/index';
 import {
 	resetNavigationTo,
 	navigateToReceiveBalance,
@@ -75,6 +74,18 @@ export function NetworkCard({
 	};
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
+			case 'PathDelete':
+				if (isSubstrateNetworkParams(networkParams)) {
+					const { pathId } = networkParams;
+					accountsStore.deleteSubstratePath(
+						`//${pathId}`,
+						networksContextState
+					);
+				} else {
+					accountsStore.deleteEthereumAddress(networkKey);
+				}
+				resetNavigationTo(navigation, 'Wallet');
+				break;
 			case 'SignTransaction':
 				navigation.navigate('SignTransaction');
 				break;
@@ -91,7 +102,9 @@ export function NetworkCard({
 						style={styles.icon}
 					/>
 					<View style={styles.desc}>
-						<AccountPrefixedTitle title={title} />
+						<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+							{title}
+						</Text>
 					</View>
 					<View style={styles.contentRow}>
 						<Text style={styles.text}>0 {networkParams.unit}</Text>
@@ -101,8 +114,12 @@ export function NetworkCard({
 						menuTriggerIconName={'more-vert'}
 						menuItems={[
 							{
-								text: 'Sign a polkadot-js transaction',
+								text: 'Sign transaction',
 								value: 'SignTransaction'
+							},
+							{
+								text: 'Remove this network',
+								value: 'PathDelete'
 							}
 						]}
 					/>

@@ -62,11 +62,7 @@ function SignTransactionFinishView({
 	return (
 		<View style={components.pageWide}>
 			<Text style={styles.topTitle}>Signed extrinsic</Text>
-			<CompatibleCard
-				account={sender}
-				accountsStore={accountsStore}
-				titlePrefix={'from:'}
-			/>
+			<CompatibleCard account={sender} accountsStore={accountsStore} />
 			<Separator
 				shadow={true}
 				style={{

@@ -25,12 +25,10 @@ import { FoundAccount } from 'types/identityTypes';
 
 const CompatibleCard = ({
 	account,
-	accountsStore,
-	titlePrefix
+	accountsStore
 }: {
 	account: FoundAccount;
 	accountsStore: AccountsContextState;
-	titlePrefix?: string;
 }): React.ReactElement => {
 	const renderIdentityPathCard = (
 		identityAccount: FoundAccount
@@ -38,13 +36,7 @@ const CompatibleCard = ({
 		const identity = accountsStore.getIdentityByAccountId(
 			identityAccount.accountId
 		)!;
-		return (
-			<PathCard
-				identity={identity}
-				path={identityAccount.path}
-				titlePrefix={titlePrefix + identity.name}
-			/>
-		);
+		return <PathCard identity={identity} path={identityAccount.path} />;
 	};
 
 	return renderIdentityPathCard(account);
@@ -52,8 +44,7 @@ const CompatibleCard = ({
 
 CompatibleCard.propTypes = {
 	account: PropTypes.object.isRequired,
-	accountsStore: PropTypes.object.isRequired,
-	titlePrefix: PropTypes.string
+	accountsStore: PropTypes.object.isRequired
 };
 
 export default CompatibleCard;

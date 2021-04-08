@@ -100,7 +100,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 								}
 							/>
 							<ButtonWithArrow
-								title="Show Key Phrase"
+								title="Show Recovery Phrase"
 								onPress={(): Promise<void> => showRecoveryPhrase(identity)}
 							/>
 						</>

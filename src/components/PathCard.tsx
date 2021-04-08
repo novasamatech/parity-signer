@@ -17,11 +17,10 @@
 
 import Clipboard from '@react-native-community/clipboard';
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
 import AccountIcon from './AccountIcon';
-import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
@@ -42,15 +41,13 @@ export default function PathCard({
 	isPathValid = true,
 	path,
 	networkKey,
-	testID,
-	titlePrefix
+	testID
 }: {
 	identity: Identity;
 	isPathValid?: boolean;
 	path: string;
 	networkKey?: string;
 	testID?: string;
-	titlePrefix?: string;
 }): React.ReactElement {
 	const networksContext = useContext(NetworksContext);
 	const { networks, allNetworks } = networksContext;
@@ -110,7 +107,9 @@ export default function PathCard({
 					style={styles.identicon}
 				/>
 				<View style={styles.desc}>
-					<AccountPrefixedTitle title={networkParams.title} />
+					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+						{networkParams.title}
+					</Text>
 					<Address address={address} protocol={networkParams.protocol} />
 				</View>
 			</View>

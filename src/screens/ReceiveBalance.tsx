@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext } from 'react';
 import { View } from 'react-native';
 
@@ -24,7 +23,6 @@ import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { RootStackParamList } from 'types/routes';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getAddressWithPath,
@@ -39,13 +37,11 @@ import QrView from 'components/QrView';
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation: StackNavigationProp<RootStackParamList, 'ReceiveBalance'>;
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
 function ReceiveBalance({
 	accountsStore,
-	navigation,
 	route
 }: NavigationAccountIdentityProps<'ReceiveBalance'>): React.ReactElement {
 	const path = route.params.path;
