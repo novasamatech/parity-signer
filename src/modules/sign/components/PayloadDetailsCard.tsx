@@ -61,7 +61,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const { networks, getSubstrateNetwork } = useContext(NetworksContext);
 		const networkParams = getSubstrateNetwork(networkKey);
 		const prefix = networkParams.prefix;
-		const typeRegistry = getTypeRegistry(networks, networkKey)!;
+		const [typeRegistry] = getTypeRegistry(networks, networkKey)!;
 
 		useEffect(() => {
 			if (label === 'Method' && !fallback) {

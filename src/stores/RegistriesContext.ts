@@ -45,7 +45,8 @@ const networkTypesMap: NetworkTypesMap = {
 
 export const getOverrideTypes = (
 	registry: TypeRegistry,
-	pathId: string
+	pathId: string,
+	specVersion: number
 ): any => {
 	let specName = '',
 		chainName = '';
@@ -61,7 +62,7 @@ export const getOverrideTypes = (
 			}
 		}
 	);
-	return getSpecTypes(registry, chainName, specName, Number.MAX_SAFE_INTEGER);
+	return getSpecTypes(registry, chainName, specName, specVersion);
 };
 
 export type RegistriesStoreState = {
@@ -69,7 +70,7 @@ export type RegistriesStoreState = {
 	getTypeRegistry: (
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
-	) => TypeRegistry | null;
+	) => [TypeRegistry, Record<string, string>] | null;
 };
 
 export function useRegistriesStore(): RegistriesStoreState {
@@ -78,23 +79,30 @@ export function useRegistriesStore(): RegistriesStoreState {
 	function getTypeRegistry(
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
-	): TypeRegistry | null {
+	): [TypeRegistry, Record<string, string>] | null {
 		try {
-			const networkMetadataRaw = getMetadata(networkKey);
+			const foundMetadata = getMetadata(networkKey);
+			if (foundMetadata === null) return null;
+			const [networkMetadataRaw, specVersion] = foundMetadata;
 			if (networkMetadataRaw === null) return null;
 
 			if (registries.has(networkKey)) return registries.get(networkKey)!;
 
 			const networkParams = networks.get(networkKey)!;
 			const newRegistry = new TypeRegistry();
-			const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+			const overrideTypes = getOverrideTypes(
+				newRegistry,
+				networkParams.pathId,
+				specVersion
+			);
 			newRegistry.register(overrideTypes);
 			const metadata = new Metadata(newRegistry, networkMetadataRaw);
 			newRegistry.setMetadata(metadata);
 			const newRegistries = deepCopyMap(registries);
 			newRegistries.set(networkKey, newRegistry);
 			setRegistries(newRegistries);
-			return newRegistry;
+			const metadataKey = `${networkParams.genesisHash}-${specVersion}`;
+			return [newRegistry, { [metadataKey]: networkMetadataRaw }];
 		} catch (e) {
 			console.log('error', e);
 			return null;

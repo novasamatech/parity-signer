@@ -268,20 +268,20 @@ export const getPathName = (
 	return extractSubPathName(path);
 };
 
-export const getMetadata = (networkKey: string): string | null => {
+export const getMetadata = (networkKey: string): [string, number] | null => {
 	switch (networkKey) {
 		case SubstrateNetworkKeys.KUSAMA:
-			return kusamaMetadata;
+			return [kusamaMetadata, 2029];
 		case SubstrateNetworkKeys.WESTEND:
-			return westendMetadata;
+			return [westendMetadata, 49];
 		case SubstrateNetworkKeys.EDGEWARE:
-			return edgewareMetadata;
+			return [edgewareMetadata, 45];
 		case SubstrateNetworkKeys.KULUPU:
-			return kulupuMetadata;
+			return [kulupuMetadata, 17];
 		case SubstrateNetworkKeys.POLKADOT:
-			return polkadotMetaData;
+			return [polkadotMetaData, 29];
 		case SubstrateNetworkKeys.ROCOCO:
-			return rococoMetadata;
+			return [rococoMetadata, 229];
 		default:
 			return null;
 	}

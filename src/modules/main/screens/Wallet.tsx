@@ -112,7 +112,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 				> => {
 					if (balances[networkKey]) return [networkKey, balances[networkKey]];
 					if (isSubstrateNetworkParams(networkParams)) {
-						const registry = getTypeRegistry(
+						const [registry, metadata] = getTypeRegistry(
 							networkContextState.networks,
 							networkKey
 						)!;
@@ -123,6 +123,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 						// TODO: make this stateful so we don't have to reload every time we come here
 						console.log(`CREATING API: ${networkParams.url}`);
 						const api = await ApiPromise.create({
+							metadata,
 							provider: new WsProvider(networkParams.url),
 							registry
 						});
@@ -132,10 +133,8 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 						const base = new BN(10).pow(new BN(networkParams.decimals));
 						const div = fetchedBal.free.div(base);
 						const mod = fetchedBal.free.mod(base);
-						return [
-							networkKey,
-							div + '.' + mod.toString(10, networkParams.decimals)
-						];
+						const nDisplayDecimals = 3;
+						return [networkKey, div + '.' + mod.toString(10, nDisplayDecimals)];
 					} else {
 						// TODO: decide whether to support ETH -- for now it's disabled in NetworkCard
 						return [networkKey, undefined];
