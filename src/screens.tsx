@@ -21,7 +21,8 @@ import {
 	createStackNavigator
 } from '@react-navigation/stack';
 import * as React from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { colors, fonts } from 'styles/index';
 import Wallet from 'modules/main/screens/Wallet';
@@ -42,24 +43,42 @@ import { RootStackParamList } from 'types/routes';
 
 const ScreenStack = createStackNavigator<RootStackParamList>();
 
-const globalStackNavigationOptions = {
+const stackNavigationOptions = {
 	// more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
+	cardStyle: { backgroundColor: 'transparent' },
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-	headerBackTitleStyle: {
-		color: colors.navText.main
+	headerBackImage: (_tintColor): React.ReactNode => {
+		return (
+			<View
+				style={{
+					height: 46,
+					marginTop: 30,
+					padding: 6,
+					width: 46
+					// backgroundColor: '#ccc'
+				}}
+			>
+				<Icon
+					name={'arrow-left'}
+					size={32}
+					color={colors.text.white}
+					style={{ position: 'relative' }}
+				/>
+			</View>
+		);
 	},
 	headerBackTitleVisible: false,
 	headerStyle: {
 		backgroundColor: colors.background.accent,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: 112,
+		height: 140,
 		shadowColor: 'transparent'
 	},
 	headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
 	headerTintColor: colors.text.white,
 	headerTitle: (t): React.ReactNode => {
-		let title;
+		let title, isRoot;
 		switch (t.children) {
 			case 'AddNetwork':
 				title = 'Select Network';
@@ -87,6 +106,11 @@ const globalStackNavigationOptions = {
 				break;
 			case 'Settings':
 				title = 'Settings';
+				isRoot = true;
+				break;
+			case 'Wallet':
+				title = 'Wallet';
+				isRoot = true;
 				break;
 			case 'ReceiveBalance':
 				title = 'Receive Balance';
@@ -103,12 +127,15 @@ const globalStackNavigationOptions = {
 			default:
 				title = t.children;
 		}
+		console.log(t);
 		return (
 			<Text
 				style={{
 					color: colors.text.white,
 					fontFamily: fonts.bold,
 					fontSize: 24,
+					marginHorizontal: isRoot ? 0 : 28,
+					paddingTop: 28,
 					textAlign: 'left'
 				}}
 			>
@@ -116,13 +143,16 @@ const globalStackNavigationOptions = {
 			</Text>
 		);
 	},
-	headerTitleAlign: 'left'
+	headerTitleAlign: 'left',
+	headerTitleContainerStyle: {
+		left: 20
+	}
 };
 
 export const AppNavigator = (): React.ReactElement => (
 	<ScreenStack.Navigator
 		initialRouteName="Wallet"
-		screenOptions={globalStackNavigationOptions}
+		screenOptions={stackNavigationOptions}
 	>
 		<ScreenStack.Screen
 			name="Wallet"
