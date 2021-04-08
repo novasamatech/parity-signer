@@ -22,7 +22,7 @@ import React, {
 	useMemo,
 	useState
 } from 'react';
-import { BackHandler, FlatList, FlatListProps, View } from 'react-native';
+import { View, BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import BN from 'bn.js';
