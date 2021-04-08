@@ -30,6 +30,7 @@ export default class TextInput extends React.PureComponent<
 		suffix?: string;
 		autofocus?: boolean;
 		label?: string;
+		labelRight?: string;
 		error?: boolean;
 	},
 	{}
@@ -51,9 +52,22 @@ export default class TextInput extends React.PureComponent<
 	}
 
 	renderLabel(): React.ReactNode {
-		const { label } = this.props;
-		if (!label) return;
-		return <Text style={components.textInputLabel}>{label}</Text>;
+		const { label, labelRight } = this.props;
+		if (!label && !labelRight) return;
+		return (
+			<View style={components.textInputLabel}>
+				{typeof label === 'string' ? (
+					<Text style={components.textInputLabelLeft}>{label}</Text>
+				) : (
+					label
+				)}
+				{typeof labelRight === 'string' ? (
+					<Text style={components.textInputLabelRight}>{labelRight}</Text>
+				) : (
+					labelRight
+				)}
+			</View>
+		);
 	}
 
 	render(): React.ReactElement {

@@ -28,7 +28,7 @@ export const colors = {
 		dark: '#000000',
 		light: '#ddd',
 		medium: '#999',
-		negative: '#ff4500'
+		negative: '#DF3535'
 	},
 	border: {
 		dark: '#000000',
@@ -83,6 +83,17 @@ export const components = {
 		fontFamily: fonts.regular,
 		fontSize: 17
 	},
+	link: {
+		color: colors.text.accent,
+		fontFamily: fonts.regular,
+		textDecorationLine: 'underline'
+	},
+	linkSmall: {
+		color: colors.text.accent,
+		fontFamily: fonts.regular,
+		fontSize: 14,
+		textDecorationLine: 'underline'
+	},
 	page: {
 		backgroundColor: colors.text.white,
 		flex: 1,
@@ -122,8 +133,20 @@ export const components = {
 		marginVertical: 12
 	},
 	textInputLabel: {
-		fontFamily: fonts.regular,
-		marginBottom: 8
+		display: 'flex',
+		flexDirection: 'row',
+		height: 18,
+		justifyContent: 'space-between',
+		marginBottom: 8,
+		paddingRight: 6
+	},
+	textInputLabelLeft: {
+		flex: 1,
+		fontFamily: fonts.regular
+	},
+	textInputLabelRight: {
+		flex: 1,
+		fontFamily: fonts.regular
 	},
 	textInputSuffix: {
 		borderWidth: 0,
