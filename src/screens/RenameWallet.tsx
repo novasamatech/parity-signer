@@ -25,7 +25,6 @@ import { NetworksContext } from 'stores/NetworkContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { getNetworkKey } from 'utils/identitiesUtils';
 
 type Props = NavigationAccountIdentityProps<'RenameWallet'>;
 
@@ -33,9 +32,6 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { identity } = route.params;
 	const [newIdentityName, setNewIdentityName] = useState(identity?.name || '');
-
-	const path = route.params.path;
-	const networksContextState = useContext(NetworksContext);
 
 	if (!identity) return <View />;
 
@@ -62,7 +58,7 @@ function RenameWallet({ navigation, route }: Props): React.ReactElement {
 				placeholder="Enter a new wallet name"
 				autofocus
 			/>
-	    <Button title="Save" onPress={onSaveIdentity} fluid={true} />
+			<Button title="Save" onPress={onSaveIdentity} fluid={true} />
 		</View>
 	);
 }

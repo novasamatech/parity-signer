@@ -16,10 +16,10 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { colors } from 'styles/index';
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import { NavigationProps } from 'types/props';
@@ -29,7 +29,6 @@ import { resetNavigationTo } from 'utils/navigationHelpers';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 
 function CreateWalletImport({
 	navigation
@@ -80,29 +79,21 @@ function CreateWalletImport({
 	};
 
 	return (
-		<KeyboardScrollView bounces={false} style={styles.body}>
+		<View style={components.page}>
 			<AccountSeed
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
 				valid={isSeedValid.valid}
 			/>
-			<Button title={'Import'} onPress={onRecoverConfirm} />
-			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
-		</KeyboardScrollView>
+			<Button title={'Import'} onPress={onRecoverConfirm} fluid={true} />
+			<Button
+				title={'Go back'}
+				onPress={(): void => navigation.goBack()}
+				fluid={true}
+			/>
+		</View>
 	);
 }
 
 export default CreateWalletImport;
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		overflow: 'hidden'
-	},
-	btnBox: {
-		alignContent: 'center',
-		marginTop: 32
-	}
-});

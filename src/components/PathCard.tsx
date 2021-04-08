@@ -102,7 +102,6 @@ export default function PathCard({
 						address
 				);
 			}}
-			style={styles.body}
 		>
 			<View style={styles.content} testID={testID}>
 				<AccountIcon
@@ -120,17 +119,12 @@ export default function PathCard({
 }
 
 const styles = StyleSheet.create({
-	body: {
-		borderBottomWidth: 1,
-		borderColor: colors.background.app,
-		borderTopWidth: 1
-	},
 	content: {
 		alignItems: 'center',
-		backgroundColor: colors.background.card,
+		backgroundColor: colors.background.accentLight,
 		flexDirection: 'row',
 		paddingLeft: 16,
-		paddingVertical: 8
+		paddingVertical: 12
 	},
 	desc: {
 		flex: 1,

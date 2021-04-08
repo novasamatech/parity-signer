@@ -16,20 +16,13 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	useNavigation,
-	useNavigationState,
-	useRoute
-} from '@react-navigation/native';
-import {
 	CardStyleInterpolators,
-	createStackNavigator,
-	HeaderBackButton
+	createStackNavigator
 } from '@react-navigation/stack';
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { Text } from 'react-native';
 
 import { colors, fonts } from 'styles/index';
-import testIDs from 'e2e/testIDs';
 import Wallet from 'modules/main/screens/Wallet';
 import AddNetwork from 'screens/AddNetwork';
 import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
@@ -122,36 +115,6 @@ const globalStackNavigationOptions = {
 		);
 	},
 	headerTitleAlign: 'left'
-};
-
-const HeaderLeft = (): React.ReactElement => {
-	const route = useRoute();
-	const navigation = useNavigation();
-	const isFirstRouteInParent = useNavigationState(
-		state => state.routes[0].key === route.key
-	);
-	return isFirstRouteInParent ? (
-		<View style={{ paddingLeft: 10 }}>
-			<Text
-				style={{
-					color: colors.text.white,
-					fontFamily: fonts.bold,
-					fontSize: 26
-				}}
-			>
-				Layer Wallet
-			</Text>
-		</View>
-	) : (
-		<View testID={testIDs.Header.headerBackButton}>
-			<HeaderBackButton
-				labelStyle={globalStackNavigationOptions.headerBackTitleStyle}
-				labelVisible={false}
-				tintColor={colors.text.white}
-				onPress={(): void => navigation.goBack()}
-			/>
-		</View>
-	);
 };
 
 export const AppNavigator = (): React.ReactElement => (

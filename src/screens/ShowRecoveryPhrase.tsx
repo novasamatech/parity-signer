@@ -17,10 +17,10 @@
 
 import Clipboard from '@react-native-community/clipboard';
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { fontStyles } from 'styles/index';
+import { components, fontStyles } from 'styles';
 import { NavigationProps } from 'types/props';
 import TouchableItem from 'components/TouchableItem';
 
@@ -28,7 +28,7 @@ function ShowRecoveryPhrase({
 	route
 }: NavigationProps<'ShowRecoveryPhrase'>): React.ReactElement {
 	return (
-		<>
+		<View style={components.page}>
 			<Text>
 				Write these words down on paper and keep them somewhere secure. These
 				words allow anyone to recover this account and access its funds.
@@ -46,7 +46,7 @@ function ShowRecoveryPhrase({
 					{route.params.seedPhrase}
 				</Text>
 			</TouchableItem>
-		</>
+		</View>
 	);
 }
 

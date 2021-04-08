@@ -54,7 +54,7 @@ function CreateWallet2({
 	}, [route.params, wordsNumber]);
 
 	return (
-	    <View style={components.page}>
+		<View style={components.page}>
 			<Text>
 				Write these words down on paper. Keep the backup paper safe. These words
 				allow anyone to recover this account and access its funds.
@@ -81,9 +81,13 @@ function CreateWallet2({
 				onPress={(): void =>
 					navigation.navigate('CreateWallet3', { seedPhrase })
 				}
-fluid={true}
+				fluid={true}
 			/>
-	    <Button title={'Go back'} onPress={(): void => navigation.goBack()} fluid={true} />
+			<Button
+				title={'Go back'}
+				onPress={(): void => navigation.goBack()}
+				fluid={true}
+			/>
 		</View>
 	);
 }
@@ -91,9 +95,6 @@ fluid={true}
 export default CreateWallet2;
 
 const styles = StyleSheet.create({
-	body: {
-		padding: 16
-	},
 	mnemonicSelectionButton: {
 		backgroundColor: colors.background.app,
 		flex: 1,

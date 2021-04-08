@@ -21,7 +21,7 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles/index';
+import { colors, components, fontStyles } from 'styles';
 import OnBoardingView from 'modules/main/components/OnBoarding';
 import ButtonIcon from 'components/ButtonIcon';
 import Separator from 'components/Separator';
@@ -107,7 +107,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 
 	return (
 		<>
-			<View style={styles.card}>
+			<View style={components.pageWide}>
 				<ScrollView bounces={false}>
 					{identities.map(renderIdentity)}
 				</ScrollView>

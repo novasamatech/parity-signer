@@ -19,7 +19,7 @@ import '../shim';
 import 'utils/iconLoader';
 import * as React from 'react';
 import { StatusBar, LogBox } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import NavigationBar from 'react-native-navbar-color';
 import FlashMessage from 'react-native-flash-message';
@@ -37,6 +37,9 @@ import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
+
+const navTheme = DefaultTheme;
+navTheme.colors.background = colors.white;
 
 export default function App(props: AppProps): React.ReactElement {
 	getLaunchArgs(props);
@@ -75,7 +78,9 @@ export default function App(props: AppProps): React.ReactElement {
 									barStyle="light-content"
 									backgroundColor={colors.background.app}
 								/>
-								<NavigationContainer>{renderStacks()}</NavigationContainer>
+								<NavigationContainer theme={navTheme}>
+									{renderStacks()}
+								</NavigationContainer>
 								<FlashMessage
 									position="top"
 									style={{ backgroundColor: colors.background.accentDark }}

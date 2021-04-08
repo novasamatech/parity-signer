@@ -17,15 +17,13 @@
 
 import React from 'react';
 import {
-	StyleSheet,
 	TextInput as TextInputOrigin,
 	View,
 	Text,
-	TextStyle,
-	TextInputProps
+	TextStyle
 } from 'react-native';
 
-import { fonts, fontStyles, components, styles, colors } from 'styles/index';
+import { components, colors } from 'styles/index';
 
 export default class TextInput extends React.PureComponent<
 	{
@@ -80,7 +78,9 @@ export default class TextInput extends React.PureComponent<
 						selectionColor={colors.text.cursor}
 					/>
 					{suffix && (
-						<Text style={[finalInputStyles, components.textInputSuffix]}>{suffix}</Text>
+						<Text style={[finalInputStyles, components.textInputSuffix]}>
+							{suffix}
+						</Text>
 					)}
 				</View>
 			</View>

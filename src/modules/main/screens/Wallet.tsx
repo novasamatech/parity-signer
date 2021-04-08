@@ -23,6 +23,7 @@ import { NetworkCard } from '../components/NetworkCard';
 import OnBoardingView from '../components/OnBoarding';
 import NoCurrentIdentity from '../components/NoCurrentIdentity';
 
+import { components } from 'styles';
 import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsContext } from 'stores/AccountsContext';
@@ -151,13 +152,15 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 
 	return (
 		<>
-			<FlatList
-				data={networkList}
-				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
-				renderItem={renderNetwork}
-				testID={testIDs.Wallet.chooserScreen}
-				{...getListOptions()}
-			/>
+			<View style={components.pageWide}>
+				<FlatList
+					data={networkList}
+					keyExtractor={(item: [string, NetworkParams]): string => item[0]}
+					renderItem={renderNetwork}
+					testID={testIDs.Wallet.chooserScreen}
+					{...getListOptions()}
+				/>
+			</View>
 			<NavigationTab />
 		</>
 	);

@@ -18,7 +18,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
 
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { components } from 'styles/index';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { ScannerContext } from 'stores/ScannerContext';
@@ -60,7 +60,7 @@ function SignTransactionFinishView({
 	const { signedData } = scannerStore.state;
 
 	return (
-		<SafeAreaScrollViewContainer>
+		<View style={components.pageWide}>
 			<Text style={styles.topTitle}>Signed extrinsic</Text>
 			<CompatibleCard
 				account={sender}
@@ -78,7 +78,7 @@ function SignTransactionFinishView({
 			<View style={styles.qr} testID={testIDs.SignTransactionFinish.qrView}>
 				<QrView data={signedData} />
 			</View>
-		</SafeAreaScrollViewContainer>
+		</View>
 	);
 }
 

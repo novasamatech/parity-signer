@@ -44,7 +44,7 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 
 	return (
 		<View style={components.page}>
-	    <Button title="Delete" onPress={deleteWallet} fluid={true} />
+			<Button title="Delete" onPress={deleteWallet} fluid={true} />
 		</View>
 	);
 }

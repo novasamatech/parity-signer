@@ -24,7 +24,6 @@ export const colors = {
 		accentLight: '#eff2fe',
 		app: '#fff',
 		button: '#f7f9ff',
-		card: '#eee',
 		dark: '#000000',
 		light: '#ddd'
 	},
@@ -57,6 +56,9 @@ export const fonts = {
 };
 
 export const components = {
+	app: {
+		backgroundColor: colors.background.white
+	},
 	button: {
 		alignSelf: 'center',
 		backgroundColor: colors.background.accent,
@@ -78,18 +80,25 @@ export const components = {
 		fontFamily: fonts.regular,
 		fontSize: 17
 	},
-  page: {
-    paddingHorizontal: 20,
-    paddingTop: 34,
-  },
-  textInput: {
-    marginVertical: 12
-  },
-  textInputLabel: {
+	page: {
+		backgroundColor: colors.text.white,
+		flex: 1,
+		paddingHorizontal: 20,
+		paddingTop: 34
+	},
+	pageWide: {
+		backgroundColor: colors.text.white,
+		flex: 1,
+		paddingTop: 24
+	},
+	textInput: {
+		marginVertical: 12
+	},
+	textInputLabel: {
 		fontFamily: fonts.regular,
 		marginBottom: 8
-  },
-  textInputSuffix: {
+	},
+	textInputSuffix: {
 		borderWidth: 0,
 		color: colors.text.dark,
 		flex: 0,
@@ -97,21 +106,21 @@ export const components = {
 		paddingTop: 13,
 		position: 'absolute',
 		right: 14
-  },
-  textInputText: {
+	},
+	textInputText: {
+		borderColor: colors.border.light,
+		borderRadius: 10,
+		borderWidth: 0.8,
+		flex: 1,
 		fontFamily: fonts.regular,
 		fontSize: 18,
-		borderColor: colors.border.light,
-		borderWidth: 0.8,
-		borderRadius: 10,
-		flex: 1,
+		paddingBottom: 10,
 		paddingHorizontal: 14,
-		paddingTop: 12,
-		paddingBottom: 10
-  },
-  textInputTextError: {
+		paddingTop: 12
+	},
+	textInputTextError: {
 		borderBottomColor: colors.text.error
-  },
+	}
 };
 
 export const fontStyles = StyleSheet.create({

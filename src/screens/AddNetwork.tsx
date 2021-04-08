@@ -16,9 +16,10 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useContext, useMemo } from 'react';
-import { FlatList } from 'react-native';
+import { View, FlatList } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
+import { components } from 'styles';
 import Separator from 'components/Separator';
 import { AddNetworkCard } from 'components/AddNetworkCard';
 import { UnknownNetworkKeys } from 'constants/networkSpecs';
@@ -123,7 +124,7 @@ function AddNetwork({
 	};
 
 	return (
-		<>
+		<View style={components.page}>
 			<FlatList
 				data={networkListMainnets}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
@@ -137,7 +138,7 @@ function AddNetwork({
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 			/>
-		</>
+		</View>
 	);
 }
 

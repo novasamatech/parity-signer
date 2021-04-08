@@ -17,8 +17,9 @@
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
+import { components } from 'styles';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
@@ -68,13 +69,11 @@ function ReceiveBalance({
 	);
 
 	return (
-		<>
-			<ScrollView bounces={false}>
-				<PathCard identity={currentIdentity} path={path} />
-				<QrView data={`${accountId}:${accountName}`} />
-				{isUnknownNetwork && <UnknownAccountWarning isPath />}
-			</ScrollView>
-		</>
+		<View style={components.pageWide}>
+			<PathCard identity={currentIdentity} path={path} />
+			<QrView data={`${accountId}:${accountName}`} />
+			{isUnknownNetwork && <UnknownAccountWarning isPath />}
+		</View>
 	);
 }
 

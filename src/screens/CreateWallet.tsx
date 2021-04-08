@@ -16,9 +16,9 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { colors, components } from 'styles/index';
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
@@ -49,16 +49,16 @@ function CreateWallet({
 				value={accountsStore.state.newIdentity.name}
 				placeholder="Wallet name"
 			/>
-				<Button
-					title="New wallet"
-	  onPress={(): void => navigation.navigate('CreateWallet2')}
-          fluid={true}
-				/>
-				<Button
-					title="Import wallet"
-					onPress={(): void => navigation.navigate('CreateWalletImport')}
-          fluid={true}
-				/>
+			<Button
+				title="New wallet"
+				onPress={(): void => navigation.navigate('CreateWallet2')}
+				fluid={true}
+			/>
+			<Button
+				title="Import wallet"
+				onPress={(): void => navigation.navigate('CreateWalletImport')}
+				fluid={true}
+			/>
 		</View>
 	);
 }

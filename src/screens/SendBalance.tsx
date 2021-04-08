@@ -19,8 +19,9 @@ import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { components } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
-import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
+import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
@@ -49,8 +50,6 @@ function SendBalance({
 		networksContextState
 	);
 	const networkParams = networksContextState.getNetwork(networkKey ?? '');
-	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
-	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
 
 	const [amount, setAmount] = useState('');
 	const onChangeAmount = async (name: string): Promise<void> => {
@@ -88,7 +87,7 @@ function SendBalance({
 			/>
 			<Button
 				title="Send"
-          fluid={true}
+				fluid={true}
 				onPress={(): void => {
 					return;
 				}}
@@ -98,12 +97,12 @@ function SendBalance({
 				onChangeText={onChangeNewAddressBookEntry}
 				value={newAddressBookEntry}
 				placeholder="Address"
-          fluid={true}
+				fluid={true}
 				autoCorrect={false}
 			/>
 			<Button
 				title="Add"
-          fluid={true}
+				fluid={true}
 				onPress={(): void => {
 					return;
 				}}

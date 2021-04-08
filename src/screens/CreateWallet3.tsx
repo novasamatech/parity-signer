@@ -55,7 +55,7 @@ function CreateWallet3({
 	};
 
 	return (
-	    <View style={components.page}>
+		<View style={components.page}>
 			<Text>Retype the key phrase as shown on the prior screen.</Text>
 			<AccountSeed
 				onChangeText={onSeedTextInput}
@@ -66,10 +66,14 @@ function CreateWallet3({
 			<Button
 				title={'Confirm'}
 				onPress={createWallet}
-	  disabled={!isSeedMatching}
-          fluid={true}
+				disabled={!isSeedMatching}
+				fluid={true}
 			/>
-	    <Button title={'Go back'} onPress={(): void => navigation.goBack()} fluid={true} />
+			<Button
+				title={'Go back'}
+				onPress={(): void => navigation.goBack()}
+				fluid={true}
+			/>
 		</View>
 	);
 }

@@ -19,7 +19,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
-import { colors, fonts } from 'styles/index';
+import { colors, components, fonts } from 'styles/index';
 import Button from 'components/Button';
 import { useProcessBarCode } from 'modules/sign/utils';
 import { useInjectionQR } from 'e2e/injections';
@@ -141,12 +141,8 @@ export default function SignTransaction({
 	} = multiFrames;
 	return (
 		<>
-			<RNCamera
-				captureAudio={false}
-				onBarCodeRead={onBarCodeRead}
-				style={styles.view}
-			>
-				<View style={styles.body}>
+			<RNCamera captureAudio={false} onBarCodeRead={onBarCodeRead}>
+				<View style={components.page}>
 					<View style={styles.middle}>
 						<View style={styles.middleLeft} />
 						<View style={styles.middleCenter} />
@@ -184,11 +180,6 @@ export default function SignTransaction({
 }
 
 const styles = StyleSheet.create({
-	body: {
-		backgroundColor: 'transparent',
-		flex: 1,
-		flexDirection: 'column'
-	},
 	bottom: {
 		alignItems: 'center',
 		backgroundColor: colors.background.light,
@@ -236,8 +227,5 @@ const styles = StyleSheet.create({
 	progress: {
 		alignItems: 'center',
 		justifyContent: 'center'
-	},
-	view: {
-		flex: 1
 	}
 });
