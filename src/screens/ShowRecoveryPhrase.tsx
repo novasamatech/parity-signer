@@ -20,7 +20,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { components, fontStyles } from 'styles';
+import { components } from 'styles';
 import { NavigationProps } from 'types/props';
 import TouchableItem from 'components/TouchableItem';
 
@@ -29,20 +29,24 @@ function ShowRecoveryPhrase({
 }: NavigationProps<'ShowRecoveryPhrase'>): React.ReactElement {
 	return (
 		<View style={components.page}>
-			<Text>
-				Write these words down on paper and keep them somewhere secure. These
-				words allow anyone to recover this account and access its funds.
+			<Text style={components.textBlock}>
+				Save this phrase somewhere secure.
+			</Text>
+			<Text style={components.textBlock}>
+				Do not screenshot or save it on your computer, or anyone with access
+				could compromise your account.
 			</Text>
 			<TouchableItem
 				onPress={(): void => {
 					// only allow the copy of the key phrase in dev environment
 					if (__DEV__) {
-						showMessage('Key phrase copied.');
+						showMessage('Recovery phrase copied.');
 						Clipboard.setString(route.params.seedPhrase);
 					}
 				}}
+				style={components.textBlockPreformatted}
 			>
-				<Text style={[fontStyles.t_seed, { marginHorizontal: 16 }]}>
+				<Text style={components.textBlockPreformattedText}>
 					{route.params.seedPhrase}
 				</Text>
 			</TouchableItem>

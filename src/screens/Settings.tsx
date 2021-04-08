@@ -108,10 +108,7 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	return (
 		<>
 			<View style={components.pageWide}>
-				<ScrollView bounces={false}>
-					{identities.map(renderIdentity)}
-				</ScrollView>
-
+				{identities.map(renderIdentity)}
 				<ButtonIcon
 					title="Add wallet"
 					testID={testIDs.IdentitiesSwitch.addIdentityButton}

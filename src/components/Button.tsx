@@ -25,7 +25,7 @@ import {
 	View
 } from 'react-native';
 
-import { components } from 'styles/index';
+import { components, colors } from 'styles/index';
 import { ButtonListener } from 'types/props';
 
 export default class Button extends React.PureComponent<{
@@ -33,11 +33,12 @@ export default class Button extends React.PureComponent<{
 	onPress: ButtonListener;
 	disabled?: boolean;
 	fluid?: boolean;
+	negative?: boolean;
 	testID?: string;
 	style?: ViewStyle;
 }> {
 	render(): React.ReactElement {
-		const { onPress, title, disabled, fluid, testID, style } = this.props;
+	  const { onPress, title, disabled, fluid, negative, testID, style } = this.props;
 
 		const finalTextStyles = [components.buttonText, {}];
 		const finalButtonStyles = [components.button, {}];
@@ -48,6 +49,9 @@ export default class Button extends React.PureComponent<{
 		if (fluid) {
 			finalButtonStyles.push(components.buttonFluid);
 			finalTextStyles.push({ textAlign: 'center' });
+		}
+		if (negative) {
+			finalButtonStyles.push({ backgroundColor: colors.background.negative });
 		}
 
 		return Platform.OS === 'android' ? (

@@ -25,7 +25,9 @@ export const colors = {
 		app: '#fff',
 		button: '#f7f9ff',
 		dark: '#000000',
-		light: '#ddd'
+		light: '#ddd',
+		medium: '#999',
+		negative: '#ff4500'
 	},
 	border: {
 		dark: '#000000',
@@ -90,6 +92,25 @@ export const components = {
 		backgroundColor: colors.text.white,
 		flex: 1,
 		paddingTop: 24
+	},
+	textBlock: {
+		fontFamily: fonts.regular,
+		fontSize: 18,
+		lineHeight: 24,
+		marginBottom: 8
+	},
+	textBlockPreformatted: {
+		borderRadius: 10,
+		backgroundColor: colors.background.accentDark,
+		marginVertical: 16,
+		minHeight: 100,
+		paddingHorizontal: 18,
+		paddingVertical: 12
+	},
+	textBlockPreformattedText: {
+		color: colors.text.white,
+		fontFamily: fonts.regular,
+		fontSize: 18
 	},
 	textInput: {
 		marginVertical: 12
@@ -179,17 +200,5 @@ export const fontStyles = StyleSheet.create({
 		fontFamily: fonts.regular,
 		fontSize: 14,
 		textTransform: 'uppercase'
-	},
-	t_seed: {
-		borderColor: colors.background.card,
-		borderWidth: 0.8,
-		color: colors.text.accent,
-		fontFamily: fonts.light,
-		fontSize: 18,
-		letterSpacing: 0.7,
-		lineHeight: 23,
-		minHeight: 100,
-		paddingHorizontal: 16,
-		paddingVertical: 10
 	}
 });

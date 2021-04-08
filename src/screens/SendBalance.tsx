@@ -21,7 +21,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { components } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
-import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';

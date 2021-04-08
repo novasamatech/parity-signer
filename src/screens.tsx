@@ -63,7 +63,7 @@ const globalStackNavigationOptions = {
 				title = 'Add Network';
 				break;
 			case 'ShowRecoveryPhrase':
-				title = 'Show Key Phrase';
+				title = 'Show Recovery Phrase';
 				break;
 			case 'RenameWallet':
 				title = 'Rename Wallet';
@@ -78,7 +78,7 @@ const globalStackNavigationOptions = {
 				title = 'Create Wallet';
 				break;
 			case 'CreateWallet3':
-				title = 'Verify Key Phrase';
+				title = 'Verify Recovery Phrase';
 				break;
 			case 'CreateWalletImport':
 				title = 'Create Wallet';

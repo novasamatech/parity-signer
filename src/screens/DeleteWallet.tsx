@@ -16,7 +16,7 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext } from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
 import { components } from 'styles';
@@ -44,7 +44,13 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 
 	return (
 		<View style={components.page}>
-			<Button title="Delete" onPress={deleteWallet} fluid={true} />
+			<Text style={components.textBlock}>
+				Delete this wallet?
+			</Text>
+			<Text style={components.textBlock}>
+				You will not be able to recover it unless you have its recovery key.
+			</Text>
+			<Button title="Delete" onPress={deleteWallet} fluid={true} negative={true} />
 		</View>
 	);
 }

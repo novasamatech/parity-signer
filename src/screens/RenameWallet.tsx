@@ -21,7 +21,6 @@ import { showMessage } from 'react-native-flash-message';
 
 import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { NavigationAccountIdentityProps } from 'types/props';
