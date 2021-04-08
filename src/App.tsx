@@ -37,6 +37,7 @@ import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
+import Api from 'components/Api';
 
 const navTheme = DefaultTheme;
 navTheme.colors.background = colors.white;
@@ -67,28 +68,33 @@ export default function App(props: AppProps): React.ReactElement {
 		return <AppNavigator />;
 	};
 
+	// TODO: get this network key from someplace!
+	const networkKey = '';
+
 	return (
 		<NetworksContext.Provider value={networkContext}>
 			<AccountsContext.Provider value={accountsContext}>
 				<ScannerContext.Provider value={scannerContext}>
 					<RegistriesContext.Provider value={registriesContext}>
 						<SeedRefsContext.Provider value={seedRefContext}>
-							<MenuProvider backHandler={true}>
-								<StatusBar
-									barStyle="light-content"
-									backgroundColor={colors.background.app}
-								/>
-								<NavigationContainer theme={navTheme}>
-									{renderStacks()}
-								</NavigationContainer>
-								<FlashMessage
-									position="top"
-									style={{ backgroundColor: colors.background.accentDark }}
-									textStyle={{ fontFamily: fonts.regular }}
-									titleStyle={{ fontFamily: fonts.regular }}
-									duration={3000}
-								/>
-							</MenuProvider>
+							<Api networkKey={networkKey}>
+								<MenuProvider backHandler={true}>
+									<StatusBar
+										barStyle="light-content"
+										backgroundColor={colors.background.app}
+									/>
+									<NavigationContainer theme={navTheme}>
+										{renderStacks()}
+									</NavigationContainer>
+									<FlashMessage
+										position="top"
+										style={{ backgroundColor: colors.background.accentDark }}
+										textStyle={{ fontFamily: fonts.regular }}
+										titleStyle={{ fontFamily: fonts.regular }}
+										duration={3000}
+									/>
+								</MenuProvider>
+							</Api>
 						</SeedRefsContext.Provider>
 					</RegistriesContext.Provider>
 				</ScannerContext.Provider>

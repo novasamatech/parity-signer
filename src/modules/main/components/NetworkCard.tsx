@@ -110,9 +110,11 @@ export function NetworkCard({
 					</View>
 					{isSubstrateNetworkParams(networkParams) && (
 						<View style={styles.contentRow}>
-							<Text style={styles.text}>{balance ?? '...'} {networkParams.unit}</Text>
-						</View>)
-                                        }
+							<Text style={styles.text}>
+								{balance ?? '...'} {networkParams.unit}
+							</Text>
+						</View>
+					)}
 					<PopupMenu
 						onSelect={onOptionSelect}
 						menuTriggerIconName={'more-vert'}

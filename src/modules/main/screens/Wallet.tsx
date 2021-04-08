@@ -49,7 +49,7 @@ import {
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import Button from 'components/Button';
 import NavigationTab from 'components/NavigationTab';
-import { RegistriesContext } from 'stores/RegistriesContext';
+import ApiContext from 'stores/ApiContext';
 
 const filterNetworks = (
 	networkList: Map<string, NetworkParams>,
@@ -67,13 +67,22 @@ const filterNetworks = (
 		.sort((a, b) => a[1].order - b[1].order);
 };
 
+interface State {
+	freeBalance: string;
+}
+
+const EMPTY_STATE: State = {
+	freeBalance: 'Loading...'
+};
+
 function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { identities, currentIdentity, loaded } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
-	const { getTypeRegistry } = useContext(RegistriesContext);
-	const [balances, setBalances] = useState({} as { [key: string]: string });
+	const { api } = useContext(ApiContext);
+	const [balance, setBalance] = useState(EMPTY_STATE);
 	const { allNetworks } = networkContextState;
+
 	// catch android back button and prevent exiting the app
 	useFocusEffect(
 		React.useCallback((): any => {
@@ -102,58 +111,28 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 		[availableNetworks, allNetworks]
 	);
 
-	const fetchBalances = async (
-		networks: [string, NetworkParams][]
-	): Promise<void> => {
-		const fetchedBalances = await Promise.all(
-			networks.map(
-				async ([networkKey, networkParams]): Promise<
-					[string, string | undefined]
-				> => {
-					if (balances[networkKey]) return [networkKey, balances[networkKey]];
-					if (isSubstrateNetworkParams(networkParams)) {
-						const [registry, metadata] = getTypeRegistry(
-							networkContextState.networks,
-							networkKey
-						)!;
-						const path = `//${networkParams.pathId}`;
-						const address = getAddressWithPath(path, currentIdentity);
-						// TODO: load metadata at startup
-						// TODO: handle errors
-						// TODO: make this stateful so we don't have to reload every time we come here
-						console.log(`CREATING API: ${networkParams.url}`);
-						const api = await ApiPromise.create({
-							metadata,
-							provider: new WsProvider(networkParams.url),
-							registry
-						});
-						const fetchedBal = await api.query.balances.account(address);
-						console.log('DISCONNECTING API');
-						await api.disconnect();
-						const base = new BN(10).pow(new BN(networkParams.decimals));
-						const div = fetchedBal.free.div(base);
-						const mod = fetchedBal.free.mod(base);
-						const nDisplayDecimals = 3;
-						return [networkKey, div + '.' + mod.toString(10, nDisplayDecimals)];
-					} else {
-						// TODO: decide whether to support ETH -- for now it's disabled in NetworkCard
-						return [networkKey, undefined];
-					}
-				}
-			)
-		);
-
-		// populate finished object
-		const balancesObj: { [key: string]: string } = {};
-		for (const [key, bal] of fetchedBalances) {
-			if (bal) balancesObj[key] = bal;
-		}
-		setBalances(balancesObj);
-	};
+	// initialize the API using the first network the user has, if they have any
+	const firstNetwork = networkList[0];
 
 	useEffect(() => {
-		fetchBalances(networkList);
-	}, []);
+		if (!firstNetwork) return;
+		const firstNetworkParams = firstNetwork[1];
+		if (isSubstrateNetworkParams(firstNetworkParams)) {
+			const path = `//${firstNetworkParams.pathId}`;
+			const address = getAddressWithPath(path, currentIdentity);
+			if (api?.query?.balances) {
+				api.query.balances.account(address).then(fetchedBalance => {
+					const base = new BN(10).pow(new BN(firstNetworkParams.decimals));
+					const div = fetchedBalance.free.div(base);
+					const mod = fetchedBalance.free.mod(base);
+					const nDisplayDecimals = 3;
+					setBalance({
+						freeBalance: div + '.' + mod.toString(10, nDisplayDecimals)
+					});
+				});
+			}
+		}
+	}, [api, currentIdentity, firstNetwork]);
 
 	if (!loaded) return <View />;
 	if (identities.length === 0) return <OnBoardingView />;
@@ -205,7 +184,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 				onPress={(): Promise<void> =>
 					onNetworkChosen(networkKey, networkParams)
 				}
-				balance={balances[networkKey]}
+				balance={balance.freeBalance}
 				title={networkParams.title}
 			/>
 		);
