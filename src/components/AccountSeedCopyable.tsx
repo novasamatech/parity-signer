@@ -16,14 +16,18 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import Clipboard from '@react-native-community/clipboard';
-import React, { ReactElement, useState } from 'react';
-import { Text, View } from 'react-native';
+import React from 'react';
+import { Text } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
-import { components } from 'styles';
+import { components, fonts, colors } from 'styles';
 import TouchableItem from 'components/TouchableItem';
 
-export default function AccountSeedCopyable({ seed }: { seed: string }) {
+export default function AccountSeedCopyable({
+	seed
+}: {
+	seed: string;
+}): React.ReactElement {
 	return (
 		<TouchableItem
 			onPress={(): void => {
@@ -36,8 +40,15 @@ export default function AccountSeedCopyable({ seed }: { seed: string }) {
 			style={components.textBlockPreformatted}
 		>
 			<Text style={components.textBlockPreformattedText}>{seed}</Text>
+			<Text
+				style={{
+					color: colors.text.accent,
+					fontFamily: fonts.regular,
+					fontSize: 14
+				}}
+			>
+				Press to copy
+			</Text>
 		</TouchableItem>
 	);
 }
-
-export default AccountSeedCopyable;

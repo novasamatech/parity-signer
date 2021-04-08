@@ -16,13 +16,12 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { components } from 'styles';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import AccountSeedCopyable from 'components/AccountSeedCopyable';
-import TouchableItem from 'components/TouchableItem';
 import Button from 'components/Button';
 
 function CreateWallet2({

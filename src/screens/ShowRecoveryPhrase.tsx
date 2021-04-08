@@ -15,15 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import Clipboard from '@react-native-community/clipboard';
 import React from 'react';
 import { Text, View } from 'react-native';
-import { showMessage } from 'react-native-flash-message';
 
 import { components } from 'styles';
 import { NavigationProps } from 'types/props';
 import AccountSeedCopyable from 'components/AccountSeedCopyable';
-import TouchableItem from 'components/TouchableItem';
 
 function ShowRecoveryPhrase({
 	route

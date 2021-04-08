@@ -39,11 +39,11 @@ const SUGGESTIONS_COUNT = 5;
 
 interface Props extends TextInputProps {
 	onChangeText: (text: string) => void;
-	valid: boolean;
+	invalid: boolean;
 }
 
 export default function AccountSeedTextInput({
-	valid,
+	invalid,
 	onChangeText,
 	...props
 }: Props): React.ReactElement {
@@ -147,7 +147,7 @@ export default function AccountSeedTextInput({
 		);
 	}
 
-	const invalidStyles = !valid ? styles.inputInvalid : {};
+	const invalidStyles = invalid ? styles.inputInvalid : {};
 	return (
 		<View>
 			<TextInput

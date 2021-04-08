@@ -128,8 +128,8 @@ export const components = {
 	textBlockPreformatted: {
 		backgroundColor: colors.background.white,
 		borderColor: colors.border.light,
-		borderWidth: 0.8,
 		borderRadius: 10,
+		borderWidth: 0.8,
 		marginVertical: 16,
 		minHeight: 100,
 		paddingHorizontal: 18,
