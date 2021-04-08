@@ -24,7 +24,6 @@ import React, {
 } from 'react';
 import { View, BackHandler, FlatList, FlatListProps } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { ApiPromise, WsProvider } from '@polkadot/api';
 import BN from 'bn.js';
 
 import { NetworkCard } from '../components/NetworkCard';
@@ -49,7 +48,8 @@ import {
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import Button from 'components/Button';
 import NavigationTab from 'components/NavigationTab';
-import ApiContext from 'stores/ApiContext';
+import { ApiContext } from 'stores/ApiContext';
+import { RegistriesContext } from 'stores/RegistriesContext';
 
 const filterNetworks = (
 	networkList: Map<string, NetworkParams>,
@@ -79,7 +79,8 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { identities, currentIdentity, loaded } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
-	const { api } = useContext(ApiContext);
+	const registriesContext = useContext(RegistriesContext);
+	const { selectNetwork, state, disconnect } = useContext(ApiContext);
 	const [balance, setBalance] = useState(EMPTY_STATE);
 	const { allNetworks } = networkContextState;
 
@@ -114,15 +115,27 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	// initialize the API using the first network the user has, if they have any
 	const firstNetwork = networkList[0];
 
-	useEffect(() => {
-		if (!firstNetwork) return;
-		const firstNetworkParams = firstNetwork[1];
-		if (isSubstrateNetworkParams(firstNetworkParams)) {
-			const path = `//${firstNetworkParams.pathId}`;
+	useEffect((): (() => void) => {
+		const cleanupFn = (): void => {
+			if (state.apiError || state.isApiReady) {
+				disconnect();
+			}
+		};
+
+		if (!firstNetwork) return cleanupFn;
+		const [networkKey, networkParams] = firstNetwork;
+		if (!isSubstrateNetworkParams(networkParams)) return cleanupFn;
+		if (!state.isApiInitialized) {
+			selectNetwork(networkKey, networkContextState, registriesContext);
+		} else if (state.apiError) {
+			// TODO: is this error handling code correct?
+			console.error(`API ERROR: ${state.apiError}`);
+		} else if (state.isApiReady) {
+			const path = `//${networkParams.pathId}`;
 			const address = getAddressWithPath(path, currentIdentity);
-			if (api?.query?.balances) {
-				api.query.balances.account(address).then(fetchedBalance => {
-					const base = new BN(10).pow(new BN(firstNetworkParams.decimals));
+			if (state.api?.query?.balances) {
+				state.api.query.balances.account(address).then(fetchedBalance => {
+					const base = new BN(10).pow(new BN(networkParams.decimals));
 					const div = fetchedBalance.free.div(base);
 					const mod = fetchedBalance.free.mod(base);
 					const nDisplayDecimals = 3;
@@ -132,7 +145,8 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 				});
 			}
 		}
-	}, [api, currentIdentity, firstNetwork]);
+		return cleanupFn;
+	}, [currentIdentity, firstNetwork, state]);
 
 	if (!loaded) return <View />;
 	if (identities.length === 0) return <OnBoardingView />;

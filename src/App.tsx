@@ -37,6 +37,7 @@ import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
 import Api from 'components/Api';
+import { ApiContext, useApiContext } from 'stores/ApiContext';
 
 const navTheme = DefaultTheme;
 navTheme.colors.background = colors.white;
@@ -63,13 +64,11 @@ export default function App(props: AppProps): React.ReactElement {
 	const accountsContext = useAccountContext();
 	const scannerContext = useScannerContext();
 	const registriesContext = useRegistriesStore();
+	const apiContext = useApiContext();
 
 	const renderStacks = (): React.ReactElement => {
 		return <AppNavigator />;
 	};
-
-	// TODO: get this network key from someplace!
-	const networkKey = '';
 
 	return (
 		<NetworksContext.Provider value={networkContext}>
@@ -77,7 +76,7 @@ export default function App(props: AppProps): React.ReactElement {
 				<ScannerContext.Provider value={scannerContext}>
 					<RegistriesContext.Provider value={registriesContext}>
 						<SeedRefsContext.Provider value={seedRefContext}>
-							<Api networkKey={networkKey}>
+							<ApiContext.Provider value={apiContext}>
 								<MenuProvider backHandler={true}>
 									<StatusBar
 										barStyle="light-content"
@@ -94,7 +93,7 @@ export default function App(props: AppProps): React.ReactElement {
 										duration={3000}
 									/>
 								</MenuProvider>
-							</Api>
+							</ApiContext.Provider>
 						</SeedRefsContext.Provider>
 					</RegistriesContext.Provider>
 				</ScannerContext.Provider>
