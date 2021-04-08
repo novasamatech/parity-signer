@@ -52,7 +52,7 @@ const stackNavigationOptions = {
 			<View
 				style={{
 					height: 46,
-					marginTop: 30,
+					marginTop: 45,
 					padding: 6,
 					width: 46
 					// backgroundColor: '#ccc'
@@ -72,10 +72,10 @@ const stackNavigationOptions = {
 		backgroundColor: colors.background.accent,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: 140,
+		height: 154,
 		shadowColor: 'transparent'
 	},
-	headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
+	headerStyleInterpolator: HeaderStyleInterpolators.forStatic,
 	headerTintColor: colors.text.white,
 	headerTitle: (t): React.ReactNode => {
 		let title, isRoot;
@@ -135,7 +135,7 @@ const stackNavigationOptions = {
 					fontFamily: fonts.bold,
 					fontSize: 24,
 					marginHorizontal: isRoot ? 0 : 28,
-					paddingTop: 28,
+					paddingTop: 42,
 					textAlign: 'left'
 				}}
 			>
