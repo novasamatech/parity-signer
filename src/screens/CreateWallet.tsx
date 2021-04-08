@@ -16,24 +16,27 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { colors } from 'styles';
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { NavigationProps } from 'types/props';
 import { emptyIdentity } from 'utils/identitiesUtils';
-import ScreenHeading from 'components/ScreenHeading';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 
 function CreateWallet({
 	navigation
 }: NavigationProps<'CreateWallet'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const clearIdentity = useRef(() =>
-		accountsStore.updateNewIdentity(emptyIdentity())
-	);
+	const clearIdentity = useRef(() => {
+		const newIdentity = emptyIdentity();
+		const currentAccounts = Array.from(
+			accountsStore.state.currentIdentity?.addresses.entries()
+		);
+		newIdentity.name = `Wallet ${currentAccounts.length + 1}`;
+		return accountsStore.updateNewIdentity(newIdentity);
+	});
 
 	useEffect((): (() => void) => {
 		clearIdentity.current();
@@ -45,37 +48,26 @@ function CreateWallet({
 	};
 
 	return (
-		<KeyboardScrollView bounces={false} style={styles.body}>
-			<ScreenHeading title={'New Wallet'} />
+		<View style={components.page}>
 			<TextInput
 				onChangeText={updateName}
 				value={accountsStore.state.newIdentity.name}
 				placeholder="Wallet name"
+				autofocus={true}
 			/>
-			<View style={styles.btnBox}>
-				<Button
-					title="Generate a key phrase"
-					onPress={(): void => navigation.navigate('CreateWallet2')}
-				/>
-				<Button
-					title="Import a key phrase"
-					onPress={(): void => navigation.navigate('CreateWalletImport')}
-				/>
-			</View>
-		</KeyboardScrollView>
+			<Button
+				title="Create wallet"
+				onPress={(): void => navigation.navigate('CreateWallet2')}
+				fluid={true}
+			/>
+			<Button
+				title="Import wallet"
+				onPress={(): void => navigation.navigate('CreateWalletImport')}
+				fluid={true}
+				secondary={true}
+			/>
+		</View>
 	);
 }
 
 export default CreateWallet;
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		overflow: 'hidden'
-	},
-	btnBox: {
-		alignContent: 'center',
-		marginTop: 32
-	}
-});

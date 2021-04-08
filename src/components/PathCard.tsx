@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
 import AccountIcon from './AccountIcon';
-import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
 	defaultNetworkKey,
@@ -33,34 +33,24 @@ import {
 	NetworkProtocols
 } from 'constants/networkSpecs';
 import { Identity } from 'types/identityTypes';
-import {
-	getAddressWithPath,
-	getNetworkKeyByPath,
-	getPathName
-} from 'utils/identitiesUtils';
+import { getAddressWithPath, getNetworkKeyByPath } from 'utils/identitiesUtils';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
 	identity,
 	isPathValid = true,
 	path,
-	name,
 	networkKey,
-	testID,
-	titlePrefix
+	testID
 }: {
 	identity: Identity;
 	isPathValid?: boolean;
 	path: string;
-	name?: string;
 	networkKey?: string;
 	testID?: string;
-	titlePrefix?: string;
 }): React.ReactElement {
 	const networksContext = useContext(NetworksContext);
 	const { networks, allNetworks } = networksContext;
-	const isNotEmptyName = name && name !== '';
-	const pathName = isNotEmptyName ? name : getPathName(path, identity);
 	const { isSeedRefValid, substrateAddress } = useSeedRef(
 		identity.encryptedSeed
 	);
@@ -102,13 +92,13 @@ export default function PathCard({
 	return (nonSubstrateCard = (
 		<TouchableItem
 			accessibilityComponentType="button"
-			onPress={() =>
+			onPress={(): void => {
+				showMessage('Address copied.');
 				Clipboard.setString(
 					(networkParams.protocol === NetworkProtocols.ETHEREUM ? '0x' : '') +
 						address
-				)
-			}
-			style={styles.body}
+				);
+			}}
 		>
 			<View style={styles.content} testID={testID}>
 				<AccountIcon
@@ -117,7 +107,9 @@ export default function PathCard({
 					style={styles.identicon}
 				/>
 				<View style={styles.desc}>
-					<AccountPrefixedTitle title={networkParams.title} />
+					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+						{networkParams.title}
+					</Text>
 					<Address address={address} protocol={networkParams.protocol} />
 				</View>
 			</View>
@@ -126,17 +118,12 @@ export default function PathCard({
 }
 
 const styles = StyleSheet.create({
-	body: {
-		borderBottomWidth: 1,
-		borderColor: colors.background.app,
-		borderTopWidth: 1
-	},
 	content: {
 		alignItems: 'center',
-		backgroundColor: colors.background.card,
+		backgroundColor: colors.background.accentLight,
 		flexDirection: 'row',
 		paddingLeft: 16,
-		paddingVertical: 8
+		paddingVertical: 12
 	},
 	desc: {
 		flex: 1,

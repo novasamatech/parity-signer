@@ -16,20 +16,21 @@
 // along with Parity.	If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useContext } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import React, { useContext } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles';
+import { colors, components, fontStyles } from 'styles';
+import OnBoardingView from 'modules/main/components/OnBoarding';
+import Button from 'components/Button';
 import ButtonIcon from 'components/ButtonIcon';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import Separator from 'components/Separator';
 import NavigationTab from 'components/NavigationTab';
 import { AccountsContext } from 'stores/AccountsContext';
 import { Identity } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import testIDs from 'e2e/testIDs';
 import { getIdentitySeed, getIdentityName } from 'utils/identitiesUtils';
 
 function ButtonWithArrow(props: {
@@ -44,11 +45,10 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const { currentIdentity, identities } = accountsStore.state;
+	if (identities.length === 0) return <OnBoardingView />;
 	if (!currentIdentity) return <View />;
 
-	const renderNonSelectedIdentity = (
-		identity: Identity
-	): React.ReactElement => {
+	const renderIdentity = (identity: Identity): React.ReactElement => {
 		const title = getIdentityName(identity, identities);
 		const showRecoveryPhrase = async (
 			targetIdentity: Identity
@@ -59,85 +59,81 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 
 		return (
 			<View key={identity.encryptedSeed}>
-				<ButtonIcon
-					title={title}
-					iconType="antdesign"
-					iconName="user"
-					iconSize={24}
-					style={styles.indentedButton}
-					textStyle={fontStyles.h2}
-				/>
-				{currentIdentity.encryptedSeed !== identity.encryptedSeed ? (
-					<ButtonWithArrow
-						title="Select this wallet"
-						onPress={(): void => {
-							accountsStore.selectIdentity(identity);
-						}}
+				<View style={styles.card}>
+					<ButtonIcon
+						title={title}
+						iconType="antdesign"
+						iconName="user"
+						iconSize={24}
+						style={styles.indentedButton}
+						textStyle={fontStyles.h2}
 					/>
-				) : null}
-				<ButtonWithArrow
-					title="Rename"
-					onPress={(): void =>
-						navigation.navigate('RenameWallet', {
-							accountsStore,
-							identity,
-							navigation
-						})
-					}
-				/>
-				<ButtonWithArrow
-					title="Delete"
-					onPress={(): void =>
-						navigation.navigate('DeleteWallet', {
-							accountsStore,
-							identity,
-							navigation
-						})
-					}
-				/>
-				<ButtonWithArrow
-					title="Show Key Phrase"
-					onPress={(): Promise<void> => showRecoveryPhrase(identity)}
-				/>
+					{currentIdentity.encryptedSeed !== identity.encryptedSeed ? (
+						<ButtonWithArrow
+							title="Select this wallet"
+							onPress={(): void => {
+								accountsStore.selectIdentity(identity);
+								showMessage('Wallet switched.');
+							}}
+						/>
+					) : null}
+					{currentIdentity.encryptedSeed === identity.encryptedSeed ? (
+						<>
+							<ButtonWithArrow
+								title="Rename"
+								onPress={(): void =>
+									navigation.navigate('RenameWallet', {
+										accountsStore,
+										identity,
+										navigation
+									})
+								}
+							/>
+							<ButtonWithArrow
+								title="Delete"
+								onPress={(): void =>
+									navigation.navigate('DeleteWallet', {
+										accountsStore,
+										identity,
+										navigation
+									})
+								}
+							/>
+							<ButtonWithArrow
+								title="Show Recovery Phrase"
+								onPress={(): Promise<void> => showRecoveryPhrase(identity)}
+							/>
+						</>
+					) : null}
+				</View>
 				<Separator style={{ marginBottom: 0 }} />
 			</View>
 		);
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			<View style={styles.card}>
-				<ScrollView bounces={false}>
-					<View style={{ paddingVertical: 8 }}>
-						{identities.map(renderNonSelectedIdentity)}
-					</View>
-				</ScrollView>
-
-				<ButtonIcon
-					title="Add wallet"
-					testID={testIDs.IdentitiesSwitch.addIdentityButton}
-					onPress={(): void => navigation.navigate('CreateWallet')}
-					iconName="plus"
-					iconType="antdesign"
-					iconSize={24}
-					textStyle={fontStyles.t_big}
-					style={styles.indentedButton}
-				/>
+		<>
+			<View style={components.pageWideFullBleed}>
+				{identities.map(renderIdentity)}
+				<View style={{ paddingHorizontal: 32, paddingVertical: 16 }}>
+					<Button
+						title="Add wallet"
+						onPress={(): void => navigation.navigate('CreateWallet')}
+						fluid={true}
+					/>
+				</View>
 			</View>
-			{/* TODO: get this footer on every page */}
 			<View style={styles.tab}>
 				<NavigationTab />
 			</View>
-		</SafeAreaViewContainer>
+		</>
 	);
 }
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: colors.background.app,
-		borderRadius: 4,
-		paddingBottom: 16,
-		paddingTop: 8
+		paddingBottom: 6,
+		paddingTop: 14
 	},
 	container: {
 		justifyContent: 'center',
@@ -157,12 +153,12 @@ const styles = StyleSheet.create({
 });
 
 const i_arrowOptions = {
-	iconColor: colors.signal.main,
+	iconColor: colors.text.accent,
 	iconName: 'arrowright',
-	iconSize: fontStyles.i_medium.fontSize,
+	iconSize: 18,
 	iconType: 'antdesign',
 	style: styles.i_arrowStyle,
-	textStyle: { ...fontStyles.a_text, color: colors.signal.main }
+	textStyle: { ...fontStyles.a_text, color: colors.text.accent }
 };
 
 export default Settings;

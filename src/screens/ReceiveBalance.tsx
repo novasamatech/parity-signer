@@ -15,15 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
+import { components } from 'styles';
 import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContext } from 'stores/NetworkContext';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { RootStackParamList } from 'types/routes';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getAddressWithPath,
@@ -33,20 +32,16 @@ import {
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
 import PathCard from 'components/PathCard';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { ScreenHeadingWithNetworkIcon } from 'components/ScreenHeading';
 import QrView from 'components/QrView';
 
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation: StackNavigationProp<RootStackParamList, 'ReceiveBalance'>;
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
 function ReceiveBalance({
 	accountsStore,
-	navigation,
 	route
 }: NavigationAccountIdentityProps<'ReceiveBalance'>): React.ReactElement {
 	const path = route.params.path;
@@ -70,17 +65,11 @@ function ReceiveBalance({
 	);
 
 	return (
-		<SafeAreaViewContainer>
-			<ScrollView bounces={false}>
-				<ScreenHeadingWithNetworkIcon
-					title="Receive Balance"
-					networkKey={formattedNetworkKey}
-				/>
-				<PathCard identity={currentIdentity} path={path} />
-				<QrView data={`${accountId}:${accountName}`} />
-				{isUnknownNetwork && <UnknownAccountWarning isPath />}
-			</ScrollView>
-		</SafeAreaViewContainer>
+		<View style={components.pageWide}>
+			<PathCard identity={currentIdentity} path={path} />
+			<QrView data={`${accountId}:${accountName}`} />
+			{isUnknownNetwork && <UnknownAccountWarning isPath />}
+		</View>
 	);
 }
 

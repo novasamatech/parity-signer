@@ -18,26 +18,25 @@
 import React from 'react';
 import {
 	Platform,
-	StyleSheet,
 	Text,
-	TextStyle,
 	TouchableNativeFeedback,
 	TouchableOpacity,
 	ViewStyle,
 	View
 } from 'react-native';
 
-import { colors, fontStyles } from 'styles';
+import { components, colors } from 'styles/index';
 import { ButtonListener } from 'types/props';
 
 export default class Button extends React.PureComponent<{
 	title: string;
 	onPress: ButtonListener;
-	textStyles?: TextStyle;
-	aboveKeyboard?: boolean;
 	disabled?: boolean;
-	small?: boolean;
-	onlyText?: boolean;
+	inactive?: boolean;
+	fluid?: boolean;
+	negative?: boolean;
+	secondary?: boolean;
+	active?: boolean;
 	testID?: string;
 	style?: ViewStyle;
 }> {
@@ -45,31 +44,41 @@ export default class Button extends React.PureComponent<{
 		const {
 			onPress,
 			title,
-			aboveKeyboard,
 			disabled,
-			small,
-			textStyles,
-			onlyText,
+			inactive,
+			fluid,
+			negative,
+			secondary,
+			active,
 			testID,
 			style
 		} = this.props;
 
-		const finalTextStyles = [styles.buttonText, {}];
-		const finalButtonStyles = [styles.button, {}];
+		const finalTextStyles = [components.buttonText, {}];
+		const finalButtonStyles = [components.button, {}];
 
-		if (small) {
-			finalTextStyles.push({ fontSize: 14 });
-			finalButtonStyles.push(styles.buttonSmall);
-		}
-		if (onlyText) {
-			finalTextStyles.push({ color: colors.text.main });
-			finalButtonStyles.push(styles.buttonOnlyText);
-		}
 		if (disabled) {
-			finalButtonStyles.push(styles.buttonDisabled);
+			finalButtonStyles.push(components.buttonDisabled);
 		}
-		if (aboveKeyboard) {
-			finalButtonStyles.push(styles.buttonAboveKeyboard);
+		if (inactive) {
+			finalButtonStyles.push(components.buttonDisabled);
+			finalTextStyles.push({ color: colors.text.light });
+		}
+		if (fluid) {
+			finalButtonStyles.push(components.buttonFluid);
+			finalTextStyles.push({ textAlign: 'center' });
+		}
+		if (negative) {
+			finalButtonStyles.push({ backgroundColor: colors.background.negative });
+		}
+		if (secondary) {
+			finalButtonStyles.push({
+				backgroundColor: colors.background.accentMedium
+			});
+			finalTextStyles.push({ color: colors.text.dark });
+		}
+		if (active) {
+			finalTextStyles.push({ fontWeight: 'bold' });
 		}
 
 		return Platform.OS === 'android' ? (
@@ -80,16 +89,7 @@ export default class Button extends React.PureComponent<{
 				testID={testID}
 			>
 				<View style={[finalButtonStyles, style]}>
-					<Text
-						style={[
-							fontStyles.h1,
-							styles.buttonText,
-							finalTextStyles,
-							textStyles
-						]}
-					>
-						{title}
-					</Text>
+					<Text style={[finalTextStyles]}>{title}</Text>
 				</View>
 			</TouchableNativeFeedback>
 		) : (
@@ -100,48 +100,8 @@ export default class Button extends React.PureComponent<{
 				testID={testID}
 				style={[finalButtonStyles, style]}
 			>
-				<Text
-					style={[
-						fontStyles.h1,
-						styles.buttonText,
-						finalTextStyles,
-						textStyles
-					]}
-				>
-					{title}
-				</Text>
+				<Text style={[finalTextStyles]}>{title}</Text>
 			</TouchableOpacity>
 		);
 	}
 }
-
-const styles = StyleSheet.create({
-	button: {
-		alignSelf: 'center',
-		backgroundColor: colors.text.main,
-		borderRadius: 60,
-		height: 48,
-		justifyContent: 'center',
-		marginVertical: 12,
-		paddingHorizontal: 40
-	},
-	buttonAboveKeyboard: {
-		bottom: 56,
-		position: 'absolute'
-	},
-	buttonDisabled: {
-		backgroundColor: colors.background.card
-	},
-	buttonOnlyText: {
-		backgroundColor: colors.background.app,
-		elevation: 8
-	},
-	buttonSmall: {
-		height: 40,
-		marginVertical: 8,
-		paddingHorizontal: 32
-	},
-	buttonText: {
-		...fontStyles.a_button
-	}
-});

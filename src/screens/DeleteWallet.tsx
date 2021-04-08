@@ -16,38 +16,45 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext } from 'react';
+import { View, Text } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
-import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import ScreenHeading from 'components/ScreenHeading';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { alertError } from 'utils/alertUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 
 type Props = NavigationAccountIdentityProps<'DeleteWallet'>;
 
 function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { setAlert } = useContext(AlertStateContext);
 	const { identity } = route.params;
 
 	const deleteWallet = async (): Promise<void> => {
 		try {
-			resetNavigationTo(navigation, 'Wallet');
-			await accountsStore.deleteWallet(identity);
+			resetNavigationTo(navigation, 'Settings');
+			accountsStore.deleteWallet(identity);
+			showMessage('Wallet deleted.');
 		} catch (err) {
 			console.error(err);
-			alertError(setAlert, "Can't delete wallet");
+			showMessage('Failed to delete wallet.');
 		}
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title="Delete Wallet" />
-			<Button title="Delete" onPress={deleteWallet} />
-		</SafeAreaViewContainer>
+		<View style={components.page}>
+			<Text style={components.textBlock}>Delete this wallet?</Text>
+			<Text style={components.textBlock}>
+				You will not be able to recover it unless you have its recovery key.
+			</Text>
+			<Button
+				title="Delete"
+				onPress={deleteWallet}
+				fluid={true}
+				negative={true}
+			/>
+		</View>
 	);
 }
 

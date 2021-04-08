@@ -1,41 +1,13 @@
 import React, { ReactNode } from 'react';
-import {
-	ScrollView,
-	ScrollViewProps,
-	StyleSheet,
-	ViewProps
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView } from 'react-native';
 
-import { containerStyles } from 'styles';
-
-interface SafeAreaContainerProps extends ViewProps {
+export const SafeAreaScrollViewContainer = (props: {
 	children?: ReactNode | ReactNode[];
-}
-
-interface SafeAreaScrollViewProps extends ScrollViewProps {
-	children?: ReactNode | ReactNode[];
-}
-
-export const SafeAreaViewContainer = (
-	props: SafeAreaContainerProps
-): React.ReactElement => (
-	<SafeAreaView
+}): React.ReactElement => (
+	<ScrollView
 		{...props}
-		style={StyleSheet.flatten([containerStyles.background, props.style])}
+		bounces={false}
+		style={props.style}
 		children={props.children}
 	/>
-);
-
-export const SafeAreaScrollViewContainer = (
-	props: SafeAreaScrollViewProps
-): React.ReactElement => (
-	<SafeAreaView style={containerStyles.background}>
-		<ScrollView
-			{...props}
-			bounces={false}
-			style={StyleSheet.flatten([containerStyles.background, props.style])}
-			children={props.children}
-		/>
-	</SafeAreaView>
 );

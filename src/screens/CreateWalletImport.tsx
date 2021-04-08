@@ -16,22 +16,19 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
-import { colors } from 'styles';
+import { components } from 'styles';
 import { AccountsContext } from 'stores/AccountsContext';
-import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
 import { NavigationProps } from 'types/props';
 import { validateSeed } from 'utils/account';
-import AccountSeed from 'components/AccountSeed';
+import AccountSeedTextInput from 'components/AccountSeedTextInput';
 import { resetNavigationTo } from 'utils/navigationHelpers';
-import { alertError, alertIdentityCreationError } from 'utils/alertUtils';
-import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 import { useNewSeedRef } from 'utils/seedRefHooks';
-import KeyboardScrollView from 'components/KeyboardScrollView';
 
 function CreateWalletImport({
 	navigation
@@ -40,7 +37,6 @@ function CreateWalletImport({
 	const defaultSeedValidObject = validateSeed('', false);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const { setAlert } = useContext(AlertStateContext);
 	const createSeedRefWithNewSeed = useNewSeedRef();
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
@@ -71,21 +67,20 @@ function CreateWalletImport({
 			setSeedPhrase('');
 			resetNavigationTo(navigation, 'Wallet', { isNew: true });
 		} catch (e) {
-			alertIdentityCreationError(setAlert, e.message);
+			showMessage('Could not find a valid wallet for the seed: ' + e.message);
 		}
 	};
 
 	const onRecoverConfirm = (): void | Promise<void> => {
 		if (!isSeedValid.valid) {
-			return alertError(setAlert, `${isSeedValid.reason}`);
+			return showMessage(isSeedValid.reason);
 		}
 		return onRecoverIdentity();
 	};
 
 	return (
-		<KeyboardScrollView bounces={false} style={styles.body}>
-			<ScreenHeading title={'Import Wallet'} />
-			<AccountSeed
+		<View style={components.page}>
+			<AccountSeedTextInput
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
@@ -93,24 +88,17 @@ function CreateWalletImport({
 			/>
 			<Button
 				title={'Import'}
-				onPress={onRecoverConfirm}
 				disabled={!isSeedValid.valid}
+				onPress={onRecoverConfirm}
+				fluid={true}
 			/>
-			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
-		</KeyboardScrollView>
+			<Button
+				title={'Go back'}
+				onPress={(): void => navigation.goBack()}
+				fluid={true}
+			/>
+		</View>
 	);
 }
 
 export default CreateWalletImport;
-
-const styles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		overflow: 'hidden'
-	},
-	btnBox: {
-		alignContent: 'center',
-		marginTop: 32
-	}
-});

@@ -16,18 +16,14 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useContext, useMemo } from 'react';
-import { FlatList } from 'react-native';
+import { View, FlatList } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 
+import { components } from 'styles';
 import Separator from 'components/Separator';
 import { AddNetworkCard } from 'components/AddNetworkCard';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import ScreenHeading from 'components/ScreenHeading';
-import {
-	SubstrateNetworkKeys,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
+import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
-import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import {
 	isEthereumNetworkParams,
@@ -35,7 +31,6 @@ import {
 	NetworkParams
 } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { alertPathDerivationError } from 'utils/alertUtils';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys } from 'utils/identitiesUtils';
 import { resetNavigationTo } from 'utils/navigationHelpers';
@@ -52,11 +47,19 @@ function AddNetwork({
 	const { getSubstrateNetwork, allNetworks } = networkContextState;
 	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
 
-	const { setAlert } = useContext(AlertStateContext);
 	const onNetworkChosen = async (
 		networkKey: string,
 		networkParams: NetworkParams
 	): Promise<void> => {
+		// remove existing network
+		if (isSubstrateNetworkParams(networkParams)) {
+			const { pathId } = networkParams;
+			accountsStore.deleteSubstratePath(`//${pathId}`, networkContextState);
+		} else {
+			accountsStore.deleteEthereumAddress(networkKey);
+		}
+
+		// add new network
 		if (isSubstrateNetworkParams(networkParams)) {
 			// derive substrate account
 			const { pathId } = networkParams;
@@ -69,10 +72,11 @@ function AddNetwork({
 					`${networkParams.title} root`
 				);
 			} catch (error) {
-				alertPathDerivationError(setAlert, error.message);
-				console.log(error.message);
+				showMessage(
+					'Could not derive a valid account from the seed: ' + error.message
+				);
+				return;
 			}
-			resetNavigationTo(navigation, 'Wallet');
 		} else {
 			// derive ethereum account
 			try {
@@ -82,11 +86,13 @@ function AddNetwork({
 					allNetworks
 				);
 			} catch (error) {
-				alertPathDerivationError(setAlert, error.message);
-				console.log(error.message);
+				showMessage(
+					'Could not derive a valid account from the seed: ' + error.message
+				);
+				return;
 			}
-			resetNavigationTo(navigation, 'Wallet');
 		}
+		resetNavigationTo(navigation, 'Wallet');
 	};
 
 	const availableNetworks = useMemo(
@@ -95,7 +101,7 @@ function AddNetwork({
 	);
 
 	const networkList = Array.from(allNetworks.entries())
-		.filter(([networkKey, network]) => {
+		.filter(([networkKey, _network]) => {
 			if (networkKey === UnknownNetworkKeys.UNKNOWN) return false;
 			if (isNew) return true;
 			if (availableNetworks.includes(networkKey)) return false;
@@ -128,12 +134,7 @@ function AddNetwork({
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			{isNew ? (
-				<ScreenHeading title={'Select a network'} />
-			) : (
-				<ScreenHeading title={'Add a network'} />
-			)}
+		<View style={components.page}>
 			<FlatList
 				data={networkListMainnets}
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
@@ -147,7 +148,7 @@ function AddNetwork({
 				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 			/>
-		</SafeAreaViewContainer>
+		</View>
 	);
 }
 

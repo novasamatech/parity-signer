@@ -27,7 +27,7 @@ import {
 import { Icon } from 'react-native-elements';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import { ButtonListener } from 'types/props';
 
 interface Props {
@@ -83,7 +83,7 @@ const ButtonIcon: FunctionComponent<Props> = ({
 		if (iconType === 'antdesign') {
 			return (
 				<AntIcon
-					color={iconColor || colors.text.main}
+					color={iconColor || colors.text.dark}
 					size={size - 6}
 					name={iconName}
 				/>
@@ -91,7 +91,7 @@ const ButtonIcon: FunctionComponent<Props> = ({
 		}
 		return (
 			<Icon
-				color={iconColor || colors.text.main}
+				color={iconColor || colors.text.dark}
 				size={size - 6}
 				name={iconName}
 				type={iconType}

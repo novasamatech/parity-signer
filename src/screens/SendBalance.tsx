@@ -16,30 +16,25 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState } from 'react';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { View } from 'react-native';
 
+import { components } from 'styles';
 import { NetworksContext } from 'stores/NetworkContext';
-import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AccountsStoreStateWithIdentity } from 'types/identityTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { RootStackParamList } from 'types/routes';
 import { withCurrentIdentity } from 'utils/HOC';
 import { getNetworkKey } from 'utils/identitiesUtils';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { ScreenHeadingWithNetworkIcon } from 'components/ScreenHeading';
 
 interface Props {
 	path: string;
 	networkKey: string;
-	navigation: StackNavigationProp<RootStackParamList, 'SendBalance'>;
 	accountsStore: AccountsStoreStateWithIdentity;
 }
 
 function SendBalance({
 	accountsStore,
-	navigation,
 	route
 }: NavigationAccountIdentityProps<'SendBalance'>): React.ReactElement {
 	const path = route.params.path;
@@ -49,8 +44,7 @@ function SendBalance({
 		accountsStore.state.currentIdentity,
 		networksContextState
 	);
-	const isUnknownNetwork = networkKey === UnknownNetworkKeys.UNKNOWN;
-	const formattedNetworkKey = isUnknownNetwork ? defaultNetworkKey : networkKey;
+	const networkParams = networksContextState.getNetwork(networkKey ?? '');
 
 	const [amount, setAmount] = useState('');
 	const onChangeAmount = async (name: string): Promise<void> => {
@@ -68,12 +62,9 @@ function SendBalance({
 	};
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeadingWithNetworkIcon
-				title="Send Balance"
-				networkKey={formattedNetworkKey}
-			/>
+		<View style={components.page}>
 			<TextInput
+				suffix={networkParams.unit}
 				label="Amount"
 				onChangeText={onChangeAmount}
 				value={amount}
@@ -86,12 +77,13 @@ function SendBalance({
 				label="Recipient"
 				onChangeText={onChangeRecipient}
 				value={recipient}
-				placeholder="(address)"
+				placeholder="Address"
 				autoCorrect={false}
 			/>
 			<Button
 				title="Send"
-				onPress={() => {
+				fluid={true}
+				onPress={(): void => {
 					return;
 				}}
 			/>
@@ -99,16 +91,18 @@ function SendBalance({
 				label="Add to Address Book"
 				onChangeText={onChangeNewAddressBookEntry}
 				value={newAddressBookEntry}
-				placeholder="(address)"
+				placeholder="Address"
+				fluid={true}
 				autoCorrect={false}
 			/>
 			<Button
 				title="Add"
-				onPress={() => {
+				fluid={true}
+				onPress={(): void => {
 					return;
 				}}
 			/>
-		</SafeAreaViewContainer>
+		</View>
 	);
 }
 

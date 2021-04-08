@@ -20,6 +20,7 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, View, ViewStyle } from 'react-native';
 
 import { qrCode, qrCodeHex } from 'utils/native';
+import { colors } from 'styles/index';
 
 interface Props {
 	data: string;
@@ -61,7 +62,7 @@ export default function QrView(props: Props): React.ReactElement {
 			style={[
 				{
 					alignItems: 'center',
-					backgroundColor: 'white',
+					backgroundColor: colors.background.white,
 					flexBasis,
 					height: flexBasis,
 					justifyContent: 'center',

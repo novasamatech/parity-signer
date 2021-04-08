@@ -23,7 +23,7 @@ import { Icon } from 'react-native-elements';
 
 import TouchableItem from './TouchableItem';
 
-import { colors, fontStyles } from 'styles';
+import { colors, fontStyles } from 'styles/index';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
 import { RootStackParamList } from 'types/routes';
@@ -43,9 +43,11 @@ export default function NavigationTab(): React.ReactElement {
 			>
 				<Icon
 					color={
-						route.name === 'Wallet' ? colors.text.main : colors.text.disabled
+						route.name === 'Wallet'
+							? colors.navText.main
+							: colors.navText.disabled
 					}
-					size={fontStyles.i_large.fontSize}
+					size={22}
 					name="account-balance-wallet"
 					type="material"
 				/>
@@ -68,9 +70,11 @@ export default function NavigationTab(): React.ReactElement {
 			>
 				<Icon
 					color={
-						route.name === 'Settings' ? colors.text.main : colors.text.disabled
+						route.name === 'Settings'
+							? colors.navText.main
+							: colors.navText.disabled
 					}
-					size={fontStyles.i_large.fontSize}
+					size={22}
 					name="settings"
 					type="material"
 				/>
@@ -91,19 +95,17 @@ export default function NavigationTab(): React.ReactElement {
 const styles = StyleSheet.create({
 	disabledTextLabel: {
 		...fontStyles.a_text,
-		color: colors.text.disabled,
+		color: colors.navText.disabled,
 		marginTop: 4
 	},
 	item: {
 		alignItems: 'center',
 		alignSelf: 'flex-start',
-		backgroundColor: colors.background.os,
-		borderBottomColor: colors.background.app,
-		borderBottomWidth: 1,
+		backgroundColor: colors.background.dark,
 		flexGrow: 1,
 		justifyContent: 'center',
-		paddingBottom: 30,
-		paddingTop: 20
+		paddingBottom: 34,
+		paddingTop: 16
 	},
 	row: {
 		flexDirection: 'row',
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
 	},
 	textLabel: {
 		...fontStyles.a_text,
-		color: colors.text.main,
+		color: colors.navText.main,
 		marginTop: 4
 	}
 });

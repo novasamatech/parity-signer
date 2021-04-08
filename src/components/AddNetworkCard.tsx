@@ -16,11 +16,11 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement, useContext } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
+import { fontStyles } from 'styles';
 import AccountIcon from 'components/AccountIcon';
 import TouchableItem from 'components/TouchableItem';
-import AccountPrefixedTitle from 'components/AccountPrefixedTitle';
 import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import { ButtonListener } from 'types/props';
@@ -51,7 +51,9 @@ export function AddNetworkCard({
 			<View style={styles.content}>
 				<AccountIcon address={''} network={networkParams} style={styles.icon} />
 				<View style={styles.desc}>
-					<AccountPrefixedTitle title={title} />
+					<Text numberOfLines={1} style={[fontStyles.h2, { marginTop: -2 }]}>
+						{title}
+					</Text>
 				</View>
 			</View>
 		</TouchableItem>

@@ -18,13 +18,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
+import { showMessage } from 'react-native-flash-message';
 
-import { colors, fontStyles } from 'styles';
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
+import { components } from 'styles';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
-import ScreenHeading from 'components/ScreenHeading';
 import Button from 'components/Button';
 
 function CreateWallet2({
@@ -35,16 +34,13 @@ function CreateWallet2({
 	const [wordsNumber, setWordsNumber] = useState(12);
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
-		const textStyles = wordsNumber === buttonWordsNumber && {
-			color: colors.signal.main
-		};
 		return (
 			<Button
 				title={`${buttonWordsNumber} words`}
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
-				onlyText
-				small
-				textStyles={{ ...textStyles }}
+				fluid={true}
+				inactive={wordsNumber !== buttonWordsNumber}
+				secondary={wordsNumber === buttonWordsNumber}
 			/>
 		);
 	};
@@ -60,54 +56,55 @@ function CreateWallet2({
 	}, [route.params, wordsNumber]);
 
 	return (
-		<SafeAreaViewContainer>
-			<ScreenHeading title={'Key Phrase'} />
-			<Text>
-				Write these words down on paper. Keep the backup paper safe. These words
-				allow anyone to recover this account and access its funds.
+		<View style={components.page}>
+			<Text style={components.textBlock}>
+				Save this phrase somewhere secure.
 			</Text>
-			<View style={styles.mnemonicSelectionRow}>
-				{renderTextButton(12)}
-				{renderTextButton(24)}
-			</View>
+			<Text style={components.textBlock}>
+				Do not screenshot or save it on your computer, or anyone with access
+				could compromise your account.
+			</Text>
 			<TouchableItem
 				onPress={(): void => {
 					// only allow the copy of the key phrase in dev environment
 					if (__DEV__) {
+						showMessage('Recovery phrase copied.');
 						Clipboard.setString(seedPhrase);
 					}
 				}}
+				style={components.textBlockPreformatted}
 			>
-				<Text style={[fontStyles.t_seed, { marginHorizontal: 16 }]}>
-					{seedPhrase}
-				</Text>
+				<Text style={components.textBlockPreformattedText}>{seedPhrase}</Text>
 			</TouchableItem>
+			<View style={styles.mnemonicSelectionRow}>
+				<View style={styles.mnemonicSelectionCol}>{renderTextButton(12)}</View>
+				<View style={styles.mnemonicSelectionCol}>{renderTextButton(24)}</View>
+			</View>
 			<Button
 				title={'Continue'}
 				onPress={(): void =>
 					navigation.navigate('CreateWallet3', { seedPhrase })
 				}
+				fluid={true}
 			/>
-			<Button title={'Go back'} onPress={(): void => navigation.goBack()} />
-		</SafeAreaViewContainer>
+			<Button
+				title={'Go back'}
+				onPress={(): void => navigation.goBack()}
+				fluid={true}
+			/>
+		</View>
 	);
 }
 
 export default CreateWallet2;
 
 const styles = StyleSheet.create({
-	body: {
-		padding: 16
-	},
-	mnemonicSelectionButton: {
-		backgroundColor: colors.background.app,
+	mnemonicSelectionCol: {
 		flex: 1,
-		height: 30,
-		paddingHorizontal: 4,
-		paddingVertical: 4
+		flexDirection: 'row',
+		paddingBottom: 20
 	},
 	mnemonicSelectionRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-around'
+		flexDirection: 'row'
 	}
 });

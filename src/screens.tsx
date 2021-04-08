@@ -16,20 +16,13 @@
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	useNavigation,
-	useNavigationState,
-	useRoute
-} from '@react-navigation/native';
-import {
 	CardStyleInterpolators,
-	createStackNavigator,
-	HeaderBackButton
+	createStackNavigator
 } from '@react-navigation/stack';
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { Text } from 'react-native';
 
-import { colors, fonts, headerHeight } from 'styles';
-import testIDs from 'e2e/testIDs';
+import { colors, fonts } from 'styles/index';
 import Wallet from 'modules/main/screens/Wallet';
 import AddNetwork from 'screens/AddNetwork';
 import ShowRecoveryPhrase from 'screens/ShowRecoveryPhrase';
@@ -48,75 +41,80 @@ import { RootStackParamList } from 'types/routes';
 
 const ScreenStack = createStackNavigator<RootStackParamList>();
 
-const HeaderLeft = (): React.ReactElement => {
-	const route = useRoute();
-	const isFirstRouteInParent = useNavigationState(
-		state => state.routes[0].key === route.key
-	);
-	return isFirstRouteInParent ? <HeaderLeftHome /> : <HeaderLeftWithBack />;
-};
-
 const globalStackNavigationOptions = {
-	//more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
+	// more transition animations refer to: https://reactnavigation.org/docs/en/stack-navigator.html#animations
 	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
 	headerBackTitleStyle: {
-		color: colors.text.main
+		color: colors.navText.main
 	},
 	headerBackTitleVisible: false,
-	headerLeft: (): React.ReactElement => <HeaderLeft />,
-	headerLeftContainerStyle: {
-		height: headerHeight,
-		paddingLeft: 8
-	},
 	headerStyle: {
-		backgroundColor: colors.background.app,
-		borderBottomColor: colors.background.app,
+		backgroundColor: colors.background.accent,
 		borderBottomWidth: 0,
 		elevation: 0,
-		height: headerHeight,
+		height: 112,
 		shadowColor: 'transparent'
 	},
-	headerTintColor: colors.text.main,
-	headerTitle: (): React.ReactNode => null
-};
-
-const HeaderLeftHome = (): React.ReactElement => {
-	return (
-		<View
-			style={{
-				alignItems: 'center',
-				flexDirection: 'row',
-				height: 48,
-				paddingLeft: 15
-			}}
-		>
+	headerTintColor: colors.text.white,
+	headerTitle: (t): React.ReactNode => {
+		let title;
+		switch (t.children) {
+			case 'AddNetwork':
+				title = 'Select Network';
+				break;
+			case 'ShowRecoveryPhrase':
+				title = 'Show Recovery Phrase';
+				break;
+			case 'RenameWallet':
+				title = 'Rename Wallet';
+				break;
+			case 'DeleteWallet':
+				title = 'Delete Wallet';
+				break;
+			case 'CreateWallet':
+				title = 'Create Wallet';
+				break;
+			case 'CreateWallet2':
+				title = 'Create Wallet';
+				break;
+			case 'CreateWallet3':
+				title = 'Confirm Recovery Phrase';
+				break;
+			case 'CreateWalletImport':
+				title = 'Create Wallet';
+				break;
+			case 'Settings':
+				title = 'Settings';
+				break;
+			case 'ReceiveBalance':
+				title = 'Receive Balance';
+				break;
+			case 'SendBalance':
+				title = 'Send Balance';
+				break;
+			case 'SignTransaction':
+				title = 'Sign Transaction';
+				break;
+			case 'SignTransactionFinish':
+				title = 'Sign Transaction';
+				break;
+			default:
+				title = t.children;
+		}
+		return (
 			<Text
 				style={{
-					color: colors.text.main,
-					fontFamily: fonts.light,
-					fontSize: 14,
-					marginRight: 2,
-					marginTop: 15
+					color: colors.text.white,
+					fontFamily: fonts.bold,
+					fontSize: 24,
+					textAlign: 'left'
 				}}
 			>
-				Layer Wallet
+				{title}
 			</Text>
-		</View>
-	);
-};
-
-const HeaderLeftWithBack = (): React.ReactElement => {
-	const navigation = useNavigation();
-	return (
-		<View testID={testIDs.Header.headerBackButton}>
-			<HeaderBackButton
-				labelStyle={globalStackNavigationOptions.headerBackTitleStyle}
-				labelVisible={false}
-				tintColor={colors.text.main}
-				onPress={(): void => navigation.goBack()}
-			/>
-		</View>
-	);
+		);
+	},
+	headerTitleAlign: 'left'
 };
 
 export const AppNavigator = (): React.ReactElement => (

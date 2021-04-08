@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Layer Wallet. If not, see <http://www.gnu.org/licenses/>.
 
-import { colors } from 'styles';
+import { colors } from 'styles/index';
 import {
 	EthereumNetworkDefaultConstants,
 	EthereumNetworkParams,
@@ -64,7 +64,7 @@ export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
 });
 
 export const unknownNetworkParams: UnknownNetworkParams = {
-	color: colors.signal.error,
+	color: colors.text.error,
 	order: 99,
 	pathId: unknownNetworkPathId,
 	prefix: 2,
@@ -106,13 +106,13 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
-		logo: require('res/img/logos/Kulupu.png'),
 		isTestnet: false,
+		logo: require('res/img/logos/Kulupu.png'),
 		order: 5,
 		pathId: 'kulupu',
 		prefix: 16,
 		title: 'Kulupu',
-		unit: 'KULU',
+		unit: 'KLP',
 		url: 'wss://rpc.kulupu.corepaper.org/ws'
 	},
 	[SubstrateNetworkKeys.KUSAMA]: {
