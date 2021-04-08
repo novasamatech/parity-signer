@@ -18,11 +18,12 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import React, { useContext } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 
 import { colors, components, fontStyles } from 'styles';
 import OnBoardingView from 'modules/main/components/OnBoarding';
+import Button from 'components/Button';
 import ButtonIcon from 'components/ButtonIcon';
 import Separator from 'components/Separator';
 import NavigationTab from 'components/NavigationTab';
@@ -30,7 +31,6 @@ import { AccountsContext } from 'stores/AccountsContext';
 import { Identity } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import { RootStackParamList } from 'types/routes';
-import testIDs from 'e2e/testIDs';
 import { getIdentitySeed, getIdentityName } from 'utils/identitiesUtils';
 
 function ButtonWithArrow(props: {
@@ -59,47 +59,53 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 
 		return (
 			<View key={identity.encryptedSeed}>
-				<ButtonIcon
-					title={title}
-					iconType="antdesign"
-					iconName="user"
-					iconSize={24}
-					style={styles.indentedButton}
-					textStyle={fontStyles.h2}
-				/>
-				{currentIdentity.encryptedSeed !== identity.encryptedSeed ? (
-					<ButtonWithArrow
-						title="Select this wallet"
-						onPress={(): void => {
-							accountsStore.selectIdentity(identity);
-							showMessage('Wallet switched.');
-						}}
+				<View style={styles.card}>
+					<ButtonIcon
+						title={title}
+						iconType="antdesign"
+						iconName="user"
+						iconSize={24}
+						style={styles.indentedButton}
+						textStyle={fontStyles.h2}
 					/>
-				) : null}
-				<ButtonWithArrow
-					title="Rename"
-					onPress={(): void =>
-						navigation.navigate('RenameWallet', {
-							accountsStore,
-							identity,
-							navigation
-						})
-					}
-				/>
-				<ButtonWithArrow
-					title="Delete"
-					onPress={(): void =>
-						navigation.navigate('DeleteWallet', {
-							accountsStore,
-							identity,
-							navigation
-						})
-					}
-				/>
-				<ButtonWithArrow
-					title="Show Key Phrase"
-					onPress={(): Promise<void> => showRecoveryPhrase(identity)}
-				/>
+					{currentIdentity.encryptedSeed !== identity.encryptedSeed ? (
+						<ButtonWithArrow
+							title="Select this wallet"
+							onPress={(): void => {
+								accountsStore.selectIdentity(identity);
+								showMessage('Wallet switched.');
+							}}
+						/>
+					) : null}
+					{currentIdentity.encryptedSeed === identity.encryptedSeed ? (
+						<>
+							<ButtonWithArrow
+								title="Rename"
+								onPress={(): void =>
+									navigation.navigate('RenameWallet', {
+										accountsStore,
+										identity,
+										navigation
+									})
+								}
+							/>
+							<ButtonWithArrow
+								title="Delete"
+								onPress={(): void =>
+									navigation.navigate('DeleteWallet', {
+										accountsStore,
+										identity,
+										navigation
+									})
+								}
+							/>
+							<ButtonWithArrow
+								title="Show Key Phrase"
+								onPress={(): Promise<void> => showRecoveryPhrase(identity)}
+							/>
+						</>
+					) : null}
+				</View>
 				<Separator style={{ marginBottom: 0 }} />
 			</View>
 		);
@@ -107,18 +113,15 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 
 	return (
 		<>
-			<View style={components.pageWide}>
+			<View style={components.pageWideFullBleed}>
 				{identities.map(renderIdentity)}
-				<ButtonIcon
-					title="Add wallet"
-					testID={testIDs.IdentitiesSwitch.addIdentityButton}
-					onPress={(): void => navigation.navigate('CreateWallet')}
-					iconName="plus"
-					iconType="antdesign"
-					iconSize={24}
-					textStyle={fontStyles.t_big}
-					style={styles.indentedButton}
-				/>
+				<View style={{ paddingHorizontal: 32, paddingVertical: 16 }}>
+					<Button
+						title="Add wallet"
+						onPress={(): void => navigation.navigate('CreateWallet')}
+						fluid={true}
+					/>
+				</View>
 			</View>
 			<View style={styles.tab}>
 				<NavigationTab />
@@ -129,10 +132,8 @@ function Settings({}: NavigationProps<'Settings'>): React.ReactElement {
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: colors.background.app,
-		borderRadius: 4,
-		paddingBottom: 16,
-		paddingTop: 16
+		paddingBottom: 6,
+		paddingTop: 14
 	},
 	container: {
 		justifyContent: 'center',

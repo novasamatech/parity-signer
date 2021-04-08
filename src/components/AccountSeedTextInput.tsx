@@ -42,7 +42,7 @@ interface Props extends TextInputProps {
 	valid: boolean;
 }
 
-export default function AccountSeed({
+export default function AccountSeedTextInput({
 	valid,
 	onChangeText,
 	...props
@@ -147,15 +147,11 @@ export default function AccountSeed({
 		);
 	}
 
-	const invalidStyles = !valid ? styles.invalidInput : {};
+	const invalidStyles = !valid ? styles.inputInvalid : {};
 	return (
 		<View>
 			<TextInput
-				style={StyleSheet.flatten([
-					components.textBlockPreformatted,
-					styles.input,
-					invalidStyles
-				])}
+				style={StyleSheet.flatten([styles.input, invalidStyles])}
 				multiline
 				autoCorrect={false}
 				autoCompleteType="off"
@@ -168,19 +164,16 @@ export default function AccountSeed({
 				onChangeText={onNativeChangeText}
 				{...props}
 			/>
-			{value.length > 0 && renderSuggestions()}
+			{renderSuggestions()}
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	body: {
-		flexDirection: 'column'
-	},
 	input: {
-		borderBottomColor: colors.border.light
+		minHeight: 140
 	},
-	invalidInput: {
+	inputInvalid: {
 		borderBottomColor: colors.border.signal,
 		borderColor: colors.border.signal
 	},
@@ -195,12 +188,13 @@ const styles = StyleSheet.create({
 	suggestions: {
 		alignItems: 'center',
 		backgroundColor: colors.background.card,
-		borderColor: colors.background.card,
+		borderColor: colors.border.light,
+		borderRadius: 8,
 		borderWidth: 0.5,
+		color: colors.text.dark,
 		flexDirection: 'row',
 		height: 32,
-		marginHorizontal: 16,
-		marginTop: -8,
+		marginBottom: 12,
 		overflow: 'hidden'
 	}
 });

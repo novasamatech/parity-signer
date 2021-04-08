@@ -96,15 +96,8 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 		return {
 			ListFooterComponent: (
 				<View style={{ marginBottom: 12, paddingHorizontal: 15 }}>
-					{availableNetworks.length !== 0 ? (
-						<Button
-							title="Sign a polkadot-js transaction"
-							onPress={(): void => navigation.navigate('SignTransaction')}
-							fluid={true}
-						/>
-					) : null}
 					<Button
-						title="Add a network"
+						title="Switch network"
 						onPress={(): void => navigation.navigate('AddNetwork')}
 						fluid={true}
 					/>

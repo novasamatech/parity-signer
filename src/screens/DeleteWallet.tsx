@@ -44,13 +44,16 @@ function DeleteWallet({ navigation, route }: Props): React.ReactElement {
 
 	return (
 		<View style={components.page}>
-			<Text style={components.textBlock}>
-				Delete this wallet?
-			</Text>
+			<Text style={components.textBlock}>Delete this wallet?</Text>
 			<Text style={components.textBlock}>
 				You will not be able to recover it unless you have its recovery key.
 			</Text>
-			<Button title="Delete" onPress={deleteWallet} fluid={true} negative={true} />
+			<Button
+				title="Delete"
+				onPress={deleteWallet}
+				fluid={true}
+				negative={true}
+			/>
 		</View>
 	);
 }

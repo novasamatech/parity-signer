@@ -22,6 +22,7 @@ export const colors = {
 		accent: '#5d7ff3',
 		accentDark: '#4d6fe3',
 		accentLight: '#eff2fe',
+		accentMedium: '#E1E5F8',
 		app: '#fff',
 		button: '#f7f9ff',
 		dark: '#000000',
@@ -71,7 +72,7 @@ export const components = {
 		paddingHorizontal: 28
 	},
 	buttonDisabled: {
-		backgroundColor: colors.background.card
+		backgroundColor: colors.background.accentLight
 	},
 	buttonFluid: {
 		textAlign: 'center',
@@ -93,6 +94,10 @@ export const components = {
 		flex: 1,
 		paddingTop: 24
 	},
+	pageWideFullBleed: {
+		backgroundColor: colors.text.white,
+		flex: 1
+	},
 	textBlock: {
 		fontFamily: fonts.regular,
 		fontSize: 18,
@@ -100,8 +105,8 @@ export const components = {
 		marginBottom: 8
 	},
 	textBlockPreformatted: {
-		borderRadius: 10,
 		backgroundColor: colors.background.accentDark,
+		borderRadius: 10,
 		marginVertical: 16,
 		minHeight: 100,
 		paddingHorizontal: 18,
@@ -110,7 +115,8 @@ export const components = {
 	textBlockPreformattedText: {
 		color: colors.text.white,
 		fontFamily: fonts.regular,
-		fontSize: 18
+		fontSize: 18,
+		minHeight: 140
 	},
 	textInput: {
 		marginVertical: 12

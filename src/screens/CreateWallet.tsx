@@ -29,9 +29,14 @@ function CreateWallet({
 	navigation
 }: NavigationProps<'CreateWallet'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const clearIdentity = useRef(() =>
-		accountsStore.updateNewIdentity(emptyIdentity())
-	);
+	const clearIdentity = useRef(() => {
+		const newIdentity = emptyIdentity();
+		const currentAccounts = Array.from(
+			accountsStore.state.currentIdentity?.addresses.entries()
+		);
+		newIdentity.name = `Wallet ${currentAccounts.length + 1}`;
+		return accountsStore.updateNewIdentity(newIdentity);
+	});
 
 	useEffect((): (() => void) => {
 		clearIdentity.current();
@@ -48,9 +53,10 @@ function CreateWallet({
 				onChangeText={updateName}
 				value={accountsStore.state.newIdentity.name}
 				placeholder="Wallet name"
+				autofocus={true}
 			/>
 			<Button
-				title="New wallet"
+				title="Create wallet"
 				onPress={(): void => navigation.navigate('CreateWallet2')}
 				fluid={true}
 			/>
@@ -58,6 +64,7 @@ function CreateWallet({
 				title="Import wallet"
 				onPress={(): void => navigation.navigate('CreateWalletImport')}
 				fluid={true}
+				secondary={true}
 			/>
 		</View>
 	);

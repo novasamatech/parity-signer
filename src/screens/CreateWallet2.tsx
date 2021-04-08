@@ -20,7 +20,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import { showMessage } from 'react-native-flash-message';
 
-import { components, colors } from 'styles';
+import { components } from 'styles';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
@@ -38,7 +38,9 @@ function CreateWallet2({
 			<Button
 				title={`${buttonWordsNumber} words`}
 				onPress={(): void => setWordsNumber(buttonWordsNumber)}
-				active={wordsNumber === buttonWordsNumber}
+				fluid={true}
+				inactive={wordsNumber !== buttonWordsNumber}
+				secondary={wordsNumber === buttonWordsNumber}
 			/>
 		);
 	};
@@ -62,10 +64,6 @@ function CreateWallet2({
 				Do not screenshot or save it on your computer, or anyone with access
 				could compromise your account.
 			</Text>
-			<View style={styles.mnemonicSelectionRow}>
-				{renderTextButton(12)}
-				{renderTextButton(24)}
-			</View>
 			<TouchableItem
 				onPress={(): void => {
 					// only allow the copy of the key phrase in dev environment
@@ -78,6 +76,10 @@ function CreateWallet2({
 			>
 				<Text style={components.textBlockPreformattedText}>{seedPhrase}</Text>
 			</TouchableItem>
+			<View style={styles.mnemonicSelectionRow}>
+				<View style={styles.mnemonicSelectionCol}>{renderTextButton(12)}</View>
+				<View style={styles.mnemonicSelectionCol}>{renderTextButton(24)}</View>
+			</View>
 			<Button
 				title={'Continue'}
 				onPress={(): void =>
@@ -97,15 +99,12 @@ function CreateWallet2({
 export default CreateWallet2;
 
 const styles = StyleSheet.create({
-	mnemonicSelectionButton: {
-		backgroundColor: colors.background.app,
+	mnemonicSelectionCol: {
 		flex: 1,
-		height: 30,
-		paddingHorizontal: 4,
-		paddingVertical: 4
+		flexDirection: 'row',
+		paddingBottom: 20
 	},
 	mnemonicSelectionRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-around'
+		flexDirection: 'row'
 	}
 });

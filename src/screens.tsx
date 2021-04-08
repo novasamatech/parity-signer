@@ -60,7 +60,7 @@ const globalStackNavigationOptions = {
 		let title;
 		switch (t.children) {
 			case 'AddNetwork':
-				title = 'Add Network';
+				title = 'Switch Network';
 				break;
 			case 'ShowRecoveryPhrase':
 				title = 'Show Recovery Phrase';
@@ -78,7 +78,7 @@ const globalStackNavigationOptions = {
 				title = 'Create Wallet';
 				break;
 			case 'CreateWallet3':
-				title = 'Verify Recovery Phrase';
+				title = 'Confirm Recovery Phrase';
 				break;
 			case 'CreateWalletImport':
 				title = 'Create Wallet';

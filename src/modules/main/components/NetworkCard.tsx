@@ -75,17 +75,8 @@ export function NetworkCard({
 	};
 	const onOptionSelect = async (value: string): Promise<void> => {
 		switch (value) {
-			case 'PathDelete':
-				if (isSubstrateNetworkParams(networkParams)) {
-					const { pathId } = networkParams;
-					accountsStore.deleteSubstratePath(
-						`//${pathId}`,
-						networksContextState
-					);
-				} else {
-					accountsStore.deleteEthereumAddress(networkKey);
-				}
-				resetNavigationTo(navigation, 'Wallet');
+			case 'SignTransaction':
+				navigation.navigate('SignTransaction');
 				break;
 		}
 	};
@@ -110,8 +101,8 @@ export function NetworkCard({
 						menuTriggerIconName={'more-vert'}
 						menuItems={[
 							{
-								text: `Remove ${title}`,
-								value: 'PathDelete'
+								text: 'Sign a polkadot-js transaction',
+								value: 'SignTransaction'
 							}
 						]}
 					/>

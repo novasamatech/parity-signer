@@ -24,7 +24,7 @@ import { AccountsContext } from 'stores/AccountsContext';
 import Button from 'components/Button';
 import { NavigationProps } from 'types/props';
 import { validateSeed } from 'utils/account';
-import AccountSeed from 'components/AccountSeed';
+import AccountSeedTextInput from 'components/AccountSeedTextInput';
 import { resetNavigationTo } from 'utils/navigationHelpers';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
@@ -80,13 +80,18 @@ function CreateWalletImport({
 
 	return (
 		<View style={components.page}>
-			<AccountSeed
+			<AccountSeedTextInput
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
 				valid={isSeedValid.valid}
 			/>
-			<Button title={'Import'} onPress={onRecoverConfirm} fluid={true} />
+			<Button
+				title={'Import'}
+				disabled={!isSeedValid.valid}
+				onPress={onRecoverConfirm}
+				fluid={true}
+			/>
 			<Button
 				title={'Go back'}
 				onPress={(): void => navigation.goBack()}

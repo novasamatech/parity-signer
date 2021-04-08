@@ -25,7 +25,7 @@ import { NavigationProps } from 'types/props';
 import Button from 'components/Button';
 import { useNewSeedRef } from 'utils/seedRefHooks';
 import { resetNavigationTo } from 'utils/navigationHelpers';
-import AccountSeed from 'components/AccountSeed';
+import AccountSeedTextInput from 'components/AccountSeedTextInput';
 
 function CreateWallet3({
 	navigation,
@@ -56,8 +56,8 @@ function CreateWallet3({
 
 	return (
 		<View style={components.page}>
-			<Text>Retype the key phrase as shown on the prior screen.</Text>
-			<AccountSeed
+			<Text style={components.textBlock}>Retype the key phrase.</Text>
+			<AccountSeedTextInput
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={createWallet}
 				returnKeyType="done"

@@ -32,13 +32,27 @@ export default class Button extends React.PureComponent<{
 	title: string;
 	onPress: ButtonListener;
 	disabled?: boolean;
+	inactive?: boolean;
 	fluid?: boolean;
 	negative?: boolean;
+	secondary?: boolean;
+	active?: boolean;
 	testID?: string;
 	style?: ViewStyle;
 }> {
 	render(): React.ReactElement {
-	  const { onPress, title, disabled, fluid, negative, testID, style } = this.props;
+		const {
+			onPress,
+			title,
+			disabled,
+			inactive,
+			fluid,
+			negative,
+			secondary,
+			active,
+			testID,
+			style
+		} = this.props;
 
 		const finalTextStyles = [components.buttonText, {}];
 		const finalButtonStyles = [components.button, {}];
@@ -46,12 +60,23 @@ export default class Button extends React.PureComponent<{
 		if (disabled) {
 			finalButtonStyles.push(components.buttonDisabled);
 		}
+		if (inactive) {
+			finalButtonStyles.push(components.buttonDisabled);
+			finalTextStyles.push({ color: colors.text.light });
+		}
 		if (fluid) {
 			finalButtonStyles.push(components.buttonFluid);
 			finalTextStyles.push({ textAlign: 'center' });
 		}
 		if (negative) {
 			finalButtonStyles.push({ backgroundColor: colors.background.negative });
+		}
+		if (secondary) {
+			finalButtonStyles.push({ backgroundColor: colors.background.accentMedium });
+			finalTextStyles.push({ color: colors.text.dark });
+		}
+		if (active) {
+			finalTextStyles.push({ fontWeight: 'bold' });
 		}
 
 		return Platform.OS === 'android' ? (

@@ -51,6 +51,15 @@ function AddNetwork({
 		networkKey: string,
 		networkParams: NetworkParams
 	): Promise<void> => {
+		// remove existing network
+		if (isSubstrateNetworkParams(networkParams)) {
+			const { pathId } = networkParams;
+			accountsStore.deleteSubstratePath(`//${pathId}`, networkContextState);
+		} else {
+			accountsStore.deleteEthereumAddress(networkKey);
+		}
+
+		// add new network
 		if (isSubstrateNetworkParams(networkParams)) {
 			// derive substrate account
 			const { pathId } = networkParams;
@@ -66,8 +75,8 @@ function AddNetwork({
 				showMessage(
 					'Could not derive a valid account from the seed: ' + error.message
 				);
+				return;
 			}
-			resetNavigationTo(navigation, 'Wallet');
 		} else {
 			// derive ethereum account
 			try {
@@ -80,9 +89,10 @@ function AddNetwork({
 				showMessage(
 					'Could not derive a valid account from the seed: ' + error.message
 				);
+				return;
 			}
-			resetNavigationTo(navigation, 'Wallet');
 		}
+		resetNavigationTo(navigation, 'Wallet');
 	};
 
 	const availableNetworks = useMemo(
