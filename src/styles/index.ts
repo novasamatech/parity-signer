@@ -117,7 +117,8 @@ export const components = {
 	},
 	pageWideFullBleed: {
 		backgroundColor: colors.text.white,
-		flex: 1
+		flex: 1,
+		minHeight: 100 // Unsure why but this prevents "Add Wallet" from breaking after first use
 	},
 	textBlock: {
 		fontFamily: fonts.regular,

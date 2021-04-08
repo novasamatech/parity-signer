@@ -127,7 +127,6 @@ const stackNavigationOptions = {
 			default:
 				title = t.children;
 		}
-		console.log(t);
 		return (
 			<Text
 				style={{
