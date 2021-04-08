@@ -33,7 +33,7 @@ export default class Button extends React.PureComponent<{
 	onPress: ButtonListener;
 	disabled?: boolean;
 	inactive?: boolean;
-	fluid?: boolean;
+	fluid?: boolean | string;
 	negative?: boolean;
 	secondary?: boolean;
 	active?: boolean;
@@ -65,7 +65,13 @@ export default class Button extends React.PureComponent<{
 			finalTextStyles.push({ color: colors.text.light });
 		}
 		if (fluid) {
-			finalButtonStyles.push(components.buttonFluid);
+			finalButtonStyles.push(
+				fluid === 'left'
+					? components.buttonFluidLeft
+					: fluid === 'right'
+					? components.buttonFluidRight
+					: components.buttonFluid
+			);
 			finalTextStyles.push({ textAlign: 'center' });
 		}
 		if (negative) {

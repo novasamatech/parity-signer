@@ -33,17 +33,6 @@ function CreateWallet2({
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
 
-	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
-		return (
-			<Button
-				title={`${buttonWordsNumber} words`}
-				onPress={(): void => setWordsNumber(buttonWordsNumber)}
-				fluid={true}
-				inactive={wordsNumber !== buttonWordsNumber}
-				secondary={wordsNumber === buttonWordsNumber}
-			/>
-		);
-	};
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
 			setSeedPhrase(await words(wordsNumber));
@@ -76,9 +65,25 @@ function CreateWallet2({
 			>
 				<Text style={components.textBlockPreformattedText}>{seedPhrase}</Text>
 			</TouchableItem>
-			<View style={styles.mnemonicSelectionRow}>
-				<View style={styles.mnemonicSelectionCol}>{renderTextButton(12)}</View>
-				<View style={styles.mnemonicSelectionCol}>{renderTextButton(24)}</View>
+	    <View style={{ flexDirection: 'row', paddingBottom: 20 }}>
+				<View style={{ flex: 1, flexDirection: 'row' }}>
+					<Button
+						title={'12 words'}
+						onPress={(): void => setWordsNumber(12)}
+						fluid={'left'}
+						inactive={wordsNumber !== 12}
+						secondary={wordsNumber === 12}
+					/>
+				</View>
+				<View style={{ flex: 1, flexDirection: 'row', paddingRight: 10 }}>
+					<Button
+						title={'24 words'}
+						onPress={(): void => setWordsNumber(24)}
+						fluid={'right'}
+						inactive={wordsNumber !== 24}
+						secondary={wordsNumber === 24}
+					/>
+				</View>
 			</View>
 			<Button
 				title={'Continue'}
@@ -97,14 +102,3 @@ function CreateWallet2({
 }
 
 export default CreateWallet2;
-
-const styles = StyleSheet.create({
-	mnemonicSelectionCol: {
-		flex: 1,
-		flexDirection: 'row',
-		paddingBottom: 20
-	},
-	mnemonicSelectionRow: {
-		flexDirection: 'row'
-	}
-});

@@ -78,6 +78,16 @@ export const components = {
 		textAlign: 'center',
 		width: '100%'
 	},
+	buttonFluidLeft: {
+		marginRight: 10,
+		textAlign: 'center',
+		width: '100%'
+	},
+	buttonFluidRight: {
+		marginLeft: 10,
+		textAlign: 'center',
+		width: '100%'
+	},
 	buttonText: {
 		color: colors.text.white,
 		fontFamily: fonts.regular,
