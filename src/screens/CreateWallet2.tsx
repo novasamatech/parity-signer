@@ -17,12 +17,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
-import { showMessage } from 'react-native-flash-message';
 
 import { components } from 'styles';
 import { NavigationProps } from 'types/props';
 import { words } from 'utils/native';
+import AccountSeedCopyable from 'components/AccountSeedCopyable';
 import TouchableItem from 'components/TouchableItem';
 import Button from 'components/Button';
 
@@ -53,19 +52,8 @@ function CreateWallet2({
 				Do not screenshot or save it on your computer, or anyone with access
 				could compromise your account.
 			</Text>
-			<TouchableItem
-				onPress={(): void => {
-					// only allow the copy of the key phrase in dev environment
-					if (__DEV__) {
-						showMessage('Recovery phrase copied.');
-						Clipboard.setString(seedPhrase);
-					}
-				}}
-				style={components.textBlockPreformatted}
-			>
-				<Text style={components.textBlockPreformattedText}>{seedPhrase}</Text>
-			</TouchableItem>
-	    <View style={{ flexDirection: 'row', paddingBottom: 20 }}>
+			<AccountSeedCopyable seed={seedPhrase} />
+			<View style={{ flexDirection: 'row', paddingBottom: 20 }}>
 				<View style={{ flex: 1, flexDirection: 'row' }}>
 					<Button
 						title={'12 words'}

@@ -126,7 +126,9 @@ export const components = {
 		marginBottom: 8
 	},
 	textBlockPreformatted: {
-		backgroundColor: colors.background.accentDark,
+		backgroundColor: colors.background.white,
+		borderColor: colors.border.light,
+		borderWidth: 0.8,
 		borderRadius: 10,
 		marginVertical: 16,
 		minHeight: 100,
@@ -134,7 +136,7 @@ export const components = {
 		paddingVertical: 12
 	},
 	textBlockPreformattedText: {
-		color: colors.text.white,
+		color: colors.text.dark,
 		fontFamily: fonts.regular,
 		fontSize: 18,
 		minHeight: 140
