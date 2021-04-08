@@ -115,26 +115,27 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	// initialize the API using the first network the user has, if they have any
 	const firstNetwork = networkList[0];
 
-	useEffect((): (() => void) => {
-		const cleanupFn = (): void => {
-			if (state.apiError || state.isApiReady) {
-				disconnect();
-			}
-		};
-
-		if (!firstNetwork) return cleanupFn;
+	// TODO: fix this hook!!!
+	useEffect((): void => {
+		if (!firstNetwork) return;
 		const [networkKey, networkParams] = firstNetwork;
-		if (!isSubstrateNetworkParams(networkParams)) return cleanupFn;
-		if (!state.isApiInitialized) {
+
+		if (!isSubstrateNetworkParams(networkParams)) return;
+		if (networkKey !== state.apiNetworkKey) {
+			console.log('unequal network keys!');
+			disconnect();
 			selectNetwork(networkKey, networkContextState, registriesContext);
 		} else if (state.apiError) {
 			// TODO: is this error handling code correct?
 			console.error(`API ERROR: ${state.apiError}`);
 		} else if (state.isApiReady) {
+			console.log('API READY!');
 			const path = `//${networkParams.pathId}`;
 			const address = getAddressWithPath(path, currentIdentity);
 			if (state.api?.query?.balances) {
+				console.log('FETCHING BALANCES...');
 				state.api.query.balances.account(address).then(fetchedBalance => {
+					console.log('BALANCES FETCHED!');
 					const base = new BN(10).pow(new BN(networkParams.decimals));
 					const div = fetchedBalance.free.div(base);
 					const mod = fetchedBalance.free.mod(base);
@@ -145,7 +146,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 				});
 			}
 		}
-		return cleanupFn;
+		return;
 	}, [currentIdentity, firstNetwork, state]);
 
 	if (!loaded) return <View />;
