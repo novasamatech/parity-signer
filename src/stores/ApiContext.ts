@@ -115,20 +115,30 @@ export function useApiContext(): ApiContextState {
 		AppState.currentState
 	);
 
-	// TODO: Manage offline state better!
+	// manage entering/leaving the app
 	React.useEffect(() => {
 		const _handleAppStateChange = async (
 			nextAppState: AppStateStatus
 		): Promise<void> => {
-			console.log('state change triggered');
+			console.log(`state change triggered: ${appState} -> ${nextAppState}`);
 			if (nextAppState.match(/inactive|background/) && appState === 'active') {
 				// disconnect on inactive
+				// TODO: save state if needed
 				await disconnectAsync();
+			} else if (
+				nextAppState === 'active' &&
+				(appState === 'inactive' || appState === 'background')
+			) {
+				// TODO: reconnect on active if not connected
 			}
 			setAppState(nextAppState);
 		};
 		AppState.addEventListener('change', _handleAppStateChange);
-	}, []);
+
+		return (): void => {
+			AppState.removeEventListener('change', _handleAppStateChange);
+		};
+	}, [appState]);
 
 	return {
 		disconnect,
