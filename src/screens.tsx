@@ -75,7 +75,7 @@ const stackNavigationOptions = {
 		height: 154,
 		shadowColor: 'transparent'
 	},
-	headerStyleInterpolator: HeaderStyleInterpolators.forStatic,
+	headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
 	headerTintColor: colors.text.white,
 	headerTitle: (t): React.ReactNode => {
 		let title, isRoot;
