@@ -116,6 +116,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	const firstNetwork = networkList[0];
 
 	// TODO: fix this hook!!!
+	/*
 	useEffect((): void => {
 		if (!firstNetwork) return;
 		const [networkKey, networkParams] = firstNetwork;
@@ -148,6 +149,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 		}
 		return;
 	}, [currentIdentity, firstNetwork, state]);
+	*/
 
 	if (!loaded) return <View />;
 	if (identities.length === 0) return <OnBoardingView />;
