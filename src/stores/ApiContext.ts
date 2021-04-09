@@ -1,11 +1,8 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { ApiPromise } from '@polkadot/api/promise';
 import { WsProvider } from '@polkadot/rpc-provider';
 import { TypeRegistry } from '@polkadot/types';
-
-import { NetworksContext } from './NetworkContext';
-import { RegistriesContext } from './RegistriesContext';
 
 export type ApiStoreState = {
 	api: ApiPromise | null;
@@ -59,11 +56,11 @@ export function useApiContext(): ApiContextState {
 	};
 
 	// TODO: ensure this cleanup works as expected
-	async function disconnectAsync(api: ApiPromise | null): Promise<void> {
-		if (api && api.isConnected) {
+	async function disconnectAsync(): Promise<void> {
+		if (state.api && state.api.isConnected) {
 			console.log('DISCONNECTING API');
+			const api = state.api;
 			setState({
-				api: null,
 				apiError: null,
 				isApiConnected: false,
 				isApiInitialized: false,
@@ -77,8 +74,20 @@ export function useApiContext(): ApiContextState {
 		}
 	}
 
-	function disconnect(api: ApiPromise | null): void {
-		disconnectAsync(api);
+	function disconnect(): void {
+		disconnectAsync();
+	}
+
+	async function restoreApi(): Promise<void> {
+		if (!state.api) return;
+		const api = new ApiPromise({ source: state.api });
+		console.log('RESTORING API');
+		api.on('connected', onConnected);
+		api.on('disconnected', onDisconnected);
+		api.on('error', onError);
+		api.on('ready', onReady);
+		setState({ isApiInitialized: true });
+		await api.isReady;
 	}
 
 	function initApi(
@@ -88,11 +97,10 @@ export function useApiContext(): ApiContextState {
 		metadata?: Record<string, string>
 	): Promise<ApiPromise | null> {
 		if (state.apiNetworkKey === networkKey) return Promise.resolve(null);
-		setState({ apiNetworkKey: networkKey });
-		// console.log('calling disconnect');
-		// disconnect(state.api);
+		disconnect();
 
 		console.log(`CREATING API: ${url}`);
+		setState({ apiNetworkKey: networkKey });
 		const provider = new WsProvider(url);
 		const api = new ApiPromise({
 			metadata,
@@ -122,13 +130,13 @@ export function useApiContext(): ApiContextState {
 			console.log(`state change triggered: ${appState} -> ${nextAppState}`);
 			if (nextAppState.match(/inactive|background/) && appState === 'active') {
 				// disconnect on inactive
-				// TODO: save state if needed
-				// await disconnectAsync(state.api);
+				await disconnectAsync();
 			} else if (
 				nextAppState === 'active' &&
 				(appState === 'inactive' || appState === 'background')
 			) {
-				// TODO: reconnect on active if not connected
+				// reconnect on active if not connected
+				await restoreApi();
 			}
 			setAppState(nextAppState);
 		};
