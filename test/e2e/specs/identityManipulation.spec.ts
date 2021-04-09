@@ -29,7 +29,8 @@ import {
 	testVisible,
 	testSetUpDefaultPath,
 	pinCode,
-	waitAlert
+	waitAlert,
+	wrongPinCode
 } from 'e2e/utils';
 import {
 	ETHEREUM_NETWORK_LIST,
@@ -145,13 +146,24 @@ describe('Load test', () => {
 		await testNotExist(Main.networkButton + ethereumButtonIndex);
 	});
 
-	it('delete identity', async () => {
+	it('delete identity with wrong pin', async () => {
 		await element(by.id(IdentitiesSwitch.toggleButton)).atIndex(0).tap();
 		await testTap(IdentitiesSwitch.manageIdentityButton);
 		await testTap(IdentityManagement.popupMenuButton);
 		await testTap(IdentityManagement.deleteButton);
 		await testTap(Alert.deleteIdentity);
-		await testUnlockPin(pinCode);
+		await testUnlockPin('111111');
+		await testNotVisible(Main.noAccountScreen);
+	});
+
+	it('delete identity', async () => {
+		await tapBack();
+		await element(by.id(IdentitiesSwitch.toggleButton)).atIndex(0).tap();
+		await testTap(IdentitiesSwitch.manageIdentityButton);
+		await testTap(IdentityManagement.popupMenuButton);
+		await testTap(IdentityManagement.deleteButton);
+		await testTap(Alert.deleteIdentity);
+		await testUnlockPin(wrongPinCode);
 		await testVisible(Main.noAccountScreen);
 	});
 });

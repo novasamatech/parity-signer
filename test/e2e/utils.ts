@@ -29,6 +29,7 @@ export const mockIdentityName = 'mockIdentity';
 export const mockSeedPhrase =
 	'ability cave solid soccer gloom thought response hard around minor want welcome';
 export const pinCode = '000000';
+export const wrongPinCode = '111111';
 const substrateNetworkButtonIndex =
 	Main.networkButton +
 	SUBSTRATE_NETWORK_LIST[SubstrateNetworkKeys.KUSAMA].pathId;

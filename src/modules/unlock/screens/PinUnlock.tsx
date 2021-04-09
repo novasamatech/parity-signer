@@ -26,7 +26,7 @@ import { NavigationTargetIdentityProps } from 'types/props';
 import { debounce } from 'utils/debounce';
 import { withTargetIdentity } from 'utils/HOC';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
-import {decryptData} from 'utils/native';
+import { decryptData } from 'utils/native';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlock({
