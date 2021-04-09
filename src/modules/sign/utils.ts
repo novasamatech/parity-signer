@@ -46,6 +46,7 @@ import {
 import { getIdentityFromSender } from 'utils/identitiesUtils';
 import { SeedRefClass } from 'utils/native';
 import {
+	previewTransactionAndApprove,
 	unlockSeedPhrase,
 	unlockSeedPhraseWithPassword
 } from 'utils/navigationHelpers';
@@ -188,6 +189,7 @@ export function useProcessBarCode(
 
 	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
 		const { sender, type } = qrInfo;
+		if (type === 'transaction') await previewTransactionAndApprove(navigation);
 		if (!sender)
 			return showAlertMessage(
 				strings.ERROR_TITLE,
@@ -204,9 +206,9 @@ export function useProcessBarCode(
 				});
 			}
 		}
-
 		const seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
 		const isSeedRefInvalid = seedRef && seedRef.isValid();
+
 		await _unlockSeedAndSign(sender, qrInfo);
 		const nextRoute = type === 'transaction' ? 'SignedTx' : 'SignedMessage';
 

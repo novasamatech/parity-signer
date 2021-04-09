@@ -1,13 +1,13 @@
 export default `
 **PARITY SIGNER MOBILE APPLICATION - END USER LICENCE AGREEMENT**
 
-**Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at Ignition Law, Moray House, 23-31 Great Titchfield Street, London WC1W 7PA ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
+**Parity Technologies Limited** is a company registered in England and Wales under company number 09760015, with its registered office at c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT ("**Parity**"). Parity operates this Parity Signer mobile application (the "**App**").
 
 In this document, when we refer to "**we**", "**us**" or "**our**", we mean Parity; and when we refer to "**you**" or "**your**" we mean you, the person downloading, accessing and/or using the App.
 
 **1.  Understanding these terms**
 
-  1.1  This end user licence agreement together with appendix 1 to it and our instructions referred to in it (this "**EULA**") describes how you may download the App and access and/or use the App. By downloading, accessing and/or using the App, this EULA will apply to you and you agree to the terms of this EULA. You should therefore read the terms carefully before downloading, accessing and/or using the App. If any written instruction we have given you is inconsistent with the terms set out in this document, you should comply with our instructions and in doing so you will not be in breach of the inconsistent term of this document.
+  1.1  This end user license agreement together with appendix 1 to it and our instructions referred to in it (this "**EULA**") describes how you may download the App and access and/or use the App. By downloading, accessing and/or using the App, this EULA will apply to you and you agree to the terms of this EULA. You should therefore read the terms carefully before downloading, accessing and/or using the App. If any written instruction we have given you is inconsistent with the terms set out in this document, you should comply with our instructions and in doing so you will not be in breach of the inconsistent term of this document.
 
   1.2  When certain words and phrases are used in this EULA, they have specific meanings (these are known as "**defined terms**"). You can identify these defined terms because they start with capital letters (even if they are not at the start of a sentence). Where a defined term is used, it has the meaning given to it in the section of this EULA where it was defined (you can find these meanings by looking at the sentence where the defined term is included in brackets and speech marks).
 
@@ -45,7 +45,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   2.8  You should only download, access and/or use the App if you are familiar with interacting with the Blockchains. We recommend you learn about and understand the basics of the Blockchains in connection with which you intend to use the App before downloading, accessing and/or using the App.
 
-  2.9  The purpose of the App is to provide the App Functionality on a Device which is not connected to any form network or the internet. The App should only ever be used on an offline Device. Once you have downloaded, installed and set up the App on the Device, it is very important that you follow the instructions we provide on our website (available [*here*](https://wiki.parity.io/Parity-Signer-Mobile-App-MyCrypto-tutorial)) to ensure the Device is not connected to any network or the internet.
+  2.9  The purpose of the App is to provide the App Functionality on a Device which is not connected to any form network or the internet. The App should only ever be used on an offline Device. Once you have downloaded, installed and set up the App on the Device, it is very important that you follow the instructions we provide on our website (available at [https://github.com/paritytech/parity-signer](https://github.com/paritytech/parity-signer)) to ensure the Device is not connected to any network or the internet.
 
   2.10  You are responsible for the use and security of any Device on which you have installed the App. We will have no liability to you for any losses or damages you incur in respect of (i) access and/or use of the App (including the creation of any Digital Signature or loss of Private Keys) as a result of unauthorised persons gaining access to your Device; or (ii) your Device being compromised or corrupted.
 
@@ -59,7 +59,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
 *General*
 
-  4.1  We provide software code in the App on an "open source" basis in accordance with the terms of the GPL 3.0 licence, which can be found here: [*https://opensource.org/licenses/GPL-3.0*](https://opensource.org/licenses/GPL-3.0), ("GPL 3.0") and make the source code of the App available here [*https://github.com/paritytech/parity-signer*](https://protect-eu.mimecast.com/s/G9QrCW6Agclr60pTxhQkw). You are free to use, modify and distribute the software code in the App in accordance with the terms of GPL 3.0. In the case of any conflict between the terms of GPL 3.0 and the terms of this EULA in relation to your use of the software code in the App, the terms of GPL 3.0 shall prevail.
+  4.1  We provide software code in the App on an "open source" basis in accordance with the terms of the GPL 3.0 licence, which can be found here: [*https://opensource.org/licenses/GPL-3.0*](https://opensource.org/licenses/GPL-3.0), ("GPL 3.0") and make the source code of the App available at [*https://github.com/paritytech/parity-signer*](https://github.com/paritytech/parity-signer). You are free to use, modify and distribute the software code in the App in accordance with the terms of GPL 3.0. In the case of any conflict between the terms of GPL 3.0 and the terms of this EULA in relation to your use of the software code in the App, the terms of GPL 3.0 shall prevail.
 
   4.2  When accessing and/or using the App, you agree:
 
@@ -141,7 +141,7 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 
   8.1  We may make changes to the terms of this EULA from time to time (if, for example, there is a change in the law that means we need to change this EULA). Please check this EULA (at the address indicated in clause 1.1) regularly to ensure that you understand the up-to-date terms that apply at the time that you access and use the App. If we update the terms of this EULA, the updated terms will apply 10 days after the update is posted (at the address indicated in clause 1.1) to each of your uses of the App from that point on.
 
-  8.2  From time to time updates to the App may be issued through the relevant app store. As the App is designed to operate on a Device which remains offline, you agree that it is your responsibility to check whether we have published any updates to the App. You should carry out this check on a device on which the App has not been installed and follow our instructions (available at [*https://wiki.parity.io/Parity-Signer-Mobile-App*](https://wiki.parity.io/Parity-Signer-Mobile-App)) as to how to update the App.
+  8.2  From time to time updates to the App may be issued through the relevant app store. As the App is designed to operate on a Device which remains offline, you agree that it is your responsibility to check whether we have published any updates to the App. You should carry out this check on a device on which the App has not been installed and follow our instructions (available at [https://github.com/paritytech/parity-signer](https://github.com/paritytech/parity-signer)) as to how to update the App.
 
   8.3  You will be assumed to have obtained permission from the owners of any Devices that are controlled, but not owned, by you to download a copy of the App onto the Devices. You and they may be charged by your and their service providers for Internet access on the Devices. You accept responsibility in accordance with the terms of this EULA for the use of the App in relation to any Device, whether or not it is owned by you.
 
@@ -164,12 +164,12 @@ In this document, when we refer to "**we**", "**us**" or "**our**", we mean Pari
 **11.  Contacting us**
 
 Should you have any reasons for a complaint, we will endeavour to resolve the issue and avoid any re-occurrence in the future. You can always contact us by using the following details:
-Address: Parity Technologies Limited, Ignition Law, Moray House, 23-31 Great Titchfield Street, London WC1W 7PA
+Address: Parity Technologies Limited, c/o Ignition Law, 1 Sans Walk, London, England, EC1R 0LT
 Email address: admin@parity.io and legal@parity.io
 
 Thank you.
 
-**Terms last updated 10 December 2019**
+**Terms last updated 09 Februray 2021**
 
 **APPENDIX 1**
 

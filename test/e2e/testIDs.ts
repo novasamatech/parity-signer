@@ -24,6 +24,9 @@ const testIDs = {
 		deleteConfirmation: 'alert_delete_confirmation',
 		deleteIdentity: 'alert_delete_identity'
 	},
+	DetailsTx: {
+		signButton: 'sign_button'
+	},
 	Header: {
 		headerBackButton: 'header_back_button'
 	},

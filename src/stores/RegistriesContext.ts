@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Metadata, TypeRegistry } from '@polkadot/types';
+import { Metadata } from '@polkadot/metadata';
+import { TypeRegistry } from '@polkadot/types';
 import { getSpecTypes } from '@polkadot/types-known';
 import React, { useState } from 'react';
 
@@ -44,7 +45,8 @@ const networkTypesMap: NetworkTypesMap = {
 		chains: {
 			westend: 'Westend'
 		}
-	}
+	},
+	rococo: { chains: {} }
 };
 
 export const getOverrideTypes = (
@@ -72,37 +74,42 @@ export const getOverrideTypes = (
 
 export type RegistriesStoreState = {
 	registries: Map<string, TypeRegistry>;
-	get: (
+	getTypeRegistry: (
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
-	) => TypeRegistry;
+	) => TypeRegistry | null;
 };
 
 export function useRegistriesStore(): RegistriesStoreState {
-	const dumbRegistry = new TypeRegistry();
 	const [registries, setRegistries] = useState(new Map());
 
-	function get(
+	function getTypeRegistry(
 		networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
-	): TypeRegistry {
-		if (!networks.has(networkKey)) return dumbRegistry;
-		if (registries.has(networkKey)) return registries.get(networkKey)!;
+	): TypeRegistry | null {
+		try {
+			const networkMetadataRaw = getMetadata(networkKey);
+			if (networkMetadataRaw === null) return null;
 
-		const networkParams = networks.get(networkKey)!;
-		const newRegistry = new TypeRegistry();
-		const networkMetadataRaw = getMetadata(networkKey);
-		const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
-		newRegistry.register(overrideTypes);
-		const metadata = new Metadata(newRegistry, networkMetadataRaw);
-		newRegistry.setMetadata(metadata);
-		const newRegistries = deepCopyMap(registries);
-		newRegistries.set(networkKey, newRegistry);
-		setRegistries(newRegistries);
-		return newRegistry;
+			if (registries.has(networkKey)) return registries.get(networkKey)!;
+
+			const networkParams = networks.get(networkKey)!;
+			const newRegistry = new TypeRegistry();
+			const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+			newRegistry.register(overrideTypes);
+			const metadata = new Metadata(newRegistry, networkMetadataRaw);
+			newRegistry.setMetadata(metadata);
+			const newRegistries = deepCopyMap(registries);
+			newRegistries.set(networkKey, newRegistry);
+			setRegistries(newRegistries);
+			return newRegistry;
+		} catch (e) {
+			console.log('error', e);
+			return null;
+		}
 	}
 
-	return { get, registries };
+	return { getTypeRegistry, registries };
 }
 
 export const RegistriesContext = React.createContext(
