@@ -274,7 +274,7 @@ export function useAccountContext(): AccountsContextState {
 		setState({ currentIdentity: null });
 	}
 
-	async function _addPathToIdentity(
+	async function _updateIdentityPath(
 		newPath: string,
 		createSubstrateAddress: TrySubstrateAddress,
 		updatedIdentity: Identity,
@@ -297,6 +297,9 @@ export function useAccountContext(): AccountsContextState {
 			networkPathId: pathId,
 			updatedAt: new Date().getTime()
 		};
+		// always clear all addresses on switch
+		updatedIdentity.meta.clear();
+		updatedIdentity.addresses.clear();
 		updatedIdentity.meta.set(newPath, pathMeta);
 		updatedIdentity.addresses.set(address, newPath);
 		return updatedIdentity;
@@ -359,7 +362,7 @@ export function useAccountContext(): AccountsContextState {
 		name: string
 	): Promise<void> {
 		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity!);
-		await _addPathToIdentity(
+		await _updateIdentityPath(
 			newPath,
 			createSubstrateAddress,
 			updatedCurrentIdentity,
