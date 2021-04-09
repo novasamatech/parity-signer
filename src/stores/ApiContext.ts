@@ -22,7 +22,7 @@ export type ApiContextState = {
 		networkContextState: NetworksContextState,
 		registriesState: RegistriesStoreState
 	) => Promise<void>;
-	disconnect: () => void;
+	disconnect: (api: ApiPromise | null) => void;
 };
 
 const defaultApiState = {
@@ -87,10 +87,10 @@ export function useApiContext(): ApiContextState {
 		setState({ isApiInitialized: true });
 	}
 
-	async function disconnectAsync(): Promise<void> {
-		if (state.api && state.api.isConnected) {
+	// TODO: ensure this cleanup works as expected
+	async function disconnectAsync(api: ApiPromise | null): Promise<void> {
+		if (api && api.isConnected) {
 			console.log('DISCONNECTING API');
-			const api = state.api;
 			setState({
 				api: null,
 				apiError: null,
@@ -106,9 +106,8 @@ export function useApiContext(): ApiContextState {
 		}
 	}
 
-	// TODO: ensure this cleanup works as expected
-	function disconnect(): void {
-		disconnectAsync();
+	function disconnect(api: ApiPromise | null): void {
+		disconnectAsync(api);
 	}
 
 	const [appState, setAppState] = React.useState<AppStateStatus>(
@@ -124,7 +123,7 @@ export function useApiContext(): ApiContextState {
 			if (nextAppState.match(/inactive|background/) && appState === 'active') {
 				// disconnect on inactive
 				// TODO: save state if needed
-				await disconnectAsync();
+				await disconnectAsync(state.api);
 			} else if (
 				nextAppState === 'active' &&
 				(appState === 'inactive' || appState === 'background')

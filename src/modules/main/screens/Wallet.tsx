@@ -124,7 +124,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 		if (!isSubstrateNetworkParams(networkParams)) return;
 		if (networkKey !== state.apiNetworkKey) {
 			console.log('unequal network keys!');
-			disconnect();
+			disconnect(state.api);
 			selectNetwork(networkKey, networkContextState, registriesContext);
 		} else if (state.apiError) {
 			// TODO: is this error handling code correct?
