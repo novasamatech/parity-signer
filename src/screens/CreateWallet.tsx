@@ -31,9 +31,9 @@ function CreateWallet({
 	const accountsStore = useContext(AccountsContext);
 	const clearIdentity = useRef(() => {
 		const newIdentity = emptyIdentity();
-		const currentAccounts = Array.from(
-			accountsStore.state.currentIdentity?.addresses.entries()
-		);
+		const currentAccounts = accountsStore.state.currentIdentity
+			? Array.from(accountsStore.state.currentIdentity.addresses.entries())
+			: [];
 		newIdentity.name = `Wallet ${currentAccounts.length + 1}`;
 		return accountsStore.updateNewIdentity(newIdentity);
 	});

@@ -23,7 +23,7 @@ export type ApiContextState = {
 		url: string,
 		registry?: TypeRegistry,
 		metadata?: Record<string, string>
-	) => void;
+	) => Promise<ApiPromise | null>;
 	disconnect: (api: ApiPromise | null) => void;
 };
 
@@ -41,10 +41,12 @@ export function useApiContext(): ApiContextState {
 	const reducer = (
 		state: ApiStoreState,
 		delta: Partial<ApiStoreState>
-	): ApiStoreState => ({
-		...state,
-		...delta
-	});
+	): ApiStoreState => {
+		return {
+			...state,
+			...delta
+		};
+	};
 	const [state, setState] = useReducer(reducer, initialState);
 
 	// TODO: load an initial context
@@ -84,10 +86,11 @@ export function useApiContext(): ApiContextState {
 		url: string,
 		registry?: TypeRegistry,
 		metadata?: Record<string, string>
-	): void {
-		if (networkKey === state.apiNetworkKey) return;
+	): Promise<ApiPromise | null> {
+		if (state.apiNetworkKey === networkKey) return Promise.resolve(null);
 		setState({ apiNetworkKey: networkKey });
-		disconnect(state.api);
+		// console.log('calling disconnect');
+		// disconnect(state.api);
 
 		console.log(`CREATING API: ${url}`);
 		const provider = new WsProvider(url);
@@ -104,6 +107,7 @@ export function useApiContext(): ApiContextState {
 		api.on('ready', onReady);
 
 		setState({ isApiInitialized: true });
+		return api.isReady;
 	}
 
 	// manage entering/leaving the app
@@ -119,7 +123,7 @@ export function useApiContext(): ApiContextState {
 			if (nextAppState.match(/inactive|background/) && appState === 'active') {
 				// disconnect on inactive
 				// TODO: save state if needed
-				await disconnectAsync(state.api);
+				// await disconnectAsync(state.api);
 			} else if (
 				nextAppState === 'active' &&
 				(appState === 'inactive' || appState === 'background')
@@ -143,18 +147,3 @@ export function useApiContext(): ApiContextState {
 }
 
 export const ApiContext = React.createContext({} as ApiContextState);
-
-export function useApi(networkKey: string): ApiStoreState {
-	console.log(`Use API: ${networkKey}`);
-	const apiContext = useContext(ApiContext);
-	const { getSubstrateNetwork, networks } = useContext(NetworksContext);
-	const { getTypeRegistry } = useContext(RegistriesContext);
-	if (!networkKey) return apiContext.state;
-
-	const networkParams = getSubstrateNetwork(networkKey);
-	if (!networkParams.url) return apiContext.state; // check for dummy substrate network
-
-	const [registry, metadata] = getTypeRegistry(networks, networkKey)!;
-	apiContext.initApi(networkKey, networkParams.url, registry, metadata);
-	return apiContext.state;
-}

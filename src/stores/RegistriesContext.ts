@@ -48,8 +48,8 @@ export const getOverrideTypes = (
 	pathId: string,
 	specVersion: number
 ): any => {
-	let specName = '',
-		chainName = '';
+	let specName = '';
+	let chainName = '';
 	Object.entries(networkTypesMap).find(
 		([networkName, networkTypes]: [string, RegisteredTypes]) => {
 			if (networkName === pathId) {
@@ -85,10 +85,14 @@ export function useRegistriesStore(): RegistriesStoreState {
 			if (foundMetadata === null) return null;
 			const [networkMetadataRaw, specVersion] = foundMetadata;
 			if (networkMetadataRaw === null) return null;
-
-			if (registries.has(networkKey)) return registries.get(networkKey)!;
-
 			const networkParams = networks.get(networkKey)!;
+			const metadataKey = `${networkParams.genesisHash}-${specVersion}`;
+			const metadataApiObj = { [metadataKey]: networkMetadataRaw };
+
+			if (registries.has(networkKey)) {
+				return [registries.get(networkKey)!, metadataApiObj];
+			}
+
 			const newRegistry = new TypeRegistry();
 			const overrideTypes = getOverrideTypes(
 				newRegistry,
@@ -101,8 +105,7 @@ export function useRegistriesStore(): RegistriesStoreState {
 			const newRegistries = deepCopyMap(registries);
 			newRegistries.set(networkKey, newRegistry);
 			setRegistries(newRegistries);
-			const metadataKey = `${networkParams.genesisHash}-${specVersion}`;
-			return [newRegistry, { [metadataKey]: networkMetadataRaw }];
+			return [newRegistry, metadataApiObj];
 		} catch (e) {
 			console.log('error', e);
 			return null;

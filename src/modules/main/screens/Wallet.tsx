@@ -48,7 +48,7 @@ import {
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import Button from 'components/Button';
 import NavigationTab from 'components/NavigationTab';
-import { ApiContext, useApi } from 'stores/ApiContext';
+import { ApiContext } from 'stores/ApiContext';
 import { RegistriesContext } from 'stores/RegistriesContext';
 
 const filterNetworks = (
@@ -111,41 +111,49 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	);
 
 	// initialize the API using the first network the user has, if they have any
-	const firstNetwork = networkList[0];
-	const networkParams = firstNetwork && firstNetwork[1];
-	// TODO: test this hook also works as intended
-	const result = useApi(firstNetwork && firstNetwork[0]);
-	console.log(result);
-	let address = '';
-	let decimals = 0;
-	if (networkParams && isSubstrateNetworkParams(networkParams)) {
-		const path = `//${networkParams.pathId}`;
-		address = getAddressWithPath(path, currentIdentity);
-		decimals = networkParams.decimals;
-	}
+	const { initApi, state } = useContext(ApiContext);
+	const { networks } = networkContextState;
+	const { getTypeRegistry } = useContext(RegistriesContext);
 
-	// TODO: test this hook works as intended
-	/*
+	// initialize API (TODO: move out of wallet!)
 	useEffect((): void => {
-		if (isApiReady && address) {
-			console.log('API READY!');
-			if (api?.query?.balances) {
-				console.log('FETCHING BALANCES...');
-				api.query.balances.account(address).then(fetchedBalance => {
-					console.log('BALANCES FETCHED!');
+		// TODO: make this refresh less often!
+		const firstNetwork = networkList[0];
+		if (!firstNetwork) return;
+		const [networkKey, networkParams] = firstNetwork;
+		if (!isSubstrateNetworkParams(networkParams) || !networkParams.url) return;
+		const registryData = getTypeRegistry(networks, networkKey);
+		if (!registryData) return;
+		const [registry, metadata] = registryData;
+		initApi(networkKey, networkParams.url, registry, metadata);
+	}, [networkList]);
+
+	// initialize balances
+	useEffect((): void => {
+		if (state.isApiReady) {
+			const firstNetwork = networkList[0];
+			if (!firstNetwork) return;
+			const [networkKey, networkParams] = firstNetwork;
+			if (!isSubstrateNetworkParams(networkParams) || !networkParams.url)
+				return;
+			console.log(`Use API: ${networkKey}`);
+			const path = `//${networkParams.pathId}`;
+			const address = getAddressWithPath(path, currentIdentity);
+			const decimals = networkParams.decimals;
+			if (state.api?.derive?.balances) {
+				console.log(`FETCHING BALANCES: ${address}`);
+				state.api.derive.balances.all(address).then(fetchedBalance => {
 					const base = new BN(10).pow(new BN(decimals));
-					const div = fetchedBalance.free.div(base);
-					const mod = fetchedBalance.free.mod(base);
+					const div = fetchedBalance.availableBalance.div(base);
+					const mod = fetchedBalance.availableBalance.mod(base);
 					const nDisplayDecimals = 3;
 					setBalance({
-						freeBalance: div + '.' + mod.toString(10, nDisplayDecimals)
+						freeBalance: div + '.' + mod.toString(10).slice(0, nDisplayDecimals)
 					});
 				});
 			}
 		}
-		return;
-	}, [address, isApiReady]);
-	*/
+	}, [state]);
 
 	if (!loaded) return <View />;
 	if (identities.length === 0) return <OnBoardingView />;
