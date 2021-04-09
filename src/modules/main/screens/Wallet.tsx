@@ -48,7 +48,7 @@ import {
 import { navigateToReceiveBalance } from 'utils/navigationHelpers';
 import Button from 'components/Button';
 import NavigationTab from 'components/NavigationTab';
-import { ApiContext } from 'stores/ApiContext';
+import { ApiContext, useApi } from 'stores/ApiContext';
 import { RegistriesContext } from 'stores/RegistriesContext';
 
 const filterNetworks = (
@@ -79,8 +79,6 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { identities, currentIdentity, loaded } = accountsStore.state;
 	const networkContextState = useContext(NetworksContext);
-	const registriesContext = useContext(RegistriesContext);
-	const { selectNetwork, state, disconnect } = useContext(ApiContext);
 	const [balance, setBalance] = useState(EMPTY_STATE);
 	const { allNetworks } = networkContextState;
 
@@ -114,30 +112,28 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 
 	// initialize the API using the first network the user has, if they have any
 	const firstNetwork = networkList[0];
+	const networkParams = firstNetwork && firstNetwork[1];
+	// TODO: test this hook also works as intended
+	const result = useApi(firstNetwork && firstNetwork[0]);
+	console.log(result);
+	let address = '';
+	let decimals = 0;
+	if (networkParams && isSubstrateNetworkParams(networkParams)) {
+		const path = `//${networkParams.pathId}`;
+		address = getAddressWithPath(path, currentIdentity);
+		decimals = networkParams.decimals;
+	}
 
-	// TODO: fix this hook!!!
+	// TODO: test this hook works as intended
 	/*
 	useEffect((): void => {
-		if (!firstNetwork) return;
-		const [networkKey, networkParams] = firstNetwork;
-
-		if (!isSubstrateNetworkParams(networkParams)) return;
-		if (networkKey !== state.apiNetworkKey) {
-			console.log('unequal network keys!');
-			disconnect(state.api);
-			selectNetwork(networkKey, networkContextState, registriesContext);
-		} else if (state.apiError) {
-			// TODO: is this error handling code correct?
-			console.error(`API ERROR: ${state.apiError}`);
-		} else if (state.isApiReady) {
+		if (isApiReady && address) {
 			console.log('API READY!');
-			const path = `//${networkParams.pathId}`;
-			const address = getAddressWithPath(path, currentIdentity);
-			if (state.api?.query?.balances) {
+			if (api?.query?.balances) {
 				console.log('FETCHING BALANCES...');
-				state.api.query.balances.account(address).then(fetchedBalance => {
+				api.query.balances.account(address).then(fetchedBalance => {
 					console.log('BALANCES FETCHED!');
-					const base = new BN(10).pow(new BN(networkParams.decimals));
+					const base = new BN(10).pow(new BN(decimals));
 					const div = fetchedBalance.free.div(base);
 					const mod = fetchedBalance.free.mod(base);
 					const nDisplayDecimals = 3;
@@ -148,7 +144,7 @@ function Wallet({ navigation }: NavigationProps<'Wallet'>): React.ReactElement {
 			}
 		}
 		return;
-	}, [currentIdentity, firstNetwork, state]);
+	}, [address, isApiReady]);
 	*/
 
 	if (!loaded) return <View />;

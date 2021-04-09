@@ -1,10 +1,11 @@
-import React, { useReducer } from 'react';
+import React, { useContext, useReducer } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { ApiPromise } from '@polkadot/api/promise';
 import { WsProvider } from '@polkadot/rpc-provider';
+import { TypeRegistry } from '@polkadot/types';
 
-import { NetworksContextState } from './NetworkContext';
-import { RegistriesStoreState } from './RegistriesContext';
+import { NetworksContext } from './NetworkContext';
+import { RegistriesContext } from './RegistriesContext';
 
 export type ApiStoreState = {
 	api: ApiPromise | null;
@@ -17,11 +18,12 @@ export type ApiStoreState = {
 
 export type ApiContextState = {
 	state: ApiStoreState;
-	selectNetwork: (
+	initApi: (
 		networkKey: string,
-		networkContextState: NetworksContextState,
-		registriesState: RegistriesStoreState
-	) => Promise<void>;
+		url: string,
+		registry?: TypeRegistry,
+		metadata?: Record<string, string>
+	) => void;
 	disconnect: (api: ApiPromise | null) => void;
 };
 
@@ -54,39 +56,6 @@ export function useApiContext(): ApiContextState {
 		console.log('API READY');
 	};
 
-	async function selectNetwork(
-		networkKey: string,
-		networkContextState: NetworksContextState,
-		registriesState: RegistriesStoreState
-	): Promise<void> {
-		setState({ apiNetworkKey: networkKey });
-		const networkParams = networkContextState.getSubstrateNetwork(networkKey);
-		if (!networkParams.url) return;
-
-		const [registry, metadata] = registriesState.getTypeRegistry(
-			networkContextState.networks,
-			networkKey
-		)!;
-		// TODO: load metadata at startup
-		// TODO: handle errors
-		// TODO: make this stateful so we don't have to reload every time we come here
-		console.log(`CREATING API: ${networkParams.url}`);
-		const provider = new WsProvider(networkParams.url);
-		const api = new ApiPromise({
-			metadata,
-			provider,
-			registry
-		});
-		setState({ api });
-
-		api.on('connected', onConnected);
-		api.on('disconnected', onDisconnected);
-		api.on('error', onError);
-		api.on('ready', onReady);
-
-		setState({ isApiInitialized: true });
-	}
-
 	// TODO: ensure this cleanup works as expected
 	async function disconnectAsync(api: ApiPromise | null): Promise<void> {
 		if (api && api.isConnected) {
@@ -110,11 +79,38 @@ export function useApiContext(): ApiContextState {
 		disconnectAsync(api);
 	}
 
+	function initApi(
+		networkKey: string,
+		url: string,
+		registry?: TypeRegistry,
+		metadata?: Record<string, string>
+	): void {
+		if (networkKey === state.apiNetworkKey) return;
+		setState({ apiNetworkKey: networkKey });
+		disconnect(state.api);
+
+		console.log(`CREATING API: ${url}`);
+		const provider = new WsProvider(url);
+		const api = new ApiPromise({
+			metadata,
+			provider,
+			registry
+		});
+		setState({ api });
+
+		api.on('connected', onConnected);
+		api.on('disconnected', onDisconnected);
+		api.on('error', onError);
+		api.on('ready', onReady);
+
+		setState({ isApiInitialized: true });
+	}
+
+	// manage entering/leaving the app
 	const [appState, setAppState] = React.useState<AppStateStatus>(
 		AppState.currentState
 	);
 
-	// manage entering/leaving the app
 	React.useEffect(() => {
 		const _handleAppStateChange = async (
 			nextAppState: AppStateStatus
@@ -141,9 +137,24 @@ export function useApiContext(): ApiContextState {
 
 	return {
 		disconnect,
-		selectNetwork,
+		initApi,
 		state
 	};
 }
 
 export const ApiContext = React.createContext({} as ApiContextState);
+
+export function useApi(networkKey: string): ApiStoreState {
+	console.log(`Use API: ${networkKey}`);
+	const apiContext = useContext(ApiContext);
+	const { getSubstrateNetwork, networks } = useContext(NetworksContext);
+	const { getTypeRegistry } = useContext(RegistriesContext);
+	if (!networkKey) return apiContext.state;
+
+	const networkParams = getSubstrateNetwork(networkKey);
+	if (!networkParams.url) return apiContext.state; // check for dummy substrate network
+
+	const [registry, metadata] = getTypeRegistry(networks, networkKey)!;
+	apiContext.initApi(networkKey, networkParams.url, registry, metadata);
+	return apiContext.state;
+}

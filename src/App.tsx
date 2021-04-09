@@ -36,7 +36,6 @@ import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
 import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
-import Api from 'components/Api';
 import { ApiContext, useApiContext } from 'stores/ApiContext';
 
 const navTheme = DefaultTheme;
