@@ -26,6 +26,7 @@ import { NavigationTargetIdentityProps } from 'types/props';
 import { debounce } from 'utils/debounce';
 import { withTargetIdentity } from 'utils/HOC';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
+import {decryptData} from 'utils/native';
 import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlock({
@@ -49,6 +50,7 @@ function PinUnlock({
 					resolveSeedPhrase(seedPhrase);
 				} else {
 					const resolve = route.params.resolve;
+					await decryptData(targetIdentity.encryptedSeed, pin);
 					await createSeedRef(pin);
 					resetState();
 					resolve();
