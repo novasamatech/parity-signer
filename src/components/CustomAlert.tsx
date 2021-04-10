@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View, Animated, Text, Easing } from 'react-native';
+import { StyleSheet, View, Animated, Text } from 'react-native';
 
 import Button from 'components/Button';
 import { Action, AlertStateContext } from 'stores/alertContext';
@@ -33,14 +33,7 @@ export default function CustomAlert(): React.ReactElement {
 		if (alertIndex === 0) return;
 		setAlertDisplay(true);
 		if (actions.length === 0) {
-			Animated.timing(animatedValue, {
-				duration: 1000,
-				easing: Easing.poly(8),
-				toValue: 0,
-				useNativeDriver: false
-			}).start(() => {
-				setAlertDisplay(false);
-			});
+			setAlertDisplay(false);
 		}
 		/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	}, [alertIndex]);

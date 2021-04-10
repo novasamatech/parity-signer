@@ -14,14 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Metadata, TypeRegistry } from '@polkadot/types';
-import Call from '@polkadot/types/generic/Call';
+import { Metadata } from '@polkadot/metadata';
+import { TypeRegistry } from '@polkadot/types';
+import { GenericCall as Call } from '@polkadot/types/generic';
 import { formatBalance } from '@polkadot/util';
 
-import { kusamaMetadata } from 'constants/networkMetadata';
+import { polkadotMetaData } from 'constants/networkMetadata';
 import { fromWei } from 'utils/units';
 const registry = new TypeRegistry();
-registry.setMetadata(new Metadata(registry, kusamaMetadata));
+registry.setMetadata(new Metadata(registry, polkadotMetaData));
 
 describe('units', () => {
 	describe('ethereum', () => {
@@ -40,7 +41,7 @@ describe('units', () => {
 		});
 	});
 
-	describe('kusama', () => {
+	describe('polkadot', () => {
 		let method_1: Call;
 		let method_2: Call;
 		let method_3: Call;
@@ -55,7 +56,7 @@ describe('units', () => {
 					args[i].toRawType() === 'Balance' ||
 					args[i].toRawType() === 'Compact<Balance>'
 				) {
-					value = formatBalance(args[i].toString(), undefined, 12);
+					value = formatBalance(args[i].toString(), undefined, 10);
 				} else {
 					value = args[i].toString();
 				}
@@ -66,48 +67,52 @@ describe('units', () => {
 
 		beforeAll(() => {
 			formatBalance.setDefaults({
-				decimals: 12,
-				unit: 'KSM'
+				decimals: 10,
+				unit: 'DOT'
 			});
 
 			method_1 = new Call(
 				registry,
-				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110a0b00b04e2bde6f'
+				'0x0503008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b008cb6611e01'
 			);
 			method_2 = new Call(
 				registry,
-				'0x0400ffd541fa133def7268cc0e5213aebf10ec04b822d59fb7556341f4e49911fc110ae2d45a1d'
+				'0x0503008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48ce830700'
 			);
 			method_3 = new Call(
 				registry,
-				'0x0400ffd9d249ea49e9ae53fc0df3df40d3b070c88e387c265841fe2f3362970d864fdf1f0000606b82534ae05e4508'
+				'0x0503008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4833ffffffff9f36f400d946dad510ee8507'
 			);
 		});
 
-		it('should format KSM', () => {
+		it('should format DOT', () => {
 			const result = getResultFromMethod(method_1);
+
 			expect(result.dest).toBe(
-				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
+				//substrate address '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				'14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3'
 			);
-			expect(result.value).toBe('123.000 KSM');
+			expect(result.value).toBe('123.0000 DOT');
 		});
 
-		it('should format decimals for less than one KSM', () => {
+		it('should format decimals for less than one DOT', () => {
 			const result = getResultFromMethod(method_2);
 
 			expect(result.dest).toBe(
-				'5GtKezSWWfXCNdnC4kkb3nRF9tn3NiN6ZWSEf7UaFdfMUanc'
+				//substrate address '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				'14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3'
 			);
-			expect(result.value).toBe('123.123µ KSM');
+			expect(result.value).toBe('12.3123 µDOT');
 		});
 
 		it('should format absurdly large KSM', () => {
 			const result = getResultFromMethod(method_3);
 
 			expect(result.dest).toBe(
-				'5GzJiY3oG9LcyDiJbEJ6UF8jDF1AGeE2MgeXgSwgGCPopWsb'
+				//substrate address '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
+				'14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3'
 			);
-			expect(result.value).toBe('9.999T KSM');
+			expect(result.value).toBe('999.9999 YDOT');
 		});
 	});
 });
