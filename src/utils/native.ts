@@ -58,10 +58,16 @@ function toHex(x: string): string {
 }
 
 //Try to decode fountain packages
-export async function tryDecodeQr(data: Array[string], size: number): Promise<void> {
+export async function tryDecodeQr(
+	data: Array<string>,
+	size: number
+): Promise<string> {
 	const preparedData = data.join(',');
 	const localSizeCopy = size;
-	decoded = await SubstrateSign.tryDecodeQrSequence(localSizeCopy, preparedData);
+	const decoded = await SubstrateSign.tryDecodeQrSequence(
+		localSizeCopy,
+		preparedData
+	);
 	return decoded;
 }
 

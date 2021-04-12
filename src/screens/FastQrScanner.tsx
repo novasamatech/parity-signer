@@ -14,25 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, WebView } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
-
-import testIDs from 'e2e/testIDs';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import Button from 'components/Button';
-import { useProcessBarCode } from 'modules/sign/utils';
-import { useInjectionQR } from 'e2e/injections';
-import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
-import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
-import { Frames, TxRequestData } from 'types/scannerTypes';
-import { navigateToNetworkSettings } from 'utils/navigationHelpers';
 import { tryDecodeQr } from 'utils/native';
 import { packetSize } from 'constants/raptorQ';
 import { saveMetadata } from 'utils/db';
@@ -40,42 +30,36 @@ import { saveMetadata } from 'utils/db';
 export default function Scanner({
 	navigation
 }: NavigationProps<'FastQrScanner'>): React.ReactElement {
-	const scannerStore = useContext(ScannerContext);
-	const networksContextState = useContext(NetworksContext);
-	const { setAlert } = useContext(AlertStateContext);
-	const [enableScan, setEnableScan] = useState<boolean>(true);
-	const [lastFrame, setLastFrame] = useState<null | string>(null);
-	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
-	const [readPacketsData, setReadPacketsData] = useState<Array[string]>([]);
+	const [readPacketsData, setReadPacketsData] = useState<Array<string>>([]);
 	const [readPacketsCount, setReadPacketsCount] = useState(0);
 	const [messageSize, setMessageSize] = useState(0);
 	const [nominalPacketsNumber, setNominalPacketsNumber] = useState(0);
-	
+
 	// all code to derive information when size of package is determined
-	function setExpectedMessageInfo (size: string): void {
-		const parsedPrefix = parseInt("0x"+size);
+	function setExpectedMessageInfo(size: string): void {
+		const parsedPrefix = parseInt('0x' + size, 16);
 		setMessageSize(parsedPrefix);
 		//always ask for two more packets (here and ">") to kick P>99.9%
-		setNominalPacketsNumber(~~(parsedPrefix/packetSize)+1);
+		setNominalPacketsNumber(~~(parsedPrefix / packetSize) + 1);
 	}
 
-	useEffect(() => {	
-	}, []);
-
-	function useQrFrame(data: string): void {
+	function processQrFrame(data: string): void {
 		if (nominalPacketsNumber === 0) {
 			setExpectedMessageInfo(data.substr(5, 16));
 		}
-		const payload = data.substr(21, packetSize*2);
+		const payload = data.substr(21, packetSize * 2);
 		if (!readPacketsData.includes(payload)) {
-			setReadPacketsData(readPacketsData.concat(payload))
+			setReadPacketsData(readPacketsData.concat(payload));
 			setReadPacketsCount(readPacketsCount + 1);
 		}
 	}
 
 	const onBarCodeRead = async function (event: any): Promise<void> {
-		useQrFrame(event.rawData);
-		if (readPacketsCount >= nominalPacketsNumber && nominalPacketsNumber !== 0) {
+		processQrFrame(event.rawData);
+		if (
+			readPacketsCount >= nominalPacketsNumber &&
+			nominalPacketsNumber !== 0
+		) {
 			const decoded = await tryDecodeQr(readPacketsData, messageSize);
 			if (decoded !== '') {
 				//TODO: here we should place general handler if/when we switch
@@ -104,9 +88,7 @@ export default function Scanner({
 						<View style={styles.middleRight} />
 					</View>
 					<View style={styles.bottom}>
-						<Text style={styles.descTitle}>
-							Scanning fountain data
-						</Text>
+						<Text style={styles.descTitle}>Scanning fountain data</Text>
 						<Text style={styles.descSecondary}>
 							Packets: {readPacketsCount} / {nominalPacketsNumber}
 						</Text>
