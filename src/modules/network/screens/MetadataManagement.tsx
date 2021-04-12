@@ -25,6 +25,7 @@ import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { MetadataHandle } from 'types/metadata';
 import ScreenHeading from 'components/ScreenHeading';
 import { getRelevantMetadata } from 'utils/db';
+import FastQrScannerTab from 'components/FastQrScannerTab';
 
 export default function MetadataManagement({
 	navigation,
@@ -71,6 +72,7 @@ export default function MetadataManagement({
 				renderItem={renderMetadata}
 				keyExtractor={(item: MetadataHandle): string => item.hash}
 			/>
+			<FastQrScannerTab />
 		</SafeAreaViewContainer>
 	);
 }

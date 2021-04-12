@@ -15,8 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, WebView } from 'react-native';
 import { RNCamera } from 'react-native-camera';
+
 
 import testIDs from 'e2e/testIDs';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
@@ -32,7 +33,9 @@ import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { Frames, TxRequestData } from 'types/scannerTypes';
 import { navigateToNetworkSettings } from 'utils/navigationHelpers';
-import { getQrFrame, startQrProcess, stopQrProcess } from 'utils/native';
+import { tryDecodeQr } from 'utils/native';
+import { packetSize } from 'constants/raptorQ';
+import { saveMetadata } from 'utils/db';
 
 export default function Scanner({
 	navigation
@@ -43,70 +46,50 @@ export default function Scanner({
 	const [enableScan, setEnableScan] = useState<boolean>(true);
 	const [lastFrame, setLastFrame] = useState<null | string>(null);
 	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
-	const [multiFrames, setMultiFrames] = useState<Frames>({
-		completedFramesCount: 0,
-		isMultipart: false,
-		missedFrames: [],
-		missingFramesMessage: '',
-		totalFramesCount: 0
-	});
-	function showAlertMessage(
-		title: string,
-		message: string,
-		isAddNetworkSuccess?: boolean
-	): void {
-		const clearByTap = async (): Promise<void> => {
-			scannerStore.cleanup();
-			scannerStore.setReady();
-			setLastFrame(null);
-			setEnableScan(true);
-		};
-		setEnableScan(false);
-		if (isAddNetworkSuccess) {
-			setAlert(title, message, [
-				{
-					onPress: async (): Promise<void> => {
-						await clearByTap();
-						navigateToNetworkSettings(navigation);
-					},
-					testID: testIDs.QrScanner.networkAddSuccessButton,
-					text: 'Done'
-				}
-			]);
-		} else {
-			setAlert(title, message, [
-				{
-					onPress: clearByTap,
-					text: 'Try again'
-				}
-			]);
+	const [readPacketsData, setReadPacketsData] = useState<Array[string]>([]);
+	const [readPacketsCount, setReadPacketsCount] = useState(0);
+	const [messageSize, setMessageSize] = useState(0);
+	const [nominalPacketsNumber, setNominalPacketsNumber] = useState(0);
+	
+	// all code to derive information when size of package is determined
+	function setExpectedMessageInfo (size: string): void {
+		const parsedPrefix = parseInt("0x"+size);
+		setMessageSize(parsedPrefix);
+		//always ask for two more packets (here and ">") to kick P>99.9%
+		setNominalPacketsNumber(~~(parsedPrefix/packetSize)+1);
+	}
+
+	useEffect(() => {	
+	}, []);
+
+	function useQrFrame(data: string): void {
+		if (nominalPacketsNumber === 0) {
+			setExpectedMessageInfo(data.substr(5, 16));
+		}
+		const payload = data.substr(21, packetSize*2);
+		if (!readPacketsData.includes(payload)) {
+			setReadPacketsData(readPacketsData.concat(payload))
+			setReadPacketsCount(readPacketsCount + 1);
 		}
 	}
 
-	const processBarCode = useProcessBarCode(
-		showAlertMessage,
-		networksContextState
-	);
-	useEffect(() => {
-		const parseTheScan = async function (): Promise<void> {
-			console.log('Stuck marker 2');
-			const readResult = await startQrProcess();
-			console.log(readResult);
-			await stopQrProcess();
-			navigation.goBack();
+	const onBarCodeRead = async function (event: any): Promise<void> {
+		useQrFrame(event.rawData);
+		if (readPacketsCount >= nominalPacketsNumber && nominalPacketsNumber !== 0) {
+			const decoded = await tryDecodeQr(readPacketsData, messageSize);
+			if (decoded !== '') {
+				//TODO: here we should place general handler if/when we switch
+				//to ubiquitous fountains. Now this handles only metadata input
+				saveMetadata(decoded);
+				navigation.goBack();
+			}
 		}
-		console.log('Stuck marker 1');
-		parseTheScan();
-	}, []);
-
-	const onBarCodeRead = (event: any): Promise<void> => {
-		getQrFrame(event.rawData);
-		
 	};
 
 	return (
 		<SafeAreaViewContainer>
 			<RNCamera
+				barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
 				captureAudio={false}
 				onBarCodeRead={onBarCodeRead}
 				style={styles.view}
@@ -119,6 +102,14 @@ export default function Scanner({
 						<View style={styles.middleLeft} />
 						<View style={styles.middleCenter} />
 						<View style={styles.middleRight} />
+					</View>
+					<View style={styles.bottom}>
+						<Text style={styles.descTitle}>
+							Scanning fountain data
+						</Text>
+						<Text style={styles.descSecondary}>
+							Packets: {readPacketsCount} / {nominalPacketsNumber}
+						</Text>
 					</View>
 				</View>
 			</RNCamera>

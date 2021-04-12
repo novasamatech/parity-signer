@@ -220,7 +220,7 @@ export async function saveMetadata(newMetadata: string): Promise<void> {
 		const metadataHandle = getMetadataHandleFromRaw(newMetadata);
 		const newMetadataKey = metadataHandleToKey(metadataHandle);
 		await SecureStorage.setItem(newMetadataKey, newMetadata, metadataStorage);
-		console.log('Loaded: ' + newMetadataKey);
+		console.log('Saved: ' + newMetadataKey);
 	} catch (e) {
 		handleError(e, 'save metadata');
 	}

@@ -57,24 +57,12 @@ function toHex(x: string): string {
 		.join('');
 }
 
-//This function sends a read frame to asynchronous processing runtime
-//corresponding event handler should be started before
-export async function getQrFrame(frame: string): Promise<void> {
-	await SubstrateSign.getQrFrame(frame);
-	return;
-}
-
-//start QR code event handler
-export async function startQrProcess(): Promise<String> {
-	console.log("Stuck marker 3");
-	decoded = SubstrateSign.startQrParser();
-	console.log("Stuck marker 4");
-	return new Promise(decoded);
-}
-
-//terminate QR code event handler
-export async function stopQrProcess(): Promise<void> {
-	return;
+//Try to decode fountain packages
+export async function tryDecodeQr(data: Array[string], size: number): Promise<void> {
+	const preparedData = data.join(',');
+	const localSizeCopy = size;
+	decoded = await SubstrateSign.tryDecodeQrSequence(localSizeCopy, preparedData);
+	return decoded;
 }
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {

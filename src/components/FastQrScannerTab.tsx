@@ -23,17 +23,17 @@ import { Icon } from 'react-native-elements';
 import TouchableItem from './TouchableItem';
 
 import colors from 'styles/colors';
-import { navigateToQrScanner } from 'utils/navigationHelpers';
+import { navigateToFastQrScanner } from 'utils/navigationHelpers';
 import testIDs from 'e2e/testIDs';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
 
-export default function QrScannerTab(): React.ReactElement {
+export default function FastQrScannerTab(): React.ReactElement {
 	const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
 	return (
 		<TouchableItem
-			onPress={(): void => navigateToQrScanner(navigation)}
+			onPress={(): void => navigateToFastQrScanner(navigation)}
 			testID={testIDs.SecurityHeader.scanButton}
 			style={styles.body}
 		>
@@ -43,7 +43,7 @@ export default function QrScannerTab(): React.ReactElement {
 				name="qrcode-scan"
 				type="material-community"
 			/>
-			<Text style={styles.textLabel}>QR Scanner</Text>
+			<Text style={styles.textLabel}>Fast QR Scanner</Text>
 		</TouchableItem>
 	);
 }
