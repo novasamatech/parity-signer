@@ -41,6 +41,7 @@ Any data transfer from or to the app happens using QR code. By doing so, the mos
 - [QA Check List](./docs/wiki/QA.md)
 - [HDKD Feature](./docs/wiki/HDKD.md)
 - [Changelog](./docs/wiki/Changelog.md)
+- [QR encoding definition](https://github.com/maciejhirsz/uos)
 
 ## License
 
