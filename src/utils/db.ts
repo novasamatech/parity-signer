@@ -202,8 +202,17 @@ export async function getRelevantMetadata(
 	specName: string
 ): Promise<Array<MetadataHandle>> {
 	try {
+		//This is the SLOW operation to blame!
 		const allMetadataMap = await SecureStorage.getAllItems(metadataStorage);
 		const metadataKeys = Object.getOwnPropertyNames(allMetadataMap);
+
+		// Uncomment this to clean up
+		// /*
+		//for (let deleteme of metadataKeys) {
+		//	await SecureStorage.deleteItem(deleteme, metadataStorage);
+		//}
+		// */
+
 		return metadataKeys
 			.map(function (keyValue: string): MetadataHandle {
 				return getMetadataHandleFromRaw(allMetadataMap[keyValue]);

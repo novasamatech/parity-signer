@@ -12,33 +12,48 @@ export const metadataHandleToKey = (metadataHandle: MetadataHandle): string => {
 	return metadataKey;
 };
 
+//TODO: add actual hash function
+function getMetadataHash(metadataRaw: string): string {
+	return metadataRaw.substr(2, 64);
+}
+
 export const getMetadataHandleFromRaw = (
 	metadataRaw: string
 ): MetadataHandle => {
-	const registry = new TypeRegistry();
-	const metadata = new Metadata(registry, metadataRaw);
-	registry.setMetadata(metadata);
-	const decorated = expandMetadata(registry, metadata);
-	const metadataVersion = (decorated.consts.system.version as unknown) as Map<
-		string,
-		any
-	>;
-	(metadataVersion as unknown) as Map<string, any>;
-	const metadataHandle: MetadataHandle = {
-		hash: metadataVersion.toString(),
-		specName: metadataVersion.get('specName'),
-		specVersion: metadataVersion.get('specVersion')
-	};
-	return metadataHandle;
-	//this would be the proper way to do it
-	/*
-	for (const moduleRecord of metadata.asLatest.modules)
-		if (moduleRecord.name === 'System')
-			for (constantRecord of moduleRecord.constants)
-				if (constantRecord.name === 'Version')
-					runtimeVersion = constantRecord.value;
-	//decode runtimeVersion;
-      	*/
+	try {
+		const registry = new TypeRegistry();
+		const metadata = new Metadata(registry, metadataRaw);
+		registry.setMetadata(metadata);
+		const decorated = expandMetadata(registry, metadata);
+		const metadataVersion = (decorated.consts.system.version as unknown) as Map<
+			string,
+			any
+		>;
+		(metadataVersion as unknown) as Map<string, any>;
+		const metadataHandle: MetadataHandle = {
+			hash: getMetadataHash(metadataRaw),
+			specName: metadataVersion.get('specName').toString(),
+			specVersion: parseInt(metadataVersion.get('specVersion'), 10)
+		};
+		return metadataHandle;
+		//this would be the proper way to do it
+		/*
+		for (const moduleRecord of metadata.asLatest.modules)
+			if (moduleRecord.name === 'System')
+				for (constantRecord of moduleRecord.constants)
+					if (constantRecord.name === 'Version')
+						runtimeVersion = constantRecord.value;
+		//decode runtimeVersion;
+      		*/
+	} catch (e) {
+		console.log(e);
+		const metadataHandle: MetadataHandle = {
+			hash: getMetadataHash(metadataRaw),
+			specName: '',
+			specVersion: 0
+		};
+		return metadataHandle;
+	}
 };
 
 export async function populateMetadata(): Promise<void> {

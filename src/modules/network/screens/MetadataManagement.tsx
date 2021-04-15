@@ -37,7 +37,6 @@ export default function MetadataManagement({
 	);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
-
 	const [knownMetadata, setKnownMetadata] = useState<Array<MetadataHandle>>([]);
 
 	useEffect(() => {

@@ -7989,7 +7989,7 @@ react-native-status-bar-height@^2.2.0:
 
 "react-native-substrate-sign@git+https://github.com/paritytech/react-native-substrate-sign.git#metadata-handling-tools":
   version "1.1.1"
-  resolved "git+https://github.com/paritytech/react-native-substrate-sign.git#ab2ae1e47e5f3943fa872a359e12f5c2ab586a1f"
+  resolved "git+https://github.com/paritytech/react-native-substrate-sign.git#189519c1ac56f15bce13defef2ae6ce2074aa239"
 
 react-native-svg@12.1.0, react-native-svg@^12.1.0:
   version "12.1.0"

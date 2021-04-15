@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
@@ -24,8 +24,11 @@ import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { tryDecodeQr } from 'utils/native';
-import { packetSize } from 'constants/raptorQ';
 import { saveMetadata } from 'utils/db';
+import { TxRequestData } from 'types/scannerTypes';
+//for tests
+import testIDs from 'e2e/testIDs';
+import { useInjectionQR } from 'e2e/injections';
 
 export default function Scanner({
 	navigation
@@ -34,21 +37,43 @@ export default function Scanner({
 	const [readPacketsCount, setReadPacketsCount] = useState(0);
 	const [messageSize, setMessageSize] = useState(0);
 	const [nominalPacketsNumber, setNominalPacketsNumber] = useState(0);
+	const [packetSize, setPacketSize] = useState(0);
+	const [decodeProcess, setDecodeProcess] = useState(true);
+
+	// E2E tests
+	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
 
 	// all code to derive information when size of package is determined
 	function setExpectedMessageInfo(size: string): void {
-		const parsedPrefix = parseInt('0x' + size, 16);
-		setMessageSize(parsedPrefix);
-		//always ask for two more packets (here and ">") to kick P>99.9%
-		setNominalPacketsNumber(~~(parsedPrefix / packetSize) + 1);
+		const parsedPacketSize = parseInt(size.substr(0, 4), 16) - 8;
+		const parsedMessageSize = parseInt(size.substr(4, 8), 16) - 0x80000000;
+		console.log(parsedPacketSize);
+		console.log(parsedMessageSize);
+		setPacketSize(parsedPacketSize);
+		setMessageSize(parsedMessageSize);
+		//always ask for two more packets to kick P>99.9%
+		setNominalPacketsNumber(~~(parsedMessageSize / parsedPacketSize) + 2);
 	}
 
 	function processQrFrame(data: string): void {
 		if (nominalPacketsNumber === 0) {
-			setExpectedMessageInfo(data.substr(5, 16));
+			console.log(data);
+			setDecodeProcess(true);
+			if (parseInt(data.substr(5, 1), 16) & 8) {
+				setExpectedMessageInfo(data.substr(1, 12));
+			} else {
+				console.log('legacy package');
+				const parsedLegacySize = parseInt(data.substr(1, 4), 16) - 5;
+				console.log(parsedLegacySize);
+				//processPackage(data.substr(15,parsedLegacySize*2));
+				navigation.goBack();
+			}
 		}
-		const payload = data.substr(21, packetSize * 2);
-		if (!readPacketsData.includes(payload)) {
+		const payload = data.substr(13, packetSize * 2);
+
+		//fountain message received and packetSize still not updated? Tough luck!
+
+		if (!readPacketsData.includes(payload) && payload) {
 			setReadPacketsData(readPacketsData.concat(payload));
 			setReadPacketsCount(readPacketsCount + 1);
 		}
@@ -60,15 +85,34 @@ export default function Scanner({
 			readPacketsCount >= nominalPacketsNumber &&
 			nominalPacketsNumber !== 0
 		) {
-			const decoded = await tryDecodeQr(readPacketsData, messageSize);
-			if (decoded !== '') {
+			const decoded = await tryDecodeQr(
+				readPacketsData,
+				messageSize,
+				packetSize
+			);
+			if (decoded !== '' && decodeProcess) {
+				setDecodeProcess(false);
 				//TODO: here we should place general handler if/when we switch
 				//to ubiquitous fountains. Now this handles only metadata input
-				saveMetadata(decoded);
+				//processPakage(decoded);
+				saveMetadata('0x' + decoded.substr(6));
 				navigation.goBack();
 			}
 		}
 	};
+
+	useEffect(() => {
+		/** E2E Test Injection Code **/
+		if (global.inTest && global.scanRequest !== undefined) {
+			onMockBarCodeRead(
+				global.scanRequest,
+				async (tx: TxRequestData): Promise<void> => {
+					await onBarCodeRead(tx);
+				}
+			);
+		}
+		/* eslint-disable-next-line react-hooks/exhaustive-deps */
+	}, [mockIndex]);
 
 	return (
 		<SafeAreaViewContainer>

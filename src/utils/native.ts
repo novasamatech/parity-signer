@@ -60,12 +60,15 @@ function toHex(x: string): string {
 //Try to decode fountain packages
 export async function tryDecodeQr(
 	data: Array<string>,
-	size: number
+	size: number,
+	packetSize: number
 ): Promise<string> {
 	const preparedData = data.join(',');
 	const localSizeCopy = size;
+	const localPacketSizeCopy = packetSize;
 	const decoded = await SubstrateSign.tryDecodeQrSequence(
 		localSizeCopy,
+		localPacketSizeCopy,
 		preparedData
 	);
 	return decoded;
