@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-/* global jest */
-// import mockCamera from './__mocks__/Camera'
+//
+//  Use this file to import your target's public headers that you would like to expose to Swift.
+//
 
-jest.doMock('react-native', () => 'reactNativeMock');
-
-// jest.doMock('react-native-substrate-sign', () => 'substrateSignMock');
+#import <React/RCTBridgeModule.h>
+#import "signer.h"
