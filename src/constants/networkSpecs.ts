@@ -149,7 +149,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Edgeware',
 		unit: 'EDG'
 	},
-/*	[SubstrateNetworkKeys.KULUPU]: {
+	/*	[SubstrateNetworkKeys.KULUPU]: {
 		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
@@ -164,7 +164,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Kulupu',
 		unit: 'KULU'
 	},
-*/	[SubstrateNetworkKeys.KUSAMA]: {
+*/ [SubstrateNetworkKeys.KUSAMA]: {
 		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,

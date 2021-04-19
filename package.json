@@ -26,7 +26,7 @@
     "clean:ios": "yarn clean && rm -rf ./ios/build && (cd ios && pod deintegrate)",
     "commit": "commit-wizard",
     "ios": "yarn run build-rust:ios && npx react-native run-ios",
-    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
+    "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --ignore-path lintignore",
     "lint:fix": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
     "start": "NODE_OPTIONS=--max_old_space_size=8192 npx react-native start",
     "unit": "jest --config ./test/unit/jest.config.js",
