@@ -87,4 +87,4 @@ android/app/bin
 
 # rust
 rust/signer/target
-rust/qr-fountain-gen/target
+rust/meta_reading/target

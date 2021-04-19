@@ -90,7 +90,7 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	metadata: {
 		hash: 'dummy',
 		specName: 'kusama',
-		specVersion: 2029
+		specVersion: 2030
 	},
 	protocol: NetworkProtocols.SUBSTRATE,
 	unit: 'UNIT'
@@ -108,8 +108,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
 			hash: 'centrifuge-dummy',
-			specName: 'centrifuge-chain',
-			specVersion: 240
+			specName: '',
+			specVersion: 0
 		},
 		order: 7,
 		pathId: 'centrifuge',
@@ -124,8 +124,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
 			hash: 'centrifuge-dummy',
-			specName: 'centrifuge-chain',
-			specVersion: 240
+			specName: '',
+			specVersion: 0
 		},
 		order: 8,
 		pathId: 'centrifuge_amber',
@@ -140,8 +140,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		logo: require('res/img/logos/Edgeware.png'),
 		metadata: {
 			hash: 'edgeware-dummy',
-			specName: 'edgeware',
-			specVersion: 41
+			specName: '',
+			specVersion: 0
 		},
 		order: 6,
 		pathId: 'edgeware',
@@ -149,7 +149,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Edgeware',
 		unit: 'EDG'
 	},
-	[SubstrateNetworkKeys.KULUPU]: {
+/*	[SubstrateNetworkKeys.KULUPU]: {
 		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
@@ -164,7 +164,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Kulupu',
 		unit: 'KULU'
 	},
-	[SubstrateNetworkKeys.KUSAMA]: {
+*/	[SubstrateNetworkKeys.KUSAMA]: {
 		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
@@ -172,7 +172,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		metadata: {
 			hash: 'kusama-dummy',
 			specName: 'kusama',
-			specVersion: 2029
+			specVersion: 2030
 		},
 		order: 2,
 		pathId: 'kusama',
@@ -187,7 +187,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		metadata: {
 			hash: 'kusama-dummy',
 			specName: 'kusama',
-			specVersion: 2029
+			specVersion: 2030
 		},
 		order: 99,
 		pathId: 'kusama_dev',
@@ -233,7 +233,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		metadata: {
 			hash: 'rococo-dummy',
 			specName: 'rococo',
-			specVersion: 214
+			specVersion: 232
 		},
 		order: 4,
 		pathId: 'rococo',
@@ -249,7 +249,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		metadata: {
 			hash: 'westend-dummy',
 			specName: 'westend',
-			specVersion: 49
+			specVersion: 50
 		},
 		order: 3,
 		pathId: 'westend',

@@ -1,0 +1,64 @@
+======
+Metadata fetching started: 2021-04-19 09:07:51.052646331 UTC
+
+* Updating kusama:
+S Added version 2030 as a new entry
+
+* Updating westend:
+S Added version 50 as a new entry
+
+* Updating edgeware:
+W No version found in constants
+S Added as a new entry without version
+
+* Updating kulupu:
+E Networking or low-level protocol error: Failed to resolve IP addresses for this hostname: 0
+
+* Updating centrifuge:
+W RuntimeMetadata version incompatible
+S Added as a new entry without version
+
+* Updating centrifugeAmber:
+W RuntimeMetadata version incompatible
+S Added as a new entry without version
+
+* Updating polkadot:
+E Networking or low-level protocol error: Couldn't find any IP address for this hostname
+
+* Updating rococo:
+S Added version 232 as a new entry
+
+Metadata fetching finished: 2021-04-19 09:07:57.101982174 UTC
+======
+Metadata fetching started: 2021-04-19 09:08:47.175422899 UTC
+
+* Updating kusama:
+* Version 2030 up to date.
+
+* Updating westend:
+* Version 50 up to date.
+
+* Updating edgeware:
+W No version found in constants
+* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
+
+* Updating kulupu:
+E Networking or low-level protocol error: Failed to resolve IP addresses for this hostname: 0
+
+* Updating centrifuge:
+W RuntimeMetadata version incompatible
+* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
+
+* Updating centrifugeAmber:
+W RuntimeMetadata version incompatible
+* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
+
+* Updating polkadot:
+E Networking or low-level protocol error: Couldn't find any IP address for this hostname
+
+* Updating rococo:
+* Version 232 up to date.
+
+Metadata fetching finished: 2021-04-19 09:08:52.983998587 UTC
+
+ No updates made.
