@@ -24,7 +24,7 @@ import testIDs from 'e2e/testIDs';
 import { testTap, testVisible } from 'e2e/utils';
 
 // Set the default timeout
-jest.setTimeout(120000);
+jest.setTimeout(360000);
 jasmine.getEnv().addReporter(adapter);
 
 // This takes care of generating status logs on a per-spec basis. By default, jest only reports at file-level.
