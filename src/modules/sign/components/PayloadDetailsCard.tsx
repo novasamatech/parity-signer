@@ -14,9 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GenericExtrinsicPayload, GenericCall } from '@polkadot/types';
+import { GenericExtrinsicPayload, GenericCall, Struct } from '@polkadot/types';
 import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
-import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
+import {
+	AnyJson,
+	AnyU8a,
+	Codec,
+	IExtrinsicEra,
+	IMethod
+} from '@polkadot/types/types';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useContext, useEffect, useState } from 'react';
@@ -41,6 +47,24 @@ type ExtrinsicPartProps = {
 	value: AnyJson | AnyU8a | IMethod | IExtrinsicEra;
 };
 
+type FrameMethod = {
+	method: string;
+	pallet: string;
+};
+
+type SanitizedArgs = {
+	[key: string]: unknown;
+	call?: SanitizedCall;
+	calls?: SanitizedCall[];
+};
+
+type SanitizedCall = {
+	[key: string]: unknown;
+	args: SanitizedArgs;
+	callIndex?: Uint8Array | string;
+	method: string | FrameMethod;
+};
+
 const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 	({
 		fallback,
@@ -63,59 +87,59 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const typeRegistry = getTypeRegistry(networkKey)!;
 
 		function parseArrayGenericCalls(
-			argsArray: Codec[],
-		): (Codec | ISanitizedCall)[] {
-			return argsArray.map((argument) => {
+			argsArray: Codec[]
+		): (Codec | SanitizedCall)[] {
+			return argsArray.map(argument => {
 				if (argument instanceof GenericCall) {
 					return parseGenericCall(argument);
 				}
-	
+
 				return argument;
 			});
 		}
-	
-		function parseGenericCall(
-			genericCall: GenericCall,
-		): ISanitizedCall {
-			const newArgs = {};
-	
+
+		function parseGenericCall(genericCall: GenericCall): SanitizedCall {
+			const newArgs: SanitizedArgs = {};
+
 			// Pull out the struct of arguments to this call
 			const callArgs = genericCall.get('args') as Struct;
-	
+
 			// Make sure callArgs exists and we can access its keys
 			if (callArgs && callArgs.defKeys) {
 				// paramName is a string
 				for (const paramName of callArgs.defKeys) {
 					const argument = callArgs.get(paramName);
-	
+
 					if (Array.isArray(argument)) {
 						newArgs[paramName] = parseArrayGenericCalls(argument);
 					} else if (argument instanceof GenericCall) {
 						newArgs[paramName] = parseGenericCall(argument);
-					} else if (paramName === 'call' && argument?.toRawType() === 'Bytes') {
+					} else if (
+						paramName === 'call' &&
+						argument?.toRawType() === 'Bytes'
+					) {
 						// multiSig.asMulti.args.call is an OpaqueCall (Vec<u8>) that we
 						// serialize to a polkadot-js Call and parse so it is not a hex blob.
 						try {
 							const call = typeRegistry.createType('Call', argument.toHex());
 							newArgs[paramName] = parseGenericCall(call);
 						} catch {
-							newArgs[paramName] = argument;
+							newArgs[paramName] = (argument as any) as SanitizedCall;
 						}
 					} else {
-							newArgs[paramName] = argument;
+						newArgs[paramName] = (argument as any) as SanitizedCall;
 					}
 				}
 			}
-	
+
 			return {
-				method: {
-					pallet: genericCall.section,
-					method: genericCall.method,
-					},
 				args: newArgs,
+				method: {
+					method: genericCall.method,
+					pallet: genericCall.section
+				}
 			};
 		}
-
 
 		useEffect(() => {
 			if (label === 'Era' && !fallback) {
@@ -139,7 +163,6 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			typeRegistry,
 			networks
 		]);
-
 
 		const renderEraDetails = (): React.ReactElement => {
 			if (period && phase) {
@@ -175,12 +198,10 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 
 		const renderMethodDetails = (): React.ReactNode => {
 			const call = typeRegistry.createType('Call', value);
-			const parsed = JSON.stringify(parseGenericCall(call), null,2);
+			const parsed = JSON.stringify(parseGenericCall(call), null, 2);
 			return (
 				<View style={styles.callDetails}>
-					<Text style={styles.titleText}>
-						{parsed}
-					</Text>
+					<Text style={styles.titleText}>{parsed}</Text>
 				</View>
 			);
 		};
