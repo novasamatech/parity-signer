@@ -95,7 +95,8 @@ export default function Scanner({
 				//TODO: here we should place general handler if/when we switch
 				//to ubiquitous fountains. Now this handles only metadata input
 				//processPakage(decoded);
-				saveMetadata('0x' + decoded.substr(6));
+				//saveMetadata('0x' + decoded.substr(6));
+				console.log(decoded);
 				navigation.goBack();
 			}
 		}

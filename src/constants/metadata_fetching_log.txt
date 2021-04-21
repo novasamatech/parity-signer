@@ -1,64 +1,47 @@
 ======
-Metadata fetching started: 2021-04-19 09:07:51.052646331 UTC
+Metadata fetching started: 2021-04-21 13:28:52.049121550 UTC
 
 * Updating kusama:
-S Added version 2030 as a new entry
+S Updated: new version 2030 was fetched. Older version 2029 metadata was updated to have version visibly recorded, and sent to historical record.
 
 * Updating westend:
-S Added version 50 as a new entry
+S Updated: new version 50 was fetched. Older version 49 metadata was updated to have version visibly recorded, and sent to historical record.
 
 * Updating edgeware:
 W No version found in constants
-S Added as a new entry without version
+S Updated, only newly retrieved metadata kept. No version in both existing and retrieved metadata, and metadata changed.
 
 * Updating kulupu:
 E Networking or low-level protocol error: Failed to resolve IP addresses for this hostname: 0
+* Updated to have version 17 visibly recorded.
 
 * Updating centrifuge:
 W RuntimeMetadata version incompatible
-S Added as a new entry without version
+S Updated, only newly retrieved metadata kept. No version in both existing and retrieved metadata, and metadata changed.
 
 * Updating centrifugeAmber:
-W RuntimeMetadata version incompatible
-S Added as a new entry without version
-
-* Updating polkadot:
 E Networking or low-level protocol error: Couldn't find any IP address for this hostname
 
-* Updating rococo:
-S Added version 232 as a new entry
-
-Metadata fetching finished: 2021-04-19 09:07:57.101982174 UTC
-======
-Metadata fetching started: 2021-04-19 09:08:47.175422899 UTC
-
-* Updating kusama:
-* Version 2030 up to date.
-
-* Updating westend:
-* Version 50 up to date.
-
-* Updating edgeware:
-W No version found in constants
-* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
-
-* Updating kulupu:
-E Networking or low-level protocol error: Failed to resolve IP addresses for this hostname: 0
-
-* Updating centrifuge:
-W RuntimeMetadata version incompatible
-* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
-
-* Updating centrifugeAmber:
-W RuntimeMetadata version incompatible
-* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
-
 * Updating polkadot:
-E Networking or low-level protocol error: Couldn't find any IP address for this hostname
+S Updated: new version 29 was fetched. Older version 28 metadata was updated to have version visibly recorded, and sent to historical record.
 
 * Updating rococo:
-* Version 232 up to date.
+S Updated: new version 232 was fetched. Older version 214 metadata was updated to have version visibly recorded, and sent to historical record.
 
-Metadata fetching finished: 2021-04-19 09:08:52.983998587 UTC
+Metadata fetching finished: 2021-04-21 13:28:56.697493577 UTC
 
- No updates made.
+Updating networkSpecs.ts file
+* Updating kusama
+S OK
+* Updating kulupu
+S OK
+* Updating kusama
+S OK
+* Updating kusama
+S OK
+* Updating polkadot
+S OK
+* Updating rococo
+S OK
+* Updating westend
+S OK

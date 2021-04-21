@@ -2,6 +2,7 @@ use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use chrono::{DateTime, Utc};
+use regex::Regex;
 
 use meta_reading::*;
 
@@ -224,6 +225,53 @@ fn main() {
                 }
             }
         }
+    }
+// Updating networkSpecs.ts file
+    if let Err(e) = writeln!(file, "\nUpdating networkSpecs.ts file") {
+        eprintln!("Couldn't write to file: {}", e);
+    }
+
+    let re = Regex::new(r#"metadata: \{\n.*hash: '(?P<hash>[^']+)',\n.*specName: '(?P<name>[^']+)',\n.*specVersion: (?P<vers>[0-9]*)\n.*\},\n"#).unwrap();
+    let old_specs = fs::read_to_string("networkSpecs.ts").unwrap();
+    let mut new_specs = fs::read_to_string("networkSpecs.ts").unwrap();
+//    println!("{:?}", re.as_str());
+    
+    for caps in re.captures_iter(&old_specs) {
+        if let Err(e) = writeln!(file, "* Updating {}", &caps["name"]) {
+            eprintln!("Couldn't write to file: {}", e);
+        }
+        let mut found_flag = false;
+        for x in existing.latest.iter() {
+            if &caps["name"] == x.name {
+                let hash_real = format!("0x****{}", &caps["name"]);
+                let ver_real = match x.version{
+                    Some(v) => v,
+                    None => 0,
+                };
+                let search_line = format!("metadata: \\{{\n.*hash: '(?P<hash>[^']+)',\n.*specName: '{}',\n.*specVersion: (?P<vers>[0-9]*)\n.*\\}},\n", &caps["name"]);
+                let re_fixing = Regex::new(&search_line).unwrap();
+                new_specs = re_fixing.replace_all(&new_specs, format!("metadata: {{\n\t\t\thash: '{}',\n\t\t\tspecName: '{}',\n\t\t\tspecVersion: {}\n\t\t}},\n", hash_real, &caps["name"], ver_real)).to_string();
+                found_flag = true;
+                if let Err(e) = writeln!(file, "S OK") {
+                    eprintln!("Couldn't write to file: {}", e);
+                }
+                break;
+            }
+        }
+        if !found_flag {
+            if let Err(e) = writeln!(file, "E Name not found. Check manually.") {
+                eprintln!("Couldn't write to file: {}", e);
+            }
+        }
+    }
+    let mut ns_file = OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open("networkSpecs.ts")
+        .unwrap();
+    if let Err(e) = writeln!(ns_file, "{}", new_specs) {
+        eprintln!("Couldn't write to file: {}", e);
     }
 }
 

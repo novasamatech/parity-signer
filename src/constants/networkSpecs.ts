@@ -88,7 +88,7 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	metadata: {
-		hash: 'dummy',
+		hash: '0x****kusama',
 		specName: 'kusama',
 		specVersion: 2030
 	},
@@ -154,7 +154,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
 		metadata: {
-			hash: 'kulupu-dummy',
+			hash: '0x****kulupu',
 			specName: 'kulupu',
 			specVersion: 17
 		},
@@ -170,7 +170,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('res/img/logos/Kusama.png'),
 		metadata: {
-			hash: 'kusama-dummy',
+			hash: '0x****kusama',
 			specName: 'kusama',
 			specVersion: 2030
 		},
@@ -185,7 +185,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		metadata: {
-			hash: 'kusama-dummy',
+			hash: '0x****kusama',
 			specName: 'kusama',
 			specVersion: 2030
 		},
@@ -201,9 +201,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.POLKADOT,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: 'polkadot-dummy',
+			hash: '0x****polkadot',
 			specName: 'polkadot',
-			specVersion: 28
+			specVersion: 29
 		},
 		order: 1,
 		pathId: 'polkadot',
@@ -231,7 +231,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
 		logo: require('res/img/logos/Rococo.png'),
 		metadata: {
-			hash: 'rococo-dummy',
+			hash: '0x****rococo',
 			specName: 'rococo',
 			specVersion: 232
 		},
@@ -247,7 +247,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.WESTEND,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: 'westend-dummy',
+			hash: '0x****westend',
 			specName: 'westend',
 			specVersion: 50
 		},
