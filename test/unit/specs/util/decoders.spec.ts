@@ -17,10 +17,10 @@
 import {
 	createType,
 	GenericExtrinsicPayload,
-	Metadata,
 	TypeRegistry
 } from '@polkadot/types';
-import Call from '@polkadot/types/generic/Call';
+import { Metadata } from '@polkadot/metadata';
+import { GenericCall as Call } from '@polkadot/types/generic';
 import { hexToU8a, u8aConcat } from '@polkadot/util';
 import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { describe, expect, it } from '@jest/globals';
@@ -73,7 +73,7 @@ const SIGNER_PAYLOAD_TEST = {
 	era: createType(registry, 'ExtrinsicEra', { current: 2301232, period: 200 }),
 	genesisHash: SubstrateNetworkKeys.KUSAMA,
 	method:
-		'0x0600ffd7568e5f0a7eda67a82691ff379ac4bba4f9c9b859fe779b5d46363b61ad2db9e56c',
+		'0x0600008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4813f6ffffffffff3f0102',
 	nonce: 0x1234,
 	specVersion: 123,
 	tip: 0x5678,

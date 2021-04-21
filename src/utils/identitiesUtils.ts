@@ -43,12 +43,11 @@ import {
 import {
 	centrifugeAmberMetadata,
 	centrifugeMetadata,
-	defaultMetaData,
 	edgewareMetadata,
 	kulupuMetadata,
 	kusamaMetadata,
 	polkadotMetaData,
-	substrateDevMetadata,
+	rococoMetadata,
 	westendMetadata
 } from 'constants/networkMetadata';
 
@@ -475,7 +474,7 @@ export const groupPaths = (
 	return groupedPaths.sort(_comparePathGroups);
 };
 
-export const getMetadata = (networkKey: string): string => {
+export const getMetadata = (networkKey: string): string | null => {
 	switch (networkKey) {
 		case SubstrateNetworkKeys.CENTRIFUGE:
 			return centrifugeMetadata;
@@ -486,15 +485,15 @@ export const getMetadata = (networkKey: string): string => {
 			return kusamaMetadata;
 		case SubstrateNetworkKeys.WESTEND:
 			return westendMetadata;
-		case SubstrateNetworkKeys.SUBSTRATE_DEV:
-			return substrateDevMetadata;
 		case SubstrateNetworkKeys.EDGEWARE:
 			return edgewareMetadata;
 		case SubstrateNetworkKeys.KULUPU:
 			return kulupuMetadata;
 		case SubstrateNetworkKeys.POLKADOT:
 			return polkadotMetaData;
+		case SubstrateNetworkKeys.ROCOCO:
+			return rococoMetadata;
 		default:
-			return defaultMetaData;
+			return null;
 	}
 };

@@ -74,7 +74,7 @@ type SignedTX = {
 type ScannerStoreState = {
 	busy: boolean;
 	completedFramesCount: number;
-	dataToSign: string | GenericExtrinsicPayload;
+	dataToSign: string | Uint8Array;
 	isHash: boolean;
 	isOversized: boolean;
 	latestFrame: number | null;
@@ -82,6 +82,7 @@ type ScannerStoreState = {
 	missedFrames: Array<number>;
 	multipartData: null | Array<Uint8Array | null>;
 	multipartComplete: boolean;
+	rawPayload: Uint8Array | string | null;
 	recipient: FoundAccount | null;
 	sender: FoundAccount | null;
 	signedData: string;
@@ -132,6 +133,7 @@ const DEFAULT_STATE: ScannerStoreState = {
 	missedFrames: [],
 	multipartComplete: false,
 	multipartData: null,
+	rawPayload: null,
 	recipient: null,
 	sender: null,
 	signedData: '',
@@ -347,7 +349,7 @@ export function useScannerContext(): ScannerContextState {
 			)) || emptyAccount(recipientAddress, networkKey);
 
 		const qrInfo: TxQRInfo = {
-			dataToSign: dataToSign as string,
+			dataToSign: dataToSign,
 			isHash: false,
 			isOversized,
 			recipient: recipient as FoundAccount,
@@ -356,7 +358,7 @@ export function useScannerContext(): ScannerContextState {
 			type: 'transaction'
 		};
 
-		setState(qrInfo);
+		setState({ ...qrInfo, rawPayload: txRequest.data.data });
 		return qrInfo;
 	}
 
@@ -464,7 +466,8 @@ export function useScannerContext(): ScannerContextState {
 		if (dataToSign instanceof GenericExtrinsicPayload) {
 			signable = u8aToHex(dataToSign.toU8a(true), -1, false);
 		} else if (isHash) {
-			signable = hexStripPrefix(dataToSign);
+			console.log('sign substrate data type is', typeof dataToSign);
+			signable = hexStripPrefix(dataToSign.toString());
 		} else if (isU8a(dataToSign)) {
 			signable = hexStripPrefix(u8aToHex(dataToSign));
 		} else if (isAscii(dataToSign)) {
@@ -500,7 +503,8 @@ export function useScannerContext(): ScannerContextState {
 			if (dataToSign instanceof GenericExtrinsicPayload) {
 				signable = u8aToHex(dataToSign.toU8a(true), -1, false);
 			} else if (isHash) {
-				signable = hexStripPrefix(dataToSign);
+				console.log('sign legacy data type is', typeof dataToSign);
+				signable = hexStripPrefix(dataToSign.toString());
 			} else if (isU8a(dataToSign)) {
 				signable = hexStripPrefix(u8aToHex(dataToSign));
 			} else if (isAscii(dataToSign)) {

@@ -36,12 +36,11 @@
     "e2e": "yarn e2e:ios && yarn e2e:android"
   },
   "dependencies": {
-    "@polkadot/api": "1.26.1",
+    "@polkadot/api": "3.9.3",
+    "@polkadot/metadata": "^3.9.3",
     "@polkadot/reactnative-identicon": "0.53.1",
-    "@polkadot/types": "1.26.1",
-    "@polkadot/types-known": "1.26.1",
-    "@polkadot/util": "2.11.1",
-    "@polkadot/util-crypto": "2.11.1",
+    "@polkadot/util": "5.4.4",
+    "@polkadot/util-crypto": "5.4.4",
     "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-native-community/netinfo": "^5.9.3",
@@ -49,13 +48,16 @@
     "@react-navigation/stack": "^5.7.1",
     "bignumber.js": "^9.0.0",
     "hoist-non-react-statics": "^3.3.0",
+    "jest-circus": "26.5.2",
+    "jest-environment-node": "26.6.2",
+    "mocha": "6.0.0",
     "node-libs-react-native": "^1.0.3",
     "react": "^16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.63.4",
     "react-native-camera": "^3.21.0",
     "react-native-elements": "^1.2.6",
     "react-native-gesture-handler": "^1.6.0",
-    "react-native-keyboard-aware-scroll-view": "^0.9.1",
+    "react-native-keyboard-aware-scroll-view": "0.9.3",
     "react-native-markdown-renderer": "^3.2.8",
     "react-native-navbar-color": "^1.0.3",
     "react-native-popup-menu": "^0.15.6",
@@ -65,7 +67,7 @@
     "react-native-substrate-sign": "git+https://github.com/Slesarew/react-native-substrate-sign.git#signer-issue614",
     "react-native-svg": "12.1.0",
     "react-native-tabs": "^1.0.9",
-    "react-native-vector-icons": "^7.0.0",
+    "react-native-vector-icons": "^8.0.0",
     "readable-stream": "^3.4.0",
     "vm-browserify": "1.1.0"
   },
@@ -81,22 +83,22 @@
     "@types/jasmine": "^3.5.12",
     "@types/jest": "^25.2.3",
     "@types/react": "^16.9.34",
-    "@types/react-native": "^0.62.2",
+    "@types/react-native": "0.63.35",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.28.0",
     "babel-eslint": "10.1.0",
-    "babel-jest": "^25.5.1",
+    "babel-jest": "26.6.3",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-rewrite-require": "^1.14.5",
     "babel-plugin-tester": "^9.0.1",
-    "detox": "^16.8.2",
+    "detox": "17.14.9",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react-hooks": "^3.0.0",
-    "jest": "^25.4.0",
+    "jest": "26.6.3",
     "jetifier": "^1.6.5",
     "metro-react-native-babel-preset": "^0.59.0",
     "prettier": "2.0.2",
@@ -104,7 +106,7 @@
     "react-native-typescript-transformer": "^1.2.13",
     "react-test-renderer": "16.13.1",
     "reactotron-react-native": "5.0.0",
-    "ts-jest": "^25.4.0",
+    "ts-jest": "^26.5.1",
     "typescript": "^3.9.7"
   },
   "resolutions": {
@@ -133,7 +135,7 @@
         "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Nexus_5_API_28"
+          "avdName": "Pixel_3a_API_30_x86"
         }
       },
       "android.emu.release": {
@@ -141,11 +143,16 @@
         "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
         "type": "android.emulator",
         "device": {
-          "avdName": "Nexus_5_API_28"
+          "avdName": "Pixel_3a_API_30_x86"
         }
       }
     },
     "runner-config": "test/e2e/jest.config.js",
     "test-runner": "jest"
+  },
+  "jest": {
+    "projects": [
+      "test/unit/jest.config.js"
+    ]
   }
 }
