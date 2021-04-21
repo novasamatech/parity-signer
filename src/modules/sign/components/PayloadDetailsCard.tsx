@@ -14,9 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GenericExtrinsicPayload } from '@polkadot/types';
+import { GenericExtrinsicPayload, GenericCall, Struct } from '@polkadot/types';
 import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
-import { AnyJson, AnyU8a, IExtrinsicEra, IMethod } from '@polkadot/types/types';
+import {
+	AnyJson,
+	AnyU8a,
+	Codec,
+	IExtrinsicEra,
+	IMethod
+} from '@polkadot/types/types';
 import { formatBalance } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import React, { useContext, useEffect, useState } from 'react';
@@ -41,6 +47,24 @@ type ExtrinsicPartProps = {
 	value: AnyJson | AnyU8a | IMethod | IExtrinsicEra;
 };
 
+type FrameMethod = {
+	method: string;
+	pallet: string;
+};
+
+type SanitizedArgs = {
+	[key: string]: unknown;
+	call?: SanitizedCall;
+	calls?: SanitizedCall[];
+};
+
+type SanitizedCall = {
+	[key: string]: unknown;
+	args: SanitizedArgs;
+	callIndex?: Uint8Array | string;
+	method: string | FrameMethod;
+};
+
 const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 	({
 		fallback,
@@ -62,65 +86,62 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const prefix = networkParams.prefix;
 		const typeRegistry = getTypeRegistry(networkKey)!;
 
-		useEffect(() => {
-			if (label === 'Method' && !fallback) {
-				try {
-					const call = typeRegistry.createType('Call', value);
-					const methodArgs = {};
+		function parseArrayGenericCalls(
+			argsArray: Codec[]
+		): (Codec | SanitizedCall)[] {
+			return argsArray.map(argument => {
+				if (argument instanceof GenericCall) {
+					return parseGenericCall(argument);
+				}
 
-					function formatArgs(
-						callInstance: Call,
-						callMethodArgs: any,
-						depth: number
-					): void {
-						const { args, meta } = callInstance;
-						const paramArgKvArray = [];
-						if (!meta.args.length) {
-							const sectionMethod = `${call.method}.${call.section}`;
-							callMethodArgs[sectionMethod] = null;
-							return;
-						}
+				return argument;
+			});
+		}
 
-						for (let i = 0; i < meta.args.length; i++) {
-							let argument;
-							if (
-								args[i].toRawType() === 'Balance' ||
-								args[i].toRawType() === 'Compact<Balance>'
-							) {
-								argument = formatBalance(args[i].toString());
-							} else if (
-								args[i].toRawType() === 'Address' ||
-								args[i].toRawType() === 'AccountId'
-							) {
-								// encode Address and AccountId to the appropriate prefix
-								argument = recodeAddress(args[i].toString(), prefix);
-							} else if ((args[i] as Call).section) {
-								argument = formatArgs(args[i] as Call, callMethodArgs, depth++); // go deeper into the nested calls
-							} else if (
-								args[i].toRawType() === 'Vec<AccountId>' ||
-								args[i].toRawType() === 'Vec<Address>'
-							) {
-								argument = (args[i] as any).map((v: any) =>
-									recodeAddress(v.toString(), prefix)
-								);
-							} else {
-								argument = args[i].toString();
-							}
-							const param = meta.args[i].name.toString();
-							const sectionMethod = `${call.method}.${call.section}`;
-							paramArgKvArray.push([param, argument]);
-							callMethodArgs[sectionMethod] = paramArgKvArray;
+		function parseGenericCall(genericCall: GenericCall): SanitizedCall {
+			const newArgs: SanitizedArgs = {};
+
+			// Pull out the struct of arguments to this call
+			const callArgs = genericCall.get('args') as Struct;
+
+			// Make sure callArgs exists and we can access its keys
+			if (callArgs && callArgs.defKeys) {
+				// paramName is a string
+				for (const paramName of callArgs.defKeys) {
+					const argument = callArgs.get(paramName);
+
+					if (Array.isArray(argument)) {
+						newArgs[paramName] = parseArrayGenericCalls(argument);
+					} else if (argument instanceof GenericCall) {
+						newArgs[paramName] = parseGenericCall(argument);
+					} else if (
+						paramName === 'call' &&
+						argument?.toRawType() === 'Bytes'
+					) {
+						// multiSig.asMulti.args.call is an OpaqueCall (Vec<u8>) that we
+						// serialize to a polkadot-js Call and parse so it is not a hex blob.
+						try {
+							const call = typeRegistry.createType('Call', argument.toHex());
+							newArgs[paramName] = parseGenericCall(call);
+						} catch {
+							newArgs[paramName] = (argument as any) as SanitizedCall;
 						}
+					} else {
+						newArgs[paramName] = (argument as any) as SanitizedCall;
 					}
-
-					formatArgs(call, methodArgs, 0);
-					setFormattedCallArgs(methodArgs);
-				} catch (e) {
-					alertDecodeError(setAlert);
-					setUseFallBack(true);
 				}
 			}
 
+			return {
+				args: newArgs,
+				method: {
+					method: genericCall.method,
+					pallet: genericCall.section
+				}
+			};
+		}
+
+		useEffect(() => {
 			if (label === 'Era' && !fallback) {
 				if ((value as ExtrinsicEra).isMortalEra) {
 					setPeriod((value as ExtrinsicEra).asMortalEra.period.toString());
@@ -132,15 +153,15 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 				setTip(formatBalance(value as any));
 			}
 		}, [
-			fallback, //good
-			label, //good
-			prefix, //good
-			//value,	//bad
-			networkKey, //good
-			//registriesStore,	//bad
-			//setAlert,	//bad
-			typeRegistry, //good
-			networks //good
+			fallback,
+			label,
+			prefix,
+			value,
+			networkKey,
+			registriesStore,
+			setAlert,
+			typeRegistry,
+			networks
 		]);
 
 		const renderEraDetails = (): React.ReactElement => {
@@ -175,58 +196,14 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			}
 		};
 
-		type ArgsList = Array<[string, any]>;
-		type MethodCall = [string, ArgsList];
-		type FormattedArgs = Array<MethodCall>;
-
 		const renderMethodDetails = (): React.ReactNode => {
-			if (formattedCallArgs) {
-				const formattedArgs: FormattedArgs = Object.entries(formattedCallArgs);
-
-				// HACK: if there's a sudo method just put it to the front. Better way would be to order by depth but currently this is only relevant for a single extrinsic, so seems like overkill.
-				for (let i = 1; i < formattedArgs.length; i++) {
-					if (formattedArgs[i][0].includes('sudo')) {
-						const tmp = formattedArgs[i];
-						formattedArgs.splice(i, 1);
-						formattedArgs.unshift(tmp);
-						break;
-					}
-				}
-
-				return formattedArgs.map((entry, index) => {
-					const sectionMethod = entry[0];
-					const paramArgs: Array<[any, any]> = entry[1];
-
-					return (
-						<View key={index} style={styles.callDetails}>
-							<Text style={styles.secondaryText}>
-								Call <Text style={styles.titleText}>{sectionMethod}</Text> with
-								the following arguments:
-							</Text>
-							{paramArgs ? (
-								paramArgs.map(([param, arg]) => (
-									<View key={param} style={styles.callDetails}>
-										<Text style={styles.titleText}>
-											{' { '}
-											{param}:{' '}
-											{arg && arg.length > 50
-												? shortString(arg)
-												: arg instanceof Array
-												? arg.join(', ')
-												: arg}{' '}
-											{'}'}
-										</Text>
-									</View>
-								))
-							) : (
-								<Text style={styles.secondaryText}>
-									This method takes 0 arguments.
-								</Text>
-							)}
-						</View>
-					);
-				});
-			}
+			const call = typeRegistry.createType('Call', value);
+			const parsed = JSON.stringify(parseGenericCall(call), null, 2);
+			return (
+				<View style={styles.callDetails}>
+					<Text style={styles.titleText}>{parsed}</Text>
+				</View>
+			);
 		};
 
 		const renderTipDetails = (): React.ReactElement => {
