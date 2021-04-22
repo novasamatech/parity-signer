@@ -116,10 +116,19 @@ workflows:
         title: install
         inputs:
         - command: install:ios
-    - yarn@0:
+    - script@1:
         title: build
         inputs:
-        - command: xcbuild:debug
+        - is_debug: 'yes'
+        - content: |
+            #!/usr/bin/env bash
+            cd ios
+            xcodebuild clean archive \
+            PRODUCT_BUNDLE_IDENTIFIER=io.parity.NativeSigner \
+            -scheme NativeSigner \
+            -configuration Debug -derivedDataPath ./build \
+            -archivePath ./build/Products/ParitySigner.xcarchive \
+            -workspace NativeSigner.xcworkspace
     - cache-push@2:
         inputs:
         - compress_archive: 'true'
