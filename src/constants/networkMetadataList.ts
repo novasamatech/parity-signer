@@ -6,11 +6,11 @@ export const defaultMetaData = metadata.kusamaMetadataV2030;
 
 export const allBuiltInMetadata = [
 	metadata.kulupuMetadataV17,
-	metadata.centrifugeAmberMetadata,
 	metadata.kusamaMetadataV2030,
 	metadata.westendMetadataV50,
 	metadata.edgewareMetadata,
 	metadata.centrifugeMetadata,
 	metadata.polkadotMetadataV29,
 	metadata.rococoMetadataV232,
+	metadata.centrifugeAmberMetadata,
 ];

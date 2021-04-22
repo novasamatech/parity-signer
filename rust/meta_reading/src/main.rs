@@ -11,13 +11,7 @@ fn main() {
 // existing metadata is stored in networkMetadata.ts file, this part fetches the metadata as MetaValues from file
     let contents = fs::read_to_string("networkMetadata.ts");
     let old_full: Vec<MetaValues> = match contents {
-        Ok(c) => {
-            c
-            .lines()
-            .filter(|line| line.contains("export const"))
-            .map(|line| split_properly(line))
-            .collect()
-        },
+        Ok(c) => split_properly(&c),
         Err(_) => Vec::new(),
     };
 // Sorting old metadata into most recent group - one entry with latest version for each chain name (the one to check against), and the historical group (keep at most one historical entry for each chain name). "No version" is by default older than some version.
@@ -26,12 +20,8 @@ fn main() {
 // address book is stored in address_book text file, to be updated if necessary; this part fetches address book entries
     let filename = "address_book";
     let contents = fs::read_to_string(filename).expect("No address book found.");
-    let address_book: Vec<AddressBookEntry> = {
-        contents
-        .lines()
-        .map(|line| get_address(line))
-        .collect()
-    };
+    let address_book = get_addresses(&contents);
+    
 // getting the time stamp before fetching the metadata
     let timestamp_before: DateTime<Utc> = Utc::now();
 // fetching the metadata from addresses provided; that one is slow;
@@ -243,7 +233,13 @@ fn main() {
         let mut found_flag = false;
         for x in existing.latest.iter() {
             if &caps["name"] == x.name {
-                let hash_real = format!("0x****{}", &caps["name"]);
+                let hash_real = match hash_from_meta(&x.meta) {
+                    Some(a) => a,
+                    None => {
+                        eprintln!("Couldn't calculate hash for: {}", x.name);
+                        String::from("")
+                    },
+                };
                 let ver_real = match x.version{
                     Some(v) => v,
                     None => 0,

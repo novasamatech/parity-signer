@@ -17,3 +17,5 @@ jsonrpsee-ws-client = "0.2.0-alpha.4"
 tokio = { version = "1", features = ["full"] }
 chrono = "0.4.19"
 regex = "1.4.5"
+json = "0.12.4"
+blake2-rfc = "0.2.18"

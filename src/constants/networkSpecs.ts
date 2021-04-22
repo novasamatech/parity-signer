@@ -88,10 +88,10 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	metadata: {
-		hash: '0x****kusama',
-		specName: 'kusama',
-		specVersion: 2030
-	},
+			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
+			specName: 'kusama',
+			specVersion: 2030
+		},
 	protocol: NetworkProtocols.SUBSTRATE,
 	unit: 'UNIT'
 };
@@ -154,7 +154,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
 		metadata: {
-			hash: '0x****kulupu',
+			hash: '124a81a831e846343e15380846988ce0f744fbcccba90979c501477a2ff58b76',
 			specName: 'kulupu',
 			specVersion: 17
 		},
@@ -170,7 +170,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('res/img/logos/Kusama.png'),
 		metadata: {
-			hash: '0x****kusama',
+			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
 			specName: 'kusama',
 			specVersion: 2030
 		},
@@ -185,7 +185,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		metadata: {
-			hash: '0x****kusama',
+			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
 			specName: 'kusama',
 			specVersion: 2030
 		},
@@ -201,7 +201,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.POLKADOT,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: '0x****polkadot',
+			hash: '7ef1da1c6b931d2f64580013517f1e023c2ce24785eeaa749e6e56384bd58bd3',
 			specName: 'polkadot',
 			specVersion: 29
 		},
@@ -217,7 +217,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
 		logo: require('res/img/logos/Rococo.png'),
 		metadata: {
-			hash: '0x****rococo',
+			hash: '2e309508628ab604963f4b8b06ee6c1ec0b6637596822219f2f637c29066ac91',
 			specName: 'rococo',
 			specVersion: 232
 		},
@@ -233,7 +233,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.WESTEND,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: '0x****westend',
+			hash: '58ad604854feab1e95a57335727a9ede65659a06d0f304bc9761b7b832741daf',
 			specName: 'westend',
 			specVersion: 50
 		},
@@ -340,3 +340,4 @@ export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(
 );
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
+
