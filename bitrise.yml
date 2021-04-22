@@ -39,14 +39,14 @@ workflows:
             #!/usr/bin/env bash
             set -ex
             TMPDIR=${BITRISE_SOURCE_DIR}/metro-cache
-            NODE_OPTIONS=--max_old_space_size=8192
+            NODE_OPTIONS=--max_old_space_size=7000
             time npx react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/src/main/assets/index.android.bundle --assets-dest ./android/app/src/main/res
     - gradle-runner@1:
         inputs:
-        - gradlew_path: ./android/gradlew
+        - gradlew_path: $BITRISE_SOURCE_DIR/android/gradlew
         - gradle_options: ''
-        - gradle_task: assembleDebug
-        - gradle_file: /Users/vagrant/git/android/build.gradle
+        - gradle_file: $BITRISE_SOURCE_DIR/android/build.gradle
+        - gradle_task: assembleRelease
     - cache-push@2:
         run_if: true
         inputs:
@@ -58,14 +58,6 @@ workflows:
     - deploy-to-bitrise-io@1:
         inputs:
         - deploy_path: $BITRISE_APK_PATH
-    - amazon-s3-uploader@1:
-        inputs:
-        - aws_access_key: ${AWS_ACC_KEY}
-        - aws_secret_key: ${AWS_SEC_KEY}
-        - bucket_name: signer-builds/unsigned
-        - file_path: $BITRISE_APK_PATH
-        - path_in_bucket: '$debug_build_${BITRISE_BUILD_SLUG}'
-        - bucket_region: eu-central-1
   android_release_unsigned:
   # Produces a release binary, should be signed before using or publishing.
     steps:
@@ -89,9 +81,9 @@ workflows:
         - command: install
     - gradle-runner@1:
         inputs:
-        - gradlew_path: ./android/gradlew
+        - gradlew_path: $BITRISE_SOURCE_DIR/android/gradlew
         - gradle_options: ''
-        - gradle_file: /Users/vagrant/git/android/build.gradle
+        - gradle_file: $BITRISE_SOURCE_DIR/android/build.gradle
         - gradle_task: assembleRelease
     - cache-push@2:
         run_if: true
@@ -104,14 +96,6 @@ workflows:
     - deploy-to-bitrise-io@1:
         inputs:
         - deploy_path: $BITRISE_APK_PATH
-    - amazon-s3-uploader@1:
-        inputs:
-        - aws_access_key: ${AWS_ACC_KEY}
-        - aws_secret_key: ${AWS_SEC_KEY}
-        - bucket_name: signer-builds/unsigned
-        - bucket_region: eu-central-1
-        - path_in_bucket: '$unsigned_build_${BITRISE_BUILD_SLUG}'
-        - file_path: $BITRISE_APK_PATH
   iOS_iphonesimulator_build:
     steps:
     - activate-ssh-key@4:
@@ -167,15 +151,6 @@ workflows:
         inputs:
         - is_compress: 'true'
         - deploy_path: >-
-            $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app
-    - amazon-s3-uploader@1:
-        inputs:
-        - aws_access_key: ${AWS_ACC_KEY}
-        - aws_secret_key: ${AWS_SEC_KEY}
-        - bucket_name: signer-builds/test-ci
-        - bucket_region: eu-central-1
-        - path_in_bucket: '$test_unsigned_build_${BITRISE_BUILD_SLUG}'
-        - file_path: >-
             $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app
 app:
   envs:
