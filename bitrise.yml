@@ -123,12 +123,15 @@ workflows:
         - content: |
             #!/usr/bin/env bash
             cd ios
+            gem install cocoapods
+            pod install
             xcodebuild clean archive \
             PRODUCT_BUNDLE_IDENTIFIER=io.parity.NativeSigner \
             -scheme NativeSigner \
             -configuration Debug -derivedDataPath ./build \
             -archivePath ./build/Products/ParitySigner.xcarchive \
-            -workspace NativeSigner.xcworkspace
+            -workspace NativeSigner.xcworkspace \
+            -sdk iphonesimulator
     - cache-push@2:
         inputs:
         - compress_archive: 'true'
