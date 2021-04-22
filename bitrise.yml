@@ -10,7 +10,7 @@ trigger_map:
 - tag: v*
   workflow: android_release_unsigned
 workflows:
-  android_assembleDebug:
+  android_build:
   # Produces a debug release, good for AVD or manual testing.
     steps:
     - activate-ssh-key@4:
@@ -96,7 +96,7 @@ workflows:
     - deploy-to-bitrise-io@1:
         inputs:
         - deploy_path: $BITRISE_APK_PATH
-  iOS_iphonesimulator_build:
+  iOS_build_iphonesimulator:
     steps:
     - activate-ssh-key@4:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
@@ -113,32 +113,13 @@ workflows:
         - npm_version: ''
         - command: install -g yarn
     - yarn@0:
+        title: install
+        inputs:
+        - command: install:ios
+    - yarn@0:
         title: build
         inputs:
-        - command: build
-    - yarn@0:
-        title: 'xcbuild:githubActions'
-        inputs:
-        - command: 'xcbuild:githubActions'
-    - script@1:
-        title: Generate React native
-        inputs:
-        - is_debug: 'yes'
-        - content: >-
-            #!/usr/bin/env bash
-            set -ex
-            # install all the related dependencies.
-            #gem install xcpretty
-            # Build the JS bundle with
-            #yarn build-prod:ios
-            # yarn archive
-            git status
-            ls $BITRISE_SOURCE_DIR/ios/build || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products || true
-            ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator || true
-            # ls $BITRISE_SOURCE_DIR/ios/build/NativeSigner.xarchive || true
+        - command: xcbuild:debug
     - cache-push@2:
         inputs:
         - compress_archive: 'true'
