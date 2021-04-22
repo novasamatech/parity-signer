@@ -4,7 +4,7 @@ default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
 project_type: react-native
 trigger_map:
 - pull_request_source_branch: '*'
-  workflow: android_assembleDebug
+  workflow: android_build
 - tag: '/^v[0-9]+\.[0-9]+.*$/'
   workflow: android_release_unsigned
 - tag: v*
