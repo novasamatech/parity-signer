@@ -149,7 +149,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Edgeware',
 		unit: 'EDG'
 	},
-	/*	[SubstrateNetworkKeys.KULUPU]: {
+	[SubstrateNetworkKeys.KULUPU]: {
 		color: '#003366',
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
@@ -164,7 +164,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		title: 'Kulupu',
 		unit: 'KULU'
 	},
-*/ [SubstrateNetworkKeys.KUSAMA]: {
+	[SubstrateNetworkKeys.KUSAMA]: {
 		color: '#000',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
@@ -210,21 +210,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		prefix: 0,
 		title: 'Polkadot',
 		unit: 'DOT'
-	} /*	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#18FFB2',
-		decimals: 12,
-		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
-		metadata: {
-			hash: "dummy",
-			specName: "polkadot",
-			specVersion: 28
-		},
-		order: 100,
-		pathId: 'substrate_dev',
-		prefix: 42,
-		title: 'Substrate Development',
-		unit: 'UNIT'
-	},*/,
+	},
 	[SubstrateNetworkKeys.ROCOCO]: {
 		color: '#6f36dc',
 		decimals: 12,

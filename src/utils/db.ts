@@ -21,6 +21,7 @@ import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
+import { allBuiltInMetadata } from 'constants/networkMetadataList';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
 import { MetadataHandle } from 'types/metadata';
@@ -194,17 +195,12 @@ export async function getMetadata(
 	}
 }
 
-function isRelevant(this: string, element: MetadataHandle): boolean {
-	return String(element.specName) === this;
-}
-
-export async function getRelevantMetadata(
-	specName: string
-): Promise<Array<MetadataHandle>> {
+export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
 	try {
 		//This is the SLOW operation to blame!
 		const allMetadataMap = await SecureStorage.getAllItems(metadataStorage);
 		const metadataKeys = Object.getOwnPropertyNames(allMetadataMap);
+		const handles: Array<MetadataHandle> = [];
 
 		// Uncomment this to clean up
 		// /*
@@ -212,21 +208,31 @@ export async function getRelevantMetadata(
 		//	await SecureStorage.deleteItem(deleteme, metadataStorage);
 		//}
 		// */
-
-		return metadataKeys
-			.map(function (keyValue: string): MetadataHandle {
-				return getMetadataHandleFromRaw(allMetadataMap[keyValue]);
-			})
-			.filter(isRelevant, specName);
+		for(keyValue of metadataKeys) {
+			handles.push(await getMetadataHandleFromRaw(allMetadataMap[keyValue]));
+		}
+		return handles;
 	} catch (e) {
 		handleError(e, 'getRelevantMetadata');
 		return [];
 	}
+
+}
+
+function isRelevant(this: string, element: MetadataHandle): boolean {
+	return String(element.specName) === this;
+}
+
+export async function getRelevantMetadata(
+	specName: string
+): Promise<Array<MetadataHandle>> {
+	const handles = await getAllMetadata();
+	return handles.filter(isRelevant, specName);
 }
 
 export async function saveMetadata(newMetadata: string): Promise<void> {
 	try {
-		const metadataHandle = getMetadataHandleFromRaw(newMetadata);
+		const metadataHandle = await getMetadataHandleFromRaw(newMetadata);
 		const newMetadataKey = metadataHandleToKey(metadataHandle);
 		await SecureStorage.setItem(newMetadataKey, newMetadata, metadataStorage);
 		console.log('Saved: ' + newMetadataKey);
@@ -234,6 +240,14 @@ export async function saveMetadata(newMetadata: string): Promise<void> {
 		handleError(e, 'save metadata');
 	}
 }
+
+export async function populateMetadata(): Promise<void> {
+	console.log('loading built-in metadata...');
+	for (const metadataString of allBuiltInMetadata) {
+		await saveMetadata(metadataString);
+	}
+}
+
 
 /*
  * ========================================
