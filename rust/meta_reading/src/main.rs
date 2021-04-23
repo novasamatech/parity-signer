@@ -222,9 +222,10 @@ fn main() {
     }
 
     let re = Regex::new(r#"metadata: \{\n.*hash: '(?P<hash>[^']+)',\n.*specName: '(?P<name>[^']+)',\n.*specVersion: (?P<vers>[0-9]*)\n.*\},\n"#).unwrap();
+    let rehash = Regex::new(r#"hash: '(?P<hash>[^']+)'"#).unwrap();
+    let revers = Regex::new(r#"specVersion: (?P<vers>[0-9]*)"#).unwrap();
     let old_specs = fs::read_to_string("networkSpecs.ts").unwrap();
     let mut new_specs = fs::read_to_string("networkSpecs.ts").unwrap();
-//    println!("{:?}", re.as_str());
     
     for caps in re.captures_iter(&old_specs) {
         if let Err(e) = writeln!(file, "* Updating {}", &caps["name"]) {
@@ -233,6 +234,7 @@ fn main() {
         let mut found_flag = false;
         for x in existing.latest.iter() {
             if &caps["name"] == x.name {
+                let mut new_line = caps[0].to_string();
                 let hash_real = match hash_from_meta(&x.meta) {
                     Some(a) => a,
                     None => {
@@ -240,13 +242,15 @@ fn main() {
                         String::from("")
                     },
                 };
+                let hash_line = format!("hash: '{}'", hash_real);
+                new_line = rehash.replace(&new_line, hash_line).into_owned();
                 let ver_real = match x.version{
                     Some(v) => v,
                     None => 0,
                 };
-                let search_line = format!("metadata: \\{{\n.*hash: '(?P<hash>[^']+)',\n.*specName: '{}',\n.*specVersion: (?P<vers>[0-9]*)\n.*\\}},\n", &caps["name"]);
-                let re_fixing = Regex::new(&search_line).unwrap();
-                new_specs = re_fixing.replace_all(&new_specs, format!("metadata: {{\n\t\t\thash: '{}',\n\t\t\tspecName: '{}',\n\t\t\tspecVersion: {}\n\t\t}},\n", hash_real, &caps["name"], ver_real)).to_string();
+                let ver_line = format!("specVersion: {}", ver_real);
+                new_line = revers.replace(&new_line, ver_line).into_owned();
+                new_specs = new_specs.replace(&caps[0], &new_line);
                 found_flag = true;
                 if let Err(e) = writeln!(file, "S OK") {
                     eprintln!("Couldn't write to file: {}", e);
@@ -266,7 +270,7 @@ fn main() {
         .write(true)
         .open("networkSpecs.ts")
         .unwrap();
-    if let Err(e) = writeln!(ns_file, "{}", new_specs) {
+    if let Err(e) = write!(ns_file, "{}", new_specs) {
         eprintln!("Couldn't write to file: {}", e);
     }
 }
