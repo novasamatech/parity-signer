@@ -29,7 +29,12 @@ import {
 } from 'constants/networkSpecs';
 import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
 import { NetworkParsedData } from 'types/scannerTypes';
-import { loadNetworks, saveNetworks, getMetadata, populateMetadata } from 'utils/db';
+import {
+	loadNetworks,
+	saveNetworks,
+	getMetadata,
+	populateMetadata
+} from 'utils/db';
 import {
 	deepCopyNetworks,
 	generateNetworkParamsFromParsedData

@@ -6,14 +6,13 @@ import { MetadataHandle } from 'types/metadata';
 import { blake2b } from 'utils/native';
 
 export const metadataHandleToKey = (metadataHandle: MetadataHandle): string => {
-	if (metadataHandle.version) {
+	if (metadataHandle.specVersion) {
 		return metadataHandle.specName + '_v' + metadataHandle.specVersion;
 	} else {
 		return metadataHandle.hash;
 	}
 };
 
-//TODO: add actual hash function
 async function getMetadataHash(metadataRaw: string): Promise<string> {
 	return await blake2b(metadataRaw.substr(2));
 }
@@ -55,6 +54,4 @@ export async function getMetadataHandleFromRaw(
 		};
 		return metadataHandle;
 	}
-};
-
-
+}

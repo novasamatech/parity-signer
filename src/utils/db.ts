@@ -208,7 +208,7 @@ export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
 		//	await SecureStorage.deleteItem(deleteme, metadataStorage);
 		//}
 		// */
-		for(keyValue of metadataKeys) {
+		for (const keyValue of metadataKeys) {
 			handles.push(await getMetadataHandleFromRaw(allMetadataMap[keyValue]));
 		}
 		return handles;
@@ -216,7 +216,6 @@ export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
 		handleError(e, 'getRelevantMetadata');
 		return [];
 	}
-
 }
 
 function isRelevant(this: string, element: MetadataHandle): boolean {
@@ -247,7 +246,6 @@ export async function populateMetadata(): Promise<void> {
 		await saveMetadata(metadataString);
 	}
 }
-
 
 /*
  * ========================================
