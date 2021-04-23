@@ -88,10 +88,10 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	metadata: {
-			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
-			specName: 'kusama',
-			specVersion: 2030
-		},
+		hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
+		specName: 'kusama',
+		specVersion: 2030
+	},
 	protocol: NetworkProtocols.SUBSTRATE,
 	unit: 'UNIT'
 };
@@ -107,8 +107,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
-			hash: 'centrifuge-dummy',
-			specName: '',
+			hash: '5159df481cf4378ad99f15cac521861bf32458e1b4fad19f03bb3dd8923f899d',
+			specName: 'centrifuge',
 			specVersion: 0
 		},
 		order: 7,
@@ -123,8 +123,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE_AMBER,
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
-			hash: 'centrifuge-dummy',
-			specName: '',
+			hash: '5159df481cf4378ad99f15cac521861bf32458e1b4fad19f03bb3dd8923f899d',
+			specName: 'centrifugeAmber',
 			specVersion: 0
 		},
 		order: 8,
@@ -139,8 +139,8 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.EDGEWARE,
 		logo: require('res/img/logos/Edgeware.png'),
 		metadata: {
-			hash: 'edgeware-dummy',
-			specName: '',
+			hash: '9f3c1c7ff32e84f942659b1ef44ef49a6bc33067392f731b2e76e4e0bd18ad4f',
+			specName: 'edgeware',
 			specVersion: 0
 		},
 		order: 6,
@@ -340,4 +340,3 @@ export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(
 );
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;
-
