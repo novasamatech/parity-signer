@@ -27,6 +27,7 @@ import { ButtonListener } from 'types/props';
 type MetadataCardProps = {
 	specName: string;
 	specVersion: string;
+	metadataHash: string;
 	onPress: ButtonListener;
 };
 
@@ -44,6 +45,7 @@ const CardSeparator = (): ReactElement => (
 export function MetadataCard({
 	specName,
 	specVersion,
+	metadataHash,
 	onPress
 }: MetadataCardProps): React.ReactElement {
 	//	const { getNetwork } = useContext();
@@ -61,7 +63,7 @@ export function MetadataCard({
 				</View>
 				<View style={styles.content}>
 					<Text style={fontStyles.t_code}>
-						{`spec_name: ${specName} spec_version: ${specVersion}`}
+						{`spec_name: ${specName}\nspec_version: ${specVersion}\nhash: ${metadataHash}`}
 					</Text>
 				</View>
 				<View />

@@ -58,6 +58,7 @@ export default function MetadataManagement({
 			<MetadataCard
 				specName={item.specName}
 				specVersion={String(item.specVersion)}
+				metadataHash={item.hash}
 				onPress={(): void => setMetadata(item)}
 			/>
 		);

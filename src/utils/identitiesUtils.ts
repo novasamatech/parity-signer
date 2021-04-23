@@ -456,27 +456,3 @@ export const groupPaths = (
 	);
 	return groupedPaths.sort(_comparePathGroups);
 };
-
-/* This should be a set-hook function runned once from getMetadata
-	switch (networkKey) {
-		case SubstrateNetworkKeys.CENTRIFUGE:
-			return centrifugeMetadata;
-		case SubstrateNetworkKeys.CENTRIFUGE_AMBER:
-			return centrifugeAmberMetadata;
-		case SubstrateNetworkKeys.KUSAMA:
-		case SubstrateNetworkKeys.KUSAMA_DEV:
-			return kusamaMetadata;
-		case SubstrateNetworkKeys.WESTEND:
-			return westendMetadata;
-		case SubstrateNetworkKeys.EDGEWARE:
-			return edgewareMetadata;
-		case SubstrateNetworkKeys.KULUPU:
-			return kulupuMetadata;
-		case SubstrateNetworkKeys.POLKADOT:
-			return polkadotMetaData;
-		case SubstrateNetworkKeys.ROCOCO:
-			return rococoMetadata;
-		default:
-			return null;
-	}
-};*/

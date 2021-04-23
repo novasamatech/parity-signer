@@ -29,12 +29,16 @@ import {
 } from 'constants/networkSpecs';
 import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
 import { NetworkParsedData } from 'types/scannerTypes';
-import { loadNetworks, saveNetworks, getMetadata } from 'utils/db';
+import {
+	loadNetworks,
+	saveNetworks,
+	getMetadata,
+	populateMetadata
+} from 'utils/db';
 import {
 	deepCopyNetworks,
 	generateNetworkParamsFromParsedData
 } from 'utils/networksUtils';
-import { populateMetadata } from 'utils/metadataUtils';
 import { MetadataHandle } from 'types/metadata';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
