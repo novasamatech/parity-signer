@@ -2,7 +2,9 @@
 
 import * as metadata from 'constants/networkMetadata';
 
-export const defaultMetaData = metadata.kusamaMetadataV2030;
+export const defaultMetadata = metadata.kusamaMetadataV2030;
+
+export const defaultPolkadotMetadata = metadata.polkadotMetadataV29;
 
 export const allBuiltInMetadata = [
 	metadata.kulupuMetadataV17,

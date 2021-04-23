@@ -40,14 +40,14 @@ import {
 	isJsonString
 } from 'utils/decoders';
 import { isAscii } from 'utils/strings';
-import { kusamaMetadata } from 'constants/networkMetadata';
+import { defaultMetadata } from 'constants/networkMetadataList';
 
 const SUBSTRATE_ID = new Uint8Array([0x53]);
 const CRYPTO_SR25519 = new Uint8Array([0x01]);
 const CMD_SIGN_MORTAL = new Uint8Array([0]);
 const CMD_SIGN_MSG = new Uint8Array([3]);
 const registry = new TypeRegistry();
-registry.setMetadata(new Metadata(registry, kusamaMetadata));
+registry.setMetadata(new Metadata(registry, defaultMetadata));
 
 const KUSAMA_ADDRESS = 'FF42iLDmp7JLeySMjwWWtYQqfycJvsJFBYrySoMvtGfvAGs';
 const TEST_MESSAGE = 'THIS IS SPARTA!';
