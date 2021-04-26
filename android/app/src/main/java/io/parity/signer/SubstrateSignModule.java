@@ -247,6 +247,11 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void generateMetadataHandle(String metadata, Promise promise) {
+    	promise.resolve(metadataGenerateMetadataHandle(metadata));
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletBIP39Address(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
@@ -272,4 +277,5 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
     private static native String ethkeySubstrateMiniSecretKey(String suri);
     private static native String ethkeySubstrateMiniSecretKeyWithRef(long seedRef, String suriSuffix);
     private static native String qrparserTryDecodeQrSequence(int size, int chunkSize, String data);
+    private static native String metadataGenerateMetadataHandle(String metadata);
 }

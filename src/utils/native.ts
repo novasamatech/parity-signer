@@ -20,6 +20,8 @@ import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 
+import { MetadataHandle } from 'types/metadata';
+
 const { SubstrateSign } = NativeModules || {};
 
 interface AddressObject {
@@ -74,6 +76,18 @@ export async function tryDecodeQr(
 		preparedData
 	);
 	return decoded;
+}
+
+//Generate metadata handle from metadata
+export async function generateMetadataHandle(metadata: string): Promise<MetadataHandle> {
+	const handleJSON = await SubstrateSign.generateMetadataHandle(metadata);
+	const handle = JSON.parse(handleJSON);
+	const metadataHandle: MetadataHandle = {
+			hash: handle[2],
+			specName: handle[0],
+			specVersion: parseInt(handle[1], 10)
+		};
+	return metadataHandle;
 }
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {

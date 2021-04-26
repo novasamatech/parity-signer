@@ -360,6 +360,13 @@ export! {
         Ok(answer)
 	}
 
+    @Java_io_parity_signer_SubstrateSignModule_metadataGenerateMetadataHandle
+	fn generate_metadata_handle(
+		metadata: &str
+	) -> String {
+        metadata::meta_to_json(metadata)
+	}
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);
