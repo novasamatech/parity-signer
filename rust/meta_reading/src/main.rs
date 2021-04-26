@@ -145,12 +145,12 @@ fn main() {
             if x.name == "kusama" {
                 match x.version {
                     Some(version) => {
-                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetaData = metadata.{}MetadataV{};\n", x.name, version)) {
+                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetadata = metadata.{}MetadataV{};\n", x.name, version)) {
                             eprintln!("Couldn't write to file: {}", e);
                         }
                     },
                     None => {
-                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetaData = metadata.{}Metadata;\n", x.name)) {
+                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetadata = metadata.{}Metadata;\n", x.name)) {
                             eprintln!("Couldn't write to file: {}", e);
                         }
                     }
