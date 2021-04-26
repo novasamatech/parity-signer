@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import SubstrateSign from 'react-native-substrate-sign';
+import { NativeModules } from 'react-native';
 
 import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
+
+const { SubstrateSign } = NativeModules || {};
 
 interface AddressObject {
 	address: string;
@@ -55,6 +57,23 @@ function toHex(x: string): string {
 		.map(c => c.charCodeAt(0).toString(16))
 		.map(n => (n.length < 2 ? `0${n}` : n))
 		.join('');
+}
+
+//Try to decode fountain packages
+export async function tryDecodeQr(
+	data: Array<string>,
+	size: number,
+	packetSize: number
+): Promise<string> {
+	const preparedData = data.join(',');
+	const localSizeCopy = size;
+	const localPacketSizeCopy = packetSize;
+	const decoded = await SubstrateSign.tryDecodeQrSequence(
+		localSizeCopy,
+		localPacketSizeCopy,
+		preparedData
+	);
+	return decoded;
 }
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {

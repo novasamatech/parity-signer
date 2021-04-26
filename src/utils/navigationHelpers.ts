@@ -280,6 +280,12 @@ export const navigateToQrScanner = <RouteName extends keyof RootStackParamList>(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationWithNetworkChooser(navigation, 'QrScanner');
 
+export const navigateToFastQrScanner = <
+	RouteName extends keyof RootStackParamList
+>(
+	navigation: GenericNavigationProps<RouteName>
+): void => resetNavigationWithNetworkChooser(navigation, 'FastQrScanner');
+
 export const navigateToLegacyAccountList = <
 	RouteName extends keyof RootStackParamList
 >(

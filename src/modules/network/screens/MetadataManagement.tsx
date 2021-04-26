@@ -25,6 +25,7 @@ import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { MetadataHandle } from 'types/metadata';
 import ScreenHeading from 'components/ScreenHeading';
 import { getRelevantMetadata } from 'utils/db';
+import FastQrScannerTab from 'components/FastQrScannerTab';
 
 export default function MetadataManagement({
 	navigation,
@@ -36,7 +37,6 @@ export default function MetadataManagement({
 	);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
-
 	const [knownMetadata, setKnownMetadata] = useState<Array<MetadataHandle>>([]);
 
 	useEffect(() => {
@@ -58,6 +58,7 @@ export default function MetadataManagement({
 			<MetadataCard
 				specName={item.specName}
 				specVersion={String(item.specVersion)}
+				metadataHash={item.hash}
 				onPress={(): void => setMetadata(item)}
 			/>
 		);
@@ -71,6 +72,7 @@ export default function MetadataManagement({
 				renderItem={renderMetadata}
 				keyExtractor={(item: MetadataHandle): string => item.hash}
 			/>
+			<FastQrScannerTab />
 		</SafeAreaViewContainer>
 	);
 }

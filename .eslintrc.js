@@ -50,7 +50,8 @@ module.exports = {
         ...commonRules,
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/semi": ["error"],
-        "@typescript-eslint/no-use-before-define": ["error", { "variables": false }], // enable defining variables after react component;
+// deprecated: https://palantir.github.io/tslint/rules/no-use-before-declare/
+        "@typescript-eslint/no-use-before-define": 0, // ["error", { "variables": false }], // enable defining variables after react component;
         "@typescript-eslint/no-non-null-assertion": 0,
         '@typescript-eslint/camelcase': 0,
         '@typescript-eslint/ban-ts-ignore': 0,

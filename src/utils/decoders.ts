@@ -86,11 +86,12 @@ export function rawDataToU8A(rawData: string): Uint8Array | null {
   Example Full Raw Data
   ---
   4 // indicates binary
-  37 // indicates data length
-  --- UOS Specific Data
+  0037 // indicates data length
+  --- UOS Specific Data - legacy
   00 + // is it multipart?
   0001 + // how many parts in total?
   0000 +  // which frame are we on?
+  --- Useful payload
   53 // indicates payload is for Substrate
   01 // crypto: sr25519
   00 // indicates action: signData
@@ -125,8 +126,23 @@ export async function constructDataFromBytes(
 		return partData;
 	}
 
+	// Network type:
+	// 45 - Etherium
+	// 53 - Substrate
 	const zerothByte = uosAfterFrames.substr(0, 2);
+
+	// Cryptography algorithm:
+	// 00 - ed25519
+	// 01 - sr25519
+	// TODO: was this really implemented?
 	const firstByte = uosAfterFrames.substr(2, 2);
+
+	// Action:
+	// 00 - sign data (mortal extr)
+	// 01 - sign hash
+	// 02 - sign data (immortal extr)
+	// 80 - metadata payload
+	// c0 - add network
 	const secondByte = uosAfterFrames.substr(4, 2);
 
 	let action;

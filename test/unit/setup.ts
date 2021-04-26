@@ -19,4 +19,4 @@
 
 jest.doMock('react-native', () => 'reactNativeMock');
 
-jest.doMock('react-native-substrate-sign', () => 'substrateSignMock');
+// jest.doMock('react-native-substrate-sign', () => 'substrateSignMock');

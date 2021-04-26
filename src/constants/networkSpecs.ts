@@ -88,9 +88,9 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	metadata: {
-		hash: 'dummy',
+		hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
 		specName: 'kusama',
-		specVersion: 2029
+		specVersion: 2030
 	},
 	protocol: NetworkProtocols.SUBSTRATE,
 	unit: 'UNIT'
@@ -107,9 +107,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE,
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
-			hash: 'dummy',
-			specName: 'centrifuge-chain',
-			specVersion: 240
+			hash: '5159df481cf4378ad99f15cac521861bf32458e1b4fad19f03bb3dd8923f899d',
+			specName: 'centrifuge',
+			specVersion: 0
 		},
 		order: 7,
 		pathId: 'centrifuge',
@@ -123,9 +123,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.CENTRIFUGE_AMBER,
 		logo: require('res/img/logos/Centrifuge.png'),
 		metadata: {
-			hash: 'dummy',
-			specName: 'centrifuge-chain',
-			specVersion: 240
+			hash: '5159df481cf4378ad99f15cac521861bf32458e1b4fad19f03bb3dd8923f899d',
+			specName: 'centrifugeAmber',
+			specVersion: 0
 		},
 		order: 8,
 		pathId: 'centrifuge_amber',
@@ -139,9 +139,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.EDGEWARE,
 		logo: require('res/img/logos/Edgeware.png'),
 		metadata: {
-			hash: 'dummy',
+			hash: '9f3c1c7ff32e84f942659b1ef44ef49a6bc33067392f731b2e76e4e0bd18ad4f',
 			specName: 'edgeware',
-			specVersion: 41
+			specVersion: 0
 		},
 		order: 6,
 		pathId: 'edgeware',
@@ -154,7 +154,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 18,
 		genesisHash: SubstrateNetworkKeys.KULUPU,
 		metadata: {
-			hash: 'dummy',
+			hash: '124a81a831e846343e15380846988ce0f744fbcccba90979c501477a2ff58b76',
 			specName: 'kulupu',
 			specVersion: 17
 		},
@@ -170,9 +170,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('res/img/logos/Kusama.png'),
 		metadata: {
-			hash: 'dummy',
+			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
 			specName: 'kusama',
-			specVersion: 2029
+			specVersion: 2030
 		},
 		order: 2,
 		pathId: 'kusama',
@@ -185,9 +185,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		metadata: {
-			hash: 'dummy',
+			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
 			specName: 'kusama',
-			specVersion: 2029
+			specVersion: 2030
 		},
 		order: 99,
 		pathId: 'kusama_dev',
@@ -201,39 +201,25 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.POLKADOT,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: 'dummy',
+			hash: '7ef1da1c6b931d2f64580013517f1e023c2ce24785eeaa749e6e56384bd58bd3',
 			specName: 'polkadot',
-			specVersion: 28
+			specVersion: 29
 		},
 		order: 1,
 		pathId: 'polkadot',
 		prefix: 0,
 		title: 'Polkadot',
 		unit: 'DOT'
-	} /*	[SubstrateNetworkKeys.SUBSTRATE_DEV]: {
-		color: '#18FFB2',
-		decimals: 12,
-		genesisHash: SubstrateNetworkKeys.SUBSTRATE_DEV,
-		metadata: {
-			hash: "dummy",
-			specName: "polkadot",
-			specVersion: 28
-		},
-		order: 100,
-		pathId: 'substrate_dev',
-		prefix: 42,
-		title: 'Substrate Development',
-		unit: 'UNIT'
-	},*/,
+	},
 	[SubstrateNetworkKeys.ROCOCO]: {
 		color: '#6f36dc',
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
 		logo: require('res/img/logos/Rococo.png'),
 		metadata: {
-			hash: 'dummy',
+			hash: '2e309508628ab604963f4b8b06ee6c1ec0b6637596822219f2f637c29066ac91',
 			specName: 'rococo',
-			specVersion: 214
+			specVersion: 232
 		},
 		order: 4,
 		pathId: 'rococo',
@@ -247,9 +233,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.WESTEND,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: 'dummy',
+			hash: '58ad604854feab1e95a57335727a9ede65659a06d0f304bc9761b7b832741daf',
 			specName: 'westend',
-			specVersion: 49
+			specVersion: 50
 		},
 		order: 3,
 		pathId: 'westend',
