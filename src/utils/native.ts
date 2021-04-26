@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import SubstrateSign from 'react-native-substrate-sign';
+import { NativeModules } from 'react-native';
 
 import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
+
+const { SubstrateSign } = NativeModules || {};
 
 interface AddressObject {
 	address: string;

@@ -84,3 +84,7 @@ fastlane/screenshots
 android/.project
 android/app/.project
 android/app/bin
+
+# rust
+rust/signer/target
+rust/meta_reading/target

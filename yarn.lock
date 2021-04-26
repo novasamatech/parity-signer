@@ -7987,10 +7987,6 @@ react-native-status-bar-height@^2.2.0:
   resolved "https://registry.yarnpkg.com/react-native-status-bar-height/-/react-native-status-bar-height-2.5.0.tgz#bc0fb85230603850aab9667ee8111a62954de90c"
   integrity sha512-sYBCPYA/NapBSHkdm/IVL4ID3LLlIuLqINi2FBDyMkc2BU9pfSGOtkz9yfxoK39mYJuTrlTOQ7mManARUsYDSA==
 
-"react-native-substrate-sign@git+https://github.com/paritytech/react-native-substrate-sign.git#metadata-handling-tools":
-  version "1.1.1"
-  resolved "git+https://github.com/paritytech/react-native-substrate-sign.git#189519c1ac56f15bce13defef2ae6ce2074aa239"
-
 react-native-svg@12.1.0, react-native-svg@^12.1.0:
   version "12.1.0"
   resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-12.1.0.tgz#acfe48c35cd5fca3d5fd767abae0560c36cfc03d"

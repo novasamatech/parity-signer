@@ -40,6 +40,7 @@ export default function NetworkDetails({
 			<MetadataCard
 				specName={metadataHandle ? metadataHandle.specName : ''}
 				specVersion={metadataHandle ? String(metadataHandle.specVersion) : ''}
+				metadataHash={metadataHandle ? metadataHandle.hash : ''}
 				onPress={(): void =>
 					navigation.navigate('FullMetadata', {
 						pathId: networkPathId
@@ -62,6 +63,7 @@ export default function NetworkDetails({
 			<MetadataCard
 				specName="invalid"
 				specVersion="invalid"
+				metadataHash={metadataHandle ? metadataHandle.hash : 'invalid'}
 				onPress={(): void =>
 					navigation.navigate('FullMetadata', {
 						pathId: networkPathId

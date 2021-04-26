@@ -91,6 +91,8 @@ export default function Scanner({
 				packetSize
 			);
 			if (decoded !== '' && decodeProcess) {
+				console.log('success');
+				console.log(decoded.substr(128));
 				setDecodeProcess(false);
 				//TODO: here we should place general handler if/when we switch
 				//to ubiquitous fountains. Now this handles only metadata input
