@@ -203,11 +203,11 @@ export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
 		const handles: Array<MetadataHandle> = [];
 
 		// Uncomment this to clean up
-		// /*
-		//for (let deleteme of metadataKeys) {
-		//	await SecureStorage.deleteItem(deleteme, metadataStorage);
-		//}
-		// */
+		 /*
+		for (let deleteme of metadataKeys) {
+			await SecureStorage.deleteItem(deleteme, metadataStorage);
+		}
+		 */
 		for (const keyValue of metadataKeys) {
 			handles.push(await getMetadataHandleFromRaw(allMetadataMap[keyValue]));
 		}
