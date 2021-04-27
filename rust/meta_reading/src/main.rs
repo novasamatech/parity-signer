@@ -139,28 +139,47 @@ fn main() {
         if let Err(e) = writeln!(file2, "{}", prelude2) {
             eprintln!("Couldn't write to file: {}", e);
         }
-// writing default line in networkMetadataList.ts file
+// writing default lines in networkMetadataList.ts file
         let mut found_kusama = false;
+        let mut found_polka = false;
         for x in existing.latest.iter() {
             if x.name == "kusama" {
                 match x.version {
                     Some(version) => {
-                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetaData = metadata.{}MetadataV{};\n", x.name, version)) {
+                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetadata = metadata.{}MetadataV{};\n", x.name, version)) {
                             eprintln!("Couldn't write to file: {}", e);
                         }
                     },
                     None => {
-                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetaData = metadata.{}Metadata;\n", x.name)) {
+                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultMetadata = metadata.{}Metadata;\n", x.name)) {
                             eprintln!("Couldn't write to file: {}", e);
                         }
                     }
                 }
                 found_kusama = true;
-                break;
             }
+            if x.name == "polkadot" {
+                match x.version {
+                    Some(version) => {
+                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultPolkadotMetadata = metadata.{}MetadataV{};\n", x.name, version)) {
+                            eprintln!("Couldn't write to file: {}", e);
+                        }
+                    },
+                    None => {
+                        if let Err(e) = writeln!(file2, "{}", format!("export const defaultPolkadotMetadata = metadata.{}Metadata;\n", x.name)) {
+                            eprintln!("Couldn't write to file: {}", e);
+                        }
+                    }
+                }
+                found_polka = true;
+            }
+            if found_kusama && found_polka {break;}
         }
         if !found_kusama {
             eprintln!("Default kusama not found. No default printed to networkMetadataList.ts");
+        }
+        if !found_polka {
+            eprintln!("Default polkadot not found. No default printed to networkMetadataList.ts");
         }
 // adding to networkMetadataList.ts file
         if let Err(e) = writeln!(file2, "export const allBuiltInMetadata = [") {
@@ -175,7 +194,7 @@ fn main() {
                         eprintln!("Couldn't write to file: {}", e);
                     }
                 // writing into networkMetadataList file
-                    if let Err(e) = writeln!(file2, "{}", format!("	metadata.{}MetadataV{},", x.name, version)) {
+                    if let Err(e) = writeln!(file2, "{}", format!("\tmetadata.{}MetadataV{},", x.name, version)) {
                         eprintln!("Couldn't write to file: {}", e);
                     }
                 },
@@ -185,17 +204,13 @@ fn main() {
                         eprintln!("Couldn't write to file: {}", e);
                     }
                 // writing into networkMetadataList file
-                    if let Err(e) = writeln!(file2, "{}", format!("	metadata.{}Metadata,", x.name)) {
+                    if let Err(e) = writeln!(file2, "{}", format!("\tmetadata.{}Metadata,", x.name)) {
                         eprintln!("Couldn't write to file: {}", e);
                     }
                 }
             }
         }
-// completing networkMetadataList.ts
-        if let Err(e) = writeln!(file2, "];") {
-            eprintln!("Couldn't write to file: {}", e);
-        }
-// writing historical metadata into networkMetadata.ts
+// writing historical metadata into networkMetadata.ts and into networkMetadataList.ts
         if let Err(e) = writeln!(file1, "\n\n// historical metadata versions:\n") {
             eprintln!("Couldn't write to file: {}", e);
         }
@@ -206,14 +221,26 @@ fn main() {
                     if let Err(e) = writeln!(file1, "{}", format!("export const {}MetadataV{} = '{}';", x.name, version, x.meta)) {
                         eprintln!("Couldn't write to file: {}", e);
                     }
-                }
+                // writing into networkMetadataList file
+                    if let Err(e) = writeln!(file2, "{}", format!("\tmetadata.{}MetadataV{},", x.name, version)) {
+                        eprintln!("Couldn't write to file: {}", e);
+                    }
+                },
                 None => {
                 // writing into networkMetadata.ts file
                     if let Err(e) = writeln!(file1, "{}", format!("export const {}Metadata = '{}';", x.name, x.meta)) {
                         eprintln!("Couldn't write to file: {}", e);
                     }
+                // writing into networkMetadataList file
+                    if let Err(e) = writeln!(file2, "{}", format!("\tmetadata.{}Metadata,", x.name)) {
+                        eprintln!("Couldn't write to file: {}", e);
+                    }
                 }
             }
+        }
+// completing networkMetadataList.ts
+        if let Err(e) = writeln!(file2, "];") {
+            eprintln!("Couldn't write to file: {}", e);
         }
     }
 // Updating networkSpecs.ts file

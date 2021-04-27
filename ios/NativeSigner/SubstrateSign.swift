@@ -291,7 +291,6 @@ class SubstrateSign: NSObject {
         return val
     })
   }
-}
 
   @objc func tryDecodeQrSequence(_ size: NSInteger, chunk_size: NSInteger, data: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     handle_error(
@@ -304,6 +303,19 @@ class SubstrateSign: NSObject {
         return val
     })
   }
+
+  @objc func generateMetadataHandle(_ metadata: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { generate_metadata_handle($0, metadata) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
+  }
+
 }
 
 
