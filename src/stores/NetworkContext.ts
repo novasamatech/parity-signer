@@ -162,7 +162,10 @@ export function useNetworksContext(): NetworksContextState {
 					const metadataHandle = networkParams.metadata;
 					const networkMetadataRaw = await getMetadata(metadataHandle);
 					const newRegistry = new TypeRegistry();
-					const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+					const overrideTypes = getOverrideTypes(
+						newRegistry,
+						networkParams.pathId
+					);
 					//const overrideTypes = getSpecTypes(newRegistry, networkParams.pathId, metadataHandle.specName, Number.MAX_SAFE_INTEGER);
 					newRegistry.register(overrideTypes);
 					const metadata = new Metadata(newRegistry, networkMetadataRaw);

@@ -43,7 +43,7 @@
     "e2e": "yarn e2e:ios && yarn e2e:android"
   },
   "dependencies": {
-    "@polkadot/api": "4.7.2",
+    "@polkadot/api": "3.9.3",
     "@polkadot/metadata": "^3.9.3",
     "@polkadot/reactnative-identicon": "0.53.1",
     "@polkadot/util": "5.4.4",
