@@ -14,26 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-// This screen is not functional yet
+// This screen should show full contents of chosen metadata
 
 import React, {
-	ReactElement /*, useContext, useEffect, useState*/
+	ReactElement, useContext, useEffect, useState
 } from 'react';
 import { StyleSheet } from 'react-native';
 
+import { TypeRegistry } from '@polkadot/types';
+import { Metadata } from '@polkadot/metadata';
+import { expandMetadata } from '@polkadot/metadata/decorate';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-//import { NetworksContext } from 'stores/NetworkContext';
+import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
-//import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
-//import { getMetadata } from 'utils/db';
-//import { useFullMetadataHook } from 'modules/network/networksHooks';
+import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
+import { getMetadata } from 'utils/db';
+import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 
-export default function FullMetadata({}: //	navigation,
-//	route
-NavigationProps<'NetworkSettings'>): React.ReactElement {
-	/*const networkPathId = route.params.pathId;
+export default function FullMetadata({
+ 	navigation,
+	route
+}: NavigationProps<'FullMetadataViewer'>): React.ReactElement {
+	const networkPathId = route.params.pathId;
 	const { networks } = useContext(NetworksContext);
 	const [savedMetadata, setSavedMetadata] = useState<string>('');
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
@@ -43,11 +47,15 @@ NavigationProps<'NetworkSettings'>): React.ReactElement {
 	useEffect(() => {
 		const getSavedMetadata = async function (): Promise<void> {
 			const newSavedMetadata = await getMetadata(metadataHandle);
-			setSavedMetadata(newSavedMetadata);
+			const registry = new TypeRegistry();
+			const metadata = new Metadata(registry, newSavedMetadata);
+			const decorated = expandMetadata(registry, metadata);
+			setSavedMetadata(decorated);
 			setMetadataReady(true);
 		};
 		getSavedMetadata();
 	}, [setSavedMetadata, setMetadataReady, metadataHandle]);
+
 	console.log(typeof savedMetadata);
 	console.log(metadataReady);
 
@@ -58,9 +66,12 @@ NavigationProps<'NetworkSettings'>): React.ReactElement {
 			return;
 		}
 	}
-			{showFullMetadata()} //call it below
-*/
-	return <SafeAreaScrollViewContainer style={styles.body} />;
+
+	return (
+		<SafeAreaScrollViewContainer style={styles.body}>
+			{showFullMetadata()}
+		</SafeAreaScrollViewContainer>
+	);
 }
 
 const styles = StyleSheet.create({

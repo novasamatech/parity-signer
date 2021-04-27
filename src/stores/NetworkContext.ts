@@ -59,16 +59,14 @@ const networkTypesMap: NetworkTypesMap = {
 	centrifuge: {
 		alias: 'centrifuge-chain',
 		chains: {
-			centrifuge_amber: 'centrifuge-chain-amber'
+			centrifuge_amber: 'centrifuge-chain-amber',
+			edgeware: 'edgeware'
 		}
 	},
 	kusama: { chains: {} },
-	polkadot: {
-		chains: {
-			westend: 'Westend'
-		}
-	},
-	rococo: { chains: {} }
+	polkadot: { chains: {} },
+	rococo: { chains: {} },
+	westend: { chains: {} }
 };
 
 export const getOverrideTypes = (
@@ -157,19 +155,20 @@ export function useNetworksContext(): NetworksContextState {
 			console.log('Populating registries...');
 			const initRegistries = new Map();
 			for (const networkKey of Array.from(initNetworkSpecs.keys())) {
-				console.log('Registering network:');
-				console.log(networkKey);
 				try {
 					const networkParams = initNetworkSpecs.get(networkKey)!;
+					console.log('Registering network:');
+					console.log(networkParams.pathId);
 					const metadataHandle = networkParams.metadata;
 					const networkMetadataRaw = await getMetadata(metadataHandle);
 					const newRegistry = new TypeRegistry();
-					//const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
-					//console.log(overrideTypes);
-					//newRegistry.register(overrideTypes);
+					const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
+					//const overrideTypes = getSpecTypes(newRegistry, networkParams.pathId, metadataHandle.specName, Number.MAX_SAFE_INTEGER);
+					newRegistry.register(overrideTypes);
 					const metadata = new Metadata(newRegistry, networkMetadataRaw);
 					newRegistry.setMetadata(metadata);
 					initRegistries.set(networkKey, newRegistry);
+					console.log('Success!!!');
 				} catch (e) {
 					console.log('Init network registration error', e);
 				}
