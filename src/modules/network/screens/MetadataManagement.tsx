@@ -24,32 +24,52 @@ import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { MetadataHandle } from 'types/metadata';
 import ScreenHeading from 'components/ScreenHeading';
-import { getRelevantMetadata } from 'utils/db';
-import FastQrScannerTab from 'components/FastQrScannerTab';
+import { getRelevantMetadata, getAllMetadata, deleteMetadata } from 'utils/db';
+import MetadataManagerTab from 'components/MetadataManagerTab';
 
 export default function MetadataManagement({
 	navigation,
 	route
 }: NavigationProps<'MetadataManagement'>): React.ReactElement {
 	const networkPathId = route.params.pathId;
-	const { networks, getSubstrateNetwork, setMetadataVersion } = useContext(
-		NetworksContext
-	);
+	const {
+		networks,
+		getSubstrateNetwork,
+		setMetadataVersion,
+		isMetadataActive
+	} = useContext(NetworksContext);
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
 	const networkParams = getSubstrateNetwork(networkKey);
 	const [knownMetadata, setKnownMetadata] = useState<Array<MetadataHandle>>([]);
+	const [showAll, setShowAll] = useState<boolean>(false);
+	const [deletionMode, setDeletionMode] = useState<boolean>(false);
 
 	useEffect(() => {
 		const getKnownMetadata = async function (specName: string): Promise<void> {
-			const newKnownMetadata = await getRelevantMetadata(specName);
-			setKnownMetadata(newKnownMetadata);
+			if (showAll) {
+				const newKnownMetadata = await getAllMetadata();
+				setKnownMetadata(newKnownMetadata);
+			} else {
+				const newKnownMetadata = await getRelevantMetadata(specName);
+				setKnownMetadata(newKnownMetadata);
+			}
 		};
 		if (networkParams.metadata)
 			getKnownMetadata(networkParams.metadata.specName);
-	}, [networkParams]);
+	}, [networkParams, showAll]);
 
-	function setMetadata(metadataHandle: MetadataHandle): void {
-		setMetadataVersion(networkKey, metadataHandle);
+	function chooseMetadata(metadataHandle: MetadataHandle): void {
+		if (deletionMode) {
+			console.log(metadataHandle);
+			console.log(networkParams.metadata);
+			if (isMetadataActive(metadataHandle)) {
+				console.warn('Metadata in use, please release it first');
+			} else {
+				deleteMetadata(metadataHandle);
+			}
+		} else {
+			setMetadataVersion(networkKey, metadataHandle);
+		}
 		navigation.goBack();
 	}
 
@@ -59,20 +79,26 @@ export default function MetadataManagement({
 				specName={item.specName}
 				specVersion={String(item.specVersion)}
 				metadataHash={item.hash}
-				onPress={(): void => setMetadata(item)}
+				onPress={(): void => chooseMetadata(item)}
 			/>
 		);
 	};
 
 	return (
 		<SafeAreaViewContainer>
-			<ScreenHeading title={networkParams.title} />
+			<ScreenHeading
+				title={deletionMode ? 'Delete metadata record' : networkParams.title}
+			/>
 			<FlatList
 				data={knownMetadata}
 				renderItem={renderMetadata}
 				keyExtractor={(item: MetadataHandle): string => item.hash}
 			/>
-			<FastQrScannerTab />
+			<MetadataManagerTab
+				deletion={(): void => setDeletionMode(!deletionMode)}
+				showall={(): void => setShowAll(!showAll)}
+				isDeletion={deletionMode}
+			/>
 		</SafeAreaViewContainer>
 	);
 }

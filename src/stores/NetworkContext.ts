@@ -59,16 +59,14 @@ const networkTypesMap: NetworkTypesMap = {
 	centrifuge: {
 		alias: 'centrifuge-chain',
 		chains: {
-			centrifuge_amber: 'centrifuge-chain-amber'
+			centrifuge_amber: 'centrifuge-chain-amber',
+			edgeware: 'edgeware'
 		}
 	},
 	kusama: { chains: {} },
-	polkadot: {
-		chains: {
-			westend: 'Westend'
-		}
-	},
-	rococo: { chains: {} }
+	polkadot: { chains: {} },
+	rococo: { chains: {} },
+	westend: { chains: {} }
 };
 
 export const getOverrideTypes = (
@@ -115,6 +113,7 @@ export type NetworksContextState = {
 	) => TypeRegistry | null;
 	updateTypeRegistries: () => Promise<void>;
 	initTypeRegistry: (networkKey: string) => Promise<TypeRegistry | null>;
+	isMetadataActive: (metadataHandle: MetadataHandle) => boolean;
 	setMetadataVersion: (
 		networkKey: string,
 		metadataHandle: MetadataHandle
@@ -157,19 +156,23 @@ export function useNetworksContext(): NetworksContextState {
 			console.log('Populating registries...');
 			const initRegistries = new Map();
 			for (const networkKey of Array.from(initNetworkSpecs.keys())) {
-				console.log('Registering network:');
-				console.log(networkKey);
 				try {
 					const networkParams = initNetworkSpecs.get(networkKey)!;
+					console.log('Registering network:');
+					console.log(networkParams.pathId);
 					const metadataHandle = networkParams.metadata;
 					const networkMetadataRaw = await getMetadata(metadataHandle);
 					const newRegistry = new TypeRegistry();
-					//const overrideTypes = getOverrideTypes(newRegistry, networkParams.pathId);
-					//console.log(overrideTypes);
-					//newRegistry.register(overrideTypes);
+					const overrideTypes = getOverrideTypes(
+						newRegistry,
+						networkParams.pathId
+					);
+					//const overrideTypes = getSpecTypes(newRegistry, networkParams.pathId, metadataHandle.specName, Number.MAX_SAFE_INTEGER);
+					newRegistry.register(overrideTypes);
 					const metadata = new Metadata(newRegistry, networkMetadataRaw);
 					newRegistry.setMetadata(metadata);
 					initRegistries.set(networkKey, newRegistry);
+					console.log('Success!!!');
 				} catch (e) {
 					console.log('Init network registration error', e);
 				}
@@ -285,6 +288,29 @@ export function useNetworksContext(): NetworksContextState {
 		setRegistries(newRegistries);
 	}
 
+	function isMetadataActive(metadataHandle: MetadataHandle): boolean {
+		//weird development tool
+		//console.log('-----========------');
+		//console.log(dumpNetworksData());
+		//console.log('-----========------');
+
+		for (const network of substrateNetworks.entries()) {
+			if (
+				network[1].metadata &&
+				network[1].metadata.hash === metadataHandle.hash
+			) {
+				console.log('Its a match');
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//This is a placeholder function to emulate rust-based native db
+	function dumpNetworksData(): string {
+		return JSON.stringify(Array.from(substrateNetworks.entries()));
+	}
+
 	return {
 		addNetwork,
 		allNetworks,
@@ -292,6 +318,7 @@ export function useNetworksContext(): NetworksContextState {
 		getSubstrateNetwork: getSubstrateNetworkParams,
 		getTypeRegistry,
 		initTypeRegistry,
+		isMetadataActive,
 		networks: substrateNetworks,
 		pathIds,
 		populateNetworks,

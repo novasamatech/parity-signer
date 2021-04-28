@@ -25,6 +25,7 @@ export type RootStackParamList = {
 	NetworkSettings: undefined;
 	MetadataManagement: { pathId: string };
 	FullMetadata: { pathId: string };
+	FullMetadataViewer: { pathId: string };
 	PathDerivation: { parentPath: string };
 	PathDetails: { path: string };
 	PathManagement: { path: string };

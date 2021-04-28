@@ -84,9 +84,9 @@ export async function generateMetadataHandle(
 	const handleJSON = await SubstrateSign.generateMetadataHandle(metadata);
 	const handle = JSON.parse(handleJSON);
 	const metadataHandle: MetadataHandle = {
-		hash: handle[2],
-		specName: handle[0],
-		specVersion: parseInt(handle[1], 10)
+		hash: handle[2].toString() as string,
+		specName: handle[0] ? (handle[0] as string) : '',
+		specVersion: handle[1] ? parseInt(handle[1], 10) : 0
 	};
 	return metadataHandle;
 }
