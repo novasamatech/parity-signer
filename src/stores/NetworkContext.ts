@@ -113,6 +113,7 @@ export type NetworksContextState = {
 	) => TypeRegistry | null;
 	updateTypeRegistries: () => Promise<void>;
 	initTypeRegistry: (networkKey: string) => Promise<TypeRegistry | null>;
+	isMetadataActive: (metadataHandle: MetadataHandle) => boolean;
 	setMetadataVersion: (
 		networkKey: string,
 		metadataHandle: MetadataHandle
@@ -287,6 +288,29 @@ export function useNetworksContext(): NetworksContextState {
 		setRegistries(newRegistries);
 	}
 
+	function isMetadataActive(metadataHandle: MetadataHandle): boolean {
+		//weird development tool
+		//console.log('-----========------');
+		//console.log(dumpNetworksData());
+		//console.log('-----========------');
+
+		for (const network of substrateNetworks.entries()) {
+			if (
+				network[1].metadata &&
+				network[1].metadata.hash === metadataHandle.hash
+			) {
+				console.log('Its a match');
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//This is a placeholder function to emulate rust-based native db
+	function dumpNetworksData(): string {
+		return JSON.stringify(Array.from(substrateNetworks.entries()));
+	}
+
 	return {
 		addNetwork,
 		allNetworks,
@@ -294,6 +318,7 @@ export function useNetworksContext(): NetworksContextState {
 		getSubstrateNetwork: getSubstrateNetworkParams,
 		getTypeRegistry,
 		initTypeRegistry,
+		isMetadataActive,
 		networks: substrateNetworks,
 		pathIds,
 		populateNetworks,

@@ -213,7 +213,7 @@ export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
 		}
 		return handles;
 	} catch (e) {
-		handleError(e, 'getRelevantMetadata');
+		handleError(e, 'getAllMetadata');
 		return [];
 	}
 }
@@ -244,6 +244,21 @@ export async function populateMetadata(): Promise<void> {
 	console.log('loading built-in metadata...');
 	for (const metadataString of allBuiltInMetadata) {
 		await saveMetadata(metadataString);
+	}
+}
+
+export async function deleteMetadata(
+	metadataHandle: MetadataHandle
+): Promise<void> {
+	try {
+		await SecureStorage.deleteItem(
+			metadataHandleToKey(metadataHandle),
+			metadataStorage
+		);
+		console.log('metadata successfully removed: ');
+		console.log(metadataHandle);
+	} catch (e) {
+		handleError(e, 'metadata deletion');
 	}
 }
 

@@ -27,9 +27,10 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { getMetadata } from 'utils/db';
-import { useFullMetadataHook } from 'modules/network/networksHooks';
+//import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
+import fontStyles from 'styles/fontStyles';
 
 export default function FullMetadata({
 	navigation,
@@ -39,8 +40,8 @@ export default function FullMetadata({
 	const { networks } = useContext(NetworksContext);
 	const [savedMetadata, setSavedMetadata] = useState<string>('');
 	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
-	const metadataHandle = networks.get(networkKey).metadata;
-	const [metadataReady, setMetadataReady] = useState<bool>(false);
+	const metadataHandle = networks.get(networkKey)!.metadata;
+	const [metadataReady, setMetadataReady] = useState<boolean>(false);
 
 	useEffect(() => {
 		const getSavedMetadata = async function (): Promise<void> {
@@ -48,18 +49,15 @@ export default function FullMetadata({
 			const registry = new TypeRegistry();
 			const metadata = new Metadata(registry, newSavedMetadata);
 			const decorated = expandMetadata(registry, metadata);
-			setSavedMetadata(decorated);
+			setSavedMetadata(JSON.stringify(decorated));
 			setMetadataReady(true);
 		};
 		getSavedMetadata();
 	}, [setSavedMetadata, setMetadataReady, metadataHandle]);
 
-	console.log(typeof savedMetadata);
-	console.log(metadataReady);
-
 	function showFullMetadata(): React.ReactNode {
 		if (metadataReady) {
-			return <Text>{savedMetadata}</Text>;
+			return <Text style={styles.titleText}>{savedMetadata}</Text>;
 		} else {
 			return;
 		}
@@ -92,5 +90,10 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		paddingBottom: 10,
 		textAlign: 'center'
+	},
+	titleText: {
+		...fontStyles.t_codeS,
+		color: colors.text.main,
+		paddingHorizontal: 16
 	}
 });
