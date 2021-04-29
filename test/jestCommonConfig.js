@@ -24,7 +24,9 @@ module.exports = {
 	rootDir: './../../',
 	testEnvironment: 'node',
 	testPathIgnorePatterns: ['node_modules/'],
-	transformIgnorePatterns: ['node_modules/(?!@polkadot|react-native|@babel/runtime/helpers/esm/)'],
+	transformIgnorePatterns: [
+		'node_modules/(?!@polkadot|react-native|@babel/runtime/helpers/esm/)'
+	],
 	transform: {
 		...tsjPreset.transform,
 		'\\.js$': '<rootDir>/node_modules/react-native/jest/preprocessor.js'
