@@ -34,7 +34,8 @@ module.exports = {
 				root: ['.']
 			}
 		],
-		['./scripts/rewrite-node-global']
+		['./scripts/rewrite-node-global'],
+		['@babel/plugin-transform-modules-commonjs']
 	],
 	presets: ['module:metro-react-native-babel-preset']
 };
