@@ -62,6 +62,7 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 		params?: RootStackParamList[RouteName]
 	): void => {
 		setVisible(false);
+		// @ts-ignore: https://github.com/react-navigation/react-navigation/pull/8389/files breaks things
 		navigation.navigate(screenName, params);
 	};
 
