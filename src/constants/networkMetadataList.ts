@@ -2,21 +2,21 @@
 
 import * as metadata from 'constants/networkMetadata';
 
-export const defaultPolkadotMetadata = metadata.polkadotMetadataV29;
-
 export const defaultMetadata = metadata.kusamaMetadataV2030;
+
+export const defaultPolkadotMetadata = metadata.polkadotMetadataV30;
 
 export const allBuiltInMetadata = [
 	metadata.kulupuMetadataV17,
 	metadata.edgewareMetadata,
 	metadata.centrifugeMetadata,
-	metadata.polkadotMetadataV29,
-	metadata.rococoMetadataV232,
 	metadata.centrifugeAmberMetadata,
 	metadata.westendMetadataV50,
 	metadata.kusamaMetadataV2030,
-	metadata.polkadotMetadataV28,
-	metadata.rococoMetadataV214,
+	metadata.polkadotMetadataV30,
+	metadata.rococoMetadataV233,
 	metadata.westendMetadataV49,
 	metadata.kusamaMetadataV2029,
+	metadata.polkadotMetadataV29,
+	metadata.rococoMetadataV232,
 ];
