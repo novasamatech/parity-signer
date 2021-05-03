@@ -22,11 +22,14 @@ module.exports = {
 		'^utils/(.*)$': '<rootDir>/src/utils/$1'
 	},
 	rootDir: './../../',
-	testEnvironment: 'node',
-	testPathIgnorePatterns: ['/node_modules/'],
+	testEnvironment: 'jsdom',
+	testPathIgnorePatterns: ['node_modules/'],
 	transform: {
 		...tsjPreset.transform,
 		'\\.js$': '<rootDir>/node_modules/react-native/jest/preprocessor.js'
 	},
+	transformIgnorePatterns: [
+		'<rootDir>/node_modules/(?!@polkadot|react-native|@babel/runtime/helpers/esm/)'
+	],
 	verbose: true
 };

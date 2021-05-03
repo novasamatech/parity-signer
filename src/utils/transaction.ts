@@ -49,7 +49,7 @@ export class Transaction {
 
 async function asyncTransaction(
 	rlp: string,
-	resolve: (value?: Transaction) => void,
+	resolve: (value: Transaction) => void,
 	reject: any
 ): Promise<void> {
 	try {

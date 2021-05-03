@@ -201,9 +201,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.POLKADOT,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: '7ef1da1c6b931d2f64580013517f1e023c2ce24785eeaa749e6e56384bd58bd3',
+			hash: '93b9065e4a6b8327ca1ce90e9ac3d7d967a660dcc5cda408e2595aa3e5c1ab46',
 			specName: 'polkadot',
-			specVersion: 29
+			specVersion: 30
 		},
 		order: 1,
 		pathId: 'polkadot',
@@ -217,9 +217,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
 		logo: require('res/img/logos/Rococo.png'),
 		metadata: {
-			hash: '2e309508628ab604963f4b8b06ee6c1ec0b6637596822219f2f637c29066ac91',
+			hash: 'd5b291603b4e9e5a28f70915e8d7176cff04f5997b103a25bd320ee837145b08',
 			specName: 'rococo',
-			specVersion: 232
+			specVersion: 233
 		},
 		order: 4,
 		pathId: 'rococo',

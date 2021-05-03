@@ -17,6 +17,31 @@
 /* global jest */
 // import mockCamera from './__mocks__/Camera'
 
+// mock reactnative that requires native platform
 jest.doMock('react-native', () => 'reactNativeMock');
 
+// mock native RNG
+jest.mock('react-native-randombytes', () => {
+	const apiMock = {
+		randomBytes: jest.fn(length => {
+			let data = new Uint8Array(length);
+			data = data.map(() => Math.floor(Math.random() * 90) + 10);
+			return data;
+		})
+	};
+	return apiMock;
+});
+
+// mock WASM code - used in tests only
+/*
+jest.mock('@polkadot/wasm-crypto', () => {
+	const original = jest.requireActual('@polkadot/wasm-crypto');
+	const apiMock = {
+		...original,
+		waitReady: jest.fn().mockReturnValue(new Promise((resolve, reject) => {resolve(true)})),
+		isReady: jest.fn().mockReturnValue(true)
+	};
+	return apiMock;
+});
+*/
 // jest.doMock('react-native-substrate-sign', () => 'substrateSignMock');

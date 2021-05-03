@@ -45,7 +45,7 @@ function ButtonWithArrow(props: {
 	return <ButtonIcon {...props} {...i_arrowOptions} />;
 }
 
-function IdentitiesSwitch({}: {}): React.ReactElement {
+function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
@@ -62,7 +62,7 @@ function IdentitiesSwitch({}: {}): React.ReactElement {
 		params?: RootStackParamList[RouteName]
 	): void => {
 		setVisible(false);
-		// @ts-ignore
+		// @ts-ignore: https://github.com/react-navigation/react-navigation/pull/8389/files breaks things
 		navigation.navigate(screenName, params);
 	};
 

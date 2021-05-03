@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-const commonConfig = require('../jestCommonConfig');
+const commonConfig = require('../jestCommonConfig.js');
 
 module.exports = {
 	...commonConfig,

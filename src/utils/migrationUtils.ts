@@ -34,7 +34,7 @@ import {
 } from 'utils/identitiesUtils';
 
 interface LegacyMeta extends AccountMeta {
-	accountId: string;
+	accountId?: string;
 }
 
 interface LegacyIdentity extends Identity {
@@ -43,8 +43,8 @@ interface LegacyIdentity extends Identity {
 }
 
 interface LegacyAccount extends LockedAccount {
-	chainId: string;
-	networkType: string;
+	chainId?: string;
+	networkType?: string;
 }
 
 export const migrateIdentity = async (): Promise<void> => {
@@ -64,12 +64,12 @@ export const migrateIdentity = async (): Promise<void> => {
 			addressMap.set(getAddressKey(accountId), path);
 		});
 		identity.addresses = addressMap;
-		delete identity.accountIds;
+		identity.accountIds.clear();
 
 		const metaMap = new Map();
 		identity.meta.forEach((metaData: LegacyMeta, path: string): void => {
-			if (metaData.hasOwnProperty('accountId')) {
-				const { accountId } = metaData;
+			const { accountId } = metaData;
+			if (accountId) {
 				metaData.address = extractAddressFromAccountId(accountId);
 				delete metaData.accountId;
 				metaMap.set(path, metaData);

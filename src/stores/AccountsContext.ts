@@ -151,13 +151,14 @@ export function useAccountContext(): AccountsContextState {
 		});
 	}
 
+	//TODO: please note this not very secure thing on proper security polishing
 	function _deleteSensitiveData(account: UnlockedAccount): LockedAccount {
-		delete account.seed;
-		delete account.seedPhrase;
-		delete account.derivationPassword;
-		delete account.derivationPath;
+		account.seed = '';
+		account.seedPhrase = '';
+		account.derivationPassword = '';
+		account.derivationPath = '';
 
-		return account;
+		return account as LockedAccount;
 	}
 
 	async function save(
