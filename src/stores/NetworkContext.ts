@@ -125,7 +125,7 @@ export function useNetworksContext(): NetworksContextState {
 		Map<string, SubstrateNetworkParams>
 	>(new Map());
 	const [registries, setRegistries] = useState(new Map());
-	const [registriesReady, setRegistriesReady] = useState<bool>(false);
+	const [registriesReady, setRegistriesReady] = useState<boolean>(false);
 
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
 		const ethereumNetworks: Map<string, NetworkParams> = new Map(
