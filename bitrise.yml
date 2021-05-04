@@ -140,7 +140,7 @@ workflows:
             $BITRISE_SOURCE_DIR/ios/build
             $BITRISE_SOURCE_DIR/node_modules
         - is_debug_mode: 'true'
-    - deploy-to-bitrise-io:
+    - deploy-to-bitrise-io@1.6.1:
         inputs:
         - is_compress: 'true'
         - deploy_path: >-
