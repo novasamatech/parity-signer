@@ -20,6 +20,7 @@ import {
 	tapBack,
 	testExist,
 	testRecoverIdentity,
+	testScrollAndTap,
 	testTap,
 	testUnlockPin,
 	testVisible
