@@ -36,6 +36,7 @@ frame-metadata = "12.0.1"
 [lib]
 name = "signer"
 crate-type = ["staticlib", "cdylib"]
+proc-macro = true
 
 [features]
 default = ["jni"]
