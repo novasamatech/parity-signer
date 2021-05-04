@@ -25,6 +25,7 @@ const testIDs = {
 		deleteIdentity: 'alert_delete_identity'
 	},
 	DetailsTx: {
+		detailsScreen: 'details_screen',
 		signButton: 'sign_button'
 	},
 	Header: {

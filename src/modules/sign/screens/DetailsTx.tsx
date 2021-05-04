@@ -116,7 +116,7 @@ function UnsignedTxView({
 	};
 
 	return (
-		<SafeAreaScrollViewContainer>
+		<SafeAreaScrollViewContainer testID={testIDs.DetailsTx.detailsScreen}>
 			<Text style={styles.topTitle}>Signed extrinsic</Text>
 			<CompatibleCard
 				account={sender}
