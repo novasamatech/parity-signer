@@ -144,7 +144,7 @@ workflows:
         inputs:
         - is_compress: 'true'
         - deploy_path: >-
-            $BITRISE_SOURCE_DIR/ios/build/NativeSigner/Build/Products/GithubActions-iphonesimulator/NativeSigner.app
+            $BITRISE_SOURCE_DIR/ios/build/Products/ParitySigner.xcarchive
 app:
   envs:
   - opts:
