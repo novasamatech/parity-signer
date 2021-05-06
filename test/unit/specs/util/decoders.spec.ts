@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import '@polkadot/util-crypto';
+import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import {
 	createType,
 	GenericExtrinsicPayload,
@@ -23,7 +23,6 @@ import {
 import { Metadata } from '@polkadot/metadata';
 import { GenericCall as Call } from '@polkadot/types/generic';
 import { hexToU8a, u8aConcat } from '@polkadot/util';
-import { checkAddress, decodeAddress } from '@polkadot/util-crypto';
 import { describe, expect, it } from '@jest/globals';
 
 import { getOverrideTypes } from 'stores/NetworkContext';

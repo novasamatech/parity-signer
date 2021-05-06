@@ -14,7 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ScrollView, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
+import {
+	ScrollView,
+	StyleSheet,
+	View,
+	ActivityIndicator,
+	Text
+} from 'react-native';
 
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
