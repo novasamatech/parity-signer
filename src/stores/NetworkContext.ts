@@ -107,6 +107,7 @@ export type NetworksContextState = {
 	getNetwork: GetNetwork;
 	pathIds: string[];
 	registries: Map<string, TypeRegistry>;
+	registriesReady: boolean;
 	getTypeRegistry: (
 		//networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
@@ -324,6 +325,7 @@ export function useNetworksContext(): NetworksContextState {
 		pathIds,
 		populateNetworks,
 		registries,
+		registriesReady,
 		setMetadataVersion,
 		updateTypeRegistries
 	};
