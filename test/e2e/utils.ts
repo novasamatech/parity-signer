@@ -106,7 +106,7 @@ export const testSetUpDefaultPath = async (): Promise<void> => {
 };
 
 export const waitAlert = (ms?: number): Promise<void> =>
-	new Promise(resolve => setTimeout(resolve, ms || 100000));
+	new Promise(resolve => setTimeout(resolve, ms || 1000000));
 
 export const launchWithScanRequest = async (
 	txRequest: number
