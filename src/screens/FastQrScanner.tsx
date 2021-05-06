@@ -45,14 +45,14 @@ export default function Scanner({
 
 	// all code to derive information when size of package is determined
 	function setExpectedMessageInfo(size: string): void {
-		const parsedPacketSize = parseInt(size.substr(0, 4), 16) - 8;
+		const parsedPacketSize = parseInt(size.substr(0, 4), 16) - 4;
 		const parsedMessageSize = parseInt(size.substr(4, 8), 16) - 0x80000000;
 		console.log(parsedPacketSize);
 		console.log(parsedMessageSize);
 		setPacketSize(parsedPacketSize);
 		setMessageSize(parsedMessageSize);
 		//always ask for two more packets to kick P>99.9%
-		setNominalPacketsNumber(~~(parsedMessageSize / parsedPacketSize) + 2);
+		setNominalPacketsNumber(~~(parsedMessageSize / (parsedPacketSize - 4)) + 2);
 	}
 
 	function processQrFrame(data: string): void {
