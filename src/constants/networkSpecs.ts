@@ -233,9 +233,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.WESTEND,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: '03d45f0a19a7592a2e30b142887c26970a752b57532a010c7a920faab604ad10',
+			hash: 'e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce',
 			specName: 'westend',
-			specVersion: 900
+			specVersion: 9000
 		},
 		order: 3,
 		pathId: 'westend',

@@ -411,3 +411,56 @@ S OK
 S OK
 * Updating westend
 S OK
+======
+Metadata fetching started: 2021-05-06 06:06:50.321677778 UTC
+
+* Updating kusama:
+* Version 2030 up to date.
+
+* Updating westend:
+S Updated: new version 9000 was fetched. Older version 900 metadata was sent to historical record.
+
+* Updating edgeware:
+W No version found in constants
+* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
+
+* Updating kulupu:
+E Networking or low-level protocol error: Failed to resolve IP addresses for this hostname: 0
+
+* Updating centrifuge:
+W RuntimeMetadata version incompatible
+* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
+
+* Updating centrifugeAmber:
+W RuntimeMetadata version incompatible
+* No updates made. No version in both existing and retrieved metadata. No changes in metadata.
+
+* Updating polkadot:
+E The background task been terminated because: Networking or low-level protocol error: error in the WebSocket connection; restart required
+
+* Updating rococo:
+* Version 233 up to date.
+
+Metadata fetching finished: 2021-05-06 06:07:55.240060896 UTC
+
+Updating networkSpecs.ts file
+* Updating kusama
+S OK
+* Updating centrifuge
+S OK
+* Updating centrifugeAmber
+S OK
+* Updating edgeware
+S OK
+* Updating kulupu
+S OK
+* Updating kusama
+S OK
+* Updating kusama
+S OK
+* Updating polkadot
+S OK
+* Updating rococo
+S OK
+* Updating westend
+S OK
