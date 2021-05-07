@@ -23,6 +23,7 @@ import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
+import MetadataSaving from 'screens/MetadataSaving';
 import { tryDecodeQr } from 'utils/native';
 import { saveMetadata } from 'utils/db';
 import { TxRequestData } from 'types/scannerTypes';
@@ -92,13 +93,13 @@ export default function Scanner({
 			);
 			if (decoded !== '' && decodeProcess) {
 				console.log('success');
-				console.log(decoded.substr(128));
+				console.log(decoded.substr(0, 128));
 				setDecodeProcess(false);
 				//TODO: here we should place general handler if/when we switch
 				//to ubiquitous fountains. Now this handles only metadata input
 				//processPakage(decoded);
-				saveMetadata('0x' + decoded.substr(6));
-				navigation.goBack();
+				const toSave = '0x' + decoded.substr(6);
+				navigation.navigate('MetadataSaving', { metadata: toSave });
 			}
 		}
 	};

@@ -28,7 +28,7 @@ type MetadataCardProps = {
 	specName: string;
 	specVersion: string;
 	metadataHash: string;
-	onPress: ButtonListener;
+	onPress?: ButtonListener;
 };
 
 const CardSeparator = (): ReactElement => (

@@ -17,7 +17,7 @@
 // This screen should show full contents of chosen metadata
 
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { TypeRegistry } from '@polkadot/types';
 import { Metadata } from '@polkadot/metadata';
 import { expandMetadata } from '@polkadot/metadata/decorate';
@@ -59,7 +59,17 @@ export default function FullMetadata({
 		if (metadataReady) {
 			return <Text style={styles.titleText}>{savedMetadata}</Text>;
 		} else {
-			return;
+			return (
+				<View>
+					<ActivityIndicator
+						animating={true}
+						color="red"
+						size="large"
+						style={styles.indicator}
+					/>
+					<Text style={fontStyles.quote}>"Reading metadata"</Text>
+				</View>
+			);
 		}
 	}
 
@@ -90,6 +100,9 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		paddingBottom: 10,
 		textAlign: 'center'
+	},
+	indicator: {
+		margin: 15
 	},
 	titleText: {
 		...fontStyles.t_codeS,
