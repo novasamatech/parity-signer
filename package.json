@@ -40,7 +40,7 @@
     "test-e2e:ios": "detox test -c ios.sim.debug -l info --noStackTrace",
     "test-e2e:ci": "detox test -c ios.sim.release -l info --noStackTrace  --cleanup",
     "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios",
-    "e2e": "yarn e2e:ios && yarn e2e:android"
+    "e2e": "yarn e2e:android && yarn e2e:ios"
   },
   "dependencies": {
     "@polkadot/api": "4.7.2",
