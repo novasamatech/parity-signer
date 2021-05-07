@@ -39,7 +39,7 @@ beforeAll(async () => {
 		await device.clearKeychain();
 	}
 	await device.launchApp({ permissions: { camera: 'YES' } });
-	await waitFor(element(by.Id(TacScreen.tacView)))
+	await waitFor(element(by.id(TacScreen.tacView)))
 		.toBeVisible()
 		.withTimeout(300000);
 	await testVisible(TacScreen.tacView);
