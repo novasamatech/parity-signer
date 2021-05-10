@@ -30,10 +30,10 @@ export default function Main(
 ): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { identities, currentIdentity, loaded, accounts } = accountsStore.state;
-	const { registriesReady } = useContext(NetworksContext);
+	const { registriesReady, startupAttraction } = useContext(NetworksContext);
 	const hasLegacyAccount = accounts.size !== 0;
 
-	if (!registriesReady) return <LoadingScreen />;
+	if (!registriesReady) return <LoadingScreen infoText={startupAttraction}/>;
 	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0)
 		return <OnBoardingView hasLegacyAccount={hasLegacyAccount} />;

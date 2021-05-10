@@ -26,18 +26,24 @@ import {
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 
-function LoadingScreen({}: Record<string, never>): React.ReactElement {
+type LoadingScreenParams = {
+	infoText: string;
+};
+
+function LoadingScreen({infoText}: LoadingScreenParams): React.ReactElement {
 	return (
-		<View style={styles.background}>
+		<SafeAreaViewContainer style={styles.background}>
 			<ActivityIndicator
 				animating={true}
 				color="red"
 				size="large"
 				style={styles.indicator}
 			/>
-			<Text style={fontStyles.quote}>"Please wait"</Text>
-		</View>
+			<Text style={fontStyles.quote}>Please wait</Text>
+			<Text style={fontStyles.a_text}>{infoText}</Text>
+		</SafeAreaViewContainer>
 	);
 }
 

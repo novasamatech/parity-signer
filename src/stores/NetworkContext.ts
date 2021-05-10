@@ -108,6 +108,7 @@ export type NetworksContextState = {
 	pathIds: string[];
 	registries: Map<string, TypeRegistry>;
 	registriesReady: boolean;
+	startupAttraction: string;
 	getTypeRegistry: (
 		//networks: Map<string, SubstrateNetworkParams>,
 		networkKey: string
@@ -127,6 +128,7 @@ export function useNetworksContext(): NetworksContextState {
 	>(new Map());
 	const [registries, setRegistries] = useState(new Map());
 	const [registriesReady, setRegistriesReady] = useState<boolean>(false);
+	const [startupAttraction, setStartupAttraction] = useState<string>('');
 
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
 		const ethereumNetworks: Map<string, NetworkParams> = new Map(
@@ -150,10 +152,16 @@ export function useNetworksContext(): NetworksContextState {
 	useEffect(() => {
 		const initNetworksAndRegistries = async function (): Promise<void> {
 			console.log('=====SIGNER STARTING=====');
+			let startingString = 'Signer loading...\nLoading metadata...';
+			setStartupAttraction(startingString);
 			console.log('Loading metadata...');
 			await populateMetadata();
+			startingString = startingString + '\nLoading networks...';
+			setStartupAttraction(startingString);
 			console.log('Loading networks...');
 			const initNetworkSpecs = await loadNetworks();
+			startingString = startingString + '\nRegistering types...';
+			setStartupAttraction(startingString);
 			console.log('Populating registries...');
 			const initRegistries = new Map();
 			for (const networkKey of Array.from(initNetworkSpecs.keys())) {
@@ -173,6 +181,8 @@ export function useNetworksContext(): NetworksContextState {
 					const metadata = new Metadata(newRegistry, networkMetadataRaw);
 					newRegistry.setMetadata(metadata);
 					initRegistries.set(networkKey, newRegistry);
+					startingString = startingString + '\nRegistered metadata ' + metadataHandle.specName + ' v ' + metadataHandle.specVersion + ' for network ' + networkParams.pathId;
+					setStartupAttraction(startingString);
 					console.log('Success!!!');
 				} catch (e) {
 					console.log('Init network registration error', e);
@@ -327,6 +337,7 @@ export function useNetworksContext(): NetworksContextState {
 		registries,
 		registriesReady,
 		setMetadataVersion,
+		startupAttraction,
 		updateTypeRegistries
 	};
 }
