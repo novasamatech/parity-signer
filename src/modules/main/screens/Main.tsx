@@ -33,7 +33,7 @@ export default function Main(
 	const { registriesReady, startupAttraction } = useContext(NetworksContext);
 	const hasLegacyAccount = accounts.size !== 0;
 
-	if (!registriesReady) return <LoadingScreen infoText={startupAttraction}/>;
+	if (!registriesReady) return <LoadingScreen infoText={startupAttraction} />;
 	if (!loaded) return <SafeAreaViewContainer />;
 	if (identities.length === 0)
 		return <OnBoardingView hasLegacyAccount={hasLegacyAccount} />;

@@ -32,7 +32,7 @@ type LoadingScreenParams = {
 	infoText: string;
 };
 
-function LoadingScreen({infoText}: LoadingScreenParams): React.ReactElement {
+function LoadingScreen({ infoText }: LoadingScreenParams): React.ReactElement {
 	return (
 		<SafeAreaViewContainer style={styles.background}>
 			<ActivityIndicator

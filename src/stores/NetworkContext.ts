@@ -181,7 +181,14 @@ export function useNetworksContext(): NetworksContextState {
 					const metadata = new Metadata(newRegistry, networkMetadataRaw);
 					newRegistry.setMetadata(metadata);
 					initRegistries.set(networkKey, newRegistry);
-					startingString = startingString + '\nRegistered metadata ' + metadataHandle.specName + ' v ' + metadataHandle.specVersion + ' for network ' + networkParams.pathId;
+					startingString =
+						startingString +
+						'\nRegistered metadata ' +
+						metadataHandle.specName +
+						' v ' +
+						metadataHandle.specVersion +
+						' for network ' +
+						networkParams.pathId;
 					setStartupAttraction(startingString);
 					console.log('Success!!!');
 				} catch (e) {
