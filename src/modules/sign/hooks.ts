@@ -17,7 +17,11 @@ export function usePayloadDetails(
 		// was this line useful for anything?
 		//if (getTypeRegistry === null) return;
 		const typeRegistry = getTypeRegistry(networkKey);
-		if (typeRegistry === null || typeof rawPayload === 'string' || !typeRegistry.metadata) {
+		if (
+			typeRegistry === null ||
+			typeof rawPayload === 'string' ||
+			!typeRegistry.metadata
+		) {
 			setIsProcessing(false);
 			return;
 		} else {
