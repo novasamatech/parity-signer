@@ -13,10 +13,10 @@ export const allBuiltInMetadata = [
 	metadata.centrifugeAmberMetadata,
 	metadata.kusamaMetadataV2030,
 	metadata.polkadotMetadataV30,
-	metadata.rococoMetadataV233,
 	metadata.westendMetadataV9000,
+	metadata.rococoMetadataV9001,
 	metadata.kusamaMetadataV2029,
 	metadata.polkadotMetadataV29,
-	metadata.rococoMetadataV232,
 	metadata.westendMetadataV900,
+	metadata.rococoMetadataV233,
 ];

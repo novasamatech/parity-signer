@@ -217,9 +217,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
 		logo: require('res/img/logos/Rococo.png'),
 		metadata: {
-			hash: 'd5b291603b4e9e5a28f70915e8d7176cff04f5997b103a25bd320ee837145b08',
+			hash: '4fd9e79b98959f96d6f0097f7c5f95966a8e2637ac39b99a4477e97f35bb1b3a',
 			specName: 'rococo',
-			specVersion: 233
+			specVersion: 9001
 		},
 		order: 4,
 		pathId: 'rococo',
