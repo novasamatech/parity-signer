@@ -153,6 +153,7 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 				<ButtonWithArrow
 					title="Network Settings"
 					onPress={(): void => closeModalAndNavigate('NetworkSettings')}
+					testID={testIDs.IdentitiesSwitch.networkSettings}
 				/>
 				<ButtonWithArrow
 					title="Terms and Conditions"

@@ -57,7 +57,7 @@ export default function NetworkSettings({
 	};
 
 	return (
-		<SafeAreaViewContainer style={styles.body}>
+		<SafeAreaViewContainer style={styles.body} testID={testIDs.NetworkSettings.networkSettingsScreen}>
 			<ScreenHeading title="Supported Networks" />
 			<FlatList
 				data={networkParams}

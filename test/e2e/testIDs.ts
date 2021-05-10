@@ -35,6 +35,7 @@ const testIDs = {
 		addIdentityButton: 'identities_switch_add_identity',
 		manageIdentityButton: 'identities_switch_manager_button',
 		modal: 'identity_switch_modal',
+		networkSettings: 'identity_switch_network_settings',
 		toggleButton: 'identities_switch_toggle_button'
 	},
 	IdentityBackup: {
@@ -74,7 +75,8 @@ const testIDs = {
 		showExistedButton: 'anc_show_existed'
 	},
 	NetworkSettings: {
-		networkCard: 'network_settings_network_card'
+		networkCard: 'network_settings_network_card',
+		networkSettingsScreen: 'network_settings_network_settings_screen'
 	},
 	PathDerivation: {
 		deriveButton: 'path_derivation_derive_button',
