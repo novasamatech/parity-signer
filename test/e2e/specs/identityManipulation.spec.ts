@@ -70,7 +70,7 @@ describe('Load test', () => {
 		await testTap(PathsList.deriveButton);
 		await testInput(PathDerivation.pathInput, defaultPath);
 		await testInput(PathDerivation.nameInput, 'default');
-		await waitAlert();
+		//await waitAlert();
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}`);
 	});
 
@@ -79,7 +79,7 @@ describe('Load test', () => {
 		await testTap(PathDetail.deriveButton);
 		await testInput(PathDerivation.pathInput, childPath);
 		await testInput(PathDerivation.nameInput, 'child');
-		await waitAlert();
+		//await waitAlert();
 		await testExist(PathsList.pathCard + `//kusama${defaultPath}${childPath}`);
 	});
 
@@ -98,7 +98,7 @@ describe('Load test', () => {
 		await testUnlockPin(pinCode);
 		await testInput(PathDerivation.pathInput, secondPath);
 		await testInput(PathDerivation.nameInput, 'second');
-		await waitAlert();
+		//await waitAlert();
 		await testExist(PathsList.pathCard + `//kusama${secondPath}`);
 	});
 
@@ -108,7 +108,7 @@ describe('Load test', () => {
 		await testTap(Main.addCustomNetworkButton);
 		await testInput(PathDerivation.pathInput, customPath);
 		await testInput(PathDerivation.nameInput, 'custom');
-		await waitAlert();
+		//await waitAlert();
 		await testVisible(Main.chooserScreen);
 	});
 

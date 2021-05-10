@@ -33,7 +33,7 @@ describe('passworded account test', () => {
 		await testInput(PathDerivation.pathInput, passwordedPath);
 		await testTap(PathDerivation.togglePasswordButton);
 		await testInput(PathDerivation.passwordInput, password);
-		await waitAlert();
+		//await waitAlert();
 		await testExist(PathsList.pathCard + `//kusama${passwordedPath}`);
 	});
 
