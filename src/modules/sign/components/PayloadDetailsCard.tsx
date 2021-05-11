@@ -35,6 +35,8 @@ import fontStyles from 'styles/fontStyles';
 import { alertDecodeError } from 'utils/alertUtils';
 import { withRegistriesStore } from 'utils/HOC';
 import { shortString } from 'utils/strings';
+import { MethodCard } from 'components/MethodCard';
+import { FrameMethod, SanitizedArgs, SanitizedCall } from 'types/payloads';
 
 const recodeAddress = (encodedAddress: string, prefix: number): string =>
 	encodeAddress(decodeAddress(encodedAddress), prefix);
@@ -45,24 +47,6 @@ type ExtrinsicPartProps = {
 	networkKey: string;
 	registriesStore: NetworksContextState;
 	value: AnyJson | AnyU8a | IMethod | IExtrinsicEra;
-};
-
-type FrameMethod = {
-	method: string;
-	pallet: string;
-};
-
-type SanitizedArgs = {
-	[key: string]: unknown;
-	call?: SanitizedCall;
-	calls?: SanitizedCall[];
-};
-
-type SanitizedCall = {
-	[key: string]: unknown;
-	args: SanitizedArgs;
-	callIndex?: Uint8Array | string;
-	method: string | FrameMethod;
 };
 
 const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
@@ -220,11 +204,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			const call = typeRegistry.createType('Call', value);
 			const parsedJSON = parseGenericCall(call, 0);
 			const parsed = JSON.stringify(parsedJSON, null, 2);
-			return (
-				<View style={styles.callDetails}>
-					<Text style={styles.titleText}>{parsed}</Text>
-				</View>
-			);
+			return <MethodCard renderCall={parsedJSON} depth={0} />;
 		};
 
 		const renderTipDetails = (): React.ReactElement => {
