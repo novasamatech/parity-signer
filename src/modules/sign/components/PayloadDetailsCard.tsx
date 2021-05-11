@@ -106,14 +106,13 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 			depthLimiter: number
 		): SanitizedCall {
 			//Recursion depth limitation close but safely within framework's limits.
+			const newArgs: SanitizedArgs = {};
 			if (depthLimiter > 50) {
 				return {
-					args: [],
+					args: newArgs,
 					method: 'depth overflow (over 50 nested layers)'
 				};
 			}
-
-			const newArgs: SanitizedArgs = {};
 
 			// Pull out the struct of arguments to this call
 			const callArgs = genericCall.get('args') as Struct;
@@ -143,7 +142,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 						} catch {
 							//don't guess - admit failure
 							return {
-								args: [],
+								args: newArgs,
 								method: 'Could not parse call!'
 							};
 						}

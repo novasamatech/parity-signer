@@ -20,7 +20,8 @@ export function usePayloadDetails(
 		if (
 			typeRegistry === null ||
 			typeof rawPayload === 'string' ||
-			!typeRegistry.metadata
+			!networks.get(networkKey) ||
+			!networks.get(networkKey)!.metadata
 		) {
 			setIsProcessing(false);
 			return;
