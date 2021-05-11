@@ -86,19 +86,33 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const prefix = networkParams.prefix;
 		const typeRegistry = getTypeRegistry(networkKey)!;
 
+		//These operations should be re-implemented in Rust once metadata V13 is out
+		//TODO: please audit these two functions again and again to make sure they do not lie
 		function parseArrayGenericCalls(
-			argsArray: Codec[]
+			argsArray: Codec[],
+			depthLimiter: number
 		): (Codec | SanitizedCall)[] {
 			return argsArray.map(argument => {
 				if (argument instanceof GenericCall) {
-					return parseGenericCall(argument);
+					return parseGenericCall(argument, depthLimiter + 1);
 				}
 
 				return argument;
 			});
 		}
 
-		function parseGenericCall(genericCall: GenericCall): SanitizedCall {
+		function parseGenericCall(
+			genericCall: GenericCall,
+			depthLimiter: number
+		): SanitizedCall {
+			//Recursion depth limitation close but safely within framework's limits.
+			if (depthLimiter > 50) {
+				return {
+					args: [],
+					method: 'depth overflow (over 50 nested layers)'
+				};
+			}
+
 			const newArgs: SanitizedArgs = {};
 
 			// Pull out the struct of arguments to this call
@@ -111,9 +125,12 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 					const argument = callArgs.get(paramName);
 
 					if (Array.isArray(argument)) {
-						newArgs[paramName] = parseArrayGenericCalls(argument);
+						newArgs[paramName] = parseArrayGenericCalls(
+							argument,
+							depthLimiter + 1
+						);
 					} else if (argument instanceof GenericCall) {
-						newArgs[paramName] = parseGenericCall(argument);
+						newArgs[paramName] = parseGenericCall(argument, depthLimiter + 1);
 					} else if (
 						paramName === 'call' &&
 						argument?.toRawType() === 'Bytes'
@@ -122,9 +139,13 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 						// serialize to a polkadot-js Call and parse so it is not a hex blob.
 						try {
 							const call = typeRegistry.createType('Call', argument.toHex());
-							newArgs[paramName] = parseGenericCall(call);
+							newArgs[paramName] = parseGenericCall(call, depthLimiter + 1);
 						} catch {
-							newArgs[paramName] = (argument as any) as SanitizedCall;
+							//don't guess - admit failure
+							return {
+								args: [],
+								method: 'Could not parse call!'
+							};
 						}
 					} else {
 						newArgs[paramName] = (argument as any) as SanitizedCall;
@@ -198,7 +219,8 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 
 		const renderMethodDetails = (): React.ReactNode => {
 			const call = typeRegistry.createType('Call', value);
-			const parsed = JSON.stringify(parseGenericCall(call), null, 2);
+			const parsedJSON = parseGenericCall(call, 0);
+			const parsed = JSON.stringify(parsedJSON, null, 2);
 			return (
 				<View style={styles.callDetails}>
 					<Text style={styles.titleText}>{parsed}</Text>

@@ -173,7 +173,7 @@ export function useNetworksContext(): NetworksContextState {
 					if (metadataHandle) {
 						const networkMetadataRaw = await getMetadata(metadataHandle);
 						const newRegistry = new TypeRegistry();
-							const overrideTypes = getOverrideTypes(
+						const overrideTypes = getOverrideTypes(
 							newRegistry,
 							networkParams.pathId
 						);
@@ -196,11 +196,10 @@ export function useNetworksContext(): NetworksContextState {
 						startingString =
 							startingString +
 							'\nRegistered network ' +
-							networkParams.pathId + 
+							networkParams.pathId +
 							' without metadata!';
 						setStartupAttraction(startingString);
 						console.log('Success!!!');
-
 					}
 				} catch (e) {
 					console.log('Init network registration error', e);
