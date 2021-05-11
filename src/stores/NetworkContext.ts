@@ -170,27 +170,38 @@ export function useNetworksContext(): NetworksContextState {
 					console.log('Registering network:');
 					console.log(networkParams.pathId);
 					const metadataHandle = networkParams.metadata;
-					const networkMetadataRaw = await getMetadata(metadataHandle);
-					const newRegistry = new TypeRegistry();
-					const overrideTypes = getOverrideTypes(
-						newRegistry,
-						networkParams.pathId
-					);
-					//const overrideTypes = getSpecTypes(newRegistry, networkParams.pathId, metadataHandle.specName, Number.MAX_SAFE_INTEGER);
-					newRegistry.register(overrideTypes);
-					const metadata = new Metadata(newRegistry, networkMetadataRaw);
-					newRegistry.setMetadata(metadata);
-					initRegistries.set(networkKey, newRegistry);
-					startingString =
-						startingString +
-						'\nRegistered metadata ' +
-						metadataHandle.specName +
-						' v ' +
-						metadataHandle.specVersion +
-						' for network ' +
-						networkParams.pathId;
-					setStartupAttraction(startingString);
-					console.log('Success!!!');
+					if (metadataHandle) {
+						const networkMetadataRaw = await getMetadata(metadataHandle);
+						const newRegistry = new TypeRegistry();
+							const overrideTypes = getOverrideTypes(
+							newRegistry,
+							networkParams.pathId
+						);
+						//const overrideTypes = getSpecTypes(newRegistry, networkParams.pathId, metadataHandle.specName, Number.MAX_SAFE_INTEGER);
+						newRegistry.register(overrideTypes);
+						const metadata = new Metadata(newRegistry, networkMetadataRaw);
+						newRegistry.setMetadata(metadata);
+						initRegistries.set(networkKey, newRegistry);
+						startingString =
+							startingString +
+							'\nRegistered metadata ' +
+							metadataHandle.specName +
+							' v ' +
+							metadataHandle.specVersion +
+							' for network ' +
+							networkParams.pathId;
+						setStartupAttraction(startingString);
+						console.log('Success!!!');
+					} else {
+						startingString =
+							startingString +
+							'\nRegistered network ' +
+							networkParams.pathId + 
+							' without metadata!';
+						setStartupAttraction(startingString);
+						console.log('Success!!!');
+
+					}
 				} catch (e) {
 					console.log('Init network registration error', e);
 				}
