@@ -4,14 +4,14 @@ default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
 project_type: react-native
 trigger_map:
 - pull_request_source_branch: '*'
-  workflow: e2e-test
+  workflow: build
 workflows:
   build:
     steps:
     - activate-ssh-key@4:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
     - cache-pull@2: {}
-    - git-clone@4: {}
+    - git-clone@5.1: {}
     - nvm@1:
         inputs:
         - node_version: '15'
@@ -69,6 +69,10 @@ workflows:
             -archivePath ./build/Products/ParitySigner.xcarchive \
             -workspace NativeSigner.xcworkspace \
             -sdk iphonesimulator
+    - yarn@0:
+        inputs:
+        - args: 'test-e2e:ios'
+        - command: run
     - cache-push@2:
         inputs:
         - compress_archive: 'true'
@@ -77,44 +81,10 @@ workflows:
             $BITRISE_SOURCE_DIR/ios/build
             $BITRISE_SOURCE_DIR/node_modules
         - is_debug_mode: 'true'
-    - deploy-to-bitrise-io@1.6.1:
+    - deploy-to-bitrise-io@1.13:
         inputs:
         - is_compress: 'true'
         - deploy_path: $BITRISE_SOURCE_DIR/ios/build/Products/ParitySigner.xcarchive
-  e2e-test:
-    steps:
-    - activate-ssh-key@4:
-        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-    - cache-pull@2: {}
-    - git-clone@5.1: {}
-    - nvm@1:
-        inputs:
-        - node_version: '15'
-    - npm@1:
-        inputs:
-        - cache_local_deps: 'true'
-        - npm_version: ''
-        - command: |-
-            install -g yarn
-            install -g react-native-cli
-    - yarn@0:
-        title: install
-        inputs:
-        - command: install
-    - yarn@0:
-        inputs:
-        - command: e2e
-    - cache-push@2:
-        run_if: true
-        inputs:
-        - is_debug_mode: 'true'
-        - compress_archive: 'true'
-        - cache_paths: |-
-            $BITRISE_CACHE_DIR
-            $BITRISE_SOURCE_DIR/metro-cache
-    - deploy-to-bitrise-io@1:
-        inputs:
-        - deploy_path: $BITRISE_APK_PATH
 app:
   envs:
   - opts:
