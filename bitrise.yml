@@ -4,7 +4,7 @@ default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
 project_type: react-native
 trigger_map:
 - pull_request_source_branch: '*'
-  workflow: build
+  workflow: e2e-test
 workflows:
   build:
     steps:
@@ -14,7 +14,7 @@ workflows:
     - git-clone@4: {}
     - nvm@1:
         inputs:
-        - node_version: '13'
+        - node_version: '15'
     - npm@1:
         inputs:
         - cache_local_deps: 'true'
@@ -89,7 +89,7 @@ workflows:
     - git-clone@5.1: {}
     - nvm@1:
         inputs:
-        - node_version: '13'
+        - node_version: '15'
     - npm@1:
         inputs:
         - cache_local_deps: 'true'
