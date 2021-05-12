@@ -33,11 +33,11 @@
     "unit:debug": "node --inspect node_modules/.bin/jest --config ./test/unit/jest.config.js --watch --runInBand",
     "test-rust": "(cd ./rust/signer && cargo test)",
     "build-e2e:android": "detox build -c android.emu.debug -l info",
-    "test-e2e:android": "detox test -c android.emu.debug -l info --noStackTrace",
+    "test-e2e:android": "detox test -c android.emu.debug -l verbose --noStackTrace",
     "e2e:android": "yarn run build-e2e:android && yarn run test-e2e:android",
     "build-e2e:ios": "detox build -c ios.sim.debug -l info",
     "build-e2e:ci": "detox build -c ios.sim.release -l info",
-    "test-e2e:ios": "detox test -c ios.sim.debug -l info --noStackTrace",
+    "test-e2e:ios": "detox test -c ios.sim.debug -l verbose --noStackTrace",
     "test-e2e:ci": "detox test -c ios.sim.release -l info --noStackTrace  --cleanup",
     "e2e:ios": "yarn run build-e2e:ios && yarn run test-e2e:ios",
     "e2e": "yarn e2e:ios && yarn e2e:android"
