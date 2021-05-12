@@ -31,9 +31,18 @@ function renderArgs(
 ): React.ReactNode {
 	return Object.keys(argObject).map((key: string) => {
 		if (key === 'call') {
-			return <MethodCard renderCall={argObject[key]} depth={argsDepth} />;
-		} else if (key === 'calls') {
-			return argObject[key].map(
+			return (
+				<MethodCard
+					renderCall={argObject[key] as SanitizedCall}
+					depth={argsDepth}
+				/>
+			);
+		} else if (
+			key === 'calls' &&
+			argObject[key] &&
+			typeof argObject[key] === 'object'
+		) {
+			return (argObject[key] as SanitizedCall[]).map(
 				(recursiveCall: SanitizedCall): React.ReactNode => {
 					return <MethodCard renderCall={recursiveCall} depth={argsDepth} />;
 				}
@@ -43,7 +52,14 @@ function renderArgs(
 			const stringifiedArgs = JSON.stringify(argObject[key], null, 2);
 			return (
 				<View>
-					<Text style={StyleSheet.compose(styles.titleText, {paddingLeft: (argsDepth + '0%')})}>
+					<Text
+						style={[
+							styles.titleText,
+							{
+								paddingLeft: argsDepth + '0%'
+							}
+						]}
+					>
 						{key} : <Text style={styles.secondaryText}>{stringifiedArgs}</Text>
 					</Text>
 				</View>
@@ -68,9 +84,16 @@ export function MethodCard({
 
 	return (
 		<View>
-			{renderCall.method.method ? (
+			{typeof renderCall.method === 'object' ? (
 				<View>
-					<Text style={StyleSheet.compose(styles.titleText, {paddingLeft: (depth + '0%')})}>
+					<Text
+						style={[
+							styles.titleText,
+							{
+								paddingLeft: depth + '0%'
+							}
+						]}
+					>
 						{renderCall.method.method}
 						<Text style={styles.secondaryText}> from </Text>
 						{renderCall.method.pallet}
@@ -106,7 +129,7 @@ const styles = StyleSheet.create({
 		color: colors.text.main,
 		paddingHorizontal: 16
 	},
-	warnindText: {
+	warningText: {
 		...fontStyles.t_codeS,
 		color: colors.signal.main
 	}
