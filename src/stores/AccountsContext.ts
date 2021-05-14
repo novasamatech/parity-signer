@@ -511,12 +511,12 @@ export function useAccountContext(): AccountsContextState {
 
 		updatedIdentity.encryptedSeed = await encryptData(suri, pin);
 		//prevent duplication
-		if (
-			state.identities.find(
-				i => i.encryptedSeed === updatedIdentity.encryptedSeed
-			)
-		)
-			throw new Error(duplicatedIdentityError);
+		//if (
+		//	state.identities.find(
+		//		i => i.encryptedSeed === updatedIdentity.encryptedSeed
+		//	)
+		//)
+		//	throw new Error(duplicatedIdentityError);
 		await generateSeedRef(updatedIdentity.encryptedSeed, pin);
 		const newIdentities = state.identities.concat(updatedIdentity);
 		setState({
