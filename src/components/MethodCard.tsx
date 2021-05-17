@@ -17,7 +17,7 @@
 // This component recursively renders all possible nested methods with their arguments
 
 import React, { ReactElement } from 'react';
-import { StyleSheet, View, VirtualizedList, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
 import { SanitizedCall } from 'types/payloads';
 import fontStyles from 'styles/fontStyles';

@@ -15,15 +15,9 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react';
-import {
-	ScrollView,
-	StyleSheet,
-	View,
-	ActivityIndicator,
-	Text
-} from 'react-native';
+import { StyleSheet, ActivityIndicator, Text } from 'react-native';
 
-import testIDs from 'e2e/testIDs';
+//import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';

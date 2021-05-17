@@ -26,6 +26,7 @@ import { MetadataHandle } from 'types/metadata';
 import ScreenHeading from 'components/ScreenHeading';
 import { getRelevantMetadata, getAllMetadata, deleteMetadata } from 'utils/db';
 import MetadataManagerTab from 'components/MetadataManagerTab';
+import testIDs from 'e2e/testIDs';
 
 export default function MetadataManagement({
 	navigation,

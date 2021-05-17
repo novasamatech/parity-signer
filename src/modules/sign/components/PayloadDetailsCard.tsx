@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { GenericExtrinsicPayload, GenericCall, Struct } from '@polkadot/types';
-import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
+import type { ExtrinsicEra } from '@polkadot/types/interfaces';
 import {
 	AnyJson,
 	AnyU8a,
@@ -32,11 +32,9 @@ import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext, NetworksContextState } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { alertDecodeError } from 'utils/alertUtils';
 import { withRegistriesStore } from 'utils/HOC';
-import { shortString } from 'utils/strings';
 import { MethodCard } from 'components/MethodCard';
-import { FrameMethod, SanitizedArgs, SanitizedCall } from 'types/payloads';
+import { SanitizedArgs, SanitizedCall } from 'types/payloads';
 
 const recodeAddress = (encodedAddress: string, prefix: number): string =>
 	encodeAddress(decodeAddress(encodedAddress), prefix);
@@ -59,7 +57,7 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 	}: ExtrinsicPartProps): React.ReactElement => {
 		const [period, setPeriod] = useState<string>();
 		const [phase, setPhase] = useState<string>();
-		const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
+		//const [formattedCallArgs, setFormattedCallArgs] = useState<any>();
 		const [tip, setTip] = useState<string>();
 		const [useFallback, setUseFallBack] = useState(false);
 		const { setAlert } = useContext(AlertStateContext);
@@ -203,7 +201,6 @@ const ExtrinsicPart = withRegistriesStore<ExtrinsicPartProps>(
 		const renderMethodDetails = (): React.ReactNode => {
 			const call = typeRegistry.createType('Call', value);
 			const parsedJSON = parseGenericCall(call, 0);
-			const parsed = JSON.stringify(parsedJSON, null, 2);
 			return <MethodCard renderCall={parsedJSON} depth={0} />;
 		};
 

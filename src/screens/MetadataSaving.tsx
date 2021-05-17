@@ -15,22 +15,18 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text } from 'react-native';
 
 import { MetadataCard } from 'modules/network/components/MetadataCard';
 import Button from 'components/Button';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
-import colors from 'styles/colors';
-import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
-import ScreenHeading from 'components/ScreenHeading';
 import { generateMetadataHandle } from 'utils/native';
 import { saveMetadata } from 'utils/db';
 import { MetadataHandle } from 'types/metadata';
 //for tests
 import testIDs from 'e2e/testIDs';
-import { useInjectionQR } from 'e2e/injections';
 
 interface Props extends NavigationProps<'MetadataSaving'> {
 	metadata: string;

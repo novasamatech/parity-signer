@@ -1,13 +1,3 @@
-import { GenericExtrinsicPayload, GenericCall, Struct } from '@polkadot/types';
-import type { Call, ExtrinsicEra } from '@polkadot/types/interfaces';
-import {
-	AnyJson,
-	AnyU8a,
-	Codec,
-	IExtrinsicEra,
-	IMethod
-} from '@polkadot/types/types';
-
 export type FrameMethod = {
 	method: string;
 	pallet: string;

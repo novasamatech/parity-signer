@@ -57,7 +57,7 @@ export default class AccountIconChooser extends React.PureComponent<
 	Props,
 	{ icons: IconType[] }
 > {
-	constructor(props: any) {
+	constructor(props: Props) {
 		super(props);
 
 		this.state = {
@@ -172,7 +172,7 @@ export default class AccountIconChooser extends React.PureComponent<
 
 	debouncedRefreshIcons = debounce(this.refreshIcons, 200);
 
-	componentDidUpdate(prevProps: any): void {
+	componentDidUpdate(prevProps: Props): void {
 		const { derivationPassword, derivationPath, network } = this.props;
 
 		if (

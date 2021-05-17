@@ -24,6 +24,7 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import Button from 'components/Button';
+import testIDs from 'e2e/testIDs';
 
 export default function NetworkDetails({
 	navigation,
@@ -53,6 +54,7 @@ export default function NetworkDetails({
 						pathId: networkPathId
 					})
 				}
+				testID={testIDs.NetworkDetails.manageValidMetadata}
 				title="Manage metadata"
 			/>
 		</>
@@ -82,7 +84,9 @@ export default function NetworkDetails({
 	);
 
 	return (
-		<SafeAreaScrollViewContainer>
+		<SafeAreaScrollViewContainer
+			testID={testIDs.NetworkDetails.networkDetailsScreen}
+		>
 			<NetworkCard
 				networkKey={networkParams.genesisHash}
 				title={networkParams.title}

@@ -336,9 +336,10 @@ export function useNetworksContext(): NetworksContextState {
 	}
 
 	//This is a placeholder function to emulate rust-based native db
+	/*
 	function dumpNetworksData(): string {
 		return JSON.stringify(Array.from(substrateNetworks.entries()));
-	}
+	}*/
 
 	return {
 		addNetwork,

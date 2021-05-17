@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import TouchableItem from './TouchableItem';
@@ -10,6 +10,7 @@ import FastQrScannerTab from 'components/FastQrScannerTab';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { ButtonListener } from 'types/props';
+import testIDs from 'e2e/testIDs';
 
 type MetadataManagerTabProps = {
 	deletion: ButtonListener;
@@ -34,6 +35,7 @@ export default function MetadataManagerTab({
 					accessibilityComponentType="button"
 					onPress={deletion}
 					style={styles.derivationButton}
+					testID={testIDs.MetadataManagement.deleteMetadataSwitch}
 				>
 					<Text style={isDeletion ? styles.activeIcon : styles.icon}>🗑</Text>
 					<Text style={isDeletion ? styles.textLabelActive : styles.textLabel}>

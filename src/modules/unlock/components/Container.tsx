@@ -19,6 +19,7 @@ import styles from '../styles';
 
 import KeyboardScrollView from 'components/KeyboardScrollView';
 import testIDs from 'e2e/testIDs';
+//import { KeyboardAwareContainerProps } from 'types/props';
 
 export function KeyboardAwareContainer(props: any): React.ReactElement {
 	return (

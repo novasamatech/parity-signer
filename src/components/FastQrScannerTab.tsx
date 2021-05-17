@@ -34,7 +34,7 @@ export default function FastQrScannerTab(): React.ReactElement {
 	return (
 		<TouchableItem
 			onPress={(): void => navigateToFastQrScanner(navigation)}
-			testID={testIDs.SecurityHeader.scanButton}
+			testID={testIDs.MetadataManagement.scannerButton}
 			style={styles.body}
 		>
 			<Icon

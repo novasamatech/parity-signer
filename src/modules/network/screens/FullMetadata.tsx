@@ -16,7 +16,7 @@
 
 // This screen should show full contents of chosen metadata
 
-import React, { ReactElement, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { TypeRegistry } from '@polkadot/types';
 import { Metadata } from '@polkadot/metadata';
@@ -33,7 +33,6 @@ import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';
 
 export default function FullMetadata({
-	navigation,
 	route
 }: NavigationProps<'FullMetadataViewer'>): React.ReactElement {
 	const networkPathId = route.params.pathId;

@@ -23,9 +23,7 @@ import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
-import MetadataSaving from 'screens/MetadataSaving';
 import { tryDecodeQr } from 'utils/native';
-import { saveMetadata } from 'utils/db';
 import { TxRequestData } from 'types/scannerTypes';
 //for tests
 import testIDs from 'e2e/testIDs';
