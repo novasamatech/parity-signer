@@ -74,6 +74,14 @@ const testIDs = {
 		recoverButton: 'anc_recover_button',
 		showExistedButton: 'anc_show_existed'
 	},
+	MetadataManagement: {
+		deleteMetadataSwitch: 'metadata_management_delete_metadata_switch',
+		scannerButton: 'metadata_management_scanner_button'
+	},
+	NetworkDetails: {
+		manageValidMetadata: 'network_details_manage_valid_metadata',
+		networkDetailsScreen: 'network_details_screen'
+	},
 	NetworkSettings: {
 		networkCard: 'network_settings_network_card',
 		networkSettingsScreen: 'network_settings_network_settings_screen'

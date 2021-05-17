@@ -27,7 +27,9 @@ export enum ScanTestRequest {
 	EthereumMessage,
 	PasswordedAccountExtrinsic,
 	AddNewNetwork,
-	AddedNetworkRemarkExtrinsic
+	AddedNetworkRemarkExtrinsic,
+	AddMetadataOne,
+	AddMetadataTwo
 }
 
 const addNetworkTitle = 'Acala Mandala TC4';
@@ -77,5 +79,7 @@ export const scanRequestDataMap = {
 		rawData: ''
 	},
 	[ScanTestRequest.AddedNetworkRemarkExtrinsic]:
-		'499000001000053010210c431b78448702621d5fd79d7661b1dd6bfce01067a2280039ea6b2352c4b2d100001041186050000fa01000001000000783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade361f688cef5e80e4065ff312c4d36215fb41b0e8410360df8dbeb6501bedefe05f783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade360ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec'
+		'499000001000053010210c431b78448702621d5fd79d7661b1dd6bfce01067a2280039ea6b2352c4b2d100001041186050000fa01000001000000783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade361f688cef5e80e4065ff312c4d36215fb41b0e8410360df8dbeb6501bedefe05f783c78945a4e4a3118190bcf93002bb2d2903192bed10040eb52d54500aade360ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec11ec',
+	[ScanTestRequest.AddMetadataOne]: '',
+	[ScanTestRequest.AddMetadataTwo]: ''
 };

@@ -25,7 +25,7 @@ jest.mock('react-native-secure-storage', () => {
 
 jest.mock('react-native-crypto', () => {
 	const apiMock = {
-		randomBytes: jest.fn((length, cn) => {
+		randomBytes: jest.fn((length, _cn) => {
 			let data = new Uint8Array(length);
 			data = data.map(() => Math.floor(Math.random() * 90) + 10);
 			return data;
