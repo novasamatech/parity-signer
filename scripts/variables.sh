@@ -4,7 +4,7 @@
 LIB_NAME=signer
 API_LEVEL=29
 
-NDK_HOME=/opt/android_ndk
+#NDK_HOME=/opt/android_ndk
 ANDROID_ARCHS=(aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android)
 ANDROID_FOLDER=(arm64-v8a armeabi-v7a x86 x86_64)
 ANDROID_BIN_PREFIX=(aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android)
