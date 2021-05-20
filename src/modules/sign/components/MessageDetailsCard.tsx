@@ -16,9 +16,10 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { hexToString } from '@polkadot/util';
 
 import fontStyles from 'styles/fontStyles';
-import { hexToAscii, isAscii } from 'utils/strings';
+import { isAscii } from 'utils/strings';
 import colors from 'styles/colors';
 import Separator from 'components/Separator';
 
@@ -50,7 +51,7 @@ export default function MessageDetailsCard({
 					<Text style={styles.messageText}>{message}</Text>
 				) : (
 					<Text style={styles.messageText}>
-						{isAscii(message) ? hexToAscii(message) : data}
+						{isAscii(message) ? hexToString(message) : data}
 					</Text>
 				)}
 			</View>

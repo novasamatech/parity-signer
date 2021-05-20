@@ -32,6 +32,14 @@ import {
 } from 'types/scannerTypes';
 import { blake2b } from 'utils/native';
 
+// from https://github.com/maciejhirsz/uos#substrate-payload
+const CRYPTO_ED25519 = '00';
+const CRYPTO_SR25519 = '01';
+const CMD_SIGN_MORTAL = '00';
+const CMD_SIGN_HASH = '01';
+const CMD_SIGN_IMMORTAL = '02';
+const CMD_SIGN_MSG = '03';
+
 /*
  * @return strippedData: the rawBytes from react-native-camera, stripped of the ec11 padding to fill the frame size. See: decoders.js
  * N.B. Substrate oversized/multipart payloads will already be hashed at this point.
@@ -140,9 +148,9 @@ export async function constructDataFromBytes(
 					data: {} // for consistency with legacy data format.
 				} as EthereumParsedData;
 				action =
-					firstByte === '00' || firstByte === '01'
+					firstByte === CRYPTO_ED25519 || firstByte === CRYPTO_SR25519
 						? 'signData'
-						: firstByte === '01'
+						: firstByte === CRYPTO_SR25519
 						? 'signTransaction'
 						: null;
 				const address = uosAfterFrames.substr(4, 44);
@@ -165,9 +173,9 @@ export async function constructDataFromBytes(
 				} as SubstrateCompletedParsedData;
 				try {
 					data.data.crypto =
-						firstByte === '00'
+						firstByte === CRYPTO_ED25519
 							? 'ed25519'
-							: firstByte === '01'
+							: firstByte === CRYPTO_SR25519
 							? 'sr25519'
 							: null;
 					const pubKeyHex = uosAfterFrames.substr(6, 64);
@@ -184,8 +192,8 @@ export async function constructDataFromBytes(
 					}
 
 					switch (secondByte) {
-						case '00': // sign mortal extrinsic
-						case '02': // sign immortal extrinsic
+						case CMD_SIGN_MORTAL:
+						case CMD_SIGN_IMMORTAL:
 							data.action = isOversized ? 'signData' : 'signTransaction';
 							data.oversized = isOversized;
 							data.isHash = isOversized;
@@ -200,10 +208,11 @@ export async function constructDataFromBytes(
 							); // encode to the prefix;
 
 							break;
-						case '01': // data is a hash
+						case CMD_SIGN_HASH:
+						case CMD_SIGN_MSG:
 							data.action = 'signData';
 							data.oversized = false;
-							data.isHash = true;
+							data.isHash = secondByte === CMD_SIGN_HASH ? true : false;
 							data.data.data = hexPayload;
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,

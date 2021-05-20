@@ -70,6 +70,7 @@ function SignedMessageView({
 	const { getNetwork } = useContext(NetworksContext);
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
+	const displayData = isEthereum ? signedData : signedData.slice(2);
 
 	return (
 		<SafeAreaScrollViewContainer>
@@ -85,7 +86,7 @@ function SignedMessageView({
 				{'Scan to publish'}
 			</Text>
 			<View testID={testIDs.SignedMessage.qrView}>
-				<QrView data={signedData} />
+				<QrView data={displayData} />
 			</View>
 			<CompatibleCard
 				titlePrefix={'from:'}
@@ -95,7 +96,7 @@ function SignedMessageView({
 			{!isEthereum && dataToSign ? (
 				<PayloadDetailsCard
 					description={strings.INFO_MULTI_PART}
-					signature={signedData.toString()}
+					signature={displayData}
 					networkKey={sender.networkKey}
 				/>
 			) : null}
