@@ -33,27 +33,54 @@ import {
 import { ScanTestRequest } from 'e2e/mockScanRequests';
 import testIDs from 'e2e/testIDs';
 
-describe('Metadata management test', () => {
+async function openWestendNetworkSettingsMetadata(): Promise<void> {
+	await testTap(testIDs.IdentitiesSwitch.toggleButton); //Open menu on top
+	await testTap(testIDs.IdentitiesSwitch.networkSettings); //Select network settings
+	await testScrollAndTap(
+		testIDs.NetworkSettings.networkCard +
+			'0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e',
+		testIDs.NetworkSettings.networkSettingsScreen
+	); //Select Westend
+	await testScrollAndTap(
+		testIDs.NetworkDetails.manageValidMetadata,
+		testIDs.NetworkDetails.networkDetailsScreen
+	); //manage metadata button
+}
+
+describe('Metadata management test', async () => {
 	testRecoverIdentity();
 
-	it('download metadata from raptor sequence', async() => {});
+	it('download metadata from raptor sequence', async () => {
+		await tapBack();
+		await openWestendNetworkSettingsMetadata();
+		await testTap(testIDs.MetadataManagement.scannerButton); //Select scanner for injection
+		//Check output
+		//Accept metadata
+	});
 
-	it('select downloaded metadata', async() => {});
+	it('select downloaded metadata', async () => {
+		await openWestendNetworkSettingsMetadata();
+		//Select new metadata
+	});
 
-	it('transaction parsed with new metadata', async() => {});
+	it('transaction parsed with new metadata', async () => {
+		//Start app with transaction request injection
+		//Tap scanner
+		//Check that something is rendered
+	});
 
-	it('protect used metadata from removal', async() => {});
+	it('protect used metadata from removal', async () => {
+		await openWestendNetworkSettingsMetadata();
+		//tap on delete
+		//Select new metadata
+		//Admire rejection
+	});
 
-	it('remove metadata', async() => {
-		await testTap(IdentitiesSwitch.toggleButton);
-		await testTap(IdentitiesSwitch.networkSettings);
-		await testScrollAndTap(NetworkSettings.networkCard + '0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e', NetworkSettings.networkSettingsScreen);
-		await testScrollAndTap(); //manage metadata
-		await testTap //delete entries
+	it('remove metadata', async () => {
+		await openWestendNetworkSettingsMetadata();
+		/*		await testTap //delete entries
 		await testTap //select old metadata
 		await testTap //manage metadata again
-		await //test that it was removed
-
+		await //test that it was removed*/
 	});
 });
-
