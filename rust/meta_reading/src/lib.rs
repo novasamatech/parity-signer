@@ -3,10 +3,11 @@ use std::io::prelude::*;
 use std::collections::HashMap;
 use regex::Regex;
 use hex;
-use parity_scale_codec::{Encode, Decode};
+use parity_scale_codec::{Decode, Encode};
 use frame_metadata::{RuntimeMetadataV12, DecodeDifferent};
 use jsonrpsee_types::{
-	jsonrpc::{JsonValue, Params},
+	JsonValue, 
+	v2::params::JsonRpcParams,
 	traits::Client,
 };
 use jsonrpsee_ws_client::WsClientBuilder;
@@ -177,7 +178,7 @@ pub fn decode_version_from_hex (version_meta: &str) -> VersionDecoded {
 #[tokio::main]
 pub async fn fetch_metadata(str_address: &str) -> Result<String, Box<dyn std::error::Error>> {
     let client = WsClientBuilder::default().build(str_address).await?;
-    let response: JsonValue = client.request("state_getMetadata", Params::None).await?;
+    let response: JsonValue = client.request("state_getMetadata", JsonRpcParams::NoParams).await?;
     let out = match response {
         JsonValue::String(x) => x,
         _ => panic!("unexpected state metadata format"),
@@ -501,7 +502,7 @@ mod tests {
         let result = get_meta_const(&fetch_test0).unwrap();
         let decoded = decode_version(result);
         assert!(decoded.specname=="westend", "Incorrectly parsed name [web fetch]");
-        assert!(decoded.spec_version==50, "Incorrectly parsed version [web fetch]");
+        assert!(decoded.spec_version==9010, "Incorrectly parsed version [web fetch]");
     }
     
     #[test]
