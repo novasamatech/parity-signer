@@ -6,13 +6,13 @@ use frame_metadata::{RuntimeMetadataV12, DecodeDifferent};
 use base58::{ToBase58, FromBase58};
 use blake2_rfc::blake2b::{blake2b};
 use meta_reading::*;
-use std::fs;
 use std::convert::TryInto;
 use std::collections::HashMap;
 use serde_json;
 use std::mem::size_of;
 use bitvec::prelude::*;
 use sp_arithmetic::{Percent, Perbill, PerU16};
+use sp_runtime::generic::Era;
 
 const BASE58PREFIX: u8 = 42;
 
@@ -101,14 +101,12 @@ pub fn base_to_hex (address: &str) -> String {
     hex::encode(part)
 }
 
-/// function reads the database output from file "filename"
-/// and produces vector of ChainGenHash values
+/// function vector of ChainGenHash values using genesis hash database
 
-pub fn get_genesis_hash (filename: &str) -> Vec<GenHashBookEntry> {
-    let gen_hash_file = fs::read_to_string(filename).unwrap();
+pub fn get_genesis_hash (genesis_hash_database: &str) -> Vec<GenHashBookEntry> {
     let re = Regex::new(r#"(?i)"genesisHash":"0x(?P<gen_hash>[0-9a-f]{64})"[^]]*"specName":"(?P<name>[^"]+)""#).unwrap();
     let mut out: Vec<GenHashBookEntry> = Vec::new();
-    for caps in re.captures_iter(&gen_hash_file) {
+    for caps in re.captures_iter(genesis_hash_database) {
         let new = GenHashBookEntry {
             name: caps["name"].to_string(),
             genesis_hash: caps["gen_hash"].to_string(),
@@ -120,13 +118,13 @@ pub fn get_genesis_hash (filename: &str) -> Vec<GenHashBookEntry> {
 
 /// function to find the chain name in database based on genesis hash
 
-pub fn name_from_genesis_hash (filename: &str, genesis_hash_found: &str) -> Result<String, &'static str> {
+pub fn name_from_genesis_hash (genesis_hash_database: &str, genesis_hash_found: &str) -> Result<String, &'static str> {
 
 // checking the input
     if genesis_hash_found.len() != 64 {return Err("Wrong genesis hash length.");}
 
 // reading the genesis hash database
-    let hash_book = get_genesis_hash(filename);
+    let hash_book = get_genesis_hash(genesis_hash_database);
     
 // find the corresponding chain name
     let mut name_found = None;
@@ -144,18 +142,27 @@ pub fn name_from_genesis_hash (filename: &str, genesis_hash_found: &str) -> Resu
 }
 
 /// function to fetch full metadata of latest version of chain with known name from file
-pub fn find_meta(chain_name: String, filename: &str) -> Result<RuntimeMetadataV12, &'static str> {
-    let contents = fs::read_to_string(filename);
-    let old_full: Vec<MetaValues> = match contents {
-        Ok(c) => split_properly(&c),
-        Err(_) => return Err("File error"),
-    };
+/// at this point looks for correct chain name and, if chain is versioned in database, correct chain version in latest;
+/// if database entry has no chain version, metadata is accepted
+pub fn find_meta(chain_name: &str, version: u32, metadata_contents: &str) -> Result<RuntimeMetadataV12, &'static str> {
+   
+    let old_full: Vec<MetaValues> = split_properly(metadata_contents);
     let existing = split_existing_metadata(old_full);
     let mut meta = None;
     for x in existing.latest {
         if x.name == chain_name {
-            meta = Some(x.meta);
-            break;
+            match x.version {
+                Some(ver) => {
+                    if ver == version {
+                        meta = Some(x.meta);
+                        break;
+                    }
+                },
+                None => {
+                    meta = Some(x.meta);
+                    break;
+                },
+            }
         }
     }
     match meta {
@@ -166,7 +173,7 @@ pub fn find_meta(chain_name: String, filename: &str) -> Result<RuntimeMetadataV1
             let part1 = &m[10..12];
             let part1_vec = hex::decode(part1).expect("Should have been hex-decodeable.");
             let part1_decoded = u8::decode(&mut &part1_vec[..]).expect("Unable to decode two u8 units for RuntimeMetadata version.");
-            if part1_decoded != 12 {
+            if part1_decoded < 12 {
                 return Err("RuntimeMetadata version incompatible");
             }
             let meta_unhex = hex::decode(&m[12..]).expect("Should have been hex-decodeable.");
@@ -268,13 +275,9 @@ pub fn map_types (meta: &RuntimeMetadataV12) -> HashMap<String, u32> {
 
 /// function to make a hashmap of all types in all chains for file
 
-pub fn map_types_all (filename: &str) -> Result<HashMap<String, u32>, &'static str> {
+pub fn map_types_all (metadata_contents: &str) -> HashMap<String, u32> {
     
-    let contents = fs::read_to_string(filename);
-    let old_full: Vec<MetaValues> = match contents {
-        Ok(c) => split_properly(&c),
-        Err(_) => return Err("File error"),
-    };
+    let old_full: Vec<MetaValues> = split_properly(metadata_contents);
     let mut types_map = HashMap::new();
     
     for x in old_full.iter() {
@@ -298,7 +301,7 @@ pub fn map_types_all (filename: &str) -> Result<HashMap<String, u32>, &'static s
             }
         }
     }
-    Ok(types_map)
+    types_map
 }
 
 #[derive(Debug)]
@@ -333,7 +336,7 @@ pub struct TypeEntry {
     pub description: Description,
 }
 
-// Making statics for regex parcing of type database
+// Making statics for regex parsing of type database
 
 lazy_static! {
     static ref REG_STRUCTS_WITH_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\{(?P<description>(\n +(pub )?\w+: .*(,)?)*\n)\}"#).unwrap();
@@ -349,16 +352,12 @@ lazy_static! {
 
 /// function to process the external file with types description (structs, enums, custom types) and generate a vector of entries
 
-pub fn generate_type_database (filename: &str) -> Result<Vec<TypeEntry>, &'static str> {
-    let type_info = match fs::read_to_string(filename) {
-        Ok(x) => x,
-        Err(_) => return Err("Type database missing"),
-    };
+pub fn generate_type_database (type_info: &str) -> Vec<TypeEntry> {
     
 // output preparation
     let mut output_prep: Vec<TypeEntry> = Vec::new();
 
-    for caps1 in REG_STRUCTS_WITH_NAMES.captures_iter(&type_info) {
+    for caps1 in REG_STRUCTS_WITH_NAMES.captures_iter(type_info) {
         let struct_name = (&caps1["name"]).to_string();
         let struct_description = (&caps1["description"]).to_string();
         let mut struct_fields: Vec<StructField> = Vec::new();
@@ -375,7 +374,7 @@ pub fn generate_type_database (filename: &str) -> Result<Vec<TypeEntry>, &'stati
         };
         output_prep.push(new_entry);
     }
-    for caps in REG_STRUCTS_NO_NAMES.captures_iter(&type_info) {
+    for caps in REG_STRUCTS_NO_NAMES.captures_iter(type_info) {
         let only_field = StructField {
             field_name: None,
             field_type: (&caps["description"]).to_string()
@@ -386,7 +385,7 @@ pub fn generate_type_database (filename: &str) -> Result<Vec<TypeEntry>, &'stati
         };
         output_prep.push(new_entry);
     }
-    for caps1 in REG_ENUM.captures_iter(&type_info) {
+    for caps1 in REG_ENUM.captures_iter(type_info) {
         let enum_name = (&caps1["name"]).to_string();
         let enum_description = (&caps1["description"]).to_string();
         let enum_variants = enum_description
@@ -434,14 +433,14 @@ pub fn generate_type_database (filename: &str) -> Result<Vec<TypeEntry>, &'stati
         };
         output_prep.push(new_entry);
     }
-    for caps in REG_TYPES.captures_iter(&type_info) {
+    for caps in REG_TYPES.captures_iter(type_info) {
         let new_entry = TypeEntry {
             name: (&caps["name"]).to_string(),
             description: Description::Type((&caps["description"]).to_string()),
         };
         output_prep.push(new_entry);
     }
-    Ok(output_prep)
+    output_prep
 }
 
 pub struct CutCompact<T: HasCompact> {
@@ -513,6 +512,11 @@ pub struct DecodedOut {
     pub fancy_out: String,
 }
 
+/// function to write pretty formatted fancy out string
+fn fancy (index: u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
+    format!("{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":\"{}\"}}", index, indent, card_type, decoded_string)
+}
+
 /// function to decode types with known length,
 /// outputs DecodedOut
 
@@ -523,7 +527,7 @@ pub fn decode_known_length<T: Decode + serde::ser::Serialize>(data: &Vec<u8>, mu
     match decoded_data {
         Ok(x) => {
             let decoded_string = serde_json::to_string(&x).expect("Type should have been checked.");
-            let fancy_out = format!(",{{\"index\":{},\"indent\":{},\"type\":\"default\",\"payload\":\"{}\"}}", index, indent, decoded_string);
+            let fancy_out = format!(",{}", fancy(index, indent, "default", &decoded_string));
             index = index + 1;
             let mut remaining_vector: Vec<u8> = Vec::new();
             if data.len()>length {remaining_vector = (data[length..]).to_vec();}
@@ -549,7 +553,7 @@ pub fn decode_as_compact<T> (data: &Vec<u8>, mut index: u32, indent: u32) -> Res
     if data.len()==0 {return Err("Data is empty.");}
     let compact_found = get_compact::<T>(data)?;
     let decoded_string = serde_json::to_string(&compact_found.compact_found).expect("Type should have been checked.");
-    let fancy_out = format!(",{{\"index\":{},\"indent\":{},\"type\":\"default\",\"payload\":\"{}\"}}", index, indent, decoded_string);
+    let fancy_out = format!(",{}", fancy(index, indent, "default", &decoded_string));
     index = index + 1;
     let remaining_vector = match compact_found.start_next_unit {
         Some(x) => (data[x..]).to_vec(),
@@ -643,7 +647,7 @@ pub fn process_as_call (mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_datab
         0 => String::new(),
         _ => String::from(","),
     };
-    let add_to_fancy_out = format!("{{\"index\":{},\"indent\":{},\"type\":\"call\",\"payload\":{{\"method\":\"{}\",\"pallet\":\"{}\"}}}}", index, indent, call_in_processing.method.method_name, call_in_processing.method.pallet_name);
+    let add_to_fancy_out = fancy(index, indent, "call", &format!("{{\"method\":\"{}\",\"pallet\":\"{}\"}}", call_in_processing.method.method_name, call_in_processing.method.pallet_name));
     fancy_out.push_str(&add_to_fancy_out);
     index = index + 1;
     indent = indent + 1;
@@ -651,7 +655,7 @@ pub fn process_as_call (mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_datab
     let mut results = String::from("{");
     
     for (i, x) in call_in_processing.method.arguments.iter().enumerate() {
-        let add_to_fancy_out = format!(",{{\"index\":{},\"indent\":{},\"type\":\"varname\",\"payload\":\"{}\"}}", index, indent, x.name);
+        let add_to_fancy_out = format!(",{}", fancy(index, indent, "varname", &x.name));
         fancy_out.push_str(&add_to_fancy_out);
         index = index + 1;
         
@@ -677,7 +681,7 @@ pub fn process_as_call (mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_datab
     })
 }
 
-// Making regex for type parcing
+// Making regex for type parsing
 
 lazy_static! {
     static ref REGOPTION: Regex = Regex::new(r#"(?m)^Option<(?P<arg>.*)>"#).unwrap();
@@ -696,7 +700,7 @@ pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
             if data.len()>1 {remaining_vector = (&data[1..]).to_vec();}
             let out = serde_json::Value::Null;
             let decoded_string = serde_json::to_string(&out).unwrap();
-            let fancy_out = format!(",{{\"index\":{},\"indent\":{},\"type\":\"None\",\"payload\":\"\"}}", index, indent);
+            let fancy_out = format!(",{}", fancy(index, indent, "None", ""));
             index = index + 1;
             Ok(DecodedOut {
                 decoded_string,
@@ -803,7 +807,7 @@ pub fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntr
                             if output_prep.len()!=1 {output_prep.push(',')}
                             let new = format!("IdentityField::{}", x.variant_name);
                             output_prep.push_str(&new);
-                            let fancy_output_prep = format!(",{{\"index\":{},\"indent\":{},\"type\":\"IdentityField\",\"payload\":\"{}\"}}", index, indent,x.variant_name);
+                            let fancy_output_prep = format!(",{}", fancy(index, indent, "IdentityField", &x.variant_name));
                             fancy_out.push_str(&fancy_output_prep);
                             index = index + 1;
                         };
@@ -841,7 +845,7 @@ pub fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Resul
             let into_bv = data[start..fin].to_vec();
             let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
             let decoded_string = bv.to_string();
-            let fancy_out = format!(",{{\"index\":{},\"indent\":{},\"type\":\"BitVec\",\"payload\":\"{}\"}}", index, indent, decoded_string);
+            let fancy_out = format!(",{}", fancy(index, indent, "BitVec", &decoded_string));
             index = index + 1;
             let mut remaining_vector: Vec<u8> = Vec::new();
             if data.len() > fin {remaining_vector = data[fin..].to_vec();}
@@ -876,7 +880,7 @@ pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32) -> R
             let decoded_string = arr_to_base(x, BASE58PREFIX);
             let mut remaining_vector: Vec<u8> = Vec::new();
             if data.len()>32 {remaining_vector = (&data[32..]).to_vec();}
-            let fancy_out = format!(",{{\"index\":{},\"indent\":{},\"type\":\"Id\",\"payload\":\"{}\"}}", index, indent, decoded_string);
+            let fancy_out = format!(",{}", fancy(index, indent, "Id", &decoded_string));
             index = index + 1;
             Ok(DecodedOut {
                 decoded_string,
@@ -897,8 +901,8 @@ pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database
     let mut output_prep = String::from("{{");
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
-            Some(z) => format!(",{{\"index\":{},\"indent\":{},\"type\":\"field_name\",\"payload\":\"{}\"}}", index, indent, z),
-            None => format!(",{{\"index\":{},\"indent\":{},\"type\":\"field_number\",\"payload\":\"{}\"}}", index, indent, i),
+            Some(z) => format!(",{}", fancy(index, indent, "field_name", &z)),
+            None => format!(",{}", fancy(index, indent, "field_number", &i.to_string())),
         };
         fancy_out.push_str(&fancy_output_prep);
         index = index + 1;
@@ -938,7 +942,7 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
             let mut remaining_vector: Vec<u8> = Vec::new();
             if data.len()>1 {remaining_vector = (&data[1..]).to_vec();}
             let out = serde_json::to_string(&found_variant.variant_name).unwrap();
-            let fancy_out = format!(",{{\"index\":{},\"indent\":{},\"type\":\"enum_variant_name\",\"payload\":\"{}\"}}", index, indent, found_variant.variant_name);
+            let fancy_out = format!(",{}", fancy(index, indent, "enum_variant_name", &found_variant.variant_name));
             Ok(DecodedOut {
                 decoded_string: out,
                 remaining_vector,
@@ -950,7 +954,7 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
         EnumVariantType::Type(inner_ty) => {
             if data.len()==1 {return Err("While decoding Enum, expected declared variant to be followed by some associated data, that data was not found.")}
             data=data[1..].to_vec();
-            let mut fancy_output_prep = format!(",{{\"index\":{},\"indent\":{},\"type\":\"enum_variant_name\",\"payload\":\"{}\"}}", index, indent, found_variant.variant_name);
+            let mut fancy_output_prep = format!(",{}", fancy(index, indent, "enum_variant_name", &found_variant.variant_name));
             index = index + 1;
             let after_run = decode_simple(&inner_ty, data, type_database, index, indent+1)?;
             index = after_run.index;
@@ -972,8 +976,8 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
             let mut output_prep = format!("{{\"{}\":{{", found_variant.variant_name);
             for (i, y) in v2.iter().enumerate() {
                 let fancy_output_prep = match &y.field_name {
-                    Some(z) => format!(",{{\"index\":{},\"indent\":{},\"type\":\"field_name\",\"payload\":\"{}\"}}", index, indent, z),
-                    None => format!(",{{\"index\":{},\"indent\":{},\"type\":\"field_number\",\"payload\":\"{}\"}}", index, indent, i),
+                    Some(z) => format!(",{}", fancy(index, indent, "field_name", z)),
+                    None => format!(",{}", fancy(index, indent, "field_number", &i.to_string())),
                 };
                 fancy_out.push_str(&fancy_output_prep);
                 index = index + 1;
@@ -1037,7 +1041,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                                         let capture_name = format!("arg{}", i);
                                         match caps.name(&capture_name) {
                                             Some(x) => {
-                                                let fancy_output_prep = format!(",{{\"index\":{},\"indent\":{},\"type\":\"field_number\",\"payload\":\"{}\"}}", index, indent, i);
+                                                let fancy_output_prep = format!(",{}", fancy(index, indent, "field_number", &i.to_string()));
                                                 fancy_out.push_str(&fancy_output_prep);
                                                 index = index + 1;
                                                 let inner_ty = x.as_str();
@@ -1142,10 +1146,34 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
 
 /// struct to store three important file names: genesis_hash_database, metadata, and types_description_database
 
-pub struct DataFiles<'a> {
-    pub gen_hash_filename: &'a str,
-    pub metadata_filename: &'a str,
-    pub types_description_filename: &'a str,
+pub struct DataFiles {
+    pub genesis_hash_database: String,
+    pub metadata_contents: String,
+    pub types_info: String,
+}
+
+/// struct to separate prelude, address, actual method, and extrinsics in transaction string
+#[derive(Debug, Decode)]
+pub struct TransactionParts {
+    pub prelude: [u8; 3],
+    pub author: [u8; 32],
+    pub method: Vec<u8>,
+    pub extrinsics: ExtrinsicValues,
+    pub genesis_hash: [u8; 32],
+}
+
+/// struct to decode extrinsics
+#[derive(Debug, Decode)]
+pub struct ExtrinsicValues {
+    pub era: Era,
+#[codec(compact)]
+    pub nonce: u64,
+#[codec(compact)]
+    pub tip: u128,
+    pub metadata_version: u32,
+    pub tx_version: u32,
+    pub genesis_hash: [u8; 32],
+    pub block_hash: [u8; 32],
 }
 
 /// struct to store the output of decoding: "normal" format and fancy easy-into-js format
@@ -1160,65 +1188,60 @@ pub struct DecodingResult {
 /// i.e. it starts with 53****, followed by address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResult, &'static str> {
+pub fn full_run (transaction: &str, datafiles: &DataFiles) -> Result<DecodingResult, &'static str> {
     let data_hex = match transaction.starts_with("0x") {
         true => &transaction[2..],
         false => &transaction,
     };
     
-    if data_hex.len()<134 {return Err("Input transaction string unexpectedly short.");}
-    
-// 53**** fragment, 53: payload is for Substrate, **: crypto type, **: action
-    let _data_fragment1 = &data_hex[..6];
-    
-// following is the transaction author(?) public key
-    let data_fragment2 = &data_hex[6..70];
-    let _author = hex_to_base(data_fragment2, BASE58PREFIX);
-
-// final 64 symbols are genesis hash for the chain
-    let genesis_hash = &data_hex[data_hex.len()-64..];
-    let chain_name = name_from_genesis_hash(datafiles.gen_hash_filename, genesis_hash)?;
-
-// fetch chain metadata in RuntimeMetadataV12 format
-    let meta = find_meta(chain_name, datafiles.metadata_filename)?;
-
-// generate type database to be used in decoding
-    let type_database = generate_type_database (datafiles.types_description_filename)?;
-
-// actual fragment to work with
-    let data_fragment3 = &data_hex[70..data_hex.len()-64];
-
-    let data_unhex = match hex::decode(data_fragment3) {
+    let data = match hex::decode(data_hex) {
         Ok(a) => a,
         Err(_) => return Err("Wrong format of input transaction string."),
     };
     
-// cut data into transaction (SCALE encoded Vec<u8>) and extrinsics, decode transaction
-    let init_compact = match get_compact::<u32>(&data_unhex) {
+    let transaction_decoded = match <TransactionParts>::decode(&mut &data[..]) {
         Ok(a) => a,
-        Err(_) => return Err("Expected transaction to be SCALE encoded Vec<u8>. Unable to find compact containing Vec<u8> length."),
+        Err(_) => return Err("Error separating prelude, author address, method, and extrinsics"),
     };
-    let length = match init_compact.start_next_unit {
-        Some(a) => {a+(init_compact.compact_found as usize)},
-        None => return Err ("Separating transaction: no data after transaction Vec<u8> length declaration."),
-    };
-    if data_unhex.len()<=length {return Err("Separating transaction and extrinsics: data too short.");}
     
-// transaction, ready to be parsed
-    let data_transaction = <Vec::<u8>>::decode(&mut &data_unhex[..length]).expect("All checks should have already be passed");
-    
+    let _author = arr_to_base(transaction_decoded.author, BASE58PREFIX);
+
+// get chain name from genesis hash
+    if transaction_decoded.genesis_hash != transaction_decoded.extrinsics.genesis_hash {return Err("Two different genesis hashes are found.")}
+    let genesis_hash = hex::encode(&transaction_decoded.genesis_hash);
+    let chain_name = name_from_genesis_hash(&datafiles.genesis_hash_database, &genesis_hash)?;
+
+// fetch chain metadata in RuntimeMetadataV12 format
+    let meta = find_meta(&chain_name, transaction_decoded.extrinsics.metadata_version, &datafiles.metadata_contents)?;
+
+// generate type database to be used in decoding
+    let type_database = generate_type_database (&datafiles.types_info);
+
+// transaction parsing
     let index_enter: u32 = 0;
     let indent_enter: u32 = 0;
     
-    let transaction_parced = process_as_call (data_transaction, &meta, &type_database, index_enter, indent_enter)?;
+    let transaction_parsed = process_as_call (transaction_decoded.method, &meta, &type_database, index_enter, indent_enter)?;
+    let index = transaction_parsed.index;
     
-    if transaction_parced.remaining_vector.len() != 0 {return Err("After transaction parcing, some data in transaction vector remained unused.")}
+    if transaction_parsed.remaining_vector.len() != 0 {return Err("After transaction parsing, some data in transaction vector remained unused.")}
     
-    let normal = transaction_parced.decoded_string;
-    let js = format!("{{\"method\":[{}]}}",transaction_parced.fancy_out);
+    let mut normal = transaction_parsed.decoded_string;
     
-// extrinsics
-    let _data_extrinsics = &data_unhex[length..];
+    let short = transaction_decoded.extrinsics;
+// adding the extrinsics information
+    let extrinsics_to_normal = match short.era {
+        Era::Immortal => format!(",\"extrinsics\":{{\"era\":Immortal,\"nonce\":{},\"tip\":{},\"chain\":{},\"version\":{},\"tx_version\":{}}}", short.nonce, short.tip, chain_name, short.metadata_version, short.tx_version),
+        Era::Mortal(period, phase) => format!(",\"extrinsics\":{{\"era\":Mortal,\"phase\":{},\"period\":{},\"nonce\":{},\"tip\":{},\"chain\":{},\"version\":{},\"tx_version\":{},\"block_hash\":\"{}\"}}", phase, period, short.nonce, short.tip, chain_name, short.metadata_version, short.tx_version, hex::encode(short.block_hash)),
+    };
+    
+    let extrinsics_to_js = match short.era {
+        Era::Immortal => format!("{},{}", fancy(index, 0, "era_nonce_tip", &format!("{{\"era\":\"Immortal\",\"nonce\":{},\"tip\":{}}}", short.nonce, short.tip)), fancy(index+1, 0, "tx_spec", &format!("{{\"chain\":{},\"version\":{},\"tx_version\":{}}}", chain_name, short.metadata_version, short.tx_version))),
+        Era::Mortal(period, phase) => format!("{},{},{}", fancy(index, 0, "era_nonce_tip", &format!("{{\"era\":\"Mortal\",\"phase\":{},\"period\":{},\"nonce\":{},\"tip\":{}}}", phase, period, short.nonce, short.tip)), fancy(index+1, 0, "block_hash", &hex::encode(short.block_hash)), fancy(index+2, 0, "tx_spec", &format!("{{\"chain\":\"{}\",\"version\":{},\"tx_version\":{}}}", chain_name, short.metadata_version, short.tx_version))),
+    };
+    
+    normal.push_str(&extrinsics_to_normal);
+    let js = format!("{{\"method\":[{}]}},{{\"extrinsics\":[{}]}}",transaction_parsed.fancy_out, extrinsics_to_js);
     
     Ok(DecodingResult{
         normal,
@@ -1231,6 +1254,7 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
 
     #[test]
     fn alice_and_bob_hex() {
@@ -1256,8 +1280,8 @@ mod tests {
     
     #[test]
     fn read_hash_book() {
-        let filename = "database_output";
-        let hash_book = get_genesis_hash(filename);
+        let genesis_hash_database = fs::read_to_string("database_output").unwrap();
+        let hash_book = get_genesis_hash(&genesis_hash_database);
         assert!(hash_book.len()==9, "Used to be 9. Found: {}", hash_book.len());
     }
 }

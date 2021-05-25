@@ -1067,7 +1067,7 @@ dependencies = [
 
 [[package]]
 name = "meta_reading"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blake2-rfc",
  "chrono",
@@ -2180,7 +2180,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "transaction_parcing"
+name = "transaction_parsing"
 version = "0.1.0"
 dependencies = [
  "base58",

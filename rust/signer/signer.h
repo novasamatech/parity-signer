@@ -91,4 +91,14 @@ const char * try_decode_qr_sequence(struct ExternError*, int size, int chunk_siz
 // metadata: "0x..."
 const char * generate_metadata_handle(struct ExternError*, const char* metadata);
 
-
+// Parse transaction
+// takes 4 strings:
+// payload; genesis hash list, metadata list, type descriptor list
+// Returns decoded payload as serialized payload cards contents with following structure:
+// {Method:[...], Extrinsic:[...]}
+// Each card has following fields:
+// index - to sort cards on screen, use as key in flatlist env
+// indent - indentation to visualize cards hierarchy
+// type - type of card
+// payload - contents of card
+const char * parse_transaction(struct ExternError*, const char* payload, const char* gen_hash, const char* metadata, const char* type_descriptor);

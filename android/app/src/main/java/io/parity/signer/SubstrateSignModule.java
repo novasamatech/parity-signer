@@ -252,6 +252,16 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
     	promise.resolve(metadataGenerateMetadataHandle(metadata));
     }
 
+    @ReactMethod
+    public void parseTransaction(String payload, String genHash, String metadata, String typeDescriptor, Promise promise) {
+    	try {
+		String decoded = substrateParseTransaction(payload, genHash, metadata, typeDescriptor);
+		promise.resolve(decoded);
+	} catch (Exception e) {
+		rejectWithException(promise, "transaction parsing", e);
+	}
+    }
+
     private static native String ethkeyBrainwalletAddress(String seed);
     private static native String ethkeyBrainwalletBIP39Address(String seed);
     private static native String ethkeyBrainwalletSign(String seed, String message);
@@ -278,4 +288,5 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
     private static native String ethkeySubstrateMiniSecretKeyWithRef(long seedRef, String suriSuffix);
     private static native String qrparserTryDecodeQrSequence(int size, int chunkSize, String data);
     private static native String metadataGenerateMetadataHandle(String metadata);
+    private static native String substrateParseTransaction(String payload, String genHash, String metadata, String typeDescriptor);
 }

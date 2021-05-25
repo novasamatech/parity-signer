@@ -28,13 +28,14 @@ use serde_json;
 
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
+use transaction_parsing;
 
 mod eth;
 mod export;
-mod result;
-mod sr25519;
 mod metadata;
 mod qr;
+mod result;
+mod sr25519;
 
 const CRYPTO_ITERATIONS: u32 = 10240;
 
@@ -367,6 +368,16 @@ export! {
         metadata::meta_to_json(metadata)
 	}
 
+    @Java_io_parity_signer_SubstrateSignModule_substrateParseTransaction
+	fn parse_transaction(
+		payload: &str,
+        gen_hash: &str,
+        metadata: &str,
+        type_descriptor: &str
+	) -> crate::Result<String> {
+        //placeholder for tests
+        Ok(r#"{"method":[{"index":0,"indent":0,"type":"call","payload":{"method":"batch_all","pallet":"Utility"}},{"index":1,"indent":1,"type":"varname","payload":"calls"},{"index":2,"indent":2,"type":"call","payload":{"method":"bond","pallet":"Staking"}},{"index":3,"indent":3,"type":"varname","payload":"controller"},{"index":4,"indent":4,"type":"enum_variant_name","payload":"Id"},{"index":5,"indent":5,"type":"Id","payload":"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"},{"index":6,"indent":3,"type":"varname","payload":"value"},{"index":7,"indent":4,"type":"default","payload":"300000000000"},{"index":8,"indent":3,"type":"varname","payload":"payee"},{"index":9,"indent":4,"type":"enum_variant_name","payload":"Staked"},{"index":9,"indent":2,"type":"call","payload":{"method":"nominate","pallet":"Staking"}},{"index":10,"indent":3,"type":"varname","payload":"targets"},{"index":11,"indent":4,"type":"enum_variant_name","payload":"Id"},{"index":12,"indent":5,"type":"Id","payload":"5G1ojzh47Yt8KoYhuAjXpHcazvsoCXe3G8LZchKDvumozJJJ"},{"index":13,"indent":4,"type":"enum_variant_name","payload":"Id"},{"index":14,"indent":5,"type":"Id","payload":"5FZoQhgUCmqBxnkHX7jCqThScS2xQWiwiF61msg63CFL3Y8f"},{"index":15,"indent":2,"type":"call","payload":{"method":"set_controller","pallet":"Staking"}},{"index":16,"indent":3,"type":"varname","payload":"controller"},{"index":17,"indent":4,"type":"enum_variant_name","payload":"Id"},{"index":18,"indent":5,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"}]}"#.to_string())
+    }
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

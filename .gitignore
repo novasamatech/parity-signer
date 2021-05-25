@@ -88,4 +88,4 @@ android/app/bin
 # rust
 rust/signer/target
 rust/meta_reading/target
-rust/transaction_parcing/target
+rust/transaction_parsing/target
