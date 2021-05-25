@@ -1,17 +1,24 @@
-export type FrameMethod = {
-	method: string;
-	pallet: string;
+//List of valid renderable card templates
+export type PayloadCardType = 'call' | 'varname' | 'enum_variant_name' | 'Id' | 'default';
+
+export type PayloadCardContent = {
+	[key: string]: unknown;
 };
 
-export type SanitizedArgs = {
-	[key: string]: unknown;
-	call?: SanitizedCall;
-	calls?: SanitizedCall[];
+//Renderable unit records for transaction details screen
+//index: key for proper sorting
+//indent: the card should be shifted to indicate hierarchy
+//type: template for rendering
+//payload: actual info to show
+export type PayloadCardData = {
+	index: number;
+	indent: number;
+	type: PayloadCardType;
+	payload?: PayloadCardContent;
 };
 
-export type SanitizedCall = {
+//Object to store all parsed transaction information
+export type PayloadCardsSet = {
 	[key: string]: unknown;
-	args: SanitizedArgs;
-	callIndex?: Uint8Array | string;
-	method: string | FrameMethod;
+	method: PayloadCardData[];
 };

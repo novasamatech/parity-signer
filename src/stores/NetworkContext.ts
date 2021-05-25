@@ -160,6 +160,7 @@ export function useNetworksContext(): NetworksContextState {
 			setStartupAttraction(startingString);
 			console.log('Loading networks...');
 			const initNetworkSpecs = await loadNetworks();
+			/*
 			startingString = startingString + '\nRegistering types...';
 			setStartupAttraction(startingString);
 			console.log('Populating registries...');
@@ -204,9 +205,9 @@ export function useNetworksContext(): NetworksContextState {
 				} catch (e) {
 					console.log('Init network registration error', e);
 				}
-			}
+			}*/
 			setSubstrateNetworks(initNetworkSpecs);
-			setRegistries(initRegistries);
+			//setRegistries(initRegistries);
 			setRegistriesReady(true);
 			console.log('====INITIALIZATION COMPLETE=====');
 		};

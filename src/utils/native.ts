@@ -91,6 +91,20 @@ export async function generateMetadataHandle(
 	return metadataHandle;
 }
 
+export async function makeTransactionCardsContents(
+	_payload: string,
+	_genHash: string,
+	_metadata: string,
+	_typeDescriptor: string
+): Promise<PayloadCardsSet>{
+	console.log("hooyak!");
+	const parsedJSON = await SubstrateSign.parseTransaction("", "", "", "");
+	console.log(parsedJSON);
+	const parsed = JSON.parse(parsedJSON);
+	console.log(parsed);
+	return parsed;
+}
+
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	const taggedAddress = await SubstrateSign.brainWalletAddress(seed);
 	const { bip39, address } = untagAddress(taggedAddress);

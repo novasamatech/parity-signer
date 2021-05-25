@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { GenericExtrinsicPayload } from '@polkadot/types';
+import { parseTransaction } from 'utils/native';
 
 import { ExtrinsicPayloadLatestVersion } from 'constants/chainData';
 import { NetworksContext } from 'stores/NetworkContext';
@@ -14,8 +15,6 @@ export function usePayloadDetails(
 
 	useEffect(() => {
 		setIsProcessing(true);
-		// was this line useful for anything?
-		//if (getTypeRegistry === null) return;
 		const typeRegistry = getTypeRegistry(networkKey);
 		if (
 			typeRegistry === null ||
@@ -27,15 +26,12 @@ export function usePayloadDetails(
 			return;
 		} else {
 			try {
-				const extrinsicPayload = typeRegistry.createType(
-					'ExtrinsicPayload',
-					rawPayload,
-					{
-						version: ExtrinsicPayloadLatestVersion
-					}
-				);
-				setPayload(extrinsicPayload);
-				setIsProcessing(false);
+				const generateCards = async function (encoded: string): Promise<void> {
+					const extrinsicPayloadCards = await parseTransaction(encoded, "", "", "");
+					setPayload(extrinsicPayloadCards);
+					setIsProcessing(false);
+				}
+				generateCards(rawPayload);
 			} catch (e) {
 				//can't generate extrinsic payload, don't display.
 				console.log('Payload details error', e);

@@ -16,26 +16,26 @@
 
 // This screen shows Tx-type payload details and asks for signing confirmation
 
-import React, { useContext, useEffect, useRef } from 'react';
-import { Text, View } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Text, View, FlatList } from 'react-native';
 
-import { usePayloadDetails } from 'modules/sign/hooks';
-import PayloadDetailsCard from 'modules/sign/components/PayloadDetailsCard';
 import strings from 'modules/sign/strings';
-import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
+import { PayloadCardData } from 'types/payload';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
-import TxDetailsCard from 'modules/sign/components/TxDetailsCard';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 import Button from 'components/Button';
+import { makeTransactionCardsContents } from 'utils/native';
+import PayloadCard from 'modules/sign/components/PayloadCard';
 
 function DetailsTx({
 	route,
@@ -76,39 +76,26 @@ function UnsignedTxView({
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
-	const [isProcessing, payload] = usePayloadDetails(
-		rawPayload,
-		sender.networkKey
-	);
+	const payload = null;
+	const [ payloadCards, setPayloadCards ] = useState<PayloadCardData[]>([])
 
-	function renderPayloadDetails(): React.ReactNode {
-		if (isEthereum) {
-			return (
-				<View style={[styles.bodyContent, { marginTop: 16 }]}>
-					<TxDetailsCard
-						style={{ marginBottom: 20 }}
-						description={strings.INFO_ETH_TX}
-						value={value}
-						gas={gas}
-						gasPrice={gasPrice}
-					/>
-					<Text style={styles.title}>Recipient</Text>
-					<CompatibleCard account={recipient} accountsStore={accountsStore} />
-				</View>
-			);
-		} else {
-			if (!isProcessing && payload !== null) {
-				return (
-					<PayloadDetailsCard
-						networkKey={sender.networkKey}
-						payload={payload}
-					/>
-				);
-			} else {
-				return <View />;
-			}
+	useEffect(() => {
+		const generateCards = async function (encoded: string): Promise<void> {
+			const cardsSet = await makeTransactionCardsContents(encoded, "", "", "");
+			setPayloadCards(cardsSet.method);
 		}
-	}
+		generateCards(rawPayload);
+	}, [rawPayload]);
+	
+	const renderCard = ({ item }: { item: PayloadCard }): ReactElement => {
+		return (
+			<PayloadCard 
+				indent={item.indent}
+				type={item.type}
+				payload={item.payload}
+			/>
+		);
+	};
 
 	const approveTransaction = (): void => {
 		const resolve = route.params.resolve;
@@ -116,30 +103,24 @@ function UnsignedTxView({
 	};
 
 	return (
-		<SafeAreaScrollViewContainer testID={testIDs.DetailsTx.detailsScreen}>
-			<Text style={styles.topTitle}>Signed extrinsic</Text>
+		<SafeAreaViewContainer testID={testIDs.DetailsTx.detailsScreen}>
+			<Text style={styles.topTitle}>Extrinsic to sign</Text>
 			<CompatibleCard
 				account={sender}
 				accountsStore={accountsStore}
 				titlePrefix={'from:'}
 			/>
-			{renderPayloadDetails()}
-			<Separator
-				shadow={true}
-				style={{
-					height: 0,
-					marginVertical: 20
-				}}
+			<FlatList 
+				data={payloadCards}
+				renderItem={renderCard}
+				keyExtractor={(item: PayloadCard): number => item.index}
 			/>
-			<Text style={styles.topTitle}>
-				You are about to sign this transaction, please verify with care
-			</Text>
 			<Button
 				onPress={approveTransaction}
 				title="SIGN"
 				testID={testIDs.DetailsTx.signButton}
 			/>
-		</SafeAreaScrollViewContainer>
+		</SafeAreaViewContainer>
 	);
 }
 
