@@ -212,7 +212,7 @@ export async function constructDataFromBytes(
 						case CMD_SIGN_MSG:
 							data.action = 'signData';
 							data.oversized = false;
-							data.isHash = secondByte === CMD_SIGN_HASH ? true : false;
+							data.isHash = secondByte === CMD_SIGN_HASH;
 							data.data.data = hexPayload;
 							data.data.account = encodeAddress(
 								publicKeyAsBytes,
