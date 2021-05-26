@@ -103,6 +103,7 @@ export type NetworksContextState = {
 	addNetwork(networkParsedData: NetworkParsedData): void;
 	networks: Map<string, SubstrateNetworkParams>;
 	allNetworks: Map<string, NetworkParams>;
+	dumpNetworkData(): string;
 	getSubstrateNetwork: GetSubstrateNetwork;
 	getNetwork: GetNetwork;
 	pathIds: string[];
@@ -160,54 +161,7 @@ export function useNetworksContext(): NetworksContextState {
 			setStartupAttraction(startingString);
 			console.log('Loading networks...');
 			const initNetworkSpecs = await loadNetworks();
-			/*
-			startingString = startingString + '\nRegistering types...';
-			setStartupAttraction(startingString);
-			console.log('Populating registries...');
-			const initRegistries = new Map();
-			for (const networkKey of Array.from(initNetworkSpecs.keys())) {
-				try {
-					const networkParams = initNetworkSpecs.get(networkKey)!;
-					console.log('Registering network:');
-					console.log(networkParams.pathId);
-					const metadataHandle = networkParams.metadata;
-					if (metadataHandle) {
-						const networkMetadataRaw = await getMetadata(metadataHandle);
-						const newRegistry = new TypeRegistry();
-						const overrideTypes = getOverrideTypes(
-							newRegistry,
-							networkParams.pathId
-						);
-						//const overrideTypes = getSpecTypes(newRegistry, networkParams.pathId, metadataHandle.specName, Number.MAX_SAFE_INTEGER);
-						newRegistry.register(overrideTypes);
-						const metadata = new Metadata(newRegistry, networkMetadataRaw);
-						newRegistry.setMetadata(metadata);
-						initRegistries.set(networkKey, newRegistry);
-						startingString =
-							startingString +
-							'\nRegistered metadata ' +
-							metadataHandle.specName +
-							' v ' +
-							metadataHandle.specVersion +
-							' for network ' +
-							networkParams.pathId;
-						setStartupAttraction(startingString);
-						console.log('Success!!!');
-					} else {
-						startingString =
-							startingString +
-							'\nRegistered network ' +
-							networkParams.pathId +
-							' without metadata!';
-						setStartupAttraction(startingString);
-						console.log('Success!!!');
-					}
-				} catch (e) {
-					console.log('Init network registration error', e);
-				}
-			}*/
 			setSubstrateNetworks(initNetworkSpecs);
-			//setRegistries(initRegistries);
 			setRegistriesReady(true);
 			console.log('====INITIALIZATION COMPLETE=====');
 		};
@@ -337,14 +291,14 @@ export function useNetworksContext(): NetworksContextState {
 	}
 
 	//This is a placeholder function to emulate rust-based native db
-	/*
 	function dumpNetworksData(): string {
 		return JSON.stringify(Array.from(substrateNetworks.entries()));
-	}*/
+	}
 
 	return {
 		addNetwork,
 		allNetworks,
+		dumpNetworksData,
 		getNetwork,
 		getSubstrateNetwork: getSubstrateNetworkParams,
 		getTypeRegistry,

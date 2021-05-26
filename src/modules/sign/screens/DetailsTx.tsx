@@ -36,6 +36,8 @@ import Separator from 'components/Separator';
 import Button from 'components/Button';
 import { makeTransactionCardsContents } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
+import { getMetadata } from 'utils/db';
+import { typeDefs } from 'constants/typeDefs';
 
 function DetailsTx({
 	route,
@@ -71,7 +73,7 @@ function UnsignedTxView({
 	route
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { getNetwork } = useContext(NetworksContext);
+	const { idumpNetworksData, getNetwork } = useContext(NetworksContext);
 	const { tx, rawPayload } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
@@ -81,19 +83,23 @@ function UnsignedTxView({
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
-			const cardsSet = await makeTransactionCardsContents(encoded, "", "", "");
-			setPayloadCards(cardsSet.method);
+			const networksData = dumpNetworksData();
+			const metadata = await getMetadata(senderNetworkParams.metadata);
+			const cardsSet = await makeTransactionCardsContents(encoded, networksData, metadata, typedefs);
+			console.log(cardsSet.method.concat(cardsSet.extrinsics));
+			setPayloadCards(cardsSet.method.concat(cardsSet.extrinsics));
 		}
 		generateCards(rawPayload);
 	}, [rawPayload]);
 	
 	const renderCard = ({ item }: { item: PayloadCard }): ReactElement => {
 		return (
-			<PayloadCard 
-				indent={item.indent}
-				type={item.type}
-				payload={item.payload}
-			/>
+			<View style={[{paddingLeft: item.indent*4 + '%'}]}>
+				<PayloadCard 
+					type={item.type}
+					payload={item.payload}
+				/>
+			</View>
 		);
 	};
 
