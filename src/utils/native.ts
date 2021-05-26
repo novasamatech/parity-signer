@@ -96,9 +96,9 @@ export async function makeTransactionCardsContents(
 	_genHash: string,
 	_metadata: string,
 	_typeDescriptor: string
-): Promise<PayloadCardsSet>{
-	console.log("hooyak!");
-	const parsedJSON = await SubstrateSign.parseTransaction("", "", "", "");
+): Promise<PayloadCardsSet> {
+	console.log('hooyak!');
+	const parsedJSON = await SubstrateSign.parseTransaction('', '', '', '');
 	console.log(parsedJSON);
 	const parsed = JSON.parse(parsedJSON);
 	console.log(parsed);

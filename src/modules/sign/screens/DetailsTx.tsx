@@ -19,6 +19,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Text, View, FlatList } from 'react-native';
 
+import { PayloadCardData } from 'types/payloads';
 import strings from 'modules/sign/strings';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
@@ -27,7 +28,6 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
-import { PayloadCardData } from 'types/payload';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
@@ -73,32 +73,34 @@ function UnsignedTxView({
 	route
 }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { idumpNetworksData, getNetwork } = useContext(NetworksContext);
+	const { dumpNetworksData, getNetwork } = useContext(NetworksContext);
 	const { tx, rawPayload } = scannerStore.state;
 	const senderNetworkParams = getNetwork(sender.networkKey);
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
 	const payload = null;
-	const [ payloadCards, setPayloadCards ] = useState<PayloadCardData[]>([])
+	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([]);
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
 			const networksData = dumpNetworksData();
 			const metadata = await getMetadata(senderNetworkParams.metadata);
-			const cardsSet = await makeTransactionCardsContents(encoded, networksData, metadata, typedefs);
+			const cardsSet = await makeTransactionCardsContents(
+				encoded,
+				networksData,
+				metadata,
+				typeDefs
+			);
 			console.log(cardsSet.method.concat(cardsSet.extrinsics));
 			setPayloadCards(cardsSet.method.concat(cardsSet.extrinsics));
-		}
+		};
 		generateCards(rawPayload);
 	}, [rawPayload]);
-	
+
 	const renderCard = ({ item }: { item: PayloadCard }): ReactElement => {
 		return (
-			<View style={[{paddingLeft: item.indent*4 + '%'}]}>
-				<PayloadCard 
-					type={item.type}
-					payload={item.payload}
-				/>
+			<View style={[{ paddingLeft: item.indent * 4 + '%' }]}>
+				<PayloadCard type={item.type} payload={item.payload} />
 			</View>
 		);
 	};
@@ -116,7 +118,7 @@ function UnsignedTxView({
 				accountsStore={accountsStore}
 				titlePrefix={'from:'}
 			/>
-			<FlatList 
+			<FlatList
 				data={payloadCards}
 				renderItem={renderCard}
 				keyExtractor={(item: PayloadCard): number => item.index}

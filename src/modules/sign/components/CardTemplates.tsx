@@ -1,18 +1,16 @@
 import React, { ReactElement } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Identicon from '@polkadot/reactnative-identicon';
 
-import { PayloadCardContent } from 'types/payload';
+import { PayloadCardContent } from 'types/payloads';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import Identicon from '@polkadot/reactnative-identicon';
 
 type CardProps = {
 	payload?: PayloadCardContent;
 };
 
-export function DefaultCard({
-	payload
-}: CardProps): ReactElement {
+export function DefaultCard({ payload }: CardProps): ReactElement {
 	return (
 		<View>
 			<Text style={fontStyles.t_regular}>{JSON.stringify(payload)}</Text>
@@ -20,37 +18,28 @@ export function DefaultCard({
 	);
 }
 
-export function BlockHashCard({
-	payload
-}: CardProps): ReactElement {
+export function BlockHashCard({ payload }: CardProps): ReactElement {
 	return (
-		<View style={styles.content}>
-			<Text style={styles.titleText} > Block </Text> 
+		<View>
+			<Text style={styles.titleText}> Block </Text>
 			<Text style={styles.secondaryText}>{payload}</Text>
 		</View>
 	);
 }
 
-export function CallCard({
-	payload
-}: CardProps): ReactElement {
+export function CallCard({ payload }: CardProps): ReactElement {
 	return (
 		<View>
-			<Text
-				style={styles.titleText}
-			>
+			<Text style={styles.titleText}>
 				{payload.method}
 				<Text style={styles.secondaryText}> from </Text>
 				{payload.pallet}
 			</Text>
-
 		</View>
 	);
 }
 
-export function EraNonceTipCard({
-	payload
-}: CardProps): ReactElement {
+export function EraNonceTipCard({ payload }: CardProps): ReactElement {
 	if (payload.era === 'Mortal') {
 		return (
 			<View style={styles.content}>
@@ -73,11 +62,9 @@ export function EraNonceTipCard({
 			</View>
 		);
 	} else {
-		return(
+		return (
 			<View>
-				<Text
-					style={styles.titleText}
-				>
+				<Text style={styles.titleText}>
 					Immortal Era
 					<Text style={styles.secondaryText}> Nonce: </Text>
 					{payload.nonce}
@@ -89,45 +76,40 @@ export function EraNonceTipCard({
 	}
 }
 
-export function IdCard({
-	payload
-}: CardProps): ReactElement {
+export function IdCard({ payload }: CardProps): ReactElement {
 	return (
 		<View style={styles.content}>
-			<Identicon 
-				value={payload}
-				size={40}
-			/>
-			<View style={{paddingHorizontal: 10}}>
-				<Text style={fontStyles.t_codeS}>{payload}</Text>
+			<Identicon value={payload} size={40} />
+			<View style={{ paddingHorizontal: 10 }}>
+				<Text style={fontStyles.t_codeS}>{payload.substr(0,12)}</Text>
+				<Text style={fontStyles.t_codeS}>{payload.substr(12,12)}</Text>
+				<Text style={fontStyles.t_codeS}>{payload.substr(24,12)}</Text>
+				<Text style={fontStyles.t_codeS}>{payload.substr(36,12)}</Text>
 			</View>
 		</View>
 	);
 }
 
-export function TxSpecCard({
-	payload
-}: CardProps): ReactElement {
+export function TxSpecCard({ payload }: CardProps): ReactElement {
 	return (
-		<View>
-			<Text
-				style={styles.titleText}
-			>
+		<View style={styles.content}>
+			<View>
 				<Text style={styles.secondaryText}> Network </Text>
-				{payload.chain}
-				<Text style={styles.secondaryText}> Spec version: </Text>
-				{payload.version}
-				<Text style={styles.secondaryText}> tx version: </Text>
-				{payload.tx_version}
-			</Text>
-
+				<Text style={styles.titleText}>	{payload.chain} </Text>
+			</View>
+			<View>		
+				<Text style={styles.secondaryText}> Spec version </Text>
+				<Text style={styles.titleText}>	{payload.version} </Text>
+			</View>
+			<View>
+				<Text style={styles.secondaryText}> tx version </Text>
+				<Text style={styles.titleText}>	{payload.tx_version} </Text>
+			</View>
 		</View>
 	);
 }
 
-export function VariableNameCard({
-	payload
-}: CardProps): ReactElement {
+export function VariableNameCard({ payload }: CardProps): ReactElement {
 	return (
 		<View>
 			<Text style={fontStyles.t_regular}>{payload}</Text>
@@ -180,5 +162,4 @@ const styles = StyleSheet.create({
 		color: colors.text.main,
 		paddingHorizontal: 16
 	}
-
 });

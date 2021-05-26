@@ -2,7 +2,7 @@
 //Hopefully, by the time it's really needed,
 //self-descripting metadata will be ready
 
-export typeDefs = `// from pallet_im_online::Heartbeat
+export const typeDefs = `// from pallet_im_online::Heartbeat
 pub struct Heartbeat<T::BlockNumber> {
     pub block_number: BlockNumber,
     pub network_state: OpaqueNetworkState,
@@ -1197,4 +1197,4 @@ pub struct Vote {
 // from pallet_collective::ProposalIndex
 type ProposalIndex = u32;
 
-`
+`;

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { GenericExtrinsicPayload } from '@polkadot/types';
-import { parseTransaction } from 'utils/native';
 
+import { parseTransaction } from 'utils/native';
 import { ExtrinsicPayloadLatestVersion } from 'constants/chainData';
 import { NetworksContext } from 'stores/NetworkContext';
 
@@ -27,10 +27,15 @@ export function usePayloadDetails(
 		} else {
 			try {
 				const generateCards = async function (encoded: string): Promise<void> {
-					const extrinsicPayloadCards = await parseTransaction(encoded, "", "", "");
+					const extrinsicPayloadCards = await parseTransaction(
+						encoded,
+						'',
+						'',
+						''
+					);
 					setPayload(extrinsicPayloadCards);
 					setIsProcessing(false);
-				}
+				};
 				generateCards(rawPayload);
 			} catch (e) {
 				//can't generate extrinsic payload, don't display.

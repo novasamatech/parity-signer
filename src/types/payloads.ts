@@ -1,5 +1,13 @@
 //List of valid renderable card templates
-export type PayloadCardType = 'call' | 'varname' | 'enum_variant_name' | 'Id' | 'default' | 'era_nonce_tip' | 'block_hash' | 'tx_spec';
+export type PayloadCardType =
+	| 'call'
+	| 'varname'
+	| 'enum_variant_name'
+	| 'Id'
+	| 'default'
+	| 'era_nonce_tip'
+	| 'block_hash'
+	| 'tx_spec';
 
 export type PayloadCardContent = {
 	[key: string]: unknown;
