@@ -10,6 +10,28 @@ type CardProps = {
 	payload?: PayloadCardContent;
 };
 
+export function LoadingCard():ReactElement {
+	return (
+		<View>
+			<ActivityIndicator 
+				animating={true}
+				color="red"
+				size="large"
+				style={styles.indicator}
+			/>
+			<Text style={styles.titleText}>Parsing transaction, please wait</Text>
+		</View>
+	);
+}
+
+export function ErrorCard({ payload }: CardProps): ReactElement {
+	return (
+		<View>
+			<Text style={styles.titleText}>ERROR! {payload}</Text>
+		</View>
+	);
+}
+
 export function DefaultCard({ payload }: CardProps): ReactElement {
 	return (
 		<View>
@@ -81,10 +103,10 @@ export function IdCard({ payload }: CardProps): ReactElement {
 		<View style={styles.content}>
 			<Identicon value={payload} size={40} />
 			<View style={{ paddingHorizontal: 10 }}>
-				<Text style={fontStyles.t_codeS}>{payload.substr(0,12)}</Text>
-				<Text style={fontStyles.t_codeS}>{payload.substr(12,12)}</Text>
-				<Text style={fontStyles.t_codeS}>{payload.substr(24,12)}</Text>
-				<Text style={fontStyles.t_codeS}>{payload.substr(36,12)}</Text>
+				<Text style={fontStyles.t_codeS}>{payload.substr(0, 12)}</Text>
+				<Text style={fontStyles.t_codeS}>{payload.substr(12, 12)}</Text>
+				<Text style={fontStyles.t_codeS}>{payload.substr(24, 12)}</Text>
+				<Text style={fontStyles.t_codeS}>{payload.substr(36, 12)}</Text>
 			</View>
 		</View>
 	);
@@ -95,15 +117,15 @@ export function TxSpecCard({ payload }: CardProps): ReactElement {
 		<View style={styles.content}>
 			<View>
 				<Text style={styles.secondaryText}> Network </Text>
-				<Text style={styles.titleText}>	{payload.chain} </Text>
+				<Text style={styles.titleText}> {payload.chain} </Text>
 			</View>
-			<View>		
+			<View>
 				<Text style={styles.secondaryText}> Spec version </Text>
-				<Text style={styles.titleText}>	{payload.version} </Text>
+				<Text style={styles.titleText}> {payload.version} </Text>
 			</View>
 			<View>
 				<Text style={styles.secondaryText}> tx version </Text>
-				<Text style={styles.titleText}>	{payload.tx_version} </Text>
+				<Text style={styles.titleText}> {payload.tx_version} </Text>
 			</View>
 		</View>
 	);
@@ -146,6 +168,9 @@ const styles = StyleSheet.create({
 	identicon: {
 		height: 40,
 		width: 40
+	},
+	indicator: {
+		margin: 15
 	},
 	row: {
 		alignItems: 'flex-end',
