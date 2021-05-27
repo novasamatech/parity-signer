@@ -27,6 +27,7 @@ import { Account, Identity } from 'types/identityTypes';
 import { MetadataHandle } from 'types/metadata';
 import {
 	metadataHandleToKey,
+	metadataStorage,
 	getMetadataHandleFromRaw
 } from 'utils/metadataUtils';
 
@@ -172,10 +173,6 @@ export async function saveNetworks(
  *	Metadata Store
  * ========================================
  */
-const metadataStorage = {
-	keychainService: 'parity_signer_metadata',
-	sharedPreferencesName: 'parity_signer_metadata'
-};
 
 export async function getMetadata(
 	metadataHandle: MetadataHandle | null
@@ -184,22 +181,36 @@ export async function getMetadata(
 		if (!metadataHandle) return '';
 		const metadataKey = metadataHandleToKey(metadataHandle);
 		console.log(metadataKey);
-		const metadataRecord = await SecureStorage.getItem(
-			metadataKey,
-			metadataStorage
-		);
-		return metadataRecord;
+		const metadataRecord = await AsyncStorage.getItem(metadataKey);
+		return metadataRecord ? metadataRecord : '';
 	} catch (e) {
 		handleError(e, 'load metadata');
 		return '';
 	}
 }
 
+function isMetadataKey(this: string): boolean {
+	//check if the line begins with 'signer_metadata_' - not ideomatic but safe
+	return this.substr(0, metadataStorage.length) === metadataStorage;
+}
+
+export async function dumpMetadataDB(): Promise<
+	Array<[string, string | null]>
+> {
+	try {
+		const allKeys = await AsyncStorage.getAllKeys();
+		const metadataKeys = allKeys.filter(isMetadataKey);
+		const allMetadataMap = await AsyncStorage.multiGet(metadataKeys);
+		return allMetadataMap;
+	} catch (e) {
+		handleError(e, 'metadata db fetch failed');
+		return [];
+	}
+}
+
 export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
 	try {
-		//This is the SLOW operation to blame!
-		const allMetadataMap = await SecureStorage.getAllItems(metadataStorage);
-		const metadataKeys = Object.getOwnPropertyNames(allMetadataMap);
+		const allMetadataMap = await dumpMetadataDB();
 		const handles: Array<MetadataHandle> = [];
 
 		// Uncomment this to clean up
@@ -208,8 +219,8 @@ export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
 			await SecureStorage.deleteItem(deleteme, metadataStorage);
 		}
 		*/
-		for (const keyValue of metadataKeys) {
-			handles.push(await getMetadataHandleFromRaw(allMetadataMap[keyValue]));
+		for (const metadataValue of allMetadataMap) {
+			handles.push(await getMetadataHandleFromRaw(metadataValue[1]));
 		}
 		return handles;
 	} catch (e) {
@@ -233,7 +244,7 @@ export async function saveMetadata(newMetadata: string): Promise<void> {
 	try {
 		const metadataHandle = await getMetadataHandleFromRaw(newMetadata);
 		const newMetadataKey = metadataHandleToKey(metadataHandle);
-		await SecureStorage.setItem(newMetadataKey, newMetadata, metadataStorage);
+		await AsyncStorage.setItem(newMetadataKey, newMetadata);
 		console.log('Saved: ' + newMetadataKey);
 	} catch (e) {
 		handleError(e, 'save metadata');
@@ -251,10 +262,7 @@ export async function deleteMetadata(
 	metadataHandle: MetadataHandle
 ): Promise<void> {
 	try {
-		await SecureStorage.deleteItem(
-			metadataHandleToKey(metadataHandle),
-			metadataStorage
-		);
+		await AsyncStorage.removeItem(metadataHandleToKey(metadataHandle));
 		console.log('metadata successfully removed: ');
 		console.log(metadataHandle);
 	} catch (e) {
