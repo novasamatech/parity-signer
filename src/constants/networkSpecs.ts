@@ -88,9 +88,9 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	metadata: {
-		hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
+		hash: 'd266fcfdf60c09b2065d6a36751fcde65600df34d372cf0fc1e9d86c1d9edb45',
 		specName: 'kusama',
-		specVersion: 2030
+		specVersion: 9010
 	},
 	protocol: NetworkProtocols.SUBSTRATE,
 	unit: 'UNIT'
@@ -139,7 +139,7 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.EDGEWARE,
 		logo: require('res/img/logos/Edgeware.png'),
 		metadata: {
-			hash: '9f3c1c7ff32e84f942659b1ef44ef49a6bc33067392f731b2e76e4e0bd18ad4f',
+			hash: '9f7f918419a8937498e718e30164a69f6ac669bed3779f5a1c02589d7a831c41',
 			specName: 'edgeware',
 			specVersion: 0
 		},
@@ -170,9 +170,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('res/img/logos/Kusama.png'),
 		metadata: {
-			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
+			hash: 'd266fcfdf60c09b2065d6a36751fcde65600df34d372cf0fc1e9d86c1d9edb45',
 			specName: 'kusama',
-			specVersion: 2030
+			specVersion: 9010
 		},
 		order: 2,
 		pathId: 'kusama',
@@ -185,9 +185,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		metadata: {
-			hash: 'efaa97434a2e971067e5819f6f80e892daeb2711ac0544a4e8260d4ff0c14270',
+			hash: 'd266fcfdf60c09b2065d6a36751fcde65600df34d372cf0fc1e9d86c1d9edb45',
 			specName: 'kusama',
-			specVersion: 2030
+			specVersion: 9010
 		},
 		order: 99,
 		pathId: 'kusama_dev',
@@ -217,9 +217,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.ROCOCO,
 		logo: require('res/img/logos/Rococo.png'),
 		metadata: {
-			hash: '4fd9e79b98959f96d6f0097f7c5f95966a8e2637ac39b99a4477e97f35bb1b3a',
+			hash: 'a91f58c2a11b8bdc671f63f2cca291b417604d1d96df7cc8adbf30b03ed6b698',
 			specName: 'rococo',
-			specVersion: 9001
+			specVersion: 9002
 		},
 		order: 4,
 		pathId: 'rococo',
@@ -233,9 +233,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.WESTEND,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: 'e80237ad8b2e92b72fcf6beb8f0e4ba4a21043a7115c844d91d6c4f981e469ce',
+			hash: 'dd71fa0db7b0f678fa819fc01146b5ea25ed3ab91c5ce8477ed7695b1ad66626',
 			specName: 'westend',
-			specVersion: 9000
+			specVersion: 9030
 		},
 		order: 3,
 		pathId: 'westend',
