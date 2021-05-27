@@ -109,7 +109,7 @@ pub fn get_meta_const (meta: &str) -> Result<Vec<u8>, &str> {
     let part1 = &meta[10..12];
     let part1_vec = hex::decode(part1).unwrap();
     let part1_decoded = u8::decode(&mut &part1_vec[..]).unwrap();
-    if part1_decoded != 12 {
+    if part1_decoded < 12 {
         return Err("RuntimeMetadata version incompatible");
     }
     
