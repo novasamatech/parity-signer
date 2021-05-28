@@ -41,7 +41,7 @@ import AccountEdit from 'screens/AccountEdit';
 import Main from 'modules/main/screens/Main';
 import AccountNew from 'screens/AccountNew';
 import AccountPin from 'screens/AccountPin';
-import { AccountUnlock, AccountUnlockAndSign } from 'screens/AccountUnlock';
+import { AccountUnlock } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
 import IdentityNew from 'screens/IdentityNew';
@@ -57,11 +57,8 @@ import PathManagement from 'screens/PathManagement';
 import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
-import QrScanner from 'modules/sign/screens/QrScanner';
 import FastQrScanner from 'screens/FastQrScanner';
 import Security from 'screens/Security';
-import DetailsMessage from 'modules/sign/screens/DetailsMessage';
-import SignedMessage from 'modules/sign/screens/SignedMessage';
 import DetailsTx from 'modules/sign/screens/DetailsTx';
 import SignedTx from 'modules/sign/screens/SignedTx';
 import TermsAndConditions from 'screens/TermsAndConditions';
@@ -135,10 +132,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="AccountUnlock" component={AccountUnlock} />
 		<ScreenStack.Screen name="AccountNew" component={AccountNew} />
 		<ScreenStack.Screen
-			name="AccountUnlockAndSign"
-			component={AccountUnlockAndSign}
-		/>
-		<ScreenStack.Screen
 			name="LegacyAccountBackup"
 			component={LegacyAccountBackup}
 		/>
@@ -175,11 +168,8 @@ export const AppNavigator = (): React.ReactElement => (
 			name="PinUnlockWithPassword"
 			component={PinUnlockWithPassword}
 		/>
-		<ScreenStack.Screen name="QrScanner" component={QrScanner} />
 		<ScreenStack.Screen name="FastQrScanner" component={FastQrScanner} />
 		<ScreenStack.Screen name="Security" component={Security} />
-		<ScreenStack.Screen name="DetailsMessage" component={DetailsMessage} />
-		<ScreenStack.Screen name="SignedMessage" component={SignedMessage} />
 		<ScreenStack.Screen name="DetailsTx" component={DetailsTx} />
 		<ScreenStack.Screen name="SignedTx" component={SignedTx} />
 		<ScreenStack.Screen

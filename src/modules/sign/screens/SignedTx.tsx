@@ -20,7 +20,6 @@ import { Text, View } from 'react-native';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
-import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
 import QrView from 'components/QrView';
@@ -30,12 +29,6 @@ import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 
 function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
-	const scannerStore = useContext(ScannerContext);
-	const { recipient, sender } = scannerStore.state;
-	const cleanup = useRef(scannerStore.cleanup);
-
-	useEffect(() => cleanup.current, [cleanup]);
-
 	if (sender === null || recipient === null) return <View />;
 	return (
 		<SignedTxView sender={sender} scannerStore={scannerStore} {...props} />
@@ -50,14 +43,10 @@ function SignedTxView({ sender, scannerStore }: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { signedData } = scannerStore.state;
 
+	//IMPORTANT: nothing but QR code should be shown here; showing address path is dangerous
 	return (
 		<SafeAreaScrollViewContainer>
 			<Text style={styles.topTitle}>Signed extrinsic</Text>
-			<CompatibleCard
-				account={sender}
-				accountsStore={accountsStore}
-				titlePrefix={'from:'}
-			/>
 			<Separator
 				shadow={true}
 				style={{

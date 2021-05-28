@@ -40,6 +40,18 @@ export function DefaultCard({ payload }: CardProps): ReactElement {
 	);
 }
 
+export function AuthorCard({ payload }: CardProps): ReactElement {
+	return (
+		<View style={styles.content}>
+			<Identicon value={payload.base58} size={40} />
+			<View style={{ paddingHorizontal: 10 }}>
+				<Text style={styles.titleText}>From:</Text>
+				<Text style={fontStyles.t_codeS}>{payload.base58}</Text>
+			</View>
+		</View>
+	);
+}
+
 export function BlockHashCard({ payload }: CardProps): ReactElement {
 	return (
 		<View>

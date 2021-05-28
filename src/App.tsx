@@ -30,7 +30,6 @@ import {
 } from './screens';
 
 import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
-import { useScannerContext, ScannerContext } from 'stores/ScannerContext';
 import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import CustomAlert from 'components/CustomAlert';
 import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
@@ -65,7 +64,6 @@ export default function App(props: AppProps): React.ReactElement {
 	const globalContext: GlobalState = useGlobalStateContext();
 	const seedRefContext = useSeedRefStore();
 	const accountsContext = useAccountContext();
-	const scannerContext = useScannerContext();
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
@@ -91,22 +89,20 @@ export default function App(props: AppProps): React.ReactElement {
 		<SafeAreaProvider>
 			<NetworksContext.Provider value={networkContext}>
 				<AccountsContext.Provider value={accountsContext}>
-					<ScannerContext.Provider value={scannerContext}>
-						<GlobalStateContext.Provider value={globalContext}>
-							<AlertStateContext.Provider value={alertContext}>
-								<SeedRefsContext.Provider value={seedRefContext}>
-									<MenuProvider backHandler={true}>
-										<StatusBar
-											barStyle="light-content"
-											backgroundColor={colors.background.app}
-										/>
-										<CustomAlert />
-										<NavigationContainer>{renderStacks()}</NavigationContainer>
-									</MenuProvider>
-								</SeedRefsContext.Provider>
-							</AlertStateContext.Provider>
-						</GlobalStateContext.Provider>
-					</ScannerContext.Provider>
+					<GlobalStateContext.Provider value={globalContext}>
+						<AlertStateContext.Provider value={alertContext}>
+							<SeedRefsContext.Provider value={seedRefContext}>
+								<MenuProvider backHandler={true}>
+									<StatusBar
+										barStyle="light-content"
+										backgroundColor={colors.background.app}
+									/>
+									<CustomAlert />
+									<NavigationContainer>{renderStacks()}</NavigationContainer>
+								</MenuProvider>
+							</SeedRefsContext.Provider>
+						</AlertStateContext.Provider>
+					</GlobalStateContext.Provider>
 				</AccountsContext.Provider>
 			</NetworksContext.Provider>
 		</SafeAreaProvider>

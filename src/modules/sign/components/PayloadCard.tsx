@@ -6,6 +6,7 @@ import {
 	LoadingCard,
 	ErrorCard,
 	DefaultCard,
+	AuthorCard,
 	BlockHashCard,
 	CallCard,
 	EraNonceTipCard,
@@ -27,6 +28,8 @@ export default function PayloadCard({
 		return <LoadingCard payload={payload} />;
 	} else if (type === 'error') {
 		return <ErrorCard payload={payload} />;
+	} else if (type === 'author') {
+		return <AuthorCard payload={payload} />;
 	} else if (type === 'call') {
 		return <CallCard payload={payload} />;
 	} else if (type === 'varname') {

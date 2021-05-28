@@ -54,6 +54,10 @@ export default function Scanner({
 		setNominalPacketsNumber(~~(parsedMessageSize / (parsedPacketSize - 4)) + 2);
 	}
 
+	function processPackage(payload: string): void {
+		navigation.navigate('DetailsTx', {payload: payload});
+	};
+
 	function processQrFrame(data: string): void {
 		if (nominalPacketsNumber === 0) {
 			console.log(data);
@@ -64,8 +68,9 @@ export default function Scanner({
 				console.log('legacy package');
 				const parsedLegacySize = parseInt(data.substr(1, 4), 16) - 5;
 				console.log(parsedLegacySize);
-				//processPackage(data.substr(15,parsedLegacySize*2));
-				navigation.goBack();
+				console.log(data.substr(15,parsedLegacySize*2));
+				processPackage(data.substr(15,parsedLegacySize*2));
+				//navigation.goBack();
 			}
 		}
 		const payload = data.substr(13, packetSize * 2);

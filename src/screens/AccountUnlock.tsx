@@ -21,47 +21,11 @@ import { CommonActions } from '@react-navigation/native';
 import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
-import { ScannerContext } from 'stores/ScannerContext';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import ScreenHeading from 'components/ScreenHeading';
 import TextInput from 'components/TextInput';
-
-/* Used for unlock and sign tx and messages for legacy accounts */
-export function AccountUnlockAndSign(
-	props: NavigationProps<'AccountUnlockAndSign'>
-): React.ReactElement {
-	const { navigation, route } = props;
-	const next = route.params.next ?? 'SignedTx';
-	const scannerStore = useContext(ScannerContext);
-	const { getNetwork } = useContext(NetworksContext);
-
-	return (
-		<AccountUnlockView
-			checkPin={async (pin: string): Promise<boolean> => {
-				try {
-					await scannerStore.signDataLegacy(pin, getNetwork);
-					return true;
-				} catch (e) {
-					return false;
-				}
-			}}
-			navigate={(): void => {
-				const resetAction = CommonActions.reset({
-					index: 1,
-					routes: [
-						{
-							name: 'LegacyAccountList'
-						},
-						{ name: next }
-					]
-				});
-				navigation.dispatch(resetAction);
-			}}
-		/>
-	);
-}
 
 export function AccountUnlock({
 	navigation,

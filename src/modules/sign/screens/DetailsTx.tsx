@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-// This screen shows Tx-type payload details and asks for signing confirmation
+// This screen shows payload details and asks for signing confirmation
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Text, View, FlatList } from 'react-native';
@@ -43,42 +43,9 @@ function DetailsTx({
 	route,
 	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
-	const scannerStore = useContext(ScannerContext);
-	const { recipient, sender } = scannerStore.state;
-	const cleanup = useRef(scannerStore.cleanup);
-
-	useEffect(() => cleanup.current, [cleanup]);
-
-	if (sender === null || recipient === null) return <View />;
-	return (
-		<UnsignedTxView
-			sender={sender}
-			recipient={recipient}
-			scannerStore={scannerStore}
-			route={route}
-			navigation={navigation}
-		/>
-	);
-}
-
-interface Props extends NavigationScannerProps<'DetailsTx'> {
-	sender: FoundAccount;
-	recipient: FoundAccount;
-}
-
-function UnsignedTxView({
-	sender,
-	recipient,
-	scannerStore,
-	route
-}: Props): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
 	const { dumpNetworksData, getNetwork } = useContext(NetworksContext);
-	const { tx, rawPayload } = scannerStore.state;
-	const senderNetworkParams = getNetwork(sender.networkKey);
-	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
-	const { value, gas, gasPrice } = tx as Transaction;
-	const payload = null;
+	const payload = route.params.payload;
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
 	]);
@@ -88,27 +55,27 @@ function UnsignedTxView({
 			const networksData = dumpNetworksData();
 			const metadata = await dumpMetadataDB();
 			const metadataJSON = JSON.stringify(metadata);
-			console.log(typeDefs.substr(0,10));
-			console.log(encoded);
-			console.log(typeof networksData);
-			console.log(typeof metadataJSON);
-			console.log(typeof typeDefs);
 			const cardsSet = await makeTransactionCardsContents(
 				encoded,
 				networksData,
 				metadataJSON,
 				typeDefs
 			);
-			console.log(cardsSet.method.concat(cardsSet.extrinsics));
-			setPayloadCards(cardsSet.method.concat(cardsSet.extrinsics));
+			const sortedCardSet = [].concat(
+				cardsSet.author ? cardsSet.author : [],
+				cardsSet.error ? cardsSet.author : [],
+				cardsSet.method ? cardsSet.method : [],
+				cardsSet.extrinsics ? cardsSet.extrinsics : []
+			);
+			console.log(sortedCardSet);
+			setPayloadCards(sortedCardSet ? sortedCardSet : 
+				{ indent: 0, index: 0, payload: "System error: transaction parser failed entirely", type: 'error' }
+			);
 		};
-		console.log(rawPayload);
-		console.log(rawPayload.map(c => c.toString(16)));
-		console.log(rawPayload.map(c => c.toString(16)).map(n => (n.length <2 ? `0${n}` : n)));
-		generateCards(rawPayload.map(c => c.toString(16)).map(n => (n.length <2 ? `0${n}` : n)).join(''));
-	}, [rawPayload]);
+		generateCards(payload);
+	}, [payload]);
 
-	const renderCard = ({ item }: { item: PayloadCard }): ReactElement => {
+	const renderCard = ({ item }: { item: PayloadCardData }): ReactElement => {
 		return (
 			<View style={[{ paddingLeft: item.indent * 4 + '%' }]}>
 				<PayloadCard type={item.type} payload={item.payload} />
@@ -124,15 +91,10 @@ function UnsignedTxView({
 	return (
 		<SafeAreaViewContainer testID={testIDs.DetailsTx.detailsScreen}>
 			<Text style={styles.topTitle}>Extrinsic to sign</Text>
-			<CompatibleCard
-				account={sender}
-				accountsStore={accountsStore}
-				titlePrefix={'from:'}
-			/>
 			<FlatList
 				data={payloadCards}
 				renderItem={renderCard}
-				keyExtractor={(item: PayloadCard): number => item.index}
+				keyExtractor={(item: PayloadCardData): number => item.index}
 			/>
 			<Button
 				onPress={approveTransaction}
