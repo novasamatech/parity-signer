@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import Identicon from '@polkadot/reactnative-identicon';
 
 import { PayloadCardContent } from 'types/payloads';
@@ -10,10 +10,10 @@ type CardProps = {
 	payload?: PayloadCardContent;
 };
 
-export function LoadingCard():ReactElement {
+export function LoadingCard(): ReactElement {
 	return (
 		<View>
-			<ActivityIndicator 
+			<ActivityIndicator
 				animating={true}
 				color="red"
 				size="large"
@@ -66,19 +66,19 @@ export function EraNonceTipCard({ payload }: CardProps): ReactElement {
 		return (
 			<View style={styles.content}>
 				<View>
-					<Text style={styles.secondaryText}> Period </Text>
+					<Text style={styles.label}> Period </Text>
 					<Text style={styles.titleText}>{payload.period}</Text>
 				</View>
 				<View>
-					<Text style={styles.secondaryText}> Phase </Text>
+					<Text style={styles.label}> Phase </Text>
 					<Text style={styles.titleText}>{payload.phase}</Text>
 				</View>
 				<View>
-					<Text style={styles.secondaryText}> Nonce </Text>
+					<Text style={styles.label}> Nonce </Text>
 					<Text style={styles.titleText}>{payload.nonce}</Text>
 				</View>
 				<View>
-					<Text style={styles.secondaryText}> Tip </Text>
+					<Text style={styles.label}> Tip </Text>
 					<Text style={styles.titleText}>{payload.tip}</Text>
 				</View>
 			</View>
@@ -88,9 +88,9 @@ export function EraNonceTipCard({ payload }: CardProps): ReactElement {
 			<View>
 				<Text style={styles.titleText}>
 					Immortal Era
-					<Text style={styles.secondaryText}> Nonce: </Text>
+					<Text style={styles.label}> Nonce: </Text>
 					{payload.nonce}
-					<Text style={styles.secondaryText}> Tip: </Text>
+					<Text style={styles.label}> Tip: </Text>
 					{payload.tip}
 				</Text>
 			</View>
@@ -116,15 +116,15 @@ export function TxSpecCard({ payload }: CardProps): ReactElement {
 	return (
 		<View style={styles.content}>
 			<View>
-				<Text style={styles.secondaryText}> Network </Text>
+				<Text style={styles.label}> Network </Text>
 				<Text style={styles.titleText}> {payload.chain} </Text>
 			</View>
 			<View>
-				<Text style={styles.secondaryText}> Spec version </Text>
+				<Text style={styles.label}> Spec version </Text>
 				<Text style={styles.titleText}> {payload.version} </Text>
 			</View>
 			<View>
-				<Text style={styles.secondaryText}> tx version </Text>
+				<Text style={styles.label}> tx version </Text>
 				<Text style={styles.titleText}> {payload.tx_version} </Text>
 			</View>
 		</View>
@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: colors.background.card,
 		flexDirection: 'row',
-		paddingLeft: 16,
 		paddingVertical: 8
 	},
 	desc: {
@@ -171,6 +170,14 @@ const styles = StyleSheet.create({
 	},
 	indicator: {
 		margin: 15
+	},
+	label: {
+		...fontStyles.t_label,
+		backgroundColor: colors.signal.main,
+		color: colors.background.app,
+		marginBottom: 10,
+		paddingHorizontal: 8,
+		textAlign: 'center'
 	},
 	row: {
 		alignItems: 'flex-end',

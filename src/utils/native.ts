@@ -92,14 +92,27 @@ export async function generateMetadataHandle(
 }
 
 export async function makeTransactionCardsContents(
-	_payload: string,
-	_genHash: string,
-	_metadata: string,
-	_typeDescriptor: string
+	payload: string,
+	genHash: string,
+	metadata: string,
+	typeDescriptor: string
 ): Promise<PayloadCardsSet> {
-	console.log('hooyak!');
-	const parsedJSON = await SubstrateSign.parseTransaction('', '', '', '');
+	console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+	console.log('Parsing: ');
+			console.log(typeof payload);
+       	console.log(payload);
+			console.log(typeof genHash);
+	console.log(genHash.substr(0,1000));
+			console.log(typeof metadata);
+	console.log(metadata.substr(0,1000));
+			console.log(typeof typeDescriptor);
+	console.log(typeDescriptor.substr(0,10));
+	const payloadPrepared = '530102' + payload;
+	console.log(payloadPrepared);
+	const parsedJSON = await SubstrateSign.parseTransaction(payloadPrepared, genHash, metadata, typeDescriptor);
+	console.log('done');
 	console.log(parsedJSON);
+	console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~');
 	const parsed = JSON.parse(parsedJSON);
 	console.log(parsed);
 	return parsed;

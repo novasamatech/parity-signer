@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use regex::Regex;
 use hex;
 use parity_scale_codec::{Decode, Encode};
-use frame_metadata::{RuntimeMetadataV12, DecodeDifferent};
+use frame_metadata::{RuntimeMetadata, DecodeDifferent};
 use jsonrpsee_types::{
 	JsonValue, 
 	v2::params::JsonRpcParams,
@@ -72,7 +72,7 @@ pub struct VersionDecoded {
 
 pub fn split_properly(meta_file: &str) -> Vec<MetaValues> {
 
-    let re = Regex::new(r#"(?i)export const (?P<name>\S*)Metadata(V(?P<version>[0-9]+))? = '(?P<meta>0x[0-9a-f][0-9a-f]+)'"#).unwrap();
+    let re = Regex::new(r#"(?i)export const (?P<name>\S*)Metadata(V(?P<version>[0-9]+))? = '(?P<meta>0x([0-9a-f][0-9a-f])+)'"#).unwrap();
     let out = meta_file
         .lines()
         .filter(|line| re.is_match(line))
@@ -101,41 +101,7 @@ pub fn split_properly(meta_file: &str) -> Vec<MetaValues> {
 
 // TODO: change unwrap() to error propagation thingy
 
-pub fn get_meta_const_light (meta_back: &RuntimeMetadataV12) -> Result<Vec<u8>, &'static str> {
-    let mut out = Vec::new();
-    let mut system_block = false;
-    let mut constants_version = false;
-    
-    if let DecodeDifferent::Decoded(meta_vector) = &meta_back.modules {
-        for x in meta_vector.iter() {
-            if x.name==DecodeDifferent::Encode("System") {
-                system_block = true;
-                if let DecodeDifferent::Decoded(constants_vector) = &x.constants {
-                    for y in constants_vector.iter() {
-                        if y.name==DecodeDifferent::Encode("Version") {
-                            constants_version = true;
-                            if let DecodeDifferent::Decoded(fin) = &y.value {out = fin.to_vec();}
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
-    if !system_block {
-        return Err("No system block found");
-    }
-    if !constants_version {
-        return Err("No version found in constants");
-    }
-    if out.len()==0 {
-        return Err("No version retrieved from constants");
-    }
-    Ok(out)
-}
-
-pub fn get_meta_const (meta: &str) -> Result<Vec<u8>, &'static str> {
+pub fn get_meta_const (meta: &str) -> Result<Vec<u8>, &str> {
 
     if !meta.starts_with("0x6d657461") {
         return Err("No 'meta' starting sequence in metadata");
@@ -148,12 +114,46 @@ pub fn get_meta_const (meta: &str) -> Result<Vec<u8>, &'static str> {
         return Err("RuntimeMetadata version incompatible");
     }
     
-    let meta_str = &meta[12..];
+    let meta_str = &meta[10..];
     let meta_work = hex::decode(meta_str).unwrap();
-    let meta_back = RuntimeMetadataV12::decode(&mut &meta_work[..]).unwrap();
+    let meta_back_versioned = RuntimeMetadata::decode(&mut &meta_work[..]).unwrap();
     
-    get_meta_const_light(&meta_back)
+    let mut out = Vec::new();
+    let mut system_block = false;
+    let mut constants_version = false;
     
+    match meta_back_versioned {
+        RuntimeMetadata::V12(meta_back) => {
+            if let DecodeDifferent::Decoded(meta_vector) = meta_back.modules {
+                for x in meta_vector.iter() {
+                    if x.name==DecodeDifferent::Encode("System") {
+                        system_block = true;
+                        if let DecodeDifferent::Decoded(constants_vector) = &x.constants {
+                            for y in constants_vector.iter() {
+                                if y.name==DecodeDifferent::Encode("Version") {
+                                    constants_version = true;
+                                    if let DecodeDifferent::Decoded(fin) = &y.value {out = fin.to_vec();}
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            if !system_block {
+                return Err("No system block found");
+            }
+            if !constants_version {
+                return Err("No version found in constants");
+            }
+            if out.len()==0 {
+                return Err("No version retrieved from constants");
+            }
+        },
+        _ => return Err("RuntimeMetadata version incompatible"),
+    }
+    Ok(out)
 }
 
 
@@ -506,7 +506,7 @@ mod tests {
         let result = get_meta_const(&fetch_test0).unwrap();
         let decoded = decode_version(result);
         assert!(decoded.specname=="westend", "Incorrectly parsed name [web fetch]");
-        assert!(decoded.spec_version==9030, "Incorrectly parsed version [web fetch]");
+        assert!(decoded.spec_version==9010, "Incorrectly parsed version [web fetch]");
     }
     
     #[test]

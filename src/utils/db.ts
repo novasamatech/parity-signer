@@ -189,9 +189,13 @@ export async function getMetadata(
 	}
 }
 
-function isMetadataKey(this: string): boolean {
+function isMetadataKey(element: string): boolean {
 	//check if the line begins with 'signer_metadata_' - not ideomatic but safe
-	return this.substr(0, metadataStorage.length) === metadataStorage;
+	if(!element) return false;
+	console.log(element);
+	console.log(metadataStorage);
+	console.log(element.substr(0, metadataStorage.length));
+	return element.substr(0, metadataStorage.length) === metadataStorage;
 }
 
 export async function dumpMetadataDB(): Promise<
@@ -199,6 +203,7 @@ export async function dumpMetadataDB(): Promise<
 > {
 	try {
 		const allKeys = await AsyncStorage.getAllKeys();
+		console.log(allKeys);
 		const metadataKeys = allKeys.filter(isMetadataKey);
 		const allMetadataMap = await AsyncStorage.multiGet(metadataKeys);
 		return allMetadataMap;

@@ -36,7 +36,7 @@ import Separator from 'components/Separator';
 import Button from 'components/Button';
 import { makeTransactionCardsContents } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
-import { getMetadata } from 'utils/db';
+import { dumpMetadataDB } from 'utils/db';
 import { typeDefs } from 'constants/typeDefs';
 
 function DetailsTx({
@@ -79,22 +79,33 @@ function UnsignedTxView({
 	const isEthereum = isEthereumNetworkParams(senderNetworkParams);
 	const { value, gas, gasPrice } = tx as Transaction;
 	const payload = null;
-	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([]);
+	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
+		{ indent: 0, index: 0, payload: {}, type: 'loading' }
+	]);
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
 			const networksData = dumpNetworksData();
-			const metadata = await getMetadata(senderNetworkParams.metadata);
+			const metadata = await dumpMetadataDB();
+			const metadataJSON = JSON.stringify(metadata);
+			console.log(typeDefs.substr(0,10));
+			console.log(encoded);
+			console.log(typeof networksData);
+			console.log(typeof metadataJSON);
+			console.log(typeof typeDefs);
 			const cardsSet = await makeTransactionCardsContents(
 				encoded,
 				networksData,
-				metadata,
+				metadataJSON,
 				typeDefs
 			);
 			console.log(cardsSet.method.concat(cardsSet.extrinsics));
 			setPayloadCards(cardsSet.method.concat(cardsSet.extrinsics));
 		};
-		generateCards(rawPayload);
+		console.log(rawPayload);
+		console.log(rawPayload.map(c => c.toString(16)));
+		console.log(rawPayload.map(c => c.toString(16)).map(n => (n.length <2 ? `0${n}` : n)));
+		generateCards(rawPayload.map(c => c.toString(16)).map(n => (n.length <2 ? `0${n}` : n)).join(''));
 	}, [rawPayload]);
 
 	const renderCard = ({ item }: { item: PayloadCard }): ReactElement => {

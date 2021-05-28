@@ -3,13 +3,15 @@ import { View } from 'react-native';
 
 import { PayloadCardType, PayloadCardContent } from 'types/payloads';
 import {
+	LoadingCard,
+	ErrorCard,
+	DefaultCard,
 	BlockHashCard,
 	CallCard,
 	EraNonceTipCard,
 	IdCard,
 	TxSpecCard,
-	VariableNameCard,
-	DefaultCard
+	VariableNameCard
 } from 'modules/sign/components/CardTemplates';
 
 type PayloadCardProps = {
@@ -21,7 +23,11 @@ export default function PayloadCard({
 	type,
 	payload
 }: PayloadCardProps): ReactElement {
-	if (type === 'call') {
+	if (type === 'loading') {
+		return <LoadingCard payload={payload} />;
+	} else if (type === 'error') {
+		return <ErrorCard payload={payload} />;
+	} else if (type === 'call') {
 		return <CallCard payload={payload} />;
 	} else if (type === 'varname') {
 		return <VariableNameCard payload={payload} />;

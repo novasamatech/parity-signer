@@ -1153,7 +1153,7 @@ dependencies = [
 
 [[package]]
 name = "meta_reading"
-version = "0.1.1"
+version = "0.1.0"
 dependencies = [
  "blake2-rfc",
  "chrono",
@@ -1476,6 +1476,10 @@ dependencies = [
  "impl-serde",
  "uint",
 ]
+
+[[package]]
+name = "printing_balance"
+version = "0.1.0"
 
 [[package]]
 name = "proc-macro-crate"
@@ -2432,6 +2436,7 @@ dependencies = [
  "meta_reading",
  "parity-scale-codec",
  "parity-scale-codec-derive",
+ "printing_balance",
  "regex",
  "serde",
  "serde_json",

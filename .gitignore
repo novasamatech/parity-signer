@@ -86,6 +86,6 @@ android/app/.project
 android/app/bin
 
 # rust
-rust/signer/target
-rust/meta_reading/target
-rust/transaction_parsing/target
+rust/*/target
+rust/*/target
+rust/*/target
