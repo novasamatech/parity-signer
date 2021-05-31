@@ -28,8 +28,8 @@ export type PayloadCardData = {
 //Object to store all parsed transaction information
 export type PayloadCardsSet = {
 	[key: string]: unknown;
-	author: PayloadCardData[];
-	error: PayloadCardData[];
-	extrinsics: PayloadCardData[];
-	method: PayloadCardData[];
+	author?: PayloadCardData[];
+	error?: PayloadCardData[];
+	extrinsics?: PayloadCardData[];
+	method?: PayloadCardData[];
 };

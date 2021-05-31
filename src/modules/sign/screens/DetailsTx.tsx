@@ -39,16 +39,28 @@ import PayloadCard from 'modules/sign/components/PayloadCard';
 import { dumpMetadataDB } from 'utils/db';
 import { typeDefs } from 'constants/typeDefs';
 
+interface ActionType {
+	buttonLabel: string;
+	payload: any;
+	type: string;
+}
+
 function DetailsTx({
 	route,
 	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { dumpNetworksData, getNetwork } = useContext(NetworksContext);
+	const { dumpNetworksData, getNetwork, networkContext } = useContext(NetworksContext);
 	const payload = route.params.payload;
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
 	]);
+	const [action, setAction] = useState<ActionType>({
+		buttonLabel: 'Back',
+		payload: '',
+		type: ''
+	})
+	const [sender, setSender] = useState<null | FoundAccount>(null);
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
@@ -61,16 +73,28 @@ function DetailsTx({
 				metadataJSON,
 				typeDefs
 			);
+			//TODO: here should be finer features on what to do
+			//with different payload types.
+			//
+			//last sort seems useless but things depend
+			//on undocumented features otherwise
 			const sortedCardSet = [].concat(
 				cardsSet.author ? cardsSet.author : [],
-				cardsSet.error ? cardsSet.author : [],
+				cardsSet.error ? cardsSet.error : [],
 				cardsSet.method ? cardsSet.method : [],
 				cardsSet.extrinsics ? cardsSet.extrinsics : []
-			);
+			).sort((a,b) => {return a.index-b.index;});
 			console.log(sortedCardSet);
 			setPayloadCards(sortedCardSet ? sortedCardSet : 
 				{ indent: 0, index: 0, payload: "System error: transaction parser failed entirely", type: 'error' }
 			);
+			//TODO: this should be just an object from Rust for safety
+			setAction({
+				type: "sign_transaction",
+				buttonLabel: "SIGN",
+				payload: payload
+			});
+			//TODO: this should go to Rust as well
 		};
 		generateCards(payload);
 	}, [payload]);
@@ -83,9 +107,13 @@ function DetailsTx({
 		);
 	};
 
-	const approveTransaction = (): void => {
-		const resolve = route.params.resolve;
-		resolve();
+	const performAction = async (): Promise<void> => {
+		console.log(action);
+		switch (action.type) {
+			case 'sign_transaction' : navigation.navigate('SignedTx', {payload: action});
+			case '': navigation.goBack();
+			default: return;
+		}
 	};
 
 	return (
@@ -94,11 +122,12 @@ function DetailsTx({
 			<FlatList
 				data={payloadCards}
 				renderItem={renderCard}
-				keyExtractor={(item: PayloadCardData): number => item.index}
+				keyExtractor={(item: PayloadCardData): number => item.index.toString()}
 			/>
 			<Button
-				onPress={approveTransaction}
-				title="SIGN"
+				disabled={action.buttonRole===''}
+				onPress={performAction}
+				title={action.buttonLabel}
 				testID={testIDs.DetailsTx.signButton}
 			/>
 		</SafeAreaViewContainer>

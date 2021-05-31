@@ -128,7 +128,7 @@ export function useProcessBarCode(
 		}
 	}
 
-	async function _unlockSeedAndSign(
+	async function unlockSeedAndSign(
 		sender: FoundIdentityAccount,
 		qrInfo: QrInfo
 	): Promise<void> {
@@ -168,23 +168,16 @@ export function useProcessBarCode(
 			}
 		}
 		// 3. sign data
-		if (isEthereum) {
-			await scannerStore.signEthereumData(
-				seedRef.tryBrainWalletSign.bind(seedRef),
-				qrInfo
-			);
-		} else {
-			const suriSuffix = constructSuriSuffix({
-				derivePath: sender.path,
-				password
-			});
-			await scannerStore.signSubstrateData(
-				seedRef.trySubstrateSign.bind(seedRef),
-				suriSuffix,
-				qrInfo,
-				networks
-			);
-		}
+		const suriSuffix = constructSuriSuffix({
+			derivePath: sender.path,
+			password
+		});
+		await scannerStore.signSubstrateData(
+			seedRef.trySubstrateSign.bind(seedRef),
+			suriSuffix,
+			qrInfo,
+			networks
+		);
 	}
 
 	async function unlockAndNavigationToSignedQR(qrInfo: QrInfo): Promise<void> {
@@ -195,17 +188,6 @@ export function useProcessBarCode(
 				strings.ERROR_TITLE,
 				strings.ERROR_NO_SENDER_FOUND
 			);
-		if (sender.isLegacy) {
-			if (type === 'transaction') {
-				return navigation.navigate('AccountUnlockAndSign', {
-					next: 'SignedTx'
-				});
-			} else {
-				return navigation.navigate('AccountUnlockAndSign', {
-					next: 'SignedMessage'
-				});
-			}
-		}
 		const seedRef = getSeedRef(sender.encryptedSeed, seedRefs);
 		const isSeedRefInvalid = seedRef && seedRef.isValid();
 

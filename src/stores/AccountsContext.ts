@@ -364,14 +364,8 @@ export function useAccountContext(): AccountsContextState {
 			const searchList = Array.from(identity.addresses.entries());
 			for (const [addressKey, path] of searchList) {
 				const networkKey = getNetworkKey(path, identity, networkContext);
-				let accountId, address;
-				if (isEthereumAccountId(addressKey)) {
-					accountId = addressKey;
-					address = extractAddressFromAccountId(addressKey);
-				} else {
-					accountId = generateAccountId(addressKey, networkKey, allNetworks);
-					address = addressKey;
-				}
+				const accountId = generateAccountId(addressKey, networkKey, allNetworks);
+				const address = addressKey;
 				const searchAccountIdOrAddress = isAccountId ? accountId : address;
 				const found = isEthereumAccountId(accountId)
 					? searchAccountIdOrAddress.toLowerCase() ===
@@ -416,17 +410,11 @@ export function useAccountContext(): AccountsContextState {
 	): null | FoundAccount {
 		const { allNetworks } = networkContext;
 		const accountId = generateAccountId(address, networkKey, allNetworks);
-		const legacyAccount = _getAccountWithoutCaseSensitive(accountId);
-		if (legacyAccount) return parseFoundLegacyAccount(legacyAccount, accountId);
 		let derivedAccount;
 		//assume it is an accountId
 		if (networkKey !== UnknownNetworkKeys.UNKNOWN) {
 			derivedAccount = _getAccountFromIdentity(accountId, networkContext);
 		}
-		//TODO backward support for user who has create account in known network for an unknown network. removed after offline network update
-		derivedAccount =
-			derivedAccount || _getAccountFromIdentity(address, networkContext);
-
 		if (derivedAccount instanceof Object)
 			return { ...derivedAccount, isLegacy: false };
 		return null;

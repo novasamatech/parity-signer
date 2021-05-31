@@ -32,7 +32,6 @@ export interface TxRequestData {
 
 export type ParsedData =
 	| SubstrateParsedData
-	| EthereumParsedData
 	| NetworkParsedData;
 
 export type NetworkParsedData = {
@@ -47,22 +46,11 @@ export type NetworkParsedData = {
 	};
 };
 
-export type EthereumParsedData = {
-	data: {
-		data: string;
-		account: string;
-		rlp: string;
-	};
-	action: string | null; //"signTransaction"
-};
-
 export type SubstrateParsedData =
 	| SubstrateMultiParsedData
 	| SubstrateCompletedParsedData;
 
-export type CompletedParsedData =
-	| SubstrateCompletedParsedData
-	| EthereumParsedData;
+export type CompletedParsedData = SubstrateCompletedParsedData;
 
 export type SubstrateCompletedParsedData =
 	| SubstrateTransactionParsedData
@@ -136,12 +124,6 @@ export function isMultiFramesInfo(
 	data: MultiFramesInfo | SubstrateCompletedParsedData
 ): data is MultiFramesInfo {
 	return (data as MultiFramesInfo).completedFramesCount !== undefined;
-}
-
-export function isEthereumCompletedParsedData(
-	parsedData: ParsedData
-): parsedData is EthereumParsedData {
-	return (parsedData as EthereumParsedData).data.rlp !== undefined;
 }
 
 export function isSubstrateCompletedParsedData(
