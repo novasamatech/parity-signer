@@ -52,6 +52,15 @@ export function AuthorCard({ payload }: CardProps): ReactElement {
 	);
 }
 
+export function BalanceCard({payload}: CardProps): ReactElement {
+	return (
+		<View style={styles.content}>
+			<Text style={styles.titleText}>{payload.amount} </Text>
+			<Text style={styles.titleText}>{payload.units}</Text>
+		</View>
+	);
+}
+
 export function BlockHashCard({ payload }: CardProps): ReactElement {
 	return (
 		<View>
@@ -73,7 +82,7 @@ export function CallCard({ payload }: CardProps): ReactElement {
 	);
 }
 
-export function EraNonceTipCard({ payload }: CardProps): ReactElement {
+export function EraNonceCard({ payload }: CardProps): ReactElement {
 	if (payload.era === 'Mortal') {
 		return (
 			<View style={styles.content}>
@@ -89,22 +98,18 @@ export function EraNonceTipCard({ payload }: CardProps): ReactElement {
 					<Text style={styles.label}> Nonce </Text>
 					<Text style={styles.titleText}>{payload.nonce}</Text>
 				</View>
-				<View>
-					<Text style={styles.label}> Tip </Text>
-					<Text style={styles.titleText}>{payload.tip}</Text>
-				</View>
 			</View>
 		);
 	} else {
 		return (
-			<View>
-				<Text style={styles.titleText}>
-					Immortal Era
+			<View style={styles.content}>
+				<View>
+					<Text style={styles.label}> Immortal Era </Text>
+				</View>
+				<View>
 					<Text style={styles.label}> Nonce: </Text>
-					{payload.nonce}
-					<Text style={styles.label}> Tip: </Text>
-					{payload.tip}
-				</Text>
+					<Text style={styles.titleText}>{payload.nonce}</Text>
+				</View>
 			</View>
 		);
 	}
@@ -120,6 +125,16 @@ export function IdCard({ payload }: CardProps): ReactElement {
 				<Text style={fontStyles.t_codeS}>{payload.substr(24, 12)}</Text>
 				<Text style={fontStyles.t_codeS}>{payload.substr(36, 12)}</Text>
 			</View>
+		</View>
+	);
+}
+
+export function TipCard({ payload }: CardProps): ReactElement {
+	return (
+		<View style={styles.content}>
+			<Text style={styles.label}> Tip </Text>
+			<Text style={styles.titleText}>{payload.amount}</Text>
+			<Text style={styles.titleText}>{payload.units}</Text>
 		</View>
 	);
 }

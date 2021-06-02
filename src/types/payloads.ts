@@ -25,9 +25,15 @@ export type PayloadCardData = {
 	payload?: PayloadCardContent;
 };
 
+type Action = {
+	type: string;
+	payload: unknown;
+};
+
 //Object to store all parsed transaction information
 export type PayloadCardsSet = {
 	[key: string]: unknown;
+	action: Action;
 	author?: PayloadCardData[];
 	error?: PayloadCardData[];
 	extrinsics?: PayloadCardData[];

@@ -7,10 +7,12 @@ import {
 	ErrorCard,
 	DefaultCard,
 	AuthorCard,
+	BalanceCard,
 	BlockHashCard,
 	CallCard,
-	EraNonceTipCard,
+	EraNonceCard,
 	IdCard,
+	TipCard,
 	TxSpecCard,
 	VariableNameCard
 } from 'modules/sign/components/CardTemplates';
@@ -24,27 +26,19 @@ export default function PayloadCard({
 	type,
 	payload
 }: PayloadCardProps): ReactElement {
-	if (type === 'loading') {
-		return <LoadingCard payload={payload} />;
-	} else if (type === 'error') {
-		return <ErrorCard payload={payload} />;
-	} else if (type === 'author') {
-		return <AuthorCard payload={payload} />;
-	} else if (type === 'call') {
-		return <CallCard payload={payload} />;
-	} else if (type === 'varname') {
-		return <VariableNameCard payload={payload} />;
-	} else if (type === 'enum_variant_name') {
-		return <VariableNameCard payload={payload} />;
-	} else if (type === 'Id') {
-		return <IdCard payload={payload} />;
-	} else if (type === 'era_nonce_tip') {
-		return <EraNonceTipCard payload={payload} />;
-	} else if (type === 'block_hash') {
-		return <BlockHashCard payload={payload} />;
-	} else if (type === 'tx_spec') {
-		return <TxSpecCard payload={payload} />;
-	} else {
-		return <DefaultCard payload={payload} />;
+	switch (type) {
+		case 'loading' : return <LoadingCard payload={payload} />;
+		case 'error' : return <ErrorCard payload={payload} />;
+		case 'author' : return <AuthorCard payload={payload} />;
+		case 'balance' : return <BalanceCard payload={payload} />;
+		case 'call' : return <CallCard payload={payload} />;
+		case 'varname' : return <VariableNameCard payload={payload} />;
+		case 'enum_variant_name' : return <VariableNameCard payload={payload} />;
+		case 'Id' : return <IdCard payload={payload} />;
+		case 'era_nonce' : return <EraNonceCard payload={payload} />;
+		case 'tip' : return <TipCard payload={payload} />;
+		case 'block_hash' : return <BlockHashCard payload={payload} />;
+		case 'tx_spec' : return <TxSpecCard payload={payload} />;
+		default : return <DefaultCard payload={payload} />;
 	}
 }

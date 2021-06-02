@@ -36,7 +36,7 @@ import Separator from 'components/Separator';
 import Button from 'components/Button';
 import { makeTransactionCardsContents } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
-import { dumpMetadataDB } from 'utils/db';
+import { dumpMetadataDB, loadIdentities } from 'utils/db';
 import { typeDefs } from 'constants/typeDefs';
 
 interface ActionType {
@@ -56,7 +56,6 @@ function DetailsTx({
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
 	]);
 	const [action, setAction] = useState<ActionType>({
-		buttonLabel: 'Back',
 		payload: '',
 		type: ''
 	})
@@ -67,6 +66,8 @@ function DetailsTx({
 			const networksData = dumpNetworksData();
 			const metadata = await dumpMetadataDB();
 			const metadataJSON = JSON.stringify(metadata);
+			const identities = await loadIdentities();
+			console.log(identities);
 			const cardsSet = await makeTransactionCardsContents(
 				encoded,
 				networksData,
@@ -88,13 +89,7 @@ function DetailsTx({
 			setPayloadCards(sortedCardSet ? sortedCardSet : 
 				{ indent: 0, index: 0, payload: "System error: transaction parser failed entirely", type: 'error' }
 			);
-			//TODO: this should be just an object from Rust for safety
-			setAction({
-				type: "sign_transaction",
-				buttonLabel: "SIGN",
-				payload: payload
-			});
-			//TODO: this should go to Rust as well
+			setAction(cardsSet.action);
 		};
 		generateCards(payload);
 	}, [payload]);
@@ -107,13 +102,14 @@ function DetailsTx({
 		);
 	};
 
-	const performAction = async (): Promise<void> => {
+	const performAction = (): void => {
 		console.log(action);
-		switch (action.type) {
-			case 'sign_transaction' : navigation.navigate('SignedTx', {payload: action});
-			case '': navigation.goBack();
-			default: return;
+		if (action.type === 'sign_transaction') { 
+			navigation.navigate('SignedTx', {payload: action.payload});
+		} else {
+			navigation.goBack();
 		}
+		return;
 	};
 
 	return (
@@ -127,7 +123,7 @@ function DetailsTx({
 			<Button
 				disabled={action.buttonRole===''}
 				onPress={performAction}
-				title={action.buttonLabel}
+				title={action.type === 'sign_transaction' ? 'SIGN' : 'BACK'}
 				testID={testIDs.DetailsTx.signButton}
 			/>
 		</SafeAreaViewContainer>

@@ -373,15 +373,17 @@ export! {
 		payload: &str,
         gen_hash: &str,
         metadata: &str,
-        type_descriptor: &str
+        type_descriptor: &str,
+        identities: &str
 	) -> crate::Result<String> {
         let datafiles = transaction_parsing::DataFiles {
             chain_spec_database : gen_hash,
             metadata_contents : metadata,
             types_info : type_descriptor,
+            identities: identities,
         };
         match transaction_parsing::full_run(payload, datafiles) {
-            Ok(a) => Ok(a.js.to_string()),
+            Ok(a) => Ok(a.js_cards.to_string()),
             Err(e) => Ok(e.to_string()),
         }
         //placeholder for tests

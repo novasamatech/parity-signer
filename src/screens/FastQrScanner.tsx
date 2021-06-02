@@ -25,6 +25,7 @@ import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { tryDecodeQr } from 'utils/native';
 import { TxRequestData } from 'types/scannerTypes';
+import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 //for tests
 import testIDs from 'e2e/testIDs';
 import { useInjectionQR } from 'e2e/injections';
@@ -55,7 +56,7 @@ export default function Scanner({
 	}
 
 	function processPackage(payload: string): void {
-		navigation.navigate('DetailsTx', {payload: payload});
+		resetNavigationWithNetworkChooser(navigation, 'DetailsTx', {payload: payload});
 	};
 
 	function processQrFrame(data: string): void {

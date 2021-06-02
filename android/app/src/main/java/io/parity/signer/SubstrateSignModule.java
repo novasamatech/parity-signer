@@ -253,9 +253,9 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void parseTransaction(String payload, String genHash, String metadata, String typeDescriptor, Promise promise) {
+    public void parseTransaction(String payload, String genHash, String metadata, String typeDescriptor, String identities, Promise promise) {
     	try {
-		String decoded = substrateParseTransaction(payload, genHash, metadata, typeDescriptor);
+		String decoded = substrateParseTransaction(payload, genHash, metadata, typeDescriptor, identities);
 		promise.resolve(decoded);
 	} catch (Exception e) {
 		rejectWithException(promise, "transaction parsing", e);
@@ -288,5 +288,5 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
     private static native String ethkeySubstrateMiniSecretKeyWithRef(long seedRef, String suriSuffix);
     private static native String qrparserTryDecodeQrSequence(int size, int chunkSize, String data);
     private static native String metadataGenerateMetadataHandle(String metadata);
-    private static native String substrateParseTransaction(String payload, String genHash, String metadata, String typeDescriptor);
+    private static native String substrateParseTransaction(String payload, String genHash, String metadata, String typeDescriptor, String identities);
 }

@@ -27,7 +27,7 @@ fn main() -> Result<(), &'static str>{
     
     let chain_spec_database = match fs::read_to_string("database_output") {
         Ok(x) => x,
-        Err(_) => return Err("Genesis hash database missing"),
+        Err(_) => return Err("Chain spec database missing"),
     };
     
     let metadata_contents = match fs::read_to_string("metadata_database.ts") {
@@ -35,18 +35,24 @@ fn main() -> Result<(), &'static str>{
         Err(_) => return Err("Metadata database missing"),
     };
     
+    let identities = match fs::read_to_string("identities") {
+        Ok(x) => x,
+        Err(_) => return Err("Identities database missing"),
+    };
+    
     let datafiles = DataFiles {
         chain_spec_database: &chain_spec_database,
         metadata_contents: &metadata_contents,
         types_info: &types_info,
+        identities: &identities,
     };
     
     match full_run (input_data, datafiles) {
         Ok(a) => {
             println!("Format to import into js:");
-            println!("{}", a.js);
+            println!("{}", a.js_cards);
             println!("Normal format:");
-            println!("{}", a.normal);
+            println!("{}", a.normal_cards);
         },
         Err(e) => println!("Error. {}", e),
     }

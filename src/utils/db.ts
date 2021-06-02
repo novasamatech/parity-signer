@@ -109,6 +109,19 @@ export async function loadIdentities(version = 4): Promise<Identity[]> {
 	}
 }
 
+export async function dumpIdentities(version = 4): Promise<Identity[]> {
+	const identityStorageLabel = `identities_v${version}`;
+	try {
+		const identities = await SecureStorage.getItem(
+			identityStorageLabel,
+			identitiesStore
+		);
+		return identities;
+	} catch (e) {
+		return handleError(e, 'identity');
+	}
+}
+
 export const saveIdentities = (identities: Identity[]): void => {
 	SecureStorage.setItem(
 		currentIdentityStorageLabel,
@@ -180,7 +193,6 @@ export async function getMetadata(
 	try {
 		if (!metadataHandle) return '';
 		const metadataKey = metadataHandleToKey(metadataHandle);
-		console.log(metadataKey);
 		const metadataRecord = await AsyncStorage.getItem(metadataKey);
 		return metadataRecord ? metadataRecord : '';
 	} catch (e) {
@@ -192,9 +204,6 @@ export async function getMetadata(
 function isMetadataKey(element: string): boolean {
 	//check if the line begins with 'signer_metadata_' - not ideomatic but safe
 	if(!element) return false;
-	console.log(element);
-	console.log(metadataStorage);
-	console.log(element.substr(0, metadataStorage.length));
 	return element.substr(0, metadataStorage.length) === metadataStorage;
 }
 
@@ -203,7 +212,6 @@ export async function dumpMetadataDB(): Promise<
 > {
 	try {
 		const allKeys = await AsyncStorage.getAllKeys();
-		console.log(allKeys);
 		const metadataKeys = allKeys.filter(isMetadataKey);
 		const allMetadataMap = await AsyncStorage.multiGet(metadataKeys);
 		return allMetadataMap;

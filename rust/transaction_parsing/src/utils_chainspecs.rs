@@ -1,6 +1,6 @@
 use regex::Regex;
 use frame_metadata::{RuntimeMetadataV12};
-use meta_reading::{get_meta_const_light, decode_version};
+use meta_reading::{get_meta_const, get_meta_const_light, decode_version, get_addresses, make_meta_entry};
 use hex;
 use parity_scale_codec::{Decode};
 
@@ -26,10 +26,75 @@ pub struct ChainSpecEntry {
 }
 
 
+/// function to generate metadata database file using address book contents
+/// slow, actually fetches metadata from addresses
+
+pub fn generate_meta_database (address_book_contents: &str) -> String {
+    let address_book_entries = get_addresses(&address_book_contents);
+    let mut out = String::from("[");
+    for x in address_book_entries {
+        let new = make_meta_entry(&x);
+        if let Ok(y) = new.meta {
+            let res_const = get_meta_const(&y);
+            if let Ok(z) = res_const {
+                let decoded = decode_version(z);
+                out.push_str(&format!("[\"signer_metadata_{}_v{}\",\"{}\"]", decoded.specname, decoded.spec_version, y));
+            }
+        }
+    }
+    out.push_str("]");
+    out
+}
+
+/// struct to store the results of metadata fetching with errors
+
+pub struct FetchingResults {
+    pub good: String,
+    pub errors_in_fetching: String,
+    pub errors_in_decoding: String,
+}
+
+/// function to generate metadata database file using address book content,
+/// separately outputs strings with decoding errors and fetching errors
+/// slow, actually fetches metadata from addresses
+
+pub fn generate_meta_database_with_errors (address_book_contents: &str) -> FetchingResults {
+    let address_book_entries = get_addresses(&address_book_contents);
+    let mut good = String::from("[");
+    let mut errors_in_fetching = String::new();
+    let mut errors_in_decoding = String::new();
+    for x in address_book_entries {
+        let new = make_meta_entry(&x);
+        match new.meta {
+            Ok(y) => {
+                let res_const = get_meta_const(&y);
+                match res_const {
+                    Ok(z) => {
+                        let decoded = decode_version(z);
+                        good.push_str(&format!("[\"signer_metadata_{}_v{}\",\"{}\"]", decoded.specname, decoded.spec_version, y));
+                    },
+                    Err(err) => {
+                        errors_in_decoding.push_str(&format!("Error in {}: {}\n", new.name, err));
+                    },
+                }
+            },
+            Err(err) => {
+                errors_in_fetching.push_str(&format!("Error in {}: {}\n", new.name, err));
+            },
+        }
+    }
+    good.push_str("]");
+    FetchingResults{
+        good,
+        errors_in_fetching,
+        errors_in_decoding,
+    }
+}
+
 /// function to collect MetaValuesVersioned entries from metadata database
 
 pub fn collect_meta (metadata_contents: &str) -> Vec<MetaValuesVersioned> {
-    let re = Regex::new(r#"(?i)\["signer_metadata_(?P<name>[\w]+)_v(?P<version>[0-9]+)","(0x)?6d657461(?P<meta>([0-9a-z][0-9a-z])+)"\]"#).unwrap();
+    let re = Regex::new(r#"(?i)\["signer_metadata_(?P<name>[^\]]+)_v(?P<version>[0-9]+)","(0x)?6d657461(?P<meta>([0-9a-z][0-9a-z])+)"\]"#).unwrap();
     let mut metadata: Vec<MetaValuesVersioned> = Vec::new();
     for caps in re.captures_iter(&metadata_contents) {
         let new = MetaValuesVersioned {

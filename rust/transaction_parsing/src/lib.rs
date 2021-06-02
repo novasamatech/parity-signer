@@ -1,12 +1,12 @@
 use hex;
-use parity_scale_codec::{Decode};
+use parity_scale_codec::{Decode, Encode};
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sp_runtime::generic::Era;
 
 pub mod constants;
 pub mod utils_base58;
-    use utils_base58::arr_to_base;
-mod utils_chainspecs;
+    use utils_base58::{arr_to_base, get_id_values};
+pub mod utils_chainspecs;
     use utils_chainspecs::{specs_from_genesis_hash, find_meta};
 pub mod map_types;
 pub mod parse_types;
@@ -21,6 +21,7 @@ pub struct DataFiles<'a> {
     pub chain_spec_database: &'a str,
     pub metadata_contents: &'a str,
     pub types_info: &'a str,
+    pub identities: &'a str,
 }
 
 /// struct to separate prelude, address, actual method, and extrinsics in transaction string
@@ -50,16 +51,16 @@ pub struct ExtrinsicValues {
 /// struct to store the output of decoding: "normal" format and fancy easy-into-js format
 
 pub struct DecodingResult {
-    pub normal: String,
-    pub js: String,
+    pub normal_cards: String,
+    pub js_cards: String,
 }
 
 
 /// function to print extrinsics in fancy format
-fn print_fancy_extrinsics (index: u32, indent: u32, tip_output: PrettyOutput, short: ExtrinsicValues, chain_name: &str) -> String {
+fn print_fancy_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, short: &ExtrinsicValues, chain_name: &str) -> String {
     match short.era {
-        Era::Immortal => format!("{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Immortal\",\"nonce\":\"{}\"}}", short.nonce)), fancy(index+1, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", tip_output.number, tip_output.units)), fancy(index+2, indent, "tx_spec", &format!("{{\"chain\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", chain_name, short.metadata_version, short.tx_version))),
-        Era::Mortal(period, phase) => format!("{},{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\"}}", phase, period, short.nonce)), fancy(index+1, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", tip_output.number, tip_output.units)), fancy(index+2, indent, "block_hash", &format!("\"{}\"", hex::encode(short.block_hash))), fancy(index+3, indent, "tx_spec", &format!("{{\"chain\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", chain_name, short.metadata_version, short.tx_version))),
+        Era::Immortal => format!("{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Immortal\",\"nonce\":\"{}\"}}", short.nonce)), fancy(index+1, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", tip_output.number, tip_output.units)), fancy(index+2, indent, "tx_spec", &format!("{{\"network\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", chain_name, short.metadata_version, short.tx_version))),
+        Era::Mortal(period, phase) => format!("{},{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\"}}", phase, period, short.nonce)), fancy(index+1, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", tip_output.number, tip_output.units)), fancy(index+2, indent, "block_hash", &format!("\"{}\"", hex::encode(short.block_hash))), fancy(index+3, indent, "tx_spec", &format!("{{\"network\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", chain_name, short.metadata_version, short.tx_version))),
     }
 }
 
@@ -104,8 +105,11 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
 
         // transform author
             let author = arr_to_base(transaction_decoded.author, chain_prefix);
-            let mut to_normal = format!("\"author\":{{\"base58\":\"{}\"}}", author);
-            let mut to_fancy = fancy(index, indent, "author", &format!("{{\"base58\":\"{}\"}}", author));
+        // and get id values for author, those also go into action card if action card is created
+            let id_values = get_id_values(&author, &datafiles.identities)?;
+            
+            let mut to_normal = format!("\"author\":{{\"base58\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", author, id_values.path, id_values.has_pwd, id_values.name);
+            let mut to_fancy = fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", author, id_values.path, id_values.has_pwd, id_values.name));
             index = index + 1;
             
         // update tip output
@@ -131,32 +135,62 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
                 // generate type database to be used in decoding
                     let type_database = generate_type_database (&datafiles.types_info);
                     
-                // transaction parsing
-                    let transaction_parsed = process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs)?;
-                    let index = transaction_parsed.index;
+                // action card preparations
+                    let method_output = hex::encode(&(transaction_decoded.method.encode()));
+                    let crypto = match &data_hex[2..4] {
+                        "00" => "ed25519",
+                        "01" => "sr25519",
+                        "02" => "Ecdsa",
+                        _ => "unknown",
+                    };
                     
-                    if transaction_parsed.remaining_vector.len() != 0 {return Err("After transaction parsing, some data in transaction vector remained unused.")}
+                // transaction parsing
+                    match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs) {
+                        Ok(transaction_parsed) => {
+                            let index = transaction_parsed.index;
+                            if transaction_parsed.remaining_vector.len() != 0 {return Err("After transaction parsing, some data in transaction vector remained unused.")}
 
-                    let normal = format!("{},{},{}", to_normal, transaction_parsed.decoded_string, extrinsics_to_normal);
-                //transform extrinsics information for fancy output
-                    let extrinsics_to_js = print_fancy_extrinsics (index, indent, tip_output, short, chain_name);
-                    let js = format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", to_fancy, &transaction_parsed.fancy_out[1..], extrinsics_to_js);
-                    Ok(DecodingResult{
-                        normal,
-                        js,
-                    })
+                            let normal_cards = format!("{},{},{}", to_normal, transaction_parsed.decoded_string, extrinsics_to_normal);
+                        //transform extrinsics information for fancy output
+                            let extrinsics_to_js = print_fancy_extrinsics (index, indent, &tip_output, &short, chain_name);
+                        // making action card for js
+                            let action = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"author\":\"{}\",\"encrypted_seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\",\"network\":\"{}\",\"version\":\"{}\",\"genesis_hash\":\"{}\",\"prefix\":\"{}\",\"transaction\":\"{}\",\"crypto\":\"{}\"}}}}", author, id_values.seed, id_values.path, id_values.has_pwd, id_values.name, chain_name, short.metadata_version, hex::encode(&transaction_decoded.genesis_hash), chain_prefix, method_output, crypto);
+                            let js_cards = format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", to_fancy, &transaction_parsed.fancy_out[1..], extrinsics_to_js, action);
+                            Ok(DecodingResult{
+                                normal_cards,
+                                js_cards,
+                            })
+                        },
+                        Err(e) => {
+                            let mut err = String::from("Unable to decode the transaction.");
+                            if e == "Could not interpret the type." {
+                                err.push_str(" Unknown types encountered.")
+                            }
+                            let error_normal = format!("\"error\":{{\"{}\"}}", err);
+                            let error_fancy = fancy(index, indent, "error", &format!("\"{}\"", e));
+                            index = index + 1;
+                            let normal_cards = format!("{},{},{}", to_normal, error_normal, extrinsics_to_normal);
+                        //transform extrinsics information for fancy output
+                            let extrinsics_to_js = print_fancy_extrinsics (index, indent, &tip_output, &short, chain_name);
+                            let js_cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", to_fancy, error_fancy, extrinsics_to_js);
+                            Ok(DecodingResult{
+                                normal_cards,
+                                js_cards,
+                            })
+                        },
+                    }
                 },
                 Err(e) => {
                     let error_normal = format!("\"error\":{{\"{}\"}}", e);
                     let error_fancy = fancy(index, indent, "error", &format!("\"{}\"", e));
                     index = index + 1;
-                    let normal = format!("{},{},{}", to_normal, error_normal, extrinsics_to_normal);
+                    let normal_cards = format!("{},{},{}", to_normal, error_normal, extrinsics_to_normal);
                 //transform extrinsics information for fancy output
-                    let extrinsics_to_js = print_fancy_extrinsics (index, indent, tip_output, short, chain_name);
-                    let js = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", to_fancy, error_fancy, extrinsics_to_js);
+                    let extrinsics_to_js = print_fancy_extrinsics (index, indent, &tip_output, &short, chain_name);
+                    let js_cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", to_fancy, error_fancy, extrinsics_to_js);
                     Ok(DecodingResult{
-                        normal,
-                        js,
+                        normal_cards,
+                        js_cards,
                     })
                 },
             }
@@ -174,11 +208,11 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
                 Era::Immortal => format!("{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Immortal\",\"nonce\":\"{}\"}}", short.nonce)), fancy(index+1, indent, "tip_plain", &format!("\"{}\"", short.tip)), fancy(index+2, indent, "tx_spec_plain", &format!("{{\"chain_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", hex::encode(transaction_decoded.genesis_hash), short.metadata_version, short.tx_version))),
                 Era::Mortal(period, phase) => format!("{},{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\"}}", phase, period, short.nonce)), fancy(index+1, indent, "tip_plain", &format!("\"{}\"", short.tip)), fancy(index+2, indent, "block_hash", &format!("\"{}\"", hex::encode(short.block_hash))), fancy(index+3, indent, "tx_spec_plain", &format!("{{\"chain_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", hex::encode(transaction_decoded.genesis_hash), short.metadata_version, short.tx_version))),
             };
-            let normal = format!("{},{}", error_normal, extrinsics_to_normal);
-            let js = format!("{{\"error\":[{}],\"extrinsics\":[{}]}}", error_fancy, extrinsics_to_js);
+            let normal_cards = format!("{},{}", error_normal, extrinsics_to_normal);
+            let js_cards = format!("{{\"error\":[{}],\"extrinsics\":[{}]}}", error_fancy, extrinsics_to_js);
             Ok(DecodingResult{
-                normal,
-                js,
+                normal_cards,
+                js_cards,
             })
         },
         Err(e) => return Err(e),

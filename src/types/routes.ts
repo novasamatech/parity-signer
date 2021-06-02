@@ -59,7 +59,7 @@ export type RootStackParamList = {
 	Security: undefined;
 	DetailsMessage: undefined;
 	SignedMessage: undefined;
-	DetailsTx: { resolve: () => void };
+	DetailsTx: undefined;
 	SignedTx: undefined;
 	TermsAndConditions: undefined;
 	TxDetails: undefined;

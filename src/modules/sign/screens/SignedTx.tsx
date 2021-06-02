@@ -14,10 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
+import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
+import PinInput from 'modules/unlock/components/PinInput';
+import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
+import ScreenHeading from 'components/ScreenHeading';
+import Button from 'components/Button';
+import t from 'modules/unlock/strings';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { FoundAccount } from 'types/identityTypes';
@@ -28,40 +34,94 @@ import CompatibleCard from 'components/CompatibleCard';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 
-function SignedTx(props: NavigationProps<'SignedTx'>): React.ReactElement {
-	if (sender === null || recipient === null) return <View />;
-	return (
-		<SignedTxView sender={sender} scannerStore={scannerStore} {...props} />
-	);
-}
+function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.ReactElement {
+	const [signedData, setSignedData] = useState('');//route.params.action.payload;
+	const [pin, setPin] = useState('');
+	const [password, setPassword] = useState('');
+	const [focusPassword, setFocusPassword] = useState<boolean>(false);
+	const [buttonDisabled, setButtonDisabled] = useState(false);
 
-interface Props extends NavigationScannerProps<'SignedTx'> {
-	sender: FoundAccount;
-}
+	async function submit(): Promise<void> {
+		setButtonDisabled(true);
+		setFocusPassword(false);
+		if (pin.length >= 6) {
+			try {
+				setSignedData('1');	//TODO: send action to native signer
+				console.log(pin);
+				console.log(password);
+				console.log(route.params.payload);
+			} catch (e) {
+				console.log(e);
+				//TODO record error times;
+			}
+		} //TODO else { setAlert('pin too short (at least 6 numbers'); }
+	}
 
-function SignedTxView({ sender, scannerStore }: Props): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
-	const { signedData } = scannerStore.state;
-
-	//IMPORTANT: nothing but QR code should be shown here; showing address path is dangerous
-	return (
-		<SafeAreaScrollViewContainer>
-			<Text style={styles.topTitle}>Signed extrinsic</Text>
-			<Separator
-				shadow={true}
-				style={{
-					height: 0,
-					marginVertical: 20
+	//IMPORTANT: nothing but QR code and address name should be shown here; showing address path is dangerous
+	if (signedData) {
+		return (
+			<SafeAreaScrollViewContainer>
+				<Text style={styles.topTitle}>Signed extrinsic</Text>
+				<Separator
+					shadow={true}
+					style={{
+						height: 0,
+						marginVertical: 20
+					}}
+				/>
+				<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
+					{'Scan to publish'}
+				</Text>
+				<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
+					<QrView data={signedData} />
+				</View>
+			</SafeAreaScrollViewContainer>
+		);
+	} else {
+		return (
+			<KeyboardAwareContainer
+				contentContainerStyle={{
+					flexGrow: 1
 				}}
-			/>
-			<Text style={[fontStyles.h_subheading, { paddingHorizontal: 16 }]}>
-				{'Scan to publish'}
-			</Text>
-			<View style={styles.qr} testID={testIDs.SignedTx.qrView}>
-				<QrView data={signedData} />
-			</View>
-		</SafeAreaScrollViewContainer>
-	);
+			>
+				<ScreenHeading
+					title={t.title.pinUnlock}
+					error={''}
+					subtitle={''}
+				/>
+				<PinInput
+					label={t.pinLabel}
+					autoFocus
+					testID={testIDs.IdentityPin.unlockPinInput}
+					onChangeText={(newInput: string): void => {
+						setButtonDisabled(false)
+						setPin(newInput)
+					}}
+					onSubmitEditing={(): void => setFocusPassword(true)}
+					value={pin}
+				/>
+				<PinInput
+					label={t.passwordLabel}
+					testID={testIDs.IdentityPin.passwordInput}
+					returnKeyType="done"
+					keyboardType="default"
+					focus={focusPassword}
+					onChangeText={(newInput: string): void => {
+						setButtonDisabled(false)
+						setPassword(newInput)
+					}}
+					onSubmitEditing={submit}
+					value={password}
+				/>
+				<Button
+					disabled={buttonDisabled}
+					title={t.doneButton.pinUnlock}
+					onPress={submit}
+					testID={testIDs.IdentityPin.unlockPinButton}
+				/>
+			</KeyboardAwareContainer>
+		);
+	}
 }
 
 export default SignedTx;

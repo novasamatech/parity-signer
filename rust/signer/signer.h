@@ -101,4 +101,5 @@ const char * generate_metadata_handle(struct ExternError*, const char* metadata)
 // indent - indentation to visualize cards hierarchy
 // type - type of card
 // payload - contents of card
-const char * parse_transaction(struct ExternError*, const char* payload, const char* gen_hash, const char* metadata, const char* type_descriptor);
+// identities - dump of identities from RN storage
+const char * parse_transaction(struct ExternError*, const char* payload, const char* gen_hash, const char* metadata, const char* type_descriptor, const char* identities);
