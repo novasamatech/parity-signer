@@ -35,7 +35,7 @@ pub struct TransactionParts {
 }
 
 /// struct to decode extrinsics
-#[derive(Debug, Decode)]
+#[derive(Debug, Decode, Encode)]
 pub struct ExtrinsicValues {
     pub era: Era,
 #[codec(compact)]
@@ -46,6 +46,13 @@ pub struct ExtrinsicValues {
     pub tx_version: u32,
     pub genesis_hash: [u8; 32],
     pub block_hash: [u8; 32],
+}
+
+/// struct to collect data for signing
+#[derive(Debug, Encode)]
+struct ForSigning <'a> {
+    method: &'a Vec<u8>,
+    extrinsics: &'a ExtrinsicValues,
 }
 
 /// struct to store the output of decoding: "normal" format and fancy easy-into-js format
@@ -86,7 +93,7 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
         Err(_) => return Err("Error separating prelude, author address, method, and extrinsics"),
     };
     
-    let short = transaction_decoded.extrinsics;
+    let short = &transaction_decoded.extrinsics;
     
 // initialize index and indent
     let mut index: u32 = 0;
@@ -136,7 +143,11 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
                     let type_database = generate_type_database (&datafiles.types_info);
                     
                 // action card preparations
-                    let method_output = hex::encode(&(transaction_decoded.method.encode()));
+                    let prep_to_sign = ForSigning {
+                        method: &transaction_decoded.method,
+                        extrinsics: &transaction_decoded.extrinsics,
+                    };
+                    let transaction_to_sign = hex::encode(&(prep_to_sign.encode()));
                     let crypto = match &data_hex[2..4] {
                         "00" => "ed25519",
                         "01" => "sr25519",
@@ -154,7 +165,7 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
                         //transform extrinsics information for fancy output
                             let extrinsics_to_js = print_fancy_extrinsics (index, indent, &tip_output, &short, chain_name);
                         // making action card for js
-                            let action = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"author\":\"{}\",\"encrypted_seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\",\"network\":\"{}\",\"version\":\"{}\",\"genesis_hash\":\"{}\",\"prefix\":\"{}\",\"transaction\":\"{}\",\"crypto\":\"{}\"}}}}", author, id_values.seed, id_values.path, id_values.has_pwd, id_values.name, chain_name, short.metadata_version, hex::encode(&transaction_decoded.genesis_hash), chain_prefix, method_output, crypto);
+                            let action = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"author\":\"{}\",\"encrypted_seed\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\",\"network\":\"{}\",\"version\":\"{}\",\"genesis_hash\":\"{}\",\"prefix\":\"{}\",\"transaction\":\"{}\",\"crypto\":\"{}\"}}}}", author, id_values.seed, id_values.path, id_values.has_pwd, id_values.name, chain_name, short.metadata_version, hex::encode(&transaction_decoded.genesis_hash), chain_prefix, transaction_to_sign, crypto);
                             let js_cards = format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", to_fancy, &transaction_parsed.fancy_out[1..], extrinsics_to_js, action);
                             Ok(DecodingResult{
                                 normal_cards,

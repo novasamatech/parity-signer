@@ -33,11 +33,12 @@ import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
+import { sign } from 'utils/native';
 
 function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.ReactElement {
-	const [signedData, setSignedData] = useState('');//route.params.action.payload;
-	const [pin, setPin] = useState('');
-	const [password, setPassword] = useState('');
+	const [signedData, setSignedData] = useState<string>('');//route.params.action.payload;
+	const [pin, setPin] = useState<string>('');
+	const [password, setPassword] = useState<string>('');
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
 	const [buttonDisabled, setButtonDisabled] = useState(false);
 
@@ -46,10 +47,15 @@ function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.React
 		setFocusPassword(false);
 		if (pin.length >= 6) {
 			try {
-				setSignedData('1');	//TODO: send action to native signer
 				console.log(pin);
+				console.log(typeof pin);
 				console.log(password);
-				console.log(route.params.payload);
+				console.log(typeof password);
+				const toSign = JSON.stringify(route.params.payload);
+				console.log(toSign);
+				console.log(typeof toSign);
+				const signerOutput = await sign(toSign, pin.toString(), password.toString());
+				setSignedData(signerOutput);
 			} catch (e) {
 				console.log(e);
 				//TODO record error times;

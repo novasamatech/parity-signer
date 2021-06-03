@@ -29,6 +29,7 @@ use serde_json;
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
 use transaction_parsing;
+use transaction_signing;
 
 mod eth;
 mod export;
@@ -386,8 +387,18 @@ export! {
             Ok(a) => Ok(a.js_cards.to_string()),
             Err(e) => Ok(e.to_string()),
         }
-        //placeholder for tests
-        //Ok(r#"{"method":[{"index":0,"indent":0,"type":"call","payload":{"method":"transfer_keep_alive","pallet":"Balances"}},{"index":1,"indent":1,"type":"varname","payload":"dest"},{"index":2,"indent":2,"type":"enum_variant_name","payload":"Id"},{"index":3,"indent":3,"type":"Id","payload":"5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"},{"index":4,"indent":1,"type":"varname","payload":"value"},{"index":5,"indent":2,"type":"default","payload":"300000000000000"}],"extrinsics":[{"index":6,"indent":0,"type":"era_nonce_tip","payload":{"era":"Mortal","phase":"55","period":"64","nonce":"89","tip":"300000000000000"}},{"index":7,"indent":0,"type":"block_hash","payload":"a8dfb73a4b44e6bf84affe258954c12db1fe8e8cf00b965df2af2f49c1ec11cd"},{"index":8,"indent":0,"type":"tx_spec","payload":{"chain":"westend","version":"9010","tx_version":"5"}}]}"#.to_string())
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateSignTransaction
+	fn sign_transaction(
+		action: &str,
+        pin: &str,
+        password: &str
+	) -> crate::Result<String> {
+        match transaction_signing::create_signature(action, pin, password) {
+            Ok(a) => Ok(a),
+            Err(e) => Ok(e.to_string()),
+        }
     }
 }
 

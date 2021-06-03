@@ -103,3 +103,12 @@ const char * generate_metadata_handle(struct ExternError*, const char* metadata)
 // payload - contents of card
 // identities - dump of identities from RN storage
 const char * parse_transaction(struct ExternError*, const char* payload, const char* gen_hash, const char* metadata, const char* type_descriptor, const char* identities);
+
+// Sign transaction
+// wrapper to actually sign transaction in 1 simple call:
+// takes 3 strings
+// action: json-payload with action to perform (will be expanded later to include other actions
+// including non-signing);
+// pin code; and password
+
+const char * sign_transaction(struct ExternError*, const char* action, const char* pin, const char* password);

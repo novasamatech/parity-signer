@@ -107,6 +107,16 @@ export async function makeTransactionCardsContents(
 	return parsed;
 }
 
+export async function sign(
+	action: string,
+	pin:string,
+	password: string
+): Promise<string> {
+	const signedPayload = await SubstrateSign.signTransaction(action, pin, password);
+	return signedPayload;
+
+}
+
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	const taggedAddress = await SubstrateSign.brainWalletAddress(seed);
 	const { bip39, address } = untagAddress(taggedAddress);
