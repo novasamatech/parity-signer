@@ -101,7 +101,7 @@ where
 				// !!!! WE CAN NO LONGER INTERACT WITH JNIENV AFTER THROWING   !!!!
 				// !!!!														   !!!!
 				// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				env.throw(format!("testing 123 {:?}", e))
+				env.throw(format!("{:?}", e))
 					.expect("Must be able to throw the Exception; qed");
 				ret
 			}
