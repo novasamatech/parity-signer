@@ -25,6 +25,8 @@ use rustc_hex::{FromHex, ToHex};
 use tiny_keccak::keccak256 as keccak;
 use tiny_keccak::Keccak;
 use serde_json;
+use sled;
+use rusqlite;
 
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
@@ -396,6 +398,30 @@ export! {
         password: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         transaction_signing::create_signature(action, pin, password)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest
+	fn development_test(
+		input: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let output = Ok(std::env::consts::OS.to_string());
+        /*let conn = rusqlite::Connection::open(&format!("{}/test.db3", input))?;
+        conn.execute(
+            "CREATE TABLE test1 (
+                id      INTEGET PRIMARY KEY,
+                name    TEXT
+                )",
+            rusqlite::NO_PARAMS,
+        ).unwrap();*/
+        //conn.execute("CREATE TABLE ", [],)?;
+        //let output = Ok("meh".to_string());
+        let tree = sled::open(&format!("{}", input))?;
+        /*match tree.insert(b"test1", input.as_bytes()) {
+            Ok(None) => Ok("success".to_string()),
+            Ok(Some(s)) => Ok(format!("{:?}",s)),
+            Err(e) => Err(Box::new(e)),
+        }*/
+        return output;
     }
 }
 

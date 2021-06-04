@@ -1,5 +1,7 @@
 package io.parity.signer;
 
+import android.content.Context;
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -268,7 +270,18 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		String signed = substrateSignTransaction(action, pin, password);
 		promise.resolve(signed);
 	} catch (Exception e) {
-		rejectWithException(promise, "transaction parsing", e);
+		rejectWithException(promise, "transaction signing", e);
+	}
+    }
+
+    @ReactMethod
+    public void developmentTest(String input, Promise promise) {
+    	try {
+		String path = reactContext.getFilesDir().toString();
+		String output = substrateDevelopmentTest(path);
+		promise.resolve(output);
+	} catch (Exception e) {
+		rejectWithException(promise, "Rust interface testing error", e);
 	}
     }
 
@@ -300,4 +313,5 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
     private static native String metadataGenerateMetadataHandle(String metadata);
     private static native String substrateParseTransaction(String payload, String genHash, String metadata, String typeDescriptor, String identities);
     private static native String substrateSignTransaction(String action, String pin, String password);
+    private static native String substrateDevelopmentTest(String input);
 }

@@ -112,3 +112,5 @@ const char * parse_transaction(struct ExternError*, const char* payload, const c
 // pin code; and password
 
 const char * sign_transaction(struct ExternError*, const char* action, const char* pin, const char* password);
+
+const char * development_test(struct ExternError*, const char* input);

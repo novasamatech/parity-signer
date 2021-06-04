@@ -2,10 +2,11 @@ use hex;
 use parity_scale_codec::{Decode, Encode};
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sp_runtime::generic::Era;
+use std::convert::TryInto;
 
 pub mod constants;
 pub mod utils_base58;
-    use utils_base58::{arr_to_base, get_id_values};
+    use utils_base58::{vec_to_base, get_id_values};
 pub mod utils_chainspecs;
     use utils_chainspecs::{specs_from_genesis_hash, find_meta};
 pub mod map_types;
@@ -27,11 +28,16 @@ pub struct DataFiles<'a> {
 /// struct to separate prelude, address, actual method, and extrinsics in transaction string
 #[derive(Debug, Decode)]
 pub struct TransactionParts {
-    pub prelude: [u8; 3],
-    pub author: [u8; 32],
     pub method: Vec<u8>,
     pub extrinsics: ExtrinsicValues,
     pub genesis_hash: [u8; 32],
+}
+
+/// enum to record author public key depending on crypto used: so far ed25519, sr25519, and ecdsa should be supported
+pub enum AuthorPublicKey {
+    Ed25519([u8; 32]),
+    Sr25519([u8; 32]),
+    Ecdsa([u8; 33]),
 }
 
 /// struct to decode extrinsics
@@ -83,14 +89,23 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
         false => &transaction,
     };
     
-    let data = match hex::decode(data_hex) {
+    if &data_hex[..2] != "53" {return Err("Only Substrate transactions are supported.")}
+    
+    let data = match hex::decode(&data_hex) {
         Ok(a) => a,
         Err(_) => return Err("Wrong format of input transaction string."),
     };
     
+    let (author_pub_key, data) = match &data_hex[2..4] {
+        "00" => (AuthorPublicKey::Ed25519(data[3..35].try_into().unwrap()), &data[35..]),
+        "01" => (AuthorPublicKey::Sr25519(data[3..35].try_into().unwrap()), &data[35..]),
+        "02" => (AuthorPublicKey::Ecdsa(data[3..36].try_into().unwrap()), &data[36..]),
+        _ => return Err("Crypto type not supported.")
+    };
+    
     let transaction_decoded = match <TransactionParts>::decode(&mut &data[..]) {
         Ok(a) => a,
-        Err(_) => return Err("Error separating prelude, author address, method, and extrinsics"),
+        Err(_) => return Err("Error separating method and extrinsics"),
     };
     
     let short = &transaction_decoded.extrinsics;
@@ -101,6 +116,18 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
 
 // try to get chain specs from genesis hash
     if transaction_decoded.genesis_hash != short.genesis_hash {return Err("Two different genesis hashes are found.")}
+
+// this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
+    match &data_hex[4..6] {
+        "00" => {
+            if let Era::Immortal = short.era {return Err("Expected mortal transaction because of prelude. Got immortal one on decoding.")}
+        },
+        "02" => {
+            if let Era::Mortal(_, _) = short.era {return Err("Expected immortal transaction because of prelude. Got mortal one on decoding.")}
+        },
+        _ => return Err("Payload type not supported"),
+    }
+
     if let Era::Immortal = short.era {if short.genesis_hash != short.block_hash {return Err("Block hash found to not be equal to genesis hash in immortal transaction.")}}
     
     let genesis_hash = hex::encode(&transaction_decoded.genesis_hash);
@@ -110,8 +137,12 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
             let chain_name = &chain_specs.name;
             let chain_prefix = chain_specs.base58prefix;
 
-        // transform author
-            let author = arr_to_base(transaction_decoded.author, chain_prefix);
+        // transform author into base58 and get crypto for action card exporting
+            let (author, crypto) = match author_pub_key {
+                AuthorPublicKey::Ed25519(x) => (vec_to_base(&(x.to_vec()), chain_prefix), "ed25519"),
+                AuthorPublicKey::Sr25519(x) => (vec_to_base(&(x.to_vec()), chain_prefix), "sr25519"),
+                AuthorPublicKey::Ecdsa(x) => (vec_to_base(&(x.to_vec()), chain_prefix), "ecdsa"),
+            };
         // and get id values for author, those also go into action card if action card is created
             let id_values = get_id_values(&author, &datafiles.identities)?;
             
@@ -148,12 +179,6 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
                         extrinsics: &transaction_decoded.extrinsics,
                     };
                     let transaction_to_sign = hex::encode(&(prep_to_sign.encode()));
-                    let crypto = match &data_hex[2..4] {
-                        "00" => "ed25519",
-                        "01" => "sr25519",
-                        "02" => "Ecdsa",
-                        _ => "unknown",
-                    };
                     
                 // transaction parsing
                     match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs) {

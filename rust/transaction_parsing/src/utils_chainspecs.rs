@@ -132,9 +132,6 @@ pub fn get_genesis_hash (chain_spec_database: &str) -> Vec<ChainSpecEntry> {
 
 pub fn specs_from_genesis_hash (chain_spec_database: &str, genesis_hash_found: &str) -> Result<ChainSpecEntry, &'static str> {
 
-// checking the input - should not get here ever
-    if genesis_hash_found.len() != 64 {return Err("Wrong genesis hash length.");}
-
 // reading the genesis hash database
     let hash_book = get_genesis_hash(chain_spec_database);
 

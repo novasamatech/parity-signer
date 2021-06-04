@@ -40,6 +40,7 @@ import {
 	generateNetworkParamsFromParsedData
 } from 'utils/networksUtils';
 import { MetadataHandle } from 'types/metadata';
+import { rustTest } from 'utils/native';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
@@ -152,6 +153,8 @@ export function useNetworksContext(): NetworksContextState {
 	//all initialization of built-in and saved networks in a single place to eliminate races
 	useEffect(() => {
 		const initNetworksAndRegistries = async function (): Promise<void> {
+			console.log('maybe');
+			await rustTest('/storage/test.db3');
 			console.log('=====SIGNER STARTING=====');
 			let startingString = 'Signer loading...\nLoading metadata...';
 			setStartupAttraction(startingString);

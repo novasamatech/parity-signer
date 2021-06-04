@@ -11,7 +11,7 @@ use printing_balance::convert_balance_pretty;
 use super::method::what_next;
 use super::parse_types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField};
 use super::utils_chainspecs::ChainSpecEntry;
-use super::utils_base58::arr_to_base;
+use super::utils_base58::vec_to_base;
 
 /// struct to store the decoded data as string and as fancy easy-to-import-to-js string,
 /// remaining data as Vec<u8>, and index and indent used for fancy string printing
@@ -461,7 +461,7 @@ pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chai
     let decoded_data = <[u8; 32]>::decode(&mut &data[..32]);
     match decoded_data {
         Ok(x) => {
-            let decoded_string = format!("\"{}\"", arr_to_base(x, chain_specs.base58prefix));
+            let decoded_string = format!("\"{}\"", vec_to_base(&(x.to_vec()), chain_specs.base58prefix));
             let remaining_vector = {
                 if data.len()>32 {(&data[32..]).to_vec()}
                 else {Vec::new()}

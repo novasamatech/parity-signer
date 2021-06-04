@@ -9,6 +9,7 @@ pub struct Action <'a> {
     pub seed: &'a str,
     pub transaction: Vec<u8>,
     pub has_pwd: bool,
+    pub author_base58: &'a str,
 }
 
 // Making lazy statics for regex interpreting input action string
@@ -19,6 +20,7 @@ lazy_static! {
     static ref REG_SEED: Regex = Regex::new(r#"(?i)"encrypted_seed":( )*(?P<seed>.*?"\{.*?\}")"#).unwrap();
     static ref REG_TRANSACTION: Regex = Regex::new(r#"(?i)"transaction":( )*"(?P<transaction>([a-z0-9][a-z0-9])*)""#).unwrap();
     static ref REG_HASPWD: Regex = Regex::new(r#"(?i)"has_password":( )*"(?P<has_pwd>(true|false))""#).unwrap();
+    static ref REG_AUTHOR: Regex = Regex::new(r#"(?i)"author":( )*"(?P<author>[0-9a-z]+)""#).unwrap();
 }
 
 pub fn get_info <'a> (action_line: &'a str) -> Result<Action, &'static str> {
@@ -70,11 +72,22 @@ pub fn get_info <'a> (action_line: &'a str) -> Result<Action, &'static str> {
         },
         None => {return Err("No encryption method found. Wrong action line formatting.")},
     };
+    let author_base58 = match REG_AUTHOR.captures(&action_line) {
+        Some(caps) => {
+            match caps.name("author") {
+                Some(c) => c.as_str(),
+                None => {return Err("No author field found. Wrong action line formatting.")},
+            }
+        },
+        None => {return Err("No author field found. Wrong action line formatting.")},
+    };
+    
     Ok(Action{
         crypto,
         path,
         seed,
         transaction,
         has_pwd,
+        author_base58,
     })
 }

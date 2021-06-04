@@ -61,6 +61,26 @@ function toHex(x: string): string {
 		.join('');
 }
 
+export async function rustTest(input: string): Promise<string> {
+	console.log('###########################');
+	console.log('RUST INTERFACE TEST INVOKED');
+	console.log('###########################');
+	console.log(input);
+	console.log(typeof input);
+	let output = '';
+	try {
+		output = await SubstrateSign.developmentTest(input);
+	} catch (e) {
+		output = e;
+	}
+	console.log('###########################');
+	console.log(output);
+	console.log('###########################');
+	console.log('RUST INTERFACE TEST SUCCESS');
+	console.log('###########################');
+	return output;
+}
+
 //Try to decode fountain packages
 export async function tryDecodeQr(
 	data: Array<string>,

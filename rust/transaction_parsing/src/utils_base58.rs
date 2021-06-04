@@ -7,12 +7,15 @@ use regex::Regex;
 use super::constants::PREFIX;
 
 
-/// function to convert [u8; 32] array into base58 address,
-/// needs u8 prefix (found in chain specs)
+/// function to convert Vec<u8> into base58 address,
+/// needs u8 prefix (found in chain specs);
+/// Vec<u8> length should be 32 for ed25519 and sr25519 encoding
+/// and 33 for ecdsa encoding,
+/// this should be checked elsewhere
 
-pub fn arr_to_base (array: [u8; 32], prefix: u8) -> String {
+pub fn vec_to_base (data: &Vec<u8>, prefix: u8) -> String {
     let mut fin = vec![prefix];
-    fin.extend_from_slice(&array.to_vec());
+    fin.extend_from_slice(&data);
     let hash = blake2b(64, &[], &[PREFIX, &fin].concat());
     fin.extend_from_slice(&hash.as_bytes()[0..2]);
     fin.to_base58()
@@ -23,7 +26,6 @@ pub fn arr_to_base (array: [u8; 32], prefix: u8) -> String {
 /// address, needs u8 prefix (found in chain specs)
 
 pub fn hex_to_base (hex_part: &str, prefix: u8) -> String {
-    assert!(hex_part.len()==64, "Wrong hex part length");
     let mut fin = vec![prefix];
     let part_unhex = hex::decode(&hex_part).unwrap();
     fin.extend_from_slice(&part_unhex);
@@ -35,7 +37,7 @@ pub fn hex_to_base (hex_part: &str, prefix: u8) -> String {
 
 /// function to convert base58 address into [u8; 32] array
 
-pub fn base_to_arr (address: &str) -> [u8; 32] {
+pub fn base_to_vec (address: &str) -> Vec<u8> {
     let address_unbase = address.from_base58().unwrap();
 // cut off the prefix [0] and the hash [2 last symbols]
     let part = &address_unbase[1..(address_unbase.len()-2)];
@@ -125,11 +127,11 @@ mod tests {
     }
     
     #[test]
-    fn bob_array() {
-        let bob_array = [142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
+    fn bob_vec() {
+        let bob_vec = vec![142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72];
         let bob = "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty";
-        assert!(arr_to_base(bob_array, 42) == bob, "Bob array into base58 not converting right.");
-        assert!(base_to_arr(bob) == bob_array, "Bob base58 into array not converting right.");
+        assert!(vec_to_base(&bob_vec, 42) == bob, "Bob vec into base58 not converting right.");
+        assert!(base_to_vec(bob) == bob_vec, "Bob base58 into array not converting right.");
     }
         
 }
