@@ -394,11 +394,8 @@ export! {
 		action: &str,
         pin: &str,
         password: &str
-	) -> crate::Result<String> {
-        match transaction_signing::create_signature(action, pin, password) {
-            Ok(a) => Ok(a),
-            Err(e) => Ok(e.to_string()),
-        }
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        transaction_signing::create_signature(action, pin, password)
     }
 }
 

@@ -41,6 +41,7 @@ function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.React
 	const [password, setPassword] = useState<string>('');
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
 	const [buttonDisabled, setButtonDisabled] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
 	async function submit(): Promise<void> {
 		setButtonDisabled(true);
@@ -58,6 +59,7 @@ function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.React
 				setSignedData(signerOutput);
 			} catch (e) {
 				console.log(e);
+				setErrorMessage(e.toString());
 				//TODO record error times;
 			}
 		} //TODO else { setAlert('pin too short (at least 6 numbers'); }
@@ -92,8 +94,8 @@ function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.React
 			>
 				<ScreenHeading
 					title={t.title.pinUnlock}
-					error={''}
-					subtitle={''}
+					error={!!errorMessage}
+					subtitle={errorMessage}
 				/>
 				<PinInput
 					label={t.pinLabel}
