@@ -54,13 +54,6 @@ pub struct ExtrinsicValues {
     pub block_hash: [u8; 32],
 }
 
-/// struct to collect data for signing
-#[derive(Debug, Encode)]
-struct ForSigning <'a> {
-    method: &'a Vec<u8>,
-    extrinsics: &'a ExtrinsicValues,
-}
-
 /// struct to store the output of decoding: "normal" format and fancy easy-into-js format
 
 pub struct DecodingResult {
@@ -174,11 +167,9 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
                     let type_database = generate_type_database (&datafiles.types_info);
                     
                 // action card preparations
-                    let prep_to_sign = ForSigning {
-                        method: &transaction_decoded.method,
-                        extrinsics: &transaction_decoded.extrinsics,
-                    };
-                    let transaction_to_sign = hex::encode(&(prep_to_sign.encode()));
+                    let extrinsics_to_sign = &transaction_decoded.extrinsics.encode();
+                    let prep_to_sign = [transaction_decoded.method.to_vec(), extrinsics_to_sign.to_vec()].concat();
+                    let transaction_to_sign = hex::encode(&prep_to_sign);
                     
                 // transaction parsing
                     match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs) {
