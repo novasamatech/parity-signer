@@ -88,9 +88,9 @@ export const dummySubstrateNetworkParams: SubstrateNetworkParams = {
 	genesisHash: UnknownNetworkKeys.UNKNOWN,
 	logo: require('res/img/logos/Substrate_Dev.png'),
 	metadata: {
-		hash: 'd266fcfdf60c09b2065d6a36751fcde65600df34d372cf0fc1e9d86c1d9edb45',
+		hash: '1ebf7f4bb0663dad97ef45480966da966d3d7e894dbb4b794b0b275228d5c3a4',
 		specName: 'kusama',
-		specVersion: 9010
+		specVersion: 9030
 	},
 	protocol: NetworkProtocols.SUBSTRATE,
 	unit: 'UNIT'
@@ -170,9 +170,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.KUSAMA,
 		logo: require('res/img/logos/Kusama.png'),
 		metadata: {
-			hash: 'd266fcfdf60c09b2065d6a36751fcde65600df34d372cf0fc1e9d86c1d9edb45',
+			hash: '1ebf7f4bb0663dad97ef45480966da966d3d7e894dbb4b794b0b275228d5c3a4',
 			specName: 'kusama',
-			specVersion: 9010
+			specVersion: 9030
 		},
 		order: 2,
 		pathId: 'kusama',
@@ -185,9 +185,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		decimals: 12,
 		genesisHash: SubstrateNetworkKeys.KUSAMA_DEV,
 		metadata: {
-			hash: 'd266fcfdf60c09b2065d6a36751fcde65600df34d372cf0fc1e9d86c1d9edb45',
+			hash: '1ebf7f4bb0663dad97ef45480966da966d3d7e894dbb4b794b0b275228d5c3a4',
 			specName: 'kusama',
-			specVersion: 9010
+			specVersion: 9030
 		},
 		order: 99,
 		pathId: 'kusama_dev',
@@ -233,9 +233,9 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 		genesisHash: SubstrateNetworkKeys.WESTEND,
 		logo: require('res/img/logos/Polkadot.png'),
 		metadata: {
-			hash: 'dd71fa0db7b0f678fa819fc01146b5ea25ed3ab91c5ce8477ed7695b1ad66626',
+			hash: '69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb',
 			specName: 'westend',
-			specVersion: 9030
+			specVersion: 9033
 		},
 		order: 3,
 		pathId: 'westend',
