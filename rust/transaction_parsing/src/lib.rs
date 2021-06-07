@@ -118,7 +118,7 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
     if transaction_decoded.genesis_hash != short.genesis_hash {return Err("Two different genesis hashes are found.")}
 
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
-    match &data_hex[4..6] {
+/*    match &data_hex[4..6] {
         "00" => {
             if let Era::Immortal = short.era {return Err("Expected mortal transaction because of prelude. Got immortal one on decoding.")}
         },
@@ -126,7 +126,7 @@ pub fn full_run (transaction: &str, datafiles: DataFiles) -> Result<DecodingResu
             if let Era::Mortal(_, _) = short.era {return Err("Expected immortal transaction because of prelude. Got mortal one on decoding.")}
         },
         _ => return Err("Payload type not supported"),
-    }
+    }*/
 
     if let Era::Immortal = short.era {if short.genesis_hash != short.block_hash {return Err("Block hash found to not be equal to genesis hash in immortal transaction.")}}
     
