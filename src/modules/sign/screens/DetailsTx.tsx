@@ -19,7 +19,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Text, View, FlatList } from 'react-native';
 
-import { PayloadCardData } from 'types/payloads';
+import { PayloadCardData, Action } from 'types/payloads';
 import strings from 'modules/sign/strings';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
@@ -39,12 +39,6 @@ import PayloadCard from 'modules/sign/components/PayloadCard';
 import { dumpMetadataDB, loadIdentities } from 'utils/db';
 import { typeDefs } from 'constants/typeDefs';
 
-interface ActionType {
-	buttonLabel: string;
-	payload: any;
-	type: string;
-}
-
 function DetailsTx({
 	route,
 	navigation
@@ -55,7 +49,7 @@ function DetailsTx({
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
 	]);
-	const [action, setAction] = useState<ActionType>({
+	const [action, setAction] = useState<Action>({
 		payload: '',
 		type: ''
 	})
@@ -89,7 +83,7 @@ function DetailsTx({
 			setPayloadCards(sortedCardSet ? sortedCardSet : 
 				{ indent: 0, index: 0, payload: "System error: transaction parser failed entirely", type: 'error' }
 			);
-			setAction(cardsSet.action);
+			if (cardsSet.action) setAction(cardsSet.action);
 		};
 		generateCards(payload);
 	}, [payload]);
@@ -121,7 +115,6 @@ function DetailsTx({
 				keyExtractor={(item: PayloadCardData): number => item.index.toString()}
 			/>
 			<Button
-				disabled={action.buttonRole===''}
 				onPress={performAction}
 				title={action.type === 'sign_transaction' ? 'SIGN' : 'BACK'}
 				testID={testIDs.DetailsTx.signButton}
