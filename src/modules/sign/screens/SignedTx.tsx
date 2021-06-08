@@ -35,8 +35,11 @@ import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 import { sign } from 'utils/native';
 
-function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.ReactElement {
-	const [signedData, setSignedData] = useState<string>('');//route.params.action.payload;
+function SignedTx({
+	route,
+	navigation
+}: NavigationProps<'SignedTx'>): React.ReactElement {
+	const [signedData, setSignedData] = useState<string>(''); //route.params.action.payload;
 	const [pin, setPin] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
@@ -55,7 +58,11 @@ function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.React
 				const toSign = JSON.stringify(route.params.payload);
 				console.log(toSign);
 				console.log(typeof toSign);
-				const signerOutput = await sign(toSign, pin.toString(), password.toString());
+				const signerOutput = await sign(
+					toSign,
+					pin.toString(),
+					password.toString()
+				);
 				setSignedData(signerOutput);
 			} catch (e) {
 				console.log(e);
@@ -102,8 +109,8 @@ function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.React
 					autoFocus
 					testID={testIDs.IdentityPin.unlockPinInput}
 					onChangeText={(newInput: string): void => {
-						setButtonDisabled(false)
-						setPin(newInput)
+						setButtonDisabled(false);
+						setPin(newInput);
 					}}
 					onSubmitEditing={(): void => setFocusPassword(true)}
 					value={pin}
@@ -115,8 +122,8 @@ function SignedTx({route, navigation}: NavigationProps<'SignedTx'>): React.React
 					keyboardType="default"
 					focus={focusPassword}
 					onChangeText={(newInput: string): void => {
-						setButtonDisabled(false)
-						setPassword(newInput)
+						setButtonDisabled(false);
+						setPassword(newInput);
 					}}
 					onSubmitEditing={submit}
 					value={password}

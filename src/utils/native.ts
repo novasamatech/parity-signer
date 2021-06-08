@@ -21,6 +21,7 @@ import { checksummedAddress } from './checksum';
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 import { MetadataHandle } from 'types/metadata';
 import { dumpIdentities } from 'utils/db';
+import { PayloadCardsSet } from 'types/payloads';
 
 const { SubstrateSign } = NativeModules || {};
 
@@ -120,7 +121,13 @@ export async function makeTransactionCardsContents(
 ): Promise<PayloadCardsSet> {
 	const identities = await dumpIdentities();
 	console.log(identities);
-	const parsedJSON = await SubstrateSign.parseTransaction(payload, genHash, metadata, typeDescriptor, identities);
+	const parsedJSON = await SubstrateSign.parseTransaction(
+		payload,
+		genHash,
+		metadata,
+		typeDescriptor,
+		identities
+	);
 	console.log(parsedJSON);
 	const parsed = JSON.parse(parsedJSON);
 	console.log(parsed);
@@ -129,12 +136,15 @@ export async function makeTransactionCardsContents(
 
 export async function sign(
 	action: string,
-	pin:string,
+	pin: string,
 	password: string
 ): Promise<string> {
-	const signedPayload = await SubstrateSign.signTransaction(action, pin, password);
+	const signedPayload = await SubstrateSign.signTransaction(
+		action,
+		pin,
+		password
+	);
 	return signedPayload;
-
 }
 
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {

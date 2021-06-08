@@ -364,7 +364,11 @@ export function useAccountContext(): AccountsContextState {
 			const searchList = Array.from(identity.addresses.entries());
 			for (const [addressKey, path] of searchList) {
 				const networkKey = getNetworkKey(path, identity, networkContext);
-				const accountId = generateAccountId(addressKey, networkKey, allNetworks);
+				const accountId = generateAccountId(
+					addressKey,
+					networkKey,
+					allNetworks
+				);
 				const address = addressKey;
 				const searchAccountIdOrAddress = isAccountId ? accountId : address;
 				const found = isEthereumAccountId(accountId)

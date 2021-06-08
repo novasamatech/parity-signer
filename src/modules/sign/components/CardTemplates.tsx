@@ -62,17 +62,31 @@ export function AuthorCard({ payload }: CardProps): ReactElement {
 					<Text style={styles.secondaryText}>{payload.name} </Text>
 				</View>
 				<View style={styles.row}>
-					<AntIcon name="user" size={fontStyles.i_small.fontSize} color={colors.signal.main} /> 
+					<AntIcon
+						name="user"
+						size={fontStyles.i_small.fontSize}
+						color={colors.signal.main}
+					/>
 					<Text style={styles.secondaryText}>{payload.derivation_path} </Text>
-					{payload.has_password === "true" ? <AntIcon name="lock" style={styles.iconLock} /> : <View />}
+					{payload.has_password === 'true' ? (
+						<AntIcon name="lock" style={styles.iconLock} />
+					) : (
+						<View />
+					)}
 				</View>
-				<Text style={styles.authorAddressText} numberOfLines={1} adjustFontSizeToFit>{payload.base58}</Text>
+				<Text
+					style={styles.authorAddressText}
+					numberOfLines={1}
+					adjustFontSizeToFit
+				>
+					{payload.base58}
+				</Text>
 			</View>
 		</View>
 	);
 }
 
-export function BalanceCard({payload}: CardProps): ReactElement {
+export function BalanceCard({ payload }: CardProps): ReactElement {
 	return (
 		<View style={styles.card}>
 			<Text style={styles.titleText}>{payload.amount} </Text>
@@ -281,7 +295,7 @@ const styles = StyleSheet.create({
 	},
 	titleText: {
 		...fontStyles.t_codeS,
-		color: colors.text.main,
+		color: colors.text.main
 	},
 	warningCard: {
 		flexDirection: 'row'

@@ -109,7 +109,7 @@ export async function loadIdentities(version = 4): Promise<Identity[]> {
 	}
 }
 
-export async function dumpIdentities(version = 4): Promise<Identity[]> {
+export async function dumpIdentities(version = 4): Promise<string> {
 	const identityStorageLabel = `identities_v${version}`;
 	try {
 		const identities = await SecureStorage.getItem(
@@ -118,7 +118,8 @@ export async function dumpIdentities(version = 4): Promise<Identity[]> {
 		);
 		return identities;
 	} catch (e) {
-		return handleError(e, 'identity');
+		console.warn('db error ', e);
+		return '';
 	}
 }
 
@@ -203,7 +204,7 @@ export async function getMetadata(
 
 function isMetadataKey(element: string): boolean {
 	//check if the line begins with 'signer_metadata_' - not ideomatic but safe
-	if(!element) return false;
+	if (!element) return false;
 	return element.substr(0, metadataStorage.length) === metadataStorage;
 }
 

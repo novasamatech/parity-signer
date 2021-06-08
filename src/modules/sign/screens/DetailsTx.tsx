@@ -25,7 +25,6 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
-import { ScannerContext } from 'stores/ScannerContext';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps, NavigationScannerProps } from 'types/props';
@@ -44,7 +43,9 @@ function DetailsTx({
 	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { dumpNetworksData, getNetwork, networkContext } = useContext(NetworksContext);
+	const { dumpNetworksData, getNetwork, networkContext } = useContext(
+		NetworksContext
+	);
 	const payload = route.params.payload;
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
@@ -52,7 +53,7 @@ function DetailsTx({
 	const [action, setAction] = useState<Action>({
 		payload: '',
 		type: ''
-	})
+	});
 	const [sender, setSender] = useState<null | FoundAccount>(null);
 
 	useEffect(() => {
@@ -73,16 +74,27 @@ function DetailsTx({
 			//
 			//last sort seems useless but things depend
 			//on undocumented features otherwise
-			const sortedCardSet = [].concat(
-				cardsSet.author ? cardsSet.author : [],
-				cardsSet.error ? cardsSet.error : [],
-				cardsSet.warning ? cardsSet.warning : [],
-				cardsSet.method ? cardsSet.method : [],
-				cardsSet.extrinsics ? cardsSet.extrinsics : []
-			).sort((a,b) => {return a.index-b.index;});
+			const sortedCardSet = []
+				.concat(
+					cardsSet.author ? cardsSet.author : [],
+					cardsSet.error ? cardsSet.error : [],
+					cardsSet.warning ? cardsSet.warning : [],
+					cardsSet.method ? cardsSet.method : [],
+					cardsSet.extrinsics ? cardsSet.extrinsics : []
+				)
+				.sort((a, b) => {
+					return a.index - b.index;
+				});
 			console.log(sortedCardSet);
-			setPayloadCards(sortedCardSet ? sortedCardSet : 
-				{ indent: 0, index: 0, payload: "System error: transaction parser failed entirely", type: 'error' }
+			setPayloadCards(
+				sortedCardSet
+					? sortedCardSet
+					: {
+							indent: 0,
+							index: 0,
+							payload: 'System error: transaction parser failed entirely',
+							type: 'error'
+					  }
 			);
 			if (cardsSet.action) setAction(cardsSet.action);
 		};
@@ -99,8 +111,8 @@ function DetailsTx({
 
 	const performAction = (): void => {
 		console.log(action);
-		if (action.type === 'sign_transaction') { 
-			navigation.navigate('SignedTx', {payload: action.payload});
+		if (action.type === 'sign_transaction') {
+			navigation.navigate('SignedTx', { payload: action.payload });
 		} else {
 			navigation.goBack();
 		}

@@ -30,9 +30,7 @@ export interface TxRequestData {
 	target?: number;
 }
 
-export type ParsedData =
-	| SubstrateParsedData
-	| NetworkParsedData;
+export type ParsedData = SubstrateParsedData | NetworkParsedData;
 
 export type NetworkParsedData = {
 	action: 'addNetwork';
