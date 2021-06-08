@@ -76,6 +76,7 @@ function DetailsTx({
 			const sortedCardSet = [].concat(
 				cardsSet.author ? cardsSet.author : [],
 				cardsSet.error ? cardsSet.error : [],
+				cardsSet.warning ? cardsSet.warning : [],
 				cardsSet.method ? cardsSet.method : [],
 				cardsSet.extrinsics ? cardsSet.extrinsics : []
 			).sort((a,b) => {return a.index-b.index;});

@@ -5,6 +5,7 @@ import { PayloadCardType, PayloadCardContent } from 'types/payloads';
 import {
 	LoadingCard,
 	ErrorCard,
+	WarningCard,
 	DefaultCard,
 	AuthorCard,
 	BalanceCard,
@@ -29,6 +30,7 @@ export default function PayloadCard({
 	switch (type) {
 		case 'loading' : return <LoadingCard payload={payload} />;
 		case 'error' : return <ErrorCard payload={payload} />;
+		case 'warning' : return <WarningCard payload={payload} />;
 		case 'author' : return <AuthorCard payload={payload} />;
 		case 'balance' : return <BalanceCard payload={payload} />;
 		case 'call' : return <CallCard payload={payload} />;

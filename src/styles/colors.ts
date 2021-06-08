@@ -29,11 +29,13 @@ export default {
 	},
 	signal: {
 		error: '#D73400',
-		main: '#FF4077'
+		main: '#FF4077',
+		warning: '#DDFF00'
 	},
 	text: {
 		alert: '#D73400',
 		faded: '#9A9A9A',
-		main: '#C0C0C0'
+		main: '#C0C0C0',
+		warning: '#000000'
 	}
 };
