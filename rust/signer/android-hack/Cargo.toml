@@ -23,7 +23,6 @@ qrcodegen = "1.4"
 raptorq = "1.6.3"
 regex = "1.2.1"
 rlp = { version = "0.3.0", features = ["ethereum"] }
-rusqlite = { version = "0.25.3", features = ["bundled"] }
 rustc-hex = "2.1.0"
 schnorrkel = "0.8.5"
 serde = "1.0"

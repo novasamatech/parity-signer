@@ -26,7 +26,6 @@ use tiny_keccak::keccak256 as keccak;
 use tiny_keccak::Keccak;
 use serde_json;
 use sled;
-use rusqlite;
 
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
