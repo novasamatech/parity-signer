@@ -1,5 +1,10 @@
+import mockAsyncStorage from '@react-native-community/async-storage/jest/async-storage-mock';
+
 export default '';
 
+jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
+
+/*
 jest.mock('@react-native-community/async-storage', () => {
 	// a map/dict/kvs of types to return - the leaves of the def
 	// are jest functions
@@ -11,6 +16,7 @@ jest.mock('@react-native-community/async-storage', () => {
 	};
 	return apiMock;
 });
+*/
 
 jest.mock('react-native-secure-storage', () => {
 	// a map/dict/kvs of types to return - the leaves of the def

@@ -27,7 +27,7 @@ import t from 'modules/unlock/strings';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { FoundAccount } from 'types/identityTypes';
-import { NavigationProps, NavigationScannerProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import QrView from 'components/QrView';
 import fontStyles from 'styles/fontStyles';
 import CompatibleCard from 'components/CompatibleCard';
@@ -55,7 +55,7 @@ function SignedTx({
 				console.log(typeof pin);
 				console.log(password);
 				console.log(typeof password);
-				const toSign = JSON.stringify(route.params.payload);
+				const toSign = route.params ? JSON.stringify(route.params.payload) : '';
 				console.log(toSign);
 				console.log(typeof toSign);
 				const signerOutput = await sign(

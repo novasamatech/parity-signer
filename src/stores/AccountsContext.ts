@@ -10,7 +10,6 @@ import {
 	Account,
 	AccountsStoreState,
 	FoundAccount,
-	FoundIdentityAccount,
 	Identity,
 	isUnlockedAccount,
 	LockedAccount,
@@ -39,8 +38,7 @@ import {
 	extractAddressFromAccountId,
 	getAddressKeyByPath,
 	getNetworkKey,
-	isEthereumAccountId,
-	parseFoundLegacyAccount
+	isEthereumAccountId
 } from 'utils/identitiesUtils';
 import {
 	brainWalletAddressWithRef,
@@ -353,7 +351,7 @@ export function useAccountContext(): AccountsContextState {
 	function _getAccountFromIdentity(
 		accountIdOrAddress: string,
 		networkContext: NetworksContextState
-	): false | FoundIdentityAccount {
+	): false | FoundAccount {
 		const { allNetworks } = networkContext;
 		const isAccountId = accountIdOrAddress.split(':').length > 1;
 		let targetAccountId = null;
@@ -430,12 +428,6 @@ export function useAccountContext(): AccountsContextState {
 	): false | FoundAccount {
 		if (!address) {
 			return false;
-		}
-
-		for (const [k, v] of state.accounts.entries()) {
-			if (v.address.toLowerCase() === address.toLowerCase()) {
-				return { ...v, accountId: k, isLegacy: true };
-			}
 		}
 		return _getAccountFromIdentity(address, networkContext);
 	}

@@ -104,7 +104,7 @@ export type NetworksContextState = {
 	addNetwork(networkParsedData: NetworkParsedData): void;
 	networks: Map<string, SubstrateNetworkParams>;
 	allNetworks: Map<string, NetworkParams>;
-	dumpNetworkData(): string;
+	dumpNetworksData(): string;
 	getSubstrateNetwork: GetSubstrateNetwork;
 	getNetwork: GetNetwork;
 	pathIds: string[];

@@ -20,14 +20,13 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Text, View, FlatList } from 'react-native';
 
 import { PayloadCardData, Action } from 'types/payloads';
-import strings from 'modules/sign/strings';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { FoundAccount } from 'types/identityTypes';
 import { isEthereumNetworkParams } from 'types/networkTypes';
-import { NavigationProps, NavigationScannerProps } from 'types/props';
+import { NavigationProps } from 'types/props';
 import CompatibleCard from 'components/CompatibleCard';
 import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
@@ -43,10 +42,8 @@ function DetailsTx({
 	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
 	const accountsStore = useContext(AccountsContext);
-	const { dumpNetworksData, getNetwork, networkContext } = useContext(
-		NetworksContext
-	);
-	const payload = route.params.payload;
+	const { dumpNetworksData } = useContext(NetworksContext);
+	const payload = route.params ? route.params.payload : '';
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
 	]);
@@ -101,7 +98,11 @@ function DetailsTx({
 		generateCards(payload);
 	}, [payload]);
 
-	const renderCard = ({ item }: { item: PayloadCardData }): ReactElement => {
+	const renderCard = ({
+		item
+	}: {
+		item: PayloadCardData;
+	}): React.ReactElement => {
 		return (
 			<View style={[{ paddingLeft: item.indent * 4 + '%' }]}>
 				<PayloadCard type={item.type} payload={item.payload} />

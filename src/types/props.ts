@@ -35,16 +35,3 @@ export interface NavigationTargetIdentityProps<
 > extends NavigationProps<ScreenName> {
 	targetIdentity: Identity;
 }
-
-export interface NavigationAccountScannerProps<
-	ScreenName extends keyof RootStackParamList
-> extends NavigationProps<ScreenName> {
-	scannerStore: ScannerContextState;
-	accountsStore: AccountsContextState;
-}
-
-export interface NavigationScannerProps<
-	ScreenName extends keyof RootStackParamList
-> extends NavigationProps<ScreenName> {
-	scannerStore: ScannerContextState;
-}

@@ -5,13 +5,26 @@ export type PayloadCardType =
 	| 'enum_variant_name'
 	| 'Id'
 	| 'default'
-	| 'era_nonce_tip'
+	| 'era_nonce'
 	| 'block_hash'
+	| 'loading'
+	| 'error'
+	| 'warning'
+	| 'author'
+	| 'balance'
+	| 'tip'
+	| 'none'
+	| 'identity_field'
+	| 'bitvec'
+	| 'field_name'
+	| 'field_number'
 	| 'tx_spec';
 
-export type PayloadCardContent = {
+export type PayloadCardContentDefault = {
 	[key: string]: unknown;
 };
+
+export type PayloadCardContent = PayloadCardContentDefault;
 
 //Renderable unit records for transaction details screen
 //index: key for proper sorting
@@ -25,7 +38,8 @@ export type PayloadCardData = {
 	payload?: PayloadCardContent;
 };
 
-type Action = {
+//Whet should the only button on payload preview screen do
+export type Action = {
 	type: string;
 	payload: unknown;
 };
@@ -38,4 +52,5 @@ export type PayloadCardsSet = {
 	error?: PayloadCardData[];
 	extrinsics?: PayloadCardData[];
 	method?: PayloadCardData[];
+	warning?: PayloadCardData[];
 };

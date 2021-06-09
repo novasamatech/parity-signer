@@ -21,12 +21,7 @@ import AccountCard from './AccountCard';
 import PathCard from './PathCard';
 
 import { AccountsContextState } from 'stores/AccountsContext';
-import {
-	FoundAccount,
-	FoundIdentityAccount,
-	FoundLegacyAccount
-} from 'types/identityTypes';
-import { isLegacyFoundAccount } from 'utils/identitiesUtils';
+import { FoundAccount } from 'types/identityTypes';
 
 const CompatibleCard = ({
 	account,
@@ -37,18 +32,8 @@ const CompatibleCard = ({
 	accountsStore: AccountsContextState;
 	titlePrefix?: string;
 }): React.ReactElement => {
-	const renderLegacyAccountCard = (
-		legacyAccount: FoundLegacyAccount
-	): React.ReactElement => (
-		<AccountCard
-			title={legacyAccount.name}
-			address={legacyAccount.address}
-			networkKey={legacyAccount.networkKey || ''}
-		/>
-	);
-
 	const renderIdentityPathCard = (
-		identityAccount: FoundIdentityAccount
+		identityAccount: FoundAccount
 	): React.ReactElement => {
 		const identity = accountsStore.getIdentityByAccountId(
 			identityAccount.accountId
@@ -62,9 +47,7 @@ const CompatibleCard = ({
 		);
 	};
 
-	return isLegacyFoundAccount(account) || account.isLegacy === undefined
-		? renderLegacyAccountCard(account)
-		: renderIdentityPathCard(account);
+	return renderIdentityPathCard(account);
 };
 
 CompatibleCard.propTypes = {

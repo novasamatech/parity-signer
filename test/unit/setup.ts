@@ -16,9 +16,12 @@
 
 /* global jest */
 // import mockCamera from './__mocks__/Camera'
+import mockAsyncStorage from '@react-native-community/async-storage/jest/async-storage-mock';
 
 // mock reactnative that requires native platform
 jest.doMock('react-native', () => 'reactNativeMock');
+
+jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 
 // mock native RNG
 jest.mock('react-native-randombytes', () => {
@@ -31,17 +34,3 @@ jest.mock('react-native-randombytes', () => {
 	};
 	return apiMock;
 });
-
-// mock WASM code - used in tests only
-/*
-jest.mock('@polkadot/wasm-crypto', () => {
-	const original = jest.requireActual('@polkadot/wasm-crypto');
-	const apiMock = {
-		...original,
-		waitReady: jest.fn().mockReturnValue(new Promise((resolve, reject) => {resolve(true)})),
-		isReady: jest.fn().mockReturnValue(true)
-	};
-	return apiMock;
-});
-*/
-// jest.doMock('react-native-substrate-sign', () => 'substrateSignMock');
