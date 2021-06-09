@@ -16,8 +16,6 @@
 
 import colors from 'styles/colors';
 import {
-	EthereumNetworkDefaultConstants,
-	EthereumNetworkParams,
 	NetworkParams,
 	NetworkProtocol,
 	SubstrateNetworkDefaultConstant,
@@ -28,7 +26,6 @@ import {
 export const unknownNetworkPathId = '';
 
 export const NetworkProtocols: Record<string, NetworkProtocol> = Object.freeze({
-	ETHEREUM: 'ethereum',
 	SUBSTRATE: 'substrate',
 	UNKNOWN: 'unknown'
 });
@@ -37,19 +34,6 @@ export const NetworkProtocols: Record<string, NetworkProtocol> = Object.freeze({
 export const UnknownNetworkKeys: Record<string, string> = Object.freeze({
 	UNKNOWN: 'unknown'
 });
-
-// ethereumChainId is used as Network key for Ethereum networks
-/* eslint-disable sort-keys */
-export const EthereumNetworkKeys: Record<string, string> = Object.freeze({
-	FRONTIER: '1',
-	ROPSTEN: '3',
-	RINKEBY: '4',
-	GOERLI: '5',
-	KOVAN: '42',
-	CLASSIC: '61'
-});
-
-/* eslint-enable sort-keys */
 
 // genesisHash is used as Network key for Substrate networks
 export const SubstrateNetworkKeys: Record<string, string> = Object.freeze({
@@ -245,46 +229,6 @@ const substrateNetworkBase: Record<string, SubstrateNetworkDefaultConstant> = {
 	}
 };
 
-const ethereumNetworkBase: Record<string, EthereumNetworkDefaultConstants> = {
-	[EthereumNetworkKeys.FRONTIER]: {
-		color: '#8B94B3',
-		ethereumChainId: EthereumNetworkKeys.FRONTIER,
-		order: 101,
-		secondaryColor: colors.background.card,
-		title: 'Ethereum'
-	},
-	[EthereumNetworkKeys.CLASSIC]: {
-		color: '#1a4d33',
-		ethereumChainId: EthereumNetworkKeys.CLASSIC,
-		logo: require('res/img/logos/Ethereum_Classic.png'),
-		order: 102,
-		secondaryColor: colors.background.card,
-		title: 'Ethereum Classic'
-	},
-	[EthereumNetworkKeys.ROPSTEN]: {
-		ethereumChainId: EthereumNetworkKeys.ROPSTEN,
-		order: 104,
-		title: 'Ropsten Testnet'
-	},
-	[EthereumNetworkKeys.GOERLI]: {
-		ethereumChainId: EthereumNetworkKeys.GOERLI,
-		order: 105,
-		title: 'Görli Testnet'
-	},
-	[EthereumNetworkKeys.KOVAN]: {
-		ethereumChainId: EthereumNetworkKeys.KOVAN,
-		order: 103,
-		title: 'Kovan Testnet'
-	}
-};
-
-const ethereumDefaultValues = {
-	color: '#434875',
-	logo: require('res/img/logos/Ethereum.png'),
-	protocol: NetworkProtocols.ETHEREUM,
-	secondaryColor: colors.background.card
-};
-
 const substrateDefaultValues = {
 	color: '#4C4646',
 	deleted: false,
@@ -292,18 +236,6 @@ const substrateDefaultValues = {
 	protocol: NetworkProtocols.SUBSTRATE,
 	secondaryColor: colors.background.card
 };
-
-function setEthereumNetworkDefault(): Record<string, EthereumNetworkParams> {
-	return Object.keys(ethereumNetworkBase).reduce((acc, networkKey) => {
-		return {
-			...acc,
-			[networkKey]: {
-				...ethereumDefaultValues,
-				...ethereumNetworkBase[networkKey]
-			}
-		};
-	}, {});
-}
 
 function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
 	return Object.keys(substrateNetworkBase).reduce((acc, networkKey) => {
@@ -317,10 +249,6 @@ function setSubstrateNetworkDefault(): Record<string, SubstrateNetworkParams> {
 	}, {});
 }
 
-export const ETHEREUM_NETWORK_LIST: Record<
-	string,
-	EthereumNetworkParams
-> = Object.freeze(setEthereumNetworkDefault());
 export const SUBSTRATE_NETWORK_LIST: Record<
 	string,
 	SubstrateNetworkParams
@@ -331,12 +259,7 @@ export const UNKNOWN_NETWORK: Record<
 > = Object.freeze(unknownNetworkBase);
 
 export const NETWORK_LIST: Record<string, NetworkParams> = Object.freeze(
-	Object.assign(
-		{},
-		SUBSTRATE_NETWORK_LIST,
-		ETHEREUM_NETWORK_LIST,
-		UNKNOWN_NETWORK
-	)
+	Object.assign({}, SUBSTRATE_NETWORK_LIST, UNKNOWN_NETWORK)
 );
 
 export const defaultNetworkKey = SubstrateNetworkKeys.KUSAMA;

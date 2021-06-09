@@ -17,7 +17,6 @@
 import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
 import {
-	EthereumNetworkParams,
 	isSubstrateNetworkParams,
 	isUnknownNetworkParams,
 	NetworkParams
@@ -45,9 +44,6 @@ export function generateAccountId(
 		return `${protocol}:${address}:${genesisHash ?? ''}`;
 	} else if (isUnknownNetworkParams(networkParams)) {
 		return `substrate:${address}:${networkKey ?? ''}`;
-	} else {
-		const { ethereumChainId } = networkParams as EthereumNetworkParams;
-		return `${protocol}:0x${address}@${ethereumChainId}`;
 	}
 }
 

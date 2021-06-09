@@ -27,10 +27,7 @@ import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
-import {
-	isEthereumNetworkParams,
-	isUnknownNetworkParams
-} from 'types/networkTypes';
+import { isUnknownNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { withCurrentIdentity } from 'utils/HOC';
 import {
@@ -53,36 +50,18 @@ function PathsList({
 	const networkParams = getNetwork(networkKey);
 
 	const { currentIdentity } = accountsStore.state;
-	const isEthereumPath = isEthereumNetworkParams(networkParams);
 	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
 	const pathsGroups = useMemo((): PathGroup[] | null => {
-		if (!currentIdentity || isEthereumPath) return null;
+		if (!currentIdentity) return null;
 		const listedPaths = getPathsWithSubstrateNetworkKey(
 			currentIdentity,
 			networkKey,
 			networkContextState
 		);
 		return groupPaths(listedPaths, networks);
-	}, [
-		currentIdentity,
-		isEthereumPath,
-		networkKey,
-		networkContextState,
-		networks
-	]);
+	}, [currentIdentity, networkKey, networkContextState, networks]);
 	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
 	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
-
-	if (isEthereumNetworkParams(networkParams)) {
-		return (
-			<PathDetailsView
-				networkKey={networkKey}
-				path={networkKey}
-				navigation={navigation}
-				accountsStore={accountsStore}
-			/>
-		);
-	}
 
 	const { navigate } = navigation;
 	const rootPath = `//${networkParams.pathId}`;

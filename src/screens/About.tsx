@@ -47,9 +47,8 @@ export default class About extends React.PureComponent {
 						Any data transfer from or to the App will happen using QR code
 						scanning. By doing so, the most sensitive piece of information, the
 						private keys, will never leave the phone. The Parity Signer mobile
-						app can be used to store Ethereum or Kusama accounts. This includes
-						ETH, ETC or Ether from various testnets (Kovan, Ropsten…) as well as
-						KSMs.
+						app can be used to store Substrate accounts. This includes DOT, KSM
+						and WND.
 					</Text>
 					<Text style={styles.text}>
 						This app does not send any data to Parity Technologies or any

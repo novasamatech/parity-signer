@@ -24,7 +24,6 @@ import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import ScreenHeading from 'components/ScreenHeading';
 import { tryDecodeQr } from 'utils/native';
-import { TxRequestData } from 'types/scannerTypes';
 import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 //for tests
 import testIDs from 'e2e/testIDs';
@@ -110,9 +109,9 @@ export default function Scanner({
 		}
 	};
 
-	useEffect(() => {
-		/** E2E Test Injection Code **/
-		if (global.inTest && global.scanRequest !== undefined) {
+	//	useEffect(() => {
+	/** E2E Test Injection Code **/
+	/*		if (global.inTest && global.scanRequest !== undefined) {
 			onMockBarCodeRead(
 				global.scanRequest,
 				async (tx: TxRequestData): Promise<void> => {
@@ -121,7 +120,7 @@ export default function Scanner({
 			);
 		}
 		/* eslint-disable-next-line react-hooks/exhaustive-deps */
-	}, [mockIndex]);
+	//	}, [mockIndex]);
 
 	return (
 		<SafeAreaViewContainer>

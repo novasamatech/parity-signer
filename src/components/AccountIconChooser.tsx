@@ -88,26 +88,21 @@ export default class AccountIconChooser extends React.PureComponent<
 						};
 						result.seed = await words(24);
 
-						if (network.protocol === NetworkProtocols.ETHEREUM) {
-							Object.assign(result, await brainWalletAddress(result.seed));
-						} else {
-							// Substrate
-							try {
-								const suri = constructSURI({
-									derivePath: derivationPath,
-									password: derivationPassword,
-									phrase: result.seed
-								});
+						try {
+							const suri = constructSURI({
+								derivePath: derivationPath,
+								password: derivationPassword,
+								phrase: result.seed
+							});
 
-								result.address = await substrateAddress(
-									suri,
-									(network as SubstrateNetworkParams).prefix
-								);
-								result.bip39 = true;
-							} catch (e) {
-								// invalid seed or derivation path
-								console.error(e);
-							}
+							result.address = await substrateAddress(
+								suri,
+								(network as SubstrateNetworkParams).prefix
+							);
+							result.bip39 = true;
+						} catch (e) {
+							// invalid seed or derivation path
+							console.error(e);
 						}
 						return result;
 					})

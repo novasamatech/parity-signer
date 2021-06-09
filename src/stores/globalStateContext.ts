@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import * as React from 'react';
 
 import { loadToCAndPPConfirmation } from 'utils/db';
-import { migrateAccounts, migrateIdentity } from 'utils/migrationUtils';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 export type GlobalState = {
@@ -27,10 +26,6 @@ export function useGlobalStateContext(): GlobalState {
 		const loadPolicyConfirmationAndMigrateData = async (): Promise<void> => {
 			const tocPP = await loadToCAndPPConfirmation();
 			setPolicyConfirmed(tocPP);
-			if (!tocPP) {
-				await migrateAccounts();
-				await migrateIdentity();
-			}
 		};
 		setDataLoaded(true);
 		loadPolicyConfirmationAndMigrateData();

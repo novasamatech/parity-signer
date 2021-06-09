@@ -27,8 +27,6 @@
  * @property {string} password - The optionnal password password without the `///`
  */
 
-import { SURIObject } from 'types/scannerTypes';
-
 /**
  * @description Extract the phrase, path and password from a SURI format for specifying secret keys `<secret>/<soft-key>//<hard-key>///<password>` (the `///password` may be omitted, and `/<soft-key>` and `//<hard-key>` maybe repeated and mixed).
  * @param {string} suri The SURI to be parsed
@@ -63,7 +61,9 @@ export function parseDerivationPath(
 	};
 }
 
-export function parseSURI(suri: string): SURIObject {
+export function parseSURI(
+	suri: string
+): { derivePath: string; password: string; phrase: string } {
 	const RE_CAPTURE = /^([\w ]+(?: +\w*)*)?(.*)$/;
 	const matches = suri.match(RE_CAPTURE);
 	let phrase,

@@ -23,7 +23,6 @@ import { NetworksContextState } from 'stores/NetworkContext';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
-	ETHEREUM_NETWORK_LIST,
 	UnknownNetworkKeys,
 	unknownNetworkPathId
 } from 'constants/networkSpecs';
@@ -60,9 +59,6 @@ export const extractSubPathName = (path: string): string => {
 
 export const isSubstratePath = (path: string): boolean =>
 	path.match(pathsRegex.allPath) !== null || path === '';
-
-export const isEthereumAccountId = (v: string): boolean =>
-	v.indexOf('ethereum:') === 0;
 
 export const isSubstrateHardDerivedPath = (path: string): boolean => {
 	if (!isSubstratePath(path)) return false;
@@ -220,10 +216,6 @@ export const getNetworkKeyByPath = (
 	networkContextState: NetworksContextState
 ): string => {
 	const { networks, pathIds } = networkContextState;
-	if (!isSubstratePath(path) && ETHEREUM_NETWORK_LIST.hasOwnProperty(path)) {
-		//It is a ethereum path
-		return path;
-	}
 	const pathId = pathMeta.networkPathId || extractPathId(path, pathIds);
 
 	return getSubstrateNetworkKeyByPathId(pathId, networks);
@@ -243,9 +235,7 @@ export const getAddressWithPath = (
 	const pathMeta = identity.meta.get(path);
 	if (!pathMeta) return '';
 	const { address } = pathMeta;
-	return isEthereumAccountId(address)
-		? extractAddressFromAccountId(address)
-		: address;
+	return address;
 };
 
 export const unlockIdentitySeedWithReturn = async (

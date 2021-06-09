@@ -14,30 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import PinInput from 'modules/unlock/components/PinInput';
-import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import ScreenHeading from 'components/ScreenHeading';
 import Button from 'components/Button';
 import t from 'modules/unlock/strings';
 import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
-import { FoundAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import QrView from 'components/QrView';
 import fontStyles from 'styles/fontStyles';
-import CompatibleCard from 'components/CompatibleCard';
 import styles from 'modules/sign/styles';
 import Separator from 'components/Separator';
 import { sign } from 'utils/native';
 
 function SignedTx({
 	route,
-	navigation
+	_navigation
 }: NavigationProps<'SignedTx'>): React.ReactElement {
 	const [signedData, setSignedData] = useState<string>(''); //route.params.action.payload;
 	const [pin, setPin] = useState<string>('');

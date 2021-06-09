@@ -27,7 +27,6 @@ import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import {
-	isEthereumNetworkParams,
 	isSubstrateNetworkParams,
 	NetworkParams,
 	SubstrateNetworkParams
@@ -106,20 +105,6 @@ function NetworkSelector({
 		}
 	};
 
-	const deriveEthereumAccount = async (networkKey: string): Promise<void> => {
-		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
-		try {
-			await accountsStore.deriveEthereumAccount(
-				seedRefHooks.brainWalletAddress,
-				networkKey,
-				allNetworks
-			);
-			navigateToPathsList(navigation, networkKey);
-		} catch (e) {
-			alertPathDerivationError(setAlert, e.message);
-		}
-	};
-
 	const getListOptions = (): Partial<FlatListProps<any>> => {
 		if (isNew) return {};
 		if (shouldShowMoreNetworks) {
@@ -172,8 +157,6 @@ function NetworkSelector({
 		if (isNew || shouldShowMoreNetworks) {
 			if (isSubstrateNetworkParams(networkParams)) {
 				await deriveSubstrateNetworkRootPath(networkKey, networkParams);
-			} else {
-				await deriveEthereumAccount(networkKey);
 			}
 		} else {
 			navigation.navigate('PathsList', { networkKey });
@@ -205,9 +188,7 @@ function NetworkSelector({
 		item: [string, NetworkParams];
 	}): ReactElement => {
 		const [networkKey, networkParams] = item;
-		const networkIndexSuffix = isEthereumNetworkParams(networkParams)
-			? networkParams.ethereumChainId
-			: networkParams.pathId;
+		const networkIndexSuffix = networkParams.pathId;
 		return (
 			<NetworkCard
 				key={networkKey}

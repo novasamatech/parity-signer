@@ -23,11 +23,9 @@ import { NetworkProtocol } from 'types/networkTypes';
 
 export default function Address(props: {
 	address: string;
-	protocol?: NetworkProtocol;
 	style?: TextStyle;
 }): ReactElement {
-	const { address, protocol = NetworkProtocols.SUBSTRATE, style = {} } = props;
-	const prefix = protocol === NetworkProtocols.ETHEREUM ? '0x' : '';
+	const { address, style = {} } = props;
 
 	return (
 		<Text
@@ -35,7 +33,6 @@ export default function Address(props: {
 			style={[style, fontStyles.t_codeS]}
 			ellipsizeMode="middle"
 		>
-			{prefix}
 			{address}
 		</Text>
 	);

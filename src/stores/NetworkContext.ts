@@ -22,13 +22,11 @@ import { default as React, useEffect, useMemo, useState } from 'react';
 import { deepCopyMap } from 'stores/utils';
 import {
 	dummySubstrateNetworkParams,
-	ETHEREUM_NETWORK_LIST,
 	UnknownNetworkKeys,
 	unknownNetworkParams,
 	unknownNetworkPathId
 } from 'constants/networkSpecs';
 import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
-import { NetworkParsedData } from 'types/scannerTypes';
 import {
 	loadNetworks,
 	saveNetworks,
@@ -101,7 +99,6 @@ export type GetSubstrateNetwork = (
 
 export type NetworksContextState = {
 	populateNetworks(): Promise<void>;
-	addNetwork(networkParsedData: NetworkParsedData): void;
 	networks: Map<string, SubstrateNetworkParams>;
 	allNetworks: Map<string, NetworkParams>;
 	dumpNetworksData(): string;
@@ -133,11 +130,7 @@ export function useNetworksContext(): NetworksContextState {
 	const [startupAttraction, setStartupAttraction] = useState<string>('');
 
 	const allNetworks: Map<string, NetworkParams> = useMemo(() => {
-		const ethereumNetworks: Map<string, NetworkParams> = new Map(
-			Object.entries(ETHEREUM_NETWORK_LIST)
-		);
 		return new Map([
-			...ethereumNetworks,
 			...substrateNetworks,
 			[UnknownNetworkKeys.UNKNOWN, unknownNetworkParams]
 		]);
@@ -227,17 +220,6 @@ export function useNetworksContext(): NetworksContextState {
 		return allNetworks.get(networkKey) || dummySubstrateNetworkParams;
 	}
 
-	function addNetwork(networkParsedData: NetworkParsedData): void {
-		const newNetworkParams = generateNetworkParamsFromParsedData(
-			networkParsedData
-		);
-		const networkKey = newNetworkParams.genesisHash;
-		const newNetworksList = deepCopyNetworks(substrateNetworks);
-		newNetworksList.set(networkKey, newNetworkParams);
-		setSubstrateNetworks(newNetworksList);
-		saveNetworks(newNetworkParams);
-	}
-
 	function getTypeRegistry(networkKey: string): TypeRegistry | null {
 		try {
 			if (registries.has(networkKey)) {
@@ -299,7 +281,6 @@ export function useNetworksContext(): NetworksContextState {
 	}
 
 	return {
-		addNetwork,
 		allNetworks,
 		dumpNetworksData,
 		getNetwork,

@@ -1,10 +1,6 @@
 import { default as React, useEffect, useReducer } from 'react';
 
-import {
-	ETHEREUM_NETWORK_LIST,
-	NetworkProtocols,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
+import { NetworkProtocols, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContextState } from 'stores/NetworkContext';
 import {
 	Account,
@@ -37,8 +33,7 @@ import {
 	emptyIdentity,
 	extractAddressFromAccountId,
 	getAddressKeyByPath,
-	getNetworkKey,
-	isEthereumAccountId
+	getNetworkKey
 } from 'utils/identitiesUtils';
 import {
 	brainWalletAddressWithRef,
@@ -59,11 +54,6 @@ export type AccountsContextState = {
 	updateNew: (accountUpdate: Partial<UnlockedAccount>) => void;
 	submitNew: (
 		pin: string,
-		allNetworks: Map<string, NetworkParams>
-	) => Promise<void>;
-	deriveEthereumAccount: (
-		createBrainWalletAddress: TryBrainWalletAddress,
-		networkKey: string,
 		allNetworks: Map<string, NetworkParams>
 	) => Promise<void>;
 	updateSelectedAccount: (updatedAccount: Partial<LockedAccount>) => void;
@@ -229,36 +219,6 @@ export function useAccountContext(): AccountsContextState {
 		_updateCurrentIdentity(updatedCurrentIdentity);
 	}
 
-	async function deriveEthereumAccount(
-		createBrainWalletAddress: TryBrainWalletAddress,
-		networkKey: string,
-		allNetworks: Map<string, NetworkParams>
-	): Promise<void> {
-		const networkParams = ETHEREUM_NETWORK_LIST[networkKey];
-		const ethereumAddress = await brainWalletAddressWithRef(
-			createBrainWalletAddress
-		);
-		if (ethereumAddress.address === '') throw new Error(addressGenerateError);
-		const { ethereumChainId } = networkParams;
-		const accountId = generateAccountId(
-			ethereumAddress.address,
-			networkKey,
-			allNetworks
-		);
-		if (state.currentIdentity === null) throw new Error(emptyIdentityError);
-		const updatedCurrentIdentity = deepCopyIdentity(state.currentIdentity);
-		if (updatedCurrentIdentity.meta.has(ethereumChainId))
-			throw new Error(accountExistedError);
-		updatedCurrentIdentity.meta.set(ethereumChainId, {
-			address: ethereumAddress.address,
-			createdAt: new Date().getTime(),
-			name: '',
-			updatedAt: new Date().getTime()
-		});
-		updatedCurrentIdentity.addresses.set(accountId, ethereumChainId);
-		_updateCurrentIdentity(updatedCurrentIdentity);
-	}
-
 	function _updateAccount(
 		accountKey: string,
 		updatedAccount: Partial<LockedAccount>
@@ -328,12 +288,7 @@ export function useAccountContext(): AccountsContextState {
 	function _getAccountWithoutCaseSensitive(accountId: string): Account | null {
 		let findLegacyAccount = null;
 		for (const [key, value] of state.accounts) {
-			if (isEthereumAccountId(accountId)) {
-				if (key.toLowerCase() === accountId.toLowerCase()) {
-					findLegacyAccount = value;
-					break;
-				}
-			} else if (key === accountId) {
+			if (key === accountId) {
 				findLegacyAccount = value;
 				break;
 			} else if (
@@ -369,11 +324,7 @@ export function useAccountContext(): AccountsContextState {
 				);
 				const address = addressKey;
 				const searchAccountIdOrAddress = isAccountId ? accountId : address;
-				const found = isEthereumAccountId(accountId)
-					? searchAccountIdOrAddress.toLowerCase() ===
-					  accountIdOrAddress.toLowerCase()
-					: searchAccountIdOrAddress === accountIdOrAddress;
-				if (found) {
+				if (searchAccountIdOrAddress === accountIdOrAddress) {
 					targetPath = path;
 					targetIdentity = identity;
 					targetAccountId = accountId;
@@ -588,7 +539,6 @@ export function useAccountContext(): AccountsContextState {
 		deleteAccount,
 		deleteCurrentIdentity,
 		deletePath,
-		deriveEthereumAccount,
 		deriveNewPath,
 		getAccountByAddress,
 		getById,

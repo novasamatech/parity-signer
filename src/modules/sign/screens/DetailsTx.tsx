@@ -16,7 +16,7 @@
 
 // This screen shows payload details and asks for signing confirmation
 
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Text, View, FlatList } from 'react-native';
 
 import { PayloadCardData, Action } from 'types/payloads';
@@ -25,12 +25,8 @@ import testIDs from 'e2e/testIDs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { FoundAccount } from 'types/identityTypes';
-import { isEthereumNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
-import CompatibleCard from 'components/CompatibleCard';
-import { Transaction } from 'utils/transaction';
 import styles from 'modules/sign/styles';
-import Separator from 'components/Separator';
 import Button from 'components/Button';
 import { makeTransactionCardsContents } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
@@ -41,7 +37,6 @@ function DetailsTx({
 	route,
 	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
 	const { dumpNetworksData } = useContext(NetworksContext);
 	const payload = route.params ? route.params.payload : '';
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
@@ -51,7 +46,6 @@ function DetailsTx({
 		payload: '',
 		type: ''
 	});
-	const [sender, setSender] = useState<null | FoundAccount>(null);
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {

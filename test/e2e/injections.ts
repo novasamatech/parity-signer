@@ -18,7 +18,6 @@ import { useState } from 'react';
 import { Platform } from 'react-native';
 
 import { scanRequestDataMap, ScanTestRequest } from 'e2e/mockScanRequests';
-import { TxRequestData } from 'types/scannerTypes';
 
 type AndroidAppArgs = {
 	scanRequest?: number;
@@ -53,6 +52,7 @@ export const getLaunchArgs = (props: AppProps): void => {
 	global.inTest = false;
 };
 
+/*
 const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	bounds: {
 		bounds: [
@@ -67,7 +67,9 @@ const buildSignRequest = (rawData: string, data = ''): TxRequestData => ({
 	target: 319,
 	type: Platform.OS === 'ios' ? 'org.iso.QRCode' : 'QR_CODE'
 });
+*/
 
+/*
 export function useInjectionQR(): [
 	number,
 	(
@@ -100,4 +102,4 @@ export function useInjectionQR(): [
 	};
 
 	return [mockIndex, onMockBarCodeRead];
-}
+}*/

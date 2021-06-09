@@ -128,13 +128,6 @@ export default function AccountNew({
 								} catch (e) {
 									console.error(e);
 								}
-							} else {
-								// Ethereum account
-								accountsStore.updateNew({
-									address: newAddress,
-									seed: newSeed,
-									validBip39Seed: isBip39
-								});
 							}
 						} else {
 							accountsStore.updateNew({

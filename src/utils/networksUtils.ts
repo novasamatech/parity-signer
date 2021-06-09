@@ -1,6 +1,5 @@
 import colors from 'styles/colors';
 import { SubstrateNetworkParams } from 'types/networkTypes';
-import { NetworkParsedData } from 'types/scannerTypes';
 
 export const serializeNetworks = (
 	networks: Map<string, SubstrateNetworkParams>
@@ -50,20 +49,4 @@ export const mergeNetworks = (
 		defaultNetworks
 	);
 	return new Map(Object.entries(mergedNetworksObject));
-};
-
-export const generateNetworkParamsFromParsedData = (
-	networkParsedData: NetworkParsedData
-): SubstrateNetworkParams => {
-	const pathId = networkParsedData.data.title.toLowerCase();
-	return {
-		...networkParsedData.data,
-		deleted: false,
-		logo: require('res/img/logos/Substrate_Dev.png'),
-		metadata: null,
-		order: 0,
-		pathId: pathId.replace(/ /g, '_'),
-		protocol: 'substrate',
-		secondaryColor: colors.background.card
-	};
 };

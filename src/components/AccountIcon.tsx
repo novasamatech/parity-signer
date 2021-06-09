@@ -31,24 +31,7 @@ export default function AccountIcon(props: {
 	style?: ViewStyle | ImageStyle;
 }): ReactElement {
 	const { address, style, network } = props;
-	const [ethereumIconUri, setEthereumIconUri] = useState('');
 	const protocol = network.protocol;
-
-	useEffect((): (() => void) => {
-		let promiseDisabled = false;
-
-		if (protocol === NetworkProtocols.ETHEREUM && address !== '') {
-			const setEthereumIcon = async (): Promise<void> => {
-				const generatedIconUri = await blockiesIcon('0x' + address);
-				if (promiseDisabled) return;
-				setEthereumIconUri(generatedIconUri);
-			};
-			setEthereumIcon();
-		}
-		return (): void => {
-			promiseDisabled = true;
-		};
-	}, [address, protocol]);
 
 	if (address === '') {
 		return (
@@ -66,11 +49,7 @@ export default function AccountIcon(props: {
 			</View>
 		);
 	}
-	if (protocol === NetworkProtocols.ETHEREUM) {
-		return (
-			<Image source={{ uri: ethereumIconUri }} style={style as ImageStyle} />
-		);
-	} else if (address !== '') {
+	if (address !== '') {
 		let iconSize;
 		if (typeof style?.width === 'string') {
 			const parseIconSize = parseInt(style.width, 10);
