@@ -30,7 +30,6 @@ import {
 	serializeIdentities
 } from 'utils/identitiesUtils';
 import {
-	EthereumNetworkKeys,
 	NETWORK_LIST,
 	SUBSTRATE_NETWORK_LIST,
 	SubstrateNetworkKeys,
@@ -263,7 +262,6 @@ describe('IdentitiesUtils', () => {
 			dummyNetworkContext
 		);
 		expect(networkKeys).toEqual([
-			EthereumNetworkKeys.FRONTIER,
 			SubstrateNetworkKeys.KUSAMA,
 			SubstrateNetworkKeys.WESTEND,
 			UnknownNetworkKeys.UNKNOWN,
@@ -289,7 +287,6 @@ describe('IdentitiesUtils', () => {
 		expect(getNetworkKeyByPathTest('//kusama//funding/2')).toEqual(
 			SubstrateNetworkKeys.WESTEND
 		);
-		expect(getNetworkKeyByPathTest('1')).toEqual(EthereumNetworkKeys.FRONTIER);
 	});
 
 	it('group path under their network correctly, has no missing accounts', () => {
@@ -331,8 +328,6 @@ describe('IdentitiesUtils', () => {
 		expect(isSubstrateHardDerivedPath(testPath3)).toBe(false);
 		const testPath4 = '/soft//in//the//start';
 		expect(isSubstrateHardDerivedPath(testPath4)).toBe(false);
-		const testEthereumPath = '1';
-		expect(isSubstrateHardDerivedPath(testEthereumPath)).toBe(false);
 		const testRootPath = '';
 		expect(isSubstrateHardDerivedPath(testRootPath)).toBe(false);
 	});

@@ -42,7 +42,7 @@ export function generateAccountId(
 	if (isSubstrateNetworkParams(networkParams)) {
 		const { genesisHash } = networkParams;
 		return `${protocol}:${address}:${genesisHash ?? ''}`;
-	} else if (isUnknownNetworkParams(networkParams)) {
+	} else {
 		return `substrate:${address}:${networkKey ?? ''}`;
 	}
 }

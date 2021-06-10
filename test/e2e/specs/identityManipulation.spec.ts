@@ -31,10 +31,6 @@ import {
 	pinCode,
 	waitAlert
 } from 'e2e/utils';
-import {
-	ETHEREUM_NETWORK_LIST,
-	EthereumNetworkKeys
-} from 'constants/networkSpecs';
 
 const {
 	Alert,
@@ -52,8 +48,6 @@ const defaultPath = '//default';
 const childPath = '/funding';
 const customPath = '//sunny_day/1';
 const secondPath = '/2';
-const ethereumButtonIndex =
-	ETHEREUM_NETWORK_LIST[EthereumNetworkKeys.FRONTIER].ethereumChainId;
 
 describe('Load test', () => {
 	it('create a new identity with default substrate account', async () => {
@@ -120,29 +114,6 @@ describe('Load test', () => {
 		await testTap(PathDetail.deleteButton);
 		await testTap(Alert.deleteAccount);
 		await testNotExist(PathsList.pathCard + `//kusama${defaultPath}`);
-	});
-
-	it('is able to create ethereum account', async () => {
-		await tapBack();
-		const ethereumNetworkButtonIndex =
-			Main.networkButton + EthereumNetworkKeys.FRONTIER;
-		await testTap(testIDs.Main.addNewNetworkButton);
-		await testScrollAndTap(
-			ethereumNetworkButtonIndex,
-			testIDs.Main.chooserScreen
-		);
-		await testVisible(PathDetail.screen);
-		await tapBack();
-		await testExist(Main.chooserScreen);
-	});
-
-	it('is able to delete it', async () => {
-		await testTap(Main.networkButton + ethereumButtonIndex);
-		await testVisible(PathDetail.screen);
-		await testTap(PathDetail.popupMenuButton);
-		await testTap(PathDetail.deleteButton);
-		await testTap(Alert.deleteAccount);
-		await testNotExist(Main.networkButton + ethereumButtonIndex);
 	});
 
 	it('delete identity', async () => {

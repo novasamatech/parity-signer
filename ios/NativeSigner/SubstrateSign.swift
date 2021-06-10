@@ -316,6 +316,44 @@ class SubstrateSign: NSObject {
     })
   }
 
+  @objc func parseTransaction(_ payload: String, gen_hash: String, metadata: String, type_descriptor: String, identities: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { parse_transaction($0, payload, metadata, type_descriptor, identities) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
+  }
+
+  @objc func signTransaction(_ action: String, pin: String, password: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { sign_transaction($0, action, pin, password) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
+  }
+
+  @objc func developmentTest(_ input: String, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    handle_error(
+      resolve: resolve,
+      reject: reject,
+      get_result: { development_test($0, input) },
+      success: { (res: Optional<UnsafePointer<CChar>>) -> String in
+        let val = String(cString: res!)
+        signer_destroy_string(res!)
+        return val
+    })
+  }
+
+
+
 }
 
 

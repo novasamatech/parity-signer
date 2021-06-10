@@ -39,4 +39,8 @@ RCT_EXTERN_METHOD(substrateSecret:(NSString*)suri resolve:(RCTPromiseResolveBloc
 RCT_EXTERN_METHOD(substrateSecretWithRef:(int64_t*)seedRef suri_suffix:(NSString*)suri_suffix resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(tryDecodeQrSequence:(NSInteger*)size chunk_size:(NSInteger*)chunk_size data:(NSString*)data resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(generateMetadataHandle:(NSString*)metadata resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(parseTransaction:(NSString*)payload gen_hash:(NSString*)gen_hash metadata:(NSString*)metadata type_desc:(NSString*)type_desc identities:(NSString*)identities resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(signTransaction:(NSString*)action pin:(NSString*)pin password:(NSString*)password resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(developmentTest:(NSString*)input resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+
 @end
