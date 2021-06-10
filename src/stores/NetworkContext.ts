@@ -24,21 +24,23 @@ import {
 	dummySubstrateNetworkParams,
 	UnknownNetworkKeys,
 	unknownNetworkParams,
-	unknownNetworkPathId
+	unknownNetworkPathId,
+	SUBSTRATE_NETWORK_LIST
 } from 'constants/networkSpecs';
 import { SubstrateNetworkParams, NetworkParams } from 'types/networkTypes';
 import {
 	loadNetworks,
 	saveNetworks,
 	getMetadata,
-	populateMetadata
+	populateMetadata,
+	dumpNetworks
 } from 'utils/db';
 import {
 	deepCopyNetworks,
 	generateNetworkParamsFromParsedData
 } from 'utils/networksUtils';
 import { MetadataHandle } from 'types/metadata';
-import { rustTest } from 'utils/native';
+import { rustTest, dbInit } from 'utils/native';
 
 // https://github.com/polkadot-js/ui/blob/f2f36e2db07f5faec14ee43cf4295f5e8a6f3cfa/packages/reactnative-identicon/src/icons/Polkadot.tsx#L37.
 
@@ -159,6 +161,7 @@ export function useNetworksContext(): NetworksContextState {
 			const initNetworkSpecs = await loadNetworks();
 			setSubstrateNetworks(initNetworkSpecs);
 			setRegistriesReady(true);
+			await dbInit();
 			console.log('====INITIALIZATION COMPLETE=====');
 		};
 		initNetworksAndRegistries();

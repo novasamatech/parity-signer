@@ -40,7 +40,7 @@ export default function Scanner({
 	const [decodeProcess, setDecodeProcess] = useState(true);
 
 	// E2E tests
-	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
+	//const [mockIndex, onMockBarCodeRead] = useInjectionQR();
 
 	// all code to derive information when size of package is determined
 	function setExpectedMessageInfo(size: string): void {

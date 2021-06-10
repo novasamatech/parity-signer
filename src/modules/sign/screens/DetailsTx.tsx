@@ -31,7 +31,6 @@ import Button from 'components/Button';
 import { makeTransactionCardsContents } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
 import { dumpMetadataDB, loadIdentities } from 'utils/db';
-import { typeDefs } from 'constants/typeDefs';
 
 function DetailsTx({
 	route,
@@ -49,17 +48,10 @@ function DetailsTx({
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
-			const networksData = dumpNetworksData();
-			const metadata = await dumpMetadataDB();
-			const metadataJSON = JSON.stringify(metadata);
-			const identities = await loadIdentities();
-			console.log(identities);
 			const cardsSet = await makeTransactionCardsContents(
 				encoded,
-				networksData,
-				metadataJSON,
-				typeDefs
 			);
+
 			//TODO: here should be finer features on what to do
 			//with different payload types.
 			//

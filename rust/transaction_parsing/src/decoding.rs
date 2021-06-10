@@ -1,16 +1,16 @@
 use regex::Regex;
 use lazy_static::lazy_static;
 use parity_scale_codec::{Decode, HasCompact, Compact};
+use serde;
 use serde_json;
 use std::mem::size_of;
 use sp_arithmetic::{Percent, Perbill, PerU16};
 use frame_metadata::{RuntimeMetadataV12};
 use bitvec::prelude::{BitVec, Lsb0};
 use printing_balance::convert_balance_pretty;
+use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
 use super::method::what_next;
-use super::parse_types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField};
-use super::utils_chainspecs::ChainSpecEntry;
 use super::utils_base58::vec_to_base;
 
 /// struct to store the decoded data as string and as fancy easy-to-import-to-js string,
@@ -155,7 +155,7 @@ pub fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: u32, indent: u32
 
 /// function to decode any type, including calls and vectors of calls
 
-pub fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
 
     match found_ty {
         "Box<<T as Config<I>>::Proposal>" | "Box<<T as Config>::Call>" | "Box<<T as Config>::Proposal>" => {
@@ -199,7 +199,7 @@ pub fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &RuntimeMetadata
 /// function to process single call;
 /// the place to start when decoding the transaction
 
-pub fn process_as_call (mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, mut indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn process_as_call (mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, mut indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     let call_in_processing = what_next (data, meta)?;
     data = call_in_processing.data;
     
@@ -249,7 +249,7 @@ lazy_static! {
 
 /// function to decode Option<_>
 
-pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     if inner_ty == "bool" {
         let (decoded_string, fancy_out) = match &data[0] {
             0 => (serde_json::to_string(&(serde_json::Value::Null)).unwrap(), format!(",{}", fancy(index, indent, "none", "\"\""))),
@@ -301,7 +301,7 @@ pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
 
 /// function to decode Vector<_>
 
-pub fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     let pre_vector = get_compact::<u32>(&data)?;
     let mut output_prep = String::from("[");
     let mut fancy_output_prep = String::new();
@@ -343,7 +343,7 @@ pub fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
 
 /// function to decode an array
 
-pub fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     let mut output_prep = String::from("[");
     let mut fancy_output_prep = String::new();
     for i in 1..number_of_elements+1 {
@@ -456,7 +456,7 @@ pub fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Resul
 
 /// function to decode of AccounId special case (with transformation into base58 format)
 
-pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     if data.len() < 32 {return Err("Data shorter than expected length.")}
     let decoded_data = <[u8; 32]>::decode(&mut &data[..32]);
     match decoded_data {
@@ -488,7 +488,7 @@ fn goto_balance(found_ty: &str) -> bool {
 /// function to decode and represent properly any special case related to balances
 /// (both compacts and non-compacts)
 
-pub fn special_case_balance (found_ty: &str, data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn special_case_balance (found_ty: &str, data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     
     match found_ty {
         "Balance" | "T::Balance" | "BalanceOf<T>" | "BalanceOf<T, I>" => {
@@ -541,7 +541,7 @@ pub fn special_case_balance (found_ty: &str, data: Vec<u8>, mut index: u32, inde
 
 /// function to decode structs
 
-pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     let mut fancy_out = String::new();
     let mut output_prep = String::from("{{");
     for (i, y) in v1.iter().enumerate() {
@@ -580,7 +580,7 @@ pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database
 
 /// function to decode enums
 
-pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
     let enum_index = data[0] as usize;
     if enum_index >= v1.len() {return Err("While decoding Enum, encountered unexpected variant.")}
     let found_variant = &v1[enum_index];
@@ -663,7 +663,7 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
 
 /// function to decode anything except calls
 
-pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecEntry) -> Result<DecodedOut, &'static str> {
+pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
 //    println!("Dealing with type: {}", found_ty);
     if data.len()==0 {return Err("Data is empty.");}
     match decode_primitive(&found_ty, &data, index, indent) {

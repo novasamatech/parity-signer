@@ -20,8 +20,10 @@ import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 import { MetadataHandle } from 'types/metadata';
-import { dumpIdentities } from 'utils/db';
+import { dumpIdentities, dumpMetadataDB } from 'utils/db';
 import { PayloadCardsSet } from 'types/payloads';
+import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
+import { typeDefs } from 'constants/typeDefs';
 
 const { SubstrateSign } = NativeModules || {};
 
@@ -82,6 +84,25 @@ export async function rustTest(input: string): Promise<string> {
 	return output;
 }
 
+export async function dbInit(): Promise<void> {
+	try {
+		const networksData = JSON.stringify(Array.from(Object.entries(SUBSTRATE_NETWORK_LIST)));
+		const metadata = await dumpMetadataDB();
+		const metadataJSON = JSON.stringify(metadata);
+		const identities = await dumpIdentities();
+		const parsedJSON = await SubstrateSign.dbInit(
+			networksData,
+			metadataJSON,
+			typeDefs,
+			identities
+		);
+		console.log('db created!');
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+
 //Try to decode fountain packages
 export async function tryDecodeQr(
 	data: Array<string>,
@@ -115,18 +136,9 @@ export async function generateMetadataHandle(
 
 export async function makeTransactionCardsContents(
 	payload: string,
-	genHash: string,
-	metadata: string,
-	typeDescriptor: string
 ): Promise<PayloadCardsSet> {
-	const identities = await dumpIdentities();
-	console.log(identities);
 	const parsedJSON = await SubstrateSign.parseTransaction(
-		payload,
-		genHash,
-		metadata,
-		typeDescriptor,
-		identities
+		payload
 	);
 	console.log(parsedJSON);
 	const parsed = JSON.parse(parsedJSON);

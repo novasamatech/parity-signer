@@ -772,6 +772,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "db_handling"
+version = "0.1.0"
+dependencies = [
+ "hex",
+ "lazy_static",
+ "parity-scale-codec",
+ "parity-scale-codec-derive",
+ "regex",
+ "serde_json",
+ "sled",
+]
+
+[[package]]
 name = "deflate"
 version = "0.7.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2735,6 +2748,7 @@ dependencies = [
  "base64 0.10.1",
  "blake2-rfc",
  "blockies",
+ "db_handling",
  "ethsign",
  "ffi-support",
  "frame-metadata",
@@ -3420,6 +3434,7 @@ dependencies = [
  "base58",
  "bitvec",
  "blake2-rfc",
+ "db_handling",
  "frame-metadata",
  "hex",
  "lazy_static",
@@ -3430,6 +3445,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "sled",
  "sp-arithmetic",
  "sp-runtime",
 ]
@@ -3438,11 +3454,14 @@ dependencies = [
 name = "transaction_signing"
 version = "0.1.0"
 dependencies = [
+ "db_handling",
  "ethsign",
  "hex",
  "lazy_static",
+ "parity-scale-codec",
  "regex",
  "serde_json",
+ "sled",
  "sp-core",
 ]
 

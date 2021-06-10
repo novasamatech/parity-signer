@@ -239,79 +239,93 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void tryDecodeQrSequence(int size, int chunkSize, String data, Promise promise) {
-        try {
-            String decoded = qrparserTryDecodeQrSequence(size, chunkSize, data);
-            promise.resolve(decoded);
-        } catch (Exception e) {
-            rejectWithException(promise, "try to decode qr goblet", e);
-        }
-    }
-
-    @ReactMethod
-    public void generateMetadataHandle(String metadata, Promise promise) {
-    	promise.resolve(metadataGenerateMetadataHandle(metadata));
-    }
-
-    @ReactMethod
-    public void parseTransaction(String payload, String genHash, String metadata, String typeDescriptor, String identities, Promise promise) {
-    	try {
-		String decoded = substrateParseTransaction(payload, genHash, metadata, typeDescriptor, identities);
-		promise.resolve(decoded);
-	} catch (Exception e) {
-		rejectWithException(promise, "transaction parsing", e);
+	@ReactMethod
+	public void tryDecodeQrSequence(int size, int chunkSize, String data, Promise promise) {
+		try {
+			String decoded = qrparserTryDecodeQrSequence(size, chunkSize, data);
+			promise.resolve(decoded);
+		} catch (Exception e) {
+			rejectWithException(promise, "try to decode qr goblet", e);
+        	}
 	}
-    }
 
-    @ReactMethod
-    public void signTransaction(String action, String pin, String password, Promise promise) {
-    	try {
-		String signed = substrateSignTransaction(action, pin, password);
-		promise.resolve(signed);
-	} catch (Exception e) {
-		rejectWithException(promise, "transaction signing", e);
+	@ReactMethod
+	public void generateMetadataHandle(String metadata, Promise promise) {
+		promise.resolve(metadataGenerateMetadataHandle(metadata));
 	}
-    }
 
-    @ReactMethod
-    public void developmentTest(String input, Promise promise) {
-    	try {
-		String path = reactContext.getFilesDir().toString();
-		String output = substrateDevelopmentTest(path);
-		promise.resolve(output);
-	} catch (Exception e) {
-		rejectWithException(promise, "Rust interface testing error", e);
+	@ReactMethod
+	public void parseTransaction(String transaction, Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			String decoded = substrateParseTransaction(transaction, dbname);
+			promise.resolve(decoded);
+		} catch (Exception e) {
+			rejectWithException(promise, "transaction parsing", e);
+		}
 	}
-    }
 
-    private static native String ethkeyBrainwalletAddress(String seed);
-    private static native String ethkeyBrainwalletBIP39Address(String seed);
-    private static native String ethkeyBrainwalletSign(String seed, String message);
-    private static native String ethkeyRlpItem(String data, int position);
-    private static native String ethkeyKeccak(String data);
-    private static native String ethkeyBlake(String data);
-    private static native String ethkeyEthSign(String data);
-    private static native String ethkeyBlockiesIcon(String seed);
-    private static native String ethkeyRandomPhrase(int wordsNumber);
-    private static native String ethkeyEncryptData(String data, String password);
-    private static native String ethkeyDecryptData(String data, String password);
-    private static native String ethkeyQrCode(String data);
-    private static native String ethkeyQrCodeHex(String data);
-    private static native String substrateBrainwalletAddress(String seed, int prefix);
-    private static native String substrateBrainwalletSign(String seed, String message);
-    private static native boolean schnorrkelVerify(String seed, String message, String signature);
-    private static native long ethkeyDecryptDataRef(String data, String password);
-    private static native void ethkeyDestroyDataRef(long data_ref);
-    private static native String ethkeyBrainwalletSignWithRef(long seed_ref, String message);
-    private static native String ethkeySubstrateBrainwalletSignWithRef(long seed_ref, String suriSuffix, String message);
-    private static native String ethkeySubstrateWalletAddressWithRef(long seedRef, String suriSuffix, int prefix);
-    private static native String ethkeyBrainWalletAddressWithRef(long seedRef);
-    private static native String ethkeySubstrateMiniSecretKey(String suri);
-    private static native String ethkeySubstrateMiniSecretKeyWithRef(long seedRef, String suriSuffix);
-    private static native String qrparserTryDecodeQrSequence(int size, int chunkSize, String data);
-    private static native String metadataGenerateMetadataHandle(String metadata);
-    private static native String substrateParseTransaction(String payload, String genHash, String metadata, String typeDescriptor, String identities);
-    private static native String substrateSignTransaction(String action, String pin, String password);
-    private static native String substrateDevelopmentTest(String input);
+	@ReactMethod
+	public void signTransaction(String action, String pin, String password, Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			String signed = substrateSignTransaction(action, pin, password, dbname);
+			promise.resolve(signed);
+		} catch (Exception e) {
+			rejectWithException(promise, "transaction signing", e);
+		}
+	}
+
+	@ReactMethod
+	public void developmentTest(String input, Promise promise) {
+		try {
+			String path = reactContext.getFilesDir().toString();
+			String output = substrateDevelopmentTest(path);
+			promise.resolve(output);
+		} catch (Exception e) {
+			rejectWithException(promise, "Rust interface testing error", e);
+		}
+	}
+
+	@ReactMethod
+	public void dbInit(String genHash, String metadata, String typeDescriptor, String identities, Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			substrateDbInit(genHash, metadata, typeDescriptor, identities, dbname);
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "Database initialization error", e);
+		}
+	}
+
+	private static native String ethkeyBrainwalletAddress(String seed);
+	private static native String ethkeyBrainwalletBIP39Address(String seed);
+	private static native String ethkeyBrainwalletSign(String seed, String message);
+	private static native String ethkeyRlpItem(String data, int position);
+	private static native String ethkeyKeccak(String data);
+	private static native String ethkeyBlake(String data);
+	private static native String ethkeyEthSign(String data);
+	private static native String ethkeyBlockiesIcon(String seed);
+	private static native String ethkeyRandomPhrase(int wordsNumber);
+	private static native String ethkeyEncryptData(String data, String password);
+	private static native String ethkeyDecryptData(String data, String password);
+	private static native String ethkeyQrCode(String data);
+	private static native String ethkeyQrCodeHex(String data);
+	private static native String substrateBrainwalletAddress(String seed, int prefix);
+	private static native String substrateBrainwalletSign(String seed, String message);
+	private static native boolean schnorrkelVerify(String seed, String message, String signature);
+	private static native long ethkeyDecryptDataRef(String data, String password);
+	private static native void ethkeyDestroyDataRef(long data_ref);
+	private static native String ethkeyBrainwalletSignWithRef(long seed_ref, String message);
+	private static native String ethkeySubstrateBrainwalletSignWithRef(long seed_ref, String suriSuffix, String message);
+	private static native String ethkeySubstrateWalletAddressWithRef(long seedRef, String suriSuffix, int prefix);
+	private static native String ethkeyBrainWalletAddressWithRef(long seedRef);
+	private static native String ethkeySubstrateMiniSecretKey(String suri);
+	private static native String ethkeySubstrateMiniSecretKeyWithRef(long seedRef, String suriSuffix);
+	private static native String qrparserTryDecodeQrSequence(int size, int chunkSize, String data);
+	private static native String metadataGenerateMetadataHandle(String metadata);
+	private static native String substrateParseTransaction(String transaction, String dbname);
+	private static native String substrateSignTransaction(String action, String pin, String password, String dbname);
+	private static native String substrateDevelopmentTest(String input);
+	private static native void substrateDbInit(String genHash, String metadata, String typeDescriptor, String identities, String dbname);
 }

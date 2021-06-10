@@ -1,7 +1,6 @@
-use transaction_parsing::{full_run, DataFiles};
-use std::fs;
+use transaction_parsing::full_run;
 
-fn main() -> Result<(), &'static str>{
+fn main() {
 //    let input_data = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27da40403008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480700e8764817b501b8003200000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e538a7d7a0ac17eb6dd004578cb8e238c384a10f57c999a3fa1200409cd9b3f33e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
 
 //    let input_data = "530102d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d550210020c060000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0700b864d9450006050800aebb0211dbb07b4d335a657257b8ac5e53794c901e4f616d4a254f2490c43934009ae581fef1fc06828723715731adcf810e42ce4dadad629b1b7fa5c3c144a81d0608008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48f501b4003200000005000000e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e314e9f9aef4e836a54bdd109aba380106e05e2ea83fbc490206b476840cd68e3e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e";
@@ -20,34 +19,9 @@ fn main() -> Result<(), &'static str>{
 
 //    let input_data = "53010296129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04a804030096129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e040b00407a10f35a0502000b00a0724e18092a23000000000000e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c977939685426ef5405ee88fb80e8968f8a4c9f600af82d4537a79c418721dde54221e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779";
     
-    let types_info = match fs::read_to_string("new_full_types") {
-        Ok(x) => x,
-        Err(_) => return Err("Type database missing"),
-    };
+    let dbname = "../db_handling/signer_database";
     
-    let chain_spec_database = match fs::read_to_string("database_output") {
-        Ok(x) => x,
-        Err(_) => return Err("Chain spec database missing"),
-    };
-    
-    let metadata_contents = match fs::read_to_string("metadata_database.ts") {
-        Ok(x) => x,
-        Err(_) => return Err("Metadata database missing"),
-    };
-    
-    let identities = match fs::read_to_string("identities") {
-        Ok(x) => x,
-        Err(_) => return Err("Identities database missing"),
-    };
-    
-    let datafiles = DataFiles {
-        chain_spec_database: &chain_spec_database,
-        metadata_contents: &metadata_contents,
-        types_info: &types_info,
-        identities: &identities,
-    };
-    
-    match full_run (input_data, datafiles) {
+    match full_run (input_data, dbname) {
         Ok(a) => {
             println!("Format to import into js:");
             println!("{}", a.js_cards);
@@ -56,5 +30,4 @@ fn main() -> Result<(), &'static str>{
         },
         Err(e) => println!("Error. {}", e),
     }
-    Ok(())
 }

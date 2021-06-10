@@ -25,8 +25,8 @@ use rustc_hex::{FromHex, ToHex};
 use tiny_keccak::keccak256 as keccak;
 use tiny_keccak::Keccak;
 use serde_json;
-use sled;
 
+use db_handling;
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
 use transaction_parsing;
@@ -372,21 +372,12 @@ export! {
 
     @Java_io_parity_signer_SubstrateSignModule_substrateParseTransaction
 	fn parse_transaction(
-		payload: &str,
-        gen_hash: &str,
-        metadata: &str,
-        type_descriptor: &str,
-        identities: &str
-	) -> crate::Result<String> {
-        let datafiles = transaction_parsing::DataFiles {
-            chain_spec_database : gen_hash,
-            metadata_contents : metadata,
-            types_info : type_descriptor,
-            identities: identities,
-        };
-        match transaction_parsing::full_run(payload, datafiles) {
+		transaction: &str,
+        dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        match transaction_parsing::full_run(transaction, dbname) {
             Ok(a) => Ok(a.js_cards.to_string()),
-            Err(e) => Ok(e.to_string()),
+            Err(e) => Err(e),
         }
     }
 
@@ -394,34 +385,37 @@ export! {
 	fn sign_transaction(
 		action: &str,
         pin: &str,
-        password: &str
+        password: &str,
+        dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        transaction_signing::create_signature(action, pin, password)
+        transaction_signing::create_signature(action, pin, password, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest
 	fn development_test(
-		input: &str
+		_input: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         let output = Ok(std::env::consts::OS.to_string());
-        /*let conn = rusqlite::Connection::open(&format!("{}/test.db3", input))?;
-        conn.execute(
-            "CREATE TABLE test1 (
-                id      INTEGET PRIMARY KEY,
-                name    TEXT
-                )",
-            rusqlite::NO_PARAMS,
-        ).unwrap();*/
-        //conn.execute("CREATE TABLE ", [],)?;
-        //let output = Ok("meh".to_string());
-        let tree = sled::open(&format!("{}", input))?;
-        /*match tree.insert(b"test1", input.as_bytes()) {
-            Ok(None) => Ok("success".to_string()),
-            Ok(Some(s)) => Ok(format!("{:?}",s)),
-            Err(e) => Err(Box::new(e)),
-        }*/
         return output;
     }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateDbInit
+	fn db_init(
+        gen_hash: &str,
+        metadata: &str,
+        type_descriptor: &str,
+        identities: &str,
+		dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let datafiles = db_handling::DataFiles {
+            chain_spec_database : gen_hash,
+            metadata_contents : metadata,
+            types_info : type_descriptor,
+            identities: identities,
+        };
+        db_handling::fill_database_from_files(dbname, datafiles)
+    }
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);
