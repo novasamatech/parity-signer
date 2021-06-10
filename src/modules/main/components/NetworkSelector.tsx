@@ -189,6 +189,7 @@ function NetworkSelector({
 	}): ReactElement => {
 		const [networkKey, networkParams] = item;
 		const networkIndexSuffix = networkParams.pathId;
+		console.log(item);
 		return (
 			<NetworkCard
 				key={networkKey}

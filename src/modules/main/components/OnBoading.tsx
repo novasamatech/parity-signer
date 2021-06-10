@@ -26,11 +26,7 @@ import styles from 'modules/main/styles';
 import fontStyles from 'styles/fontStyles';
 import { RootStackParamList } from 'types/routes';
 
-export default function OnBoardingView({
-	hasLegacyAccount
-}: {
-	hasLegacyAccount: boolean;
-}): React.ReactElement {
+export default function OnBoardingView(): React.ReactElement {
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 
 	function TextButton({
@@ -63,15 +59,6 @@ export default function OnBoardingView({
 				<Text style={fontStyles.quote}> or </Text>
 				<TextButton text="recover" isRecover={true} />
 				<Text style={fontStyles.quote}>your identity to get started.</Text>
-				{hasLegacyAccount && (
-					<Button
-						title="Show Legacy Accounts"
-						onPress={(): void => navigation.navigate('LegacyAccountList')}
-						small={true}
-						onlyText={true}
-						style={{ marginLeft: 0 }}
-					/>
-				)}
 			</View>
 		</SafeAreaScrollViewContainer>
 	);

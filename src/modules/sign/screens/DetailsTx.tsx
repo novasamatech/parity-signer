@@ -22,21 +22,16 @@ import { Text, View, FlatList } from 'react-native';
 import { PayloadCardData, Action } from 'types/payloads';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
-import { FoundAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import styles from 'modules/sign/styles';
 import Button from 'components/Button';
 import { makeTransactionCardsContents } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
-import { dumpMetadataDB, loadIdentities } from 'utils/db';
 
 function DetailsTx({
 	route,
 	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
-	const { dumpNetworksData } = useContext(NetworksContext);
 	const payload = route.params ? route.params.payload : '';
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }

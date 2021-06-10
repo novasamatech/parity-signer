@@ -415,6 +415,15 @@ export! {
         };
         db_handling::fill_database_from_files(dbname, datafiles)
     }
+    
+    @Java_io_parity_signer_SubstrateSignModule_dbGetNetwork
+	fn get_network(
+		genesis_hash: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        
+        let output = Ok(std::env::consts::OS.to_string());
+        return output;
+    }
 
 }
 
