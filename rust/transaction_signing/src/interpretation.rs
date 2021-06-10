@@ -5,8 +5,12 @@ use lazy_static::lazy_static;
 // Making lazy statics for regex interpreting input action string
 
 lazy_static! {
-    static ref REG_CHECKSUM: Regex = Regex::new(r#"(?i)"checksum":( )*"(?P<checksum>[0-9]*)""#).unwrap();
+    static ref REG_CHECKSUM: Regex = Regex::new(r#"(?i)"checksum":( )*"(?P<checksum>[0-9]*)""#).expect("constructed from checked static value");
 }
+
+
+/// Function for integrity check of action line returned from RN.
+/// In case of success produces u32 checksum for database.
 
 pub fn get_checksum (action_line: &str) -> Result<u32, Box<dyn std::error::Error>> {
     let checksum: u32 = match REG_CHECKSUM.captures(&action_line) {

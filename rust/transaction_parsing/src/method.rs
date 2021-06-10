@@ -1,26 +1,28 @@
 use frame_metadata::{RuntimeMetadataV12, DecodeDifferent};
 
-/// struct to store the method information
+/// Struct to store the method information
 pub struct Method {
     pub pallet_name: String,
     pub method_name: String,
     pub arguments: Vec<Argument>
 }
 
-/// struct to store the argument name and type
+/// Struct to store the argument name and type
 pub struct Argument {
     pub name: String,
     pub ty: String,
 }
 
-/// struct to store current method and remaining data
+/// Struct to store current method and remaining data
 pub struct NextDecode {
     pub method: Method,
     pub data: Vec<u8>,
 }
 
-/// function to search through metadata for method with given pallet index and method index,
-/// in case of success outputs Method
+/// Function to search through metadata for method with given pallet index and method index,
+/// in case of success outputs Method value.
+/// Pallet index is explicitly recorded in network metadata as a number.
+/// Method index is ordinal number in vector of calls within pallet.
 
 pub fn find_method (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV12) -> Result<Method, &'static str> {
     let mut found_pallet_name = None;
@@ -80,7 +82,8 @@ pub fn find_method (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
     }
 }
 
-/// function to find method for current call
+/// Function to find method for current call.
+/// Outputs NextDecode value.
 
 pub fn what_next (data: Vec<u8>, meta: &RuntimeMetadataV12) -> Result<NextDecode, &'static str> {
     if data.len() < 2 {return Err("Data vector too short");}

@@ -4,11 +4,11 @@ use db_handling::{metadata::NameVersioned};
 use parity_scale_codec::{Decode, Encode};
 use sled::Tree;
 
-/// function searches for full metadata for certain chain name and version in metadata database;
-/// checks that found full metadata indeed corresponds to the queried name and version;
+/// Function searches for full metadata for certain chain name and version in metadata database tree.
+/// Checks that found full metadata indeed corresponds to the queried name and version;
 /// in case of successful find produces a tuple of corresponding RuntimeMetadataV12 and Option<u32>;
 /// Option is None if the version of chain is the latest known one,
-/// and Some(latest_version) if there are later versions available
+/// and Some(latest_version) if there are later versions available.
 
 pub fn find_meta(chain_name: &str, version: u32, metadata: &Tree) -> Result<(RuntimeMetadataV12, Option<u32>), Box<dyn std::error::Error>> {
     

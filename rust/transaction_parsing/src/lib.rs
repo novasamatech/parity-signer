@@ -16,7 +16,14 @@ mod decoding;
     use decoding::{process_as_call, fancy};
 
 
-/// struct to separate prelude, address, actual method, and extrinsics in transaction string
+/// Transaction in hex format as it arrives into parsing program contains following elements:
+/// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),
+/// see the standard for details,
+/// - author public key (length depends on cryptography used),
+/// - method, extrinsics, network genesis hash
+
+
+/// Struct to decode method, extrinsics, and genesis hash from transaction Vec<u8>
 #[derive(Debug, parity_scale_codec_derive::Decode)]
 struct TransactionParts {
     method: Vec<u8>,
@@ -24,14 +31,15 @@ struct TransactionParts {
     genesis_hash: [u8; 32],
 }
 
-/// enum to record author public key depending on crypto used: so far ed25519, sr25519, and ecdsa should be supported
+/// Enum to record author public key depending on crypto used:
+/// so far ed25519, sr25519, and ecdsa should be supported
 enum AuthorPublicKey {
     Ed25519([u8; 32]),
     Sr25519([u8; 32]),
     Ecdsa([u8; 33]),
 }
 
-/// struct to decode extrinsics
+/// Struct to decode extrinsics
 #[derive(Debug, parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 struct ExtrinsicValues {
     era: Era,
@@ -45,7 +53,7 @@ struct ExtrinsicValues {
     block_hash: [u8; 32],
 }
 
-/// struct to store the output of decoding: "normal" format and fancy easy-into-js format
+/// Struct to store the output of decoding: "normal" format and fancy easy-into-js format
 
 pub struct DecodingResult {
     pub normal_cards: String,
@@ -62,8 +70,8 @@ fn print_fancy_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, s
 }
 
 
-/// function to parse full transaction
-/// transaction format corresponds to what we get from qr code:
+/// Function to parse full transaction.
+/// Transaction format corresponds to what we get from qr code:
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
@@ -81,9 +89,9 @@ pub fn full_run (transaction: &str, dbname: &str) -> Result<DecodingResult, Box<
     };
     
     let (author_pub_key, data) = match &data_hex[2..4] {
-        "00" => (AuthorPublicKey::Ed25519(data[3..35].try_into().unwrap()), &data[35..]),
-        "01" => (AuthorPublicKey::Sr25519(data[3..35].try_into().unwrap()), &data[35..]),
-        "02" => (AuthorPublicKey::Ecdsa(data[3..36].try_into().unwrap()), &data[36..]),
+        "00" => (AuthorPublicKey::Ed25519(data[3..35].try_into().expect("fixed size should fit in array")), &data[35..]),
+        "01" => (AuthorPublicKey::Sr25519(data[3..35].try_into().expect("fixed size should fit in array")), &data[35..]),
+        "02" => (AuthorPublicKey::Ecdsa(data[3..36].try_into().expect("fixed size should fit in array")), &data[36..]),
         _ => return Err(Box::from("Crypto type not supported."))
     };
     
@@ -102,7 +110,7 @@ pub fn full_run (transaction: &str, dbname: &str) -> Result<DecodingResult, Box<
     if transaction_decoded.genesis_hash != short.genesis_hash {return Err(Box::from("Two different genesis hashes are found."))}
 
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
-    /*match &data_hex[4..6] {
+   /* match &data_hex[4..6] {
         "00" => {
             if let Era::Immortal = short.era {return Err(Box::from("Expected mortal transaction because of prelude. Got immortal one on decoding."))}
         },

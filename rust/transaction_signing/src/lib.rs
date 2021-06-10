@@ -9,7 +9,10 @@ use parity_scale_codec::{Decode, Encode};
 mod interpretation;
 use interpretation::get_checksum;
 
-/// function to create signatures using js output action line, and user entered pin and password
+
+/// Function to create signatures using RN output action line, and user entered pin and password.
+/// Also needs database name to fetch saved transaction and key.
+
 pub fn create_signature (action_line: &str, pin: &str, pwd_entry: &str, dbname: &str) -> Result<String, Box<dyn std::error::Error>> {
 
 // get checksum from action line

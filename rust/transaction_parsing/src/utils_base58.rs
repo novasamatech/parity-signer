@@ -4,11 +4,11 @@ use blake2_rfc::blake2b::blake2b;
 use super::constants::PREFIX;
 
 
-/// function to convert Vec<u8> into base58 address,
-/// needs u8 prefix (found in chain specs);
+/// Function to convert Vec<u8> into base58 address,
+/// needs u8 prefix (found in chain specs).
 /// Vec<u8> length should be 32 for ed25519 and sr25519 encoding
 /// and 33 for ecdsa encoding,
-/// this should be checked elsewhere
+/// this should be checked elsewhere.
 
 pub fn vec_to_base (data: &Vec<u8>, prefix: u8) -> String {
     let mut fin = vec![prefix];
