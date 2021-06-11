@@ -8,6 +8,7 @@ set -e
 echo "[+] Building rust components"
 "$(dirname "${0}")"/build.sh android
 echo "[+] Moving to android directory to build app..."
+yarn install
 pushd "$(dirname "${0}")"/../android
   echo "[+] Running Gradle"
   ./gradlew assembleRelease
