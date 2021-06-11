@@ -7,6 +7,7 @@ android-build-release:
   only:
     - master
     - /^[0-9]+$/
+    - mp-gitlab-build
   script: |
     cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     /build/scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
