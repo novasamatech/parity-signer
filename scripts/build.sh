@@ -1,10 +1,11 @@
 #!/bin/bash
+set -e
 
-source ./scripts/variables.sh
+. "$(dirname "${0}")/variables.sh"
 
-cd ./rust/signer
+cd "$(dirname "${0}")/../rust/signer"
 
-if [ $1 == "android" ]
+if [ "$1" == "android" ]
   then
 
     # Build android
@@ -55,7 +56,7 @@ if [ $1 == "android" ]
 
 fi
 
-if [ $1 == "ios" ]
+if [ "$1" == "ios" ]
   then
 
     # Build iOS
