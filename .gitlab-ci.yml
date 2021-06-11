@@ -8,4 +8,5 @@ android-build-release:
     - master
     - /^[0-9]+$/
   script: |
-    /build/scripts/build-release.sh
+    cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
+    /build/scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
