@@ -10,6 +10,9 @@ use users::load_users;
 pub mod settings;
 use settings::load_types;
 
+mod db_utils;
+mod constants;
+
 /// struct to store three important databases: chain_spec, metadata, and types_info
 pub struct DataFiles<'a> {
     pub chain_spec_database: &'a str,
@@ -27,4 +30,9 @@ pub fn fill_database_from_files (dbname: &str, datafiles: DataFiles) -> Result<(
     
     Ok(())
     
+}
+
+#[cfg(tests)]
+mod tests {
+    use super::*;
 }
