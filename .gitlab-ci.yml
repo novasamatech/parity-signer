@@ -1,6 +1,13 @@
 stages:
   - build
 
+variables:
+  GIT_STRATEGY: fetch
+  GIT_DEPTH: 100
+
+default:
+  cache: {}
+
 android-build-release:
   stage: build
   image: paritytech/parity-signer
