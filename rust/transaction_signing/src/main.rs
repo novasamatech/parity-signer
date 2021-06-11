@@ -2,7 +2,7 @@ use transaction_signing::*;
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let dbname = "../db_handling/signer_database";
+    let dbname = "../db_handling/tests/signer_database";
     let mock_action_line = r#"{"checksum":"1076431204","has_password":"false"}"#;
     let pin = "000000";
     let pwd_entry = "jaskier";

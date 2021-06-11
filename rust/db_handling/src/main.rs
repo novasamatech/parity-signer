@@ -6,7 +6,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 // creating the database from the files
 
-    let dbname = "signer_database";
+    let dbname = "tests/signer_database";
     let types_info = match fs::read_to_string("new_full_types") {
         Ok(x) => x,
         Err(_) => return Err(Box::from("Type database missing")),

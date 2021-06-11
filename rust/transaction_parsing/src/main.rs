@@ -19,7 +19,7 @@ fn main() {
 
 //    let input_data = "53010296129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e04a804030096129dcebc2e10f644e81fcf4269a663e521330084b1e447369087dec8017e040b00407a10f35a0502000b00a0724e18092a23000000000000e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c977939685426ef5405ee88fb80e8968f8a4c9f600af82d4537a79c418721dde54221e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779";
     
-    let dbname = "../db_handling/signer_database";
+    let dbname = "../db_handling/tests/signer_database";
     
     match full_run (input_data, dbname) {
         Ok(a) => {
