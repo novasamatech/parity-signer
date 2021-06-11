@@ -17,6 +17,9 @@ android-build-release:
     - master
     - /^[0-9]+$/
     - mp-gitlab-build
+  artifacts:
+    paths:
+      - signer-app-release-signed.apk
   script: |
     cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     wc /tmp/gitlab-ci.keystore
