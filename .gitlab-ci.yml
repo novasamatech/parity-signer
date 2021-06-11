@@ -20,4 +20,4 @@ android-build-release:
   script: |
     cat "$KEYSTORE_DATA" | base64 -d > /tmp/gitlab-ci.keystore
     wc /tmp/gitlab-ci.keystore
-    /build/scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
+    ./scripts/build-release.sh /tmp/gitlab-ci.keystore "$KEYSTORE_ALIAS" "$KEYSTORE_PASS"
