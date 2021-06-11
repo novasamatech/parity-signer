@@ -92,25 +92,31 @@ const char * try_decode_qr_sequence(struct ExternError*, int size, int chunk_siz
 const char * generate_metadata_handle(struct ExternError*, const char* metadata);
 
 // Parse transaction
-// takes 4 strings:
-// payload; genesis hash list, metadata list, type descriptor list
-// Returns decoded payload as serialized payload cards contents with following structure:
-// {Method:[...], Extrinsic:[...]}
+// takes 2 strings:
+// transaction, dbname (from OS)
+// Returns decoded payload as serialized payload cards contents with following structure (JSON):
+// {author:[...], warning:[...], error:[...], method:[...], extrinsic:[...]}
 // Each card has following fields:
 // index - to sort cards on screen, use as key in flatlist env
 // indent - indentation to visualize cards hierarchy
 // type - type of card
 // payload - contents of card
-// identities - dump of identities from RN storage
-const char * parse_transaction(struct ExternError*, const char* payload, const char* gen_hash, const char* metadata, const char* type_descriptor, const char* identities);
+const char * parse_transaction(struct ExternError*, const char* transaction, const char* dbname);
 
 // Sign transaction
 // wrapper to actually sign transaction in 1 simple call:
-// takes 3 strings
+// takes 4 strings
 // action: json-payload with action to perform (will be expanded later to include other actions
 // including non-signing);
 // pin code; and password
+// dbname (from OS)
+const char * sign_transaction(struct ExternError*, const char* action, const char* pin, const char* password, const char* dbname);
 
-const char * sign_transaction(struct ExternError*, const char* action, const char* pin, const char* password);
-
+// Self descriptive: development test for channel
+// TODO: remove for safety
 const char * development_test(struct ExternError*, const char* input);
+
+// Initial population of DB, currently in "development tool" state
+// TODO: leave only dbname in input
+void db_init(struct ExternError*, const char* gen_hash, const char* metadata, const char* type_descriptor, const char* identities, const char* dbname);
+

@@ -6,7 +6,7 @@ use super::db_utils;
 use super::constants::get_default_chainspecs;
 
 //TODO: rename fields to make them more clear
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
 pub struct ChainSpecs {
     pub base58prefix: u8,
     pub color: String,
@@ -102,12 +102,14 @@ mod tests {
 
     #[test]
     fn test_add_fetch_remove_network(){
-        let database: Db = open(TESTDB).unwrap();
         let testspecs = get_default_chainspecs();
-        add_network(TESTDB, &hex::encode(testspecs[0].genesis_hash), &testspecs[0]);
-        //assert_eq!(get_network(TESTDB, GENHASH1), CHAIN1);
-        remove_network(TESTDB, &hex::encode(testspecs[0].genesis_hash));
+        let genhash0 = hex::encode(testspecs[0].genesis_hash);
+        add_network(TESTDB, &genhash0, &testspecs[0]);
+        let fetched_network = get_network(TESTDB, &genhash0).unwrap();
+        assert_eq!(fetched_network, testspecs[0]);
+        remove_network(TESTDB, &genhash0);
         //mustfail fetch
+        let database: Db = open(TESTDB).unwrap();
         db_utils::db_flush_check(&database);
     }
 

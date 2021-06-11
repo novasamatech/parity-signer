@@ -416,13 +416,54 @@ export! {
         db_handling::fill_database_from_files(dbname, datafiles)
     }
     
-    @Java_io_parity_signer_SubstrateSignModule_dbGetNetwork
-	fn get_network(
-		genesis_hash: &str
+    @Java_io_parity_signer_SubstrateSignModule_dbGetNetworkForSelector
+	fn get_network_for_selector(
+		genesis_hash: &str,
+        dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let spec = db_handling::chainspecs::get_network(dbname, genesis_hash)?;
+        Ok(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\" }}",
+            spec.color, 
+            spec.logo, 
+            spec.order,
+            spec.secondary_color,
+            spec.title))
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbGetAllNetworksForNetworkSelector
+	fn get_all_networks_for_network_selector(
+        dbname: &str
+    ) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let specs = db_handling::chainspecs::get_all_networks(dbname)?;
+        let mut output = "[".to_owned();
+        for spec in specs {
+            output.push_str(&format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\" }}",
+            spec.color, 
+            spec.logo, 
+            spec.order,
+            spec.secondary_color,
+            spec.title))
+        }
+        output.push_str("]");
+        Ok(output.to_string())
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbAddNetwork
+	fn add_network(
+		_network_json: &str,
+        _dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
         
-        let output = Ok(std::env::consts::OS.to_string());
-        return output;
+        Ok(())
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbRemoveNetwork
+	fn remove_network(
+		_genesis_hash: &str,
+        _dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        
+        Ok(())
     }
 
 }
