@@ -88,3 +88,4 @@ android/app/bin
 # rust
 rust/*/target
 rust/db_handling/signer_database
+rust/db_handling/test
