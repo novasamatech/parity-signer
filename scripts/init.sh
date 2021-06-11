@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./scripts/variables.sh
+source ./variables.sh
 
 cargo install cargo-lipo
 
