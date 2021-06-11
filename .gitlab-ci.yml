@@ -4,6 +4,8 @@ stages:
 android-build-release:
   stage: build
   image: paritytech/parity-signer
+  tags:
+    linux-docker
   only:
     - master
     - /^[0-9]+$/
