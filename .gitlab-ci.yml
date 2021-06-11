@@ -3,7 +3,7 @@ stages:
 
 android-build-release:
   stage: build
-  image: localhost/paritytech/parity-signer
+  image: paritytech/parity-signer
   only:
     - master
     - /^[0-9]+$/
