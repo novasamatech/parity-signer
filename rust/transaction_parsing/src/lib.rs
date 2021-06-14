@@ -1,3 +1,4 @@
+use hex;
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
@@ -13,7 +14,11 @@ mod utils_chainspecs;
     use utils_chainspecs::{find_meta};
 mod method;
 mod decoding;
-    use decoding::{process_as_call, fancy};
+    use decoding::{process_as_call};
+mod cards;
+    use cards::{Card, Warning};
+mod error;
+    use error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError};
 
 
 /// Transaction in hex format as it arrives into parsing program contains following elements:
@@ -33,7 +38,7 @@ struct TransactionParts {
 
 /// Enum to record author public key depending on crypto used:
 /// so far ed25519, sr25519, and ecdsa should be supported
-enum AuthorPublicKey {
+pub enum AuthorPublicKey {
     Ed25519([u8; 32]),
     Sr25519([u8; 32]),
     Ecdsa([u8; 33]),
@@ -53,19 +58,12 @@ struct ExtrinsicValues {
     block_hash: [u8; 32],
 }
 
-/// Struct to store the output of decoding: "normal" format and fancy easy-into-js format
 
-pub struct DecodingResult {
-    pub normal_cards: String,
-    pub js_cards: String,
-}
-
-
-/// function to print extrinsics in fancy format
-fn print_fancy_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, short: &ExtrinsicValues, chain_name: &str) -> String {
+/// function to print full extrinsics cards
+fn print_full_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, short: &ExtrinsicValues, chain_name: &str) -> String {
     match short.era {
-        Era::Immortal => format!("{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Immortal\",\"nonce\":\"{}\"}}", short.nonce)), fancy(index+1, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", tip_output.number, tip_output.units)), fancy(index+2, indent, "tx_spec", &format!("{{\"network\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", chain_name, short.metadata_version, short.tx_version))),
-        Era::Mortal(period, phase) => format!("{},{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\"}}", phase, period, short.nonce)), fancy(index+1, indent, "tip", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", tip_output.number, tip_output.units)), fancy(index+2, indent, "block_hash", &format!("\"{}\"", hex::encode(short.block_hash))), fancy(index+3, indent, "tx_spec", &format!("{{\"network\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", chain_name, short.metadata_version, short.tx_version))),
+        Era::Immortal => format!("{},{},{}", (Card::EraImmortalNonce(short.nonce)).card(index, indent), (Card::Tip{number: &tip_output.number, units: &tip_output.units}).card(index+1, indent), (Card::TxSpec{network: chain_name, version: short.metadata_version, tx_version: short.tx_version}).card(index+2, indent)),
+        Era::Mortal(period, phase) => format!("{},{},{},{}", (Card::EraMortalNonce{phase, period, nonce: short.nonce}).card(index, indent), (Card::Tip{number: &tip_output.number, units: &tip_output.units}).card(index+1, indent), (Card::BlockHash(&hex::encode(short.block_hash))).card(index+2, indent), (Card::TxSpec{network: chain_name, version: short.metadata_version, tx_version: short.tx_version}).card(index+3, indent)),
     }
 }
 
@@ -75,29 +73,61 @@ fn print_fancy_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, s
 /// i.e. it starts with 53****, followed by author address, followed by actual transaction piece,
 /// followed by extrinsics, concluded with chain genesis hash
 
-pub fn full_run (transaction: &str, dbname: &str) -> Result<DecodingResult, Box<dyn std::error::Error>> {
+pub fn full_run (transaction: &str, dbname: &str) -> Result<String, Error> {
+
+// loading the database and removing the previous (if any) signing saves
+    let database: Db = match open(dbname) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    };
+    let chainspecs: Tree = match database.open_tree(b"chainspecs") {
+        Ok(x) => x,
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    };
+    let metadata: Tree = match database.open_tree(b"metadata") {
+        Ok(x) => x,
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    };
+    let addresses: Tree = match database.open_tree(b"addresses") {
+        Ok(x) => x,
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    };
+    let settings: Tree = match database.open_tree(b"settings") {
+        Ok(x) => x,
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    };
+    
+    match settings.remove(b"sign_transaction") {
+        Ok(_) => (),
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    }
+    
+
     let data_hex = match transaction.starts_with("0x") {
         true => &transaction[2..],
         false => &transaction,
     };
+
+// input hex data of correct size should have at least 6 + 64 + 64 symbols (prelude + author public key minimal size + genesis hash)
+    if data_hex.len() < 134 {return Err(Error::BadInputData(BadInputData::TooShort))}
     
-    if &data_hex[..2] != "53" {return Err(Box::from("Only Substrate transactions are supported."))}
+    if &data_hex[..2] != "53" {return Err(Error::BadInputData(BadInputData::NotSubstrate))}
     
     let data = match hex::decode(&data_hex) {
         Ok(a) => a,
-        Err(_) => return Err(Box::from("Wrong format of input transaction string.")),
+        Err(_) => return Err(Error::BadInputData(BadInputData::NotHex)),
     };
     
     let (author_pub_key, data) = match &data_hex[2..4] {
         "00" => (AuthorPublicKey::Ed25519(data[3..35].try_into().expect("fixed size should fit in array")), &data[35..]),
         "01" => (AuthorPublicKey::Sr25519(data[3..35].try_into().expect("fixed size should fit in array")), &data[35..]),
         "02" => (AuthorPublicKey::Ecdsa(data[3..36].try_into().expect("fixed size should fit in array")), &data[36..]),
-        _ => return Err(Box::from("Crypto type not supported."))
+        _ => return Err(Error::BadInputData(BadInputData::CryptoNotSupported))
     };
     
     let transaction_decoded = match <TransactionParts>::decode(&mut &data[..]) {
         Ok(a) => a,
-        Err(_) => return Err(Box::from("Error separating method and extrinsics")),
+        Err(_) => return Err(Error::UnableToDecode(UnableToDecode::MethodAndExtrinsicsFailure)),
     };
     
     let short = &transaction_decoded.extrinsics;
@@ -107,32 +137,39 @@ pub fn full_run (transaction: &str, dbname: &str) -> Result<DecodingResult, Box<
     let indent: u32 = 0;
 
 // try to get chain specs from genesis hash
-    if transaction_decoded.genesis_hash != short.genesis_hash {return Err(Box::from("Two different genesis hashes are found."))}
+    if transaction_decoded.genesis_hash != short.genesis_hash {return Err(Error::BadInputData(BadInputData::GenesisHashMismatch))}
 
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
-   /* match &data_hex[4..6] {
+/*    match &data_hex[4..6] {
         "00" => {
-            if let Era::Immortal = short.era {return Err(Box::from("Expected mortal transaction because of prelude. Got immortal one on decoding."))}
+            if let Era::Immortal = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedImmortality))}
         },
         "02" => {
-            if let Era::Mortal(_, _) = short.era {return Err(Box::from("Expected immortal transaction because of prelude. Got mortal one on decoding."))}
+            if let Era::Mortal(_, _) = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedMortality))}
         },
-        _ => return Err(Box::from("Payload type not supported")),
+        _ => return Err(Error::BadInputData(BadInputData::WrongPayloadType)),
     }*/
 
-    if let Era::Immortal = short.era {if short.genesis_hash != short.block_hash {return Err(Box::from("Block hash found to not be equal to genesis hash in immortal transaction."))}}
+    if let Era::Immortal = short.era {if short.genesis_hash != short.block_hash {return Err(Error::BadInputData(BadInputData::ImmortalHashMismatch))}}
     
-    let database: Db = open(dbname)?;
-    let chainspecs: Tree = database.open_tree(b"chainspecs")?;
-    let metadata: Tree = database.open_tree(b"metadata")?;
-    let addresses: Tree = database.open_tree(b"addresses")?;
-    let settings: Tree = database.open_tree(b"settings")?;
-    
-    match chainspecs.get(transaction_decoded.genesis_hash)? {
+    let chainspecs_db_reply = match chainspecs.get(transaction_decoded.genesis_hash) {
+        Ok(x) => x,
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    };
+    match chainspecs_db_reply {
         Some(x) => {
-            let chain_specs_found = <ChainSpecs>::decode(&mut &x[..])?;
+            let chain_specs_found = match <ChainSpecs>::decode(&mut &x[..]) {
+                Ok(x) => x,
+                Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
+            };
             let chain_name = &chain_specs_found.name;
             let chain_prefix = chain_specs_found.base58prefix;
+            
+        // update tip output since we know chain specs already
+            let tip_output = match convert_balance_pretty (short.tip, chain_specs_found.decimals, &chain_specs_found.unit) {
+                Ok(x) => x,
+                Err(_) => return Err(Error::SystemError(SystemError::BalanceFail)),
+            };
 
         // transform public key into base58 address and get crypto for action card exporting
             let (author, crypto) = match author_pub_key {
@@ -141,132 +178,220 @@ pub fn full_run (transaction: &str, dbname: &str) -> Result<DecodingResult, Box<
                 AuthorPublicKey::Ecdsa(t) => (vec_to_base(&(t.to_vec()), chain_prefix), "ecdsa"),
             };
         // search for this base58 address in existing accounts, get address details
-            match addresses.get(author.encode())? {
+            let addresses_db_reply = match addresses.get(author.encode()) {
+                Ok(x) => x,
+                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+            };
+            match addresses_db_reply {
                 Some(y) => {
-                    
-                    let id_values = <AddressDetails>::decode(&mut &y[..])?;
-                    let mut to_normal = format!("\"author\":{{\"base58\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", author, id_values.path, id_values.has_pwd, id_values.name);
-                    let mut to_fancy = fancy(index, indent, "author", &format!("{{\"base58\":\"{}\",\"derivation_path\":\"{}\",\"has_password\":\"{}\",\"name\":\"{}\"}}", author, id_values.path, id_values.has_pwd, id_values.name));
-                    index = index + 1;
-            
-                // update tip output
-                    let tip_output = convert_balance_pretty (short.tip, chain_specs_found.decimals, &chain_specs_found.unit)?;
-            
-                // transform extrinsics information for normal output
-                    let extrinsics_to_normal = match short.era {
-                        Era::Immortal => format!("\"extrinsics\":{{\"era\":\"Immortal\",\"nonce\":\"{}\",\"tip\":\"{}\",\"units\":\"{}\",\"chain\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", short.nonce, tip_output.number, tip_output.units, chain_name, short.metadata_version, short.tx_version),
-                        Era::Mortal(period, phase) => format!("\"extrinsics\":{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\",\"tip\":\"{}\",\"units\":\"{}\",\"chain\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\",\"block_hash\":\"{}\"}}", phase, period, short.nonce, tip_output.number, tip_output.units, chain_name, short.metadata_version, short.tx_version, hex::encode(short.block_hash)),
+                    let id_values = match <AddressDetails>::decode(&mut &y[..]) {
+                        Ok(x) => x,
+                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedAddressDetails)),
                     };
-            
+                    let author_card = (Card::Author{base58_author: &author, path: &id_values.path, has_pwd: id_values.has_pwd, name: &id_values.name}).card(index, indent);
+                    index = index + 1;
+
                 // fetch chain metadata in RuntimeMetadataV12 format
                     match find_meta(&chain_name, short.metadata_version, &metadata) {
                         Ok((meta, ver)) => {
+                            let mut warning_card = None;
                             if let Some(x) = ver {
-                                let warn_normal = format!(",\"warning\":{{\"Transaction uses outdated runtime version {}. Latest known available version is {}.\"}}", short.metadata_version, x);
-                                to_normal.push_str(&warn_normal);
-                                let warn_fancy = format!("],\"warning\":[{}", fancy(index, indent, "warning", &format!("\"Transaction uses outdated runtime version {}. Latest known available version is {}.\"", short.metadata_version, x)));
+                                warning_card = Some(Card::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x}).card(index, indent));
                                 index = index + 1;
-                                to_fancy.push_str(&warn_fancy);
                             }
                     
                         // generate type database to be used in decoding
                             
-                            let type_database = match settings.get(String::from("types").encode())? {
-                                Some(a) => <Vec<TypeEntry>>::decode(&mut &a[..])?,
-                                None => {return Err(Box::from("No types info found in database."))}
+                            let types_db_reply = match settings.get(String::from("types").encode()) {
+                                Ok(x) => x,
+                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                            }; 
+                            let type_database = match types_db_reply {
+                                Some(a) => {
+                                    match <Vec<TypeEntry>>::decode(&mut &a[..]) {
+                                        Ok(x) => x,
+                                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
+                                    }
+                                },
+                                None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
                             };
                     
-                        // action card preparations
-                            let extrinsics_to_sign = &transaction_decoded.extrinsics.encode();
-                            let prep_to_sign = [transaction_decoded.method.to_vec(), extrinsics_to_sign.to_vec()].concat();
+                        // action card preparations: vector that should be signed
+                            let for_signing = [transaction_decoded.method.to_vec(), transaction_decoded.extrinsics.encode().to_vec()].concat();
                     
                         // transaction parsing
                             match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs_found) {
                                 Ok(transaction_parsed) => {
+                                    let method_cards = &transaction_parsed.fancy_out[1..];
                                     let index = transaction_parsed.index;
-                                    if transaction_parsed.remaining_vector.len() != 0 {return Err(Box::from("After transaction parsing, some data in transaction vector remained unused."))}
+                                    if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
 
-                                    let normal_cards = format!("{},{},{}", to_normal, transaction_parsed.decoded_string, extrinsics_to_normal);
-                                // transform extrinsics information for fancy output
-                                    let extrinsics_to_js = print_fancy_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                // make extrinsics card set
+                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
                                 // making action entry into database
                                     let action_into_db = SignDb {
                                         crypto: crypto.to_string(),
                                         path: id_values.path,
                                         name_for_seed: id_values.name_for_seed,
-                                        transaction: prep_to_sign,
+                                        transaction: for_signing,
                                         has_pwd: id_values.has_pwd,
                                         author_base58: author,
                                     };
-                                    settings.insert(b"sign_transaction", action_into_db.encode())?;
-                                    database.flush()?;
-                                    let checksum = database.checksum()?;
-                                // making action card for js
-                                    let action = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"checksum\":\"{}\",\"has_password\":\"{}\"}}}}", checksum, id_values.has_pwd);
-                                    let js_cards = format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", to_fancy, &transaction_parsed.fancy_out[1..], extrinsics_to_js, action);
-                                    Ok(DecodingResult{
-                                        normal_cards,
-                                        js_cards,
-                                    })
+                                    match settings.insert(b"sign_transaction", action_into_db.encode()) {
+                                        Ok(_) => (),
+                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                    };
+                                    match database.flush() {
+                                        Ok(_) => (),
+                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                    };
+                                    let checksum = match database.checksum() {
+                                        Ok(x) => x,
+                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                    };
+                                // action card
+                                    let action_card = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"checksum\":\"{}\",\"has_password\":\"{}\"}}}}", checksum, id_values.has_pwd);
+                                // full cards set
+                                    let cards = match warning_card {
+                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),
+                                        None => format!("{{\"author\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, method_cards, extrinsics_cards, action_card),
+                                    };
+                                    Ok(cards)
                                 },
                                 Err(e) => {
-                                    let mut err = String::from("Unable to decode the transaction.");
-                                    if e == "Could not interpret the type." {
-                                        err.push_str(" Unknown types encountered.")
-                                    }
-                                    let error_normal = format!("\"error\":{{\"{}\"}}", err);
-                                    let error_fancy = fancy(index, indent, "error", &format!("\"{}\"", e));
+                                // was unable to decode transaction properly, produced one of known decoding errors
+                                // no action possible
+                                    let error_card = (Card::Error(e)).card(index, indent);
                                     index = index + 1;
-                                    let normal_cards = format!("{},{},{}", to_normal, error_normal, extrinsics_to_normal);
-                                // transform extrinsics information for fancy output
-                                    let extrinsics_to_js = print_fancy_extrinsics (index, indent, &tip_output, &short, chain_name);
-                                    let js_cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", to_fancy, error_fancy, extrinsics_to_js);
-                                    Ok(DecodingResult{
-                                        normal_cards,
-                                        js_cards,
-                                    })
+                                // make extrinsics card set
+                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                // full cards set
+                                    let cards = match warning_card {
+                                        Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warn, error_card, extrinsics_cards),
+                                        None => format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards),
+                                    };
+                                    Ok(cards)
                                 },
                             }
                         },
                         Err(e) => {
-                            let error_normal = format!("\"error\":{{\"{}\"}}", e);
-                            let error_fancy = fancy(index, indent, "error", &format!("\"{}\"", e));
-                            index = index + 1;
-                            let normal_cards = format!("{},{},{}", to_normal, error_normal, extrinsics_to_normal);
-                        // transform extrinsics information for fancy output
-                            let extrinsics_to_js = print_fancy_extrinsics (index, indent, &tip_output, &short, chain_name);
-                            let js_cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", to_fancy, error_fancy, extrinsics_to_js);
-                            Ok(DecodingResult{
-                                normal_cards,
-                                js_cards,
-                            })
+                        // run failed on finding/decoding metadata step, produced one of known errors
+                            if (e == Error::DatabaseError(DatabaseError::NoMetaThisVersion))||(e == Error::DatabaseError(DatabaseError::NoMetaAtAll)) {
+                                let error_card = (Card::Error(e)).card(index, indent);
+                                index = index + 1;
+                            // make extrinsics card set
+                                let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                            // full cards set
+                                let cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards);
+                                Ok(cards)
+                            }
+                            else {return Err(e)}
                         },
                     }
                 },
-                None => {return Err(Box::from("Transaction made by account not listed in current account database. Please add the account."))}
+                None => {
+                // identity not found in database
+                // try to decode the transaction anyways
+                // no action card made, no signing possible
+                    let author_card = (Card::AuthorPlain(&author)).card(index, indent);
+                    index = index + 1;
+                    let mut warning_card = (Card::Warning(Warning::AuthorNotFound)).card(index, indent);
+                    index = index + 1;
+                    
+                    // fetch chain metadata in RuntimeMetadataV12 format
+                    match find_meta(&chain_name, short.metadata_version, &metadata) {
+                        Ok((meta, ver)) => {
+                            if let Some(x) = ver {
+                                let add_this = (Card::Warning(Warning::NewerVersion{used_version: short.metadata_version, latest_version: x})).card(index, indent);
+                                warning_card.push_str(&format!(",{}", add_this));
+                                index = index + 1;
+                            }
+                    
+                        // generate type database to be used in decoding
+                            
+                            let types_db_reply = match settings.get(String::from("types").encode()) {
+                                Ok(x) => x,
+                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                            }; 
+                            let type_database = match types_db_reply {
+                                Some(a) => {
+                                    match <Vec<TypeEntry>>::decode(&mut &a[..]) {
+                                        Ok(x) => x,
+                                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
+                                    }
+                                },
+                                None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
+                            };
+
+                        // transaction parsing
+                            match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs_found) {
+                                Ok(transaction_parsed) => {
+                                    let method_cards = &transaction_parsed.fancy_out[1..];
+                                    let index = transaction_parsed.index;
+                                    if transaction_parsed.remaining_vector.len() != 0 {return Err(Error::BadInputData(BadInputData::SomeDataNotUsed))}
+
+                                // make extrinsics card set
+                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                // full cards set
+                                    let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, method_cards, extrinsics_cards);
+                                    Ok(cards)
+                                },
+                                Err(e) => {
+                                // was unable to decode transaction properly, produced one of known decoding errors
+                                // no action possible
+                                    let error_card = (Card::Error(e)).card(index, indent);
+                                    index = index + 1;
+                                // make extrinsics card set
+                                    let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                    let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
+                                    Ok(cards)
+                                },
+                            }
+                        },
+                        Err(e) => {
+                        // run failed on finding/decoding metadata step, produced one of known errors
+                            if (e == Error::DatabaseError(DatabaseError::NoMetaThisVersion))||(e == Error::DatabaseError(DatabaseError::NoMetaAtAll)) {
+                                let error_card = (Card::Error(e)).card(index, indent);
+                                index = index + 1;
+                            // make extrinsics card set
+                                let extrinsics_cards = print_full_extrinsics (index, indent, &tip_output, &short, chain_name);
+                                let cards = format!("{{\"author\":[{}],\"warning\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, warning_card, error_card, extrinsics_cards);
+                                Ok(cards)
+                            }
+                            else {return Err(e)}
+                        },
+                    }
+                    
+                },
             }
         },
         None => {
-            let error_normal = String::from("\"error\":{\"Network not found. Please add the network.\"}");
-            let error_fancy = fancy(index, indent, "error", "\"Network not found. Please add the network.\"");
+        // did not find network with matching genesis hash in database
+            let author_card = (Card::AuthorPublicKey(author_pub_key)).card(index, indent);
             index = index + 1;
-            // extrinsics information
-            let extrinsics_to_normal = match short.era {
-                Era::Immortal => format!("\"extrinsics\":{{\"era\":\"Immortal\",\"nonce\":\"{}\",\"tip\":\"{}\",\"chain_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", short.nonce, short.tip, hex::encode(transaction_decoded.genesis_hash), short.metadata_version, short.tx_version),
-                Era::Mortal(period, phase) => format!("\"extrinsics\":{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\",\"tip\":\"{}\",\"chain_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\",\"block_hash\":\"{}\"}}", phase, period, short.nonce, short.tip, hex::encode(transaction_decoded.genesis_hash), short.metadata_version, short.tx_version, hex::encode(short.block_hash)),
+            let error_card = (Card::Error(Error::DatabaseError(DatabaseError::NoNetwork))).card(index, indent);
+            index = index + 1;
+        // can print plain extrinsics anyways
+            let extrinsics_cards = match short.era {
+                Era::Immortal => format!("{},{},{}", (Card::EraImmortalNonce(short.nonce)).card(index, indent), (Card::TipPlain(short.tip)).card(index+1, indent), (Card::TxSpecPlain{gen_hash: &hex::encode(transaction_decoded.genesis_hash), version: short.metadata_version, tx_version: short.tx_version}).card(index+2, indent)),
+                Era::Mortal(period, phase) => format!("{},{},{},{}", (Card::EraMortalNonce{phase, period, nonce: short.nonce}).card(index, indent), (Card::TipPlain(short.tip)).card(index+1, indent), (Card::BlockHash(&hex::encode(short.block_hash))).card(index+2, indent), (Card::TxSpecPlain{gen_hash: &hex::encode(transaction_decoded.genesis_hash), version: short.metadata_version, tx_version: short.tx_version}).card(index+3, indent)),
             };
-            let extrinsics_to_js = match short.era {
-                Era::Immortal => format!("{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Immortal\",\"nonce\":\"{}\"}}", short.nonce)), fancy(index+1, indent, "tip_plain", &format!("\"{}\"", short.tip)), fancy(index+2, indent, "tx_spec_plain", &format!("{{\"chain_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", hex::encode(transaction_decoded.genesis_hash), short.metadata_version, short.tx_version))),
-                Era::Mortal(period, phase) => format!("{},{},{},{}", fancy(index, indent, "era_nonce", &format!("{{\"era\":\"Mortal\",\"phase\":\"{}\",\"period\":\"{}\",\"nonce\":\"{}\"}}", phase, period, short.nonce)), fancy(index+1, indent, "tip_plain", &format!("\"{}\"", short.tip)), fancy(index+2, indent, "block_hash", &format!("\"{}\"", hex::encode(short.block_hash))), fancy(index+3, indent, "tx_spec_plain", &format!("{{\"chain_genesis_hash\":\"{}\",\"version\":\"{}\",\"tx_version\":\"{}\"}}", hex::encode(transaction_decoded.genesis_hash), short.metadata_version, short.tx_version))),
-            };
-            let normal_cards = format!("{},{}", error_normal, extrinsics_to_normal);
-            let js_cards = format!("{{\"error\":[{}],\"extrinsics\":[{}]}}", error_fancy, extrinsics_to_js);
-            Ok(DecodingResult{
-                normal_cards,
-                js_cards,
-            })
+
+            let cards = format!("{{\"author\":[{}],\"error\":[{}],\"extrinsics\":[{}]}}", author_card, error_card, extrinsics_cards);
+            Ok(cards)
         },
     }
 }
 
+
+/// Function to interact with outside code.
+/// Ends up with string output: either produces a set of cards to be displayed
+/// with or without an action card or a single error card.
+
+pub fn output (transaction: &str, dbname: &str) -> String {
+    match full_run (transaction, dbname) {
+        Ok(out) => out,
+        Err(e) => (Card::Error(e)).card(0,0),
+    }
+}
 

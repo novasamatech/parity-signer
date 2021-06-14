@@ -80,10 +80,11 @@ pub fn remove_network (_database_name: &str, _genesis_hash: &str) -> Result<(), 
 }
 
 ///Function to initially populate network specs database
-pub fn load_chainspecs (database_name: &str, _chain_specs: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn load_chainspecs (database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     
     let database: Db = open(database_name)?;
     let chainspecs: Tree = database.open_tree(b"chainspecs")?;
+    chainspecs.clear()?;
     
     for record in get_default_chainspecs() {
         let genesis_hash = record.genesis_hash;

@@ -7,15 +7,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 // creating the database from the files
 
     let dbname = "tests/signer_database";
-    let types_info = match fs::read_to_string("new_full_types") {
-        Ok(x) => x,
-        Err(_) => return Err(Box::from("Type database missing")),
-    };
-    
-    let chain_spec_database = match fs::read_to_string("database_output") {
-        Ok(x) => x,
-        Err(_) => return Err(Box::from("Chain spec database missing")),
-    };
     
     let metadata_contents = match fs::read_to_string("metadata_database.ts") {
         Ok(x) => x,
@@ -28,9 +19,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     
     let datafiles = DataFiles {
-        chain_spec_database: &chain_spec_database,
         metadata_contents: &metadata_contents,
-        types_info: &types_info,
         identities: &identities,
     };
     

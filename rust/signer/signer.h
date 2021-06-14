@@ -118,5 +118,8 @@ const char * development_test(struct ExternError*, const char* input);
 
 // Initial population of DB, currently in "development tool" state
 // TODO: leave only dbname in input
-void db_init(struct ExternError*, const char* gen_hash, const char* metadata, const char* type_descriptor, const char* identities, const char* dbname);
+void db_init(struct ExternError*, const char* metadata, const char* identities, const char* dbname);
+
+// Fetch list of available networks for network selector screen
+const char * get_all_networks_for_network_selector(struct ExternalError*, const char* dbname);
 

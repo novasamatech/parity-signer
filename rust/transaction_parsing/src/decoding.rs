@@ -12,6 +12,8 @@ use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, Description, Enu
 
 use super::method::what_next;
 use super::utils_base58::vec_to_base;
+use super::cards::Card;
+use super::error::{Error, UnableToDecode, SystemError};
 
 
 /// Struct to store the decoded data, used for data storage between decoding iterations.
@@ -21,18 +23,10 @@ use super::utils_base58::vec_to_base;
 /// and remaining vector contains the input data not yet used after the last decoding iteration.
 
 pub struct DecodedOut {
-    pub decoded_string: String,
     pub remaining_vector: Vec<u8>,
     pub index: u32,
     pub indent: u32,
     pub fancy_out: String,
-}
-
-
-/// Function to write pretty formatted fancy output string, used in js cards exports
-
-pub fn fancy (index: u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
-    format!("{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":{}}}", index, indent, card_type, decoded_string)
 }
 
 
@@ -48,12 +42,12 @@ pub struct CutCompact<T: HasCompact> {
 /// Function to search Vec<u8> for shortest compact <T> by brute force.
 /// Outputs CutCompact value in case of success.
 
-pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, &'static str> 
+pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, Error> 
     where 
         T: HasCompact,
         Compact<T>: Decode
 {
-    if data.len()==0 {return Err("Empty data vector on input.");}
+    if data.len()==0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     let mut out = None;
     for i in 1..data.len()+1 {
         let hippo = &data[..i];
@@ -70,7 +64,7 @@ pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, &'static str>
     }
     match out {
         Some(c) => Ok(c),
-        None => return Err("No compact found"),
+        None => return Err(Error::UnableToDecode(UnableToDecode::NoCompact)),
     }
 }
 
@@ -82,32 +76,31 @@ pub fn get_compact<T> (data: &Vec<u8>) -> Result<CutCompact<T>, &'static str>
 ///
 /// The function takes as arguments
 /// - data (remaining Vec<u8> of data),
+/// - found_ty: name of the type found,
 /// - index and indent that are used for creating properly formatted js cards.
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn decode_known_length<T: Decode + serde::ser::Serialize>(data: &Vec<u8>, mut index: u32, indent: u32) -> Result<DecodedOut, &'static str> {
+pub fn decode_known_length<T: Decode + serde::ser::Serialize>(data: &Vec<u8>, found_ty: &str, mut index: u32, indent: u32) -> Result<DecodedOut, Error> {
     let length = size_of::<T>();
-    if data.len() < length {return Err("Data shorter than expected length.")}
+    if data.len() < length {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     let decoded_data = <T>::decode(&mut &data[..length]);
     match decoded_data {
         Ok(x) => {
-            let decoded_string = format!("\"{}\"", serde_json::to_string(&x).expect("Type should have been checked."));
-            let fancy_out = format!(",{}", fancy(index, indent, "default", &decoded_string));
+            let fancy_out = format!(",{}", (Card::Default(&serde_json::to_string(&x).expect("Type should have been checked."))).card(index, indent));
             index = index + 1;
             let remaining_vector = {
                 if data.len()>length {(data[length..]).to_vec()}
                 else {Vec::new()}
             };
             Ok(DecodedOut {
-                decoded_string,
                 remaining_vector,
                 index,
                 indent,
                 fancy_out,
             })
         },
-        Err(_) => return Err("Failed to decode."),
+        Err(_) => return Err(Error::UnableToDecode(UnableToDecode::PrimitiveFailure(found_ty.to_string()))),
     }
 }
 
@@ -123,22 +116,19 @@ pub fn decode_known_length<T: Decode + serde::ser::Serialize>(data: &Vec<u8>, mu
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn decode_as_compact<T> (data: &Vec<u8>, mut index: u32, indent: u32) -> Result<DecodedOut, &'static str> 
+pub fn decode_as_compact<T> (data: &Vec<u8>, mut index: u32, indent: u32) -> Result<DecodedOut, Error> 
     where 
         T: HasCompact + serde::ser::Serialize,
         Compact<T>: Decode
 {
-    if data.len()==0 {return Err("Data is empty.");}
     let compact_found = get_compact::<T>(data)?;
-    let decoded_string = format!("\"{}\"", serde_json::to_string(&compact_found.compact_found).expect("Type should have been checked."));
-    let fancy_out = format!(",{}", fancy(index, indent, "default", &decoded_string));
+    let fancy_out = format!(",{}", (Card::Default(&serde_json::to_string(&compact_found.compact_found).expect("Type should have been checked."))).card(index, indent));
     index = index + 1;
     let remaining_vector = match compact_found.start_next_unit {
         Some(x) => (data[x..]).to_vec(),
         None => Vec::new(),
     };
     Ok(DecodedOut{
-        decoded_string,
         remaining_vector,
         index,
         indent,
@@ -161,17 +151,17 @@ pub fn decode_as_compact<T> (data: &Vec<u8>, mut index: u32, indent: u32) -> Res
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: u32, indent: u32) -> Result<DecodedOut, &'static str> {
+pub fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: u32, indent: u32) -> Result<DecodedOut, Error> {
     match found_ty {
-        "bool" => decode_known_length::<bool>(data, index, indent),
-        "u8" => decode_known_length::<u8>(data, index, indent),
-        "u16" => decode_known_length::<u16>(data, index, indent),
-        "u32" => decode_known_length::<u32>(data, index, indent),
-        "u64" => decode_known_length::<u64>(data, index, indent),
-        "u128" => decode_known_length::<u128>(data, index, indent),
-        "Percent" => decode_known_length::<Percent>(data, index, indent),
-        "Perbill" => decode_known_length::<Perbill>(data, index, indent),
-        "PerU16" => decode_known_length::<PerU16>(data, index, indent),
+        "bool" => decode_known_length::<bool>(data, found_ty, index, indent),
+        "u8" => decode_known_length::<u8>(data, found_ty, index, indent),
+        "u16" => decode_known_length::<u16>(data, found_ty, index, indent),
+        "u32" => decode_known_length::<u32>(data, found_ty, index, indent),
+        "u64" => decode_known_length::<u64>(data, found_ty, index, indent),
+        "u128" => decode_known_length::<u128>(data, found_ty, index, indent),
+        "Percent" => decode_known_length::<Percent>(data, found_ty, index, indent),
+        "Perbill" => decode_known_length::<Perbill>(data, found_ty, index, indent),
+        "PerU16" => decode_known_length::<PerU16>(data, found_ty, index, indent),
         "Compact<u8>" => decode_as_compact::<u8>(data, index, indent),
         "Compact<u16>" => decode_as_compact::<u16>(data, index, indent),
         "Compact<u32>" => decode_as_compact::<u32>(data, index, indent),
@@ -180,7 +170,7 @@ pub fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: u32, indent: u32
         "Compact<Percent>" => decode_as_compact::<Percent>(data, index, indent),
         "Compact<Perbill>" => decode_as_compact::<Perbill>(data, index, indent),
         "Compact<PerU16>" => decode_as_compact::<PerU16>(data, index, indent),
-        _ => return Err("Not a primitive type"),
+        _ => return Err(Error::UnableToDecode(UnableToDecode::NotPrimitive(found_ty.to_string()))),
     }
 }
 
@@ -208,7 +198,7 @@ pub fn decode_primitive (found_ty: &str, data: &Vec<u8>, index: u32, indent: u32
 /// Calls and vectors of calls are treated separately here.
 /// All simpler types are processed through decode_simple function.
 
-pub fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
 
     match found_ty {
         "Box<<T as Config<I>>::Proposal>" | "Box<<T as Config>::Call>" | "Box<<T as Config>::Proposal>" => {
@@ -217,28 +207,23 @@ pub fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &RuntimeMetadata
         "Vec<<T as Config>::Call>" => {
             let pre_vector = get_compact::<u32>(&data)?;
             let number_of_calls = pre_vector.compact_found;
-            let mut output_prep = String::from("[");
             let mut fancy_output_prep = String::new();
             match pre_vector.start_next_unit {
                 Some(start) => {
-                    if data.len() < start + 2*(number_of_calls as usize) {return Err("Expected vector of calls. Following data is shorter than expected.")}
+                    if data.len() < start + 2*(number_of_calls as usize) {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
                     data = data[start..].to_vec();
-                    for i in 1..number_of_calls+1 {
+                    for _i in 0..number_of_calls {
                         let after_run = process_as_call(data, meta, type_database, index, indent, chain_specs)?;
                         index = after_run.index;
-                        if i>1 {output_prep.push(',')}
-                        output_prep.push_str(&after_run.decoded_string);
                         fancy_output_prep.push_str(&after_run.fancy_out);
                         data = after_run.remaining_vector;
                     }
                 },
                 None => {
-                    if number_of_calls != 0 {return Err("Expected vector of calls. Found no data after vector declaration.");}
+                    if number_of_calls != 0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
                 },
             }
-            output_prep.push(']');
             Ok(DecodedOut{
-                decoded_string: output_prep,
                 remaining_vector: data,
                 index,
                 indent,
@@ -277,40 +262,30 @@ pub fn decode_complex (found_ty: &str, mut data: Vec<u8>, meta: &RuntimeMetadata
 /// For each argument the card "varname" with argument name is added to fancy_out,
 /// followed by card(s) of actual decoded agrument values.
 
-pub fn process_as_call (mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, mut indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn process_as_call (mut data: Vec<u8>, meta: &RuntimeMetadataV12, type_database: &Vec<TypeEntry>, mut index: u32, mut indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let call_in_processing = what_next (data, meta)?;
     data = call_in_processing.data;
     
-    let mut fancy_out = format!(",{}", fancy(index, indent, "call", &format!("{{\"method\":\"{}\",\"pallet\":\"{}\"}}", call_in_processing.method.method_name, call_in_processing.method.pallet_name)));
+    let mut fancy_out = format!(",{}", (Card::Call{method: &call_in_processing.method.method_name, pallet: &call_in_processing.method.pallet_name}).card(index, indent));
     index = index + 1;
     indent = indent + 1;
     
-    let mut results = String::from("{");
-    
-    for (i, x) in call_in_processing.method.arguments.iter().enumerate() {
-        let add_to_fancy_out = format!(",{}", fancy(index, indent, "varname", &format!("\"{}\"", x.name)));
+    for x in call_in_processing.method.arguments.iter() {
+        let add_to_fancy_out = format!(",{}", (Card::Varname(&x.name)).card(index, indent));
         fancy_out.push_str(&add_to_fancy_out);
         index = index + 1;
         
         let decoded_out = decode_complex(&x.ty, data, meta, type_database, index, indent+1, chain_specs)?;
         index = decoded_out.index;
         data = decoded_out.remaining_vector;
-        let new = format!("\"{}\":{}", x.name, decoded_out.decoded_string);
-        if i>0 {results.push(',');}
-        results.push_str(&new);
         fancy_out.push_str(&decoded_out.fancy_out);
     }
     
-    results.push_str("}");
-    
-    let out = format!("\"method\":{{\"pallet\":\"{}\",\"method\":\"{}\"}},\"args\":{}", call_in_processing.method.pallet_name, call_in_processing.method.method_name, results);
-    
     Ok(DecodedOut{
-    decoded_string: out,
-    remaining_vector: data.to_vec(),
-    index,
-    indent,
-    fancy_out,
+        remaining_vector: data.to_vec(),
+        index,
+        indent,
+        fancy_out,
     })
 }
 
@@ -358,13 +333,14 @@ lazy_static! {
 /// Js cards are of type "none" if the Option<_> is None.
 /// At this moment no special js card for Some(x) is presented, only the card of x itself.
 
-pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     if inner_ty == "bool" {
-        let (decoded_string, fancy_out) = match &data[0] {
-            0 => (serde_json::to_string(&(serde_json::Value::Null)).expect("static value"), format!(",{}", fancy(index, indent, "none", "\"\""))),
-            1 => (serde_json::to_string(&true).expect("static value"), format!(",{}", fancy(index, indent, "default", "\"True\""))),
-            2 => (serde_json::to_string(&false).expect("static value"), format!(",{}", fancy(index, indent, "default", "\"False\""))),
-            _ => {return Err("Decoding as Option: unexpected first character of data.")},
+    
+        let fancy_out = match &data[0] {
+            0 => format!(",{}", (Card::None).card(index, indent)),
+            1 => format!(",{}", (Card::Default("True")).card(index, indent)),
+            2 => format!(",{}", (Card::Default("False")).card(index, indent)),
+            _ => {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedOptionVariant))},
         };
         index = index + 1;
         let remaining_vector = {
@@ -372,7 +348,6 @@ pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
             else {Vec::new()}
         };
         Ok(DecodedOut {
-            decoded_string,
             remaining_vector,
             index,
             indent,
@@ -386,11 +361,9 @@ pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
                     if data.len()>1 {(&data[1..]).to_vec()}
                     else {Vec::new()}
                 };
-                let decoded_string = serde_json::to_string(&(serde_json::Value::Null)).expect("static value");
-                let fancy_out = format!(",{}", fancy(index, indent, "none", "\"\""));
+                let fancy_out = format!(",{}", (Card::None).card(index, indent));
                 index = index + 1;
                 Ok(DecodedOut {
-                    decoded_string,
                     remaining_vector,
                     index,
                     indent,
@@ -398,11 +371,11 @@ pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
                 })
             },
             1 => {
-                if data.len()==1 {return Err("Decoding as Option: data too short.")}
+                if data.len()==1 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
                 data = data[1..].to_vec();
                 decode_simple(inner_ty, data, type_database, index, indent, chain_specs)
             },
-            _ => {return Err("Decoding as Option: unexpected first character of data.")},
+            _ => {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedOptionVariant))},
         }
     }
 }
@@ -430,25 +403,20 @@ pub fn deal_with_option (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let pre_vector = get_compact::<u32>(&data)?;
-    let mut output_prep = String::from("[");
     let mut fancy_output_prep = String::new();
     let elements_of_vector = pre_vector.compact_found;
     match pre_vector.start_next_unit {
         Some(start) => {
             data = data[start..].to_vec();
-            for i in 1..elements_of_vector+1 {
+            for _i in 0..elements_of_vector {
                 let after_run = decode_simple(inner_ty, data, type_database, index, indent, chain_specs)?;
                 index = after_run.index;
                 fancy_output_prep.push_str(&after_run.fancy_out);
-                output_prep.push_str(&after_run.decoded_string);
-                if i<elements_of_vector {output_prep.push(',')}
-                else {output_prep.push(']')}
                 data = after_run.remaining_vector;
             }
             Ok(DecodedOut {
-                decoded_string: output_prep,
                 remaining_vector: data,
                 index,
                 indent,
@@ -456,10 +424,9 @@ pub fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
             })
         },
         None => {
-            if elements_of_vector != 0 {return Err("Decoding vector: found no data after vector length declaration.");}
+            if elements_of_vector != 0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             else {
                 Ok(DecodedOut {
-                    decoded_string: String::from("[]"),
                     remaining_vector: Vec::new(),
                     index,
                     indent,
@@ -491,20 +458,15 @@ pub fn deal_with_vector (inner_ty: &str, mut data: Vec<u8>, type_database: &Vec<
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
-    let mut output_prep = String::from("[");
+pub fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let mut fancy_output_prep = String::new();
-    for i in 1..number_of_elements+1 {
+    for _i in 0..number_of_elements {
         let after_run = decode_simple(inner_ty, data, type_database, index, indent, chain_specs)?;
         index = after_run.index;
         fancy_output_prep.push_str(&after_run.fancy_out);
-        output_prep.push_str(&after_run.decoded_string);
-        if i<number_of_elements {output_prep.push(',')}
-        else {output_prep.push(']')}
         data = after_run.remaining_vector;
     }
     Ok(DecodedOut{
-        decoded_string: output_prep,
         remaining_vector: data,
         index,
         indent,
@@ -533,9 +495,9 @@ pub fn deal_with_array (inner_ty: &str, number_of_elements: u32, mut data: Vec<u
 ///
 /// For each identity field an individual js card "identity_field" is added to fancy_out.
 
-pub fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32) -> Result<DecodedOut, &'static str> {
+pub fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32) -> Result<DecodedOut, Error> {
     // at the moment, the length is known: 8 units in Vec<u8>
-    if data.len() < 8 {return Err("Decoding as IdentityFields: data too short");}
+    if data.len() < 8 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     let remaining_vector = {
         if data.len() > 8 {data[8..].to_vec()}
         else {Vec::new()}
@@ -544,33 +506,24 @@ pub fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntr
     // make correct Bitvec
     let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
     let mut found = false;
-    let mut output_prep = String::from("(");
     let mut fancy_out = String::new();
     for x in type_database.iter() {
         if x.name == "IdentityField" {
-            found = true;
-            match &x.description {
-                Description::Enum(v1) => {
-                    for (i, x) in v1.iter().enumerate() {
-                        if bv[i] {
-                            if output_prep.len()!=1 {output_prep.push(',')}
-                            let new = format!("IdentityField::{}", x.variant_name);
-                            output_prep.push_str(&new);
-                            let fancy_output_prep = format!(",{}", fancy(index, indent, "identity_field", &format!("\"{}\"", x.variant_name)));
-                            fancy_out.push_str(&fancy_output_prep);
-                            index = index + 1;
-                        };
-                    }
-                    output_prep.push(')');
-                },
-                _ => return Err("Decoding as IdentityFields: IdentityField no longer enum.")
+            if let Description::Enum(v1) = &x.description {
+                found = true;
+                for (i, x) in v1.iter().enumerate() {
+                    if bv[i] {
+                        let fancy_output_prep = format!(",{}", (Card::IdentityField(&x.variant_name)).card(index, indent));
+                        fancy_out.push_str(&fancy_output_prep);
+                        index = index + 1;
+                    };
+                }
             }
             break;
         }
     }
-    if !found {return Err("Decoding as IdentityFields: enum IdentityField not found.");}
+    if !found {return Err(Error::UnableToDecode(UnableToDecode::IdFields))}
     Ok(DecodedOut{
-        decoded_string: output_prep,
         remaining_vector,
         index,
         indent,
@@ -599,7 +552,7 @@ pub fn special_case_identity_fields (data: Vec<u8>, type_database: &Vec<TypeEntr
 ///
 /// Resulting BitVec is added to fancy_out on js card "bitvec".
 
-pub fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Result<DecodedOut, &'static str> {
+pub fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Result<DecodedOut, Error> {
     // the data is preluded by compact indicating the number of BitVec elements - info from js documentation, decode not implemented for BitVec as is
     let pre_bitvec = get_compact::<u32>(&data)?;
     let actual_length = match pre_bitvec.compact_found % 8 {
@@ -609,18 +562,16 @@ pub fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Resul
     match pre_bitvec.start_next_unit {
         Some(start) => {
             let fin = start + (actual_length as usize);
-            if data.len() < fin {return Err("Decoding as BitVec: data too short");}
+            if data.len() < fin {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             let into_bv = data[start..fin].to_vec();
             let bv: BitVec<Lsb0, u8> = BitVec::from_vec(into_bv);
-            let decoded_string = format!("\"{}\"", bv);
-            let fancy_out = format!(",{}", fancy(index, indent, "bitvec", &decoded_string));
+            let fancy_out = format!(",{}", (Card::BitVec(bv)).card(index, indent));
             index = index + 1;
             let remaining_vector = {
                 if data.len() > fin {data[fin..].to_vec()}
                 else {Vec::new()}
             };
             Ok(DecodedOut {
-                decoded_string,
                 remaining_vector,
                 index,
                 indent,
@@ -628,9 +579,8 @@ pub fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Resul
             })
         },
         None => {
-            if actual_length != 0 {return Err("Decoding as BitVec: no actual data after length declaration.");}
+            if actual_length != 0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             Ok(DecodedOut {
-                decoded_string: String::from("[]"),
                 remaining_vector: Vec::new(),
                 index,
                 indent,
@@ -658,27 +608,25 @@ pub fn special_case_bitvec (data: Vec<u8>, mut index: u32, indent: u32) -> Resul
 ///
 /// Resulting AccountId in base58 form is added to fancy_out on js card "Id".
 
-pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
-    if data.len() < 32 {return Err("Data shorter than expected length.")}
+pub fn special_case_account_id (data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
+    if data.len() < 32 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     let decoded_data = <[u8; 32]>::decode(&mut &data[..32]);
     match decoded_data {
         Ok(x) => {
-            let decoded_string = format!("\"{}\"", vec_to_base(&(x.to_vec()), chain_specs.base58prefix));
             let remaining_vector = {
                 if data.len()>32 {(&data[32..]).to_vec()}
                 else {Vec::new()}
             };
-            let fancy_out = format!(",{}", fancy(index, indent, "Id", &decoded_string));
+            let fancy_out = format!(",{}", (Card::Id(&vec_to_base(&(x.to_vec()), chain_specs.base58prefix))).card(index, indent));
             index = index + 1;
             Ok(DecodedOut {
-                decoded_string,
                 remaining_vector,
                 index,
                 indent,
                 fancy_out,
             })
         },
-        Err(_) => return Err("Decoding as base58 address failed."),
+        Err(_) => return Err(Error::UnableToDecode(UnableToDecode::Array)),
     }
 }
 
@@ -705,54 +653,55 @@ fn goto_balance(found_ty: &str) -> bool {
 ///
 /// Resulting balance is added to fancy_out on js card "balance".
 
-pub fn special_case_balance (found_ty: &str, data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn special_case_balance (found_ty: &str, data: Vec<u8>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     
     match found_ty {
         "Balance" | "T::Balance" | "BalanceOf<T>" | "BalanceOf<T, I>" => {
             let length = size_of::<u128>();
-            if data.len() < length {return Err("Data shorter than expected length.")}
+            if data.len() < length {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             let decoded_data = <u128>::decode(&mut &data[..length]);
             match decoded_data {
                 Ok(x) => {
-                    let balance_output = convert_balance_pretty (x, chain_specs.decimals, &chain_specs.unit)?;
-                    let decoded_string = format!("\"{}\",\"units\":\"{}\"", balance_output.number, balance_output.units);
-                    let fancy_out = format!(",{}", fancy(index, indent, "balance", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", balance_output.number, balance_output.units)));
+                    let balance_output = match convert_balance_pretty (x, chain_specs.decimals, &chain_specs.unit) {
+                        Ok(x) => x,
+                        Err(_) => return Err(Error::SystemError(SystemError::BalanceFail)),
+                    };
+                    let fancy_out = format!(",{}", (Card::Balance{number: &balance_output.number, units: &balance_output.units}).card(index, indent));
                     index = index + 1;
                     let remaining_vector = {
                         if data.len()>length {(data[length..]).to_vec()}
                         else {Vec::new()}
                     };
                     Ok(DecodedOut {
-                        decoded_string,
                         remaining_vector,
                         index,
                         indent,
                         fancy_out,
                     })
                 },
-                Err(_) => return Err("Failed to decode balance."),
+                Err(_) => return Err(Error::UnableToDecode(UnableToDecode::PrimitiveFailure(String::from("<u128>")))),
             }
         },
         "Compact<Balance>" | "Compact<T::Balance>" | "Compact<BalanceOf<T>>" | "Compact<BalanceOf<T, I>>" => {
-            if data.len()==0 {return Err("Data is empty.");}
             let compact_found = get_compact::<u128>(&data)?;
-            let balance_output = convert_balance_pretty (compact_found.compact_found, chain_specs.decimals, &chain_specs.unit)?;
-            let decoded_string = format!("\"{}\",\"units\":\"{}\"", balance_output.number, balance_output.units);
-            let fancy_out = format!(",{}", fancy(index, indent, "balance", &format!("{{\"amount\":\"{}\",\"units\":\"{}\"}}", balance_output.number, balance_output.units)));
+            let balance_output = match convert_balance_pretty (compact_found.compact_found, chain_specs.decimals, &chain_specs.unit) {
+                Ok(x) => x,
+                Err(_) => return Err(Error::SystemError(SystemError::BalanceFail)),
+            };
+            let fancy_out = format!(",{}", (Card::Balance{number: &balance_output.number, units: &balance_output.units}).card(index, indent));
             index = index + 1;
             let remaining_vector = match compact_found.start_next_unit {
                 Some(x) => (data[x..]).to_vec(),
                 None => Vec::new(),
             };
             Ok(DecodedOut{
-                decoded_string,
                 remaining_vector,
                 index,
                 indent,
                 fancy_out,
             })
         },
-        _ => return Err("Balance type not described.")
+        _ => return Err(Error::UnableToDecode(UnableToDecode::BalanceNotDescribed(found_ty.to_string())))
     }
 }
 
@@ -777,13 +726,12 @@ pub fn special_case_balance (found_ty: &str, data: Vec<u8>, mut index: u32, inde
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let mut fancy_out = String::new();
-    let mut output_prep = String::from("{{");
     for (i, y) in v1.iter().enumerate() {
         let fancy_output_prep = match &y.field_name {
-            Some(z) => format!(",{}", fancy(index, indent, "field_name", &format!("\"{}\"", z))),
-            None => format!(",{}", fancy(index, indent, "field_number", &format!("\"{}\"", i))),
+            Some(z) => format!(",{}", (Card::FieldName(&z)).card(index, indent)),
+            None => format!(",{}", (Card::FieldNumber(i)).card(index, indent)),
         };
         fancy_out.push_str(&fancy_output_prep);
         index = index + 1;
@@ -791,22 +739,8 @@ pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database
         data = after_run.remaining_vector;
         index = after_run.index;
         fancy_out.push_str(&after_run.fancy_out);
-        match &y.field_name {
-            Some(z) => {
-                let line = format!("\"{}\":\"{}\"", z, after_run.decoded_string);
-                output_prep.push_str(&line);
-            },
-            None => {
-                output_prep.push_str("\"");
-                output_prep.push_str(&after_run.decoded_string);
-                output_prep.push_str("\"");
-            },
-        }
-        if i < v1.len() {output_prep.push(',')}
-        else {output_prep.push_str("}}")}
     }
     Ok(DecodedOut {
-        decoded_string: output_prep,
         remaining_vector: data,
         index,
         indent,
@@ -834,9 +768,9 @@ pub fn deal_with_struct (v1: &Vec<StructField>, mut data: Vec<u8>, type_database
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
     let enum_index = data[0] as usize;
-    if enum_index >= v1.len() {return Err("While decoding Enum, encountered unexpected variant.")}
+    if enum_index >= v1.len() {return Err(Error::UnableToDecode(UnableToDecode::UnexpectedEnumVariant))}
     let found_variant = &v1[enum_index];
     match &found_variant.variant_type {
         EnumVariantType::None => {
@@ -844,11 +778,9 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
                 if data.len()>1 {(&data[1..]).to_vec()}
                 else {Vec::new()}
             };
-            let out = format!("\"{}\"", found_variant.variant_name);
-            let fancy_out = format!(",{}", fancy(index, indent, "enum_variant_name", &format!("\"{}\"", found_variant.variant_name)));
+            let fancy_out = format!(",{}", (Card::EnumVariantName(&found_variant.variant_name)).card(index, indent));
             index = index + 1;
             Ok(DecodedOut {
-                decoded_string: out,
                 remaining_vector,
                 index,
                 indent,
@@ -856,17 +788,15 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
             })
         },
         EnumVariantType::Type(inner_ty) => {
-            if data.len()==1 {return Err("While decoding Enum, expected declared variant to be followed by some associated data, that data was not found.")}
+            if data.len()==1 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             data=data[1..].to_vec();
-            let mut fancy_output_prep = format!(",{}", fancy(index, indent, "enum_variant_name",  &format!("\"{}\"", found_variant.variant_name)));
+            let mut fancy_output_prep = format!(",{}", (Card::EnumVariantName(&found_variant.variant_name)).card(index, indent));
             index = index + 1;
             let after_run = decode_simple(&inner_ty, data, type_database, index, indent+1, chain_specs)?;
             index = after_run.index;
             fancy_output_prep.push_str(&after_run.fancy_out);
-            let output_prep = format!("{{\"{}\":\"{}\"}}", found_variant.variant_name, after_run.decoded_string);
             data = after_run.remaining_vector;
             Ok(DecodedOut {
-                decoded_string: output_prep,
                 remaining_vector: data,
                 index,
                 indent,
@@ -874,14 +804,13 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
             })
         },
         EnumVariantType::Struct(v2) => {
-            if data.len()==1 {return Err("While decoding Enum, expected declared variant to be followed by some associated data, that data was not found.")}
+            if data.len()==1 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
             data=data[1..].to_vec();
             let mut fancy_out = String::new();
-            let mut output_prep = format!("{{\"{}\":{{", found_variant.variant_name);
             for (i, y) in v2.iter().enumerate() {
                 let fancy_output_prep = match &y.field_name {
-                    Some(z) => format!(",{}", fancy(index, indent, "field_name", &format!("\"{}\"", z))),
-                    None => format!(",{}", fancy(index, indent, "field_number", &format!("\"{}\"", i))),
+                    Some(z) => format!(",{}", (Card::FieldName(&z)).card(index, indent)),
+                    None => format!(",{}", (Card::FieldNumber(i)).card(index, indent)),
                 };
                 fancy_out.push_str(&fancy_output_prep);
                 index = index + 1;
@@ -889,22 +818,8 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
                 data = after_run.remaining_vector;
                 index = after_run.index;
                 fancy_out.push_str(&after_run.fancy_out);
-                match &y.field_name {
-                    Some(z) => {
-                        let line = format!("\"{}\":\"{}\"", z, after_run.decoded_string);
-                        output_prep.push_str(&line);
-                    },
-                    None => {
-                        output_prep.push_str("\"");
-                        output_prep.push_str(&after_run.decoded_string);
-                        output_prep.push_str("\"");
-                    },
-                }
-                if i < v2.len() {output_prep.push(',')}
-                else {output_prep.push_str("}}}}")}
             }
             Ok(DecodedOut {
-                decoded_string: output_prep,
                 remaining_vector: data,
                 index,
                 indent,
@@ -933,9 +848,9 @@ pub fn deal_with_enum (v1: &Vec<EnumVariant>, mut data: Vec<u8>, type_database: 
 ///
 /// The function outputs the DecodedOut value in case of success.
 
-pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, &'static str> {
+pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<TypeEntry>, mut index: u32, indent: u32, chain_specs: &ChainSpecs) -> Result<DecodedOut, Error> {
 
-    if data.len()==0 {return Err("Data is empty.");}
+    if data.len()==0 {return Err(Error::UnableToDecode(UnableToDecode::DataTooShort))}
     match decode_primitive(&found_ty, &data, index, indent) {
         Ok(a) => Ok(a),
         Err(_) => {
@@ -944,7 +859,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                 Some(caps) => {
                     let inner_ty = match caps.name("arg") {
                         Some(c) => c.as_str(),
-                        None => return Err("Regex error. Single argument in option capture, should not get here."),
+                        None => return Err(Error::SystemError(SystemError::RegexError)),
                     };
                     deal_with_option(inner_ty, data, type_database, index, indent, chain_specs)
                 },
@@ -954,7 +869,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                         Some(caps) => {
                             let inner_ty = match caps.name("arg") {
                                 Some(c) => c.as_str(),
-                                None => return Err("Regex error. Single argument in vector capture, should not get here.")
+                                None => return Err(Error::SystemError(SystemError::RegexError)),
                             };
                             deal_with_vector(inner_ty, data, type_database, index, indent, chain_specs)
                         },
@@ -962,35 +877,26 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                             // check for tuples
                             match REGTUPLE.captures(&found_ty) {
                                 Some(caps) => {
-                                    let mut output_prep = String::from("(");
                                     let mut fancy_out = String::new();
                                     let mut i=1;
                                     loop {
                                         let capture_name = format!("arg{}", i);
                                         match caps.name(&capture_name) {
                                             Some(x) => {
-                                                let fancy_output_prep = format!(",{}", fancy(index, indent, "field_number", &format!("\"{}\"", i)));
+                                                let fancy_output_prep = format!(",{}", (Card::FieldNumber(i)).card(index, indent));
                                                 fancy_out.push_str(&fancy_output_prep);
                                                 index = index + 1;
                                                 let inner_ty = x.as_str();
                                                 let after_run = decode_simple(inner_ty, data, type_database, index, indent+1, chain_specs)?;
                                                 index = after_run.index;
                                                 fancy_out.push_str(&after_run.fancy_out);
-                                                if i>1 {output_prep.push(',');}
-                                                output_prep.push_str("\"");
-                                                output_prep.push_str(&after_run.decoded_string);
-                                                output_prep.push_str("\"");
                                                 data = after_run.remaining_vector;
                                             }
-                                            None => {
-                                                output_prep.push(')');
-                                                break;
-                                            }
+                                            None => break,
                                         }
                                         i = i+1;
                                     }
                                     Ok(DecodedOut{
-                                        decoded_string: output_prep,
                                         remaining_vector: data,
                                         index,
                                         indent,
@@ -1020,7 +926,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                                                             if x.name == inner_ty {
                                                                 new_inner_ty = match &x.description {
                                                                     Description::Type(a) => Some(a),
-                                                                    _ => return Err("Decoding compact: unexpected compact insides."),
+                                                                    _ => return Err(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides)),
                                                                 };
                                                                 break;
                                                             }
@@ -1030,7 +936,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                                                                 let new_ty = found_ty.replace(inner_ty, a);
                                                                 decode_simple(&new_ty, data, type_database, index, indent, chain_specs)
                                                             },
-                                                            None => return Err("Decoding compact: type in compact not transforming into primitive.")
+                                                            None => return Err(Error::UnableToDecode(UnableToDecode::CompactNotGetsPrimitive)),
                                                         }
                                                     },
                                                     None => {
@@ -1060,7 +966,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                                                                     }
                                                                     match found_solution {
                                                                         Some(x) => Ok(x),
-                                                                        None => return Err("Could not interpret the type."),
+                                                                        None => return Err(Error::UnableToDecode(UnableToDecode::UnknownType(found_ty.to_string()))),
                                                                     }
                                                                 }
                                                             }

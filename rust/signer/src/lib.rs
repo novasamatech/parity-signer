@@ -374,11 +374,8 @@ export! {
 	fn parse_transaction(
 		transaction: &str,
         dbname: &str
-	) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        match transaction_parsing::full_run(transaction, dbname) {
-            Ok(a) => Ok(a.js_cards.to_string()),
-            Err(e) => Err(e),
-        }
+	) -> String {
+        transaction_parsing::output(transaction, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateSignTransaction
@@ -401,16 +398,12 @@ export! {
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDbInit
 	fn db_init(
-        gen_hash: &str,
         metadata: &str,
-        type_descriptor: &str,
         identities: &str,
 		dbname: &str
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
         let datafiles = db_handling::DataFiles {
-            chain_spec_database : gen_hash,
             metadata_contents : metadata,
-            types_info : type_descriptor,
             identities: identities,
         };
         db_handling::fill_database_from_files(dbname, datafiles)
@@ -422,7 +415,7 @@ export! {
         dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         let spec = db_handling::chainspecs::get_network(dbname, genesis_hash)?;
-        Ok(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\" }}",
+        Ok(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}}",
             spec.color, 
             spec.logo, 
             spec.order,
@@ -435,15 +428,18 @@ export! {
         dbname: &str
     ) -> std::result::Result<String, Box<dyn std::error::Error>> {
         let specs = db_handling::chainspecs::get_all_networks(dbname)?;
+        //TODO: gentler formatting, or serde-json?
         let mut output = "[".to_owned();
         for spec in specs {
-            output.push_str(&format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\" }}",
-            spec.color, 
-            spec.logo, 
-            spec.order,
-            spec.secondary_color,
-            spec.title))
+            output.push_str(&format!("{{\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}},",
+                hex::encode(spec.genesis_hash),
+                spec.color, 
+                spec.logo, 
+                spec.order,
+                spec.secondary_color,
+                spec.title))
         }
+        output.pop(); //would result in nonsence for empty list of networks. But that's nonsence itself and UI seems to handle it.
         output.push_str("]");
         Ok(output.to_string())
     }
