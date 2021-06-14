@@ -27,6 +27,7 @@ import { typeDefs } from 'constants/typeDefs';
 
 const { SubstrateSign } = NativeModules || {};
 
+/*
 interface AddressObject {
 	address: string;
 	bip39: boolean;
@@ -35,11 +36,13 @@ interface AddressObject {
 export function keccak(data: string): Promise<string> {
 	return SubstrateSign.keccak(data);
 }
-
+*/
+//is this needed?
 /**
  * Turn an address string tagged with either 'legacy:' or 'bip39:' prefix
  * to an object, marking if it was generated with BIP39.
  */
+/*
 function untagAddress(address: string): AddressObject {
 	let bip39 = false;
 
@@ -63,6 +66,7 @@ function toHex(x: string): string {
 		.map(n => (n.length < 2 ? `0${n}` : n))
 		.join('');
 }
+*/
 
 export async function rustTest(input: string): Promise<string> {
 	console.log('###########################');
@@ -84,16 +88,18 @@ export async function rustTest(input: string): Promise<string> {
 	return output;
 }
 
+// Creates a QR code for the UTF-8 representation of a string
+export function qrCode(data: string): Promise<string> {
+	return SubstrateSign.qrCode(data);
+}
+
 export async function dbInit(): Promise<void> {
 	try {
-		const networksData = JSON.stringify(Array.from(Object.entries(SUBSTRATE_NETWORK_LIST)));
 		const metadata = await dumpMetadataDB();
 		const metadataJSON = JSON.stringify(metadata);
 		const identities = await dumpIdentities();
 		const parsedJSON = await SubstrateSign.dbInit(
-			networksData,
 			metadataJSON,
-			typeDefs,
 			identities
 		);
 		console.log('db created!');
@@ -134,18 +140,20 @@ export async function generateMetadataHandle(
 	return metadataHandle;
 }
 
+//Generate payload info
+//TODO: replace altogether with arbitrary payload parsing finction
 export async function makeTransactionCardsContents(
 	payload: string,
 ): Promise<PayloadCardsSet> {
 	const parsedJSON = await SubstrateSign.parseTransaction(
 		payload
 	);
-	console.log(parsedJSON);
 	const parsed = JSON.parse(parsedJSON);
-	console.log(parsed);
 	return parsed;
 }
 
+//Perform action requiring use of secret
+//Typically sign a transaction
 export async function sign(
 	action: string,
 	pin: string,
@@ -159,6 +167,24 @@ export async function sign(
 	return signedPayload;
 }
 
+/**
+ * Functions to fill UI
+ */
+
+//Get info to fill screen with list of networks
+export async function getAllNetworks(): Promise<Network> {
+	try {
+		const allNetworksJSON = await SubstrateSign.getAllNetworksForNetworkSelector();
+		const allNetworks = JSON.parse(allNetworksJSON);
+		return allNetworks;
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+//================================
+//the rest is probably junk by now
+/*
 export async function brainWalletAddress(seed: string): Promise<AddressObject> {
 	const taggedAddress = await SubstrateSign.brainWalletAddress(seed);
 	const { bip39, address } = untagAddress(taggedAddress);
@@ -232,10 +258,6 @@ export function decryptData(data: string, password: string): Promise<string> {
 	return SubstrateSign.decryptData(data, password);
 }
 
-// Creates a QR code for the UTF-8 representation of a string
-export function qrCode(data: string): Promise<string> {
-	return SubstrateSign.qrCode(data);
-}
 
 // Creates a QR code for binary data from a hex-encoded string
 export function qrCodeHex(data: string): Promise<string> {
@@ -276,7 +298,7 @@ export function schnorrkelVerify(
 ): Promise<boolean> {
 	return SubstrateSign.schnorrkelVerify(seed, message, signature);
 }
-
+/*
 export class SeedRefClass {
 	private dataRef: number;
 	private valid: boolean;
@@ -369,4 +391,4 @@ export class SeedRefClass {
 		}
 		return SubstrateSign.substrateSecretWithRef(this.dataRef, suriSuffix);
 	}
-}
+}*/

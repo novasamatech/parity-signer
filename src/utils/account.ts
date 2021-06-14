@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import { UnlockedAccount } from 'types/identityTypes';
 import {
 	isSubstrateNetworkParams,
@@ -49,7 +48,7 @@ export function generateAccountId(
 
 export function emptyAccount(
 	address = '',
-	networkKey: string = SubstrateNetworkKeys.KUSAMA
+	networkKey: ''
 ): UnlockedAccount {
 	return {
 		address: address,

@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext, useMemo, useState } from 'react';
-import { BackHandler, FlatList, FlatListProps } from 'react-native';
+import React, { ReactElement, useContext, useMemo, useState, useEffect } from 'react';
+import { BackHandler, FlatList, FlatListProps, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { filterNetworks } from 'modules/network/utils';
-import { NetworkCard } from 'components/AccountCard';
+import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
@@ -41,8 +41,8 @@ import {
 	unlockSeedPhrase,
 	useUnlockSeed
 } from 'utils/navigationHelpers';
-import { useSeedRef } from 'utils/seedRefHooks';
 import QrScannerTab from 'components/QrScannerTab';
+import { getAllNetworks } from 'utils/native';
 
 function NetworkSelector({
 	accountsStore,
@@ -50,16 +50,23 @@ function NetworkSelector({
 	route
 }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
 	const isNew = route.params?.isNew ?? false;
-	const [shouldShowMoreNetworks, setShouldShowMoreNetworks] = useState(false);
-	const { identities, currentIdentity } = accountsStore.state;
-	const networkContextState = useContext(NetworksContext);
-	const { getSubstrateNetwork, allNetworks } = networkContextState;
-	const seedRefHooks = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword } = useUnlockSeed(seedRefHooks.isSeedRefValid);
+	const [networkList, setNetworkList] = useState<Array>([]);
 
 	const { setAlert } = useContext(AlertStateContext);
+
+	useEffect(() => {
+		const fetchNetworkList = async function (): Promise<void> {
+			console.log(networkList);
+			const networkListFetch = await getAllNetworks();
+			console.log(networkListFetch);
+			setNetworkList(networkListFetch);
+		}
+		fetchNetworkList();
+	}, []);
+
 	// catch android back button and prevent exiting the app
 	// TODO: this just doesn't work and nobody noticed, let's fix later
+	/*
 	useFocusEffect(
 		React.useCallback((): any => {
 			const handleBackButton = (): boolean => {
@@ -77,7 +84,8 @@ function NetworkSelector({
 			return (): void => backHandler.remove();
 		}, [shouldShowMoreNetworks])
 	);
-
+*/
+/*
 	const onAddCustomPath = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
@@ -133,72 +141,29 @@ function NetworkSelector({
 			};
 		}
 	};
-
+*/
 	const renderScreenHeading = (): React.ReactElement => {
 		if (isNew) {
 			return <ScreenHeading title={'Create your first Keypair'} />;
-		} else if (shouldShowMoreNetworks) {
-			return (
-				<IdentityHeading
-					title={'Choose Network'}
-					onPressBack={(): void => setShouldShowMoreNetworks(false)}
-				/>
-			);
 		} else {
-			const identityName = getIdentityName(currentIdentity, identities);
-			return <IdentityHeading title={identityName} />;
+			return <IdentityHeading title={'TitleScreen'} />;
 		}
 	};
 
 	const onNetworkChosen = async (
 		networkKey: string,
-		networkParams: NetworkParams
 	): Promise<void> => {
-		if (isNew || shouldShowMoreNetworks) {
-			if (isSubstrateNetworkParams(networkParams)) {
-				await deriveSubstrateNetworkRootPath(networkKey, networkParams);
-			}
-		} else {
-			navigation.navigate('PathsList', { networkKey });
-		}
+		navigation.navigate('PathsList', { networkKey });
 	};
 
-	const availableNetworks = useMemo(
-		() => getExistedNetworkKeys(currentIdentity, networkContextState),
-		[currentIdentity, networkContextState]
-	);
-
-	const networkList = useMemo(
-		() =>
-			filterNetworks(allNetworks, (networkKey, shouldExclude) => {
-				if (isNew && !shouldExclude) return true;
-
-				if (shouldShowMoreNetworks) {
-					if (shouldExclude) return false;
-					return !availableNetworks.includes(networkKey);
-				}
-				return availableNetworks.includes(networkKey);
-			}),
-		[availableNetworks, isNew, shouldShowMoreNetworks, allNetworks]
-	);
-
-	const renderNetwork = ({
-		item
-	}: {
-		item: [string, NetworkParams];
-	}): ReactElement => {
-		const [networkKey, networkParams] = item;
-		const networkIndexSuffix = networkParams.pathId;
-		console.log(item);
+	const renderNetwork = (item): ReactElement => {
 		return (
 			<NetworkCard
-				key={networkKey}
-				testID={testIDs.Main.networkButton + networkIndexSuffix}
-				networkKey={networkKey}
+				testID={testIDs.Main.networkButton + item.title}
+				network={item.item}
 				onPress={(): Promise<void> =>
-					onNetworkChosen(networkKey, networkParams)
+					onNetworkChosen(item.key)
 				}
-				title={networkParams.title}
 			/>
 		);
 	};
@@ -209,12 +174,10 @@ function NetworkSelector({
 			<FlatList
 				bounces={false}
 				data={networkList}
-				keyExtractor={(item: [string, NetworkParams]): string => item[0]}
 				renderItem={renderNetwork}
 				testID={testIDs.Main.chooserScreen}
-				{...getListOptions()}
 			/>
-			{!shouldShowMoreNetworks && !isNew && <QrScannerTab />}
+			<QrScannerTab />
 		</SafeAreaViewContainer>
 	);
 }

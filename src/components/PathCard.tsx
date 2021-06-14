@@ -25,11 +25,6 @@ import TouchableItem from './TouchableItem';
 
 import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
-import {
-	defaultNetworkKey,
-	NETWORK_LIST,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
@@ -43,7 +38,6 @@ import {
 	getNetworkKeyByPath,
 	getPathName
 } from 'utils/identitiesUtils';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
 	onPress,

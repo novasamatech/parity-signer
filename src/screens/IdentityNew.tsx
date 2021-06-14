@@ -37,7 +37,6 @@ import {
 import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
-import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityNew({
 	navigation,

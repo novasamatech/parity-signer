@@ -34,7 +34,6 @@ import {
 	alertIdentityCreationError
 } from 'utils/alertUtils';
 import Button from 'components/Button';
-import { useNewSeedRef } from 'utils/seedRefHooks';
 
 function IdentityBackup({
 	navigation,
@@ -44,7 +43,6 @@ function IdentityBackup({
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const [wordsNumber, setWordsNumber] = useState(12);
 	const { setAlert } = useContext(AlertStateContext);
-	const createSeedRefWithNewSeed = useNewSeedRef();
 	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
 		const pin = await setPin(navigation);

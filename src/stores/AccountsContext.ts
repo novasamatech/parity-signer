@@ -1,6 +1,5 @@
 import { default as React, useEffect, useReducer } from 'react';
 
-import { NetworkProtocols, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { NetworksContextState } from 'stores/NetworkContext';
 import {
 	Account,

@@ -26,14 +26,12 @@ import { NavigationTargetIdentityProps } from 'types/props';
 import { debounce } from 'utils/debounce';
 import { withTargetIdentity } from 'utils/HOC';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 function PinUnlock({
 	targetIdentity,
 	route
 }: NavigationTargetIdentityProps<'PinUnlock'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
-	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(pin: string): Promise<void> {
 		if (pin.length >= 6 && targetIdentity) {

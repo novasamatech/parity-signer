@@ -20,7 +20,6 @@ import SecureStorage from 'react-native-secure-storage';
 import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
 
 import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
-import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { allBuiltInMetadata } from 'constants/networkMetadataList';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { Account, Identity } from 'types/identityTypes';
@@ -130,57 +129,6 @@ export const saveIdentities = (identities: Identity[]): void => {
 		identitiesStore
 	);
 };
-
-/*
- * ========================================
- *	Networks Store
- * ========================================
- */
-const networkStorage = {
-	keychainService: 'parity_signer_updated_networks',
-	sharedPreferencesName: 'parity_signer_updated_networks'
-};
-const currentNetworkStorageLabel = 'networks_v4';
-
-export async function loadNetworks(): Promise<
-	Map<string, SubstrateNetworkParams>
-> {
-	try {
-		const networksJson = await SecureStorage.getItem(
-			currentNetworkStorageLabel,
-			networkStorage
-		);
-
-		if (!networksJson) return new Map(Object.entries(SUBSTRATE_NETWORK_LIST));
-		const networksEntries = JSON.parse(networksJson);
-		return mergeNetworks(SUBSTRATE_NETWORK_LIST, networksEntries);
-	} catch (e) {
-		handleError(e, 'networks');
-		return new Map();
-	}
-}
-
-export async function saveNetworks(
-	newNetwork: SubstrateNetworkParams
-): Promise<void> {
-	try {
-		let addedNetworks = new Map();
-		const addedNetworkJson = await SecureStorage.getItem(
-			currentNetworkStorageLabel,
-			networkStorage
-		);
-		if (addedNetworkJson) addedNetworks = new Map(JSON.parse(addedNetworkJson));
-
-		addedNetworks.set(newNetwork.genesisHash, newNetwork);
-		SecureStorage.setItem(
-			currentNetworkStorageLabel,
-			serializeNetworks(addedNetworks),
-			networkStorage
-		);
-	} catch (e) {
-		handleError(e, 'networks');
-	}
-}
 
 /*
  * ========================================

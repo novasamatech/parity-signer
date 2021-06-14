@@ -20,7 +20,6 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
@@ -46,7 +45,6 @@ import { alertDeleteAccount, alertError } from 'utils/alertUtils';
 import { navigateToPathsList, useUnlockSeed } from 'utils/navigationHelpers';
 import { generateAccountId } from 'utils/account';
 import { UnknownAccountWarning } from 'components/Warnings';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 interface Props {
 	path: string;

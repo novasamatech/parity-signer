@@ -30,19 +30,12 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import TransparentBackground from './TransparentBackground';
 
 import { NetworksContext } from 'stores/NetworkContext';
-import { SubstrateNetworkKeys } from 'constants/networkSpecs';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 
 const ACCOUNT_NETWORK = 'Account Network';
 const Touchable: React.ComponentClass<TouchableNativeFeedbackProps> =
 	Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
-
-const excludedNetworks: string[] = [];
-if (!__DEV__) {
-	excludedNetworks.push(SubstrateNetworkKeys.SUBSTRATE_DEV);
-	excludedNetworks.push(SubstrateNetworkKeys.KUSAMA_DEV);
-}
 
 export function DerivationNetworkSelector({
 	networkKey,

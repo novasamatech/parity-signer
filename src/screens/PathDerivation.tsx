@@ -18,7 +18,6 @@ import React, { useRef, useState, useMemo, useContext } from 'react';
 
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
-import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
@@ -39,7 +38,6 @@ import {
 	DerivationNetworkSelector,
 	NetworkOptions
 } from 'components/DerivationNetworkSelector';
-import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 

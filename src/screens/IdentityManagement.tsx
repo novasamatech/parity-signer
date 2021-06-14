@@ -32,7 +32,6 @@ import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
@@ -42,7 +41,6 @@ function IdentityManagement({
 }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
-	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {

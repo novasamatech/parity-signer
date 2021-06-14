@@ -24,7 +24,6 @@ import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import { NavigationTargetIdentityProps } from 'types/props';
 import { withTargetIdentity } from 'utils/HOC';
-import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
 
 function PinUnlockWithPassword({
@@ -33,7 +32,6 @@ function PinUnlockWithPassword({
 }: NavigationTargetIdentityProps<'PinUnlockWithPassword'>): React.ReactElement {
 	const [state, updateState, resetState] = usePinState();
 	const [focusPassword, setFocusPassword] = useState<boolean>(false);
-	const { createSeedRef } = useSeedRef(targetIdentity.encryptedSeed);
 
 	async function submit(): Promise<void> {
 		const { pin, password } = state;

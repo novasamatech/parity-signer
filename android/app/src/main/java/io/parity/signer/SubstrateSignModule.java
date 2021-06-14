@@ -288,13 +288,24 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void dbInit(String genHash, String metadata, String typeDescriptor, String identities, Promise promise) {
+	public void dbInit(String metadata, String identities, Promise promise) {
 		try {
 			String dbname = reactContext.getFilesDir().toString();
-			substrateDbInit(genHash, metadata, typeDescriptor, identities, dbname);
+			substrateDbInit(metadata, identities, dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Database initialization error", e);
+		}
+	}
+
+	@ReactMethod
+	public void getAllNetworksForNetworkSelector(Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			String allNetworks = dbGetAllNetworksForNetworkSelector(dbname);
+			promise.resolve(allNetworks);
+		} catch (Exception e) {
+			rejectWithException(promise, "Database all networks fetch error", e);
 		}
 	}
 
@@ -327,5 +338,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native String substrateParseTransaction(String transaction, String dbname);
 	private static native String substrateSignTransaction(String action, String pin, String password, String dbname);
 	private static native String substrateDevelopmentTest(String input);
-	private static native void substrateDbInit(String genHash, String metadata, String typeDescriptor, String identities, String dbname);
+	private static native void substrateDbInit(String metadata, String identities, String dbname);
+	private static native String dbGetAllNetworksForNetworkSelector(String dbname);
 }

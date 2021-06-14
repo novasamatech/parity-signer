@@ -18,7 +18,6 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NetworkProtocols } from 'constants/networkSpecs';
 import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';

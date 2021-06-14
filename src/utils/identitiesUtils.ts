@@ -23,10 +23,6 @@ import { NetworksContextState } from 'stores/NetworkContext';
 import { SubstrateNetworkParams } from 'types/networkTypes';
 import { TryCreateFunc } from 'utils/seedRefHooks';
 import {
-	UnknownNetworkKeys,
-	unknownNetworkPathId
-} from 'constants/networkSpecs';
-import {
 	Account,
 	AccountMeta,
 	FoundAccount,

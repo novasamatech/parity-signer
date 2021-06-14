@@ -45,16 +45,12 @@ import { AccountUnlock } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
 import IdentityNew from 'screens/IdentityNew';
-import LegacyAccountBackup from 'screens/LegacyAccountBackup';
-import LegacyAccountList from 'screens/LegacyAccountList';
-import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
 import MetadataManagement from 'modules/network/screens/MetadataManagement';
 import FullMetadata from 'modules/network/screens/FullMetadata';
 import MetadataSaving from 'screens/MetadataSaving';
 import PathDerivation from 'screens/PathDerivation';
 import PathDetails from 'screens/PathDetails';
 import PathManagement from 'screens/PathManagement';
-import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
 import FastQrScanner from 'screens/FastQrScanner';
@@ -131,18 +127,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="AccountPin" component={AccountPin} />
 		<ScreenStack.Screen name="AccountUnlock" component={AccountUnlock} />
 		<ScreenStack.Screen name="AccountNew" component={AccountNew} />
-		<ScreenStack.Screen
-			name="LegacyAccountBackup"
-			component={LegacyAccountBackup}
-		/>
-		<ScreenStack.Screen
-			name="LegacyAccountList"
-			component={LegacyAccountList}
-		/>
-		<ScreenStack.Screen
-			name="LegacyNetworkChooser"
-			component={LegacyNetworkChooser}
-		/>
 		<ScreenStack.Screen name="IdentityBackup" component={IdentityBackup} />
 		<ScreenStack.Screen
 			name="IdentityManagement"
@@ -160,7 +144,6 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
 		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
-		<ScreenStack.Screen name="PathSecret" component={PathSecret} />
 		<ScreenStack.Screen name="PathManagement" component={PathManagement} />
 		<ScreenStack.Screen name="PinNew" component={PinNew} />
 		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
