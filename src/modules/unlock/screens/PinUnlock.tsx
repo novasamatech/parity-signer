@@ -24,10 +24,9 @@ import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import { NavigationTargetIdentityProps } from 'types/props';
 import { debounce } from 'utils/debounce';
-import { withTargetIdentity } from 'utils/HOC';
 import { unlockIdentitySeedWithReturn } from 'utils/identitiesUtils';
 
-function PinUnlock({
+export default function PinUnlock({
 	targetIdentity,
 	route
 }: NavigationTargetIdentityProps<'PinUnlock'>): React.ReactElement {
@@ -88,4 +87,3 @@ function PinUnlock({
 	);
 }
 
-export default withTargetIdentity(PinUnlock);

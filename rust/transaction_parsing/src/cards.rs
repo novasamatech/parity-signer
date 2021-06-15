@@ -38,8 +38,8 @@ pub enum Warning {
 impl Warning {
     pub fn show (&self) -> String {
         match &self {
-            Warning::AuthorNotFound => String::from("\"Transaction author public key not found.\""),
-            Warning::NewerVersion {used_version, latest_version} => format!("\"Transaction uses outdated runtime version {}. Latest known available version is {}.\"", used_version, latest_version),
+            Warning::AuthorNotFound => String::from("Transaction author public key not found."),
+            Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {}. Latest known available version is {}.", used_version, latest_version),
         }
     }
 }

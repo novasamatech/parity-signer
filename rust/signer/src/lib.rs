@@ -375,7 +375,8 @@ export! {
 		transaction: &str,
         dbname: &str
 	) -> String {
-        transaction_parsing::output(transaction, dbname)
+        if transaction == "test all" {return transaction_parsing::test_all_cards::make_all_cards()}
+        else {return transaction_parsing::output(transaction, dbname)}
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateSignTransaction

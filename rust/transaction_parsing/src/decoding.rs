@@ -936,7 +936,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                                                                 let new_ty = found_ty.replace(inner_ty, a);
                                                                 decode_simple(&new_ty, data, type_database, index, indent, chain_specs)
                                                             },
-                                                            None => return Err(Error::UnableToDecode(UnableToDecode::CompactNotGetsPrimitive)),
+                                                            None => return Err(Error::UnableToDecode(UnableToDecode::CompactNotPrimitive)),
                                                         }
                                                     },
                                                     None => {

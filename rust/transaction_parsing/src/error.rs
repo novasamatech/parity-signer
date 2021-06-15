@@ -41,7 +41,7 @@ pub enum UnableToDecode {
     BalanceNotDescribed(String),
     UnexpectedEnumVariant,
     UnexpectedCompactInsides,
-    CompactNotGetsPrimitive,
+    CompactNotPrimitive,
     UnknownType(String),
 }
 
@@ -74,7 +74,7 @@ impl Error {
             Error::BadInputData(x) => {
                 match x {
                     BadInputData::TooShort => String::from("Data is too short."),
-                    BadInputData::NotSubstrate => String::from("Only Substrate transactions are supported. Transaction is expected to start with '53'."),
+                    BadInputData::NotSubstrate => String::from("Only Substrate transactions are supported. Transaction is expected to start with 53."),
                     BadInputData::NotHex => String::from("Input data not in hex format."),
                     BadInputData::CryptoNotSupported => String::from("Crypto type not supported."),
                     BadInputData::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
@@ -89,7 +89,7 @@ impl Error {
                 match x {
                     UnableToDecode::MethodAndExtrinsicsFailure => String::from("Unable to separate transaction vector, extrinsics, and genesis hash."),
                     UnableToDecode::NeedPalletAndMethod => String::from("Error on decoding. Expected method and pallet information. Found data is shorter."),
-                    UnableToDecode::MethodNotFound {method_index, pallet_name} => format!("Method number {} not found in pallet \"{}\".", method_index, pallet_name),
+                    UnableToDecode::MethodNotFound {method_index, pallet_name} => format!("Method number {} not found in pallet {}.", method_index, pallet_name),
                     UnableToDecode::PalletNotFound (i) => format!("Pallet with index {} not found.", i),
                     UnableToDecode::MethodIndexTooHigh {method_index, pallet_index, total} => format!("Method number {} too high for pallet number {}. Only {} indices available.", method_index, pallet_index, total),
                     UnableToDecode::ArgumentTypeError => String::from("Argument type error."),
@@ -104,8 +104,8 @@ impl Error {
                     UnableToDecode::BalanceNotDescribed(x) => format!("Error decoding call content. Balance type {} used is not described.", x),
                     UnableToDecode::UnexpectedEnumVariant => String::from("Error decoding call content. Encountered unexpected enum variant."),
                     UnableToDecode::UnexpectedCompactInsides => String::from("Error decoding call content. Unexpected type inside compact."),
-                    UnableToDecode::CompactNotGetsPrimitive => String::from("Error decoding call content. Type inside compact cound not be transformed into primitive."),
-                    UnableToDecode::UnknownType(x) => format!("Error decoding call content. No description found for type \"{}\".", x),
+                    UnableToDecode::CompactNotPrimitive => String::from("Error decoding call content. Type inside compact cound not be transformed into primitive."),
+                    UnableToDecode::UnknownType(x) => format!("Error decoding call content. No description found for type {}.", x),
                 }
             },
             Error::DatabaseError(x) => {

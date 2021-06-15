@@ -23,10 +23,9 @@ import { getSubtitle, onPinInputChange } from 'modules/unlock/utils';
 import testIDs from 'e2e/testIDs';
 import ScreenHeading from 'components/ScreenHeading';
 import { NavigationTargetIdentityProps } from 'types/props';
-import { withTargetIdentity } from 'utils/HOC';
 import Button from 'components/Button';
 
-function PinUnlockWithPassword({
+export default function PinUnlockWithPassword({
 	targetIdentity,
 	route
 }: NavigationTargetIdentityProps<'PinUnlockWithPassword'>): React.ReactElement {
@@ -102,5 +101,3 @@ function PinUnlockWithPassword({
 		</KeyboardAwareContainer>
 	);
 }
-
-export default withTargetIdentity(PinUnlockWithPassword);

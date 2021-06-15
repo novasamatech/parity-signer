@@ -21,7 +21,6 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
 	unlockAndReturnSeed,
@@ -35,7 +34,7 @@ import PopupMenu from 'components/PopupMenu';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
-function IdentityManagement({
+export default function IdentityManagement({
 	accountsStore,
 	navigation
 }: Props): React.ReactElement {
@@ -105,7 +104,6 @@ function IdentityManagement({
 	);
 }
 
-export default withCurrentIdentity(IdentityManagement);
 
 const styles = StyleSheet.create({
 	deleteText: {

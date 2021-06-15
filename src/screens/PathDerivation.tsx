@@ -22,7 +22,6 @@ import { AlertStateContext } from 'stores/alertContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import TextInput from 'components/TextInput';
-import { withCurrentIdentity } from 'utils/HOC';
 import {
 	extractPathId,
 	getNetworkKey,
@@ -41,7 +40,7 @@ import {
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 
-function PathDerivation({
+export default function PathDerivation({
 	accountsStore,
 	navigation,
 	route
@@ -169,4 +168,3 @@ function PathDerivation({
 	);
 }
 
-export default withCurrentIdentity(PathDerivation);

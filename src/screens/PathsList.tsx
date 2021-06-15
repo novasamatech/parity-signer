@@ -25,9 +25,7 @@ import PathGroupCard from 'components/PathGroupCard';
 import { useUnlockSeed } from 'utils/navigationHelpers';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { isUnknownNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths
@@ -37,37 +35,21 @@ import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 
-function PathsList({
+export default function PathsList({
 	accountsStore,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
-	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
-	const networkContextState = useContext(NetworksContext);
-	const { networks, getNetwork } = networkContextState;
-	const networkParams = getNetwork(networkKey);
-
-	const { currentIdentity } = accountsStore.state;
-	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
-	const pathsGroups = useMemo((): PathGroup[] | null => {
-		if (!currentIdentity) return null;
-		const listedPaths = getPathsWithSubstrateNetworkKey(
-			currentIdentity,
-			networkKey,
-			networkContextState
-		);
-		return groupPaths(listedPaths, networks);
-	}, [currentIdentity, networkKey, networkContextState, networks]);
-	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
+	const networkKey = route.params.networkKey;
+	const [rootSeed, setRootSeed] = useState('');
 
 	const { navigate } = navigation;
-	const rootPath = `//${networkParams.pathId}`;
+	//const rootPath = `//${networkParams.pathId}`;
 
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
-			params: { parentPath: isUnknownNetworkPath ? '' : rootPath }
+			params: { parentPath: rootPath }
 		});
 
 	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
@@ -114,5 +96,3 @@ function PathsList({
 		</SafeAreaViewContainer>
 	);
 }
-
-export default withCurrentIdentity(PathsList);

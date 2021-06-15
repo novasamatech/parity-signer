@@ -33,7 +33,6 @@ import {
 } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
 import { alertPathDerivationError } from 'utils/alertUtils';
-import { withCurrentIdentity } from 'utils/HOC';
 import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
 import {
 	navigateToPathDetails,
@@ -44,7 +43,7 @@ import {
 import QrScannerTab from 'components/QrScannerTab';
 import { getAllNetworks } from 'utils/native';
 
-function NetworkSelector({
+export default function NetworkSelector({
 	accountsStore,
 	navigation,
 	route
@@ -182,4 +181,3 @@ function NetworkSelector({
 	);
 }
 
-export default withCurrentIdentity(NetworkSelector);

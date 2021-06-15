@@ -32,7 +32,6 @@ import PopupMenu from 'components/PopupMenu';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import QrView from 'components/QrView';
-import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getAddressWithPath,
 	getNetworkKey,
@@ -178,7 +177,7 @@ export function PathDetailsView({
 	);
 }
 
-function PathDetails({
+export default function PathDetails({
 	accountsStore,
 	navigation,
 	route
@@ -205,5 +204,3 @@ const styles = StyleSheet.create({
 		color: colors.signal.error
 	}
 });
-
-export default withCurrentIdentity(PathDetails);

@@ -19,7 +19,7 @@ mod cards;
     use cards::{Card, Warning};
 mod error;
     use error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError};
-
+pub mod test_all_cards;
 
 /// Transaction in hex format as it arrives into parsing program contains following elements:
 /// - prelude, length 6 symbols ("53" stands for substrate, ** - crypto type, ** - transaction type),
@@ -140,7 +140,7 @@ pub fn full_run (transaction: &str, dbname: &str) -> Result<String, Error> {
     if transaction_decoded.genesis_hash != short.genesis_hash {return Err(Error::BadInputData(BadInputData::GenesisHashMismatch))}
 
 // this should be here by the standard; should stay commented for now, since the test transactions apparently do not comply to standard.
-/*    match &data_hex[4..6] {
+ /*   match &data_hex[4..6] {
         "00" => {
             if let Era::Immortal = short.era {return Err(Error::BadInputData(BadInputData::UnexpectedImmortality))}
         },

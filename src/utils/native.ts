@@ -148,6 +148,7 @@ export async function makeTransactionCardsContents(
 	const parsedJSON = await SubstrateSign.parseTransaction(
 		payload
 	);
+	console.log(parsedJSON);
 	const parsed = JSON.parse(parsedJSON);
 	return parsed;
 }
