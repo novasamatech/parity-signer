@@ -1,0 +1,11 @@
+[package]
+name = "generate_metadata_message"
+version = "0.1.0"
+authors = ["vera"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sp-core = "3.0.0"
+hex = "0.4.3"
