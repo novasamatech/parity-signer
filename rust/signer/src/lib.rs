@@ -410,18 +410,17 @@ export! {
         db_handling::fill_database_from_files(dbname, datafiles)
     }
     
-    @Java_io_parity_signer_SubstrateSignModule_dbGetNetworkForSelector
-	fn get_network_for_selector(
+    @Java_io_parity_signer_SubstrateSignModule_dbGetNetwork
+	fn get_network(
 		genesis_hash: &str,
         dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         let spec = db_handling::chainspecs::get_network(dbname, genesis_hash)?;
-        Ok(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}}",
+        Ok(String::from(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}}",
             spec.color, 
-            spec.logo, 
-            spec.order,
+            spec.logo,
             spec.secondary_color,
-            spec.title))
+            spec.title)))
     }
 
     @Java_io_parity_signer_SubstrateSignModule_dbGetAllNetworksForNetworkSelector
@@ -462,6 +461,43 @@ export! {
         
         Ok(())
     }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbGetAllSeedNames
+	fn get_all_seed_names(
+        dbname: &str
+    ) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let seednames = db_handling::identities::get_seed_names_list(dbname)?;
+        //TODO: gentler formatting, or serde-json?
+        let mut output = "[".to_owned();
+        for seedname in seednames {
+            output.push_str(&format!("\"{}\",",
+                seedname))
+        }
+        output.pop(); //would result in nonsence for empty list of networks. But that's nonsence itself and UI seems to handle it.
+        output.push_str("]");
+        Ok(output.to_string())
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbGetRelevantIdentities
+	fn get_relevant_identities(
+		seed_name: &str,
+        genesis_hash: &str,
+        dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let relevant_identities = db_handling::identities::get_relevant_identities(seed_name, genesis_hash, dbname)?;
+        let mut output = "[".to_owned();
+        for identity in relevant_identities {
+            output.push_str(&format!("{{\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
+                identity.path,
+                identity.has_pwd,
+                identity.name))
+        }
+        output.pop(); //would result in nonsence for empty list of networks. But that's nonsence itself and UI seems to handle it.
+        output.push_str("]");
+        Ok(output.to_string())
+    }
+
+
 
 }
 

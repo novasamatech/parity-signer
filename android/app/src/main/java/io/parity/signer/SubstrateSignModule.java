@@ -308,6 +308,40 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 			rejectWithException(promise, "Database all networks fetch error", e);
 		}
 	}
+	
+	@ReactMethod
+	public void getNetwork(String genesisHash, Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			String network = dbGetNetwork(genesisHash, dbname);
+			promise.resolve(network);
+		} catch (Exception e) {
+			rejectWithException(promise, "Database network fetch error", e);
+		}
+	}
+
+	@ReactMethod
+	public void getAllSeedNames(Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			String allSeedNames = dbGetAllSeedNames(dbname);
+			promise.resolve(allSeedNames);
+		} catch (Exception e) {
+			rejectWithException(promise, "Database all seed names fetch error", e);
+		}
+	}
+
+	@ReactMethod
+	public void getRelevantIdentities(String seedName, String genesisHash, Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			String allSeedNames = dbGetRelevantIdentities(seedName, genesisHash, dbname);
+			promise.resolve(allSeedNames);
+		} catch (Exception e) {
+			rejectWithException(promise, "Database fetch relevant identities error", e);
+		}
+	}
+
 
 	private static native String ethkeyBrainwalletAddress(String seed);
 	private static native String ethkeyBrainwalletBIP39Address(String seed);
@@ -340,4 +374,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native String substrateDevelopmentTest(String input);
 	private static native void substrateDbInit(String metadata, String identities, String dbname);
 	private static native String dbGetAllNetworksForNetworkSelector(String dbname);
+	private static native String dbGetNetwork(String genesisHash, String dbname);
+	private static native String dbGetAllSeedNames(String dbname);
+	private static native String dbGetRelevantIdentities(String seedName, String genesisHash, String dbname);
 }

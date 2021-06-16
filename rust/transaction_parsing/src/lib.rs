@@ -3,7 +3,7 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sled::{Db, Tree, open};
-use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, SignDb}, users::AddressDetails};
+use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, SignDb}, identities::AddressDetails};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 

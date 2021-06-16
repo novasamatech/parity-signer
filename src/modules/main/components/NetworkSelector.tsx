@@ -44,7 +44,6 @@ import QrScannerTab from 'components/QrScannerTab';
 import { getAllNetworks } from 'utils/native';
 
 export default function NetworkSelector({
-	accountsStore,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'Main'>): React.ReactElement {
@@ -55,9 +54,7 @@ export default function NetworkSelector({
 
 	useEffect(() => {
 		const fetchNetworkList = async function (): Promise<void> {
-			console.log(networkList);
 			const networkListFetch = await getAllNetworks();
-			console.log(networkListFetch);
 			setNetworkList(networkListFetch);
 		}
 		fetchNetworkList();
@@ -161,7 +158,7 @@ export default function NetworkSelector({
 				testID={testIDs.Main.networkButton + item.title}
 				network={item.item}
 				onPress={(): Promise<void> =>
-					onNetworkChosen(item.key)
+					onNetworkChosen(item.item.key)
 				}
 			/>
 		);

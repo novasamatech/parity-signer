@@ -183,6 +183,47 @@ export async function getAllNetworks(): Promise<Network> {
 	}
 }
 
+//Get relevant showable info on one network
+export async function getNetwork(networkKey: string): Promise<Network> {
+	try {
+		const networkJSON = await SubstrateSign.getNetwork(networkKey);
+		const network = JSON.parse(networkJSON);
+		return network;
+	} catch (e) {
+		console.log(e);
+		return {};
+	}
+}
+
+//Get list of identities under current seed
+export async function getIdentitiesForSeed(seedName: string, genesisHash: string): Promise<Identitieslist> {
+	try {
+		//TODO: remove this plug onve db is corrected
+		const genHashPlug = "westend";
+		const relevantIdentitiesJSON = await SubstrateSign.getRelevantIdentities(seedName, genHashPlug);
+		const relevantIdentities = JSON.parse(relevantIdentitiesJSON);
+		console.log(relevantIdentities);
+		return relevantIdentities;
+	} catch (e) {
+		console.log(e);
+		return [];
+	}
+}
+
+//Get list of seedphrase identifiers
+export async function getAllSeedNames(): Promise<[string]> {
+	try {
+		const allSeedsJSON = await SubstrateSign.getAllSeedNames();
+		console.log(allSeedsJSON);
+		const allSeeds = JSON.parse(allSeedsJSON);
+		console.log(allSeeds);
+		return allSeeds;
+	} catch(e) {
+		console.log(e);
+		return [];
+	}
+}
+
 //================================
 //the rest is probably junk by now
 /*

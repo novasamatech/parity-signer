@@ -4,8 +4,8 @@ use metadata::load_metadata;
 pub mod chainspecs;
 use chainspecs::load_chainspecs;
 
-pub mod users;
-use users::load_users;
+pub mod identities;
+use identities::load_users;
 
 pub mod settings;
 use settings::load_types;

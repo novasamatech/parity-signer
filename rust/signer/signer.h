@@ -123,3 +123,12 @@ void db_init(struct ExternError*, const char* metadata, const char* identities, 
 // Fetch list of available networks for network selector screen
 const char * get_all_networks_for_network_selector(struct ExternalError*, const char* dbname);
 
+// Fetch one network for general display purposes
+const char * get_network(struct ExternalError*, const char* genesis_hash, const char* dbname);
+
+// Fetch list of all root seeds
+const char * get_all_seed_names(struct ExternalError*, const char* dbname);
+
+//Filter identities derived for given seed and network
+const char * get_relevant_identities(srtuct ExternalError*, const char* seed_name, const char* genesis_hash, const char* dbname);
+

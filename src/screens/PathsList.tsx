@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useMemo } from 'react';
-import { ScrollView } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { FlatList, ScrollView, Text } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
@@ -34,17 +34,39 @@ import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
+import { getAllSeedNames, getNetwork, getIdentitiesForSeed } from 'utils/native';
 
 export default function PathsList({
-	accountsStore,
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
 	const networkKey = route.params.networkKey;
 	const [rootSeed, setRootSeed] = useState('');
+	const [rootSeedList, setRootSeedList] = useState([]);
+	const [network, setNetwork] = useState();
+	const [paths, setPaths] = useState([]);
 
 	const { navigate } = navigation;
 	//const rootPath = `//${networkParams.pathId}`;
+	
+	useEffect(() => {
+		const populatePathsList = async function (networkKeyRef: string): Promise<void> {
+			const networkInfo = await getNetwork(networkKeyRef);
+			setNetwork(networkInfo);
+			const seedList = await getAllSeedNames();
+			setRootSeedList(seedList);
+			if (seedList) setRootSeed(seedList[0]);
+		}
+		populatePathsList(networkKey);
+	}, [networkKey]);
+
+	useEffect(() => {
+		const fetchPaths = async function (networkKeyRef: string, rootSeedRef: string): Promise<void> {
+			const fetched = await getIdentitiesForSeed(rootSeedRef, networkKeyRef);
+			setPaths(fetched);
+		}
+		fetchPaths(networkKey, rootSeed);
+	}, [networkKey, rootSeed])
 
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
@@ -52,42 +74,25 @@ export default function PathsList({
 			params: { parentPath: rootPath }
 		});
 
-	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
-		const path = pathsGroup.paths[0];
-		return (
-			<PathCard
-				key={path}
-				testID={testIDs.PathsList.pathCard + path}
-				identity={currentIdentity}
-				path={path}
-				onPress={(): void => navigate('PathDetails', { path })}
-			/>
-		);
-	};
-
 	return (
 		<SafeAreaViewContainer>
-			<ScrollView testID={testIDs.PathsList.screen}>
-				<LeftScreenHeading
-					title={networkParams.title}
-					hasSubtitleIcon={true}
-					networkKey={networkKey}
-				/>
-				{(pathsGroups as PathGroup[]).map(pathsGroup =>
-					pathsGroup.paths.length === 1 ? (
-						renderSinglePath(pathsGroup)
-					) : (
-						<PathGroupCard
-							currentIdentity={currentIdentity}
-							pathGroup={pathsGroup}
-							networkParams={networkParams}
-							accountsStore={accountsStore}
-							key={pathsGroup.title}
-						/>
-					)
-				)}
-				<Separator style={{ backgroundColor: 'transparent' }} />
-			</ScrollView>
+			<LeftScreenHeading
+				title={network ? network.title : ''}
+				hasSubtitleIcon={true}
+				networkKey={networkKey}
+			/>
+			<Separator style={{ backgroundColor: 'transparent' }} />
+			<FlatList horizontal={true} 
+				data={rootSeedList}
+				renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item}</Text>)}
+				onPress={() => setRootSeed(item)}
+				keyExtractor={item => item}
+			/>
+			<FlatList
+				data={paths}
+				renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item.name}</Text>)}
+				keyExtractor={item => item.path}
+			/>
 			<QRScannerAndDerivationTab
 				derivationTestID={testIDs.PathsList.deriveButton}
 				title="Derive New Account"

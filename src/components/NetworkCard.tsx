@@ -23,7 +23,7 @@ import AccountIcon from './AccountIcon';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
-import {networkLogo} from 'utils/networkLogo';
+import NetworkIcon from 'components/NetworkIcon';
 
 import Separator from 'components/Separator';
 import { CardSeparator } from 'components/CardSeparator';
@@ -54,25 +54,16 @@ export function NetworkCard({
 	testID?: string;
 }): ReactElement {
 	const isDisabled = onPress === undefined;
-	const logo = networkLogo(network.logo);
-	console.log('network card');
-	console.log(network);
 	return (
 		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
 			<CardSeparator />
 			<View style={styles.content}>
 
 				<View style={styles.icon}>
-					{logo ? (
-						<Image
-							source={logo}//TODO: dynamic logo storage
-							style={styles.logo}
-						/>
-					) : (
-						<View style={styles.logo}>
-							<FontAwesome name="question" color={colors.text.main} size={28} />
-						</View>
-					)}
+					<NetworkIcon
+						logo={network.logo}//TODO: dynamic logo storage
+						style={styles.logo}
+					/>
 				</View>
 
 				<View style={styles.desc}>
