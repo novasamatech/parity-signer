@@ -34,6 +34,7 @@ import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
+import OnBoardingView from 'modules/main/components/OnBoarding';
 import { getAllSeedNames, getNetwork, getIdentitiesForSeed } from 'utils/native';
 
 export default function PathsList({
@@ -65,7 +66,7 @@ export default function PathsList({
 			const fetched = await getIdentitiesForSeed(rootSeedRef, networkKeyRef);
 			setPaths(fetched);
 		}
-		fetchPaths(networkKey, rootSeed);
+		if(rootSeed) fetchPaths(networkKey, rootSeed);
 	}, [networkKey, rootSeed])
 
 	const onTapDeriveButton = (): Promise<void> =>
@@ -74,30 +75,35 @@ export default function PathsList({
 			params: { parentPath: rootPath }
 		});
 
-	return (
-		<SafeAreaViewContainer>
-			<LeftScreenHeading
-				title={network ? network.title : ''}
-				hasSubtitleIcon={true}
-				networkKey={networkKey}
-			/>
-			<Separator style={{ backgroundColor: 'transparent' }} />
-			<FlatList horizontal={true} 
-				data={rootSeedList}
-				renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item}</Text>)}
-				onPress={() => setRootSeed(item)}
-				keyExtractor={item => item}
-			/>
-			<FlatList
-				data={paths}
-				renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item.name}</Text>)}
-				keyExtractor={item => item.path}
-			/>
-			<QRScannerAndDerivationTab
-				derivationTestID={testIDs.PathsList.deriveButton}
-				title="Derive New Account"
-				onPress={onTapDeriveButton}
-			/>
-		</SafeAreaViewContainer>
-	);
+	if (rootSeed) {
+		return (
+			<SafeAreaViewContainer>
+				<LeftScreenHeading
+					title={network ? network.title : ''}
+					hasSubtitleIcon={true}
+					networkKey={networkKey}
+				/>
+				<Separator style={{ backgroundColor: 'transparent' }} />
+				<FlatList horizontal={true} 
+					data={rootSeedList}
+					renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item}</Text>)}
+					onPress={() => setRootSeed(item)}
+					keyExtractor={item => item}
+				/>
+				<FlatList
+					data={paths}
+					renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item.name}</Text>)}
+					keyExtractor={item => item.path}
+				/>
+				<QRScannerAndDerivationTab
+					derivationTestID={testIDs.PathsList.deriveButton}
+					title="Derive New Account"
+					onPress={onTapDeriveButton}
+				/>
+			</SafeAreaViewContainer>
+		);
+	} else {
+		console.log('its empty');
+		return <OnBoardingView />
+	}
 }

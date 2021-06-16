@@ -23,7 +23,6 @@ import { Metadata } from '@polkadot/metadata';
 import { expandMetadata } from '@polkadot/metadata/decorate';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { getMetadata } from 'utils/db';

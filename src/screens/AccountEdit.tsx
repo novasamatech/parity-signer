@@ -20,10 +20,8 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import AccountCard from 'components/AccountCard';
 import TextInput from 'components/TextInput';
-import { AccountsContext, AccountsContextState } from 'stores/AccountsContext';
 
 const onNameInput = async (
-	accountsStore: AccountsContextState,
 	name: string
 ): Promise<void> => {
 	await accountsStore.updateSelectedAccount({ name });
@@ -36,7 +34,6 @@ export default function AccountEdit({}: Record<
 	string,
 	never
 >): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
 	const selectedAccount = accountsStore.getSelected()!;
 	if (!selectedAccount) {
 		return <ScrollView bounces={false} style={styles.body} />;

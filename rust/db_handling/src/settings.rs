@@ -164,3 +164,23 @@ pub fn load_types (database_name: &str, type_info: &str) -> Result<(), Box<dyn s
     
     Ok(())
 }
+
+///Function to save terms and conditions ack
+
+pub fn ack_user_agreement(database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let database: Db = open(database_name)?;   
+    let settings: Tree = database.open_tree(b"settings")?;
+
+    settings.insert(b"terms and conditions", vec![1])?;
+
+    Ok(())
+}
+
+///Function to check terms and conditions ack
+
+pub fn check_user_agreement(database_name: &str) -> Result<bool, Box<dyn std::error::Error>> {
+    let database: Db = open(database_name)?;
+    let settings: Tree = database.open_tree(b"settings")?;
+
+    Ok(settings.contains_key(b"terms and conditions")?)
+}

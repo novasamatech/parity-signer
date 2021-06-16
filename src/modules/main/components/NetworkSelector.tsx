@@ -62,82 +62,19 @@ export default function NetworkSelector({
 
 	// catch android back button and prevent exiting the app
 	// TODO: this just doesn't work and nobody noticed, let's fix later
-	/*
 	useFocusEffect(
 		React.useCallback((): any => {
 			const handleBackButton = (): boolean => {
-				if (shouldShowMoreNetworks) {
-					setShouldShowMoreNetworks(false);
-					return true;
-				} else {
-					return false;
-				}
+				return false;
 			};
 			const backHandler = BackHandler.addEventListener(
 				'hardwareBackPress',
 				handleBackButton
 			);
 			return (): void => backHandler.remove();
-		}, [shouldShowMoreNetworks])
+		}, [])
 	);
-*/
-/*
-	const onAddCustomPath = (): Promise<void> =>
-		unlockWithoutPassword({
-			name: 'PathDerivation',
-			params: { parentPath: '' }
-		});
 
-	const deriveSubstrateNetworkRootPath = async (
-		networkKey: string,
-		networkParams: SubstrateNetworkParams
-	): Promise<void> => {
-		const { pathId } = networkParams;
-		await unlockSeedPhrase(navigation, seedRefHooks.isSeedRefValid);
-		const fullPath = `//${pathId}`;
-		try {
-			await accountsStore.deriveNewPath(
-				fullPath,
-				seedRefHooks.substrateAddress,
-				getSubstrateNetwork(networkKey),
-				`${networkParams.title} root`,
-				''
-			);
-			navigateToPathDetails(navigation, networkKey, fullPath);
-		} catch (error) {
-			alertPathDerivationError(setAlert, error.message);
-		}
-	};
-
-	const getListOptions = (): Partial<FlatListProps<any>> => {
-		if (isNew) return {};
-		if (shouldShowMoreNetworks) {
-			return {
-				ListHeaderComponent: (
-					<NetworkCard
-						isAdd={true}
-						onPress={onAddCustomPath}
-						testID={testIDs.Main.addCustomNetworkButton}
-						title="Create Custom Path"
-						networkColor={colors.background.app}
-					/>
-				)
-			};
-		} else {
-			return {
-				ListFooterComponent: (
-					<NetworkCard
-						isAdd={true}
-						onPress={(): void => setShouldShowMoreNetworks(true)}
-						testID={testIDs.Main.addNewNetworkButton}
-						title="Add Network Account"
-						networkColor={colors.background.app}
-					/>
-				)
-			};
-		}
-	};
-*/
 	const renderScreenHeading = (): React.ReactElement => {
 		if (isNew) {
 			return <ScreenHeading title={'Create your first Keypair'} />;

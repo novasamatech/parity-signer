@@ -19,7 +19,6 @@ import React, { useContext, useReducer } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
-import { AccountsContext } from 'stores/AccountsContext';
 import { NetworksContext } from 'stores/NetworkContext';
 import fontStyles from 'styles/fontStyles';
 import { NavigationProps } from 'types/props';
@@ -41,8 +40,6 @@ function AccountPin({
 	navigation,
 	route
 }: NavigationProps<'AccountPin'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
-	const { allNetworks } = useContext(NetworksContext);
 	const initialState: State = {
 		confirmation: '',
 		focusConfirmation: false,

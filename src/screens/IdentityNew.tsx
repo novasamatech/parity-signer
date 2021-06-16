@@ -19,7 +19,6 @@ import { StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';

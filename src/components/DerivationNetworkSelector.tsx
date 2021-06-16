@@ -29,7 +29,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import TransparentBackground from './TransparentBackground';
 
-import { NetworksContext } from 'stores/NetworkContext';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 

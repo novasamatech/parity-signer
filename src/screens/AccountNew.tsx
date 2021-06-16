@@ -17,8 +17,6 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { Account, UnlockedAccount } from 'types/identityTypes';
 import { NetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';

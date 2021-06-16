@@ -288,10 +288,10 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void dbInit(String metadata, String identities, Promise promise) {
+	public void dbInit(String metadata, Promise promise) {
 		try {
 			String dbname = reactContext.getFilesDir().toString();
-			substrateDbInit(metadata, identities, dbname);
+			substrateDbInit(metadata, dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Database initialization error", e);
@@ -342,6 +342,27 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	@ReactMethod
+	public void ackUserAgreement(Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			dbAckUserAgreement(dbname);
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "Database acknowledge terms and conditions and privacy policy error", e);
+		}
+	}
+	
+	@ReactMethod
+	public void checkUserAgreement(Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			promise.resolve(dbCheckUserAgreement(dbname));
+		} catch (Exception e) {
+			rejectWithException(promise, "Database check if terms and conditions and privacy policy are acknowledged error", e);
+		}
+	}
+
 
 	private static native String ethkeyBrainwalletAddress(String seed);
 	private static native String ethkeyBrainwalletBIP39Address(String seed);
@@ -372,9 +393,11 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native String substrateParseTransaction(String transaction, String dbname);
 	private static native String substrateSignTransaction(String action, String pin, String password, String dbname);
 	private static native String substrateDevelopmentTest(String input);
-	private static native void substrateDbInit(String metadata, String identities, String dbname);
+	private static native void substrateDbInit(String metadata, String dbname);
 	private static native String dbGetAllNetworksForNetworkSelector(String dbname);
 	private static native String dbGetNetwork(String genesisHash, String dbname);
 	private static native String dbGetAllSeedNames(String dbname);
 	private static native String dbGetRelevantIdentities(String seedName, String genesisHash, String dbname);
+	private static native void dbAckUserAgreement(String dbname);
+	private static native boolean dbCheckUserAgreement(String dbname);
 }

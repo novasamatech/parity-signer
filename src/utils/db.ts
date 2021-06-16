@@ -14,121 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import AsyncStorage from '@react-native-community/async-storage';
-import SecureStorage from 'react-native-secure-storage';
+//TODO: remove this file
 
-import { deserializeIdentities, serializeIdentities } from './identitiesUtils';
-
-import { mergeNetworks, serializeNetworks } from 'utils/networksUtils';
 import { allBuiltInMetadata } from 'constants/networkMetadataList';
-import { SubstrateNetworkParams } from 'types/networkTypes';
-import { Account, Identity } from 'types/identityTypes';
 import { MetadataHandle } from 'types/metadata';
 import {
-	metadataHandleToKey,
-	metadataStorage,
 	getMetadataHandleFromRaw
 } from 'utils/metadataUtils';
-
-function handleError(e: Error, label: string): any[] {
-	console.warn(`loading ${label} error`, e);
-	return [];
-}
-
-/*
- * ========================================
- *	Accounts Store
- * ========================================
- */
-const currentAccountsStore = {
-	keychainService: 'accounts_v3',
-	sharedPreferencesName: 'accounts_v3'
-};
-
-export async function loadAccounts(version = 3): Promise<Map<string, any>> {
-	if (!SecureStorage) {
-		return Promise.resolve(new Map());
-	}
-
-	const accountsStoreVersion =
-		version === 1 ? 'accounts' : `accounts_v${version}`;
-	const accountsStore = {
-		keychainService: accountsStoreVersion,
-		sharedPreferencesName: accountsStoreVersion
-	};
-
-	return SecureStorage.getAllItems(accountsStore).then(
-		(accounts: { [key: string]: string }) => {
-			const accountMap = new Map();
-			for (const [key, value] of Object.entries(accounts)) {
-				const account = JSON.parse(value);
-				accountMap.set(key, { ...account });
-			}
-
-			return accountMap;
-		}
-	);
-}
-
-export const deleteAccount = (accountKey: string): Promise<void> =>
-	SecureStorage.deleteItem(accountKey, currentAccountsStore);
-
-export const saveAccount = (
-	accountKey: string,
-	account: Account
-): Promise<void> =>
-	SecureStorage.setItem(
-		accountKey,
-		JSON.stringify(account, null, 0),
-		currentAccountsStore
-	);
-
-/*
- * ========================================
- *	Identities Store
- * ========================================
- */
-const identitiesStore = {
-	keychainService: 'parity_signer_identities',
-	sharedPreferencesName: 'parity_signer_identities'
-};
-const currentIdentityStorageLabel = 'identities_v4';
-
-export async function loadIdentities(version = 4): Promise<Identity[]> {
-	const identityStorageLabel = `identities_v${version}`;
-	try {
-		const identities = await SecureStorage.getItem(
-			identityStorageLabel,
-			identitiesStore
-		);
-		if (!identities) return [];
-		return deserializeIdentities(identities);
-	} catch (e) {
-		return handleError(e, 'identity');
-	}
-}
-
-export async function dumpIdentities(version = 4): Promise<string> {
-	const identityStorageLabel = `identities_v${version}`;
-	try {
-		const identities = await SecureStorage.getItem(
-			identityStorageLabel,
-			identitiesStore
-		);
-		return identities;
-	} catch (e) {
-		console.warn('db error ', e);
-		return '';
-	}
-}
-
-export const saveIdentities = (identities: Identity[]): void => {
-	SecureStorage.setItem(
-		currentIdentityStorageLabel,
-		serializeIdentities(identities),
-		identitiesStore
-	);
-};
 
 /*
  * ========================================
@@ -136,114 +28,14 @@ export const saveIdentities = (identities: Identity[]): void => {
  * ========================================
  */
 
-export async function getMetadata(
-	metadataHandle: MetadataHandle | null
-): Promise<string> {
-	try {
-		if (!metadataHandle) return '';
-		const metadataKey = metadataHandleToKey(metadataHandle);
-		const metadataRecord = await AsyncStorage.getItem(metadataKey);
-		return metadataRecord ? metadataRecord : '';
-	} catch (e) {
-		handleError(e, 'load metadata');
-		return '';
-	}
-}
-
-function isMetadataKey(element: string): boolean {
-	//check if the line begins with 'signer_metadata_' - not ideomatic but safe
-	if (!element) return false;
-	return element.substr(0, metadataStorage.length) === metadataStorage;
-}
-
 export async function dumpMetadataDB(): Promise<
 	Array<[string, string | null]>
 > {
-	try {
-		const allKeys = await AsyncStorage.getAllKeys();
-		const metadataKeys = allKeys.filter(isMetadataKey);
-		const allMetadataMap = await AsyncStorage.multiGet(metadataKeys);
-		return allMetadataMap;
-	} catch (e) {
-		handleError(e, 'metadata db fetch failed');
-		return [];
-	}
-}
-
-export async function getAllMetadata(): Promise<Array<MetadataHandle>> {
-	try {
-		const allMetadataMap = await dumpMetadataDB();
-		const handles: Array<MetadataHandle> = [];
-
-		// Uncomment this to clean up
-		/*
-		for (let deleteme of metadataKeys) {
-			await SecureStorage.deleteItem(deleteme, metadataStorage);
-		}
-		*/
-		for (const metadataValue of allMetadataMap) {
-			handles.push(await getMetadataHandleFromRaw(metadataValue[1]));
-		}
-		return handles;
-	} catch (e) {
-		handleError(e, 'getAllMetadata');
-		return [];
-	}
-}
-
-function isRelevant(this: string, element: MetadataHandle): boolean {
-	return String(element.specName) === this;
-}
-
-export async function getRelevantMetadata(
-	specName: string
-): Promise<Array<MetadataHandle>> {
-	const handles = await getAllMetadata();
-	return handles.filter(isRelevant, specName);
-}
-
-export async function saveMetadata(newMetadata: string): Promise<void> {
-	try {
-		const metadataHandle = await getMetadataHandleFromRaw(newMetadata);
-		const newMetadataKey = metadataHandleToKey(metadataHandle);
-		await AsyncStorage.setItem(newMetadataKey, newMetadata);
-		console.log('Saved: ' + newMetadataKey);
-	} catch (e) {
-		handleError(e, 'save metadata');
-	}
-}
-
-export async function populateMetadata(): Promise<void> {
-	console.log('loading built-in metadata...');
+	var allMetadataMap = [];
 	for (const metadataString of allBuiltInMetadata) {
-		await saveMetadata(metadataString);
+		const metadataHandle = await getMetadataHandleFromRaw(metadataString);
+		allMetadataMap.push(metadataHandle, metadataString);
 	}
+	return allMetadataMap;
 }
 
-export async function deleteMetadata(
-	metadataHandle: MetadataHandle
-): Promise<void> {
-	try {
-		await AsyncStorage.removeItem(metadataHandleToKey(metadataHandle));
-		console.log('metadata successfully removed: ');
-		console.log(metadataHandle);
-	} catch (e) {
-		handleError(e, 'metadata deletion');
-	}
-}
-
-/*
- * ========================================
- *	Privacy Policy and Terms Conditions Store
- * ========================================
- */
-
-export async function loadToCAndPPConfirmation(): Promise<boolean> {
-	const result = await AsyncStorage.getItem('ToCAndPPConfirmation_v4');
-
-	return !!result;
-}
-
-export async function saveToCAndPPConfirmation(): Promise<void> {
-	await AsyncStorage.setItem('ToCAndPPConfirmation_v4', 'yes');
-}

@@ -19,7 +19,6 @@ import React, { useRef, useState, useMemo, useContext } from 'react';
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import TextInput from 'components/TextInput';
 import {

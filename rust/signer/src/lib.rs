@@ -400,12 +400,10 @@ export! {
     @Java_io_parity_signer_SubstrateSignModule_substrateDbInit
 	fn db_init(
         metadata: &str,
-        identities: &str,
 		dbname: &str
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
         let datafiles = db_handling::DataFiles {
             metadata_contents : metadata,
-            identities: identities,
         };
         db_handling::fill_database_from_files(dbname, datafiles)
     }
@@ -439,9 +437,7 @@ export! {
                 spec.secondary_color,
                 spec.title))
         }
-        output.pop(); //would result in nonsence for empty list of networks. But that's nonsence itself and UI seems to handle it.
-        output.push_str("]");
-        Ok(output.to_string())
+        result::return_json_array(output)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_dbAddNetwork
@@ -473,9 +469,7 @@ export! {
             output.push_str(&format!("\"{}\",",
                 seedname))
         }
-        output.pop(); //would result in nonsence for empty list of networks. But that's nonsence itself and UI seems to handle it.
-        output.push_str("]");
-        Ok(output.to_string())
+        result::return_json_array(output)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_dbGetRelevantIdentities
@@ -492,12 +486,22 @@ export! {
                 identity.has_pwd,
                 identity.name))
         }
-        output.pop(); //would result in nonsence for empty list of networks. But that's nonsence itself and UI seems to handle it.
-        output.push_str("]");
-        Ok(output.to_string())
+        result::return_json_array(output)
     }
 
+    @Java_io_parity_signer_SubstrateSignModule_dbAckUserAgreement
+	fn ack_user_agreement(
+		dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        db_handling::settings::ack_user_agreement(dbname)
+    }
 
+    @Java_io_parity_signer_SubstrateSignModule_dbCheckUserAgreement
+	fn check_user_agreement(
+		dbname: &str
+	) -> std::result::Result<bool, Box<dyn std::error::Error>> {
+        db_handling::settings::check_user_agreement(dbname)
+    }
 
 }
 

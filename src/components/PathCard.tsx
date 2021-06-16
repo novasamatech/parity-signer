@@ -23,7 +23,6 @@ import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
-import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';

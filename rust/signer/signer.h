@@ -118,7 +118,7 @@ const char * development_test(struct ExternError*, const char* input);
 
 // Initial population of DB, currently in "development tool" state
 // TODO: leave only dbname in input
-void db_init(struct ExternError*, const char* metadata, const char* identities, const char* dbname);
+void db_init(struct ExternError*, const char* metadata, const char* dbname);
 
 // Fetch list of available networks for network selector screen
 const char * get_all_networks_for_network_selector(struct ExternalError*, const char* dbname);
@@ -131,4 +131,10 @@ const char * get_all_seed_names(struct ExternalError*, const char* dbname);
 
 //Filter identities derived for given seed and network
 const char * get_relevant_identities(srtuct ExternalError*, const char* seed_name, const char* genesis_hash, const char* dbname);
+
+//Acknowledge user agreement
+void ack_user_agreement(struct ExternalError, const char* dbname);
+
+//Check whether user agreement is acknowledged
+bool check_user_agreement(struct ExternalError, const char* dbname);
 

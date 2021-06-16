@@ -29,7 +29,7 @@ import fontStyles from 'styles/fontStyles';
 import Button from 'components/Button';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
-import { saveToCAndPPConfirmation } from 'utils/db';
+import { ackUserAgreement } from 'utils/native';
 import CustomScrollView from 'components/CustomScrollView';
 
 export default function TermsAndConditions(
@@ -43,7 +43,7 @@ export default function TermsAndConditions(
 	);
 	const { navigation } = props;
 	const onConfirm = async (): Promise<void> => {
-		await saveToCAndPPConfirmation();
+		await ackUserAgreement();
 		setPolicyConfirmed(true);
 	};
 

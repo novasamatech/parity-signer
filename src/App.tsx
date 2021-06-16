@@ -29,8 +29,6 @@ import {
 	ScreenStack
 } from './screens';
 
-import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
-import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import CustomAlert from 'components/CustomAlert';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
@@ -59,9 +57,7 @@ export default function App(props: AppProps): React.ReactElement {
 	}
 
 	const alertContext = useAlertContext();
-	const networkContext = useNetworksContext();
 	const globalContext: GlobalState = useGlobalStateContext();
-	const accountsContext = useAccountContext();
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
@@ -73,7 +69,7 @@ export default function App(props: AppProps): React.ReactElement {
 		} else {
 			return (
 				<ScreenStack.Navigator>
-					<ScreenStack.Screen name="Empty">
+					<ScreenStack.Screen name="Loading">
 						{(navigationProps: any): React.ReactElement => (
 							<View style={emptyScreenStyles} {...navigationProps} />
 						)}
@@ -85,22 +81,18 @@ export default function App(props: AppProps): React.ReactElement {
 
 	return (
 		<SafeAreaProvider>
-			<NetworksContext.Provider value={networkContext}>
-				<AccountsContext.Provider value={accountsContext}>
-					<GlobalStateContext.Provider value={globalContext}>
-						<AlertStateContext.Provider value={alertContext}>
-								<MenuProvider backHandler={true}>
-									<StatusBar
-										barStyle="light-content"
-										backgroundColor={colors.background.app}
-									/>
-									<CustomAlert />
-									<NavigationContainer>{renderStacks()}</NavigationContainer>
-								</MenuProvider>
-						</AlertStateContext.Provider>
-					</GlobalStateContext.Provider>
-				</AccountsContext.Provider>
-			</NetworksContext.Provider>
+			<GlobalStateContext.Provider value={globalContext}>
+				<AlertStateContext.Provider value={alertContext}>
+					<MenuProvider backHandler={true}>
+						<StatusBar
+							barStyle="light-content"
+							backgroundColor={colors.background.app}
+						/>
+						<CustomAlert />
+						<NavigationContainer>{renderStacks()}</NavigationContainer>
+					</MenuProvider>
+				</AlertStateContext.Provider>
+			</GlobalStateContext.Provider>
 		</SafeAreaProvider>
 	);
 }

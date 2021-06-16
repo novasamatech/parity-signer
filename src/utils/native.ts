@@ -20,7 +20,7 @@ import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 import { MetadataHandle } from 'types/metadata';
-import { dumpIdentities, dumpMetadataDB } from 'utils/db';
+import { dumpMetadataDB } from 'utils/db';
 import { PayloadCardsSet } from 'types/payloads';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { typeDefs } from 'constants/typeDefs';
@@ -97,10 +97,8 @@ export async function dbInit(): Promise<void> {
 	try {
 		const metadata = await dumpMetadataDB();
 		const metadataJSON = JSON.stringify(metadata);
-		const identities = await dumpIdentities();
 		const parsedJSON = await SubstrateSign.dbInit(
 			metadataJSON,
-			identities
 		);
 		console.log('db created!');
 	} catch (e) {
@@ -223,6 +221,33 @@ export async function getAllSeedNames(): Promise<[string]> {
 		return [];
 	}
 }
+
+//Set TC&PP
+
+export async function ackUserAgreement(): Promise<void> {
+	try {
+		await SubstrateSign.ackUserAgreement();
+		console.log("I do");
+		return;
+	} catch(e) {
+		console.log(e);
+		return;
+	}	
+}
+
+//check if TC&PP were acked
+
+export async function checkUserAgreement(): Promise<bool> {
+	try {
+		const check = await SubstrateSign.checkUserAgreement();
+		console.log(check);
+		return check;
+	} catch(e) {
+		console.log(e);
+		return false;
+	}	
+}
+
 
 //================================
 //the rest is probably junk by now

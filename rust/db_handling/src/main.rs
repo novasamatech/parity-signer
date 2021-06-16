@@ -20,7 +20,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let datafiles = DataFiles {
         metadata_contents: &metadata_contents,
-        identities: &identities,
     };
     
     fill_database_from_files(dbname, datafiles)?;
