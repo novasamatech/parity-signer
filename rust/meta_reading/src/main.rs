@@ -1,13 +1,13 @@
-use std::fs;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
-use chrono::{DateTime, Utc};
-use regex::Regex;
-
-use meta_reading::*;
+use meta_reading::full_run;
 
 fn main() {
-
+    let database_name = "tests/metadata_database";
+    let logfile_name = "tests/log";
+    match full_run(database_name, logfile_name) {
+        Ok(()) => (),
+        Err(e) => println!("Application error. {}", e),
+    }
+/*
 // existing metadata is stored in networkMetadata.ts file, this part fetches the metadata as MetaValues from file
     let contents = fs::read_to_string("networkMetadata.ts");
     let old_full: Vec<MetaValues> = match contents {
@@ -61,7 +61,7 @@ fn main() {
                 };
                 match res_const {
                     Ok(z) => {
-                        let decoded = decode_version(z);
+                        let decoded = decode_version(z).unwrap();
                         new.name = decoded.specname;
                         new.version = Some(decoded.spec_version);
                     },
@@ -300,6 +300,7 @@ fn main() {
     if let Err(e) = write!(ns_file, "{}", new_specs) {
         eprintln!("Couldn't write to file: {}", e);
     }
+*/
 }
 
 
