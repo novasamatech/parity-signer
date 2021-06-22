@@ -363,6 +363,29 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	@ReactMethod
+	public void tryCreateSeed(String seedName, String crypto, Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			substrateTryCreateSeed(seedName, crypto, dbname);
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "New seed creation failed", e);
+		}
+	}
+
+	@ReactMethod
+	public void tryRecoverSeed(String seedName, String crypto, String seedPhrase, Promise promise) {
+		try {
+			String dbname = reactContext.getFilesDir().toString();
+			substrateTryRecoverSeed(seedName, crypto, seedPhrase, dbname);
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "New seed creation failed", e);
+		}
+	}
+
+
 
 	private static native String ethkeyBrainwalletAddress(String seed);
 	private static native String ethkeyBrainwalletBIP39Address(String seed);
@@ -400,4 +423,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native String dbGetRelevantIdentities(String seedName, String genesisHash, String dbname);
 	private static native void dbAckUserAgreement(String dbname);
 	private static native boolean dbCheckUserAgreement(String dbname);
+	private static native void substrateTryCreateSeed(String seedName, String crypto, String dbname);
+	private static native void substrateTryRecoverSeed(String seedName, String crypto, String seedPhrase, String dbname);
 }

@@ -1,5 +1,27 @@
 use sled::Db;
 
+pub type SeedKey = Vec<u8>;
+pub type AddressKey = Vec<u8>;
+pub type NetworkKey = Vec<u8>;
+
+///These abstractions are in place in case more complexity is needed
+///They should not fail
+
+///Generate seed key from minimal amount of information
+pub fn generate_seed_key (name: &str) -> SeedKey {
+    name.as_bytes().to_vec()
+}
+
+///Generate address key from minimal amount of information
+pub fn generate_address_key (public: Vec<u8>) -> AddressKey {
+    public
+}
+
+///Generate network key from minimal amount of information
+pub fn generate_network_key (genhash: Vec<u8>) -> NetworkKey {
+    genhash
+}
+
 ///This could replace Ok(()) at the end of all db-opening functions
 ///
 
@@ -15,11 +37,6 @@ mod tests {
     use super::*;
     use sled::open;
 
-    static TESTDB: &str = "tests/testdb";
-
-    //These tests are blocking each other due to DB access;
-    //TODO: either consolidate tests into single thread
-    //or give each a separate db to mess with
     #[test]
     fn successfully_flush_db() {
         let database: Db = open("tests/test_flush_db").unwrap();

@@ -1,11 +1,11 @@
 use hex;
 
-mod address_book;
+pub mod address_book;
     use address_book::{AddressBookEntry, get_default_address_book};
 mod constants;
-mod decode_metadata;
+pub mod decode_metadata;
     use decode_metadata::decode_version;
-mod fetch_metadata;
+pub mod fetch_metadata;
     use fetch_metadata::fetch_info;
 mod write_metadata;
     use write_metadata::{read_metadata_database, sort_metavalues, SortedMetaValues, add_new, write_metadata_database};

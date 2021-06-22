@@ -10,7 +10,7 @@ pub mod settings;
 use settings::load_types;
 
 mod db_utils;
-mod constants;
+pub mod constants;
 mod default_type_defs;
 
 /// struct to store three important databases: chain_spec, metadata, and types_info

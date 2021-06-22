@@ -1,5 +1,4 @@
 use sled;
-//use db_handling::chainspecs::Verifier;
 
 #[derive(PartialEq)]
 pub enum Error {
@@ -71,6 +70,7 @@ pub enum DatabaseError {
 #[derive(PartialEq)]
 pub enum SystemError {
     BalanceFail,
+    NotMeta,
     MetaVersionBelow12,
     MetaMismatch,
     NoVersion,
@@ -150,6 +150,7 @@ impl Error {
             Error::SystemError(x) => {
                 match x {
                     SystemError::BalanceFail => format!("System error. Balance printing failed."),
+                    SystemError::NotMeta => String::from("System error. First characters in metadata are expected to be 0x6d657461."),
                     SystemError::MetaVersionBelow12 => String::from("System error. Metadata could not be decoded. Runtime metadata version is below 12."),
                     SystemError::MetaMismatch => String::from("Network metadata entry corrupted in database. Please remove the entry and download the metadata for this network."),
                     SystemError::NoVersion => String::from("System error. No version in metadata."),

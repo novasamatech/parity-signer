@@ -2,8 +2,8 @@ use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use std::convert::TryInto;
 use sled::{Db, Tree, open};
-use db_handling::{chainspecs::{ChainSpecs, Verifier}, settings::{LoadMetaDb, UpdSpecs}, metadata::NameVersioned};
-use meta_reading::{get_meta_const_light, VersionDecoded};
+use db_handling::{chainspecs::{ChainSpecs, Verifier}, settings::{LoadMetaDb, UpdSpecs}, metadata::NameVersioned, constants::{SPECSTREE, METATREE, SETTREE, LOADMETA}};
+use meta_reading::decode_metadata::{get_meta_const_light, VersionDecoded};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
 use frame_metadata::RuntimeMetadataV12;
@@ -56,19 +56,18 @@ fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_specs: 
                                 Ok(z) => {
                                     match z {
                                         Some(a) => {
-                                            if a[..] == meta[4..] {return Err(Error::BadInputData(BadInputData::MetaAlreadyThere))}
+                                            if a[..] == meta[..] {return Err(Error::BadInputData(BadInputData::MetaAlreadyThere))}
                                             else {return Err(Error::BadInputData(BadInputData::MetaTotalMismatch))}
                                         },
                                         None => {
                                             let meta_card = Card::Meta{specname: name, spec_version: y.spec_version, meta_hash: &hex::encode(blake2b(32, &[], &meta).as_bytes())}.card(index, 0);
                                         // making action entry into database
                                             let action_into_db = LoadMetaDb {
-                                                name: y.specname.to_string(),
-                                                version: y.spec_version,
-                                                meta: meta[4..].to_vec(),
+                                                versioned_name: received_versioned_name.encode(),
+                                                meta,
                                                 upd_specs,
                                             };
-                                            match settings.insert(b"load_metadata", action_into_db.encode()) {
+                                            match settings.insert(LOADMETA, action_into_db.encode()) {
                                                 Ok(_) => (),
                                                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                             };
@@ -81,7 +80,7 @@ fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_specs: 
                                                 Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                             };
                                         // action card
-                                            let action_card = format!("\"action\":{{\"type\":\"load_metadata\",\"payload\":{{\"checksum\":\"{}\"}}}}", checksum);
+                                            let action_card = format!("\"action\":{{\"type\":\"load_metadata\",\"payload\":{{\"type\":\"load_metadata\",\"checksum\":\"{}\"}}}}", checksum);
                                             Ok((meta_card, action_card))
                                         },
                                     }
@@ -129,20 +128,20 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let chainspecs: Tree = match database.open_tree(b"chainspecs") {
+    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let metadata: Tree = match database.open_tree(b"metadata") {
+    let metadata: Tree = match database.open_tree(METATREE) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let settings: Tree = match database.open_tree(b"settings") {
+    let settings: Tree = match database.open_tree(SETTREE) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
     
-    match settings.remove(b"load_metadata") {
+    match settings.remove(LOADMETA) {
         Ok(_) => (),
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     }

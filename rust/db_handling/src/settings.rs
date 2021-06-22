@@ -6,6 +6,7 @@ use lazy_static::lazy_static;
 
 use super::chainspecs::Verifier;
 use super::constants::{SETTREE};
+use super::db_utils::SeedKey;
 
 /// Struct to store type name and description
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
@@ -49,7 +50,7 @@ pub struct StructField {
 pub struct SignDb {
     pub crypto: String,
     pub path: String,
-    pub name_for_seed: String,
+    pub name_for_seed: SeedKey,
     pub transaction: Vec<u8>,
     pub has_pwd: bool,
     pub author_base58: String,
@@ -58,8 +59,7 @@ pub struct SignDb {
 /// Struct to store load_metadata action information
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 pub struct LoadMetaDb {
-    pub name: String,
-    pub version: u32,
+    pub versioned_name: Vec<u8>,
     pub meta: Vec<u8>,
     pub upd_specs: Option<UpdSpecs>
 }

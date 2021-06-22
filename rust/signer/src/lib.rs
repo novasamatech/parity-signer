@@ -376,7 +376,7 @@ export! {
         dbname: &str
 	) -> String {
         if transaction == "test all" {return transaction_parsing::test_all_cards::make_all_cards()}
-        else {return transaction_parsing::output(transaction, dbname)}
+        else {return transaction_parsing::produce_output(transaction, dbname)}
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateSignTransaction
@@ -386,7 +386,7 @@ export! {
         password: &str,
         dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        transaction_signing::create_signature(action, pin, password, dbname)
+        transaction_signing::handle_action(action, pin, password, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest
@@ -509,7 +509,19 @@ export! {
         crypto: &str,
 		dbname: &str
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        db_handling::identities::try_create_seed(seed_name, crypto, dbname)
+        let password = "test";
+        db_handling::identities::try_create_seed(seed_name, crypto, password, dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateTryRecoverSeed
+	fn try_recover_seed(
+        seed_name: &str,
+        crypto: &str,
+        seed_phrase: &str,
+		dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let password = "test";
+        db_handling::identities::try_recover_seed(seed_name, crypto, seed_phrase, password, dbname)
     }
 
 }

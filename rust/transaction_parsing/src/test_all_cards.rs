@@ -100,6 +100,7 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::NoMetaAtAll)));
     
     all_cards.push(Card::Error(Error::SystemError(SystemError::BalanceFail)));
+    all_cards.push(Card::Error(Error::SystemError(SystemError::NotMeta)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::MetaVersionBelow12)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::MetaMismatch)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::NoVersion)));

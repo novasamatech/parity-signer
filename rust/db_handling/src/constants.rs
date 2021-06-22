@@ -27,7 +27,7 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             unit: String::from("KSM"),
             verifier: Verifier::None,
     	},
-	ChainSpecs {
+	    ChainSpecs {
             base58prefix: 0,
             color: String::from("#E6027A"),
             decimals: 10,
@@ -41,8 +41,8 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             unit: String::from("DOT"),
             verifier: Verifier::None,
     	},
-	ChainSpecs {
-            base58prefix: 0,
+    	ChainSpecs {
+            base58prefix: 42,
             color: String::from("#6f36dc"),
             decimals: 12,
             genesis_hash: hex::decode("78ae7dc7e64637e01fa6a6b6e4fa252c486f62af7aa71c471ad17f015bd375ce").unwrap().try_into().unwrap(),

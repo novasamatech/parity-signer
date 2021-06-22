@@ -1,5 +1,5 @@
 use frame_metadata::{RuntimeMetadataV12};
-use meta_reading::{get_meta_const_light, VersionDecoded};
+use meta_reading::decode_metadata::{get_meta_const_light, VersionDecoded};
 use db_handling::{metadata::NameVersioned};
 use parity_scale_codec::{Decode, Encode};
 use sled::Tree;
@@ -36,10 +36,11 @@ pub fn find_meta(chain_name: &str, version: u32, metadata: &Tree) -> Result<(Run
     
     match meta {
         Some(m) => {
-            if m[0] < 12 {
+            if !m.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::SystemError(SystemError::NotMeta))}
+            if m[4] < 12 {
                 return Err(Error::SystemError(SystemError::MetaVersionBelow12));
             }
-            let data_back = RuntimeMetadataV12::decode(&mut &m[1..]);
+            let data_back = RuntimeMetadataV12::decode(&mut &m[5..]);
             match data_back {
                 Ok(metadata) => {
                 // check if the name and version are same in metadata, i.e. the database is not damaged

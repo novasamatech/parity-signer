@@ -3,7 +3,7 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sled::{Db, Tree, open};
-use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, SignDb}, users::AddressDetails};
+use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, SignDb}, identities::AddressDetails, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS}};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
@@ -76,24 +76,24 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let chainspecs: Tree = match database.open_tree(b"chainspecs") {
+    let chainspecs: Tree = match database.open_tree(SPECSTREE) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let metadata: Tree = match database.open_tree(b"metadata") {
+    let metadata: Tree = match database.open_tree(METATREE) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let addresses: Tree = match database.open_tree(b"addresses") {
+    let addresses: Tree = match database.open_tree(ADDRTREE) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let settings: Tree = match database.open_tree(b"settings") {
+    let settings: Tree = match database.open_tree(SETTREE) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
     
-    match settings.remove(b"sign_transaction") {
+    match settings.remove(SIGNTRANS) {
         Ok(_) => (),
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     }
@@ -218,7 +218,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         has_pwd: id_values.has_pwd,
                                         author_base58: author,
                                     };
-                                    match settings.insert(b"sign_transaction", action_into_db.encode()) {
+                                    match settings.insert(SIGNTRANS, action_into_db.encode()) {
                                         Ok(_) => (),
                                         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                     };
@@ -231,7 +231,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                     };
                                 // action card
-                                    let action_card = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"checksum\":\"{}\",\"has_password\":\"{}\"}}}}", checksum, id_values.has_pwd);
+                                    let action_card = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"type\":\"sign_transaction\",\"checksum\":\"{}\",\"has_password\":\"{}\"}}}}", checksum, id_values.has_pwd);
                                 // full cards set
                                     let cards = match warning_card {
                                         Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),

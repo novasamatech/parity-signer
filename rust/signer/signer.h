@@ -138,3 +138,8 @@ void ack_user_agreement(struct ExternalError, const char* dbname);
 //Check whether user agreement is acknowledged
 bool check_user_agreement(struct ExternalError, const char* dbname);
 
+//Two functions to create new seed
+//TODO: implement password!!!
+void try_create_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* dbname);
+void try_recover_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* seed_phrase, const char* dbname);
+
