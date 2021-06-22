@@ -37,33 +37,24 @@ import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
 
-function IdentityNew({
+function RootSeedNew({
 	navigation,
 	route
-}: NavigationProps<'IdentityNew'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
+}: NavigationProps<'RootSeedNew'>): React.ReactElement {
 	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
 	const { setAlert } = useContext(AlertStateContext);
-	const createSeedRefWithNewSeed = useNewSeedRef();
-	const clearIdentity = useRef(() =>
-		accountsStore.updateNewIdentity(emptyIdentity())
-	);
-
-	useEffect((): (() => void) => {
-		clearIdentity.current();
-		return clearIdentity.current;
-	}, [clearIdentity]);
+	const [newIdentityName, setNewIdentityName] = useState('');
 
 	const updateName = (name: string): void => {
-		accountsStore.updateNewIdentity({ name });
+		setNewIdentityName(name);
 	};
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
-		setSeedPhrase(inputSeedPhrase);
+		setSeedPhrase(inputSeedPhrase);/*
 		const addressGeneration = (): Promise<void> =>
 			brainWalletAddress(inputSeedPhrase.trimEnd())
 				.then(({ bip39 }) => {
@@ -71,40 +62,15 @@ function IdentityNew({
 				})
 				.catch(() => setIsSeedValid(defaultSeedValidObject));
 		const debouncedAddressGeneration = debounce(addressGeneration, 200);
-		debouncedAddressGeneration();
+		debouncedAddressGeneration();*/
 	};
 
 	const onRecoverIdentity = async (): Promise<void> => {
-		const pin = await setPin(navigation);
-		try {
-			if (isSeedValid.bip39) {
-				await accountsStore.saveNewIdentity(
-					seedPhrase.trimEnd(),
-					pin,
-					createSeedRefWithNewSeed
-				);
-			} else {
-				await accountsStore.saveNewIdentity(
-					seedPhrase,
-					pin,
-					createSeedRefWithNewSeed
-				);
-			}
-			setSeedPhrase('');
-			navigateToNewIdentityNetwork(navigation);
-		} catch (e) {
-			alertIdentityCreationError(setAlert, e.message);
-		}
+		setSeedPhrase('');
+		navigation.goBack();
 	};
 
 	const onRecoverConfirm = (): void | Promise<void> => {
-		if (!isSeedValid.valid) {
-			if (isSeedValid.accountRecoveryAllowed) {
-				return alertRisks(setAlert, `${isSeedValid.reason}`, onRecoverIdentity);
-			} else {
-				return alertError(setAlert, `${isSeedValid.reason}`);
-			}
-		}
 		return onRecoverIdentity();
 	};
 
@@ -112,6 +78,7 @@ function IdentityNew({
 		setSeedPhrase('');
 		navigation.navigate('IdentityBackup', {
 			isNew: true
+			
 		});
 	};
 
@@ -132,7 +99,7 @@ function IdentityNew({
 					small={true}
 				/>
 				<Button
-					title="or create new identity"
+					title="or create new seed"
 					onPress={(): void => {
 						setIsRecover(false);
 					}}
@@ -152,7 +119,7 @@ function IdentityNew({
 				small={true}
 			/>
 			<Button
-				title="or recover existing identity"
+				title="or recover existing seed"
 				onPress={(): void => setIsRecover(true)}
 				small={true}
 				onlyText={true}
@@ -162,19 +129,19 @@ function IdentityNew({
 
 	return (
 		<KeyboardAwareContainer>
-			<ScreenHeading title={'New Identity'} />
+			<ScreenHeading title={'New Root Seed'} />
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.IdentityNew.nameInput}
-				value={accountsStore.state.newIdentity.name}
-				placeholder="Identity Name"
+				value={newIdentityName}
+				placeholder="Seed Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}
 		</KeyboardAwareContainer>
 	);
 }
 
-export default IdentityNew;
+export default RootSeedNew;
 
 const styles = StyleSheet.create({
 	body: {

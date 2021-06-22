@@ -3447,6 +3447,7 @@ dependencies = [
  "serde_json",
  "sled",
  "sp-arithmetic",
+ "sp-core",
  "sp-runtime",
 ]
 

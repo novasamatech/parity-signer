@@ -1,8 +1,8 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use hex;
 
-use super::error::{Error};
-use super::AuthorPublicKey;
+use super::error::Error;
+use super::parse_transaction::AuthorPublicKey;
 
 pub enum Card <'a> {
     Call {pallet: &'a str, method: &'a str},
@@ -26,6 +26,8 @@ pub enum Card <'a> {
     Author {base58_author: &'a str, path: &'a str, has_pwd: bool, name: &'a str},
     AuthorPlain (&'a str),
     AuthorPublicKey (AuthorPublicKey),
+    Verifier(String),
+    Meta {specname: &'a str, spec_version: u32, meta_hash: &'a str},
     Warning (Warning),
     Error (Error),
 }
@@ -33,6 +35,8 @@ pub enum Card <'a> {
 pub enum Warning {
     AuthorNotFound,
     NewerVersion {used_version: u32, latest_version: u32},
+    VerifierAppeared,
+    NotVerified,
 }
 
 impl Warning {
@@ -40,6 +44,8 @@ impl Warning {
         match &self {
             Warning::AuthorNotFound => String::from("Transaction author public key not found."),
             Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {}. Latest known available version is {}.", used_version, latest_version),
+            Warning::VerifierAppeared => String::from("Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."),
+            Warning::NotVerified => String::from("Received network metadata is not verified."),
         }
     }
 }
@@ -76,6 +82,8 @@ impl <'a> Card <'a> {
                 AuthorPublicKey::Sr25519(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"sr25519\"}}", &hex::encode(x))),
                 AuthorPublicKey::Ecdsa(x) => fancy(index, indent, "author_public_key", &format!("{{\"hex\":\"{}\",\"crypto\":\"ecdsa\"}}", &hex::encode(x))),
             },
+            Card::Verifier(x) => fancy(index, indent, "verifier", x),
+            Card::Meta{specname, spec_version, meta_hash} => fancy(index, indent, "meta", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\"}}", specname, spec_version, meta_hash)),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
         }

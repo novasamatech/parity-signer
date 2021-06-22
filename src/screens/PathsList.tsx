@@ -34,7 +34,7 @@ import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
-import OnBoardingView from 'modules/main/components/OnBoarding';
+import OnBoardingView from 'components/OnBoarding';
 import { getAllSeedNames, getNetwork, getIdentitiesForSeed } from 'utils/native';
 
 export default function PathsList({

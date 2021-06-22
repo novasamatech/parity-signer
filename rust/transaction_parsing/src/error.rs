@@ -1,4 +1,5 @@
 use sled;
+//use db_handling::chainspecs::Verifier;
 
 #[derive(PartialEq)]
 pub enum Error {
@@ -6,6 +7,7 @@ pub enum Error {
     UnableToDecode(UnableToDecode),
     DatabaseError(DatabaseError),
     SystemError(SystemError),
+    CryptoError(CryptoError)
 }
 
 #[derive(PartialEq)]
@@ -20,6 +22,14 @@ pub enum BadInputData {
     GenesisHashMismatch,
     ImmortalHashMismatch,
     SomeDataNotUsed,
+    NotMeta,
+    MetaVersionBelow12,
+    MetaMismatch,
+    MetaAlreadyThere,
+    MetaTotalMismatch,
+    VersionNotDecodeable,
+    NoMetaVersion,
+    UnableToDecodeMeta,
 }
 
 #[derive(PartialEq)]
@@ -64,8 +74,16 @@ pub enum SystemError {
     MetaVersionBelow12,
     MetaMismatch,
     NoVersion,
+    VersionNotDecodeable,
     UnableToDecodeMeta,
     RegexError,
+}
+
+#[derive(PartialEq)]
+pub enum CryptoError {
+    BadSignature,
+    VerifierChanged {old_show: String, new_show: String},
+    VerifierDisappeared,
 }
 
 impl Error {
@@ -74,7 +92,7 @@ impl Error {
             Error::BadInputData(x) => {
                 match x {
                     BadInputData::TooShort => String::from("Data is too short."),
-                    BadInputData::NotSubstrate => String::from("Only Substrate transactions are supported. Transaction is expected to start with 53."),
+                    BadInputData::NotSubstrate => String::from("Only Substrate transactions are supported. Transaction is expected to start with 0x53."),
                     BadInputData::NotHex => String::from("Input data not in hex format."),
                     BadInputData::CryptoNotSupported => String::from("Crypto type not supported."),
                     BadInputData::UnexpectedImmortality => String::from("Expected mortal transaction due to prelude format. Found immortal transaction."),
@@ -83,6 +101,14 @@ impl Error {
                     BadInputData::GenesisHashMismatch => String::from("Genesis hash from extrinsics not matching with genesis hash at the transaction end."),
                     BadInputData::ImmortalHashMismatch => String::from("Block hash for immortal transaction not matching genesis hash for the network."),
                     BadInputData::SomeDataNotUsed => String::from("After decoding some data remained unused."),
+                    BadInputData::NotMeta => String::from("First characters in metadata are expected to be 0x6d657461."),
+                    BadInputData::MetaVersionBelow12 => String::from("Received metadata could not be decoded. Runtime metadata version is below 12."),
+                    BadInputData::MetaMismatch => String::from("Received metadata specname does not match."),
+                    BadInputData::MetaAlreadyThere => String::from("Metadata already in database."),
+                    BadInputData::MetaTotalMismatch => String::from("Attempt to load different metadata for same name and version."),
+                    BadInputData::VersionNotDecodeable => String::from("Received metadata version could not be decoded."),
+                    BadInputData::NoMetaVersion => String::from("No version in received metadata."),
+                    BadInputData::UnableToDecodeMeta => String::from("Unable to decode received metadata."),
                 }
             },
             Error::UnableToDecode(x) => {
@@ -127,8 +153,16 @@ impl Error {
                     SystemError::MetaVersionBelow12 => String::from("System error. Metadata could not be decoded. Runtime metadata version is below 12."),
                     SystemError::MetaMismatch => String::from("Network metadata entry corrupted in database. Please remove the entry and download the metadata for this network."),
                     SystemError::NoVersion => String::from("System error. No version in metadata."),
+                    SystemError::VersionNotDecodeable => String::from("System error. Retrieved from metadata version constant could not be decoded."),
                     SystemError::UnableToDecodeMeta => String::from("System error. Unable to decode metadata."),
-                    SystemError::RegexError => String::from("System error. Expected single argument in regex capture, should not get here.")
+                    SystemError::RegexError => String::from("System error. Unexpected regular expressions error.")
+                }
+            },
+            Error::CryptoError(x) => {
+                match x {
+                    CryptoError::BadSignature => String::from("Corrupted data. Bad signature."),
+                    CryptoError::VerifierChanged {old_show, new_show} => format!("Different verifier was used for this network previously. Previously used {}. Current attempt {}.", old_show, new_show),
+                    CryptoError::VerifierDisappeared => String::from("Saved metadata for this network was signed by a verifier. This metadata is not.")
                 }
             },
         }

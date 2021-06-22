@@ -502,6 +502,15 @@ export! {
 	) -> std::result::Result<bool, Box<dyn std::error::Error>> {
         db_handling::settings::check_user_agreement(dbname)
     }
+    
+    @Java_io_parity_signer_SubstrateSignModule_substrateTryCreateSeed
+	fn try_create_seed(
+        seed_name: &str,
+        crypto: &str,
+		dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        db_handling::identities::try_create_seed(seed_name, crypto, dbname)
+    }
 
 }
 

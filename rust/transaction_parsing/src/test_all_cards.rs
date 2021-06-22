@@ -1,9 +1,10 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use sled::IVec;
+use db_handling::chainspecs::Verifier;
 
-use super::AuthorPublicKey;
+use super::parse_transaction::AuthorPublicKey;
 use super::cards::{Card, Warning};
-use super::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError};
+use super::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError, CryptoError};
 
 
 /// Function to pring all types of cards.
@@ -37,8 +38,14 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", path: "//Alice", has_pwd: false, name: ""});
     all_cards.push(Card::AuthorPlain("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"));
     all_cards.push(Card::AuthorPublicKey(AuthorPublicKey::Sr25519([142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72])));
+    all_cards.push(Card::Verifier(Verifier::Sr25519(String::from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty")).show_card().to_string()));
+    all_cards.push(Card::Meta{specname: "westend", spec_version: 9033, meta_hash: "69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb"});
+    
     all_cards.push(Card::Warning(Warning::AuthorNotFound));
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}));
+    all_cards.push(Card::Warning(Warning::VerifierAppeared));
+    all_cards.push(Card::Warning(Warning::NotVerified));
+    
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::TooShort)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotSubstrate)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotHex)));
@@ -49,6 +56,15 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::GenesisHashMismatch)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::ImmortalHashMismatch)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::SomeDataNotUsed)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotMeta)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::MetaVersionBelow12)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::MetaMismatch)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::MetaAlreadyThere)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::MetaTotalMismatch)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::VersionNotDecodeable)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::NoMetaVersion)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnableToDecodeMeta)));
+    
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::MethodAndExtrinsicsFailure)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NeedPalletAndMethod)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::MethodNotFound{method_index: 2, pallet_name: "test_Pallet".to_string()})));
@@ -68,6 +84,7 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::UnexpectedCompactInsides)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::CompactNotPrimitive)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::UnknownType(String::from("T::SomeUnknownType")))));
+    
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::Internal(sled::Error::CollectionNotFound(IVec::from(vec![1]))))));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::Internal(sled::Error::Unsupported(String::from("Something Unsupported."))))));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::Internal(sled::Error::ReportableBug(String::from("Please report me"))))));
@@ -81,20 +98,26 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::DamagedVersName)));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::NoMetaThisVersion)));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::NoMetaAtAll)));
+    
     all_cards.push(Card::Error(Error::SystemError(SystemError::BalanceFail)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::MetaVersionBelow12)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::MetaMismatch)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::NoVersion)));
+    all_cards.push(Card::Error(Error::SystemError(SystemError::VersionNotDecodeable)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::UnableToDecodeMeta)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::RegexError)));
     
-    let mut output_cards = String::from(r#"{"method":["#);
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::BadSignature)));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::VerifierChanged {old_show: Verifier::Ed25519(String::from("dOnTrEmOvEmE")).show_error(), new_show: Verifier::Sr25519(String::from("dOnTaCcEpTmE")).show_error()})));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::VerifierDisappeared)));
+    
+    let mut output_cards = String::from("[");
     
     for (i,x) in all_cards.iter().enumerate() {
         if i > 0 {output_cards.push_str(",")}
         output_cards.push_str(&x.card(i as u32,0));
     }
     
-    output_cards.push_str(r#"]}"#);
+    output_cards.push_str("]");
     output_cards
 }

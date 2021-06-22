@@ -3,7 +3,7 @@ use parity_scale_codec::{Encode, Decode};
 use parity_scale_codec_derive;
 
 use super::db_utils;
-use super::constants::get_default_chainspecs;
+use super::constants::{get_default_chainspecs, SPECSTREE};
 
 //TODO: rename fields to make them more clear
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
@@ -19,13 +19,41 @@ pub struct ChainSpecs {
     pub secondary_color: String,
     pub title: String,
     pub unit: String,
+    pub verifier: Verifier,
     //TODO: add metadata signature parameters
+}
+
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
+pub enum Verifier {
+    Ed25519(String),
+    Sr25519(String),
+    Ecdsa(String),
+    None,
+}
+
+impl Verifier {
+    pub fn show_card(&self) -> String {
+        match &self {
+            Verifier::Ed25519(x) => format!("{{\"base58\":\"{}\",\"encryption\":\"ed25519\"}}", x),
+            Verifier::Sr25519(x) => format!("{{\"base58\":\"{}\",\"encryption\":\"sr25519\"}}", x),
+            Verifier::Ecdsa(x) => format!("{{\"base58\":\"{}\",\"encryption\":\"ecdsa\"}}", x),
+            Verifier::None => String::from("none"),
+        }
+    }
+    pub fn show_error(&self) -> String {
+        match &self {
+            Verifier::Ed25519(x) => format!("base58 address: {}, encryption: ed25519", x),
+            Verifier::Sr25519(x) => format!("base58 address: {}, encryption: sr25519", x),
+            Verifier::Ecdsa(x) => format!("base58 address: {}, encryption: ecdsa", x),
+            Verifier::None => String::from("none"),
+        }
+    }
 }
 
 /// Fetch 1 network from database by genesis hash
 pub fn get_network (database_name: &str, genesis_hash: &str) -> Result<ChainSpecs, Box<dyn std::error::Error>> {
     let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(b"chainspecs")?;
+    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
     let chain_id = hex::decode(genesis_hash)?;
 
     match chainspecs.get(chain_id) {
@@ -38,7 +66,7 @@ pub fn get_network (database_name: &str, genesis_hash: &str) -> Result<ChainSpec
 /// Fetch all saved networks
 pub fn get_all_networks (database_name: &str) -> Result<Vec<ChainSpecs>, Box<dyn std::error::Error>> {
     let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(b"chainspecs")?;
+    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
 
     /*
     for Ok((_Id, record)) in chainspecs.iter() {
@@ -65,7 +93,7 @@ pub fn get_all_networks (database_name: &str) -> Result<Vec<ChainSpecs>, Box<dyn
 /// Add network
 pub fn add_network (database_name: &str, genesis_hash: &str, specs: &ChainSpecs) -> Result<(), Box<dyn std::error::Error>> {
     let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(b"chainspecs")?;
+    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
     let chain_id = hex::decode(genesis_hash)?;
 
     chainspecs.insert(chain_id, specs.encode())?;
@@ -83,7 +111,7 @@ pub fn remove_network (_database_name: &str, _genesis_hash: &str) -> Result<(), 
 pub fn load_chainspecs (database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     
     let database: Db = open(database_name)?;
-    let chainspecs: Tree = database.open_tree(b"chainspecs")?;
+    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
     chainspecs.clear()?;
     
     for record in get_default_chainspecs() {

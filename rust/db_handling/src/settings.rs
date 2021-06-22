@@ -4,6 +4,9 @@ use parity_scale_codec_derive;
 use regex::Regex;
 use lazy_static::lazy_static;
 
+use super::chainspecs::Verifier;
+use super::constants::{SETTREE};
+
 /// Struct to store type name and description
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 pub struct TypeEntry {
@@ -52,6 +55,22 @@ pub struct SignDb {
     pub author_base58: String,
 }
 
+/// Struct to store load_metadata action information
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+pub struct LoadMetaDb {
+    pub name: String,
+    pub version: u32,
+    pub meta: Vec<u8>,
+    pub upd_specs: Option<UpdSpecs>
+}
+
+/// Struct to store optional chainspecs update part of load_metadata info
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+pub struct UpdSpecs {
+    pub gen_hash: Vec<u8>,
+    pub verifier: Verifier,
+}
+
 lazy_static! {
     static ref REG_STRUCTS_WITH_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\{(?P<description>(\n +(pub )?\w+: .*(,)?)*\n)\}"#).unwrap();
     static ref REG_STRUCTS_NO_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\((pub )?(?P<description>.*)\)"#).unwrap();
@@ -68,7 +87,7 @@ pub fn load_types (database_name: &str, type_info: &str) -> Result<(), Box<dyn s
     
     let database: Db = open(database_name)?;
     
-    let settings: Tree = database.open_tree(b"settings")?;
+    let settings: Tree = database.open_tree(SETTREE)?;
     
     let name = String::from("types").encode();
     let mut types_prep: Vec<TypeEntry> = Vec::new();

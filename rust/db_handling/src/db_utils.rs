@@ -1,5 +1,8 @@
 use sled::Db;
 
+///This could replace Ok(()) at the end of all db-opening functions
+///
+
 pub fn db_flush_check (database: &Db) -> Result<(), Box<dyn std::error::Error>> {
     match database.flush() {
         Ok(_) => Ok(()),
@@ -18,9 +21,8 @@ mod tests {
     //TODO: either consolidate tests into single thread
     //or give each a separate db to mess with
     #[test]
-    #[ignore]
     fn successfully_flush_db() {
-        let database: Db = open(TESTDB).unwrap();
+        let database: Db = open("tests/test_flush_db").unwrap();
         db_flush_check(&database).unwrap()
     }
 }

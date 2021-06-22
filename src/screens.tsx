@@ -44,7 +44,7 @@ import AccountPin from 'screens/AccountPin';
 import { AccountUnlock } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
-import IdentityNew from 'screens/IdentityNew';
+import RootSeedNew from 'screens/RootSeedNew';
 import MetadataManagement from 'modules/network/screens/MetadataManagement';
 import FullMetadata from 'modules/network/screens/FullMetadata';
 import MetadataSaving from 'screens/MetadataSaving';
@@ -132,7 +132,7 @@ export const AppNavigator = (): React.ReactElement => (
 			name="IdentityManagement"
 			component={IdentityManagement}
 		/>
-		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
+		<ScreenStack.Screen name="RootSeedNew" component={RootSeedNew} />
 		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
 		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
 		<ScreenStack.Screen

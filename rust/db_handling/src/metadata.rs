@@ -5,6 +5,8 @@ use regex::Regex;
 use lazy_static::lazy_static;
 use hex;
 
+use super::constants::{METATREE};
+
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
 pub struct NameVersioned {
     pub name: String,
@@ -18,7 +20,7 @@ lazy_static! {
 pub fn load_metadata (database_name: &str, metadata_contents: &str) -> Result<(), Box<dyn std::error::Error>> {
     
     let database: Db = open(database_name)?;
-    let metadata: Tree = database.open_tree(b"metadata")?;
+    let metadata: Tree = database.open_tree(METATREE)?;
     
     for caps in REG_META.captures_iter(&metadata_contents) {
         let new = NameVersioned {

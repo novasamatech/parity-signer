@@ -11,7 +11,7 @@ export type RootStackParamList = {
 	AccountUnlock: { next: string; onDelete: () => any };
 	IdentityBackup: { isNew: true } | { isNew: false; seedPhrase: string };
 	IdentityManagement: undefined;
-	IdentityNew: { isRecover: boolean } | undefined;
+	RootSeedNew: { isRecover: boolean } | undefined;
 	MessageDetails: undefined;
 	Empty: undefined;
 	LegacyAccountBackup:
