@@ -36,50 +36,59 @@ import {
 import ScreenHeading from 'components/ScreenHeading';
 import { brainWalletAddress } from 'utils/native';
 import { debounce } from 'utils/debounce';
+import PinInput from 'modules/unlock/components/PinInput';
+import {tryCreateSeed, tryRecoverSeed} from 'utils/native';
 
 function RootSeedNew({
 	navigation,
 	route
 }: NavigationProps<'RootSeedNew'>): React.ReactElement {
-	const defaultSeedValidObject = validateSeed('', false);
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
-	const [isSeedValid, setIsSeedValid] = useState(defaultSeedValidObject);
 	const [seedPhrase, setSeedPhrase] = useState('');
+	const [pin, setPin] = useState('');
 	const { setAlert } = useContext(AlertStateContext);
-	const [newIdentityName, setNewIdentityName] = useState('');
+	const [seedName, setSeedName] = useState('');
+	const [disabled, setDisabled] = useState(false);
+	const [error, setError] = useState('');
+	const [cryptoType, setCryptoType] = useState('sr25519');
 
 	const updateName = (name: string): void => {
-		setNewIdentityName(name);
+		setSeedName(name);
+		setDisabled(false);
+		setError('');
 	};
 
 	const onSeedTextInput = (inputSeedPhrase: string): void => {
-		setSeedPhrase(inputSeedPhrase);/*
-		const addressGeneration = (): Promise<void> =>
-			brainWalletAddress(inputSeedPhrase.trimEnd())
-				.then(({ bip39 }) => {
-					setIsSeedValid(validateSeed(inputSeedPhrase, bip39));
-				})
-				.catch(() => setIsSeedValid(defaultSeedValidObject));
-		const debouncedAddressGeneration = debounce(addressGeneration, 200);
-		debouncedAddressGeneration();*/
+		setSeedPhrase(inputSeedPhrase);
+		setDisabled(false);
+		setError('');
 	};
 
-	const onRecoverIdentity = async (): Promise<void> => {
-		setSeedPhrase('');
-		navigation.goBack();
+	const onRecoverConfirm = async (): void => {
+		setDisabled(true);
+		try {
+			await tryRecoverSeed(seedName, cryptoType, seedPhrase, pin);
+			setSeedPhrase('');
+			navigation.navigate('IdentityBackup', {	
+				seedName
+			});
+		} catch (e) {
+			setError(e);
+		}
 	};
 
-	const onRecoverConfirm = (): void | Promise<void> => {
-		return onRecoverIdentity();
-	};
-
-	const onCreateNewIdentity = (): void => {
-		setSeedPhrase('');
-		navigation.navigate('IdentityBackup', {
-			isNew: true
-			
-		});
+	const onCreateNewIdentity = async (): void => {
+		setDisabled(true);
+		try {
+			await tryCreateSeed(seedName, cryptoType, pin);
+			setSeedPhrase('');
+			navigation.navigate('IdentityBackup', {	
+				seedName
+			});
+		} catch (e) {
+			setError(e);
+		}
 	};
 
 	const renderRecoverView = (): React.ReactElement => (
@@ -97,6 +106,7 @@ function RootSeedNew({
 					testID={testIDs.IdentityNew.recoverButton}
 					onPress={onRecoverConfirm}
 					small={true}
+					disabled={disabled || (pin.length < 6) || (seedName.length < 1) || (seedPhrase.length < 24)}
 				/>
 				<Button
 					title="or create new seed"
@@ -117,6 +127,7 @@ function RootSeedNew({
 				testID={testIDs.IdentityNew.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
+				disabled={ disabled || (pin.length < 6) || (seedName.length < 1) }
 			/>
 			<Button
 				title="or recover existing seed"
@@ -129,11 +140,21 @@ function RootSeedNew({
 
 	return (
 		<KeyboardAwareContainer>
-			<ScreenHeading title={'New Root Seed'} />
+			<ScreenHeading title={'New Root Seed'} error={!!error} subtitle={error} />
+			<PinInput 
+				label={'Input pin'}
+				returnKeyType="done"
+				onChangeText={(newInput: string): void => {
+					setDisabled(false);
+					setPin(newInput);
+					setError('');
+				}}
+				value={pin}
+			/>
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.IdentityNew.nameInput}
-				value={newIdentityName}
+				value={seedName}
 				placeholder="Seed Name"
 			/>
 			{isRecover ? renderRecoverView() : renderCreateView()}

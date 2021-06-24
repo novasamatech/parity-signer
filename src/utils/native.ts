@@ -106,6 +106,13 @@ export async function dbInit(): Promise<void> {
 	}
 }
 
+export async function tryCreateSeed(seedName: string, cryptoType: string, pin: string): Promise<void> {
+	await SubstrateSign.tryCreateSeed(seedName, cryptoType, pin);
+}
+
+export async function tryRecoverSeed(seedName: string, cryptoType: string, seedPhrase: string, pin: string): Promise<void> {
+	await SubstrateSign.tryRecoverSeed(seedName, cryptoType, seedPhrase, pin);
+}
 
 //Try to decode fountain packages
 export async function tryDecodeQr(
@@ -247,7 +254,6 @@ export async function checkUserAgreement(): Promise<bool> {
 		return false;
 	}	
 }
-
 
 //================================
 //the rest is probably junk by now

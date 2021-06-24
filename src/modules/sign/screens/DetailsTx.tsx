@@ -55,9 +55,11 @@ function DetailsTx({
 			const sortedCardSet = []
 				.concat(
 					cardsSet.author ? cardsSet.author : [],
+					cardsSet.verifier ? cardsSet.verifier : [],
 					cardsSet.error ? cardsSet.error : [],
 					cardsSet.warning ? cardsSet.warning : [],
 					cardsSet.method ? cardsSet.method : [],
+					cardsSet.meta ? cardsSet.meta : [],
 					cardsSet.extrinsics ? cardsSet.extrinsics : []
 				)
 				.sort((a, b) => {
@@ -99,6 +101,8 @@ function DetailsTx({
 		console.log(action);
 		if (action.type === 'sign_transaction') {
 			navigation.navigate('SignedTx', { payload: action.payload });
+		} else if (action.type === 'load_metadata') {
+			navigation.navigate('SignedTx', { payload: action.payload });
 		} else {
 			navigation.goBack();
 		}
@@ -115,7 +119,8 @@ function DetailsTx({
 			/>
 			<Button
 				onPress={performAction}
-				title={action.type === 'sign_transaction' ? 'SIGN' : 'BACK'}
+				title={action.type === 'sign_transaction' ? 'SIGN' : 
+					action.type === 'load_metadata' ? 'ACCEPT' : 'BACK'}
 				testID={testIDs.DetailsTx.signButton}
 			/>
 		</SafeAreaViewContainer>

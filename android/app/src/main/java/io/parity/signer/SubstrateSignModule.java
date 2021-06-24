@@ -1,6 +1,16 @@
 package io.parity.signer;
 
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyPair;
+
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+
+//import androidx.biometric.BiometricManager;
+//import androidx.biometric.BiometricPrompt.PromptInfo;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -287,11 +297,22 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	//This should be only run once ever!
 	@ReactMethod
 	public void dbInit(String metadata, Promise promise) {
 		try {
 			String dbname = reactContext.getFilesDir().toString();
 			substrateDbInit(metadata, dbname);
+
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance(
+				KeyProperties.KEY_ALGORITHM_EC,
+				"AndroidKeyStore");
+			kpg.initialize(new KeyGenParameterSpec.Builder(
+					"theKey",
+					KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+				.setUserAuthenticationParameters(1, KeyProperties.AUTH_DEVICE_CREDENTIAL)
+				.build());
+			KeyPair kp = kpg.generateKeyPair();
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Database initialization error", e);
@@ -364,9 +385,10 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void tryCreateSeed(String seedName, String crypto, Promise promise) {
+	public void tryCreateSeed(String seedName, String crypto, String pin, Promise promise) {
 		try {
 			String dbname = reactContext.getFilesDir().toString();
+
 			substrateTryCreateSeed(seedName, crypto, dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
@@ -375,17 +397,15 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void tryRecoverSeed(String seedName, String crypto, String seedPhrase, Promise promise) {
+	public void tryRecoverSeed(String seedName, String crypto, String seedPhrase, String pin, Promise promise) {
 		try {
 			String dbname = reactContext.getFilesDir().toString();
 			substrateTryRecoverSeed(seedName, crypto, seedPhrase, dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
-			rejectWithException(promise, "New seed creation failed", e);
+			rejectWithException(promise, "Seed recovery failed", e);
 		}
 	}
-
-
 
 	private static native String ethkeyBrainwalletAddress(String seed);
 	private static native String ethkeyBrainwalletBIP39Address(String seed);

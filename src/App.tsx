@@ -25,6 +25,8 @@ import NavigationBar from 'react-native-navbar-color';
 
 import {
 	AppNavigator,
+	BareLoadingScreen,
+	BarePinNew,
 	TocAndPrivacyPolicyNavigator,
 	ScreenStack
 } from './screens';
@@ -68,13 +70,7 @@ export default function App(props: AppProps): React.ReactElement {
 			);
 		} else {
 			return (
-				<ScreenStack.Navigator>
-					<ScreenStack.Screen name="Loading">
-						{(navigationProps: any): React.ReactElement => (
-							<View style={emptyScreenStyles} {...navigationProps} />
-						)}
-					</ScreenStack.Screen>
-				</ScreenStack.Navigator>
+				<BareLoadingScreen />
 			);
 		}
 	};

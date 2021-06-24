@@ -133,9 +133,9 @@ android {
     defaultConfig {
         applicationId "io.parity.signer"
         multiDexEnabled true
-        minSdkVersion 24
+        minSdkVersion 30
         missingDimensionStrategy 'react-native-camera', 'general'
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 4602
         versionName "4.6.2"
         ndk {

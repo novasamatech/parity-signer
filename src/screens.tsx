@@ -44,6 +44,7 @@ import AccountPin from 'screens/AccountPin';
 import { AccountUnlock } from 'screens/AccountUnlock';
 import IdentityBackup from 'screens/IdentityBackup';
 import IdentityManagement from 'screens/IdentityManagement';
+import LoadingScreen from 'screens/LoadingScreen';
 import RootSeedNew from 'screens/RootSeedNew';
 import MetadataManagement from 'modules/network/screens/MetadataManagement';
 import FullMetadata from 'modules/network/screens/FullMetadata';
@@ -132,6 +133,7 @@ export const AppNavigator = (): React.ReactElement => (
 			name="IdentityManagement"
 			component={IdentityManagement}
 		/>
+		<ScreenStack.Screen name="LoadingScreen" component={LoadingScreen} />
 		<ScreenStack.Screen name="RootSeedNew" component={RootSeedNew} />
 		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
 		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
@@ -176,5 +178,35 @@ export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
 			component={TermsAndConditions}
 		/>
 		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+	</ScreenStack.Navigator>
+);
+
+export const BareLoadingScreen = (): React.ReactElement => (
+	<ScreenStack.Navigator
+		initialRouteName="LoadingScreen"
+		screenOptions={{
+			...globalStackNavigationOptions,
+			headerRight: (): React.ReactNode => null
+		}}
+	>
+		<ScreenStack.Screen
+			name="LoadingScreen"
+			component={LoadingScreen}
+		/>
+	</ScreenStack.Navigator>
+);
+
+export const BarePinNew = (): React.ReactElement => (
+	<ScreenStack.Navigator
+		initialRouteName="PinNew"
+		screenOptions={{
+			...globalStackNavigationOptions,
+			headerRight: (): React.ReactNode => null
+		}}
+	>
+		<ScreenStack.Screen
+			name="PinNew"
+			component={PinNew}
+		/>
 	</ScreenStack.Navigator>
 );

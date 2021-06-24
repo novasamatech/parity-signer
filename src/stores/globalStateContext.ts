@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 
-import { checkUserAgreement, dbInit } from 'utils/native';
+import { checkUserAgreement, dbInit, checkPinSet } from 'utils/native';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 export type GlobalState = {
@@ -25,7 +25,8 @@ export function useGlobalStateContext(): GlobalState {
 	useEffect(() => {
 		const loadPolicyConfirmation = async (): Promise<void> => {
 			const tocPP = await checkUserAgreement();
-			await dbInit();
+//			if (!tocPP) 
+				await dbInit();
 			console.log("loadPolicyConfirmation");
 			setPolicyConfirmed(tocPP);
 			setDataLoaded(true);
@@ -37,7 +38,7 @@ export function useGlobalStateContext(): GlobalState {
 		dataLoaded,
 		policyConfirmed,
 		setDataLoaded,
-		setPolicyConfirmed
+		setPolicyConfirmed,
 	};
 }
 
