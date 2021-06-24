@@ -28,6 +28,7 @@ pub enum Card <'a> {
     AuthorPublicKey (AuthorPublicKey),
     Verifier(String),
     Meta {specname: &'a str, spec_version: u32, meta_hash: &'a str},
+    TypesInfo(&'a str),
     Warning (Warning),
     Error (Error),
 }
@@ -37,6 +38,11 @@ pub enum Warning {
     NewerVersion {used_version: u32, latest_version: u32},
     VerifierAppeared,
     NotVerified,
+    MetaAlreadyThere,
+    UpdatingTypes,
+    TypesNotVerified,
+    TypesVerifierAppeared,
+    TypesAlreadyThere,
 }
 
 impl Warning {
@@ -46,6 +52,11 @@ impl Warning {
             Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {}. Latest known available version is {}.", used_version, latest_version),
             Warning::VerifierAppeared => String::from("Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."),
             Warning::NotVerified => String::from("Received network metadata is not verified."),
+            Warning::MetaAlreadyThere => String::from("Received metadata is already in database, only verifier could be added."),
+            Warning::UpdatingTypes => String::from("Updating types (really rare operation)."),
+            Warning::TypesNotVerified => String::from("Received types information is not verified."),
+            Warning::TypesVerifierAppeared => String::from("Previously unverified types information now received signed by a verifier. If accepted, types information only from this verifier could be received."),
+            Warning::TypesAlreadyThere => String::from("Received types information is already in database, only verifier could be added."),
         }
     }
 }
@@ -84,6 +95,7 @@ impl <'a> Card <'a> {
             },
             Card::Verifier(x) => fancy(index, indent, "verifier", x),
             Card::Meta{specname, spec_version, meta_hash} => fancy(index, indent, "meta", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\"}}", specname, spec_version, meta_hash)),
+            Card::TypesInfo(x) => fancy(index, indent, "types_hash", x),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
         }

@@ -45,6 +45,7 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}));
     all_cards.push(Card::Warning(Warning::VerifierAppeared));
     all_cards.push(Card::Warning(Warning::NotVerified));
+    all_cards.push(Card::Warning(Warning::MetaAlreadyThere));
     
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::TooShort)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotSubstrate)));

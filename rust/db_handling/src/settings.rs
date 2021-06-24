@@ -5,18 +5,18 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 use super::chainspecs::Verifier;
-use super::constants::{SETTREE};
+use super::constants::{SETTREE, TYPES, TYPESVERIFIER};
 use super::db_utils::SeedKey;
 
 /// Struct to store type name and description
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
 pub struct TypeEntry {
     pub name: String,
     pub description: Description,
 }
 
 /// Type description
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
 pub enum Description {
     Type(String),
     Enum(Vec<EnumVariant>),
@@ -24,14 +24,14 @@ pub enum Description {
 }
 
 /// Enum variants
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
 pub struct EnumVariant {
     pub variant_name: String,
     pub variant_type: EnumVariantType,
 }
 
 /// Types of enum variants
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
 pub enum EnumVariantType {
     None,
     Type(String),
@@ -39,7 +39,7 @@ pub enum EnumVariantType {
 }
 
 /// Struct fields (field name is optional)
-#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq)]
 pub struct StructField {
     pub field_name: Option<String>,
     pub field_type: String,
@@ -71,6 +71,13 @@ pub struct UpdSpecs {
     pub verifier: Verifier,
 }
 
+/// Struct to store load_types action information
+#[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode)]
+pub struct LoadTypesDb {
+    pub types_info_encoded: Vec<u8>,
+    pub upd_verifier: Option<Verifier>,
+}
+
 lazy_static! {
     static ref REG_STRUCTS_WITH_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\{(?P<description>(\n +(pub )?\w+: .*(,)?)*\n)\}"#).unwrap();
     static ref REG_STRUCTS_NO_NAMES: Regex = Regex::new(r#"(pub )?struct (?P<name>.*?)( )?\((pub )?(?P<description>.*)\)"#).unwrap();
@@ -89,7 +96,6 @@ pub fn load_types (database_name: &str, type_info: &str) -> Result<(), Box<dyn s
     
     let settings: Tree = database.open_tree(SETTREE)?;
     
-    let name = String::from("types").encode();
     let mut types_prep: Vec<TypeEntry> = Vec::new();
 
     for caps1 in REG_STRUCTS_WITH_NAMES.captures_iter(type_info) {
@@ -177,10 +183,20 @@ pub fn load_types (database_name: &str, type_info: &str) -> Result<(), Box<dyn s
     }
     
     let types = types_prep.encode();
-    settings.insert(name, types)?;
+    settings.insert(TYPES, types)?;
     
     database.flush()?;
     
+    Ok(())
+}
+
+///Set verifier signature for types definitions
+
+pub fn set_types_verifier (database_name: &str, types_verifier: Verifier) -> Result<(), Box<dyn std::error::Error>> {
+    let database: Db = open(database_name)?;
+    let settings: Tree = database.open_tree(SETTREE)?;
+    settings.insert(TYPESVERIFIER, types_verifier.encode())?;
+    database.flush()?;
     Ok(())
 }
 

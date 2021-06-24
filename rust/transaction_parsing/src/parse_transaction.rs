@@ -3,7 +3,7 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sled::{Db, Tree, open};
-use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, SignDb}, identities::AddressDetails, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS}};
+use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, SignDb}, identities::AddressDetails, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TYPES}};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
@@ -59,6 +59,24 @@ fn print_full_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, sh
     }
 }
 
+
+/// function to search database for the TypeEntry vector
+pub fn get_types (settings: &Tree) -> Result<Vec<TypeEntry>, Error> {
+    match settings.get(TYPES) {
+        Ok(types_db_reply) => {
+            match types_db_reply {
+                Some(a) => {
+                    match <Vec<TypeEntry>>::decode(&mut &a[..]) {
+                        Ok(x) => Ok(x),
+                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
+                    }
+                },
+                None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
+            }
+        },
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    }
+}
 
 /// Function to parse transaction.
 /// Attempts to decode the transaction, and if completely successful,
@@ -183,19 +201,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                     
                         // generate type database to be used in decoding
                             
-                            let types_db_reply = match settings.get(String::from("types").encode()) {
-                                Ok(x) => x,
-                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                            }; 
-                            let type_database = match types_db_reply {
-                                Some(a) => {
-                                    match <Vec<TypeEntry>>::decode(&mut &a[..]) {
-                                        Ok(x) => x,
-                                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
-                                    }
-                                },
-                                None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
-                            };
+                            let type_database = get_types(&settings)?;
                     
                         // action card preparations: vector that should be signed
                             let for_signing = [transaction_decoded.method.to_vec(), transaction_decoded.extrinsics.encode().to_vec()].concat();
@@ -290,19 +296,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                     
                         // generate type database to be used in decoding
                             
-                            let types_db_reply = match settings.get(String::from("types").encode()) {
-                                Ok(x) => x,
-                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                            }; 
-                            let type_database = match types_db_reply {
-                                Some(a) => {
-                                    match <Vec<TypeEntry>>::decode(&mut &a[..]) {
-                                        Ok(x) => x,
-                                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
-                                    }
-                                },
-                                None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
-                            };
+                            let type_database = get_types(&settings)?;
 
                         // transaction parsing
                             match process_as_call (transaction_decoded.method, &meta, &type_database, index, indent, &chain_specs_found) {

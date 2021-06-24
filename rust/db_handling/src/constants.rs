@@ -8,8 +8,13 @@ pub const METATREE: &[u8] = b"metadata";
 pub const ADDRTREE: &[u8] = b"addresses";
 pub const IDTREE: &[u8] = b"seeds";
 pub const SETTREE: &[u8] = b"settings";
+pub const TYPES: &[u8] = b"types";
+pub const TYPESVERIFIER: &[u8] = b"types_verifier";
 pub const SIGNTRANS: &[u8] = b"sign_transaction";
 pub const LOADMETA: &[u8] = b"load_metadata";
+pub const ADDMETAVERIFIER: &[u8] = b"add_metadata_verifier";
+pub const LOADTYPES: &[u8] = b"load_types";
+pub const ADDTYPESVERIFIER: &[u8] = b"add_types_verifier";
 
 pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
     vec![
@@ -27,7 +32,7 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             unit: String::from("KSM"),
             verifier: Verifier::None,
     	},
-	    ChainSpecs {
+	ChainSpecs {
             base58prefix: 0,
             color: String::from("#E6027A"),
             decimals: 10,
@@ -41,11 +46,11 @@ pub fn get_default_chainspecs() -> Vec<ChainSpecs> {
             unit: String::from("DOT"),
             verifier: Verifier::None,
     	},
-    	ChainSpecs {
+	ChainSpecs {
             base58prefix: 42,
             color: String::from("#6f36dc"),
             decimals: 12,
-            genesis_hash: hex::decode("78ae7dc7e64637e01fa6a6b6e4fa252c486f62af7aa71c471ad17f015bd375ce").unwrap().try_into().unwrap(),
+            genesis_hash: hex::decode("e7c3d5edde7db964317cd9b51a3a059d7cd99f81bdbce14990047354334c9779").unwrap().try_into().unwrap(),
             logo: String::from("rococo"),
             name: String::from("rococo"),
             order: 4,

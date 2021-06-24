@@ -1,5 +1,5 @@
 [package]
-name = "generate_metadata_message"
+name = "generate_message"
 version = "0.1.0"
 authors = ["vera"]
 edition = "2018"
@@ -11,3 +11,6 @@ sp-core = "3.0.0"
 hex = "0.4.3"
 qrcode_rtx = {path = "../qrcode_rtx"}
 meta_reading = {path = "../meta_reading"}
+db_handling = {path = "../db_handling"}
+parity-scale-codec = "2.1.1"
+sled = "0.34.6"

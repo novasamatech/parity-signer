@@ -14,7 +14,7 @@ pub struct NameVersioned {
 }
 
 lazy_static! {
-    static ref REG_META: Regex = Regex::new(r#"(?i)\["signer_metadata_(?P<name>[^\]]+)_v(?P<version>[0-9]+)","(0x)?6d657461(?P<meta>([0-9a-z][0-9a-z])+)"\]"#).unwrap();
+    static ref REG_META: Regex = Regex::new(r#"(?i)\["signer_metadata_(?P<name>[^\]]+)_v(?P<version>[0-9]+)","(0x)?(?P<meta>6d657461([0-9a-z][0-9a-z])+)"\]"#).unwrap();
 }
 
 pub fn load_metadata (database_name: &str, metadata_contents: &str) -> Result<(), Box<dyn std::error::Error>> {

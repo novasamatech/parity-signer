@@ -6,7 +6,7 @@ use lazy_static::lazy_static;
 
 lazy_static! {
     static ref REG_CHECKSUM: Regex = Regex::new(r#"(?i)"checksum":( )*"(?P<checksum>[0-9]*)""#).expect("constructed from checked static value");
-    static ref REG_ACTION: Regex = Regex::new(r#"(?i)"type":( )*"(?P<action_type>sign_transaction|load_metadata)""#).expect("constructed from checked static value");
+    static ref REG_ACTION: Regex = Regex::new(r#"(?i)"type":( )*"(?P<action_type>.*?)""#).expect("constructed from checked static value");
 }
 
 
@@ -30,6 +30,9 @@ pub fn get_checksum (action_line: &str) -> Result<u32, Box<dyn std::error::Error
 pub enum ActionType {
     SignTransaction,
     LoadMetadata,
+    AddMetadataVerifier,
+    LoadTypes,
+    AddTypesVerifier,
 }
 
 /// Function to determine the action type of incoming action line
@@ -44,6 +47,9 @@ pub fn get_action_type (action_line: &str) -> Result<ActionType, &'static str> {
                     match c.as_str() {
                         "sign_transaction" => ActionType::SignTransaction,
                         "load_metadata" => ActionType::LoadMetadata,
+                        "add_metadata_verifier" => ActionType::AddMetadataVerifier,
+                        "load_types" => ActionType::LoadTypes,
+                        "add_types_verifier" => ActionType::AddTypesVerifier,
                         _ => return Err("Action type not supported."),
                     }
                 },

@@ -1,16 +1,14 @@
 use sled::{Db, Tree, open};
-use sp_core::{Pair, ed25519, sr25519, ecdsa, crypto::Ss58Codec};
+use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use ethsign::{Protected, keyfile::Crypto};
 use super::chainspecs::ChainSpecs;
 use super::constants::{ADDRTREE, IDTREE, SPECSTREE};
-use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, SeedKey, AddressKey, NetworkKey};
+use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, SeedKey, NetworkKey};
 use serde_json;
 use serde;
 use bip39::{Language, Mnemonic, MnemonicType};
-use blake2_rfc::blake2b::blake2b;
-use base58::ToBase58;
 use zeroize::Zeroize;
 
 #[cfg(test)]
@@ -110,7 +108,6 @@ fn get_seed (database: &Db, seed_name: &str, password: Protected) -> Result<Stri
 fn create_address (
     database: &Db, 
     path: &str, 
-    network: &ChainSpecs,
     network_id: NetworkKey,
     name: &str, 
     seed: &str, 
@@ -178,7 +175,6 @@ fn populate_addresses (database: &Db, seed_name: &str, seed: &str, encryption: E
                 create_address (
                     database, 
                     "", 
-                    &network,
                     key.to_vec(),
                     "root address", 
                     seed, 
@@ -188,7 +184,6 @@ fn populate_addresses (database: &Db, seed_name: &str, seed: &str, encryption: E
                 create_address (
                     database, 
                     &network.path_id, 
-                    &network,
                     key.to_vec(),
                     &format!("{} root address", network.name),
                     seed,

@@ -2,7 +2,7 @@ use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use std::convert::TryInto;
 use sled::{Db, Tree, open};
-use db_handling::{chainspecs::{ChainSpecs, Verifier}, settings::{LoadMetaDb, UpdSpecs}, metadata::NameVersioned, constants::{SPECSTREE, METATREE, SETTREE, LOADMETA}};
+use db_handling::{chainspecs::{ChainSpecs, Verifier}, settings::{LoadMetaDb, UpdSpecs}, metadata::NameVersioned, constants::{ADDMETAVERIFIER, LOADMETA, METATREE, SETTREE, SPECSTREE}};
 use meta_reading::decode_metadata::{get_meta_const_light, VersionDecoded};
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
@@ -10,29 +10,27 @@ use frame_metadata::RuntimeMetadataV12;
 
 use super::cards::{Card, Warning};
 use super::error::{Error, BadInputData, DatabaseError, CryptoError};
-use super::utils_base58::vec_to_base;
-
 
 
 /// Function to search for genesis_hash in chainspecs database tree
-fn get_chainspecs (gen_hash: &Vec<u8>, chainspecs: Tree) -> Result<ChainSpecs, Error> {
-
-    let chainspecs_db_reply = match chainspecs.get(gen_hash) {
-        Ok(x) => x,
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
-    match chainspecs_db_reply {
-        Some(x) => {
-        // some entry found for this genesis hash
-            match <ChainSpecs>::decode(&mut &x[..]) {
-                Ok(y) => Ok(y),
-                Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
+fn get_chainspecs (gen_hash: &Vec<u8>, chainspecs: &Tree) -> Result<ChainSpecs, Error> {
+    match chainspecs.get(gen_hash) {
+        Ok(chainspecs_db_reply) => {
+            match chainspecs_db_reply {
+                Some(x) => {
+                // some entry found for this genesis hash
+                    match <ChainSpecs>::decode(&mut &x[..]) {
+                        Ok(y) => Ok(y),
+                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
+                    }
+                },
+                None => {
+                // no entry exists
+                    return Err(Error::DatabaseError(DatabaseError::NoNetwork))
+                },
             }
         },
-        None => {
-        // no entry exists
-            return Err(Error::DatabaseError(DatabaseError::NoNetwork))
-        },
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     }
 }
 
@@ -56,7 +54,30 @@ fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_specs: 
                                 Ok(z) => {
                                     match z {
                                         Some(a) => {
-                                            if a[..] == meta[..] {return Err(Error::BadInputData(BadInputData::MetaAlreadyThere))}
+                                            if a[..] == meta[..] {
+                                                match upd_specs {
+                                                    Some(upd) => {
+                                                        let meta_card = Card::Warning(Warning::MetaAlreadyThere).card(index, 0);
+                                                    // making action entry into database
+                                                        match settings.insert(ADDMETAVERIFIER, upd.encode()) {
+                                                            Ok(_) => (),
+                                                            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                        };
+                                                        match database.flush() {
+                                                            Ok(_) => (),
+                                                            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                        };
+                                                        let checksum = match database.checksum() {
+                                                            Ok(x) => x,
+                                                            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                        };
+                                                    // action card
+                                                        let action_card = format!("\"action\":{{\"type\":\"add_metadata_verifier\",\"payload\":{{\"type\":\"add_metadata_verifier\",\"checksum\":\"{}\"}}}}", checksum);
+                                                        Ok((meta_card, action_card))
+                                                    },
+                                                    None => return Err(Error::BadInputData(BadInputData::MetaAlreadyThere)),
+                                                }
+                                            }
                                             else {return Err(Error::BadInputData(BadInputData::MetaTotalMismatch))}
                                         },
                                         None => {
@@ -146,6 +167,11 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     }
     
+    match database.flush() {
+        Ok(_) => (),
+        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+    };
+    
     let data = match hex::decode(&data_hex) {
         Ok(a) => a,
         Err(_) => return Err(Error::BadInputData(BadInputData::NotHex)),
@@ -164,10 +190,9 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
             if ed25519::Pair::verify(&signature, &message, &pubkey) {
                 let meta = message[..message.len()-32].to_vec();
                 let gen_hash = message[message.len()-32..].to_vec();
-                let chain_specs_found = get_chainspecs(&gen_hash, chainspecs)?;
-                let author = vec_to_base(&(into_pubkey.to_vec()), chain_specs_found.base58prefix);
-                let ver_author = Verifier::Ed25519(author);
-                check_verifier (&chain_specs_found.verifier, ver_author, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
+                let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
+                let verifier = Verifier::Ed25519(hex::encode(&into_pubkey));
+                check_verifier (&chain_specs_found.verifier, verifier, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
             }
             else {return Err(Error::CryptoError(CryptoError::BadSignature))}
         },
@@ -183,10 +208,9 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
             if sr25519::Pair::verify(&signature, &message, &pubkey) {
                 let meta = message[..message.len()-32].to_vec();
                 let gen_hash = message[message.len()-32..].to_vec();
-                let chain_specs_found = get_chainspecs(&gen_hash, chainspecs)?;
-                let author = vec_to_base(&(into_pubkey.to_vec()), chain_specs_found.base58prefix);
-                let ver_author = Verifier::Sr25519(author);
-                check_verifier (&chain_specs_found.verifier, ver_author, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
+                let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
+                let verifier = Verifier::Sr25519(hex::encode(&into_pubkey));
+                check_verifier (&chain_specs_found.verifier, verifier, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
             }
             else {return Err(Error::CryptoError(CryptoError::BadSignature))}
         },
@@ -202,10 +226,9 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
             if ecdsa::Pair::verify(&signature, &message, &pubkey) {
                 let meta = message[..message.len()-32].to_vec();
                 let gen_hash = message[message.len()-32..].to_vec();
-                let chain_specs_found = get_chainspecs(&gen_hash, chainspecs)?;
-                let author = vec_to_base(&(into_pubkey.to_vec()), chain_specs_found.base58prefix);
-                let ver_author = Verifier::Ecdsa(author);
-                check_verifier (&chain_specs_found.verifier, ver_author, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
+                let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
+                let verifier = Verifier::Ecdsa(hex::encode(&into_pubkey));
+                check_verifier (&chain_specs_found.verifier, verifier, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
             }
             else {return Err(Error::CryptoError(CryptoError::BadSignature))}
         },
@@ -215,7 +238,7 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
             if data.len() < 35 {return Err(Error::BadInputData(BadInputData::TooShort))}
             let meta = data[3..data.len()-32].to_vec();
             let gen_hash = data[data.len()-32..].to_vec();
-            let chain_specs_found = get_chainspecs(&gen_hash, chainspecs)?;
+            let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
             if chain_specs_found.verifier == Verifier::None {
                 let index = 1;
                 let upd_specs = None;

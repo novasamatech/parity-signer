@@ -6,6 +6,8 @@ mod error;
     use error::{Error, BadInputData};
 mod load_metadata;
     use load_metadata::load_metadata;
+mod load_types;
+    use load_types::load_types;
 mod method;
 mod parse_transaction;
     use parse_transaction::parse_transaction;
@@ -28,12 +30,14 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
         false => &payload,
     };
     
+    if data_hex.len() < 6 {return Err(Error::BadInputData(BadInputData::TooShort))}
+    
     if &data_hex[..2] != "53" {return Err(Error::BadInputData(BadInputData::NotSubstrate))}
     
     match &data_hex[4..6] {
         "00"|"02" => parse_transaction(data_hex, dbname),
         "80" => load_metadata(data_hex, dbname),
-//        "81" => load_types(),
+        "81" => load_types(data_hex, dbname),
 //        "c0" => add_network(),
         "f0" => Ok(make_all_cards()),
         _ => return Err(Error::BadInputData(BadInputData::WrongPayloadType)),
@@ -43,6 +47,6 @@ fn handle_scanner_input (payload: &str, dbname: &str) -> Result<String, Error> {
 pub fn produce_output (payload: &str, dbname: &str) -> String {
     match handle_scanner_input (payload, dbname) {
         Ok(out) => out,
-        Err(e) => Card::Error(e).card(0,0),
+        Err(e) => format!("\"error\":[{}]", Card::Error(e).card(0,0)),
     }
 }

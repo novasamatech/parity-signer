@@ -1,7 +1,9 @@
 use sled::{Db, open};
 
 mod accept_metadata;
-    use accept_metadata::accept_metadata;
+    use accept_metadata::{accept_metadata, add_meta_verifier};
+mod accept_types;
+    use accept_types::{accept_types, add_types_verifier};
 mod interpretation;
     use interpretation::{get_checksum, get_action_type, ActionType};
 mod sign_transaction;
@@ -29,5 +31,8 @@ pub fn handle_action (action_line: &str, pin: &str, pwd_entry: &str, dbname: &st
     match action_type {
         ActionType::SignTransaction => create_signature(pin, pwd_entry, database),
         ActionType::LoadMetadata => accept_metadata(database),
+        ActionType::AddMetadataVerifier => add_meta_verifier(database),
+        ActionType::LoadTypes => accept_types(database),
+        ActionType::AddTypesVerifier => add_types_verifier(database),
     }
 }

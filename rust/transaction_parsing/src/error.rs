@@ -6,7 +6,7 @@ pub enum Error {
     UnableToDecode(UnableToDecode),
     DatabaseError(DatabaseError),
     SystemError(SystemError),
-    CryptoError(CryptoError)
+    CryptoError(CryptoError),
 }
 
 #[derive(PartialEq)]
@@ -29,6 +29,8 @@ pub enum BadInputData {
     VersionNotDecodeable,
     NoMetaVersion,
     UnableToDecodeMeta,
+    UnableToDecodeTypes,
+    TypesAlreadyThere,
 }
 
 #[derive(PartialEq)]
@@ -65,6 +67,8 @@ pub enum DatabaseError {
     DamagedVersName,
     NoMetaThisVersion,
     NoMetaAtAll,
+    DamagedTypesVerifier,
+    NoTypesVerifier,
 }
 
 #[derive(PartialEq)]
@@ -84,6 +88,8 @@ pub enum CryptoError {
     BadSignature,
     VerifierChanged {old_show: String, new_show: String},
     VerifierDisappeared,
+    TypesVerifierChanged {old_show: String, new_show: String},
+    TypesVerifierDisappeared,
 }
 
 impl Error {
@@ -109,6 +115,8 @@ impl Error {
                     BadInputData::VersionNotDecodeable => String::from("Received metadata version could not be decoded."),
                     BadInputData::NoMetaVersion => String::from("No version in received metadata."),
                     BadInputData::UnableToDecodeMeta => String::from("Unable to decode received metadata."),
+                    BadInputData::UnableToDecodeTypes => String::from("Unable to decode received types information."),
+                    BadInputData::TypesAlreadyThere => String::from("Types information already in database."),
                 }
             },
             Error::UnableToDecode(x) => {
@@ -145,6 +153,8 @@ impl Error {
                     DatabaseError::DamagedVersName => String::from("Network versioned name from metadata database could not be decoded."),
                     DatabaseError::NoMetaThisVersion => String::from("No metadata on file for this version."),
                     DatabaseError::NoMetaAtAll => String::from("No metadata on file for this network."),
+                    DatabaseError::DamagedTypesVerifier => String::from("Types verifier information from database could not be decoded."),
+                    DatabaseError::NoTypesVerifier => String::from("No types verifier information in the database."),
                 }
             },
             Error::SystemError(x) => {
@@ -163,7 +173,9 @@ impl Error {
                 match x {
                     CryptoError::BadSignature => String::from("Corrupted data. Bad signature."),
                     CryptoError::VerifierChanged {old_show, new_show} => format!("Different verifier was used for this network previously. Previously used {}. Current attempt {}.", old_show, new_show),
-                    CryptoError::VerifierDisappeared => String::from("Saved metadata for this network was signed by a verifier. This metadata is not.")
+                    CryptoError::VerifierDisappeared => String::from("Saved metadata for this network was signed by a verifier. This metadata is not."),
+                    CryptoError::TypesVerifierChanged {old_show, new_show} => format!("Different verifier was used for types previously. Previously used {}. Current attempt {}.", old_show, new_show),
+                    CryptoError::TypesVerifierDisappeared => String::from("Saved types information was signed by a verifier. Received types information is not."),
                 }
             },
         }

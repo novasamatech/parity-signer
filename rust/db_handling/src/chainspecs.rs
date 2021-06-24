@@ -23,6 +23,8 @@ pub struct ChainSpecs {
     //TODO: add metadata signature parameters
 }
 
+/// Verifier for both network metadata and for types information,
+/// String is hexadecimal representation of verifier public key
 #[derive(parity_scale_codec_derive::Decode, parity_scale_codec_derive::Encode, PartialEq, Debug)]
 pub enum Verifier {
     Ed25519(String),
@@ -34,17 +36,17 @@ pub enum Verifier {
 impl Verifier {
     pub fn show_card(&self) -> String {
         match &self {
-            Verifier::Ed25519(x) => format!("{{\"base58\":\"{}\",\"encryption\":\"ed25519\"}}", x),
-            Verifier::Sr25519(x) => format!("{{\"base58\":\"{}\",\"encryption\":\"sr25519\"}}", x),
-            Verifier::Ecdsa(x) => format!("{{\"base58\":\"{}\",\"encryption\":\"ecdsa\"}}", x),
+            Verifier::Ed25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ed25519\"}}", x),
+            Verifier::Sr25519(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"sr25519\"}}", x),
+            Verifier::Ecdsa(x) => format!("{{\"hex\":\"{}\",\"encryption\":\"ecdsa\"}}", x),
             Verifier::None => String::from("none"),
         }
     }
     pub fn show_error(&self) -> String {
         match &self {
-            Verifier::Ed25519(x) => format!("base58 address: {}, encryption: ed25519", x),
-            Verifier::Sr25519(x) => format!("base58 address: {}, encryption: sr25519", x),
-            Verifier::Ecdsa(x) => format!("base58 address: {}, encryption: ecdsa", x),
+            Verifier::Ed25519(x) => format!("public key: {}, encryption: ed25519", x),
+            Verifier::Sr25519(x) => format!("public key: {}, encryption: sr25519", x),
+            Verifier::Ecdsa(x) => format!("public key: {}, encryption: ecdsa", x),
             Verifier::None => String::from("none"),
         }
     }
