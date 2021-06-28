@@ -310,7 +310,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 			kpg.initialize(new KeyGenParameterSpec.Builder(
 					"theKey",
 					KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-				.setUserAuthenticationParameters(1, KeyProperties.AUTH_DEVICE_CREDENTIAL)
+				//.setUserAuthenticationParameters(1, KeyProperties.AUTH_DEVICE_CREDENTIAL)
 				.build());
 			KeyPair kp = kpg.generateKeyPair();
 			promise.resolve(0);

@@ -1,10 +1,9 @@
-use sled::{Db, Tree, open};
+use sled::Tree;
 use parity_scale_codec::{Encode, Decode};
 use parity_scale_codec_derive;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 
-use super::constants::{METATREE};
 use super::decode_metadata::{get_meta_const, MetaValues, VersionDecoded};
 
 /// Struct used to store the network metadata name and version in the database
@@ -19,12 +18,9 @@ pub struct NameVersioned {
 /// Function to read network metadata entries existing in the database into MetaValues vector,
 /// and remove the database tree after reading.
 
-pub fn read_metadata_database (database_name: &str) -> Result<Vec<MetaValues>, Box<dyn std::error::Error>> {
+pub fn read_metadata_database (metadata: &Tree) -> Result<Vec<MetaValues>, Box<dyn std::error::Error>> {
     
     let mut out: Vec<MetaValues> = Vec::new();
-    
-    let database: Db = open(database_name)?;
-    let metadata: Tree = database.open_tree(METATREE)?;
     
     for x in metadata.iter() {
     
@@ -56,9 +52,6 @@ pub fn read_metadata_database (database_name: &str) -> Result<Vec<MetaValues>, B
             out.push(new);
         }
     }
-    
-    database.drop_tree(METATREE)?;
-    database.flush()?;
     
     Ok(out)
     
@@ -195,14 +188,12 @@ pub fn add_new (new: &MetaValues, mut sorted: SortedMetaValues) -> Result<UpdSor
 /// Function to update the database with modified entries,
 /// also creates log file
 
-pub fn write_metadata_database (database_name: &str, meta_values: Vec<MetaValues>, logfile_name: &str) -> Result <(), Box<dyn std::error::Error>> {
-    
-    let database: Db = open(database_name)?;
-    let metadata: Tree = database.open_tree(METATREE)?;
+pub fn write_metadata_database (metadata: &Tree, meta_values: Vec<MetaValues>, logfile_name: &str) -> Result <(), Box<dyn std::error::Error>> {
     
     let mut file = OpenOptions::new()
         .create(true)
         .write(true)
+        .truncate(true)
         .open(logfile_name)?;
         
     for x in meta_values.iter() {
@@ -214,8 +205,6 @@ pub fn write_metadata_database (database_name: &str, meta_values: Vec<MetaValues
         metadata.insert(versioned_name.encode(), x.meta.to_vec())?;
         writeln!(file, "{}", string_for_log)?;
     }
-    
-    database.flush()?;
     
     Ok(())
 
