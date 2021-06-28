@@ -41,7 +41,9 @@ export default function TermsAndConditions(
 	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(
 		GlobalStateContext
 	);
+
 	const { navigation } = props;
+
 	const onConfirm = async (): Promise<void> => {
 		await ackUserAgreement();
 		setPolicyConfirmed(true);

@@ -76,11 +76,7 @@ export default function NetworkSelector({
 	);
 
 	const renderScreenHeading = (): React.ReactElement => {
-		if (isNew) {
-			return <ScreenHeading title={'Create your first Keypair'} />;
-		} else {
-			return <IdentityHeading title={'TitleScreen'} />;
-		}
+		return <IdentityHeading title={'Select network'} />;
 	};
 
 	const onNetworkChosen = async (

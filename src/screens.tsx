@@ -42,7 +42,7 @@ import Main from 'modules/main/screens/Main';
 import AccountNew from 'screens/AccountNew';
 import AccountPin from 'screens/AccountPin';
 import { AccountUnlock } from 'screens/AccountUnlock';
-import IdentityBackup from 'screens/IdentityBackup';
+import SeedBackup from 'screens/SeedBackup';
 import IdentityManagement from 'screens/IdentityManagement';
 import LoadingScreen from 'screens/LoadingScreen';
 import RootSeedNew from 'screens/RootSeedNew';
@@ -128,7 +128,7 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="AccountPin" component={AccountPin} />
 		<ScreenStack.Screen name="AccountUnlock" component={AccountUnlock} />
 		<ScreenStack.Screen name="AccountNew" component={AccountNew} />
-		<ScreenStack.Screen name="IdentityBackup" component={IdentityBackup} />
+		<ScreenStack.Screen name="SeedBackup" component={SeedBackup} />
 		<ScreenStack.Screen
 			name="IdentityManagement"
 			component={IdentityManagement}

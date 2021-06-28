@@ -218,12 +218,15 @@ export async function getIdentitiesForSeed(seedName: string, genesisHash: string
 //Get list of seedphrase identifiers
 export async function getAllSeedNames(): Promise<[string]> {
 	try {
+		console.log('1');
 		const allSeedsJSON = await SubstrateSign.getAllSeedNames();
 		console.log(allSeedsJSON);
+		console.log('2');
 		const allSeeds = JSON.parse(allSeedsJSON);
 		console.log(allSeeds);
 		return allSeeds;
 	} catch(e) {
+		console.log('blem');
 		console.log(e);
 		return [];
 	}

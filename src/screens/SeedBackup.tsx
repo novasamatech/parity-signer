@@ -25,7 +25,7 @@ import { words } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
+import { navigateToLandingPage } from 'utils/navigationHelpers';
 import ScreenHeading from 'components/ScreenHeading';
 import {
 	alertBackupDone,
@@ -34,28 +34,15 @@ import {
 } from 'utils/alertUtils';
 import Button from 'components/Button';
 
-function IdentityBackup({
+function SeedBackup({
 	navigation,
 	route
-}: NavigationProps<'IdentityBackup'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
+}: NavigationProps<'SeedBackup'>): React.ReactElement {
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const [wordsNumber, setWordsNumber] = useState(12);
+	const seedName = route.params.seedName;
 	const { setAlert } = useContext(AlertStateContext);
-	const isNew = route.params.isNew ?? false;
 	const onBackupDone = async (): Promise<void> => {
-		const pin = await setPin(navigation);
-		try {
-			await accountsStore.saveNewIdentity(
-				seedPhrase,
-				pin,
-				createSeedRefWithNewSeed
-			);
-			setSeedPhrase('');
-			navigateToNewIdentityNetwork(navigation);
-		} catch (e) {
-			alertIdentityCreationError(setAlert, e.message);
-		}
+		NavigateToLandignPage(navigation);
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
@@ -74,18 +61,13 @@ function IdentityBackup({
 	};
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
-			if (route.params.isNew) {
-				setSeedPhrase(await words(wordsNumber));
-			} else {
-				setSeedPhrase(route.params.seedPhrase);
-			}
 		};
 
 		setSeedPhraseAsync();
 		return (): void => {
 			setSeedPhrase('');
 		};
-	}, [route.params, wordsNumber]);
+	}, [route.params]);
 
 	return (
 		<SafeAreaViewContainer>
@@ -95,40 +77,23 @@ function IdentityBackup({
 					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
 				}
 			/>
-			{isNew && (
-				<View style={styles.mnemonicSelectionRow}>
-					{renderTextButton(12)}
-					{renderTextButton(24)}
-				</View>
-			)}
-			<TouchableItem
-				onPress={(): void => {
-					// only allow the copy of the recovery phrase in dev environment
-					if (__DEV__) {
-						alertCopyBackupPhrase(setAlert, seedPhrase);
-					}
-				}}
+			<Text
+				style={[fontStyles.t_seed, { marginHorizontal: 16 }]}
+				testID={testIDs.IdentityBackup.seedText}
 			>
-				<Text
-					style={[fontStyles.t_seed, { marginHorizontal: 16 }]}
-					testID={testIDs.IdentityBackup.seedText}
-				>
-					{seedPhrase}
-				</Text>
-			</TouchableItem>
-			{isNew && (
-				<Button
-					title={'Next'}
-					testID={testIDs.IdentityBackup.nextButton}
-					onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
-					aboveKeyboard
-				/>
-			)}
+				{seedPhrase}
+			</Text>
+			<Button
+				title={'Done'}
+				testID={testIDs.IdentityBackup.nextButton}
+				onPress={(): void => alertBackupDone(setAlert, onBackupDone)}
+				aboveKeyboard
+			/>
 		</SafeAreaViewContainer>
 	);
 }
 
-export default IdentityBackup;
+export default SeedBackup;
 
 const styles = StyleSheet.create({
 	body: {

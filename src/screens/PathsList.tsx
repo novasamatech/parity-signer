@@ -52,10 +52,13 @@ export default function PathsList({
 	
 	useEffect(() => {
 		const populatePathsList = async function (networkKeyRef: string): Promise<void> {
+			console.log(networkKeyRef);
 			const networkInfo = await getNetwork(networkKeyRef);
+			console.log(networkInfo);
 			setNetwork(networkInfo);
 			const seedList = await getAllSeedNames();
 			setRootSeedList(seedList);
+			console.log(seedList);
 			if (seedList) setRootSeed(seedList[0]);
 		}
 		populatePathsList(networkKey);
@@ -103,7 +106,6 @@ export default function PathsList({
 			</SafeAreaViewContainer>
 		);
 	} else {
-		console.log('its empty');
 		return <OnBoardingView />
 	}
 }

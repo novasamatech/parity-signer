@@ -70,7 +70,7 @@ function RootSeedNew({
 		try {
 			await tryRecoverSeed(seedName, cryptoType, seedPhrase, pin);
 			setSeedPhrase('');
-			navigation.navigate('IdentityBackup', {	
+			navigation.navigate('SeedBackup', {	
 				seedName
 			});
 		} catch (e) {
@@ -83,11 +83,13 @@ function RootSeedNew({
 		try {
 			await tryCreateSeed(seedName, cryptoType, pin);
 			setSeedPhrase('');
-			navigation.navigate('IdentityBackup', {	
+			navigation.navigate('SeedBackup', {	
 				seedName
 			});
 		} catch (e) {
-			setError(e);
+			console.log(e.toString());
+			console.log(typeof e.toString());
+			setError(e.toString());
 		}
 	};
 

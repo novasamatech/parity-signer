@@ -1,4 +1,6 @@
 use sled::Db;
+use parity_scale_codec::Encode;
+
 
 pub type SeedKey = Vec<u8>;
 pub type AddressKey = Vec<u8>;
@@ -9,7 +11,7 @@ pub type NetworkKey = Vec<u8>;
 
 ///Generate seed key from minimal amount of information
 pub fn generate_seed_key (name: &str) -> SeedKey {
-    name.as_bytes().to_vec()
+    <String>::encode(&name.to_string())
 }
 
 ///Generate address key from minimal amount of information

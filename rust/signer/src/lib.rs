@@ -465,7 +465,7 @@ export! {
         let seednames = db_handling::identities::get_seed_names_list(dbname)?;
         //TODO: gentler formatting, or serde-json?
         let mut output = "[".to_owned();
-        for seedname in seednames {
+        for seedname in seednames.iter() {
             output.push_str(&format!("\"{}\",",
                 seedname))
         }
@@ -480,7 +480,7 @@ export! {
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         let relevant_identities = db_handling::identities::get_relevant_identities(seed_name, genesis_hash, dbname)?;
         let mut output = "[".to_owned();
-        for identity in relevant_identities {
+        for identity in relevant_identities.iter() {
             output.push_str(&format!("{{\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
                 identity.path,
                 identity.has_pwd,
@@ -509,7 +509,7 @@ export! {
         crypto: &str,
 		dbname: &str
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        let password = "test";
+        let password = "000000";
         db_handling::identities::try_create_seed(seed_name, crypto, password, dbname)
     }
 
@@ -520,7 +520,7 @@ export! {
         seed_phrase: &str,
 		dbname: &str
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        let password = "test";
+        let password = "000000";
         db_handling::identities::try_recover_seed(seed_name, crypto, seed_phrase, password, dbname)
     }
 
