@@ -389,7 +389,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		try {
 			String dbname = reactContext.getFilesDir().toString();
 
-			substrateTryCreateSeed(seedName, crypto, dbname);
+			substrateTryCreateSeed(seedName, crypto, pin, dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "New seed creation failed", e);
@@ -400,7 +400,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	public void tryRecoverSeed(String seedName, String crypto, String seedPhrase, String pin, Promise promise) {
 		try {
 			String dbname = reactContext.getFilesDir().toString();
-			substrateTryRecoverSeed(seedName, crypto, seedPhrase, dbname);
+			substrateTryRecoverSeed(seedName, crypto, seedPhrase, pin, dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Seed recovery failed", e);
@@ -443,6 +443,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native String dbGetRelevantIdentities(String seedName, String genesisHash, String dbname);
 	private static native void dbAckUserAgreement(String dbname);
 	private static native boolean dbCheckUserAgreement(String dbname);
-	private static native void substrateTryCreateSeed(String seedName, String crypto, String dbname);
-	private static native void substrateTryRecoverSeed(String seedName, String crypto, String seedPhrase, String dbname);
+	private static native void substrateTryCreateSeed(String seedName, String crypto, String password, String dbname);
+	private static native void substrateTryRecoverSeed(String seedName, String crypto, String seedPhrase, String password, String dbname);
 }

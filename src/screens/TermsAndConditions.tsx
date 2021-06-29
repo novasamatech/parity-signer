@@ -51,6 +51,7 @@ export default function TermsAndConditions(
 
 	return (
 		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
+			<Text style={fontStyles.t_big}>{policyConfirmed ? "YES" : "NO"}</Text>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>

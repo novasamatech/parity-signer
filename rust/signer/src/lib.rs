@@ -507,9 +507,9 @@ export! {
 	fn try_create_seed(
         seed_name: &str,
         crypto: &str,
+        password: &str,
 		dbname: &str
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        let password = "000000";
         db_handling::identities::try_create_seed(seed_name, crypto, password, dbname)
     }
 
@@ -518,9 +518,9 @@ export! {
         seed_name: &str,
         crypto: &str,
         seed_phrase: &str,
+        password: &str,
 		dbname: &str
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        let password = "000000";
         db_handling::identities::try_recover_seed(seed_name, crypto, seed_phrase, password, dbname)
     }
 

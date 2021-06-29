@@ -42,7 +42,7 @@ function SeedBackup({
 	const seedName = route.params.seedName;
 	const { setAlert } = useContext(AlertStateContext);
 	const onBackupDone = async (): Promise<void> => {
-		NavigateToLandignPage(navigation);
+		NavigateToLandingPage(navigation);
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
@@ -59,15 +59,14 @@ function SeedBackup({
 			/>
 		);
 	};
+
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
-		};
-
-		setSeedPhraseAsync();
-		return (): void => {
+			
 			setSeedPhrase('');
 		};
-	}, [route.params]);
+		setSeedPhraseAsync();
+	}, [seedName]);
 
 	return (
 		<SafeAreaViewContainer>
