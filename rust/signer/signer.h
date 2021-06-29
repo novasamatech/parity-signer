@@ -143,3 +143,6 @@ bool check_user_agreement(struct ExternalError, const char* dbname);
 void try_create_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* dbname);
 void try_recover_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* seed_phrase, const char* dbname);
 
+//Function to show plaintext seed to user
+const char * fetch_seed(struct ExternError*, const char* seed_name, const char* password, const char* dbname);
+

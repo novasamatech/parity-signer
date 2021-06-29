@@ -523,6 +523,15 @@ export! {
 	) -> std::result::Result<(), Box<dyn std::error::Error>> {
         db_handling::identities::try_recover_seed(seed_name, crypto, seed_phrase, password, dbname)
     }
+    
+    @Java_io_parity_signer_SubstrateSignModule_substrateFetchSeed
+	fn fetch_seed(
+        seed_name: &str,
+        password: &str,
+		dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        db_handling::identities::fetch_seed(seed_name, password, dbname)
+    }
 
 }
 

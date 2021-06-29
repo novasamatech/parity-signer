@@ -107,11 +107,22 @@ export async function dbInit(): Promise<void> {
 }
 
 export async function tryCreateSeed(seedName: string, cryptoType: string, pin: string): Promise<void> {
+	console.log(seedName);
+	console.log(cryptoType);
+	console.log(pin);
 	await SubstrateSign.tryCreateSeed(seedName, cryptoType, pin);
+	console.log('seed creation');
 }
 
 export async function tryRecoverSeed(seedName: string, cryptoType: string, seedPhrase: string, pin: string): Promise<void> {
 	await SubstrateSign.tryRecoverSeed(seedName, cryptoType, seedPhrase, pin);
+}
+
+export async function getSeedPhraseForBackup(seedName: string, pin: string): Promise<string> {
+	const seedPhrase = await SubstrateSign.fetchSeed(seedName, pin);
+	console.log('it is now smeared all over memory');
+	console.log(seedPhrase);
+	return seedPhrase;
 }
 
 //Try to decode fountain packages

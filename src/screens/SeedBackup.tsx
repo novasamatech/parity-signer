@@ -21,7 +21,7 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationProps } from 'types/props';
-import { words } from 'utils/native';
+import { getSeedPhraseForBackup } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
@@ -62,8 +62,14 @@ function SeedBackup({
 
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
-			
-			setSeedPhrase('');
+			try {
+				const fetchedSeedPhrase = await getSeedPhraseForBackup(seedName, '000000');
+				setSeedPhrase(fetchedSeedPhrase);
+			} catch (e) {
+				console.log('seed phrase fetch failed, system corrupted');
+				console.log(e);
+				setAlert(e);
+			}
 		};
 		setSeedPhraseAsync();
 	}, [seedName]);
