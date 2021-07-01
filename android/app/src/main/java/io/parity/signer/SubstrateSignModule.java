@@ -3,7 +3,19 @@ package io.parity.signer;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyPair;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStoreException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.io.IOException;
 import java.util.concurrent.Executor;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.NoSuchPaddingException;
 
 import android.os.Looper;
 import android.app.Activity;
@@ -22,6 +34,7 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.biometric.BiometricPrompt.PromptInfo;
 
+import com.facebook.react.bridge.AssertionException;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -36,6 +49,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private final BiometricManager biometricManager;
 	private Executor executor;
 	private BiometricPrompt biometricPrompt;
+	private final String KEY_NAME = "SubstrateSignerMasterKey";
 
 
     static {
@@ -62,7 +76,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 			startActivity(enrollIntent);
 		}*/
 		
-    }
+	}
 
     private void rejectWithException(Promise promise, String code, Exception e) {
         String[] sp = e.getMessage().split(": ");
@@ -70,15 +84,44 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
         promise.reject(code, s);
     }
 
-    private KeyPair kp;
-
     @Override
     public String getName() {
         return "SubstrateSign";
     }
 
+	private void generateSecretKey(KeyGenParameterSpec keyGenParameterSpec) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(
+			KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+		keyGenerator.init(keyGenParameterSpec);
+		keyGenerator.generateKey();
+	}
+
+	private SecretKey getSecretKey() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
+		KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+
+		// Before the keystore can be accessed, it must be loaded.
+		keyStore.load(null);
+		return ((SecretKey)keyStore.getKey(KEY_NAME, null));
+	}
+
+	private Cipher getCipher() throws NoSuchAlgorithmException, NoSuchPaddingException {
+		return Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
+			+ KeyProperties.BLOCK_MODE_CBC + "/"
+			+ KeyProperties.ENCRYPTION_PADDING_PKCS7);
+	}
+
+/*	protected BiometricPrompt authenticateWithPrompt(@NonNull final FragmentActivity activity) {
+		final BiometricPrompt prompt = new BiometricPrompt(activity, executor, this);
+		prompt.authenticate(this.promptInfo);
+
+		return prompt;
+	}
+*/
 	/** Block current NON-main thread and wait for user authentication results. */
 	public void waitResult() {
+		if (Thread.currentThread() == Looper.getMainLooper().getThread())
+			throw new AssertionException("method should not be executed from MAIN thread");
+
 		try {
 			synchronized (this) {
 				wait();
@@ -91,41 +134,23 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	/** trigger interactive authentication. */
 	public void startAuthentication() {
 		FragmentActivity activity = (FragmentActivity) getCurrentActivity();
-
+		/*
 		// code can be executed only from MAIN thread
 		if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
 			activity.runOnUiThread(this::startAuthentication);
-			//waitResult();
+			waitResult();
 			return;
-		}
+		}*/
+		activity.runOnUiThread(this::startAuthentication);
 
 		executor = reactContext.getMainExecutor();
 		biometricPrompt = new BiometricPrompt(
 			activity,
 			executor, 
-			new BiometricPrompt.AuthenticationCallback() {
-				@Override
-				public void onAuthenticationError(
-					int errorCode,
-					CharSequence errString
-				) {
-					super.onAuthenticationError(errorCode, errString);
-				}
-
-				@Override
-				public void onAuthenticationSucceeded(
-					BiometricPrompt.AuthenticationResult result
-				) {
-					super.onAuthenticationSucceeded(result);
-				}
-
-				@Override
-				public void onAuthenticationFailed() {
-					super.onAuthenticationFailed();
-				}
-			});
+			new BiometricPrompt.AuthenticationCallback(){});
 		
 		biometricPrompt.authenticate(promptInfo);
+		return;
 	}
 
 
@@ -388,16 +413,14 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	public void dbInit(String metadata, Promise promise) {
 		try {
 			substrateDbInit(metadata, dbname);
-			
-			KeyPairGenerator kpg = KeyPairGenerator.getInstance(
-				KeyProperties.KEY_ALGORITHM_EC,
-				"AndroidKeyStore");
-			kpg.initialize(new KeyGenParameterSpec.Builder(
-					"theKey",
-					KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-				.setUserAuthenticationParameters(0, KeyProperties.AUTH_DEVICE_CREDENTIAL)
+			generateSecretKey(new KeyGenParameterSpec.Builder(
+				KEY_NAME,
+				KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
+			).setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+				.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+				.setUserAuthenticationParameters(1, KeyProperties.AUTH_DEVICE_CREDENTIAL)
+				.setUserAuthenticationRequired(true)
 				.build());
-			kp = kpg.generateKeyPair();
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Database initialization error", e);
@@ -468,12 +491,14 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	public void tryCreateSeed(String seedName, String crypto, int seedLength, Promise promise) {
 		try {
 			
-			//String seedPhrase = substrateTryCreateSeed(seedName, crypto, "", seedLength, dbname);
 			//sharedPreferences.edit().putString(seedName, encryptedSeed).apply();
-
 			startAuthentication();
-
-			promise.resolve(0);
+			String seedPhrase = substrateTryCreateSeed(seedName, crypto, "", seedLength, dbname);
+			Cipher cipher = getCipher();
+			SecretKey secretKey = getSecretKey();
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			byte[] encryptedSeedBytes = cipher.doFinal(seedPhrase.getBytes());
+			promise.resolve(encryptedSeedBytes);
 		} catch (Exception e) {
 			rejectWithException(promise, "New seed creation failed", e);
 		}
