@@ -46,7 +46,6 @@ function RootSeedNew({
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const [pin, setPin] = useState('');
 	const { setAlert } = useContext(AlertStateContext);
 	const [seedName, setSeedName] = useState('');
 	const [disabled, setDisabled] = useState(false);
@@ -68,7 +67,7 @@ function RootSeedNew({
 	const onRecoverConfirm = async (): void => {
 		setDisabled(true);
 		try {
-			await tryRecoverSeed(seedName, cryptoType, seedPhrase, pin);
+			await tryRecoverSeed(seedName, cryptoType, seedPhrase);
 			setSeedPhrase('');
 			navigation.navigate('SeedBackup', {	
 				seedName
@@ -81,7 +80,7 @@ function RootSeedNew({
 	const onCreateNewIdentity = async (): void => {
 		setDisabled(true);
 		try {
-			await tryCreateSeed(seedName, cryptoType, pin);
+			await tryCreateSeed(seedName, cryptoType);
 			setSeedPhrase('');
 			navigation.navigate('SeedBackup', {	
 				seedName
@@ -108,7 +107,7 @@ function RootSeedNew({
 					testID={testIDs.IdentityNew.recoverButton}
 					onPress={onRecoverConfirm}
 					small={true}
-					disabled={disabled || (pin.length < 6) || (seedName.length < 1) || (seedPhrase.length < 24)}
+					disabled={disabled || (seedName.length < 1) || (seedPhrase.length < 24)}
 				/>
 				<Button
 					title="or create new seed"
@@ -129,7 +128,7 @@ function RootSeedNew({
 				testID={testIDs.IdentityNew.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
-				disabled={ disabled || (pin.length < 6) || (seedName.length < 1) }
+				disabled={ disabled || (seedName.length < 1) }
 			/>
 			<Button
 				title="or recover existing seed"
@@ -143,16 +142,6 @@ function RootSeedNew({
 	return (
 		<KeyboardAwareContainer>
 			<ScreenHeading title={'New Root Seed'} error={!!error} subtitle={error} />
-			<PinInput 
-				label={'Input pin'}
-				returnKeyType="done"
-				onChangeText={(newInput: string): void => {
-					setDisabled(false);
-					setPin(newInput);
-					setError('');
-				}}
-				value={pin}
-			/>
 			<TextInput
 				onChangeText={updateName}
 				testID={testIDs.IdentityNew.nameInput}

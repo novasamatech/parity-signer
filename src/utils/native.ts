@@ -106,15 +106,14 @@ export async function dbInit(): Promise<void> {
 	}
 }
 
-export async function tryCreateSeed(seedName: string, cryptoType: string, pin: string): Promise<void> {
+export async function tryCreateSeed(seedName: string, cryptoType: string): Promise<void> {
 	console.log(seedName);
 	console.log(cryptoType);
-	console.log(pin);
 	await SubstrateSign.tryCreateSeed(seedName, cryptoType, 24);
 	console.log('seed creation');
 }
 
-export async function tryRecoverSeed(seedName: string, cryptoType: string, seedPhrase: string, pin: string): Promise<void> {
+export async function tryRecoverSeed(seedName: string, cryptoType: string, seedPhrase: string): Promise<void> {
 	await SubstrateSign.tryRecoverSeed(seedName, cryptoType, seedPhrase);
 }
 

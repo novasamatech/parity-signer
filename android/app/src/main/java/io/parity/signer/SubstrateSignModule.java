@@ -95,7 +95,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		// code can be executed only from MAIN thread
 		if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
 			activity.runOnUiThread(this::startAuthentication);
-			waitResult();
+			//waitResult();
 			return;
 		}
 
