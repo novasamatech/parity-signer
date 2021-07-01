@@ -458,20 +458,6 @@ export! {
         Ok(())
     }
 
-    @Java_io_parity_signer_SubstrateSignModule_dbGetAllSeedNames
-	fn get_all_seed_names(
-        dbname: &str
-    ) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        let seednames = db_handling::identities::get_seed_names_list(dbname)?;
-        //TODO: gentler formatting, or serde-json?
-        let mut output = "[".to_owned();
-        for seedname in seednames.iter() {
-            output.push_str(&format!("\"{}\",",
-                seedname))
-        }
-        result::return_json_array(output)
-    }
-
     @Java_io_parity_signer_SubstrateSignModule_dbGetRelevantIdentities
 	fn get_relevant_identities(
 		seed_name: &str,
@@ -507,30 +493,11 @@ export! {
 	fn try_create_seed(
         seed_name: &str,
         crypto: &str,
-        password: &str,
-		dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        db_handling::identities::try_create_seed(seed_name, crypto, password, dbname)
-    }
-
-    @Java_io_parity_signer_SubstrateSignModule_substrateTryRecoverSeed
-	fn try_recover_seed(
-        seed_name: &str,
-        crypto: &str,
         seed_phrase: &str,
-        password: &str,
-		dbname: &str
-	) -> std::result::Result<(), Box<dyn std::error::Error>> {
-        db_handling::identities::try_recover_seed(seed_name, crypto, seed_phrase, password, dbname)
-    }
-    
-    @Java_io_parity_signer_SubstrateSignModule_substrateFetchSeed
-	fn fetch_seed(
-        seed_name: &str,
-        password: &str,
+        seed_length: u32,
 		dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        db_handling::identities::fetch_seed(seed_name, password, dbname)
+        db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
     }
 
 }

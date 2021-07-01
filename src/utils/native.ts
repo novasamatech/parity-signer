@@ -110,12 +110,12 @@ export async function tryCreateSeed(seedName: string, cryptoType: string, pin: s
 	console.log(seedName);
 	console.log(cryptoType);
 	console.log(pin);
-	await SubstrateSign.tryCreateSeed(seedName, cryptoType, pin);
+	await SubstrateSign.tryCreateSeed(seedName, cryptoType, 24);
 	console.log('seed creation');
 }
 
 export async function tryRecoverSeed(seedName: string, cryptoType: string, seedPhrase: string, pin: string): Promise<void> {
-	await SubstrateSign.tryRecoverSeed(seedName, cryptoType, seedPhrase, pin);
+	await SubstrateSign.tryRecoverSeed(seedName, cryptoType, seedPhrase);
 }
 
 export async function getSeedPhraseForBackup(seedName: string, pin: string): Promise<string> {
@@ -228,6 +228,8 @@ export async function getIdentitiesForSeed(seedName: string, genesisHash: string
 export async function getAllSeedNames(): Promise<[string]> {
 	try {
 		const allSeedsJSON = await SubstrateSign.getAllSeedNames();
+		console.log('something returned for seeds');
+		console.log(allSeedsJSON);
 		const allSeeds = JSON.parse(allSeedsJSON);
 		return allSeeds;
 	} catch(e) {

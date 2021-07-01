@@ -3,14 +3,24 @@ package io.parity.signer;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyPair;
+import java.util.concurrent.Executor;
 
+import android.os.Looper;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.provider.Settings;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.widget.Toast;
+//import androidx.security.crypto.MasterKey;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.fragment.app.FragmentActivity;
 
-//import androidx.biometric.BiometricManager;
-//import androidx.biometric.BiometricPrompt.PromptInfo;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.biometric.BiometricPrompt.PromptInfo;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -19,15 +29,39 @@ import com.facebook.react.bridge.Promise;
 
 public class SubstrateSignModule extends ReactContextBaseJavaModule {
 
-    private final ReactApplicationContext reactContext;
+	private final ReactApplicationContext reactContext;
+	private final SharedPreferences sharedPreferences;
+	private final BiometricPrompt.PromptInfo promptInfo;
+	private final String dbname;
+	private final BiometricManager biometricManager;
+	private Executor executor;
+	private BiometricPrompt biometricPrompt;
+
 
     static {
         System.loadLibrary("signer");
     }
 
-    public SubstrateSignModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-        this.reactContext = reactContext;
+	public SubstrateSignModule(ReactApplicationContext reactContext) {
+		super(reactContext);
+		this.reactContext = reactContext;
+		sharedPreferences = reactContext.getSharedPreferences("SubstrateSignKeychain", Context.MODE_PRIVATE);
+		dbname = reactContext.getFilesDir().toString();
+
+		promptInfo = new BiometricPrompt.PromptInfo.Builder()
+        		.setTitle("Secret seed protection")
+	        	.setSubtitle("Please log in")
+	        	.setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+		        .build();
+		biometricManager = BiometricManager.from(reactContext);
+		/*if (biometricManager.canAuthenticate(BiometricManager.Authenticators.DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED) {
+			// Prompts the user to create credentials that your app accepts.
+			final Intent enrollIntent = new Intent(Settings.ACTION_BIOMETRIC_ENROLL);
+			enrollIntent.putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+				BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+			startActivity(enrollIntent);
+		}*/
+		
     }
 
     private void rejectWithException(Promise promise, String code, Exception e) {
@@ -36,10 +70,64 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
         promise.reject(code, s);
     }
 
+    private KeyPair kp;
+
     @Override
     public String getName() {
         return "SubstrateSign";
     }
+
+	/** Block current NON-main thread and wait for user authentication results. */
+	public void waitResult() {
+		try {
+			synchronized (this) {
+				wait();
+			}
+		} catch (InterruptedException ignored) {
+			/* shutdown sequence */
+		}
+	}
+
+	/** trigger interactive authentication. */
+	public void startAuthentication() {
+		FragmentActivity activity = (FragmentActivity) getCurrentActivity();
+
+		// code can be executed only from MAIN thread
+		if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+			activity.runOnUiThread(this::startAuthentication);
+			waitResult();
+			return;
+		}
+
+		executor = reactContext.getMainExecutor();
+		biometricPrompt = new BiometricPrompt(
+			activity,
+			executor, 
+			new BiometricPrompt.AuthenticationCallback() {
+				@Override
+				public void onAuthenticationError(
+					int errorCode,
+					CharSequence errString
+				) {
+					super.onAuthenticationError(errorCode, errString);
+				}
+
+				@Override
+				public void onAuthenticationSucceeded(
+					BiometricPrompt.AuthenticationResult result
+				) {
+					super.onAuthenticationSucceeded(result);
+				}
+
+				@Override
+				public void onAuthenticationFailed() {
+					super.onAuthenticationFailed();
+				}
+			});
+		
+		biometricPrompt.authenticate(promptInfo);
+	}
+
 
     @ReactMethod
     public void brainWalletAddress(String seed, Promise promise) {
@@ -267,7 +355,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void parseTransaction(String transaction, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			String decoded = substrateParseTransaction(transaction, dbname);
 			promise.resolve(decoded);
 		} catch (Exception e) {
@@ -278,7 +365,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void signTransaction(String action, String pin, String password, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			String signed = substrateSignTransaction(action, pin, password, dbname);
 			promise.resolve(signed);
 		} catch (Exception e) {
@@ -301,18 +387,17 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void dbInit(String metadata, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			substrateDbInit(metadata, dbname);
-
+			
 			KeyPairGenerator kpg = KeyPairGenerator.getInstance(
 				KeyProperties.KEY_ALGORITHM_EC,
 				"AndroidKeyStore");
 			kpg.initialize(new KeyGenParameterSpec.Builder(
 					"theKey",
 					KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-				.setUserAuthenticationParameters(1, KeyProperties.AUTH_DEVICE_CREDENTIAL)
+				.setUserAuthenticationParameters(0, KeyProperties.AUTH_DEVICE_CREDENTIAL)
 				.build());
-			KeyPair kp = kpg.generateKeyPair();
+			kp = kpg.generateKeyPair();
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Database initialization error", e);
@@ -322,7 +407,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void getAllNetworksForNetworkSelector(Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			String allNetworks = dbGetAllNetworksForNetworkSelector(dbname);
 			promise.resolve(allNetworks);
 		} catch (Exception e) {
@@ -333,7 +417,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void getNetwork(String genesisHash, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			String network = dbGetNetwork(genesisHash, dbname);
 			promise.resolve(network);
 		} catch (Exception e) {
@@ -344,9 +427,9 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void getAllSeedNames(Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
-			String allSeedNames = dbGetAllSeedNames(dbname);
-			promise.resolve(allSeedNames);
+			KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
+			ks.load(null);
+			promise.resolve(ks.aliases());
 		} catch (Exception e) {
 			rejectWithException(promise, "Database all seed names fetch error", e);
 		}
@@ -355,7 +438,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void getRelevantIdentities(String seedName, String genesisHash, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			String allSeedNames = dbGetRelevantIdentities(seedName, genesisHash, dbname);
 			promise.resolve(allSeedNames);
 		} catch (Exception e) {
@@ -366,7 +448,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void ackUserAgreement(Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			dbAckUserAgreement(dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
@@ -377,7 +458,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void checkUserAgreement(Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
 			promise.resolve(dbCheckUserAgreement(dbname));
 		} catch (Exception e) {
 			rejectWithException(promise, "Database check if terms and conditions and privacy policy are acknowledged error", e);
@@ -385,10 +465,14 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void tryCreateSeed(String seedName, String crypto, String pin, Promise promise) {
+	public void tryCreateSeed(String seedName, String crypto, int seedLength, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
-			substrateTryCreateSeed(seedName, crypto, pin, dbname);
+			
+			//String seedPhrase = substrateTryCreateSeed(seedName, crypto, "", seedLength, dbname);
+			//sharedPreferences.edit().putString(seedName, encryptedSeed).apply();
+
+			startAuthentication();
+
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "New seed creation failed", e);
@@ -396,10 +480,9 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void tryRecoverSeed(String seedName, String crypto, String seedPhrase, String pin, Promise promise) {
+	public void tryRecoverSeed(String seedName, String crypto, String seedPhrase, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
-			substrateTryRecoverSeed(seedName, crypto, seedPhrase, pin, dbname);
+			seedPhrase = substrateTryCreateSeed(seedName, crypto, seedPhrase, 0, dbname);
 			promise.resolve(0);
 		} catch (Exception e) {
 			rejectWithException(promise, "Seed recovery failed", e);
@@ -409,8 +492,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void fetchSeed(String seedName, String pin, Promise promise) {
 		try {
-			String dbname = reactContext.getFilesDir().toString();
-			promise.resolve(substrateFetchSeed(seedName, pin, dbname));
+			promise.resolve("plug");
 		} catch (Exception e) {
 			rejectWithException(promise, "Seed fetch failed", e);
 		}
@@ -448,11 +530,8 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native void substrateDbInit(String metadata, String dbname);
 	private static native String dbGetAllNetworksForNetworkSelector(String dbname);
 	private static native String dbGetNetwork(String genesisHash, String dbname);
-	private static native String dbGetAllSeedNames(String dbname);
 	private static native String dbGetRelevantIdentities(String seedName, String genesisHash, String dbname);
 	private static native void dbAckUserAgreement(String dbname);
 	private static native boolean dbCheckUserAgreement(String dbname);
-	private static native void substrateTryCreateSeed(String seedName, String crypto, String password, String dbname);
-	private static native void substrateTryRecoverSeed(String seedName, String crypto, String seedPhrase, String password, String dbname);
-	private static native String substrateFetchSeed(String seedName, String password, String dbname);
+	private static native String substrateTryCreateSeed(String seedName, String crypto, String seedPhrase, int seedLength, String dbname);
 }
