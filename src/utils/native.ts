@@ -109,8 +109,9 @@ export async function dbInit(): Promise<void> {
 export async function tryCreateSeed(seedName: string, cryptoType: string): Promise<void> {
 	console.log(seedName);
 	console.log(cryptoType);
-	await SubstrateSign.tryCreateSeed(seedName, cryptoType, 24);
+	const spitOut = await SubstrateSign.tryCreateSeed(seedName, cryptoType, 24);
 	console.log('seed creation');
+	console.log(spitOut);
 }
 
 export async function tryRecoverSeed(seedName: string, cryptoType: string, seedPhrase: string): Promise<void> {

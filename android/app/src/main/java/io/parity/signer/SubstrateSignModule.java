@@ -50,7 +50,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private Executor executor;
 	private BiometricPrompt biometricPrompt;
 	private final String KEY_NAME = "SubstrateSignerMasterKey";
-
+	private Object AuthLockAbomination = new Object();
 
     static {
         System.loadLibrary("signer");
@@ -123,8 +123,8 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 			throw new AssertionException("method should not be executed from MAIN thread");
 
 		try {
-			synchronized (this) {
-				wait();
+			synchronized (AuthLockAbomination) {
+				AuthLockAbomination.wait();
 			}
 		} catch (InterruptedException ignored) {
 			/* shutdown sequence */
@@ -134,23 +134,48 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	/** trigger interactive authentication. */
 	public void startAuthentication() {
 		FragmentActivity activity = (FragmentActivity) getCurrentActivity();
-		/*
+		
 		// code can be executed only from MAIN thread
 		if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
 			activity.runOnUiThread(this::startAuthentication);
 			waitResult();
 			return;
-		}*/
-		activity.runOnUiThread(this::startAuthentication);
+		}
 
 		executor = reactContext.getMainExecutor();
 		biometricPrompt = new BiometricPrompt(
 			activity,
 			executor, 
-			new BiometricPrompt.AuthenticationCallback(){});
+			new BiometricPrompt.AuthenticationCallback(){
+				@Override
+				public void onAuthenticationError(int errorCode,
+					CharSequence errString) {
+					super.onAuthenticationError(errorCode, errString);
+					synchronized (AuthLockAbomination) {
+						AuthLockAbomination.notify();
+					}
+
+				}
+
+				@Override
+				public void onAuthenticationSucceeded(
+					BiometricPrompt.AuthenticationResult result) {
+					super.onAuthenticationSucceeded(result);
+					synchronized (AuthLockAbomination) {
+						AuthLockAbomination.notify();
+					}
+				}
+
+				@Override
+				public void onAuthenticationFailed() {
+					super.onAuthenticationFailed();
+					synchronized (AuthLockAbomination) {
+						AuthLockAbomination.notify();
+					}
+				}
+			});
 		
 		biometricPrompt.authenticate(promptInfo);
-		return;
 	}
 
 
@@ -490,15 +515,16 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void tryCreateSeed(String seedName, String crypto, int seedLength, Promise promise) {
 		try {
-			
-			//sharedPreferences.edit().putString(seedName, encryptedSeed).apply();
+			if (sharedPreferences.contains(seedName)) throw new AssertionException("Seed with this name already exists");
+
 			startAuthentication();
 			String seedPhrase = substrateTryCreateSeed(seedName, crypto, "", seedLength, dbname);
 			Cipher cipher = getCipher();
 			SecretKey secretKey = getSecretKey();
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 			byte[] encryptedSeedBytes = cipher.doFinal(seedPhrase.getBytes());
-			promise.resolve(encryptedSeedBytes);
+			//sharedPreferences.edit().putString(seedName, encryptedSeed).apply();
+			promise.resolve(encryptedSeedBytes.toString());
 		} catch (Exception e) {
 			rejectWithException(promise, "New seed creation failed", e);
 		}
