@@ -16,6 +16,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 
 import android.os.Looper;
 import android.app.Activity;
@@ -25,7 +26,7 @@ import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.widget.Toast;
+import android.util.Base64;
 //import androidx.security.crypto.MasterKey;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.fragment.app.FragmentActivity;
@@ -51,6 +52,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private BiometricPrompt biometricPrompt;
 	private final String KEY_NAME = "SubstrateSignerMasterKey";
 	private Object AuthLockAbomination = new Object();
+	private final String separator = "-";
 
     static {
         System.loadLibrary("signer");
@@ -475,9 +477,8 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void getAllSeedNames(Promise promise) {
 		try {
-			KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
-			ks.load(null);
-			promise.resolve(ks.aliases());
+			String seedNameSet = "[\"" + String.join("\", \"", sharedPreferences.getAll().keySet()) + "\"]";
+			promise.resolve(seedNameSet);
 		} catch (Exception e) {
 			rejectWithException(promise, "Database all seed names fetch error", e);
 		}
@@ -518,13 +519,20 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 			if (sharedPreferences.contains(seedName)) throw new AssertionException("Seed with this name already exists");
 
 			startAuthentication();
-			String seedPhrase = substrateTryCreateSeed(seedName, crypto, "", seedLength, dbname);
+			
 			Cipher cipher = getCipher();
 			SecretKey secretKey = getSecretKey();
+			
+			String seedPhrase = substrateTryCreateSeed(seedName, crypto, "", seedLength, dbname);
+			
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			String iv = Base64.encodeToString(cipher.getIV(), Base64.DEFAULT);
 			byte[] encryptedSeedBytes = cipher.doFinal(seedPhrase.getBytes());
-			//sharedPreferences.edit().putString(seedName, encryptedSeed).apply();
-			promise.resolve(encryptedSeedBytes.toString());
+			String encryptedSeedRecord = Base64.encodeToString(encryptedSeedBytes, Base64.DEFAULT) + separator + iv;
+
+			sharedPreferences.edit().putString(seedName, encryptedSeedRecord).apply();
+			
+			promise.resolve(seedPhrase + " =|= " + encryptedSeedRecord);
 		} catch (Exception e) {
 			rejectWithException(promise, "New seed creation failed", e);
 		}
@@ -543,7 +551,16 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void fetchSeed(String seedName, String pin, Promise promise) {
 		try {
-			promise.resolve("plug");
+			String encryptedSeedRecord = sharedPreferences.getString(seedName, null);
+
+			String[] encryptedParts = encryptedSeedRecord.split(separator);
+			Cipher cipher = getCipher();
+			SecretKey secretKey = getSecretKey();
+			
+			cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(Base64.decode(encryptedParts[1], Base64.DEFAULT)));
+			String seedPhrase = new String(cipher.doFinal(Base64.decode(encryptedParts[0], Base64.DEFAULT)));
+
+			promise.resolve(seedPhrase);
 		} catch (Exception e) {
 			rejectWithException(promise, "Seed fetch failed", e);
 		}
