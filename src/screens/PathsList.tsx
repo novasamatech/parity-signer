@@ -61,7 +61,8 @@ export default function PathsList({
 			const networkInfo = await getNetwork(networkKeyRef);
 			console.log(networkInfo);
 			setNetwork(networkInfo);
-			const seedList = await getAllSeedNames();
+			const seedListUnsorted = await getAllSeedNames();
+			const seedList = seedListUnsorted.sort();
 			setRootSeedList(seedList);
 			console.log(seedList);
 			if (seedList) setRootSeed(seedList[0]);
@@ -72,56 +73,67 @@ export default function PathsList({
 	useEffect(() => {
 		const fetchPaths = async function (networkKeyRef: string, rootSeedRef: string): Promise<void> {
 			const fetched = await getIdentitiesForSeed(rootSeedRef, networkKeyRef);
+			const sorted = fetched.sort((a, b) => { return a.path>b.path});
 			setPaths(fetched);
 		}
 		if(rootSeed) fetchPaths(networkKey, rootSeed);
 	}, [networkKey, rootSeed])
 
 	const renderSeed = ({ item }: { item: string }): ReactElement => {
+		const active = item === rootSeed;
 		return (
 			<TouchableItem
 				onPress={() => setRootSeed(item)}
-				style={styles.card}
+				style={active ? styles.seedActive : styles.seed}
 			>
-				<Text style={styles.seedLabel}>{item}</Text>
+				<Text style={active ? styles.seedLabelActive : styles.seedLabelInactive}>{item}</Text>
 			</TouchableItem>
 		);
 	};
 	
 	const renderIdentity = ({ item }): ReactElement => {
 		return (
-			<TouchableItem
-				onPress={onTapIdentity}
-				style={styles.card}
-			>
-				<View style={styles.content}>
-					<Identicon value={'0'} size={40} />
-					<View style={{ paddingHorizontal: 10 }}>
-						<Text style={styles.textLabel}>{item.name}</Text>
-						<View style={{flexDirection: 'row'}}>
-							<AntIcon 
-								name="user"
-								size={fontStyles.i_small.fontSize}
-								color={colors.signal.main}
-							/>
-							<Text style={styles.textLabel}>{item.path}</Text>
-							{item.hasPassword === 'true' ? (
-								<AntIcon name="lock" style={styles.iconLock} />
-							) : (
-								<View />
-							)}
+			<View style={{...styles.content, justifyContent: 'space-between'}}>
+				<TouchableItem
+					onPress={onTapIdentity}
+					style={styles.card}
+				>
+					<View style={{flexDirection: 'row'}}>
+						<Identicon value={'0'} size={40} />
+						<View style={{ paddingHorizontal: 10 }}>
+							<Text style={styles.textLabel}>{item.name}</Text>
+							<View style={{flexDirection: 'row'}}>
+								<Text style={{...styles.derivationText, fontWeight: 'bold'}}>{rootSeed}</Text>
+								<Text style={styles.derivationText}>{item.path}</Text>
+								{item.hasPassword === 'true' ? (
+									<AntIcon name="lock" style={styles.icon} />
+								) : (
+									<View />
+								)}
+							</View>
+							<Text
+								style={styles.authorAddressText}
+								numberOfLines={1}
+								adjustFontSizeToFit
+							>
+								{'123456789'}
+							</Text>
+
 						</View>
 					</View>
-				</View>
-			</TouchableItem>
+				</TouchableItem>
+				<TouchableItem
+					onPress={onTapDeriveButton}
+					style={{...styles.card, alignItems: 'center'}}
+				>
+					<Text style={styles.icon}>+</Text>
+					<Text style={styles.textLabel}>Derive</Text>
+				</TouchableItem>
+			</View>
 		);
 	};
 
-	const onTapDeriveButton = (): Promise<void> =>
-		unlockWithoutPassword({
-			name: 'PathDerivation',
-			params: { parentPath: rootPath }
-		});
+	const onTapDeriveButton = (): Promise<void> => {};
 
 	const onTapNewSeedButton = (): Promise<void> => {
 		navigation.navigate('RootSeedNew', { false });
@@ -146,11 +158,10 @@ export default function PathsList({
 					/>
 					<TouchableItem
 						onPress={onTapNewSeedButton}
-						style={{...styles.card, alignItems: 'center', height: 72}}
+						style={{...styles.card, alignItems: 'center', height: 54}}
 					>
 						<Text style={styles.icon}>+</Text>
 						<Text style={styles.textLabel}>New</Text>
-						<Text style={styles.textLabel}>seed</Text>
 					</TouchableItem>
 				</View>
 				<Separator style={{ backgroundColor: 'transparent' }} />
@@ -173,7 +184,12 @@ export default function PathsList({
 
 const styles = StyleSheet.create({
 	card: {
-		borderColor: colors.background.os,
+		paddingLeft: 16,
+		paddingRight: 16
+	},
+	cardActive: {
+		backgroundColor: colors.background.cardActive,
+		borderColor: colors.border.light,
 		borderWidth: 1,
 		paddingLeft: 16,
 		paddingRight: 16
@@ -182,16 +198,39 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: colors.background.card,
 		flexDirection: 'row',
-		paddingLeft: 8,
-		paddingVertical: 8
+	},
+	derivationText: {
+		...fontStyles.t_codeS,
+		color: colors.signal.main,
+		textAlign: 'left'
 	},
 	icon: {
 		...fontStyles.i_large,
 		color: colors.signal.main,
 		fontWeight: 'bold'
 	},
-	seedLabel: {
-		...fontStyles.a_text,
+	seed: {
+		backgroundColor: colors.background.card,
+		borderColor: colors.border.light,
+		borderWidth: 1,
+		paddingLeft: 16,
+		paddingRight: 16
+	},
+	seedActive: {
+		backgroundColor: colors.background.cardActive,
+		borderColor: colors.border.light,
+		borderWidth: 1,
+		paddingLeft: 16,
+		paddingRight: 16
+	},
+	seedLabelActive: {
+		...fontStyles.t_label,
+		justifyContent: 'center',
+		fontSize: 32
+	},
+	seedLabelInactive: {
+		...fontStyles.t_label,
+		color: colors.text.main,
 		justifyContent: 'center',
 		fontSize: 32
 	},
