@@ -39,6 +39,9 @@ import { getAllSeedNames, getNetwork, getIdentitiesForSeed } from 'utils/native'
 import TouchableItem from 'components/TouchableItem';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
+import Identicon from '@polkadot/reactnative-identicon';
+import AntIcon from 'react-native-vector-icons/AntDesign';
+
 
 export default function PathsList({
 	navigation,
@@ -74,9 +77,45 @@ export default function PathsList({
 		if(rootSeed) fetchPaths(networkKey, rootSeed);
 	}, [networkKey, rootSeed])
 
-	//const renderSeed
-	//
-	//const renderIdentity
+	const renderSeed = ({ item }: { item: string }): ReactElement => {
+		return (
+			<TouchableItem
+				onPress={() => setRootSeed(item)}
+				style={styles.card}
+			>
+				<Text style={styles.seedLabel}>{item}</Text>
+			</TouchableItem>
+		);
+	};
+	
+	const renderIdentity = ({ item }): ReactElement => {
+		return (
+			<TouchableItem
+				onPress={onTapIdentity}
+				style={styles.card}
+			>
+				<View style={styles.content}>
+					<Identicon value={'0'} size={40} />
+					<View style={{ paddingHorizontal: 10 }}>
+						<Text style={styles.textLabel}>{item.name}</Text>
+						<View style={{flexDirection: 'row'}}>
+							<AntIcon 
+								name="user"
+								size={fontStyles.i_small.fontSize}
+								color={colors.signal.main}
+							/>
+							<Text style={styles.textLabel}>{item.path}</Text>
+							{item.hasPassword === 'true' ? (
+								<AntIcon name="lock" style={styles.iconLock} />
+							) : (
+								<View />
+							)}
+						</View>
+					</View>
+				</View>
+			</TouchableItem>
+		);
+	};
 
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
@@ -87,6 +126,8 @@ export default function PathsList({
 	const onTapNewSeedButton = (): Promise<void> => {
 		navigation.navigate('RootSeedNew', { false });
 	};
+
+	const onTapIdentity = (): Promise<void> => {};
 
 	if (rootSeed) {
 		return (
@@ -100,8 +141,7 @@ export default function PathsList({
 				<View style={{flexDirection: 'row'}}>
 					<FlatList horizontal={true} 
 						data={rootSeedList}
-						renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item}</Text>)}
-						onPress={() => setRootSeed(item)}
+						renderItem={renderSeed}
 						keyExtractor={item => item}
 					/>
 					<TouchableItem
@@ -113,14 +153,15 @@ export default function PathsList({
 						<Text style={styles.textLabel}>seed</Text>
 					</TouchableItem>
 				</View>
+				<Separator style={{ backgroundColor: 'transparent' }} />
 				<FlatList
 					data={paths}
-					renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item.name}</Text>)}
+					renderItem={renderIdentity}
 					keyExtractor={item => item.path}
 				/>
 				<QRScannerAndDerivationTab
 					derivationTestID={testIDs.PathsList.deriveButton}
-					title="Derive New Account"
+					title="Derive"
 					onPress={onTapDeriveButton}
 				/>
 			</SafeAreaViewContainer>
@@ -137,10 +178,22 @@ const styles = StyleSheet.create({
 		paddingLeft: 16,
 		paddingRight: 16
 	},
+	content: {
+		alignItems: 'center',
+		backgroundColor: colors.background.card,
+		flexDirection: 'row',
+		paddingLeft: 8,
+		paddingVertical: 8
+	},
 	icon: {
 		...fontStyles.i_large,
 		color: colors.signal.main,
 		fontWeight: 'bold'
+	},
+	seedLabel: {
+		...fontStyles.a_text,
+		justifyContent: 'center',
+		fontSize: 32
 	},
 	textLabel: {
 		...fontStyles.a_text

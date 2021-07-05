@@ -99,7 +99,6 @@ function RootSeedNew({
 				onChangeText={onSeedTextInput}
 				onSubmitEditing={onRecoverConfirm}
 				returnKeyType="done"
-				valid={isSeedValid.valid}
 			/>
 			<View style={styles.btnBox}>
 				<Button
