@@ -541,8 +541,23 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void tryRecoverSeed(String seedName, String crypto, String seedPhrase, Promise promise) {
 		try {
-			seedPhrase = substrateTryCreateSeed(seedName, crypto, seedPhrase, 0, dbname);
-			promise.resolve(0);
+			if (sharedPreferences.contains(seedName)) throw new AssertionException("Seed with this name already exists");
+
+			startAuthentication();
+			
+			Cipher cipher = getCipher();
+			SecretKey secretKey = getSecretKey();
+			
+			String seedPhraseCheck = substrateTryCreateSeed(seedName, crypto, seedPhrase, 0, dbname);
+			
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			String iv = Base64.encodeToString(cipher.getIV(), Base64.DEFAULT);
+			byte[] encryptedSeedBytes = cipher.doFinal(seedPhraseCheck.getBytes());
+			String encryptedSeedRecord = Base64.encodeToString(encryptedSeedBytes, Base64.DEFAULT) + separator + iv;
+
+			sharedPreferences.edit().putString(seedName, encryptedSeedRecord).apply();
+			
+			promise.resolve(seedPhraseCheck + " =|= " + encryptedSeedRecord);
 		} catch (Exception e) {
 			rejectWithException(promise, "Seed recovery failed", e);
 		}
