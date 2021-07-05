@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useContext, useState, useEffect } from 'react';
-import { FlatList, ScrollView, Text } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
@@ -36,6 +36,9 @@ import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 import OnBoardingView from 'components/OnBoarding';
 import { getAllSeedNames, getNetwork, getIdentitiesForSeed } from 'utils/native';
+import TouchableItem from 'components/TouchableItem';
+import fontStyles from 'styles/fontStyles';
+import colors from 'styles/colors';
 
 export default function PathsList({
 	navigation,
@@ -48,7 +51,6 @@ export default function PathsList({
 	const [paths, setPaths] = useState([]);
 
 	const { navigate } = navigation;
-	//const rootPath = `//${networkParams.pathId}`;
 	
 	useEffect(() => {
 		const populatePathsList = async function (networkKeyRef: string): Promise<void> {
@@ -72,11 +74,19 @@ export default function PathsList({
 		if(rootSeed) fetchPaths(networkKey, rootSeed);
 	}, [networkKey, rootSeed])
 
+	//const renderSeed
+	//
+	//const renderIdentity
+
 	const onTapDeriveButton = (): Promise<void> =>
 		unlockWithoutPassword({
 			name: 'PathDerivation',
 			params: { parentPath: rootPath }
 		});
+
+	const onTapNewSeedButton = (): Promise<void> => {
+		navigation.navigate('RootSeedNew', { false });
+	};
 
 	if (rootSeed) {
 		return (
@@ -87,12 +97,22 @@ export default function PathsList({
 					networkKey={networkKey}
 				/>
 				<Separator style={{ backgroundColor: 'transparent' }} />
-				<FlatList horizontal={true} 
-					data={rootSeedList}
-					renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item}</Text>)}
-					onPress={() => setRootSeed(item)}
-					keyExtractor={item => item}
-				/>
+				<View style={{flexDirection: 'row'}}>
+					<FlatList horizontal={true} 
+						data={rootSeedList}
+						renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item}</Text>)}
+						onPress={() => setRootSeed(item)}
+						keyExtractor={item => item}
+					/>
+					<TouchableItem
+						onPress={onTapNewSeedButton}
+						style={{...styles.card, alignItems: 'center', height: 72}}
+					>
+						<Text style={styles.icon}>+</Text>
+						<Text style={styles.textLabel}>New</Text>
+						<Text style={styles.textLabel}>seed</Text>
+					</TouchableItem>
+				</View>
 				<FlatList
 					data={paths}
 					renderItem={({item, index, separators}) => (<Text style={{color: 'white'}}>{item.name}</Text>)}
@@ -109,3 +129,20 @@ export default function PathsList({
 		return <OnBoardingView />
 	}
 }
+
+const styles = StyleSheet.create({
+	card: {
+		borderColor: colors.background.os,
+		borderWidth: 1,
+		paddingLeft: 16,
+		paddingRight: 16
+	},
+	icon: {
+		...fontStyles.i_large,
+		color: colors.signal.main,
+		fontWeight: 'bold'
+	},
+	textLabel: {
+		...fontStyles.a_text
+	}
+});

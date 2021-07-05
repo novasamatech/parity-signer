@@ -42,7 +42,7 @@ function SeedBackup({
 	const seedName = route.params.seedName;
 	const { setAlert } = useContext(AlertStateContext);
 	const onBackupDone = async (): Promise<void> => {
-		NavigateToLandingPage(navigation);
+		navigateToLandingPage(navigation);
 	};
 
 	const renderTextButton = (buttonWordsNumber: number): React.ReactElement => {
@@ -79,7 +79,7 @@ function SeedBackup({
 			<ScreenHeading
 				title={'Recovery Phrase'}
 				subtitle={
-					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover this account and access its funds.'
+					'Write these words down on paper. Keep the backup paper safe. These words allow anyone to recover your identities and gain full access to them.'
 				}
 			/>
 			<Text
