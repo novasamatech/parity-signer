@@ -23,7 +23,6 @@ import ButtonIcon from './ButtonIcon';
 import Separator from './Separator';
 import TransparentBackground from './TransparentBackground';
 
-import { AccountsContext } from 'stores/AccountsContext';
 import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
@@ -37,6 +36,8 @@ import {
 } from 'utils/navigationHelpers';
 import { Identity } from 'types/identityTypes';
 
+//TODO: rename this screen and clean up
+
 function ButtonWithArrow(props: {
 	onPress: () => void;
 	testID?: string;
@@ -46,10 +47,8 @@ function ButtonWithArrow(props: {
 }
 
 function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
 	const navigation: StackNavigationProp<RootStackParamList> = useNavigation();
 	const [visible, setVisible] = useState(false);
-	const { currentIdentity, identities, accounts } = accountsStore.state;
 	// useEffect(() => {
 	// 	const firstLogin: boolean = identities.length === 0;
 	// 	if (currentIdentity === null && !firstLogin) {
@@ -114,30 +113,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 		);
 	};
 
-	const renderCurrentIdentityCard = (): React.ReactNode => {
-		if (!currentIdentity) return;
-
-		const currentIdentityTitle = getIdentityName(currentIdentity, identities);
-
-		return (
-			<>
-				<ButtonIcon
-					title={currentIdentityTitle}
-					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(currentIdentity, 'Main')
-					}
-					iconType="antdesign"
-					iconName="user"
-					iconSize={40}
-					style={{ paddingLeft: 16 }}
-					textStyle={fontStyles.h1}
-				/>
-				{renderIdentityOptions(currentIdentity)}
-				<Separator style={{ marginBottom: 0 }} />
-			</>
-		);
-	};
-
 	const renderSettings = (): React.ReactElement => {
 		return (
 			<>
@@ -164,27 +139,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
 				/>
 			</>
-		);
-	};
-
-	const renderNonSelectedIdentity = (
-		identity: Identity
-	): React.ReactElement => {
-		const title = getIdentityName(identity, identities);
-
-		return (
-			<ButtonIcon
-				title={title}
-				onPress={(): Promise<void> =>
-					onIdentitySelectedAndNavigate(identity, 'Main')
-				}
-				key={identity.encryptedSeed}
-				iconType="antdesign"
-				iconName="user"
-				iconSize={24}
-				style={styles.indentedButton}
-				textStyle={fontStyles.h2}
-			/>
 		);
 	};
 
@@ -239,23 +193,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 				animationType="none"
 			>
 				<View style={styles.card}>
-					{renderCurrentIdentityCard()}
-					{renderIdentities()}
-					{accounts.size > 0 && (
-						<>
-							<ButtonIcon
-								title="Legacy Accounts"
-								onPress={onLegacyListClicked}
-								iconName="solution1"
-								iconType="antdesign"
-								iconSize={24}
-								textStyle={fontStyles.t_big}
-								style={styles.indentedButton}
-							/>
-							<Separator />
-						</>
-					)}
-
 					<ButtonIcon
 						title="Add Identity"
 						testID={testIDs.IdentitiesSwitch.addIdentityButton}
@@ -268,21 +205,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 					/>
 
 					<Separator />
-					{__DEV__ && (
-						<View>
-							<ButtonIcon
-								title="Add legacy account"
-								onPress={(): void => closeModalAndNavigate('AccountNew')}
-								iconName="plus"
-								iconType="antdesign"
-								iconSize={24}
-								textStyle={fontStyles.t_big}
-								style={styles.indentedButton}
-							/>
-							<Separator />
-						</View>
-					)}
-
 					{renderSettings()}
 				</View>
 			</TransparentBackground>

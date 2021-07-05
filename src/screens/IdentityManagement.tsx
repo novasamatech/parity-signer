@@ -21,7 +21,6 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import {
 	unlockAndReturnSeed,
@@ -32,17 +31,15 @@ import { alertDeleteIdentity, alertError } from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
 import colors from 'styles/colors';
 import PopupMenu from 'components/PopupMenu';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 type Props = NavigationAccountIdentityProps<'IdentityManagement'>;
 
-function IdentityManagement({
+export default function IdentityManagement({
 	accountsStore,
 	navigation
 }: Props): React.ReactElement {
 	const { currentIdentity } = accountsStore.state;
 	const { setAlert } = useContext(AlertStateContext);
-	const { destroySeedRef } = useSeedRef(currentIdentity.encryptedSeed);
 	if (!currentIdentity) return <View />;
 
 	const onRenameIdentity = async (name: string): Promise<void> => {
@@ -107,7 +104,6 @@ function IdentityManagement({
 	);
 }
 
-export default withCurrentIdentity(IdentityManagement);
 
 const styles = StyleSheet.create({
 	deleteText: {

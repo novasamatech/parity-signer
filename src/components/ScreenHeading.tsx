@@ -20,7 +20,7 @@ import AntIcon from 'react-native-vector-icons/AntDesign';
 import { Icon } from 'react-native-elements';
 
 import ButtonIcon from './ButtonIcon';
-import AccountIcon from './AccountIcon';
+import NetworkIcon from 'components/NetworkIcon';
 
 import { NetworksContext } from 'stores/NetworkContext';
 import TouchableItem from 'components/TouchableItem';
@@ -115,7 +115,6 @@ export function LeftScreenHeading({
 		...baseStyles.text,
 		...baseStyles.t_left
 	};
-	const { getNetwork } = useContext(NetworksContext);
 	const isDisabled = onPress === undefined;
 	return (
 		<TouchableItem
@@ -124,9 +123,8 @@ export function LeftScreenHeading({
 			disabled={isDisabled}
 		>
 			<View style={{ alignItems: 'center', flexDirection: 'row' }}>
-				<AccountIcon
-					address={''}
-					network={getNetwork(networkKey)}
+				<NetworkIcon
+					logo={'network goes here'}
 					style={baseStyles.networkIcon}
 				/>
 				<View>

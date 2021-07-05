@@ -18,7 +18,10 @@ frame-metadata = "13.0.0"
 serde_json = "1.0.64"
 meta_reading = {path = "../meta_reading"}
 printing_balance = {path = "../printing_balance"}
+db_handling = {path = "../db_handling"}
+sled = "0.34.6"
 bitvec = "0.20.4"
 sp-arithmetic = "3.0.0"
 lazy_static = "1.4.0"
 sp-runtime = "3.0.0"
+sp-core = "3.0.0"

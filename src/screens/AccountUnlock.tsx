@@ -18,7 +18,6 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
-import { AccountsContext } from 'stores/AccountsContext';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
@@ -33,8 +32,6 @@ export function AccountUnlock({
 }: NavigationProps<'AccountUnlock'>): React.ReactElement {
 	const next = route.params.next ?? 'LegacyAccountList';
 	const onDelete = route.params.onDelete ?? ((): any => null);
-	const accountsStore = useContext(AccountsContext);
-	const { selectedKey } = accountsStore.state;
 
 	return (
 		<AccountUnlockView

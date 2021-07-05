@@ -40,7 +40,7 @@ export default function Scanner({
 	const [decodeProcess, setDecodeProcess] = useState(true);
 
 	// E2E tests
-	const [mockIndex, onMockBarCodeRead] = useInjectionQR();
+	//const [mockIndex, onMockBarCodeRead] = useInjectionQR();
 
 	// all code to derive information when size of package is determined
 	function setExpectedMessageInfo(size: string): void {
@@ -100,11 +100,7 @@ export default function Scanner({
 				console.log('success');
 				console.log(decoded.substr(0, 128));
 				setDecodeProcess(false);
-				//TODO: here we should place general handler if/when we switch
-				//to ubiquitous fountains. Now this handles only metadata input
-				//processPakage(decoded);
-				const toSave = '0x' + decoded.substr(6);
-				navigation.navigate('MetadataSaving', { metadata: toSave });
+				processPackage(decoded);
 			}
 		}
 	};

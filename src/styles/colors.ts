@@ -18,8 +18,9 @@ export default {
 	background: {
 		alert: '#444444',
 		app: '#151515',
-		button: 'C0C0C0',
+		button: '#C0C0C0',
 		card: '#262626',
+		cardActive: '#363636',
 		os: '#000000'
 	},
 	border: {

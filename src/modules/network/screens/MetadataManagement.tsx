@@ -19,7 +19,6 @@ import React, { useContext, useState, useEffect, ReactElement } from 'react';
 
 import { MetadataCard } from 'modules/network/components/MetadataCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { MetadataHandle } from 'types/metadata';

@@ -25,8 +25,8 @@ use rustc_hex::{FromHex, ToHex};
 use tiny_keccak::keccak256 as keccak;
 use tiny_keccak::Keccak;
 use serde_json;
-use sled;
 
+use db_handling;
 use eth::{KeyPair, PhraseKind};
 use result::{Error, Result};
 use transaction_parsing;
@@ -372,56 +372,134 @@ export! {
 
     @Java_io_parity_signer_SubstrateSignModule_substrateParseTransaction
 	fn parse_transaction(
-		payload: &str,
-        gen_hash: &str,
-        metadata: &str,
-        type_descriptor: &str,
-        identities: &str
-	) -> crate::Result<String> {
-        let datafiles = transaction_parsing::DataFiles {
-            chain_spec_database : gen_hash,
-            metadata_contents : metadata,
-            types_info : type_descriptor,
-            identities: identities,
-        };
-        match transaction_parsing::full_run(payload, datafiles) {
-            Ok(a) => Ok(a.js_cards.to_string()),
-            Err(e) => Ok(e.to_string()),
-        }
+		transaction: &str,
+        dbname: &str
+	) -> String {
+        if transaction == "test all" {return transaction_parsing::test_all_cards::make_all_cards()}
+        else {return transaction_parsing::produce_output(transaction, dbname)}
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateSignTransaction
 	fn sign_transaction(
 		action: &str,
         pin: &str,
-        password: &str
+        password: &str,
+        dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
-        transaction_signing::create_signature(action, pin, password)
+        transaction_signing::handle_action(action, pin, password, dbname)
     }
 
     @Java_io_parity_signer_SubstrateSignModule_substrateDevelopmentTest
 	fn development_test(
-		input: &str
+		_input: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         let output = Ok(std::env::consts::OS.to_string());
-        /*let conn = rusqlite::Connection::open(&format!("{}/test.db3", input))?;
-        conn.execute(
-            "CREATE TABLE test1 (
-                id      INTEGET PRIMARY KEY,
-                name    TEXT
-                )",
-            rusqlite::NO_PARAMS,
-        ).unwrap();*/
-        //conn.execute("CREATE TABLE ", [],)?;
-        //let output = Ok("meh".to_string());
-        let tree = sled::open(&format!("{}", input))?;
-        /*match tree.insert(b"test1", input.as_bytes()) {
-            Ok(None) => Ok("success".to_string()),
-            Ok(Some(s)) => Ok(format!("{:?}",s)),
-            Err(e) => Err(Box::new(e)),
-        }*/
         return output;
     }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateDbInit
+	fn db_init(
+        metadata: &str,
+		dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let datafiles = db_handling::DataFiles {
+            metadata_contents : metadata,
+        };
+        db_handling::fill_database_from_files(dbname, datafiles)
+    }
+    
+    @Java_io_parity_signer_SubstrateSignModule_dbGetNetwork
+	fn get_network(
+		genesis_hash: &str,
+        dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let spec = db_handling::chainspecs::get_network(dbname, genesis_hash)?;
+        Ok(String::from(format!("{{\"color\":\"{}\",\"logo\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}}",
+            spec.color, 
+            spec.logo,
+            spec.secondary_color,
+            spec.title)))
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbGetAllNetworksForNetworkSelector
+	fn get_all_networks_for_network_selector(
+        dbname: &str
+    ) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let specs = db_handling::chainspecs::get_all_networks(dbname)?;
+        //TODO: gentler formatting, or serde-json?
+        let mut output = "[".to_owned();
+        for spec in specs {
+            output.push_str(&format!("{{\"key\":\"{}\",\"color\":\"{}\",\"logo\":\"{}\",\"order\":\"{}\",\"secondaryColor\":\"{}\",\"title\":\"{}\"}},",
+                hex::encode(spec.genesis_hash),
+                spec.color, 
+                spec.logo, 
+                spec.order,
+                spec.secondary_color,
+                spec.title))
+        }
+        result::return_json_array(output)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbAddNetwork
+	fn add_network(
+		_network_json: &str,
+        _dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        
+        Ok(())
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbRemoveNetwork
+	fn remove_network(
+		_genesis_hash: &str,
+        _dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        
+        Ok(())
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbGetRelevantIdentities
+	fn get_relevant_identities(
+		seed_name: &str,
+        genesis_hash: &str,
+        dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        let relevant_identities = db_handling::identities::get_relevant_identities(seed_name, genesis_hash, dbname)?;
+        let mut output = "[".to_owned();
+        for identity in relevant_identities.iter() {
+            output.push_str(&format!("{{\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
+                identity.path,
+                identity.has_pwd,
+                identity.name))
+        }
+        result::return_json_array(output)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbAckUserAgreement
+	fn ack_user_agreement(
+		dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        db_handling::settings::ack_user_agreement(dbname)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_dbCheckUserAgreement
+	fn check_user_agreement(
+		dbname: &str
+	) -> std::result::Result<bool, Box<dyn std::error::Error>> {
+        db_handling::settings::check_user_agreement(dbname)
+    }
+    
+    @Java_io_parity_signer_SubstrateSignModule_substrateTryCreateSeed
+	fn try_create_seed(
+        seed_name: &str,
+        crypto: &str,
+        seed_phrase: &str,
+        seed_length: u32,
+		dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
+    }
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

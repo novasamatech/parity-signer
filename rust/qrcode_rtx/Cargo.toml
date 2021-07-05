@@ -1,0 +1,13 @@
+[package]
+name = "qrcode_rtx"
+version = "0.1.0"
+authors = ["vera"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+hex = "0.4.3"
+raptorq = "1.6.3"
+qrcodegen = "1.6.0"
+apng-encoder = "0.3.0"

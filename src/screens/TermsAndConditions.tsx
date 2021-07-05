@@ -29,7 +29,7 @@ import fontStyles from 'styles/fontStyles';
 import Button from 'components/Button';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
-import { saveToCAndPPConfirmation } from 'utils/db';
+import { ackUserAgreement } from 'utils/native';
 import CustomScrollView from 'components/CustomScrollView';
 
 export default function TermsAndConditions(
@@ -41,14 +41,17 @@ export default function TermsAndConditions(
 	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(
 		GlobalStateContext
 	);
+
 	const { navigation } = props;
+
 	const onConfirm = async (): Promise<void> => {
-		await saveToCAndPPConfirmation();
+		await ackUserAgreement();
 		setPolicyConfirmed(true);
 	};
 
 	return (
 		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
+			<Text style={fontStyles.t_big}>{policyConfirmed ? "YES" : "NO"}</Text>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>

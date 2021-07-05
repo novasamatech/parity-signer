@@ -1,5 +1,4 @@
 import { MetadataHandle } from 'types/metadata';
-import { NetworkProtocols, unknownNetworkPathId } from 'constants/networkSpecs';
 
 export type NetworkProtocol = 'substrate' | 'unknown';
 

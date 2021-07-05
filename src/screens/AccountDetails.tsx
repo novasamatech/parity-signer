@@ -18,10 +18,7 @@ import React, { useContext } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NetworkProtocols } from 'constants/networkSpecs';
-import { AccountsContext } from 'stores/AccountsContext';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import colors from 'styles/colors';
 import AccountCard from 'components/AccountCard';
 import QrView from 'components/QrView';
@@ -40,11 +37,7 @@ import QrScannerTab from 'components/QrScannerTab';
 export default function AccountDetails({
 	navigation
 }: NavigationProps<'AccountDetails'>): React.ReactElement {
-	const accountsStore = useContext(AccountsContext);
-	const account = accountsStore.getSelected();
-	const { getNetwork } = useContext(NetworksContext);
 	const { setAlert } = useContext(AlertStateContext);
-	const { accounts, selectedKey } = accountsStore.state;
 
 	if (!account) return <View />;
 

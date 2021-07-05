@@ -25,14 +25,13 @@ import NavigationBar from 'react-native-navbar-color';
 
 import {
 	AppNavigator,
+	BareLoadingScreen,
+	BarePinNew,
 	TocAndPrivacyPolicyNavigator,
 	ScreenStack
 } from './screens';
 
-import { useNetworksContext, NetworksContext } from 'stores/NetworkContext';
-import { useAccountContext, AccountsContext } from 'stores/AccountsContext';
 import CustomAlert from 'components/CustomAlert';
-import { SeedRefsContext, useSeedRefStore } from 'stores/SeedRefStore';
 import colors from 'styles/colors';
 import '../ReactotronConfig';
 import { AppProps, getLaunchArgs } from 'e2e/injections';
@@ -60,10 +59,7 @@ export default function App(props: AppProps): React.ReactElement {
 	}
 
 	const alertContext = useAlertContext();
-	const networkContext = useNetworksContext();
 	const globalContext: GlobalState = useGlobalStateContext();
-	const seedRefContext = useSeedRefStore();
-	const accountsContext = useAccountContext();
 
 	const renderStacks = (): React.ReactElement => {
 		if (globalContext.dataLoaded) {
@@ -74,37 +70,25 @@ export default function App(props: AppProps): React.ReactElement {
 			);
 		} else {
 			return (
-				<ScreenStack.Navigator>
-					<ScreenStack.Screen name="Empty">
-						{(navigationProps: any): React.ReactElement => (
-							<View style={emptyScreenStyles} {...navigationProps} />
-						)}
-					</ScreenStack.Screen>
-				</ScreenStack.Navigator>
+				<BareLoadingScreen />
 			);
 		}
 	};
 
 	return (
 		<SafeAreaProvider>
-			<NetworksContext.Provider value={networkContext}>
-				<AccountsContext.Provider value={accountsContext}>
-					<GlobalStateContext.Provider value={globalContext}>
-						<AlertStateContext.Provider value={alertContext}>
-							<SeedRefsContext.Provider value={seedRefContext}>
-								<MenuProvider backHandler={true}>
-									<StatusBar
-										barStyle="light-content"
-										backgroundColor={colors.background.app}
-									/>
-									<CustomAlert />
-									<NavigationContainer>{renderStacks()}</NavigationContainer>
-								</MenuProvider>
-							</SeedRefsContext.Provider>
-						</AlertStateContext.Provider>
-					</GlobalStateContext.Provider>
-				</AccountsContext.Provider>
-			</NetworksContext.Provider>
+			<GlobalStateContext.Provider value={globalContext}>
+				<AlertStateContext.Provider value={alertContext}>
+					<MenuProvider backHandler={true}>
+						<StatusBar
+							barStyle="light-content"
+							backgroundColor={colors.background.app}
+						/>
+						<CustomAlert />
+						<NavigationContainer>{renderStacks()}</NavigationContainer>
+					</MenuProvider>
+				</AlertStateContext.Provider>
+			</GlobalStateContext.Provider>
 		</SafeAreaProvider>
 	);
 }

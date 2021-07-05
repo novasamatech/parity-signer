@@ -1,93 +1,62 @@
-use hex;
 use regex::Regex;
 use lazy_static::lazy_static;
 
-// struct to store action line information
-pub struct Action <'a> {
-    pub crypto: &'a str,
-    pub path: &'a str,
-    pub seed: &'a str,
-    pub transaction: Vec<u8>,
-    pub has_pwd: bool,
-    pub author_base58: &'a str,
-}
 
 // Making lazy statics for regex interpreting input action string
 
 lazy_static! {
-    static ref REG_CRYPTO: Regex = Regex::new(r#"(?i)"crypto":( )*"(?P<crypto>[a-z0-9]*)""#).unwrap();
-    static ref REG_PATH: Regex = Regex::new(r#"(?i)"derivation_path":( )*"(?P<path>.*?)""#).unwrap();
-    static ref REG_SEED: Regex = Regex::new(r#"(?i)"encrypted_seed":( )*(?P<seed>.*?"\{.*?\}")"#).unwrap();
-    static ref REG_TRANSACTION: Regex = Regex::new(r#"(?i)"transaction":( )*"(?P<transaction>([a-z0-9][a-z0-9])*)""#).unwrap();
-    static ref REG_HASPWD: Regex = Regex::new(r#"(?i)"has_password":( )*"(?P<has_pwd>(true|false))""#).unwrap();
-    static ref REG_AUTHOR: Regex = Regex::new(r#"(?i)"author":( )*"(?P<author>[0-9a-z]+)""#).unwrap();
+    static ref REG_CHECKSUM: Regex = Regex::new(r#"(?i)"checksum":( )*"(?P<checksum>[0-9]*)""#).expect("constructed from checked static value");
+    static ref REG_ACTION: Regex = Regex::new(r#"(?i)"type":( )*"(?P<action_type>.*?)""#).expect("constructed from checked static value");
 }
 
-pub fn get_info <'a> (action_line: &'a str) -> Result<Action, &'static str> {
-    let path = match REG_PATH.captures(&action_line) {
+
+/// Function for integrity check of action line returned from RN.
+/// In case of success produces u32 checksum for database.
+
+pub fn get_checksum (action_line: &str) -> Result<u32, Box<dyn std::error::Error>> {
+    let checksum: u32 = match REG_CHECKSUM.captures(&action_line) {
         Some(caps) => {
-            match caps.name("path") {
-                Some(c) => c.as_str(),
-                None => {return Err("No derivation path found. Wrong action line formatting.")}
+            match caps.name("checksum") {
+                Some(c) => c.as_str().parse()?,
+                None => {return Err(Box::from("Checksum missing."))}
             }
         },
-        None => {return Err("No derivation path found. Wrong action line formatting.")},
+        None => {return Err(Box::from("Checksum missing."))},
     };
-    let seed = match REG_SEED.captures(&action_line) {
+    Ok(checksum)
+}
+
+
+pub enum ActionType {
+    SignTransaction,
+    LoadMetadata,
+    AddMetadataVerifier,
+    LoadTypes,
+    AddTypesVerifier,
+}
+
+/// Function to determine the action type of incoming action line
+/// returned from RN.
+/// In case of success produces ActionType enum value.
+
+pub fn get_action_type (action_line: &str) -> Result<ActionType, &'static str> {
+    let action_type = match REG_ACTION.captures(&action_line) {
         Some(caps) => {
-            match caps.name("seed") {
-                Some(c) => c.as_str(),
-                None => {return Err("No encrypted seed found. Wrong action line formatting.")}
-            }
-        },
-        None => {return Err("No encrypted seed found. Wrong action line formatting.")},
-    };
-    let has_pwd: bool = match REG_HASPWD.captures(&action_line) {
-        Some(caps) => {
-            match caps.name("has_pwd") {
-                Some(c) => c.as_str().parse().expect("Should have found only bool values by regex."),
-                None => {return Err("No has_password field found. Wrong action line formatting.")},
-            }
-        },
-        None => {return Err("No has_password field found. Wrong action line formatting.")},
-    };
-    let transaction = match REG_TRANSACTION.captures(&action_line) {
-        Some(caps) => {
-            match caps.name("transaction") {
+            match caps.name("action_type") {
                 Some(c) => {
-                    let tr_hex = c.as_str();
-                    hex::decode(&tr_hex).expect("Only hex decodeable line should be found by regex.")
+                    match c.as_str() {
+                        "sign_transaction" => ActionType::SignTransaction,
+                        "load_metadata" => ActionType::LoadMetadata,
+                        "add_metadata_verifier" => ActionType::AddMetadataVerifier,
+                        "load_types" => ActionType::LoadTypes,
+                        "add_types_verifier" => ActionType::AddTypesVerifier,
+                        _ => return Err("Action type not supported."),
+                    }
                 },
-                None => {return Err("No transaction found. Wrong action line formatting.")},
+                None => return Err("Action type missing."),
             }
         },
-        None => {return Err("No transaction found. Wrong action line formatting.")},
+        None => return Err("Action type missing."),
     };
-    let crypto = match REG_CRYPTO.captures(&action_line) {
-        Some(caps) => {
-            match caps.name("crypto") {
-                Some(c) => c.as_str(),
-                None => {return Err("No encryption method found. Wrong action line formatting.")},
-            }
-        },
-        None => {return Err("No encryption method found. Wrong action line formatting.")},
-    };
-    let author_base58 = match REG_AUTHOR.captures(&action_line) {
-        Some(caps) => {
-            match caps.name("author") {
-                Some(c) => c.as_str(),
-                None => {return Err("No author field found. Wrong action line formatting.")},
-            }
-        },
-        None => {return Err("No author field found. Wrong action line formatting.")},
-    };
-    
-    Ok(Action{
-        crypto,
-        path,
-        seed,
-        transaction,
-        has_pwd,
-        author_base58,
-    })
+    Ok(action_type)
 }

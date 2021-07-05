@@ -18,11 +18,10 @@ import React from 'react';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withCurrentIdentity } from 'utils/HOC';
 import TextInput from 'components/TextInput';
 import PathCard from 'components/PathCard';
 
-function PathManagement({
+export default function PathManagement({
 	accountsStore,
 	route
 }: NavigationAccountIdentityProps<'PathManagement'>): React.ReactElement {
@@ -45,5 +44,3 @@ function PathManagement({
 		</SafeAreaScrollViewContainer>
 	);
 }
-
-export default withCurrentIdentity(PathManagement);

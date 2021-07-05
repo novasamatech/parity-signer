@@ -83,7 +83,6 @@ export default StyleSheet.create({
 		fontSize: 13
 	},
 	t_label: {
-		backgroundColor: colors.signal.main,
 		color: colors.signal.main,
 		fontFamily: fonts.robotoMedium,
 		fontSize: 13
