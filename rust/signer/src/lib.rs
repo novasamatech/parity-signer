@@ -465,9 +465,11 @@ export! {
         dbname: &str
 	) -> std::result::Result<String, Box<dyn std::error::Error>> {
         let relevant_identities = db_handling::identities::get_relevant_identities(seed_name, genesis_hash, dbname)?;
+        let prefix = db_handling::chainspecs::get_network(dbname, genesis_hash)?.base58prefix;
         let mut output = "[".to_owned();
-        for identity in relevant_identities.iter() {
-            output.push_str(&format!("{{\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
+        for (pubkey, identity) in relevant_identities.iter() {
+            output.push_str(&format!("{{\"ss58\":\"{}\",\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
+                transaction_parsing::utils_base58::vec_to_base(pubkey, prefix),
                 identity.path,
                 identity.has_pwd,
                 identity.name))

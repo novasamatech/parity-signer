@@ -20,7 +20,7 @@ export default {
 		app: '#151515',
 		button: '#C0C0C0',
 		card: '#262626',
-		cardActive: '#363636',
+		cardActive: '#1D1D1D',
 		os: '#000000'
 	},
 	border: {

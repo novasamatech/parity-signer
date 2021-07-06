@@ -9,7 +9,7 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use super::chainspecs::ChainSpecs;
 use super::constants::{ADDRTREE, SPECSTREE};
-use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, SeedKey, NetworkKey};
+use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, AddressKey, SeedKey, NetworkKey};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
 
@@ -51,20 +51,23 @@ pub struct SeedObject<'a> {
 }
 
 ///get all identities within given seed and network
-pub fn get_relevant_identities (seed_name: &str, network_id_string: &str, database_name: &str) -> Result<Vec<AddressDetails>, Box<dyn std::error::Error>> {
+pub fn get_relevant_identities (seed_name: &str, network_id_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
     let network_id = generate_network_key(hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
     let database: Db = open(database_name)?;
     let identities: Tree = database.open_tree(ADDRTREE)?;
     let name_for_seed = generate_seed_key(seed_name);
-    Ok(identities
+    let mut identities_out: Vec<(AddressKey, AddressDetails)> = Vec::new();
+    for (key, value) in identities
         .iter()
         .collect::<Result<Vec<_>,_>>()?
-        .into_iter()
-        .map(|(_, value)| <AddressDetails>::decode(&mut &value[..]))
-        .collect::<Result<Vec<_>,_>>()?
-        .into_iter()
-        .filter(|identity| (identity.network_id.contains(&network_id)) && (identity.name_for_seed == name_for_seed))
-        .collect())
+        .into_iter() {
+        let address = key.to_vec();
+        let details = <AddressDetails>::decode(&mut &value[..])?;
+        if details.network_id.contains(&network_id) && details.name_for_seed == name_for_seed {
+            identities_out.push((address, details));
+        }
+    }
+    Ok(identities_out)
 }
 
 fn generate_random_phrase (words_number: u32) -> Result<String, Box<dyn std::error::Error>> {
@@ -240,7 +243,7 @@ mod tests {
         let chainspecs = get_default_chainspecs();
         let default_addresses = get_relevant_identities("Alice", &hex::encode(chainspecs[0].genesis_hash), dbname).unwrap();
         assert!(default_addresses.len()>0);
-        assert_eq!(r#"[AddressDetails { name_for_seed: [20, 65, 108, 105, 99, 101], path: "", has_pwd: false, name: "root address", network_id: [[145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195], [176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254], [225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62], [231, 195, 213, 237, 222, 125, 185, 100, 49, 124, 217, 181, 26, 58, 5, 157, 124, 217, 159, 129, 189, 188, 225, 73, 144, 4, 115, 84, 51, 76, 151, 121]], encryption: Sr25519 }, AddressDetails { name_for_seed: [20, 65, 108, 105, 99, 101], path: "//kusama", has_pwd: false, name: "kusama root address", network_id: [[176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]], encryption: Sr25519 }]"#, format!("{:?}", default_addresses)); //because JSON export is what we care about
+        assert_eq!(r#"[([70, 235, 221, 239, 140, 217, 187, 22, 125, 195, 8, 120, 215, 17, 59, 126, 22, 142, 111, 6, 70, 190, 255, 215, 125, 105, 211, 155, 173, 118, 180, 122], AddressDetails { name_for_seed: [20, 65, 108, 105, 99, 101], path: "", has_pwd: false, name: "root address", network_id: [[145, 177, 113, 187, 21, 142, 45, 56, 72, 250, 35, 169, 241, 194, 81, 130, 251, 142, 32, 49, 59, 44, 30, 180, 146, 25, 218, 122, 112, 206, 144, 195], [176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254], [225, 67, 242, 56, 3, 172, 80, 232, 246, 248, 230, 38, 149, 209, 206, 158, 78, 29, 104, 170, 54, 193, 205, 44, 253, 21, 52, 2, 19, 243, 66, 62], [231, 195, 213, 237, 222, 125, 185, 100, 49, 124, 217, 181, 26, 58, 5, 157, 124, 217, 159, 129, 189, 188, 225, 73, 144, 4, 115, 84, 51, 76, 151, 121]], encryption: Sr25519 }), ([100, 163, 18, 53, 212, 191, 155, 55, 207, 237, 58, 250, 138, 166, 7, 84, 103, 95, 156, 73, 21, 67, 4, 84, 211, 101, 192, 81, 18, 120, 77, 5], AddressDetails { name_for_seed: [20, 65, 108, 105, 99, 101], path: "//kusama", has_pwd: false, name: "kusama root address", network_id: [[176, 168, 212, 147, 40, 92, 45, 247, 50, 144, 223, 183, 230, 31, 135, 15, 23, 180, 24, 1, 25, 122, 20, 156, 169, 54, 84, 73, 158, 163, 218, 254]], encryption: Sr25519 })]"#, format!("{:?}", default_addresses)); //because JSON export is what we care about
         let database: Db = open(dbname).unwrap();
         let identities: Tree = database.open_tree(ADDRTREE).unwrap();
         let test_key = generate_address_key(hex::decode("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a").unwrap());

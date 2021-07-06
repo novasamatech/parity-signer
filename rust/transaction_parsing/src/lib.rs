@@ -13,7 +13,7 @@ mod parse_transaction;
     use parse_transaction::parse_transaction;
 pub mod test_all_cards;
     use test_all_cards::make_all_cards;
-mod utils_base58;
+pub mod utils_base58;
 mod utils_chainspecs;
 
 /// Payload in hex format as it arrives into handling contains following elements:

@@ -41,6 +41,7 @@ import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
 import Identicon from '@polkadot/reactnative-identicon';
 import AntIcon from 'react-native-vector-icons/AntDesign';
+import { CardSeparator } from 'components/CardSeparator';
 
 
 export default function PathsList({
@@ -52,6 +53,7 @@ export default function PathsList({
 	const [rootSeedList, setRootSeedList] = useState([]);
 	const [network, setNetwork] = useState();
 	const [paths, setPaths] = useState([]);
+	const [activeAddress, setActiveAddress] = useState('');
 
 	const { navigate } = navigation;
 	
@@ -92,43 +94,71 @@ export default function PathsList({
 	};
 	
 	const renderIdentity = ({ item }): ReactElement => {
+		const active = item.ss58 === activeAddress;
 		return (
-			<View style={{...styles.content, justifyContent: 'space-between'}}>
-				<TouchableItem
-					onPress={onTapIdentity}
-					style={styles.card}
-				>
-					<View style={{flexDirection: 'row'}}>
-						<Identicon value={'0'} size={40} />
-						<View style={{ paddingHorizontal: 10 }}>
-							<Text style={styles.textLabel}>{item.name}</Text>
-							<View style={{flexDirection: 'row'}}>
-								<Text style={{...styles.derivationText, fontWeight: 'bold'}}>{rootSeed}</Text>
-								<Text style={styles.derivationText}>{item.path}</Text>
-								{item.hasPassword === 'true' ? (
-									<AntIcon name="lock" style={styles.icon} />
-								) : (
-									<View />
-								)}
+			<View>
+				<View style={active ? styles.contentActive : styles.content}>
+					<TouchableItem
+						onPress={() => activeAddress === item.ss58 ? setActiveAddress('') : setActiveAddress(item.ss58)}
+						style={styles.card}
+					>
+						<View style={{flexDirection: 'row'}}>
+							<Identicon value={item.ss58} size={40} style={{paddingTop: 10}}/>
+							<View style={{ paddingHorizontal: 10 }}>
+								<Text style={styles.textLabel}>{item.name}</Text>
+								<View style={{flexDirection: 'row'}}>
+									<Text style={{...styles.derivationText, fontWeight: 'bold'}}>{rootSeed}</Text>
+									<Text style={styles.derivationText}>{item.path}</Text>
+									{item.hasPassword === 'true' ? (
+										<AntIcon name="lock" style={styles.icon} />
+									) : (
+										<View />
+									)}
+								</View>
+								<Text
+									style={styles.authorAddressText}
+									numberOfLines={1}
+									adjustFontSizeToFit
+								>
+									{item.ss58}
+								</Text>
+	
 							</View>
-							<Text
-								style={styles.authorAddressText}
-								numberOfLines={1}
-								adjustFontSizeToFit
-							>
-								{'123456789'}
-							</Text>
-
 						</View>
+					</TouchableItem>
+				</View>
+				{item.ss58 === activeAddress ? (
+					<View style={styles.contentActive}>
+						<TouchableItem
+							onPress={onTapDeriveButton}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>del</Text>
+							<Text style={styles.textLabel}>Delete</Text>
+						</TouchableItem>
+						<TouchableItem
+							onPress={onTapDeriveButton}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>QR</Text>
+							<Text style={styles.textLabel}>Export</Text>
+						</TouchableItem>
+						<TouchableItem
+							onPress={onTapDeriveButton}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>/+1</Text>
+							<Text style={styles.textLabel}>Increment</Text>
+						</TouchableItem>
+						<TouchableItem
+							onPress={onTapDeriveButton}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>/name</Text>
+							<Text style={styles.textLabel}>Derive</Text>
+						</TouchableItem>
 					</View>
-				</TouchableItem>
-				<TouchableItem
-					onPress={onTapDeriveButton}
-					style={{...styles.card, alignItems: 'center'}}
-				>
-					<Text style={styles.icon}>+</Text>
-					<Text style={styles.textLabel}>Derive</Text>
-				</TouchableItem>
+				) : ( <View /> )}
 			</View>
 		);
 	};
@@ -169,6 +199,7 @@ export default function PathsList({
 					data={paths}
 					renderItem={renderIdentity}
 					keyExtractor={item => item.path}
+					ItemSeparatorComponent={CardSeparator}
 				/>
 				<QRScannerAndDerivationTab
 					derivationTestID={testIDs.PathsList.deriveButton}
@@ -183,9 +214,16 @@ export default function PathsList({
 }
 
 const styles = StyleSheet.create({
+	authorAddressText: {
+		...fontStyles.t_codeS,
+		color: colors.text.faded,
+		fontSize: 10
+	},
 	card: {
+		paddingBottom: 8,
 		paddingLeft: 16,
-		paddingRight: 16
+		paddingRight: 16,
+		paddingTop: 8
 	},
 	cardActive: {
 		backgroundColor: colors.background.cardActive,
@@ -198,6 +236,13 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: colors.background.card,
 		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
+	contentActive: {
+		alignItems: 'center',
+		backgroundColor: colors.background.cardActive,
+		flexDirection: 'row',
+		justifyContent: 'space-between'
 	},
 	derivationText: {
 		...fontStyles.t_codeS,
@@ -212,14 +257,12 @@ const styles = StyleSheet.create({
 	seed: {
 		backgroundColor: colors.background.card,
 		borderColor: colors.border.light,
-		borderWidth: 1,
 		paddingLeft: 16,
 		paddingRight: 16
 	},
 	seedActive: {
 		backgroundColor: colors.background.cardActive,
 		borderColor: colors.border.light,
-		borderWidth: 1,
 		paddingLeft: 16,
 		paddingRight: 16
 	},
