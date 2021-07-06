@@ -32,11 +32,6 @@ import {
 	isUnknownNetworkParams
 } from 'types/networkTypes';
 import { ButtonListener } from 'types/props';
-import {
-	getAddressWithPath,
-	getNetworkKeyByPath,
-	getPathName
-} from 'utils/identitiesUtils';
 
 export default function PathCard({
 	onPress,

@@ -31,6 +31,7 @@ import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
 import { ackUserAgreement } from 'utils/native';
 import CustomScrollView from 'components/CustomScrollView';
+import { navigateToLandingPage } from 'utils/navigationHelpers';
 
 export default function TermsAndConditions(
 	props: NavigationProps<'TermsAndConditions'>
@@ -47,11 +48,11 @@ export default function TermsAndConditions(
 	const onConfirm = async (): Promise<void> => {
 		await ackUserAgreement();
 		setPolicyConfirmed(true);
+		navigateToLandingPage(navigation);
 	};
 
 	return (
 		<View style={containerStyles.background} testID={testIDs.TacScreen.tacView}>
-			<Text style={fontStyles.t_big}>{policyConfirmed ? "YES" : "NO"}</Text>
 			<CustomScrollView contentContainerStyle={{ paddingHorizontal: 16 }}>
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>

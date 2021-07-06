@@ -21,21 +21,11 @@ import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import TextInput from 'components/TextInput';
-import {
-	extractPathId,
-	getNetworkKey,
-	getSubstrateNetworkKeyByPathId,
-	validateDerivedPath
-} from 'utils/identitiesUtils';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
-import {
-	DerivationNetworkSelector,
-	NetworkOptions
-} from 'components/DerivationNetworkSelector';
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 

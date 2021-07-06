@@ -21,9 +21,6 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
-import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
-import { getMetadata } from 'utils/db';
-//import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';

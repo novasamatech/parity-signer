@@ -1,8 +1,6 @@
 import { MetadataHandle } from 'types/metadata';
 import { generateMetadataHandle } from 'utils/native';
 
-export const metadataStorage = 'signer_metadata_';
-
 export const metadataHandleToKey = (metadataHandle: MetadataHandle): string => {
 	if (metadataHandle.specVersion) {
 		return (

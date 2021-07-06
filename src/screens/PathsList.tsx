@@ -44,6 +44,7 @@ import AntIcon from 'react-native-vector-icons/AntDesign';
 import { CardSeparator } from 'components/CardSeparator';
 import QrView from 'components/QrView';
 import Button from 'components/Button';
+import { NetworkCard } from 'components/NetworkCard';
 
 export default function PathsList({
 	navigation,
@@ -178,6 +179,7 @@ export default function PathsList({
 	if (showQR) {
 		return (
 			<SafeAreaViewContainer>
+				<Text style={styles.addressName}>{activeAddress.name}</Text>
 				<QrView data={`substrate:${activeAddress.ss58}:${networkKey}:${activeAddress.name}`} />
 				<Button 
 					onPress={() => setShowQR(false)}
@@ -188,12 +190,10 @@ export default function PathsList({
 	} else if (rootSeed) {
 		return (
 			<SafeAreaViewContainer>
-				<LeftScreenHeading
-					title={network ? network.title : ''}
-					hasSubtitleIcon={true}
-					networkKey={networkKey}
+				<NetworkCard
+					network={network}
+					onPress={(): Promise<void> => {navigation.goBack();}}
 				/>
-				<Separator style={{ backgroundColor: 'transparent' }} />
 				<View style={{flexDirection: 'row'}}>
 					<FlatList horizontal={true} 
 						data={rootSeedList}
@@ -228,6 +228,11 @@ export default function PathsList({
 }
 
 const styles = StyleSheet.create({
+	addressName: {
+		...fontStyles.t_codeS,
+		fontSize: 20,
+		textAlign: 'center'
+	},
 	authorAddressText: {
 		...fontStyles.t_codeS,
 		color: colors.text.faded,

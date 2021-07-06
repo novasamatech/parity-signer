@@ -173,17 +173,3 @@ export const BareLoadingScreen = (): React.ReactElement => (
 	</ScreenStack.Navigator>
 );
 
-export const BarePinNew = (): React.ReactElement => (
-	<ScreenStack.Navigator
-		initialRouteName="PinNew"
-		screenOptions={{
-			...globalStackNavigationOptions,
-			headerRight: (): React.ReactNode => null
-		}}
-	>
-		<ScreenStack.Screen
-			name="PinNew"
-			component={PinNew}
-		/>
-	</ScreenStack.Navigator>
-);

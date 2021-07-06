@@ -43,12 +43,10 @@ const NetworkFooter = ({ color }: { color: string }): React.ReactElement => (
 );
 
 export function NetworkCard({
-	isAdd,
 	network,
 	onPress,
 	testID,
 }: {
-	isAdd?: boolean;
 	network?: string;
 	onPress?: ButtonListener;
 	testID?: string;

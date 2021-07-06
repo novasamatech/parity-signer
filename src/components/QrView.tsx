@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, View, ViewStyle } from 'react-native';
 
-import { qrCode, qrCodeHex } from 'utils/native';
+import { qrCode } from 'utils/native';
 
 interface Props {
 	data: string;

@@ -20,10 +20,8 @@ import React, { useContext, useState, useEffect, ReactElement } from 'react';
 import { MetadataCard } from 'modules/network/components/MetadataCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
-import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import { MetadataHandle } from 'types/metadata';
 import ScreenHeading from 'components/ScreenHeading';
-import { getRelevantMetadata, getAllMetadata, deleteMetadata } from 'utils/db';
 import MetadataManagerTab from 'components/MetadataManagerTab';
 import testIDs from 'e2e/testIDs';
 
