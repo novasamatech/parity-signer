@@ -468,7 +468,8 @@ export! {
         let prefix = db_handling::chainspecs::get_network(dbname, genesis_hash)?.base58prefix;
         let mut output = "[".to_owned();
         for (pubkey, identity) in relevant_identities.iter() {
-            output.push_str(&format!("{{\"ss58\":\"{}\",\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
+            output.push_str(&format!("{{\"publicKey\":\"{}\",\"ss58\":\"{}\",\"path\":\"{}\",\"hasPassword\":\"{}\",\"name\":\"{}\"}},",
+                hex::encode(pubkey),
                 transaction_parsing::utils_base58::vec_to_base(pubkey, prefix),
                 identity.path,
                 identity.has_pwd,
