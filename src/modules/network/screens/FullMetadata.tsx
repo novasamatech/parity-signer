@@ -18,9 +18,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { TypeRegistry } from '@polkadot/types';
-import { Metadata } from '@polkadot/metadata';
-import { expandMetadata } from '@polkadot/metadata/decorate';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
