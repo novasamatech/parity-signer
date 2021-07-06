@@ -1,8 +1,8 @@
 package io.parity.signer;
 
-import java.security.KeyPairGenerator;
+//import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.KeyPair;
+//import java.security.KeyPair;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
