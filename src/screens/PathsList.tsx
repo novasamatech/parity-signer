@@ -42,7 +42,8 @@ import colors from 'styles/colors';
 import Identicon from '@polkadot/reactnative-identicon';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import { CardSeparator } from 'components/CardSeparator';
-
+import QrView from 'components/QrView';
+import Button from 'components/Button';
 
 export default function PathsList({
 	navigation,
@@ -53,7 +54,8 @@ export default function PathsList({
 	const [rootSeedList, setRootSeedList] = useState([]);
 	const [network, setNetwork] = useState();
 	const [paths, setPaths] = useState([]);
-	const [activeAddress, setActiveAddress] = useState('');
+	const [activeAddress, setActiveAddress] = useState();
+	const [showQR, setShowQR] = useState(false);
 
 	const { navigate } = navigation;
 	
@@ -79,7 +81,7 @@ export default function PathsList({
 			setPaths(fetched);
 		}
 		if(rootSeed) fetchPaths(networkKey, rootSeed);
-	}, [networkKey, rootSeed])
+	}, [networkKey, rootSeed]);
 
 	const renderSeed = ({ item }: { item: string }): ReactElement => {
 		const active = item === rootSeed;
@@ -94,12 +96,12 @@ export default function PathsList({
 	};
 	
 	const renderIdentity = ({ item }): ReactElement => {
-		const active = item.ss58 === activeAddress;
+		const active = item === activeAddress;
 		return (
 			<View>
 				<View style={active ? styles.contentActive : styles.content}>
 					<TouchableItem
-						onPress={() => activeAddress === item.ss58 ? setActiveAddress('') : setActiveAddress(item.ss58)}
+						onPress={() => activeAddress === item ? setActiveAddress('') : setActiveAddress(item)}
 						style={styles.card}
 					>
 						<View style={{flexDirection: 'row'}}>
@@ -127,24 +129,24 @@ export default function PathsList({
 						</View>
 					</TouchableItem>
 				</View>
-				{item.ss58 === activeAddress ? (
+				{active ? (
 					<View style={styles.contentActive}>
 						<TouchableItem
-							onPress={onTapDeriveButton}
+							onPress={onTapDeleteButton}
 							style={{...styles.card, alignItems: 'center'}}
 						>
 							<Text style={styles.icon}>del</Text>
 							<Text style={styles.textLabel}>Delete</Text>
 						</TouchableItem>
 						<TouchableItem
-							onPress={onTapDeriveButton}
+							onPress={() => setShowQR(true)}
 							style={{...styles.card, alignItems: 'center'}}
 						>
 							<Text style={styles.icon}>QR</Text>
 							<Text style={styles.textLabel}>Export</Text>
 						</TouchableItem>
 						<TouchableItem
-							onPress={onTapDeriveButton}
+							onPress={onTapIncrementButton}
 							style={{...styles.card, alignItems: 'center'}}
 						>
 							<Text style={styles.icon}>/+1</Text>
@@ -163,6 +165,8 @@ export default function PathsList({
 		);
 	};
 
+	const onTapDeleteButton = (): Promise<void> => {};
+	const onTapIncrementButton = (): Promise<void> => {};
 	const onTapDeriveButton = (): Promise<void> => {};
 
 	const onTapNewSeedButton = (): Promise<void> => {
@@ -171,7 +175,17 @@ export default function PathsList({
 
 	const onTapIdentity = (): Promise<void> => {};
 
-	if (rootSeed) {
+	if (showQR) {
+		return (
+			<SafeAreaViewContainer>
+				<QrView data={`substrate:${activeAddress.ss58}:${networkKey}:${activeAddress.name}`} />
+				<Button 
+					onPress={() => setShowQR(false)}
+					title={'DONE'}
+				/>
+			</SafeAreaViewContainer>
+		);
+	} else if (rootSeed) {
 		return (
 			<SafeAreaViewContainer>
 				<LeftScreenHeading
