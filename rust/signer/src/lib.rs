@@ -503,6 +503,27 @@ export! {
         db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
     }
 
+    @Java_io_parity_signer_SubstrateSignModule_substrateCheckPath
+	fn check_path(
+        path: &str
+	) -> std::result::Result<bool, Box<dyn std::error::Error>> {
+        db_handling::identities::check_derivation_format(path)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateTryCreateIdentity
+	fn try_create_identity(
+        id_name: &str,
+        seed_name: &str,
+        seed_phrase: &str,
+        crypto: &str,
+        path: &str,
+        network: &str,
+        has_password: bool,
+		dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        db_handling::identities::try_create_address(id_name, seed_name, seed_phrase, crypto, path, network, has_password, dbname)
+    }
+
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);

@@ -201,8 +201,8 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
     Ok(seed_phrase)
 }
 
-///Check seed phrase format and determine whether there is a password
-pub fn check_seed_phrase(path: &str) -> Result<bool, Box<dyn std::error::Error>> {
+///Check derivation format and determine whether there is a password
+pub fn check_derivation_format(path: &str) -> Result<bool, Box<dyn std::error::Error>> {
     //stolen from sp_core
     let re = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.*))?$")
 		.expect("constructed from known-good static value; qed");
@@ -290,18 +290,18 @@ mod tests {
 
     #[test]
     fn must_check_for_valid_derivation_phrase() {
-        assert!(!check_seed_phrase("").expect("valid empty path"));
-        assert!(check_seed_phrase("//").is_err());
-        assert!(!check_seed_phrase("//path1").expect("valid path1"));
-        assert!(!check_seed_phrase("//path/path").expect("soft derivation"));
-        assert!(!check_seed_phrase("//path//path").expect("hard derivation"));
-        assert!(check_seed_phrase("//path///password").expect("path with password"));
-        assert!(check_seed_phrase("///").expect("only password but it is empty"));
-        assert!(!check_seed_phrase("//$~").expect("weird symbols"));
-        assert!(check_seed_phrase("abraca dabre").is_err());
-        assert!(check_seed_phrase("////").expect("//// - password is /"));
-        assert!(check_seed_phrase("//path///password///password").expect("password///password is a password"));
-        assert!(!check_seed_phrase("//путь").expect("valid utf8 abomination"));
+        assert!(!check_derivation_format("").expect("valid empty path"));
+        assert!(check_derivation_format("//").is_err());
+        assert!(!check_derivation_format("//path1").expect("valid path1"));
+        assert!(!check_derivation_format("//path/path").expect("soft derivation"));
+        assert!(!check_derivation_format("//path//path").expect("hard derivation"));
+        assert!(check_derivation_format("//path///password").expect("path with password"));
+        assert!(check_derivation_format("///").expect("only password but it is empty"));
+        assert!(!check_derivation_format("//$~").expect("weird symbols"));
+        assert!(check_derivation_format("abraca dabre").is_err());
+        assert!(check_derivation_format("////").expect("//// - password is /"));
+        assert!(check_derivation_format("//path///password///password").expect("password///password is a password"));
+        assert!(!check_derivation_format("//путь").expect("valid utf8 abomination"));
     }
 
     #[test]
