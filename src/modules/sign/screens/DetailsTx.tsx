@@ -22,22 +22,16 @@ import { Text, View, FlatList } from 'react-native';
 import { PayloadCardData, Action } from 'types/payloads';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
-import { AccountsContext } from 'stores/AccountsContext';
-import { NetworksContext } from 'stores/NetworkContext';
-import { FoundAccount } from 'types/identityTypes';
 import { NavigationProps } from 'types/props';
 import styles from 'modules/sign/styles';
 import Button from 'components/Button';
 import { makeTransactionCardsContents } from 'utils/native';
 import PayloadCard from 'modules/sign/components/PayloadCard';
-import { dumpMetadataDB, loadIdentities } from 'utils/db';
-import { typeDefs } from 'constants/typeDefs';
 
 function DetailsTx({
 	route,
 	navigation
 }: NavigationProps<'DetailsTx'>): React.ReactElement {
-	const { dumpNetworksData } = useContext(NetworksContext);
 	const payload = route.params ? route.params.payload : '';
 	const [payloadCards, setPayloadCards] = useState<PayloadCardData[]>([
 		{ indent: 0, index: 0, payload: {}, type: 'loading' }
@@ -49,17 +43,10 @@ function DetailsTx({
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
-			const networksData = dumpNetworksData();
-			const metadata = await dumpMetadataDB();
-			const metadataJSON = JSON.stringify(metadata);
-			const identities = await loadIdentities();
-			console.log(identities);
 			const cardsSet = await makeTransactionCardsContents(
 				encoded,
-				networksData,
-				metadataJSON,
-				typeDefs
 			);
+
 			//TODO: here should be finer features on what to do
 			//with different payload types.
 			//
@@ -68,9 +55,11 @@ function DetailsTx({
 			const sortedCardSet = []
 				.concat(
 					cardsSet.author ? cardsSet.author : [],
+					cardsSet.verifier ? cardsSet.verifier : [],
 					cardsSet.error ? cardsSet.error : [],
 					cardsSet.warning ? cardsSet.warning : [],
 					cardsSet.method ? cardsSet.method : [],
+					cardsSet.meta ? cardsSet.meta : [],
 					cardsSet.extrinsics ? cardsSet.extrinsics : []
 				)
 				.sort((a, b) => {
@@ -89,7 +78,11 @@ function DetailsTx({
 			);
 			if (cardsSet.action) setAction(cardsSet.action);
 		};
-		generateCards(payload);
+		if (payload === '5301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe') {
+			generateCards('test all');
+		} else {
+			generateCards(payload);
+		}
 	}, [payload]);
 
 	const renderCard = ({
@@ -108,6 +101,8 @@ function DetailsTx({
 		console.log(action);
 		if (action.type === 'sign_transaction') {
 			navigation.navigate('SignedTx', { payload: action.payload });
+		} else if (action.type === 'load_metadata') {
+			navigation.navigate('SignedTx', { payload: action.payload });
 		} else {
 			navigation.goBack();
 		}
@@ -124,7 +119,8 @@ function DetailsTx({
 			/>
 			<Button
 				onPress={performAction}
-				title={action.type === 'sign_transaction' ? 'SIGN' : 'BACK'}
+				title={action.type === 'sign_transaction' ? 'SIGN' : 
+					action.type === 'load_metadata' ? 'ACCEPT' : 'BACK'}
 				testID={testIDs.DetailsTx.signButton}
 			/>
 		</SafeAreaViewContainer>

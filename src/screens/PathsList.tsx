@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useMemo } from 'react';
-import { ScrollView } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { PathDetailsView } from './PathDetails';
 
@@ -23,13 +23,9 @@ import { NetworksContext } from 'stores/NetworkContext';
 import { PathGroup } from 'types/identityTypes';
 import PathGroupCard from 'components/PathGroupCard';
 import { useUnlockSeed } from 'utils/navigationHelpers';
-import { useSeedRef } from 'utils/seedRefHooks';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { UnknownNetworkKeys } from 'constants/networkSpecs';
 import testIDs from 'e2e/testIDs';
-import { isUnknownNetworkParams } from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { withCurrentIdentity } from 'utils/HOC';
 import {
 	getPathsWithSubstrateNetworkKey,
 	groupPaths
@@ -38,83 +34,269 @@ import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
 import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
+import OnBoardingView from 'components/OnBoarding';
+import { getAllSeedNames, getNetwork, getIdentitiesForSeed } from 'utils/native';
+import TouchableItem from 'components/TouchableItem';
+import fontStyles from 'styles/fontStyles';
+import colors from 'styles/colors';
+import Identicon from '@polkadot/reactnative-identicon';
+import AntIcon from 'react-native-vector-icons/AntDesign';
+import { CardSeparator } from 'components/CardSeparator';
+import QrView from 'components/QrView';
+import Button from 'components/Button';
+import { NetworkCard } from 'components/NetworkCard';
 
-function PathsList({
-	accountsStore,
+export default function PathsList({
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathsList'>): React.ReactElement {
-	const networkKey = route.params.networkKey ?? UnknownNetworkKeys.UNKNOWN;
-	const networkContextState = useContext(NetworksContext);
-	const { networks, getNetwork } = networkContextState;
-	const networkParams = getNetwork(networkKey);
-
-	const { currentIdentity } = accountsStore.state;
-	const isUnknownNetworkPath = isUnknownNetworkParams(networkParams);
-	const pathsGroups = useMemo((): PathGroup[] | null => {
-		if (!currentIdentity) return null;
-		const listedPaths = getPathsWithSubstrateNetworkKey(
-			currentIdentity,
-			networkKey,
-			networkContextState
-		);
-		return groupPaths(listedPaths, networks);
-	}, [currentIdentity, networkKey, networkContextState, networks]);
-	const { isSeedRefValid } = useSeedRef(currentIdentity.encryptedSeed);
-	const { unlockWithoutPassword } = useUnlockSeed(isSeedRefValid);
+	const networkKey = route.params.networkKey;
+	const [rootSeed, setRootSeed] = useState('');
+	const [rootSeedList, setRootSeedList] = useState([]);
+	const [network, setNetwork] = useState();
+	const [paths, setPaths] = useState([]);
+	const [activeAddress, setActiveAddress] = useState();
+	const [showQR, setShowQR] = useState(false);
 
 	const { navigate } = navigation;
-	const rootPath = `//${networkParams.pathId}`;
+	
+	useEffect(() => {
+		const populatePathsList = async function (networkKeyRef: string): Promise<void> {
+			console.log(networkKeyRef);
+			const networkInfo = await getNetwork(networkKeyRef);
+			console.log(networkInfo);
+			setNetwork(networkInfo);
+			const seedListUnsorted = await getAllSeedNames();
+			const seedList = seedListUnsorted.sort();
+			setRootSeedList(seedList);
+			console.log(seedList);
+			if (seedList) setRootSeed(seedList[0]);
+		}
+		populatePathsList(networkKey);
+	}, [networkKey]);
 
-	const onTapDeriveButton = (): Promise<void> =>
-		unlockWithoutPassword({
-			name: 'PathDerivation',
-			params: { parentPath: isUnknownNetworkPath ? '' : rootPath }
-		});
+	useEffect(() => {
+		const fetchPaths = async function (networkKeyRef: string, rootSeedRef: string): Promise<void> {
+			const fetched = await getIdentitiesForSeed(rootSeedRef, networkKeyRef);
+			const sorted = fetched.sort((a, b) => { return a.path>b.path});
+			setPaths(fetched);
+		}
+		if(rootSeed) fetchPaths(networkKey, rootSeed);
+	}, [networkKey, rootSeed]);
 
-	const renderSinglePath = (pathsGroup: PathGroup): React.ReactElement => {
-		const path = pathsGroup.paths[0];
+	const renderSeed = ({ item }: { item: string }): ReactElement => {
+		const active = item === rootSeed;
 		return (
-			<PathCard
-				key={path}
-				testID={testIDs.PathsList.pathCard + path}
-				identity={currentIdentity}
-				path={path}
-				onPress={(): void => navigate('PathDetails', { path })}
-			/>
+			<TouchableItem
+				onPress={() => setRootSeed(item)}
+				style={active ? styles.seedActive : styles.seed}
+			>
+				<Text style={active ? styles.seedLabelActive : styles.seedLabelInactive}>{item}</Text>
+			</TouchableItem>
+		);
+	};
+	
+	const renderIdentity = ({ item }): ReactElement => {
+		const active = item === activeAddress;
+		return (
+			<View>
+				<View style={active ? styles.contentActive : styles.content}>
+					<TouchableItem
+						onPress={() => activeAddress === item ? setActiveAddress('') : setActiveAddress(item)}
+						style={styles.card}
+					>
+						<View style={{flexDirection: 'row'}}>
+							<Identicon value={item.ss58} size={40} style={{paddingTop: 10}}/>
+							<View style={{ paddingHorizontal: 10 }}>
+								<Text style={styles.textLabel}>{item.name}</Text>
+								<View style={{flexDirection: 'row'}}>
+									<Text style={{...styles.derivationText, fontWeight: 'bold'}}>{rootSeed}</Text>
+									<Text style={styles.derivationText}>{item.path}</Text>
+									{item.hasPassword === 'true' ? (
+										<AntIcon name="lock" style={styles.icon} />
+									) : (
+										<View />
+									)}
+								</View>
+								<Text
+									style={styles.authorAddressText}
+									numberOfLines={1}
+									adjustFontSizeToFit
+								>
+									{item.ss58}
+								</Text>
+	
+							</View>
+						</View>
+					</TouchableItem>
+				</View>
+				{active ? (
+					<View style={styles.contentActive}>
+						<TouchableItem
+							onPress={onTapDeleteButton}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>del</Text>
+							<Text style={styles.textLabel}>Delete</Text>
+						</TouchableItem>
+						<TouchableItem
+							onPress={() => setShowQR(true)}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>QR</Text>
+							<Text style={styles.textLabel}>Export</Text>
+						</TouchableItem>
+						<TouchableItem
+							onPress={onTapIncrementButton}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>/+1</Text>
+							<Text style={styles.textLabel}>Increment</Text>
+						</TouchableItem>
+						<TouchableItem
+							onPress={onTapDeriveButton}
+							style={{...styles.card, alignItems: 'center'}}
+						>
+							<Text style={styles.icon}>/name</Text>
+							<Text style={styles.textLabel}>Derive</Text>
+						</TouchableItem>
+					</View>
+				) : ( <View /> )}
+			</View>
 		);
 	};
 
-	return (
-		<SafeAreaViewContainer>
-			<ScrollView testID={testIDs.PathsList.screen}>
-				<LeftScreenHeading
-					title={networkParams.title}
-					hasSubtitleIcon={true}
-					networkKey={networkKey}
+	const onTapDeleteButton = (): Promise<void> => {};
+	const onTapIncrementButton = (): Promise<void> => {};
+	const onTapDeriveButton = (): Promise<void> => {};
+
+	const onTapNewSeedButton = (): Promise<void> => {
+		navigation.navigate('RootSeedNew', { false });
+	};
+
+	const onTapIdentity = (): Promise<void> => {};
+
+	if (showQR) {
+		return (
+			<SafeAreaViewContainer>
+				<Text style={styles.addressName}>{activeAddress.name}</Text>
+				<QrView data={`substrate:${activeAddress.ss58}:${networkKey}:${activeAddress.name}`} />
+				<Button 
+					onPress={() => setShowQR(false)}
+					title={'DONE'}
 				/>
-				{(pathsGroups as PathGroup[]).map(pathsGroup =>
-					pathsGroup.paths.length === 1 ? (
-						renderSinglePath(pathsGroup)
-					) : (
-						<PathGroupCard
-							currentIdentity={currentIdentity}
-							pathGroup={pathsGroup}
-							networkParams={networkParams}
-							accountsStore={accountsStore}
-							key={pathsGroup.title}
-						/>
-					)
-				)}
+			</SafeAreaViewContainer>
+		);
+	} else if (rootSeed) {
+		return (
+			<SafeAreaViewContainer>
+				<NetworkCard
+					network={network}
+					onPress={(): Promise<void> => {navigation.goBack();}}
+				/>
+				<View style={{flexDirection: 'row'}}>
+					<FlatList horizontal={true} 
+						data={rootSeedList}
+						renderItem={renderSeed}
+						keyExtractor={item => item}
+					/>
+					<TouchableItem
+						onPress={onTapNewSeedButton}
+						style={{...styles.card, alignItems: 'center', height: 54}}
+					>
+						<Text style={styles.icon}>+</Text>
+						<Text style={styles.textLabel}>New</Text>
+					</TouchableItem>
+				</View>
 				<Separator style={{ backgroundColor: 'transparent' }} />
-			</ScrollView>
-			<QRScannerAndDerivationTab
-				derivationTestID={testIDs.PathsList.deriveButton}
-				title="Derive New Account"
-				onPress={onTapDeriveButton}
-			/>
-		</SafeAreaViewContainer>
-	);
+				<FlatList
+					data={paths}
+					renderItem={renderIdentity}
+					keyExtractor={item => item.path}
+					ItemSeparatorComponent={CardSeparator}
+				/>
+				<QRScannerAndDerivationTab
+					derivationTestID={testIDs.PathsList.deriveButton}
+					title="Derive"
+					onPress={onTapDeriveButton}
+				/>
+			</SafeAreaViewContainer>
+		);
+	} else {
+		return <OnBoardingView />
+	}
 }
 
-export default withCurrentIdentity(PathsList);
+const styles = StyleSheet.create({
+	addressName: {
+		...fontStyles.t_codeS,
+		fontSize: 20,
+		textAlign: 'center'
+	},
+	authorAddressText: {
+		...fontStyles.t_codeS,
+		color: colors.text.faded,
+		fontSize: 10
+	},
+	card: {
+		paddingBottom: 8,
+		paddingLeft: 16,
+		paddingRight: 16,
+		paddingTop: 8
+	},
+	cardActive: {
+		backgroundColor: colors.background.cardActive,
+		borderColor: colors.border.light,
+		borderWidth: 1,
+		paddingLeft: 16,
+		paddingRight: 16
+	},
+	content: {
+		alignItems: 'center',
+		backgroundColor: colors.background.card,
+		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
+	contentActive: {
+		alignItems: 'center',
+		backgroundColor: colors.background.cardActive,
+		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
+	derivationText: {
+		...fontStyles.t_codeS,
+		color: colors.signal.main,
+		textAlign: 'left'
+	},
+	icon: {
+		...fontStyles.i_large,
+		color: colors.signal.main,
+		fontWeight: 'bold'
+	},
+	seed: {
+		backgroundColor: colors.background.card,
+		borderColor: colors.border.light,
+		paddingLeft: 16,
+		paddingRight: 16
+	},
+	seedActive: {
+		backgroundColor: colors.background.cardActive,
+		borderColor: colors.border.light,
+		paddingLeft: 16,
+		paddingRight: 16
+	},
+	seedLabelActive: {
+		...fontStyles.t_label,
+		justifyContent: 'center',
+		fontSize: 32
+	},
+	seedLabelInactive: {
+		...fontStyles.t_label,
+		color: colors.text.main,
+		justifyContent: 'center',
+		fontSize: 32
+	},
+	textLabel: {
+		...fontStyles.a_text
+	}
+});

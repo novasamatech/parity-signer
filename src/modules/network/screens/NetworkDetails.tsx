@@ -20,7 +20,6 @@ import { NetworkCard } from 'components/AccountCard';
 import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
 import { MetadataCard } from 'modules/network/components/MetadataCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
 import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import Button from 'components/Button';
@@ -31,10 +30,6 @@ export default function NetworkDetails({
 	route
 }: NavigationProps<'NetworkDetails'>): React.ReactElement {
 	const networkPathId = route.params.pathId as string;
-	const { networks, getSubstrateNetwork } = useContext(NetworksContext);
-	const networkKey = getSubstrateNetworkKeyByPathId(networkPathId, networks);
-	const networkParams = getSubstrateNetwork(networkKey);
-	const metadataHandle = networkParams.metadata;
 
 	const metadataValid = (): React.ReactElement => (
 		<>

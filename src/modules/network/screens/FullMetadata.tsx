@@ -18,16 +18,9 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { TypeRegistry } from '@polkadot/types';
-import { Metadata } from '@polkadot/metadata';
-import { expandMetadata } from '@polkadot/metadata/decorate';
 
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationProps } from 'types/props';
-import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
-import { getMetadata } from 'utils/db';
-//import { useFullMetadataHook } from 'modules/network/networksHooks';
 import colors from 'styles/colors';
 import fonts from 'styles/fonts';
 import fontStyles from 'styles/fontStyles';

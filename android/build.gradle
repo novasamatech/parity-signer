@@ -2,10 +2,10 @@
 
 buildscript {
    ext {
-        buildToolsVersion = "29.0.3"
-        minSdkVersion = 24
-        compileSdkVersion = 29
-        targetSdkVersion = 29
+        buildToolsVersion = "30.0.2"
+        minSdkVersion = 30
+        compileSdkVersion = 30
+        targetSdkVersion = 30
         kotlinVersion = '1.3.41'
     }
     repositories {
@@ -13,7 +13,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:3.5.2')
+        classpath('com.android.tools.build:gradle:4.2.0')
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -46,15 +46,15 @@ subprojects {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group == 'com.android.support'
                 && !details.requested.name.contains('multidex') ) {
-            details.useVersion "29.0.3"
+            details.useVersion "30.0.2"
             }
         }
     }
     afterEvaluate {project ->
         if (project.hasProperty("android")) {
             android {
-                compileSdkVersion 29
-                buildToolsVersion "29.0.3"
+                compileSdkVersion 30
+                buildToolsVersion "30.0.2"
             }
         }
     }

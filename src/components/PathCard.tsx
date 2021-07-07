@@ -23,13 +23,7 @@ import AccountPrefixedTitle from './AccountPrefixedTitle';
 import Address from './Address';
 import TouchableItem from './TouchableItem';
 
-import { NetworksContext } from 'stores/NetworkContext';
 import Separator from 'components/Separator';
-import {
-	defaultNetworkKey,
-	NETWORK_LIST,
-	UnknownNetworkKeys
-} from 'constants/networkSpecs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
 import { Identity } from 'types/identityTypes';
@@ -38,12 +32,6 @@ import {
 	isUnknownNetworkParams
 } from 'types/networkTypes';
 import { ButtonListener } from 'types/props';
-import {
-	getAddressWithPath,
-	getNetworkKeyByPath,
-	getPathName
-} from 'utils/identitiesUtils';
-import { useSeedRef } from 'utils/seedRefHooks';
 
 export default function PathCard({
 	onPress,

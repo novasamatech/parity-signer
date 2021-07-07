@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import { isHex } from '@polkadot/util';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, View, ViewStyle } from 'react-native';
 
-import { qrCode, qrCodeHex } from 'utils/native';
+import { qrCode } from 'utils/native';
 
 interface Props {
 	data: string;
@@ -35,9 +34,7 @@ export default function QrView(props: Props): React.ReactElement {
 		let promiseDisabled = false;
 		async function displayQrCode(data: string): Promise<void> {
 			try {
-				const generatedQr = isHex(data)
-					? await qrCodeHex(data)
-					: await qrCode(data);
+				const generatedQr = await qrCode(data);
 				if (promiseDisabled) return;
 				setQr(generatedQr);
 			} catch (e) {

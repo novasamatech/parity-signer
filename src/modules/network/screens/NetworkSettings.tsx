@@ -19,9 +19,7 @@ import { FlatList, StyleSheet } from 'react-native';
 
 import testIDs from 'e2e/testIDs';
 import { NetworkCard } from 'components/AccountCard';
-import { filterNetworks } from 'modules/network/utils';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -31,10 +29,6 @@ import ScreenHeading from 'components/ScreenHeading';
 export default function NetworkSettings({
 	navigation
 }: NavigationProps<'NetworkSettings'>): React.ReactElement {
-	const { networks } = useContext(NetworksContext);
-	const networkParams = filterNetworks(networks) as Array<
-		[string, SubstrateNetworkParams]
-	>;
 	const renderNetwork = ({
 		item
 	}: {

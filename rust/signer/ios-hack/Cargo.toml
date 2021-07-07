@@ -11,6 +11,7 @@ base64 = "0.10.1"
 blake2-rfc = "0.2.18"
 blockies = "0.3"
 codec = { package = "parity-scale-codec", version = "2.1.1", default-features = false, features = ["derive"] }
+db_handling = {path = "../db_handling"}
 ethsign = { version = "0.7.3", default-features = false, features = ["pure-rust"] }
 ffi-support = "0.4"
 frame-metadata = "13.0.0"

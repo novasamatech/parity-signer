@@ -29,32 +29,19 @@ import { View } from 'react-native';
 
 import NetworkDetails from 'modules/network/screens/NetworkDetails';
 import NetworkSettings from 'modules/network/screens/NetworkSettings';
-import PinNew from 'modules/unlock/screens/PinNew';
-import PinUnlock from 'modules/unlock/screens/PinUnlock';
-import PinUnlockWithPassword from 'modules/unlock/screens/PinUnlockWithPassword';
 import HeaderLeftHome from 'components/HeaderLeftHome';
 import SecurityHeader from 'components/SecurityHeader';
 import testIDs from 'e2e/testIDs';
 import About from 'screens/About';
-import AccountDetails from 'screens/AccountDetails';
-import AccountEdit from 'screens/AccountEdit';
 import Main from 'modules/main/screens/Main';
-import AccountNew from 'screens/AccountNew';
-import AccountPin from 'screens/AccountPin';
-import { AccountUnlock } from 'screens/AccountUnlock';
-import IdentityBackup from 'screens/IdentityBackup';
+import SeedBackup from 'screens/SeedBackup';
 import IdentityManagement from 'screens/IdentityManagement';
-import IdentityNew from 'screens/IdentityNew';
-import LegacyAccountBackup from 'screens/LegacyAccountBackup';
-import LegacyAccountList from 'screens/LegacyAccountList';
-import LegacyNetworkChooser from 'screens/LegacyNetworkChooser';
+import LoadingScreen from 'screens/LoadingScreen';
+import RootSeedNew from 'screens/RootSeedNew';
 import MetadataManagement from 'modules/network/screens/MetadataManagement';
 import FullMetadata from 'modules/network/screens/FullMetadata';
 import MetadataSaving from 'screens/MetadataSaving';
 import PathDerivation from 'screens/PathDerivation';
-import PathDetails from 'screens/PathDetails';
-import PathManagement from 'screens/PathManagement';
-import PathSecret from 'screens/PathSecret';
 import PathsList from 'screens/PathsList';
 import PrivacyPolicy from 'screens/PrivacyPolicy';
 import FastQrScanner from 'screens/FastQrScanner';
@@ -126,29 +113,13 @@ export const AppNavigator = (): React.ReactElement => (
 	>
 		<ScreenStack.Screen name="Main" component={Main} />
 		<ScreenStack.Screen name="About" component={About} />
-		<ScreenStack.Screen name="AccountDetails" component={AccountDetails} />
-		<ScreenStack.Screen name="AccountEdit" component={AccountEdit} />
-		<ScreenStack.Screen name="AccountPin" component={AccountPin} />
-		<ScreenStack.Screen name="AccountUnlock" component={AccountUnlock} />
-		<ScreenStack.Screen name="AccountNew" component={AccountNew} />
-		<ScreenStack.Screen
-			name="LegacyAccountBackup"
-			component={LegacyAccountBackup}
-		/>
-		<ScreenStack.Screen
-			name="LegacyAccountList"
-			component={LegacyAccountList}
-		/>
-		<ScreenStack.Screen
-			name="LegacyNetworkChooser"
-			component={LegacyNetworkChooser}
-		/>
-		<ScreenStack.Screen name="IdentityBackup" component={IdentityBackup} />
+		<ScreenStack.Screen name="SeedBackup" component={SeedBackup} />
 		<ScreenStack.Screen
 			name="IdentityManagement"
 			component={IdentityManagement}
 		/>
-		<ScreenStack.Screen name="IdentityNew" component={IdentityNew} />
+		<ScreenStack.Screen name="LoadingScreen" component={LoadingScreen} />
+		<ScreenStack.Screen name="RootSeedNew" component={RootSeedNew} />
 		<ScreenStack.Screen name="NetworkDetails" component={NetworkDetails} />
 		<ScreenStack.Screen name="NetworkSettings" component={NetworkSettings} />
 		<ScreenStack.Screen
@@ -158,16 +129,7 @@ export const AppNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="FullMetadata" component={FullMetadata} />
 		<ScreenStack.Screen name="MetadataSaving" component={MetadataSaving} />
 		<ScreenStack.Screen name="PathDerivation" component={PathDerivation} />
-		<ScreenStack.Screen name="PathDetails" component={PathDetails} />
 		<ScreenStack.Screen name="PathsList" component={PathsList} />
-		<ScreenStack.Screen name="PathSecret" component={PathSecret} />
-		<ScreenStack.Screen name="PathManagement" component={PathManagement} />
-		<ScreenStack.Screen name="PinNew" component={PinNew} />
-		<ScreenStack.Screen name="PinUnlock" component={PinUnlock} />
-		<ScreenStack.Screen
-			name="PinUnlockWithPassword"
-			component={PinUnlockWithPassword}
-		/>
 		<ScreenStack.Screen name="FastQrScanner" component={FastQrScanner} />
 		<ScreenStack.Screen name="Security" component={Security} />
 		<ScreenStack.Screen name="DetailsTx" component={DetailsTx} />
@@ -195,3 +157,19 @@ export const TocAndPrivacyPolicyNavigator = (): React.ReactElement => (
 		<ScreenStack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
 	</ScreenStack.Navigator>
 );
+
+export const BareLoadingScreen = (): React.ReactElement => (
+	<ScreenStack.Navigator
+		initialRouteName="LoadingScreen"
+		screenOptions={{
+			...globalStackNavigationOptions,
+			headerRight: (): React.ReactNode => null
+		}}
+	>
+		<ScreenStack.Screen
+			name="LoadingScreen"
+			component={LoadingScreen}
+		/>
+	</ScreenStack.Navigator>
+);
+

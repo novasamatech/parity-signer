@@ -92,25 +92,54 @@ const char * try_decode_qr_sequence(struct ExternError*, int size, int chunk_siz
 const char * generate_metadata_handle(struct ExternError*, const char* metadata);
 
 // Parse transaction
-// takes 4 strings:
-// payload; genesis hash list, metadata list, type descriptor list
-// Returns decoded payload as serialized payload cards contents with following structure:
-// {Method:[...], Extrinsic:[...]}
+// takes 2 strings:
+// transaction, dbname (from OS)
+// Returns decoded payload as serialized payload cards contents with following structure (JSON):
+// {author:[...], warning:[...], error:[...], method:[...], extrinsic:[...]}
 // Each card has following fields:
 // index - to sort cards on screen, use as key in flatlist env
 // indent - indentation to visualize cards hierarchy
 // type - type of card
 // payload - contents of card
-// identities - dump of identities from RN storage
-const char * parse_transaction(struct ExternError*, const char* payload, const char* gen_hash, const char* metadata, const char* type_descriptor, const char* identities);
+const char * parse_transaction(struct ExternError*, const char* transaction, const char* dbname);
 
 // Sign transaction
 // wrapper to actually sign transaction in 1 simple call:
-// takes 3 strings
+// takes 4 strings
 // action: json-payload with action to perform (will be expanded later to include other actions
 // including non-signing);
 // pin code; and password
+// dbname (from OS)
+const char * sign_transaction(struct ExternError*, const char* action, const char* pin, const char* password, const char* dbname);
 
-const char * sign_transaction(struct ExternError*, const char* action, const char* pin, const char* password);
-
+// Self descriptive: development test for channel
+// TODO: remove for safety
 const char * development_test(struct ExternError*, const char* input);
+
+// Initial population of DB, currently in "development tool" state
+// TODO: leave only dbname in input
+void db_init(struct ExternError*, const char* metadata, const char* dbname);
+
+// Fetch list of available networks for network selector screen
+const char * get_all_networks_for_network_selector(struct ExternalError*, const char* dbname);
+
+// Fetch one network for general display purposes
+const char * get_network(struct ExternalError*, const char* genesis_hash, const char* dbname);
+
+// Fetch list of all root seeds
+const char * get_all_seed_names(struct ExternalError*, const char* dbname);
+
+//Filter identities derived for given seed and network
+const char * get_relevant_identities(srtuct ExternalError*, const char* seed_name, const char* genesis_hash, const char* dbname);
+
+//Acknowledge user agreement
+void ack_user_agreement(struct ExternalError, const char* dbname);
+
+//Check whether user agreement is acknowledged
+bool check_user_agreement(struct ExternalError, const char* dbname);
+
+//Two functions to create new seed
+//TODO: implement password!!!
+void try_create_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* seed_phrase, int seed_length, const char* dbname);
+
+

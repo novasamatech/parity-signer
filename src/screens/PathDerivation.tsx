@@ -18,32 +18,18 @@ import React, { useRef, useState, useMemo, useContext } from 'react';
 
 import PasswordInput from 'components/PasswordInput';
 import testIDs from 'e2e/testIDs';
-import { defaultNetworkKey, UnknownNetworkKeys } from 'constants/networkSpecs';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import TextInput from 'components/TextInput';
-import { withCurrentIdentity } from 'utils/HOC';
-import {
-	extractPathId,
-	getNetworkKey,
-	getSubstrateNetworkKeyByPathId,
-	validateDerivedPath
-} from 'utils/identitiesUtils';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
 import PathCard from 'components/PathCard';
-import {
-	DerivationNetworkSelector,
-	NetworkOptions
-} from 'components/DerivationNetworkSelector';
-import { useSeedRef } from 'utils/seedRefHooks';
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 
-function PathDerivation({
+export default function PathDerivation({
 	accountsStore,
 	navigation,
 	route
@@ -171,4 +157,3 @@ function PathDerivation({
 	);
 }
 
-export default withCurrentIdentity(PathDerivation);

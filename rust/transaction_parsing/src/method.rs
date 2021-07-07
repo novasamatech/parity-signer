@@ -1,28 +1,31 @@
 use frame_metadata::{RuntimeMetadataV12, DecodeDifferent};
+use super::error::{Error, UnableToDecode};
 
-/// struct to store the method information
+/// Struct to store the method information
 pub struct Method {
     pub pallet_name: String,
     pub method_name: String,
     pub arguments: Vec<Argument>
 }
 
-/// struct to store the argument name and type
+/// Struct to store the argument name and type
 pub struct Argument {
     pub name: String,
     pub ty: String,
 }
 
-/// struct to store current method and remaining data
+/// Struct to store current method and remaining data
 pub struct NextDecode {
     pub method: Method,
     pub data: Vec<u8>,
 }
 
-/// function to search through metadata for method with given pallet index and method index,
-/// in case of success outputs Method
+/// Function to search through metadata for method with given pallet index and method index,
+/// in case of success outputs Method value.
+/// Pallet index is explicitly recorded in network metadata as a number.
+/// Method index is ordinal number in vector of calls within pallet.
 
-pub fn find_method (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV12) -> Result<Method, &'static str> {
+pub fn find_method (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV12) -> Result<Method, Error> {
     let mut found_pallet_name = None;
     let mut found_method_name = None;
     let mut arguments: Vec<Argument> = Vec::new();
@@ -34,7 +37,7 @@ pub fn find_method (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     found_pallet_name = Some(name.to_string());
                 }
                 if let Some(DecodeDifferent::Decoded(calls)) = &y.calls {
-                    if calls.len() <= method_index.into() {return Err("Method not found, index too high");}
+                    if calls.len() <= method_index.into() {return Err(Error::UnableToDecode(UnableToDecode::MethodIndexTooHigh{method_index, pallet_index, total: calls.len()}));}
                     else {
                         if let DecodeDifferent::Decoded(nm) = &calls[method_index as usize].name {
                             found_method_name = Some(nm.to_string());
@@ -49,10 +52,10 @@ pub fn find_method (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                                     Some(x) => {
                                         match ty_a {
                                             Some(y) => {arguments.push(Argument{name: x, ty: y});},
-                                            None => {return Err("Arguments type error.")},
+                                            None => {return Err(Error::UnableToDecode(UnableToDecode::ArgumentTypeError))},
                                         }
                                     },
-                                    None => {return Err("Arguments name error.")},
+                                    None => {return Err(Error::UnableToDecode(UnableToDecode::ArgumentNameError))},
                                 }
                             }
                         }
@@ -73,17 +76,18 @@ pub fn find_method (pallet_index: u8, method_index: u8, meta: &RuntimeMetadataV1
                     };
                     Ok(out)
                 },
-                None => return Err("Method not found"),
+                None => return Err(Error::UnableToDecode(UnableToDecode::MethodNotFound{method_index, pallet_name: x})),
             }
         },
-        None => return Err("Pallet not found"),
+        None => return Err(Error::UnableToDecode(UnableToDecode::PalletNotFound(pallet_index))),
     }
 }
 
-/// function to find method for current call
+/// Function to find method for current call.
+/// Outputs NextDecode value.
 
-pub fn what_next (data: Vec<u8>, meta: &RuntimeMetadataV12) -> Result<NextDecode, &'static str> {
-    if data.len() < 2 {return Err("Data vector too short");}
+pub fn what_next (data: Vec<u8>, meta: &RuntimeMetadataV12) -> Result<NextDecode, Error> {
+    if data.len() < 2 {return Err(Error::UnableToDecode(UnableToDecode::NeedPalletAndMethod));}
     let pallet_index = data[0];
     let method_index = data[1];
     let new_method = find_method(pallet_index, method_index, meta)?;

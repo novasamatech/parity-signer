@@ -39,7 +39,6 @@ import {
 	UnknownNetworkParams
 } from 'types/networkTypes';
 import { removeSlash } from 'utils/identitiesUtils';
-import { useSeedRef } from 'utils/seedRefHooks';
 import { unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import { RootStackParamList } from 'types/routes';
