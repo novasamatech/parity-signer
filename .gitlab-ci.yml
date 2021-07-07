@@ -16,7 +16,6 @@ android-build-release:
   only:
     - master
     - /^[0-9]+$/
-    - mp-gitlab-build
   artifacts:
     paths:
       - signer-app-release-signed.apk
