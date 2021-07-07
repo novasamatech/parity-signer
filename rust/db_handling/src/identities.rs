@@ -7,6 +7,7 @@ use sled::{Db, Tree, open};
 use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
+use regex::Regex;
 use super::chainspecs::ChainSpecs;
 use super::constants::{ADDRTREE, SPECSTREE};
 use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, AddressKey, SeedKey, NetworkKey};
@@ -83,25 +84,27 @@ fn create_address (
     network_id: NetworkKey,
     name: &str,
     seed_object: &SeedObject,
-    path_password: Option<&str>
+    has_password: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     //TOTO: check zeroize
     let mut full_address = seed_object.seed_phrase.to_owned() + path;
+    let chainspecs: Tree = database.open_tree(SPECSTREE)?;
+    if !chainspecs.contains_key(&network_id)? { return Err(Box::from("Error: Create address: network not found")); }
     let address_key = match seed_object.encryption {
         Encryption::Sr25519 => {
-            match sr25519::Pair::from_string(&full_address, path_password) {
+            match sr25519::Pair::from_string(&full_address, None) {
                 Ok(a) => generate_address_key(a.public().to_vec()),
                 Err(_) => return Err(Box::from("Error generating sr25519 address")),
             }
         },
         Encryption::Ed25519 => {
-            match ed25519::Pair::from_string(&full_address, path_password) {
+            match ed25519::Pair::from_string(&full_address, None) {
                 Ok(a) => generate_address_key(a.public().to_vec()),
                 Err(_) => return Err(Box::from("Error generating ed25519 address")),
             }
         },
         Encryption::Ecdsa => {
-            match ecdsa::Pair::from_string(&full_address, path_password) {
+            match ecdsa::Pair::from_string(&full_address, None) {
                 Ok(a) => generate_address_key(a.public().0.to_vec()),
                 Err(_) => return Err(Box::from("Error generating ecdsa address")),
             }
@@ -111,6 +114,7 @@ fn create_address (
     let identities: Tree = database.open_tree(ADDRTREE)?;
     match identities.get(&address_key)? {
         Some(address_record) => {
+            //TODO: IMPORTANT: handle collisions!!!!
             let mut address = <AddressDetails>::decode(&mut &address_record[..])?;
             if !address.network_id.contains(&network_id) {
                 address.network_id.push(network_id);
@@ -121,7 +125,7 @@ fn create_address (
             let address = AddressDetails {
                 name_for_seed: generate_seed_key(&seed_object.seed_name),
                 path: path.to_string(),
-                has_pwd: path_password != None,
+                has_pwd: has_password,
                 name: name.to_string(),
                 network_id: vec!(network_id),
                 encryption: seed_object.encryption,
@@ -150,14 +154,14 @@ fn populate_addresses (database: &Db, seed_object: &SeedObject) -> Result<(), Bo
                     key.to_vec(),
                     "root address", 
                     seed_object,
-                    None)?;
+                    false)?;
                 create_address (
                     database, 
                     &network.path_id, 
                     key.to_vec(),
                     &format!("{} root address", network.name),
                     seed_object,
-                    None)?;
+                    false)?;
             }
             Err (e) => return Err(Box::from(e)),
         }
@@ -195,6 +199,39 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
     populate_addresses(&database, &seed_object)?;
     database.flush()?;
     Ok(seed_phrase)
+}
+
+///Check seed phrase format and determine whether there is a password
+pub fn check_seed_phrase(path: &str) -> Result<bool, Box<dyn std::error::Error>> {
+    //stolen from sp_core
+    let re = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.*))?$")
+		.expect("constructed from known-good static value; qed");
+	Ok(match re.captures(path) {
+        Some(caps) => caps.name("password").is_some(),
+        None => return Err(Box::from("Invalid derivation format")),
+    })
+}
+
+///Generate new identity (api for create_address())
+pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, encryption_name: &str, path: &str, network: &str, has_password: bool, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let database: Db = open(database_name)?;
+
+    let encryption = match encryption_name {
+        "sr25519" => Encryption::Sr25519,
+        "ed25519" => Encryption::Ed25519,
+        "ecdsa" => Encryption::Ecdsa,
+        _ => return Err(Box::from("System error: unknown encryption algorithm")),
+    };
+    
+    let seed_object = SeedObject {
+        seed_name: seed_name,
+        seed_phrase: seed_phrase,
+        encryption: encryption,
+    };
+
+    let network_id: NetworkKey = hex::decode(network)?;
+
+    create_address(&database, path, network_id, id_name, &seed_object, has_password)
 }
 
 #[cfg(test)]
@@ -251,5 +288,58 @@ mod tests {
         assert!(identities.contains_key(test_key).unwrap());
     }
 
+    #[test]
+    fn must_check_for_valid_derivation_phrase() {
+        assert!(!check_seed_phrase("").expect("valid empty path"));
+        assert!(check_seed_phrase("//").is_err());
+        assert!(!check_seed_phrase("//path1").expect("valid path1"));
+        assert!(!check_seed_phrase("//path/path").expect("soft derivation"));
+        assert!(!check_seed_phrase("//path//path").expect("hard derivation"));
+        assert!(check_seed_phrase("//path///password").expect("path with password"));
+        assert!(check_seed_phrase("///").expect("only password but it is empty"));
+        assert!(!check_seed_phrase("//$~").expect("weird symbols"));
+        assert!(check_seed_phrase("abraca dabre").is_err());
+        assert!(check_seed_phrase("////").expect("//// - password is /"));
+        assert!(check_seed_phrase("//path///password///password").expect("password///password is a password"));
+        assert!(!check_seed_phrase("//путь").expect("valid utf8 abomination"));
+    }
+
+    #[test]
+    fn must_fail_on_duplicate_identity_name() { 
+        let dbname = "tests/must_fail_on_duplicate_name";
+        let _ = fs::remove_dir_all(&dbname);
+        load_chainspecs(dbname);
+        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        
+        
+        panic!("not ready"); 
+    }
+
+    #[test]
+    fn test_derive() { 
+        let dbname = "tests/test_derive";
+        let _ = fs::remove_dir_all(&dbname);
+        load_chainspecs(dbname);
+        let chainspecs = get_default_chainspecs();
+        let seed_name = "Alice";
+        try_create_seed(seed_name, ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        let seed_object = SeedObject {
+            seed_name: seed_name,
+            seed_phrase: SEED,
+            encryption: Encryption::Sr25519,
+        };
+        let database: Db = open(dbname).unwrap();
+        create_address(&database, "//Alice", chainspecs[0].genesis_hash.to_vec(), "Alice in network 0", &seed_object, false).expect("Create Alice in network 0");
+        create_address(&database, "//Alice", chainspecs[1].genesis_hash.to_vec(), "Alice in network 1", &seed_object, false).expect("Create Alice in network 1");
+        create_address(&database, "//Alice/1", chainspecs[0].genesis_hash.to_vec(), "Alice/1 in network 0", &seed_object, false).expect("Create Alice/1 in network 0");
+        let network0 = get_relevant_identities (seed_name, &hex::encode(chainspecs[0].genesis_hash), dbname);
+        println!("{:?}", network0);
+
+        panic!("not ready"); 
+    }
+
+    #[test]
+    fn test_suggest_n_plus_one() { panic!("not ready"); }
+    
 }
 

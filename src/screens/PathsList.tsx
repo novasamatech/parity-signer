@@ -202,10 +202,9 @@ export default function PathsList({
 					/>
 					<TouchableItem
 						onPress={onTapNewSeedButton}
-						style={{...styles.card, alignItems: 'center', height: 54}}
+						style={{alignItems: 'center', backgroundColor: colors.background.card, borderWidth: 2, borderColor: colors.border.light, paddingLeft: 8, paddingRight: 8}}
 					>
-						<Text style={styles.icon}>+</Text>
-						<Text style={styles.textLabel}>New</Text>
+						<Text style={styles.icon}>+ seed</Text>
 					</TouchableItem>
 				</View>
 				<Separator style={{ backgroundColor: 'transparent' }} />
@@ -276,25 +275,27 @@ const styles = StyleSheet.create({
 	seed: {
 		backgroundColor: colors.background.card,
 		borderColor: colors.border.light,
+		justifyContent: 'center',
 		paddingLeft: 16,
 		paddingRight: 16
 	},
 	seedActive: {
 		backgroundColor: colors.background.cardActive,
 		borderColor: colors.border.light,
+		justifyContent: 'center',
 		paddingLeft: 16,
 		paddingRight: 16
 	},
 	seedLabelActive: {
 		...fontStyles.t_label,
 		justifyContent: 'center',
-		fontSize: 32
+		fontSize: 20
 	},
 	seedLabelInactive: {
 		...fontStyles.t_label,
 		color: colors.text.main,
 		justifyContent: 'center',
-		fontSize: 32
+		fontSize: 20
 	},
 	textLabel: {
 		...fontStyles.a_text
