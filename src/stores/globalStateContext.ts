@@ -25,7 +25,7 @@ export function useGlobalStateContext(): GlobalState {
 	useEffect(() => {
 		const loadPolicyConfirmation = async (): Promise<void> => {
 			const tocPP = await checkUserAgreement();
-//			if (!tocPP) 
+			if (!tocPP) 
 				await dbInit();
 			console.log("loadPolicyConfirmation");
 			setPolicyConfirmed(tocPP);

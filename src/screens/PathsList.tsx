@@ -82,7 +82,7 @@ export default function PathsList({
 			setPaths(fetched);
 		}
 		if(rootSeed) fetchPaths(networkKey, rootSeed);
-	}, [networkKey, rootSeed]);
+	}, [networkKey, rootSeed, navigation]);
 
 	const renderSeed = ({ item }: { item: string }): ReactElement => {
 		const active = item === rootSeed;
@@ -167,8 +167,13 @@ export default function PathsList({
 	};
 
 	const onTapDeleteButton = (): Promise<void> => {};
-	const onTapIncrementButton = (): Promise<void> => {};
-	const onTapDeriveButton = (): Promise<void> => {};
+	const onTapIncrementButton = async function(): Promise<void> {
+		const suggetsion = await suggestNameForIncrement(activeAddress.path, networkKey, rootSeed);
+		navigation.navigate('PathDerivation', { path: suggestion, networkKey: networkKey, seedName: rootSeed });
+	};
+	const onTapDeriveButton = (): Promise<void> => {
+		navigation.navigate('PathDerivation', { path: activeAddress.path, networkKey: networkKey, seedName: rootSeed });
+	};
 
 	const onTapNewSeedButton = (): Promise<void> => {
 		navigation.navigate('RootSeedNew', { false });

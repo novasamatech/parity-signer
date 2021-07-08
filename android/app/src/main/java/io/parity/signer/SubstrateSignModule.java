@@ -117,18 +117,20 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 
 	private String decryptSeed(String encryptedSeedRecord) throws NoSuchAlgorithmException, NoSuchPaddingException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException, InvalidAlgorithmParameterException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
 		String[] encryptedParts = encryptedSeedRecord.split(separator);
-		Cipher cipher = getCipher();
-		SecretKey secretKey;
 		try {
-			secretKey = getSecretKey();
-		} catch (Exception e) {
+			Cipher cipher = getCipher();
+			SecretKey secretKey = getSecretKey();
+			cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(Base64.decode(encryptedParts[1], Base64.DEFAULT)));		
+			String seedPhrase = new String(cipher.doFinal(Base64.decode(encryptedParts[0], Base64.DEFAULT)));
+			return seedPhrase;
+		} catch (Exception ignored) {
 			startAuthentication();
-			secretKey = getSecretKey();
+			Cipher cipher = getCipher();
+			SecretKey secretKey = getSecretKey();
+			cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(Base64.decode(encryptedParts[1], Base64.DEFAULT)));		
+			String seedPhrase = new String(cipher.doFinal(Base64.decode(encryptedParts[0], Base64.DEFAULT)));
+			return seedPhrase;
 		}
-		
-		cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(Base64.decode(encryptedParts[1], Base64.DEFAULT)));
-		String seedPhrase = new String(cipher.doFinal(Base64.decode(encryptedParts[0], Base64.DEFAULT)));
-		return seedPhrase;
 	}
 
 /*	protected BiometricPrompt authenticateWithPrompt(@NonNull final FragmentActivity activity) {
