@@ -503,6 +503,16 @@ export! {
         db_handling::identities::try_create_seed(seed_name, crypto, seed_phrase, seed_length, dbname)
     }
 
+    @Java_io_parity_signer_SubstrateSignModule_substrateSuggestNPlusOne
+	fn suggest_n_plus_one(
+        path: &str,
+        seed_name: &str,
+        network_id_string: &str,
+        dbname: &str
+	) -> std::result::Result<String, Box<dyn std::error::Error>> {
+        db_handling::identities::suggest_n_plus_one(path, seed_name, network_id_string, dbname)
+    }
+
     @Java_io_parity_signer_SubstrateSignModule_substrateCheckPath
 	fn check_path(
         path: &str

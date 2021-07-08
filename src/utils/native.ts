@@ -125,6 +125,12 @@ export async function getSeedPhraseForBackup(seedName: string, pin: string): Pro
 	return seedPhrase;
 }
 
+export async function tryCreateIdentity(idName: string, seedName: string, cryptoType: string, path: string, networkId: string): Promise<void> {
+	console.log('creating identity...');
+	await SubstrateSign.tryCreateIdentity(idName, seedName, cryptoType, path, networkId);
+	console.log('identity created');
+}
+
 //Try to decode fountain packages
 export async function tryDecodeQr(
 	data: Array<string>,

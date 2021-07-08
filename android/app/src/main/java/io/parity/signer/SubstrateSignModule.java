@@ -7,6 +7,7 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
@@ -16,6 +17,8 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.IvParameterSpec;
 
 import android.os.Looper;
@@ -110,6 +113,22 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		return Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
 			+ KeyProperties.BLOCK_MODE_CBC + "/"
 			+ KeyProperties.ENCRYPTION_PADDING_PKCS7);
+	}
+
+	private String decryptSeed(String encryptedSeedRecord) throws NoSuchAlgorithmException, NoSuchPaddingException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException, InvalidAlgorithmParameterException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+		String[] encryptedParts = encryptedSeedRecord.split(separator);
+		Cipher cipher = getCipher();
+		SecretKey secretKey;
+		try {
+			secretKey = getSecretKey();
+		} catch (Exception e) {
+			startAuthentication();
+			secretKey = getSecretKey();
+		}
+		
+		cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(Base64.decode(encryptedParts[1], Base64.DEFAULT)));
+		String seedPhrase = new String(cipher.doFinal(Base64.decode(encryptedParts[0], Base64.DEFAULT)));
+		return seedPhrase;
 	}
 
 /*	protected BiometricPrompt authenticateWithPrompt(@NonNull final FragmentActivity activity) {
@@ -567,17 +586,23 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	public void fetchSeed(String seedName, String pin, Promise promise) {
 		try {
 			String encryptedSeedRecord = sharedPreferences.getString(seedName, null);
-
-			String[] encryptedParts = encryptedSeedRecord.split(separator);
-			Cipher cipher = getCipher();
-			SecretKey secretKey = getSecretKey();
-			
-			cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(Base64.decode(encryptedParts[1], Base64.DEFAULT)));
-			String seedPhrase = new String(cipher.doFinal(Base64.decode(encryptedParts[0], Base64.DEFAULT)));
-
+			String seedPhrase = decryptSeed(encryptedSeedRecord);
 			promise.resolve(seedPhrase);
 		} catch (Exception e) {
 			rejectWithException(promise, "Seed fetch failed", e);
+		}
+	}
+
+	@ReactMethod
+	public void tryCreateIdentity(String idName, String seedName, String crypto, String path, String network, Promise promise) {
+		try {
+			boolean hasPassword = substrateCheckPath(path);
+			String encryptedSeedRecord = sharedPreferences.getString(seedName, null);
+			String seedPhrase = decryptSeed(encryptedSeedRecord);
+			substrateTryCreateIdentity(idName, seedName, seedPhrase, crypto, path, network, hasPassword, dbname);	
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "Identity creation failed", e);
 		}
 	}
 
@@ -617,4 +642,7 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native void dbAckUserAgreement(String dbname);
 	private static native boolean dbCheckUserAgreement(String dbname);
 	private static native String substrateTryCreateSeed(String seedName, String crypto, String seedPhrase, int seedLength, String dbname);
+	private static native String substrateSuggestNPlusOne(String path, String seedName, String networkIdString, String dbname);
+	private static native boolean substrateCheckPath(String path);
+	private static native void substrateTryCreateIdentity(String idName, String seedName, String seedPhrase, String crypto, String path, String network, boolean hasPassword, String dbname);
 }

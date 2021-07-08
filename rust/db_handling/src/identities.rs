@@ -51,10 +51,8 @@ pub struct SeedObject<'a> {
     pub encryption: Encryption,
 }
 
-///get all identities within given seed and network
-pub fn get_relevant_identities (seed_name: &str, network_id_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
-    let network_id = generate_network_key(hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
-    let database: Db = open(database_name)?;
+///get all identities for given seed (internal use only!)
+fn get_seed_identities (database: &Db, seed_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
     let identities: Tree = database.open_tree(ADDRTREE)?;
     let name_for_seed = generate_seed_key(seed_name);
     let mut identities_out: Vec<(AddressKey, AddressDetails)> = Vec::new();
@@ -64,11 +62,19 @@ pub fn get_relevant_identities (seed_name: &str, network_id_string: &str, databa
         .into_iter() {
         let address = key.to_vec();
         let details = <AddressDetails>::decode(&mut &value[..])?;
-        if details.network_id.contains(&network_id) && details.name_for_seed == name_for_seed {
+        if details.name_for_seed == name_for_seed {
             identities_out.push((address, details));
         }
     }
     Ok(identities_out)
+}
+
+///get all identities within given seed and network
+pub fn get_relevant_identities (seed_name: &str, network_id_string: &str, database_name: &str) -> Result<Vec<(AddressKey, AddressDetails)>, Box<dyn std::error::Error>> {
+    let network_id = generate_network_key(hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
+    let database: Db = open(database_name)?;
+    let identities_out = get_seed_identities(&database, seed_name)?;
+    Ok(identities_out.into_iter().filter(|(_, details)| details.network_id.contains(&network_id)).collect())
 }
 
 fn generate_random_phrase (words_number: u32) -> Result<String, Box<dyn std::error::Error>> {
@@ -112,18 +118,35 @@ fn create_address (
     };
     full_address.zeroize();
     let identities: Tree = database.open_tree(ADDRTREE)?;
+    let name_for_seed = generate_seed_key(&seed_object.seed_name);
+    //This address might be already created; maybe we just need to allow its use in another
+    //network?
     match identities.get(&address_key)? {
         Some(address_record) => {
-            //TODO: IMPORTANT: handle collisions!!!!
+            //TODO: check that all collisions are handled
             let mut address = <AddressDetails>::decode(&mut &address_record[..])?;
+            //Check if something else resolved into this keypair
+            if address.name != name || address.path != path { return Err(Box::from(format!("Address collision with identity {} of seed {}", address.name, <String>::decode(&mut &address.name_for_seed[..])?))) }
+            //Append network to list of allowed networks
             if !address.network_id.contains(&network_id) {
                 address.network_id.push(network_id);
                 identities.insert(address_key, address.encode())?;
             };
         }
         None => {
+            //Check for collisions in name
+            for (_, value) in identities
+                .iter()
+                .collect::<Result<Vec<_>,_>>()?
+                .into_iter() {
+                    let details = <AddressDetails>::decode(&mut &value[..])?;
+                    if details.name == name && details.name_for_seed == name_for_seed {
+                        return Err(Box::from("Identity with this name already exists"));
+                    }
+            }
+
             let address = AddressDetails {
-                name_for_seed: generate_seed_key(&seed_object.seed_name),
+                name_for_seed: name_for_seed,
                 path: path.to_string(),
                 has_pwd: has_password,
                 name: name.to_string(),
@@ -155,13 +178,13 @@ fn populate_addresses (database: &Db, seed_object: &SeedObject) -> Result<(), Bo
                     "root address", 
                     seed_object,
                     false)?;
-                create_address (
+                let _ = create_address (
                     database, 
                     &network.path_id, 
                     key.to_vec(),
                     &format!("{} root address", network.name),
                     seed_object,
-                    false)?;
+                    false);
             }
             Err (e) => return Err(Box::from(e)),
         }
@@ -201,10 +224,28 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
     Ok(seed_phrase)
 }
 
+///Suggest address and name for weird N+1 feature request
+pub fn suggest_n_plus_one(path: &str, seed_name: &str, network_id_string: &str, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let identities = get_relevant_identities(seed_name, network_id_string, database_name)?;
+    let mut last_index = 0;
+    for (_, details) in identities {
+        if let Some(("", suffix)) = details.path.split_once(path) {
+            if let Some(could_be_number) = suffix.get(2..) {
+                if let Ok(index) = could_be_number.parse::<u32>() {
+                    last_index = std::cmp::max(index+1, last_index);
+                }
+            }
+        }
+    }
+    Ok(path.to_string() + "//" + &last_index.to_string())
+}
+
 ///Check derivation format and determine whether there is a password
 pub fn check_derivation_format(path: &str) -> Result<bool, Box<dyn std::error::Error>> {
     //stolen from sp_core
-    let re = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.*))?$")
+    //removed seed phrase part
+    //last + used to be *, but empty password is an error
+    let re = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$")
 		.expect("constructed from known-good static value; qed");
 	Ok(match re.captures(path) {
         Some(caps) => caps.name("password").is_some(),
@@ -238,7 +279,7 @@ pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, en
 mod tests {
     use super::*;
     use super::super::constants::get_default_chainspecs;
-    static PASSWORD: &str = "very long and unguessable phrase";
+    //static PASSWORD: &str = "very long and unguessable phrase";
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     static ENCRYPTION_NAME: &str = "sr25519";
 
@@ -264,7 +305,7 @@ mod tests {
     fn test_generate_random_account() {
         let dbname = "tests/test_generate_random_account";
         let _ = fs::remove_dir_all(&dbname);
-        load_chainspecs(dbname);
+        load_chainspecs(dbname).expect("create default database");
         try_create_seed("Randy", ENCRYPTION_NAME, "", 24, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let random_addresses = get_relevant_identities("Randy", &hex::encode(chainspecs[0].genesis_hash), dbname).unwrap();
@@ -275,7 +316,7 @@ mod tests {
     fn test_generate_default_addresses_for_alice() {
         let dbname = "tests/test_generate_default_addresses_for_Alice";
         let _ = fs::remove_dir_all(&dbname);
-        load_chainspecs(dbname);
+        load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let chainspecs = get_default_chainspecs();
         let default_addresses = get_relevant_identities("Alice", &hex::encode(chainspecs[0].genesis_hash), dbname).unwrap();
@@ -296,7 +337,7 @@ mod tests {
         assert!(!check_derivation_format("//path/path").expect("soft derivation"));
         assert!(!check_derivation_format("//path//path").expect("hard derivation"));
         assert!(check_derivation_format("//path///password").expect("path with password"));
-        assert!(check_derivation_format("///").expect("only password but it is empty"));
+        assert!(check_derivation_format("///").is_err());
         assert!(!check_derivation_format("//$~").expect("weird symbols"));
         assert!(check_derivation_format("abraca dabre").is_err());
         assert!(check_derivation_format("////").expect("//// - password is /"));
@@ -307,21 +348,37 @@ mod tests {
     #[test]
     fn must_fail_on_duplicate_identity_name() { 
         let dbname = "tests/must_fail_on_duplicate_name";
+        let path_should_fail_0 = "//path-should-fail-0";
+        let path_should_succeed = "//path-should-succeed";
+        let path_should_fail_1 = "//path-should-fail-1";
         let _ = fs::remove_dir_all(&dbname);
-        load_chainspecs(dbname);
+        let chainspecs = get_default_chainspecs();
+        load_chainspecs(dbname).expect("create default database");
         try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
-        
-        
-        panic!("not ready"); 
+        assert!(try_create_address("root address", "Alice", SEED, ENCRYPTION_NAME, path_should_fail_0, &hex::encode(chainspecs[0].genesis_hash), false, dbname).is_err());
+        try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, path_should_succeed, &hex::encode(chainspecs[0].genesis_hash), false, dbname).expect("creating unique address that should prohibit creation of similarly named adderss soon");
+        assert!(try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, path_should_fail_1, &hex::encode(chainspecs[0].genesis_hash), false, dbname).is_err());
+        let identities = get_relevant_identities("Alice", &hex::encode(chainspecs[0].genesis_hash), dbname).unwrap();
+        let mut flag = false;
+        for (_, address) in identities {
+            if address.path == path_should_fail_0 || address.path == path_should_fail_1 { panic!("Wrong identity was created: {:?}", address);}
+            flag = flag || address.path == path_should_succeed;
+        }
+        assert!(flag);
     }
 
     #[test]
     fn test_derive() { 
         let dbname = "tests/test_derive";
         let _ = fs::remove_dir_all(&dbname);
-        load_chainspecs(dbname);
+        load_chainspecs(dbname).expect("create default database");
         let chainspecs = get_default_chainspecs();
         let seed_name = "Alice";
+        let network_id_0 = chainspecs[0].genesis_hash.to_vec();
+        let network_id_1 = chainspecs[1].genesis_hash.to_vec();
+        let both_networks = vec![network_id_0.to_vec(), network_id_1.to_vec()];
+        let only_one_network = vec![network_id_0.to_vec()];
+
         try_create_seed(seed_name, ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
         let seed_object = SeedObject {
             seed_name: seed_name,
@@ -329,17 +386,32 @@ mod tests {
             encryption: Encryption::Sr25519,
         };
         let database: Db = open(dbname).unwrap();
-        create_address(&database, "//Alice", chainspecs[0].genesis_hash.to_vec(), "Alice in network 0", &seed_object, false).expect("Create Alice in network 0");
-        create_address(&database, "//Alice", chainspecs[1].genesis_hash.to_vec(), "Alice in network 1", &seed_object, false).expect("Create Alice in network 1");
-        create_address(&database, "//Alice/1", chainspecs[0].genesis_hash.to_vec(), "Alice/1 in network 0", &seed_object, false).expect("Create Alice/1 in network 0");
-        let network0 = get_relevant_identities (seed_name, &hex::encode(chainspecs[0].genesis_hash), dbname);
-        println!("{:?}", network0);
-
-        panic!("not ready"); 
+        create_address(&database, "//Alice", network_id_0.to_vec(), "Alice", &seed_object, false).expect("Create Alice in network 0");
+        create_address(&database, "//Alice", network_id_1, "Alice", &seed_object, false).expect("Create Alice in network 1");
+        create_address(&database, "//Alice/1", network_id_0, "Alice/1", &seed_object, false).expect("Create Alice/1 in network 0");
+        let identities = get_seed_identities (&database, seed_name).unwrap();
+        println!("{:?}", identities);
+        let mut flag0 = false;
+        let mut flag1 = false;
+        for (_, details) in identities {
+            flag0 = flag0 || (details.name == "Alice" && details.network_id == both_networks);
+            flag1 = flag1 || (details.name == "Alice/1" && details.network_id == only_one_network);
+        }
+        assert!(flag0, "Something is wrong with //Alice");
+        assert!(flag1, "Something is wrong with //Alice/1");
     }
 
     #[test]
-    fn test_suggest_n_plus_one() { panic!("not ready"); }
+    fn test_suggest_n_plus_one() { 
+        let dbname = "tests/test_suggest_n_plus_one";
+        let _ = fs::remove_dir_all(&dbname);
+        load_chainspecs(dbname).expect("create default database");
+        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        let chainspecs = get_default_chainspecs();
+        let network_id_string_0 = &hex::encode(chainspecs[0].genesis_hash);
+        try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, "//Alice//10", network_id_string_0, false, dbname).expect("create a valid address //Alice//10");
+        assert_eq!("//Alice//11", suggest_n_plus_one("//Alice", "Alice", network_id_string_0, dbname).expect("at least some suggestion about new name should be produced unless db read resulted in a failure"));
+    }
     
 }
 

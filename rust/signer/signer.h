@@ -121,25 +121,31 @@ const char * development_test(struct ExternError*, const char* input);
 void db_init(struct ExternError*, const char* metadata, const char* dbname);
 
 // Fetch list of available networks for network selector screen
-const char * get_all_networks_for_network_selector(struct ExternalError*, const char* dbname);
+const char * get_all_networks_for_network_selector(struct ExternError*, const char* dbname);
 
 // Fetch one network for general display purposes
-const char * get_network(struct ExternalError*, const char* genesis_hash, const char* dbname);
+const char * get_network(struct ExternError*, const char* genesis_hash, const char* dbname);
 
 // Fetch list of all root seeds
-const char * get_all_seed_names(struct ExternalError*, const char* dbname);
+const char * get_all_seed_names(struct ExternError*, const char* dbname);
 
 //Filter identities derived for given seed and network
-const char * get_relevant_identities(srtuct ExternalError*, const char* seed_name, const char* genesis_hash, const char* dbname);
+const char * get_relevant_identities(struct ExternError*, const char* seed_name, const char* genesis_hash, const char* dbname);
+
+//Suggest next numbered path
+const char * suggest_n_plus_one(struct ExternError*, const char* path, const char* seed_name, const char* network_id_string, const char* dbname);
+
+//Check validity of proposed path and find password
+bool check_path(struct ExternError*, const char* path);
 
 //Acknowledge user agreement
-void ack_user_agreement(struct ExternalError, const char* dbname);
+void ack_user_agreement(struct ExternError*, const char* dbname);
 
 //Check whether user agreement is acknowledged
-bool check_user_agreement(struct ExternalError, const char* dbname);
+bool check_user_agreement(struct ExternError*, const char* dbname);
 
-//Two functions to create new seed
-//TODO: implement password!!!
+//Function to create new seed
 void try_create_seed(struct ExternError*, const char* seed_name, const char* crypto, const char* seed_phrase, int seed_length, const char* dbname);
 
-
+//Function to create new address
+void try_create_identity(struct ExternError*, const char* id_name, const char* seed_name, const char* seed_phrase, const char* crypto, const char* path, const char* network, bool has_password, const char* dbname);
