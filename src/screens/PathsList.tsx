@@ -35,7 +35,7 @@ import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
 import { LeftScreenHeading } from 'components/ScreenHeading';
 import OnBoardingView from 'components/OnBoarding';
-import { getAllSeedNames, getNetwork, getIdentitiesForSeed } from 'utils/native';
+import { getAllSeedNames, getNetwork, getIdentitiesForSeed, suggestNPlusOne } from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
@@ -168,7 +168,7 @@ export default function PathsList({
 
 	const onTapDeleteButton = (): Promise<void> => {};
 	const onTapIncrementButton = async function(): Promise<void> {
-		const suggetsion = await suggestNameForIncrement(activeAddress.path, networkKey, rootSeed);
+		const suggestion = await suggestNPlusOne(activeAddress.path, rootSeed, networkKey);
 		navigation.navigate('PathDerivation', { path: suggestion, networkKey: networkKey, seedName: rootSeed });
 	};
 	const onTapDeriveButton = (): Promise<void> => {

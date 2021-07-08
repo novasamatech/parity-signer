@@ -608,6 +608,16 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	@ReactMethod
+	public void suggestNPlusOne(String path, String seedName, String networkId, Promise promise) {
+		try {
+			String suggestion = substrateSuggestNPlusOne(path, seedName, networkId, dbname);
+			promise.resolve(suggestion);
+		} catch (Exception e) {
+			rejectWithException(promise, "Can't suggest a path", e);
+		}
+	}
+
 	private static native String ethkeyBrainwalletAddress(String seed);
 	private static native String ethkeyBrainwalletBIP39Address(String seed);
 	private static native String ethkeyBrainwalletSign(String seed, String message);

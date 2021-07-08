@@ -20,7 +20,6 @@ import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
 import { NavigationAccountIdentityProps } from 'types/props';
 import TextInput from 'components/TextInput';
-import { unlockSeedPhrase } from 'utils/navigationHelpers';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
@@ -49,7 +48,7 @@ export default function PathDerivation({
 		try {
 			await tryCreateIdentity(keyPairsName, route.params.seedName, 'sr25519', derivationPath, networkKey);
 			setAlert('Success', 'New Account Successfully derived');
-			navigation.goBack();
+			navigation.pop();
 		} catch (e) {
 			setError(e.toString());
 			alertPathDerivationError(setAlert, e.message);

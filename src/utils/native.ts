@@ -125,6 +125,16 @@ export async function getSeedPhraseForBackup(seedName: string, pin: string): Pro
 	return seedPhrase;
 }
 
+export async function suggestNPlusOne(path: string, seedName: string, network: string): Promise<string> {
+	try {
+		const suggest = await SubstrateSign.suggestNPlusOne(path, seedName, network);
+		return suggest;
+	} catch (e) {
+		console.warn(e);
+		return "";
+	}
+}
+
 export async function tryCreateIdentity(idName: string, seedName: string, cryptoType: string, path: string, networkId: string): Promise<void> {
 	console.log('creating identity...');
 	await SubstrateSign.tryCreateIdentity(idName, seedName, cryptoType, path, networkId);
