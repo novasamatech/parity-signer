@@ -113,7 +113,7 @@ export default function PathsList({
 									<Text style={{...styles.derivationText, fontWeight: 'bold'}}>{rootSeed}</Text>
 									<Text style={styles.derivationText}>{item.path}</Text>
 									{item.hasPassword === 'true' ? (
-										<AntIcon name="lock" style={styles.icon} />
+										<AntIcon name="lock" style={styles.derivationText} />
 									) : (
 										<View />
 									)}

@@ -13,6 +13,7 @@ use super::constants::{ADDRTREE, SPECSTREE};
 use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, AddressKey, SeedKey, NetworkKey};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
+use lazy_static::lazy_static;
 
 #[cfg(test)]
 use std::fs;
@@ -49,6 +50,14 @@ pub struct SeedObject<'a> {
     pub seed_name: &'a str,
     pub seed_phrase: &'a str,
     pub encryption: Encryption,
+}
+
+lazy_static! {
+    //stolen from sp_core
+    //removed seed phrase part
+    //last '+' used to be '*', but empty password is an error
+    static ref REG_PATH: Regex = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$")
+		.expect("constructed from known-good static value; qed");
 }
 
 ///get all identities for given seed (internal use only!)
@@ -144,10 +153,16 @@ fn create_address (
                         return Err(Box::from("Identity with this name already exists"));
                     }
             }
-
+            let cropped_path = match REG_PATH.captures(path) {
+                Some(caps) => match caps.name("path") {
+                    Some(a) => a.as_str(),
+                    None => "",
+                },
+                None => "",
+            };
             let address = AddressDetails {
                 name_for_seed: name_for_seed,
-                path: path.to_string(),
+                path: cropped_path.to_string(),
                 has_pwd: has_password,
                 name: name.to_string(),
                 network_id: vec!(network_id),
@@ -224,6 +239,68 @@ pub fn try_create_seed (seed_name: &str, encryption_name: &str, seed_phrase_prop
     Ok(seed_phrase)
 }
 
+///Sanitize numbers in path (only for name suggestions!)
+fn sanitize_number(could_be_number: &str) -> String {
+    match could_be_number.parse::<u32>() {
+        Ok(number) => number.to_string(),
+        Err(_) => could_be_number.to_string(),
+    }
+}
+
+///Suggest name from path
+//TODO: surprizingly - zeroize!
+pub fn suggest_path_name(path_all: &str) -> String {
+    let mut output = String::from("");
+    if let Some(caps) = REG_PATH.captures(path_all) {
+        if let Some(path) = caps.name("path") {
+            if !path.as_str().is_empty() {
+                for hard in path.as_str().split("//") {
+                    let mut softened = hard.split("/");
+                    if let Some(first) = softened.next() {
+                        output.push_str(&sanitize_number(first));
+                        let mut number_of_brackets = 0;
+                        for soft in softened {
+                            number_of_brackets+=1;
+                            output.push_str(" (");
+                            output.push_str(&sanitize_number(soft));
+                        }
+                        if number_of_brackets == 0 {
+                            output.push_str(" ");
+                        } else {
+                            output.push_str(&") ".repeat(number_of_brackets));
+                        }
+                    }
+                }
+            }
+        };
+    }
+    output = output.trim().to_string(); //is this good enough zeroization?
+    output
+}
+
+///Delete identity
+pub fn delete_address(pub_key: &str, network_id_string: &str, database_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let database: Db = open(database_name)?;
+    let identities: Tree = database.open_tree(ADDRTREE)?;
+    let address_key = hex::decode(pub_key)?;
+    let network_id = generate_network_key(hex::decode(network_id_string)?); //TODO: add whatever is needed for parachains?
+    match identities.get(&address_key)? {
+        Some(address_record) => {
+            let mut address = <AddressDetails>::decode(&mut &address_record[..])?;
+            address.network_id = address.network_id.into_iter().filter(|id| *id != network_id).collect();
+            if address.network_id.is_empty() {
+                identities.remove(&address_key)?;
+            } else {
+                identities.insert(address_key, address.encode())?;
+            }
+        }
+        None => return Err(Box::from("Error: this address does not exist in database")),
+    };
+    
+
+    Ok(())
+}
+
 ///Suggest address and name for weird N+1 feature request
 pub fn suggest_n_plus_one(path: &str, seed_name: &str, network_id_string: &str, database_name: &str) -> Result<String, Box<dyn std::error::Error>> {
     let identities = get_relevant_identities(seed_name, network_id_string, database_name)?;
@@ -242,12 +319,7 @@ pub fn suggest_n_plus_one(path: &str, seed_name: &str, network_id_string: &str, 
 
 ///Check derivation format and determine whether there is a password
 pub fn check_derivation_format(path: &str) -> Result<bool, Box<dyn std::error::Error>> {
-    //stolen from sp_core
-    //removed seed phrase part
-    //last + used to be *, but empty password is an error
-    let re = Regex::new(r"^(?P<path>(//?[^/]+)*)(///(?P<password>.+))?$")
-		.expect("constructed from known-good static value; qed");
-	Ok(match re.captures(path) {
+	Ok(match REG_PATH.captures(path) {
         Some(caps) => caps.name("password").is_some(),
         None => return Err(Box::from("Invalid derivation format")),
     })
@@ -412,6 +484,65 @@ mod tests {
         try_create_address("clone", "Alice", SEED, ENCRYPTION_NAME, "//Alice//10", network_id_string_0, false, dbname).expect("create a valid address //Alice//10");
         assert_eq!("//Alice//11", suggest_n_plus_one("//Alice", "Alice", network_id_string_0, dbname).expect("at least some suggestion about new name should be produced unless db read resulted in a failure"));
     }
+
+    #[test]
+    fn test_sanitize_number() {
+        assert_eq!("1", sanitize_number("1"));
+        assert_eq!("1", sanitize_number("001"));
+        assert_eq!("1f", sanitize_number("1f"));
+        assert_eq!("a", sanitize_number("a"));
+        assert_eq!("0a", sanitize_number("0a"));
+        assert_eq!("0z", sanitize_number("0z"));
+    }
     
+    #[test]
+    fn account_name_suggestions() {
+        assert_eq!("Alice", suggest_path_name("//Alice"));
+        assert_eq!("", suggest_path_name(""));
+        assert_eq!("Alice verifier", suggest_path_name("//Alice//verifier"));
+        assert_eq!("Alice", suggest_path_name("//Alice///password"));
+        assert_eq!("Alice (alias)", suggest_path_name("//Alice/alias"));
+        assert_eq!("Alice", suggest_path_name("//Alice///password///password"));
+        assert_eq!("Лазарь Сигизмундович", suggest_path_name("//Лазарь//Сигизмундович"));
+        assert_eq!("Вася (Пупкин)", suggest_path_name("//Вася/Пупкин"));
+        assert_eq!("Антон", suggest_path_name("//Антон///секретный"));
+        assert_eq!("Alice 1", suggest_path_name("//Alice//0001"));
+        assert_eq!("Alice (brackets)", suggest_path_name("//Alice//(brackets)"));
+        assert_eq!("Alice ((brackets))", suggest_path_name("//Alice/(brackets)"));
+        assert_eq!("Alice", suggest_path_name("//Alice///(brackets)"));
+        assert_eq!("(Alice)", suggest_path_name("/Alice"));
+        assert_eq!("", suggest_path_name("///password"));
+    }
+
+    #[test]
+    fn test_identity_deletion() {
+        let dbname = "tests/test_identity_deletion";
+        let _ = fs::remove_dir_all(&dbname);
+        load_chainspecs(dbname).expect("create default database");
+        try_create_seed("Alice", ENCRYPTION_NAME, SEED, 0, dbname).unwrap();
+        let chainspecs = get_default_chainspecs();
+        let network_id_string_0 = &hex::encode(chainspecs[0].genesis_hash);
+        let network_id_string_1 = &hex::encode(chainspecs[1].genesis_hash);
+        let mut identities = get_relevant_identities("Alice", network_id_string_0, dbname).expect("Alice should have some addresses by default");
+        println!("{:?}", identities);
+        let (key0, _) = identities.remove(0); //TODO: this should be root key
+        let (key1, _) = identities.remove(0); //TODO: this should be network-specific key
+        delete_address(&hex::encode(&key0), network_id_string_0, dbname).expect("delete and address");
+        delete_address(&hex::encode(&key1), network_id_string_0, dbname).expect("delete another address");
+        let identities = get_relevant_identities("Alice", network_id_string_0, dbname).expect("Alice still should have some addresses after deletion of two");
+        for (pub_key, address) in identities {
+            assert_ne!(pub_key, key0);
+            assert_ne!(pub_key, key1);
+        }
+        let identities = get_relevant_identities("Alice", network_id_string_1, dbname).expect("Alice still should have some addresses after deletion of two");
+        let mut flag_to_check_key0_remains = false;
+        for (pub_key, address) in identities {
+            if pub_key == key0 {
+                flag_to_check_key0_remains = true;
+            }
+            assert_ne!(pub_key, key1);
+        }
+        assert!(flag_to_check_key0_remains, "An address that should have only lost network was removed entirely");
+    }
 }
 
