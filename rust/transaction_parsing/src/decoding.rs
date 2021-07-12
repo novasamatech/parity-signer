@@ -8,7 +8,7 @@ use sp_arithmetic::{Percent, Perbill, PerU16};
 use frame_metadata::{RuntimeMetadataV12};
 use bitvec::prelude::{BitVec, Lsb0};
 use printing_balance::convert_balance_pretty;
-use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
+use definitions::{network_specs::ChainSpecs, types::{TypeEntry, Description, EnumVariant, EnumVariantType, StructField}};
 
 use super::method::what_next;
 use super::utils_base58::vec_to_base;
@@ -891,7 +891,7 @@ pub fn decode_simple (found_ty: &str, mut data: Vec<u8>, type_database: &Vec<Typ
                                                 index = after_run.index;
                                                 fancy_out.push_str(&after_run.fancy_out);
                                                 data = after_run.remaining_vector;
-                                            }
+                                            },
                                             None => break,
                                         }
                                         i = i+1;

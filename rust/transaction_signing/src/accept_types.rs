@@ -1,11 +1,17 @@
-use sled::{Db, Tree};
-use db_handling::{constants::{ADDTYPESVERIFIER, LOADTYPES, SETTREE, TYPES, TYPESVERIFIER}, settings::LoadTypesDb};
+use sled::{Db, open, Tree};
+use definitions::{constants::{ADDGENERALVERIFIER, LOADTYPES, SETTREE, TRANSACTION, TYPES, GENERALVERIFIER}, transactions::LoadTypesDb};
 use parity_scale_codec::{Decode, Encode};
 
-pub fn accept_types (database: Db) -> Result<String, Box<dyn std::error::Error>> {
+pub fn accept_types (dbname: &str, checksum: u32) -> Result<String, Box<dyn std::error::Error>> {
+    
+    let database: Db = open(dbname)?;
+    let real_checksum = database.checksum()?;
+    
+    if checksum != real_checksum {return Err(Box::from("Database checksum mismatch."))}
     
     let settings: Tree = database.open_tree(SETTREE)?;
-    let action = match settings.remove(LOADTYPES)? {
+    let transaction: Tree = database.open_tree(TRANSACTION)?;
+    let action = match transaction.remove(LOADTYPES)? {
         Some(x) => {<LoadTypesDb>::decode(&mut &x[..])?},
         None => {return Err(Box::from("No approved types information found."))}
     };
@@ -15,7 +21,7 @@ pub fn accept_types (database: Db) -> Result<String, Box<dyn std::error::Error>>
     database.flush()?;
     
     if let Some(new_verifier) = action.upd_verifier {
-        settings.insert(TYPESVERIFIER, new_verifier.encode())?;
+        settings.insert(GENERALVERIFIER, new_verifier.encode())?;
         database.flush()?;
     }
     
@@ -23,16 +29,23 @@ pub fn accept_types (database: Db) -> Result<String, Box<dyn std::error::Error>>
 }
 
 
-pub fn add_types_verifier (database: Db) -> Result<String, Box<dyn std::error::Error>> {
+pub fn add_general_verifier (dbname: &str, checksum: u32) -> Result<String, Box<dyn std::error::Error>> {
+    
+    let database: Db = open(dbname)?;
+    let real_checksum = database.checksum()?;
+    
+    if checksum != real_checksum {return Err(Box::from("Database checksum mismatch."))}
     
     let settings: Tree = database.open_tree(SETTREE)?;
-    let new_verifier_encoded = match settings.remove(ADDTYPESVERIFIER)? {
+    let transaction: Tree = database.open_tree(TRANSACTION)?;
+    
+    let new_verifier_encoded = match transaction.remove(ADDGENERALVERIFIER)? {
         Some(x) => x,
-        None => {return Err(Box::from("No approved types verifier found."))}
+        None => {return Err(Box::from("No approved general verifier found."))}
     };
     database.flush()?;
     
-    settings.insert(TYPESVERIFIER, new_verifier_encoded)?;
+    settings.insert(GENERALVERIFIER, new_verifier_encoded)?;
     database.flush()?;
     
     Ok(String::from("Types verifier successfully updated."))

@@ -1,5 +1,6 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use hex;
+use definitions::network_specs::ChainSpecsToSend; 
 
 use super::error::Error;
 use super::parse_transaction::AuthorPublicKey;
@@ -29,6 +30,7 @@ pub enum Card <'a> {
     Verifier(String),
     Meta {specname: &'a str, spec_version: u32, meta_hash: &'a str},
     TypesInfo(&'a str),
+    NewNetwork {specname: &'a str, spec_version: u32, meta_hash: &'a str, chain_specs: &'a ChainSpecsToSend, verifier_line: String},
     Warning (Warning),
     Error (Error),
 }
@@ -38,11 +40,15 @@ pub enum Warning {
     NewerVersion {used_version: u32, latest_version: u32},
     VerifierAppeared,
     NotVerified,
-    MetaAlreadyThere,
     UpdatingTypes,
     TypesNotVerified,
-    TypesVerifierAppeared,
+    GeneralVerifierAppeared,
     TypesAlreadyThere,
+    MetaAlreadyThereUpdBothVerifiers,
+    MetaAlreadyThereUpdMetaVerifier,
+    MetaAlreadyThereUpdGeneralVerifier,
+    NetworkAlreadyHasEntries,
+    AddNetworkNotVerified,
 }
 
 impl Warning {
@@ -52,16 +58,20 @@ impl Warning {
             Warning::NewerVersion {used_version, latest_version} => format!("Transaction uses outdated runtime version {}. Latest known available version is {}.", used_version, latest_version),
             Warning::VerifierAppeared => String::from("Previously unverified network metadata now received signed by a verifier. If accepted, only metadata from same verifier could be received for this network."),
             Warning::NotVerified => String::from("Received network metadata is not verified."),
-            Warning::MetaAlreadyThere => String::from("Received metadata is already in database, only verifier could be added."),
             Warning::UpdatingTypes => String::from("Updating types (really rare operation)."),
             Warning::TypesNotVerified => String::from("Received types information is not verified."),
-            Warning::TypesVerifierAppeared => String::from("Previously unverified types information now received signed by a verifier. If accepted, types information only from this verifier could be received."),
+            Warning::GeneralVerifierAppeared => String::from("Previously unverified information now received signed by a verifier. If accepted, updating types and adding networks could be verified only by this verifier."),
             Warning::TypesAlreadyThere => String::from("Received types information is already in database, only verifier could be added."),
+            Warning::MetaAlreadyThereUpdBothVerifiers => String::from("Received metadata is already in database, both general verifier and network verifier could be added."),
+            Warning::MetaAlreadyThereUpdMetaVerifier => String::from("Received metadata is already in database, only network verifier could be added."),
+            Warning::MetaAlreadyThereUpdGeneralVerifier => String::from("Received metadata is already in database, only general verifier could be added."),
+            Warning::NetworkAlreadyHasEntries => String::from("Add network message is received for network that already has some entries in the database."),
+            Warning::AddNetworkNotVerified => String::from("Received new network information is not verified."),
         }
     }
 }
 
-pub fn fancy (index: u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
+fn fancy (index: u32, indent: u32, card_type: &str, decoded_string: &str) -> String {
     format!("{{\"index\":{},\"indent\":{},\"type\":\"{}\",\"payload\":{}}}", index, indent, card_type, decoded_string)
 }
 
@@ -96,8 +106,42 @@ impl <'a> Card <'a> {
             Card::Verifier(x) => fancy(index, indent, "verifier", x),
             Card::Meta{specname, spec_version, meta_hash} => fancy(index, indent, "meta", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\"}}", specname, spec_version, meta_hash)),
             Card::TypesInfo(x) => fancy(index, indent, "types_hash", x),
+            Card::NewNetwork{specname, spec_version, meta_hash, chain_specs, verifier_line} => fancy(index, indent, "new_network", &format!("{{\"specname\":\"{}\",\"spec_version\":\"{}\",\"meta_hash\":\"{}\",\"base58prefix\":\"{}\",\"color\":\"{}\",\"decimals\":\"{}\",\"genesis_hash\":\"{}\",\"logo\":\"{}\",\"name\":\"{}\",\"path_id\":\"{}\",\"secondary_color\":\"{}\",\"title\":\"{}\",\"unit\":\"{}\",\"verifier\":\"{}\"}}", specname, spec_version, meta_hash, chain_specs.base58prefix, chain_specs.color, chain_specs.decimals, hex::encode(chain_specs.genesis_hash), chain_specs.logo, chain_specs.name, chain_specs.path_id, chain_specs.secondary_color, chain_specs.title, chain_specs.unit, verifier_line)),
             Card::Warning (warn) => fancy(index, indent, "warning", &format!("\"{}\"", warn.show())),
             Card::Error (err) => fancy(index, indent, "error", &format!("\"{}\"", err.show())),
+        }
+    }
+}
+
+
+pub enum Action {
+    SignTransaction (u32),
+    LoadMetadata (u32),
+    AddMetadataVerifier (u32),
+    LoadTypes (u32),
+    AddGeneralVerifier (u32),
+    AddTwoVerifiers (u32),
+    LoadMetadataAndAddGeneralVerifier (u32),
+    AddNetwork (u32),
+    AddNetworkAndAddGeneralVerifier (u32),
+}
+
+fn print_action (action: &str, checksum: &u32) -> String {
+    format!("\"action\":{{\"type\":\"{}\",\"payload\":{{\"type\":\"{}\",\"checksum\":\"{}\"}}}}", action, action, checksum)
+}
+
+impl Action {
+    pub fn card (&self) -> String {
+        match &self {
+            Action::SignTransaction(x) => print_action("sign_transaction", x),
+            Action::LoadMetadata(x) => print_action("load_metadata", x),
+            Action::AddMetadataVerifier(x) => print_action("add_metadata_verifier", x),
+            Action::LoadTypes(x) => print_action("load_types", x),
+            Action::AddGeneralVerifier(x) => print_action("add_general_verifier", x),
+            Action::AddTwoVerifiers(x) => print_action("add_two_verifiers", x),
+            Action::LoadMetadataAndAddGeneralVerifier(x) => print_action("load_metadata_and_add_general_verifier", x),
+            Action::AddNetwork(x) => print_action("add_network", x),
+            Action::AddNetworkAndAddGeneralVerifier (x) => print_action("add_network_and_add_general_verifier", x),
         }
     }
 }

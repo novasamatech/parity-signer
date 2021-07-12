@@ -8,8 +8,7 @@ use sp_core::{Pair, ed25519, sr25519, ecdsa};
 use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use regex::Regex;
-use super::chainspecs::ChainSpecs;
-use super::constants::{ADDRTREE, SPECSTREE};
+use definitions::{constants::{ADDRTREE, SPECSTREE}, network_specs::ChainSpecs};
 use super::db_utils::{generate_seed_key, generate_address_key, generate_network_key, AddressKey, SeedKey, NetworkKey};
 use bip39::{Language, Mnemonic, MnemonicType};
 use zeroize::Zeroize;
@@ -350,7 +349,7 @@ pub fn try_create_address (id_name: &str, seed_name: &str, seed_phrase: &str, en
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::constants::get_default_chainspecs;
+    use definitions::defaults::get_default_chainspecs;
     //static PASSWORD: &str = "very long and unguessable phrase";
     static SEED: &str = "bottom drive obey lake curtain smoke basket hold race lonely fit walk";
     static ENCRYPTION_NAME: &str = "sr25519";

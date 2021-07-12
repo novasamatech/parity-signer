@@ -1,20 +1,11 @@
 use serde_json::map::Map;
 use jsonrpsee_types::JsonValue;
 use std::convert::TryInto;
-use parity_scale_codec::Encode;
-use parity_scale_codec_derive;
+use definitions::network_specs::ChainProperties;
 
-#[derive(Debug, parity_scale_codec_derive::Encode, parity_scale_codec_derive::Decode)]
-pub struct ChainSpecsShort {
-    base58prefix: u8,
-    decimals: u8,
-    genesis_hash: [u8; 32],
-    name: String,
-    unit: String,
-}
+/// Function to interpret network properties fetched via rpc call
 
-pub fn interpret_chainspecs <'a> (x: &'a Map<String, JsonValue>, genesis_hash: [u8; 32], name: &'a str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    
+pub fn interpret_properties (x: &Map<String, JsonValue>) -> Result<ChainProperties, Box<dyn std::error::Error>> {
     let base58prefix: u8 = match x.get("ss58Format") {
         Some(a) => {
             match a {
@@ -56,13 +47,10 @@ pub fn interpret_chainspecs <'a> (x: &'a Map<String, JsonValue>, genesis_hash: [
         },
         None => return Err(Box::from("No unit fetched.")),
     };
-
-    Ok(ChainSpecsShort{
+    Ok(ChainProperties {
         base58prefix,
         decimals,
-        genesis_hash,
-        name: name.to_string(),
         unit: unit.to_string(),
-    }.encode())
-
+    })
 }
+

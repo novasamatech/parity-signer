@@ -3,14 +3,14 @@ use parity_scale_codec::{Decode, Encode};
 use parity_scale_codec_derive;
 use printing_balance::{PrettyOutput, convert_balance_pretty};
 use sled::{Db, Tree, open};
-use db_handling::{chainspecs::ChainSpecs, settings::{TypeEntry, SignDb}, identities::AddressDetails, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TYPES}};
+use definitions::{network_specs::ChainSpecs, transactions::SignDb, users::AddressDetails, constants::{SPECSTREE, METATREE, ADDRTREE, SETTREE, SIGNTRANS, TRANSACTION}};
 use sp_runtime::generic::Era;
 use std::convert::TryInto;
 
 use super::utils_base58::vec_to_base;
-use super::utils_chainspecs::find_meta;
+use super::utils::{find_meta, get_types};
 use super::decoding::process_as_call;
-use super::cards::{Card, Warning};
+use super::cards::{Action, Card, Warning};
 use super::error::{Error, BadInputData, UnableToDecode, DatabaseError, SystemError};
 
 /// Transaction payload in hex format as it arrives into parsing program contains following elements:
@@ -60,24 +60,6 @@ fn print_full_extrinsics (index: u32, indent: u32, tip_output: &PrettyOutput, sh
 }
 
 
-/// function to search database for the TypeEntry vector
-pub fn get_types (settings: &Tree) -> Result<Vec<TypeEntry>, Error> {
-    match settings.get(TYPES) {
-        Ok(types_db_reply) => {
-            match types_db_reply {
-                Some(a) => {
-                    match <Vec<TypeEntry>>::decode(&mut &a[..]) {
-                        Ok(x) => Ok(x),
-                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedTypesDatabase)),
-                    }
-                },
-                None => return Err(Error::DatabaseError(DatabaseError::NoTypes)),
-            }
-        },
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    }
-}
-
 /// Function to parse transaction.
 /// Attempts to decode the transaction, and if completely successful,
 /// produces a set of cards to print the transaction content,
@@ -110,12 +92,11 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    
-    match settings.remove(SIGNTRANS) {
-        Ok(_) => (),
+    let transaction: Tree = match database.open_tree(TRANSACTION) {
+        Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    }
-
+    };
+    
 // input hex data of correct size should have at least 6 + 64 + 64 symbols (prelude + author public key minimal size + genesis hash)
     if data_hex.len() < 134 {return Err(Error::BadInputData(BadInputData::TooShort))}
 
@@ -224,7 +205,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         has_pwd: id_values.has_pwd,
                                         author_base58: author,
                                     };
-                                    match settings.insert(SIGNTRANS, action_into_db.encode()) {
+                                    match transaction.insert(SIGNTRANS, action_into_db.encode()) {
                                         Ok(_) => (),
                                         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                     };
@@ -237,7 +218,7 @@ pub fn parse_transaction (data_hex: &str, dbname: &str) -> Result<String, Error>
                                         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
                                     };
                                 // action card
-                                    let action_card = format!("\"action\":{{\"type\":\"sign_transaction\",\"payload\":{{\"type\":\"sign_transaction\",\"checksum\":\"{}\",\"has_password\":\"{}\"}}}}", checksum, id_values.has_pwd);
+                                    let action_card = Action::SignTransaction(checksum).card();
                                 // full cards set
                                     let cards = match warning_card {
                                         Some(warn) => format!("{{\"author\":[{}],\"warning\":[{}],\"method\":[{}],\"extrinsics\":[{}],{}}}", author_card, warn, method_cards, extrinsics_cards, action_card),

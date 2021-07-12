@@ -1,6 +1,8 @@
 use bitvec::prelude::{BitVec, Lsb0};
 use sled::IVec;
-use db_handling::chainspecs::Verifier;
+use definitions::network_specs::{Verifier, ChainSpecsToSend};
+use hex;
+use std::convert::TryInto;
 
 use super::parse_transaction::AuthorPublicKey;
 use super::cards::{Card, Warning};
@@ -38,14 +40,37 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Author{base58_author: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", path: "//Alice", has_pwd: false, name: ""});
     all_cards.push(Card::AuthorPlain("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"));
     all_cards.push(Card::AuthorPublicKey(AuthorPublicKey::Sr25519([142, 175, 4, 21, 22, 135, 115, 99, 38, 201, 254, 161, 126, 37, 252, 82, 135, 97, 54, 147, 201, 18, 144, 156, 178, 38, 170, 71, 148, 242, 106, 72])));
-    all_cards.push(Card::Verifier(Verifier::Sr25519(String::from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty")).show_card().to_string()));
+    all_cards.push(Card::Verifier(Verifier::Sr25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_card()));
     all_cards.push(Card::Meta{specname: "westend", spec_version: 9033, meta_hash: "69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb"});
+    all_cards.push(Card::TypesInfo("345f53c073281fc382d20758aee06ceae3014fd53df734d3e94d54642a56dd51"));
+    
+    let chain_specs = ChainSpecsToSend {
+        base58prefix: 42,
+        color: String::from("#660D35"),
+        decimals: 12,
+        genesis_hash: hex::decode("e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e").expect("known value").try_into().expect("known value"),
+        logo: String::from("westend"),
+        name: String::from("westend"),
+        path_id: String::from("//westend"),
+        secondary_color: String::from("#262626"),
+        title: String::from("Westend"),
+        unit: String::from("WND"),
+    };
+    all_cards.push(Card::NewNetwork{specname: "westend", spec_version: 9033, meta_hash: "69300be6f9f5d14ee98294ad15c7af8d34aa6c16f94517216dc4178faadacabb", chain_specs: &chain_specs, verifier_line: Verifier::Sr25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_card()});
     
     all_cards.push(Card::Warning(Warning::AuthorNotFound));
     all_cards.push(Card::Warning(Warning::NewerVersion{used_version: 50, latest_version: 9010}));
     all_cards.push(Card::Warning(Warning::VerifierAppeared));
     all_cards.push(Card::Warning(Warning::NotVerified));
-    all_cards.push(Card::Warning(Warning::MetaAlreadyThere));
+    all_cards.push(Card::Warning(Warning::UpdatingTypes));
+    all_cards.push(Card::Warning(Warning::TypesNotVerified));
+    all_cards.push(Card::Warning(Warning::GeneralVerifierAppeared));
+    all_cards.push(Card::Warning(Warning::TypesAlreadyThere));
+    all_cards.push(Card::Warning(Warning::MetaAlreadyThereUpdBothVerifiers));
+    all_cards.push(Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier));
+    all_cards.push(Card::Warning(Warning::MetaAlreadyThereUpdGeneralVerifier));
+    all_cards.push(Card::Warning(Warning::AddNetworkNotVerified));
+    all_cards.push(Card::Warning(Warning::NetworkAlreadyHasEntries));
     
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::TooShort)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NotSubstrate)));
@@ -65,6 +90,10 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::VersionNotDecodeable)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::NoMetaVersion)));
     all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnableToDecodeMeta)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnableToDecodeTypes)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::TypesAlreadyThere)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::UnableToDecodeAddNetworkMessage)));
+    all_cards.push(Card::Error(Error::BadInputData(BadInputData::ImportantSpecsChanged)));
     
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::MethodAndExtrinsicsFailure)));
     all_cards.push(Card::Error(Error::UnableToDecode(UnableToDecode::NeedPalletAndMethod)));
@@ -99,6 +128,8 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::DamagedVersName)));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::NoMetaThisVersion)));
     all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::NoMetaAtAll)));
+    all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::DamagedGeneralVerifier)));
+    all_cards.push(Card::Error(Error::DatabaseError(DatabaseError::NoGeneralVerifier)));
     
     all_cards.push(Card::Error(Error::SystemError(SystemError::BalanceFail)));
     all_cards.push(Card::Error(Error::SystemError(SystemError::NotMeta)));
@@ -110,8 +141,11 @@ pub fn make_all_cards() -> String {
     all_cards.push(Card::Error(Error::SystemError(SystemError::RegexError)));
     
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::BadSignature)));
-    all_cards.push(Card::Error(Error::CryptoError(CryptoError::VerifierChanged {old_show: Verifier::Ed25519(String::from("dOnTrEmOvEmE")).show_error(), new_show: Verifier::Sr25519(String::from("dOnTaCcEpTmE")).show_error()})));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::VerifierChanged {old_show: Verifier::Ed25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_error(), new_show: Verifier::Sr25519(String::from("5a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969")).show_error()})));
     all_cards.push(Card::Error(Error::CryptoError(CryptoError::VerifierDisappeared)));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierChanged {old_show: Verifier::Ed25519(String::from("d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")).show_error(), new_show: Verifier::Sr25519(String::from("5a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969")).show_error()})));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::GeneralVerifierDisappeared)));
+    all_cards.push(Card::Error(Error::CryptoError(CryptoError::NetworkExistsVerifierDisappeared)));
     
     let mut output_cards = String::from("[");
     

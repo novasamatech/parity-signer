@@ -405,7 +405,7 @@ export! {
         let datafiles = db_handling::DataFiles {
             metadata_contents : metadata,
         };
-        db_handling::fill_database_from_files(dbname, datafiles)
+        db_handling::populate_cold(dbname, datafiles)
     }
     
     @Java_io_parity_signer_SubstrateSignModule_dbGetNetwork

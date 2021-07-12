@@ -1,9 +1,16 @@
-use generate_message::*;
+use std::env;
+use generate_message::{full_run, parser::Command};
 
-fn main() {
-    let crypto_used = CryptoUsed::None;
-    let dbname = "../db_handling/tests/signer_database";
-    generate_types_default(dbname, &crypto_used).unwrap();
-//    generate_metadata_defaults(&crypto_used).unwrap();
+fn main() -> Result<(), String> {
+
+    let command = match Command::new(env::args()) {
+        Ok(x) => x,
+        Err(e) => return Err(format!("Error parsing arguments. {}", e)),
+    };
+    
+    match full_run(command) {
+        Ok(()) => Ok(()),
+        Err(e) => return Err(format!("Application error. {}", e)),
+    }
+    
 }
-

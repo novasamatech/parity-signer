@@ -11,7 +11,7 @@ fn main() {
     
     let out_name = format!("{}-qrcoded", filename);
     
-    if let Err(e) = transform_into_qr_apng(input, &out_name) {
+    if let Err(e) = transform_into_qr_apng(&input, &out_name) {
         eprintln!("Application error: {}", e);
         process::exit(1);
     }

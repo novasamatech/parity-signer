@@ -42,7 +42,9 @@ export default function PathDerivation({
 	const networkKey = route.params.networkKey;
 
 	//synchronize default name with path
-	useEffect(() => {setKeyPairsName(derivationPath);}, [derivationPath]);
+	useEffect(() => {
+		const update
+		setKeyPairsName(derivationPath);}, [derivationPath]);
 
 	const onPathDerivation = async (): Promise<void> => {
 		try {

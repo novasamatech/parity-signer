@@ -1,41 +1,19 @@
 use hex;
-use sp_core::{Pair, ed25519, sr25519, ecdsa};
-use std::convert::TryInto;
 use sled::{Db, Tree, open};
-use db_handling::{chainspecs::{ChainSpecs, Verifier}, settings::{LoadMetaDb, UpdSpecs}, metadata::NameVersioned, constants::{ADDMETAVERIFIER, LOADMETA, METATREE, SETTREE, SPECSTREE}};
-use meta_reading::decode_metadata::{get_meta_const_light, VersionDecoded};
+use definitions::{network_specs::Verifier, transactions::{LoadMetaDb, UpdSpecs}, metadata::{NameVersioned, VersionDecoded}, constants::{ADDGENERALVERIFIER, ADDMETAVERIFIER, LOADMETA, METATREE, SPECSTREE, TRANSACTION}};
+use meta_reading::decode_metadata::get_meta_const_light;
 use parity_scale_codec::{Decode, Encode};
 use blake2_rfc::blake2b::blake2b;
 use frame_metadata::RuntimeMetadataV12;
 
-use super::cards::{Card, Warning};
+use super::cards::{Action, Card, Warning};
 use super::error::{Error, BadInputData, DatabaseError, CryptoError};
+use super::check_signature::pass_crypto;
+use super::utils::get_chainspecs;
 
-
-/// Function to search for genesis_hash in chainspecs database tree
-fn get_chainspecs (gen_hash: &Vec<u8>, chainspecs: &Tree) -> Result<ChainSpecs, Error> {
-    match chainspecs.get(gen_hash) {
-        Ok(chainspecs_db_reply) => {
-            match chainspecs_db_reply {
-                Some(x) => {
-                // some entry found for this genesis hash
-                    match <ChainSpecs>::decode(&mut &x[..]) {
-                        Ok(y) => Ok(y),
-                        Err(_) => return Err(Error::DatabaseError(DatabaseError::DamagedChainSpecs)),
-                    }
-                },
-                None => {
-                // no entry exists
-                    return Err(Error::DatabaseError(DatabaseError::NoNetwork))
-                },
-            }
-        },
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    }
-}
 
 /// Function to check incoming metadata, and prepare info card and database entry
-fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_specs: Option<UpdSpecs>, metadata: Tree, settings: Tree, database: Db) -> Result<(String, String), Error> {
+pub fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_network: Option<Vec<u8>>, upd_general: bool, verifier: Verifier, metadata: Tree, transaction: Tree, database: Db) -> Result<(String, String), Error> {
     if !meta.starts_with(&vec![109, 101, 116, 97]) {return Err(Error::BadInputData(BadInputData::NotMeta))}
     if meta[4] < 12 {return Err(Error::BadInputData(BadInputData::MetaVersionBelow12))}
     match RuntimeMetadataV12::decode(&mut &meta[5..]) {
@@ -54,54 +32,129 @@ fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_specs: 
                                 Ok(z) => {
                                     match z {
                                         Some(a) => {
+                                        // same versioned name found
                                             if a[..] == meta[..] {
-                                                match upd_specs {
-                                                    Some(upd) => {
-                                                        let meta_card = Card::Warning(Warning::MetaAlreadyThere).card(index, 0);
-                                                    // making action entry into database
-                                                        match settings.insert(ADDMETAVERIFIER, upd.encode()) {
-                                                            Ok(_) => (),
-                                                            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                                        };
-                                                        match database.flush() {
-                                                            Ok(_) => (),
-                                                            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                                        };
-                                                        let checksum = match database.checksum() {
-                                                            Ok(x) => x,
-                                                            Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                                        };
-                                                    // action card
-                                                        let action_card = format!("\"action\":{{\"type\":\"add_metadata_verifier\",\"payload\":{{\"type\":\"add_metadata_verifier\",\"checksum\":\"{}\"}}}}", checksum);
-                                                        Ok((meta_card, action_card))
+                                            // same versioned name found, and metadata equal
+                                                match upd_network {
+                                                    Some(gen_hash) => {
+                                                        // preparing action entry
+                                                            let upd = UpdSpecs {
+                                                                gen_hash,
+                                                                verifier,
+                                                            };
+                                                        // selecting correct action card type
+                                                        if upd_general {
+                                                        // need to update both verifiers
+                                                            let meta_card = Card::Warning(Warning::MetaAlreadyThereUpdBothVerifiers).card(index, 0);
+                                                        // making action entry into database
+                                                            match transaction.insert(ADDMETAVERIFIER, upd.encode()) {
+                                                                Ok(_) => (),
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                            match database.flush() {
+                                                                Ok(_) => (),
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                            let checksum = match database.checksum() {
+                                                                Ok(x) => x,
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                        // action card
+                                                            let action_card = Action::AddTwoVerifiers(checksum).card();
+                                                            Ok((meta_card, action_card))
+                                                        }
+                                                        else {
+                                                        // need to update only metadata verifier
+                                                            let meta_card = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(index, 0);
+                                                        // making action entry into database
+                                                            match transaction.insert(ADDMETAVERIFIER, upd.encode()) {
+                                                                Ok(_) => (),
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                            match database.flush() {
+                                                                Ok(_) => (),
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                            let checksum = match database.checksum() {
+                                                                Ok(x) => x,
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                        // action card
+                                                            let action_card = Action::AddMetadataVerifier(checksum).card();
+                                                            Ok((meta_card, action_card))
+                                                        }
                                                     },
-                                                    None => return Err(Error::BadInputData(BadInputData::MetaAlreadyThere)),
+                                                    None => {
+                                                        let meta_card = Card::Warning(Warning::MetaAlreadyThereUpdGeneralVerifier).card(index, 0);
+                                                        if upd_general {
+                                                            match transaction.insert(ADDGENERALVERIFIER, verifier.encode()) {
+                                                                Ok(_) => (),
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                            match database.flush() {
+                                                                Ok(_) => (),
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                            let checksum = match database.checksum() {
+                                                                Ok(x) => x,
+                                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                            };
+                                                        // action card
+                                                            let action_card = Action::AddGeneralVerifier(checksum).card();
+                                                            Ok((meta_card, action_card))
+                                                        }
+                                                        else {return Err(Error::BadInputData(BadInputData::MetaAlreadyThere))}
+                                                    },
                                                 }
                                             }
                                             else {return Err(Error::BadInputData(BadInputData::MetaTotalMismatch))}
                                         },
                                         None => {
+                                        // same versioned name NOT found
                                             let meta_card = Card::Meta{specname: name, spec_version: y.spec_version, meta_hash: &hex::encode(blake2b(32, &[], &meta).as_bytes())}.card(index, 0);
                                         // making action entry into database
                                             let action_into_db = LoadMetaDb {
                                                 versioned_name: received_versioned_name.encode(),
                                                 meta,
-                                                upd_specs,
+                                                upd_network,
+                                                verifier,
                                             };
-                                            match settings.insert(LOADMETA, action_into_db.encode()) {
-                                                Ok(_) => (),
-                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                            let action_card = {
+                                                if upd_general {
+                                                // updating general verifier
+                                                    match transaction.insert(LOADMETA, action_into_db.encode()) {
+                                                        Ok(_) => (),
+                                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                    };
+                                                    match database.flush() {
+                                                        Ok(_) => (),
+                                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                    };
+                                                    let checksum = match database.checksum() {
+                                                        Ok(x) => x,
+                                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                    };
+                                                // action card
+                                                    Action::LoadMetadataAndAddGeneralVerifier(checksum).card()
+                                                }
+                                                else {
+                                                // NOT updating general verifier
+                                                    match transaction.insert(LOADMETA, action_into_db.encode()) {
+                                                        Ok(_) => (),
+                                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                    };
+                                                    match database.flush() {
+                                                        Ok(_) => (),
+                                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                    };
+                                                    let checksum = match database.checksum() {
+                                                        Ok(x) => x,
+                                                        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
+                                                    };
+                                                // action card
+                                                    Action::LoadMetadata(checksum).card()
+                                                }
                                             };
-                                            match database.flush() {
-                                                Ok(_) => (),
-                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                            };
-                                            let checksum = match database.checksum() {
-                                                Ok(x) => x,
-                                                Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-                                            };
-                                        // action card
-                                            let action_card = format!("\"action\":{{\"type\":\"load_metadata\",\"payload\":{{\"type\":\"load_metadata\",\"checksum\":\"{}\"}}}}", checksum);
                                             Ok((meta_card, action_card))
                                         },
                                     }
@@ -120,28 +173,6 @@ fn process_received_metadata (meta: Vec<u8>, name: &str, index: u32, upd_specs: 
 }
 
 
-/// Function to create output card based on verifier info
-fn check_verifier (old: &Verifier, new: Verifier, meta: Vec<u8>, gen_hash: Vec<u8>, name: &str, metadata: Tree, settings: Tree, database: Db) -> Result <String, Error> {
-    if old == &new {
-        let verifier_card = Card::Verifier(new.show_card()).card(0,0);
-        let index = 1;
-        let upd_specs = None;
-        let (meta_card, action_card) = process_received_metadata(meta, name, index, upd_specs, metadata, settings, database)?;
-        Ok(format!("{{\"verifier\":[{}],\"meta\":[{}],{}}}", verifier_card, meta_card, action_card))
-    }
-    else {
-        if old == &Verifier::None {
-            let verifier_card = Card::Verifier(new.show_card()).card(0,0);
-            let warning_card = Card::Warning(Warning::VerifierAppeared).card(1,0);
-            let index = 2;
-            let upd_specs = Some(UpdSpecs{gen_hash, verifier: new});
-            let (meta_card, action_card) = process_received_metadata(meta, name, index, upd_specs, metadata, settings, database)?;
-            Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"meta\":[{}],{}}}", verifier_card, warning_card, meta_card, action_card))
-        }
-        else {return Err(Error::CryptoError(CryptoError::VerifierChanged{old_show: old.show_error(), new_show: new.show_error()}))}
-    }
-}
-
 pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
 
 // loading the database and removing the previous (if any) load_metadata saves
@@ -157,97 +188,61 @@ pub fn load_metadata (data_hex: &str, dbname: &str) -> Result<String, Error> {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
-    let settings: Tree = match database.open_tree(SETTREE) {
+    let transaction: Tree = match database.open_tree(TRANSACTION) {
         Ok(x) => x,
         Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
     };
     
-    match settings.remove(LOADMETA) {
-        Ok(_) => (),
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    }
+    let checked_info = pass_crypto(&data_hex)?;
     
-    match database.flush() {
-        Ok(_) => (),
-        Err(e) => return Err(Error::DatabaseError(DatabaseError::Internal(e))),
-    };
+// minimal length is 32 - the length of genesis hash
+    if checked_info.message.len() < 32 {return Err(Error::BadInputData(BadInputData::TooShort))}
+    let meta = checked_info.message[..checked_info.message.len()-32].to_vec();
+    let gen_hash = checked_info.message[checked_info.message.len()-32..].to_vec();
     
-    let data = match hex::decode(&data_hex) {
-        Ok(a) => a,
-        Err(_) => return Err(Error::BadInputData(BadInputData::NotHex)),
-    };
+    let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
     
-    match &data_hex[2..4] {
-        "00" => {
-        // Ed25519 crypto was used by the verifier of the metadata
-        // minimal possible data length is 3 + 32 + 32 + 64 (prelude, public key in ed25519, network genesis hash, signature in ed25519)
-            if data.len() < 131 {return Err(Error::BadInputData(BadInputData::TooShort))}
-            let into_pubkey: [u8;32] = data[3..35].try_into().expect("fixed size should fit in array");
-            let pubkey = ed25519::Public::from_raw(into_pubkey);
-            let message = data[35..data.len()-64].to_vec();
-            let into_signature: [u8;64] = data[data.len()-64..].try_into().expect("fixed size should fit in array");
-            let signature = ed25519::Signature::from_raw(into_signature);
-            if ed25519::Pair::verify(&signature, &message, &pubkey) {
-                let meta = message[..message.len()-32].to_vec();
-                let gen_hash = message[message.len()-32..].to_vec();
-                let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
-                let verifier = Verifier::Ed25519(hex::encode(&into_pubkey));
-                check_verifier (&chain_specs_found.verifier, verifier, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
-            }
-            else {return Err(Error::CryptoError(CryptoError::BadSignature))}
-        },
-        "01" => {
-        // Sr25519 crypto was used by the verifier of the metadata
-        // minimal possible data length is 3 + 32 + 32 + 64 (prelude, public key in sr25519, network genesis hash, signature in sr25519)
-            if data.len() < 131 {return Err(Error::BadInputData(BadInputData::TooShort))}
-            let into_pubkey: [u8;32] = data[3..35].try_into().expect("fixed size should fit in array");
-            let pubkey = sr25519::Public::from_raw(into_pubkey);
-            let message = data[35..data.len()-64].to_vec();
-            let into_signature: [u8;64] = data[data.len()-64..].try_into().expect("fixed size should fit in array");
-            let signature = sr25519::Signature::from_raw(into_signature);
-            if sr25519::Pair::verify(&signature, &message, &pubkey) {
-                let meta = message[..message.len()-32].to_vec();
-                let gen_hash = message[message.len()-32..].to_vec();
-                let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
-                let verifier = Verifier::Sr25519(hex::encode(&into_pubkey));
-                check_verifier (&chain_specs_found.verifier, verifier, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
-            }
-            else {return Err(Error::CryptoError(CryptoError::BadSignature))}
-        },
-        "02" => {
-        // Ecdsa crypto was used by the verifier of the metadata
-        // minimal possible data length is 3 + 33 + 32 + 65 (prelude, public key in ecdsa, network genesis hash, signature in ecdsa)
-            if data.len() < 133 {return Err(Error::BadInputData(BadInputData::TooShort))}
-            let into_pubkey: [u8;33] = data[3..36].try_into().expect("fixed size should fit in array");
-            let pubkey = ecdsa::Public::from_raw(into_pubkey);
-            let message = data[36..data.len()-65].to_vec();
-            let into_signature: [u8;65] = data[data.len()-65..].try_into().expect("fixed size should fit in array");
-            let signature = ecdsa::Signature::from_raw(into_signature);
-            if ecdsa::Pair::verify(&signature, &message, &pubkey) {
-                let meta = message[..message.len()-32].to_vec();
-                let gen_hash = message[message.len()-32..].to_vec();
-                let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
-                let verifier = Verifier::Ecdsa(hex::encode(&into_pubkey));
-                check_verifier (&chain_specs_found.verifier, verifier, meta, gen_hash, &chain_specs_found.name, metadata, settings, database)
-            }
-            else {return Err(Error::CryptoError(CryptoError::BadSignature))}
-        },
-        "ff" => {
-        // Received metadata was not signed
-        // minimal possible data length is 3 + 32 (prelude, network genesis hash)
-            if data.len() < 35 {return Err(Error::BadInputData(BadInputData::TooShort))}
-            let meta = data[3..data.len()-32].to_vec();
-            let gen_hash = data[data.len()-32..].to_vec();
-            let chain_specs_found = get_chainspecs(&gen_hash, &chainspecs)?;
+    let verifier = checked_info.verifier;
+    
+    match verifier {
+        Verifier::None => {
             if chain_specs_found.verifier == Verifier::None {
+            // action appears only if the metadata is actually uploaded
+            // "only verifier" warning is not possible
                 let index = 1;
-                let upd_specs = None;
-                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_specs, metadata, settings, database)?;
+                let upd_network = None;
+                let upd_general = false;
+                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
                 Ok(format!("{{\"warning\":[{}],\"meta\":[{}],{}}}", Card::Warning(Warning::NotVerified).card(0,0), meta_card, action_card))
             }
             else {return Err(Error::CryptoError(CryptoError::VerifierDisappeared))}
         },
-        _ => return Err(Error::BadInputData(BadInputData::CryptoNotSupported))
-    }    
-
+        _ => {
+            let verifier_card = Card::Verifier(verifier.show_card()).card(0,0);
+            if chain_specs_found.verifier == verifier {
+            // action appears only if the metadata is actually uploaded
+            // "only verifier" warning is not possible
+                let index = 1;
+                let upd_network = None;
+                let upd_general = false;
+                let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                Ok(format!("{{\"verifier\":[{}],\"meta\":[{}],{}}}", verifier_card, meta_card, action_card))
+            }
+            else {
+                if chain_specs_found.verifier == Verifier::None {
+                // action could be either uploading of metadata or only updating of the network verifier
+                    let warning_card = Card::Warning(Warning::VerifierAppeared).card(1,0);
+                    let possible_warning = Card::Warning(Warning::MetaAlreadyThereUpdMetaVerifier).card(2, 0);
+                    let index = 2;
+                    let upd_network = Some(gen_hash);
+                    let upd_general = false;
+                    let (meta_card, action_card) = process_received_metadata(meta, &chain_specs_found.name, index, upd_network, upd_general, verifier, metadata, transaction, database)?;
+                    if meta_card == possible_warning {Ok(format!("{{\"verifier\":[{}],\"warning\":[{},{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
+                    else {Ok(format!("{{\"verifier\":[{}],\"warning\":[{}],\"meta\":[{}],{}}}", verifier_card, warning_card, meta_card, action_card))}
+                }
+                else {return Err(Error::CryptoError(CryptoError::VerifierChanged{old_show: chain_specs_found.verifier.show_error(), new_show: verifier.show_error()}))}
+            }
+        },
+        
+    }
 }

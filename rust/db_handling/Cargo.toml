@@ -19,7 +19,7 @@ sp-core = "3.0.0"
 tiny-bip39 = { version = "0.8.0", default-features = false }
 blake2-rfc = "0.2.18"
 base58 = "0.1.0"
-xsalsa20poly1305 = {version = "0.7.1", default-features = false, features = ["alloc"]}
 zeroize = {version = "1.3.0", features = ["zeroize_derive"]}
+definitions = {path = "../definitions"}
 
 

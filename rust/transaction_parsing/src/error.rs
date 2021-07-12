@@ -31,6 +31,9 @@ pub enum BadInputData {
     UnableToDecodeMeta,
     UnableToDecodeTypes,
     TypesAlreadyThere,
+    UnableToDecodeAddNetworkMessage,
+    ImportantSpecsChanged,
+    
 }
 
 #[derive(PartialEq)]
@@ -67,8 +70,8 @@ pub enum DatabaseError {
     DamagedVersName,
     NoMetaThisVersion,
     NoMetaAtAll,
-    DamagedTypesVerifier,
-    NoTypesVerifier,
+    DamagedGeneralVerifier,
+    NoGeneralVerifier,
 }
 
 #[derive(PartialEq)]
@@ -88,8 +91,10 @@ pub enum CryptoError {
     BadSignature,
     VerifierChanged {old_show: String, new_show: String},
     VerifierDisappeared,
-    TypesVerifierChanged {old_show: String, new_show: String},
-    TypesVerifierDisappeared,
+    GeneralVerifierChanged {old_show: String, new_show: String},
+    GeneralVerifierDisappeared,
+    NetworkExistsVerifierDisappeared,
+    
 }
 
 impl Error {
@@ -117,6 +122,8 @@ impl Error {
                     BadInputData::UnableToDecodeMeta => String::from("Unable to decode received metadata."),
                     BadInputData::UnableToDecodeTypes => String::from("Unable to decode received types information."),
                     BadInputData::TypesAlreadyThere => String::from("Types information already in database."),
+                    BadInputData::UnableToDecodeAddNetworkMessage => String::from("Unable to decode received add network message."),
+                    BadInputData::ImportantSpecsChanged => String::from("Network already has entries. Important chainspecs in received add network message are different."),
                 }
             },
             Error::UnableToDecode(x) => {
@@ -153,8 +160,8 @@ impl Error {
                     DatabaseError::DamagedVersName => String::from("Network versioned name from metadata database could not be decoded."),
                     DatabaseError::NoMetaThisVersion => String::from("No metadata on file for this version."),
                     DatabaseError::NoMetaAtAll => String::from("No metadata on file for this network."),
-                    DatabaseError::DamagedTypesVerifier => String::from("Types verifier information from database could not be decoded."),
-                    DatabaseError::NoTypesVerifier => String::from("No types verifier information in the database."),
+                    DatabaseError::DamagedGeneralVerifier => String::from("General verifier information from database could not be decoded."),
+                    DatabaseError::NoGeneralVerifier => String::from("No general verifier information in the database."),
                 }
             },
             Error::SystemError(x) => {
@@ -174,8 +181,9 @@ impl Error {
                     CryptoError::BadSignature => String::from("Corrupted data. Bad signature."),
                     CryptoError::VerifierChanged {old_show, new_show} => format!("Different verifier was used for this network previously. Previously used {}. Current attempt {}.", old_show, new_show),
                     CryptoError::VerifierDisappeared => String::from("Saved metadata for this network was signed by a verifier. This metadata is not."),
-                    CryptoError::TypesVerifierChanged {old_show, new_show} => format!("Different verifier was used for types previously. Previously used {}. Current attempt {}.", old_show, new_show),
-                    CryptoError::TypesVerifierDisappeared => String::from("Saved types information was signed by a verifier. Received types information is not."),
+                    CryptoError::GeneralVerifierChanged {old_show, new_show} => format!("Different general verifier was used previously. Previously used {}. Current attempt {}.", old_show, new_show),
+                    CryptoError::GeneralVerifierDisappeared => String::from("General verifier information exists in the database. Received information could be accepted only from the same general verifier."),
+                    CryptoError::NetworkExistsVerifierDisappeared => String::from("Network already has specs recorded in database. Received add network message is not signed, previously this network information was signed."),
                 }
             },
         }

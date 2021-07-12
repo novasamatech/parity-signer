@@ -1,13 +1,16 @@
-use sled::{Db, open};
+use transaction_parsing::cards::Action;
 
 mod accept_metadata;
     use accept_metadata::{accept_metadata, add_meta_verifier};
+mod accept_network;
+    use accept_network::add_network;
 mod accept_types;
-    use accept_types::{accept_types, add_types_verifier};
+    use accept_types::{accept_types, add_general_verifier};
 mod interpretation;
-    use interpretation::{get_checksum, get_action_type, ActionType};
+    use interpretation::interpret_action;
 mod sign_transaction;
     use sign_transaction::create_signature;
+mod tests;
 
 /// Function process action card from RN.
 /// Currently supported action type cards are:
@@ -16,23 +19,17 @@ mod sign_transaction;
 
 pub fn handle_action (action_line: &str, pin: &str, pwd_entry: &str, dbname: &str) -> Result<String, Box<dyn std::error::Error>> {
 
-// get checksum from action line
-    let checksum = get_checksum(action_line)?;
-
-// open the actual database and get the actual checksum
-    let database: Db = open(dbname)?;
-    let real_checksum = database.checksum()?;
+    let action = interpret_action (action_line)?;
     
-    if checksum != real_checksum {return Err(Box::from("Database checksum mismatch."))}
-
-// get action type from action line
-    let action_type = get_action_type(action_line)?;
-    
-    match action_type {
-        ActionType::SignTransaction => create_signature(pin, pwd_entry, database),
-        ActionType::LoadMetadata => accept_metadata(database),
-        ActionType::AddMetadataVerifier => add_meta_verifier(database),
-        ActionType::LoadTypes => accept_types(database),
-        ActionType::AddTypesVerifier => add_types_verifier(database),
+    match action {
+        Action::SignTransaction(checksum) => create_signature(pin, pwd_entry, dbname, checksum),
+        Action::LoadMetadata(checksum) => accept_metadata(dbname, checksum, false),
+        Action::AddMetadataVerifier(checksum) => add_meta_verifier(dbname, checksum, false),
+        Action::LoadTypes(checksum) => accept_types(dbname, checksum),
+        Action::AddGeneralVerifier(checksum) => add_general_verifier(dbname, checksum),
+        Action::AddTwoVerifiers(checksum) => add_meta_verifier(dbname, checksum, true),
+        Action::LoadMetadataAndAddGeneralVerifier(checksum) => accept_metadata (dbname, checksum, true),
+        Action::AddNetwork(checksum) => add_network (dbname, checksum, false),
+        Action::AddNetworkAndAddGeneralVerifier(checksum) => add_network (dbname, checksum, true),
     }
 }

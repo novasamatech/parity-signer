@@ -2,18 +2,23 @@ use hex;
 use sp_core::{Pair, ed25519, sr25519, ecdsa, crypto::Ss58Codec};
 use ethsign::{keyfile::Crypto, Protected};
 use serde_json;
-use sled::{Db, Tree};
-use db_handling::{settings::SignDb, constants::{SETTREE, SIGNTRANS, IDTREE}};
+use sled::{Db, open, Tree};
+use definitions::{transactions::SignDb, constants::{TRANSACTION, SIGNTRANS, IDTREE}};
 use parity_scale_codec::{Decode, Encode};
 
 
 /// Function to create signatures using RN output action line, and user entered pin and password.
 /// Also needs database name to fetch saved transaction and key.
 
-pub fn create_signature (pin: &str, pwd_entry: &str, database: Db) -> Result<String, Box<dyn std::error::Error>> {
-
-    let settings: Tree = database.open_tree(SETTREE)?;
-    let action = match settings.get(SIGNTRANS)? {
+pub fn create_signature (pin: &str, pwd_entry: &str, dbname: &str, checksum: u32) -> Result<String, Box<dyn std::error::Error>> {
+    
+    let database: Db = open(dbname)?;
+    let real_checksum = database.checksum()?;
+    
+    if checksum != real_checksum {return Err(Box::from("Database checksum mismatch."))}
+    
+    let transaction: Tree = database.open_tree(TRANSACTION)?;
+    let action = match transaction.get(SIGNTRANS)? {
         Some(x) => {<SignDb>::decode(&mut &x[..])?},
         None => {return Err(Box::from("No approved transaction found."))}
     };
@@ -54,7 +59,7 @@ pub fn create_signature (pin: &str, pwd_entry: &str, database: Db) -> Result<Str
             };
             if x != ed25519_pair.public() {return Err(Box::from("Wrong password."))}
             let signature = ed25519_pair.sign(&action.transaction[..]);
-            settings.remove(SIGNTRANS)?;
+            transaction.remove(SIGNTRANS)?;
             database.flush()?;
             Ok(format!("00{}", hex::encode(signature)))
         },
@@ -69,7 +74,7 @@ pub fn create_signature (pin: &str, pwd_entry: &str, database: Db) -> Result<Str
             };
             if x != sr25519_pair.public() {return Err(Box::from("Wrong password."))}
             let signature = sr25519_pair.sign(&action.transaction[..]);
-            settings.remove(SIGNTRANS)?;
+            transaction.remove(SIGNTRANS)?;
             database.flush()?;
             Ok(format!("01{}", hex::encode(signature)))
         },
@@ -84,7 +89,7 @@ pub fn create_signature (pin: &str, pwd_entry: &str, database: Db) -> Result<Str
             };
             if x != ecdsa_pair.public() {return Err(Box::from("Wrong password."))}
             let signature = ecdsa_pair.sign(&action.transaction[..]);
-            settings.remove(SIGNTRANS)?;
+            transaction.remove(SIGNTRANS)?;
             database.flush()?;
             Ok(format!("02{}", hex::encode(signature)))
         },
