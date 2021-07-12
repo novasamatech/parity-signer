@@ -614,7 +614,23 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 			String suggestion = substrateSuggestNPlusOne(path, seedName, networkId, dbname);
 			promise.resolve(suggestion);
 		} catch (Exception e) {
-			rejectWithException(promise, "Can't suggest a path", e);
+			rejectWithException(promise, "Can not suggest a path", e);
+		}
+	}
+
+	@ReactMethod
+	public void suggestPathName(String path, Promise promise) {
+		String suggestion = substrateSuggestName(path);
+		promise.resolve(suggestion);
+	}
+
+	@ReactMethod
+	public void deleteIdentity(String pubKey, String networkId, Promise promise) {
+		try {
+			substrateDeleteIdentity(pubKey, networkId, dbname);
+			promise.resolve(0);
+		} catch (Exception e) {
+			rejectWithException(promise, "Can not delete identity", e);
 		}
 	}
 
@@ -657,4 +673,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	private static native String substrateSuggestNPlusOne(String path, String seedName, String networkIdString, String dbname);
 	private static native boolean substrateCheckPath(String path);
 	private static native void substrateTryCreateIdentity(String idName, String seedName, String seedPhrase, String crypto, String path, String network, boolean hasPassword, String dbname);
+	private static native String substrateSuggestName(String path);
+	private static native void substrateDeleteIdentity(String pubKey, String network, String dbname);
 }

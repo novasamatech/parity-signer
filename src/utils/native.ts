@@ -135,10 +135,26 @@ export async function suggestNPlusOne(path: string, seedName: string, network: s
 	}
 }
 
+export async function suggestSeedName(path: string): Promise<string> {
+	const suggest = await SubstrateSign.suggestPathName(path);
+	console.log(suggest);
+	return suggest;
+}
+
 export async function tryCreateIdentity(idName: string, seedName: string, cryptoType: string, path: string, networkId: string): Promise<void> {
 	console.log('creating identity...');
 	await SubstrateSign.tryCreateIdentity(idName, seedName, cryptoType, path, networkId);
 	console.log('identity created');
+}
+
+export async function deleteIdentity(pubKey: string, networkId: string): Promise<void> {
+	try {
+		console.log('deleting identity');
+		await SubstrateSign.deleteIdentity(pubKey, networkId);
+		console.log('deleting successful');
+	} catch (e) {
+		console.warn(e);
+	}
 }
 
 //Try to decode fountain packages

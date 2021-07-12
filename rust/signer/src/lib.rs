@@ -534,6 +534,21 @@ export! {
         db_handling::identities::try_create_address(id_name, seed_name, seed_phrase, crypto, path, network, has_password, dbname)
     }
 
+    @Java_io_parity_signer_SubstrateSignModule_substrateSuggestName
+	fn suggest_name(
+        path: &str
+	) -> String {
+        db_handling::identities::suggest_path_name(path)
+    }
+
+    @Java_io_parity_signer_SubstrateSignModule_substrateDeleteIdentity
+	fn delete_identity(
+        pub_key: &str,
+        network: &str,
+        dbname: &str
+	) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        db_handling::identities::delete_address(pub_key, network, dbname)
+    }
 }
 
 ffi_support::define_string_destructor!(signer_destroy_string);
