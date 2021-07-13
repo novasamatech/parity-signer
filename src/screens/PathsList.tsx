@@ -45,6 +45,7 @@ import { CardSeparator } from 'components/CardSeparator';
 import QrView from 'components/QrView';
 import Button from 'components/Button';
 import { NetworkCard } from 'components/NetworkCard';
+import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 
 export default function PathsList({
 	navigation,
@@ -168,6 +169,9 @@ export default function PathsList({
 
 	const onTapDeleteButton = (): Promise<void> => {
 		deleteIdentity(activeAddress.publicKey, networkKey);
+		setPaths(paths.filter(item => item !== activeAddress));
+		setActiveAddress();
+		
 	};
 	const onTapIncrementButton = async function(): Promise<void> {
 		const suggestion = await suggestNPlusOne(activeAddress.path, rootSeed, networkKey);
