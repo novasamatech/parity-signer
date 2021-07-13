@@ -93,13 +93,10 @@ export function qrCode(data: string): Promise<string> {
 	return SubstrateSign.qrCode(data);
 }
 
+//This is called when terms and conditions are acknowledged; the Signer is not usable before db init.
 export async function dbInit(): Promise<void> {
 	try {
-		const metadata = await dumpMetadataDB();
-		const metadataJSON = JSON.stringify(metadata);
-		const parsedJSON = await SubstrateSign.dbInit(
-			metadataJSON,
-		);
+		await SubstrateSign.dbInit();
 		console.log('db created!');
 	} catch (e) {
 		console.log(e);
@@ -268,32 +265,6 @@ export async function getAllSeedNames(): Promise<[string]> {
 		console.log(e);
 		return [];
 	}
-}
-
-//Set TC&PP
-
-export async function ackUserAgreement(): Promise<void> {
-	try {
-		await SubstrateSign.ackUserAgreement();
-		console.log("I do");
-		return;
-	} catch(e) {
-		console.log(e);
-		return;
-	}	
-}
-
-//check if TC&PP were acked
-
-export async function checkUserAgreement(): Promise<bool> {
-	try {
-		const check = await SubstrateSign.checkUserAgreement();
-		console.log(check);
-		return check;
-	} catch(e) {
-		console.log(e);
-		return false;
-	}	
 }
 
 //================================

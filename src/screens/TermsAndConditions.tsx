@@ -21,7 +21,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import toc from '../../docs/terms-and-conditions.md';
 
 import containerStyles from 'styles/containerStyles';
-import { GlobalState, GlobalStateContext } from 'stores/globalStateContext';
 import testIDs from 'e2e/testIDs';
 import { NavigationProps } from 'types/props';
 import colors from 'styles/colors';
@@ -29,7 +28,7 @@ import fontStyles from 'styles/fontStyles';
 import Button from 'components/Button';
 import Markdown from 'components/Markdown';
 import TouchableItem from 'components/TouchableItem';
-import { ackUserAgreement } from 'utils/native';
+import { dbInit } from 'utils/native';
 import CustomScrollView from 'components/CustomScrollView';
 import { navigateToLandingPage } from 'utils/navigationHelpers';
 
@@ -39,15 +38,11 @@ export default function TermsAndConditions(
 	const [ppAgreement, setPpAgreement] = useState<boolean>(false);
 	const [tocAgreement, setTocAgreement] = useState<boolean>(false);
 
-	const { setPolicyConfirmed, policyConfirmed } = useContext<GlobalState>(
-		GlobalStateContext
-	);
-
 	const { navigation } = props;
+	const policyConfirmed = props.route.params?.policyConfirmed ?? true;
 
 	const onConfirm = async (): Promise<void> => {
-		await ackUserAgreement();
-		setPolicyConfirmed(true);
+		await dbInit();
 		navigateToLandingPage(navigation);
 	};
 
@@ -57,7 +52,7 @@ export default function TermsAndConditions(
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>
 
-			{!policyConfirmed && (
+			{policyConfirmed ? <View /> : (
 				<View>
 					<TouchableItem
 						testID={testIDs.TacScreen.agreeTacButton}

@@ -55,6 +55,11 @@ export default function NetworkSelector({
 	useEffect(() => {
 		const fetchNetworkList = async function (): Promise<void> {
 			const networkListFetch = await getAllNetworks();
+			//This is where we check if the user has accepted TOC and PP
+			if (Object.keys(networkListFetch).length === 0) {
+				console.log("go to TOC");
+				navigation.navigate("TermsAndConditions", {policyConfirmed: false});
+			}
 			setNetworkList(networkListFetch);
 		}
 		fetchNetworkList();
@@ -62,6 +67,7 @@ export default function NetworkSelector({
 
 	// catch android back button and prevent exiting the app
 	// TODO: this just doesn't work and nobody noticed, let's fix later
+	// Maybe this is not the desired behavior?
 	useFocusEffect(
 		React.useCallback((): any => {
 			const handleBackButton = (): boolean => {

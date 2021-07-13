@@ -207,11 +207,11 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	/**
-	 * Copy the asset at the specified path to this app's data directory. If the
+	 * Copy the database asset at the specified path to this app's data directory. If the
 	 * asset is a directory, its contents are also copied.
 	 *	
 	 * @param path
-	 * Path to asset, relative to app's assets directory.
+	 * Path to asset, relative to app's assets/database directory.
 	 */
 	private void copyAsset(String path) throws IOException {
 		AssetManager manager = reactContext.getAssets();
@@ -243,11 +243,11 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	/**
-	 * Copy the asset file specified by path to app's data directory. Assumes
+	 * Copy the database asset file specified by path to app's data directory. Assumes
 	 * parent directories have already been created.
 	 *
 	 * @param path
-	 * Path to asset, relative to app's assets directory.
+	 * Path to asset, relative to app's assets/database directory.
 	 */
 	private void copyFileAsset(String path) throws IOException {
 		AssetManager manager = reactContext.getAssets();
@@ -519,10 +519,14 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	}
 
 	//This should be only run once ever!
+	//Also this factory resets the Signer upon deletion of local data
+	//Should be cryptographically reliable
+	//However this was not audited yet
 	@ReactMethod
-	public void dbInit(String metadata, Promise promise) {
+	public void dbInit(Promise promise) {
 		try {
-			//substrateDbInit(metadata, dbname);
+			//Move database from assets to internal storage
+			//This function is not usable for anything else
 			copyAsset("");
 			generateSecretKey(new KeyGenParameterSpec.Builder(
 				KEY_NAME,
@@ -575,25 +579,6 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 			promise.resolve(allSeedNames);
 		} catch (Exception e) {
 			rejectWithException(promise, "Database fetch relevant identities error", e);
-		}
-	}
-
-	@ReactMethod
-	public void ackUserAgreement(Promise promise) {
-		try {
-			dbAckUserAgreement(dbname);
-			promise.resolve(0);
-		} catch (Exception e) {
-			rejectWithException(promise, "Database acknowledge terms and conditions and privacy policy error", e);
-		}
-	}
-	
-	@ReactMethod
-	public void checkUserAgreement(Promise promise) {
-		try {
-			promise.resolve(dbCheckUserAgreement(dbname));
-		} catch (Exception e) {
-			rejectWithException(promise, "Database check if terms and conditions and privacy policy are acknowledged error", e);
 		}
 	}
 
