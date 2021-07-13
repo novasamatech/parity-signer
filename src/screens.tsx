@@ -166,10 +166,6 @@ export const BareLoadingScreen = (): React.ReactElement => (
 			headerRight: (): React.ReactNode => null
 		}}
 	>
-		<ScreenStack.Screen
-			name="LoadingScreen"
-			component={LoadingScreen}
-		/>
+		<ScreenStack.Screen name="LoadingScreen" component={LoadingScreen} />
 	</ScreenStack.Navigator>
 );
-

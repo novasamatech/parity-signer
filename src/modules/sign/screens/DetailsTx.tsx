@@ -43,9 +43,7 @@ function DetailsTx({
 
 	useEffect(() => {
 		const generateCards = async function (encoded: string): Promise<void> {
-			const cardsSet = await makeTransactionCardsContents(
-				encoded,
-			);
+			const cardsSet = await makeTransactionCardsContents(encoded);
 
 			//TODO: here should be finer features on what to do
 			//with different payload types.
@@ -78,7 +76,10 @@ function DetailsTx({
 			);
 			if (cardsSet.action) setAction(cardsSet.action);
 		};
-		if (payload === '5301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe') {
+		if (
+			payload ===
+			'5301025a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe969a40403005a4a03f84a19cf8ebda40e62358c592870691a9cf456138bb4829969d10fe9690700e40b5402c5005c00ec07000004000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafebcd1b489599db4424ed928804ddad3a4689fb8c835151ef34bc250bb845cdc1eb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe'
+		) {
 			generateCards('test all');
 		} else {
 			generateCards(payload);
@@ -119,8 +120,13 @@ function DetailsTx({
 			/>
 			<Button
 				onPress={performAction}
-				title={action.type === 'sign_transaction' ? 'SIGN' : 
-					action.type === 'load_metadata' ? 'ACCEPT' : 'BACK'}
+				title={
+					action.type === 'sign_transaction'
+						? 'SIGN'
+						: action.type === 'load_metadata'
+						? 'ACCEPT'
+						: 'BACK'
+				}
 				testID={testIDs.DetailsTx.signButton}
 			/>
 		</SafeAreaViewContainer>

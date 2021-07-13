@@ -14,15 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, ReactNode, useContext } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { View, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import { Icon } from 'react-native-elements';
 
 import ButtonIcon from './ButtonIcon';
-import NetworkIcon from 'components/NetworkIcon';
 
-import { NetworksContext } from 'stores/NetworkContext';
+import NetworkIcon from 'components/NetworkIcon';
 import TouchableItem from 'components/TouchableItem';
 import testIDs from 'e2e/testIDs';
 import fontStyles from 'styles/fontStyles';

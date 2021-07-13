@@ -14,38 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useState, useEffect } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import Identicon from '@polkadot/reactnative-identicon';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 
-import { PathDetailsView } from './PathDetails';
-
-import { NetworksContext } from 'stores/NetworkContext';
-import { PathGroup } from 'types/identityTypes';
-import PathGroupCard from 'components/PathGroupCard';
-import { useUnlockSeed } from 'utils/navigationHelpers';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import testIDs from 'e2e/testIDs';
 import { NavigationAccountIdentityProps } from 'types/props';
-import {
-	getPathsWithSubstrateNetworkKey,
-	groupPaths
-} from 'utils/identitiesUtils';
 import QRScannerAndDerivationTab from 'components/QRScannerAndDerivationTab';
-import PathCard from 'components/PathCard';
 import Separator from 'components/Separator';
-import { LeftScreenHeading } from 'components/ScreenHeading';
 import OnBoardingView from 'components/OnBoarding';
-import { getAllSeedNames, getNetwork, getIdentitiesForSeed, suggestNPlusOne, deleteIdentity } from 'utils/native';
+import {
+	getAllSeedNames,
+	getNetwork,
+	getIdentitiesForSeed,
+	suggestNPlusOne,
+	deleteIdentity
+} from 'utils/native';
 import TouchableItem from 'components/TouchableItem';
 import fontStyles from 'styles/fontStyles';
 import colors from 'styles/colors';
-import Identicon from '@polkadot/reactnative-identicon';
-import AntIcon from 'react-native-vector-icons/AntDesign';
 import { CardSeparator } from 'components/CardSeparator';
 import QrView from 'components/QrView';
 import Button from 'components/Button';
 import { NetworkCard } from 'components/NetworkCard';
-import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 
 export default function PathsList({
 	navigation,
@@ -60,9 +53,11 @@ export default function PathsList({
 	const [showQR, setShowQR] = useState(false);
 
 	const { navigate } = navigation;
-	
+
 	useEffect(() => {
-		const populatePathsList = async function (networkKeyRef: string): Promise<void> {
+		const populatePathsList = async function (
+			networkKeyRef: string
+		): Promise<void> {
 			console.log(networkKeyRef);
 			const networkInfo = await getNetwork(networkKeyRef);
 			console.log(networkInfo);
@@ -72,17 +67,22 @@ export default function PathsList({
 			setRootSeedList(seedList);
 			console.log(seedList);
 			if (seedList) setRootSeed(seedList[0]);
-		}
+		};
 		populatePathsList(networkKey);
 	}, [networkKey]);
 
 	useEffect(() => {
-		const fetchPaths = async function (networkKeyRef: string, rootSeedRef: string): Promise<void> {
+		const fetchPaths = async function (
+			networkKeyRef: string,
+			rootSeedRef: string
+		): Promise<void> {
 			const fetched = await getIdentitiesForSeed(rootSeedRef, networkKeyRef);
-			const sorted = fetched.sort((a, b) => { return a.path>b.path});
+			const sorted = fetched.sort((a, b) => {
+				return a.path > b.path;
+			});
 			setPaths(fetched);
-		}
-		if(rootSeed) fetchPaths(networkKey, rootSeed);
+		};
+		if (rootSeed) fetchPaths(networkKey, rootSeed);
 	}, [networkKey, rootSeed, navigation]);
 
 	const renderSeed = ({ item }: { item: string }): ReactElement => {
@@ -92,26 +92,42 @@ export default function PathsList({
 				onPress={() => setRootSeed(item)}
 				style={active ? styles.seedActive : styles.seed}
 			>
-				<Text style={active ? styles.seedLabelActive : styles.seedLabelInactive}>{item}</Text>
+				<Text
+					style={active ? styles.seedLabelActive : styles.seedLabelInactive}
+				>
+					{item}
+				</Text>
 			</TouchableItem>
 		);
 	};
-	
+
 	const renderIdentity = ({ item }): ReactElement => {
 		const active = item === activeAddress;
 		return (
 			<View>
 				<View style={active ? styles.contentActive : styles.content}>
 					<TouchableItem
-						onPress={() => activeAddress === item ? setActiveAddress('') : setActiveAddress(item)}
+						onPress={() =>
+							activeAddress === item
+								? setActiveAddress('')
+								: setActiveAddress(item)
+						}
 						style={styles.card}
 					>
-						<View style={{flexDirection: 'row'}}>
-							<Identicon value={item.ss58} size={40} style={{paddingTop: 10}}/>
+						<View style={{ flexDirection: 'row' }}>
+							<Identicon
+								value={item.ss58}
+								size={40}
+								style={{ paddingTop: 10 }}
+							/>
 							<View style={{ paddingHorizontal: 10 }}>
 								<Text style={styles.textLabel}>{item.name}</Text>
-								<View style={{flexDirection: 'row'}}>
-									<Text style={{...styles.derivationText, fontWeight: 'bold'}}>{rootSeed}</Text>
+								<View style={{ flexDirection: 'row' }}>
+									<Text
+										style={{ ...styles.derivationText, fontWeight: 'bold' }}
+									>
+										{rootSeed}
+									</Text>
 									<Text style={styles.derivationText}>{item.path}</Text>
 									{item.hasPassword === 'true' ? (
 										<AntIcon name="lock" style={styles.derivationText} />
@@ -126,7 +142,6 @@ export default function PathsList({
 								>
 									{item.ss58}
 								</Text>
-	
 							</View>
 						</View>
 					</TouchableItem>
@@ -135,34 +150,36 @@ export default function PathsList({
 					<View style={styles.contentActive}>
 						<TouchableItem
 							onPress={onTapDeleteButton}
-							style={{...styles.card, alignItems: 'center'}}
+							style={{ ...styles.card, alignItems: 'center' }}
 						>
 							<Text style={styles.icon}>del</Text>
 							<Text style={styles.textLabel}>Delete</Text>
 						</TouchableItem>
 						<TouchableItem
 							onPress={() => setShowQR(true)}
-							style={{...styles.card, alignItems: 'center'}}
+							style={{ ...styles.card, alignItems: 'center' }}
 						>
 							<Text style={styles.icon}>QR</Text>
 							<Text style={styles.textLabel}>Export</Text>
 						</TouchableItem>
 						<TouchableItem
 							onPress={onTapIncrementButton}
-							style={{...styles.card, alignItems: 'center'}}
+							style={{ ...styles.card, alignItems: 'center' }}
 						>
 							<Text style={styles.icon}>/+1</Text>
 							<Text style={styles.textLabel}>Increment</Text>
 						</TouchableItem>
 						<TouchableItem
 							onPress={onTapDeriveButton}
-							style={{...styles.card, alignItems: 'center'}}
+							style={{ ...styles.card, alignItems: 'center' }}
 						>
 							<Text style={styles.icon}>/name</Text>
 							<Text style={styles.textLabel}>Derive</Text>
 						</TouchableItem>
 					</View>
-				) : ( <View /> )}
+				) : (
+					<View />
+				)}
 			</View>
 		);
 	};
@@ -171,31 +188,43 @@ export default function PathsList({
 		deleteIdentity(activeAddress.publicKey, networkKey);
 		setPaths(paths.filter(item => item !== activeAddress));
 		setActiveAddress();
-		
 	};
-	const onTapIncrementButton = async function(): Promise<void> {
-		const suggestion = await suggestNPlusOne(activeAddress.path, rootSeed, networkKey);
-		navigation.navigate('PathDerivation', { path: suggestion, networkKey: networkKey, seedName: rootSeed });
+	const onTapIncrementButton = async function (): Promise<void> {
+		const suggestion = await suggestNPlusOne(
+			activeAddress.path,
+			rootSeed,
+			networkKey
+		);
+		navigation.navigate('PathDerivation', {
+			networkKey: networkKey,
+			path: suggestion,
+			seedName: rootSeed
+		});
 	};
 	const onTapDeriveButton = (): Promise<void> => {
-		navigation.navigate('PathDerivation', { path: activeAddress.path, networkKey: networkKey, seedName: rootSeed });
+		navigation.navigate('PathDerivation', {
+			networkKey: networkKey,
+			path: activeAddress.path,
+			seedName: rootSeed
+		});
 	};
 
 	const onTapNewSeedButton = (): Promise<void> => {
-		navigation.navigate('RootSeedNew', { false });
+		navigation.navigate('RootSeedNew', { isBackup: false });
 	};
 
-	const onTapIdentity = (): Promise<void> => {};
+	const onTapIdentity = (): Promise<void> => {
+		return;
+	};
 
 	if (showQR) {
 		return (
 			<SafeAreaViewContainer>
 				<Text style={styles.addressName}>{activeAddress.name}</Text>
-				<QrView data={`substrate:${activeAddress.ss58}:${networkKey}:${activeAddress.name}`} />
-				<Button 
-					onPress={() => setShowQR(false)}
-					title={'DONE'}
+				<QrView
+					data={`substrate:${activeAddress.ss58}:${networkKey}:${activeAddress.name}`}
 				/>
+				<Button onPress={() => setShowQR(false)} title={'DONE'} />
 			</SafeAreaViewContainer>
 		);
 	} else if (rootSeed) {
@@ -203,17 +232,27 @@ export default function PathsList({
 			<SafeAreaViewContainer>
 				<NetworkCard
 					network={network}
-					onPress={(): Promise<void> => {navigation.goBack();}}
+					onPress={(): Promise<void> => {
+						navigation.goBack();
+					}}
 				/>
-				<View style={{flexDirection: 'row'}}>
-					<FlatList horizontal={true} 
+				<View style={{ flexDirection: 'row' }}>
+					<FlatList
+						horizontal={true}
 						data={rootSeedList}
 						renderItem={renderSeed}
 						keyExtractor={item => item}
 					/>
 					<TouchableItem
 						onPress={onTapNewSeedButton}
-						style={{alignItems: 'center', backgroundColor: colors.background.card, borderWidth: 2, borderColor: colors.border.light, paddingLeft: 8, paddingRight: 8}}
+						style={{
+							alignItems: 'center',
+							backgroundColor: colors.background.card,
+							borderColor: colors.border.light,
+							borderWidth: 2,
+							paddingLeft: 8,
+							paddingRight: 8
+						}}
 					>
 						<Text style={styles.icon}>+ seed</Text>
 					</TouchableItem>
@@ -233,7 +272,7 @@ export default function PathsList({
 			</SafeAreaViewContainer>
 		);
 	} else {
-		return <OnBoardingView />
+		return <OnBoardingView />;
 	}
 }
 
@@ -299,14 +338,14 @@ const styles = StyleSheet.create({
 	},
 	seedLabelActive: {
 		...fontStyles.t_label,
-		justifyContent: 'center',
-		fontSize: 20
+		fontSize: 20,
+		justifyContent: 'center'
 	},
 	seedLabelInactive: {
 		...fontStyles.t_label,
 		color: colors.text.main,
-		justifyContent: 'center',
-		fontSize: 20
+		fontSize: 20,
+		justifyContent: 'center'
 	},
 	textLabel: {
 		...fontStyles.a_text

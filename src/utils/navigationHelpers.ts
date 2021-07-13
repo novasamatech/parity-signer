@@ -170,4 +170,3 @@ export const navigateToFastQrScanner = <
 >(
 	navigation: GenericNavigationProps<RouteName>
 ): void => resetNavigationWithNetworkChooser(navigation, 'FastQrScanner');
-

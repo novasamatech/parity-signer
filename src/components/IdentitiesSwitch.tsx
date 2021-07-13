@@ -15,7 +15,7 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -27,7 +27,6 @@ import { RootStackParamList } from 'types/routes';
 import testIDs from 'e2e/testIDs';
 import colors from 'styles/colors';
 import fontStyles from 'styles/fontStyles';
-import { getIdentityName } from 'utils/identitiesUtils';
 import {
 	unlockAndReturnSeed,
 	navigateToLegacyAccountList,
@@ -87,32 +86,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 		}
 	};
 
-	const onLegacyListClicked = (): void => {
-		setVisible(false);
-		navigateToLegacyAccountList(navigation);
-		accountsStore.resetCurrentIdentity();
-	};
-
-	const renderIdentityOptions = (identity: Identity): React.ReactElement => {
-		return (
-			<>
-				<ButtonWithArrow
-					title="Manage Identity"
-					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(identity, 'IdentityManagement')
-					}
-					testID={testIDs.IdentitiesSwitch.manageIdentityButton}
-				/>
-				<ButtonWithArrow
-					title="Show Recovery Phrase"
-					onPress={(): Promise<void> =>
-						onIdentitySelectedAndNavigate(identity, 'IdentityBackup')
-					}
-				/>
-			</>
-		);
-	};
-
 	const renderSettings = (): React.ReactElement => {
 		return (
 			<>
@@ -138,37 +111,6 @@ function IdentitiesSwitch({}: Record<string, never>): React.ReactElement {
 					title="Privacy Policy"
 					onPress={(): void => closeModalAndNavigate('PrivacyPolicy')}
 				/>
-			</>
-		);
-	};
-
-	const renderIdentities = (): React.ReactNode => {
-		// if no identity or the only one we have is the selected one
-
-		if (!identities.length || (identities.length === 1 && currentIdentity))
-			return <Separator style={{ height: 0, marginVertical: 4 }} />;
-
-		const identitiesToShow = currentIdentity
-			? identities.filter(
-					identity => identity.encryptedSeed !== currentIdentity.encryptedSeed
-			  )
-			: identities;
-
-		return (
-			<>
-				<ScrollView
-					bounces={false}
-					style={{
-						maxHeight: 160
-					}}
-				>
-					<View style={{ paddingVertical: 8 }}>
-						{identitiesToShow.map(renderNonSelectedIdentity)}
-					</View>
-				</ScrollView>
-				{identities.length > 5 && (
-					<Separator shadow={true} style={{ marginTop: 0 }} />
-				)}
 			</>
 		);
 	};

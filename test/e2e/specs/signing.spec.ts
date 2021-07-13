@@ -15,10 +15,6 @@
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
-import {
 	launchWithScanRequest,
 	pinCode,
 	tapBack,
@@ -50,12 +46,6 @@ const testSignedTx = async (): Promise<void> => {
 };
 
 const testSignedMessage = async (): Promise<void> => {
-	await testTap(SecurityHeader.scanButton);
-	await testUnlockPin(pinCode);
-	await testVisible(SignedMessage.qrView);
-};
-
-const testEthereumMessage = async (): Promise<void> => {
 	await testTap(SecurityHeader.scanButton);
 	await testUnlockPin(pinCode);
 	await testVisible(SignedMessage.qrView);

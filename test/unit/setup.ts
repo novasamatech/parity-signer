@@ -16,12 +16,9 @@
 
 /* global jest */
 // import mockCamera from './__mocks__/Camera'
-import mockAsyncStorage from '@react-native-community/async-storage/jest/async-storage-mock';
 
 // mock reactnative that requires native platform
 jest.doMock('react-native', () => 'reactNativeMock');
-
-jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
 
 // mock native RNG
 jest.mock('react-native-randombytes', () => {

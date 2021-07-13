@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
@@ -23,21 +23,10 @@ import { AlertStateContext } from 'stores/alertContext';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 import { NavigationProps } from 'types/props';
-import { emptyIdentity } from 'utils/identitiesUtils';
 import colors from 'styles/colors';
-import { validateSeed } from 'utils/account';
 import AccountSeed from 'components/AccountSeed';
-import { navigateToNewIdentityNetwork, setPin } from 'utils/navigationHelpers';
-import {
-	alertError,
-	alertIdentityCreationError,
-	alertRisks
-} from 'utils/alertUtils';
 import ScreenHeading from 'components/ScreenHeading';
-import { brainWalletAddress } from 'utils/native';
-import { debounce } from 'utils/debounce';
-import PinInput from 'modules/unlock/components/PinInput';
-import {tryCreateSeed, tryRecoverSeed} from 'utils/native';
+import { tryCreateSeed, tryRecoverSeed } from 'utils/native';
 
 function RootSeedNew({
 	navigation,
@@ -46,7 +35,6 @@ function RootSeedNew({
 	const isRecoverDefaultValue = route.params?.isRecover ?? false;
 	const [isRecover, setIsRecover] = useState(isRecoverDefaultValue);
 	const [seedPhrase, setSeedPhrase] = useState('');
-	const { setAlert } = useContext(AlertStateContext);
 	const [seedName, setSeedName] = useState('');
 	const [disabled, setDisabled] = useState(false);
 	const [error, setError] = useState('');
@@ -69,7 +57,7 @@ function RootSeedNew({
 		try {
 			await tryRecoverSeed(seedName, cryptoType, seedPhrase);
 			setSeedPhrase('');
-			navigation.navigate('SeedBackup', {	
+			navigation.navigate('SeedBackup', {
 				seedName
 			});
 		} catch (e) {
@@ -82,7 +70,7 @@ function RootSeedNew({
 		try {
 			await tryCreateSeed(seedName, cryptoType);
 			setSeedPhrase('');
-			navigation.navigate('SeedBackup', {	
+			navigation.navigate('SeedBackup', {
 				seedName
 			});
 		} catch (e) {
@@ -106,7 +94,7 @@ function RootSeedNew({
 					testID={testIDs.IdentityNew.recoverButton}
 					onPress={onRecoverConfirm}
 					small={true}
-					disabled={disabled || (seedName.length < 1) || (seedPhrase.length < 24)}
+					disabled={disabled || seedName.length < 1 || seedPhrase.length < 24}
 				/>
 				<Button
 					title="or create new seed"
@@ -127,7 +115,7 @@ function RootSeedNew({
 				testID={testIDs.IdentityNew.createButton}
 				onPress={onCreateNewIdentity}
 				small={true}
-				disabled={ disabled || (seedName.length < 1) }
+				disabled={disabled || seedName.length < 1}
 			/>
 			<Button
 				title="or recover existing seed"

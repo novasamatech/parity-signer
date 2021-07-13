@@ -18,7 +18,7 @@ import React, { ReactElement, useContext } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 
 import testIDs from 'e2e/testIDs';
-import { NetworkCard } from 'components/AccountCard';
+import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 import { NavigationProps } from 'types/props';

@@ -14,11 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import NetworkSelector from 'modules/main/components/NetworkSelector';
-import LoadingScreen from 'components/LoadingScreen';
 import { NavigationAccountIdentityProps, NavigationProps } from 'types/props';
 
 export default function Main(

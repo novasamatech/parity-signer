@@ -16,13 +16,8 @@
 
 import { NativeModules } from 'react-native';
 
-import { checksummedAddress } from './checksum';
-
-import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 import { MetadataHandle } from 'types/metadata';
 import { PayloadCardsSet } from 'types/payloads';
-import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
-import { typeDefs } from 'constants/typeDefs';
 
 const { SubstrateSign } = NativeModules || {};
 
@@ -61,7 +56,10 @@ export async function dbInit(): Promise<void> {
 	}
 }
 
-export async function tryCreateSeed(seedName: string, cryptoType: string): Promise<void> {
+export async function tryCreateSeed(
+	seedName: string,
+	cryptoType: string
+): Promise<void> {
 	console.log(seedName);
 	console.log(cryptoType);
 	const spitOut = await SubstrateSign.tryCreateSeed(seedName, cryptoType, 24);
@@ -69,24 +67,39 @@ export async function tryCreateSeed(seedName: string, cryptoType: string): Promi
 	console.log(spitOut);
 }
 
-export async function tryRecoverSeed(seedName: string, cryptoType: string, seedPhrase: string): Promise<void> {
+export async function tryRecoverSeed(
+	seedName: string,
+	cryptoType: string,
+	seedPhrase: string
+): Promise<void> {
 	await SubstrateSign.tryRecoverSeed(seedName, cryptoType, seedPhrase);
 }
 
-export async function getSeedPhraseForBackup(seedName: string, pin: string): Promise<string> {
+export async function getSeedPhraseForBackup(
+	seedName: string,
+	pin: string
+): Promise<string> {
 	const seedPhrase = await SubstrateSign.fetchSeed(seedName, pin);
 	console.log('it is now smeared all over memory');
 	console.log(seedPhrase);
 	return seedPhrase;
 }
 
-export async function suggestNPlusOne(path: string, seedName: string, network: string): Promise<string> {
+export async function suggestNPlusOne(
+	path: string,
+	seedName: string,
+	network: string
+): Promise<string> {
 	try {
-		const suggest = await SubstrateSign.suggestNPlusOne(path, seedName, network);
+		const suggest = await SubstrateSign.suggestNPlusOne(
+			path,
+			seedName,
+			network
+		);
 		return suggest;
 	} catch (e) {
 		console.warn(e);
-		return "";
+		return '';
 	}
 }
 
@@ -96,13 +109,28 @@ export async function suggestSeedName(path: string): Promise<string> {
 	return suggest;
 }
 
-export async function tryCreateIdentity(idName: string, seedName: string, cryptoType: string, path: string, networkId: string): Promise<void> {
+export async function tryCreateIdentity(
+	idName: string,
+	seedName: string,
+	cryptoType: string,
+	path: string,
+	networkId: string
+): Promise<void> {
 	console.log('creating identity...');
-	await SubstrateSign.tryCreateIdentity(idName, seedName, cryptoType, path, networkId);
+	await SubstrateSign.tryCreateIdentity(
+		idName,
+		seedName,
+		cryptoType,
+		path,
+		networkId
+	);
 	console.log('identity created');
 }
 
-export async function deleteIdentity(pubKey: string, networkId: string): Promise<void> {
+export async function deleteIdentity(
+	pubKey: string,
+	networkId: string
+): Promise<void> {
 	try {
 		console.log('deleting identity');
 		await SubstrateSign.deleteIdentity(pubKey, networkId);
@@ -146,11 +174,9 @@ export async function generateMetadataHandle(
 //Generate payload info
 //TODO: replace altogether with arbitrary payload parsing finction
 export async function makeTransactionCardsContents(
-	payload: string,
+	payload: string
 ): Promise<PayloadCardsSet> {
-	const parsedJSON = await SubstrateSign.parseTransaction(
-		payload
-	);
+	const parsedJSON = await SubstrateSign.parseTransaction(payload);
 	console.log(parsedJSON);
 	const parsed = JSON.parse(parsedJSON);
 	return parsed;
@@ -199,9 +225,15 @@ export async function getNetwork(networkKey: string): Promise<Network> {
 }
 
 //Get list of identities under current seed
-export async function getIdentitiesForSeed(seedName: string, genesisHash: string): Promise<Identitieslist> {
+export async function getIdentitiesForSeed(
+	seedName: string,
+	genesisHash: string
+): Promise<Identitieslist> {
 	try {
-		const relevantIdentitiesJSON = await SubstrateSign.getRelevantIdentities(seedName, genesisHash);
+		const relevantIdentitiesJSON = await SubstrateSign.getRelevantIdentities(
+			seedName,
+			genesisHash
+		);
 		const relevantIdentities = JSON.parse(relevantIdentitiesJSON);
 		console.log(relevantIdentities);
 		return relevantIdentities;
@@ -219,7 +251,7 @@ export async function getAllSeedNames(): Promise<[string]> {
 		console.log(allSeedsJSON);
 		const allSeeds = JSON.parse(allSeedsJSON);
 		return allSeeds;
-	} catch(e) {
+	} catch (e) {
 		console.log(e);
 		return [];
 	}

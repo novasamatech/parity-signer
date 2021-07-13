@@ -17,19 +17,13 @@
 import '../shim';
 import 'utils/iconLoader';
 import * as React from 'react';
-import { StatusBar, StyleSheet, View, LogBox } from 'react-native';
+import { StatusBar, LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { MenuProvider } from 'react-native-popup-menu';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NavigationBar from 'react-native-navbar-color';
 
-import {
-	AppNavigator,
-	BareLoadingScreen,
-	BarePinNew,
-	TocAndPrivacyPolicyNavigator,
-	ScreenStack
-} from './screens';
+import { AppNavigator } from './screens';
 
 import CustomAlert from 'components/CustomAlert';
 import colors from 'styles/colors';
@@ -72,12 +66,3 @@ export default function App(props: AppProps): React.ReactElement {
 		</SafeAreaProvider>
 	);
 }
-
-const emptyScreenStyles = StyleSheet.create({
-	body: {
-		backgroundColor: colors.background.app,
-		flex: 1,
-		flexDirection: 'column',
-		padding: 20
-	}
-});

@@ -14,21 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext } from 'react';
-import { Image, ImageStyle, StyleSheet, Text, View, ViewStyle } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import React, { ReactElement } from 'react';
+import { StyleSheet, View } from 'react-native';
 
-import AccountIcon from './AccountIcon';
-import Address from './Address';
 import TouchableItem from './TouchableItem';
 import AccountPrefixedTitle from './AccountPrefixedTitle';
-import NetworkIcon from 'components/NetworkIcon';
 
-import Separator from 'components/Separator';
+import NetworkIcon from 'components/NetworkIcon';
 import { CardSeparator } from 'components/CardSeparator';
-import fontStyles from 'styles/fontStyles';
-import colors from 'styles/colors';
 import { ButtonListener } from 'types/props';
 
 const NetworkFooter = ({ color }: { color: string }): React.ReactElement => (
@@ -45,7 +38,7 @@ const NetworkFooter = ({ color }: { color: string }): React.ReactElement => (
 export function NetworkCard({
 	network,
 	onPress,
-	testID,
+	testID
 }: {
 	network?: string;
 	onPress?: ButtonListener;
@@ -56,10 +49,9 @@ export function NetworkCard({
 		<TouchableItem testID={testID} disabled={isDisabled} onPress={onPress}>
 			<CardSeparator />
 			<View style={styles.content}>
-
 				<View style={styles.icon}>
 					<NetworkIcon
-						logo={network.logo}//TODO: dynamic logo storage
+						logo={network.logo} //TODO: dynamic logo storage
 						style={styles.logo}
 					/>
 				</View>

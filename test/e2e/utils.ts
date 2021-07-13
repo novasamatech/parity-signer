@@ -18,11 +18,6 @@ import { expect, element, by, device } from 'detox';
 
 import testIDs from './testIDs';
 
-import {
-	SUBSTRATE_NETWORK_LIST,
-	SubstrateNetworkKeys
-} from 'constants/networkSpecs';
-
 const { IdentityPin, IdentityNew, Main, PathDetail, PathsList } = testIDs;
 
 export const mockIdentityName = 'mockIdentity';

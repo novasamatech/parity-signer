@@ -104,7 +104,6 @@ export default function IdentityManagement({
 	);
 }
 
-
 const styles = StyleSheet.create({
 	deleteText: {
 		color: colors.signal.error

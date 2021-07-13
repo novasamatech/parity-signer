@@ -52,7 +52,9 @@ export default function TermsAndConditions(
 				<Markdown>{toc}</Markdown>
 			</CustomScrollView>
 
-			{policyConfirmed ? <View /> : (
+			{policyConfirmed ? (
+				<View />
+			) : (
 				<View>
 					<TouchableItem
 						testID={testIDs.TacScreen.agreeTacButton}

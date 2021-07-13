@@ -46,7 +46,7 @@ export default function PathDerivation({
 		const updateSuggestedName = async (): Promise<void> => {
 			const suggestion = await suggestSeedName(derivationPath);
 			setKeyPairsName(suggestion);
-		}
+		};
 		updateSuggestedName();
 	}, [derivationPath]);
 

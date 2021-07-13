@@ -14,17 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import Identicon from '@polkadot/reactnative-identicon';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement } from 'react';
 import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {networkLogo} from 'utils/networkLogo';
 
+import { networkLogo } from 'utils/networkLogo';
 import colors from 'styles/colors';
-import { NetworkProtocols } from 'constants/networkSpecs';
-import { blockiesIcon } from 'utils/native';
-import { NetworkParams, SubstrateNetworkParams } from 'types/networkTypes';
 
 export default function NetworkIcon(props: {
 	logo: string;
@@ -35,7 +30,7 @@ export default function NetworkIcon(props: {
 		<View style={styles.icon}>
 			{logoHandle ? (
 				<Image
-					source={logoHandle}//TODO: dynamic logo storage
+					source={logoHandle} //TODO: dynamic logo storage
 					style={styles.logo}
 				/>
 			) : (

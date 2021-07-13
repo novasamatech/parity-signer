@@ -63,7 +63,10 @@ function SeedBackup({
 	useEffect((): (() => void) => {
 		const setSeedPhraseAsync = async (): Promise<void> => {
 			try {
-				const fetchedSeedPhrase = await getSeedPhraseForBackup(seedName, '000000');
+				const fetchedSeedPhrase = await getSeedPhraseForBackup(
+					seedName,
+					'000000'
+				);
 				setSeedPhrase(fetchedSeedPhrase);
 			} catch (e) {
 				console.log('seed phrase fetch failed, system corrupted');

@@ -7,7 +7,6 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { AccountsContextState } from 'stores/AccountsContext';
 import { AccountsStoreStateWithIdentity, Identity } from 'types/identityTypes';
 import { RootStackParamList } from 'types/routes';
 

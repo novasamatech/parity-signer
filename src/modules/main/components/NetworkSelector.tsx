@@ -14,32 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { ReactElement, useContext, useMemo, useState, useEffect } from 'react';
-import { BackHandler, FlatList, FlatListProps, View } from 'react-native';
+import React, { ReactElement, useContext, useState, useEffect } from 'react';
+import { BackHandler, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
-import { filterNetworks } from 'modules/network/utils';
 import { NetworkCard } from 'components/NetworkCard';
 import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
-import ScreenHeading, { IdentityHeading } from 'components/ScreenHeading';
+import { IdentityHeading } from 'components/ScreenHeading';
 import testIDs from 'e2e/testIDs';
 import { AlertStateContext } from 'stores/alertContext';
-import { NetworksContext } from 'stores/NetworkContext';
-import colors from 'styles/colors';
-import {
-	isSubstrateNetworkParams,
-	NetworkParams,
-	SubstrateNetworkParams
-} from 'types/networkTypes';
 import { NavigationAccountIdentityProps } from 'types/props';
-import { alertPathDerivationError } from 'utils/alertUtils';
-import { getExistedNetworkKeys, getIdentityName } from 'utils/identitiesUtils';
-import {
-	navigateToPathDetails,
-	navigateToPathsList,
-	unlockSeedPhrase,
-	useUnlockSeed
-} from 'utils/navigationHelpers';
 import QrScannerTab from 'components/QrScannerTab';
 import { getAllNetworks } from 'utils/native';
 
@@ -57,17 +41,18 @@ export default function NetworkSelector({
 			const networkListFetch = await getAllNetworks();
 			//This is where we check if the user has accepted TOC and PP
 			if (Object.keys(networkListFetch).length === 0) {
-				console.log("go to TOC");
-				navigation.navigate("TermsAndConditions", {policyConfirmed: false});
+				console.log('go to TOC');
+				navigation.navigate('TermsAndConditions', { policyConfirmed: false });
 			}
 			setNetworkList(networkListFetch);
-		}
+		};
 		fetchNetworkList();
 	}, []);
 
 	// catch android back button and prevent exiting the app
 	// TODO: this just doesn't work and nobody noticed, let's fix later
 	// Maybe this is not the desired behavior?
+	/*
 	useFocusEffect(
 		React.useCallback((): any => {
 			const handleBackButton = (): boolean => {
@@ -79,15 +64,13 @@ export default function NetworkSelector({
 			);
 			return (): void => backHandler.remove();
 		}, [])
-	);
+	);*/
 
 	const renderScreenHeading = (): React.ReactElement => {
 		return <IdentityHeading title={'Select network'} />;
 	};
 
-	const onNetworkChosen = async (
-		networkKey: string,
-	): Promise<void> => {
+	const onNetworkChosen = async (networkKey: string): Promise<void> => {
 		navigation.navigate('PathsList', { networkKey });
 	};
 
@@ -96,9 +79,7 @@ export default function NetworkSelector({
 			<NetworkCard
 				testID={testIDs.Main.networkButton + item.title}
 				network={item.item}
-				onPress={(): Promise<void> =>
-					onNetworkChosen(item.item.key)
-				}
+				onPress={(): Promise<void> => onNetworkChosen(item.item.key)}
 			/>
 		);
 	};
@@ -116,4 +97,3 @@ export default function NetworkSelector({
 		</SafeAreaViewContainer>
 	);
 }
-

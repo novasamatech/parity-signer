@@ -14,14 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { NetworkCard } from 'components/AccountCard';
 import NetworkInfoCard from 'modules/network/components/NetworkInfoCard';
+import { NetworkCard } from 'components/NetworkCard';
 import { MetadataCard } from 'modules/network/components/MetadataCard';
 import { SafeAreaScrollViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
-import { getSubstrateNetworkKeyByPathId } from 'utils/identitiesUtils';
 import Button from 'components/Button';
 import testIDs from 'e2e/testIDs';
 
