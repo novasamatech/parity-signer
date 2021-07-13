@@ -23,7 +23,6 @@ import { SafeAreaViewContainer } from 'components/SafeAreaContainer';
 import { NavigationProps } from 'types/props';
 import fontStyles from 'styles/fontStyles';
 import { generateMetadataHandle } from 'utils/native';
-import { saveMetadata } from 'utils/db';
 import { MetadataHandle } from 'types/metadata';
 //for tests
 import testIDs from 'e2e/testIDs';

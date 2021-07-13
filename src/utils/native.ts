@@ -20,7 +20,6 @@ import { checksummedAddress } from './checksum';
 
 import { TryBrainWalletAddress } from 'utils/seedRefHooks';
 import { MetadataHandle } from 'types/metadata';
-import { dumpMetadataDB } from 'utils/db';
 import { PayloadCardsSet } from 'types/payloads';
 import { SUBSTRATE_NETWORK_LIST } from 'constants/networkSpecs';
 import { typeDefs } from 'constants/typeDefs';
