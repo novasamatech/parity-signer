@@ -12,6 +12,10 @@ import java.security.KeyStoreException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
 import java.util.concurrent.Executor;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -26,6 +30,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.provider.Settings;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -201,6 +206,63 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 		biometricPrompt.authenticate(promptInfo);
 	}
 
+	/**
+	 * Copy the asset at the specified path to this app's data directory. If the
+	 * asset is a directory, its contents are also copied.
+	 *	
+	 * @param path
+	 * Path to asset, relative to app's assets directory.
+	 */
+	private void copyAsset(String path) throws IOException {
+		AssetManager manager = reactContext.getAssets();
+
+		// If we have a directory, we make it and recurse. If a file, we copy its
+		// contents.
+		try {
+			String[] contents = manager.list("database" + path);
+
+			// The documentation suggests that list throws an IOException, but doesn't
+			// say under what conditions. It'd be nice if it did so when the path was
+			// to a file. That doesn't appear to be the case. If the returned array is
+			// null or has 0 length, we assume the path is to a file. This means empty
+			// directories will get turned into files.
+			if (contents == null || contents.length == 0)
+				throw new IOException();
+
+			// Make the directory.
+			File dir = new File(dbname, path);
+			dir.mkdirs();
+
+			// Recurse on the contents.
+			for (String entry : contents) {
+				copyAsset(path + "/" + entry);
+			}
+		} catch (IOException e) {
+			copyFileAsset(path);
+		}
+	}
+
+	/**
+	 * Copy the asset file specified by path to app's data directory. Assumes
+	 * parent directories have already been created.
+	 *
+	 * @param path
+	 * Path to asset, relative to app's assets directory.
+	 */
+	private void copyFileAsset(String path) throws IOException {
+		AssetManager manager = reactContext.getAssets();
+		File file = new File(dbname, path);
+		InputStream in = manager.open("database" + path);
+		OutputStream out = new FileOutputStream(file);
+		byte[] buffer = new byte[1024];
+		int read = in.read(buffer);
+		while (read != -1) {
+			out.write(buffer, 0, read);
+			read = in.read(buffer);
+		}
+		out.close();
+		in.close();
+	}
 
     @ReactMethod
     public void brainWalletAddress(String seed, Promise promise) {
@@ -460,7 +522,8 @@ public class SubstrateSignModule extends ReactContextBaseJavaModule {
 	@ReactMethod
 	public void dbInit(String metadata, Promise promise) {
 		try {
-			substrateDbInit(metadata, dbname);
+			//substrateDbInit(metadata, dbname);
+			copyAsset("");
 			generateSecretKey(new KeyGenParameterSpec.Builder(
 				KEY_NAME,
 				KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
