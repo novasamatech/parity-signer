@@ -23,20 +23,19 @@ import TextInput from 'components/TextInput';
 import { alertPathDerivationError } from 'utils/alertUtils';
 import Separator from 'components/Separator';
 import ScreenHeading from 'components/ScreenHeading';
-import PathCard from 'components/PathCard';
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
-import { tryCreateIdentity } from 'utils/native';
-import {resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
+import { tryCreateIdentity, suggestSeedName } from 'utils/native';
+import { resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 
 export default function PathDerivation({
 	navigation,
 	route
 }: NavigationAccountIdentityProps<'PathDerivation'>): React.ReactElement {
-	const [derivationPath, setDerivationPath] = useState<string>(route.params.path);
+	const [derivationPath, setDerivationPath] = useState<string>(
+		route.params.path
+	);
 	const [keyPairsName, setKeyPairsName] = useState<string>('');
-	const [modalVisible, setModalVisible] = useState<boolean>(false);
-	const [password, setPassword] = useState<string>('');
 	const [error, setError] = useState('');
 	const pathNameInput = useRef<TextInput>(null);
 	const { setAlert } = useContext(AlertStateContext);
@@ -44,14 +43,26 @@ export default function PathDerivation({
 
 	//synchronize default name with path
 	useEffect(() => {
-		const update
-		setKeyPairsName(derivationPath);}, [derivationPath]);
+		const updateSuggestedName = async (): Promise<void> => {
+			const suggestion = await suggestSeedName(derivationPath);
+			setKeyPairsName(suggestion);
+		}
+		updateSuggestedName();
+	}, [derivationPath]);
 
 	const onPathDerivation = async (): Promise<void> => {
 		try {
-			await tryCreateIdentity(keyPairsName, route.params.seedName, 'sr25519', derivationPath, networkKey);
+			await tryCreateIdentity(
+				keyPairsName,
+				route.params.seedName,
+				'sr25519',
+				derivationPath,
+				networkKey
+			);
 			setAlert('Success', 'New Account Successfully derived');
-			resetNavigationWithNetworkChooser(navigation, "PathsList", {networkKey});
+			resetNavigationWithNetworkChooser(navigation, 'PathsList', {
+				networkKey
+			});
 		} catch (e) {
 			setError(e.toString());
 			alertPathDerivationError(setAlert, e.message);
@@ -60,11 +71,7 @@ export default function PathDerivation({
 
 	return (
 		<KeyboardAwareContainer>
-			<ScreenHeading
-				title="Derive Account"
-				error={!!error}
-				subtitle={error}
-			/>
+			<ScreenHeading title="Derive Account" error={!!error} subtitle={error} />
 			<TextInput
 				autoCompleteType="off"
 				autoCorrect={false}
@@ -101,4 +108,3 @@ export default function PathDerivation({
 		</KeyboardAwareContainer>
 	);
 }
-
