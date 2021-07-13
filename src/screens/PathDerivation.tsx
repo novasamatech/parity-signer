@@ -27,6 +27,7 @@ import PathCard from 'components/PathCard';
 import Button from 'components/Button';
 import { KeyboardAwareContainer } from 'modules/unlock/components/Container';
 import { tryCreateIdentity } from 'utils/native';
+import {resetNavigationWithNetworkChooser } from 'utils/navigationHelpers';
 
 export default function PathDerivation({
 	navigation,
@@ -50,7 +51,7 @@ export default function PathDerivation({
 		try {
 			await tryCreateIdentity(keyPairsName, route.params.seedName, 'sr25519', derivationPath, networkKey);
 			setAlert('Success', 'New Account Successfully derived');
-			navigation.pop();
+			resetNavigationWithNetworkChooser(navigation, "PathsList", {networkKey});
 		} catch (e) {
 			setError(e.toString());
 			alertPathDerivationError(setAlert, e.message);
